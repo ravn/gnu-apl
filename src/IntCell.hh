@@ -40,6 +40,10 @@ public:
    IntCell(APL_Float f, APL_Float qct)
       { value.ival = near_int(f); }
 
+   /// overloaded Cell::init_other
+   virtual void init_other(void * other, Value & cell_owner, const char * loc)
+      const { new (other)   IntCell(value.ival); }
+
    /// overloaded Cell::is_integer_cell()
    virtual bool is_integer_cell() const
       { return true; }

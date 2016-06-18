@@ -49,6 +49,8 @@ ShapeItem Value::total_ravel_count = 0;
 
 void * Value::deleted_values = 0;
 int Value::deleted_values_count = 0;
+uint64_t Value::fast_new = 0;
+uint64_t Value::slow_new = 0;
 
 //-----------------------------------------------------------------------------
 inline void
@@ -229,7 +231,24 @@ const ShapeItem height = pb.get_height();
 const ShapeItem width = pb.get_width(0);
 
    loop(y, height)
-   loop(x, width)   next_ravel()->init(CharCell(pb.get_char(x, y)), *this, LOC);
+   loop(x, width)   next_ravel()->init(CharCell(pb.get_char(x, y)), *this, loc);
+
+   set_complete();
+}
+//-----------------------------------------------------------------------------
+Value::Value(const char * loc, const Shape * sh)
+   : DynamicObject(loc, &all_values),
+     shape((ShapeItem)sh->get_rank()),
+     flags(VF_NONE),
+     valid_ravel_items(0)
+{
+   ADD_EVENT(this, VHE_Create, 0, loc);
+   init_ravel();
+
+   get_ravel(0).init(IntCell(0), *this, loc);   // prototype
+
+   loop(r, sh->get_rank())
+       next_ravel()->init(IntCell(sh->get_shape_item(r)), *this, loc);
 
    set_complete();
 }
@@ -983,14 +1002,29 @@ const ShapeItem ec_z = Z->element_count();
 Value_P
 Value::index(Value_P X) const
 {
+const ShapeItem max_idx = element_count();
+const APL_Integer qio = Workspace::get_IO();
+
+   // important special case: scalar X
+   //
+   if (get_rank() == 1 && (!!X) && X->is_scalar())
+      {
+        const APL_Integer idx = X->get_ravel(0).get_near_int() - qio;
+        if (idx >= 0 && idx < max_idx)
+           {
+             Value_P Z(LOC);
+             Z->next_ravel()->init(get_ravel(idx), Z.getref(), LOC);
+             Z->check_value(LOC);
+             return Z;
+           }
+      }
+
    if (get_rank() != 1)   RANK_ERROR;
 
    if (!X)   return clone(LOC);   // elided index
 
 const Shape shape_Z(X->get_shape());
 Value_P Z(shape_Z, LOC);
-const ShapeItem max_idx = element_count();
-const APL_Integer qio = Workspace::get_IO();
 
 const Cell * cI = &X->get_ravel(0);
 

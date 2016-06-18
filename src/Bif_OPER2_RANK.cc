@@ -179,33 +179,20 @@ const Shape shape_Z = rk_B_frame ? B->get_shape().high_shape(rk_B_frame)
         return Token(TOK_APL_VALUE1, Z);
       }
 
-const Shape shape_A = A->get_shape().low_shape(rank_chunk_A);
-Value_P vsh_A(shape_A.get_rank(), LOC);
-   new (&vsh_A->get_ravel(0)) IntCell(0);   // prototype
-   loop(sh, shape_A.get_rank())
-            new (vsh_A->next_ravel()) IntCell(shape_A.get_shape_item(sh));
-   vsh_A->check_value(LOC);
+const Shape low_A = A->get_shape().low_shape(rank_chunk_A);
+const Shape low_B = B->get_shape().low_shape(rank_chunk_B);
 
-const Shape shape_B = B->get_shape().low_shape(rank_chunk_B);
-Value_P vsh_B(shape_B.get_rank(), LOC);
-   new (&vsh_B->get_ravel(0)) IntCell(0);   // prototype
-   loop(sh, shape_B.get_rank())
-            new (vsh_B->next_ravel()) IntCell(shape_B.get_shape_item(sh));
-   vsh_B->check_value(LOC);
-
-Value_P vsh_Z(shape_Z.get_rank(), LOC);
-   new (&vsh_Z->get_ravel(0)) IntCell(0);   // prototype
-   loop(sh, shape_Z.get_rank())
-            new (vsh_Z->next_ravel()) IntCell(shape_Z.get_shape_item(sh));
-   vsh_Z->check_value(LOC);
+Value_P vsh_A(LOC, &low_A);
+Value_P vsh_B(LOC, &low_B);
+Value_P vsh_Z(LOC, &shape_Z);
 
 Value_P X7(7, LOC);
    if (!X)   new (X7->next_ravel())   IntCell(-1);                // no X
    else      new (X7->next_ravel())   PointerCell(X, X7.getref());   // X
 
-   new (X7->next_ravel())   IntCell(shape_A.get_volume());        // LA
+   new (X7->next_ravel())   IntCell(low_A.get_volume());        // LA
    new (X7->next_ravel())   PointerCell(vsh_A, X7.getref());      // rho_A
-   new (X7->next_ravel())   IntCell(shape_B.get_volume());        // LB
+   new (X7->next_ravel())   IntCell(low_B.get_volume());        // LB
    new (X7->next_ravel())   PointerCell(vsh_B, X7.getref());      // rho_B
    new (X7->next_ravel())   IntCell(shape_Z.get_volume());        // N_max
    new (X7->next_ravel())   PointerCell(vsh_Z, X7.getref());      // rho_Z

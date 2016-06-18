@@ -34,6 +34,10 @@ public:
    CharCell(Unicode av)
       { value.aval = av; }
 
+   /// overloaded Cell::init_other
+   virtual void init_other(void * other, Value & cell_owner, const char * loc)
+       const { new (other)   CharCell(value.aval); }
+
    /// overloaded Cell::is_character_cell()
    virtual bool is_character_cell() const
       { return true; }

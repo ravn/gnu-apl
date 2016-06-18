@@ -39,51 +39,6 @@ Cell::operator new(std::size_t s, void * pos)
 }
 //-----------------------------------------------------------------------------
 void
-Cell::init(const Cell & other, Value & cell_owner, const char * loc)
-{
-   Assert(&other);
-   switch(other.get_cell_type())
-      {
-        default:
-             Assert(0);
-
-        case CT_CHAR:
-             new (this) CharCell(other.get_char_value());
-             return;
-
-        case CT_INT:
-             new (this) IntCell(other.get_int_value());
-             return;
-
-        case CT_FLOAT:
-             new (this) FloatCell(other.get_real_value());
-             return;
-
-        case CT_COMPLEX:
-             new (this) ComplexCell(other.get_complex_value());
-             return;
-
-        case CT_POINTER:
-             {
-               Value_P Z = other.get_pointer_value()->clone(loc);
-
-               new (this) PointerCell(Z, cell_owner);
-             }
-             return;
-
-        case CT_CELLREF:
-             {
-               LvalCell & l_other = *(LvalCell *)&other;
-             new (this) LvalCell(other.get_lval_value(),
-                                 l_other.get_cell_owner());
-             }
-             return;
-      }
-
-   Assert(0 && "Bad cell type");
-}
-//-----------------------------------------------------------------------------
-void
 Cell::init_from_value(Value_P value, Value & cell_owner, const char * loc)
 {
    if (value->is_scalar())

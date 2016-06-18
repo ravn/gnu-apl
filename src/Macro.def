@@ -123,47 +123,43 @@ mac_def(  Z__A_LO_POWER_RO_B,
 
 // reduce: Z←LO/[X] B
 //
-mac_def(Z__LO_REDUCE_X_B,
-" Z←(LO Z__LO_REDUCE_X_B) [X] B;B1;rho_B1;T;H;M;M_max;L;N;I;I_max\n"
-" B1←(rho_B1←×/¨(2+×-X+1-⍳⍴rho_B1)⊂rho_B1←1,(⍴B),1)⍴B\n"
-" (H M_max L)←rho_B1 ◊ I_max←⎕IO+⍴I←,⍳⍴Z←(H, L)⍴0 ◊ N←⎕IO\n"
-"LOOPN: (H L)←⊃I[N] ◊ M←M_max-2 ◊ T←B1[H;⎕IO+M_max-1;L]\n"
-"LOOPM: T← ⊂(⊃B1[H;⎕IO+M;L]) LO ⊃T ◊ →(0≤M←M-1)⍴LOOPM\n"
-" Z[H;L]←T ◊               →(I_max>N←N+1)⍴LOOPN\n"
-" Z←((X≠⍳⍴⍴B)/⍴B)⍴Z\n")
+mac_def(Z__LO_REDUCE_X4_B,
+" Z←(LO Z__LO_REDUCE_X4_B) [X4] B;B3;T;H;M;M_max;L;N;I;I_max\n"
+" (X4 H M_max L)←X4 ◊ B3←(H M_max L)⍴B ◊ I_max←⎕IO+⍴I←,⍳⍴Z←(H, L)⍴0 ◊ N←⎕IO\n"
+"LOOPN: (H L)←⊃I[N] ◊ M←M_max-2 ◊ T←B3[H;⎕IO+M_max-1;L]\n"
+"LOOPM: T← ⊂(⊃B3[H;⎕IO+M;L]) LO ⊃T ◊ →(0≤M←M-1)⍴LOOPM\n"
+"       Z[H;L]←T                   ◊ →(I_max>N←N+1)⍴LOOPN\n"
+" Z←((X4≠⍳⍴⍴B)/⍴B)⍴Z\n")
 
 // reduce N-wise: Z←A LO/[X] B
 //
-mac_def(  Z__pA_LO_REDUCE_X_B,
-" Z←A (LO Z__pA_LO_REDUCE_X_B) [X] B;B1;rho_Z;rho_B1;T;H;M;L;a;N;I;I_max\n"
-" A←1-A ◊ rho_Z←⍴B ◊ rho_Z[X]←rho_Z[X]+A\n"
-" B1←(rho_B1←×/¨(2+×-X+1-⍳⍴rho_B1)⊂rho_B1←1,(⍴B),1)⍴B\n"
-" I_max←⎕IO+⍴I←,⍳⍴Z←((0 A 0)+⍴B1)⍴0 ◊ N←⎕IO\n"
-"LOOPN: (H a L)←⊃I[N] ◊ M←A+1 ◊ T←B1[H;a-A;L]\n"
-"LOOPM: T← ⊂(⊃B1[H;a-M;L]) LO ⊃T ◊ →(0≥M←M+1)⍴LOOPM\n"
+// note: A was positive, A1 is negative (1 - A)
+mac_def(   Z__pA_LO_REDUCE_X4_B,
+" Z←A1 (LO Z__pA_LO_REDUCE_X4_B) [X4] B;rho_B3;B3;rho_Z;rho_Z3;T;H;M;L;a;N;I;I_max\n"
+" (X4 rho_Z rho_Z3 rho_B3)←X4 ◊ B3←rho_B3⍴B ◊ I_max←⎕IO+⍴I←,⍳⍴Z←(rho_Z3)⍴0 ◊ N←⎕IO\n"
+"LOOPN: (H a L)←⊃I[N] ◊ M←A1+1 ◊ T←B3[H;a-A1;L]\n"
+"LOOPM: T← ⊂(⊃B3[H;a-M;L]) LO ⊃T ◊ →(0≥M←M+1)⍴LOOPM\n"
 "       Z[H;a;L]←T               ◊ →(I_max>N←N+1)⍴LOOPN\n"
 " Z←rho_Z⍴Z\n")
 
-mac_def(  Z__nA_LO_REDUCE_X_B,
-" Z←A (LO Z__nA_LO_REDUCE_X_B) [X] B;B1;rho_Z;rho_B1;T;H;M;L;a;N;I;I_max\n"
-" A←A+1 ◊ rho_Z←⍴B ◊ rho_Z[X]←rho_Z[X]+A\n"
-" B1←(rho_B1←×/¨(2+×-X+1-⍳⍴rho_B1)⊂rho_B1←1,(⍴B),1)⍴B\n"
-" I_max←⎕IO+⍴I←,⍳⍴Z←((0 A 0)+⍴B1)⍴0 ◊ N←⎕IO\n"
-"LOOPN: (H a L)←⊃I[N] ◊ M←¯1 ◊ T←B1[H;a;L]\n"
-"LOOPM: T← ⊂((⊃B1[H;a-M;L]) LO ⊃T) ◊ →(A≤M←M-1)⍴LOOPM\n"
+// note: A was negative, A1 is negative (A + 1)
+mac_def(   Z__nA_LO_REDUCE_X4_B,
+" Z←A1 (LO Z__nA_LO_REDUCE_X4_B) [X4] B;rho_B3;B3;rho_Z;rho_Z3;T;H;M;L;a;N;I;I_max\n"
+" (X4 rho_Z rho_Z3 rho_B3)←X4 ◊ B3←rho_B3⍴B ◊ I_max←⎕IO+⍴I←,⍳⍴Z←(rho_Z3)⍴0 ◊ N←⎕IO\n"
+"LOOPN: (H a L)←⊃I[N] ◊ M←¯1 ◊ T←B3[H;a;L]\n"
+"LOOPM: T← ⊂((⊃B3[H;a-M;L]) LO ⊃T) ◊ →(A1≤M←M-1)⍴LOOPM\n"
 "       Z[H;a;L]←T                 ◊ →(I_max>N←N+1)⍴LOOPN\n"
 " Z←rho_Z⍴Z\n")
 
 // scan: Z←LO/[X] B
 //
-mac_def(  Z__LO_SCAN_X_B,
-  " Z←(LO Z__LO_SCAN_X_B) [X] B;B1;rho_Z;rho_B1;T;H;M;L;a;N;I;I_max\n"
-" Z←B1←(rho_B1←×/¨(2+×-X+1-⍳⍴rho_B1)⊂rho_B1←1,(⍴B),1)⍴B\n"
-" rho_Z←⍴B ◊ I_max←⎕IO+⍴I←,⍳⍴Z ◊ N←⎕IO - 1\n"
-"LOOPN: (H a L)←⊃I[N←N+1] ◊ →(a=⎕IO)⍴LOOPN ◊ M←1 ◊ T←B1[H;a;L]\n"
-"LOOPM: T← ⊂((⊃B1[H;a-M;L]) LO ⊃T) ◊ →(a>M←M+1)⍴LOOPM\n"
+mac_def(  Z__LO_SCAN_X4_B,
+  " Z←(LO Z__LO_SCAN_X4_B) [X4] B;B3;T;H;M;M_max;L;a;N;I;I_max\n"
+" (X4 H M_max L)←X4 ◊ I_max←⎕IO+⍴I←,⍳⍴Z←B3←(H M_max L)⍴B ◊ N←⎕IO - 1\n"
+"LOOPN: (H a L)←⊃I[N←N+1] ◊ →(a=⎕IO)⍴LOOPN ◊ M←1 ◊ T←B3[H;a;L]\n"
+"LOOPM: T← ⊂((⊃B3[H;a-M;L]) LO ⊃T) ◊ →(a>M←M+1)⍴LOOPM\n"
 "       Z[H;a;L]←T                 ◊ →(I_max>N+1)⍴LOOPN\n"
-" Z←rho_Z⍴Z\n")
+" Z←(⍴B)⍴Z\n")
 
 // rank: Z←  (LO⍤j) B and Z←  (LO⍤[X]j) 
 //       Z←A (LO⍤j) B and Z←(A LO⍤[X]j) 

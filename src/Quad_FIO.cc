@@ -416,6 +416,12 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
         // what < 0 are "hacker functions" that should no be used by
         // normal mortals.
         //
+        case -12: // sbrk()
+             return Token(TOK_APL_VALUE1, IntScalar((uint64_t)(sbrk(0)), LOC));
+        case -11: // fast new
+             return Token(TOK_APL_VALUE1, IntScalar(Value::fast_new, LOC));
+        case -10: // slow new
+             return Token(TOK_APL_VALUE1, IntScalar(Value::slow_new, LOC));
         case -9: // screen height
              {
                struct winsize ws;

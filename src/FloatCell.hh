@@ -37,6 +37,10 @@ public:
    FloatCell(APL_Float r)
    { value.fval = r;}
 
+   /// overloaded Cell::init_other
+   virtual void init_other(void * other, Value & cell_owner, const char * loc)
+      const { new (other)   FloatCell(value.fval); }
+
    /// Overloaded Cell::is_float_cell().
    virtual bool is_float_cell()     const   { return true; }
 

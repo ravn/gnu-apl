@@ -36,6 +36,13 @@ PointerCell::PointerCell(Value_P sub_val, Value & cell_owner)
 }
 //-----------------------------------------------------------------------------
 void
+PointerCell::init_other(void * other, Value & cell_owner,
+                            const char * loc) const
+{
+   new (other) PointerCell(get_pointer_value()->clone(loc), cell_owner);
+}
+//-----------------------------------------------------------------------------
+void
 PointerCell::release(const char * loc)
 {
    value2.owner->decrement_pointer_cell_count();

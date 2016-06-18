@@ -65,8 +65,11 @@ public:
    /// a new vector value from a CDR record
    inline Value_P(const CDR_string & cdr, const char * loc);
 
-   /// a new vector value from a CDR record
+   /// a new character matrix value from a PrintBuffer record
    inline Value_P(const PrintBuffer & pb, const char * loc);
+
+   /// a new vector value from a shape
+   inline Value_P(const char * loc, const Shape * sh);
 
    /// Constructor: from Value *
    inline Value_P(Value * val, const char * loc);

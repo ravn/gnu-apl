@@ -35,6 +35,10 @@ public:
    /// construct a cell containing nested sub-array \b val.
    PointerCell(Value_P val, Value & cell_owner);
 
+   /// overloaded Cell::init_other
+   virtual void init_other(void * other, Value & cell_owner,
+                           const char * loc) const;
+
    /// overloaded Cell::is_pointer_cell()
    virtual bool is_pointer_cell() const   { return true; }
 

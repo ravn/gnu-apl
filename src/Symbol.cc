@@ -173,10 +173,24 @@ Symbol::assign_indexed(Value_P X, Value_P B)   // A[X] ← B
    // an index with no semicolons. If X contains semicolons, then
    // assign_indexed(IndexExpr IX, ...) is called instead.
    // 
+const APL_Integer qio = Workspace::get_IO();
+
 Value_P A = get_apl_value();
+const ShapeItem max_idx = A->element_count();
+   if (!!X && X->is_scalar() && B->is_scalar() && A->get_rank() == 1)
+      {
+        const APL_Integer idx = X->get_ravel(0).get_near_int() - qio;
+        if (idx >= 0 && idx < max_idx)
+           {
+             Cell & cell = A->get_ravel(idx);
+             cell.release(LOC);
+             cell.init(B->get_ravel(0), A.getref(), LOC);
+             return;
+           }
+      }
+
    if (A->get_rank() != 1)   RANK_ERROR;
 
-const ShapeItem max_idx = A->element_count();
    if (!X)   // X[] ← B
       {
         const Cell & src = B->get_ravel(0);
@@ -192,7 +206,6 @@ const ShapeItem max_idx = A->element_count();
 
 const ShapeItem ec_B = B->element_count();
 const ShapeItem ec_X = X->element_count();
-const APL_Integer qio = Workspace::get_IO();
 const int incr_B = (ec_B == 1) ? 0 : 1;   // maybe scalar extend B
 const Cell * cX = &X->get_ravel(0);
 const Cell * cB = &B->get_ravel(0);

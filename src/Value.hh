@@ -82,6 +82,9 @@ protected:
    /// constructor: a character matrix from a PrintBuffer
    Value(const PrintBuffer & pb, const char * loc);
 
+   /// constructor: a integer vector containing the items of a shape 
+   Value(const char * loc, const Shape * sh);
+
 public:
    /// destructor
    virtual ~Value();
@@ -518,6 +521,9 @@ public:
    void add_subcount(ShapeItem count)
       { nz_subcell_count += count; }
 
+   static uint64_t fast_new;
+   static uint64_t slow_new;
+
 protected:
    /// init the ravel of an APL value, return the ravel length
    inline void init_ravel();
@@ -564,9 +570,11 @@ protected:
              --deleted_values_count;
              void * ret = deleted_values;
              deleted_values = *(void **)deleted_values;
+             ++fast_new;
              return ret;
            }
 
+        ++slow_new;
         return malloc(sz);
       }
 

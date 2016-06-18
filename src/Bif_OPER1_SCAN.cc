@@ -190,15 +190,21 @@ ErrorCode (Cell::*assoc_f2)(Cell *, const Cell *) const = LO->get_assoc();
 
    // non-trivial reduce (len > 1)
    //
+const Shape3 Z3(B->get_shape(), axis);
    if (LO->may_push_SI())   // user defined LO
       {
-        Value_P X = IntScalar(axis + Workspace::get_IO(), LOC);
-        return Macro::Z__LO_SCAN_X_B->eval_LXB(_LO, X, B);
+        Value_P X4(4, LOC);
+        new (X4->next_ravel())   IntCell(axis + Workspace::get_IO());
+        new (X4->next_ravel())   IntCell(Z3.h());
+        new (X4->next_ravel())   IntCell(Z3.m());
+        new (X4->next_ravel())   IntCell(Z3.l());
+        X4->check_value(LOC);
+        return Macro::Z__LO_SCAN_X4_B->eval_LXB(_LO, X4, B);
       }
 
-const Shape3 Z3(B->get_shape(), axis);
+   if (B->get_shape().is_empty())   return LO->eval_identity_fun(B, axis);
 
-   return Bif_REDUCE::do_reduce(B->get_shape(), Z3, -1, LO, axis, B, m_len);
+   return Bif_REDUCE::do_reduce(B->get_shape(), Z3, -1, LO, B, m_len);
 }
 //-----------------------------------------------------------------------------
 Token

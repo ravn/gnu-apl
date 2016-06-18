@@ -34,7 +34,11 @@ public:
    /// Construct an cell pointing to another cell
    LvalCell(Cell * cell, Value * cell_owner);
 
-   /// Overloaded Cell::is_lval_cell().
+   /// overloaded Cell::init_other
+   virtual void init_other(void * other, Value & cell_owner, const char * loc)
+      const { new (other)   LvalCell(get_lval_value(), &cell_owner); }
+
+   /// Overloaded Cell::is_lval_cell()
    virtual bool is_lval_cell()  const   { return true; }
 
    /// Overloaded Cell::get_lval_value()

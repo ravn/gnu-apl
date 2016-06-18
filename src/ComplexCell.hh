@@ -35,6 +35,10 @@ public:
    /// Construct an complex number cell from a complex number
    ComplexCell(APL_Complex c);
 
+   /// overloaded Cell::init_other
+   virtual void init_other(void * other, Value & cell_owner, const char * loc)
+      const { new (other)   ComplexCell(value.cval_r, value2.cval_i); }
+
    /// Construct an complex number cell from real part \b r and imag part \b i.
    ComplexCell(APL_Float r, APL_Float i);
 

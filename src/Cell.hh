@@ -53,7 +53,12 @@ public:
       { Assert(other.get_cell_type() == CT_BASE); }
 
    /// deep copy of cell \b other into \b this cell
-   void init(const Cell & other, Value & cell_owner, const char * loc);
+   void init(const Cell & other, Value & cell_owner, const char * loc)
+      { other.init_other(this, cell_owner, loc); }
+
+   virtual void init_other(void * other, Value & cell_owner,
+                           const char * loc) const
+      { Assert(0 && "Cell::init_other() called on base class"); }
 
    /// init this Cell from value. If value is a scalar then its first element
    /// is used (and value is erased). Otherwise a PointerCell is created.

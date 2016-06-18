@@ -1711,18 +1711,10 @@ const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
 Token
 Bif_F12_PARTITION::eval_B(Value_P B)
 {
+   if (B->is_simple_scalar())   return Token(TOK_APL_VALUE1, B);
+
 Value_P Z(LOC);
-
-   if (B->is_simple_scalar())   // ⊂ 5 is 5
-      {
-        Z->next_ravel()->init(B->get_ravel(0), Z.getref(), LOC);
-      }
-   else
-      {
-        new (Z->next_ravel()) PointerCell(B->clone(LOC), Z.getref());
-        Assert(Z->compute_depth() == (B->compute_depth() + 1));
-      }
-
+   new (Z->next_ravel()) PointerCell(B->clone(LOC), Z.getref());
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1942,6 +1934,8 @@ Cell * vv = &V->get_ravel(0);
 Token
 Bif_F12_PICK::disclose(Value_P B, bool rank_tolerant)
 {
+   if (B->is_simple_scalar())   return Token(TOK_APL_VALUE1, B);
+
 const ShapeItem len_B = B->element_count();
 const Shape item_shape = compute_item_shape(B, rank_tolerant);
 const Shape shape_Z = B->get_shape() + item_shape;

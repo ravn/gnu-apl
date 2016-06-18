@@ -37,7 +37,7 @@ public:
 
    /// common implementation of reduce() and reduce_n_wise.
    static Token do_reduce(const Shape & shape_Z, const Shape3 & Z3, ShapeItem a,
-                          Function * LO, Axis axis, Value_P B, ShapeItem bm);
+                          Function * LO, Value_P B, ShapeItem bm);
 
 protected:
    /// Replicate B according to A along axis.
