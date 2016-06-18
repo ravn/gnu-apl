@@ -421,7 +421,25 @@ grow:
           else
              {
                const bool left_sym = get_assign_state() == ASS_arrow_seen;
-               sym->resolve(tl.tok, left_sym);
+               bool resolved = false;
+               if (size() > 0 && at(0).tok.get_Class() == TC_INDEX && 
+                   tl.tok.get_tag() == TOK_SYMBOL)   // user defined variable
+                  {
+                    // indexed reference, e.g. A[N]. Calling sym->resolve()
+                    // would copy the entire variable and then index it, which
+                    // is inefficient if the variable is big. We rather call
+                    // Symbol::get_value() directly in order to avoid that
+                    //
+                    Value_P val = sym->get_value();
+                    if (!!val && !left_sym)
+                       {
+                         Token tok(TOK_APL_VALUE1, val);
+                         move_1(tl.tok, tok, LOC);
+                         resolved = true;
+                       }
+                  }
+               if (!resolved)   sym->resolve(tl.tok, left_sym);
+
                if (left_sym)   set_assign_state(ASS_var_seen);
                Log(LOG_prefix_parser)
                   {
@@ -430,7 +448,7 @@ grow:
                     CERR << "resolved to " << tl.tok << endl;
                   }
              }
-          PC = lookahead_high + 1;   // resolve() succeeded: restore PV
+          PC = lookahead_high + 1;   // resolve() succeeded: restore PC
 
           Log(LOG_prefix_parser)
              {

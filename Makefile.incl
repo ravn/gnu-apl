@@ -24,11 +24,22 @@ help:
 	@echo ""
 
 ###############################################################################
-# a shortcut to ./configure for devlopimg and troubleshooting
+# a shortcut to ./configure for developing and troubleshooting
 #
 .PHONY: develop
 develop:
 	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes
+	make all
+
+###############################################################################
+# a shortcut to ./configure for profiling using gprof
+#
+# running apl (in e.g. src) will then produce a file gmon.out which can then be
+# analyzed with gprof apl gmon.out
+#
+.PHONY: gprof
+develop:
+	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes GPROF_WANTED=yes
 	make all
 
 ###############################################################################

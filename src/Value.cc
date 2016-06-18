@@ -69,7 +69,7 @@ Value::init_ravel()
         // make sure that the value is properly initialized
         //
         ravel = short_value;
-        loop(l, SHORT_VALUE_LENGTH_WANTED)   new (ravel + l)   IntCell(42);
+//      loop(l, SHORT_VALUE_LENGTH_WANTED)   new (ravel + l)   IntCell(42);
 
         Workspace::more_error() = UCS_string(
 "the system limit on the APL value count (as set in ⎕SYL) was reached\n"
