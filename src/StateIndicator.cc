@@ -34,8 +34,7 @@
 //-----------------------------------------------------------------------------
 StateIndicator::StateIndicator(Executable * exec, StateIndicator * _par)
    : executable(exec),
-     safe_execution(false),
-     eoc_handlers(0),
+     safe_execution_count(0),
      level(_par ? 1 + _par->get_level() : 0),
      error(E_NO_ERROR, LOC),
      current_stack(*this, exec->get_body()),
@@ -63,20 +62,6 @@ StateIndicator::~StateIndicator()
          Assert1(executable);
          delete executable;
          executable = 0;
-      }
-
-   // clean up EOC handlers
-   //
-   if (eoc_handlers)
-      {
-        Log(LOG_EOC_handlers)
-           CERR << "StateIndicator::~StateIndicator() cleans up eoc_handlers"
-                << endl << "    deleting EOC handler "
-                << (const void *)eoc_handlers << endl;
-
-        eoc_handlers->loc = "(deleted)";
-        delete eoc_handlers;
-        eoc_handlers = 0;
       }
 }
 //-----------------------------------------------------------------------------
@@ -144,9 +129,9 @@ StateIndicator::function_name() const
 void
 StateIndicator::print(ostream & out) const
 {
-   out << "Depth:    " << level << endl;
-   out << "Exec:     " << executable << endl;
-   out << "Safe ex:  " << (safe_execution ? "yes" : "no") << endl;
+   out << "Depth:      " << level                << endl;
+   out << "Exec:       " << executable           << endl;
+   out << "Safe exec:  " << safe_execution_count << endl;
 
    Assert(executable);
 
@@ -390,21 +375,6 @@ const UserFunction * ufun = get_executable()->get_ufun();
 void
 StateIndicator::escape()  
 {
-EOC_arg * e;
-   while ((e = eoc_handlers))
-      {
-        Log(LOG_EOC_handlers)
-           CERR << "StateIndicator::escape() cleans up eoc_handler from "
-                << e->loc << endl;
-
-        e->clear(LOC);
-        Log(LOG_EOC_handlers)
-           CERR << "StateIndicator::~StateIndicator() deletes "
-                << (const void *)e << endl;
-         
-        eoc_handlers = e->next;
-        delete e;
-      }
 }
 //-----------------------------------------------------------------------------
 Token
@@ -425,14 +395,6 @@ StateIndicator::unmark_all_values() const
    executable->unmark_all_values();
 
    current_stack.unmark_all_values();
-
-   // unmark values in EOC handlers
-   //
-   for (EOC_arg * eoc = get_eoc_handlers(); eoc; eoc = eoc->next)
-       {
-         if (!!eoc->A)      eoc->A->unmark();
-         if (!!eoc->B)      eoc->B->unmark();
-       }
 }
 //-----------------------------------------------------------------------------
 int
@@ -512,74 +474,10 @@ Value_P * X = current_stack.locate_X();
 }
 //-----------------------------------------------------------------------------
 void
-StateIndicator::print_EOC_handlers(ostream & out, const char * loc) const
-{
-   out << "EOC handlers at " << loc << ":" << endl;
-   for (const StateIndicator * si = this; si; si = si->get_parent())
-       {
-         int count = 0;
-         for (EOC_arg * eoc = si->get_eoc_handlers(); eoc; eoc = eoc->next)
-             {
-               si->indent(out) << "    " << "[" << si->get_level() << "] "
-                   << "EOC handler #" << count << " " << eoc->loc << endl;
-               ++count;
-             }
-       }
-}
-//-----------------------------------------------------------------------------
-void
-StateIndicator::add_eoc_handler(EOC_HANDLER handler, EOC_arg & arg,
-                                const char * loc)
-{
-EOC_arg * new_e =  new EOC_arg(handler, arg, loc);
-
-   if (EOC_arg * e = eoc_handlers)
-      {
-        while (e->next)   e = e->next;
-        e->next = new_e;
-      }
-   else   // first EOC handler
-      {
-        eoc_handlers = new_e;
-      }
-
-   Log(LOG_EOC_handlers)
-      {
-        int count = 0;
-        for (EOC_arg * e = eoc_handlers; e; e = e->next)   ++count;
-        CERR << "SI[" << level << "] added new EOC handler(" << new_e
-             << " from " << loc << " len=" << count << endl;
-      }
-}
-//-----------------------------------------------------------------------------
-EOC_arg *
-StateIndicator::remove_eoc_handlers()
-{
-EOC_arg * ret = eoc_handlers;
-
-   Log(LOG_EOC_handlers)
-      {
-         CERR << "SI[" << level << "] remove_eoc_handler(" << eoc_handlers
-              << ") from " << eoc_handlers->loc << endl;
-      }
-
-   eoc_handlers = 0;
-   return ret;
-}
-//-----------------------------------------------------------------------------
-bool
 StateIndicator::call_eoc_handler(Token & token)
 {
-   if (!eoc_handlers)     return false;   // no eoc_handler
-
-   Log(LOG_EOC_handlers)
-       CERR << "SI[" << level << "] call_eoc_handler(" << eoc_handlers
-            << ") from " << eoc_handlers->loc << ")" << endl;
-
-
-const bool goon = eoc_handlers->handler(token);
-   return goon;   // false: success (done), true: goon
-
+   if (parent && parent->safe_execution_count != safe_execution_count)
+      Quad_EC::eoc(token);
 }
 //-----------------------------------------------------------------------------
 Function_Line

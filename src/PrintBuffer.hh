@@ -140,6 +140,9 @@ public:
    /// append lines to reach height
    void pad_height(Unicode pad, ShapeItem height);
 
+   /// prepend lines to reach height
+   void pad_height_above(Unicode pad, ShapeItem height);
+
    /// add a decorator frame around this buffer
    void add_frame(PrintStyle style, const Shape & shape, int depth);
 

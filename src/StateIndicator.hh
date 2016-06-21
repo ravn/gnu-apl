@@ -23,7 +23,6 @@
 
 #include "Common.hh"
 #include "DerivedFunction.hh"
-#include "EOC_arg.hh"
 #include "Executable.hh"
 #include "Error.hh"
 #include "Parser.hh"
@@ -73,17 +72,6 @@ public:
    /// return pointer to the current user function, statements, or execute
    const Executable * get_executable() const
       { return executable; }
-
-   /// clear EOC handlers and return the old handlers
-   EOC_arg * remove_eoc_handlers();
-
-   /// return the current EOC handlers (if any)
-   EOC_arg * get_eoc_handlers() const
-      { return eoc_handlers; }
-
-   /// set the current EOC handlers
-   void set_eoc_handlers(EOC_arg * eoc)
-      { eoc_handlers = eoc; }
 
    /// return the name of the parse mode
    Unicode get_parse_mode_name() const;
@@ -155,23 +143,22 @@ public:
    /// change axis arg
    void set_X(Value_P value);
 
-   /// print EOC handlers, starting at \b this SI entry
-   void print_EOC_handlers(ostream & out, const char * loc) const;
+   /// call eoc_handler
+   void call_eoc_handler(Token & token);
 
-   /// add an EOC handler
-   void add_eoc_handler(EOC_HANDLER handler, EOC_arg & arg, const char * loc);
-
-   /// call eoc_handler. Return false if there is none or else the result
-   /// of the eoc_handler. false indicates that the eoc_handler has finished.
-   bool call_eoc_handler(Token & token);
-
-   /// return safe_execution mode
-   bool get_safe_execution() const
-      { return safe_execution; }
+   /// return the number of pending ⎕ECs (or other safe execution contexts)
+   int get_safe_execution() const
+      { return safe_execution_count; }
 
    /// set safe_execution mode
    void set_safe_execution(bool on_off)
-      { safe_execution = on_off; }
+      { if (on_off)   // safe execution ON
+           if (parent)  safe_execution_count = parent->safe_execution_count + 1;
+           else         safe_execution_count = 1;
+        else          // safe execution OFF
+           if (parent)  safe_execution_count = parent->safe_execution_count;
+           else         safe_execution_count = 0;
+      }
 
    /// get the current prefix parser
    Prefix & get_prefix()
@@ -188,12 +175,8 @@ protected:
    /// the user function that is being executed
    Executable * executable;
 
-   /// true iff this context is in safe execution mode (⎕EA, ⎕EC)
-   bool safe_execution;
-
-   /// a (normally empty) list of EOC handler function and their arguyments.
-   /// The handlers are called at the end of execution of this context.
-   EOC_arg * eoc_handlers;
+   /// the number of pending ⎕EC calles
+   int safe_execution_count;
 
    /// The nesting level (of sub-executions)
    const int level;

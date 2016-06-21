@@ -87,5 +87,7 @@ err_def(AXIS_ERROR,             "AXIS ERROR"                     , 5,      6 )
 
 err_def(COMMAND_PUSHED,         "Command Pushed"                 , 9,      1 )
 
+err_def(QUAD_EA_EXEC,           "⎕EA execute"                    ,10,      1 )
+
 #undef err_def
 

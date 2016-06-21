@@ -22,7 +22,6 @@
 #include <fstream>
 #include <string.h>
 
-#include "EOC_arg.hh"
 #include "SystemLimits.hh"
 #include "UCS_string.hh"
 #include "UTF8_string.hh"
@@ -76,12 +75,6 @@ public:
 
    /// write StateIndicator entry \b si
    void save_SI_entry(const StateIndicator & si);
-
-   /// write EOC handler \b eoc
-   void save_EOC_handler(const EOC_arg & eoc, int level);
-
-   /// write EOC Value_P \b val with name \b name
-   void save_EOC_value(const char * name, const Value * val, int & count);
 
    /// write Token_loc \b tloc
    void save_token_loc(const Token_loc & tloc);
@@ -251,12 +244,6 @@ protected:
 
    /// read parsers in SI entry
    void read_Parser(StateIndicator & si);
-
-   /// read EOC handler in SI entry
-   EOC_arg * read_EOC(StateIndicator & si);
-
-   /// construct one Value_P
-   void read_EOC_value(const char * attr_name, Value_P & valp);
 
    /// read ⍎ Executable
    Executable * read_Execute();

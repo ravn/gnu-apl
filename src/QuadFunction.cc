@@ -30,6 +30,7 @@
 #include "IndexIterator.hh"
 #include "IntCell.hh"
 #include "LineInput.hh"
+#include "Macro.hh"
 #include "Output.hh"
 #include "PointerCell.hh"
 #include "PrintOperator.hh"
@@ -49,6 +50,7 @@ Quad_AF    Quad_AF   ::_fun;
 Quad_AT    Quad_AT   ::_fun;
 Quad_DL    Quad_DL   ::_fun;
 Quad_EA    Quad_EA   ::_fun;
+Quad_EB    Quad_EB   ::_fun;
 Quad_EC    Quad_EC   ::_fun;
 Quad_ENV   Quad_ENV  ::_fun;
 Quad_ES    Quad_ES   ::_fun;
@@ -68,6 +70,7 @@ Quad_AF    * Quad_AF   ::fun = &Quad_AF   ::_fun;
 Quad_AT    * Quad_AT   ::fun = &Quad_AT   ::_fun;
 Quad_DL    * Quad_DL   ::fun = &Quad_DL   ::_fun;
 Quad_EA    * Quad_EA   ::fun = &Quad_EA   ::_fun;
+Quad_EB    * Quad_EB   ::fun = &Quad_EB   ::_fun;
 Quad_EC    * Quad_EC   ::fun = &Quad_EC   ::_fun;
 Quad_ENV   * Quad_ENV  ::fun = &Quad_ENV  ::_fun;
 Quad_ES    * Quad_ES   ::fun = &Quad_ES   ::_fun;
@@ -236,222 +239,37 @@ Value_P Z(LOC);
 Token
 Quad_EA::eval_AB(Value_P A, Value_P B)
 {
-ExecuteList * fun = 0;
-const UCS_string statement_B(*B.get());
-
-   try
+   if (!A->is_char_string())
       {
-        fun = ExecuteList::fix(statement_B, LOC);
-      }
-   catch (...)
-      {
+        if (A->get_rank() > 1)   RANK_ERROR;
+        else                     DOMAIN_ERROR;
       }
 
-   if (fun == 0)   // ExecuteList::fix() failed
+   if (!B->is_char_string())
       {
-        // syntax error in B: try to fix A. This will reset ⎕EM and ⎕ET even
-        // though we whould keep them (lrm p. 178). Therefore we save the error
-        // info from fixing B
-        //
-        const Error error_B = *Workspace::get_error();
-        try
-           {
-             const UCS_string statement_A(*A.get());
-             fun = ExecuteList::fix(statement_A, LOC);
-           }
-       catch (...)
-           {
-           }
-
-        if (fun == 0)
-           {
-             SYNTAX_ERROR;   // syntax error in A and B: give up.
-          }
-
-        // A could be fixed: execute it.
-        //
-        Log(LOG_UserFunction__execute)   fun->print(CERR);
-
-        Workspace::push_SI(fun, LOC);
-        *Workspace::get_error() = error_B;
-        Workspace::SI_top()->set_safe_execution(true);
-
-        // install end of context handler. The handler will do nothing when
-        // B succeeds, but will execute A if not.
-        //
-        EOC_arg arg(A, B, LOC);
-        Workspace::SI_top()->add_eoc_handler(eoc_A_and_B_done, arg, LOC);
-
-        return Token(TOK_SI_PUSHED);
+        if (B->get_rank() > 1)   RANK_ERROR;
+        else                     DOMAIN_ERROR;
       }
 
-   Assert(fun);
-
-   Log(LOG_UserFunction__execute)   fun->print(CERR);
-
-   Workspace::push_SI(fun, LOC);
-   Workspace::SI_top()->set_safe_execution(true);
-
-   // install end of context handler. The handler will do nothing when
-   // B succeeds, but will execute A if not.
-   //
-   {
-     EOC_arg arg(A, B, LOC);
-     Workspace::SI_top()->add_eoc_handler(eoc_B_done, arg, LOC);
-   }
-
-   return Token(TOK_SI_PUSHED);
+   return Macro::Z__A_Quad_EA_B->eval_AB(A, B);
 }
-//-----------------------------------------------------------------------------
-bool
-Quad_EA::eoc_B_done(Token & token)
+//=============================================================================
+Token
+Quad_EB::eval_AB(Value_P A, Value_P B)
 {
-   // in A ⎕EA B, ⍎B was executed and may or may not have failed.
-   //
-   if (token.get_tag() != TOK_ERROR)   // ⍎B succeeded
+   if (!A->is_char_string())
       {
-        // do not clear ⎕EM and ⎕ET; they should remain visible.
-
-        StateIndicator * si = Workspace::SI_top();
-        si->set_safe_execution(false);
-
-        EOC_arg * arg = Workspace::SI_top()->remove_eoc_handlers();
-        EOC_arg * next = arg->next;
-
-        delete arg;
-        si->set_eoc_handlers(next);
-        if (next)   return next->handler(token);
-
-        return false;   // ⍎B successful.
+        if (A->get_rank() > 1)   RANK_ERROR;
+        else                     DOMAIN_ERROR;
       }
 
-   // in A ⎕EA B, ⍎B has failed...
-   //
-   // lrm p. 178: "⎕EM and ⎕ET are set, execution of B is abandoned without
-   // an error message, and the expression represented by A is executed."
-   //
-EOC_arg * arg = Workspace::SI_top()->remove_eoc_handlers();
-const UCS_string statement_A(*arg->A.get());
-
-ExecuteList * fun = 0;
-   try
+   if (!B->is_char_string())
       {
-        fun = ExecuteList::fix(statement_A, LOC);
-      }
-   catch (...)
-      {
-        // syntax error in A (and B has failed before): give up
-        //
-        SYNTAX_ERROR;
+        if (B->get_rank() > 1)   RANK_ERROR;
+        else                     DOMAIN_ERROR;
       }
 
-   // A could be ⎕FXed: execute it.
-   //
-   if (fun == 0 && token.get_tag() == TOK_APL_VALUE1)
-      {
-        StateIndicator * si = Workspace::SI_top();
-        si->set_safe_execution(false);
-
-        EOC_arg * next = arg->next;
-
-        delete arg;
-        si->set_eoc_handlers(next);
-        if (next)   return next->handler(token);
-        return false;
-      }
-   Assert(fun);
-
-   Log(LOG_UserFunction__execute)   fun->print(CERR);
-
-   Workspace::pop_SI(LOC);
-   Workspace::push_SI(fun, LOC);
-   Workspace::SI_top()->get_error().init((ErrorCode)(token.get_int_val()), LOC);
-
-   Workspace::SI_top()->set_safe_execution(true);
-
-   // install end of context handler for the result of ⍎A. 
-   //
-   {
-     EOC_arg arg1(arg->A, arg->B, LOC);
-     Workspace::SI_top()->add_eoc_handler(eoc_A_and_B_done, arg1, LOC);
-   }
-
-   delete arg;
-   return true;
-}
-//-----------------------------------------------------------------------------
-bool
-Quad_EA::eoc_A_and_B_done(Token & token)
-{
-   // in A ⎕EA B, ⍎B has failed, and ⍎A was executed and may or
-   // may not have failed.
-   //
-StateIndicator * si = Workspace::SI_top();
-EOC_arg * arg = si->remove_eoc_handlers();
-EOC_arg * next = arg->next;
-
-   Assert(si);
-   si->set_safe_execution(false);
-
-   if (token.get_tag() != TOK_ERROR)   // ⍎A succeeded
-      {
-        delete arg;
-        StateIndicator * si1 = si->get_parent();
-        si1->get_error() = si->get_error();
-
-        Workspace::SI_top()->set_eoc_handlers(next);
-        if (next)   return next->handler(token);
-
-        return false;   // ⍎A successful.
-      }
-
-Value_P A = arg->A;
-Value_P B = arg->B;
-const UCS_string statement_A(*A.get());
-
-   // here both ⍎B and ⍎A failed. ⎕EM shows only B, but should show
-   // A ⎕EA B instead.
-   //
-
-   // display of errors was disabled since ⎕EM was incorrect.
-   // now we have fixed ⎕EM and can display it.
-   //
-   si->get_error().print_em(UERR, LOC);
-   si->get_error().clear_error_line_1();
-
-UCS_string ucs_2(6, UNI_ASCII_SPACE);
-int left_caret = 6;
-int right_caret;
-
-const UCS_string statement_B(*B.get());
-
-   right_caret = left_caret + statement_A.size() + 3;
-
-   ucs_2.append(UNI_SINGLE_QUOTE);
-   ucs_2.append(statement_A);
-   ucs_2.append(UNI_SINGLE_QUOTE);
-
-   ucs_2.append(UNI_ASCII_SPACE);
-
-   ucs_2.append(UNI_Quad_Quad);
-   ucs_2.append(UNI_ASCII_E);
-   ucs_2.append(UNI_ASCII_A);
-
-   ucs_2.append(UNI_ASCII_SPACE);
-
-   ucs_2.append(UNI_SINGLE_QUOTE);
-   ucs_2.append(statement_B);
-   ucs_2.append(UNI_SINGLE_QUOTE);
-
-   si->get_error().set_error_line_2(ucs_2, left_caret, right_caret);
-
-   UERR << si->get_error().get_error_line_2() << endl
-        << si->get_error().get_error_line_3() << endl;
-
-   delete arg;
-   Workspace::SI_top()->set_eoc_handlers(next);
-   if (next)   return next->handler(token);
-   return false;
+   return Macro::Z__A_Quad_EB_B->eval_AB(A, B);
 }
 //=============================================================================
 Token
@@ -494,14 +312,6 @@ ExecuteList * fun = 0;
    Workspace::push_SI(fun, LOC);
    Workspace::SI_top()->set_safe_execution(true);
 
-   // install end of context handler.
-   // The handler will create the result after executing B.
-   //
-   {
-     EOC_arg arg(Value_P(), Value_P(), LOC);
-     Workspace::SI_top()->add_eoc_handler(eoc, arg, LOC);
-   }
-
    return Token(TOK_SI_PUSHED);
 }
 //-----------------------------------------------------------------------------
@@ -529,9 +339,6 @@ bool
 Quad_EC::eoc(Token & result_B)
 {
 StateIndicator * si = Workspace::SI_top();
-EOC_arg * arg = si->remove_eoc_handlers();
-EOC_arg * next = arg->next;
-
    si->set_safe_execution(false);
 
 Value_P Z(3, LOC);
@@ -615,10 +422,6 @@ Value_P Z1(2, LOC);
    Z->check_value(LOC);
    move_2(result_B, Token(TOK_APL_VALUE1, Z), LOC);
 
-   delete arg;
-   Workspace::SI_top()->set_eoc_handlers(next);
-   if (next)   return next->handler(result_B);
-
    return false;
 }
 //=============================================================================
@@ -697,6 +500,7 @@ Quad_ES::eval_B(Value_P B)
 Error error(E_NO_ERROR, LOC);
 const Token ret = event_simulate(0, B, error);
    if (error.error_code == E_NO_ERROR)   return ret;
+   if (Workspace::SI_top()->get_safe_execution())   return ret;
 
    throw error;
 }
@@ -708,7 +512,10 @@ Quad_ES::event_simulate(const UCS_string * A, Value_P B, Error & error)
    //
    if (B->element_count() == 0)   return Token();
 
-   error.init(get_error_code(B), error.throw_loc);
+const ErrorCode ec = get_error_code(B);
+   if (ec == E_QUAD_EA_EXEC)   return Token(TOK_EA_EXEC, B->clone(LOC));
+
+   error.init(ec, error.throw_loc);
 
    if (error.error_code == E_NO_ERROR)   // B = 0 0: reset ⎕ET and ⎕EM.
       {
@@ -784,9 +591,12 @@ Quad_ES::get_error_code(Value_P B)
 
    if (B->element_count() == 0)   return E_NO_ERROR;
    if (B->is_char_string())       return E_USER_DEFINED_ERROR;
-   if (B->element_count() != 2)   LENGTH_ERROR;
 
 const APL_Integer major = B->get_ravel(0).get_near_int();
+   if (major == (E_QUAD_EA_EXEC >> 16) && B->element_count() == 4)
+      return E_QUAD_EA_EXEC;
+
+   if (B->element_count() != 2)   LENGTH_ERROR;
 const APL_Integer minor = B->get_ravel(1).get_near_int();
 
    return ErrorCode(major << 16 | (minor & 0xFFFF));
@@ -847,7 +657,60 @@ UCS_string e2;
    esc1 = e1;
    esc2 = e2;
 
-   return do_INP();
+   prefixes.clear();
+   escapes.clear();
+   suffixes.clear();
+
+   read_strings();    // read lines from file or stdin
+   split_strings();   // split lines into prefixes, escapes, and suffixes
+
+const ShapeItem line_count = raw_lines.size();
+Value_P BB(line_count, LOC);
+   loop(l, line_count)
+       {
+         Cell * cBB = BB->next_ravel();
+         if (escapes[l].size() == 0)   // prefix only
+            {
+              Value_P c1(prefixes[l], LOC);
+              Value_P row(1, LOC);
+              new (row->next_ravel())   PointerCell(c1, row.getref());
+              row->check_value(LOC);
+              new (cBB)   PointerCell(row, BB.getref());
+            }
+         else if (suffixes[l].size() == 0)   // prefix and escape
+            {
+              Value_P c1(prefixes[l], LOC);
+              Value_P c2(escapes [l], LOC);
+              Value_P row(2, LOC);
+              new (row->next_ravel())   PointerCell(c1, row.getref());
+              new (row->next_ravel())   PointerCell(c2, row.getref());
+              row->check_value(LOC);
+              new (cBB)   PointerCell(row, BB.getref());
+            }
+         else                                // prefix, escape, and suffix
+            {
+              Value_P c1(prefixes[l], LOC);
+              Value_P c2(escapes [l], LOC);
+              Value_P c3(suffixes[l], LOC);
+              Value_P row(3, LOC);
+              new (row->next_ravel())   PointerCell(c1, row.getref());
+              new (row->next_ravel())   PointerCell(c2, row.getref());
+              new (row->next_ravel())   PointerCell(c3, row.getref());
+              row->check_value(LOC);
+              new (cBB)   PointerCell(row, BB.getref());
+            }
+       }
+
+Token ret = Macro::Z__Quad_INP_B->eval_B(BB);
+   Assert1(ret.get_tag() == TOK_SI_PUSHED);
+
+   loop(l, line_count)
+       {
+         BB->get_ravel(l).release(LOC);
+       }
+
+   Quad_INP_running = false;
+   return Token(TOK_SI_PUSHED);
 }
 //-----------------------------------------------------------------------------
 Token
@@ -867,10 +730,18 @@ Quad_INP::eval_B(Value_P B)
    Quad_INP_running = true;
 
    end_marker = B->get_UCS_ravel();
-   esc1.clear();
-   esc2.clear();
+   read_strings();    // read lines from file or stdin
 
-   return do_INP();
+Value_P Z(raw_lines.size(), LOC);
+   loop(l, raw_lines.size())
+       {
+         Value_P ZZ(raw_lines[l], LOC);
+         new (Z->next_ravel())   PointerCell(ZZ, Z.getref());
+       }
+
+   Quad_INP_running = false;
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
 Token
@@ -1007,6 +878,7 @@ Quad_INP::read_strings()
 {
    // read lines until an end-maker is detected
    //
+   raw_lines.clear();
    for (;;)
       {
         bool eof = false;
@@ -1032,8 +904,6 @@ Quad_INP::read_strings()
 void
 Quad_INP::split_strings()
 {
-   last_e = -1;
-
 UCS_string empty;
    loop(r, raw_lines.size())
       {
@@ -1041,16 +911,14 @@ UCS_string empty;
         const ShapeItem epos = line.substr_pos(esc1);
         if (esc1.size() == 0 || epos == -1)   // no escape in this line
            {
-             prefixes.push_back(empty);
+             prefixes.push_back(line);
              escapes.push_back(empty);
-             suffixes.push_back(line);
+             suffixes.push_back(empty);
              continue;
            }
 
         // at this point line did contain an exec string
         //
-        last_e = prefixes.size();
-
         UCS_string pref = line;
         pref.shrink(epos);
         prefixes.push_back(pref);
@@ -1085,136 +953,6 @@ UCS_string empty;
    Assert(prefixes.size() >= raw_lines.size());
    Assert(prefixes.size() == escapes.size());
    Assert(prefixes.size() == suffixes.size());
-}
-//-----------------------------------------------------------------------------
-Token
-Quad_INP::do_escapes()
-{
-   Assert(prefixes.size() >= raw_lines.size());
-   Assert(prefixes.size() == escapes.size());
-   Assert(prefixes.size() == suffixes.size());
-
-   while (idx_e <= last_e)
-      {
-        if (escapes[idx_e].size() == 0)
-           {
-             ++idx_e;
-             continue;
-           }
-
-        Token result = Bif_F1_EXECUTE::execute_statement(escapes[idx_e]);
-        if (result.get_tag() == TOK_SI_PUSHED)
-           {
-             EOC_arg arg(Value_P(), Value_P(), LOC);
-             Workspace::SI_top()->add_eoc_handler(eoc_INP, arg, LOC);
-             return result;
-           }
-FIXME;
-      }
-
-   return finish();
-}
-//-----------------------------------------------------------------------------
-Token
-Quad_INP::finish()
-{
-   Quad_INP_running = false;
-
-ShapeItem exec_LFs = 0;
-   loop(p, escapes.size())   exec_LFs += escapes[p].LF_count();
-
-Value_P Z(prefixes.size() + exec_LFs, LOC);
-   loop(p, prefixes.size())
-      {
-        UCS_string line = prefixes[p];
-        const ShapeItem LFs = escapes[p].LF_count();
-        if (LFs == 0)   // single line escape result
-           {
-             line.append(escapes[p]);
-             line.append(suffixes[p]);
-             Value_P Zp(line, LOC);
-             new (Z->next_ravel())   PointerCell(Zp, Z.getref());
-             continue;
-           }
-
-        // multi-line escape result
-        //
-        const UCS_string LF("\n");
-        loop(l, (LFs + 1))   // for every line in escapes[p]
-            {
-              const ShapeItem NL_pos = escapes[p].substr_pos(LF);
-              if (NL_pos == -1)   // last line
-                 {
-                   line.append(escapes[p]);
-                   line.append(suffixes[p]);
-                 }
-              else
-                 {
-                   line.append(UCS_string(escapes[p], 0, NL_pos));
-                   escapes[p] = escapes[p].drop(NL_pos + 1);
-                 }
-
-              Value_P Zp(line, LOC);
-              new (Z->next_ravel())   PointerCell(Zp, Z.getref());
-              line = UCS_string (prefixes[p].size(), UNI_ASCII_SPACE);
-            }
-      }
-
-   Z->set_default_Spc();
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
-//-----------------------------------------------------------------------------
-Token
-Quad_INP::do_INP()
-{
-   raw_lines.clear();
-   prefixes.clear();
-   escapes.clear();
-   suffixes.clear();
-
-   read_strings();    // read lines from file or stdin
-   split_strings();   // split lines into prefixes, escapes, and suffixes
-
-   idx_e = 0;
-   return do_escapes();
-}
-//-----------------------------------------------------------------------------
-bool
-Quad_INP::eoc_INP(Token & token)
-{
-   delete Workspace::SI_top()->remove_eoc_handlers();
-
-   if (token.get_tag() == TOK_ERROR)
-      {
-         CERR << "Error in ⎕INP" << endl;
-         UCS_string err("*** ");
-         err.append(Error::error_name((ErrorCode)(token.get_int_val())));
-         err.append_utf8(" in ⎕INP ***");
-         Value_P val(err, LOC);
-         move_2(token, Token(TOK_APL_VALUE1, val), LOC);
-         return false;   // stop it
-      }
-
-   // token is the result of ⍎ exec
-   //
-   {
-     Value_P exec_result = token.get_apl_val();
-token.extract_apl_val(LOC);
-
-     PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
-     PrintBuffer pb(*exec_result, pctx, 0);
-     UCS_string ucs;
-     loop(p, pb.get_height())
-         {
-           ucs.append(pb.get_line(p));
-           if (p < (pb.get_height() - 1))   ucs.append(UNI_ASCII_LF);
-         }
-     fun->escapes[fun->idx_e++] = ucs;
-   }
-
-   move_2(token, fun->finish(), LOC);
-   return false;
 }
 //=============================================================================
 Token

@@ -136,6 +136,7 @@ TD(TOK_F2_NOR        , TC_FUN2      , TV_FUN  , ID::F2_NOR       )
 TD(TOK_F2_OR         , TC_FUN2      , TV_FUN  , ID::F2_OR        )
 TD(TOK_F2_UNEQ       , TC_FUN2      , TV_FUN  , ID::F2_UNEQ      )
 TD(TOK_Quad_EA       , TC_FUN2      , TV_FUN  , ID::Quad_EA      )
+TD(TOK_Quad_EB       , TC_FUN2      , TV_FUN  , ID::Quad_EB      )
 TD(TOK_Quad_SVC      , TC_FUN2      , TV_FUN  , ID::Quad_SVC     )
 TD(TOK_Quad_TF       , TC_FUN2      , TV_FUN  , ID::Quad_TF      )
 
@@ -211,6 +212,7 @@ TD(TOK_INTEGER       , TC_VALUE     , TV_INT  , ID::INTEGER      )
 TD(TOK_REAL          , TC_VALUE     , TV_FLT  , ID::REAL         )
 TD(TOK_COMPLEX       , TC_VALUE     , TV_CPX  , ID::COMPLEX      )
 TD(TOK_ERROR         , TC_SI_LEAVE  , TV_INT  , ID::ERROR        )
+TD(TOK_EA_EXEC       , TC_SI_LEAVE  , TV_VAL  , ID::EA_EXEC      ) // ⎕EA helper
 
 #undef TD
 

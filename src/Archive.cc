@@ -443,55 +443,10 @@ const Executable & exec = *si.get_executable();
    //
    save_prefix(si.current_stack);
 
-   // print the EOC handlers
-   //
-   {
-      int level = 0;
-      for (EOC_arg * eoc = si.get_eoc_handlers(); eoc; eoc = eoc->next)
-          {
-            save_EOC_handler(*eoc, level++);
-          }
-   }
    --indent;
 
    do_indent();
    out << "</SI-entry>" << endl << endl;
-}
-//-----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_EOC_handler(const EOC_arg & eoc, int level)
-{
-const int type = EOC_arg::get_EOC_type(eoc.handler);
-
-   do_indent();
-   out << "<EOC level=\"" << level << "\" type=\"" << type << "\"";
-
-   ++indent;
-int count = 99;   // force new line
-   save_EOC_value("vid-A",    eoc.A.get(),    count);
-   save_EOC_value("vid-B",    eoc.B.get(),    count);
-   --indent;
-
-   out << "/>" << endl;
-}
-//-----------------------------------------------------------------------------
-void
-XML_Saving_Archive::save_EOC_value(const char * name, const Value * val,
-                                   int & count)
-{
-   if (val == 0)   return;
-
-   ++count;
-   if (count > 5)
-      {
-        out << endl;
-        do_indent();
-        out << "  ";
-        count = 1;
-      }
-
-const int vid = find_vid(*val);
-   out << " " << name << "=\"" << vid << "\"";
 }
 //-----------------------------------------------------------------------------
 void
@@ -694,7 +649,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "        <!ELEMENT StateIndicator (SI-entry*)>\n"
 "        <!ATTLIST StateIndicator levels CDATA #REQUIRED>\n"
 "\n"
-"            <!ELEMENT SI-entry ((Execute|Statements|UserFunction),Parser+,EOC*)>\n"
+"            <!ELEMENT SI-entry ((Execute|Statements|UserFunction),Parser+)>\n"
 "            <!ATTLIST SI-entry level     CDATA #REQUIRED>\n"
 "            <!ATTLIST SI-entry pc        CDATA #REQUIRED>\n"
 "            <!ATTLIST SI-entry line      CDATA #REQUIRED>\n"
@@ -727,21 +682,6 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "                    <!ATTLIST Token ufun-name    CDATA #IMPLIED>\n"
 "                    <!ATTLIST Token symbol-level CDATA #IMPLIED>\n"
 "                    <!ATTLIST Token comment      CDATA #IMPLIED>\n"
-"\n"
-"                <!ELEMENT EOC (#PCDATA)>\n"
-"                    <!ATTLIST EOC level          CDATA #REQUIRED>\n"
-"                    <!ATTLIST EOC type           CDATA #REQUIRED>\n"
-"                    <!ATTLIST EOC z              CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC data           CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC vid-Z          CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC vid-A          CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC LO-name        CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC LO-level       CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC LO-id          CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC RO-name        CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC RO-level       CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC RO-id          CDATA #IMPLIED>\n"
-"                    <!ATTLIST EOC vid-B          CDATA #IMPLIED>\n"
 "\n"
 "]>\n"
 "\n"
@@ -1963,16 +1903,12 @@ StateIndicator * si = Workspace::SI_top();
    Assert(si);
    read_Parser(*si);
 
-EOC_arg * last_eoc = 0;
    for (;;)
        {
+         // skip old EOC tags
+         //
          next_tag(LOC);
          if (is_tag("/SI-entry"))   break;
-
-         EOC_arg * next = read_EOC(*si);
-         if (last_eoc)   last_eoc->next = next;
-         else            si->set_eoc_handlers(next);
-         last_eoc = next;
        }
 }
 //-----------------------------------------------------------------------------
@@ -2059,36 +1995,6 @@ Prefix & parser = si.current_stack;
        }
 
    expect_tag("/Parser", LOC);
-}
-//-----------------------------------------------------------------------------
-EOC_arg *
-XML_Loading_Archive::read_EOC(StateIndicator & si)
-{
-   expect_tag("EOC", LOC);
-
-// const int level = find_int_attr("level", false, 10);
-const int type = find_int_attr("type",   false, 10);
-
-EOC_arg * eoc = new EOC_arg(Value_P(), Value_P(), LOC);
-   Assert(eoc);
-
-   eoc->handler = EOC_arg::get_EOC_handler((EOC_arg::EOC_type)type);
-
-   read_EOC_value("vid-A",    eoc->A);
-   read_EOC_value("vid-B",    eoc->B);
-
-   return eoc;
-}
-//-----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_EOC_value(const char * attr_name, Value_P & valp)
-{
-const int vid = find_int_attr(attr_name, true, 10);
-   if (vid == -1)   return;
-
-   Assert(vid < (int)values.size());
-   Assert(!!values[vid]);
-   valp = values[vid];
 }
 //-----------------------------------------------------------------------------
 bool
@@ -2242,8 +2148,7 @@ const int fun_id = find_int_attr(id_attr, true, 16);
         return sysfun;
       }
 
-   // not found. This can happen when the function is optional, like
-   // LO and RO functios in EOC handlers
+   // not found. This can happen when the function is optional.
    //
    return 0;
 }

@@ -133,8 +133,11 @@ public:
    static Bif_F1_EXECUTE * fun;   ///< Built-in function
    static Bif_F1_EXECUTE  _fun;   ///< Built-in function
 
-   /// execute string
+   /// execute string containing an APL expression or an APL command
    static Token execute_statement(UCS_string & statement);
+
+   /// execute string containing an APL command
+   static Token execute_command(UCS_string & command);
 
    /// overladed Function::eval_B()
    virtual Token eval_B(Value_P B);

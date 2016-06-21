@@ -222,10 +222,8 @@ Executable * statements = 0;
          //
          if (token.get_tag() == TOK_SI_PUSHED)   continue;
 
-         // maybe call EOC handler and repeat if true returned
-         //
        check_EOC:
-         if (Workspace::SI_top()->call_eoc_handler(token))   continue;
+         Workspace::SI_top()->call_eoc_handler(token);
 
          // the far most frequent cases are TC_VALUE and TOK_VOID
          // so we handle them first.
@@ -480,16 +478,6 @@ Command::cmd_CHECK(ostream & out)
           IO_Files::apl_error(LOC);
         }
      else out << "OK      - no stale indices" << endl;
-   }
-
-   {
-    const int stale = EOC_arg::EOC_arg_count;
-     if (stale)
-        {
-          out << "ERROR   - " << stale << " stale EOC_args" << endl;
-          IO_Files::apl_error(LOC);
-        }
-     else out << "OK      - no stale EOC_args" << endl;
    }
 }
 //-----------------------------------------------------------------------------

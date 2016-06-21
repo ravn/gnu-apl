@@ -851,12 +851,54 @@ Prefix::reduce_MISC_F_B_()
       }
 
 Token result = at0().get_function()->eval_B(at1().get_apl_val());
-   if (result.get_tag() == TOK_ERROR)
+   if (result.get_Class() == TC_SI_LEAVE)
       {
-        Token_loc tl(result, get_range_low());
-        push(tl);
-        action = RA_RETURN;
-        return;
+        if (result.get_tag() == TOK_EA_EXEC)
+           {
+             // the macro Quad_EA was called and has returned an action
+             // to be performed in the caller. We pop the )SI entry for
+             // Quad_EA continue in the calling prefix parser
+             //
+             action = RA_SI_PUSHED;
+             const Cell * info = &result.get_apl_val()->get_ravel(0);
+             Workspace::pop_SI(LOC);
+             UCS_string stat(*info[1].get_pointer_value());
+             if (stat.size())   // error, → or →N
+                {
+//                CERR << "⎕ES: ⍎" << stat << endl;
+                  Token exec = Bif_F1_EXECUTE::execute_statement(stat);
+                  const APL_Integer major = info[2].get_int_value();
+                  const APL_Integer minor = info[3].get_int_value();
+                  const ErrorCode ec = (ErrorCode)(major << 16 | minor);
+                  Workspace::SI_top()->get_parent()->get_error().init(ec, LOC);
+                }
+              else              // committed value
+                {
+                  Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+                  Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+                  if (info[3].is_pointer_cell())
+                     {
+                       Value_P val = info[3].get_pointer_value();
+                       new (&si_pushed)  Token(TOK_APL_VALUE2, val);
+                     }
+                  else
+                     {
+                       Value_P scalar(LOC);
+                       scalar->next_ravel()->init(info[3], scalar.getref(),LOC);
+                       scalar->check_value(LOC);
+                       new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
+                     }
+                }
+             return;
+           }
+
+        if (result.get_tag() == TOK_ERROR)
+           {
+             Token_loc tl(result, get_range_low());
+             push(tl);
+             action = RA_RETURN;
+             return;
+           }
       }
 
    pop_args_push_result(result);

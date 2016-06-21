@@ -75,7 +75,6 @@ The APL interpreter has implemented:
 OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices
-OK      - no stale EOC_args
 
       )SI
 

@@ -27,7 +27,7 @@
 //-----------------------------------------------------------------------------
 PointerCell::PointerCell(Value_P sub_val, Value & cell_owner)
 {
-   new (&value._valp()) Value_P(sub_val);
+   new (&value._valp()) Value_P(sub_val, LOC);
    value2.owner = &cell_owner;
 
    Assert(value2.owner != sub_val.get());   // typical cut-and-paste error
@@ -48,8 +48,12 @@ PointerCell::release(const char * loc)
    value2.owner->decrement_pointer_cell_count();
    value2.owner->add_subcount(-get_pointer_value()->nz_element_count());
 
+// Value * sub = (Value *)value.vptr;
+// const ShapeItem sub_len = sub->nz_element_count();
+//    loop(s, sub_len)   sub->get_ravel(s).release(loc);
+
    ptr_clear(value._valp(), loc);
-   new (this) Cell;
+   new (this) IntCell(0);
 }
 //-----------------------------------------------------------------------------
 bool

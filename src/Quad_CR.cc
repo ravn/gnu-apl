@@ -185,6 +185,8 @@ bool extra_frame = false;
         case 28: return do_CR27_28(false, *B);   // value2 as int
         case 29: pctx.set_style(PR_BOXED_GRAPHIC3);    break;
         case 30: return do_CR30(*B);             // conform B (for ⍤ macro)
+        case 31: return do_CR31_32(true, *B);    // ⎕INP helper
+        case 32: return do_CR31_32(false, *B);   // ⎕INP helper
 
         default: Workspace::more_error() = "A ⎕CR B with invalid A";
                  DOMAIN_ERROR;
@@ -1102,6 +1104,56 @@ Value_P Z(shape_Z, LOC);
            {
              Z->next_ravel()->init(cB, Z.getref(), LOC);
              loop(zz, (conformed_len - 1))   new (Z->next_ravel()) IntCell(0);
+           }
+      }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR31_32(bool align_bottom, const Value & B)
+{
+const ShapeItem len = B.element_count();
+   if (len == 0)   LENGTH_ERROR;
+
+Value_P Z(len, LOC);
+
+PrintContext pctx = Workspace::get_PrintContext();
+   pctx.set_style(PrintStyle(pctx.get_style() | PST_NO_FRACT_0));
+
+   loop(b, len)
+      {
+        Value_P row = B.get_ravel(b).get_pointer_value();
+
+        if (row->element_count() == 1)   // single item
+           {
+             Value_P Zrow = row->get_ravel(0).get_pointer_value()->clone(LOC);
+             new (Z->next_ravel())   PointerCell(Zrow, Z.getref());
+             continue;
+           }
+
+        PrintBuffer pb;
+        loop(col, row->element_count())
+            {
+              Value_P item = row->get_ravel(col).get_pointer_value();
+              PrintBuffer pb_item(*item, pctx, 0);
+              pb.pad_height(UNI_ASCII_SPACE, pb_item.get_height());
+              if (align_bottom)
+                 pb_item.pad_height_above(UNI_ASCII_SPACE, pb.get_height());
+              else
+                 pb_item.pad_height(UNI_ASCII_SPACE, pb.get_height());
+              pb.add_column(UNI_ASCII_SPACE, 0, pb_item);
+            }
+        if (pb.get_height() == 1)
+           {
+             Value_P Zrow(pb.l1(), LOC);
+             new (Z->next_ravel())   PointerCell(Zrow, Z.getref());
+           }
+        else
+           {
+             Value_P Zrow(pb, LOC);
+             new (Z->next_ravel())   PointerCell(Zrow, Z.getref());
            }
       }
 

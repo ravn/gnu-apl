@@ -114,11 +114,26 @@ public:
    static Quad_EA * fun;          ///< Built-in function.
    static Quad_EA  _fun;          ///< Built-in function.
 
-   /// end of context handler for ⎕EA
-   static bool eoc_B_done(Token & token);
+protected:
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B);
+};
+//-----------------------------------------------------------------------------
+/**
+   The system function ⎕EB (Execute Both)
+ */
+class Quad_EB : public QuadFunction
+{
+public:
+   /// Constructor.
+   Quad_EB() : QuadFunction(TOK_Quad_EB) {}
 
-   /// end of context handler for ⎕EA
-   static bool eoc_A_and_B_done(Token & token);
+   /// overladed Function::may_push_SI()
+   virtual bool may_push_SI() const   { return true; }
+
+   static Quad_EB * fun;          ///< Built-in function.
+   static Quad_EB  _fun;          ///< Built-in function.
+
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B);
@@ -228,9 +243,6 @@ public:
    static Quad_INP * fun;          ///< Built-in function.
    static Quad_INP  _fun;          ///< Built-in function.
 
-   /// read input until end_marker seen; maybe ⍎ esc1...esc2.
-   static bool eoc_INP(Token & token);
-
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B);
@@ -241,9 +253,6 @@ protected:
    /// overloaded Function::eval_XB().
    virtual Token eval_XB(Value_P X, Value_P B);
 
-   /// common code for eval_AB and eval_B
-   Token do_INP();
-
    /// extract the esc1 and esc2 strings from \b A
    void get_esc(Value_P A, UCS_string & esc1, UCS_string & esc2);
 
@@ -252,12 +261,6 @@ protected:
 
    /// split \b raw_lines into \b prefixes, \b escapes, and \b suffixes
    void split_strings();
-
-   /// perform APL escapes
-   Token do_escapes();
-
-   /// construct final result
-   Token finish();
 
    /// the end merker for APL escapes (dyadic ⎕INP only)
    /// the start merker for APL escapes (dyadic ⎕INP only)
@@ -276,9 +279,6 @@ protected:
 
    /// bool to prevent recursive ⎕INP calls
    bool Quad_INP_running;
-
-   ShapeItem idx_e;
-   ShapeItem last_e;
 };
 //-----------------------------------------------------------------------------
 /**

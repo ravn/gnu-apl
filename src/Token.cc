@@ -278,6 +278,7 @@ Token::print_function(ostream & out) const
         case TOK_Quad_UCS:
         case TOK_Quad_AT:
         case TOK_Quad_EA:
+        case TOK_Quad_EB:
         case TOK_Quad_SVC:
         case TOK_Quad_TF:
         case TOK_Quad_ES:

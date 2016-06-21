@@ -86,6 +86,8 @@ st( ESCAPE        , "→"       ,          )
 qv( ET            , "⎕ET"     ,          )
 qf( EX            , "⎕EX"     ,          )
 sf( F1_EXECUTE    , "⍎"       ,          )
+pp( EA_EXEC       , ---       ,          )
+qf( EB            , "⎕EB"     ,          )
 
 qv( FC            , "⎕FC"     , = 0x4601 )
 sf( F2_FIND       , "⋸"       ,          )

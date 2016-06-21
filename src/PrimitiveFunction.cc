@@ -2756,64 +2756,7 @@ Bif_F1_EXECUTE::execute_statement(UCS_string & statement)
    //
    if (statement.size() &&
        (statement[0] == UNI_ASCII_R_PARENT ||
-        statement[0] == UNI_ASCII_R_BRACK))
-      {
-        if (statement.starts_iwith(")LOAD")  ||
-            statement.starts_iwith(")QLOAD") ||
-            statement.starts_iwith(")CLEAR") ||
-            statement.starts_iwith(")SIC"))
-           {
-             // the command modifies the SI stack. We throw E_COMMAND_PUSHED
-             // but without displaying it. That should bring us back to
-             // Command::do_APL_expression() with token.get_tag() == TOK_ERROR
-             //
-             Workspace::push_Command(statement);
-             Error error(E_COMMAND_PUSHED, LOC);
-             throw error;
-           }
-
-        ExecuteList * fun = new ExecuteList(statement.no_pad(), LOC);
-        Assert(fun);
-        Workspace::push_SI(fun, LOC);
-
-        UTF8_ostream out;
-        const bool valid = Command::do_APL_command(out, statement);
-        if (!valid)
-           {
-              Workspace::pop_SI(LOC);
-              throw_apl_error(E_INCORRECT_COMMAND, LOC);
-           }
-
-        UTF8_string result_utf8 = out.get_data();
-        if (result_utf8.size() == 0 ||
-            result_utf8.last() != UNI_ASCII_LF)
-           result_utf8.append(UNI_ASCII_LF);
-
-        vector<ShapeItem> line_starts;
-        line_starts.push_back(0);
-        loop(r, result_utf8.size())
-           {
-             if (result_utf8[r] == UNI_ASCII_LF)   line_starts.push_back(r + 1);
-           }
-
-        Value_P Z((ShapeItem)line_starts.size() - 1, LOC);
-        loop(l, line_starts.size() - 1)
-           {
-             ShapeItem len;
-             if (l < line_starts.size() - 1)
-                len = line_starts[l + 1] - line_starts[l] - 1;
-             else
-                len = result_utf8.size() - line_starts[l];
-
-             UTF8_string line_utf8(&result_utf8[line_starts[l]], len);
-             UCS_string line_ucs(line_utf8);
-             Value_P ZZ(line_ucs, LOC);
-             new (Z->next_ravel())   PointerCell(ZZ, Z.getref());
-           }
-
-        Workspace::pop_SI(LOC);
-        return Token(TOK_APL_VALUE1, Z);
-      }
+        statement[0] == UNI_ASCII_R_BRACK))   return execute_command(statement);
 
 ExecuteList * fun = ExecuteList::fix(statement.no_pad(), LOC);
    if (fun == 0)   SYNTAX_ERROR;
@@ -2828,6 +2771,67 @@ ExecuteList * fun = ExecuteList::fix(statement.no_pad(), LOC);
       }
 
    return Token(TOK_SI_PUSHED);
+}
+//-----------------------------------------------------------------------------
+Token
+Bif_F1_EXECUTE::execute_command(UCS_string & command)
+{
+   if (command.starts_iwith(")LOAD")  ||
+       command.starts_iwith(")QLOAD") ||
+       command.starts_iwith(")CLEAR") ||
+       command.starts_iwith(")SIC"))
+      {
+        // the command modifies the SI stack. We throw E_COMMAND_PUSHED
+        // but without displaying it. That should bring us back to
+        // Command::do_APL_expression() with token.get_tag() == TOK_ERROR
+        //
+        Workspace::push_Command(command);
+        Error error(E_COMMAND_PUSHED, LOC);
+        throw error;
+      }
+
+ExecuteList * fun = new ExecuteList(command.no_pad(), LOC);
+   Assert(fun);
+   Workspace::push_SI(fun, LOC);
+
+UTF8_ostream out;
+const bool valid = Command::do_APL_command(out, command);
+   if (!valid)
+      {
+        Workspace::pop_SI(LOC);
+        throw_apl_error(E_INCORRECT_COMMAND, LOC);
+      }
+
+UTF8_string result_utf8 = out.get_data();
+   if (result_utf8.size() == 0 ||
+       result_utf8.last() != UNI_ASCII_LF)
+      result_utf8.append(UNI_ASCII_LF);
+
+vector<ShapeItem> line_starts;
+   line_starts.push_back(0);
+   loop(r, result_utf8.size())
+      {
+        if (result_utf8[r] == UNI_ASCII_LF)   line_starts.push_back(r + 1);
+      }
+
+Value_P Z((ShapeItem)line_starts.size() - 1, LOC);
+   loop(l, line_starts.size() - 1)
+      {
+        ShapeItem len;
+        if (l < line_starts.size() - 1)
+           len = line_starts[l + 1] - line_starts[l] - 1;
+        else
+           len = result_utf8.size() - line_starts[l];
+
+        UTF8_string line_utf8(&result_utf8[line_starts[l]], len);
+        UCS_string line_ucs(line_utf8);
+        Value_P ZZ(line_ucs, LOC);
+        new (Z->next_ravel())   PointerCell(ZZ, Z.getref());
+      }
+
+   Workspace::pop_SI(LOC);
+
+   return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
 Token

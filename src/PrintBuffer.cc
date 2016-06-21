@@ -658,6 +658,16 @@ PrintBuffer::pad_height(Unicode pad, ShapeItem height)
 }
 //-----------------------------------------------------------------------------
 void
+PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
+{
+   if (height > get_height())
+      {
+        UCS_string ucs(get_width(0), pad);
+        while (height > get_height())   buffer.insert(buffer.begin(), ucs);
+      }
+}
+//-----------------------------------------------------------------------------
+void
 PrintBuffer::get_frame_chars(PrintStyle pst,
                              Unicode & HORI, Unicode & VERT,
                              Unicode & NW, Unicode & NE,
