@@ -788,6 +788,15 @@ const int function_number = X->get_ravel(0).get_near_int();
                      goto out_errno;
                    }
 
+                if (!S_ISREG(st.st_mode))
+                   {
+                     close(fd);
+                     Workspace::more_error() = UCS_string(path);
+                     Workspace::more_error().append_utf8(
+                                " is not a regular file");
+                     DOMAIN_ERROR;
+                   }
+
                 ShapeItem len = st.st_size;
                 unsigned char * data = (unsigned char *)mmap(0, len, PROT_READ,
                                 MAP_SHARED, fd, 0);
