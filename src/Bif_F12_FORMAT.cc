@@ -49,8 +49,7 @@ Bif_F12_FORMAT::eval_B(Value_P B)
 
    if (!B->is_simple())
       {
-        const PrintContext pctx(PR_APL);
-        PrintBuffer pb(*B, pctx, 0);
+        PrintBuffer pb(*B, Workspace::get_PrintContext(PR_APL), 0);
         Assert(pb.is_rectangular());
         const ShapeItem cols = pb.get_width(0);
         const ShapeItem rows = pb.get_height();

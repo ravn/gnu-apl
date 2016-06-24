@@ -1380,8 +1380,10 @@ NumericCell::bif_binomial(Cell * Z, const Cell * A) const
         return E_NO_ERROR;
       }
 
-const APL_Integer a = A->get_near_int();
-const APL_Integer b = get_near_int();
+   if (!A->is_near_int())   return E_DOMAIN_ERROR;
+   if (!is_near_int())      return E_DOMAIN_ERROR;
+const APL_Integer a = A->get_checked_near_int();
+const APL_Integer b = get_checked_near_int();
 
 int how = 0;
    if (a < 0)    how |= 4;
@@ -1444,8 +1446,11 @@ const APL_Float qct = Workspace::get_CT();
    //
    if (A->is_near_int() && is_near_int())
       {
-        const APL_Integer a = A->get_near_int();
-        const APL_Integer b =    get_near_int();
+        if (!A->is_near_int())   return E_DOMAIN_ERROR;
+        if (!is_near_int())      return E_DOMAIN_ERROR;
+
+        const APL_Integer a = A->get_checked_near_int();
+        const APL_Integer b =    get_checked_near_int();
         APL_Integer gcd;
         const ErrorCode err = int_gcd(gcd, a, b);
         if (err)   return err;
@@ -1528,8 +1533,10 @@ const APL_Float qct = Workspace::get_CT();
    //
    if (A->is_near_int() && is_near_int())
       {
-        const APL_Integer a = A->get_near_int();
-        const APL_Integer b =    get_near_int();
+        if (!A->is_near_int())   return E_DOMAIN_ERROR;
+        if (!is_near_int())      return E_DOMAIN_ERROR;
+        const APL_Integer a = A->get_checked_near_int();
+        const APL_Integer b =    get_checked_near_int();
         APL_Integer gcd;
         const ErrorCode err = int_gcd(gcd, a, b);
         if (err)   return err;

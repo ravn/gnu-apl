@@ -69,7 +69,9 @@ RealCell::bif_logarithm(Cell * Z, const Cell * A) const
 ErrorCode
 RealCell::bif_circle_fun(Cell * Z, const Cell * A) const
 {
-const APL_Integer fun = A->get_near_int();
+   if (!A->is_near_int())   return E_DOMAIN_ERROR;
+const APL_Integer fun = A->get_checked_near_int();
+
    new (Z) FloatCell(0);   // prepare for DOMAIN ERROR
 
 const ErrorCode ret = do_bif_circle_fun(Z, fun);
@@ -80,7 +82,9 @@ const ErrorCode ret = do_bif_circle_fun(Z, fun);
 ErrorCode
 RealCell::bif_circle_fun_inverse(Cell * Z, const Cell * A) const
 {
-const APL_Integer fun = A->get_near_int();
+   if (!A->is_near_int())   return E_DOMAIN_ERROR;
+const APL_Integer fun = A->get_checked_near_int();
+
    new (Z) FloatCell(0);   // prepare for DOMAIN ERROR
 
 ErrorCode ret = E_DOMAIN_ERROR;

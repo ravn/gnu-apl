@@ -1067,8 +1067,8 @@ const Cell * C = &B.get_ravel(0);
             continue;
           }
 
-       if (!C->is_near_int())       return true;
-       if (C->get_near_int() < 0)   return true;
+       if (!C->is_near_int())               return true;
+       if (C->get_checked_near_int() < 0)   return true;
 
         ++C;
       }
