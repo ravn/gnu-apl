@@ -222,8 +222,11 @@ Executable * statements = 0;
          //
          if (token.get_tag() == TOK_SI_PUSHED)   continue;
 
-       check_EOC:
-         Workspace::SI_top()->call_eoc_handler(token);
+check_EOC:
+         if (Workspace::SI_top()->is_safe_execution_start())
+            {
+              Quad_EC::eoc(token);
+            }
 
          // the far most frequent cases are TC_VALUE and TOK_VOID
          // so we handle them first.
@@ -308,10 +311,8 @@ Executable * statements = 0;
                     goon = si->get_parse_mode() != PM_STATEMENT_LIST;
                     si->escape();   // pop local vars of user defined functions
                     Workspace::pop_SI(LOC);
-              }
+                  }
               return;
-
-              Assert(0 && "not reached");
             }
 
          if (token.get_tag() == TOK_ERROR)
@@ -331,24 +332,21 @@ Executable * statements = 0;
               attention_raised = false;
               interrupt_raised = false;
 
-              // check for safe execution mode. Entries in safe execution mode
-              // can be far above the current SI entry. The EOC handler will
+              // check for safe execution mode. Unroll all SI entries that
+              // have the same safe_execution_count, except the last
               // unroll the SI stack.
               //
-              for (StateIndicator * si = Workspace::SI_top();
-                   si; si = si->get_parent())
-                  {
-                    if (si->get_safe_execution())
-                       {
-                         // pop SI entries above the entry with safe_execution
-                         //
-                         while (Workspace::SI_top() != si)
-                            {
-                              Workspace::pop_SI(LOC);
-                            }
+              if (Workspace::SI_top()->get_safe_execution())
+                 {
+                  StateIndicator * si = Workspace::SI_top();
+                   while (si->get_parent() && si->get_safe_execution() ==
+                          si->get_parent()->get_safe_execution())
+                      {
+                        si = si->get_parent();
+                        Workspace::pop_SI(LOC);
+                      }
 
-                         goto check_EOC;
-                       }
+                    goto check_EOC;
                   }
 
               // if suspend is not allowed then pop all SI entries that

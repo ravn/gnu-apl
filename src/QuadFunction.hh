@@ -155,7 +155,7 @@ public:
    static Quad_EC  _fun;          ///< Built-in function.
 
    /// end of context handler for ⎕EC
-   static bool eoc(Token & token);
+   static void eoc(Token & token);
 
 protected:
    /// overloaded Function::eval_B().

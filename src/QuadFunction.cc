@@ -99,15 +99,15 @@ Value_P Z(B->get_shape(), LOC);
             {
               const Unicode uni = cell_B.get_char_value();
               int32_t pos = Avec::find_av_pos(uni);
-              if (pos < 0)   new (&Z->get_ravel(v)) IntCell(MAX_AV);
-              else           new (&Z->get_ravel(v)) IntCell(pos);
+              if (pos < 0)   new (Z->next_ravel()) IntCell(MAX_AV);
+              else           new (Z->next_ravel()) IntCell(pos);
               continue;
             }
 
          if (cell_B.is_integer_cell())
             {
               const APL_Integer idx = cell_B.get_near_int();
-              new (&Z->get_ravel(v))   CharCell(Quad_AV::indexed_at(idx));
+              new (Z->next_ravel()) CharCell(Quad_AV::indexed_at(idx));
               continue;
             }
 
@@ -230,7 +230,7 @@ const APL_time_us end = start + 1000000 * B->get_ravel(0).get_real_value();
    // return time elapsed.
    //
 Value_P Z(LOC);
-   new (&Z->get_ravel(0)) FloatCell(0.000001*(now() - start));
+   new (Z->next_ravel()) FloatCell(0.000001*(now() - start));
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -278,28 +278,21 @@ Quad_EC::eval_B(Value_P B)
 const UCS_string statement_B(*B.get());
 
 ExecuteList * fun = 0;
-
-   try
-      {
-        fun = ExecuteList::fix(statement_B, LOC);
-      }
-   catch (...)
-      {
-      }
+   try { fun = ExecuteList::fix(statement_B, LOC); }    catch (...) {}
 
    if (fun == 0)
       {
         // syntax error in B
         //
-        Value_P Z(3, LOC);
-        Value_P Z1(2, LOC);
-        Value_P Z2(Error::error_name(E_SYNTAX_ERROR), LOC);
-        new (&Z1->get_ravel(0))   IntCell(Error::error_major(E_SYNTAX_ERROR));
-        new (&Z1->get_ravel(1))   IntCell(Error::error_minor(E_SYNTAX_ERROR));
+        Value_P Z2(2, LOC);
+            new (Z2->next_ravel())  IntCell(Error::error_major(E_SYNTAX_ERROR));
+            new (Z2->next_ravel())  IntCell(Error::error_minor(E_SYNTAX_ERROR));
 
-        new (&Z->get_ravel(0)) IntCell(0);        // return code = error
-        new (&Z->get_ravel(1)) PointerCell(Z1, Z.getref());   // ⎕ET value
-        new (&Z->get_ravel(2)) PointerCell(Z2, Z.getref());   // ⎕EM
+        Value_P Z3(Error::error_name(E_SYNTAX_ERROR), LOC);
+        Value_P Z(3, LOC);
+        new (Z->next_ravel()) IntCell(0);        // return code = error
+        new (Z->next_ravel()) PointerCell(Z2, Z.getref());   // ⎕ET value
+        new (Z->next_ravel()) PointerCell(Z3, Z.getref());   // ⎕EM
 
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -310,7 +303,7 @@ ExecuteList * fun = 0;
    Log(LOG_UserFunction__execute)   fun->print(CERR);
 
    Workspace::push_SI(fun, LOC);
-   Workspace::SI_top()->set_safe_execution(true);
+   Workspace::SI_top()->set_safe_execution();
 
    return Token(TOK_SI_PUSHED);
 }
@@ -335,94 +328,93 @@ Value_P Z((ShapeItem)0, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
-bool
-Quad_EC::eoc(Token & result_B)
+void
+Quad_EC::eoc(Token & result)
 {
-StateIndicator * si = Workspace::SI_top();
-   si->set_safe_execution(false);
-
+   // set result to an APL value Z = (Z1 Z2 Z3) where:
+   //
+   // Z1 is an integer scalar 0-5 (return code),
+   // Z2 is a two-element integer vector with the value that ⎕ET would have,
+   // Z3 is some value
+   //
 Value_P Z(3, LOC);
-Value_P Z2;
-
-int result_type = 0;
-ErrorCode ec = E_NO_ERROR;
-
-   switch(result_B.get_tag())
+   if (result.get_tag() == TOK_ERROR)
       {
-       case TOK_ERROR:
-            {
-              result_type = 0;
-              const Error & err = si->get_error();
+        StateIndicator * si = Workspace::SI_top();
+        si->clear_safe_execution();
 
-              ec = ErrorCode(result_B.get_int_val());
+        const Error & err = si->get_error();
+        const ErrorCode ec = ErrorCode(result.get_int_val());
 
-              UCS_string row_1 = Error::error_name(ec);
-              UCS_string row_2 = err.get_error_line_2();
-              UCS_string row_3 = err.get_error_line_3();
-              int cols = row_1.size();
-              if (cols < row_2.size())   cols = row_2.size();
-              if (cols < row_3.size())   cols = row_3.size();
+        PrintBuffer pb;
+        pb.append_ucs(Error::error_name(ec));
+        pb.append_ucs(err.get_error_line_2());
+        pb.append_ucs(err.get_error_line_3());
 
-              const Shape sh_Z2(3, cols);
-              Z2 = Value_P(sh_Z2, LOC);   // 3 line message like ⎕EM
-              Cell * C2 = &Z2->get_ravel(0);
-              loop(c, cols)
-                 if (c < row_1.size())   new (C2++) CharCell(row_1[c]);
-                 else                    new (C2++) CharCell(UNI_ASCII_SPACE);
-              loop(c, cols)
-                 if (c < row_2.size())   new (C2++) CharCell(row_2[c]);
-                 else                    new (C2++) CharCell(UNI_ASCII_SPACE);
-              loop(c, cols)
-                 if (c < row_3.size())   new (C2++) CharCell(row_3[c]);
-                 else                    new (C2++) CharCell(UNI_ASCII_SPACE);
-            }
-            break;
+        Value_P Z2(2, LOC);
+            new (Z2->next_ravel()) IntCell(Error::error_major(ec));
+            new (Z2->next_ravel()) IntCell(Error::error_minor(ec));
+        Z2->check_value(LOC);
 
+        Value_P Z3(pb, LOC);   // 3 line message like ⎕EM
+
+        new (Z->next_ravel()) IntCell(0);
+        new (Z->next_ravel()) PointerCell(Z2, Z.getref());
+        new (Z->next_ravel()) PointerCell(Z3, Z.getref());
+
+        Z->check_value(LOC);
+        move_2(result, Token(TOK_APL_VALUE1, Z), LOC);
+        return;
+      }
+
+   // all other cases have Z2 = 0 0
+   //
+Value_P Z2(2, LOC);
+   new (Z2->next_ravel()) IntCell(0);
+   new (Z2->next_ravel()) IntCell(0);
+        Z2->check_value(LOC);
+
+   switch(result.get_tag())
+      {
         case TOK_APL_VALUE1:
         case TOK_APL_VALUE3:
-             result_type = 1;
-             Z2 = result_B.get_apl_val();
+             new (Z->next_ravel()) IntCell(1);
+             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
+             new (Z->next_ravel()) PointerCell(result.get_apl_val(),Z.getref());
              break;
 
         case TOK_APL_VALUE2:
-             result_type = 2;
-             Z2 = result_B.get_apl_val();
+             new (Z->next_ravel()) IntCell(2);
+             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
+             new (Z->next_ravel()) PointerCell(result.get_apl_val(),Z.getref());
              break;
 
         case TOK_NO_VALUE:
         case TOK_VOID:
-             result_type = 3;
-             Z2 = Idx0(LOC);  // 0⍴0
+             new (Z->next_ravel()) IntCell(3);
+             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
+             new (Z->next_ravel()) PointerCell(Idx0_0(LOC), Z.getref());
              break;
 
         case TOK_BRANCH:
-             result_type = 4;
-             Z2 = Value_P(LOC);
-             new (&Z2->get_ravel(0))   IntCell(result_B.get_int_val());
+             new (Z->next_ravel()) IntCell(4);
+             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
+             new (Z->next_ravel()) IntCell(result.get_int_val());
              break;
 
         case TOK_ESCAPE:
-             result_type = 5;
-             Z2 = Idx0(LOC);  // 0⍴0
+             new (Z->next_ravel()) IntCell(5);
+             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
+             new (Z->next_ravel()) PointerCell(Idx0_0(LOC), Z.getref());
              break;
 
-        default: CERR << "unexpected result tag " << result_B.get_tag()
+        default: CERR << "unexpected result tag " << result.get_tag()
                       << " in Quad_EC::eoc()" << endl;
                  Assert(0);
       }
 
-Value_P Z1(2, LOC);
-   new (&Z1->get_ravel(0)) IntCell(Error::error_major(ec));
-   new (&Z1->get_ravel(1)) IntCell(Error::error_minor(ec));
-
-   new (&Z->get_ravel(0)) IntCell(result_type);
-   new (&Z->get_ravel(1)) PointerCell(Z1, Z.getref());
-   new (&Z->get_ravel(2)) PointerCell(Z2, Z.getref());
-
    Z->check_value(LOC);
-   move_2(result_B, Token(TOK_APL_VALUE1, Z), LOC);
-
-   return false;
+   move_2(result, Token(TOK_APL_VALUE1, Z), LOC);
 }
 //=============================================================================
 Token
@@ -704,10 +696,7 @@ Value_P BB(line_count, LOC);
 Token ret = Macro::Z__Quad_INP_B->eval_B(BB);
    Assert1(ret.get_tag() == TOK_SI_PUSHED);
 
-   loop(l, line_count)
-       {
-         BB->get_ravel(l).release(LOC);
-       }
+   loop(l, line_count)   BB->get_ravel(l).release(LOC);
 
    Quad_INP_running = false;
    return Token(TOK_SI_PUSHED);

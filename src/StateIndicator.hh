@@ -143,21 +143,28 @@ public:
    /// change axis arg
    void set_X(Value_P value);
 
-   /// call eoc_handler
-   void call_eoc_handler(Token & token);
+   /// return true if this SI entry has entered safe execution mode (via ⎕EC)
+   bool is_safe_execution_start() const
+      { if (!parent)   return safe_execution_count > 0;
+        return safe_execution_count > parent->safe_execution_count;
+      }
 
    /// return the number of pending ⎕ECs (or other safe execution contexts)
    int get_safe_execution() const
       { return safe_execution_count; }
 
    /// set safe_execution mode
-   void set_safe_execution(bool on_off)
-      { if (on_off)   // safe execution ON
-           if (parent)  safe_execution_count = parent->safe_execution_count + 1;
-           else         safe_execution_count = 1;
-        else          // safe execution OFF
-           if (parent)  safe_execution_count = parent->safe_execution_count;
-           else         safe_execution_count = 0;
+   void set_safe_execution()
+      {
+        if (parent)  safe_execution_count = parent->safe_execution_count + 1;
+        else         safe_execution_count = 1;
+      }
+
+   /// clear safe_execution mode
+   void clear_safe_execution()
+      {
+        if (parent)  safe_execution_count = parent->safe_execution_count;
+        else         safe_execution_count = 0;
       }
 
    /// get the current prefix parser

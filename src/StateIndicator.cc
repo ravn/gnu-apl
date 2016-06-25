@@ -34,7 +34,7 @@
 //-----------------------------------------------------------------------------
 StateIndicator::StateIndicator(Executable * exec, StateIndicator * _par)
    : executable(exec),
-     safe_execution_count(0),
+     safe_execution_count(_par ? _par->safe_execution_count : 0),
      level(_par ? 1 + _par->get_level() : 0),
      error(E_NO_ERROR, LOC),
      current_stack(*this, exec->get_body()),
@@ -471,13 +471,6 @@ StateIndicator::set_X(Value_P new_value)
 {
 Value_P * X = current_stack.locate_X();
    if (X)   *X = new_value;
-}
-//-----------------------------------------------------------------------------
-void
-StateIndicator::call_eoc_handler(Token & token)
-{
-   if (parent && parent->safe_execution_count != safe_execution_count)
-      Quad_EC::eoc(token);
 }
 //-----------------------------------------------------------------------------
 Function_Line
