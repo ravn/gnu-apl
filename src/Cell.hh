@@ -56,6 +56,7 @@ public:
    void init(const Cell & other, Value & cell_owner, const char * loc)
       { other.init_other(this, cell_owner, loc); }
 
+   /// init \b other from \b this cell
    virtual void init_other(void * other, Value & cell_owner,
                            const char * loc) const
       { Assert(0 && "Cell::init_other() called on base class"); }

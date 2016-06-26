@@ -272,9 +272,16 @@ protected:
    /// the end merker for the entire ⎕INP input
    UCS_string end_marker;
 
+   /// the raw lines read from stdin
    vector<UCS_string> raw_lines;
+
+   /// the line parts left of the escapes
    vector<UCS_string> prefixes;
+
+   /// the line parts to exe executed
    vector<UCS_string> escapes;
+
+   /// the line parts right of the escapes
    vector<UCS_string> suffixes;
 
    /// bool to prevent recursive ⎕INP calls

@@ -833,10 +833,10 @@ public:
    SET_STATE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u8 _new_state,
-                Sig_item_string _loc)
+                Sig_item_string sloc)
    : key(_key),
      new_state(_new_state),
-     loc(_loc)
+     loc(sloc)
    { send_TCP(s); }
 
    /// construct (deserialize) this item from a (received) buffer

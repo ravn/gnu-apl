@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-201c  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,17 +39,38 @@
 #include "Workspace.hh"
 #include "UserPreferences.hh"
 
+/** @file **/
+
+/** \mainpage GNU APL
+
+   GNU APL is a free interpreter for the programming language APL.
+
+   GNU APL tries to be compatible with both the \b ISO \b standard \b 13751
+   (aka. Programming Language APL, Extended) and to \b IBM \b APL2.
+
+   It is \b NOT meant to be a vehicle for implementing new features to the
+   APL language.
+ **/
+
+/// when this file  was built
 static const char * build_tag[] = { BUILDTAG, 0 };
 
 //-----------------------------------------------------------------------------
 
+/// old sigaction argument for ^C
 static struct sigaction old_control_C_action;
+
+/// new sigaction argument for ^C
 static struct sigaction new_control_C_action;
 
 //-----------------------------------------------------------------------------
+/// old sigaction argument for segfaults
 static struct sigaction old_SEGV_action;
+
+/// new sigaction argument for segfaults
 static struct sigaction new_SEGV_action;
 
+/// signal handler for segfaults
 static void
 signal_SEGV_handler(int)
 {
@@ -68,22 +89,29 @@ signal_SEGV_handler(int)
    // count errors
    IO_Files::assert_error();
 
-     Command::cmd_OFF(3);
+   Command::cmd_OFF(3);
 }
 //-----------------------------------------------------------------------------
+/// old sigaction argument for SIGUSR1
+static struct sigaction old_USR1_action;
+
+/// new sigaction argument for SIGUSR1
+static struct sigaction new_USR1_action;
+
+/// signal handler for SIGUSR1
 static void
 signal_USR1_handler(int)
 {
    CERR << "Got signal USR1" << endl;
 }
-
-static struct sigaction old_USR1_action;
-static struct sigaction new_USR1_action;
-
 //-----------------------------------------------------------------------------
+/// old sigaction argument for SIGTERM
 static struct sigaction old_TERM_action;
+
+/// new sigaction argument for SIGTERM
 static struct sigaction new_TERM_action;
 
+/// signal handler for SIGTERM
 static void
 signal_TERM_handler(int)
 {
@@ -93,9 +121,13 @@ signal_TERM_handler(int)
 }
 //-----------------------------------------------------------------------------
 #if PARALLEL_ENABLED
+/// old sigaction argument for ^\
 static struct sigaction old_control_BSL_action;
+
+/// new sigaction argument for ^\
 static struct sigaction new_control_BSL_action;
 
+/// signal handler for ^\
 static void
 control_BSL(int sig)
 {
@@ -104,9 +136,13 @@ control_BSL(int sig)
 }
 #endif // PARALLEL_ENABLED
 //-----------------------------------------------------------------------------
+/// old sigaction argument for SIGHUP
 static struct sigaction old_HUP_action;
+
+/// new sigaction argument for SIGHUP
 static struct sigaction new_HUP_action;
 
+/// new signal handler for SIGHUP
 static void
 signal_HUP_handler(int)
 {
@@ -115,6 +151,7 @@ signal_HUP_handler(int)
    raise(SIGHUP);
 }
 //-----------------------------------------------------------------------------
+/// print argc and argv[]
 static void
 show_argv(int argc, const char ** argv)
 {
@@ -176,6 +213,7 @@ const int left_pad = (80 - len)/2;
        }
 }
 //-----------------------------------------------------------------------------
+/// initialize the interpreter
 int
 init_apl(int argc, const char * argv[])
 {
@@ -358,6 +396,7 @@ const bool log_startup = uprefs.parse_argv_1();
    return 0;
 }
 //-----------------------------------------------------------------------------
+/// dito.
 int
 main(int argc, const char *argv[])
 {

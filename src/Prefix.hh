@@ -198,7 +198,7 @@ public:
    Token_loc & pop()
       {  Assert1(size() > 0);   return content[--put]; }
 
-   /// discard the leftmost token (e,g, A in A←B) from the stack and return it
+   /// discard the leftmost token (e,g, A in A←B) from the stack
    void pop_and_discard()
       {  Assert1(size() > 0);   --put; }
 

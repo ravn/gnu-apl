@@ -1358,11 +1358,15 @@ void
 Prefix::reduce_V_ASS_B_()
 {
 Value_P B = at2().get_apl_val();
+
+//   Assert1(B->get_owner_count() >= 2);   // B and at2()
+//  const bool clone = B->get_owner_count() != 2;
 Symbol * V = at0().get_sym_ptr();
    V->assign(B, true, LOC);
 
-Token result = Token(TOK_APL_VALUE2, B);
-   pop_args_push_result(result);
+   pop_and_discard();   // V
+   pop_and_discard();   // ←
+   at0().ChangeTag(TOK_APL_VALUE2);   // value → committed vcvalue
 
    set_assign_state(ASS_none);
    action = RA_CONTINUE;

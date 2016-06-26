@@ -549,19 +549,11 @@ Value_P value(LOC);
 void
 Quad_PP::assign(Value_P value, bool clone, const char * loc)
 {
-   if (!value->is_scalar_or_len1_vector())
-      {
-        if (value->get_rank() > 1)   RANK_ERROR;
-        else                         LENGTH_ERROR;
-      }
+APL_Integer pp = value->get_sole_integer();
+   if (pp < MIN_Quad_PP)   DOMAIN_ERROR;
+   if (pp > MAX_Quad_PP)   pp = MAX_Quad_PP;
 
-const Cell & cell = value->get_ravel(0);
-APL_Integer val = cell.get_near_int();
-   if (val < MIN_Quad_PP)   DOMAIN_ERROR;
-
-   if (val > MAX_Quad_PP)   val = MAX_Quad_PP;
-
-   Symbol::assign(IntScalar(val, LOC), false, LOC);
+   Symbol::assign(IntScalar(pp, LOC), false, LOC);
 }
 //=============================================================================
 Quad_PR::Quad_PR()
@@ -589,20 +581,13 @@ Quad_PS::Quad_PS()
 void
 Quad_PS::assign(Value_P value, bool clone, const char * loc)
 {
-   if (!value->is_scalar_or_len1_vector())
-      {
-        if (value->get_rank() > 1)   RANK_ERROR;
-        else                         LENGTH_ERROR;
-      }
-
-const Cell & cell = value->get_ravel(0);
-const APL_Integer val = cell.get_near_int();
-   switch(val)
+const APL_Integer ps = value->get_sole_integer();
+   switch(ps)
       {
         case 0:
         case 1:
         case 2:
-        case 3:  Symbol::assign(IntScalar(val, LOC), false, LOC);   return;
+        case 3:  Symbol::assign(IntScalar(ps, LOC), false, LOC);   return;
         default: DOMAIN_ERROR;
       }
 }
@@ -616,22 +601,15 @@ Quad_PW::Quad_PW()
 void
 Quad_PW::assign(Value_P value, bool clone, const char * loc)
 {
-   if (!value->is_scalar_or_len1_vector())
-      {
-        if (value->get_rank() > 1)   RANK_ERROR;
-        else                         LENGTH_ERROR;
-      }
+const APL_Integer pw = value->get_sole_integer();
 
-const Cell & cell = value->get_ravel(0);
-const APL_Integer val = cell.get_near_int();
-
-   // min val is 30. Ignore smaller values.
-   if (val < 30)   return;
+   // min. ⎕PW is 30. Ignore smaller values.
+   if (pw < MIN_Quad_PW)   return;
 
    // max val is system specific. Ignore larger values.
-   if (val > MAX_Quad_PW)   return;
+   if (pw > MAX_Quad_PW)   return;
 
-   Symbol::assign(value, clone, LOC);
+   Symbol::assign(IntScalar(pw, LOC), false, LOC);
 }
 //=============================================================================
 Quad_Quad::Quad_Quad()
@@ -929,13 +907,13 @@ const APL_time_us offset_us = 1000000 * Workspace::get_v_Quad_TZ().get_offset();
 const YMDhmsu time(now() + offset_us);
 
 Value_P Z(7, LOC);
-   new (&Z->get_ravel(0)) IntCell(time.year);
-   new (&Z->get_ravel(1)) IntCell(time.month);
-   new (&Z->get_ravel(2)) IntCell(time.day);
-   new (&Z->get_ravel(3)) IntCell(time.hour);
-   new (&Z->get_ravel(4)) IntCell(time.minute);
-   new (&Z->get_ravel(5)) IntCell(time.second);
-   new (&Z->get_ravel(6)) IntCell(time.micro / 1000);
+   new (Z->next_ravel()) IntCell(time.year);
+   new (Z->next_ravel()) IntCell(time.month);
+   new (Z->next_ravel()) IntCell(time.day);
+   new (Z->next_ravel()) IntCell(time.hour);
+   new (Z->next_ravel()) IntCell(time.minute);
+   new (Z->next_ravel()) IntCell(time.second);
+   new (Z->next_ravel()) IntCell(time.micro / 1000);
 
    Z->check_value(LOC);
    return Z;

@@ -44,9 +44,11 @@ public:
    /// Destructor.
    ~UserFunction();
 
+   /// return true if this function is a lambda
    virtual bool is_lambda() const
       { return header.get_name()[0] == UNI_LAMBDA; }
 
+   /// return the macro number (if this function is one) or -1
    virtual int get_macnum() const
       { return -1; }
 

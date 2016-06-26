@@ -52,7 +52,7 @@ class Thread_context;
 class Value : public DynamicObject
 {
    friend class Value_P;
-   friend class PointerCell;   // needs &cell_owner
+   friend class PointerCell;   // needs & for &cell_owner
 
 protected:
    // constructors. Values should not be constructed directly but via their
@@ -145,28 +145,9 @@ public:
    bool is_char_scalar() const
       { return get_rank() == 0 && get_ravel(0).is_character_cell(); }
 
-   /// return \b true iff \b this value is simple (i.e. not nested).
-   bool is_simple() const;
-
-   /// return \b true iff \b this value and its ravel items have rank < 2
-   bool is_one_dimensional() const;
-
-   /// return \b true iff \b this value is a simple integer vector.
-   bool is_int_vector() const;
-
    /// return \b true iff \b this value is a simple integer scalar.
    bool is_int_scalar() const
       { return get_rank() == 0 && get_ravel(0).is_near_int(); }
-
-   /// return true, if this value has complex cells, false iff it has only
-   /// real cells. Throw domain error for other cells (char, nested etc.)
-   bool is_complex() const;
-
-   /// return a value containing pointers to all ravel cells of this value.
-   Value_P get_cellrefs(const char * loc);
-
-   /// assign \b val to the cell references in this value.
-   void assign_cellrefs(Value_P val);
 
    /// return the number of elements (the product of the shapes).
    ShapeItem element_count() const
@@ -212,11 +193,41 @@ public:
    ShapeItem get_offset(const Cell * cell) const
       { return cell - &get_ravel(0); }
 
+   /// return the next byte after the ravel
+   const Cell * get_ravel_end() const
+      { return &ravel[nz_element_count()]; }
+
+   /// return the integer of a value that is supposed to have (exactly) one
+   APL_Integer get_sole_integer() const
+      { if (element_count() == 1)   return get_ravel(0).get_near_int();
+        if (get_rank() > 1)   RANK_ERROR;
+        else                  LENGTH_ERROR;
+      }
+
    /// return the first integer of a value (the line number of →Value).
    Function_Line get_line_number() const
       { const APL_Integer line(ravel[0].get_near_int());
         Log(LOG_execute_goto)   CERR << "goto line " << line << endl;
         return Function_Line(line); }
+
+   /// return \b true iff \b this value is simple (i.e. not nested).
+   bool is_simple() const;
+
+   /// return \b true iff \b this value and its ravel items have rank < 2
+   bool is_one_dimensional() const;
+
+   /// return \b true iff \b this value is a simple integer vector.
+   bool is_int_vector() const;
+
+   /// return true, if this value has complex cells, false iff it has only
+   /// real cells. Throw domain error for other cells (char, nested etc.)
+   bool is_complex() const;
+
+   /// return a value containing pointers to all ravel cells of this value.
+   Value_P get_cellrefs(const char * loc);
+
+   /// assign \b val to the cell references in this value.
+   void assign_cellrefs(Value_P val);
 
    /// return the idx'th element of the ravel.
    Cell & get_ravel(ShapeItem idx)
@@ -225,10 +236,6 @@ public:
    /// return the idx'th element of the ravel.
    const Cell & get_ravel(ShapeItem idx) const
       { Assert1(idx < nz_element_count());   return ravel[idx]; }
-
-   /// return the next byte after the ravel
-   const Cell * get_ravel_end() const
-      { return &ravel[nz_element_count()]; }
 
    /// set the prototype (according to B) if this value is empty.
    void set_default(const Value & B)
@@ -367,52 +374,49 @@ public:
    /// initialize value related variables and print some statistics.
    static void init();
 
-/// maybe enable LOC for set/clear
+/// maybe enable LOC for set/clear of flags
 #if defined(VF_TRACING_WANTED) || defined(VALUE_CHECK_WANTED)   // enable LOC
 # define _LOC LOC
+# define _loc loc
+# define _loc_type const char *
 #else                                                           // disable LOC
 # define _LOC
+# define _loc
+# define _loc_type
 #endif
 
 #ifdef VF_TRACING_WANTED
- # define FLAG_INFO(l, f, n, b) flag_info(l, f, n, b);
+ # define FLAG_TRACE(f, b) flag_info(loc, VF_ ## f, #f, b);
 #else
- # define FLAG_INFO(_l, _f, _n, _b)
+ # define FLAG_TRACE(_f, _b)
 #endif
 
-   /// a macro defining SET_x(), CLEAR_x(), and IS_x() for flag x
-#define VF_flag(flg)							\
-									\
-   /** set Value flag flg **/						\
-   void SET_ ## flg(const char * loc) const				\
-      { FLAG_INFO(loc, VF_ ## flg, #flg, true)				\
-        flags |=  VF_ ## flg;						\
-        ADD_EVENT(this, VHE_SetFlag, VF_ ## flg, loc); }		\
-									\
-   /** clear Value flag flg **/						\
-   void CLEAR_ ## flg(const char * loc) const				\
-      { FLAG_INFO(loc, VF_ ## flg, #flg, false)				\
-        flags &=  ~VF_ ## flg;						\
-        ADD_EVENT(this, VHE_ClearFlag, VF_ ## flg, loc); }		\
-									\
-   /** set Value flag flg **/						\
-   void SET_ ## flg() const     { flags |=  VF_ ## flg;			\
-        ADD_EVENT(this, VHE_SetFlag, VF_ ## flg, LOC); }		\
-									\
-   /** clear Value flag flg **/						\
-   void CLEAR_ ## flg() const   { flags &=  ~VF_ ## flg;		\
-        ADD_EVENT(this, VHE_ClearFlag, VF_ ## flg, LOC); }		\
-									\
-   /** true if Value flag flg is set **/						\
-   bool is_ ## flg() const      { return (flags & VF_ ## flg) != 0; }
+   /// set the Value flag \b complete
+   void SET_complete(_loc_type _loc) const
+      { FLAG_TRACE(complete, true)   flags |=  VF_complete;
+        ADD_EVENT(this, VHE_SetFlag, VF_complete, _loc); }
+
+   /// true if Value flag \b complete is set
+   bool is_complete() const      { return (flags & VF_complete) != 0; }
 
 # define set_complete() SET_complete(_LOC)
+
+   /// set the Value flag \b marked
+   void SET_marked(_loc_type _loc) const
+      { FLAG_TRACE(marked, true)   flags |=  VF_marked;
+        ADD_EVENT(this, VHE_SetFlag, VF_marked, _loc); }
+
+   /// clear the Value flag \b marked
+   void CLEAR_marked(_loc_type _loc) const
+      { FLAG_TRACE(marked, false)   flags &=  ~VF_marked;
+        ADD_EVENT(this, VHE_ClearFlag, VF_marked, _loc); }
+
+   /// true if Value flag \b marked is set
+   bool is_marked() const
+      { return (flags & VF_marked) != 0; }
+
 # define set_marked()   SET_marked(_LOC)
-
-# define clear_marked()   CLEAR_marked(_LOC)
-
-   VF_flag(complete)
-   VF_flag(marked)
+# define clear_marked() CLEAR_marked(_LOC)
 
    /// mark all values, except static values
    static void mark_all_dynamic_values();
@@ -521,7 +525,10 @@ public:
    void add_subcount(ShapeItem count)
       { nz_subcell_count += count; }
 
+   /// the number of fast (recycled) new() calls
    static uint64_t fast_new;
+
+   /// the number of slow ( malloc() baased) new() calls
    static uint64_t slow_new;
 
 protected:

@@ -679,6 +679,7 @@ const ValueStackItem & vs = value_stack.back();
              // if we resolve a variable. the value is considered grouped.
              {
                Token t(TOK_APL_VALUE1, get_apl_value()->clone(LOC));
+//             Token t(TOK_APL_VALUE1, get_apl_value());
                move_1(tok, t, LOC);
              }
              return;

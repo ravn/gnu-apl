@@ -24,9 +24,11 @@
 #include "UserFunction.hh"
 
 //-----------------------------------------------------------------------------
+/// a system function or operator implemented as an internal defined function
 class Macro : public UserFunction
 {
 public:
+   /// the unique number of a macros
    enum Macro_num
       {
 #define mac_def(n, _txt) MAC_ ## n,
@@ -60,6 +62,7 @@ public:
    static Macro * all_macros[MAC_COUNT];
 
 protected:
+   /// A (compile-time) unique number for this macro
    const Macro_num macro_number;
 
 private:

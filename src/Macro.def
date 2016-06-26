@@ -18,31 +18,35 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// monadic EACH without result
+/// monadic EACH without result
 //
 mac_def(LO_EACH_B,
       "(LO LO_EACH_B) B;N;N_max\n"
       "N←⎕IO ◊ N_max←N+⍴B←,B\n"
       "LOOP: LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n")
 
-// dyadic EACH varieties without result...
+/// dyadic EACH without result, scalar A, vector B
 //
 mac_def(sA_LO_EACH_vB,
  "A (LO sa_LO_EACH_vB) B;N;N_max\n"
  "N←⎕IO ◊ N_max←N+⍴B←,B\n"
  "LOOP: A LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n")
 
+/// dyadic EACH without result, vector A, scalar B
+//
 mac_def(vA_LO_EACH_sB,
  "A (LO vA_LO_EACH_sB) B;N;N_max\n"
  "N←⎕IO ◊ N_max←N+⍴A←,A\n"
  "LOOP: (⊃A[N]) LO B ◊ →(N_max>N←N+1)⍴LOOP\n")
 
+/// dyadic EACH without result, vector A, vector B
+//
 mac_def(vA_LO_EACH_vB,
  "A (LO vA_LO_EACH_vB) B;N;N_max\n"
  "N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B\n"
  "LOOP: (⊃A[N]) LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n")
 
-// monadic EACH with result
+/// monadic EACH with result
 //
 mac_def(Z__LO_EACH_B, 
  "Z←(LO Z__LO_EACH_B) B;rho_Z;N;N_max\n"
@@ -50,31 +54,37 @@ mac_def(Z__LO_EACH_B,
  "LOOP: Z[N]←⊂LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n"
  "Z←rho_Z⍴Z\n")
 
-// dyadic EACH varieties with result...
+/// dyadic EACH with result, scalar A, scalar B
 //
 mac_def(Z__sA_LO_EACH_sB,
  "Z←A (LO Z__sA_LO_EACH_sB) B\n"
  "Z←⊂A LO B\n")
 
+/// dyadic EACH with result, scalar A, vector B
+//
 mac_def(  Z__sA_LO_EACH_vB, 
  "Z←A (LO Z__sA_LO_EACH_vB) B;rho_Z;N;N_max\n"
  "rho_Z←⍴B ◊ N←⎕IO ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
  "LOOP: Z[N]←⊂A LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n"
  "Z←rho_Z⍴Z\n")
 
+/// dyadic EACH with result, vector A, scalar B
+//
 mac_def(  Z__vA_LO_EACH_sB, 
  "Z←A (LO Z__vA_LO_EACH_sB) B;rho_Z;N;N_max\n"
  "rho_Z←⍴A ◊ N←⎕IO ◊ N_max←N+⍴A←,A ◊ Z←N_max⍴0\n"
  "LOOP: Z[N]←⊂(⊃A[N]) LO B ◊ →(N_max>N←N+1)⍴LOOP\n"
  "Z←rho_Z⍴Z\n")
 
+/// dyadic EACH with result, vector A, vector B
+//
 mac_def(  Z__vA_LO_EACH_vB, 
  "Z←A (LO Z__vA_LO_EACH_vB) B;rho_Z;N;N_max\n"
  "rho_Z←⍴B ◊ N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
  "LOOP: Z[N]←⊂(⊃A[N]) LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n"
  "Z←rho_Z⍴Z\n")
 
-// outer product
+/// outer product
 //
 mac_def(  Z__A_LO_OUTER_B,
  "Z←A (LO Z__A_LO_OUTER_B) B;rho_Z;N;N_max;I;IA;IB\n"
@@ -82,7 +92,7 @@ mac_def(  Z__A_LO_OUTER_B,
  "LOOP: (IA IB)←⊃I[N] ◊ Z[N]←⊂(⊃A[IA]) LO ⊃B[IB] ◊ →(N_max>N←N+1)⍴LOOP\n"
  "Z←rho_Z⍴Z\n")
 
-// inner product. caller has checked that the shapes of A and B fit
+/// inner product. caller has checked that the shapes of A and B fit
 //
 mac_def(  Z__A_LO_INNER_RO_B,
  "Z←A (LO Z__A_LO_INNER_RO_B RO) B;rho_Z;r_Ah;r_Bl;z;M;M_max;N;N_max;I;IA;IB\n"
@@ -95,33 +105,43 @@ mac_def(  Z__A_LO_INNER_RO_B,
  "       Z[N]←LO/z                    ◊ →(N_max>N←N+1)⍴OLOOP\n"
  "Z←rho_Z⍴Z\n")
 
-// power varieties
+/// monadic power with repeat count and no result
 //
 mac_def(  LO_POWER_N_B,
   " A (LO LO_POWER_N_B N) Z\n"
 "LOOP: LO Z ◊ →(0<N←N-1)⍴LOOP\n")
 
+/// dyadic power with repeat count and no result
+//
 mac_def(  A_LO_POWER_N_B,
   " A (LO A_LO_POWER_N_B N) Z\n"
 "LOOP: A LO Z ◊ →(0<N←N-1)⍴LOOP\n")
 
+/// monadic power with repeat count and result
+//
 mac_def(  Z__LO_POWER_N_B,
 " Z←A (LO Z__LO_POWER_N_B N) Z\n"
 "LOOP: Z←LO Z ◊ →(0<N←N-1)⍴LOOP\n")
 
+/// dyadic power with repeat count and result
+//
 mac_def(  Z__A_LO_POWER_N_B,
 " Z←A (LO Z__A_LO_POWER_N_B N) Z\n"
 "LOOP: Z←A LO Z ◊ →(0<N←N-1)⍴LOOP\n")
 
+/// monadic power with condition function RO and no result
+//
 mac_def(  Z__LO_POWER_RO_B,
   " Z←(LO Z__LO_POWER_RO_B RO) B;T\n"
 "LOOP: Z←LO B ◊ T←Z RO B ◊ B←Z ◊ →((,T)≢,1)⍴LOOP\n")
 
+/// monadic power with condition function RO and result
+//
 mac_def(  Z__A_LO_POWER_RO_B,
 " Z←A (LO Z__A_LO_POWER_RO_B RO) B;T\n"
 "LOOP: Z←A LO B ◊ T←Z RO B ◊ B←Z ◊ →((,T)≢,1)⍴LOOP\n")
 
-// reduce: Z←LO/[X] B
+/// reduce: Z←LO/[X] B
 //
 mac_def(Z__LO_REDUCE_X4_B,
 " Z←(LO Z__LO_REDUCE_X4_B) [X4] B;B3;T;H;M;M_max;L;N;I;I_max\n"
@@ -131,9 +151,8 @@ mac_def(Z__LO_REDUCE_X4_B,
 "       Z[H;L]←T                   ◊ →(I_max>N←N+1)⍴LOOPN\n"
 " Z←((X4≠⍳⍴⍴B)/⍴B)⍴Z\n")
 
-// reduce N-wise: Z←A LO/[X] B
+/// reduce N-wise: Z←A LO/[X] B with positive A
 //
-// note: A was positive, A1 is negative (1 - A)
 mac_def(   Z__pA_LO_REDUCE_X4_B,
 " Z←A1 (LO Z__pA_LO_REDUCE_X4_B) [X4] B;rho_B3;B3;rho_Z;rho_Z3;T;H;M;L;a;N;I;I_max\n"
 " (X4 rho_Z rho_Z3 rho_B3)←X4 ◊ B3←rho_B3⍴B ◊ I_max←⎕IO+⍴I←,⍳⍴Z←(rho_Z3)⍴0 ◊ N←⎕IO\n"
@@ -142,7 +161,8 @@ mac_def(   Z__pA_LO_REDUCE_X4_B,
 "       Z[H;a;L]←T               ◊ →(I_max>N←N+1)⍴LOOPN\n"
 " Z←rho_Z⍴Z\n")
 
-// note: A was negative, A1 is negative (A + 1)
+/// reduce N-wise: Z←A LO/[X] B with negative A
+//
 mac_def(   Z__nA_LO_REDUCE_X4_B,
 " Z←A1 (LO Z__nA_LO_REDUCE_X4_B) [X4] B;rho_B3;B3;rho_Z;rho_Z3;T;H;M;L;a;N;I;I_max\n"
 " (X4 rho_Z rho_Z3 rho_B3)←X4 ◊ B3←rho_B3⍴B ◊ I_max←⎕IO+⍴I←,⍳⍴Z←(rho_Z3)⍴0 ◊ N←⎕IO\n"
@@ -151,7 +171,7 @@ mac_def(   Z__nA_LO_REDUCE_X4_B,
 "       Z[H;a;L]←T                 ◊ →(I_max>N←N+1)⍴LOOPN\n"
 " Z←rho_Z⍴Z\n")
 
-// scan: Z←LO/[X] B
+/// scan: Z←LO/[X] B
 //
 mac_def(  Z__LO_SCAN_X4_B,
   " Z←(LO Z__LO_SCAN_X4_B) [X4] B;B3;T;H;M;M_max;L;a;N;I;I_max\n"
@@ -161,8 +181,7 @@ mac_def(  Z__LO_SCAN_X4_B,
 "       Z[H;a;L]←T                 ◊ →(I_max>N+1)⍴LOOPN\n"
 " Z←(⍴B)⍴Z\n")
 
-// rank: Z←  (LO⍤j) B and Z←  (LO⍤[X]j) 
-//       Z←A (LO⍤j) B and Z←(A LO⍤[X]j) 
+/// rank: Z←  (LO⍤j) B and Z←  (LO⍤[X]j) 
 //
 mac_def(Z__LO_RANK_X5_B,
  "Z←(LO Z__LO_RANK_X5_B) [X5] B;LB;rho_B;N_max;N;LZ;rho_Z\n"
@@ -171,6 +190,8 @@ mac_def(Z__LO_RANK_X5_B,
 "→(X5≢¯1)⍴WITH_AXES ◊ Z←30 ⎕CR rho_Z⍴Z ◊ →0\n"
 "WITH_AXES:           Z←⊃[X5]rho_Z⍴Z\n")
 
+/// rank: Z←A (LO⍤j) B and Z←(A LO⍤[X]j) 
+//
 mac_def(  Z__A_LO_RANK_X7_B,
  "Z←A (LO Z__A_LO_RANK_X7_B)[X7] B;LA;rho_A;LB;rho_B;N_max;N;LZ;rho_Z\n"
 " (X7 LA rho_A LB rho_B LZ rho_Z)←X7 ◊ A←(LZ,LA)⍴A ◊ B←(LZ,LB)⍴B\n"
@@ -179,7 +200,7 @@ mac_def(  Z__A_LO_RANK_X7_B,
 "→(X7≢¯1)⍴WITH_AXES ◊ Z←30 ⎕CR rho_Z⍴Z ◊ →0\n"
 "WITH_AXES:           Z←⊃[X7]rho_Z⍴Z\n")
 
-// ⎕INP helper
+/// ⎕INP helper
 //
 mac_def(Z__Quad_INP_B,
     " B←Z__Quad_INP_B B;C;C_max;N;N_max;ROW\n"
@@ -188,7 +209,7 @@ mac_def(Z__Quad_INP_B,
 "LOOPC: ROW[C]←⊂⍕⍎⊃ROW[C]\n"
 "CX:    →(C_max>C←C+2)⍴LOOPC ◊ B[N]←31 ⎕CR ⊂ROW ◊ →(N_max>N←N+1)⍴LOOPN\n")
 
-// ⎕EA helper
+/// ⎕EA helper
 //
 mac_def(Z__A_Quad_EA_B,
   " Z←A Z__A_Quad_EA_B B;RC;ET;RES\n"
@@ -199,7 +220,7 @@ mac_def(Z__A_Quad_EA_B,
 "BRA: ⎕ES 10 ('→',⍕RES) 0       0             ⍝ →N\n"
 "ESC: ⎕ES 10 \"→\"      0       0             ⍝ →\n")
 
-// ⎕EB helper
+/// ⎕EB helper
 //
 mac_def(Z__A_Quad_EB_B,
   " Z←A Z__A_Quad_EB_B B;RC;ET;RES\n"
