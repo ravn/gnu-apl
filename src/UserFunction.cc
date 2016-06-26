@@ -735,11 +735,7 @@ UserFunction::fix(const UCS_string & text, int & err_line,
              <<  "------------------- UserFunction::fix() --" << endl;
       }
 
-   if (Workspace::SI_top())   Workspace::SI_top()->set_safe_execution();
-
 UserFunction * ufun = new UserFunction(text, loc, creator, tolerant, false);
-   if (Workspace::SI_top())   Workspace::SI_top()->clear_safe_execution();
-
 const char * info = ufun->get_error_info();
    err_line = ufun->get_error_line();
 

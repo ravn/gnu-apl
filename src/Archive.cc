@@ -1565,7 +1565,7 @@ const int vid = find_int_attr("vid", false, 10);
 
    try
       {
-        symbol.assign(values[vid], LOC);
+        symbol.assign(values[vid], true, LOC);
       }
    catch (...)
       {

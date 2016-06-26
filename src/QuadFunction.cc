@@ -287,6 +287,7 @@ ExecuteList * fun = 0;
         Value_P Z2(2, LOC);
             new (Z2->next_ravel())  IntCell(Error::error_major(E_SYNTAX_ERROR));
             new (Z2->next_ravel())  IntCell(Error::error_minor(E_SYNTAX_ERROR));
+         Z2->check_value(LOC);
 
         Value_P Z3(Error::error_name(E_SYNTAX_ERROR), LOC);
         Value_P Z(3, LOC);
@@ -692,6 +693,7 @@ Value_P BB(line_count, LOC);
               new (cBB)   PointerCell(row, BB.getref());
             }
        }
+   BB->check_value(LOC);
 
 Token ret = Macro::Z__Quad_INP_B->eval_B(BB);
    Assert1(ret.get_tag() == TOK_SI_PUSHED);

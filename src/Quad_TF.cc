@@ -378,7 +378,7 @@ const size_t data_chars = len - idx;
         new_val->check_value(LOC);
 
         if (symbol == 0)   symbol = Workspace::lookup_symbol(name);
-        symbol->assign(new_val, LOC);
+        symbol->assign(new_val, false, LOC);
       }
    else if (mode == UNI_ASCII_N)   // numeric array
       {
@@ -435,7 +435,7 @@ const size_t data_chars = len - idx;
 
         if (!symbol)   symbol = Workspace::lookup_symbol(name);
 
-        symbol->assign(new_val, LOC);
+        symbol->assign(new_val, false, LOC);
       }
    else Assert(0);   // since checked above
    
@@ -538,7 +538,7 @@ Token_string tos;
         if (tos.size() != 3)                  return UCS_string();
         if (tos[2].get_Class() != TC_VALUE)   return UCS_string();
 
-         tos[0].get_sym_ptr()->assign(tos[2].get_apl_val(), LOC);
+         tos[0].get_sym_ptr()->assign(tos[2].get_apl_val(), true, LOC);
          return tos[0].get_sym_ptr()->get_name();   // valid 2⎕TF
       }
 
@@ -974,6 +974,7 @@ ShapeItem skipped = 0;
 
         Value_P sequence(K, LOC);
         loop(k, K)   new (sequence->next_ravel())   IntCell(N + k);
+        sequence->check_value(LOC);
         Token tok(TOK_APL_VALUE1, sequence);
         move_2(tos[s - skipped], tok, LOC);
         s += 5;   skipped += 5;
@@ -1027,6 +1028,7 @@ ShapeItem skipped = 0;
 
         Value_P sequence(K, LOC);
         loop(k, K)   new (sequence->next_ravel())   IntCell(M * (N + k));
+        sequence->check_value(LOC);
         Token tok(TOK_APL_VALUE1, sequence);
         move_2(tos[s - skipped], tok, LOC);
         s += 7;   skipped += 7;

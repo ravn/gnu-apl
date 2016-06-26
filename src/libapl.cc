@@ -372,7 +372,7 @@ Symbol * symbol = Workspace::lookup_symbol(var_name_ucs);
       symbol->get_nc() != NC_UNUSED_USER_NAME)   return 4;
 
 Value_P B(new_value, loc);
-   symbol->assign(B, loc); 
+   symbol->assign(B, true, loc); 
    return 0;   // ok
 }
 //-----------------------------------------------------------------------------

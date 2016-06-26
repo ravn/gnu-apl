@@ -123,25 +123,24 @@ Symbol::print_verbose(ostream & out) const
 }
 //-----------------------------------------------------------------------------
 void
-Symbol::assign(Value_P new_value, const char * loc)
+Symbol::assign(Value_P new_value, bool clone, const char * loc)
 {
    Assert(value_stack.size());
 
-#if 0 // TODO: make this work
    if (!new_value->is_complete())
       {
         CERR << "Incomplete value at " LOC << endl;
         new_value->print_properties(CERR, 0);
+        print_history(CERR, new_value.get(), LOC);
         Assert(0);
       }
-#endif
 
 ValueStackItem & vs = value_stack.back();
 
    switch(vs.name_class)
       {
         case NC_UNUSED_USER_NAME:
-             new_value = new_value->clone(loc);
+             if (clone)  new_value = new_value->clone(loc);
 
              vs.name_class = NC_VARIABLE;
              vs.apl_val = new_value;
@@ -151,7 +150,7 @@ ValueStackItem & vs = value_stack.back();
         case NC_VARIABLE:
              if (vs.apl_val == new_value)   return;   // X←X
 
-             new_value = new_value->clone(loc);
+             if (clone)  new_value = new_value->clone(loc);
 
              vs.apl_val = new_value;
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
@@ -432,7 +431,7 @@ Symbol::push_value(Value_P value)
 ValueStackItem vs;
    value_stack.push_back(vs);
    if (monitor_callback)   monitor_callback(*this, SEV_PUSHED);
-   assign(value, LOC);
+   assign(value, true, LOC);
 
    Log(LOG_SYMBOL_push_pop)
       {
@@ -848,7 +847,7 @@ ValueStackItem & vs = value_stack.back();
         set_SV_key(key);
 
         // assign old value to shared variable
-        assign(old_value, LOC);
+        assign(old_value, true, LOC);
 
         return;
       }
@@ -1066,13 +1065,14 @@ const Cell * cV = &values->get_ravel(0);
         Symbol * sym = symbols[sym_count - s - 1];
         if (cV->is_pointer_cell())
            {
-             sym->assign(cV->get_pointer_value(), LOC);
+             sym->assign(cV->get_pointer_value(), true, LOC);
            }
         else
            {
              Value_P val(LOC);
-             val->get_ravel(0).init(*cV, val.getref(), LOC);
-             sym->assign(val, LOC);
+             val->next_ravel()->init(*cV, val.getref(), LOC);
+             val->check_value(LOC);
+             sym->assign(val, true, LOC);
            }
 
         cV += incr;   // scalar extend values

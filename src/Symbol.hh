@@ -158,7 +158,7 @@ public:
    virtual bool is_readonly() const   { return false; }
 
    /// Assign \b value to \b this \b Symbol
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// Assign \b value to \b this \b Symbol (which is a shared variable)
    void assign_shared_variable(Value_P value, const char * loc);

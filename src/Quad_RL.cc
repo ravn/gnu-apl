@@ -37,11 +37,11 @@ const unsigned int seed = reset_seed();
    new (value->next_ravel()) IntCell(seed);
    value->check_value(LOC);
 
-   Symbol::assign(value, LOC);
+   Symbol::assign(value, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_RL::assign(Value_P value, const char * loc)
+Quad_RL::assign(Value_P value, bool clone, const char * loc)
 {
    if (!value->is_scalar_or_len1_vector())
       {
@@ -53,7 +53,7 @@ const Cell & cell = value->get_ravel(0);
 const APL_Integer val = cell.get_near_int();
 
    state = val;
-   Symbol::assign(value, LOC);
+   Symbol::assign(IntScalar(val, LOC), false, LOC);
 }
 //-----------------------------------------------------------------------------
 uint64_t

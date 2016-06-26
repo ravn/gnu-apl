@@ -48,7 +48,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::pop()
    virtual void pop();

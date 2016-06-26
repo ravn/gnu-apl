@@ -251,11 +251,11 @@ Value_P Z(sh_Z, LOC);
 Quad_SVE::Quad_SVE()
    : NL_SystemVariable(ID::Quad_SVE)
 {
-   Symbol::assign(IntScalar(0, LOC), LOC);
+   Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_SVE::assign(Value_P value, const char * loc)
+Quad_SVE::assign(Value_P value, bool clone, const char * loc)
 {
    // ⎕SVE←X merely remembers the timer expiration time. The timer is only
    // started if ⎕SVE is referenced (in Quad_SVE::get_apl_value())

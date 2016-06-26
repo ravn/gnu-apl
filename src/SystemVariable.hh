@@ -47,7 +47,7 @@ public:
    virtual ostream & print(ostream & out) const;
 
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed().
    virtual void assign_indexed(Value_P X, Value_P value);
@@ -104,7 +104,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, const char * loc) {}
+   virtual void assign(Value_P value, bool clone, const char * loc) {}
 
    /// overloaded Symbol::assign_indexed()
    virtual void assign_indexed(Value_P X, Value_P value) {}
@@ -188,13 +188,13 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
       {
         Symbol::push();
-        Symbol::assign(FloatScalar(DEFAULT_Quad_CT, LOC), LOC);
+        Symbol::assign(FloatScalar(DEFAULT_Quad_CT, LOC), false, LOC);
       }
 };
 //-----------------------------------------------------------------------------
@@ -244,7 +244,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed().
    virtual void assign_indexed(Value_P X, Value_P value);
@@ -272,13 +272,13 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
       {
         Symbol::push();
-        Symbol::assign(IntScalar(1, LOC), LOC);
+        Symbol::assign(IntScalar(1, LOC), false, LOC);
       }
 };
 //-----------------------------------------------------------------------------
@@ -296,7 +296,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
@@ -327,7 +327,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
    virtual void assign_indexed(Value_P X, Value_P value) {}
@@ -350,13 +350,13 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
       {
         Symbol::push();
-        Symbol::assign(IntScalar(DEFAULT_Quad_PP, LOC), LOC);
+        Symbol::assign(IntScalar(DEFAULT_Quad_PP, LOC), false, LOC);
       }
 };
 //-----------------------------------------------------------------------------
@@ -375,13 +375,13 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
       {
         Symbol::push();
-        Symbol::assign(CharScalar(UNI_ASCII_SPACE, LOC), LOC);
+        Symbol::assign(CharScalar(UNI_ASCII_SPACE, LOC), false, LOC);
       }
 };
 //-----------------------------------------------------------------------------
@@ -410,13 +410,13 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
       {
         Symbol::push();
-        Symbol::assign(IntScalar(0, LOC), LOC);
+        Symbol::assign(IntScalar(0, LOC), false, LOC);
       }
 };
 //-----------------------------------------------------------------------------
@@ -436,13 +436,13 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
       {
         Symbol::push();
-        Symbol::assign(IntScalar(DEFAULT_Quad_PW, LOC), LOC);
+        Symbol::assign(IntScalar(DEFAULT_Quad_PW, LOC), false, LOC);
       }
 };
 //-----------------------------------------------------------------------------
@@ -459,7 +459,7 @@ public:
    virtual void resolve(Token & token, bool left);
 
 protected:
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    // should never be called due to overloaded resolve()
    virtual Value_P get_apl_value() const
@@ -480,7 +480,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
@@ -503,7 +503,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
@@ -517,10 +517,10 @@ class Quad_SYL : public NL_SystemVariable
 public:
    /// Constructor.
    Quad_SYL() : NL_SystemVariable(ID::Quad_SYL)
-      { assign(Value_P(), LOC); }
+      { assign(Value_P(), false, LOC); }
 
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
    virtual void assign_indexed(Value_P X, Value_P value);
@@ -598,7 +598,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -606,9 +606,9 @@ protected:
         Symbol::push();
         offset_seconds = compute_offset();
         if (offset_seconds % 3600 == 0)   // full hour
-           Symbol::assign(IntScalar(offset_seconds/3600, LOC), LOC);
+           Symbol::assign(IntScalar(offset_seconds/3600, LOC), false, LOC);
         else
-           Symbol::assign(FloatScalar(offset_seconds/3600, LOC), LOC);
+           Symbol::assign(FloatScalar(offset_seconds/3600, LOC), false, LOC);
       }
 
    virtual void pop()
@@ -663,7 +663,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;

@@ -71,7 +71,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, const char * loc);
+   virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// Overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;

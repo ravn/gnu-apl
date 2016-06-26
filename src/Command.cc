@@ -1568,7 +1568,7 @@ const ShapeItem ec = val->element_count();
       }
 
    Assert(sym);
-   sym->assign(val, LOC);
+   sym->assign(val, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1621,7 +1621,7 @@ ShapeItem padded = 0;
       }
 
    Assert(sym);
-   sym->assign(val, LOC);
+   sym->assign(val, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void

@@ -1359,7 +1359,7 @@ Prefix::reduce_V_ASS_B_()
 {
 Value_P B = at2().get_apl_val();
 Symbol * V = at0().get_sym_ptr();
-   V->assign(B, LOC);
+   V->assign(B, true, LOC);
 
 Token result = Token(TOK_APL_VALUE2, B);
    pop_args_push_result(result);
