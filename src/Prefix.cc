@@ -1359,17 +1359,18 @@ Prefix::reduce_V_ASS_B_()
 {
 Value_P B = at2().get_apl_val();
 
-//   Assert1(B->get_owner_count() >= 2);   // B and at2()
-//  const bool clone = B->get_owner_count() != 2;
+   Assert1(B->get_owner_count() >= 2);   // owners are at least B and at2()
+const bool clone = B->get_owner_count() != 2 || at1().get_tag() != TOK_ASSIGN1;
 Symbol * V = at0().get_sym_ptr();
-   V->assign(B, true, LOC);
-
    pop_and_discard();   // V
    pop_and_discard();   // ←
-   at0().ChangeTag(TOK_APL_VALUE2);   // value → committed vcvalue
+
+   at0().ChangeTag(TOK_APL_VALUE2);   // change value to committed value
 
    set_assign_state(ASS_none);
    action = RA_CONTINUE;
+
+   V->assign(B, clone, LOC);
 }
 //-----------------------------------------------------------------------------
 void

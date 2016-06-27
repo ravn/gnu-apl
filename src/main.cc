@@ -121,13 +121,13 @@ signal_TERM_handler(int)
 }
 //-----------------------------------------------------------------------------
 #if PARALLEL_ENABLED
-/// old sigaction argument for ^\
+/// old sigaction argument for ^\,
 static struct sigaction old_control_BSL_action;
 
-/// new sigaction argument for ^\
+/// new sigaction argument for ^\.
 static struct sigaction new_control_BSL_action;
 
-/// signal handler for ^\
+/// signal handler for ^\.
 static void
 control_BSL(int sig)
 {

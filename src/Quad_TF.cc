@@ -531,7 +531,7 @@ Token_string tos;
 
    // we expect either VAR ← VALUE ... or ⎕FX fun-text. Try VAR ← VALUE.
    //
-   if (tos[0].get_Class() == TC_SYMBOL && tos[1].get_tag() == TOK_ASSIGN)
+   if (tos[0].get_Class() == TC_SYMBOL && tos[1].get_Class() == TC_ASSIGN)
       {
         // at this point, we expect SYM ← VALUE.
         //

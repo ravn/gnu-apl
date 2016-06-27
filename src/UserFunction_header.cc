@@ -45,10 +45,10 @@ const struct _header_pattern
 } header_patterns[] =            ///< all valid function headers
 {
 /// function result
-#define __Z  TOK_LSYMB, TOK_ASSIGN
+#define __Z  TOK_LSYMB, TOK_ASSIGN1
 
 /// lambda result (λ)
-#define __z  TOK_LAMBDA, TOK_ASSIGN
+#define __z  TOK_LAMBDA, TOK_ASSIGN1
 
 /// left function argument
 #define __A  TOK_SYMBOL

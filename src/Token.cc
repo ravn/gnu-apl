@@ -294,7 +294,6 @@ Token::print_function(ostream & out) const
         case TOK_F2_FIND:       return out << UNI_EPSILON_UBAR;
         case TOK_F2_EQUAL:      return out << UNI_ASCII_EQUAL;
         case TOK_F2_GREATER:    return out << UNI_ASCII_GREATER;
-        case TOK_ASSIGN:        return out << UNI_LEFT_ARROW;
         case TOK_F2_AND:        return out << UNI_AND;
         case TOK_F2_OR:         return out << UNI_OR;
         case TOK_F2_INDEX:      return out << UNI_SQUISH_Quad;

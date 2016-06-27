@@ -218,7 +218,7 @@ mac_def(Z__A_Quad_EA_B,
 "ERR: ⎕ES 10 (,A)       ET[⎕IO] ET[⎕IO+1]     ⍝ error\n"
 "COM: ⎕ES 10 ''         0       RES           ⍝ committed value\n"
 "BRA: ⎕ES 10 ('→',⍕RES) 0       0             ⍝ →N\n"
-"ESC: ⎕ES 10 \"→\"      0       0             ⍝ →\n")
+"ESC: ⎕ES 10 \"→\"        0       0             ⍝ →\n")
 
 /// ⎕EB helper
 //
@@ -230,7 +230,7 @@ mac_def(Z__A_Quad_EB_B,
 "ERR: ⎕ES ET    ◊ →0                          ⍝ error\n"
 "COM: ⎕ES 10 ''         0       RES           ⍝ committed value\n"
 "BRA: ⎕ES 10 ('→',⍕RES) 0       0             ⍝ →N\n"
-"ESC: ⎕ES 10 \"→\"      0       0             ⍝ →\n")
+"ESC: ⎕ES 10 \"→\"        0       0             ⍝ →\n")
 
 #undef mac_def
 

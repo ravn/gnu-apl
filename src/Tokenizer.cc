@@ -234,6 +234,11 @@ Source<Unicode> src(input);
                    break;
 
               case TC_ASSIGN:
+                   ++src;
+                   if (tos.size() == 1)   tos.append(Token(TOK_ASSIGN1), LOC);
+                   else                   tos.append(tok, LOC);
+                   break;
+
               case TC_L_PARENT:
               case TC_R_PARENT:
               case TC_L_BRACK:

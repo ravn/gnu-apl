@@ -606,7 +606,7 @@ int level = 0;
               //
               Symbol * sym_Z = &Workspace::get_v_LAMBDA();
               lambda_body.append(Token(TOK_LAMBDA, sym_Z), LOC);
-              lambda_body.append(Token(TOK_ASSIGN), LOC);
+              lambda_body.append(Token(TOK_ASSIGN1), LOC);
 
               signature |= SIG_Z;
             }

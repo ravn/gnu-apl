@@ -772,7 +772,7 @@ Parser::mark_lsymb(Token_string & tos)
 {
    loop(ass, tos.size())
       {
-        if (tos[ass].get_tag() != TOK_ASSIGN)   continue;
+        if (tos[ass].get_Class() != TC_ASSIGN)   continue;
 
         // found ←. move backwards. Before that we handle the special case of
         // vector specification, i.e. (SYM SYM ... SYM) ← value
