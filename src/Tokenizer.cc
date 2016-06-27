@@ -235,8 +235,25 @@ Source<Unicode> src(input);
 
               case TC_ASSIGN:
                    ++src;
-                   if (tos.size() == 1)   tos.append(Token(TOK_ASSIGN1), LOC);
-                   else                   tos.append(tok, LOC);
+                   {
+                     const bool sym = tos.size() >= 1 &&
+                                tos[tos.size() - 1].get_tag() == TOK_SYMBOL;
+                     const bool dia = tos.size() > 1 &&
+                                tos[tos.size() - 2].get_tag() == TOK_DIAMOND;
+                     const bool col = tos.size() > 1 &&
+                                tos[tos.size() - 2].get_tag() == TOK_COLON;
+
+                   tos.append(tok, LOC);
+
+                   // change token tag of ← if:
+                   //
+                   //   SYM ←   (at the start of line),        or
+                   // ◊ SYM ←   (at the start of statement),   or
+                   // : SYM ←   (at the start of statement after label)
+                   //
+                   if (sym && ((tos.size() == 2) || dia || col))
+                      tos.last().ChangeTag(TOK_ASSIGN1);
+                   }
                    break;
 
               case TC_L_PARENT:
