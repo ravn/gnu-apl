@@ -184,10 +184,10 @@ public:
    /// Push an undefined entry onto the stack of \b this \b Symbol
    virtual void push();
 
-   /// Push a label onto the stack of \b this \b Symbol
+   /// push a label onto the stack of \b this \b Symbol
    virtual void push_label(Function_Line label);
 
-   /// Push a function onto the stack of \b this \b Symbol
+   /// push a function onto the stack of \b this \b Symbol
    virtual void push_function(Function * function);
 
    /// Push an APL value onto the stack of \b this \b Symbol
@@ -212,9 +212,14 @@ public:
    /// set the current SV_key
    void set_SV_key(SV_key key);
 
-   /// Return true, iff this Symbol is erased
+   /// return true, iff this Symbol is erased
    bool is_erased() const
    { return erased; }
+
+   /// return true, iff this Symbol is erased
+   bool is_used() const
+   { return (value_stack_size() > 1) || (value_stack_size() &&
+        (value_stack[0].name_class != NC_UNUSED_USER_NAME)); }
 
    /// set \b erased to \b on_off
    void set_erased(bool on_off)

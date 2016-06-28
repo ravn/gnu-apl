@@ -1828,6 +1828,7 @@ const bool have_trailing_blank = replace_count && user.last() == ' ';
             {
              const Symbol * sym = all_symbols[s];
              if (sym->is_erased())   continue;
+             if (!sym->is_used())    continue;
 
               const UCS_string & sym_name = sym->get_name();
               if (!sym_name.starts_with(user))   continue;
