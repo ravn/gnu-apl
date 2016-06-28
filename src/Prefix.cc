@@ -644,7 +644,7 @@ Prefix::dont_reduce(TokenClass next) const
       {
         if (next == TC_OPER2)           // DOP B
            {
-             return best->prio < BS_OP_RO;
+             return true;
            }
         else if (next == TC_VALUE)      // A B
            {
@@ -666,7 +666,7 @@ Prefix::dont_reduce(TokenClass next) const
       {
         if (next == TC_OPER2)
            {
-             return best->prio < BS_OP_RO;
+             return true;
            }
       }
 
@@ -1131,27 +1131,6 @@ Token result = Token(TOK_FUN2, derived);
 void
 Prefix::reduce_F_D_G_()
 {
-   // reduce, except if another dyadic operator is coming. In that case
-   // F belongs to the other operator and we simply continue.
-   //
-   if (PC < body.size())
-        {
-          const Token & tok = body[PC];
-          TokenClass next =  tok.get_Class();
-          if (next == TC_SYMBOL)
-             {
-               Symbol * sym = tok.get_sym_ptr();
-               const bool left_sym = get_assign_state() == ASS_arrow_seen;
-               next = sym->resolve_class(left_sym);
-             }
-
-          if (next == TC_OPER2)
-             {
-               action = RA_PUSH_NEXT;
-               return;
-             }
-        }
-
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
    new (derived) DerivedFunction(at0(), at1().get_function(), at2(), LOC);
