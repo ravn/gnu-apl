@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1106,8 +1106,8 @@ bool mismatch = false;
         mismatch = true;
         CERR << "WARNING: this workspace was )SAVEd with SVN version "
              << saving_SVN << endl <<
-                "          but is now being )LOADed with SVN version "
-             << current_SVN << endl;
+        "          but is now being )LOADed with a SVN version "
+             << current_SVN << " or greater" << endl;
       }
 
    if (mismatch)

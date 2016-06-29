@@ -55,7 +55,7 @@ err_def(ATTENTION,              "ATTENTION"                      , 1,     17 )
 err_def(STOP_LINE,              "STOP_LINE"                      , 1,     18 )
 
 err_def(SYNTAX_ERROR,           "SYNTAX ERROR"                   , 2,      2 )
-err_def(NO_TOKEN,               "No token"                       , 2, 0x0102 )
+err_def(NO_TOKEN,               "SYNTAX ERROR+"                  , 2, 0x0102 )
 err_def(BAD_UTF8_START,         "Bad UTF-8 starting character"   , 2, 0x0202 )
 err_def(BAD_UTF8_CONT,          "Bad UTF-8 cont. character"      , 2, 0x0302 )
 err_def(UNSUPPORTED_CHAR,       "Unsupported character"          , 2, 0x0402 )
