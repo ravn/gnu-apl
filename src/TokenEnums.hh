@@ -38,31 +38,31 @@ enum TokenClass
    // permanent token classes. Token of these classes can appear in
    // the body of a defined function.
    //
-   TC_ASSIGN        = 0x01,   // ←
-   TC_R_ARROW       = 0x02,   // →N
-   TC_L_BRACK       = 0x03,   // [
-   TC_R_BRACK       = 0x04,   // ]
-   TC_END           = 0x05,   // left end of statement
-   TC_FUN0          = 0x06,
-   TC_FUN12         = 0x07,
-   TC_INDEX         = 0x08,
-   TC_OPER1         = 0x09,
-   TC_OPER2         = 0x0A,
-   TC_L_PARENT      = 0x0B,   // (
-   TC_R_PARENT      = 0x0C,   // )
-   TC_RETURN        = 0x0D,
-   TC_SYMBOL        = 0x0E,
-   TC_VALUE         = 0x0F,
+   TC_ASSIGN        = 0x01,   ///< ←
+   TC_R_ARROW       = 0x02,   ///< →N
+   TC_L_BRACK       = 0x03,   ///< [
+   TC_R_BRACK       = 0x04,   ///< ]
+   TC_END           = 0x05,   ///< left end of statement
+   TC_FUN0          = 0x06,   ///< niladic function
+   TC_FUN12         = 0x07,   ///< ambivalent function
+   TC_INDEX         = 0x08,   ///< [...]
+   TC_OPER1         = 0x09,   ///< monadic operator
+   TC_OPER2         = 0x0A,   ///< dyadic operator
+   TC_L_PARENT      = 0x0B,   ///< (
+   TC_R_PARENT      = 0x0C,   ///< )
+   TC_RETURN        = 0x0D,   ///< return from defined function
+   TC_SYMBOL        = 0x0E,   ///< user defined name
+   TC_VALUE         = 0x0F,   ///< APL value
 
    TC_MAX_PERM,               ///< permanent token are < TC_MAX_PERM
 
-   TC_FUN1          = TC_FUN12,
-   TC_FUN2          = TC_FUN12,
+   TC_FUN1          = TC_FUN12,   ///< monadic function
+   TC_FUN2          = TC_FUN12,   ///< dyadic function
 
    // temporary token classes. Token of these classes can appear as
    // intermediate results during tokenization and execution
    //
-   TC_PINDEX        = 0x10,
+   TC_PINDEX        = 0x10,   ///< partial index
    TC_VOID          = 0x11,
    TC_MAX_PHRASE,             ///< token in phrases are < TC_MAX_PHRASE
    TC_MAX_PHRASE_2 = TC_MAX_PHRASE*TC_MAX_PHRASE,     // TC_MAX_PHRASE ^ 2

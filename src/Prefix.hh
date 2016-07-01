@@ -263,6 +263,10 @@ public:
    /// read and resolve the token class left of )
    bool is_value_parent(int pc) const;
 
+   /// return true if the token at pc is a (possibly bracketed) function or
+   /// operator (or a symbol representing one).
+   bool is_fun_or_oper(int pc) const;
+
    /// return the leftmost (top-of-stack) Token_loc (at put position)
    Token_loc & tos()
        { Assert1(put);   return content[put - 1]; }

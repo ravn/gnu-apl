@@ -142,7 +142,7 @@ TokenClass next = body[pc].get_Class();
       {
         ++pc;
         if (!is_value_parent(pc))   return false;   // (fun)) XXX
-        const int offset = body[pc].get_int_val();
+        const int offset = body[pc].get_int_val2();
         pc += offset;
         if (pc >= body.size())   return true;   // syntax error
         next = body[pc].get_Class();
@@ -179,10 +179,42 @@ TokenClass next = body[pc].get_Class();
 }
 //-----------------------------------------------------------------------------
 bool
+Prefix::is_fun_or_oper(int pc) const
+{
+   // this function is called when / ⌿ \ or ⍀ shall be resolved. pc points
+   // to the token left of / ⌿ \ or ⍀.
+   //
+const TokenTag tag_LO = body[pc].get_tag();
+
+   if (tag_LO == TOK_R_BRACK)
+      {
+        // e.g. fun[...]/ or value[...]/ Skip over [...]
+        //
+        pc += body[pc].get_int_val2();
+        Assert1(body[pc].get_Class() == TC_L_BRACK);   // opening [
+        return is_fun_or_oper(pc + 1);
+      }
+
+   if (tag_LO == TOK_R_PARENT)   return !is_value_parent(pc);
+   if (body[pc].get_Class() == TC_OPER2)   return false;   // make / a function
+
+   if ((tag_LO & TV_MASK) == TV_FUN)   return true;
+
+   if (tag_LO == TOK_SYMBOL)
+      {
+        Symbol * sym = body[pc].get_sym_ptr();
+        if (sym == 0)   return false;
+        return sym->get_function() != 0;
+      }
+
+   return false;   // not a function or operator
+}
+//-----------------------------------------------------------------------------
+bool
 Prefix::is_value_bracket() const
 {
    Assert1(body[PC - 1].get_Class() == TC_R_BRACK);
-const int offset = body[PC - 1].get_int_val();
+const int offset = body[PC - 1].get_int_val2();
    Assert1(body[PC + offset - 1].get_Class() == TC_L_BRACK);   // opening [
 
 const Token & tok1 = body[PC + offset];
@@ -468,6 +500,21 @@ grow:
         {
           if (get_assign_state() != ASS_none)   syntax_error(LOC);
           set_assign_state(ASS_arrow_seen);
+        }
+      else if (tcl == TC_OPER1 && tl.tok.get_Id()) // monadic primitive operator
+        {
+          const TokenTag tag = tl.tok.get_tag();
+          if ((tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+               tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1) &&
+               PC < (body.size() - 1) && !is_fun_or_oper(PC))
+             {
+               // at this point tl.tok is / ⌿ \ or ⍀ and the token
+               // left of it is NOT a function. Thus tl.tok is not an
+               // operator but a function
+               //
+               enum { OPER1_2_FUN12 = TC_OPER1 ^ TC_FUN12 };
+               tl.tok.ChangeTag((TokenTag)(tag ^ OPER1_2_FUN12));
+             }
         }
 
      push(tl);
@@ -967,14 +1014,6 @@ Token result = at1().get_function()->eval_AB(at0().get_apl_val(),
 }
 //-----------------------------------------------------------------------------
 void
-Prefix::reduce_A_M_B_()
-{
-   Assert1(prefix_len == 3);
-
-   reduce_A_F_B_();
-}
-//-----------------------------------------------------------------------------
-void
 Prefix::reduce_A_F_C_B()
 {
    Assert1(prefix_len == 4);
@@ -995,12 +1034,6 @@ Token result = at1().get_function()->eval_AXB(at0().get_apl_val(),
 
    pop_args_push_result(result);
    set_action(result);
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_A_M_C_B()
-{
-   reduce_A_F_C_B();
 }
 //-----------------------------------------------------------------------------
 void
@@ -1310,12 +1343,6 @@ Symbol * V = at1().get_sym_ptr();
    copy_1(at1(), V->resolve_lv(LOC), LOC);
    set_assign_state(ASS_var_seen);
    action = RA_CONTINUE;
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_M_V__()
-{
-   reduce_F_V__();   // same as F2
 }
 //-----------------------------------------------------------------------------
 void

@@ -179,16 +179,7 @@ Parser::parse_statement(Token_string & tos)
         tos.print(CERR);
       }
 
-   // 5. resolve ambiguous / ⌿ \ and ⍀ operators/functions
-   //
-   degrade_scan_reduce(tos);
-   Log(LOG_parse)
-      {
-        CERR << "parse 6 [" << tos.size() << "]: ";
-        tos.print(CERR);
-      }
-
-   // 6. update distances between (), [], and {}
+   // 5. update distances between (), [], and {}
    //
    {
      const ErrorCode ec = match_par_bra(tos, false);
@@ -481,31 +472,6 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
                tos[t].clear(LOC);
                ++t;   // skip tos[t + 1]
              }
-       }
-}
-//-----------------------------------------------------------------------------
-void
-Parser::degrade_scan_reduce(Token_string & tos)
-{
-   loop(src, tos.size())
-       {
-         if (tos[src].get_Id() == ID::OPER1_REDUCE  ||
-             tos[src].get_Id() == ID::OPER1_REDUCE1 ||
-             tos[src].get_Id() == ID::OPER1_SCAN    ||
-             tos[src].get_Id() == ID::OPER1_SCAN1)
-            {
-              // tos[src] is / ⌿ \ or ⍀
-              //
-              const bool is_function = src == 0 ||   // (will SYNTAX_ERROR)
-                         check_if_value(tos, src - 1);
-              if (is_function)
-                 {
-                   // the (back-) slash is a function, not an operator.
-                   //
-                   const int ftag = (tos[src].get_tag() & ~TC_MASK) | TC_FUN12;
-                   tos[src].ChangeTag((TokenTag)ftag);
-                 }
-            }
        }
 }
 //-----------------------------------------------------------------------------
