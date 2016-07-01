@@ -184,15 +184,15 @@ Prefix::is_fun_or_oper(int pc) const
    // this function is called when / ⌿ \ or ⍀ shall be resolved. pc points
    // to the token left of / ⌿ \ or ⍀.
    //
-const TokenTag tag_LO = body[pc].get_tag();
+TokenTag tag_LO = body[pc].get_tag();
 
    if (tag_LO == TOK_R_BRACK)
       {
         // e.g. fun[...]/ or value[...]/ Skip over [...]
         //
         pc += body[pc].get_int_val2();
-        Assert1(body[pc].get_Class() == TC_L_BRACK);   // opening [
-        return is_fun_or_oper(pc + 1);
+        Assert1(body[pc++].get_Class() == TC_L_BRACK);   // opening [
+        tag_LO = body[pc].get_tag();
       }
 
    if (tag_LO == TOK_R_PARENT)   return !is_value_parent(pc);
@@ -500,21 +500,6 @@ grow:
         {
           if (get_assign_state() != ASS_none)   syntax_error(LOC);
           set_assign_state(ASS_arrow_seen);
-        }
-      else if (tcl == TC_OPER1 && tl.tok.get_Id()) // monadic primitive operator
-        {
-          const TokenTag tag = tl.tok.get_tag();
-          if ((tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-               tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1) &&
-               PC < (body.size() - 1) && !is_fun_or_oper(PC))
-             {
-               // at this point tl.tok is / ⌿ \ or ⍀ and the token
-               // left of it is NOT a function. Thus tl.tok is not an
-               // operator but a function
-               //
-               enum { OPER1_2_FUN12 = TC_OPER1 ^ TC_FUN12 };
-               tl.tok.ChangeTag((TokenTag)(tag ^ OPER1_2_FUN12));
-             }
         }
 
      push(tl);
@@ -1014,6 +999,17 @@ Token result = at1().get_function()->eval_AB(at0().get_apl_val(),
 }
 //-----------------------------------------------------------------------------
 void
+Prefix::reduce_A_M_B_()
+{
+const TokenTag tag = at1().get_tag();
+   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
+      return reduce_A_F_B_();
+
+   syntax_error(LOC);
+}
+//-----------------------------------------------------------------------------
+void
 Prefix::reduce_A_F_C_B()
 {
    Assert1(prefix_len == 4);
@@ -1037,6 +1033,17 @@ Token result = at1().get_function()->eval_AXB(at0().get_apl_val(),
 }
 //-----------------------------------------------------------------------------
 void
+Prefix::reduce_A_M_C_B()
+{
+const TokenTag tag = at1().get_tag();
+   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
+      return reduce_A_F_C_B();
+
+   syntax_error(LOC);
+}
+//-----------------------------------------------------------------------------
+void
 Prefix::reduce_F_M__()
 {
    Assert1(prefix_len == 2);
@@ -1047,6 +1054,23 @@ DerivedFunction * derived =
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    action = RA_CONTINUE;
+}
+//-----------------------------------------------------------------------------
+void
+Prefix::reduce_M_M__()
+{
+   if (is_fun_or_oper(PC))
+      {
+         action = RA_PUSH_NEXT;
+        return;
+      }
+
+const TokenTag tag = at0().get_tag();
+   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
+      return reduce_F_M__();
+
+   syntax_error(LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1061,6 +1085,23 @@ DerivedFunction * derived =
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    action = RA_CONTINUE;
+}
+//-----------------------------------------------------------------------------
+void
+Prefix::reduce_M_M_C_()
+{
+   if (is_fun_or_oper(PC))
+      {
+         action = RA_PUSH_NEXT;
+        return;
+      }
+
+const TokenTag tag = at0().get_tag();
+   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
+      return reduce_F_M_C_();
+
+   syntax_error(LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1082,6 +1123,23 @@ DerivedFunction * derived =
 }
 //-----------------------------------------------------------------------------
 void
+Prefix::reduce_M_C_M_()
+{
+   if (is_fun_or_oper(PC))
+      {
+         action = RA_PUSH_NEXT;
+        return;
+      }
+
+const TokenTag tag = at0().get_tag();
+   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
+      return reduce_F_C_M_();
+
+   syntax_error(LOC);
+}
+//-----------------------------------------------------------------------------
+void
 Prefix::reduce_F_C_M_C()
 {
    Assert1(prefix_len == 4);
@@ -1098,6 +1156,23 @@ DerivedFunction * derived =
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    action = RA_CONTINUE;
+}
+//-----------------------------------------------------------------------------
+void
+Prefix::reduce_M_C_M_C()
+{
+   if (is_fun_or_oper(PC))
+      {
+         action = RA_PUSH_NEXT;
+        return;
+      }
+
+const TokenTag tag = at0().get_tag();
+   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
+      return reduce_F_C_M_C();
+
+   syntax_error(LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1170,6 +1245,42 @@ DerivedFunction * derived =
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    action = RA_CONTINUE;
+}
+//-----------------------------------------------------------------------------
+void
+Prefix::reduce_F_D_M_()
+{
+const TokenTag tag = at2().get_tag();
+   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
+      return reduce_F_D_G_();
+
+   syntax_error(LOC);
+}
+//-----------------------------------------------------------------------------
+void
+Prefix::reduce_M_D_G_()
+{
+const TokenTag tag = at0().get_tag();
+   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
+      return reduce_F_D_G_();
+
+   syntax_error(LOC);
+}
+//-----------------------------------------------------------------------------
+void
+Prefix::reduce_M_D_M_()
+{
+const TokenTag tag0 = at0().get_tag();
+const TokenTag tag2 = at2().get_tag();
+   if ((tag0 == TOK_OPER1_REDUCE  || tag0 == TOK_OPER1_SCAN ||
+        tag0 == TOK_OPER1_REDUCE1 || tag0 == TOK_OPER1_SCAN1) && 
+       (tag2 == TOK_OPER1_REDUCE  || tag2 == TOK_OPER1_SCAN ||
+        tag2 == TOK_OPER1_REDUCE1 || tag2 == TOK_OPER1_SCAN1))
+      return reduce_F_D_G_();
+
+   syntax_error(LOC);
 }
 //-----------------------------------------------------------------------------
 void
