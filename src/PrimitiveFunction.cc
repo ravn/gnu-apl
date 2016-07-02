@@ -2831,6 +2831,7 @@ Value_P Z((ShapeItem)line_starts.size() - 1, LOC);
 
    Workspace::pop_SI(LOC);
 
+   Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
