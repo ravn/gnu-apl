@@ -2439,7 +2439,7 @@ const Cell & first_B = B->get_ravel(0);
 
 Value_P v1 = first_B.get_pointer_value();
 Value * v1_owner = v1->get_lval_cellowner();
-   if (v1_owner)   // B is a left valie
+   if (v1_owner)   // B is a left value
       {
         Value_P B1(LOC);
         new (&B1->get_ravel(0))   PointerCell(v1, B1.getref());
@@ -2452,8 +2452,10 @@ Value * v1_owner = v1->get_lval_cellowner();
       }
    else
       {
-        const ShapeItem ec = v1->nz_element_count();
+        const ShapeItem ec = v1->element_count();
         Value_P Z(v1->get_shape(), LOC);
+        if (ec == 0)   Z->get_ravel(0).init(v1->get_ravel(0), Z.getref(), LOC);
+
         loop(e, ec)   Z->next_ravel()->init(v1->get_ravel(e), Z.getref(), LOC);
 
         Z->check_value(LOC);
