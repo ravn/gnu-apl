@@ -2758,6 +2758,16 @@ ExecuteList * fun = ExecuteList::fix(statement.no_pad(), LOC);
 
    Log(LOG_UserFunction__execute)   fun->print(CERR);
 
+   // important special case: ⍎ of an APL literal value
+   //
+   if (fun->get_body().size() == 2 &&
+       fun->get_body()[0].get_Class() == TC_VALUE)
+      {
+        Value_P Z = fun->get_body()[0].get_apl_val();
+        delete fun;
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
    Workspace::push_SI(fun, LOC);
 
    Log(LOG_StateIndicator__push_pop)

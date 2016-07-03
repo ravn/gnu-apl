@@ -895,10 +895,20 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
              const Cell * info = &result.get_apl_val()->get_ravel(0);
              Workspace::pop_SI(LOC);
              UCS_string stat(*info[1].get_pointer_value());
-             if (stat.size())   // error, → or →N
+             if (stat.size())
                 {
+                  // the B side of A ⎕EA B has failed or returned → or →N
+                  // so that stat (which is A or → or →N) shall be executed
+                  //
 //                CERR << "⎕ES: ⍎" << stat << endl;
                   Token exec = Bif_F1_EXECUTE::execute_statement(stat);
+                  if (exec.get_Class() == TC_VALUE)   // ⍎ literal
+                     {
+                       move_1(Workspace::SI_top()->get_prefix().at0(),
+                              exec, LOC);
+                       return;
+                     }
+
                   const APL_Integer major = info[2].get_int_value();
                   const APL_Integer minor = info[3].get_int_value();
                   const ErrorCode ec = (ErrorCode)(major << 16 | minor);
