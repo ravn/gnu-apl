@@ -298,7 +298,8 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
 
         // Z[z] = B[b]
         //
-        Z->next_ravel()->init(B->get_ravel(b), Z.getref(), LOC);
+        Cell * cZ = Z->next_ravel();
+        cZ->init(B->get_ravel(b), Z.getref(), LOC);
 
         loop(lo, LO_count)
            {
@@ -307,25 +308,25 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
 
              // one reduction step (one call of LO)
              //
-             Cell & cZ = Z->get_ravel(z);
              const Cell & cB = B->get_ravel(b);
-             if (scalar_LO && cZ.is_simple_cell() && cB.is_simple_cell())
+             if (scalar_LO && cZ->is_simple_cell() && cB.is_simple_cell())
                 {
-                  ErrorCode ec = (cZ.*scalar_LO)(&cZ, &cB);
-                  if (ec)   return Token(TOK_ERROR, ec);
+                  ErrorCode ec = (cZ->*scalar_LO)(cZ, &cB);
+                  if (ec)   throw_apl_error(ec, LOC);
                 }
              else
                 {
                   Value_P LO_A = cB.to_value(LOC);
-                  Value_P LO_B = cZ.to_value(LOC);
+                  Value_P LO_B = cZ->to_value(LOC);
                   Token result = LO->eval_AB(LO_A, LO_B);
-                  cZ.release(LOC);
+                  cZ->release(LOC);
 
-                  if (result.get_tag() == TOK_ERROR)   return result;
+                  if (result.get_tag() == TOK_ERROR)
+                    throw_apl_error(result.get_ErrorCode(), LOC);
 
                   Assert(result.get_Class() == TC_VALUE);
                   Value_P ZZ = result.get_apl_val();
-                  cZ.init_from_value(ZZ, Z.getref(), LOC);
+                  cZ->init_from_value(ZZ, Z.getref(), LOC);
                 }
            }
       }

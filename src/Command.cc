@@ -121,7 +121,7 @@ vector<UCS_string> args;
       }
 
 #define cmd_def(cmd_str, code, _arg, _hint) \
-   if (cmd.starts_iwith(cmd_str)) { code; return true; }
+   if (cmd.starts_iwith(cmd_str)) { code; return false; }
 #include "Command.def"
 
    // check for user defined commands...

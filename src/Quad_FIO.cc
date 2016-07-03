@@ -124,8 +124,6 @@ ShapeItem fd_count = 0;
       }
 
 Value_P Z(fd_count, LOC);
-   new (&Z->get_ravel(0)) IntCell(0);   // prototype
-
    if (fds)
       {
         loop(m, max_fd)
@@ -578,7 +576,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 const int len = strlen(text);
                 Value_P Z(len, LOC);
                 loop(t, len)
-                    new (&Z->get_ravel(t))   CharCell((Unicode)(text[t]));
+                    new (Z->next_ravel())   CharCell((Unicode)(text[t]));
 
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -633,7 +631,6 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (len == 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                new (&Z->get_ravel(0)) IntCell(0);   // prototype
                 loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -650,7 +647,6 @@ const int function_number = X->get_ravel(0).get_near_int();
                 const char * s = fgets(buffer, SMALL_BUF, file);
                 const int len = s ? strlen(s) : 0;
                 Value_P Z(len, LOC);
-                new (&Z->get_ravel(0)) IntCell(0);   // prototype
                 loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -705,19 +701,19 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (result)   goto out_errno;   // fstat failed
 
                 Value_P Z(Value_P(13, LOC));
-                new (&Z->get_ravel( 0))   IntCell(s.st_dev);
-                new (&Z->get_ravel( 1))   IntCell(s.st_ino);
-                new (&Z->get_ravel( 2))   IntCell(s.st_mode);
-                new (&Z->get_ravel( 3))   IntCell(s.st_nlink);
-                new (&Z->get_ravel( 4))   IntCell(s.st_uid);
-                new (&Z->get_ravel( 5))   IntCell(s.st_gid);
-                new (&Z->get_ravel( 6))   IntCell(s.st_rdev);
-                new (&Z->get_ravel( 7))   IntCell(s.st_size);
-                new (&Z->get_ravel( 8))   IntCell(s.st_blksize);
-                new (&Z->get_ravel( 9))   IntCell(s.st_blocks);
-                new (&Z->get_ravel(10))   IntCell(s.st_atime);
-                new (&Z->get_ravel(11))   IntCell(s.st_mtime);
-                new (&Z->get_ravel(12))   IntCell(s.st_ctime);
+                new (Z->next_ravel())   IntCell(s.st_dev);
+                new (Z->next_ravel())   IntCell(s.st_ino);
+                new (Z->next_ravel())   IntCell(s.st_mode);
+                new (Z->next_ravel())   IntCell(s.st_nlink);
+                new (Z->next_ravel())   IntCell(s.st_uid);
+                new (Z->next_ravel())   IntCell(s.st_gid);
+                new (Z->next_ravel())   IntCell(s.st_rdev);
+                new (Z->next_ravel())   IntCell(s.st_size);
+                new (Z->next_ravel())   IntCell(s.st_blksize);
+                new (Z->next_ravel())   IntCell(s.st_blocks);
+                new (Z->next_ravel())   IntCell(s.st_atime);
+                new (Z->next_ravel())   IntCell(s.st_mtime);
+                new (Z->next_ravel())   IntCell(s.st_ctime);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -804,7 +800,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (data == 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                new (&Z->get_ravel(0)) CharCell(UNI_ASCII_SPACE);   // prototype
+                Z->set_proto_Spc();
                 loop(z, len)   new (Z->next_ravel()) CharCell((Unicode)data[z]);
                 munmap((char *)data, len);
 
@@ -952,7 +948,6 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                new (&Z->get_ravel(0)) IntCell(0);   // prototype
                 loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -1055,7 +1050,6 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                new (&Z->get_ravel(0)) IntCell(0);   // prototype
                 loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -1250,7 +1244,6 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (len == 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                new (&Z->get_ravel(0)) IntCell(0);   // prototype
                 loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
@@ -1293,7 +1286,6 @@ const int function_number = X->get_ravel(0).get_near_int();
                 const char * s = fgets(buffer, bytes, file);
                 const int len = s ? strlen(s) : 0;
                 Value_P Z(len, LOC);
-                new (&Z->get_ravel(0)) IntCell(0);   // prototype
                 loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
@@ -1471,7 +1463,6 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                new (&Z->get_ravel(0)) IntCell(0);   // prototype
                 loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
@@ -1527,7 +1518,6 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                new (&Z->get_ravel(0)) IntCell(0);   // prototype
                 loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);

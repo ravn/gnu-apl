@@ -309,7 +309,7 @@ const APL_Float remaining = timer_end - now();
    if (remaining < 0)   return IntScalar(0, LOC);
 
 Value_P Z(LOC);
-   new (&Z->get_ravel(0))   FloatCell(0.000001 * remaining);
+   new (Z->next_ravel())   FloatCell(0.000001 * remaining);
    return Z;
 }
 //=============================================================================
@@ -625,7 +625,7 @@ vector<int32_t> sorted;
       }
 
 Value_P Z(sorted.size(), LOC);
-   loop(z, sorted.size())   new (&Z->get_ravel(z)) IntCell(sorted[z]);
+   loop(z, sorted.size())   new (Z->next_ravel()) IntCell(sorted[z]);
    return Z;
 }
 //-----------------------------------------------------------------------------

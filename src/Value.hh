@@ -248,6 +248,10 @@ public:
            }
       }
 
+   /// set the prototype to ' '
+   void set_proto_Spc()
+      { new (&ravel[0]) CharCell(UNI_ASCII_SPACE); }
+
    /// set the prototype to ' ' if this value is empty.
    void set_default_Spc()
       { if (is_empty())   new (&ravel[0]) CharCell(UNI_ASCII_SPACE); }

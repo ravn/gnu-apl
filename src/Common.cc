@@ -300,7 +300,6 @@ Value_P
 Idx0(const char * loc)
 {
 Value_P Z((ShapeItem)0, loc);
-   new (&Z->get_ravel(0))   IntCell(0);
    Z->check_value(LOC);
    return Z;
 }
@@ -309,7 +308,7 @@ Value_P
 Str0(const char * loc)
 {
 Value_P Z((ShapeItem)0, loc);
-   new (&Z->get_ravel(0))   CharCell(UNI_ASCII_SPACE);
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
@@ -319,7 +318,7 @@ Str0_0(const char * loc)
 {
 Shape sh((ShapeItem)0, (ShapeItem)0);
 Value_P Z(sh, loc);
-   new (&Z->get_ravel(0))   CharCell(UNI_ASCII_SPACE);
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
@@ -329,7 +328,6 @@ Idx0_0(const char * loc)
 {
 Shape sh((ShapeItem)0, (ShapeItem)0);
 Value_P Z(sh, loc);
-   new (&Z->get_ravel(0))   IntCell(0);
    Z->check_value(LOC);
    return Z;
 }

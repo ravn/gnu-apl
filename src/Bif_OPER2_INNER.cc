@@ -137,11 +137,9 @@ const bool B_enclosed = B->get_rank() > 1;
         B = Bif_F12_PARTITION::enclose_with_axes(first_axis, B);
       }
    
-   loop (z, items_A * items_B)
+   loop (a, items_A)
+   loop (b, items_B)
       {
-        const ShapeItem a = z / items_B;
-        const ShapeItem b = z % items_B;
-
         Value_P RO_A(A, LOC);
         if (A_enclosed)   RO_A = A->get_ravel(a).get_pointer_value();
 
@@ -153,21 +151,23 @@ const bool B_enclosed = B->get_rank() > 1;
         if (T1.get_tag() == TOK_ERROR)   return T1;
 
         Value_P A_RO_B = T1.get_apl_val();
-        new (Z->next_ravel()) PointerCell(A_RO_B, Z.getref());
+
+        Cell * cZ = Z->next_ravel();
+        new (cZ) PointerCell(A_RO_B, Z.getref());
 
         // at this point Z[z] is the result of a built-in function RO.
         // Compute LO/Z[z].
-        Value_P ZZ = Z->get_ravel(z).get_pointer_value();
+        //
+        Value_P ZZ = cZ->get_pointer_value();
         const Token T2 = Bif_OPER1_REDUCE::fun->eval_LB(_LO, ZZ);
-        Z->get_ravel(z).release(LOC);
+        cZ->release(LOC);
 
         if (T2.get_tag() == TOK_ERROR)   return T2;
 
-        Z->get_ravel(z).init_from_value(T2.get_apl_val(), Z.getref(), LOC);
+        cZ->init_from_value(T2.get_apl_val(), Z.getref(), LOC);
       }
 
    Z->set_default(*B.get());
- 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

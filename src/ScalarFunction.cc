@@ -929,7 +929,7 @@ Shape shape_A;
 
    if (A->get_rank() > B->get_rank())   // then Z is all zeros.
       {
-        loop(z, len_Z)   new (&Z->get_ravel(z))   IntCell(0);
+        loop(z, len_Z)   new (Z->next_ravel())   IntCell(0);
         goto done;
       }
 
@@ -947,7 +947,7 @@ Shape shape_A;
        {
          if (shape_A.get_shape_item(r) > B->get_shape_item(r))
             {
-              loop(z, len_Z)   new (&Z->get_ravel(z))   IntCell(0);
+              loop(z, len_Z)   new (Z->next_ravel())   IntCell(0);
               goto done;
             }
        }
@@ -1031,7 +1031,7 @@ uint8_t * used = new uint8_t[(set_size + 7)/8];
               continue;
             }
          used[rnd >> 3] |= 1 << (rnd & 7);
-         new (&Z->get_ravel(z)) IntCell(rnd + Workspace::get_IO());
+         new (Z->next_ravel()) IntCell(rnd + Workspace::get_IO());
        }
 
    delete [] used;
@@ -1086,7 +1086,7 @@ const uint32_t len_B = B->element_count();
 const APL_Float qct = Workspace::get_CT();
 Value_P Z(len_A, LOC);
 
-uint32_t len_Z = 0;
+ShapeItem len_Z = 0;
 
    loop(a, len_A)
       {
@@ -1103,14 +1103,14 @@ uint32_t len_Z = 0;
 
         if (!found)
            {
-             Z->get_ravel(len_Z++).init(cell_A, Z.getref(), LOC);
+             Z->next_ravel()->init(cell_A, Z.getref(), LOC);
+             ++len_Z;
            }
       }
 
    Z->set_shape_item(0, len_Z);
 
-   Z->set_default(*B.get());
-
+   Z->set_default(*A.get());
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

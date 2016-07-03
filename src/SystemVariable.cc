@@ -184,16 +184,13 @@ Quad_ARG::get_apl_value() const
 const int argc = uprefs.expanded_argv.size();
 
 Value_P Z(argc, LOC);
-Cell * C = &Z->get_ravel(0);
-
    loop(a, argc)
       {
         const char * arg = uprefs.expanded_argv[a];
-        const int len = strlen(arg);
-        Value_P val(len, LOC);
-        loop(l, len)   new (val->next_ravel())   CharCell(Unicode(arg[l]));
-
-        new (C++)   PointerCell(val, Z.getref());
+        UTF8_string utf(arg);
+        UCS_string ucs(utf);
+        Value_P sub(ucs, LOC);
+        new (Z->next_ravel())   PointerCell(sub, Z.getref());
       }
 
    Z->check_value(LOC);
@@ -256,43 +253,17 @@ const Error * err = 0;
         //
         Shape sh((ShapeItem)3, (ShapeItem)0);
         Value_P Z(sh, LOC);
-        new (&Z->get_ravel(0))   CharCell(UNI_ASCII_SPACE);
+        Z->set_proto_Spc();
         Z->check_value(LOC);
         return Z;
       }
 
-const UCS_string msg_1 = err->get_error_line_1();
-const UCS_string msg_2 = err->get_error_line_2();
-const UCS_string msg_3 = err->get_error_line_3();
-
-   // compute max line length of the 3 error lines,
-   //
-const ShapeItem len_1 = msg_1.size();
-const ShapeItem len_2 = msg_2.size();
-const ShapeItem len_3 = msg_3.size();
-
-ShapeItem max_len = len_1;
-   if (max_len < len_2)   max_len = len_2;
-   if (max_len < len_3)   max_len = len_3;
-
-const Shape sh(3, max_len);
-Value_P Z(sh, LOC);
-   loop(l, max_len)
-      {
-        new (&Z->get_ravel(l))
-         CharCell((l < len_1) ? msg_1[l] : UNI_ASCII_SPACE);
-      }
-   loop(l, max_len)
-      {
-        new (&Z->get_ravel(l + max_len))
-         CharCell((l < len_2) ? msg_2[l] : UNI_ASCII_SPACE);
-      }
-   loop(l, max_len)
-      {
-        new (&Z->get_ravel(l + 2*max_len))
-         CharCell((l < len_3) ? msg_3[l] : UNI_ASCII_SPACE);
-      }
-
+PrintBuffer pb;
+   pb.append_ucs(err->get_error_line_1());
+   pb.append_ucs(err->get_error_line_2());
+   pb.append_ucs(err->get_error_line_3());
+   pb.pad_to_spaces();   // replace pad char by spaces
+Value_P Z(pb, LOC);
    Z->check_value(LOC);
    return Z;
 }
@@ -316,8 +287,8 @@ ErrorCode ec = E_NO_ERROR;
 
 Value_P Z(2, LOC);
 
-   new (&Z->get_ravel(0)) IntCell(Error::error_major(ec));
-   new (&Z->get_ravel(1)) IntCell(Error::error_minor(ec));
+   new (Z->next_ravel()) IntCell(Error::error_major(ec));
+   new (Z->next_ravel()) IntCell(Error::error_minor(ec));
 
    Z->check_value(LOC);
    return Z;
@@ -1021,7 +992,7 @@ int user_count = 0;
 #endif
 
 Value_P Z(LOC);
-   new (&Z->get_ravel(0))   IntCell(user_count);
+   new (Z->next_ravel())   IntCell(user_count);
    Z->check_value(LOC);
    return Z;
 }
@@ -1090,8 +1061,7 @@ uint64_t proc_mem = 0;            // memory as reported proc/mem_info
            }
       }
 
-   new (&Z->get_ravel(0))   IntCell(total);
-
+   new (Z->next_ravel())   IntCell(total);
    Z->check_value(LOC);
    return Z;
 }

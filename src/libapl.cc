@@ -88,14 +88,7 @@ apl_value(int rank, const int64_t * shape, const char * loc)
 const Shape sh(rank, shape);
 Value_P Z(sh, loc);
 
-   if (Z->element_count())
-      {
-         while (Cell * cell = Z->next_ravel())   new (cell)   IntCell(0);
-      }
-   else
-      {
-        new (&Z->get_ravel(0))   IntCell(0);   // prototype
-      }
+   while (Cell * cell = Z->next_ravel())   new (cell)   IntCell(0);
 
    Z->check_value(LOC);
    Value_P::increment_owner_count(Z.get(), loc);   // keep value

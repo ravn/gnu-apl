@@ -130,6 +130,11 @@ const ShapeItem length = shape.get_volume();
         ravel = short_value;
       }
 
+   // init the firsdt ravel element to (prototype) 0 so that we can avoid
+   // many empty checks all over the place
+   //
+   new (ravel)   IntCell(0);
+
    check_ptr = (const char *)this + 7;
 }
 //-----------------------------------------------------------------------------
@@ -344,12 +349,14 @@ const int src_incr = new_value->is_scalar() ? 0 : 1;
       {
         if (!C->is_lval_cell())   LEFT_SYNTAX_ERROR;
 
-        Cell * dest = C++->get_lval_value();   // can be 0!
-        if (dest)   dest->release(LOC);   // free sub-values etc (if any)
+        if (Cell * dest = C++->get_lval_value())   // dest can be 0!
+           {
+             dest->release(LOC);   // free sub-values etc (if any)
 
-        // erase the pointee when overriding a pointer-cell.
-        //
-        if (dest)   dest->init(*src, *cellowner, LOC);
+             // erase the pointee when overriding a pointer-cell.
+             //
+             dest->init(*src, *cellowner, LOC);
+           }
         src += src_incr;
       }
 }
@@ -991,7 +998,7 @@ const ShapeItem ec_z = Z->element_count();
    // means from higher indices to lower indices in this and Z
    
    loop(z, ec_z)
-       Z->get_ravel(z).init(get_ravel(mult.next()), Z.getref(), LOC);
+       Z->next_ravel()->init(get_ravel(mult.next()), Z.getref(), LOC);
 
    Assert(mult.done());
 
@@ -1671,7 +1678,7 @@ const Cell & first = get_ravel(0);
         const ShapeItem ec_Z =  Z->nz_element_count();
 
         loop(z, ec_Z)
-            Z->get_ravel(z).init_type(B0->get_ravel(z), Z.getref(), LOC);
+            Z->next_ravel()->init_type(B0->get_ravel(z), Z.getref(), LOC);
         Z->set_complete();
         return Z;
       }

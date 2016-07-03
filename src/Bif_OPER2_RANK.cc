@@ -86,7 +86,6 @@ Value_P vsh_B(shape_B.get_rank(), LOC);
    vsh_B->check_value(LOC);
 
 Value_P vsh_Z(shape_Z.get_rank(), LOC);
-   new (&vsh_Z->get_ravel(0)) IntCell(0);   // prototype
    loop(sh, shape_Z.get_rank())
             new (vsh_Z->next_ravel()) IntCell(shape_Z.get_shape_item(sh));
    vsh_Z->check_value(LOC);

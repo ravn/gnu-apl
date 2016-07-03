@@ -658,6 +658,14 @@ PrintBuffer::pad_height(Unicode pad, ShapeItem height)
 }
 //-----------------------------------------------------------------------------
 void
+PrintBuffer::pad_to_spaces()
+{
+   loop(y, get_height())
+   loop(x, get_width(y))
+      if (is_iPAD_char(get_char(x, y)))   set_char(x, y, UNI_ASCII_SPACE);
+}
+//-----------------------------------------------------------------------------
+void
 PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
 {
    if (height > get_height())

@@ -1181,7 +1181,7 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
                  break;
 
         case 2:  Z = Value_P(LOC);
-                new (&Z->get_ravel(0)) IntCell(fun_line);
+                new (Z->next_ravel()) IntCell(fun_line);
                 break;
 
         case 3:  {
@@ -1207,10 +1207,10 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
                  break;
 
         case 5: Z = Value_P(LOC);
-                new (&Z->get_ravel(0)) IntCell(PC);                      break;
+                new (Z->next_ravel()) IntCell(PC);                      break;
 
         case 6: Z = Value_P(LOC);
-                new (&Z->get_ravel(0)) IntCell(pm);                      break;
+                new (Z->next_ravel()) IntCell(pm);                      break;
 
         default: DOMAIN_ERROR;
       }
@@ -1308,14 +1308,14 @@ const ShapeItem ec = B->nz_element_count();
          if (cell_B.is_character_cell())   // char to Unicode
             {
               const Unicode uni = cell_B.get_char_value();
-              new (&Z->get_ravel(v)) IntCell(uni);
+              new (Z->next_ravel()) IntCell(uni);
               continue;
             }
 
          if (cell_B.is_integer_cell())
             {
               const APL_Integer bint = cell_B.get_near_int();
-              new (&Z->get_ravel(v))   CharCell(Unicode(bint));
+              new (Z->next_ravel())   CharCell(Unicode(bint));
               continue;
             }
 

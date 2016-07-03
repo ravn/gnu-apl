@@ -200,7 +200,7 @@ UserFunction * fun = UserFunction::fix(text, error_line, false, LOC, creator,
    if (fun == 0)
       {
         Value_P Z(LOC);
-        new (&Z->get_ravel(0))   IntCell(error_line + Workspace::get_IO());
+        new (Z->next_ravel())   IntCell(error_line + Workspace::get_IO());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }

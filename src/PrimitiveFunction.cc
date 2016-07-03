@@ -140,8 +140,7 @@ Bif_F12_RHO::eval_B(Value_P B)
 {
 Value_P Z(B->get_rank(), LOC);
 
-   loop(r, B->get_rank())
-       new (&Z->get_ravel(r)) IntCell(B->get_shape_item(r));
+   loop(r, B->get_rank())   new (Z->next_ravel()) IntCell(B->get_shape_item(r));
 
    Z->set_default_Zero();
    Z->check_value(LOC);
@@ -237,12 +236,12 @@ Value_P Z(shape_Z, LOC);
    if (len_B == 0)   // empty B: use prototype
       {
         loop(z, len_Z)
-            Z->get_ravel(z).init_type(B.get_ravel(0), Z.getref(), LOC);
+            Z->next_ravel()->init_type(B.get_ravel(0), Z.getref(), LOC);
       }
    else
       {
         loop(z, len_Z)
-            Z->get_ravel(z).init(B.get_ravel(z % len_B), Z.getref(), LOC);
+            Z->next_ravel()->init(B.get_ravel(z % len_B), Z.getref(), LOC);
       }
 
    Z->set_default(B);
@@ -312,7 +311,7 @@ Value_P Z(sh, LOC);
         Value_P ZZ(ec, LOC);
         loop(r, ec)   new (ZZ->next_ravel())   IntCell(0);
         ZZ->check_value(LOC);
-        new (&Z->get_ravel(0))   PointerCell(ZZ, Z.getref());
+        new (&Z->get_ravel(0))   PointerCell(ZZ, Z.getref());   // prototype
       }
 
    Z->check_value(LOC);
@@ -342,13 +341,13 @@ Value_P Z(B->get_shape(), LOC);
              {
                if (cell_B.equal(A->get_ravel(a), qct))
                   {
-                    new (&Z->get_ravel(bz)) IntCell(qio + a);
+                    new (Z->next_ravel()) IntCell(qio + a);
                     found = true;
                     break;
                   }
              }
          if (!found)
-            new (&Z->get_ravel(bz)) IntCell(qio + len_A);
+            new (Z->next_ravel()) IntCell(qio + len_A);
        }
 
    Z->set_default_Zero();
@@ -364,7 +363,7 @@ Value_P Z(new_shape, LOC);
 const ShapeItem count = B->element_count();
    Assert(count == Z->element_count());
 
-   loop(c, count)   Z->get_ravel(c).init(B->get_ravel(c), Z.getref(), LOC);
+   loop(c, count)   Z->next_ravel()->init(B->get_ravel(c), Z.getref(), LOC);
 
    Z->set_default(*B.get());
    Z->check_value(LOC);
@@ -381,7 +380,7 @@ Bif_COMMA::prepend_scalar(const Cell & cell_A, Axis axis, Value_P B)
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
            {
-              Z->get_ravel(0).init(cell_A, Z.getref(), LOC);
+              Z->get_ravel(0).init(cell_A, Z.getref(), LOC);   // prototype
            }
         else
            {
@@ -394,8 +393,8 @@ Bif_COMMA::prepend_scalar(const Cell & cell_A, Axis axis, Value_P B)
    if (B->is_scalar())
       {
         Value_P Z(2, LOC);
-        Z->get_ravel(0).init(cell_A, Z.getref(), LOC);
-        Z->get_ravel(1).init(B->get_ravel(0), Z.getref(), LOC);
+        Z->next_ravel()->init(cell_A, Z.getref(), LOC);
+        Z->next_ravel()->init(B->get_ravel(0), Z.getref(), LOC);
         Z->check_value(LOC);
         return Z;
       }
@@ -434,7 +433,7 @@ Bif_COMMA::append_scalar(Value_P A, Axis axis, const Cell & cell_B)
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
            {
-              Z->get_ravel(0).init(cell_B, Z.getref(), LOC);
+              Z->get_ravel(0).init(cell_B, Z.getref(), LOC);   // prototype
            }
         else
            {
@@ -872,7 +871,7 @@ Bif_F12_DOMINO::eval_B(Value_P B)
       {
         Value_P Z(LOC);
 
-        B->get_ravel(0).bif_reciprocal(&Z->get_ravel(0));
+        B->get_ravel(0).bif_reciprocal(Z->next_ravel());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -899,7 +898,7 @@ Bif_F12_DOMINO::eval_B(Value_P B)
              loop(l, len)
                  {
                    const APL_Float b = B->get_ravel(l).get_real_value();
-                   new (&Z->get_ravel(l))   FloatCell(b / r2.real());
+                   new (Z->next_ravel())   FloatCell(b / r2.real());
                  }
            }
         else                                       // complex result
@@ -907,7 +906,7 @@ Bif_F12_DOMINO::eval_B(Value_P B)
              loop(l, len)
                  {
                    const APL_Complex b = B->get_ravel(l).get_complex_value();
-                   new (&Z->get_ravel(l))   ComplexCell(b / r2);
+                   new (Z->next_ravel())   ComplexCell(b / r2);
                  }
            }
 
@@ -1336,7 +1335,6 @@ const ShapeItem l_len_B = shape_B1.get_volume();
       {
         const Shape shape_Z(shape_A1 + shape_B1);
         Value_P Z(shape_Z, LOC);
-        new (&Z->get_ravel(0))  IntCell(0);   // prototype
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -1513,7 +1511,6 @@ const ShapeItem ec_B = B->element_count();
       {
         const Shape shape_Z(A->get_shape() + B->get_shape());
         Value_P Z(shape_Z, LOC);
-        new (&Z->get_ravel(0))  IntCell(0);   // prototype
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -1693,7 +1690,7 @@ Value_P Z(A->get_shape(), LOC);
                   same = 1;
                   break;
                 }
-         new (&Z->get_ravel(z))   IntCell(same);
+         new (Z->next_ravel())   IntCell(same);
        }
    
    Z->set_default_Zero();
@@ -2457,7 +2454,7 @@ Value * v1_owner = v1->get_lval_cellowner();
       {
         const ShapeItem ec = v1->nz_element_count();
         Value_P Z(v1->get_shape(), LOC);
-        loop(e, ec)   Z->get_ravel(e).init(v1->get_ravel(e), Z.getref(), LOC);
+        loop(e, ec)   Z->next_ravel()->init(v1->get_ravel(e), Z.getref(), LOC);
 
         Z->check_value(LOC);
         return Z;
@@ -2678,9 +2675,7 @@ Bif_F12_EQUIV::eval_B(Value_P B)
 const Depth depth = B->compute_depth();
 
 Value_P Z(LOC);
-
-   new (&Z->get_ravel(0)) IntCell(depth);
-
+   new (Z->next_ravel()) IntCell(depth);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -2790,17 +2785,9 @@ Bif_F1_EXECUTE::execute_command(UCS_string & command)
         throw error;
       }
 
-ExecuteList * fun = new ExecuteList(command.no_pad(), LOC);
-   Assert(fun);
-   Workspace::push_SI(fun, LOC);
-
 UTF8_ostream out;
-const bool valid = Command::do_APL_command(out, command);
-   if (!valid)
-      {
-        Workspace::pop_SI(LOC);
-        throw_apl_error(E_INCORRECT_COMMAND, LOC);
-      }
+const bool user_cmd = Command::do_APL_command(out, command);
+   if (user_cmd)   return execute_statement(command);
 
 UTF8_string result_utf8 = out.get_data();
    if (result_utf8.size() == 0 ||
@@ -2828,8 +2815,6 @@ Value_P Z((ShapeItem)line_starts.size() - 1, LOC);
         Value_P ZZ(line_ucs, LOC);
         new (Z->next_ravel())   PointerCell(ZZ, Z.getref());
       }
-
-   Workspace::pop_SI(LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);

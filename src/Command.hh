@@ -78,7 +78,8 @@ public:
    static void process_line(UCS_string & line);
 
    /// process \b line which contains an APL command. Return true iff the
-   /// command was found
+   /// command was user-defined (and then the function for that command is
+   /// stored in \b line and shall be executed)).
    static bool do_APL_command(ostream & out, UCS_string & line);
 
    /// process \b line which contains APL statements
