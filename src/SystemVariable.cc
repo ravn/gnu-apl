@@ -486,7 +486,6 @@ Value_P Z(len, LOC);
             new (Z->next_ravel())   IntCell(si->get_line());
        }
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Z;
 }

@@ -577,7 +577,7 @@ CELL_PERFORMANCE_END(get_statistics_AB(), start_2, z)
       }
 
    joblist_AB.cancel_jobs();
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
 
 PERFORMANCE_END(fs_SCALAR_AB, start_1, len_Z)
@@ -910,7 +910,7 @@ const Cell * cB = &B->get_ravel(0);
             expand_pointers(Z->next_ravel(), Z.getref(), cA, cB++, fun);
        }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Z;
@@ -964,7 +964,6 @@ CELL_PERFORMANCE_END(get_statistics_AB(), start_2, zi.get_total())
        }
 
 done:
-   Z->set_default_Zero();
    Z->check_value(LOC);
 
 PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count());
@@ -1036,7 +1035,6 @@ uint8_t * used = new uint8_t[(set_size + 7)/8];
 
    delete [] used;
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1110,7 +1108,7 @@ ShapeItem len_Z = 0;
 
    Z->set_shape_item(0, len_Z);
 
-   Z->set_default(*A.get());
+   Z->set_default(*A.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

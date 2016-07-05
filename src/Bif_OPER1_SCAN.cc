@@ -68,7 +68,7 @@ Value_P Z(shape_Z, LOC);
       {
         if (shape_B.get_shape_item(axis) > 1)   LENGTH_ERROR;
 
-        Z->set_default(*B.get());
+        Z->set_default(*B.get(), LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -118,7 +118,7 @@ ShapeItem inc_2 = 0;              // increment after result m*l items
         cB += inc_2;
       }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);

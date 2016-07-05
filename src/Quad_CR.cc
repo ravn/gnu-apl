@@ -764,7 +764,6 @@ const Cell * cB = &B.get_ravel(0);
          new (Z->next_ravel()) CharCell(Unicode(16*n1 + n2));
        }
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Z;
 }
@@ -996,7 +995,6 @@ Value_P Z(len, LOC);
            }
       }
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Z;
 }
@@ -1040,7 +1038,6 @@ Value_P Z(len, LOC);
             }
        }
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Z;
 }

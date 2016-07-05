@@ -69,7 +69,7 @@ Value_P ret;
    return ret;
 }
 //-----------------------------------------------------------------------------
-Cell *
+void
 Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
 {
    // Note: this function changes the type of this cell, but the
@@ -95,8 +95,6 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
       {
         new (this) IntCell(0);
       }
-
-   return this;
 }
 //-----------------------------------------------------------------------------
 void

@@ -113,7 +113,6 @@ const Cell * base = &B->get_ravel(0);
    loop(bz, len_BZ)
        new (Z->next_ravel())   IntCell(qio + (array[bz] - base)/comp_len);
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -159,7 +158,6 @@ const Cell * base = &B1->get_ravel(0);
    loop(bz, len_BZ)
        new (Z->next_ravel()) IntCell(qio + (array[bz] - base)/comp_len);
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

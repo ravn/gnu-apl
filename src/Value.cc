@@ -988,7 +988,7 @@ const ShapeItem ec_z = Z->element_count();
 
    if (ec_z == 0)   // empty result
       {
-        Z->set_default(*this);
+        Z->set_default(*this, LOC);
         Z->check_value(LOC);
         return Z;
       }
@@ -1055,7 +1055,7 @@ const Cell * cI = &X->get_ravel(0);
          Z->next_ravel()->init(get_ravel(idx), Z.getref(), LOC);
       }
 
-   Z->set_default(*this);
+   Z->set_default(*this, LOC);
 
    Z->check_value(LOC);
    return Z;
@@ -1261,7 +1261,7 @@ uint32_t error_count = 0;
 const Cell * C = &get_ravel(0);
 
 const ShapeItem ec = nz_element_count();
-    loop(c, ec);
+    loop(c, ec)
        {
          const CellType ctype = C->get_cell_type();
          switch(ctype)

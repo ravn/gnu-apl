@@ -1215,7 +1215,6 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
         default: DOMAIN_ERROR;
       }
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1290,7 +1289,6 @@ ShapeItem z = 0;
 
        }
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1371,7 +1369,6 @@ Value_P Z(lines.size(), LOC);
 
    loop(z, lines.size())   new (Z->next_ravel()) IntCell(lines[z]);
 
-   Z->set_default_Zero();
    if (assigned)   return Token(TOK_APL_VALUE2, Z);
    else            return Token(TOK_APL_VALUE1, Z);
 }

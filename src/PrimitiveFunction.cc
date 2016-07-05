@@ -142,7 +142,6 @@ Value_P Z(B->get_rank(), LOC);
 
    loop(r, B->get_rank())   new (Z->next_ravel()) IntCell(B->get_shape_item(r));
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -244,7 +243,7 @@ Value_P Z(shape_Z, LOC);
             Z->next_ravel()->init(B.get_ravel(z % len_B), Z.getref(), LOC);
       }
 
-   Z->set_default(B);
+   Z->set_default(B, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -268,7 +267,6 @@ const ShapeItem ec = B->element_count();
 
         loop(z, len)   new (Z->next_ravel()) IntCell(qio + z);
 
-        Z->set_default_Zero();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -350,7 +348,6 @@ Value_P Z(B->get_shape(), LOC);
             new (Z->next_ravel()) IntCell(qio + len_A);
        }
 
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -365,7 +362,7 @@ const ShapeItem count = B->element_count();
 
    loop(c, count)   Z->next_ravel()->init(B->get_ravel(c), Z.getref(), LOC);
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -407,8 +404,8 @@ Shape shape_Z(B->get_shape());
 Value_P Z(shape_Z, LOC);
 
 const Shape3 shape_B3(B->get_shape(), axis);
-   const uint32_t slice_a = shape_B3.l();
-   const uint32_t slice_b = shape_B3.l() * B->get_shape_item(axis);
+   const ShapeItem slice_a = shape_B3.l();
+   const ShapeItem slice_b = shape_B3.l() * B->get_shape_item(axis);
 
 const Cell * cB = &B->get_ravel(0);
 
@@ -453,8 +450,8 @@ Shape shape_Z(A->get_shape());
 Value_P Z(shape_Z, LOC);
 
 const Shape3 shape_A3(A->get_shape(), axis);
-const uint32_t slice_a = shape_A3.l() * A->get_shape_item(axis);
-const uint32_t slice_b = shape_A3.l();
+const ShapeItem slice_a = shape_A3.l() * A->get_shape_item(axis);
+const ShapeItem slice_b = shape_A3.l();
 
 const Cell * cA = &A->get_ravel(0);
 
@@ -514,11 +511,11 @@ Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
 
         Value_P Z(shape_Z, LOC);
 
-        Z->set_default(*B.get());
+        Z->set_default(*B.get(), LOC);
 
         const Shape3 shape_B3(B->get_shape(), axis);
-        const uint32_t slice_a = shape_B3.l();
-        const uint32_t slice_b = shape_B3.l() * B->get_shape_item(axis);
+        const ShapeItem slice_a = shape_B3.l();
+        const ShapeItem slice_b = shape_B3.l() * B->get_shape_item(axis);
 
         const Cell * cA = &A->get_ravel(0);
         const Cell * cB = &B->get_ravel(0);
@@ -563,11 +560,11 @@ Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
 
         Value_P Z(shape_Z, LOC);
 
-        Z->set_default(*B.get());
+        Z->set_default(*B.get(), LOC);
 
         const Shape3 shape_A3(A->get_shape(), axis);
-        const uint32_t slice_a = shape_A3.l() * A->get_shape_item(axis);
-        const uint32_t slice_b = shape_A3.l();
+        const ShapeItem slice_a = shape_A3.l() * A->get_shape_item(axis);
+        const ShapeItem slice_b = shape_A3.l();
 
         const Cell * cA = &A->get_ravel(0);
         const Cell * cB = &B->get_ravel(0);
@@ -578,7 +575,7 @@ Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
               Cell::copy(*Z.get(), cB, slice_b);
             }
 
-        Z->set_default(*B.get());
+        Z->set_default(*B.get(), LOC);
 
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -607,24 +604,21 @@ Shape shape_Z;
             }
        }
 
-Value_P Z(shape_Z, LOC);
-
-   Z->set_default(*B.get());
-
 const Shape3 shape_A3(A->get_shape(), axis);
 
 const Cell * cA = &A->get_ravel(0);
 const Cell * cB = &B->get_ravel(0);
-const uint32_t slice_a = shape_A3.l() * A->get_shape_item(axis);
-const uint32_t slice_b = shape_A3.l() * B->get_shape_item(axis);
+const ShapeItem slice_a = shape_A3.l() * A->get_shape_item(axis);
+const ShapeItem slice_b = shape_A3.l() * B->get_shape_item(axis);
 
+Value_P Z(shape_Z, LOC);
    loop(hz, shape_A3.h())
        {
          Cell::copy(*Z.get(), cA, slice_a);
          Cell::copy(*Z.get(), cB, slice_b);
        }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -687,7 +681,7 @@ const Cell * cB = &B->get_ravel(0);
            }
       }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -879,7 +873,7 @@ Bif_F12_DOMINO::eval_B(Value_P B)
    if (B->get_rank() == 1)   // inversion at the unit sphere
       {
         const APL_Float qct = Workspace::get_CT();
-        const uint32_t len = B->get_shape_item(0);
+        const ShapeItem len = B->get_shape_item(0);
         APL_Complex r2(0.0);
         loop(l, len)
             {
@@ -910,7 +904,7 @@ Bif_F12_DOMINO::eval_B(Value_P B)
                  }
            }
 
-        Z->set_default(*B.get());
+        Z->set_default(*B.get(), LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -991,7 +985,7 @@ Value_P Z(shape_Z, LOC);
                  rows_A, cols_A, &A->get_ravel(0),
                  cols_B, &B->get_ravel(0), nB2);
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -1032,7 +1026,7 @@ Value_P Z(B->get_shape(), LOC);
    loop(h, shape_B3.h())
    loop(l, shape_B3.l())
        {
-         const uint32_t hl = h * shape_B3.m() * shape_B3.l() + l;
+         const ShapeItem hl = h * shape_B3.m() * shape_B3.l() + l;
          const Cell * cB = &B->get_ravel(hl);
          Cell * cZ = &Z->get_ravel(hl);
          loop(m, shape_B3.m())
@@ -1040,8 +1034,7 @@ Value_P Z(B->get_shape(), LOC);
                .init(cB[(shape_B3.m() - m - 1)*shape_B3.l()], Z.getref(), LOC);
        }
 
-   Z->set_default(*B.get());
-
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1085,7 +1078,7 @@ Value_P Z(B->get_shape(), LOC);
           ->init(B->get_ravel(shape_B3.hml(h, src, l)), Z.getref(), LOC);
        }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -1129,7 +1122,7 @@ Shape shape_A;
    loop(r, B->get_rank())   shape_A.add_shape_item(B->get_rank() - r - 1);
 
 Value_P Z = transpose(shape_A, B);
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1162,7 +1155,7 @@ const Shape shape_A(A, Workspace::get_IO());
 Value_P Z = (shape_A.get_rank() == B->get_rank() && is_permutation(shape_A))
           ? transpose(shape_A, B) : transpose_diag(shape_A, B);
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -1176,7 +1169,7 @@ Value_P Z(shape_Z, LOC);
 
    if (Z->is_empty())
       {
-         Z->set_default(*B.get());
+         Z->set_default(*B.get(), LOC);
          return Z;
       }
 
@@ -1236,7 +1229,7 @@ Shape shape_Z;
 Value_P Z(shape_Z, LOC);
    if (Z->is_empty())
       {
-         Z->set_default(*B.get());
+         Z->set_default(*B.get(), LOC);
         return Z;
       }
 
@@ -1405,7 +1398,7 @@ const Cell * cA = &A->get_ravel(0);
          cA += l_len_A;
        }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1562,7 +1555,7 @@ Value_P Z(shape_Z, LOC);
             }
        }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -1665,7 +1658,7 @@ Value_P Z(len_Z, LOC);
 Cell * z = &Z->get_ravel(0);
    B->enlist(z, Z.getref(), B->get_lval_cellowner());
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1693,7 +1686,6 @@ Value_P Z(A->get_shape(), LOC);
          new (Z->next_ravel())   IntCell(same);
        }
    
-   Z->set_default_Zero();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1771,7 +1763,7 @@ const Shape weight_B = B->get_shape().reverse_scan();
 Value_P Z(shape_Z, LOC);
    if (Z->is_empty())
       {
-         Z->set_default(*B.get());
+         Z->set_default(*B.get(), LOC);
          Z->check_value(LOC);
          return Z;
       }
@@ -1846,7 +1838,7 @@ Value_P Z(shape_Z, LOC);
 
    if (Z->is_empty())
       {
-        Z->set_default(*B.get());
+        Z->set_default(*B.get(), LOC);
 
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -1998,7 +1990,7 @@ const ShapeItem llen = item_shape.get_volume();
             }
        }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -2066,7 +2058,7 @@ Shape shape_Z;
 Value_P Z(shape_Z, LOC);
    if (Z->is_empty())
       {
-         Z->set_default(*B.get());
+         Z->set_default(*B.get(), LOC);
          return Token(TOK_APL_VALUE1, Z);
       }
 
@@ -2121,7 +2113,7 @@ PermutedArrayIterator it_Z(shape_Z, perm);
             }
       }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -2349,7 +2341,7 @@ Value_P Z;
         
       }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -2522,7 +2514,7 @@ Value_P Z(shape_Z, LOC);
 
    fill(shape_Zi, &Z->get_ravel(0), Z.getref(), B);
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -2661,7 +2653,7 @@ bool seen[MAX_RANK];
          if (seen[x])              INDEX_ERROR;
          seen[x] = true;
 
-         const int32_t amax = B->get_shape_item(x);
+         const ShapeItem amax = B->get_shape_item(x);
          if      (a >= amax)   ravel_A.set_shape_item(x, 0);
          else if (a >= 0)      ravel_A.set_shape_item(x, a - amax);
          else if (a > -amax)   ravel_A.set_shape_item(x, amax + a);

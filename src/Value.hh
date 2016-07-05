@@ -238,13 +238,15 @@ public:
       { Assert1(idx < nz_element_count());   return ravel[idx]; }
 
    /// set the prototype (according to B) if this value is empty.
-   void set_default(const Value & B)
-      { if (is_empty())
+   void set_default(const Value & B, const char * loc)
+      {
+        if (is_empty())
            {
-             if (B.get_ravel(0).is_lval_cell())
+             const Cell & cell = B.get_ravel(0);
+             if (cell.is_lval_cell())
                 new (&ravel[0]) LvalCell(0, 0);
              else
-                ravel[0].init_type(B.get_ravel(0), *this, LOC);
+                ravel[0].init_type(cell, *this, loc);
            }
       }
 
@@ -255,10 +257,6 @@ public:
    /// set the prototype to ' ' if this value is empty.
    void set_default_Spc()
       { if (is_empty())   new (&ravel[0]) CharCell(UNI_ASCII_SPACE); }
-
-   /// set the prototype to 0 if this value is empty.
-   void set_default_Zero()
-      { if (is_empty())   new (&ravel[0]) IntCell(0); }
 
    /// Return the number of scalars in this value (enlist).
    ShapeItem get_enlist_count() const;

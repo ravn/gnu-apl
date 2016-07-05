@@ -61,7 +61,7 @@ Value_P Z(A->get_shape() + B->get_shape(), LOC);
         scalar_outer_product();
         if (job.ec != E_NO_ERROR)   throw_apl_error(job.ec, LOC);
 
-        Z->set_default(*B.get());
+        Z->set_default(*B.get(), LOC);
  
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -132,7 +132,7 @@ Value_P RO_B;
         Q1(result);   FIXME;
       }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);

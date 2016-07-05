@@ -155,7 +155,7 @@ ShapeItem len_Z = 0;
 
    if (!Z)   return Token(TOK_VOID);   // LO without result
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -260,7 +260,7 @@ Value_P Z;
 
    if (!Z)   return Token(TOK_VOID);   // LO without result
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

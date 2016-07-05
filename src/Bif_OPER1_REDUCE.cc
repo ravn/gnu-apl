@@ -112,7 +112,7 @@ const Shape3 shape_B3(shape_B, axis);
            }
       }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -331,7 +331,7 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
            }
       }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

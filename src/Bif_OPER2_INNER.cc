@@ -112,7 +112,7 @@ Value_P Z(shape_A1 + shape_B1, LOC);
         scalar_inner_product();
         if (job.ec != E_NO_ERROR)   throw_apl_error(job.ec, LOC);
 
-        Z->set_default(*B.get());
+        Z->set_default(*B.get(), LOC);
  
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -167,7 +167,7 @@ const bool B_enclosed = B->get_rank() > 1;
         cZ->init_from_value(T2.get_apl_val(), Z.getref(), LOC);
       }
 
-   Z->set_default(*B.get());
+   Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
