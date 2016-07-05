@@ -1260,7 +1260,8 @@ Value::check_value(const char * loc)
 uint32_t error_count = 0;
 const Cell * C = &get_ravel(0);
 
-    loop(c, nz_element_count())
+const ShapeItem ec = nz_element_count();
+    loop(c, ec);
        {
          const CellType ctype = C->get_cell_type();
          switch(ctype)

@@ -1299,8 +1299,13 @@ Token
 Quad_UCS::eval_B(Value_P B)
 {
 Value_P Z(B->get_shape(), LOC);
+const ShapeItem ec = B->element_count();
+   if (ec == 0)
+      {
+        if (B->get_ravel(0).is_character_cell())   // char to Unicode
+        new (&Z->get_ravel(0))   CharCell(UNI_ASCII_SPACE);
+      }
 
-const ShapeItem ec = B->nz_element_count();
    loop(v, ec)
        {
          const Cell & cell_B = B->get_ravel(v);
