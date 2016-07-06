@@ -232,5 +232,10 @@ mac_def(Z__A_Quad_EB_B,
 "BRA: ⎕ES 10 ('→',⍕RES) 0       0             ⍝ →N\n"
 "ESC: ⎕ES 10 \"→\"        0       0             ⍝ →\n")
 
+/// inner product with A and B of rank ≤ 1
+//
+mac_def(  Z__vA_LO_INNER_RO_vB,
+ "Z←A (LO Z__A_LO_INNER_RO_B RO) B\n"
+ "Z←LO/(,A) RO ,B\n")
 #undef mac_def
 
