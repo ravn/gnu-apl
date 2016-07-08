@@ -31,6 +31,7 @@
 #include "Bif_F12_FORMAT.hh"
 #include "CDR.hh"
 #include "CharCell.hh"
+#include "Command.hh"
 #include "Common.hh"
 #include "FloatCell.hh"
 #include "IndexExpr.hh"
@@ -163,11 +164,12 @@ Quad_AI::get_apl_value() const
 const int total_ms = (now() - session_start)/1000;
 const int user_ms  = user_wait/1000;
 
-Value_P ret(4, LOC);
+Value_P ret(5, LOC);
    new (ret->next_ravel())   IntCell(ProcessorID::get_own_ID());
    new (ret->next_ravel())   IntCell(total_ms - user_ms);
    new (ret->next_ravel())   IntCell(total_ms);
    new (ret->next_ravel())   IntCell(user_ms);
+   new (ret->next_ravel())   IntCell(Command::get_APL_expression_count());
 
    ret->check_value(LOC);
    return ret;

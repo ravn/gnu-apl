@@ -49,6 +49,7 @@
 #include "Workspace.hh"
 
 int Command::boxing_format = -1;
+ShapeItem Command::APL_expression_count = 0;
 
 vector<Command::user_command> Command::user_commands;
 
@@ -95,6 +96,7 @@ Command::process_line(UCS_string & line)
         default: ;
       }
 
+   ++APL_expression_count;
    do_APL_expression(line);
 }
 //-----------------------------------------------------------------------------

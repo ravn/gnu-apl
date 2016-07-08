@@ -957,7 +957,7 @@ develop:
 # analyzed with gprof apl gmon.out
 #
 .PHONY: gprof
-gprof:
+develop:
 	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes GPROF_WANTED=yes
 	make all
 

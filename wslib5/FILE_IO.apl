@@ -302,6 +302,12 @@
  Zi←Ai ⎕FIO[47] Bh
 ∇
 
+∇Z ← As FIO∆fscanf Bh
+ ⍝⍝ fscanf from a file
+ ⍝⍝ As is the format string
+ Z←As ⎕FIO[48] Bh
+∇
+
 ∇FIO∆clear_statistics Bi
  ⍝⍝ clear performance statistics with ID Bi
  Zn ← ⎕FIO[200] Bi
@@ -433,7 +439,7 @@ t←t⍪'INADDR_ANY' 0
     →0
 
  NotSpecial:
- this←⊂what          ⍝ enclose the input for diadic '⍳'
+ this←⊂what          ⍝ enclose the input for dyadic '⍳'
  z←(,t[;1]) ⍳ this   ⍝ search for recognized constants into 't'
  →(z>↑⍴t)/ReturnAsis ⍝ no match
    z←t[z;2]          ⍝ do the substitution

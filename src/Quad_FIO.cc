@@ -308,6 +308,211 @@ printf_done:
    return Token(TOK_APL_VALUE1, IntScalar(out_len, LOC));
 }
 //-----------------------------------------------------------------------------
+Unicode
+Quad_FIO::fget_utf8(FILE * file, ShapeItem & fget_count)
+{
+const int b0 = fgetc(file);
+   if (b0 == EOF)   return UNI_EOF;
+
+   ++fget_count;
+   if (!(b0 & 0x80))   return (Unicode)b0;   // ASCII
+
+int len,bx;
+   if      ((b0 & 0xE0) == 0xC0)   { len = 2;   bx = b0 & 0x1F; }
+   else if ((b0 & 0xF0) == 0xE0)   { len = 3;   bx = b0 & 0x0F; }
+   else if ((b0 & 0xF8) == 0xF0)   { len = 4;   bx = b0 & 0x0E; }
+   else if ((b0 & 0xFC) == 0xF8)   { len = 5;   bx = b0 & 0x0E; }
+   else if ((b0 & 0xFE) == 0xFC)   { len = 6;   bx = b0 & 0x0E; }
+   else return UNI_EOF;
+
+uint32_t uni = 0;
+   loop(l, len - 1)
+       {
+         const int subc = fgetc(file);
+         if (subc == EOF)   return UNI_EOF;
+         bx  <<= 6;
+         uni <<= 6;
+         uni |= subc & 0x3F;
+       }
+
+
+   return Unicode(bx | uni);
+}
+//-----------------------------------------------------------------------------
+Token
+Quad_FIO::do_scanf(FILE * file, const UCS_string & format)
+{
+ShapeItem count = 0;
+   if (format.size() == 0)   LENGTH_ERROR;
+
+   // we take the total number of % as an upper bound fir the number of items
+   //
+   loop(f, format.size() - 1)
+      {
+        if (format[f] == UNI_ASCII_PERCENT)   ++count;
+      }
+
+ShapeItem fget_count = 0;   // number of input characters (not bytes!) read
+
+Value_P Z(count, LOC);
+   loop(z, count)   new (Z->next_ravel())   IntCell(0);
+ShapeItem z = 0;
+
+Unicode lookahead = fget_utf8(file, fget_count);
+   if (lookahead == UNI_EOF)   goto out;
+
+   loop(f, format.size())
+      {
+        const Unicode fmt_ch = format[f];
+        if (fmt_ch == UNI_ASCII_SPACE)
+           {
+             // one space in the format matches 0 or more spaces in the file.
+             //
+             while (lookahead == UNI_ASCII_SPACE)
+                {
+                 lookahead = fget_utf8(file, fget_count);
+                 if (lookahead == UNI_EOF)   goto out;
+                }
+             continue;
+           }
+
+        if (fmt_ch != UNI_ASCII_PERCENT)
+           {
+             // normal character in format: match with file
+             //
+             match:
+             if (fmt_ch != lookahead)   goto out;
+             lookahead = fget_utf8(file, fget_count);
+             if (lookahead == UNI_EOF)   goto out;
+             continue;
+           }
+
+        ++f;   // skip (first) %
+        const Unicode fmt_ch1 = format[f];
+        if (fmt_ch1 == UNI_ASCII_PERCENT)   goto match;   // double % is %
+
+        Unicode conv = Unicode_0;
+        int conv_len = 0;
+        bool suppress = false;
+        for (;f < format.size(); ++f)
+           {
+             const Unicode cc = format[f];
+             if (cc == UNI_ASCII_ASTERISK)   // assignment suppression
+                {
+                  suppress = true;
+                  continue;
+                }
+
+             if (strchr("hjlLmqtz", cc))   // type modifier
+                {
+                  // we provide our own conversion modifiers and ignore
+                  // conversion modifiers given by the user
+                  //
+                  continue;
+                }
+
+             if (strchr("0123456789", cc))   // field length
+                {
+                  conv_len = 10*conv_len + (cc - '0');
+                  continue;
+                }
+
+             if (strchr("cdDfFeginousxX", cc))
+                {
+                  conv = cc;
+                   break; // conversion
+                }
+           }
+
+        if (conv == Unicode_0)
+           {
+             Workspace::more_error() = UCS_string(
+    "expecting conversion character %, c, d, f, i, n, o, u, s, or x after %");
+             DOMAIN_ERROR;
+           }
+
+        if (strchr("dDiouxX", conv))  // integer conversion
+           {
+             ungetc(lookahead, file);   // let fscanf() read it
+             const char fmt[] = { '%', 'l', 'l', (char)conv, 0 };
+             long long val = 0;
+             const int count = fscanf(file, fmt, &val);
+             lookahead = fget_utf8(file, fget_count);
+             if (lookahead == UNI_EOF)   goto out;
+             if (count != 1)   goto out;
+
+             if (!suppress)   new (&Z->get_ravel(z++))   IntCell(val);
+           }
+        else if (strchr("fFeg", conv))  // float conversion
+           {
+             ungetc(lookahead, file);   // let fscanf() read it
+             const char fmt[] = { '%', 'l', (char)conv, 0 };
+             double val = 0;
+             const int count = fscanf(file, fmt, &val);
+             lookahead = fget_utf8(file, fget_count);
+             if (lookahead == UNI_EOF)   goto out;
+             if (count != 1)   goto out;
+
+             if (!suppress)   new (&Z->get_ravel(z++))   FloatCell(val);
+           }
+        else if (conv == UNI_ASCII_c)  // char(s)
+           {
+             if (conv_len == 0)   // default: single char
+                {
+                  if (!suppress)   new (&Z->get_ravel(z++)) CharCell(lookahead);
+                  lookahead = fget_utf8(file, fget_count);
+                  if (lookahead == UNI_EOF)   goto out;
+                }
+             else
+                {
+                  UCS_string ucs;
+                  loop(c, conv_len)
+                     {
+                       ucs.append(lookahead);
+                       lookahead = fget_utf8(file, fget_count);
+                       if (lookahead == UNI_EOF)   break;
+                     }
+
+                  if (!suppress)
+                     {
+                       Value_P ZZ(ucs, LOC);
+                       new (&Z->get_ravel(z++))   PointerCell(ZZ, Z.getref());
+                     }
+                }
+           }
+        else if (conv == UNI_ASCII_s)  // string
+           {
+             UCS_string ucs;
+             while (lookahead > UNI_ASCII_SPACE)
+                 {
+                   ucs.append(lookahead);
+                   if (conv_len && ucs.size() >= conv_len)   break;
+                   lookahead = fget_utf8(file, fget_count);
+                   if (lookahead == UNI_EOF)   break;
+                 }
+
+             if (!suppress)
+                {
+                  Value_P ZZ(ucs, LOC);
+                  new (&Z->get_ravel(z++))   PointerCell(ZZ, Z.getref());
+                }
+           }
+        else if (conv == UNI_ASCII_n)  // characters consumed thus far
+           {
+             if (!suppress)   new (&Z->get_ravel(z++))   IntCell(fget_count);
+           }
+      }
+
+out:
+   // shorten Z to the actual number of converted items
+   //
+Shape sh_Z(z);
+   Z->set_shape(sh_Z);
+   Z->check_value(LOC);
+
+   return Token(TOK_APL_VALUE1, Z);
+}
+//-----------------------------------------------------------------------------
 Token
 Quad_FIO::list_functions(ostream & out)
 {
@@ -388,6 +593,7 @@ Quad_FIO::list_functions(ostream & out)
 "   Za ←    ⎕FIO[45] Bh    getpeername(Bh)\n"
 "   Zi ← Ai ⎕FIO[46] Bh    getsockopt(Bh, A_level, A_optname, Zi)\n"
 "   Ze ← Ai ⎕FIO[47] Bh    setsockopt(Bh, A_level, A_optname, A_optval)\n"
+"   Ze ← As ⎕FIO[48] Bh    fscanf(Bh, As)\n"
 "\n"
 "Benchmarking functions:\n"
 "\n"
@@ -636,7 +842,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
-         case 8:   // fgets(Zi, SMALL_BUF, Bh) 1 byte per Zi\n"
+         case 8:   // fgets(Zi, SMALL_BUF, Bh) 1 byte per Zi
               {
                 errno = 0;
                 FILE * file = get_FILE(*B.get());
@@ -1227,7 +1433,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd,LOC));
               }
 
-         case 6:   // fread(Zi, 1, Ai, Bh) 1 byte per Zi\n"
+         case 6:   // fread(Zi, 1, Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
                 const int bytes = A->get_ravel(0).get_near_int();
@@ -1250,7 +1456,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
-         case 7:   // fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Zi\n"
+         case 7:   // fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
                 const int bytes = A->element_count();
@@ -1270,7 +1476,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
               }
 
-         case 8:   // fgets(Zi, Ai, Bh) 1 byte per Zi\n"
+         case 8:   // fgets(Zi, Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
                 const int bytes = A->get_ravel(0).get_near_int();
@@ -1334,7 +1540,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return do_printf(file, A);
               }
 
-         case 23:   // fwrite(Ac, 1, ⍴Ac, Bh) Unicode Ac Output UTF-8 \n"
+         case 23:   // fwrite(Ac, 1, ⍴Ac, Bh) Unicode Ac Output UTF-8
               {
                 errno = 0;
                 FILE * file = get_FILE(*B.get());
@@ -1469,7 +1675,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
-         case 38:   // send(Bh, Ai, ⍴Ai, 0) 1 byte per Zi\n"
+         case 38:   // send(Bh, Ai, ⍴Ai, 0) 1 byte per Zi
               {
                 errno = 0;
                 const int bytes = A->element_count();
@@ -1490,7 +1696,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
               }
 
-         case 39:   // send(Bh, Ac, ⍴Ac, 0) Unicode Ac Output UTF-8 \n"
+         case 39:   // send(Bh, Ac, ⍴Ac, 0) Unicode Ac Output UTF-8
               {
                 UCS_string text(*A.get());
                 UTF8_string utf(text);
@@ -1524,7 +1730,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
-         case 42:   // write(Bh, Ai, ⍴Ai) 1 byte per Zi\n"
+         case 42:   // write(Bh, Ai, ⍴Ai) 1 byte per Zi
               {
                 const int bytes = A->element_count();
                 const int fd = get_fd(*B.get());
@@ -1545,7 +1751,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
               }
 
-         case 43:   // write(Bh, Ac, ⍴Ac) Unicode Ac Output UTF-8 \n"
+         case 43:   // write(Bh, Ac, ⍴Ac) Unicode Ac Output UTF-8
               {
                 const int fd = get_fd(*B.get());
                 UCS_string text(*A.get());
@@ -1556,7 +1762,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, IntScalar(len, LOC));
               }
 
-         case 46:   // getsockopt(Bh, A_level, A_optname, Zi)\n"
+         case 46:   // getsockopt(Bh, A_level, A_optname, Zi)
               {
                 const APL_Integer level = A->get_ravel(0).get_int_value();
                 const APL_Integer optname = A->get_ravel(1).get_int_value();
@@ -1569,7 +1775,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, IntScalar(optval, LOC));
               }
 
-         case 47:   // setsockopt(Bh, A_level, A_optname, A_optval)\n"
+         case 47:   // setsockopt(Bh, A_level, A_optname, A_optval)
               {
                 const APL_Integer level = A->get_ravel(0).get_int_value();
                 const APL_Integer optname = A->get_ravel(1).get_int_value();
@@ -1578,6 +1784,13 @@ const int function_number = X->get_ravel(0).get_near_int();
                 errno = 0;
                 setsockopt(fd, level, optname, &optval, sizeof(optval));
                 goto out_errno;
+              }
+
+         case 48:   // fscanf(Bh, A_format)
+              {
+                FILE * file = get_FILE(*B.get());
+                const UCS_string format(*A.get());
+                return do_scanf(file, format);
               }
 
          case 202:   // set monadic parallel threshold

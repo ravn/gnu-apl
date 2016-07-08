@@ -104,6 +104,10 @@ public:
    static int get_boxing_format()
       { return boxing_format; }
 
+   /// return the number of APL expressions entered in immediate execution mode
+   static ShapeItem get_APL_expression_count()
+      { return APL_expression_count; }
+
    /// one user defined command
    struct user_command
       {
@@ -289,5 +293,6 @@ protected:
 
    /// format for ]BOXING
    static int boxing_format;
+   static ShapeItem APL_expression_count;
 };
 //-----------------------------------------------------------------------------

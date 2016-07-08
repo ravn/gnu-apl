@@ -271,6 +271,7 @@ dist_noinst_DATA = \
 	NativeFunctions.tc			\
 	Quad_ARG.tc				\
 	Quad_CR.tc				\
+	Quad_FIO.tc				\
 	Quad_INP.tc				\
 	UserCommand.tc				\
 	Performance.pt

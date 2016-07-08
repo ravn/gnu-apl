@@ -98,6 +98,12 @@ protected:
    /// print A to \b out
    Token do_printf(FILE * out, Value_P A);
 
+   /// perform an fscanf() from file
+   Token do_scanf(FILE * file, const UCS_string & format);
+
+   /// get one Unicode from file
+   Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
+
    /// the open files
    vector<file_entry> open_files;
 };

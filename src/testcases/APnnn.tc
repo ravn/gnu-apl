@@ -5,7 +5,7 @@
 CLEAR WS
 
       ⎕AI
-1010 ⁰ ⁰ ⁰
+1010 ⁰ ⁰ ⁰ ⁰
 
       ⍝ check that we have the correct --id
       ⍝

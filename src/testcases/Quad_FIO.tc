@@ -1,4 +1,4 @@
-⍝ File_IO.tc
+⍝ Quad_FIO.tc
 ⍝ ----------------------------------
 
       ⍝ same as File_IO_1.tc but using FILE_IO.apl library
@@ -14,9 +14,10 @@
       )COPY 5 FILE_IO.apl
 DUMPED ³
 
-      ⍝ fopen THIS file readonly
-      ⍝       ----
-      ⎕←Handle←FIO∆fopen_ro Filename←'testcases/File_IO.tc'
+      ⍝ fopen this file readonly
+      ⍝
+      Filename←'testcases/File_IO_1.tc'
+      ⎕←Handle←FIO∆fopen_ro Filename
 ⁰
 
       ⍝ get statistics
@@ -39,8 +40,13 @@ FIO∆fclose[2]  Ze←⎕FIO[4]Bh
 
       ⍝ create new file
       ⍝
-      ⎕←Handle←'w' FIO∆fopen Filename← 'FILE_IO.test1'
+      Filename← "FILE_IO.test"
+      ⎕←Handle←'w' FIO∆fopen Filename
 ⁰
+      FIO∆errno
+0
+      FIO∆strerror FIO∆errno
+Success
 
       ⍝ write 3 lines
       ⍝
@@ -58,7 +64,7 @@ FIO∆fclose[2]  Ze←⎕FIO[4]Bh
 
       ⍝ print the file
       ⍝
-      )HOST cat FILE_IO.test1
+      )HOST cat FILE_IO.test
 Hello
 World
 Line 3...
@@ -72,7 +78,7 @@ Line 3...
 
       ⍝ read one line (default max_len)
       ⍝
-      Z←FIO∆fgets Handle
+      Z← FIO∆fgets Handle
       ⎕UCS Z
 Hello
 
@@ -132,7 +138,8 @@ No such file or directory
 
       ⍝ fwrite with UCS in UTF8 out
       ⍝
-      ⎕←Handle←'w' FIO∆fopen Filename← 'FILE_IO.test2'
+      Filename← 'FILE_IO.test1'
+      ⎕←Handle←'w' FIO∆fopen Filename
 ⁰
       'HELLO ⍋ ⌽ ⍒ ⍴ ⍵' FIO∆fwrite_utf8 Handle
 25
@@ -140,7 +147,7 @@ No such file or directory
       FIO∆fclose Handle ⍝ close file
 0
 
-      )HOST cat FILE_IO.test2 
+      )HOST cat FILE_IO.test1 
 HELLO ⍋ ⌽ ⍒ ⍴ ⍵
 0 
 
@@ -156,7 +163,7 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
 
       ⍝ read entire file
       ⍝
-      ⎕UCS FIO∆read_file Filename
+      ⎕UCS FIO∆read_file 'FILE_IO.test1'
 72 69 76 76 79 32 226 141 139 32 226 140 189 32 226 141 146 32 226 141 180 32 
       226 141 181
 
@@ -236,7 +243,8 @@ World!
 
       ⍝ fscanf
       ⍝
-      ⎕←Handle←'w' FIO∆fopen Filename← 'FILE_IO.test3'
+      Filename← 'FILE_IO.test1'
+      ⎕←Handle←'w' FIO∆fopen Filename
 ⁰
       DATA←'int 22 perc % doub 3.14 char C chars DEFGH qqq str st⍴ing'
       FMT←'int %d perc %% doub %f char %c chars %5c qqq str %s %n'
@@ -256,6 +264,7 @@ World!
 
       )ERASE FORMAT Handle Handle1 Handle2 Command AF_INET SOCK_STREAM
       )ERASE Error FSTAT Filename LOCALHOST Port Z Server IPPROTO_IP
+      )ERASE FMT DATA
 
 ⍝     )VARS
 
