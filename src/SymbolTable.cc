@@ -211,7 +211,7 @@ const UCS_string ** sorted_names = new const UCS_string *[count];
 
    // figure column widths
    //
-const int qpw = Workspace::get_PrintContext().get_PW();
+const int qpw = Workspace::get_PW();
 vector<int> col_width;
    enum { tabsize = 4 };
    UCS_string::compute_column_width(col_width, sorted_names, count,

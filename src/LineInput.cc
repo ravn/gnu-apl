@@ -832,8 +832,7 @@ LineInput::edit_line(LineInputMode mode, const UCS_string & prompt,
 
    user_line.clear();
 
-LineEditContext lec(mode, 24, Workspace::get_PrintContext().get_PW(),
-                    hist, prompt);
+LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
 
    for (;;)
        {

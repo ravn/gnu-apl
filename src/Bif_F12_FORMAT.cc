@@ -175,8 +175,8 @@ Bif_F12_FORMAT::monadic_format(Value_P B)
 {
    Assert(B->get_rank() <= 2);
 
-PrintContext pctx = Workspace::get_PrintContext();
-   pctx.set_style(PrintStyle(pctx.get_style() | PST_NO_FRACT_0));
+const PrintStyle style((PrintStyle)(PR_APL | PST_NO_FRACT_0));
+const PrintContext pctx = Workspace::get_PrintContext(style);
 
 const PrintBuffer pb(*B, pctx, 0);
 

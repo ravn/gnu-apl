@@ -490,7 +490,7 @@ UCS_string fn = fun_name;
 
    // print a value
 
-PrintContext pctx = Workspace::get_PrintContext();
+PrintContext pctx = Workspace::get_PrintContext(PR_APL);
 const Value & val = *get_apl_val();
    if (val.get_rank() == 0)   // scalar
       {

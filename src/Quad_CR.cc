@@ -1116,7 +1116,7 @@ const ShapeItem len = B.element_count();
 
 Value_P Z(len, LOC);
 
-PrintContext pctx = Workspace::get_PrintContext();
+PrintContext pctx = Workspace::get_PrintContext(PR_APL);
    pctx.set_style(PrintStyle(pctx.get_style() | PST_NO_FRACT_0));
 
    loop(b, len)

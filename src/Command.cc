@@ -1043,8 +1043,7 @@ int count = 0;
    enum { tabsize = 4 };
 vector<int> col_width;
    UCS_string::compute_column_width(col_width, filenames.get_data(), count,
-                                    tabsize,
-                                    Workspace::get_PrintContext().get_PW());
+                                    tabsize, Workspace::get_PW());
 
    loop(c, count)
       {

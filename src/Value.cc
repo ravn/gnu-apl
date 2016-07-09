@@ -1448,7 +1448,7 @@ const Cell & cell_0 = get_ravel(0);
 ostream &
 Value::print(ostream & out) const
 {
-PrintContext pctx = Workspace::get_PrintContext();
+PrintContext pctx = Workspace::get_PrintContext(PR_APL);
    if (get_rank() == 0)   // scalar
       {
         pctx.set_style(PR_APL_MIN);
@@ -1512,7 +1512,7 @@ UCS_string ind(indent, UNI_ASCII_SPACE);
 void
 Value::debug(const char * info) const
 {
-const PrintContext pctx = Workspace::get_PrintContext();
+const PrintContext pctx = Workspace::get_PrintContext(PR_APL);
 PrintBuffer pb(*this, pctx, 0);
    pb.debug(CERR, info);
 }

@@ -62,29 +62,21 @@ public:
    /// Construct an empty workspace.
    Workspace();
 
-   /// return the current Quad-CT
+   /// return the current ⎕CT
    static APL_Float get_CT()
       { return the_workspace.v_Quad_CT.current(); }
 
-   /// return element \b pos of the current Quad-FC (pos should be 0..5)
+   /// return element \b pos of the current ⎕FC (pos should be 0..5)
    static APL_Char get_FC(int p)
       { return the_workspace.v_Quad_FC.current()[p]; }
 
-   /// return the current Quad-IO
+   /// return the current ⎕IO
    static APL_Integer get_IO()
       { return the_workspace.v_Quad_IO.current(); }
 
-   /// return the current Quad-LX
+   /// return the current ⎕LX
    static UCS_string get_LX()
       { return UCS_string(*the_workspace.v_Quad_LX.get_apl_value()); }
-
-   /// return the current ⎕PS, ⎕PP, and ⎕PW
-   static PrintContext get_PrintContext()
-      {
-        return PrintContext(the_workspace.v_Quad_PS.current(),
-                            the_workspace.v_Quad_PP.current(),
-                            the_workspace.v_Quad_PW.current());
-      }
 
    /// return style and the current ⎕PP, and ⎕PW
    static PrintContext get_PrintContext(PrintStyle style)
@@ -93,9 +85,17 @@ public:
                                    the_workspace.v_Quad_PW.current());
       }
 
-   /// return the current Quad-PR
+   /// return the current ⎕PR
    static const UCS_string get_PR()
       { return the_workspace.v_Quad_PR.current(); }
+
+   /// return the current ⎕PW
+   static int get_PP()
+      { return the_workspace.v_Quad_PP.current(); }
+
+   /// return the current ⎕PW
+   static int get_PW()
+      { return the_workspace.v_Quad_PW.current(); }
 
    /// the number of SI entries
    static int SI_entry_count()
