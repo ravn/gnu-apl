@@ -1676,7 +1676,12 @@ const Cell & first = get_ravel(0);
       {
         Value_P B0 = first.get_pointer_value();
         Value_P Z(B0->get_shape(), loc);
-        const ShapeItem ec_Z =  Z->nz_element_count();
+        const ShapeItem ec_Z =  Z->element_count();
+
+        if (ec_Z == 0)
+           {
+             Z->get_ravel(0).init_type(B0->get_ravel(0), Z.getref(), LOC);
+           }
 
         loop(z, ec_Z)
             Z->next_ravel()->init_type(B0->get_ravel(z), Z.getref(), LOC);
