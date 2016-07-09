@@ -656,6 +656,8 @@ int tcol = 0;
             }
 
          const UCS_string & line = text[tidx];
+         bool in_single_quotes = false;
+         bool in_double_quotes = false;
 
          if (tcol >= line.size())   // end of line: wrap to next line
             {
@@ -665,6 +667,31 @@ int tcol = 0;
             }
 
          const Unicode uni = line[tcol++];
+         if (in_single_quotes)
+            {
+              if (uni == UNI_SINGLE_QUOTE)   in_single_quotes = false;
+            }
+         else if (in_double_quotes)
+            {
+              if (uni == UNI_ASCII_DOUBLE_QUOTE &&         // maybe string end
+                 !(tcol >= 2 && line[tcol - 2] == UNI_ASCII_BACKSLASH))
+              in_double_quotes = false;
+            }
+         else if (uni == UNI_SINGLE_QUOTE)
+            {
+              in_single_quotes = true;
+            }
+         else if (uni == UNI_ASCII_DOUBLE_QUOTE)
+            {
+              in_double_quotes = true;
+            }
+         else if (uni == UNI_COMMENT || uni == UNI_ASCII_NUMBER_SIGN)
+            {
+              ++tidx;
+              tcol = 0;
+              continue;
+            }
+
          if (copying)   lambda_text.append(uni);
 
          if (uni == UNI_ASCII_L_CURLY)
