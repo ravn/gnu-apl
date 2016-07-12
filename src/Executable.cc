@@ -642,9 +642,10 @@ UCS_string lambda_text;
 
 int level = 0;   // {/} nesting level
 bool copying = false;
-
-size_t tidx = 0;
-int tcol = 0;
+size_t tidx = 0;   // the current line in text[]
+int tcol = 0;      // the current column in text[tidx];
+bool in_single_quotes = false;
+bool in_double_quotes = false;
 
    // skip over the first skip lambdas and copy the next one to lambda_text
    //
@@ -652,17 +653,17 @@ int tcol = 0;
        {
          if (tidx >= text.size())
             {
-              Q1(copying)   Q1(tidx)   FIXME;
+              Q1(copying)   Q1(tidx)   Q(skip)   FIXME;
             }
 
          const UCS_string & line = text[tidx];
-         bool in_single_quotes = false;
-         bool in_double_quotes = false;
 
          if (tcol >= line.size())   // end of line: wrap to next line
             {
-              ++tidx;
-              tcol = 0;
+              ++tidx;     // next line
+              tcol = 0;   // first column
+              in_single_quotes = false;
+              in_double_quotes = false;
               continue;
             }
 
@@ -670,49 +671,59 @@ int tcol = 0;
          if (in_single_quotes)
             {
               if (uni == UNI_SINGLE_QUOTE)   in_single_quotes = false;
+              if (copying)   lambda_text.append(uni);
+              continue;
             }
-         else if (in_double_quotes)
+
+         if (in_double_quotes)
             {
-              if (uni == UNI_ASCII_DOUBLE_QUOTE &&         // maybe string end
-                 !(tcol >= 2 && line[tcol - 2] == UNI_ASCII_BACKSLASH))
-              in_double_quotes = false;
+              if (uni == UNI_ASCII_DOUBLE_QUOTE     // either \" or string end
+                 && !(tcol >= 2 && line[tcol - 2] == UNI_ASCII_BACKSLASH))
+                 in_double_quotes = false;
+              if (copying)   lambda_text.append(uni);
+              continue;
             }
-         else if (uni == UNI_SINGLE_QUOTE)
-            {
-              in_single_quotes = true;
-            }
-         else if (uni == UNI_ASCII_DOUBLE_QUOTE)
-            {
-              in_double_quotes = true;
-            }
-         else if (uni == UNI_COMMENT || uni == UNI_ASCII_NUMBER_SIGN)
+
+         // at this point uni is outside strings
+         //
+         if (uni == UNI_COMMENT || uni == UNI_ASCII_NUMBER_SIGN)
             {
               ++tidx;
               tcol = 0;
+              in_single_quotes = false;
+              in_double_quotes = false;
               continue;
             }
 
          if (copying)   lambda_text.append(uni);
 
-         if (uni == UNI_ASCII_L_CURLY)
+         switch(uni)
             {
-              if (level++ == 0)   // top-level {
-                 {
-                   if (skip == 0)   copying = true;
-                 }
-            }
-         else if (uni == UNI_ASCII_R_CURLY)
-            {
-              if (--level == 0)   // top-level }
-                 {
-                   if (copying)   break;   // done
-                   --skip;
-                 }
+              case UNI_SINGLE_QUOTE:             // start of a new '...' string
+                   in_single_quotes = true;
+                   continue;
+
+              case UNI_ASCII_DOUBLE_QUOTE:       // start of a new "..." string
+                   in_double_quotes = true;
+                   continue;
+
+              case UNI_ASCII_L_CURLY:            // start of a new { ... }
+                   if (level++ == 0 && skip == 0)   copying = true;
+                   continue;
+
+              case UNI_ASCII_R_CURLY:            // end of { ... }
+                   if (--level)   continue;      // but not top-level }
+                   --skip;                       // next {...} at top-level
+                   if (!copying)  continue;
+
+                   lambda_text.pop();            // the last }
+                   return lambda_text;
             }
        }
 
-   lambda_text.pop();   // the last }
-   return lambda_text;
+   // not reached
+   //
+   FIXME;
 }
 //-----------------------------------------------------------------------------
 void
