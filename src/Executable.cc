@@ -718,6 +718,8 @@ bool in_double_quotes = false;
 
                    lambda_text.pop();            // the last }
                    return lambda_text;
+
+              default: continue;
             }
        }
 
