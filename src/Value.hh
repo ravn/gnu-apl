@@ -242,11 +242,10 @@ public:
       {
         if (is_empty())
            {
+             Assert1(ravel[0].is_integer_cell());   // by constructor
              const Cell & cell = B.get_ravel(0);
-             if (cell.is_lval_cell())
-                new (&ravel[0]) LvalCell(0, 0);
-             else
-                ravel[0].init_type(cell, *this, loc);
+             if (cell.is_lval_cell())   new (&ravel[0]) LvalCell(0, 0);
+             else                       ravel[0].init_type(cell, *this, loc);
            }
       }
 

@@ -72,10 +72,6 @@ Value_P ret;
 void
 Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
 {
-   // Note: this function changes the type of this cell, but the
-   // compiler may not notice that and use the declaration for this
-   // Cell. Using the return value avoids that.
-   //
    if (other.is_pointer_cell())
       {
         new (this) PointerCell(other.get_pointer_value()->clone(loc),

@@ -1001,7 +1001,6 @@ const ShapeItem ec_z = Z->element_count();
        Z->next_ravel()->init(get_ravel(mult.next()), Z.getref(), LOC);
 
    Assert(mult.done());
-
    Z->check_value(LOC);
    return Z;
 }
@@ -1056,7 +1055,6 @@ const Cell * cI = &X->get_ravel(0);
       }
 
    Z->set_default(*this, LOC);
-
    Z->check_value(LOC);
    return Z;
 }

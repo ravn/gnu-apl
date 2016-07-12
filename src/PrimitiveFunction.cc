@@ -2327,23 +2327,21 @@ IndexExpr index_expr(ASS_none, LOC);
         index_expr.add(val);
       }
 
+   // the index() do set_default() and check_value(), so we return immediately
+   //
    index_expr.quad_io = Workspace::get_IO();
 
-Value_P Z;
    if (index_expr.value_count() == 1)   // one-dimensional index
       {
         Value_P single_index = index_expr.extract_value(0);
-        Z = B->index(single_index);
+        Value_P Z = B->index(single_index);
+        return Token(TOK_APL_VALUE1, Z);
       }
-   else                                  // 0- or multi-dimensional index
+   else
       {
-        Z = B->index(index_expr);
-        
+        Value_P Z = B->index(index_expr);
+        return Token(TOK_APL_VALUE1, Z);
       }
-
-   Z->set_default(*B.get(), LOC);
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
 Token
