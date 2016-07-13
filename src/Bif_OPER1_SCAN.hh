@@ -70,6 +70,10 @@ public:
    static Bif_OPER1_SCAN  _fun;      ///< Built-in function.
 
 protected:
+   /// overloaded Function::may_push_SI()
+   virtual bool may_push_SI() const
+      { return true; }
+
 };
 //-----------------------------------------------------------------------------
 /** Primitive operator ⍀ (scan along first axis)

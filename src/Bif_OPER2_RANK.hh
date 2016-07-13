@@ -49,6 +49,10 @@ public:
    /// overloaded Function::eval_LRXB()
    virtual Token eval_LRXB(Token & LO, Token & RO_y, Value_P X, Value_P B);
 
+   /// overloaded Function::may_push_SI()
+   virtual bool may_push_SI() const
+      { return true; }
+
    /// the 'normalized' implementation of all eval_Lxxx*( functions
    Token do_LyXB(Token & LO, Value_P X, Value_P B, Rank rk_chunkB);
 

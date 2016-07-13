@@ -39,6 +39,11 @@ public:
    static Bif_JOT  _fun;             ///< Built-in function.
  
 protected:
+   /// overloaded Function::may_push_SI()
+   virtual bool may_push_SI() const
+      { return true; }
+
+
 };
 //-----------------------------------------------------------------------------
 /** Primitive operator outer product.

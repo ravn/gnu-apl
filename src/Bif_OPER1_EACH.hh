@@ -42,6 +42,9 @@ public:
    static Bif_OPER1_EACH  _fun;      ///< Built-in function.
 
 protected:
+   /// overloaded Function::may_push_SI()
+   virtual bool may_push_SI() const
+      { return true; }
 };
 //-----------------------------------------------------------------------------
 #endif // __BIF_OPER1_EACH_HH_DEFINED__

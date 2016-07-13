@@ -237,7 +237,7 @@ vector<int> col_width;
            }
       }
 
-   delete sorted_names;
+   delete [] sorted_names;
 }
 //-----------------------------------------------------------------------------
 void

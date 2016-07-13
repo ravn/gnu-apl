@@ -39,6 +39,10 @@ public:
    static Bif_OPER2_INNER  _fun;   ///< Built-in function.
 
 protected:
+   /// overloaded Function::may_push_SI()
+   virtual bool may_push_SI() const
+      { return true; }
+
    /// the context for an inner product
    struct PJob_product
       {

@@ -254,7 +254,7 @@ Value_P Z;
 
              if (result.get_tag() == TOK_ERROR)   return result;
 
-             Q1(result);   FIXME;
+             Q1(result);   Q1(*LO) FIXME;
            }
       }
 

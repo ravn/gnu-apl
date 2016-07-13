@@ -79,6 +79,7 @@ protected:
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
 
+   /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
       { return   oper->may_push_SI()
         || (left_fun .is_function() && left_fun .get_function()->may_push_SI())

@@ -45,6 +45,11 @@ protected:
 
    /// LO-reduce B n-wise along axis.
    Token reduce_n_wise(Value_P A, Token & _LO, Value_P B, Axis axis);
+
+protected:
+   /// overloaded Function::may_push_SI()
+   virtual bool may_push_SI() const
+      { return true; }
 };
 //-----------------------------------------------------------------------------
 /** Primitive operator reduce along last axis.

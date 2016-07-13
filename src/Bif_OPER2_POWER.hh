@@ -38,6 +38,10 @@ public:
    /// overloaded Function::eval_LRB()
    virtual Token eval_LRB(Token & LO, Token & RO_y, Value_P B);
 
+   /// overloaded Function::may_push_SI()
+   virtual bool may_push_SI() const
+      { return true; }
+
    /// eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)
    Token eval_form_1(Value_P A, Token & LO, Value_P N, Value_P B);
 
