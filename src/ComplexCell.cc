@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -469,16 +469,31 @@ const APL_Float ai = A->get_imag_value();
 ErrorCode
 ComplexCell::bif_logarithm(Cell * Z, const Cell * A) const
 {
+   // ISO p. 88
+   //
+   if (!A->is_numeric())          return E_DOMAIN_ERROR;
+
+   if (get_real_value() == A->get_real_value() && 
+       get_imag_value() == A->get_imag_value())   return IntCell::z1(Z);
+
+
    if (value.cval_r == 0.0 && value2.cval_i == 0.0)   return E_DOMAIN_ERROR;
+   if (A->is_near_one())                              return E_DOMAIN_ERROR;
 
    if (A->is_real_cell())
       {
-        return zv(Z, log(cval()) / log(A->get_real_value()));
+        const APL_Complex z = log(cval()) / log(A->get_real_value());
+        if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
+        if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+        return zv(Z, z);
       }
 
    if (A->is_complex_cell())
       {
-        return zv(Z, log(cval()) / log(A->get_complex_value()));
+        const APL_Complex z = log(cval()) / log(A->get_complex_value());
+        if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
+        if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+        return zv(Z, z);
       }
 
    return E_DOMAIN_ERROR;

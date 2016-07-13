@@ -31,39 +31,29 @@
 ErrorCode
 RealCell::bif_logarithm(Cell * Z, const Cell * A) const
 {
-   if (!A->is_numeric())          return E_DOMAIN_ERROR;
-   if (get_real_value() == 0.0)   return E_DOMAIN_ERROR;
-
-   // A⍟B is defined as: (⍟B)÷(⍟A)
-   // if A=1 then ⍟A is 0 which causes division by 0 unless ⍟B is 0 as well.
+   // ISO p. 88
    //
-   if (A->is_near_one())   // ⍟A is 0
-      {
-         if (!this->is_near_one())   return E_DOMAIN_ERROR;
+   if (!A->is_numeric())   return E_DOMAIN_ERROR;
 
-         // both ⍟A and ⍟B are 0, so we get 0÷0 (= 1 in APL)
-         //
-         new (Z) IntCell(1);
-         return E_NO_ERROR;
+   if (get_real_value() == A->get_real_value() &&
+       A->get_imag_value() == 0.0)   return IntCell::z1(Z);
+
+   if (get_real_value() == 0.0)   return E_DOMAIN_ERROR;
+   if (A->is_near_one())          return E_DOMAIN_ERROR;
+
+   if (A->is_real_cell() && A->get_real_value() >= 0 && get_real_value() >= 0)
+      {
+        const APL_Float z = log(get_real_value()) / log(A->get_real_value());
+        if (!isfinite(z))   return E_DOMAIN_ERROR;
+        return FloatCell::zv(Z, z);
       }
 
-   if (A->is_real_cell())
-      {
-        if (get_real_value() < 0)
-           return ComplexCell::zv(Z,
-               log(get_complex_value()) / log(A->get_complex_value()));
-
-        return FloatCell::zv(Z,
-               log(get_real_value()) / log(A->get_real_value()));
-      }
-
-   if (A->is_complex_cell())
-      {
-        return ComplexCell::zv(Z,
-               log(get_complex_value()) / log(A->get_complex_value()));
-      }
-
-   return E_DOMAIN_ERROR;
+   // complex result (complex B or negative A)
+   //
+const APL_Complex z = log(get_complex_value()) / log(A->get_complex_value());
+   if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
+   if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+   return ComplexCell::zv(Z, z);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
