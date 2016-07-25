@@ -243,8 +243,19 @@ pick APL characters from a menu inside vim is here:
     http://apl-adventures.tumblr.com/post/76528148239/an-apl-character-picker-for-vim
 
 
-9. Keyboard Wrapper
-===================
+9. The APL Keynboard Translator (akt)
+=====================================
+
+David Lamkins has written a keyboard translarot called akt. You can
+use it for generating APL characters on your keyboard. In contrast to e,g.
+the xmodmap method, the mapping is on a per program basis so that other
+programs are not negatively affected. See:
+
+    https://github.com/TieDyedDevil/akt
+
+
+10. Keyboard Wrapper
+====================
 
 If the methods described above cannot be used for whatever reason then
 you can write your own program that reads keystrokes from the keyboard
@@ -256,8 +267,8 @@ APL_keyboard_learn, and APL_keyboard, which are all located in the 'tools'
 subdirectory.
 
 
-9.1 APL_keyboard_show
----------------------
+10.1 APL_keyboard_show
+----------------------
 
 APL_keyboard_show is a simple program that displays the byte sequences
 produced by your keyboard. The following sequences are, as an example,
@@ -302,8 +313,8 @@ The alert reader will have noticed that in both cases UTF8 encoded characters
 were sent; they were just wrong for APL before running xmodmap.
 
 
-9.2 APL_keyboard_learn
-----------------------
+10.2 APL_keyboard_learn
+-----------------------
 
 The next program is APL_keyboard_learn which is derived from APL_keyboard_show.
 
@@ -340,8 +351,8 @@ in order incorporate the newly created APL_keyboard.def into the program
 APL_keyboard.
 
 
-9.3 APL_keyboard
-----------------
+10.3 APL_keyboard
+-----------------
 
 The keyboard wrapper itself is APL_keyboard. The file APL_keyboard.def is
 #included by APL_keyboard.cc and defines the mapping from bytes sequences
@@ -351,7 +362,7 @@ Once APL_keyboard is made, you can start GNU APL like this:
 
 $ APL_keyboard | apl
 
-10. aplwrap
+11. aplwrap
 ===========
 
 There  is a cool GTK-based keyboard wrapper written by Chris Moller.
@@ -360,7 +371,7 @@ You can reach it via the GNU APL Community web page:
      http://www.gnu.org/software/apl/Community.html
 
 
-11. Remote Login
+12. Remote Login
 ================
 
 Suppose GNU APL runs on machine A and you connect to it by means of ssh or
@@ -380,7 +391,7 @@ or else output coloring of GNU APL may send incorrect ESC sequences for
 switching between colors (or use apl -noColor).
 
 
-12. Pitfalls and Troubleshooting
+13. Pitfalls and Troubleshooting
 ================================
 
 There are other pieces of software that may intercept the byte stream om its
@@ -414,7 +425,7 @@ If you need to troubleshoot APL characters, proceed as follows:
    the problem.
 
 
-13. APL Keyboards
+14. APL Keyboards
 =================
 
 If you are new to APL or use it only infrequently, then you will have

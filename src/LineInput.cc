@@ -907,6 +907,9 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
                    lec.paste();
                    continue;
 
+              case Invalid_Unicode:
+                   continue;
+ 
               default:  // regular APL character
                    lec.insert_char(uni);
                    continue;
@@ -1016,9 +1019,9 @@ const int b0 = fgetc(stdin);
               //
               if (ESCmap::need_more(seq, s))   continue;
 
-              CERR << endl << "Unknown ESC sequence: ESC";
-              loop(ss, s)   CERR << " " << HEX2(seq[ss + 1]);
-              CERR << endl;
+//            CERR << endl << "Unknown ESC sequence: ESC";
+//            loop(ss, s)   CERR << " " << HEX2(seq[ss + 1]);
+//            CERR << endl;
 
               return Invalid_Unicode;
             }
