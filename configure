@@ -660,6 +660,7 @@ PERFORMANCE_COUNTERS_WANTED
 VALUE_CHECK_WANTED
 MAX_RANK_WANTED
 DEVELOP_WANTED
+MAKE_J
 WANT_LIBAPL_FALSE
 WANT_LIBAPL_TRUE
 WANT_ANDROID_FALSE
@@ -830,6 +831,7 @@ CXX
 CXXFLAGS
 CCC
 CXXCPP
+MAKE_J
 DEVELOP_WANTED
 MAX_RANK_WANTED
 VALUE_CHECK_WANTED
@@ -1505,6 +1507,7 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
+  MAKE_J      make job count (-j, see README-2-configure) default: 4)
   DEVELOP_WANTED
               set development options (see README-2-configure) default: no
   MAX_RANK_WANTED
@@ -18355,6 +18358,10 @@ $as_echo "$user_wants_libapl" >&6; }
 
 ac_config_files="$ac_config_files Makefile debian/Makefile debian/source/Makefile doc/Makefile gnu-apl.d/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/Dyalog-Keyboard/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile support-files/Dirk/Makefile tools/Makefile workspaces/Makefile wslib3/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/iso-apl-cf/Makefile"
 
+
+# AM_MAKEFLAGS: desired -j count ?
+
+if test "x$MAKE_J" = "x"; then MAKE_J=4; fi
 
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden

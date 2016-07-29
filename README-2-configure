@@ -131,6 +131,26 @@ DYNAMIC_LOG_WANTED=yes
     ./configure DYNAMIC_LOG_WANTED=yes
 
 
+MAKE_J
+    Set the -j command line option for make that shall be used when GNU APL
+    is being built. The default is 4 which causes make to be called
+    as make -j 4. In that case up to 4 files can be compiled in parallel which
+    is good when your build machine has 4 cores and sufficient memory. If the
+    machine has fewer cores, then -j 4 normally does no harm, except if the
+    machine is severly limited, like, for instance, a virtual machine with
+    little memory. In that case MAKE_J=1 is a better choice. On the other
+    side, if your machine has more cores then larger values for MAKE_J will
+    speed up the build process. Example:
+
+    ./configure MAKE_J=8
+
+DEVELOP_WANTED
+    This option enables a number of internal checks in the GNU APL interpreter
+    that are useful for maintainers of GNU APL.
+
+    Example:
+    ./configure DEVELOP_WANTED=yes
+
 MAX_RANK_WANTED=n
     Set the maximum rank of APL values to n. The default value is 8. Ranks
     smaller than 4 should be avoided. There is no performance penalty for

@@ -31,6 +31,11 @@ develop:
 	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes
 	make all
 
+.PHONY: develop4
+develop1:
+	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes
+	make all4
+
 ###############################################################################
 # a shortcut to ./configure for profiling using gprof
 #
@@ -38,7 +43,7 @@ develop:
 # analyzed with gprof apl gmon.out
 #
 .PHONY: gprof
-develop:
+gprof:
 	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes GPROF_WANTED=yes
 	make all
 

@@ -111,8 +111,6 @@ ValueHistory.cc					ValueHistory.hh		\
 Workspace.cc					Workspace.hh
 
 
-
-
 pkglib_LTLIBRARIES =
 if WANT_LIBAPL
 pkglib_LTLIBRARIES += libapl.la
@@ -130,6 +128,8 @@ apl_SOURCES = main.cc $(common_sources)
 
 endif
 
+
+AM_MAKEFLAGS = -j $(MAKE_J)
 
 # normally we would say:
 #
@@ -168,8 +168,6 @@ testAP: all
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt
 
-
-AM_MAKEFLAGS = -j 4
 
 makefile.h:
 	@echo "// some strings exported from Makefile"           > $@

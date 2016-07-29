@@ -282,6 +282,11 @@ AC_CONFIG_FILES([Makefile
                  wslib5/iso-apl-cf/Makefile
                 ])
 
+# AM_MAKEFLAGS: desired -j count ?
+AC_ARG_VAR(MAKE_J,
+   [ make job count (-j, see README-2-configure) default: 4) ])
+if test "x$MAKE_J" = "x"; then MAKE_J=4; fi
+
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden
 # further down

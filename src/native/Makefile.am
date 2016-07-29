@@ -1,4 +1,6 @@
 
+AM_MAKEFLAGS = -j $(MAKE_J)
+
 AM_CXXFLAGS = $(CXX_RDYNAMIC) -I $(srcdir)/.. -g -O2
 if DEVELOP
    AM_CXXFLAGS += -Werror -Wall -Wno-strict-aliasing

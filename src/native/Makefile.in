@@ -282,6 +282,7 @@ LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
+MAKE_J = @MAKE_J@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MAX_RANK_WANTED = @MAX_RANK_WANTED@
 MKDIR_P = @MKDIR_P@
@@ -371,6 +372,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+AM_MAKEFLAGS = -j $(MAKE_J)
 AM_CXXFLAGS = $(CXX_RDYNAMIC) -I $(srcdir)/.. -g -O2 $(am__append_1)
 pkglib_LTLIBRARIES = lib_file_io.la		\
 			lib_template_F0.la	\
