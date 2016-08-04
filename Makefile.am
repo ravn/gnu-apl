@@ -22,9 +22,6 @@ dist_noinst_DATA = Doxyfile Makefile.incl
 
 include Makefile.incl
 
-.PHONY:	all4
-	make -j 4 all
-
 # doxygen documentation
 #
 .PHONY:	DOXY
@@ -34,7 +31,7 @@ DOXY:
 # source and binary RPMs
 #
 .PHONY:	RPM
-RPM:	DIST all4
+RPM:	DIST all
 	rm -f rpm/rpm-tmp.*
 	make -C rpm $@
 	mkdir -p ftp-upload
@@ -87,7 +84,7 @@ EXPO:
 	cd src; source buildtag
 	svn -m "auto-commit by make EXPO" commit
 	./configure --disable-maintainer-mode
-	make all4
+	make all
 	make dist
 	make DEB
 #	make RPM

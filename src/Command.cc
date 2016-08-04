@@ -1559,7 +1559,7 @@ const ShapeItem ec = val->element_count();
    loop(e, ec)
       {
         const TokenTag tag = tos[e].get_tag();
-        Cell * C = &val->get_ravel(e);
+        Cell * C = val->next_ravel();
         if      (tag == TOK_INTEGER)  new (C) IntCell(tos[e].get_int_val());
         else if (tag == TOK_REAL)     new (C) FloatCell(tos[e].get_flt_val());
         else if (tag == TOK_COMPLEX)  new (C)
@@ -1567,6 +1567,8 @@ const ShapeItem ec = val->element_count();
                                                       tos[e].get_cpx_imag());
         else FIXME;
       }
+
+   val->check_value(LOC);
 
    Assert(sym);
    sym->assign(val, false, LOC);
@@ -1611,7 +1613,7 @@ ShapeItem padded = 0;
       {
         Unicode uni = UNI_ASCII_SPACE;
         if (e < (data.size() - idx))   uni = data[e + idx];
-        else                   ++padded;
+        else                           ++padded;
          new (&val->get_ravel(e)) CharCell(uni);
       }
 
@@ -1620,6 +1622,8 @@ ShapeItem padded = 0;
         CERR << "WARNING: ATF Record for " << var_name << " is broken ("
              << padded << " spaces added)" << endl;
       }
+
+   val->check_value(LOC);
 
    Assert(sym);
    sym->assign(val, false, LOC);
