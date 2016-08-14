@@ -808,16 +808,20 @@ Bif_F12_COMMA::eval_AXB(Value_P A, Value_P X, Value_P B)
    if (!X->is_scalar_or_len1_vector())   AXIS_ERROR;
 
 const Cell & cX = X->get_ravel(0);
+const APL_Integer qio = Workspace::get_IO();
 
    if (cX.is_near_int())   // catenate along existing axis
       {
-        const Axis axis = cX.get_checked_near_int() - Workspace::get_IO();
-        if (axis < 0)                                       AXIS_ERROR;
+        const Axis axis = cX.get_checked_near_int() - qio;
+        if (axis < 0)                                         AXIS_ERROR;
         if (axis >= A->get_rank() && axis >= B->get_rank())   AXIS_ERROR;
         return catenate(A, axis, B);
       }
 
-   return laminate(A, Axis(cX.get_real_value()) - Workspace::get_IO() + 1, B);
+const APL_Float axis = cX.get_real_value() - qio;
+   if (axis <= -1.0)                                                 AXIS_ERROR;
+   if (axis >= (A->get_rank() + 1) && axis >= (B->get_rank() + 1))   AXIS_ERROR;
+   return laminate(A, Axis(axis + 1), B);
 }
 //-----------------------------------------------------------------------------
 Token
