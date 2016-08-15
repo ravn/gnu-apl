@@ -1056,7 +1056,7 @@ const ShapeItem len = B.element_count();
       }
 
 ShapeItem max_shape[MAX_RANK];   // in reverse order
-   loop(r, MAX_RANK)   max_shape[r] = 1;
+   loop(r, MAX_RANK)   max_shape[r] = 0;
 Rank max_rank = 0;
 
    loop(b, len)
