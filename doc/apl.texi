@@ -62,7 +62,7 @@ and texts about APL. We would like to refer the reader to the following:
 @end ifnottex
 
 @menu
-* Chapter 1::    Installing and Starting APL
+* Chapter 1::    Installing and Starting GNU APL
 * Chapter 2::    Design Decisions
 * Chapter 3::    Non-standard Features
 * Chapter 4::    Limitations and Missing Features
@@ -77,7 +77,7 @@ and texts about APL. We would like to refer the reader to the following:
 
 @c ----------------------------------------------------------------------------
 @node Chapter 1
-@chapter Installing and Starting APL
+@chapter Installing and Starting GNU APL
 
 @section Installing APL
 
@@ -677,11 +677,30 @@ redundant parentheses so in that case there would be a small incompatibility
 between GNU APL and IBM APL2.
 
 @c ----------------------------------------------------------------------------
-@node Chapter 3
+@node    Chapter 3
 @chapter Non-standard Features
+
+@menu
+* Section 3.1::    APL Scripting
+* Section 3.2::    ⎕SYL - System limits
+* Section 3.3::    Dyadic ⎕CR
+* Section 3.4::    ⎕FIO: File I/O Functions
+* Section 3.5::    Debug Commands
+* Section 3.6::    Colored Output
+* Section 3.7::    Logging Facilities
+* Section 3.8::    Complex Numbers
+* Section 3.9::    Native Function
+* Section 3.10::   DUMP Command
+* Section 3.11::   User-defined Commands
+* Section 3.12::   Direct Functions (Lambdas)
+* Section 3.13::   Axis argument in defined functions
+* Section 3.14::   ⎕SI - State Indicator
+* Section 3.15::   History and TAB completion
+@end menu
 
 There are a few possibly useful features in GNU APL:
 
+@node    Section 3.1
 @section APL Scripting
 
 As already mentioned, it is possible to write APL scripts. Like for other
@@ -1028,6 +1047,7 @@ For that reason, if the ∇-editor is used in a script and attempts to redefine
 an existing defined function then the existing function is simply overridden
 iwith the new one and no DEFN ERROR is raised.
 
+@node    Section 3.2
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -1128,6 +1148,7 @@ is printed instead of VALUE. The shape SH is computed like this:
 
 @end verbatim
 
+@node    Section 3.3
 @section Dyadic ⎕CR
 
 The ⎕CR function has an optional left argument that selects one of several
@@ -1195,11 +1216,13 @@ general APL text vectors. Those need to be translated to bytes first and can
 then be used as input for e.g. byte vector → hex or byte vector → base64
 conversions.
 
-@section ⎕FIO
+@node    Section 3.4
+@section ⎕FIO: File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
 system function ⎕FIO. See the FILE_IO section below for details.
 
+@node    Section 3.5
 @section Debug Commands
 
 Besides the classical commands like )LOAD or )SAVE there are a number of
@@ -1211,6 +1234,7 @@ feature, colored output, uses different colors for stdout and stderr.
 
 Type )HELP or ]HELP in the interpreter for a list of all commands available.
 
+@node    Section 3.6
 @section Colored Output
 
 The APL interpreter gets its input from the standard input (stdin),
@@ -1237,6 +1261,7 @@ configured in the 'preferences' file.  The 'preferences' file also
 contains a description of all possible color settings.
 
 
+@node    Section 3.7
 @section Logging Facilities
 
 The APL interpreter has over 30 logging facilities. Each logging facility
@@ -1284,10 +1309,12 @@ state. The command
 
 toggles the state of logging facility N from OFF to ON and back.
 
+@node    Section 3.8
 @section Complex Numbers
 
 Complex numbers are fully supported.
 
+@node    Section 3.9
 @section Native Functions
 
 A Native Function is a function that can be called in APL like a normal user
@@ -1349,6 +1376,7 @@ Note: As of GNU APL 1.6, the native function FILE_IO has been turned into the
 system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 )CLEAR workspace command will close all open files. 
 
+@node    Section 3.10
 @section DUMP Command
 
 GNU APL has a command )DUMP that saves a workspace to disk, similar to command
@@ -1358,7 +1386,8 @@ produces a file in GNU APL's script format (i.e. readable APL statements).
 Files written with )DUMP can be edited with normal text editors (vi, Emacs),
 read back with "apl -f", or made executable (see scripting).
 
-@section User-defined Command
+@node    Section 3.11
+@section User-defined Commands
 
 There is a simple mechanism to define additional APL commands. This mechanism
 is intended to introduce new commands by APL libraries. Like system commands,
@@ -1392,6 +1421,7 @@ be deleted like this:
       ]USERCMD REMOVE-ALL
 @end verbatim
 
+@node    Section 3.12
 @section Direct Functions (Lambdas)
 
 GNU APL supports direct functions (aka. lambdas), but only in a rather
@@ -1448,17 +1478,34 @@ of the variable names (⍺, ⍵, and χ) and function names (⍶ and ⍹) in the
 body_expression and from whether the body_expression is empty (no λ←) or
 not (with λ←).
 
+It is possible to specify local variables that work exactly like their
+compagnions in normal defined functions. Please note that this is different
+from some other APL interpreters which treat all variables in lambda bodies
+as local variables. The syntax for specifying local variables is the same
+as for the header in normal defined functions: they are added at the end
+with semicolons as separators. In the above example one could add local
+variables C and D like this:
+
+@verbatim
+      SUM ← { ⍺ + ⍵ ;C;D }
+
+      ⎕CR 'SUM'
+λ←⍺ λ1 ⍵;C;D 
+λ← ⍺ + ⍵     
+
+@end verbatim
+
 If a named lambda is created inside a function, then the name of the lambda
 (i.e. the name left of ← @{ ... @}) can be made a local variable of the
 function in which the named lambda is created. This creates a lambda with
 local scope.
 
 Please note that the above only describes the current implementation of named
-lambda in GNU APL. As consequence of that implementation is that the symbols
+lambda in GNU APL. A consequence of that implementation is that the symbols
 ⍺, ⍵, ⍶, ⍹, and λ are pretty much behaving like user defined variables. In
 particular, they can be used outside named or unnamed lambdas. However, that
-may change in the future and therefore such use of ⍺, ⍵, ⍶, ⍹, and λ is a
-bad idea.
+may change in the future and therefore such use of ⍺, ⍵, ⍶, ⍹, and λ outside
+is certainly a bad idea.
 
 @subsection Unnamed Lambdas
 
@@ -1487,10 +1534,11 @@ There are a number of features related to lambdas that are present in other
 APL interpreters but that are NOT implemented in GNU APL. This includes
 multiple statements, guards, lexical scoping, and probably more.
 
-@section Axis argument in user-defined functions
+@node    Section 3.13
+@section Axis argument in defined functions
 
-User-defined functions and operators (including lambdas) accept an axis
-argument. For example:
+Defined functions and operators (including lambdas) accept an axis argument.
+For example:
 
 @verbatim
 
@@ -1514,7 +1562,8 @@ can use an axis as a third function argument. Keep in mind, however, that
 doing so will make your APL code incompatible with other APL interpreters.
 Use this feature carefully!
 
-@section ⎕SI
+@node    Section 3.14
+@section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
 command )SI. This can be used, for example, to create debug functions similar
@@ -1576,6 +1625,7 @@ A count from the latest to the oldest level.
 For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
+@node    Section 3.15
 @section History and TAB completion
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user

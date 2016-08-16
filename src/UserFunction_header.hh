@@ -106,6 +106,8 @@ public:
    /// print local vars etc.
    void print_properties(ostream & out, int indent) const;
 
+   void add_local_var(Symbol * sym);
+
    /// pop all local vars, labels, and parameters
    void pop_local_vars() const;
 
@@ -116,7 +118,7 @@ public:
    void add_label(Symbol * sym, Function_Line line)
       {
         labVal label = { sym, line };
-        label_values.push_back(label);
+        label_values.append(label);
       }
 
    /// Check that all function params, local vars. and labels are unique.
@@ -163,19 +165,10 @@ protected:
    Symbol * sym_B;
 
    /// The local variables of \b this function.
-   vector<Symbol *> local_vars;
-
-   /// A single label. A label is a local variable (sym) with an integer
-   /// function line (in which sym: was specified as the first tokens
-   /// in the line)
-   struct labVal
-   {
-      Symbol      * sym;    ///< The symbol for the label variable.
-      Function_Line line;   ///< The line number of the label.
-   };
+   Simple_string<Symbol *> local_vars;
 
    /// The labels of \b this function.
-   vector<labVal> label_values;
+   Simple_string<labVal> label_values;
 };
 //-----------------------------------------------------------------------------
 

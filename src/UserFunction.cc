@@ -59,7 +59,7 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
    exec_properties[2] = 0;
    exec_properties[3] = 0;
 
-   line_starts.push_back(Function_PC_0);   // will be set later.
+   line_starts.append(Function_PC_0);   // will be set later.
 
    if (header.get_error() != E_NO_ERROR)   // bad header
       {
@@ -87,7 +87,7 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
 }
 //-----------------------------------------------------------------------------
 UserFunction::UserFunction(Fun_signature sig, int lambda_num,
-                           const UCS_string & text, const Token_string & bdy)
+                           const UCS_string & text, Token_string & lambda_body)
   : Function(ID::USER_SYMBOL, TOK_FUN0),
     Executable(sig, lambda_num, text, LOC),
     header(sig, lambda_num),
@@ -114,9 +114,18 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
    else if (header.B())    tag = TOK_FUN1;
    else                    tag = TOK_FUN0;
 
-   parse_body_line(Function_Line_0, bdy, false, false, LOC);
+   while (lambda_body.size() > 2 &&
+          lambda_body.last().get_tag() == TOK_SYMBOL &&
+          lambda_body[lambda_body.size() - 2].get_tag() == TOK_SEMICOL)
+      {
+        header.add_local_var(lambda_body.last().get_sym_ptr());
+        lambda_body.pop();   // varname
+        lambda_body.pop();   // semicolon
+      }
+
+   parse_body_line(Function_Line_0, lambda_body, false, false, LOC);
    setup_lambdas();
-   line_starts.push_back(Function_PC(bdy.size() - 1));
+   line_starts.append(Function_PC(lambda_body.size() - 1));
    error_line = -1;   // no error
    error_info = 0;
 }
@@ -542,7 +551,7 @@ DynArray(bool, ts_lines, line_starts.size());
         stop_lines.clear();
         loop(ts, line_starts.size())
            {
-             if (ts_lines[ts])   stop_lines.push_back((Function_Line)ts);
+             if (ts_lines[ts])   stop_lines.append((Function_Line)ts);
            }
       }
    else
@@ -550,7 +559,7 @@ DynArray(bool, ts_lines, line_starts.size());
         trace_lines.clear();
         loop(ts, line_starts.size())
            {
-             if (ts_lines[ts])   trace_lines.push_back((Function_Line)ts);
+             if (ts_lines[ts])   trace_lines.append((Function_Line)ts);
            }
       }
 
@@ -561,7 +570,7 @@ void
 UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 {
    line_starts.clear();
-   line_starts.push_back(Function_PC_0);   // will be set later.
+   line_starts.append(Function_PC_0);   // will be set later.
 
    clear_body();
 
@@ -588,7 +597,7 @@ UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
            }
 
         error_line = l;   // assume error
-        line_starts.push_back(Function_PC(body.size()));
+        line_starts.append(Function_PC(body.size()));
 
         if (stop_line)
            {

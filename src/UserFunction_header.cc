@@ -288,7 +288,7 @@ const int sc100_tc = sym_count * 100 + tos_idx;
              return;
            }
 
-        local_vars.push_back(tos[tos_idx++].get_sym_ptr());
+        local_vars.append(tos[tos_idx++].get_sym_ptr());
       }
 
    remove_duplicate_local_variables();
@@ -339,6 +339,12 @@ bool valid_signature = false;
 
    error_info = 0;
    error = E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
+void
+UserFunction_header::add_local_var(Symbol * sym)
+{
+   local_vars.append(sym);
 }
 //-----------------------------------------------------------------------------
 void
@@ -402,8 +408,8 @@ UserFunction_header::remove_duplicate_local_var(const Symbol * sym,
        {
          if (sym == local_vars[pos])
             {
-              local_vars[pos] = local_vars.back();
-              local_vars.pop_back();
+              local_vars[pos] = local_vars.last();
+              local_vars.pop();
               continue;
             }
          ++pos;

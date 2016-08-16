@@ -232,11 +232,11 @@ public:
            }
       }
 
-   /// return a reference to the last item (size() MUSTbe checked beforehand)
+   /// return a reference to the last item (size() MUST be checked beforehand)
    const T & last() const
       { return items[items_valid - 1]; }
 
-   /// return a reference to the last item (size() MUSTbe checked beforehand)
+   /// return a reference to the last item (size() MUST be checked beforehand)
    T & last()
       { return items[items_valid - 1]; }
 

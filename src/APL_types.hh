@@ -62,6 +62,7 @@ typedef double APL_Float;
 /// microseconds since Jan. 1. 1970 00:00:00 UTC
 typedef int64_t APL_time_us;
 
+class Symbol;
 class Value;
 
 //////////////////////////////////////////////////////////////
@@ -497,6 +498,14 @@ struct Function_PC2
    Function_PC high;   ///< high PC (including)
 };
 //-----------------------------------------------------------------------------
+/// A single label. A label is a local variable (sym) with an integer function
+/// line (in which sym: was specified as the first 2 tokens in the line)
+struct labVal
+{
+   Symbol      * sym;    ///< The symbol for the label variable.
+   Function_Line line;   ///< The line number of the label.
+};
+//-----------------------------------------------------------------------------
 /// dynamic arrays. Due to several segfaults when the array is too big
 /// we removed the usage of (compiler-supported) dynamic arrays completely.
 ///
@@ -553,9 +562,34 @@ copy_1(Unicode & dst, Unicode src, const char * loc)
 }
 //-----------------------------------------------------------------------------
 inline void
+copy_1(Function_Line & dst, Function_Line src, const char * loc)
+{
+   dst = src;
+}
+//-----------------------------------------------------------------------------
+inline void
+copy_1(Function_PC & dst, Function_PC src, const char * loc)
+{
+   dst = src;
+}
+//-----------------------------------------------------------------------------
+inline void
 copy_1(ShapeItem & dst, ShapeItem src, const char * loc)
 {
   dst = src;
+}
+//-----------------------------------------------------------------------------
+inline void
+copy_1(Symbol * & dst, Symbol * src, const char * loc)
+{
+  dst = src;
+}
+//-----------------------------------------------------------------------------
+inline void
+copy_1(labVal & dst, const labVal & src, const char * loc)
+{
+  dst.sym = src.sym;
+  dst.line = src.line;
 }
 //-----------------------------------------------------------------------------
 class Token_string;

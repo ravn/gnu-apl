@@ -1363,7 +1363,7 @@ UserFunction * ufun = fun->get_ufun1();
 }
 //-----------------------------------------------------------------------------
 Token
-Stop_Trace::reference(const vector<Function_Line> & lines, bool assigned)
+Stop_Trace::reference(const Simple_string<Function_Line> & lines, bool assigned)
 {
 Value_P Z(lines.size(), LOC);
 

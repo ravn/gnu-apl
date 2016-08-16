@@ -39,7 +39,7 @@ class UserFunction : public Function, public Executable
 public:
    /// constructor for a lambda
    UserFunction(Fun_signature sig, int lambda_num,
-                const UCS_string & text, const Token_string & body);
+                const UCS_string & text, Token_string & body);
 
    /// Destructor.
    ~UserFunction();
@@ -226,11 +226,11 @@ public:
    void parse_body(const char * loc, bool tolerant, bool macro);
 
    /// return stop lines (from S∆fun ← lines)
-   const vector<Function_Line> & get_stop_lines() const
+   const Simple_string<Function_Line> & get_stop_lines() const
       { return stop_lines; }
 
    /// return trace lines (from S∆fun ← lines)
-   const vector<Function_Line> & get_trace_lines() const
+   const Simple_string<Function_Line> & get_trace_lines() const
       { return trace_lines; }
 
 protected:
@@ -285,13 +285,13 @@ protected:
       [N] TOK_RETURN_SYMBOL or TOK_RETURN_VOID   <--+
 
    **/
-   vector<Function_PC> line_starts;
+   Simple_string<Function_PC> line_starts;
 
    /// stop lines (from S∆fun ← lines)
-   vector<Function_Line> stop_lines;
+   Simple_string<Function_Line> stop_lines;
 
    /// trace lines (from S∆fun ← lines)
-   vector<Function_Line> trace_lines;
+   Simple_string<Function_Line> trace_lines;
 
    /// execution properties as per 3⎕AT
    int exec_properties[4];

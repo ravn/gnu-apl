@@ -35,7 +35,7 @@ ftp://rtfm.mit.edu/pub/usenet-by-group/comp.lang.apl/APL_language_FAQ
 
 * Menu:
 
-* Chapter 1::    Installing and Starting APL
+* Chapter 1::    Installing and Starting GNU APL
 * Chapter 2::    Design Decisions
 * Chapter 3::    Non-standard Features
 * Chapter 4::    Limitations and Missing Features
@@ -46,8 +46,8 @@ ftp://rtfm.mit.edu/pub/usenet-by-group/comp.lang.apl/APL_language_FAQ
 
 File: apl.info,  Node: Chapter 1,  Next: Chapter 2,  Prev: Top,  Up: Top
 
-1 Installing and Starting APL
-*****************************
+1 Installing and Starting GNU APL
+*********************************
 
 1.1 Installing APL
 ==================
@@ -621,7 +621,28 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 3 Non-standard Features
 ***********************
 
+* Menu:
+
+* Section 3.1::    APL Scripting
+* Section 3.2::    ⎕SYL - System limits
+* Section 3.3::    Dyadic ⎕CR
+* Section 3.4::    ⎕FIO: File I/O Functions
+* Section 3.5::    Debug Commands
+* Section 3.6::    Colored Output
+* Section 3.7::    Logging Facilities
+* Section 3.8::    Complex Numbers
+* Section 3.9::    Native Function
+* Section 3.10::   DUMP Command
+* Section 3.11::   User-defined Commands
+* Section 3.12::   Direct Functions (Lambdas)
+* Section 3.13::   Axis argument in defined functions
+* Section 3.14::   ⎕SI - State Indicator
+* Section 3.15::   History and TAB completion
+
 There are a few possibly useful features in GNU APL:
+
+
+File: apl.info,  Node: Section 3.1,  Next: Section 3.2,  Up: Chapter 3
 
 3.1 APL Scripting
 =================
@@ -934,6 +955,9 @@ ERROR, and other errors can be expected as well.
 redefine an existing defined function then the existing function is
 simply overridden iwith the new one and no DEFN ERROR is raised.
 
+
+File: apl.info,  Node: Section 3.2,  Next: Section 3.3,  Prev: Section 3.1,  Up: Chapter 3
+
 3.2 ⎕SYL - System limits
 ========================
 
@@ -1033,6 +1057,9 @@ this:
       while (ravel-length(SH) ≥ ⎕SYL[27;2])   { divide longest axis in SH by 2 }
 
 
+
+File: apl.info,  Node: Section 3.3,  Next: Section 3.4,  Prev: Section 3.2,  Up: Chapter 3
+
 3.3 Dyadic ⎕CR
 ==============
 
@@ -1107,11 +1134,17 @@ strings but does not work for general APL text vectors.  Those need to
 be translated to bytes first and can then be used as input for e.g.
 byte vector → hex or byte vector → base64 conversions.
 
-3.4 ⎕FIO
-========
+
+File: apl.info,  Node: Section 3.4,  Next: Section 3.5,  Prev: Section 3.3,  Up: Chapter 3
+
+3.4 ⎕FIO: File I/O Functions
+============================
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
 system function ⎕FIO. See the FILE_IO section below for details.
+
+
+File: apl.info,  Node: Section 3.5,  Next: Section 3.6,  Prev: Section 3.4,  Up: Chapter 3
 
 3.5 Debug Commands
 ==================
@@ -1125,6 +1158,9 @@ output, uses different colors for stdout and stderr.
 
    Type )HELP or ]HELP in the interpreter for a list of all commands
 available.
+
+
+File: apl.info,  Node: Section 3.6,  Next: Section 3.7,  Prev: Section 3.5,  Up: Chapter 3
 
 3.6 Colored Output
 ==================
@@ -1151,6 +1187,9 @@ colors and UTF-8 (Unicode) encoded character I/O.
    Non-ANSI terminals, as well as other colors than the default ones,
 can be configured in the ’preferences’ file.  The ’preferences’ file
 also contains a description of all possible color settings.
+
+
+File: apl.info,  Node: Section 3.7,  Next: Section 3.8,  Prev: Section 3.6,  Up: Chapter 3
 
 3.7 Logging Facilities
 ======================
@@ -1203,10 +1242,16 @@ current state.  The command
 
    toggles the state of logging facility N from OFF to ON and back.
 
+
+File: apl.info,  Node: Section 3.8,  Next: Section 3.9,  Prev: Section 3.7,  Up: Chapter 3
+
 3.8 Complex Numbers
 ===================
 
 Complex numbers are fully supported.
+
+
+File: apl.info,  Node: Section 3.9,  Next: Section 3.10,  Prev: Section 3.8,  Up: Chapter 3
 
 3.9 Native Functions
 ====================
@@ -1268,6 +1313,9 @@ used with a workspace that contains native functions.
 into the system function ⎕FIO. The syntax of ⎕FIO is the same as for
 FILE_IO. The )CLEAR workspace command will close all open files.
 
+
+File: apl.info,  Node: Section 3.10,  Next: Section 3.11,  Prev: Section 3.9,  Up: Chapter 3
+
 3.10 DUMP Command
 =================
 
@@ -1279,8 +1327,11 @@ APL statements).  Files written with )DUMP can be edited with normal
 text editors (vi, Emacs), read back with "apl -f", or made executable
 (see scripting).
 
-3.11 User-defined Command
-=========================
+
+File: apl.info,  Node: Section 3.11,  Next: Section 3.12,  Prev: Section 3.10,  Up: Chapter 3
+
+3.11 User-defined Commands
+==========================
 
 There is a simple mechanism to define additional APL commands.  This
 mechanism is intended to introduce new commands by APL libraries.  Like
@@ -1310,6 +1361,9 @@ be deleted like this:
 
       ]USERCMD REMOVE ]UCMD
       ]USERCMD REMOVE-ALL
+
+
+File: apl.info,  Node: Section 3.12,  Next: Section 3.13,  Prev: Section 3.11,  Up: Chapter 3
 
 3.12 Direct Functions (Lambdas)
 ===============================
@@ -1365,17 +1419,32 @@ absence of the variable names (⍺, ⍵, and χ) and function names (⍶ and ⍹
 in the body_expression and from whether the body_expression is empty (no
 λ←) or not (with λ←).
 
+   It is possible to specify local variables that work exactly like
+their compagnions in normal defined functions.  Please note that this is
+different from some other APL interpreters which treat all variables in
+lambda bodies as local variables.  The syntax for specifying local
+variables is the same as for the header in normal defined functions:
+they are added at the end with semicolons as separators.  In the above
+example one could add local variables C and D like this:
+
+      SUM ← { ⍺ + ⍵ ;C;D }
+
+      ⎕CR 'SUM'
+λ←⍺ λ1 ⍵;C;D
+λ← ⍺ + ⍵
+
+
    If a named lambda is created inside a function, then the name of the
 lambda (i.e.  the name left of ← { ...  }) can be made a local variable
 of the function in which the named lambda is created.  This creates a
 lambda with local scope.
 
    Please note that the above only describes the current implementation
-of named lambda in GNU APL. As consequence of that implementation is
-that the symbols ⍺, ⍵, ⍶, ⍹, and λ are pretty much behaving like user
-defined variables.  In particular, they can be used outside named or
-unnamed lambdas.  However, that may change in the future and therefore
-such use of ⍺, ⍵, ⍶, ⍹, and λ is a bad idea.
+of named lambda in GNU APL. A consequence of that implementation is that
+the symbols ⍺, ⍵, ⍶, ⍹, and λ are pretty much behaving like user defined
+variables.  In particular, they can be used outside named or unnamed
+lambdas.  However, that may change in the future and therefore such use
+of ⍺, ⍵, ⍶, ⍹, and λ outside is certainly a bad idea.
 
 3.12.2 Unnamed Lambdas
 ----------------------
@@ -1405,10 +1474,13 @@ other APL interpreters but that are NOT implemented in GNU APL. This
 includes multiple statements, guards, lexical scoping, and probably
 more.
 
-3.13 Axis argument in user-defined functions
-============================================
+
+File: apl.info,  Node: Section 3.13,  Next: Section 3.14,  Prev: Section 3.12,  Up: Chapter 3
 
-User-defined functions and operators (including lambdas) accept an axis
+3.13 Axis argument in defined functions
+=======================================
+
+Defined functions and operators (including lambdas) accept an axis
 argument.  For example:
 
 
@@ -1431,8 +1503,11 @@ Therefore you can use an axis as a third function argument.  Keep in
 mind, however, that doing so will make your APL code incompatible with
 other APL interpreters.  Use this feature carefully!
 
-3.14 ⎕SI
-========
+
+File: apl.info,  Node: Section 3.14,  Next: Section 3.15,  Prev: Section 3.13,  Up: Chapter 3
+
+3.14 ⎕SI - State Indicator
+==========================
 
 ⎕SI returns aspects of the current State Indicator, similar to the
 standard command )SI. This can be used, for example, to create debug
@@ -1493,6 +1568,9 @@ while negative A count from the latest to the oldest level.
 
    For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI
 is the caller, and so on.
+
+
+File: apl.info,  Node: Section 3.15,  Prev: Section 3.14,  Up: Chapter 3
 
 3.15 History and TAB completion
 ===============================
@@ -2861,17 +2939,32 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11404
-Node: Chapter 216943
-Node: Chapter 321212
-Node: Chapter 454761
-Node: Chapter 556509
-Node: Chapter 657638
-Node: Section 6.158057
-Node: Section 6.258744
-Node: Chapter 759575
-Node: Section 7.160078
-Node: Section 7.285387
+Node: Chapter 11408
+Node: Chapter 216955
+Node: Chapter 321224
+Node: Section 3.122010
+Node: Section 3.232914
+Node: Section 3.337300
+Node: Section 3.440159
+Node: Section 3.540454
+Node: Section 3.641067
+Node: Section 3.742354
+Node: Section 3.844285
+Node: Section 3.944458
+Node: Section 3.1046964
+Node: Section 3.1147542
+Node: Section 3.1248938
+Node: Section 3.1352893
+Node: Section 3.1453657
+Node: Section 3.1555646
+Node: Chapter 457410
+Node: Chapter 559158
+Node: Chapter 660287
+Node: Section 6.160706
+Node: Section 6.261393
+Node: Chapter 762224
+Node: Section 7.162727
+Node: Section 7.288036
 
 End Tag Table
 

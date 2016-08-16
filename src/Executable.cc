@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,8 +68,37 @@ Executable::Executable(Fun_signature sig, int lambda_num,
      pmode(PM_FUNCTION),
      refcount(0)
 {
-   text.push_back(UserFunction_header::lambda_header(sig, lambda_num));
-   text.push_back(lambda_text);
+UCS_string header = UserFunction_header::lambda_header(sig, lambda_num);
+
+   // remove local vars from lambda_text and add them to the header
+   //
+ShapeItem last_semi = -1;
+   for (ShapeItem t = lambda_text.size() - 1; t >= 0; --t)
+       {
+         const Unicode cc = lambda_text[t];
+         if (cc == UNI_ASCII_SPACE)      continue;
+         if (Avec::is_symbol_char(cc))   continue;
+         if (Avec::is_quad(cc))          continue;
+         if (cc == UNI_ASCII_SEMICOLON)   last_semi = t;
+         else                             break;
+       }
+
+   if (last_semi != -1)
+      {
+        for (ShapeItem t = last_semi; t < lambda_text.size(); ++t)
+            header.append(lambda_text[t]);
+        text.push_back(header);
+
+        UCS_string new_body(lambda_text);
+        new_body.shrink(last_semi);
+        new_body.remove_trailing_whitespaces();
+        text.push_back(new_body);
+      }
+   else
+      {
+        text.push_back(header);
+        text.push_back(lambda_text);
+     }
 }
 //-----------------------------------------------------------------------------
 Executable::~Executable()
@@ -545,8 +574,7 @@ int error_line = -1;
 const char * error_loc = 0;
 const UTF8_string creator("Executable::setup_one_lambda()");
 
-UserFunction * ufun = new UserFunction(ufun_text, error_line, error_loc,
-                                       false, LOC, creator, false);
+UserFunction * ufun = new UserFunction(ufun_text, LOC, creator, false, false);
 
    ufun->increment_refcount(LOC);
 
