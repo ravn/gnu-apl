@@ -1133,13 +1133,21 @@ const ValueStackItem & vs = (*this)[0];
              if    (t < text.size() && text[t] == UNI_LEFT_ARROW)   ++t;
              while (t < text.size() && text[t] <= ' ')   ++t;
 
-
-             while (t < text.size())   // copy body
+             // copy body
+             //
+             while (t < text.size())
                 {
                    const Unicode uni = text[t++];
                    if (uni == UNI_ASCII_LF)   break;
                    out << uni;
                 }
+
+             // append local variables
+             //
+             loop(l, ufun->local_var_count())
+                 {
+                   out << ";" << ufun->get_local_var(l).get_name();
+                 }
              out << UNI_ASCII_R_CURLY << endl;
            }
         else

@@ -92,6 +92,16 @@ public:
    void print_local_vars(ostream & out) const
       { return header.print_local_vars(out); }
 
+   /// return the number of local variables
+   ShapeItem local_var_count() const
+      { return header.local_var_count(); }
+
+
+   /// return the idx'th local variable
+   const Symbol & get_local_var(ShapeItem idx) const
+      { return header.get_local_var(idx); }
+
+
    /// Overloaded \b Function::is_operator.
    virtual bool is_operator() const
       { return header.is_operator(); }

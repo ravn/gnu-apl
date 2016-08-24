@@ -1637,7 +1637,7 @@ UCS_string text;
         if (text[0] == UNI_LAMBDA)
            {
              ufun = UserFunction::fix_lambda(symbol, text);
-             ufun->increment_refcount(LOC);   // since we posh it below
+             ufun->increment_refcount(LOC);   // since we push it below
            }
         else
            {

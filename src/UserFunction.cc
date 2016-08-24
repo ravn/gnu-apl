@@ -818,24 +818,45 @@ Function * old_function = symbol->get_function();
 UserFunction *
 UserFunction::fix_lambda(Symbol & var, const UCS_string & text)
 {
+   /* Example: consider {⍺+⍵;LOCAL}
+
+      text a normal (non-lambda) function like:
+
+      λ←⍺ λ1 ⍵;LOCAL
+      λ← ⍺+⍵
+
+       which has a slightly different lambda body like:
+
+       λ← ⍺+⍵;LOCAL
+
+    */
 int signature = SIG_FUN | SIG_Z;
 int t = 0;
 
+ShapeItem semi = -1;
    while (t < text.size())
        {
          switch(text[t++])
             {
-              case UNI_CHI:            signature |= SIG_X;    continue;
-              case UNI_OMEGA:          signature |= SIG_B;    continue;
-              case UNI_ALPHA_UNDERBAR: signature |= SIG_LO;   continue;
-              case UNI_OMEGA_UNDERBAR: signature |= SIG_RO;   continue;
-              case UNI_ALPHA:          signature |= SIG_A;    continue;
-              case UNI_ASCII_LF:       break;   // header done
-              default:                 continue;
+              case UNI_CHI:             signature |= SIG_X;    continue;
+              case UNI_OMEGA:           signature |= SIG_B;    continue;
+              case UNI_ALPHA_UNDERBAR:  signature |= SIG_LO;   continue;
+              case UNI_OMEGA_UNDERBAR:  signature |= SIG_RO;   continue;
+              case UNI_ALPHA:           signature |= SIG_A;    continue;
+
+              case UNI_ASCII_SEMICOLON: if (semi == -1)   semi = t - 1;
+                                        continue;
+                                        
+              case UNI_ASCII_LF:        break;   // header done
+              default:                  continue;
             }
 
          break;   // header done
        }
+
+   // discard leading spaces
+   //
+   while (t < text.size() && text[t] == UNI_ASCII_SPACE)   ++t;
 
 UCS_string body_text;
    for (; t < text.size(); ++t)   body_text.append(text[t]);
@@ -850,6 +871,14 @@ Token_string body;
      Token tok_endl(TOK_ENDL, trace);
      body.append(tok_endl);
    }
+
+   if (semi != -1)
+      {
+        for (ShapeItem s = semi; text[s] != UNI_ASCII_LF; ++s)
+           {
+             body_text.append(text[s]);
+           }
+      }
 
 const Parser parser(PM_FUNCTION, LOC, false);
 const ErrorCode ec = parser.parse(body_text, body);

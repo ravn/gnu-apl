@@ -130,6 +130,14 @@ public:
    /// push Z (if defined), local variables, and labels.
    void eval_common();
 
+   /// return the number of local variables
+   ShapeItem local_var_count() const
+      { return local_vars.size(); }
+
+   /// return the idx'th local variable
+   const Symbol & get_local_var(ShapeItem idx) const
+      { return *local_vars[idx]; }
+
 protected:
    /// remove \b sym from local_vars if it occurs at pos or above
    void remove_duplicate_local_var(const Symbol * sym, unsigned int pos);
