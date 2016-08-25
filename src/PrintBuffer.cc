@@ -440,8 +440,8 @@ const bool nested = !value.is_simple();
    return;
 
 interrupted:
-   attention_raised = false;
-   interrupt_raised = false;
+   clear_attention_raised(LOC);
+   clear_interrupt_raised(LOC);
    *out << endl << "INTERRUPT" << endl;
 }
 //-----------------------------------------------------------------------------
@@ -493,11 +493,11 @@ ShapeItem bp_len = 0;
                   }
               col += chunk_len;
 
-              if (interrupt_raised)
+              if (interrupt_is_raised())
                  {
                    out << endl << "INTERRUPT" << endl;
-                   attention_raised = false;
-                   interrupt_raised = false;
+                   clear_attention_raised(LOC);
+                   clear_interrupt_raised(LOC);
                    delete del;
                    return;
                  }

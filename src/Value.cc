@@ -64,13 +64,6 @@ Value::init_ravel()
    if (Quad_SYL::value_count_limit &&
        Quad_SYL::value_count_limit < value_count)
       {
-        --value_count;
-
-        // make sure that the value is properly initialized
-        //
-        ravel = short_value;
-//      loop(l, SHORT_VALUE_LENGTH_WANTED)   new (ravel + l)   IntCell(42);
-
         Workspace::more_error() = UCS_string(
 "the system limit on the APL value count (as set in ⎕SYL) was reached\n"
 "(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).");
@@ -78,7 +71,8 @@ Value::init_ravel()
         // reset the limit so that we don't get stuck here.
         //
         Quad_SYL::value_count_limit = 0;
-        attention_raised = interrupt_raised = true;
+        set_attention_raised(LOC);
+        set_interrupt_raised(LOC);
       }
 
 const ShapeItem length = shape.get_volume();
@@ -105,7 +99,8 @@ const ShapeItem length = shape.get_volume();
              // reset the limit so that we don't get stuck here.
              //
              Quad_SYL::ravel_count_limit = 0;
-             attention_raised = interrupt_raised = true;
+             set_attention_raised(LOC);
+             set_interrupt_raised(LOC);
            }
 
         try
@@ -130,7 +125,7 @@ const ShapeItem length = shape.get_volume();
         ravel = short_value;
       }
 
-   // init the firsdt ravel element to (prototype) 0 so that we can avoid
+   // init the first ravel element to (prototype) 0 so that we can avoid
    // many empty checks all over the place
    //
    new (ravel)   IntCell(0);

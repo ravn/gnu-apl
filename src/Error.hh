@@ -168,12 +168,14 @@ void throw_define_error(const UCS_string & fun, const UCS_string & cmd,
 #endif
 ;
 
-#define ATTENTION           throw_apl_error(E_ATTENTION,            LOC)
+#define ATTENTION           { \
+                              throw_apl_error(E_ATTENTION,          LOC); }
 #define AXIS_ERROR          throw_apl_error(E_AXIS_ERROR,           LOC)
 #define DEFN_ERROR          throw_apl_error(E_DEFN_ERROR,           LOC)
 #define DOMAIN_ERROR        throw_apl_error(E_DOMAIN_ERROR,         LOC)
 #define INDEX_ERROR         throw_apl_error(E_INDEX_ERROR,          LOC)
-#define INTERRUPT           throw_apl_error(E_INTERRUPT,            LOC)
+#define INTERRUPT           { \
+                              throw_apl_error(E_INTERRUPT,          LOC); }
 #define LENGTH_ERROR        throw_apl_error(E_LENGTH_ERROR,         LOC)
 #define LIMIT_ERROR_RANK    throw_apl_error(E_SYSTEM_LIMIT_RANK,    LOC)
 #define LIMIT_ERROR_SVAR    throw_apl_error(E_SYSTEM_LIMIT_SVAR,    LOC)

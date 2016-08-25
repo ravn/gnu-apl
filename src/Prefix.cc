@@ -1725,13 +1725,13 @@ const bool trace = (at0().get_int_val() & 1) != 0;
 Token Void(TOK_VOID);
    si.statement_result(Void, trace);
    action = RA_PUSH_NEXT;
-   if (attention_raised && end_of_line)
+   if (attention_is_raised() && end_of_line)
       {
-        const bool int_raised = interrupt_raised;
-        attention_raised = false;
-        interrupt_raised = false;
-        if (int_raised)   INTERRUPT;
-        else              ATTENTION;
+        const bool int_raised = interrupt_is_raised();
+        clear_attention_raised(LOC);
+        clear_interrupt_raised(LOC);
+        if (int_raised)   INTERRUPT
+        else              ATTENTION
       }
 }
 //-----------------------------------------------------------------------------
@@ -1751,13 +1751,13 @@ Token B = pop().tok;    // pop B
    si.statement_result(B, trace);
 
    action = RA_PUSH_NEXT;
-   if (attention_raised && end_of_line)
+   if (attention_is_raised() && end_of_line)
       {
-        const bool int_raised = interrupt_raised;
-        attention_raised = false;
-        interrupt_raised = false;
-        if (int_raised)   INTERRUPT;
-        else              ATTENTION;
+        const bool int_raised = interrupt_is_raised();
+        clear_attention_raised(LOC);
+        clear_interrupt_raised(LOC);
+        if (int_raised)   INTERRUPT
+        else              ATTENTION
       }
 }
 //-----------------------------------------------------------------------------
@@ -1813,13 +1813,13 @@ const Token result = si.jump(line);
            }
 
         action = RA_PUSH_NEXT;
-        if (attention_raised && end_of_line)
+        if (attention_is_raised() && end_of_line)
            {
-             const bool int_raised = interrupt_raised;
-             attention_raised = false;
-             interrupt_raised = false;
-             if (int_raised)   INTERRUPT;
-             else              ATTENTION;
+             const bool int_raised = interrupt_is_raised();
+             clear_attention_raised(LOC);
+             clear_interrupt_raised(LOC);
+             if (int_raised)   INTERRUPT
+             else              ATTENTION
            }
 
         return;
@@ -1828,13 +1828,13 @@ const Token result = si.jump(line);
    if (result.get_tag() == TOK_VOID)   // branch taken, e.g. →N
       {
         action = RA_PUSH_NEXT;
-        if (attention_raised && end_of_line)
+        if (attention_is_raised() && end_of_line)
            {
-             const bool int_raised = interrupt_raised;
-             attention_raised = false;
-             interrupt_raised = false;
-             if (int_raised)   INTERRUPT;
-             else              ATTENTION;
+             const bool int_raised = interrupt_is_raised();
+             clear_attention_raised(LOC);
+             clear_interrupt_raised(LOC);
+             if (int_raised)   INTERRUPT
+             else              ATTENTION
            }
 
         return;
@@ -1851,13 +1851,13 @@ const Function_PC new_pc = si.get_PC();
 
    Assert1(size() == 0);
    action = RA_PUSH_NEXT;
-   if (attention_raised && end_of_line)
+   if (attention_is_raised() && end_of_line)
       {
-        const bool int_raised = interrupt_raised;
-        attention_raised = false;
-        interrupt_raised = false;
-        if (int_raised)   INTERRUPT;
-        else              ATTENTION;
+        const bool int_raised = interrupt_is_raised();
+        clear_attention_raised(LOC);
+        clear_interrupt_raised(LOC);
+        if (int_raised)   INTERRUPT
+        else              ATTENTION
       }
 }
 //-----------------------------------------------------------------------------

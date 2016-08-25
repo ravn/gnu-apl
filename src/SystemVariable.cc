@@ -694,7 +694,7 @@ UCS_string line;
                       LineHistory::quote_quad_history);
    done(false, LOC);   // if get_quad_cr_line() has not called it
 
-   if (interrupt_raised)   INTERRUPT;
+   if (interrupt_is_raised())   INTERRUPT
 
 const UCS_string qpr = Workspace::get_PR();
 

@@ -86,7 +86,8 @@ Workspace::push_SI(Executable * fun, const char * loc)
         "(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).");
 
         Quad_SYL::si_depth_limit = 0;
-        attention_raised = interrupt_raised = true;
+        set_attention_raised(LOC);
+        set_interrupt_raised(LOC);
       }
 
    the_workspace.top_SI = new StateIndicator(fun, SI_top());

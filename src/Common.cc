@@ -42,13 +42,38 @@
 
 uint64_t total_memory = 0;
 
+//-----------------------------------------------------------------------------
+static bool attention_raised = false;
+static uint64_t attention_count = 0;
+
+extern void set_attention_raised(const char * loc)
+{
+   attention_raised = true;
+}
+extern void clear_attention_raised(const char * loc)
+{
+   attention_raised = false;
+}
+bool attention_is_raised()
+{
+   return attention_raised;
+}
+//-----------------------------------------------------------------------------
 APL_time_us interrupt_when = 0;
 uint64_t interrupt_count = 0;
-bool interrupt_raised = false;
-
-bool attention_raised = false;
-uint64_t attention_count = 0;
-
+static bool interrupt_raised = false;
+void set_interrupt_raised(const char * loc)
+{
+   interrupt_raised = true;
+}
+void clear_interrupt_raised(const char * loc)
+{
+   interrupt_raised = false;
+}
+bool interrupt_is_raised()
+{
+   return interrupt_raised;
+}
 //-----------------------------------------------------------------------------
 void
 init_1(const char * argv0, bool log_startup)

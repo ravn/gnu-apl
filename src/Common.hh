@@ -63,12 +63,15 @@ extern void init_2(bool log_startup);
 /// clean up
 extern void cleanup(bool soft);
 
-/// true if Control-C was hit
-extern bool attention_raised;
-extern uint64_t attention_count;
+/// true if Control-C was hit (once)
+extern void set_attention_raised(const char * loc);
+extern void clear_attention_raised(const char * loc);
+extern bool attention_is_raised();
 
 /// true if Control-C was hit twice within 500 ms
-extern bool interrupt_raised;
+extern void set_interrupt_raised(const char * loc);
+extern void clear_interrupt_raised(const char * loc);
+extern bool interrupt_is_raised();
 extern uint64_t interrupt_count;
 
 /// time when ^C was hit last
@@ -79,7 +82,7 @@ extern void control_C(int);
 /// normal APL output (to stdout)
 extern ostream COUT;
 
-/// debug output (to stderr)
+/// debug output (to stderrear_interrupt_raised
 extern ostream CERR;
 
 /// debug output (to stderr)

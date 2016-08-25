@@ -396,8 +396,7 @@ UserFunction_header::remove_duplicate_local_variables()
 }
 //-----------------------------------------------------------------------------
 void
-UserFunction_header::remove_duplicate_local_var(const Symbol * sym,
-                                                unsigned int pos)
+UserFunction_header::remove_duplicate_local_var(const Symbol * sym, int pos)
 {
    // remove sym from the vector of local variables. Only the local vars
    // at pos or higher are being removed

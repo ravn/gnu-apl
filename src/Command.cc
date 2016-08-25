@@ -167,7 +167,7 @@ Executable * statements = 0;
       {
         CERR << "*** Command::process_line() caught other exception ***"
              << endl;
-        return;
+        cmd_OFF(0);
       }
 
    if (statements == 0)
@@ -237,10 +237,10 @@ check_EOC:
             {
               if (Workspace::SI_top()->get_parse_mode() == PM_STATEMENT_LIST)
                  {
-                   if (attention_raised)
+                   if (attention_is_raised())
                       {
-                        attention_raised = false;
-                        interrupt_raised = false;
+                        clear_attention_raised(LOC);
+                        clear_interrupt_raised(LOC);
                         ATTENTION;
                       }
 
@@ -260,10 +260,10 @@ check_EOC:
 
                 copy_1(prefix.tos().tok, token, LOC);
               }
-              if (attention_raised)
+              if (attention_is_raised())
                  {
-                   attention_raised = false;
-                   interrupt_raised = false;
+                   clear_attention_raised(LOC);
+                   clear_interrupt_raised(LOC);
                    ATTENTION;
                  }
 
@@ -331,8 +331,8 @@ check_EOC:
 
               // clear attention and interrupt flags
               //
-              attention_raised = false;
-              interrupt_raised = false;
+              clear_attention_raised(LOC);
+              clear_interrupt_raised(LOC);
 
               // check for safe execution mode. Unroll all SI entries that
               // have the same safe_execution_count, except the last

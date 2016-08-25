@@ -140,7 +140,7 @@ public:
 
 protected:
    /// remove \b sym from local_vars if it occurs at pos or above
-   void remove_duplicate_local_var(const Symbol * sym, unsigned int pos);
+   void remove_duplicate_local_var(const Symbol * sym, int pos);
 
    /// error if header was not parsed successfully
    ErrorCode error;

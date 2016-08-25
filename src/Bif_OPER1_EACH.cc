@@ -181,8 +181,9 @@ Function * LO = _LO.get_function();
 
    if (LO->may_push_SI())   // user defined LO
       {
-        if (LO->has_result())   return Macro::Z__LO_EACH_B->eval_LB(_LO, B);
-        else                    return Macro::LO_EACH_B->eval_LB(_LO, B);
+        if (!LO->has_result())         return Macro::LO_EACH_B->eval_LB(_LO, B);
+        if (LO == Bif_F1_EXECUTE::fun)  return Macro::Z__EXEC_EACH_B->eval_B(B);
+        return Macro::Z__LO_EACH_B->eval_LB(_LO, B);
       }
 
 const ShapeItem len_Z = B->element_count();
