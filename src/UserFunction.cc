@@ -348,7 +348,6 @@ UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
    Workspace::push_SI(this, LOC);
 
    if (header.Z())         header.Z()->push();
-   if (header.X())         header.X()->push();
                            header.A()->push_value(A);
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());

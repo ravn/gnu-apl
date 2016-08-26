@@ -198,7 +198,7 @@ mac_def(  Z__A_LO_RANK_X7_B,
 " (X7 LA rho_A LB rho_B LZ rho_Z)←X7 ◊ A←(LZ,LA)⍴A ◊ B←(LZ,LB)⍴B\n"
 "  N_max←LZ+N←⎕IO ◊ Z←LZ⍴0\n"
 "LOOP:Z[N]←⊂(rho_A⍴A[N;]) LO rho_B⍴B[N;] ◊ →(N_max>N←N+1)⍴LOOP\n"
-"→(X7≢¯1)⍴WITH_AXES ◊ Z←30 ⎕CR rho_Z⍴Z ◊ →0\n"
+"  →(X7≢¯1)⍴WITH_AXES ◊ Z←30 ⎕CR rho_Z⍴Z ◊ →0\n"
 "WITH_AXES:           Z←⊃[X7]rho_Z⍴Z\n")
 
 /// ⎕INP helper
