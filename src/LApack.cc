@@ -38,13 +38,18 @@ using namespace std;
 void
 divide_matrix(Cell * cZ, bool need_complex,
               ShapeItem rows, ShapeItem cols_A, const Cell * cA,
-              ShapeItem cols_B, const Cell * cB, ShapeItem nB2)
+              ShapeItem cols_B, const Cell * cB)
 {
+   // the followong has been checked by the caller:
+   //
+   // rows_B >= cols_B and
+   // rows_A == rows_B  (aka. rows below)
+   //
    loop(c, cols_A)
        {
          if (need_complex)
             {
-              double * ad = (double *)malloc(2 * rows * sizeof(double));
+              double * ad = (double *)malloc(rows * cols_A * 2*sizeof(double));
               if (ad == 0)   WS_FULL
               ZZ * const a = (ZZ *)ad;
               loop(r, rows)
@@ -53,7 +58,7 @@ divide_matrix(Cell * cZ, bool need_complex,
                                    cA[r*cols_A + c].get_imag_value());
                   }
 
-              double * bd = (double *)malloc(2 * nB2 * nB2 * sizeof(double));
+              double * bd = (double *)malloc(rows * cols_B * 2*sizeof(double));
               if (bd == 0)   { free(a);   WS_FULL }
 
               ZZ * const b = (ZZ *)bd;
@@ -88,15 +93,14 @@ divide_matrix(Cell * cZ, bool need_complex,
             }
          else   // real
             {
-//            double * a = (double *)malloc(rows * sizeof(double));
-              double * a = (double *)malloc(nB2 * nB2 * sizeof(double));
+              double * a = (double *)malloc(rows * cols_A * sizeof(double));
               if (a == 0)   WS_FULL
               loop(r, rows)
                  {
                    a[r] = cA[r*cols_A + c].get_real_value();
                  }
 
-              double * b = (double *)malloc(nB2 * nB2 * sizeof(double));
+              double * b = (double *)malloc(rows * cols_B * sizeof(double));
               if (b == 0)   { free(a);   WS_FULL }
 
               double * bb = b;
