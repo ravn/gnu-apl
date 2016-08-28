@@ -1,24 +1,31 @@
 GNU APL was written by:
 
-Dr. Jürgen Sauermann
+      Dr. Jürgen Sauermann
 
 Patches, questions, and suggestions came from:
 
+       Kevin Anderson
        Akiva Avraham
         Wade Babacar
+      Martin Barghoorn
          Dan Baronet
       Darren Bane
    Martin R. Bartels
       Thomas Baruchel
+       Louis Chretien
        Darek Cidlinsky
         Dave Cortezi
        Tobia Conforto
+       Louis De Forcrand
        David De La Harpe
  Jean-Pierre De Soza
+        Mike Duvos
       Martin Dybdal
      Andreas Enge
          Jay Foad
         Egan Ford
+        Jean Forget
+        Mike Gerwitz
         Paul Green
       Markus Gothe
        Clark Grubb
@@ -30,42 +37,63 @@ Patches, questions, and suggestions came from:
   Jan-Pieter Jacobs
      Richard Jacoby
           Ds Jaypee
+   Xiao-Yong Jin
+       Peter Johansson
        Chris Jones
+      Dieter Kilsch
       Morten Kromberg
     David B. Lamkins
+         Guy LaRocque
         Dirk Laurie
    Daniel H. Leidisch
+     Richard Levine
         Nick Lobachevsky
         Raul Lopez
          Leo Liu
      William Main
        Elias Mårtenson
         Onjo Masayuki
+        Rick Mayforth
        Blake McBride
        Brian McGuinness
       Rustom Mody
+       Ala'a Mohammad
        Chris Moller
       Stefan Monnier
       Robert Musial
         Nick Nikolov
+      Rainer Nussbaum
        Miika Oksman
+         Urs Oswald
     Masayuki Onjo
+      Steven Paul
    Sebastian Pipping
 Frederick H. Pitts
+     Michael Potter
    Christian Robert
+       Grant Rettke
    Анастасия Яблоков
+      Fausto Saporito
+   Leslie S. Satenstein
          Sam Sirlin
+  Hans-Peter Sorge
         Adam Sjøgren
          Bob Smith
+     Richard Stallman
        Peter Teeson
+       Keith Thompson
+       David Tran
   Stephen J. Turnbull
     Vladimir Ur
+      Alexey Veretennikov
        Colin Verrilli
      Bernard Wagener
       Harteg Wariyar
+    Jonathan Webster
+        Fred Weigel
         Alex Weiner
 
 Please let me know if I forgot you or if you want to be removed from the list.
 
-Mar-29-2015
+Aug-28-2016
 

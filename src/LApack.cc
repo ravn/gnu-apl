@@ -40,7 +40,7 @@ divide_matrix(Cell * cZ, bool need_complex,
               ShapeItem rows, ShapeItem cols_A, const Cell * cA,
               ShapeItem cols_B, const Cell * cB)
 {
-   // the followong has been checked by the caller:
+   // the following has been checked by the caller:
    //
    // rows_B >= cols_B and
    // rows_A == rows_B  (aka. rows below)
