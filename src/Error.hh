@@ -191,5 +191,6 @@ void throw_define_error(const UCS_string & fun, const UCS_string & cmd,
                                throw_apl_error(E_THIS_IS_A_BUG,     LOC); }
 #define VALUE_ERROR         throw_apl_error(E_VALUE_ERROR,          LOC)
 #define VALENCE_ERROR       throw_apl_error(E_VALENCE_ERROR,        LOC)
+#define WS_FULL           { throw_apl_error(E_WS_FULL,              LOC); }
 
 #endif // __ERROR_HH_DEFINED__

@@ -18,6 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "malloc.h"
+
 #include <iostream>
 
 #include "Common.hh"
@@ -42,8 +44,8 @@ divide_matrix(Cell * cZ, bool need_complex,
        {
          if (need_complex)
             {
-              double * ad = new double[2*rows];
-              Assert(ad);
+              double * ad = (double *)malloc(2 * rows * sizeof(double));
+              if (ad == 0)   WS_FULL
               ZZ * const a = (ZZ *)ad;
               loop(r, rows)
                   {
@@ -51,8 +53,9 @@ divide_matrix(Cell * cZ, bool need_complex,
                                    cA[r*cols_A + c].get_imag_value());
                   }
 
-              double * bd = new double[2*nB2*nB2];
-              Assert(bd);
+              double * bd = (double *)malloc(2 * nB2 * nB2 * sizeof(double));
+              if (bd == 0)   { free(a);   WS_FULL }
+
               ZZ * const b = (ZZ *)bd;
               ZZ * bb = b;
               loop(rr, cols_B)
@@ -68,10 +71,10 @@ divide_matrix(Cell * cZ, bool need_complex,
                 Matrix<ZZ> B(b, rows, cols_B, /* LDB */ rows);
                 Matrix<ZZ> A(a, rows, 1,      /* LDA */ rows);
                 const ShapeItem rk = gelsy<ZZ>(B, A, rcond);
-                delete [] bd;
+                free(bd);
                 if (rk != cols_B)
                    {
-                     delete [] ad;
+                     free(ad);
                      DOMAIN_ERROR;
                    }
               }
@@ -81,19 +84,21 @@ divide_matrix(Cell * cZ, bool need_complex,
               //
               loop(r, cols_B)
                   new (cZ + r*cols_A + c) ComplexCell(a[r].real(), a[r].imag());
-              delete [] ad;
+              free(ad);
             }
          else   // real
             {
-              double * a = new double[nB2*nB2];
-              Assert(a);
+//            double * a = (double *)malloc(rows * sizeof(double));
+              double * a = (double *)malloc(nB2 * nB2 * sizeof(double));
+              if (a == 0)   WS_FULL
               loop(r, rows)
                  {
                    a[r] = cA[r*cols_A + c].get_real_value();
                  }
 
-              double * b = new double[nB2*nB2];
-              Assert(b);
+              double * b = (double *)malloc(nB2 * nB2 * sizeof(double));
+              if (b == 0)   { free(a);   WS_FULL }
+
               double * bb = b;
               loop(rr, cols_B)
               loop(cc, rows)
@@ -107,10 +112,10 @@ divide_matrix(Cell * cZ, bool need_complex,
                 Matrix<DD> B(b, rows, cols_B, /* LDB */ rows);
                 Matrix<DD> A(a, rows, 1,      /* LDA */ rows);
                 const ShapeItem rk = gelsy<DD>(B, A, rcond);
-                delete [] b;
+                free(b);
                 if (rk != cols_B)
                    {
-                     delete [] a;
+                     free(a);
                      DOMAIN_ERROR;
                    }
               }
@@ -121,7 +126,7 @@ divide_matrix(Cell * cZ, bool need_complex,
 
               loop(r, cols_B)
                   new (cZ + r*cols_A + c)   FloatCell(a[r]);
-              delete [] a;
+              free(a);
             }
        }
 }
