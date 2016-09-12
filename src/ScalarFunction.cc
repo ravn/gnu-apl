@@ -409,6 +409,7 @@ const Shape * shape_Z = 0;
    else if (A->same_shape(*B))   shape_Z = &B->get_shape();
    else 
       {
+        joblist_AB.cancel_jobs();
         if (!A->same_rank(*B))   RANK_ERROR;
         else                     LENGTH_ERROR;
       }
@@ -477,6 +478,7 @@ Value_P Z(*shape_Z, LOC);
 
                           if (inc_A1 && inc_B1 && !A1->same_shape(*B1))
                              {
+                               joblist_AB.cancel_jobs();
                                if (!A1->same_rank(*B1))   RANK_ERROR;
                                else                       LENGTH_ERROR;
                              }
