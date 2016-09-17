@@ -221,7 +221,8 @@ public:
 
    /// return true, if this value has complex cells, false iff it has only
    /// real cells. Throw domain error for other cells (char, nested etc.)
-   bool is_complex() const;
+   /// if check_numeric is \b true.
+   bool is_complex(bool check_numeric) const;
 
    /// return a value containing pointers to all ravel cells of this value.
    Value_P get_cellrefs(const char * loc);

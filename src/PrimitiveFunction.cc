@@ -35,6 +35,7 @@
 #include "IndexIterator.hh"
 #include "IntCell.hh"
 #include "LvalCell.hh"
+#include "Macro.hh"
 #include "Output.hh"
 #include "PointerCell.hh"
 #include "PrimitiveFunction.hh"
@@ -982,7 +983,7 @@ ShapeItem cols_B = 1;
    if (rows_B <  cols_B)   LENGTH_ERROR;
    if (rows_A != rows_B)   LENGTH_ERROR;
 
-const bool need_complex = A->is_complex() || B->is_complex();
+const bool need_complex = A->is_complex(true) || B->is_complex(true);
 Value_P Z(shape_Z, LOC);
    divide_matrix(&Z->get_ravel(0), need_complex,
                  rows_A, cols_A, &A->get_ravel(0),
@@ -2833,6 +2834,8 @@ Bif_F12_UNION::eval_B(Value_P B)
 const APL_Float qct = Workspace::get_CT();
 const ShapeItem len_B = B->element_count();
    if (len_B <= 1)   return Token(TOK_APL_VALUE1, B->clone(LOC));
+   if (len_B >= SHORT_VALUE_LENGTH_WANTED && !B->is_complex(false))
+      return Macro::Z__UNIQUE_B->eval_B(B);
 
 DynArray(const Cell *, items_Z, len_B);
 ShapeItem len_Z = 0;

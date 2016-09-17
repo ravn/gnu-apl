@@ -784,14 +784,18 @@ Value::is_int_vector() const
 }
 //-----------------------------------------------------------------------------
 bool
-Value::is_complex() const
+Value::is_complex(bool check_numeric) const
 {
 const ShapeItem ec = nz_element_count();
 
    loop(e, ec)
       {
         const Cell & cell = get_ravel(e);
-        if (!cell.is_numeric())        DOMAIN_ERROR;
+        if (!cell.is_numeric())
+           {
+             if (check_numeric)    DOMAIN_ERROR;
+             else                  continue;
+           }
         if (!cell.is_near_real())   return true;
       }
 

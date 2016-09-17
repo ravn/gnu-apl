@@ -253,5 +253,14 @@ mac_def(Z__EXEC_EACH_B,
  " RC4: 'SYNTAX ERROR: →N in ⍎¨ macro:' ⎕ES 2 2\n"
  " RC5: 'SYNTAX ERROR: → in ⍎¨ macro:' ⎕ES 2 2\n")
 
+/// unique for large values
+mac_def(Z__UNIQUE_B,
+ "Z←UNIQUE_B B;IDX\n"
+ " Z←B[IDX←⍋B] ◊ Z←(Z≢¨¯1⌽Z)/IDX\n"
+ "→(×⍴Z)⍴NOT_EMPTY ◊ Z←,↑B ◊ →0\n"
+ "NOT_EMPTY: Z←B[Z[⍋Z]]\n")
+
+
+
 #undef mac_def
 
