@@ -289,6 +289,7 @@ CELL_PERFORMANCE_END(get_statistics_B(), start_2, z)
                      }
                 }
            }
+        job->value_Z.check_value(LOC);
       }
 
    Z->check_value(LOC);
@@ -576,6 +577,7 @@ CELL_PERFORMANCE_END(get_statistics_AB(), start_2, z)
                         }
                 }
            }
+        job->value_Z.check_value(LOC);
       }
 
    joblist_AB.cancel_jobs();
