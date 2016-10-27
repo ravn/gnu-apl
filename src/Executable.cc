@@ -642,7 +642,15 @@ int level = 0;
          lambda_body.append(t, LOC);
        }
 
-   // if the lambda has at least one token, then it (is supposed to) return λ.
+   if ((signature & SIG_B) == 0 &&   // niladic
+       (signature & (SIG_A | SIG_LO | SIG_RO | SIG_X)))
+      {
+        Workspace::more_error() =
+         "niladic lambda with axis. left argument, or function argument(s)";
+        DEFN_ERROR;
+      }
+
+   // if the lambda has at least one token, then it is supposedly returns λ.
    // Otherwise the lambda is empty (and result-less)
    //
    if (signature & SIG_Z)
