@@ -689,7 +689,7 @@ bool in_double_quotes = false;
        {
          if (tidx >= text.size())
             {
-              Q1(copying)   Q1(tidx)   Q(skip)   FIXME;
+              Q1(copying)   Q1(tidx)   Q1(skip)   FIXME;
             }
 
          const UCS_string & line = text[tidx];

@@ -50,11 +50,15 @@ public:
    XML_Saving_Archive(ofstream & of)
    : indent(0),
      out(of),
+     value_count(0),
      char_mode(false)
    {}
 
    /// destructor
-   ~XML_Saving_Archive()   { out.close(); }
+   ~XML_Saving_Archive()   { out.close();  delete values; }
+
+   /// an index for \b values
+   enum Vid { INVALID_VID = -1 };
 
    /// write user-defined function \b fun
    void save_Function(const Function & fun);
@@ -86,10 +90,10 @@ public:
    void save_UCS(const UCS_string & str);
 
    /// write Value \b v except its ravel
-   XML_Saving_Archive & save_shape(const Value & v);
+   XML_Saving_Archive & save_shape(Vid vid);
 
    /// write ravel of Value \b v
-   XML_Saving_Archive & save_Ravel(const Value & v);
+   XML_Saving_Archive & save_Ravel(Vid vid);
 
    /// write entire workspace
    XML_Saving_Archive & save();
@@ -102,10 +106,7 @@ protected:
    int do_indent();
 
    /// return the index of \b val in values
-   int find_vid(const Value & val);
-
-   /// return the index of the value that has \b cell in its ravel in \b values
-   int find_owner(const Cell * val);
+   Vid find_vid(const Value * val);
 
    /// emit one unicode character (inside "...")
    void emit_unicode(Unicode uni, int & space);
@@ -113,7 +114,7 @@ protected:
    /// emit one ravel cell \b cell
    void emit_cell(const Cell & cell, int & space);
 
-   /// emit a token value up (excluding) the '>' of the end token
+   /// emit a token value up to (excluding) the '>' of the end token
    void emit_token_val(const Token & tok);
 
    /// enter char mode. maybe print ² and return the number of chars printed
@@ -138,31 +139,44 @@ protected:
    /// output XML file
    std::ofstream & out;
 
-   /// a value and its parent (if value is a sub-value of a nested parent)
+   /// a value and the Vid of its parent (if value is a sub-value of a 
+   /// nested parent)
    struct _val_par
       {
+         /// default constructor
+         _val_par()
+         : _val(0),
+           _par(INVALID_VID)
+         {}
+
          /// constructor
-         _val_par(const Value & v, const Value * par = 0)
+         _val_par(const Value * v, Vid par)
          : _val(v),
            _par(par)
          {}
 
          /// the value
-         const Value & _val;
+         const Value * _val;
 
          /// the optional parent
-         const Value * _par;
+         Vid _par;
 
-         /// compare with \b other
+         /// assign \b other
          void operator=(const _val_par & other)
             { new (this) _val_par(other._val, other._par); }
+
+         /// compare function for Heapsort::sort()
+         static bool compare_val_par(_val_par A, _val_par B, const void *);
+
+         /// compare function for bsearch()
+         static int compare_val_par1(const void * key, const void * B);
       };
 
    /// all values in the workspace
-   vector<_val_par> values;
+   _val_par * values;
 
-   /// current value number
-   int vid;
+   // the number of (non-stale) values
+   ShapeItem value_count;
 
    /// true iff ² is pending
    bool char_mode;

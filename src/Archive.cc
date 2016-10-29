@@ -34,6 +34,7 @@
 #include "Executable.hh"
 #include "FloatCell.hh"
 #include "Function.hh"
+#include "Heapsort.hh"
 #include "IndexExpr.hh"
 #include "IntCell.hh"
 #include "LvalCell.hh"
@@ -84,30 +85,13 @@ const int spaces = indent * INDENT_LEN;
    return 72 - spaces;
 }
 //-----------------------------------------------------------------------------
-int
-XML_Saving_Archive::find_owner(const Cell * cell)
+XML_Saving_Archive::Vid
+XML_Saving_Archive::find_vid(const Value * val)
 {
-   loop(v, values.size())
-      {
-        const Value & val = values[v]._val;
-        if (cell < &val.get_ravel(0))      continue;
-        if (cell >= val.get_ravel_end())   continue;
-        return v;
-      }
-
-   FIXME;
-   return -1;
-}
-//-----------------------------------------------------------------------------
-int
-XML_Saving_Archive::find_vid(const Value & val)
-{
-   loop(v, values.size())
-      {
-         if (&val == &values[v]._val)   return v;
-      }
-
-   return -1;
+const void * item = bsearch(val, values, value_count, sizeof(_val_par),
+                      _val_par::compare_val_par1);
+   if (item == 0)   return INVALID_VID;
+   return (Vid)((const _val_par *)item - values);
 }
 //-----------------------------------------------------------------------------
 void
@@ -151,17 +135,14 @@ int space = do_indent();
 }
 //-----------------------------------------------------------------------------
 XML_Saving_Archive &
-XML_Saving_Archive::save_shape(const Value & v)
+XML_Saving_Archive::save_shape(Vid vid)
 {
+const Value & v = *values[vid]._val;
+
    do_indent();
    out << "<Value flg=\"" << HEX(v.get_flags()) << "\" vid=\"" << vid << "\"";
 
-const int sub_vid = find_vid(v);
-   Assert(sub_vid < (int)values.size());
-unsigned int parent_vid = -1;
-
-   if (values[sub_vid]._par)   parent_vid = find_vid(*values[sub_vid]._par);
-
+const Vid parent_vid = values[vid]._par;
    out << " parent=\"" << parent_vid << "\" rk=\"" << v.get_rank()<< "\"";
 
    loop (r, v.get_rank())
@@ -174,8 +155,10 @@ unsigned int parent_vid = -1;
 }
 //-----------------------------------------------------------------------------
 XML_Saving_Archive &
-XML_Saving_Archive::save_Ravel(const Value & v)
+XML_Saving_Archive::save_Ravel(Vid vid)
 {
+const Value & v = *values[vid]._val;
+
 int space = do_indent();
 
 char cc[80];
@@ -228,7 +211,7 @@ char cc[80];
             case CT_POINTER:   // uses UNI_PAD_U6
                  space -= leave_char_mode();
                  {
-                   const int vid = find_vid(*cell.get_pointer_value());
+                   const Vid vid = find_vid(cell.get_pointer_value().get());
                    snprintf(cc, sizeof(cc), "%d", vid);
                    NEED(1 + strlen(cc)) << UNI_PAD_U6 << decr(--space, cc);
                  }
@@ -237,19 +220,21 @@ char cc[80];
             case CT_CELLREF:   // uses UNI_PAD_U7
                  space -= leave_char_mode();
                  {
-                   Cell * cp = cell.get_lval_value();
-                   if (cp == 0)
+                   const Cell * cp = cell.get_lval_value();
+                   if (cp)   // valid Cell *
                       {
-                        // 0-cell-pointer
+                        const Value * cp_owner =
+                              ((const LvalCell *)&cell)->get_cell_owner();
+                        const long long offset = cp_owner->get_offset(cp);
+                        const Vid vid = find_vid(cp_owner);
+                        snprintf(cc, sizeof(cc), "%d[%lld]", vid, offset);
+                        NEED(1 + strlen(cc)) << UNI_PAD_U7 << decr(--space, cc);
+                      }
+                   else     // 0-cell-pointer
+                      {
                         snprintf(cc, sizeof(cc), "0");
                         NEED(2) << UNI_PAD_U7 << "0" << decr(--space, cc);
-                        break;
                       }
-                   const int vid = find_owner(cp);
-                   const Value & val = values[vid]._val;
-                   const ShapeItem offset = val.get_offset(cp);
-                   snprintf(cc, sizeof(cc), "%d[%lld]", vid, (long long)offset);
-                   NEED(1 + strlen(cc)) << UNI_PAD_U7 << decr(--space, cc);
                  }
                  break;
 
@@ -505,7 +490,7 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
         case TV_LIN:   out << " line=\"" << tok.get_fun_line() << "\"";
                        break;
 
-        case TV_VAL:   { const int vid = find_vid(*tok.get_apl_val());
+        case TV_VAL:   { const Vid vid = find_vid(tok.get_apl_val().get());
                          out << " vid=\"" << vid << "\"";
                        }
                        break;
@@ -517,7 +502,7 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
                              {
                                if (i)   out << ",";
                                const Value * val = idx.values[i].get();
-                               if (val)   out << "vid_" << find_vid(*val);
+                               if (val)   out << "vid_" << find_vid(val);
                                else       out << "-";
                                 out << "\"";
                              }
@@ -554,7 +539,7 @@ XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 
         case NC_VARIABLE:
              do_indent();
-             out << "<Variable vid=\"" << find_vid(*vsi.apl_val.get())
+             out << "<Variable vid=\"" << find_vid(vsi.apl_val.get())
                  << "\"/>" << endl;
              break;
 
@@ -571,6 +556,20 @@ XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 
         default: Assert(0);
       }
+}
+//-----------------------------------------------------------------------------
+bool
+XML_Saving_Archive::_val_par::compare_val_par(_val_par A,
+                                              _val_par B, const void *)
+{
+   return A._val > B._val;
+}
+//-----------------------------------------------------------------------------
+int
+XML_Saving_Archive::_val_par::compare_val_par1(const void * key, const void * B)
+{
+const void * Bv = ((const _val_par *)B)->_val;
+   return (const char *)key - (const char *)Bv;
 }
 //-----------------------------------------------------------------------------
 XML_Saving_Archive &
@@ -715,27 +714,48 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 
          if (val.is_marked())    continue;   // stale
 
-         val.unmark();
-         values.push_back(_val_par(val));
+         ++value_count;
        }
 
+   values = new _val_par[value_count];
+ShapeItem idx = 0;
+
+   for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
+        obj != DynamicObject::get_all_values(); obj = obj->get_next())
+       {
+         const Value * val = (const Value *)obj;
+
+         if (val->is_marked())    continue;   // stale
+
+         val->unmark();
+         new (values + idx++) _val_par(val, INVALID_VID);
+       }
+
+   Assert(idx == value_count);
+
+   // some people use an excessive number of values. We therefore sort them
+   // by the address of the value as to speed up finding them later on
+   //
+   Heapsort<_val_par>::sort(values, value_count, 0, &_val_par::compare_val_par);
+   loop(v, (value_count - 1))   Assert(&values[v]._val < &values[v + 1]._val);
+   
    // set up parents of values
    //
-   loop(p, values.size())
+   loop(p, value_count)
       {
-        const Value & parent = values[p]._val;
+        const Value & parent = *values[p]._val;
         const ShapeItem ec = parent.nz_element_count();
         const Cell * cP = &parent.get_ravel(0);
         loop(e, ec)
             {
               if (cP->is_pointer_cell())
                  {
-                   const Value & sub = *cP->get_pointer_value().get();
-                   Assert1(&sub);
-                   const int sub_idx = find_vid(sub);
-                   Assert(sub_idx < (int)values.size());
-                   Assert(!values[sub_idx]._par);
-                   values[sub_idx] = _val_par(values[sub_idx]._val, &parent);
+                   const Value * sub = cP->get_pointer_value().get();
+                   Assert1(sub);
+                   const Vid sub_idx = find_vid(sub);
+                   Assert(sub_idx < value_count);
+                   Assert(!values[sub_idx]._par != INVALID_VID);
+                   values[sub_idx] = _val_par(values[sub_idx]._val, (Vid)p);
                  }
               else if (cP->is_lval_cell())
                  {
@@ -746,13 +766,14 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
             }
       }
 
+
    // save all values (without their ravel)
    //
-   for (vid = 0; vid < (int)values.size(); ++vid)  save_shape(values[vid]._val);
+   loop(vid, value_count)   save_shape((Vid)vid);
 
    // save ravels of all values
    //
-   for (vid = 0; vid < (int)values.size(); ++vid)   save_Ravel(values[vid]._val);
+   loop(vid, value_count)   save_Ravel((Vid)vid);
 
    // save user defined symbols
    //
