@@ -27,6 +27,7 @@
 #include "PrintBuffer.hh"
 
 class Value;
+class IntCell;
 
 //-----------------------------------------------------------------------------
 /**
@@ -410,10 +411,12 @@ public:
    typedef bool (*greater_fun)(const Cell * a, const Cell * b,
                                const void * comp_arg);
    /// compare comp_len items ascendingly
-   static bool greater_vec(const Cell * a, const Cell * b, const void * arg);
+   static bool greater_vec(const IntCell & a, const IntCell & b,
+                           const void * arg);
 
    /// compare comp_len items descendingly
-   static bool smaller_vec(const Cell * a, const Cell * b, const void * arg);
+   static bool smaller_vec(const IntCell & a, const IntCell & b,
+                           const void * arg);
 
    /// raw pointer to the primary value (for 27 ⎕CR)
    const void * get_u0() const   { return &value; }
@@ -434,6 +437,12 @@ private:
    /// it but not implementing it.
    void * operator new(std::size_t);
 };
+//-----------------------------------------------------------------------------
+inline void
+Hswap(const Cell * & c1, const Cell * & c2)
+{
+const Cell * tmp = c1;   c1 = c2;   c2 = tmp;
+}
 //-----------------------------------------------------------------------------
 
 typedef ErrorCode (Cell::*prim_f1)(Cell *) const;

@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "Common.hh"
+#include "Heapsort.hh"
 #include "Simple_string.hh"
 #include "Unicode.hh"
 #include "UTF8_string.hh"
@@ -316,8 +317,8 @@ public:
                                     int tab_size, int quad_PW);
 protected:
    /// return true if n1 < n2
-   static bool compare_names(const UCS_string * n1, const UCS_string * n2,
-                             const void *)
+   static bool compare_names(const UCS_string * const & n1,
+                             const UCS_string * const & n2, const void *)
       { return n2->compare(*n1) == COMP_LT; }
 };
 //-----------------------------------------------------------------------------
@@ -345,6 +346,11 @@ UCS_string_list
       }
 };
 //-----------------------------------------------------------------------------
-
+inline void
+Hswap(const UCS_string * & u1, const UCS_string * & u2)
+{
+const UCS_string * tmp = u1;   u1 = u2;   u2 = tmp;
+}
+//-----------------------------------------------------------------------------
 #endif // __UCS_STRING_HH_DEFINED__
 

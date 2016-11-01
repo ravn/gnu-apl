@@ -1744,14 +1744,21 @@ const Shape weight_B = B->get_shape().reverse_scan();
             }
        }
 
+int X_axes_used = 0;
    loop(r, shape_X.get_rank())   // the axes in shape_X
        {
          const ShapeItem x_r = shape_X.get_shape_item(r);
 
          // check that X∈⍳⍴⍴B
          //
-         if (x_r < 0)                AXIS_ERROR;
-         if (x_r >= B->get_rank())   AXIS_ERROR;
+         if (x_r < 0)                  AXIS_ERROR;
+         if (x_r >= B->get_rank())     AXIS_ERROR;
+         if (X_axes_used & 1 << x_r)
+            {
+              Workspace::more_error() = UCS_string("Duplicate axis");
+              AXIS_ERROR;
+            }
+         X_axes_used |= 1 << x_r;
 
          item_shape.add_shape_item(B->get_shape_item(x_r));
          it_weight.add_shape_item(weight_B.get_shape_item(x_r));

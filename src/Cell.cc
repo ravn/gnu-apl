@@ -214,22 +214,26 @@ const double diff = value - result;
 }
 //-----------------------------------------------------------------------------
 bool
-Cell::greater_vec(const Cell * ca, const Cell * cb, const void * comp_arg)
+Cell::greater_vec(const IntCell & Za, const IntCell & Zb, const void * comp_arg)
 {
-const ShapeItem comp_len = *(const ShapeItem *)comp_arg;
+struct _ctx { const Cell * base;   ShapeItem comp_len; };
+const _ctx * ctx = (const _ctx *)comp_arg;
+const Cell * ca = ctx->base + ctx->comp_len * Za.get_int_value();
+const Cell * cb = ctx->base + ctx->comp_len * Zb.get_int_value();
+
 const APL_Float qct = Workspace::get_CT();
 
    // most frequently comp_len is 1, so we optimize for this case.
    //
-   if (comp_len == 1)
+   if (ctx->comp_len == 1)
       {
         const bool equal = ca[0].equal(cb[0], qct);
-        if (equal)   return ca > cb;
+        if (equal)   return Za.get_int_value() > Zb.get_int_value();
         const bool result = ca[0].greater(cb[0]);
         return result;
       }
 
-   loop(c, comp_len)
+   loop(c, ctx->comp_len)
       {
         const bool equal = ca[c].equal(cb[c], qct);
         if (equal)   continue;
@@ -237,26 +241,30 @@ const APL_Float qct = Workspace::get_CT();
         return result;
       }
 
-   return ca > cb;   // a and b are equal: sort by position
+   return Za.get_int_value() > Zb.get_int_value();   // a and b are equal: sort by position
 }
 //-----------------------------------------------------------------------------
 bool
-Cell::smaller_vec(const Cell * ca, const Cell * cb, const void * comp_arg)
+Cell::smaller_vec(const IntCell & Za, const IntCell & Zb, const void * comp_arg)
 {
-const ShapeItem comp_len = *(const ShapeItem *)comp_arg;
+struct _ctx { const Cell * base;   ShapeItem comp_len; };
+const _ctx * ctx = (const _ctx *)comp_arg;
+const Cell * ca = ctx->base + ctx->comp_len * Za.get_int_value();
+const Cell * cb = ctx->base + ctx->comp_len * Zb.get_int_value();
+
 const APL_Float qct = Workspace::get_CT();
 
    // most frequently comp_len is 1, so we optimize for this case.
    //
-   if (comp_len == 1)
+   if (ctx->comp_len == 1)
       {
         const bool equal = ca[0].equal(cb[0], qct);
-        if (equal)   return ca > cb;
+        if (equal)   return Za.get_int_value() > Zb.get_int_value();
         const bool result = ca[0].greater(cb[0]);
         return !result;
       }
 
-   loop(c, comp_len)
+   loop(c, ctx->comp_len)
       {
         const bool equal = ca[c].equal(cb[c], qct);
         if (equal)   continue;
@@ -264,7 +272,7 @@ const APL_Float qct = Workspace::get_CT();
         return !result;
       }
 
-   return ca > cb;   // a and b are equal: sort by position
+   return Za.get_int_value() > Zb.get_int_value();   // a and b are equal: sort by position
 }
 //-----------------------------------------------------------------------------
 ostream & 

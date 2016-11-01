@@ -559,8 +559,8 @@ XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 }
 //-----------------------------------------------------------------------------
 bool
-XML_Saving_Archive::_val_par::compare_val_par(_val_par A,
-                                              _val_par B, const void *)
+XML_Saving_Archive::_val_par::compare_val_par(const _val_par & A,
+                                              const _val_par & B, const void *)
 {
    return A._val > B._val;
 }

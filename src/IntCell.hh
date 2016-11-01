@@ -144,6 +144,16 @@ public:
    static ErrorCode zv(Cell * Z, APL_Integer v)
       { new (Z) IntCell(v);   return E_NO_ERROR; }
 
+   void Hswap(IntCell & other)
+      {
+         const APL_Integer tmp = value.ival;
+         value.ival = other.value.ival;
+         other.value.ival = tmp;
+      }
+
+   /// overloaded Cell::get_int_value()
+   virtual APL_Integer get_int_value()  const   { return value.ival; }
+
 protected:
    /// overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const
@@ -151,9 +161,6 @@ protected:
 
    /// overloaded Cell::get_cell_subtype()
    virtual CellType get_cell_subtype() const;
-
-   /// overloaded Cell::get_int_value()
-   virtual APL_Integer get_int_value()  const   { return value.ival; }
 
    /// overloaded Cell::get_real_value()
    virtual APL_Float get_real_value() const   { return double(value.ival);  }
@@ -201,6 +208,12 @@ protected:
    /// overloaded Cell::CDR_size()
    virtual int CDR_size() const;
 };
+//-----------------------------------------------------------------------------
+inline void
+Hswap(IntCell & c1, IntCell & c2)
+{
+   c1.Hswap(c2);
+}
 //-----------------------------------------------------------------------------
 
 #endif // __INTCELL_HH_DEFINED__

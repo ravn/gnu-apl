@@ -32,10 +32,13 @@ Bif_F12_SORT_ASC * Bif_F12_SORT_ASC::fun = &Bif_F12_SORT_ASC::_fun;
 Bif_F12_SORT_DES * Bif_F12_SORT_DES::fun = &Bif_F12_SORT_DES::_fun;
 //-----------------------------------------------------------------------------
 bool
-CollatingCache::greater_vec(const Cell * ca, const Cell * cb,
+CollatingCache::greater_vec(const IntCell & Za, const IntCell & Zb,
                             const void * comp_arg)
 {
 CollatingCache & cache = *(CollatingCache *)comp_arg;
+const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
+const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
+
 const Rank rank = cache.get_rank();
 
    loop(r, rank)
@@ -44,9 +47,9 @@ const Rank rank = cache.get_rank();
            {
              const APL_Integer a = ca[c].get_int_value();
              const APL_Integer b = cb[c].get_int_value();
-             const int d = cache[a].compare(cache[b], true, rank - r - 1);
+             const int diff = cache[a].compare_axis(cache[b], rank - r - 1);
 
-              if (d)   return d > 0;
+              if (diff)   return diff > 0;
            }
       }
 
@@ -54,10 +57,12 @@ const Rank rank = cache.get_rank();
 }
 //-----------------------------------------------------------------------------
 bool
-CollatingCache::smaller_vec(const Cell * ca, const Cell * cb,
+CollatingCache::smaller_vec(const IntCell & Za, const IntCell & Zb,
                             const void * comp_arg)
 {
 CollatingCache & cache = *(CollatingCache *)comp_arg;
+const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
+const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
 const Rank rank = cache.get_rank();
 
    loop(r, rank)
@@ -66,54 +71,46 @@ const Rank rank = cache.get_rank();
            {
              const APL_Integer a = ca[c].get_int_value();
              const APL_Integer b = cb[c].get_int_value();
-             const int d = cache[a].compare(cache[b], true, rank - r - 1);
+             const int diff = cache[a].compare_axis(cache[b], rank - r - 1);
 
-              if (d)   return d < 0;
+              if (diff)   return diff < 0;
            }
       }
 
    return ca > cb;
 }
-//-----------------------------------------------------------------------------
-int
-CollatingCacheEntry::compare(const CollatingCacheEntry & other,
-                             bool ascending, Rank axis) const
-{
-   return  (ascending) ? get_pos(axis) - other.get_pos(axis)
-                       : other.get_pos(axis) - get_pos(axis);
-}
 //=============================================================================
 Token
 Bif_F12_SORT::sort(Value_P B, Sort_order order)
 {
-   if (B->is_scalar())   return Token(TOK_ERROR, E_RANK_ERROR);
+   if (B->is_scalar())          return Token(TOK_ERROR, E_RANK_ERROR);
+   if (!B->can_be_compared())   return Token(TOK_ERROR, E_DOMAIN_ERROR);
 
 const ShapeItem len_BZ = B->get_shape_item(0);
    if (len_BZ == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));
 
 const ShapeItem comp_len = B->element_count()/len_BZ;
-DynArray(const Cell *, array, len_BZ);
-   loop(bz, len_BZ)
-       {
-         array[bz] = &B->get_ravel(bz*comp_len);
-         if (array[bz]->is_complex_cell())
-            return Token(TOK_ERROR, E_DOMAIN_ERROR);
-       }
+
+   // first set Z←⍳len_BZ
+   //
+const int qio = Workspace::get_IO();
+Value_P Z(len_BZ, LOC);
+   loop(l, len_BZ)   new (Z->next_ravel())   IntCell(l + qio);
+   Z->check_value(LOC);
+   if (len_BZ == 1)   return Token(TOK_APL_VALUE1, Z);
+
+   // then sort Z (actually re-arrange Z so that B[Z] is sorted)
+   //
+const Cell * base = &B->get_ravel(0) - qio*comp_len;
+const struct { const Cell * base; ShapeItem comp_len; } ctx = { base, comp_len};
 
    if (order == SORT_ASCENDING)
-      Heapsort<const Cell *>::sort(&array[0], len_BZ, &comp_len,
-                                   &Cell::greater_vec);
+      Heapsort<IntCell>::sort((IntCell *)&Z->get_ravel(0), len_BZ, &ctx,
+                               &Cell::greater_vec);
    else
-      Heapsort<const Cell *>::sort(&array[0], len_BZ, &comp_len,
-                                   &Cell::smaller_vec);
-Value_P Z(len_BZ, LOC);
+      Heapsort<IntCell>::sort((IntCell *)&Z->get_ravel(0), len_BZ, &ctx,
+                               &Cell::smaller_vec);
 
-const APL_Integer qio = Workspace::get_IO();
-const Cell * base = &B->get_ravel(0);
-   loop(bz, len_BZ)
-       new (Z->next_ravel())   IntCell(qio + (array[bz] - base)/comp_len);
-
-   Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
@@ -129,41 +126,46 @@ const APL_Integer qio = Workspace::get_IO();
 
 const ShapeItem len_BZ = B->get_shape_item(0);
    if (len_BZ == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));
-   if (len_BZ == 1)   return Token(TOK_APL_VALUE1, IntScalar(qio, LOC));
 
-Value_P B1(B->get_shape(), LOC);
+   // first set Z←⍳len_BZ
+   //
+Value_P Z(len_BZ, LOC);
+   loop(l, len_BZ)   new (Z->next_ravel())   IntCell(l + qio);
+   Z->check_value(LOC);
+   if (len_BZ == 1)   return Token(TOK_APL_VALUE1, Z);
+
 const ShapeItem ec_B = B->element_count();
 const ShapeItem comp_len = ec_B/len_BZ;
-CollatingCache cc_cache(A->get_rank(), comp_len);
+
+   // create a vector B1 which has the same shape as B, but instead of
+   // B's characters, it has the index of the corresponding CollatingCache
+   // index for each character in B.
+   //
+Value_P B1(B->get_shape(), LOC);
+const Cell * base_B1 = &B1->get_ravel(0) - qio*comp_len;
+CollatingCache cache(A->get_rank(), base_B1, comp_len);
    loop(b, ec_B)
       {
         const Unicode uni = B->get_ravel(b).get_char_value();
-        const ShapeItem b1 = collating_cache(uni, A, cc_cache);
+        const ShapeItem b1 = find_collating_cache_entry(uni, A, cache);
         new (&B1->get_ravel(b)) IntCell(b1);
       }
 
-DynArray(const Cell *, array, len_BZ);
-   loop(bz, len_BZ)   array[bz] = &B1->get_ravel(bz*comp_len);
-
+   // then sort Z (actually re-arrange Z so that B[Z] is sorted)
+   //
+IntCell * z0 = (IntCell *)&Z->get_ravel(0);
    if (order == SORT_ASCENDING)
-      Heapsort<const Cell *>::sort(&array[0], len_BZ, &cc_cache,
-                                   &CollatingCache::greater_vec);
+      Heapsort<IntCell>::sort(z0, len_BZ, &cache, &CollatingCache::greater_vec);
    else
-      Heapsort<const Cell *>::sort(&array[0], len_BZ, &cc_cache,
-                                   &CollatingCache::smaller_vec);
-
-Value_P Z(len_BZ, LOC);
-
-const Cell * base = &B1->get_ravel(0);
-   loop(bz, len_BZ)
-       new (Z->next_ravel()) IntCell(qio + (array[bz] - base)/comp_len);
+      Heapsort<IntCell>::sort(z0, len_BZ, &cache, &CollatingCache::smaller_vec);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
 ShapeItem
-Bif_F12_SORT::collating_cache(Unicode uni, Value_P A, CollatingCache & cache)
+Bif_F12_SORT::find_collating_cache_entry(Unicode uni, Value_P A,
+                                         CollatingCache & cache)
 {
    // first check if uni is already in the cache...
    //
@@ -172,26 +174,10 @@ Bif_F12_SORT::collating_cache(Unicode uni, Value_P A, CollatingCache & cache)
         if (uni == cache[s].ce_char)   return s;
       }
 
-   // uni is not in the cache. See if it is in the collating sequence.
+   // uni is not in the cache. Add a new collating sequence entry.
    //
-const ShapeItem ec_A = A->element_count();
-CollatingCacheEntry entry(uni, A->get_shape());
-   loop(a, ec_A)
-      {
-        if (uni != A->get_ravel(a).get_char_value())   continue;
-
-        ShapeItem aq = a;
-        loop(r, entry.ce_shape.get_rank())
-           {
-             const Rank axis = entry.ce_shape.get_rank() - r - 1;
-             const ShapeItem ar = aq % A->get_shape_item(axis);
-             if (entry.ce_shape.get_shape_item(axis) > ar)
-                entry.ce_shape.set_shape_item(axis, ar);
-             aq /= A->get_shape_item(axis);
-           }
-      }
-
-   cache.push_back(entry);
+const CollatingCacheEntry entry(uni, A.getref());
+   cache.append(entry);
    return cache.size() - 1;
 }
 //-----------------------------------------------------------------------------

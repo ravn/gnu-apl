@@ -98,6 +98,38 @@ public:
    /// write entire workspace
    XML_Saving_Archive & save();
 
+   struct _val_par
+      {
+         /// default constructor
+         _val_par()
+         : _val(0),
+           _par(INVALID_VID)
+         {}
+
+         /// constructor
+         _val_par(const Value * v, Vid par)
+         : _val(v),
+           _par(par)
+         {}
+
+         /// the value
+         const Value * _val;
+
+         /// the optional parent
+         Vid _par;
+
+         /// assign \b other
+         void operator=(const _val_par & other)
+            { new (this) _val_par(other._val, other._par); }
+
+         /// compare function for Heapsort::sort()
+         static bool compare_val_par(const _val_par & A, const _val_par & B,
+                                     const void *);
+
+         /// compare function for bsearch()
+         static int compare_val_par1(const void * key, const void * B);
+      };
+
 protected:
    /// width of one indentation level
    enum { INDENT_LEN = 2 };
@@ -141,37 +173,6 @@ protected:
 
    /// a value and the Vid of its parent (if value is a sub-value of a 
    /// nested parent)
-   struct _val_par
-      {
-         /// default constructor
-         _val_par()
-         : _val(0),
-           _par(INVALID_VID)
-         {}
-
-         /// constructor
-         _val_par(const Value * v, Vid par)
-         : _val(v),
-           _par(par)
-         {}
-
-         /// the value
-         const Value * _val;
-
-         /// the optional parent
-         Vid _par;
-
-         /// assign \b other
-         void operator=(const _val_par & other)
-            { new (this) _val_par(other._val, other._par); }
-
-         /// compare function for Heapsort::sort()
-         static bool compare_val_par(_val_par A, _val_par B, const void *);
-
-         /// compare function for bsearch()
-         static int compare_val_par1(const void * key, const void * B);
-      };
-
    /// all values in the workspace
    _val_par * values;
 
@@ -181,6 +182,12 @@ protected:
    /// true iff ² is pending
    bool char_mode;
 };
+//-----------------------------------------------------------------------------
+inline void Hswap(XML_Saving_Archive::_val_par & vp1,
+                  XML_Saving_Archive::_val_par & vp2)
+{
+const XML_Saving_Archive::_val_par tmp = vp1;   vp1 = vp2;   vp2 = tmp;
+}
 //-----------------------------------------------------------------------------
 /// a helper class for loading an APL workspace
 class XML_Loading_Archive

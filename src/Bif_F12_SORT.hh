@@ -29,22 +29,44 @@
 class Cell;
 
 //-----------------------------------------------------------------------------
-/// one item of a CollatingCache
+/** one item of a CollatingCache. Every character in A (of A⍋B or A⍒B gets
+   one CollatingCacheEntry; if the same character occurs multiple times in A,
+   then the first one (in row-major order) creates the entry and the remaining
+   copies of the character use the same CollatingCacheEntry.
+
+   Later on, f two Unicodes c1 and c2 shall be compared, then the ce_shapes
+   (which are actually indices into A) of the CollatingCacheEntry for c1 and
+   c2 are used for the comparison and the lowest dimansion wins.
+**/
 struct CollatingCacheEntry
 {
-   /// constructor: an entry with character \b c and shape \b shape
-   CollatingCacheEntry(Unicode uni, const Shape & shape)
-   : ce_char(uni),
-     ce_shape(shape)
+   /// constructor: an invalid entry (for allocating Simple_string items)
+   CollatingCacheEntry()
+   : ce_char(Invalid_Unicode),
+     ce_shape()
    {}
 
-   /// copy from another CollatingCacheEntry
-   CollatingCacheEntry & operator=(const CollatingCacheEntry & other)
-      { new (this) CollatingCacheEntry(other.ce_char, other.ce_shape);
-        return *this; }
+   /// constructor: an entry with character \b c and shape \b shape
+   CollatingCacheEntry(Unicode uni, const Value & A)
+   : ce_char(uni),
+     ce_shape(A.get_shape())
+   {
+     const ShapeItem ec_A = A.element_count();
+     loop(a, ec_A)
+        {
+          if (uni != A.get_ravel(a).get_char_value())   continue;
 
-   /// return the axis'th item of shape
-   ShapeItem get_pos(Rank axis) const  { return ce_shape.get_shape_item(axis); }
+          ShapeItem aq = a;
+          loop(r, ce_shape.get_rank())
+             {
+               const Rank axis = ce_shape.get_rank() - r - 1;
+               const ShapeItem ar = aq % A.get_shape_item(axis);
+               if (ce_shape.get_shape_item(axis) > ar)
+                  ce_shape.set_shape_item(axis, ar);
+               aq /= A.get_shape_item(axis);
+             }
+        }
+   }
 
    /// the character
    const Unicode ce_char;
@@ -52,21 +74,37 @@ struct CollatingCacheEntry
    /// the shape
    Shape ce_shape;
 
-   /// compare this entry with \b other
-   int compare(const CollatingCacheEntry & other, bool ascending,
-               Rank axis) const;
+   /// compare this entry with \b other at \b axis
+   int compare_axis(const CollatingCacheEntry & other, Rank axis) const
+      {
+        return ce_shape.get_shape_item(axis)
+             - other.ce_shape.get_shape_item(axis);
+      }
 };
+//-----------------------------------------------------------------------------
+inline void
+copy_1(CollatingCacheEntry & dst, CollatingCacheEntry src, const char * loc)
+{
+  new (&dst)  CollatingCacheEntry(src);
+}
+//-----------------------------------------------------------------------------
+inline ostream &
+operator << (ostream & out, const CollatingCacheEntry & entry)
+{
+   return out << "CC-entry(" << entry.ce_char << ")";
+}
 //-----------------------------------------------------------------------------
 /// A collating cache which is the internal representation of the left
 /// argument A of dydic A⍋B or A⍒B
-class CollatingCache : public vector<CollatingCacheEntry>
+class CollatingCache : public Simple_string<CollatingCacheEntry>
 {
 public:
    /// constructor: cache of rank r and comparison length clen
-   CollatingCache(Rank r, ShapeItem clen)
+   CollatingCache(Rank r, const Cell * base, ShapeItem clen)
    : rank(r),
+     base_B1(base),
      comp_len(clen)
-   {}
+   { reserve(r*256); }
 
    /// return the number of dimensions of the collating sequence
    Rank get_rank() const { return rank; }
@@ -76,15 +114,20 @@ public:
 
    /// compare cache items ia and ib ascendingly.
    /// \b comp_arg is a CollatingCache pointer
-   static bool greater_vec(const Cell * ia, const Cell * ib, const void * arg);
+   static bool greater_vec(const IntCell & ia, const IntCell & ib,
+                           const void * arg);
 
    /// compare cache items ia and ib descendingly.
    /// \b comp_arg is a CollatingCache pointer
-   static bool smaller_vec(const Cell * ia, const Cell * ib,
+   static bool smaller_vec(const IntCell & ia, const IntCell & ib,
                            const void * arg);
 protected:
    /// the rank of the collating sequence
    const Rank rank;
+
+   
+   /// start of B.s ravel, ⎕IO adjusted
+   const Cell * base_B1;
 
    /// the number of items to compare
    const ShapeItem comp_len;
@@ -114,8 +157,8 @@ protected:
    /// sort char vector B according to collationg sequence A
    Token sort_collating(Value_P A, Value_P B, Sort_order order);
 
-   /// the collating cache that determines the order of elements
-   static ShapeItem collating_cache(Unicode uni, Value_P A,
+   /// find or create the collating cache entry for \b uni
+   static ShapeItem find_collating_cache_entry(Unicode uni, Value_P A,
                                     CollatingCache & cache);
 };
 //-----------------------------------------------------------------------------

@@ -31,9 +31,10 @@ public:
    /// a function to compare two items. The function returns true if item_a
    /// is larger than item_b. comp_arg is some additional argument guiding
    /// the comparison
-   typedef bool (*greater_fun)(T item_a, T item_b, const void * comp_arg);
+   typedef bool (*greater_fun)(const T & item_a, const T & item_b,
+                 const void * comp_arg);
 
-   /// sort a
+   /// sort \b a according to \b gf
    static void sort(T * a, int64_t heapsize, const void * comp_arg,
                     greater_fun gf)
       {
@@ -51,12 +52,32 @@ public:
               // Exchange a[0] and a[k], decrease the heap size,
               // and re-establish the heap property of the new a[0].
               //
-              const T t = a[heapsize];   a[heapsize] = a[0];   a[0] = t;
+              Hswap(a[heapsize], a[0]);
 
               // re-establish the heap property of the new a[0]
               //
               make_heap(a, heapsize, 0, comp_arg, gf);
             }
+      }
+
+   static inline void swap(T & t1, T & t2);
+
+   /// binary search of key in array)
+   template<typename K>
+   T * search(const K & key, T * array, int64_t /* array size */ u,
+              int (*compare)(const K & key, const T & item))
+      {
+        for (int64_t l = 0; l < u;)
+           {
+             const int64_t half = (l + u) / 2;
+             T * middle = &array[half];
+             const int comp = (*compare)(key, *middle);
+             if     (comp < 0)   u = half;
+            else if (comp > 0)   l = half + 1;
+             else                return middle;
+          }
+
+        return 0;
       }
 
 protected:
@@ -81,7 +102,7 @@ protected:
              if (max == parent)   return; // parent was the max: done
 
              // left or right was the max. exchange and continue
-             const T t = a[max];   a[max] = a[parent];   a[parent] = t;
+             Hswap(a[max], a[parent]);
              parent = max;
            }
       }
