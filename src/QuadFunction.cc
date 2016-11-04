@@ -629,7 +629,7 @@ Quad_INP::eval_AB(Value_P A, Value_P B)
 {
    if (Quad_INP_running)
       {
-        Workspace::more_error() = UCS_string("⎕INP called recursively");
+        MORE_ERROR() = "⎕INP called recursively";
         SYNTAX_ERROR;
       }
 
@@ -709,7 +709,7 @@ Quad_INP::eval_B(Value_P B)
 {
    if (Quad_INP_running)
       {
-        Workspace::more_error() = UCS_string("⎕INP called recursively");
+        MORE_ERROR() << "⎕INP called recursively";
         SYNTAX_ERROR;
       }
 

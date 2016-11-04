@@ -288,9 +288,8 @@ check_EOC:
 
               if (si == 0)
                  {
-                    Workspace::more_error() = UCS_string(
-                          "branch back into function (→N) without "
-                            "suspended function");
+                    MORE_ERROR() <<
+                    "branch back into function (→N) without suspended function";
                     SYNTAX_ERROR;   // →N without function,
                  }
 
@@ -504,14 +503,14 @@ Command::cmd_DROP(ostream & out, const vector<UCS_string> & lib_ws)
    if (lib_ws.size() == 0)   // missing argument
       {
         out << "BAD COMMAND+" << endl;
-        Workspace::more_error() = "missing workspace name in command )DROP";
+        MORE_ERROR() << "missing workspace name in command )DROP";
         return;
       }
 
    if (lib_ws.size() > 2)   // too many arguments
       {
         out << "BAD COMMAND+" << endl;
-        Workspace::more_error() = "too many parameters in command )DROP";
+        MORE_ERROR() << "too many parameters in command )DROP";
         return;
       }
 
@@ -529,9 +528,7 @@ const int result = unlink(filename.c_str());
    if (result)
       {
         out << wname << " NOT DROPPED: " << strerror(errno) << endl;
-        UTF8_ostream more;
-        more << "could not unlink file " << filename;
-        Workspace::more_error() = UCS_string(more.get_data());
+        MORE_ERROR() << "could not unlink file " << filename;
       }
 }
 //-----------------------------------------------------------------------------
@@ -719,8 +716,7 @@ Command::cmd_IN(ostream & out, vector<UCS_string> & args, bool protection)
    if (args.size() == 0)
       {
         out << "BAD COMMAND" << endl;
-        Workspace::more_error() =
-                   UCS_string("missing filename in command )IN");
+        MORE_ERROR() << "missing filename in command )IN";
         return;
       }
 
@@ -741,7 +737,7 @@ FILE * in = fopen(filename.c_str(), "r");
         snprintf(cc, sizeof(cc),
                  "command )IN: could not open file %s for reading: %s",
                  fname_utf8.c_str(), strerror(errno));
-        Workspace::more_error() = UCS_string(cc);
+        Workspace::more_error() << cc;
         return;
       }
 
@@ -899,13 +895,11 @@ DIR * dir = opendir(path.c_str());
 
    if (dir == 0)
       {
-        out << "IMPROPER LIBRARY REFERENCE '" << arg << "': "
-            << strerror(errno) << endl;
+        const char * why = strerror(errno);
+        out << "IMPROPER LIBRARY REFERENCE '" << arg << "': " << why << endl;
 
-        UTF8_ostream more;
-        more << "path '" << path << "' could not be openend as directory: "
-           << strerror(errno);
-        Workspace::more_error() = UCS_string(more.get_data());
+        MORE_ERROR() <<
+        "path '" << path << "' could not be openend as directory: " << why;
         return 0;
       }
 
@@ -1136,8 +1130,7 @@ Command::cmd_OUT(ostream & out, vector<UCS_string> & args)
    if (args.size() == 0)
       {
         out << "BAD COMMAND" << endl;
-        Workspace::more_error() =
-                   UCS_string("missing filename in command )OUT");
+        MORE_ERROR() << "missing filename in command )OUT";
         return;
       }
 
@@ -1150,13 +1143,11 @@ UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, false,
 FILE * atf = fopen(filename.c_str(), "w");
    if (atf == 0)
       {
-        UTF8_string fname_utf8(fname);
-        out << ")OUT " << fname << " failed: " << strerror(errno) << endl;
+        const char * why = strerror(errno);
+        out << ")OUT " << fname << " failed: " << why << endl;
         char cc[200];
-        snprintf(cc, sizeof(cc),
-                 "command )OUT: could not open file %s for writing: %s",
-                 fname_utf8.c_str(), strerror(errno));
-        Workspace::more_error() = UCS_string(cc);
+        MORE_ERROR() << "command )OUT: could not open file " << fname
+                     << " for writing: " << why;
         return;
       }
 
@@ -1183,8 +1174,7 @@ int len = cnew.size();
      }
 
    out << "BAD COMMAND" << endl;
-   Workspace::more_error() = UCS_string(
-          "conflict with existing command name in command ]USERCMD");
+   MORE_ERROR() << "conflict with existing command name in command ]USERCMD";
 
    return true;
 }
@@ -1205,10 +1195,8 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
        if (mnew != mold || fnew != fold)
          {
            out << "BAD COMMAND" << endl;
-           Workspace::more_error() 
-             = UCS_string(
-                          "conflict with existing user command definition"
-                          " in command ]USERCMD");
+           MORE_ERROR() <<
+           "conflict with existing user command definition in command ]USERCMD";
          }
        return true;
      }
@@ -1265,16 +1253,14 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
            }
 
        out << "BAD COMMAND+" << endl;
-       Workspace::more_error() = UCS_string(
-                "user command in command ]USERCMD REMOVE does not exist");
+       MORE_ERROR() << "user command in command ]USERCMD REMOVE does not exist";
        return;
      }
 
    if (args.size() > 3)
       {
         out << "BAD COMMAND+" << endl;
-        Workspace::more_error() =
-                   UCS_string("too many parameters in command ]USERCMD");
+        MORE_ERROR() << "too many parameters in command ]USERCMD";
         return;
       }
 
@@ -1282,8 +1268,8 @@ const int mode = (args.size() == 3) ? args[2].atoi() : 0;
    if (mode < 0 || mode > 1)
       {
         out << "BAD COMMAND+" << endl;
-        Workspace::more_error() =
-           UCS_string("unsupported mode in command ]USERCMD (0 or 1 expected)");
+        MORE_ERROR() << "unsupported mode " << mode
+                     << " in command ]USERCMD (0 or 1 expected)";
         return;
       }
 
@@ -1297,8 +1283,7 @@ const int mode = (args.size() == 3) ? args[2].atoi() : 0;
         if (error)
            {
              out << "BAD COMMAND+" << endl;
-             Workspace::more_error() =
-                   UCS_string("bad user command name in command ]USERCMD");
+             MORE_ERROR() << " bad user command name in command ]USERCMD";
              return;
            }
       }
@@ -1322,8 +1307,7 @@ const int mode = (args.size() == 3) ? args[2].atoi() : 0;
         if (!Avec::is_symbol_char(args[1][c]))
            {
              out << "BAD COMMAND+" << endl;
-             Workspace::more_error() =
-                   UCS_string("bad APL function name in command ]USERCMD");
+             MORE_ERROR() << "bad APL function name in command ]USERCMD";
              return;
            }
       }

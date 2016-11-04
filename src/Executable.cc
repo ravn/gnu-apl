@@ -645,8 +645,8 @@ int level = 0;
    if ((signature & SIG_B) == 0 &&   // niladic
        (signature & (SIG_A | SIG_LO | SIG_RO | SIG_X)))
       {
-        Workspace::more_error() =
-         "niladic lambda with axis. left argument, or function argument(s)";
+        MORE_ERROR() <<
+           "niladic lambda with axis. left argument, or function argument(s)";
         DEFN_ERROR;
       }
 

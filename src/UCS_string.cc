@@ -1111,6 +1111,33 @@ UCS_string::contains(Unicode uni)
    return false;
 }
 //----------------------------------------------------------------------------
+UCS_string
+UCS_string::sort() const
+{
+UCS_string ret(*this);
+   Heapsort<Unicode>::sort(ret.items, ret.size(), 0, greater_uni);
+   return ret;
+}
+//----------------------------------------------------------------------------
+UCS_string
+UCS_string::unique() const
+{
+   if (size() <= 1)   return UCS_string(*this);
+
+UCS_string sorted = sort();
+UCS_string ret;
+   ret.reserve(sorted.size());
+
+   ret.append(sorted[0]);
+   for (ShapeItem j = 1; j < size(); ++j)
+       {
+         if (sorted[j] != ret.back())   ret.append(sorted[j]);
+       }
+
+   Heapsort<Unicode>::sort(ret.items, ret.size(), 0, greater_uni);
+   return ret;
+}
+//----------------------------------------------------------------------------
 void
 UCS_string::sort_names(const UCS_string ** names, int count)
 {

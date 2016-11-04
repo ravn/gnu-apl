@@ -106,6 +106,7 @@ public:
    /// print local vars etc.
    void print_properties(ostream & out, int indent) const;
 
+   /// add a local variable
    void add_local_var(Symbol * sym);
 
    /// pop all local vars, labels, and parameters

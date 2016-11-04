@@ -47,13 +47,12 @@ UCS_string t4;
    handle = open_so_file(t4, so_path);
    if (handle == 0)
       {
-         Workspace::more_error() = t4;
+         MORE_ERROR() << t4;
          return;
       }
 
    t4 = UCS_string("shared library ");
-   t4.append(so_name);
-   t4.append_utf8(" ");
+   t4 << so_name << " ";
 
    // get the function multiplexer
    //
@@ -62,8 +61,8 @@ void * fmux = dlsym(handle, "get_function_mux");
         {
           CERR << "shared library " << so_name << " is lacking the mandatory "
                   "function get_function_mux() !" << endl;
-          t4.append_utf8("is invalid (no get_function_mux())");
-          Workspace::more_error() = t4;
+          t4 << "is invalid (no get_function_mux())";
+          MORE_ERROR() = t4;
           return;
         }
 
@@ -78,8 +77,8 @@ void * (*get_function_mux)(const char *) = (void * (*)(const char *))fmux;
         {
           CERR << "shared library is lacking the mandatory "
                   "function signature() !" << endl;
-          t4.append_utf8("is invalid (no get_signature())");
-          Workspace::more_error() = t4;
+          t4 << "is invalid (no get_signature())";
+          MORE_ERROR() << t4;
           return;
         }
 
@@ -100,10 +99,10 @@ void * (*get_function_mux)(const char *) = (void * (*)(const char *))fmux;
 Symbol * sym = Workspace::lookup_symbol(apl_name);
    Assert(sym);
 
-const char * why_not = sym->cant_be_defined();
-   if (why_not)
+const char * why = sym->cant_be_defined();
+   if (why)
       {
-        Workspace::more_error() = UCS_string(why_not);
+        MORE_ERROR() << why;
         return;
       }
 
@@ -358,10 +357,10 @@ NativeFunction::fix(const UCS_string & so_name,
              Symbol * sym = Workspace::lookup_symbol(fun->get_name());
              Assert(sym);
 
-             const char * why_not = sym->cant_be_defined();
-             if (why_not)
+             const char * why = sym->cant_be_defined();
+             if (why)
                 {
-                  Workspace::more_error() = UCS_string(why_not);
+                  MORE_ERROR() << why;
                   return 0;
                 }
 

@@ -189,8 +189,7 @@ const ShapeItem ec = val->element_count();
                 }
              else
                 {
-                  Workspace::more_error() =
-                             UCS_string("Non-number in 1 ⎕TF N record");
+                  MORE_ERROR() << "Non-number in 1 ⎕TF N record";
                   return Value_P();
                 }
            }
@@ -229,12 +228,11 @@ UCS_string ucs;
 Value_P
 Quad_TF::tf1_inv(const UCS_string & ravel)
 {
-UCS_string & more = Workspace::more_error();
 const size_t len = ravel.size();
 
    if (len < 2)
       {
-        more = UCS_string("1 ⎕TF record too short");
+        MORE_ERROR() << "1 ⎕TF record too short";
         return Value_P();
       }
 
@@ -242,14 +240,14 @@ const size_t len = ravel.size();
 const Unicode mode = ravel[0];
    if (mode != 'C' && mode != 'F' && mode != 'N')
       {
-        more = UCS_string("1 ⎕TF record type not F, N, or C");
+        MORE_ERROR() << "1 ⎕TF record type not F, N, or C";
         return Value_P();
       }
 
 UCS_string name(ravel[1]);
    if (!Avec::is_quad(name[0]) && !Avec::is_first_symbol_char(name[0]))
       {
-        more = UCS_string("Bad variable name in 1 ⎕TF record");
+        MORE_ERROR() << "Bad variable name in 1 ⎕TF record";
         return Value_P();
       }
 
@@ -259,13 +257,13 @@ ShapeItem idx = 2;
 
    if (Avec::is_quad(name[0]) && name.size() == 1)
       {
-        more = UCS_string("Bad variable name in 1 ⎕TF record");
+        MORE_ERROR() << "Bad variable name in 1 ⎕TF record";
         return Value_P();
       }
 
    if (ravel[idx++] != UNI_ASCII_SPACE)
       {
-        more = UCS_string("missing space (before rank) in 1 ⎕TF record");
+        MORE_ERROR() << "missing space (before rank) in 1 ⎕TF record";
         return Value_P();
       }
 
@@ -276,19 +274,19 @@ Rank rank = 0;
 
    if (rank == 0 && idx0 == idx)
       {
-        more = UCS_string("missing rank in 1 ⎕TF record");
+        MORE_ERROR() << "missing rank in 1 ⎕TF record";
         return Value_P();
       }
 
    if (ravel[idx++] != UNI_ASCII_SPACE)
       {
-        more = UCS_string("missing space (after rank) in 1 ⎕TF record");
+        MORE_ERROR() << "missing space (after rank) in 1 ⎕TF record";
         return Value_P();
       }
 
    if (rank > MAX_RANK)
       {
-        more = UCS_string("max. rank exceeded in 1 ⎕TF record");
+        MORE_ERROR() << "max. rank exceeded in 1 ⎕TF record";
         return Value_P();
       }
 
@@ -301,13 +299,13 @@ Shape shape;
            sh = 10 * sh + ravel[idx++] - UNI_ASCII_0;
         if (sh == 0 && idx0 == idx)   // no shape
            {
-             more = UCS_string("too few shape items in 1 ⎕TF record");
+             MORE_ERROR() << "too few shape items in 1 ⎕TF record";
              return Value_P();
            }
 
         if (ravel[idx++] != UNI_ASCII_SPACE)
            {
-             more = UCS_string("missing space (in shape) in 1 ⎕TF record");
+             MORE_ERROR() << "missing space (in shape) in 1 ⎕TF record";
              return Value_P();
            }
         shape.add_shape_item(sh);
@@ -322,7 +320,7 @@ NamedObject * sym_or_fun = Workspace::lookup_existing_name(name);
         nc = sym_or_fun->get_nc();
         if (symbol && symbol->is_readonly())
            {
-             more = UCS_string("symbol cannot be modified in 1 ⎕TF record");
+             MORE_ERROR() << "symbol cannot be modified in 1 ⎕TF record";
              return Value_P();
            }
      }
@@ -333,20 +331,19 @@ const size_t data_chars = len - idx;
       {
         if (rank != 2)
            {
-             more = UCS_string("function text is not a matrix in 1 ⎕TF record");
+             MORE_ERROR() << "function text is not a matrix in 1 ⎕TF record";
              return Value_P();
            }
 
         if (nc != NC_UNUSED_USER_NAME && nc != NC_FUNCTION && nc != NC_OPERATOR)
            {
-             more = UCS_string(
-                    "symbol is an existing variable in 1 ⎕TF F record");
+             MORE_ERROR() << "symbol is an existing variable in 1 ⎕TF F record";
              return Value_P();
            }
 
         if (data_chars != shape.get_volume())
            {
-             more = UCS_string("item count mismatch in 1 ⎕TF N record");
+             MORE_ERROR() << "item count mismatch in 1 ⎕TF N record";
              return Value_P();
            }
 
@@ -361,13 +358,13 @@ const size_t data_chars = len - idx;
       {
         if (data_chars != shape.get_volume())
            {
-             more = UCS_string("item count mismatch in 1 ⎕TF C record");
+             MORE_ERROR() << "item count mismatch in 1 ⎕TF C record";
              return Value_P();
            }
         if (nc != NC_UNUSED_USER_NAME && nc != NC_VARIABLE)
            {
-             more = UCS_string(
-                    "symbol is existing and not a variable in 1 ⎕TF C record");
+             MORE_ERROR() <<
+             "symbol is existing and not a variable in 1 ⎕TF C record";
              return Value_P();
            }
 
@@ -384,7 +381,7 @@ const size_t data_chars = len - idx;
       {
         if (nc != NC_UNUSED_USER_NAME && nc != NC_VARIABLE)
            {
-             more = UCS_string("symbol cannot be assigned in 1 ⎕TF N record");
+             MORE_ERROR() << "symbol cannot be assigned in 1 ⎕TF N record";
              return Value_P();
            }
 
@@ -393,12 +390,12 @@ const size_t data_chars = len - idx;
         Token_string tos;
         if (tokenizer.tokenize(data, tos) != E_NO_ERROR)
            {
-             more = UCS_string("tokenization failed in 1 ⎕TF N record");
+             MORE_ERROR() << "tokenization failed in 1 ⎕TF N record";
              return Value_P();
            }
         if (tos.size() != shape.get_volume())
            {
-             more = UCS_string("item count mismatch in 1 ⎕TF N record");
+             MORE_ERROR() << "item count mismatch in 1 ⎕TF N record";
              return Value_P();
            }
 
@@ -410,7 +407,7 @@ const size_t data_chars = len - idx;
              if (tag == TOK_INTEGER)   continue;
              if (tag == TOK_REAL)      continue;
              if (tag == TOK_COMPLEX)   continue;
-             more = UCS_string( "Non-number in 1 ⎕TF N record");
+             MORE_ERROR() <<  "Non-number in 1 ⎕TF N record";
              return Value_P();
            }
 

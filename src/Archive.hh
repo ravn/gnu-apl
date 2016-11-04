@@ -98,6 +98,7 @@ public:
    /// write entire workspace
    XML_Saving_Archive & save();
 
+   /// a value and its parent (if the parent is nested)
    struct _val_par
       {
          /// default constructor
@@ -176,7 +177,7 @@ protected:
    /// all values in the workspace
    _val_par * values;
 
-   // the number of (non-stale) values
+   /// the number of (non-stale) values
    ShapeItem value_count;
 
    /// true iff ² is pending

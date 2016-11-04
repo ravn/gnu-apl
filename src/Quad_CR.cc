@@ -136,7 +136,7 @@ Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
         case -17: a = 16;   break;
         case -18: a = 19;   break;
         case -19: a = 18;   break;
-        default: Workspace::more_error() = "A ⎕CR B with invalid A < 0";
+        default: MORE_ERROR() << "A ⎕CR B with invalid A < 0";
                  DOMAIN_ERROR;
       }
   
@@ -188,7 +188,7 @@ bool extra_frame = false;
         case 31: return do_CR31_32(true, *B);    // ⎕INP helper
         case 32: return do_CR31_32(false, *B);   // ⎕INP helper
 
-        default: Workspace::more_error() = "A ⎕CR B with invalid A";
+        default: MORE_ERROR() << "A ⎕CR B with invalid A";
                  DOMAIN_ERROR;
       }
 

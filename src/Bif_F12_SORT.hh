@@ -47,26 +47,10 @@ struct CollatingCacheEntry
    {}
 
    /// constructor: an entry with character \b c and shape \b shape
-   CollatingCacheEntry(Unicode uni, const Value & A)
+   CollatingCacheEntry(Unicode uni, const Shape & shape_A)
    : ce_char(uni),
-     ce_shape(A.get_shape())
-   {
-     const ShapeItem ec_A = A.element_count();
-     loop(a, ec_A)
-        {
-          if (uni != A.get_ravel(a).get_char_value())   continue;
-
-          ShapeItem aq = a;
-          loop(r, ce_shape.get_rank())
-             {
-               const Rank axis = ce_shape.get_rank() - r - 1;
-               const ShapeItem ar = aq % A.get_shape_item(axis);
-               if (ce_shape.get_shape_item(axis) > ar)
-                  ce_shape.set_shape_item(axis, ar);
-               aq /= A.get_shape_item(axis);
-             }
-        }
-   }
+     ce_shape(shape_A)   // shape_A means not found
+   {}
 
    /// the character
    const Unicode ce_char;
@@ -80,6 +64,11 @@ struct CollatingCacheEntry
         return ce_shape.get_shape_item(axis)
              - other.ce_shape.get_shape_item(axis);
       }
+
+   /// compare \b key with \b entry (for Heapsort::search())
+   static int compare_chars(const Unicode & key,
+                            const CollatingCacheEntry & entry)
+      { return key - entry.ce_char; }
 };
 //-----------------------------------------------------------------------------
 inline void
@@ -100,11 +89,7 @@ class CollatingCache : public Simple_string<CollatingCacheEntry>
 {
 public:
    /// constructor: cache of rank r and comparison length clen
-   CollatingCache(Rank r, const Cell * base, ShapeItem clen)
-   : rank(r),
-     base_B1(base),
-     comp_len(clen)
-   { reserve(r*256); }
+   CollatingCache(const Value & A, const Cell * base, ShapeItem clen);
 
    /// return the number of dimensions of the collating sequence
    Rank get_rank() const { return rank; }
@@ -112,15 +97,19 @@ public:
    /// return the number of items to compare
    ShapeItem get_comp_len() const { return comp_len; }
 
-   /// compare cache items ia and ib ascendingly.
+   /// find (the index of) the entry for \b uni
+   ShapeItem find_entry(Unicode uni) const;
+
+   /// compare cache items \b ia and \b ib ascendingly.
    /// \b comp_arg is a CollatingCache pointer
    static bool greater_vec(const IntCell & ia, const IntCell & ib,
-                           const void * arg);
+                           const void * comp_arg);
 
-   /// compare cache items ia and ib descendingly.
+   /// compare cache items \b ia and \b ib descendingly.
    /// \b comp_arg is a CollatingCache pointer
    static bool smaller_vec(const IntCell & ia, const IntCell & ib,
-                           const void * arg);
+                           const void * comp_arg);
+
 protected:
    /// the rank of the collating sequence
    const Rank rank;
@@ -147,7 +136,7 @@ public:
    static Token sort(Value_P B, Sort_order order);
 
 protected:
-   /// a helper structure for sorting: a cahr and a shape
+   /// a helper structure for sorting: a char and a shape
    struct char_shape
       {
          APL_Char achar;    ///< a char
@@ -158,8 +147,8 @@ protected:
    Token sort_collating(Value_P A, Value_P B, Sort_order order);
 
    /// find or create the collating cache entry for \b uni
-   static ShapeItem find_collating_cache_entry(Unicode uni, Value_P A,
-                                    CollatingCache & cache);
+   static ShapeItem find_collating_cache_entry(Unicode uni,
+                                               CollatingCache & cache);
 };
 //-----------------------------------------------------------------------------
 /** System function grade up ⍋

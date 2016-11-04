@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public:
       }
 
    /// constructor: the first \b len items of \b data
-   Simple_string(const T * data, int len)
+   Simple_string(const T * data, ShapeItem len)
    : items_allocated(len + ADD_ALLOC),
      items_valid(len)
       {
@@ -60,14 +60,14 @@ public:
       }
 
    /// constructor: \b len times \b data
-   Simple_string(int len, T data)
+   Simple_string(ShapeItem len, T data)
    : items_allocated(len + ADD_ALLOC),
      items_valid(len)
       {
         Assert(items_valid >= 0);
         if (items_allocated < MIN_ALLOC)   items_allocated = MIN_ALLOC;
         items = new T[items_allocated];
-        for (int l = 0; l < len; ++l)   items[l] = data;
+        for (ShapeItem l = 0; l < len; ++l)   items[l] = data;
       }
 
    /// constructor: copy other string
@@ -81,7 +81,7 @@ public:
       }
 
    /// constructor: copy other string, starting at pos, at most len
-   Simple_string(const Simple_string & other, int pos, int len)
+   Simple_string(const Simple_string & other, ShapeItem pos, ShapeItem len)
       {
         if (len > other.items_valid - pos)   len = other.items_valid - pos;
         if (len < 0)   len = 0;
@@ -121,7 +121,7 @@ public:
    bool operator ==(const Simple_string<T> & other) const
       {
         if (items_valid != other.items_valid)   return false;
-        for (int c = 0; c < items_valid; ++c)
+        for (ShapeItem c = 0; c < items_valid; ++c)
             if (items[c] != other.items[c])   return false;
         return true;
       }
@@ -131,18 +131,18 @@ public:
       { return !(*this == other); }
 
    /// return the number of characters in \b this string
-   int size() const
+   ShapeItem size() const
       { return items_valid; }
 
    /// return the idx'th character
-   const T & operator[](int idx) const
+   const T & operator[](ShapeItem idx) const
       {
         Assert(idx < items_valid);
         return items[idx];
       }
 
    /// return the idx'th character
-   T & operator[](int idx)
+   T & operator[](ShapeItem idx)
       {
         if ((items_valid - idx) <= 0)
            {
@@ -178,41 +178,41 @@ public:
       }
 
    /// insert character \b t after position \b pos
-   void insert_after(int pos, const T & t)
+   void insert_after(ShapeItem pos, const T & t)
       {
         Assert(pos < items_valid);
         if (items_valid - items_allocated >= 0)   extend();
-        for (int s = items_valid - 1; s > pos; --s)  items[s + 1] = items[s];
+        for (ShapeItem s = items_valid - 1; s > pos; --s)  items[s + 1] = items[s];
         items[pos + 1] = t;
         ++items_valid;
       }
 
    /// insert character \b t before position \b pos
-   void insert_before(int pos, const T & t)
+   void insert_before(ShapeItem pos, const T & t)
       {
         Assert(pos < items_valid);
         if (items_valid - items_allocated >= 0)   extend();
-        for (int s = items_valid - 1; s >= pos; --s)   items[s + 1] = items[s];
+        for (ShapeItem s = items_valid - 1; s >= pos; --s)   items[s + 1] = items[s];
         items[pos] = t;
         ++items_valid;
       }
 
    /// decrease size to \b new_size
-   void shrink(int new_size)
+   void shrink(ShapeItem new_size)
       {
         Assert((items_valid - new_size) >= 0);
         items_valid = new_size;
       }
 
    /// insert \b count characters \b t after position \b pos
-   void insert(int pos, int count, T t)
+   void insert(ShapeItem pos, ShapeItem count, T t)
       {
         Assert(count >= 0);
         Assert(pos <= items_valid);
         extend(items_valid + count);
         if (pos < items_valid)
            copy_downwards(items + pos + count, items + pos, items_valid - pos);
-        for (int c = 0; c < count; ++c)  items[pos + c] = t;
+        for (ShapeItem c = 0; c < count; ++c)  items[pos + c] = t;
         items_valid += count;
       }
 
@@ -221,7 +221,7 @@ public:
       { if (items_valid)   --items_valid; }
 
    /// remove the first element(s)
-   void drop_leading(int count)
+   void drop_leading(ShapeItem count)
       {
         if (count <= 0)   return;
         if (count >= items_valid)   items_valid = 0;
@@ -245,13 +245,13 @@ public:
       { items_valid = 0; }
 
    /// erase all items above pos
-   void erase(int pos)
+   void erase(ShapeItem pos)
       {
         if (items_valid > pos)   items_valid = pos;
       }
 
    /// erase \b count items above pos
-   void erase(int pos, int count)
+   void erase(ShapeItem pos, ShapeItem count)
       {
         if (pos >= items_valid)   return;   // nothing to erase
 
@@ -262,7 +262,7 @@ public:
          //             <- pos -> <-count->
          //             <-  pos + count  ->     
          //
-         const int rest = items_valid - (pos + count);
+         const ShapeItem rest = items_valid - (pos + count);
 
          if (rest < 0)   // erase more than we have, i.e. no rest
            {
@@ -278,7 +278,7 @@ public:
    void remove_front()   { erase(0, 1); }
 
    /// extend allocated size
-   void reserve(int new_alloc_size)
+   void reserve(ShapeItem new_alloc_size)
       {
         extend(new_alloc_size);
       }
@@ -286,9 +286,9 @@ public:
    /// compare strings
    Comp_result compare(const Simple_string & other) const
       {
-        const int common_len = items_valid < other.items_valid
+        const ShapeItem common_len = items_valid < other.items_valid
                              ? items_valid : other.items_valid;
-        for (int c = 0; c < common_len; ++c)
+        for (ShapeItem c = 0; c < common_len; ++c)
             {
               if (items[c] < other.items[c])   return COMP_LT;
               if (items[c] > other.items[c])   return COMP_GT;
@@ -302,11 +302,11 @@ public:
    /// exchange this and other (without copying the data)
    void swap(Simple_string & other)
       {
-        const int ia = items_allocated;
+        const ShapeItem ia = items_allocated;
         items_allocated = other.items_allocated;
         other.items_allocated = ia;
 
-        const int iv = items_valid;
+        const ShapeItem iv = items_valid;
         items_valid = other.items_valid;
         other.items_valid = iv;
 
@@ -321,7 +321,7 @@ protected:
      {
        out << "items_allocated = " << items_allocated << endl
             << "items[" << items_valid << "] = ";
-       for (int i = 0; i < items_valid; ++i)   out << items[i];
+       for (ShapeItem i = 0; i < items_valid; ++i)   out << items[i];
        return out << endl;
      }
 
@@ -342,7 +342,7 @@ protected:
       }
 
    /// increase the allocated size to at least new_size
-   void extend(int new_size)
+   void extend(ShapeItem new_size)
       {
         if ((items_allocated - new_size) >= 0)   return;
 
@@ -354,24 +354,24 @@ protected:
       }
 
    /// copy \b count characters
-   static void _copy(T * dst, const T * src, int count)
+   static void _copy(T * dst, const T * src, ShapeItem count)
       {
         Assert1(count >= 0);
-        for (int c = 0; c < count; ++c)  copy_1(dst[c], src[c], LOC);
+        for (ShapeItem c = 0; c < count; ++c)  copy_1(dst[c], src[c], LOC);
       }
 
    /// copy \b count characters downwards (for overlapping src/dst
-   static void copy_downwards(T * dst, const T * src, int count)
+   static void copy_downwards(T * dst, const T * src, ShapeItem count)
       {
         Assert(count >= 0);
-        for (int c = count - 1; c >= 0; --c)  copy_1(dst[c], src[c], LOC);
+        for (ShapeItem c = count - 1; c >= 0; --c)  copy_1(dst[c], src[c], LOC);
       }
 
    /// the number of characters allocated
-   int items_allocated;
+   ShapeItem items_allocated;
 
    /// the number of characters valid (always <= items_allocated)
-   int items_valid;
+   ShapeItem items_valid;
 
    /// the items
    T * items;

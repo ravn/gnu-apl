@@ -752,21 +752,18 @@ const char * info = ufun->get_error_info();
         if (info)
            {
              Log(LOG_UserFunction__fix)   CERR << "Error: " << info << endl;
-             Workspace::more_error() = UCS_string(info);
+             MORE_ERROR() << info;
            }
 
          if (err_line == 0)
            {
-             Workspace::more_error().append_utf8(" (function header)");
+             MORE_ERROR() << " (function header)";
              Log(LOG_UserFunction__fix) CERR << "Bad header line" <<  endl;
            }
          else if (err_line > 0)
            {
-             Workspace::more_error().append_utf8(" (function line [");
-             Workspace::more_error().append_number(err_line);
-             Workspace::more_error().append_utf8("] of:\n");
-             Workspace::more_error().append(text);
-
+             MORE_ERROR() << " (function line [" << err_line << "] of:\n"
+                          << text;
              Log(LOG_UserFunction__fix)
                 CERR << "Bad function line: " << err_line << endl;
            }

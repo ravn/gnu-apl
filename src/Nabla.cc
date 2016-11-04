@@ -68,7 +68,7 @@ Nabla::throw_edit_error(const char * why)
 
    if (Workspace::more_error().size() == 0)
       {
-        Workspace::more_error() = UCS_string(why);
+        MORE_ERROR() << why;
       }
 
    throw_define_error(fun_header, first_command, why);

@@ -196,7 +196,7 @@ throw_tokenize_error(ErrorCode code, const UCS_string & more_error_info)
            << "throwing " << Error::error_name(code)
            << " in  Tokenizer" << endl;
 
-   Workspace::more_error() = more_error_info;
+   MORE_ERROR() << more_error_info;
 
 Error error(code, LOC);
 
@@ -212,7 +212,7 @@ throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
 
    Log(LOG_verbose_error)   Backtrace::show(__FILE__, __LINE__);
 
-   Workspace::more_error() = Error::error_name(code);
+   MORE_ERROR() << Error::error_name(code);
 
 Error error(code, loc);
    error.parser_loc = par_loc;

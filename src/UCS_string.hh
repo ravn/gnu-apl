@@ -212,6 +212,15 @@ public:
    UCS_string & operator =(const char * c_string)
       { *this = UCS_string(c_string);   return *this; }
 
+   UCS_string & operator <<(const char * str)
+      { append_utf8(str);   return *this; }
+
+   UCS_string & operator <<(ShapeItem num)
+      { append_number(num);   return *this; }
+
+   UCS_string & operator <<(const UCS_string & other)
+      { append(other);   return *this; }
+
    /// append \b other in quotes, doubling quoted in \b other
    void append_quoted(const UCS_string & other);
 
@@ -277,6 +286,10 @@ public:
    /// dump \b this string to out (like U+nnn U+mmm ... )
    ostream & dump(ostream & out) const;
 
+   /// helper function for Heapsort<Unicode>::sort()
+   static bool greater_uni(const Unicode & u1, const Unicode & u2, const void *)
+      { return u1 > u2; }
+
    /// convert a signed integer value to an UCS_string (like sprintf())
    static UCS_string from_int(int64_t value);
 
@@ -302,6 +315,12 @@ public:
    /// convert double \b value to an UCS_string with \b quad_pp significant
    /// digits in fixed point format
    static UCS_string from_double_fixed_pp(double value, int quad_pp);
+
+   /// sort the characters in this string by their Unicode
+   UCS_string sort() const;
+
+   /// return the characters in this string (sorted and duplicates removed)
+   UCS_string unique() const;
 
    /// sort a (small) number of UCS_strings (filenames, variables, or functions)
    /// using a simple but quadratic time algorithm

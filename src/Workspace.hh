@@ -298,6 +298,14 @@ protected:
    /// the current workspace (for objects that need one but don't have one).
    static Workspace the_workspace;
 };
+
+/// a shortcut for starting a new \b more_error string
+inline UCS_string &
+MORE_ERROR()
+{
+   Workspace::more_error().clear();
+   return Workspace::more_error();
+}
 //-----------------------------------------------------------------------------
 
 #endif // __WORKSPACE_HH_DEFINED__

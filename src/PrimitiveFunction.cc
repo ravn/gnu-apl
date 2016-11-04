@@ -1755,7 +1755,7 @@ int X_axes_used = 0;
          if (x_r >= B->get_rank())     AXIS_ERROR;
          if (X_axes_used & 1 << x_r)
             {
-              Workspace::more_error() = UCS_string("Duplicate axis");
+              MORE_ERROR() = "Duplicate axis";
               AXIS_ERROR;
             }
          X_axes_used |= 1 << x_r;
@@ -2844,6 +2844,8 @@ const ShapeItem len_B = B->element_count();
    if (len_B >= SHORT_VALUE_LENGTH_WANTED && !B->is_complex(false))
       return Macro::Z__UNIQUE_B->eval_B(B);
 
+   // B is small, so an itertive search of unique elements is faster
+   //
 DynArray(const Cell *, items_Z, len_B);
 ShapeItem len_Z = 0;
 

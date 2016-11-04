@@ -161,7 +161,7 @@ Value_P Z;
       }
    else
       {
-        Workspace::more_error() = UCS_string("Bad left argument of ⍕");
+        MORE_ERROR() = "Bad left argument of ⍕";
         DOMAIN_ERROR;
       }
 

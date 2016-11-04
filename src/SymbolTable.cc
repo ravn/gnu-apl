@@ -342,41 +342,27 @@ Symbol * symbol = lookup_existing_symbol(sym);
 
    if (symbol == 0)
       {
-        UCS_string & t4 = Workspace::more_error();
-        t4.clear();
-        t4.append_utf8("Can't )ERASE symbol '");
-        t4.append(sym);
-        t4.append_utf8("': unknown symbol ");
+        MORE_ERROR() << "Can't )ERASE symbol '" << sym << "': unknown symbol ";
         return true;
       }
 
    if (symbol->is_erased())
       {
-        UCS_string & t4 = Workspace::more_error();
-        t4.clear();
-        t4.append_utf8("Can't )ERASE symbol '");
-        t4.append(sym);
-        t4.append_utf8("': already erased");
+        MORE_ERROR() << "Can't )ERASE symbol '" << sym << "': already erased";
         return true;
       }
 
    if (symbol->value_stack.size() != 1)
       {
-        UCS_string & t4 = Workspace::more_error();
-        t4.clear();
-        t4.append_utf8("Can't )ERASE symbol '");
-        t4.append(sym);
-        t4.append_utf8("': symbol is pushed (localized)");
+        MORE_ERROR() << "Can't )ERASE symbol '" << sym
+                     << "': symbol is pushed (localized)";
         return true;
       }
 
    if (Workspace::is_called(sym))
       {
-        UCS_string & t4 = Workspace::more_error();
-        t4.clear();
-        t4.append_utf8("Can't )ERASE symbol '");
-        t4.append(sym);
-        t4.append_utf8("': symbol is called (is on SI)");
+        MORE_ERROR() << "Can't )ERASE symbol '" << sym
+                     << "': symbol is called (is on SI)";
         return true;
       }
 
@@ -417,11 +403,8 @@ ValueStackItem & tos = symbol->value_stack[0];
                Assert(ufun);
                if (Workspace::oldest_exec(ufun))
                   {
-                    UCS_string & t4 = Workspace::more_error();
-                    t4.clear();
-                    t4.append_utf8("Can't )ERASE symbol '");
-                    t4.append(sym);
-                    t4.append_utf8("':  pushed on SI-stack");
+                    MORE_ERROR() << "Can't )ERASE symbol '" << sym
+                                 << "':  pushed on SI-stack";
                     return true;
                   }
              }

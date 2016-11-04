@@ -293,6 +293,8 @@ protected:
 
    /// format for ]BOXING
    static int boxing_format;
+
+   /// the number of APL expressions entered in immediate execution mode
    static ShapeItem APL_expression_count;
 };
 //-----------------------------------------------------------------------------

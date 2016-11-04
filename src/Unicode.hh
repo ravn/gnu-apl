@@ -98,4 +98,8 @@ extern int nibble(Unicode uni);
 /// value 0-63 of base64 digit, or -1 if uni not base64 (RFC 4648)
 extern int sixbit(Unicode uni);
 
+inline void
+Hswap(Unicode & u1, Unicode & u2)
+{ const Unicode tmp = u1;   u1 = u2;   u2 = tmp; }
+
 #endif // __UNICODE_HH_DEFINED__

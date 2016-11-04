@@ -106,18 +106,16 @@ Cell::copy(Value & val, const Cell * & src, ShapeItem count)
 bool
 Cell::greater(const Cell & other) const
 {
-   Workspace::more_error() = UCS_string("Cell::greater() : Objects of class ");
-   Workspace::more_error().append_utf8(get_classname());
-   Workspace::more_error().append_utf8(" cannot be compared");
+   MORE_ERROR() << "Cell::greater() : Objects of class " << get_classname()
+                << " cannot be compared";
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 bool
 Cell::equal(const Cell & other, APL_Float qct) const
 {
-   Workspace::more_error() = UCS_string("Cell::equal() : Objects of class ");
-   Workspace::more_error().append_utf8(get_classname());
-   Workspace::more_error().append_utf8(" cannot be compared");
+   MORE_ERROR() << "Cell::equal() : Objects of class " << get_classname()
+                << " cannot be compared";
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------

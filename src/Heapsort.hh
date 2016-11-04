@@ -39,7 +39,9 @@ public:
                     greater_fun gf)
       {
         // turn a[] into a heap, i.e. a[i] > a[2i] and a[i] > a[2i+1]
-        // for all i.
+        // for all i. At heapsize/2 + 1 ... the heap property is already
+        // fulfilled, because these items have no children. So we move
+        // downwards from heapsize/2 to 0.
         //
         for (int64_t p = heapsize/2 - 1; p >= 0; --p)
             make_heap(a, heapsize, p, comp_arg, gf);
@@ -60,17 +62,16 @@ public:
             }
       }
 
-   static inline void swap(T & t1, T & t2);
-
    /// binary search of key in array)
    template<typename K>
-   T * search(const K & key, T * array, int64_t /* array size */ u,
-              int (*compare)(const K & key, const T & item))
+   static const T * search(const K & key, const T * array,
+                           int64_t /* array size */ u,
+                           int (*compare)(const K & key, const T & item))
       {
         for (int64_t l = 0; l < u;)
            {
              const int64_t half = (l + u) / 2;
-             T * middle = &array[half];
+             const T * middle = &array[half];
              const int comp = (*compare)(key, *middle);
              if     (comp < 0)   u = half;
             else if (comp > 0)   l = half + 1;

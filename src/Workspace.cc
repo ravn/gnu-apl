@@ -81,9 +81,9 @@ Workspace::push_SI(Executable * fun, const char * loc)
    if (Quad_SYL::si_depth_limit && SI_top() &&
        Quad_SYL::si_depth_limit <= SI_top()->get_level())
       {
-        Workspace::more_error() = UCS_string(
+        MORE_ERROR() <<
         "the system limit on SI depth (as set in ⎕SYL) was reached\n"
-        "(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).");
+        "(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).";
 
         Quad_SYL::si_depth_limit = 0;
         set_attention_raised(LOC);
@@ -557,7 +557,7 @@ bool name_from_WSID = false;
    else if (lib_ws.size() > 2)   // too many arguments
       {
         out << "BAD COMMAND+" << endl;
-        more_error() = UCS_string("too many parameters in command )SAVE");
+        MORE_ERROR() << "too many parameters in command )SAVE";
         return;
       }
 
@@ -572,9 +572,9 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wname, false,
    if (wname.compare(UCS_string("CLEAR WS")) == 0)   // don't save CLEAR WS
       {
         COUT << "NOT SAVED: THIS WS IS CLEAR WS" << endl;
-        more_error() = UCS_string(
+        MORE_ERROR() <<
         "the workspace was not saved because 'CLEAR WS' is a special \n"
-        "workspace name that cannot be saved. Use )WSID <name> first.");
+        "workspace name that cannot be saved. Use )WSID <name> first.";
         return;
       }
 
@@ -588,14 +588,12 @@ const bool file_exists = access(filename.c_str(), W_OK) == 0;
              COUT << "NOT SAVED: THIS WS IS "
                   << the_workspace.WS_name << endl;
 
-             UTF8_ostream more;
-             more << "the workspace was not saved because:\n"
+             MORE_ERROR() << "the workspace was not saved because:\n"
                   << "   the workspace name '" << the_workspace.WS_name
                   << "' of )WSID\n   does not match the name '" << wname
                   << "' used in the )SAVE command\n"
                   << "   and the workspace file\n   " << filename
                   << "\n   already exists. Use )WSID " << wname << " first."; 
-             more_error() = UCS_string(more.get_data());
              return;
            }
       }
@@ -795,7 +793,7 @@ Workspace::dump_WS(ostream & out, vector<UCS_string> & lib_ws, bool html,
    else if (lib_ws.size() > 2)   // too many arguments
       {
         out << "BAD COMMAND+" << endl;
-        more_error() = UCS_string("too many parameters in command )DUMP");
+        MORE_ERROR() << "too many parameters in command )DUMP";
         return;
       }
 
@@ -810,9 +808,9 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wname, false,
    if (wname.compare(UCS_string("CLEAR WS")) == 0)   // don't save CLEAR WS
       {
         COUT << "NOT DUMPED: THIS WS IS " << wname << endl;
-        more_error() = UCS_string(
+        MORE_ERROR() <<
         "the workspace was not dumped because 'CLEAR WS' is a special\n"
-        "workspace name that cannot be dumped. Use )WSID <name> first.");
+        "workspace name that cannot be dumped. Use )WSID <name> first.";
         return;
       }
 
@@ -947,7 +945,7 @@ Workspace::load_WS(ostream & out, const vector<UCS_string> & lib_ws,
    if (lib_ws.size() < 1 || lib_ws.size() > 2)   // no or too many argument(s)
       {
         out << "BAD COMMAND+" << endl;
-        more_error() = UCS_string("too many parameters in command )LOAD");
+        MORE_ERROR() << "too many parameters in command )LOAD";
         return;
       }
 
@@ -1022,8 +1020,7 @@ Workspace::copy_WS(ostream & out, vector<UCS_string> & lib_ws_objects,
    if (lib_ws_objects.size() < 1)   // at least workspace name is required
       {
         out << "BAD COMMAND+" << endl;
-        more_error() = UCS_string(
-                       "missing parameter(s) in command )COPY or )PCOPY");
+        MORE_ERROR() << "missing parameter(s) in command )COPY or )PCOPY";
         return;
       }
 
@@ -1037,8 +1034,7 @@ LibRef libref = LIB_NONE;
    if (lib_ws_objects.size() < 1)   // at least workspace name is required
       {
         out << "BAD COMMAND+" << endl;
-        more_error() = UCS_string(
-                       "missing parameter(s) in command )COPY or )PCOPY");
+        MORE_ERROR() << "missing parameter(s) in command )COPY or )PCOPY";
         return;
       }
 

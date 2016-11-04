@@ -144,6 +144,7 @@ public:
    static ErrorCode zv(Cell * Z, APL_Integer v)
       { new (Z) IntCell(v);   return E_NO_ERROR; }
 
+   /// swap \b this Intcell and \b other (for Heapsort<IntCell> )
    void Hswap(IntCell & other)
       {
          const APL_Integer tmp = value.ival;

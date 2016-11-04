@@ -22,6 +22,7 @@
 #include "Bif_F12_SORT.hh"
 #include "Cell.hh"
 #include "Heapsort.hh"
+#include "Macro.hh"
 #include "Value.icc"
 #include "Workspace.hh"
 
@@ -30,6 +31,57 @@ Bif_F12_SORT_DES  Bif_F12_SORT_DES::_fun;     // ⍒
 
 Bif_F12_SORT_ASC * Bif_F12_SORT_ASC::fun = &Bif_F12_SORT_ASC::_fun;
 Bif_F12_SORT_DES * Bif_F12_SORT_DES::fun = &Bif_F12_SORT_DES::_fun;
+
+//-----------------------------------------------------------------------------
+CollatingCache::CollatingCache(const Value & A, const Cell * base, ShapeItem clen)
+   : rank(A.get_rank()),
+     base_B1(base),
+     comp_len(clen)
+{
+const ShapeItem ec_A = A.element_count();
+UCS_string UA;
+   UA.reserve(ec_A);
+   loop(a, ec_A)   UA.append(A.get_ravel(a).get_char_value());
+
+UCS_string UA1 = UA.unique();
+
+   reserve(UA1.size());
+
+   // create CollatingCacheEntry for every char in UA1. At this point, all
+   // entries are located at the end of A.
+   //
+   loop(a, UA1.size())
+       {
+         const Unicode uni = UA1[a];
+         const CollatingCacheEntry entry(uni, A.get_shape());
+         append(entry);
+       }
+
+   // move entries back
+   //
+   loop(a, ec_A)
+      {
+        const Unicode uni = A.get_ravel(a).get_char_value();
+        CollatingCacheEntry & entry = (*this)[find_entry(uni)];
+
+        ShapeItem aq = a;
+        loop(r, A.get_rank())
+           {
+             const Rank axis = entry.ce_shape.get_rank() - r - 1;
+             const ShapeItem ar = aq % A.get_shape_item(axis);
+             Assert(ar <= A.get_shape_item(axis));
+             if (entry.ce_shape.get_shape_item(axis) > ar)
+                entry.ce_shape.set_shape_item(axis, ar);
+             aq /= A.get_shape_item(axis);
+           }
+      }
+
+
+   // add one entry for all characters in B that are not in A
+   //
+CollatingCacheEntry others(Invalid_Unicode, A.get_shape());
+   append(others);
+}
 //-----------------------------------------------------------------------------
 bool
 CollatingCache::greater_vec(const IntCell & Za, const IntCell & Zb,
@@ -78,6 +130,18 @@ const Rank rank = cache.get_rank();
       }
 
    return ca > cb;
+}
+//-----------------------------------------------------------------------------
+ShapeItem
+CollatingCache::find_entry(Unicode uni) const
+{
+const CollatingCacheEntry * entries = get_items();
+const CollatingCacheEntry * entry =
+            Heapsort<CollatingCacheEntry>:: search<Unicode>
+                    (uni, entries, size(), CollatingCacheEntry::compare_chars);
+
+   if (entry)   return entry - entries;
+   return size() - 1;   // the entry for characters not in A
 }
 //=============================================================================
 Token
@@ -143,13 +207,14 @@ const ShapeItem comp_len = ec_B/len_BZ;
    //
 Value_P B1(B->get_shape(), LOC);
 const Cell * base_B1 = &B1->get_ravel(0) - qio*comp_len;
-CollatingCache cache(A->get_rank(), base_B1, comp_len);
+CollatingCache cache(A.getref(), base_B1, comp_len);
    loop(b, ec_B)
       {
         const Unicode uni = B->get_ravel(b).get_char_value();
-        const ShapeItem b1 = find_collating_cache_entry(uni, A, cache);
-        new (&B1->get_ravel(b)) IntCell(b1);
+        const APL_Integer b1 = cache.find_entry(uni);
+        new (B1->next_ravel()) IntCell(b1);
       }
+   B1->check_value(LOC);
 
    // then sort Z (actually re-arrange Z so that B[Z] is sorted)
    //
@@ -161,24 +226,6 @@ IntCell * z0 = (IntCell *)&Z->get_ravel(0);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
-}
-//-----------------------------------------------------------------------------
-ShapeItem
-Bif_F12_SORT::find_collating_cache_entry(Unicode uni, Value_P A,
-                                         CollatingCache & cache)
-{
-   // first check if uni is already in the cache...
-   //
-   loop(s, cache.size())
-      {
-        if (uni == cache[s].ce_char)   return s;
-      }
-
-   // uni is not in the cache. Add a new collating sequence entry.
-   //
-const CollatingCacheEntry entry(uni, A.getref());
-   cache.append(entry);
-   return cache.size() - 1;
 }
 //-----------------------------------------------------------------------------
 

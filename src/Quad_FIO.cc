@@ -290,12 +290,9 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
 
                      default:
                         {
-                          UCS_string & t4 = Workspace::more_error();
-                          t4.clear();
-                          t4.append_utf8("invalid format character ");
-                          t4.append(un1, LOC);
-                          t4.append_utf8(" in function 22 (aka. printf())"
-                                         " in module file_io:: ");
+                          MORE_ERROR() << "invalid format character " << un1
+                                       << " in function 22 (aka. printf())"
+                                         " in module file_io:: ";
                           DOMAIN_ERROR;   // bad format char
                         }
                   }
@@ -426,8 +423,8 @@ Unicode lookahead = fget_utf8(file, fget_count);
 
         if (conv == Unicode_0)
            {
-             Workspace::more_error() = UCS_string(
-    "expecting conversion character %, c, d, f, i, n, o, u, s, or x after %");
+             MORE_ERROR() << "expecting conversion character "
+                             "%, c, d, f, i, n, o, u, s, or x after %";
              DOMAIN_ERROR;
            }
 
@@ -993,9 +990,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (!S_ISREG(st.st_mode))
                    {
                      close(fd);
-                     Workspace::more_error() = UCS_string(path);
-                     Workspace::more_error().append_utf8(
-                                " is not a regular file");
+                     MORE_ERROR() << path << " is not a regular file";
                      DOMAIN_ERROR;
                    }
 

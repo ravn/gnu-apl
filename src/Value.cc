@@ -64,9 +64,9 @@ Value::init_ravel()
    if (Quad_SYL::value_count_limit &&
        Quad_SYL::value_count_limit < value_count)
       {
-        Workspace::more_error() = UCS_string(
+        MORE_ERROR() <<
 "the system limit on the APL value count (as set in ⎕SYL) was reached\n"
-"(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).");
+"(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).";
 
         // reset the limit so that we don't get stuck here.
         //
@@ -91,10 +91,10 @@ const ShapeItem length = shape.get_volume();
              new (&shape) Shape();
              new (ravel)   IntCell(42);
 
-             Workspace::more_error() = UCS_string(
+             MORE_ERROR() <<
              "the system limit on the total ravel size (as set in ⎕SYL) "
              "was reached\n(and to avoid lock-up, the limit in ⎕SYL "
-             "was automatically cleared).");
+             "was automatically cleared).";
 
              // reset the limit so that we don't get stuck here.
              //
@@ -1038,14 +1038,8 @@ const Cell * cI = &X->get_ravel(0);
          const ShapeItem idx = cI++->get_near_int() - qio;
          if (idx < 0 || idx >= max_idx)
             {
-              UCS_string & t4 = Workspace::more_error();
-              t4.clear();
-              t4.append_utf8("⎕IO=");
-              t4.append_number(qio);
-              t4.append_utf8(" offending index=");
-              t4.append_number(idx);
-              t4.append_utf8(" max index=");
-              t4.append_number(max_idx);
+              MORE_ERROR() << "⎕IO=" << qio << " offending index=" << idx
+                           << " max index=" << max_idx;
               Z->rollback(Z->valid_ravel_items, LOC);
               INDEX_ERROR;
             }
