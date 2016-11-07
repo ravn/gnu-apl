@@ -216,7 +216,7 @@ public:
    bool is_erased() const
    { return erased; }
 
-   /// return true, iff this Symbol is erased
+   /// return true, iff this Symbol is used
    bool is_used() const
    { return (value_stack_size() > 1) || (value_stack_size() &&
         (value_stack[0].name_class != NC_UNUSED_USER_NAME)); }

@@ -39,9 +39,10 @@ public:
    T * lookup_existing_symbol(const UCS_string & name)
       {
         const uint32_t hash = compute_hash(name);
-        for (T * sp = symbol_table[hash]; sp; sp = sp->next)
+        for (T * sym = symbol_table[hash]; sym; sym = sym->next)
             {
-              if (!sp->is_erased() && sp->equal(name))   return sp;
+              if (!sym->equal(name))   continue;
+              if (!sym->is_erased() || sym->is_used())   return sym;
             }
 
         return 0;
@@ -182,6 +183,8 @@ public:
 
    /// never called
    void set_erased(bool) const { FIXME; }
+
+   bool is_used() const   { return true; }
 
    /// system names are never erased
    bool is_erased()   { return false; }

@@ -163,7 +163,9 @@ int symbol_count = 0;
                     continue;
                   }
 
-               if (sym->is_erased() && !(which & LIST_ERASED))   continue;
+               if (sym->is_erased() &&
+                   !sym->is_used()  &&
+                   !(which & LIST_ERASED))   continue;
 
                const NameClass nc = sym->value_stack.back().name_class;
                if (((nc == NC_VARIABLE)         && (which & LIST_VARS))    ||
@@ -459,8 +461,8 @@ vector<const Symbol *> symbols;
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
             {
-              if (sym->is_erased())              continue;
-              if (sym->value_stack_size() < 1)   continue;
+              if (sym->is_erased() && !sym->is_used())   continue;
+              if (sym->value_stack_size() < 1)           continue;
               symbols.push_back(sym);
             }
       }
