@@ -350,8 +350,17 @@ Symbol * symbol = lookup_existing_symbol(sym);
 
    if (symbol->is_erased())
       {
-        MORE_ERROR() << "Can't )ERASE symbol '" << sym << "': already erased";
-        return true;
+        if (symbol->is_used())   // still holding a value
+           {
+             symbol->clear_vs();
+             return false;
+           }
+        else
+           {
+             MORE_ERROR() << "Can't )ERASE symbol '"
+                          << sym << "': already erased";
+             return true;
+           }
       }
 
    if (symbol->value_stack.size() != 1)
