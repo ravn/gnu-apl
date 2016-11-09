@@ -114,10 +114,6 @@ public:
    /// write this symbol in )OUT format to file \b out
    void write_OUT(FILE * out, uint64_t & seq) const;
 
-   /// replace an (erased) symbol with a new one
-   void replace_name(const UCS_string & new_name)
-      { name = new_name; }
-
    /// set \b token according to the current NC/sym_val of \b this \b Symbol
    virtual void resolve(Token & token, bool left);
 
@@ -212,18 +208,10 @@ public:
    /// set the current SV_key
    void set_SV_key(SV_key key);
 
-   /// return true, iff this Symbol is erased
+   /// return true, iff this Symbol is not used (i.e. erased)
    bool is_erased() const
-   { return erased; }
-
-   /// return true, iff this Symbol is used
-   bool is_used() const
-   { return (value_stack_size() > 1) || (value_stack_size() &&
-        (value_stack[0].name_class != NC_UNUSED_USER_NAME)); }
-
-   /// set \b erased to \b on_off
-   void set_erased(bool on_off)
-      { erased = on_off; }
+   { return (value_stack_size() <= 1) && (value_stack_size() &&
+        (value_stack[0].name_class == NC_UNUSED_USER_NAME)); }
 
    /// Return the current function (or throw a VALUE_ERROR)
    virtual const Function * get_function() const;
@@ -302,9 +290,6 @@ public:
 protected:
    /// The name of \b this \b Symbol
    UCS_string name;
-
-   /// \b True if \b this \b Symbol is/was erased
-   bool erased;
 
    /// called on symbol events (if non-0)
    void (*monitor_callback)(const Symbol &, Symbol_Event sev);

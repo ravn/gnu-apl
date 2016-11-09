@@ -1057,7 +1057,7 @@ vector<UCS_string> names;
      loop(s, symbol_count)
         {
           Symbol * symbol = table[s];
-          if (symbol->is_erased())   continue;   // erased symbol
+          if (symbol->is_erased())   continue;
 
           NameClass nc = symbol->get_nc();
           if (nc == NC_SHARED_VAR)   nc = NC_VARIABLE;

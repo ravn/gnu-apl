@@ -35,14 +35,14 @@ public:
    SymbolTableBase()
      { memset(symbol_table, 0, sizeof(symbol_table)); }
 
-   /// Return a \b Symbol with name \b name in \b this \b SymbolTable.
+   /// return a \b Symbol with name \b name in \b this \b SymbolTable.
    T * lookup_existing_symbol(const UCS_string & name)
       {
         const uint32_t hash = compute_hash(name);
         for (T * sym = symbol_table[hash]; sym; sym = sym->next)
             {
-              if (!sym->equal(name))   continue;
-              if (!sym->is_erased() || sym->is_used())   return sym;
+              if (!sym->equal(name))   continue;   // name mismatch
+              if (!sym->is_erased())      return sym;
             }
 
         return 0;
@@ -62,13 +62,6 @@ public:
 
          for (T * t = symbol_table[hash]; ; t = t->next)
              {
-               if (t->is_erased())   // override an erased symbol.
-                  {
-                    t->replace_name(sym->get_name());
-                    t->set_erased(false);
-                    return;
-                  }
-
                if (t->next == 0)   // append new_symbol at the end
                   {
                     t->next = sym;
@@ -178,16 +171,7 @@ public:
    const UCS_string & get_name() const
       { return name; }
 
-   /// never called
-   void replace_name(const UCS_string &) const { FIXME; }
-
-   /// never called
-   void set_erased(bool) const { FIXME; }
-
-   bool is_used() const   { return true; }
-
-   /// system names are never erased
-   bool is_erased()   { return false; }
+   bool is_erased() const   { return false; }
 
    /// Compare the name of \b this \b Symbol with \b ucs
    bool equal(const UCS_string & ucs) const

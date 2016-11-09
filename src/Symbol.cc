@@ -44,7 +44,6 @@ Symbol::Symbol(ID::Id id)
    : NamedObject(id),
      next(0),
      name(UCS_string(UTF8_string(ID::name(id)))),
-     erased(false),
      monitor_callback(0)
 {
    push();
@@ -54,7 +53,6 @@ Symbol::Symbol(const UCS_string & ucs, ID::Id id)
    : NamedObject(id),
      next(0),
      name(ucs),
-     erased(false),
      monitor_callback(0)
 {
    push();
@@ -899,7 +897,7 @@ Symbol::list(ostream & out)
 
    for (int s = name.size(); s < 32; ++s)   out << " ";
 
-   if (erased)   out << "   ERASED";
+   if (is_erased())   out << "   ERASED";
    Assert(value_stack.size());
 const NameClass nc = value_stack.back().name_class;
    if      (nc == NC_INVALID)            out << "   INVALID NC";
@@ -1193,6 +1191,7 @@ ValueStackItem & tos = value_stack[0];
         case NC_FUNCTION:
         case NC_OPERATOR:
              tos.sym_val.function->destroy();
+             tos.name_class = NC_UNUSED_USER_NAME;
              break;
 
         default: break;

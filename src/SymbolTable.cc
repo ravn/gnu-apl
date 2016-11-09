@@ -72,7 +72,6 @@ const uint32_t hash = compute_hash(sym_name);
        {
          if (sym->equal(sym_name))   // found
             {
-              sym->set_erased(false);
               return sym;
             }
        }
@@ -163,9 +162,7 @@ int symbol_count = 0;
                     continue;
                   }
 
-               if (sym->is_erased() &&
-                   !sym->is_used()  &&
-                   !(which & LIST_ERASED))   continue;
+               if (sym->is_erased() && !(which & LIST_ERASED))   continue;
 
                const NameClass nc = sym->value_stack.back().name_class;
                if (((nc == NC_VARIABLE)         && (which & LIST_VARS))    ||
@@ -348,20 +345,17 @@ Symbol * symbol = lookup_existing_symbol(sym);
         return true;
       }
 
-   if (symbol->is_erased())
-      {
-        if (symbol->is_used())   // still holding a value
-           {
-             symbol->clear_vs();
-             return false;
-           }
-        else
-           {
-             MORE_ERROR() << "Can't )ERASE symbol '"
-                          << sym << "': already erased";
-             return true;
-           }
-      }
+      if (symbol->is_erased())
+         {
+           MORE_ERROR() << "Can't )ERASE symbol '"
+                        << sym << "': already erased";
+           return true;
+         }
+      else   // still holding a value
+         {
+           symbol->clear_vs();
+           return false;
+         }
 
    if (symbol->value_stack.size() != 1)
       {
@@ -387,11 +381,9 @@ ValueStackItem & tos = symbol->value_stack[0];
 
         case NC_VARIABLE:
              symbol->expunge();
-             symbol->set_erased(true);
              return false;
 
         case NC_UNUSED_USER_NAME:
-             symbol->set_erased(true);
              return true;
 
         case NC_FUNCTION:
@@ -423,7 +415,6 @@ ValueStackItem & tos = symbol->value_stack[0];
              delete tos.sym_val.function;
              tos.sym_val.function = 0;
              tos.name_class = NC_UNUSED_USER_NAME;
-             symbol->set_erased(true);
              return false;
 
         default: break;
@@ -470,8 +461,8 @@ vector<const Symbol *> symbols;
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
             {
-              if (sym->is_erased() && !sym->is_used())   continue;
-              if (sym->value_stack_size() < 1)           continue;
+              if (sym->is_erased())              continue;
+              if (sym->value_stack_size() < 1)   continue;
               symbols.push_back(sym);
             }
       }

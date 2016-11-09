@@ -692,10 +692,15 @@ Value_P Z(sh_Z, LOC);
    loop(z, var_count)
       {
         Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
-        if (sym == 0)   DOMAIN_ERROR;
-
-        const SV_Coupling coupling = sym->unshare_var();
-        new (Z->next_ravel()) IntCell(coupling);
+        if (sym)
+           {
+             const SV_Coupling coupling = sym->unshare_var();
+             new (Z->next_ravel()) IntCell(coupling);
+           }
+         else
+           {
+             new (Z->next_ravel()) IntCell(0);
+           }
       }
 
    Z->check_value(LOC);
