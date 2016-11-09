@@ -586,6 +586,12 @@ copy_1(Symbol * & dst, Symbol * src, const char * loc)
 }
 //-----------------------------------------------------------------------------
 inline void
+copy_1(const Symbol * & dst, const Symbol * src, const char * loc)
+{
+  dst = src;
+}
+//-----------------------------------------------------------------------------
+inline void
 copy_1(labVal & dst, const labVal & src, const char * loc)
 {
   dst.sym = src.sym;

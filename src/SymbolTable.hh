@@ -137,11 +137,8 @@ public:
    /// write all symbols in )OUT format to file \b out
    void write_all_symbols(FILE * out, uint64_t & seq) const;
 
-   /// Number of symbols in \b this \b SymbolTable (including erased symbols)
-   int symbols_allocated() const;
-
    /// return all symbols  (including erased symbols)
-   void get_all_symbols(Symbol ** table, int table_size) const;
+   Simple_string<const Symbol *> get_all_symbols() const;
 
    /// dump symbols to out
    void dump(ostream & out, int & fcount, int & vcount) const;

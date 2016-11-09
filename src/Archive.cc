@@ -323,21 +323,17 @@ XML_Saving_Archive::save_prefix(const Prefix & prefix)
 void
 XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
 {
-   // collect all symbols in this symbol table.
-   //
-int symbol_count = symtab.symbols_allocated();
-DynArray(Symbol *, all_symbols, symbol_count);
-   symtab.get_all_symbols(&all_symbols[0], symbol_count);
+Simple_string<const Symbol *> symbols = symtab.get_all_symbols();
 
    // remove erased symbols
    //
-   for (int s = 0; s < symbol_count;)
+   for (int s = 0; s < symbols.size();)
       {
-        const Symbol * sym = all_symbols[s];
-
+        const Symbol * sym = symbols[s];
         if (sym->is_erased())
             {
-              all_symbols[s] = all_symbols[--symbol_count];
+              symbols[s] = symbols.last();
+              symbols.pop();
               continue;
             }
 
@@ -345,24 +341,25 @@ DynArray(Symbol *, all_symbols, symbol_count);
       }
 
    do_indent();
-   out << "<SymbolTable size=\"" << symbol_count << "\">" << endl;
+   out << "<SymbolTable size=\"" << symbols.size() << "\">" << endl;
 
    ++indent;
 
-   while (symbol_count > 0)
+   while (symbols.size() > 0)
       {
         // set idx to the alphabetically smallest name
         //
         int idx = 0;
-        for (int i = 1; i < symbol_count; ++i)
+        for (int i = 1; i < symbols.size(); ++i)
             {
-              if (all_symbols[idx]->compare(*all_symbols[i]) > 0)   idx = i;
+              if (symbols[idx]->compare(*symbols[i]) > 0)   idx = i;
             }
 
-        const Symbol * sym = all_symbols[idx];
+        const Symbol * sym = symbols[idx];
         save_symbol(*sym);
 
-        all_symbols[idx] = all_symbols[--symbol_count];
+        symbols[idx] = symbols.last();
+        symbols.pop();
       }
 
    --indent;

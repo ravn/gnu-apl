@@ -29,6 +29,7 @@
 #include "Quad_RL.hh"
 #include "Quad_SVx.hh"
 #include "ScalarFunction.hh"
+#include "Simple_string.hh"
 #include "Symbol.hh"
 #include "SymbolTable.hh"
 #include "SystemVariable.hh"
@@ -105,13 +106,9 @@ public:
    static StateIndicator * SI_top()
       { return the_workspace.top_SI; }
 
-   /// the number of symbols in the symbol table
-   static uint32_t symbols_allocated()
-      { return the_workspace.symbol_table.symbols_allocated(); }
-
    /// copy all allocated symbols into \b table of size \b table_size
-   static void get_all_symbols(Symbol ** table, uint32_t table_size)
-      { return the_workspace.symbol_table.get_all_symbols(table, table_size); }
+   static Simple_string<const Symbol *> get_all_symbols()
+      { return the_workspace.symbol_table.get_all_symbols(); }
 
    /// lookup an existing user defined symbol. If not found, create one
    /// (unless this would be a quad symbol)

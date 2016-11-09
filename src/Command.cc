@@ -1809,14 +1809,12 @@ const bool have_trailing_blank = replace_count && user.last() == ' ';
       {
         // nothing or user-defined name: expand names
         //
-        const int symbol_count = Workspace::symbols_allocated();
-        DynArray(Symbol *, all_symbols, symbol_count);
-        Workspace::get_all_symbols(&all_symbols[0], symbol_count);
+        Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
 
         vector<UCS_string>matches;
-        loop(s, symbol_count)
+        loop(s, symbols.size())
             {
-             const Symbol * sym = all_symbols[s];
+             const Symbol * sym = symbols[s];
              if (sym->is_erased())    continue;
 
               const UCS_string & sym_name = sym->get_name();

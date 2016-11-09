@@ -1050,13 +1050,11 @@ int requested_NCs = 0;
    //
 vector<UCS_string> names;
    {
-     const ShapeItem symbol_count = Workspace::symbols_allocated();
-     DynArray(Symbol *, table, symbol_count);
-     Workspace::get_all_symbols(&table[0], symbol_count);
+     Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
 
-     loop(s, symbol_count)
+     loop(s, symbols.size())
         {
-          Symbol * symbol = table[s];
+          const Symbol * symbol = symbols[s];
           if (symbol->is_erased())   continue;
 
           NameClass nc = symbol->get_nc();

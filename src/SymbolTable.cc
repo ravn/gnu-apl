@@ -424,33 +424,21 @@ ValueStackItem & tos = symbol->value_stack[0];
    return true;
 }
 //-----------------------------------------------------------------------------
-int
-SymbolTable::symbols_allocated() const
+Simple_string<const Symbol *>
+SymbolTable::get_all_symbols() const
 {
-int count = 0;
+Simple_string<const Symbol *> ret;
+   ret.reserve(1000);
 
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
-            ++count;
-      }
-
-   return count;
-}
-//-----------------------------------------------------------------------------
-void
-SymbolTable::get_all_symbols(Symbol ** table, int table_size) const
-{
-int idx = 0;
-
-   loop(hash, SYMBOL_HASH_TABLE_SIZE)
-      {
-        for (Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
             {
-              Assert(idx < table_size);
-              table[idx++] = sym;
+              ret.append(sym);
             }
       }
+
+   return ret;
 }
 //-----------------------------------------------------------------------------
 void
