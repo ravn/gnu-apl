@@ -57,8 +57,10 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
             want_postgresql="no"
         elif test "$withval" = "yes"; then
             want_postgresql="yes"
+            want1_postgresql="yes"
         else
             want_postgresql="yes"
+            want1_postgresql="yes"
             PG_CONFIG="$withval"
         fi
         ],

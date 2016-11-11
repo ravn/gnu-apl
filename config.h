@@ -185,6 +185,12 @@
 /* define to enable performance counters */
 /* #undef PERFORMANCE_COUNTERS_WANTED */
 
+/* ./configure with --with-postgresql */
+/* #undef REALLY_WANT_PostgreSQL */
+
+/* ./configure with --with-sqlite3 */
+/* #undef REALLY_WANT_SQLITE3 */
+
 /* short value cellcount */
 #define SHORT_VALUE_LENGTH_WANTED 12
 

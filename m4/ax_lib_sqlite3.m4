@@ -50,9 +50,11 @@ AC_DEFUN([AX_LIB_SQLITE3],
             WANT_SQLITE3="no"
         elif test "$withval" = "yes"; then
             WANT_SQLITE3="yes"
+            WANT1_SQLITE3="yes"
             ac_sqlite3_path=""
         else
             WANT_SQLITE3="yes"
+            WANT1_SQLITE3="yes"
             ac_sqlite3_path="$withval"
         fi
         ],

@@ -129,11 +129,20 @@ AC_CHECK_LIB([m],         [acosh])
 AC_CHECK_LIB([pthread],   [sem_init])
 AC_CHECK_LIB([dl],        [dlopen])
 
-# check if SQLite3 is installed
+# check if SQLite3 is wanted and installed
 m4_include([m4/ax_lib_sqlite3.m4])            AX_LIB_SQLITE3([])
+if test "x$WANT1_SQLITE3" = "xyes"; then
+   AC_DEFINE_UNQUOTED([REALLY_WANT_SQLITE3], [1],
+                      [./configure with --with-sqlite3])
+fi
 
-# check if PostgreSQL is installed
+
+# check if PostgreSQL is wanted and installed
 m4_include([m4/ax_lib_postgresql.m4])         AX_LIB_POSTGRESQL([])
+if test "x$want1_postgresql" = "xyes"; then
+   AC_DEFINE_UNQUOTED([REALLY_WANT_PostgreSQL], [1],
+                      [./configure with --with-postgresql])
+fi
 
 # check if PostgreSQL is usable (if present)
 if test "x$found_postgresql" = "xyes" ; then
@@ -147,7 +156,7 @@ if test "x$found_postgresql" = "xyes" ; then
 		[USABLE_PostgreSQL=no])
 
 CPPFLAGS="$saved_CPPFLAGS"
-AC_MSG_RESULT(["$USABLE_PostgreSQL"])
+AC_MSG_RESULT([$USABLE_PostgreSQL])
 if test "x$USABLE_PostgreSQL" = "xyes"; then
    AC_DEFINE_UNQUOTED([USABLE_PostgreSQL], [1], [PostgreSQL code compiles])
 fi
@@ -459,15 +468,17 @@ echo "const char * configure_args = \
 
 # summary
   echo " "
-if test "x$USABLE_PostgreSQL" != "xyes"; then
-  echo "NOTE: the native function for accessing PostgreSQL will not be built because"
-  echo "      your PostgreSQL installation is missing or incomplete (see details above)"
+if test "x$USABLE_PostgreSQL" != "xyes" -a "x$want1_postgresql" = "xyes"; then
+  echo "NOTE: PostgreSQL support was requested, but the native function for "
+  echo "      accessing PostgreSQL cannot be built because your PostgreSQL "
+  echo "      installation appears to be missing or incomplete (see details above)"
   echo " "
 fi
 
- if test "x$found_sqlite" != "xyes"; then
-  echo "NOTE: the native function for accessing SQLite will not be built because"
-  echo "      your SQLite installation is missing or incomplete (see details above)"
+ if test "x$found_sqlite" != "xyes" -a "x$WANT1_SQLITE3" = "xyes"; then
+  echo "NOTE: SQLite support was requested, but the native function for "
+  echo "      accessing SQLite cannot not be built because your SQLite "
+  echo "      installation appears to be missing or incomplete (see details above)"
   echo " "
 fi
 

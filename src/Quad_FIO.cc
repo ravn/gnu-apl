@@ -34,6 +34,7 @@
 
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER2_OUTER.hh"
+#include "Common.hh"
 #include "FloatCell.hh"
 #include "IntCell.hh"
 #include "PointerCell.hh"
@@ -41,6 +42,8 @@
 #include "Performance.hh"
 #include "Tokenizer.hh"
 #include "Workspace.hh"
+
+extern long long top_of_memory();
 
 Quad_FIO  Quad_FIO::_fun;
 Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
@@ -618,7 +621,7 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
         // normal mortals.
         //
         case -12: // sbrk()
-             return Token(TOK_APL_VALUE1, IntScalar((uint64_t)(sbrk(0)), LOC));
+             return Token(TOK_APL_VALUE1, IntScalar(top_of_memory(), LOC));
         case -11: // fast new
              return Token(TOK_APL_VALUE1, IntScalar(Value::fast_new, LOC));
         case -10: // slow new

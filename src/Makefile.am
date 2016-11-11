@@ -83,6 +83,7 @@ Quad_TF.cc					Quad_TF.hh		\
 Parallel.cc					Parallel.hh		\
 Performance.cc		Performance.def		Performance.hh		\
 RealCell.cc					RealCell.hh		\
+sbrk.cc									\
 Shape.cc					Shape.hh		\
 						SharedValuePointer.hh	\
 						Simple_string.hh	\

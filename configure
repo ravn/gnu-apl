@@ -17730,7 +17730,7 @@ _ACEOF
 fi
 
 
-# check if SQLite3 is installed
+# check if SQLite3 is wanted and installed
 # ===========================================================================
 #      http://www.gnu.org/software/autoconf-archive/ax_lib_sqlite3.html
 # ===========================================================================
@@ -17782,9 +17782,11 @@ if test "${with_sqlite3+set}" = set; then :
             WANT_SQLITE3="no"
         elif test "$withval" = "yes"; then
             WANT_SQLITE3="yes"
+            WANT1_SQLITE3="yes"
             ac_sqlite3_path=""
         else
             WANT_SQLITE3="yes"
+            WANT1_SQLITE3="yes"
             ac_sqlite3_path="$withval"
         fi
 
@@ -17917,8 +17919,16 @@ $as_echo "#define HAVE_SQLITE3 /**/" >>confdefs.h
         fi
     fi
 
+if test "x$WANT1_SQLITE3" = "xyes"; then
 
-# check if PostgreSQL is installed
+cat >>confdefs.h <<_ACEOF
+#define REALLY_WANT_SQLITE3 1
+_ACEOF
+
+fi
+
+
+# check if PostgreSQL is wanted and installed
 # ===========================================================================
 #     http://www.gnu.org/software/autoconf-archive/ax_lib_postgresql.html
 # ===========================================================================
@@ -17977,8 +17987,10 @@ if test "${with_postgresql+set}" = set; then :
             want_postgresql="no"
         elif test "$withval" = "yes"; then
             want_postgresql="yes"
+            want1_postgresql="yes"
         else
             want_postgresql="yes"
+            want1_postgresql="yes"
             PG_CONFIG="$withval"
         fi
 
@@ -18109,6 +18121,13 @@ $as_echo "no" >&6; }
 
 
 
+if test "x$want1_postgresql" = "xyes"; then
+
+cat >>confdefs.h <<_ACEOF
+#define REALLY_WANT_PostgreSQL 1
+_ACEOF
+
+fi
 
 # check if PostgreSQL is usable (if present)
 if test "x$found_postgresql" = "xyes" ; then
@@ -18135,8 +18154,8 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 CPPFLAGS="$saved_CPPFLAGS"
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: \"$USABLE_PostgreSQL\"" >&5
-$as_echo "\"$USABLE_PostgreSQL\"" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $USABLE_PostgreSQL" >&5
+$as_echo "$USABLE_PostgreSQL" >&6; }
 if test "x$USABLE_PostgreSQL" = "xyes"; then
 
 cat >>confdefs.h <<_ACEOF
@@ -21292,15 +21311,17 @@ echo "const char * configure_args = \
 
 # summary
   echo " "
-if test "x$USABLE_PostgreSQL" != "xyes"; then
-  echo "NOTE: the native function for accessing PostgreSQL will not be built because"
-  echo "      your PostgreSQL installation is missing or incomplete (see details above)"
+if test "x$USABLE_PostgreSQL" != "xyes" -a "x$want1_postgresql" = "xyes"; then
+  echo "NOTE: PostgreSQL support was requested, but the native function for "
+  echo "      accessing PostgreSQL cannot be built because your PostgreSQL "
+  echo "      installation appears to be missing or incomplete (see details above)"
   echo " "
 fi
 
- if test "x$found_sqlite" != "xyes"; then
-  echo "NOTE: the native function for accessing SQLite will not be built because"
-  echo "      your SQLite installation is missing or incomplete (see details above)"
+ if test "x$found_sqlite" != "xyes" -a "x$WANT1_SQLITE3" = "xyes"; then
+  echo "NOTE: SQLite support was requested, but the native function for "
+  echo "      accessing SQLite cannot not be built because your SQLite "
+  echo "      installation appears to be missing or incomplete (see details above)"
   echo " "
 fi
 

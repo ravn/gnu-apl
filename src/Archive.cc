@@ -751,7 +751,7 @@ ShapeItem idx = 0;
                    Assert1(sub);
                    const Vid sub_idx = find_vid(sub);
                    Assert(sub_idx < value_count);
-                   Assert(!values[sub_idx]._par != INVALID_VID);
+                   Assert(values[sub_idx]._par == INVALID_VID);
                    values[sub_idx] = _val_par(values[sub_idx]._val, (Vid)p);
                  }
               else if (cP->is_lval_cell())

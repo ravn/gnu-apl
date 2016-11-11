@@ -61,14 +61,14 @@ static void init_provider_map( void )
 {
 #ifdef HAVE_SQLITE3
     add_provider( new SqliteProvider() );
-#else
+#elif REALLY_WANT_SQLITE3
 # warning "SQLite3 unavailable since ./configure could not detect it"
 #endif
 
 #ifdef USABLE_PostgreSQL
     add_provider( new PostgresProvider() );
-#else
-# warning "PostgreSQL unavailable since ./configure could not detect it."
+#elif REALLY_WANT_PostgreSQL
+#  warning "PostgreSQL unavailable since ./configure could not detect it."
 # if HAVE_POSTGRESQL
 #  warning "The PostgreSQL library seems to be installed, but the header file(s) are missing"
 # endif
