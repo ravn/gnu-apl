@@ -390,21 +390,24 @@ UCS_string shape_rho;
 
    if (value.element_count() == 0)   // empty value
       {
+        UCS_string reshape(2*(picker.get_level() - 1), UNI_ASCII_SPACE);
+        Value_P proto = value.prototype(LOC);
+
+        // emit one line for the prototype
         UCS_string proto_name;
         picker.get(proto_name);
         picker.pop();
+        do_CR10_rec(result, *proto, picker, pidx);
+        result.back().append_utf8(" ⍝ prototype 1");
 
-        Value_P proto = value.prototype(LOC);
-        do_CR10_rec(result, *proto, picker, 0);
-        result.back().append_utf8(" ⍝ prototype...");
-
-        // reshape the prototype
+        // and then another line to reshape the prototype
         //
-        UCS_string reshape = proto_name;
+        reshape.append(proto_name);
         reshape.append_utf8("←");
         reshape.append(shape_rho);
         reshape.append(proto_name);
         result.push_back(reshape);
+        result.back().append_utf8(" ⍝ prototype 2");
         return;
       }
 
