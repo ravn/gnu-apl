@@ -113,7 +113,8 @@ ul.no-bullet {list-style: none}
     </ul></li>
     <li><a name="toc-Axis-argument-in-defined-functions" href="#Section-3_002e13">3.13 Axis argument in defined functions</a></li>
     <li><a name="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-3_002e14">3.14 ⎕SI - State Indicator</a></li>
-    <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e15">3.15 History and TAB completion</a></li>
+    <li><a name="toc-_005b_003f_005dDLX-_002d-Knuth_0027s-Dancing-Links-Algorithm" href="#Section-3_002e15">3.15 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</a></li>
+    <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e16">3.16 History and TAB completion</a></li>
   </ul></li>
   <li><a name="toc-Limitations-and-Missing-Features" href="#Chapter-4">4 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -791,7 +792,9 @@ Next: <a href="#Chapter-4" accesskey="n" rel="next">Chapter 4</a>, Previous: <a 
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e14">Section 3.14</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SI - State Indicator
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e15">Section 3.15</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">History and TAB completion
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e15">Section 3.15</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕DLX: Knuth&rsquo;s Dancing Links Algorithm
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e16">Section 3.16</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">History and TAB completion
 </td></tr>
 </table>
 
@@ -1111,7 +1114,7 @@ well.
 </p>
 <p>For that reason, if the ∇-editor is used in a script and attempts to redefine
 an existing defined function then the existing function is simply overridden
-iwith the new one and no DEFN ERROR is raised.
+with the new one and no DEFN ERROR is raised.
 </p>
 <hr>
 <a name="Section-3_002e2"></a>
@@ -1571,7 +1574,7 @@ present then the lambda is niladic.
 then the lambda is a normal function.
 </p>
 <p>GNU APL supports an axis argument in normal user defined functions and
-operators. In lambda expressions the greek letter χ (Chi) is the variable
+operators. In lambda expressions the Greek letter χ (Chi) is the variable
 name for an axis argument.
 </p>
 <p>The way a named lambda is implemented in GNU APL is that the expression
@@ -1600,7 +1603,7 @@ body_expression and from whether the body_expression is empty (no λ←) or
 not (with λ←).
 </p>
 <p>It is possible to specify local variables that work exactly like their
-compagnions in normal defined functions. Please note that this is different
+companions in normal defined functions. Please note that this is different
 from some other APL interpreters which treat all variables in lambda bodies
 as local variables. The syntax for specifying local variables is the same
 as for the header in normal defined functions: they are added at the end
@@ -1639,9 +1642,9 @@ For example:
 
 </pre>
 <p>Unnamed lambdas are automatically local in scope (similar to labels). They can
-be passed as function arguments to operators. However, unnamed lambdad are NOT
+be passed as function arguments to operators. However, unnamed lambdas are NOT
 inserted into the symbol table of the interpreter. They are therefore not
-visible to functions like ⎕CR or by the ∇-editor. Ocasionally the names λ1,
+visible to functions like ⎕CR or by the ∇-editor. Occasionally the names λ1,
 λ2, ... may show up in commands like )SIS. These names are automatically
 generated for unnamed lambdas in order to provide a name in places where a
 function name is needed.
@@ -1756,10 +1759,217 @@ the caller, and so on.
 <a name="Section-3_002e15"></a>
 <div class="header">
 <p>
-Previous: <a href="#Section-3_002e14" accesskey="p" rel="prev">Section 3.14</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e16" accesskey="n" rel="next">Section 3.16</a>, Previous: <a href="#Section-3_002e14" accesskey="p" rel="prev">Section 3.14</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<a name="g_t_005b_003f_005dDLX-_002d-Knuth_0027s-Dancing-Links-Algorithm"></a>
+<h3 class="section">3.15 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</h3>
+
+<p>⎕DLX is an implementation of Knuth&rsquo;s Dancing Links Algorithm (called DLX
+by Knuth himself, but is sometimes also referred to as Knuth&rsquo;s Algorithm X)
+⎕DLX is a generic backtracking machinery that can be used to dramatically
+simplify problems like the 8 queens problem on a chess board or sudokus.
+</p>
+<p>The monadic form of ⎕DLX, i.e. ⎕DLX B, is a shortcut for 0 ⎕DLX B. It
+computes the first solution for the constraint matrix B.
+</p>
+<p>The dyadic form of ⎕DLX, i.e. A ⎕DLX B, has a integer scalar A as left argument
+which determines the details of the computation as follows:
+</p>
+<p>A &gt; 0: The algorithm tries to find all solutions, but stops when A solutions
+have been found. This is handy while debugging code using ⎕DLX. The
+result is a nested vector with one vector item per solution.
+</p>
+<p>A = 0: The algorithm stops when the first solution was found. In this case
+the solution is a simple (non-nested) numeric vector.
+</p>
+<p>A = ¯1: like A &gt; 0 but finding all solutions
+</p>
+<p>A = ¯2: like A = 0 but instead of returning the first solution, the number of
+solutions (i.e. 0 or 1), the number of backtracks, and the number of
+link dances is returned as a 3-element numeric vector.
+</p>
+<p>A = ¯3: like A = ¯1 but instead of returning all solutions, the number of
+solutions, the number of backtracks, and the number of
+link dances is returned as a 3-element numeric vector.
+</p>
+<p>The right argument B of ⎕DLX B or A ⎕DLX B is a constraints matrix whose
+columns consist of either 0s and 1s (called a primary column) or 0s and 2s
+(called secondary columns). The 0s, 1s and 2s can be the integers 0, 1, or 2,
+characters &rsquo;0&rsquo;, &rsquo;1&rsquo;, or &rsquo;2&rsquo; respectively, or &rsquo; &rsquo; meaning &rsquo;0&rsquo;. The character
+representation is useful when B becomes large and shall be printed because
+the spaces in the numerical variant will not be printed. In the following,
+B is assumed to be numeric.
+</p>
+<p>Let Z←A ⎕DLX B, and let R be a solution in Z, that is, Z itself (A = 0) or
+R is Z[k] for some k if A ≠ 0. And let S←+⌿B[R].
+</p>
+<p>Then S = s1 s2 s3, ... sN where N is the number of columns in B and sj=1
+if j is a primary column of B and sj∈0 1 if j is a secondary column of B.
+</p>
+<p>In other words, ⎕DLX B computes a subset of the rows of B in such a way that
+for every column j of B exactly one (for primary column j) or at most one
+(for a secondary column) of the rows in a solution has its j&rsquo;th element set
+to 1 and all other words set their j&rsquo;th element set to 0.
+</p>
+<p>In yet other words, for every solution returned by ⎕DLX B, a 1 in one row
+prevents all other rows that also have a 1 in that column, and all rows
+together have exactly one 1 in every primary column and at most one 1 in
+every secondary column. In the absence of secondary columns, the problem
+solved by ⎕DLX is also known as the &quot;exact cover problem&quot;
+</p>
+<p>If all that sounds weird and useless, consider the following APL program
+for finding all solutions of the 8 Queens problem on a chess board (which
+probably every programmer has programmed at some point in time):
+</p>
+<pre class="verbatim">      RC←8↑'1' ◊ D←15↑¯8↑'2'   ⍝ helpers for constructing Q8
+      ⍝     rows   cols   diag1    diag2
+      Q8←⊃{(R⌽RC),(C⌽RC),((C-R)⌽D),((¯7-R+C)⌽D)⊣(R C)←-8 8⊤⍵-⎕IO} ¨ ⍳64
+      Z←¯1 ⎕DLX Q8
+      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1 2 3 92] ⍝ solutions 1, 2, and 92
+ A1 B6 C8 D3 E7 F4 G2 H5 
+ A1 C5 F4 H3 D8 G6 B7 E2 
+ A8 D6 H4 G7 C1 F5 B3 E2 
+
+</pre>
+<p>Obviously Z contains solutions for the 8 Queens problem; the total number of
+solutions is well known to be 92 and we showed only the first two and the
+last solution above.
+</p>
+<p>The constraint matrix Q8 is the key to success. The matrix has 64 rows - one
+row for every field of the chess board. And it has 8 + 8 + 15 + 15 columns.
+The first 8 columns of Q8 are constraints that prevent more than one Queen
+to be placed in the same row of the chess board (the argument ⍵ is the field
+number counting from left to right and from bottom to top).
+The next 8 columns of Q8 are constraints that prevent more than one Queen
+to be placed in the same column of the chess board.
+</p>
+<p>If we would call ⎕DLX with only these constraints, i.e. ⎕DLX T8←64 16↑Q8,
+then we would get the solutions of the 8 tower problem. However, we continue
+and add 15 more constraints for each of the two diagonals. The resulting
+constraint matrix Q8 is this:
+</p>
+<pre class="verbatim">      Q8
+
+1       1              2                     2
+1        1              2                   2 
+1         1              2                 2  
+1          1              2               2   
+1           1              2             2    
+1            1              2           2     
+1             1              2         2      
+1              1              2       2       
+ 1      1             2                     2 
+ 1       1             2                   2  
+ 1        1             2                 2   
+ 1         1             2               2    
+ 1          1             2             2     
+ 1           1             2           2      
+ 1            1             2         2       
+ 1             1             2       2        
+  1     1            2                     2  
+  1      1            2                   2   
+  1       1            2                 2    
+  1        1            2               2     
+  1         1            2             2      
+  1          1            2           2       
+  1           1            2         2        
+  1            1            2       2         
+   1    1           2                     2   
+   1     1           2                   2    
+   1      1           2                 2     
+   1       1           2               2      
+   1        1           2             2       
+   1         1           2           2        
+   1          1           2         2         
+   1           1           2       2          
+    1   1          2                     2    
+    1    1          2                   2     
+    1     1          2                 2      
+    1      1          2               2       
+    1       1          2             2        
+    1        1          2           2         
+    1         1          2         2          
+    1          1          2       2           
+     1  1         2                     2     
+     1   1         2                   2      
+     1    1         2                 2       
+     1     1         2               2        
+     1      1         2             2         
+     1       1         2           2          
+     1        1         2         2           
+     1         1         2       2            
+      1 1        2                     2      
+      1  1        2                   2       
+      1   1        2                 2        
+      1    1        2               2         
+      1     1        2             2          
+      1      1        2           2           
+      1       1        2         2            
+      1        1        2       2             
+       11       2                     2       
+       1 1       2                   2        
+       1  1       2                 2         
+       1   1       2               2          
+       1    1       2             2           
+       1     1       2           2            
+       1      1       2         2             
+       1       1       2       2              
+</pre>
+<p>To see how, for example, the first solution looks like and how it relates
+to the constraints matrix Q8:
+</p>
+<pre class="verbatim">
+      ⍝ the rows in Q8 of the first solution
+      ⍝
+      Z[1]
+ 1 14 24 27 39 44 50 61 
+
+      ⍝ the first solution translated back into the problem domain
+      ⍝
+      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1]
+ A1 B6 C8 D3 E7 F4 G2 H5 
+
+      ⍝ the constraints of the rows of the first solution
+      ⍝
+      Q8[⊃Z[1];]
+1       1              2                     2
+ 1           1             2           2      
+  1            1            2       2         
+   1      1           2                 2     
+    1         1          2         2          
+     1     1         2               2        
+      1  1        2                   2       
+       1    1       2             2           
+
+      ⍝ all primary contraints met?
+      ⍝
+      +⌿ ' '≠ Q8[⊃Z[1];] 
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1 
+      1 0 0 0 0 1
+
+</pre>
+
+<p>And that&rsquo;s it: call ⎕DLX to get the solution(s). In general all problems that
+can be solved by ⎕DLX contain 3 steps:
+</p>
+<ul>
+<li> translate the problem into a constraints matrix B,
+</li><li> Z←⎕DLX B, and
+</li><li> translate the result Z back into the problem domain.
+</li></ul>
+
+<p>Another application of ⎕DLT is solving sudokus. The constraints matrix is
+a little more complicated, but the principle is the same.
+</p>
+
+<hr>
+<a name="Section-3_002e16"></a>
+<div class="header">
+<p>
+Previous: <a href="#Section-3_002e15" accesskey="p" rel="prev">Section 3.15</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="History-and-TAB-completion"></a>
-<h3 class="section">3.15 History and TAB completion</h3>
+<h3 class="section">3.16 History and TAB completion</h3>
 
 <p>Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user
 input. libreadline did provide two useful features: tab expansion (the tab

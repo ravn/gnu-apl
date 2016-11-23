@@ -637,7 +637,8 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.12::   Direct Functions (Lambdas)
 * Section 3.13::   Axis argument in defined functions
 * Section 3.14::   ⎕SI - State Indicator
-* Section 3.15::   History and TAB completion
+* Section 3.15::   ⎕DLX: Knuth’s Dancing Links Algorithm
+* Section 3.16::   History and TAB completion
 
 There are a few possibly useful features in GNU APL:
 
@@ -953,7 +954,7 @@ ERROR, and other errors can be expected as well.
 
    For that reason, if the ∇-editor is used in a script and attempts to
 redefine an existing defined function then the existing function is
-simply overridden iwith the new one and no DEFN ERROR is raised.
+simply overridden with the new one and no DEFN ERROR is raised.
 
 
 File: apl.info,  Node: Section 3.2,  Next: Section 3.3,  Prev: Section 3.1,  Up: Chapter 3
@@ -1389,7 +1390,7 @@ operator.  If only ⍶ is present then it is a monadic operator, and if
 neither ⍶ nor ⍹ is present then the lambda is a normal function.
 
    GNU APL supports an axis argument in normal user defined functions
-and operators.  In lambda expressions the greek letter χ (Chi) is the
+and operators.  In lambda expressions the Greek letter χ (Chi) is the
 variable name for an axis argument.
 
    The way a named lambda is implemented in GNU APL is that the
@@ -1420,7 +1421,7 @@ in the body_expression and from whether the body_expression is empty (no
 λ←) or not (with λ←).
 
    It is possible to specify local variables that work exactly like
-their compagnions in normal defined functions.  Please note that this is
+their companions in normal defined functions.  Please note that this is
 different from some other APL interpreters which treat all variables in
 lambda bodies as local variables.  The syntax for specifying local
 variables is the same as for the header in normal defined functions:
@@ -1460,9 +1461,9 @@ example:
 
    Unnamed lambdas are automatically local in scope (similar to labels).
 They can be passed as function arguments to operators.  However, unnamed
-lambdad are NOT inserted into the symbol table of the interpreter.  They
+lambdas are NOT inserted into the symbol table of the interpreter.  They
 are therefore not visible to functions like ⎕CR or by the ∇-editor.
-Ocasionally the names λ1, λ2, ...  may show up in commands like )SIS.
+Occasionally the names λ1, λ2, ...  may show up in commands like )SIS.
 These names are automatically generated for unnamed lambdas in order to
 provide a name in places where a function name is needed.
 
@@ -1570,9 +1571,214 @@ while negative A count from the latest to the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 3.15,  Prev: Section 3.14,  Up: Chapter 3
+File: apl.info,  Node: Section 3.15,  Next: Section 3.16,  Prev: Section 3.14,  Up: Chapter 3
 
-3.15 History and TAB completion
+3.15 ⎕DLX - Knuth’s Dancing Links Algorithm
+===========================================
+
+⎕DLX is an implementation of Knuth’s Dancing Links Algorithm (called DLX
+by Knuth himself, but is sometimes also referred to as Knuth’s Algorithm
+X) ⎕DLX is a generic backtracking machinery that can be used to
+dramatically simplify problems like the 8 queens problem on a chess
+board or sudokus.
+
+   The monadic form of ⎕DLX, i.e.  ⎕DLX B, is a shortcut for 0 ⎕DLX B.
+It computes the first solution for the constraint matrix B.
+
+   The dyadic form of ⎕DLX, i.e.  A ⎕DLX B, has a integer scalar A as
+left argument which determines the details of the computation as
+follows:
+
+   A > 0: The algorithm tries to find all solutions, but stops when A
+solutions have been found.  This is handy while debugging code using
+⎕DLX. The result is a nested vector with one vector item per solution.
+
+   A = 0: The algorithm stops when the first solution was found.  In
+this case the solution is a simple (non-nested) numeric vector.
+
+   A = ¯1: like A > 0 but finding all solutions
+
+   A = ¯2: like A = 0 but instead of returning the first solution, the
+number of solutions (i.e.  0 or 1), the number of backtracks, and the
+number of link dances is returned as a 3-element numeric vector.
+
+   A = ¯3: like A = ¯1 but instead of returning all solutions, the
+number of solutions, the number of backtracks, and the number of link
+dances is returned as a 3-element numeric vector.
+
+   The right argument B of ⎕DLX B or A ⎕DLX B is a constraints matrix
+whose columns consist of either 0s and 1s (called a primary column) or
+0s and 2s (called secondary columns).  The 0s, 1s and 2s can be the
+integers 0, 1, or 2, characters ’0’, ’1’, or ’2’ respectively, or ’ ’
+meaning ’0’.  The character representation is useful when B becomes
+large and shall be printed because the spaces in the numerical variant
+will not be printed.  In the following, B is assumed to be numeric.
+
+   Let Z←A ⎕DLX B, and let R be a solution in Z, that is, Z itself (A =
+0) or R is Z[k] for some k if A ≠ 0.  And let S←+⌿B[R].
+
+   Then S = s1 s2 s3, ...  sN where N is the number of columns in B and
+sj=1 if j is a primary column of B and sj∈0 1 if j is a secondary column
+of B.
+
+   In other words, ⎕DLX B computes a subset of the rows of B in such a
+way that for every column j of B exactly one (for primary column j) or
+at most one (for a secondary column) of the rows in a solution has its
+j’th element set to 1 and all other words set their j’th element set to
+0.
+
+   In yet other words, for every solution returned by ⎕DLX B, a 1 in one
+row prevents all other rows that also have a 1 in that column, and all
+rows together have exactly one 1 in every primary column and at most one
+1 in every secondary column.  In the absence of secondary columns, the
+problem solved by ⎕DLX is also known as the "exact cover problem"
+
+   If all that sounds weird and useless, consider the following APL
+program for finding all solutions of the 8 Queens problem on a chess
+board (which probably every programmer has programmed at some point in
+time):
+
+      RC←8↑'1' ◊ D←15↑¯8↑'2'   ⍝ helpers for constructing Q8
+      ⍝     rows   cols   diag1    diag2
+      Q8←⊃{(R⌽RC),(C⌽RC),((C-R)⌽D),((¯7-R+C)⌽D)⊣(R C)←-8 8⊤⍵-⎕IO} ¨ ⍳64
+      Z←¯1 ⎕DLX Q8
+      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1 2 3 92] ⍝ solutions 1, 2, and 92
+ A1 B6 C8 D3 E7 F4 G2 H5
+ A1 C5 F4 H3 D8 G6 B7 E2
+ A8 D6 H4 G7 C1 F5 B3 E2
+
+
+   Obviously Z contains solutions for the 8 Queens problem; the total
+number of solutions is well known to be 92 and we showed only the first
+two and the last solution above.
+
+   The constraint matrix Q8 is the key to success.  The matrix has 64
+rows - one row for every field of the chess board.  And it has 8 + 8 +
+15 + 15 columns.  The first 8 columns of Q8 are constraints that prevent
+more than one Queen to be placed in the same row of the chess board (the
+argument ⍵ is the field number counting from left to right and from
+bottom to top).  The next 8 columns of Q8 are constraints that prevent
+more than one Queen to be placed in the same column of the chess board.
+
+   If we would call ⎕DLX with only these constraints, i.e.  ⎕DLX T8←64
+16↑Q8, then we would get the solutions of the 8 tower problem.  However,
+we continue and add 15 more constraints for each of the two diagonals.
+The resulting constraint matrix Q8 is this:
+
+      Q8
+
+1       1              2                     2
+1        1              2                   2
+1         1              2                 2
+1          1              2               2
+1           1              2             2
+1            1              2           2
+1             1              2         2
+1              1              2       2
+ 1      1             2                     2
+ 1       1             2                   2
+ 1        1             2                 2
+ 1         1             2               2
+ 1          1             2             2
+ 1           1             2           2
+ 1            1             2         2
+ 1             1             2       2
+  1     1            2                     2
+  1      1            2                   2
+  1       1            2                 2
+  1        1            2               2
+  1         1            2             2
+  1          1            2           2
+  1           1            2         2
+  1            1            2       2
+   1    1           2                     2
+   1     1           2                   2
+   1      1           2                 2
+   1       1           2               2
+   1        1           2             2
+   1         1           2           2
+   1          1           2         2
+   1           1           2       2
+    1   1          2                     2
+    1    1          2                   2
+    1     1          2                 2
+    1      1          2               2
+    1       1          2             2
+    1        1          2           2
+    1         1          2         2
+    1          1          2       2
+     1  1         2                     2
+     1   1         2                   2
+     1    1         2                 2
+     1     1         2               2
+     1      1         2             2
+     1       1         2           2
+     1        1         2         2
+     1         1         2       2
+      1 1        2                     2
+      1  1        2                   2
+      1   1        2                 2
+      1    1        2               2
+      1     1        2             2
+      1      1        2           2
+      1       1        2         2
+      1        1        2       2
+       11       2                     2
+       1 1       2                   2
+       1  1       2                 2
+       1   1       2               2
+       1    1       2             2
+       1     1       2           2
+       1      1       2         2
+       1       1       2       2
+
+   To see how, for example, the first solution looks like and how it
+relates to the constraints matrix Q8:
+
+
+      ⍝ the rows in Q8 of the first solution
+      ⍝
+      Z[1]
+ 1 14 24 27 39 44 50 61
+
+      ⍝ the first solution translated back into the problem domain
+      ⍝
+      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1]
+ A1 B6 C8 D3 E7 F4 G2 H5
+
+      ⍝ the constraints of the rows of the first solution
+      ⍝
+      Q8[⊃Z[1];]
+1       1              2                     2
+ 1           1             2           2
+  1            1            2       2
+   1      1           2                 2
+    1         1          2         2
+     1     1         2               2
+      1  1        2                   2
+       1    1       2             2
+
+      ⍝ all primary contraints met?
+      ⍝
+      +⌿ ' '≠ Q8[⊃Z[1];]
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1
+      1 0 0 0 0 1
+
+
+   And that’s it: call ⎕DLX to get the solution(s).  In general all
+problems that can be solved by ⎕DLX contain 3 steps:
+
+   • translate the problem into a constraints matrix B,
+   • Z←⎕DLX B, and
+   • translate the result Z back into the problem domain.
+
+   Another application of ⎕DLT is solving sudokus.  The constraints
+matrix is a little more complicated, but the principle is the same.
+
+
+File: apl.info,  Node: Section 3.16,  Prev: Section 3.15,  Up: Chapter 3
+
+3.16 History and TAB completion
 ===============================
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive
@@ -2942,29 +3148,30 @@ Node: Top383
 Node: Chapter 11408
 Node: Chapter 216955
 Node: Chapter 321224
-Node: Section 3.122010
-Node: Section 3.232914
-Node: Section 3.337300
-Node: Section 3.440159
-Node: Section 3.540454
-Node: Section 3.641067
-Node: Section 3.742354
-Node: Section 3.844285
-Node: Section 3.944458
-Node: Section 3.1046964
-Node: Section 3.1147542
-Node: Section 3.1248938
-Node: Section 3.1352893
-Node: Section 3.1453657
-Node: Section 3.1555646
-Node: Chapter 457410
-Node: Chapter 559158
-Node: Chapter 660287
-Node: Section 6.160706
-Node: Section 6.261393
-Node: Chapter 762224
-Node: Section 7.162727
-Node: Section 7.288036
+Node: Section 3.122071
+Node: Section 3.232974
+Node: Section 3.337360
+Node: Section 3.440219
+Node: Section 3.540514
+Node: Section 3.641127
+Node: Section 3.742414
+Node: Section 3.844345
+Node: Section 3.944518
+Node: Section 3.1047024
+Node: Section 3.1147602
+Node: Section 3.1248998
+Node: Section 3.1352953
+Node: Section 3.1453717
+Node: Section 3.1555706
+Node: Section 3.1664262
+Node: Chapter 466026
+Node: Chapter 567774
+Node: Chapter 668903
+Node: Section 6.169322
+Node: Section 6.270009
+Node: Chapter 770840
+Node: Section 7.171343
+Node: Section 7.296652
 
 End Tag Table
 

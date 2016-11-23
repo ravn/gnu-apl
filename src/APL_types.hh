@@ -507,7 +507,8 @@ struct labVal
 };
 //-----------------------------------------------------------------------------
 /// dynamic arrays. Due to several segfaults when the array is too big
-/// we removed the usage of (compiler-supported) dynamic arrays completely.
+/// we removed the usage of (compiler-supported) dynamic arrays (which seem
+/// to use alloca()) completely.
 ///
 template<typename Type>
 class __DynArray
@@ -515,25 +516,27 @@ class __DynArray
 public:
    /// constructor: allocate space
    __DynArray(ShapeItem len)
-              { data = new Type[len]; }
+      { data = len ? new Type[len] : 0; }
 
    /// destructor: free space
    ~__DynArray()
-              { delete[] data; }
+      { if (data)   delete[] data; }
 
-   /// return the idx'th element
+   /// return the idx'th element. The caller is responsible for checking \b idx
    const Type & operator[](ShapeItem idx) const
-               { return data[idx]; }
+      { return data[idx]; }
 
-   /// return the idx'th element
+   /// return the idx'th element. The caller is responsible for checking \b idx
    Type & operator[](ShapeItem idx)
-               { return data[idx]; }
+      { return data[idx]; }
 
    /// return the entire array
-   const Type * get_data() const   { return data; }
+   const Type * get_data() const
+      { return data; }
 
    /// return the entire array
-   Type * get_data() { return data; }
+   Type * get_data()
+      { return data; }
 
 protected:
    /// the array

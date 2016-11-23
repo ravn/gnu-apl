@@ -69,6 +69,7 @@ sf( F12_DIVIDE    , "÷"       ,          )
 qf( DL            , "⎕DL"     ,          )
 sf( F12_DOMINO    , "⌹"       ,          )
 sf( F12_DROP      , "↓"       ,          )
+qf( DLX           , "⎕DLX"    ,          )
 
 qf( EA            , "⎕EA"     , = 0x4501 )
 sf( OPER1_EACH    , "¨"       ,          )

@@ -61,6 +61,7 @@ log_def(0, archive                     , ")LOAD and )SAVE details             ")
 log_def(0, Svar_DB_signals             , "Svar_DB signals                     ")
 log_def(0, Parallel                    , "Parallel (multi-core) execution     ")
 log_def(0, EOC_handlers                , "EOC handler functionality           ")
+log_def(0, Quad_DLX                    , "⎕DLX details                        ")
 
 #undef log_def
 

@@ -398,7 +398,7 @@ UCS_string shape_rho;
         picker.get(proto_name);
         picker.pop();
         do_CR10_rec(result, *proto, picker, pidx);
-        result.back().append_utf8(" ⍝ prototype 1");
+        result.back().append_utf8(" ⍝ proto 1");
 
         // and then another line to reshape the prototype
         //
@@ -407,7 +407,7 @@ UCS_string shape_rho;
         reshape.append(shape_rho);
         reshape.append(proto_name);
         result.push_back(reshape);
-        result.back().append_utf8(" ⍝ prototype 2");
+        result.back().append_utf8(" ⍝ proto 2");
         return;
       }
 
