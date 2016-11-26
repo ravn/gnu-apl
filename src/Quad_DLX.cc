@@ -21,6 +21,7 @@
 #include "Logging.hh"
 #include "PointerCell.hh"
 #include "Quad_DLX.hh"
+#include "PrintOperator.hh"
 #include "Token.hh"
 #include "Workspace.hh"
 
@@ -278,12 +279,27 @@ DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
    // count the number of non-zero elemnts in the matrix
    //
 const ShapeItem ec_B = B.element_count();
+const int qio = Workspace::get_IO();
 ShapeItem ones = 0;
 const Cell * b = &B.get_ravel(0);
    loop(e, ec_B)
       {
-        const Col_Type ct = get_col_type(*b++);
-        if (ct == Col_INVALID)   DOMAIN_ERROR;
+        const Cell & cell = *b++;
+        const Col_Type ct = get_col_type(cell);
+        if (ct == Col_INVALID)
+           {
+             const ShapeItem row = qio + e/B.get_cols();
+             const ShapeItem col = qio + e%B.get_cols();
+             UCS_string & more = MORE_ERROR() << "Bad B[" << row << ";"
+                                              << col << "]: ";
+             if (cell.is_integer_cell())
+                more << cell.get_int_value();
+             else if (cell.is_character_cell())
+                more << "'" << cell.get_char_value() << "'";
+             else
+                more << "neither integer nor character";
+             DOMAIN_ERROR;
+           }
         if (ct != Col_UNKNOWN)   ++ones;
       }
 
@@ -334,7 +350,12 @@ const Cell * b = &B.get_ravel(0);
                 rm = new (n++)   DLX_Node(r, c, hdr.up, &hdr, rm, lm);
            }
 
-        Assert(lm != rm);   // otherwise there was no 1 in this row
+        if (lm == rm) // there was no 1 in this row
+           {
+             MORE_ERROR() << "⎕DLX B with empty row B["
+                          << (r + qio) << ";]";
+             DOMAIN_ERROR;
+           }
       }
 
    Log(LOG_Quad_DLX)   { loop(n, ones)   nodes[n].print(CERR); }
@@ -479,7 +500,7 @@ DLX_Root_Node root(rows, cols, result_count, B);
       }
 
 const APL_Integer qio = Workspace::get_IO();
-   if (how == 0)   // return first solution
+   if (how == 0)   // return first (flat) solution
       {
        if (root.get_solution_count() == 0)   // but no solution found
           {
@@ -496,6 +517,8 @@ const APL_Integer qio = Workspace::get_IO();
        return Token(TOK_APL_VALUE1, Z);
       }
 
+   // return all solutions
+   //
 Value_P Z(root.get_solution_count(), LOC);
    if (root.get_solution_count() == 0)   // empty result
       {

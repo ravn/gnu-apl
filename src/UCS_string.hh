@@ -218,6 +218,9 @@ public:
    UCS_string & operator <<(ShapeItem num)
       { append_number(num);   return *this; }
 
+   UCS_string & operator <<(Unicode uni)
+      { append(uni);   return *this; }
+
    UCS_string & operator <<(const UCS_string & other)
       { append(other);   return *this; }
 

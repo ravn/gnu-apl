@@ -1829,7 +1829,7 @@ can be solved by ⎕DLX contain 3 steps:
 @item translate the result Z back into the problem domain.
 @end itemize
 
-Another application of ⎕DLT is solving sudokus. The constraints matrix is
+Another application of ⎕DLX is solving sudokus. The constraints matrix is
 a little more complicated, but the principle is the same.
 
 
