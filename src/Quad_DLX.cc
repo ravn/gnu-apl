@@ -367,6 +367,22 @@ DLX_Root_Node::solve()
 new_level:
 DLX_Node * item = right;
 
+   if (LOG_Quad_DLX || attention_is_raised())
+      {
+         CERR << "⎕DLX[" << solution_length << "]";
+         loop(s, solution_length)
+             CERR << " "
+                  << (headers[s].current_solution->row + Workspace::get_IO());
+         CERR << endl;
+         clear_attention_raised(LOC);
+      }
+
+   if (interrupt_is_raised())
+      {
+        clear_interrupt_raised(LOC);
+        INTERRUPT;
+      }
+
    if (item != this)   // select shortest column
       {
         ShapeItem item_size = headers[item->col].count;
