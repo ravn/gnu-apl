@@ -115,7 +115,7 @@ public:
    : DLX_Node(-1, C, this, this, l, r),
      count(0),
      col_type(Col_UNKNOWN),
-     current_solution(0)
+     item_r(0)
    {}
 
    /// the number of '1's remaining in this column
@@ -124,11 +124,8 @@ public:
    /// the type of column
    Col_Type col_type;
 
-   /// the current_solution has nothing to do with this header node, but is
-   /// held here to avoid an extra memory allocation. Every move removes
-   /// one column, therefore the max. number of moves is at most the number
-   /// of columns
-   DLX_Node * current_solution;
+   /// the items r and j in the double-loop around cover()/uncover()
+   DLX_Node * item_r;
 };
 //-----------------------------------------------------------------------------
 DLX_Node::Col_Type
@@ -167,22 +164,23 @@ public:
    DLX_Root_Node(ShapeItem rows, ShapeItem cols, ShapeItem max_sol,
                  const Value & B);
 
+   void deep_check() const;
+
    ostream & indent(ostream & out)
       {
-        loop(s, solution_length)   out << "  ";
+        loop(s, level)   out << "  ";
         return out;
       }
 
   void cover(ShapeItem j)
      {
-       Log(LOG_Quad_DLX)   indent(CERR) << "Covering column " << j << endl;
        ++cover_count;
 
        DLX_Header_Node & c = headers[j];
        Assert(c.row == -1);
        Assert(c.col == j);
        c.remove_lr();
-       if (c.col_type == DLX_Header_Node::Col_PRIMARY)   --primary_count;
+       if (c.col_type == Col_PRIMARY)   --primary_count;
 
        for (DLX_Node * i = c.down; i != &c; i = i->down)
            {
@@ -197,8 +195,6 @@ public:
 
    void uncover(ShapeItem j)
      {
-       Log(LOG_Quad_DLX)   indent(CERR) << "  Uncovering column " << j << endl;
-
        DLX_Header_Node & c = headers[j];
        Assert(c.row == -1);
        Assert(c.col == j);
@@ -208,11 +204,12 @@ public:
              for (DLX_Node * j = i->left; j != i; j = j->left)
                  {
                    j->insert_ud();
-                   ++headers[j->col].count;
+                   headers[j->col].count++;
                  }
            }
        c.insert_lr();
-       if (c.col_type == DLX_Header_Node::Col_PRIMARY)   ++primary_count;
+       if (c.col_type == Col_PRIMARY)   ++primary_count;
+       c.check();
      }
 
    void display(ostream & out) const;
@@ -228,7 +225,7 @@ public:
 
 protected:
    /// the max. number of solutions to produce, 0 = all
-   const ShapeItem max_solution_count;
+   const ShapeItem max_solutions;
 
    /// the number of rows
    const ShapeItem rows;
@@ -252,7 +249,7 @@ protected:
    ShapeItem solution_count;
 
    /// the number of rows in the current partial solution (aka recursion depth)
-   ShapeItem solution_length;
+   ShapeItem level;
 
    /// the total number of pick'ed elements
    ShapeItem pick_count;
@@ -264,7 +261,7 @@ protected:
 DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
                              const Value & B)
    : DLX_Node(-1, -1, this, this, this, this),
-     max_solution_count(max_sol),
+     max_solutions(max_sol),
      rows(rs),
      cols(cs),
      headers(0),
@@ -272,7 +269,7 @@ DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
      primary_count(0),
      secondary_count(0),
      solution_count(0),
-     solution_length(0),
+     level(0),
      pick_count(0),
      cover_count(0)
 {
@@ -298,6 +295,7 @@ const Cell * b = &B.get_ravel(0);
                 more << "'" << cell.get_char_value() << "'";
              else
                 more << "neither integer nor character";
+             more << " in ⎕DLX B";
              DOMAIN_ERROR;
            }
         if (ct != Col_UNKNOWN)   ++ones;
@@ -348,6 +346,7 @@ const Cell * b = &B.get_ravel(0);
                 rm = new (n++)   DLX_Node(r, c, hdr.up, &hdr, rm, lm);
              else
                 rm = new (n++)   DLX_Node(r, c, hdr.up, &hdr, rm, lm);
+             ++headers[c].count;
            }
 
         if (lm == rm) // there was no 1 in this row
@@ -362,17 +361,107 @@ const Cell * b = &B.get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 void
+DLX_Root_Node::display(ostream & out) const
+{
+int w = 1;
+   if (cols >= 10)   w = 2;
+   if (cols >= 100)  w = 3;
+   if (cols >= 1000) w = 4;
+
+ShapeItem pcnt = 0;
+
+   out << endl << "  N:";
+   for (const DLX_Node * x = right; x != this; x = x->right)
+       {
+         const DLX_Header_Node & hdr = *(const DLX_Header_Node *)x;
+         Assert(hdr.row == -1);
+         if (hdr.col_type == Col_PRIMARY)   ++pcnt;
+         out << " " << setw(w) << hdr.count;
+       }
+   out << endl << "Col:";
+   for (const DLX_Node * x = right; x != this; x = x->right)
+       {
+         const DLX_Header_Node & hdr = *(const DLX_Header_Node *)x;
+         Assert(hdr.row == -1);
+         out << " " << setw(w) << hdr.col;
+       }
+   out << " (" << pcnt << ")" << endl << "----";
+   for (const DLX_Node * x = right; x != this; x = x->right)
+       {
+         for (int ww = -1; ww < w; ++ww)   out << "-";
+       }
+   out << endl;
+
+char rows_used[rows];
+   memset(rows_used, 0, sizeof(rows_used));
+
+   for (const DLX_Node * x = right; x != this; x = x->right)
+   for (const DLX_Node * y = x->down; y != x; y = y->down)
+       {
+         rows_used[y->row] = 1;     // mark row used
+       }
+
+   for (ShapeItem r = 0; r < rows; ++r)
+       {
+         if (!rows_used[r])   continue;
+
+         int row[cols];
+         memset(row, 0, sizeof(row));
+         for (const DLX_Node * x = right; x != this; x = x->right)
+         for (const DLX_Node * y = x->down; y != x; y = y->down)
+             {
+               if (y->row == r)   row[y->col] = 1;
+             }
+
+         out << setw(3) << r << ":";
+         for (const DLX_Node * x = right; x != this; x = x->right)
+             {
+               out << " " << setw(w) << row[x->col];
+             }
+         out << endl;
+       }
+
+   out << "----";
+   for (const DLX_Node * x = right; x != this; x = x->right)
+       {
+         for (int ww = -1; ww < w; ++ww)   out << "-";
+       }
+   out << endl;
+
+}
+//-----------------------------------------------------------------------------
+void
+DLX_Root_Node::deep_check() const
+{
+   for (const DLX_Node * x = right; x != this; x = x->right)
+       {
+         const DLX_Header_Node & hdr = *(const DLX_Header_Node *)x;
+         Assert(hdr.row == -1);
+         hdr.check();
+         ShapeItem ones = 0;
+         for (const DLX_Node * y = x->down; y != x; y = y->down)
+             {
+               y->check();
+              ++ones;
+             }
+         Assert(ones == hdr.count);
+       }
+}
+//-----------------------------------------------------------------------------
+
+void
 DLX_Root_Node::solve()
 {
 new_level:
-DLX_Node * item = right;
+   Assert(level < cols);
+
+   deep_check();
 
    if (LOG_Quad_DLX || attention_is_raised())
       {
-         CERR << "⎕DLX[" << solution_length << "]";
-         loop(s, solution_length)
-             CERR << " "
-                  << (headers[s].current_solution->row + Workspace::get_IO());
+         CERR << "⎕DLX[" << level << "]";
+         loop(s, level)
+             CERR << " " << (headers[s].item_r->row + Workspace::get_IO());
          CERR << endl;
          clear_attention_raised(LOC);
       }
@@ -383,92 +472,117 @@ DLX_Node * item = right;
         INTERRUPT;
       }
 
-   if (item != this)   // select shortest column
-      {
-        ShapeItem item_size = headers[item->col].count;
-        for (DLX_Node * i = item->right; i != this; i = i->right)
-            {
-              const ShapeItem i_size = headers[i->col].count;
-              if (i_size < item_size)
-                 {
-                   item = i;
-                   item_size = i_size;
-                 }
-            }
-      }
-
-   Assert(item->row == -1);
-
    // the problem is solved if there are no primary columns left
    //
+DLX_Node * item = right;
+
+   Log(LOG_Quad_DLX)   item->print_RC(CERR << "At header item ") << endl;
+
    if (primary_count == 0)
       {
-        all_solutions.append(solution_length);
-        loop(s, solution_length)
-            all_solutions.append(headers[s].current_solution->row);
+        all_solutions.append(level);
+        loop(s, level)
+            all_solutions.append(headers[s].item_r->row);
 
         Log(LOG_Quad_DLX)
            {
-             CERR << "!!!!! solution " << solution_count
-                  << ": rows are";
-             loop(s, solution_length)
-                  CERR << " " << setw(2) << headers[s].current_solution->row;
+             CERR << "!!!!! solution " << solution_count << ": rows are";
+             loop(s, level)   CERR << " " << setw(2) << headers[s].item_r->row;
              CERR << endl;
            }
 
         ++solution_count;
-        if (max_solution_count &&
-            solution_count >= max_solution_count)   return;
-      }
-// else display(CERR);
+        if (max_solutions && solution_count >= max_solutions)   return;
 
-next_in_column:
-   item = item->down;
-   if (item->row == -1)   // no '1' in column: no solution
+        goto level_done;
+      }
+
+   if (item != this)   // matrix not empty: select shortest column
       {
-        if (solution_length == 0)   // no more backtracks
+        ShapeItem col_size = 2*cols;
+        for (DLX_Node * i = right; i != this; i = i->right)
+            {
+              if (headers[i->col].col_type != Col_PRIMARY)   continue;
+              const ShapeItem i_size = headers[i->col].count;
+              if (i_size < col_size)
+                 {
+                   item = i;
+                   col_size = i_size;
+                 }
+            }
+
+        if (col_size == 0)
+           {
+              Log(LOG_Quad_DLX)   CERR << "column " << item-> col
+                                       << " is empty" << endl;
+              goto level_done;   // empty column: no solution
+           }
+      }
+
+   Assert(item->row == -1);
+   Log(LOG_Quad_DLX)   indent(CERR) << "Choose and cover column c="
+                                    << item->col << endl;
+   cover(item->col);
+
+   headers[level].item_r = item;
+
+rloop:   // running ↓
+   {
+     DLX_Node * r = headers[level].item_r->down;
+
+     Log(LOG_Quad_DLX)   r->print_RC(indent(CERR) << "rloop ↓ at r= ") << endl;
+
+     for (DLX_Node * j = r->right; j != r; j = j->right)
+         {
+           Log(LOG_Quad_DLX)
+              {
+                indent(CERR) << "Covering column j=" << j->col << endl;
+              }
+           cover(j->col);
+         }
+
+         Log(LOG_Quad_DLX)
+            {
+              r->print_RC(indent(CERR) << "Picking item ") << endl;
+            }
+         headers[level].item_r = r;
+         ++level;
+         ++pick_count;
+         goto new_level;
+   }
+
+level_done:
+   if (level > 0)
+      {
+        --level;
+        DLX_Node * r = headers[level].item_r;
+        Log(LOG_Quad_DLX)
+           {
+             r->print_RC(indent(CERR) << "Backtracking") << endl;
+           }
+
+        for (DLX_Node * j = r->left; j != r; j = j->left)
+            {
+              Log(LOG_Quad_DLX)
+                 {
+                   indent(CERR) << "Uncovering column j=" << j->col << endl;
+                 }
+              uncover(j->col);
+            }
+
+        r = r->down;
+        if (r->row == -1)   // end of rloop reached
            {
              Log(LOG_Quad_DLX)
                 {
-                  if (solution_count == 0)   CERR << "no solution" << endl;
+                  indent(CERR) << "Uncovering column c=" << r->col << endl;
                 }
-             return;
+              uncover(r->col);
+             goto level_done;
            }
 
-        item = headers[--solution_length].current_solution;   // restore item
-        Log(LOG_Quad_DLX)
-           {
-             item->print_RC(indent(CERR) << "Backtrack item ") << endl;
-           }
-
-        for (DLX_Node * col_j = item->left; ; col_j = col_j->left)
-            {
-              uncover(col_j->col);
-              if (col_j == item)   break;
-            }
-
-        goto next_in_column;
+        goto rloop;
       }
-
-   Log(LOG_Quad_DLX)
-      {
-        item->print_RC(indent(CERR) << "Picking item   ") << endl;
-      }
-
-   ++pick_count;
-   headers[solution_length++].current_solution = item;
-
-   // For each j such that A[r, j] = 1, i.e. for row r
-   //
-   for (DLX_Node * col_j = item->right; ; col_j = col_j->right)
-       {
-         // delete column j and its rows from matrix A;
-         //
-         cover(col_j->col);
-         if (col_j == item)   break;
-       }
-
-   goto new_level;
 }
 //=============================================================================
 Token
