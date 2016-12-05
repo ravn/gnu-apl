@@ -26,6 +26,8 @@
 
 #include <stdlib.h>
 
+#include <vector>
+
 class ColumnDescriptor {
 public:
     ColumnDescriptor( const string &name_in, const string &type_in ) : name( name_in ), type( type_in ) {}

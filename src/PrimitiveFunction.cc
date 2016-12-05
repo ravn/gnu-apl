@@ -2807,11 +2807,11 @@ UTF8_string result_utf8 = out.get_data();
        result_utf8.last() != UNI_ASCII_LF)
       result_utf8.append(UNI_ASCII_LF);
 
-vector<ShapeItem> line_starts;
-   line_starts.push_back(0);
+Simple_string<ShapeItem> line_starts;
+   line_starts.append(0);
    loop(r, result_utf8.size())
       {
-        if (result_utf8[r] == UNI_ASCII_LF)   line_starts.push_back(r + 1);
+        if (result_utf8[r] == UNI_ASCII_LF)   line_starts.append(r + 1);
       }
 
 Value_P Z((ShapeItem)line_starts.size() - 1, LOC);

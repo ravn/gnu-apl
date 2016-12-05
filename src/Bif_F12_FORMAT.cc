@@ -235,9 +235,9 @@ UCS_string_vector col_formats;
 
    // convert each column format string into a Format_LIFER
    //
-vector<Format_LIFER> col_items;
+Simple_string<Format_LIFER> col_items;
    loop(c, col_formats.size())
-       col_items.push_back(Format_LIFER(col_formats[c]));
+       col_items.append(Format_LIFER(col_formats[c]));
 
    Log(LOG_Bif_F12_FORMAT)
       {

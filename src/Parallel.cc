@@ -31,7 +31,7 @@
 #define sem_init(x, y, z)
 #endif // PARALLEL_ENABLED
 
-vector<CPU_Number>Parallel::all_CPUs;
+Simple_string<CPU_Number>Parallel::all_CPUs;
 CoreCount Thread_context::active_core_count = CCNT_1;   // the master
 
 Thread_context * Thread_context::thread_contexts = 0;
@@ -104,7 +104,7 @@ Parallel::init(bool logit)
 #else // not PARALLEL_ENABLED
 
    Thread_context::init_sequential(logit);
-   all_CPUs.push_back(CPU_0);
+   all_CPUs.append(CPU_0);
 
 #endif // PARALLEL_ENABLED
 }
@@ -291,13 +291,13 @@ int count = CORE_COUNT_WANTED;
 #if CORE_COUNT_WANTED == 0
 
    run_parallel = false;
-   all_CPUs.push_back(CPU_0);
+   all_CPUs.append(CPU_0);
    return;
 
 #elif CORE_COUNT_WANTED == 1
 
    run_parallel = true;
-   all_CPUs.push_back(CPU_0);
+   all_CPUs.append(CPU_0);
    return;
 
 #elif CORE_COUNT_WANTED == -2   // --cc N
@@ -307,7 +307,7 @@ int count = CORE_COUNT_WANTED;
    if (uprefs.requested_cc < 1)   // serial or 1 core
       {
         run_parallel = uprefs.requested_cc > 0;
-        all_CPUs.push_back(CPU_0);
+        all_CPUs.append(CPU_0);
         return;
       }
    else
@@ -328,7 +328,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
       {
         CERR << "pthread_getaffinity_np() failed with error "
              << err << endl;
-        all_CPUs.push_back(CPU_0);
+        all_CPUs.append(CPU_0);
         return;
       }
 
@@ -338,7 +338,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
          {
            if (CPU_ISSET(c, &CPUs))
               {
-                all_CPUs.push_back((CPU_Number)c);
+                all_CPUs.append((CPU_Number)c);
                 if ((int)all_CPUs.size() == CPU_count)   break;   // all CPUs found
               }
          }
@@ -348,7 +348,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
       {
         CERR << "*** no cores detected, assuming at least one! "
              << err << endl;
-        all_CPUs.push_back(CPU_0);
+        all_CPUs.append(CPU_0);
         return;
       }
 
@@ -371,7 +371,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
 
    if (count < 0)   count = 64;
 
-   loop(c, CORE_COUNT_WANTED)   all_CPUs.push_back((CPU_Number)c);
+   loop(c, CORE_COUNT_WANTED)   all_CPUs.append((CPU_Number)c);
 
    Log(LOG_Parallel || logit)
       {

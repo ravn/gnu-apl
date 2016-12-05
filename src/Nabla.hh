@@ -28,6 +28,11 @@ class Symbol;
 /// a line number like 1.2 while editing
 struct LineLabel
 {
+   /// empty constuctor
+   LineLabel()
+   : ln_major(0)
+   {}
+
    /// constuctor: line mj
    LineLabel(int mj)
    : ln_major(mj)
@@ -97,6 +102,12 @@ protected:
    /// a line label and program text, e.g.  [1.1] TEXT←TEXT
    struct FunLine
       {
+        /// empty constructor
+        FunLine()
+        : stop_flag(false),
+          trace_flag(false)
+        {}
+
         /// constructor
         FunLine(LineLabel lab, const UCS_string & tx)
         : label(lab),
@@ -177,7 +188,7 @@ protected:
    Symbol * fun_symbol;
 
    /// the lines of the function.
-   vector<FunLine> lines;
+   Simple_string<FunLine> lines;
 
    /// editor commands
    enum Ecmd

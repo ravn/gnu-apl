@@ -713,8 +713,7 @@ UTF8_string utf((const UTF8 *)start, len);
 
    // skip trailing \r and \n.
    //
-   while (len > 0 && (utf[len - 1] == '\r' || utf[len - 1] == '\n'))   --len;
-   utf.erase(len);
+   while (utf.size() && (utf.last() == '\r' || utf.last() == '\n'))   utf.pop();
 
 UCS_string ucs(utf);
    munmap((char *)start, st.st_size);

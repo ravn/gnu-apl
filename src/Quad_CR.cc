@@ -642,7 +642,7 @@ const bool need_disclose = get_level() > 1;
 
    // , is only needed if the picked item is not a true vector
    //
-const bool need_comma = shapes.back().get_rank() != 1;
+const bool need_comma = shapes.last().get_rank() != 1;
 
    result.append_utf8("(");
    if (need_comma)      result.append_utf8(",");

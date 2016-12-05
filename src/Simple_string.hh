@@ -178,7 +178,8 @@ public:
       {
         Assert(pos < items_valid);
         if (items_valid - items_allocated >= 0)   extend();
-        for (ShapeItem s = items_valid - 1; s > pos; --s)  items[s + 1] = items[s];
+        for (ShapeItem s = items_valid - 1; s > pos; --s)
+            items[s + 1] = items[s];
         items[pos + 1] = t;
         ++items_valid;
       }
@@ -186,9 +187,10 @@ public:
    /// insert character \b t before position \b pos
    void insert_before(ShapeItem pos, const T & t)
       {
-        Assert(pos < items_valid);
+        Assert(pos <= items_valid);
         if (items_valid - items_allocated >= 0)   extend();
-        for (ShapeItem s = items_valid - 1; s >= pos; --s)   items[s + 1] = items[s];
+        for (ShapeItem s = items_valid - 1; s >= pos; --s)
+            items[s + 1] = items[s];
         items[pos] = t;
         ++items_valid;
       }
@@ -239,12 +241,6 @@ public:
    /// shrink to size 0
    void clear()
       { items_valid = 0; }
-
-   /// erase all items above pos
-   void erase(ShapeItem pos)
-      {
-        if (items_valid > pos)   items_valid = pos;
-      }
 
    /// erase \b count items, starting at \b pos
    void erase(ShapeItem pos, ShapeItem count)

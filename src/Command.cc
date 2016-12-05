@@ -51,7 +51,7 @@
 int Command::boxing_format = -1;
 ShapeItem Command::APL_expression_count = 0;
 
-vector<Command::user_command> Command::user_commands;
+Simple_string<Command::user_command> Command::user_commands;
 
 //-----------------------------------------------------------------------------
 void
@@ -1247,7 +1247,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                   //
                   out << "    User-defined command "
                       << user_commands[u].prefix << " removed." << endl;
-                  user_commands.erase(user_commands.begin() + u);
+                  user_commands.erase(u, 1);
                   return;
                 }
            }
@@ -1313,7 +1313,7 @@ const int mode = (args.size() == 3) ? args[2].atoi() : 0;
       }
 
 user_command new_user_command = { args[0], args[1], mode };
-   user_commands.push_back(new_user_command);
+   user_commands.append(new_user_command);
 
    out << "    User-defined command "
        << new_user_command.prefix << " installed." << endl;

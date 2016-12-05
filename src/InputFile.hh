@@ -24,15 +24,15 @@
 #include "UTF8_string.hh"
 #include "UCS_string.hh"
 
-/// an input file and its properties. the file can be an apl script(.asp) file
+/// an input file and its properties. The file can be an apl script(.apl) file
 /// or a testcase (.tc) file. The file names initially come from the command
 /// line, but can be extended by )COPY commands 
 struct InputFile
 {
    friend class IO_Files;
 
-   /// constructor for vector<>::resize()
-   InputFile() {}   // for resize()
+   /// empty constructor
+   InputFile() {}
 
    /// Normal constructor
    InputFile(const UTF8_string & _filename, FILE * _file,
@@ -101,7 +101,7 @@ struct InputFile
    /// add object to object_filter
    void add_filter_object(UCS_string & object)
       {
-        object_filter.push_back(object);
+        object_filter.append(object);
       }
 
    /// return true if this file as an oject filter (from )COPY file names...)
@@ -126,7 +126,7 @@ struct InputFile
    static void randomize_files();
 
    /// files that need to be processed
-   static vector<InputFile> files_todo;
+   static Simple_string<InputFile> files_todo;
 
    FILE       * file;       ///< file descriptor
    UTF8_string  filename;   ///< dito.

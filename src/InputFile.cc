@@ -32,7 +32,7 @@
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 
-vector<InputFile> InputFile::files_todo;
+Simple_string<InputFile> InputFile::files_todo;
 int InputFile::stdin_line_no = 1;
 
 //-----------------------------------------------------------------------------

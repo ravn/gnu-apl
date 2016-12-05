@@ -572,7 +572,7 @@ Nabla::open_new_function()
       UERR << "creating new function '" << fun_symbol->get_name() 
            << "' with header '" << fun_header << "'" << endl;
 
-   lines.push_back(FunLine(0, fun_header));
+   lines.append(FunLine(0, fun_header));
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -639,7 +639,7 @@ UCS_string_vector tlines;
                   }
              }
 
-         lines.push_back(fl);
+         lines.append(fl);
        }
 
    current_line = LineLabel(tlines.size());
@@ -716,7 +716,7 @@ const LineLabel user_edit_to = edit_to;
       }
    else                      // eg. [42⎕] or [⎕]
       {
-        current_line = lines.back().label;
+        current_line = lines.last().label;
         current_line.next();
       }
 
@@ -739,7 +739,7 @@ const int idx_to = find_line(LineLabel(edit_to));
 
    if (edit_from == -1)   // delete single line
       {
-        lines.erase(lines.begin() + idx_to);
+        lines.erase(idx_to, 1);
         return 0;
       }
 
@@ -749,8 +749,8 @@ const int idx_from = find_line(LineLabel(edit_from));
    if (idx_from == -1)       return "Bad line number M in [M∆N] ";
    if (idx_from >= idx_to)   return "M ≥ N in [M∆N] ";
 
-   lines.erase(lines.begin() + idx_from, lines.begin() + idx_to);
-   current_line = lines.back().label;
+   lines.erase(idx_from, idx_to - idx_from);
+   current_line = lines.last().label;
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -847,7 +847,7 @@ const int idx_from = find_line(edit_from);
             }
 
         FunLine fl(edit_from, current_text);
-        lines.insert(lines.begin() + before_idx + 1, fl);
+        lines.insert_before(before_idx + 1, fl);
       }
    else
       {
@@ -864,7 +864,7 @@ const char *
 Nabla::execute_escape()
 {
    lines.clear();
-   lines.push_back(FunLine(0, fun_header));
+   lines.append(FunLine(0, fun_header));
    return 0;
 }
 //-----------------------------------------------------------------------------

@@ -313,7 +313,7 @@ UserPreferences::parse_argv_2(bool logit)
 
               const UTF8_string & filename(val);
               InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
-              InputFile::files_todo.push_back(fam);
+              InputFile::files_todo.append(fam);
               continue;
             }
 
@@ -537,7 +537,7 @@ UserPreferences::parse_argv_2(bool logit)
                        }
                     const UTF8_string & filename = expanded_argv[a];
                     InputFile fam(filename, 0, true, true, false, no_LX);
-                    InputFile::files_todo.push_back(fam);
+                    InputFile::files_todo.append(fam);
                   }
 
               // 
@@ -612,7 +612,7 @@ UserPreferences::parse_argv_2(bool logit)
       {
         const UTF8_string & filename = expanded_argv[script_argc];
         InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
-        InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
+        InputFile::files_todo.insert_before(0, fam);
       }
 
    // count number of testfiles
@@ -655,8 +655,8 @@ UserPreferences::expand_argv(int argc, const char ** argv)
 {
    loop(a, argc)
        {
-         original_argv.push_back(argv[a]);
-         expanded_argv.push_back(argv[a]);
+         original_argv.append(argv[a]);
+         expanded_argv.append(argv[a]);
        }
 
    if (argc <= 1)   // no args at all
@@ -683,7 +683,7 @@ const char * apl_args = argv[1];
    script_argc = 2;
    if (!strchr(apl_args, ' '))   return;   // single option
 
-   expanded_argv.erase(expanded_argv.begin() + 1);
+   expanded_argv.erase(1, 1);
    --script_argc;
    for (int index = 1;;)
        {
@@ -698,14 +698,14 @@ const char * apl_args = argv[1];
             {
               const int arg_len = arg_end - apl_args;
               const char * arg = strndup(apl_args, arg_len);
-              expanded_argv.insert(expanded_argv.begin() + index++, arg);
+              expanded_argv.insert_before(index++, arg);
               ++script_argc;
               apl_args += arg_len;
             }
          else           // last argument
             {
               const char * arg = strdup(apl_args);
-              expanded_argv.insert(expanded_argv.begin() + index++, arg);
+              expanded_argv.insert_before(index++, arg);
               ++script_argc;
               break;
             }

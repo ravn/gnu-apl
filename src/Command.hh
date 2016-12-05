@@ -117,7 +117,7 @@ public:
       };
 
    /// one user defined command
-   static vector<user_command> user_commands;
+   static Simple_string<user_command> user_commands;
 
    /// check workspace integrity (stale Value and IndexExpr objects, etc)
    static void cmd_CHECK(ostream & out);

@@ -499,7 +499,7 @@ Workspace::clear_WS(ostream & out, bool silent)
 
    // clear the value stacks of read/write system variables...
    //
-#define rw_sv_def(x, _str, _txt) get_v_ ## x().destruct();
+#define rw_sv_def(x, _str, _txt) get_v_ ## x().clear_vs();
 #define ro_sv_def(x, _str, _txt)
 #include "SystemVariable.def"
 
@@ -736,7 +736,7 @@ InputFile fam(filename, file, false, false, true, with_LX);
         loop(o, object_filter->size())
             fam.add_filter_object((*object_filter)[o]);
       }
-   InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
+   InputFile::files_todo.insert_before(0, fam);
 }
 //-----------------------------------------------------------------------------
 /// a streambuf that escapes certain HTML characters
@@ -1072,7 +1072,7 @@ void
 Workspace::wsid(ostream & out, UCS_string arg, bool silent)
 {
    while (arg.size() && arg[0] <= ' ')       arg.remove_front();
-   while (arg.size() && arg.back() <= ' ')   arg.erase(arg.size() - 1);
+   while (arg.size() && arg.back() <= ' ')   arg.pop();
 
    if (arg.size() == 0)   // inquire workspace name
       {

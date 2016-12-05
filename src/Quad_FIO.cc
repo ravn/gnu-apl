@@ -62,11 +62,11 @@ Quad_FIO::Quad_FIO()
    // init stdin, stdout, and stderr
    //
 file_entry f0(stdin, STDIN_FILENO);
-   open_files.push_back(f0);
+   open_files.append(f0);
 file_entry f1(stdout, STDOUT_FILENO);
-   open_files.push_back(f1);
+   open_files.append(f1);
 file_entry f2(stderr, STDERR_FILENO);
-   open_files.push_back(f2);
+   open_files.append(f2);
 }
 //-----------------------------------------------------------------------------
 void
@@ -75,13 +75,13 @@ Quad_FIO::clear()
    // close open files, but leave stdin, stdout, and stderr open
    while(open_files.size() > 3)
       {
-         file_entry & fe = open_files.back();
+         file_entry & fe = open_files.last();
          if (fe.fe_FILE)   fclose(fe.fe_FILE);   // also closes fe.fe_fd
          else              close(fe.fe_fd);
          CERR << "WARNING: File " << fe.path << " still open - closing it"
               << endl;
-        ::close(open_files.back().fe_fd);
-        open_files.pop_back();
+        ::close(open_files.last().fe_fd);
+        open_files.pop();
       }
 }
 //-----------------------------------------------------------------------------
@@ -801,7 +801,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 file_entry fe(f, fileno(f));
                 fe.path = path;
                 fe.fe_may_read = true;
-                open_files.push_back(fe);
+                open_files.append(fe);
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
               }
 
@@ -816,8 +816,8 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (fe.fe_FILE)   fclose(fe.fe_FILE);   // also closes fe.fe_fd
                 else              close(fe.fe_fd);
 
-                fe = open_files.back();       // move last file to fe
-                open_files.pop_back();        // erase last file
+                fe = open_files.last();       // move last file to fe
+                open_files.pop();        // erase last file
                 goto out_errno;
               }
 
@@ -961,7 +961,7 @@ const int function_number = X->get_ravel(0).get_near_int();
 
                 file_entry fe(f, fileno(f));
                 fe.fe_may_read = true;
-                open_files.push_back(fe);
+                open_files.append(fe);
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd,LOC));
               }
 
@@ -972,8 +972,8 @@ const int function_number = X->get_ravel(0).get_near_int();
                 int err = EBADF;   /* Bad file number */
                 if (fe.fe_FILE)   err = pclose(fe.fe_FILE);
 
-                fe = open_files.back();       // move last file to fe
-                open_files.pop_back();        // erase last file
+                fe = open_files.last();       // move last file to fe
+                open_files.pop();        // erase last file
 
                 if (err == -1)   goto out_errno;   // pclose() failed
                 return Token(TOK_APL_VALUE1, IntScalar(err,LOC));
@@ -1024,7 +1024,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 DIR * dir = opendir(path.c_str());
                 if (dir == 0)   goto out_errno;
 
-                vector<struct dirent> entries;
+                Simple_string<struct dirent> entries;
                 for (;;)
                     {
                       dirent * entry = readdir(dir);
@@ -1040,7 +1040,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                                continue;
                           }
 
-                      entries.push_back(*entry);
+                      entries.append(*entry);
                     }
                 closedir(dir);
 
@@ -1111,7 +1111,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 file_entry fe(0, sock);
                 fe.fe_may_read = true;
                 fe.fe_may_write = true;
-                open_files.push_back(fe);
+                open_files.append(fe);
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
 	      }
 
@@ -1133,7 +1133,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (sock == -1)   goto out_errno;
 
                 file_entry nfe (0, sock);
-                open_files.push_back(nfe);
+                open_files.append(nfe);
 
                 Value_P Z(4, LOC);
                 new (Z->next_ravel())   IntCell(nfe.fe_fd);
@@ -1430,7 +1430,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 fe.path = path;
                 fe.fe_may_read = read;
                 fe.fe_may_write = write;
-                open_files.push_back(fe);
+                open_files.append(fe);
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd,LOC));
               }
 
@@ -1575,7 +1575,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 file_entry fe(f, fileno(f));
                 fe.fe_may_read = read;
                 fe.fe_may_write = write;
-                open_files.push_back(fe);
+                open_files.append(fe);
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
               }
 

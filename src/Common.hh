@@ -42,7 +42,6 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #ifdef erase
 #undef erase
 #endif
-#include <vector>
 
 #include <complex>
 #include <iostream>

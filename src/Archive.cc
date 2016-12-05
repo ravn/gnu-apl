@@ -1296,7 +1296,7 @@ const int  rk  = find_int_attr("rk",  false, 10);
 
    if (reading_vids)
       {
-         parents.push_back(parent);
+         parents.append(parent);
          return;
       }
 
@@ -1339,14 +1339,14 @@ bool no_copy = false;   // assume the value is needed
 
    if (no_copy)
       {
-        values.push_back(Value_P());
+        values.append(Value_P());
       }
    else
       {
         Assert(vid == (int)values.size());
 
         Value_P val(sh_value, LOC);
-        values.push_back(val);
+        values.append(val);
       }
 }
 //-----------------------------------------------------------------------------
@@ -1767,7 +1767,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
         if (is_tag("Variable"))
            {
              const int vid = find_int_attr("vid", false, 10);
-             vids_COPY.push_back(vid);
+             vids_COPY.append(vid);
            }
         skip_to_tag("/Symbol");
         return;

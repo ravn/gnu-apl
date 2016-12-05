@@ -60,6 +60,9 @@ protected:
    struct file_entry
       {
         /// constructor
+        file_entry() {}
+
+        /// constructor
         file_entry(FILE * fp, int fd)
         : fe_FILE(fp),
           fe_fd(fd),
@@ -105,7 +108,7 @@ protected:
    Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
 
    /// the open files
-   vector<file_entry> open_files;
+   Simple_string<file_entry> open_files;
 };
 //-----------------------------------------------------------------------------
 #endif //  __QUAD_FIO_HH_DEFINED__

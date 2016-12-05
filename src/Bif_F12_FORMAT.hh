@@ -97,6 +97,9 @@ public:
    /// An entire format field (LIFER = Left-Int-Fract-Expo-Right
    struct Format_LIFER
       {
+        /// empty constructor
+        Format_LIFER() {}
+
         /// constructor
         Format_LIFER(UCS_string fmt);
 

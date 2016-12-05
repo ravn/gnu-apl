@@ -30,7 +30,7 @@
 #include "Symbol.hh"
 #include "Workspace.hh"
 
-vector<NativeFunction *> NativeFunction::valid_functions;
+Simple_string<NativeFunction *> NativeFunction::valid_functions;
 
 //-----------------------------------------------------------------------------
 NativeFunction::NativeFunction(const UCS_string & so_name,
@@ -146,7 +146,7 @@ const char * why = sym->cant_be_defined();
 
    Workspace::more_error().clear();
    valid = true;
-   valid_functions.push_back(this);
+   valid_functions.append(this);
 }
 //-----------------------------------------------------------------------------
 NativeFunction::~NativeFunction()
@@ -158,7 +158,7 @@ NativeFunction::~NativeFunction()
       {
         if (valid_functions[v] == this)
            {
-             valid_functions.erase(valid_functions.begin() + v);
+             valid_functions.erase(v, 1);
            }
       }
 }
@@ -310,7 +310,7 @@ NativeFunction::cleanup()
    //
    loop(v, valid_functions.size())
       {
-        NativeFunction & fun = *valid_functions.back();
+        NativeFunction & fun = *valid_functions.last();
         if (fun.close_fun && fun.handle)
            {
              const bool do_dlclose = (*fun.close_fun)(CAUSE_SHUTDOWN, &fun);

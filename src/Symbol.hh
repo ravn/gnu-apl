@@ -33,7 +33,7 @@ class IndexExpr;
 class UserFunction;
 
 //-----------------------------------------------------------------------------
-/// An entry of the value stack for \b this symbol. The value stack
+/// One entry of the value stack for \b this symbol. The value stack
 /// is pushed/poped when the symbol is localized on entry/return of
 /// a user defined function.
 struct ValueStackItem
@@ -94,15 +94,6 @@ public:
 
    /// create a symbol with name \b ucs
    Symbol(const UCS_string & ucs, ID::Id id);
-
-   /// explicit destructor
-   void destruct()
-      {
-        clear_vs();
-        vector<ValueStackItem> x;
-        value_stack.swap(x);
-        name.destruct();
-      }
 
    /// destructor
    virtual ~Symbol()
@@ -245,11 +236,11 @@ public:
 
    /// return the top-most item on the value stack
    const ValueStackItem * top_of_stack() const
-      { return value_stack.size() ? &value_stack.back() : 0; }
+      { return value_stack.size() ? &value_stack.last() : 0; }
 
    /// return the top-most item on the value stack
    ValueStackItem * top_of_stack()
-      { return value_stack.size() ? &value_stack.back() : 0; }
+      { return value_stack.size() ? &value_stack.last() : 0; }
 
    /// return the idx'th item on stack (higher index = newer item)
    const ValueStackItem & operator [](int idx) const
@@ -295,7 +286,7 @@ protected:
    void (*monitor_callback)(const Symbol &, Symbol_Event sev);
 
    /// the value stack of \b this \b Symbol
-   vector<ValueStackItem> value_stack;
+   Simple_string<ValueStackItem> value_stack;
 };
 //-----------------------------------------------------------------------------
 /// lambda result λ

@@ -129,7 +129,7 @@ UCS_string to;
 
    // put those symbols into 'list' that satisfy 'which'
    //
-vector<Symbol *> list;
+Simple_string<Symbol *> list;
 int symbol_count = 0;
    loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
@@ -157,14 +157,14 @@ int symbol_count = 0;
                   {
                     if (which == LIST_ALL)
                        {
-                         list.push_back(sym);
+                         list.append(sym);
                        }
                     continue;
                   }
 
                if (sym->is_erased() && !(which & LIST_ERASED))   continue;
 
-               const NameClass nc = sym->value_stack.back().name_class;
+               const NameClass nc = sym->value_stack.last().name_class;
                if (((nc == NC_VARIABLE)         && (which & LIST_VARS))    ||
                    ((nc == NC_FUNCTION)         && (which & LIST_FUNS))    ||
                    ((nc == NC_OPERATOR)         && (which & LIST_OPERS))   ||
@@ -173,7 +173,7 @@ int symbol_count = 0;
                    ((nc == NC_INVALID)          && (which & LIST_INVALID)) ||
                    ((nc == NC_UNUSED_USER_NAME) && (which & LIST_UNUSED)))
                    {
-                     list.push_back(sym);
+                     list.append(sym);
                    }
              }
        }
@@ -198,9 +198,9 @@ UCS_string_vector names;
         if (which == LIST_NAMES)   // append .NC
            {
              name.append(UNI_ASCII_FULLSTOP);
-             name.append_number(list[l]->value_stack.back().name_class);
+             name.append_number(list[l]->value_stack.last().name_class);
            }
-        names.push_back(name);
+        names.append(name);
       }
 
 const UCS_string ** sorted_names = new const UCS_string *[count];
@@ -447,14 +447,14 @@ Simple_string<const Symbol *> ret;
 void
 SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
 {
-vector<const Symbol *> symbols;
+Simple_string<const Symbol *> symbols;
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
             {
               if (sym->is_erased())              continue;
               if (sym->value_stack_size() < 1)   continue;
-              symbols.push_back(sym);
+              symbols.append(sym);
             }
       }
 

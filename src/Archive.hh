@@ -354,7 +354,7 @@ protected:
    const UTF8 * file_end;
 
    /// all values in the workspace
-   vector<Value_P> values;
+   Simple_string<Value_P> values;
 
    /// true for )COPY and )PCOPY, false for )LOAD
    bool copying;
@@ -366,7 +366,7 @@ protected:
    bool reading_vids;
 
    /// the vids to be copied (empty if all)
-   vector<int> vids_COPY;
+   Simple_string<int> vids_COPY;
 
    /// the names of objects (empty if all)
    UCS_string_vector allowed_objects;
@@ -382,7 +382,7 @@ protected:
      };
 
    /// parents[vid] os the parent of vid, or -1 if vid is a top-level value
-   vector<int> parents;
+   Simple_string<int> parents;
 
    /// the file name from which this archive was read
    const char * filename;

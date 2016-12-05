@@ -71,7 +71,7 @@ print_history(ostream & out, const Value * val, const char * loc)
 {
    // search backwards for events of val.
    //
-vector<const VH_entry *> var_events;
+Simple_string<const VH_entry *> var_events;
 int cidx = VH_entry::idx;
 
    loop(e, VALUEHISTORY_SIZE)
@@ -87,13 +87,13 @@ int cidx = VH_entry::idx;
             { 
               // add error event to every value history
               //
-              var_events.push_back(entry);
+              var_events.append(entry);
               continue;
             }
 
           if (entry->val != val)            continue;   // some other var
 
-          var_events.push_back(entry);
+          var_events.append(entry);
 
           if (entry->event == VHE_Create)   break;   // create event found
        }

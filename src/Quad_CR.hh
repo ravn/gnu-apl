@@ -116,11 +116,11 @@ protected:
 
           /// push \b sh on \b shapes stack and \b pidx on \b indices stack
           void push(const Shape & sh, ShapeItem pidx)
-             { shapes.push_back(sh);   indices.push_back(pidx); }
+             { shapes.append(sh);   indices.append(pidx); }
 
           /// pop \b shapes and \b indices
           void pop()
-             { shapes.pop_back();   indices.pop_back(); }
+             { shapes.pop();   indices.pop(); }
 
            /// varname or pick of varname
            void get(UCS_string & result);
@@ -137,10 +137,10 @@ protected:
            const UCS_string & var_name;
 
            /// the shapes along the pick
-           vector<Shape> shapes;
+           Simple_string<Shape> shapes;
 
            /// the indices along the pick
-           vector<ShapeItem> indices;
+           Simple_string<ShapeItem> indices;
       };
 
    /// compute 10 ⎕CR recursively

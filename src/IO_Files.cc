@@ -270,12 +270,12 @@ IO_Files::end_of_current_file()
                   << endl 
                   << endl;
                   
-             InputFile::files_todo.resize(0);
+             InputFile::files_todo.clear();
              return false;
            }
       }
 
-   InputFile::files_todo.erase(InputFile::files_todo.begin());
+   InputFile::files_todo.erase(0, 1);
 
    Output::reset_dout();
    reset_errors();
@@ -348,7 +348,7 @@ IO_Files::open_next_file()
               {
                 CERR << "could not open "
                      << InputFile::current_filename() << endl;
-                InputFile::files_todo.erase(InputFile::files_todo.begin());
+                InputFile::files_todo.erase(0, 1);
                 continue;
               }
 

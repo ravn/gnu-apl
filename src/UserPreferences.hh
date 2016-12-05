@@ -21,8 +21,6 @@
 #ifndef __USER_PREFERENCES_HH_DEFINED__
 #define __USER_PREFERENCES_HH_DEFINED__
 
-#include <vector>
-
 #include "Parallel.hh"
 #include "UTF8_string.hh"
 
@@ -92,10 +90,10 @@ struct UserPreferences
    void expand_argv(int argc, const char ** argv);
 
    /// argv/argc at startup
-   vector<const char *>original_argv;
+   Simple_string<const char *>original_argv;
 
    /// argv/argc after expand_argv
-   vector<const char *>expanded_argv;
+   Simple_string<const char *>expanded_argv;
 
    /// true if no banner/Goodbye is wanted.
    bool silent;

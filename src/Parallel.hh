@@ -149,7 +149,6 @@ inline void atomic_add(volatile _Atomic_word & counter, int increment)
 
 #include <ostream>
 #include <semaphore.h>
-#include <vector>
 
 #include "Cell.hh"
 
@@ -402,7 +401,7 @@ protected:
    static void init_all_CPUs(bool logit);
 
    /// the CPU numbers that can be used
-   static vector<CPU_Number>all_CPUs;
+   static Simple_string<CPU_Number>all_CPUs;
 };
 //=============================================================================
 /// a number of jobs to be executed in parallel
@@ -445,7 +444,7 @@ public:
          started_loc = loc;
          idx = 0;
          jobs.clear();
-         jobs.push_back(first_job);
+         jobs.append(first_job);
       }
 
    /// cancel a job list
@@ -473,7 +472,7 @@ public:
 
    /// add \b job to \b jobs
    void add_job(T & job)
-      { jobs.push_back(job); }
+      { jobs.append(job); }
 
    /// return true if not all jobs are done yet
    bool busy()
@@ -485,7 +484,7 @@ public:
 
 protected:
    /// jobs to be performed
-   vector<T> jobs;
+   Simple_string<T> jobs;
 
    /// last job
    int idx;
