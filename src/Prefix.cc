@@ -466,7 +466,7 @@ grow:
                     if (!!val && !left_sym)
                        {
                          Token tok(TOK_APL_VALUE1, val);
-                         move_1(tl.tok, tok, LOC);
+                         tl.tok.move_1(tok, LOC);
                          resolved = true;
                        }
                   }
@@ -839,8 +839,8 @@ Prefix::reduce_LPAR_F_C_RPAR()
    if (at2().get_ValueType() != TV_VAL)   SYNTAX_ERROR;
    if (!at2().get_apl_val())              SYNTAX_ERROR;
 
-   move_1(at3(), at2(), LOC);
-   move_1(at2(), at1(), LOC);
+   at3().move_1(at2(), LOC);
+   at2().move_1(at1(), LOC);
    pop();    // pop C
    pop();    // pop RPAR
    action = RA_CONTINUE;
@@ -904,8 +904,7 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
                   Token exec = Bif_F1_EXECUTE::execute_statement(stat);
                   if (exec.get_Class() == TC_VALUE)   // ⍎ literal
                      {
-                       move_1(Workspace::SI_top()->get_prefix().at0(),
-                              exec, LOC);
+                       Workspace::SI_top()->get_prefix().at0().move_1(exec,LOC);
                        return;
                      }
 
@@ -1396,7 +1395,8 @@ void
 Prefix::reduce_V_C__()
 {
 Symbol * V = at0().get_sym_ptr();
-   copy_1(at0(), V->resolve_lv(LOC), LOC);
+Token tok = V->resolve_lv(LOC);
+   at0().move_1(tok, LOC);
    set_assign_state(ASS_var_seen);
    action = RA_CONTINUE;
 }
@@ -1461,7 +1461,8 @@ Prefix::reduce_F_V__()
    // turn V into a (left-) value
    //
 Symbol * V = at1().get_sym_ptr();
-   copy_1(at1(), V->resolve_lv(LOC), LOC);
+Token tok = V->resolve_lv(LOC);
+   at1().move_1(tok, LOC);
    set_assign_state(ASS_var_seen);
    action = RA_CONTINUE;
 }
@@ -1591,8 +1592,8 @@ Token result = at1();
       {
         assign_state = idx.get_assign_state();
 
-        if (idx.is_axis()) move_2(result, Token(TOK_AXES, idx.values[0]), LOC);
-        else               move_2(result, Token(TOK_INDEX, idx), LOC);
+        if (idx.is_axis()) result.move_2(Token(TOK_AXES, idx.values[0]), LOC);
+        else               result.move_2(Token(TOK_INDEX, idx), LOC);
       }
    else
       {
@@ -1624,14 +1625,14 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
            {
              Value_P X = idx.extract_value(0);
              Assert1(!!X);
-             move_2(I, Token(TOK_AXES, X), LOC);
+             I.move_2(Token(TOK_AXES, X), LOC);
              Log(LOG_delete)
                 CERR << "delete " HEX(&idx) << " at " LOC << endl;
              delete &idx;
            }
         else
            {
-             move_2(I, Token(TOK_INDEX, idx), LOC);
+             I.move_2(Token(TOK_INDEX, idx), LOC);
            }
       }
    else
@@ -1676,7 +1677,7 @@ const int count = vector_ass_count();
         Symbol * V = at0().get_sym_ptr();
         Token result = V->resolve_lv(LOC);
         set_assign_state(ASS_var_seen);
-        move_1(at0(), result, LOC);
+        at0().move_1(result, LOC);
         action = RA_CONTINUE;
         return;
       }

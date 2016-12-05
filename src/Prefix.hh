@@ -189,7 +189,7 @@ public:
    void pop_args_push_result(const Token & result)
         {
           Assert1(size() >= prefix_len);
-          copy_1(content[put - prefix_len].tok, result, LOC);
+          content[put - prefix_len].tok.copy_1(result, LOC);
           content[put - prefix_len].pc = content[put - 1].pc;
           put -= prefix_len - 1;
         }

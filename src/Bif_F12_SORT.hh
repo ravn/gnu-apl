@@ -71,12 +71,6 @@ struct CollatingCacheEntry
       { return key - entry.ce_char; }
 };
 //-----------------------------------------------------------------------------
-inline void
-copy_1(CollatingCacheEntry & dst, CollatingCacheEntry src, const char * loc)
-{
-  new (&dst)  CollatingCacheEntry(src);
-}
-//-----------------------------------------------------------------------------
 inline ostream &
 operator << (ostream & out, const CollatingCacheEntry & entry)
 {

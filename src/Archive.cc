@@ -1822,7 +1822,8 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
       {
         if (allowed_objects[a] == name_ucs)
              {
-               allowed_objects.erase(allowed_objects.begin() + a);
+               allowed_objects[a] = allowed_objects.last();
+               allowed_objects.pop();
                break;
            }
       }

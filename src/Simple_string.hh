@@ -60,7 +60,7 @@ public:
       }
 
    /// constructor: \b len times \b data
-   Simple_string(ShapeItem len, T data)
+   Simple_string(ShapeItem len, const T & data)
    : items_allocated(len + ADD_ALLOC),
      items_valid(len)
       {
@@ -137,18 +137,14 @@ public:
    /// return the idx'th character
    const T & operator[](ShapeItem idx) const
       {
-        Assert(idx < items_valid);
+        if ((items_valid - idx) <= 0)   Assert(0 && "Bad index");
         return items[idx];
       }
 
    /// return the idx'th character
    T & operator[](ShapeItem idx)
       {
-        if ((items_valid - idx) <= 0)
-           {
-             debug(cerr) << "idx = " << idx << endl;
-             Assert(0 && "Bad index");
-           }
+        if ((items_valid - idx) <= 0)   Assert(0 && "Bad index");
         return items[idx];
       }
 
@@ -156,14 +152,14 @@ public:
    void append(const T & t)
       {
         if (items_valid - items_allocated >= 0)   extend();
-        copy_1(items[items_valid++], t, LOC);
+        new (items + items_valid++) T(t);
       }
 
    /// append character \b t to \b this string
    void append(const T & t, const char * loc)
       {
         if (items_valid - items_allocated >= 0)   extend();
-        copy_1(items[items_valid++], t, loc);
+        new (items + items_valid++) T(t);
       }
 
    /// append string \b other to \b this string
@@ -205,7 +201,7 @@ public:
       }
 
    /// insert \b count characters \b t after position \b pos
-   void insert(ShapeItem pos, ShapeItem count, T t)
+   void insert(ShapeItem pos, ShapeItem count, const T & t)
       {
         Assert(count >= 0);
         Assert(pos <= items_valid);
@@ -220,7 +216,7 @@ public:
     void pop()
       { if (items_valid)   --items_valid; }
 
-   /// remove the first element(s)
+   /// remove the first \b count elements
    void drop_leading(ShapeItem count)
       {
         if (count <= 0)   return;
@@ -250,7 +246,7 @@ public:
         if (items_valid > pos)   items_valid = pos;
       }
 
-   /// erase \b count items above pos
+   /// erase \b count items, starting at \b pos
    void erase(ShapeItem pos, ShapeItem count)
       {
         if (pos >= items_valid)   return;   // nothing to erase
@@ -316,15 +312,6 @@ public:
       }
 
 protected:
-   /// print properties
-   ostream & debug(ostream & out)
-     {
-       out << "items_allocated = " << items_allocated << endl
-            << "items[" << items_valid << "] = ";
-       for (ShapeItem i = 0; i < items_valid; ++i)   out << items[i];
-       return out << endl;
-     }
-
    enum
       {
         ADD_ALLOC = 4,   ///< extra chars added when extending the string
@@ -357,14 +344,14 @@ protected:
    static void _copy(T * dst, const T * src, ShapeItem count)
       {
         Assert1(count >= 0);
-        for (ShapeItem c = 0; c < count; ++c)  copy_1(dst[c], src[c], LOC);
+        for (ShapeItem c = 0; c < count; ++c)  new(dst + c) T(src[c]);
       }
 
    /// copy \b count characters downwards (for overlapping src/dst
    static void copy_downwards(T * dst, const T * src, ShapeItem count)
       {
         Assert(count >= 0);
-        for (ShapeItem c = count - 1; c >= 0; --c)  copy_1(dst[c], src[c], LOC);
+        for (ShapeItem c = count - 1; c >= 0; --c)  new (dst + c) T(src[c]);
       }
 
    /// the number of characters allocated

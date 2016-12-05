@@ -620,6 +620,9 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
         // what < 0 are "hacker functions" that should no be used by
         // normal mortals.
         //
+        case -13: // total number of UCS strings
+             return Token(TOK_APL_VALUE1,
+                          IntScalar(UCS_string::get_total_count(), LOC));
         case -12: // sbrk()
              return Token(TOK_APL_VALUE1, IntScalar(top_of_memory(), LOC));
         case -11: // fast new

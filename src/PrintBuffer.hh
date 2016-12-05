@@ -24,6 +24,7 @@
 #include "Avec.hh"
 #include "Common.hh"
 #include "PrintContext.hh"
+#include "PrintOperator.hh"
 #include "Shape.hh"
 #include "UCS_string.hh"
 
@@ -214,7 +215,7 @@ protected:
                                    bool nested, Rank rk1, Rank rk2);
 
    /// the character buffer.
-   vector<UCS_string> buffer;
+   UCS_string_vector buffer;
 
    /// column properties
    ColInfo col_info;

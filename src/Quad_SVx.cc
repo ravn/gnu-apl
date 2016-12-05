@@ -162,8 +162,7 @@ Quad_SVC::eval_AB(Value_P A, Value_P B)
 const ShapeItem var_count = B->get_rows();
    if (A->get_rows() != var_count)               LENGTH_ERROR;
    if (A->get_rank() > 0 && A->get_cols() != 4)   LENGTH_ERROR;
-vector<UCS_string> vars(var_count);
-   B->to_varnames(vars, false);
+const UCS_string_vector vars(B.getref(), false);
 
 const Cell * cA = &A->get_ravel(0);
 
@@ -222,8 +221,7 @@ Quad_SVC::eval_B(Value_P B)
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-vector<UCS_string> vars(var_count);
-   B->to_varnames(vars, false);
+const UCS_string_vector vars(B.getref(), false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -323,13 +321,11 @@ Quad_SVO::eval_AB(Value_P A, Value_P B)
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-vector<UCS_string> apl_vars(var_count);
-   B->to_varnames(apl_vars,   false);
-
-vector<UCS_string> surrogates(var_count);
-   B->to_varnames(surrogates, true);
-
    if (A->get_rank() == 1 && A->element_count() != var_count)   LENGTH_ERROR;
+
+const UCS_string_vector apl_vars(B.getref(), false);
+const UCS_string_vector surrogates(B.getref(), true);
+
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -463,8 +459,7 @@ Quad_SVO::eval_B(Value_P B)
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-vector<UCS_string> vars(var_count);
-   B->to_varnames(vars, false);
+const UCS_string_vector vars(B.getref(), false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -531,7 +526,7 @@ Quad_SVQ::get_processors()
    //
    // 2. running processors that have offered variables in Svar_DB.
    //
-vector<AP_num> processors;
+Simple_string<AP_num> processors;
 
    // case 1...
    //
@@ -583,7 +578,7 @@ const char * dirs[] = { "", "/APs" };
                 snprintf(expected, sizeof(expected), "AP%u", apnum);
                 if (strcmp(entry->d_name, expected))   continue;
 
-                processors.push_back((AP_num)apnum);
+                processors.append((AP_num)apnum);
              }
 
          closedir(dir);
@@ -595,7 +590,7 @@ const char * dirs[] = { "", "/APs" };
 
    // sort and remove duplicates
    //
-vector<int32_t> sorted;
+Simple_string<int32_t> sorted;
    while (processors.size())
       {
         // find smallest
@@ -606,7 +601,7 @@ vector<int32_t> sorted;
 
        // add smallest to sorted
        //
-       sorted.push_back(smallest);
+       sorted.append(smallest);
 
        // remove smallest from processors
        //
@@ -618,8 +613,8 @@ vector<int32_t> sorted;
                  }
               else
                  {
-                   processors[s] = processors.back();
-                   processors.pop_back();
+                   processors[s] = processors.last();
+                   processors.pop();
                  }
             }
       }
@@ -632,18 +627,18 @@ Value_P Z(sorted.size(), LOC);
 Value_P
 Quad_SVQ::get_variables(AP_num proc)
 {
-vector<uint32_t> varnames;
+Simple_string<uint32_t> varnames;
    Svar_DB::get_offered_variables(ProcessorID::get_own_ID(), proc, varnames);
 
    // varnames is a sequence of 0-terminated Unicodes
    //
-vector<int> var_lengths;   // including terminating 0
+Simple_string<int> var_lengths;   // including terminating 0
 int last_zero = -1;
    loop(v, varnames.size())
       {
         if (varnames[v] == 0)
            {
-             var_lengths.push_back(v + 1 - last_zero);
+             var_lengths.append(v + 1 - last_zero);
              last_zero = v;
            }
         
@@ -682,8 +677,7 @@ Quad_SVR::eval_B(Value_P B)
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-vector<UCS_string> vars(var_count);
-   B->to_varnames(vars, false);
+const UCS_string_vector vars(B.getref(), false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -713,8 +707,7 @@ Quad_SVS::eval_B(Value_P B)
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-vector<UCS_string> vars(var_count);
-   B->to_varnames(vars, false);
+const UCS_string_vector vars(B.getref(), false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);

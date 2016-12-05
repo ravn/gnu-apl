@@ -585,7 +585,8 @@ Nabla::open_existing_function()
 
    // this function must only be called when editing functions interactively
    //
-   Assert(!InputFile::running_script());
+   if (InputFile::running_script())
+      return "∇-edit existing function from a script";
 
 Function * function = fun_symbol->get_function();
    Assert(function);
@@ -609,7 +610,7 @@ const UserFunction * ufun = function->get_ufun1();
 const UCS_string ftxt = function->canonical(false);
    Log(LOG_nabla)   UERR << "existing function is:\n" << ftxt << endl;
 
-vector<UCS_string> tlines;
+UCS_string_vector tlines;
    ftxt.to_vector(tlines);
 
    Assert(tlines.size());

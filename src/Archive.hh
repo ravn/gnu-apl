@@ -207,7 +207,7 @@ public:
    void read_Workspace(bool silent);
 
    /// set copying and maybe set protection
-   void set_protection(bool prot, const vector<UCS_string> & allowed)
+   void set_protection(bool prot, const UCS_string_vector & allowed)
       { copying = true;   protection = prot;   allowed_objects = allowed;
         have_allowed_objects = allowed_objects.size() > 0; }
 
@@ -369,7 +369,7 @@ protected:
    vector<int> vids_COPY;
 
    /// the names of objects (empty if all)
-   vector<UCS_string> allowed_objects;
+   UCS_string_vector allowed_objects;
 
    /// true for selective copy (COPY with symbol names)
    bool have_allowed_objects;

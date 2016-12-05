@@ -219,7 +219,7 @@ const ShapeItem rows = B->get_rows();
    // split format into format fields, one per column.
    // If there is only one format field, then repeat it cols times.
    //
-vector<UCS_string> col_formats;
+UCS_string_vector col_formats;
    split_example_into_columns(format, col_formats);
    if (col_formats. size() == 1)
       {
@@ -227,7 +227,7 @@ vector<UCS_string> col_formats;
         loop(c, cols - 1)
            {
              format.append(f);
-             col_formats.push_back(col_formats.front());
+             col_formats.push_back(col_formats[0]);
            }
       }
 
@@ -302,7 +302,7 @@ Value_P Z(shape_Z, LOC);
 //-----------------------------------------------------------------------------
 void
 Bif_F12_FORMAT::split_example_into_columns(const UCS_string & format,
-                                   vector<UCS_string> & col_formats)
+                                   UCS_string_vector & col_formats)
 {
 bool fmt_seen = false;
 UCS_string fmt;
@@ -336,7 +336,7 @@ UCS_string fmt;
 
    if ((!fmt_seen) && (col_formats.size() > 0))
       {
-        col_formats.back().append(fmt);
+        col_formats.last().append(fmt);
       }
    else
       {

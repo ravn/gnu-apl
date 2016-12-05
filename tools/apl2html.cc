@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,9 +20,12 @@
 
 // This program converts a GNU APL .apl file to a .apl.html file (or back)
 
-#include <string.h>
-
+#include <errno.h>
 #include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -34,7 +37,7 @@ const char * prog1 = strrchr(prog, '/');
    else         prog1 = prog;
 
    cerr <<
-"usage: " << prog1 << " [options]\n"
+"usage: " << prog1 << " [options] file\n"
 "    options: \n"
 "    -h, --help           print this help\n"
 "    -a author            set meta tag author\n"
@@ -53,26 +56,26 @@ const char * keyw = "APL, GNU";
 const char * copyr = 0;
 
 void
-print_header()
+print_header(const char * filename, int day, int mon, int year)
 {
    cout <<
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n"
 "                      \"http://www.w3.org/TR/html4/strict.dtd\">\n"
 "<html>\n"
 "  <head>\n"
-"    <title>xxx.apl</title>\n"
+"    <title>" << filename<< "</title>\n"
 "    <meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n"
 "    <meta name=\"author\" content=\"" << author << "\">\n"
-"    <meta name=\"copyright\" content=\"&copy; 2015 by " << copyr << "\n"
-"    <meta name=\"date\" content=\"2015-5-31\">\n"
+"    <meta name=\"copyright\" content=\"&copy; " <<year<< " by " << copyr << ">\n"
+"    <meta name=\"date\" content=\"" << year<<"-"<<mon<<"-"<<day << "\">\n"
 "    <meta name=\"description\" content=\"" << desc << "\">\n"
 "    <meta name=\"keywords\" lang=\"en\" content=\"" << keyw << "\">\n"
 "  </head>\n"
 "  <body><pre>\n"
 "⍝\n"
 "⍝ Author:      " << author << "\n"
-"⍝ Date:        ??????\n"
-"⍝ Copyright:   Copyright (C) 2015 by " << copyr << "\n"
+"⍝ Date:        " << day << "." << mon << "." << year << "\n"
+"⍝ Copyright:   Copyright (C) " << year << " by " << copyr << "\n"
 "⍝ License:     GPL see http://www.gnu.org/licenses/gpl-3.0.en.html\n"
 "⍝ email:       ??????@??????\n"
 "⍝ Portability: ??????\n"
@@ -89,6 +92,18 @@ print_header()
 int
 main(int argc, char * argv[])
 {
+const char * filename = 0;
+bool apl_to_html = true;
+int year, mon, day;
+
+   {
+     timeval tv;
+     gettimeofday(&tv, 0);
+     tm * t = localtime(&tv.tv_sec);
+     year = 1900 + t->tm_year;
+     mon = 1 + t->tm_mon;
+     day = t->tm_mday;
+   }
 
    for (size_t a = 1; a < argc; )
        {
@@ -101,17 +116,62 @@ main(int argc, char * argv[])
          else if (!strcmp(opt, "-c"))   { copyr = val;  ++a;     }
          else if (!strcmp(opt, "-d"))   { desc = val;   ++a;     }
          else if (!strcmp(opt, "-k"))   { keyw = val;   ++a;     }
-         else
+         else   // filename ?
             {
-              cerr << "Bad option: " << opt << endl;
-              usage(argv[0]);
-              return 1;
+              if (val == 0 && access(opt, R_OK) == 0)   // last argv: filename
+                 {
+                   filename = opt;
+                   if (!strcmp(filename + strlen(filename) -4, ".apl"))
+                      {
+                        apl_to_html = true;
+                      }
+                   else if (!strcmp(filename + strlen(filename) -5, ".html"))
+                      {
+                        apl_to_html = false;
+                      }
+                 }
+              else
+                 {
+                   cerr << "Bad option: " << opt << endl;
+                   usage(argv[0]);
+                   return 1;
+                 }
             }
        }
 
+   if (filename == 0)
+      {
+        cerr << "missing filename" << endl;
+        usage(argv[0]);
+        return 1;
+      }
+
+FILE * fin = fopen(filename, "r");
+   if (fin == 0)   // file exists
+      {
+        cerr << "cannot open " << filename << strerror(errno) << endl;
+        usage(argv[0]);
+        return 1;
+      }
+
    if (copyr == 0)   copyr = author;
 
-   print_header();
+   print_header(filename, day, mon, year);
+   for (;;)
+       {
+         const int cc = fgetc(fin);
+         switch (cc)
+            {
+              case EOF: break;
+              case '&': cout << "&amp;";   continue;
+              case '<': cout << "&lt;";    continue;
+              case '>': cout << "&gt;";    continue;
+              default: cout << (char)cc;   continue;
+            }
+         break;
+       }
+   fclose(fin);
+
    cout << "  </pre></body>\n</html>\n";
    return 0;
 }

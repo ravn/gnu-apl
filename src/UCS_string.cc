@@ -31,10 +31,14 @@
 #include "UTF8_string.hh"
 #include "Value.icc"
 
+ShapeItem UCS_string::total_count = 0;
+
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const char * cstring)
    : Simple_string<Unicode>(0, 0)
 {
+   ++total_count;
+
 const int len = strlen(cstring);
    extend(len + 1);
 
@@ -45,6 +49,8 @@ const int len = strlen(cstring);
 UCS_string::UCS_string(const UTF8_string & utf)
    : Simple_string<Unicode>(0, 0)
 {
+   ++total_count;
+
    Log(LOG_char_conversion)
       CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
 
@@ -114,6 +120,8 @@ UCS_string::UCS_string(APL_Float value, bool & scaled,
                        const PrintContext & pctx)
    : Simple_string<Unicode>(0, 0)
 {
+   ++total_count;
+
 int quad_pp = pctx.get_PP();
    if (quad_pp > MAX_Quad_PP)   quad_pp = MAX_Quad_PP;
    if (quad_pp < MIN_Quad_PP)   quad_pp = MIN_Quad_PP;
@@ -285,11 +293,13 @@ const Unicode last = digits.last();
 UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
    : Simple_string<Unicode>(0, 0)
 {
+   ++total_count;
+
    if (pb.get_height() == 0)   return;      // empty PrintBuffer
 
 const int total_width = pb.get_width(0);
 
-vector<int> breakpoints;
+Simple_string<int> breakpoints;
    breakpoints.reserve(2*total_width/quad_PW);
 
    // print rows, breaking at breakpoints
@@ -306,7 +316,7 @@ vector<int> breakpoints;
               if (row == 0)   // first row: set up breakpoints
                  {
                    chunk_len = pb.get_line(0).compute_chunk_length(quad_PW,col);
-                   breakpoints.push_back(chunk_len);
+                   breakpoints.append(chunk_len);
                  }
               else
                  {
@@ -432,6 +442,8 @@ UCS_string::split_ws(UCS_string & rest)
 UCS_string::UCS_string(const Value & value)
    : Simple_string<Unicode>(0, 0)
 {
+   ++total_count;
+
    if (value.get_rank() > 1) RANK_ERROR;
 
 const ShapeItem ec = value.element_count();
@@ -443,6 +455,8 @@ const ShapeItem ec = value.element_count();
 UCS_string::UCS_string(istream & in)
    : Simple_string<Unicode>(0, 0)
 {
+   ++total_count;
+
    for (;;)
       {
         const Unicode uni = UTF8_string::getc(in);
@@ -461,7 +475,7 @@ UCS_string::copy_black(UCS_string & dest, int & idx) const
 }
 //-----------------------------------------------------------------------------
 void
-UCS_string::copy_black_list(vector<UCS_string> & dest) const
+UCS_string::copy_black_list(UCS_string_vector & dest) const
 {
    for (int idx = 0; ; )
       {
@@ -482,7 +496,7 @@ ShapeItem count = 0;
 }
 //-----------------------------------------------------------------------------
 bool
-UCS_string::contained_in(const vector<UCS_string> & list) const
+UCS_string::contained_in(const UCS_string_vector & list) const
 {
    loop(l, list.size())
       {
@@ -746,7 +760,7 @@ char cc[60];
 }
 //-----------------------------------------------------------------------------
 size_t
-UCS_string::to_vector(vector<UCS_string> & result) const
+UCS_string::to_vector(UCS_string_vector & result) const
 {
 size_t max_len = 0;
 
@@ -759,7 +773,7 @@ size_t max_len = 0;
         const Unicode uni = (*this)[s];
         if (uni == UNI_ASCII_LF)    // line done
            {
-             const size_t len = result.back().size();
+             const size_t len = result.last().size();
              if (max_len < len)   max_len = len;
 
              if (s < size() - 1)   // more coming
@@ -773,7 +787,7 @@ size_t max_len = 0;
       }
 
    // if the last line lacked a \n we check max_len here again.
-const size_t len = result.back().size();
+const size_t len = result.last().size();
    if (max_len < len)   max_len = len;
 
    return max_len;
@@ -1146,7 +1160,7 @@ UCS_string::sort_names(const UCS_string ** names, int count)
 }
 //----------------------------------------------------------------------------
 void
-UCS_string::sort_names(vector<UCS_string> names)
+UCS_string::sort_names(UCS_string_vector names)
 {
    if (names.size() < 2)   return;
 
@@ -1166,15 +1180,15 @@ UCS_string::sort_names(vector<UCS_string> names)
 }
 //----------------------------------------------------------------------------
 void
-UCS_string::compute_column_width(vector<int> & result,
+UCS_string::compute_column_width(Simple_string<int> & result,
                                  const UCS_string ** names, int name_count,
                                  int tab_size, int quad_PW)
 {
    if (name_count < 2)
       {
         result.clear();
-        if (name_count)   result.push_back(names[0]->size());
-        else              result.push_back(quad_PW);
+        if (name_count)   result.append(names[0]->size());
+        else              result.append(quad_PW);
         return;
       }
 
@@ -1208,7 +1222,7 @@ int max_col = -1;
           result.clear();
           loop(n, name_count)
               {
-                result.push_back(name_blocks[n]);
+                result.append(name_blocks[n]);
               }
           return;
         }
@@ -1228,7 +1242,7 @@ int max_col = -1;
                  {
                    free_blocks -= bn;
                    if (free_blocks < 0)   break;
-                   result.push_back(bn);
+                   result.append(bn);
                  }
               else if (bn > result[col_n])   
                  {
@@ -1249,8 +1263,90 @@ int max_nb = 0;
       {
         if (max_nb < name_blocks[n])   max_nb = name_blocks[n];
       }
-   result.push_back(max_nb);
+   result.append(max_nb);
 }
 //----------------------------------------------------------------------------
+UCS_string_vector::UCS_string_vector(const Value & val, bool surrogate)
+{
+const ShapeItem var_count = val.get_rows();
+const ShapeItem name_len = val.get_cols();
 
+   loop(v, var_count)
+      {
+        ShapeItem nidx = v*name_len;
+        const ShapeItem end = nidx + name_len;
+        append(UCS_string());
+        UCS_string & name = last();
+        loop(n, name_len)
+           {
+             const Unicode uni = val.get_ravel(nidx++).get_char_value();
+
+             if (n == 0 && Avec::is_quad(uni))   // leading ⎕
+                {
+                  name.append(uni);
+                  continue;
+                }
+
+             if (Avec::is_symbol_char(uni))   // valid symbol char
+                {
+                  name.append(uni);
+                  continue;
+                }
+             // end of (first) name reached. At this point we expect either
+             // spaces until 'end' or some spaces and another name.
+             //
+             if (uni != UNI_ASCII_SPACE)
+                {
+                  name.clear();
+                  break;
+                }
+
+             // we have reached the end of the first name. At this point
+             // there could bei:
+             //
+             // 1. spaces until 'end' (= one name), or
+             // 2. a second name (alias)
+
+             // skip spaces from nidx and subsequent spaces
+             //
+             while (nidx < end &&
+                    val.get_ravel(nidx).get_char_value() == UNI_ASCII_SPACE)
+                   ++nidx;
+
+
+             if (nidx == end)   break;   // only spaces (no second name)
+
+             // at this point we maybe have the start of a second name, which
+             // is an error (if last is false) or not. In both cases the first
+             // name can be ignored.
+             //
+             name.clear();
+             if (!surrogate)   break;   // error
+
+             // 'last' is true thus to_varnames() was called from ⎕SVO and
+             // the line may contains two variable names.
+             // Return the second (i.e. surrogate name)
+             //
+             surrogate = false;
+             while (nidx < end)
+                {
+                  const Unicode uni = val.get_ravel(nidx++).get_char_value();
+                  if (Avec::is_symbol_char(uni))   // valid symbol char
+                     {
+                       name.append(uni);
+                     }
+                  else if (uni == UNI_ASCII_SPACE)
+                     {
+                       break;
+                     }
+                  else
+                     {
+                       name.clear();   // error
+                       break;
+                     }
+                }
+             break;
+           }
+      }
+}
 //----------------------------------------------------------------------------

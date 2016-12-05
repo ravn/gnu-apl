@@ -453,7 +453,7 @@ Token * tok_L = current_stack.locate_L();
    if (tok_L == 0)   return;
 
 Value_P old_value = tok_L->get_apl_val();   // so that 
-   move_2(*tok_L, Token(tok_L->get_tag(), new_value), LOC);
+   tok_L->move_2(Token(tok_L->get_tag(), new_value), LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -463,7 +463,7 @@ Token * tok_R = current_stack.locate_R();
    if (tok_R == 0)   return;
 
 Value_P old_value = tok_R->get_apl_val();   // so that 
-   move_2(*tok_R, Token(tok_R->get_tag(), new_value), LOC);
+   tok_R->move_2(Token(tok_R->get_tag(), new_value), LOC);
 }
 //-----------------------------------------------------------------------------
 void

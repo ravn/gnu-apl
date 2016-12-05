@@ -112,7 +112,7 @@ int len = 0;
    line.copy_black(cmd, len);
 
 UCS_string arg(line, len, line.size() - len);
-vector<UCS_string> args;
+UCS_string_vector args;
    arg.copy_black_list(args);
    line.clear();
    if (!cmd.starts_iwith(")MORE")) 
@@ -260,7 +260,7 @@ check_EOC:
                          Workspace::SI_top()->get_prefix();
                 Assert(prefix.at0().get_tag() == TOK_SI_PUSHED);
 
-                copy_1(prefix.tos().tok, token, LOC);
+                new (&prefix.tos().tok) Token(token);
               }
               if (attention_is_raised())
                  {
@@ -487,13 +487,13 @@ Command::cmd_CONTINUE(ostream & out)
 {
    Workspace::wsid(out, UCS_string("CONTINUE"), false);
 
-vector<UCS_string> vcont;
+UCS_string_vector vcont;
    Workspace::save_WS(out, vcont);
    cmd_OFF(0);
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_DROP(ostream & out, const vector<UCS_string> & lib_ws)
+Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
 {
    // )DROP wsname
    // )DROP libnum wsname
@@ -518,8 +518,8 @@ Command::cmd_DROP(ostream & out, const vector<UCS_string> & lib_ws)
    // is the lib number
    //
 LibRef libref = LIB_NONE;
-UCS_string wname = lib_ws.back();
-   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws.front().atoi());
+UCS_string wname = lib_ws.last();
+   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws[0].atoi());
 
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
                                                   ".xml", ".apl");
@@ -533,7 +533,7 @@ const int result = unlink(filename.c_str());
 }
 //-----------------------------------------------------------------------------
 void
-Command::cmd_ERASE(ostream & out, vector<UCS_string> & args)
+Command::cmd_ERASE(ostream & out, UCS_string_vector & args)
 {
    Workspace::erase_symbols(out, args);
 }
@@ -711,7 +711,7 @@ int result = pclose(pipe);
 }
 //-----------------------------------------------------------------------------
 void
-Command::cmd_IN(ostream & out, vector<UCS_string> & args, bool protection)
+Command::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
 {
    if (args.size() == 0)
       {
@@ -720,8 +720,9 @@ Command::cmd_IN(ostream & out, vector<UCS_string> & args, bool protection)
         return;
       }
 
-UCS_string fname = args.front();
-   args.erase(args.begin());
+UCS_string fname = args[0];
+   args[0] = args.last();
+   args.pop();
 
 UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, true,
                                                   ".atf", 0);
@@ -781,7 +782,7 @@ transfer_context tctx(protection);
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_LIBS(ostream & out, const vector<UCS_string> & args)
+Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 {
    // Command is:
    //
@@ -934,9 +935,9 @@ DIR * dir = open_LIB_dir(path, out, arg);
 
    // 2. collect files and directories
    //
-vector<UCS_string> apl_files;
-vector<UCS_string> xml_files;
-vector<UCS_string> directories;
+UCS_string_vector apl_files;
+UCS_string_vector xml_files;
+UCS_string_vector directories;
 
    for (;;)
        {
@@ -1037,7 +1038,7 @@ int count = 0;
    // figure column widths
    //
    enum { tabsize = 4 };
-vector<int> col_width;
+Simple_string<int> col_width;
    UCS_string::compute_column_width(col_width, filenames.get_data(), count,
                                     tabsize, Workspace::get_PW());
 
@@ -1125,7 +1126,7 @@ Command::cmd_OFF(int exit_val)
 }
 //-----------------------------------------------------------------------------
 void
-Command::cmd_OUT(ostream & out, vector<UCS_string> & args)
+Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
    if (args.size() == 0)
       {
@@ -1134,8 +1135,8 @@ Command::cmd_OUT(ostream & out, vector<UCS_string> & args)
         return;
       }
 
-UCS_string fname = args.front();
-   args.erase(args.begin());
+UCS_string fname = args[0];
+   args.erase(0);
 
 UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, false,
                                                   ".atf", 0);
@@ -1205,7 +1206,7 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
 //-----------------------------------------------------------------------------
 void
 Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
-                     vector<UCS_string> & args)
+                     UCS_string_vector & args)
 {
    // ]USERCMD
    // ]USERCMD REMOVE-ALL
@@ -1321,7 +1322,7 @@ user_command new_user_command = { args[0], args[1], mode };
 void
 Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
                     const UCS_string & line, const UCS_string & cmd,
-                    vector<UCS_string> & args, int uidx)
+                    UCS_string_vector & args, int uidx)
 {
   if (user_commands[uidx].mode > 0)   // dyadic
      {
@@ -1343,7 +1344,7 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
 void
 Command::log_control(const UCS_string & arg)
 {
-vector<UCS_string> args;
+UCS_string_vector args;
    arg.copy_black_list(args);
 
    if (args.size() == 0 || arg[0] == UNI_ASCII_QUESTION)  // no arg or '?'
@@ -1382,8 +1383,8 @@ int on_off = -1;
 #endif
 //-----------------------------------------------------------------------------
 void
-Command::transfer_context::process_record(const UTF8 * record, const
-                                          vector<UCS_string> & objects)
+Command::transfer_context::process_record(const UTF8 * record,
+                                          const UCS_string_vector & objects)
 {
 const char rec_type = record[0];   // '*', ' ', or 'X'
 const char sub_type = record[1];
@@ -1499,7 +1500,7 @@ int rank = 0;
 }
 //-----------------------------------------------------------------------------
 void
-Command::transfer_context::numeric_1TF(const vector<UCS_string> & objects) const
+Command::transfer_context::numeric_1TF(const UCS_string_vector & objects) const
 {
 UCS_string var_name;
 Shape shape;
@@ -1560,7 +1561,7 @@ const ShapeItem ec = val->element_count();
 }
 //-----------------------------------------------------------------------------
 void
-Command::transfer_context::chars_1TF(const vector<UCS_string> & objects) const
+Command::transfer_context::chars_1TF(const UCS_string_vector & objects) const
 {
 UCS_string var_name;
 Shape shape;
@@ -1615,7 +1616,7 @@ ShapeItem padded = 0;
 }
 //-----------------------------------------------------------------------------
 void
-Command::transfer_context::array_2TF(const vector<UCS_string> & objects) const
+Command::transfer_context::array_2TF(const UCS_string_vector & objects) const
 {
    // an Array in 2 ⎕TF format
    //
@@ -1646,7 +1647,7 @@ UCS_string var_or_fun;
 }
 //-----------------------------------------------------------------------------
 void
-Command::transfer_context::function_2TF(const vector<UCS_string> & objects)const
+Command::transfer_context::function_2TF(const UCS_string_vector & objects)const
 {
 int idx = 1;
 UCS_string fun_name;
@@ -1799,6 +1800,7 @@ Command::expand_tab(UCS_string & user, int & replace_count)
 {
    replace_count = user.size();
 
+   // remember if there was a trailing blank
 const bool have_trailing_blank = replace_count && user.last() == ' ';
 
    // skip leading and trailing blanks
@@ -1806,50 +1808,61 @@ const bool have_trailing_blank = replace_count && user.last() == ' ';
    user.remove_leading_and_trailing_whitespaces();
       
    if (user.size() == 0 || Avec::is_first_symbol_char(user[0]))
-      {
-        // nothing or user-defined name: expand names
-        //
-        Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
-
-        vector<UCS_string>matches;
-        loop(s, symbols.size())
-            {
-             const Symbol * sym = symbols[s];
-             if (sym->is_erased())    continue;
-
-              const UCS_string & sym_name = sym->get_name();
-              if (!sym_name.starts_with(user))   continue;
-              matches.push_back(sym_name);
-            }
-
-        if (matches.size() == 0)   return ER_IGNORE;   // no match
-        if (matches.size() > 1)   // multiple names match user input
-           {
-             const int user_len = user.size();
-             user.clear();
-             return show_alternatives(user, user_len, matches);
-           }
-
-        // unique match
-        //
-        if (user.size() < matches[0].size())
-           {
-             // the name is longer than user, so we expand it.
-             //
-             user = matches[0];
-             return ER_REPLACE;
-           }
-        return ER_IGNORE;
-      }
+      return expand_user_name(user, replace_count);
 
    if (user[0] == ')' || user[0] == ']')   // APL command
+      return expand_APL_command(user, replace_count, have_trailing_blank);
+
+   return expand_distinguished_name(user, replace_count);
+}
+//-----------------------------------------------------------------------------
+ExpandResult
+Command::expand_user_name(UCS_string & user, int & replace_count)
+{
+Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
+
+UCS_string_vector matches;
+   loop(s, symbols.size())
       {
-        ExpandHint ehint = EH_NO_PARAM;
-        const char * shint = 0;
-        vector<UCS_string>matches;
-        UCS_string cmd = user;
-        UCS_string arg;
-        cmd.split_ws(arg);
+        const Symbol * sym = symbols[s];
+        if (sym->is_erased())    continue;
+
+        const UCS_string & sym_name = sym->get_name();
+        if (!sym_name.starts_with(user))   continue;
+        matches.push_back(sym_name);
+      }
+
+   if (matches.size() == 0)   return ER_IGNORE;   // no match
+   if (matches.size() > 1)   // multiple names match user input
+      {
+        const int user_len = user.size();
+        user.clear();
+        return show_alternatives(user, user_len, matches);
+      }
+
+   // unique match
+   //
+   if (user.size() < matches[0].size())
+      {
+        // the name is longer than user, so we expand it.
+        //
+        user = matches[0];
+        return ER_REPLACE;
+      }
+
+   return ER_IGNORE;
+}
+//-----------------------------------------------------------------------------
+ExpandResult
+Command::expand_APL_command(UCS_string & user, int & replace_count,
+                            bool have_trailing_blank)
+{
+ExpandHint ehint = EH_NO_PARAM;
+const char * shint = 0;
+UCS_string_vector matches;
+UCS_string cmd = user;
+UCS_string arg;
+   cmd.split_ws(arg);
 
 #define cmd_def(cmd_str, code, arg, hint)  \
    { UCS_string ustr(cmd_str);             \
@@ -1857,59 +1870,58 @@ const bool have_trailing_blank = replace_count && user.last() == ' ';
         { matches.push_back(ustr); ehint = hint; shint = arg; } }
 #include "Command.def"
 
-        // if no match was found then ignore the TAB
-        //
-        if (matches.size() == 0)   return ER_IGNORE;
+   // no match was found: ignore the TAB
+   //
+   if (matches.size() == 0)   return ER_IGNORE;
 
-        // if we have multiple matches but the user has provided a command
-        // argument then some matches were wrong. For example:
-        //
-        // LIB 3 matches LIB and LIBS
-        //
-        // remove wrong matches
-        //
-        if (matches.size() > 1 && arg.size() > 0)
+   // if we have multiple matches but the user has provided a command
+   // argument then some matches were wrong. For example:
+   //
+   // LIB 3 matches LIB and LIBS
+   //
+   // remove wrong matches
+   //
+   if (matches.size() > 1 && arg.size() > 0)
+      {
+        again:
+        if (matches.size() > 1)
            {
-             again:
-             if (matches.size() > 1)
+             loop(m, matches.size())
                 {
-                  loop(m, matches.size())
+                  if (matches[m].size() != cmd.size())   // wrong match
                      {
-                       if (matches[m].size() != cmd.size())   // wrong match
-                          {
-                             matches[m].swap(matches.back());
-                             matches.pop_back();
-                             goto again;
-                          }
+                       matches.erase_unsorted(m);
+                       goto again;
                      }
                 }
            }
+      }
 
-        // if multiple matches were found then either expand the common part
-        // or list all matches
+   // if multiple matches were found then either expand the common part
+   // or list all matches
+   //
+   if (matches.size() > 1)   // multiple commands match cmd
+      {
+        user.clear();
+        return show_alternatives(user, cmd.size(), matches);
+      }
+
+   // unique match
+   //
+   if (cmd.size() < matches[0].size())
+      {
+        // the command is longer than user, so we expand it.
         //
-        if (matches.size() > 1)   // multiple commands match cmd
-           {
-             user.clear();
-             return show_alternatives(user, cmd.size(), matches);
-           }
+        user = matches[0];
+        if (ehint != EH_NO_PARAM)   user.append(UNI_ASCII_SPACE);
+        return ER_REPLACE;
+      }
 
-        // unique match
-        //
-        if (cmd.size() < matches[0].size())
-           {
-             // the command is longer than user, so we expand it.
-             //
-             user = matches[0];
-             if (ehint != EH_NO_PARAM)   user.append(UNI_ASCII_SPACE);
-             return ER_REPLACE;
-           }
-
-        if (cmd.size() == matches[0].size() &&
-            ehint != EH_NO_PARAM            &&
-            !arg.size()                     &&
-            !have_trailing_blank)   // no blank entered
-           {
+   if (cmd.size() == matches[0].size() &&
+       ehint != EH_NO_PARAM            &&
+       arg.size() == 0                 &&
+       !have_trailing_blank)   // no blank entered
+      {
              // the entire command was entered but without a blank. If the
              // command has arguments then append a space to indicate that.
              // Otherwiese fall throught to expand_command_arg();
@@ -1917,16 +1929,28 @@ const bool have_trailing_blank = replace_count && user.last() == ' ';
              user = matches[0];
              user.append(UNI_ASCII_SPACE);
              return ER_REPLACE;
-           }
-        return expand_command_arg(user, have_trailing_blank,
-                                  ehint, shint, matches[0], arg);
       }
 
-   // not an APL command.
+   return expand_command_arg(user, have_trailing_blank,
+                             ehint, shint, matches[0], arg);
+}
+//-----------------------------------------------------------------------------
+ExpandResult
+Command::expand_distinguished_name(UCS_string & user, int & replace_count)
+{
+   // figure the length of longest ⎕xxx name (probably ⎕TRACE == 5)
    //
-   user.remove_leading_and_trailing_whitespaces();
+unsigned int max_e = 2;
+#define ro_sv_def(_q, str, _txt) if (max_e < strlen(str))   max_e = strlen(str);
+#define rw_sv_def(_q, str, _txt) if (max_e < strlen(str))   max_e = strlen(str);
+#define sf_def(_q, str, _txt)    if (max_e < strlen(str))   max_e = strlen(str);
+#include "SystemVariable.def"
+
+   // Search for ⎕ backwards from the end
+   //
 int qpos = -1;
-   loop(e, 5)
+
+   loop(e, max_e)
       {
         if (e >= user.size())   break;
         if (user[user.size() - e - 1] == UNI_Quad_Quad)
@@ -1939,7 +1963,8 @@ int qpos = -1;
    if (qpos != -1)   // ⎕xxx at end
       {
         UCS_string qxx(user, qpos, user.size() - qpos);
-        vector<UCS_string>matches;
+        UCS_string_vector matches;
+
 
 #define ro_sv_def(_q, str, _txt) { UCS_string ustr(str);   \
    if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
@@ -2074,20 +2099,35 @@ Command::expand_filename(UCS_string & user, bool have_trailing_blank,
          return expand_wsname(user, cmd, lib, arg);
       }
 
+   // otherwise: real file name
    {
      UCS_string dir_ucs;
+     const bool slash_at_1 = arg.size() > 1 && arg[1] == UNI_ASCII_SLASH;
+     const bool tilde_at_0 = arg[0] == UNI_ASCII_TILDE ||
+                             arg[0] == UNI_TILDE_OPERATOR;
 
-     if (arg[0] == '/')
+     if (arg[0] == UNI_ASCII_SLASH)                     // absolute path /xxx
         {
           dir_ucs = arg;
         }
-     else if (arg[0] == '.')
+     else if (arg[0] == UNI_ASCII_FULLSTOP && slash_at_1) // relative path ./xxx
         {
           const char * pwd = getenv("PWD");
           if (pwd == 0)   goto nothing;
           dir_ucs = UCS_string(pwd);
-          dir_ucs.append(UNI_ASCII_SLASH);
-          dir_ucs.append(arg);
+          dir_ucs.append(arg.drop(1));
+        }
+     else if (tilde_at_0 && slash_at_1)                 // user's home ~/
+        {
+          const char * home = getenv("HOME");
+          if (home == 0)   goto nothing;
+          dir_ucs = UCS_string(home);
+          dir_ucs.append(arg.drop(1));
+        }
+     else if (tilde_at_0)                               // somebody's home
+        {
+          dir_ucs = UCS_string("/home/");
+          dir_ucs.append(arg.drop(1));
         }
      else goto nothing;
 
@@ -2104,7 +2144,7 @@ Command::expand_filename(UCS_string & user, bool have_trailing_blank,
      DIR * dir = opendir(dir_utf.c_str());
      if (dir == 0)   goto nothing;
 
-     vector<UCS_string>matches;
+     UCS_string_vector matches;
      read_matching_filenames(dir, dir_utf, base_utf, ehint, matches);
      closedir(dir);
 
@@ -2118,10 +2158,9 @@ Command::expand_filename(UCS_string & user, bool have_trailing_blank,
      if (matches.size() > 1)
         {
           UCS_string prefix(base_utf);
-          user = cmd;
+          user = cmd;                     // e.g. )LOAD
           user.append(UNI_ASCII_SPACE);
-          user.append(dir_ucs);
-          user.append(prefix);
+          user.append(dir_ucs);           // e.g. )LOAD /usr/apl/
           return show_alternatives(user, prefix.size(), matches);
         }
 
@@ -2171,7 +2210,7 @@ DIR * dir = opendir(path.c_str());
         return ER_REPLACE;
       }
 
-vector<UCS_string>matches;
+UCS_string_vector matches;
 UTF8_string arg_utf(filename);
    read_matching_filenames(dir, path, arg_utf, EH_oLIB_WSNAME, matches);
    closedir(dir);
@@ -2202,7 +2241,7 @@ nothing:
 }
 //-----------------------------------------------------------------------------
 int
-Command::compute_common_length(int len, const vector<UCS_string> & matches)
+Command::compute_common_length(int len, const UCS_string_vector & matches)
 {
    // we assume that all matches have the same case
 
@@ -2219,7 +2258,7 @@ Command::compute_common_length(int len, const vector<UCS_string> & matches)
 void
 Command::read_matching_filenames(DIR * dir, UTF8_string dirname,
                                  UTF8_string prefix, ExpandHint ehint,
-                                 vector<UCS_string> & matches)
+                                 UCS_string_vector & matches)
 {
 const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
                              (ehint == EH_WSNAME     ) ||
@@ -2256,7 +2295,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
 //-----------------------------------------------------------------------------
 ExpandResult
 Command::show_alternatives(UCS_string & user, int prefix_len,
-                           vector<UCS_string>matches)
+                           UCS_string_vector & matches)
 {
 const int common_len = compute_common_length(prefix_len, matches);
 

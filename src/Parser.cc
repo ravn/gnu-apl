@@ -113,7 +113,7 @@ Simple_string<Token_string *> statements;
         loop(t, stat->size())
            {
              tos.append(Token());
-             move_1(tos[tos.size() - 1], (*stat)[t], LOC);
+             tos[tos.size() - 1].move_1((*stat)[t], LOC);
            }
         delete stat;
       }
@@ -461,7 +461,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
                // If X is non-scalar, enclose it
                //
                progress = true;
-               move_1(tos[t + 2], tos[t + 1], LOC);
+               tos[t + 2].move_1(tos[t + 1], LOC);
 
                // we "remember" the nongrouping parantheses to disambiguate
                // e,g, SYM/xxx from (SYM)/xxx
@@ -529,7 +529,7 @@ int dst = 0;
    loop(src, tos.size())
        {
          if (tos[src].get_tag() == TOK_VOID)   continue;
-         if (src != dst)   move_1(tos[dst], tos[src], LOC);
+         if (src != dst)   tos[dst].move_1(tos[src], LOC);
          ++dst;
        }
 
@@ -628,7 +628,7 @@ Parser::create_scalar_value(Token & output)
                new (&scalar->get_ravel(0))  CharCell(output.get_char_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
-               move_1(output, tok, LOC);
+               output.move_1(tok, LOC);
              }
              return;
 
@@ -639,7 +639,7 @@ Parser::create_scalar_value(Token & output)
                new (&scalar->get_ravel(0))   IntCell(output.get_int_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
-               move_1(output, tok, LOC);
+               output.move_1(tok, LOC);
              }
              return;
 
@@ -650,7 +650,7 @@ Parser::create_scalar_value(Token & output)
                new (&scalar->get_ravel(0))  FloatCell(output.get_flt_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
-               move_1(output, tok, LOC);
+               output.move_1(tok, LOC);
              }
              return;
 
@@ -662,7 +662,7 @@ Parser::create_scalar_value(Token & output)
                                                          output.get_cpx_imag());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
-               move_1(output, tok, LOC);
+               output.move_1(tok, LOC);
              }
              return;
 
@@ -724,7 +724,7 @@ Value_P vector(count, LOC);
    vector->check_value(LOC);
 Token tok(TOK_APL_VALUE3, vector);
 
-   move_1(tos[pos], tok, LOC);
+   tos[pos].move_1(tok, LOC);
 
    Log(LOG_create_value)
       {

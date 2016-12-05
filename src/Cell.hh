@@ -44,14 +44,8 @@ class IntCell;
 class Cell
 {
 public:
-   /// Construct a Cell
+   /// Construct an un-initialized Cell
    Cell() {}
-
-   /// Constructor from other cell. This should only be used by
-   /// vector<Cell>::resize(). resize() copies Cell() into the new Cells,
-   /// therefore the cell type of the new cells is expected to be CT_BASE.
-   Cell(const Cell & other)
-      { Assert(other.get_cell_type() == CT_BASE); }
 
    /// deep copy of cell \b other into \b this cell
    void init(const Cell & other, Value & cell_owner, const char * loc)

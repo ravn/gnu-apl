@@ -31,7 +31,7 @@
 Token::Token(const Token & other)
    : tag(TOK_VOID)
 {
-   copy_1(*this, other, "Token::Token(other)");
+   copy_1(other, "Token::Token(other)");
 }
 //-----------------------------------------------------------------------------
 Token::Token(TokenTag tg, IndexExpr & idx)
@@ -766,9 +766,9 @@ Token::copy_N(const Token & src)
 }
 //-----------------------------------------------------------------------------
 void
-copy_1(Token & dst, const Token & src, const char * loc)
+Token::copy_1(const Token & src, const char * loc)
 {
-   dst.clear(loc);
+   clear(loc);
    if (src.is_apl_val())
       {
         Value * val = src.get_apl_val_pointer();
@@ -782,14 +782,14 @@ copy_1(Token & dst, const Token & src, const char * loc)
            }
       }
 
-   dst.copy_N(src);
+   copy_N(src);
 }
 //-----------------------------------------------------------------------------
 void
-move_1(Token & dst, Token & src, const char * loc)
+Token::move_1(Token & src, const char * loc)
 {
-   dst.clear(loc);
-   dst.copy_N(src);
+   clear(loc);
+   copy_N(src);
 
    if (src.is_apl_val())
       {
@@ -800,10 +800,10 @@ move_1(Token & dst, Token & src, const char * loc)
 }
 //-----------------------------------------------------------------------------
 void
-move_2(Token & dst, const Token & src, const char * loc)
+Token::move_2(const Token & src, const char * loc)
 {
-   dst.clear(loc);
-   dst.copy_N(src);
+   clear(loc);
+   copy_N(src);
 
    if (src.is_apl_val())
       {

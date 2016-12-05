@@ -202,7 +202,7 @@ Value_P
 Quad_TF::tf1(const UCS_string & fun_name, const Function & fun)
 {
 const UCS_string text = fun.canonical(false);
-vector<UCS_string> lines;
+UCS_string_vector lines;
 const size_t max_len = text.to_vector(lines);
 
 UCS_string ucs;
@@ -784,11 +784,11 @@ ShapeItem skipped = 0;
              for (; s < tos.size() && tos[s].get_Class() == TC_VALUE; ++s)
                 {
                   tos[s].get_apl_val()->toggle_UCS();
-                  move_1(tos[s - skipped], tos[s], LOC);
+                  tos[s - skipped].move_1(tos[s], LOC);
                 }
            }
 
-        if (skipped)   move_1(tos[s - skipped], tos[s], LOC);
+        if (skipped)   tos[s - skipped].move_1(tos[s], LOC);
 
       }
 
@@ -811,7 +811,7 @@ ShapeItem skipped = 0;
             tos[s + 2].get_Class() != TC_VALUE)                     // B 
            {
              if (skipped)   // dont copy to itself
-                move_1(tos[s - skipped], tos[s], LOC);
+                tos[s - skipped].move_1(tos[s], LOC);
              continue;
            }
 
@@ -826,14 +826,14 @@ ShapeItem skipped = 0;
         Value_P bval = tos[s].get_apl_val();
         if (sh.get_volume() == bval->element_count())   // same volume
            {
-             move_1(tos[s - skipped], tos[s], LOC);
+             tos[s - skipped].move_1(tos[s], LOC);
              tos[s - skipped].ChangeTag(TOK_APL_VALUE1);
              bval->set_shape(sh);
            }
         else
            {
              Token t = Bif_F12_RHO::do_reshape(sh, *bval);
-             move_1(tos[s - skipped], t, LOC);
+             tos[s - skipped].move_1(t, LOC);
            }
       }
 
@@ -862,7 +862,7 @@ ShapeItem skipped = 0;
                 {
                   // TOK_R_PARENT will become a value: just copy it for now
                   //
-                  if (skipped)   move_1(tos[s - skipped], tos[s], LOC);
+                  if (skipped)   tos[s - skipped].move_1(tos[s], LOC);
                   continue;
                 }
 
@@ -880,7 +880,7 @@ ShapeItem skipped = 0;
 
                   tos[s + 1].clear(LOC);
                   Token tok_AB(TOK_APL_VALUE1, Z);
-                  move_2(tos[d_1], tok_AB, LOC);
+                  tos[d_1].move_2(tok_AB, LOC);
                   s += 1;   skipped += 2;   // skip , (of A , B) but not B
                   continue;   // don't move_1() below
                 }
@@ -893,11 +893,11 @@ ShapeItem skipped = 0;
              bval->set_shape(sh);
 
              tos[s].ChangeTag(TOK_APL_VALUE1);
-             move_1(tos[s - skipped], tos[s], LOC);
+             tos[s - skipped].move_1(tos[s], LOC);
              continue;
            }
 
-        if (skipped)   move_1(tos[s - skipped], tos[s], LOC);
+        if (skipped)   tos[s - skipped].move_1(tos[s], LOC);
       }
 
    if (skipped)
@@ -921,7 +921,7 @@ ShapeItem skipped = 0;
             tos[s + 2].get_Class() != TC_VALUE)              // not B 
            {
              if (skipped)   // dont copy to itself
-                move_1(tos[s - skipped], tos[s], LOC);
+                tos[s - skipped].move_1(tos[s], LOC);
              continue;
            }
 
@@ -958,7 +958,7 @@ ShapeItem skipped = 0;
            !tos[s + 5].get_apl_val()->is_int_scalar())      // K not integer
            {
              if (skipped)   // dont copy to itself
-                move_1(tos[s - skipped], tos[s], LOC);
+                tos[s - skipped].move_1(tos[s], LOC);
              continue;
            }
 
@@ -973,7 +973,7 @@ ShapeItem skipped = 0;
         loop(k, K)   new (sequence->next_ravel())   IntCell(N + k);
         sequence->check_value(LOC);
         Token tok(TOK_APL_VALUE1, sequence);
-        move_2(tos[s - skipped], tok, LOC);
+        tos[s - skipped].move_2(tok, LOC);
         s += 5;   skipped += 5;
       }
 
@@ -1010,7 +1010,7 @@ ShapeItem skipped = 0;
            !tos[s + 7].get_apl_val()->is_int_scalar())      // K not integer
            {
              if (skipped)   // dont copy to itself
-                move_1(tos[s - skipped], tos[s], LOC);
+                tos[s - skipped].move_1(tos[s], LOC);
              continue;
            }
 
@@ -1027,7 +1027,7 @@ ShapeItem skipped = 0;
         loop(k, K)   new (sequence->next_ravel())   IntCell(M * (N + k));
         sequence->check_value(LOC);
         Token tok(TOK_APL_VALUE1, sequence);
-        move_2(tos[s - skipped], tok, LOC);
+        tos[s - skipped].move_2(tok, LOC);
         s += 7;   skipped += 7;
       }
 
@@ -1054,21 +1054,21 @@ ShapeItem skipped = 0;
             tos[s + 3].get_tag()   != TOK_R_PARENT)          // not )
            {
              if (skipped)   // dont copy to itself
-                move_1(tos[s - skipped], tos[s], LOC);
+                tos[s - skipped].move_1(tos[s], LOC);
              continue;
            }
 
         Value_P B = tos[s + 2].get_apl_val();
         if (B->is_scalar())
            {
-             move_1(tos[s - skipped], tos[s + 2], LOC);
+             tos[s - skipped].move_1(tos[s + 2], LOC);
            }
         else
            {
              Value_P enc_B(LOC);
              new (enc_B->next_ravel()) PointerCell(B, enc_B.getref());
              Token tok(TOK_APL_VALUE1, enc_B);
-             move_2(tos[s - skipped], tok, LOC);
+             tos[s - skipped].move_2(tok, LOC);
              tos[s + 2].clear(LOC);   // B
            }
         s += 3;   skipped += 3;
@@ -1096,24 +1096,24 @@ ShapeItem skipped = 0;
             tos[s + 2].get_Class() != TC_VALUE)              // not B 
            {
              if (skipped)   // dont copy to itself
-                move_1(tos[s - skipped], tos[s], LOC);
+                tos[s - skipped].move_1(tos[s], LOC);
              continue;
            }
 
         if (skipped)   // dont copy to itself
-           move_1(tos[s - skipped], tos[s], LOC);   // move ⍴
+           tos[s - skipped].move_1(tos[s], LOC);   // move ⍴
 
         Value_P B = tos[s + 2].get_apl_val();
         if (B->is_scalar())
            {
-             move_1(tos[s - skipped + 1], tos[s + 2], LOC);
+             tos[s - skipped + 1].move_1(tos[s + 2], LOC);
            }
         else
            {
              Value_P enc_B(LOC);
              new (enc_B->next_ravel()) PointerCell(B, enc_B.getref());
              Token tok(TOK_APL_VALUE1, enc_B);
-             move_2(tos[s - skipped + 1], tok, LOC);
+             tos[s - skipped + 1].move_2(tok, LOC);
              tos[s + 2].clear(LOC);   // B
            }
         s += 2;   ++skipped;
@@ -1140,13 +1140,13 @@ ShapeItem skipped = 0;
             tos[s + 1].get_Class() == TC_VALUE     &&
             tos[s + 2].get_tag()   == TOK_R_PARENT)   // ( B )
            {
-             move_1(tos[s - skipped], tos[s + 1], LOC);  // override ( of (B)
+             tos[s - skipped].move_1(tos[s + 1], LOC);  // override ( of (B)
              s += 2;   skipped += 2;
              continue;
            }
 
         if (skipped)   // dont copy to itself
-           move_1(tos[s - skipped], tos[s], LOC);
+           tos[s - skipped].move_1(tos[s], LOC);
       }
 
    if (skipped)
@@ -1166,7 +1166,7 @@ ShapeItem skipped = 0;
         // the first value (if any) survives
         //
         if (skipped)   // dont copy to itself
-           move_1(tos[s - skipped], tos[s], LOC);
+           tos[s - skipped].move_1(tos[s], LOC);
 
         if (tos[s - skipped].get_Class() != TC_VALUE)   continue;
 
@@ -1176,7 +1176,7 @@ ShapeItem skipped = 0;
          while ((s + 1) < tos.size() && tos[s + 1].get_Class() == TC_VALUE)
             {
                Token t;
-               move_1(t, tos[s - skipped], LOC);
+               t.move_1(tos[s - skipped], LOC);
                Value::glue(tos[s - skipped], t, tos[s + 1], LOC);
                s += 1;   skipped += 1;
             }
@@ -1219,7 +1219,7 @@ const UCS_string text = fun.canonical(false);
         return;
       }
 
-vector<UCS_string> lines;
+UCS_string_vector lines;
    text.to_vector(lines);
 
    ucs.append_utf8("⎕FX");

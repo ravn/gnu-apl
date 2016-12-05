@@ -76,7 +76,7 @@ const Function * function = 0;
    // show the function...
    //
 const UCS_string ucs = function->canonical(false);
-vector<UCS_string> tlines;
+UCS_string_vector tlines;
    ucs.to_vector(tlines);
 int max_len = 0;
    loop(row, tlines.size())
@@ -247,7 +247,7 @@ Quad_CR::do_CR10(const Value & B)
    // cannot use PrintBuffer because the lines in ucs_vec
    // have different lengths
    //
-vector<UCS_string> ucs_vec;
+UCS_string_vector ucs_vec;
    do_CR10(ucs_vec, B);
 
 Value_P Z(ucs_vec.size(), LOC);
@@ -263,7 +263,7 @@ Value_P Z(ucs_vec.size(), LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_CR::do_CR10(vector<UCS_string> & result, const Value & B)
+Quad_CR::do_CR10(UCS_string_vector & result, const Value & B)
 {
 const UCS_string symbol_name(B);
 const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
@@ -338,7 +338,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_CR::do_CR10_var(vector<UCS_string> & result, const UCS_string & var_name,
+Quad_CR::do_CR10_var(UCS_string_vector & result, const UCS_string & var_name,
                      const Value & value)
 {
 Picker picker(var_name);
@@ -346,7 +346,7 @@ Picker picker(var_name);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_CR::do_CR10_rec(vector<UCS_string> & result, const Value & value, 
+Quad_CR::do_CR10_rec(UCS_string_vector & result, const Value & value, 
                      Picker & picker, ShapeItem pidx)
 {
    /*
@@ -398,7 +398,7 @@ UCS_string shape_rho;
         picker.get(proto_name);
         picker.pop();
         do_CR10_rec(result, *proto, picker, pidx);
-        result.back().append_utf8(" ⍝ proto 1");
+        result.last().append_utf8(" ⍝ proto 1");
 
         // and then another line to reshape the prototype
         //
@@ -407,7 +407,7 @@ UCS_string shape_rho;
         reshape.append(shape_rho);
         reshape.append(proto_name);
         result.push_back(reshape);
-        result.back().append_utf8(" ⍝ proto 2");
+        result.last().append_utf8(" ⍝ proto 2");
         return;
       }
 
@@ -495,7 +495,7 @@ bool nested = false;
 }
 //-----------------------------------------------------------------------------
 bool
-Quad_CR::short_ravel(vector<UCS_string> & result, bool & nested,
+Quad_CR::short_ravel(UCS_string_vector & result, bool & nested,
                      const Value & value, const Picker & picker,
                      const UCS_string & left, const UCS_string & shape_rho)
 {

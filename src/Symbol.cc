@@ -667,7 +667,7 @@ const ValueStackItem & vs = value_stack.back();
                IntCell lab(vs.sym_val.label);
                Value_P value(lab, LOC);
                Token t(TOK_APL_VALUE1, value);
-               move_1(tok, t, LOC);
+               tok.move_1(t, LOC);
              }
              return;
 
@@ -677,7 +677,7 @@ const ValueStackItem & vs = value_stack.back();
              // if we resolve a variable. the value is considered grouped.
              {
                Token t(TOK_APL_VALUE1, get_apl_value()->clone(LOC));
-               move_1(tok, t, LOC);
+               tok.move_1(t, LOC);
              }
              return;
 
@@ -689,7 +689,7 @@ const ValueStackItem & vs = value_stack.back();
                   //
                   return;
                 }
-             move_2(tok, vs.sym_val.function->get_token(), LOC);
+             tok.move_2(vs.sym_val.function->get_token(), LOC);
              return;
 
         case NC_SHARED_VAR:
@@ -1083,7 +1083,7 @@ Symbol::dump(ostream & out) const
 const ValueStackItem & vs = (*this)[0];
    if (vs.name_class == NC_VARIABLE)
       {
-        vector<UCS_string> CR10;
+        UCS_string_vector CR10;
         Quad_CR::do_CR10_var(CR10, get_name(), *vs.apl_val.get());
 
         loop(l, CR10.size())

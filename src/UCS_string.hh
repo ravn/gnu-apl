@@ -36,6 +36,7 @@ class PrintBuffer;
 class PrintContext;
 class Shape;
 class Value;
+class UCS_string_vector;
 
 //=============================================================================
 /// A string of Unicode characters (32-bit)
@@ -45,27 +46,27 @@ public:
    /// constructor: empty string
    UCS_string()
    : Simple_string<Unicode>(0, 0)
-   {}
+   { ++total_count; }
 
    /// constructor: one-element string
    UCS_string(Unicode uni)
    : Simple_string<Unicode>(1, uni)
-   {}
+   { ++total_count; }
 
    /// constructor: \b len Unicode characters, starting at \b data
    UCS_string(const Unicode * data, size_t len)
    : Simple_string<Unicode>(data, len)
-   {}
+   { ++total_count; }
 
    /// constructor: \b len times \b uni
    UCS_string(size_t len, Unicode uni)
    : Simple_string<Unicode>(len, uni)
-   {}
+   { ++total_count; }
 
    /// constructor: copy of another UCS_string
    UCS_string(const UCS_string & ucs, size_t pos, size_t len)
    : Simple_string<Unicode>(ucs, pos, len)
-   {}
+   { ++total_count; }
 
    /// constructor: UCS_string from UTF8_string
    UCS_string(const UTF8_string & utf);
@@ -85,6 +86,9 @@ public:
 
    /// constructor: UCS_string from simple character vector value.
    UCS_string(const Value & value);
+
+   ~UCS_string()
+   { --total_count; }
 
    /// compute the length of an output row
    int compute_chunk_length(int quad_PW, int col) const;
@@ -110,7 +114,7 @@ public:
    void copy_black(UCS_string & dest, int & idx) const;
 
    /// copy names etc. separated by whitespaces to \b dest
-   void copy_black_list(vector<UCS_string> & dest) const;
+   void copy_black_list(UCS_string_vector & dest) const;
 
    /// \b this is a command with optional args. Remove leading and trailing
    /// whitespaces, append args to rest, and remove args from this.
@@ -120,7 +124,7 @@ public:
    ShapeItem LF_count() const;
 
    /// return \b true iff \b this string is contained in \b list
-   bool contained_in(const vector<UCS_string> & list) const;
+   bool contained_in(const UCS_string_vector & list) const;
 
    /// return the start position of \b sub in \b this string or -1 if \b sub
    /// is not contained in \b this string
@@ -210,7 +214,7 @@ public:
    /// set this string to the 0-terminated ASCII c_string (don't use for UTF8
    /// encoded strings)
    UCS_string & operator =(const char * c_string)
-      { *this = UCS_string(c_string);   return *this; }
+      { new (this) UCS_string(c_string);   return *this; }
 
    UCS_string & operator <<(const char * str)
       { append_utf8(str);   return *this; }
@@ -241,7 +245,7 @@ public:
 
    /// split \b this multi-line string into individual lines,
    /// removing the CR and NL chars in \b this string.
-   size_t to_vector(vector<UCS_string> & result) const;
+   size_t to_vector(UCS_string_vector & result) const;
 
    /// an iterator for UCS_strings
    class iterator
@@ -261,7 +265,7 @@ public:
            Unicode next()
               { return pos < s.size() ? s[pos++] : Invalid_Unicode; }
 
-           /// return truei iff there are more chars in the string
+           /// return true iff there are more chars in the string
            bool more() const
               { return pos < s.size(); }
 
@@ -331,17 +335,22 @@ public:
 
    /// sort a (small) number of UCS_strings (filenames, variables, or functions)
    /// using a simple but quadratic time algorithm
-   static void sort_names(vector<UCS_string> names);
+   static void sort_names(UCS_string_vector names);
 
    /// compute column widths so that names align nicely
-   static void compute_column_width(vector<int> & result,
+   static void compute_column_width(Simple_string<int> & result,
                                     const UCS_string ** names, int name_count,
                                     int tab_size, int quad_PW);
+   static ShapeItem get_total_count()
+      { return total_count; }
+
 protected:
    /// return true if n1 < n2
    static bool compare_names(const UCS_string * const & n1,
                              const UCS_string * const & n2, const void *)
       { return n2->compare(*n1) == COMP_LT; }
+
+   static ShapeItem total_count;
 };
 //-----------------------------------------------------------------------------
 /// a singly linked list of UCS_strings.
@@ -365,6 +374,44 @@ UCS_string_list
       {
         for (int ret = 0; ; list = list->prev, ++ret)
             { if (list == 0)   return ret; }
+      }
+};
+//-----------------------------------------------------------------------------
+/// a vector of UCS_strings.
+class
+UCS_string_vector : public Simple_string<UCS_string>
+{
+public:
+   /// constructor: empty vector
+   UCS_string_vector()
+   : Simple_string<UCS_string>(0, 0)
+   {}
+
+   /// constructor: from APL character matrix (removes trailing blanks)
+   UCS_string_vector(const Value & val, bool surrogate);
+
+   /// append another UCS_string
+   void push_back(const UCS_string & item)
+      { append(item, LOC); }
+
+   void resize(ShapeItem new_size)
+      {
+        if (new_size <= size())   shrink(new_size);
+        else while (size() < new_size)   append(UCS_string(), LOC);
+      }
+
+   /// a quick erase() that does NOT keep the order of elements
+   void erase_unsorted(ShapeItem idx)
+      {
+        (*this)[idx].swap(last());
+        pop();
+      }
+
+   /// an erase() that keeps the order of elements
+   void erase(ShapeItem idx)
+      {
+        for (++idx; idx < size(); ++idx)   (*this)[idx - 1].swap((*this)[idx]);
+        pop();
       }
 };
 //-----------------------------------------------------------------------------

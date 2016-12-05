@@ -535,7 +535,8 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 }
 //-----------------------------------------------------------------------------
 void
-Svar_DB::get_offering_processors(AP_num to_proc, vector<AP_num> & processors)
+Svar_DB::get_offering_processors(AP_num to_proc,
+                                 Simple_string<AP_num> & processors)
 {
 const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
    if (tcp == NO_TCP_SOCKET)   return;
@@ -553,14 +554,14 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
         const AP_num * procs = (const AP_num *)(op.data());
         const size_t count = op.size() / sizeof(AP_num);
 
-        loop(c, count)   processors.push_back(*procs++);
+        loop(c, count)   processors.append(*procs++);
         delete response; 
       }
 }
 //-----------------------------------------------------------------------------
 void
 Svar_DB::get_offered_variables(AP_num to_proc, AP_num from_proc,
-                               vector<uint32_t> & varnames)
+                               Simple_string<uint32_t> & varnames)
 {
 const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
    if (tcp == NO_TCP_SOCKET)   return;
@@ -578,7 +579,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
         const uint32_t * names = (const uint32_t *)(ov.data());
         const size_t count = ov.size() / sizeof(uint32_t);
 
-        loop(c, count)   varnames.push_back(*names++);
+        loop(c, count)   varnames.append(*names++);
         delete response; 
       }
 }

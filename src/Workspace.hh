@@ -129,7 +129,7 @@ public:
       { return the_workspace.more_error_info; }
 
    /// erase the symbols in \b symbols from the symbol table
-   static void erase_symbols(ostream & out, const vector<UCS_string> & symbols)
+   static void erase_symbols(ostream & out, const UCS_string_vector & symbols)
       { the_workspace.symbol_table.erase_symbols(CERR, symbols); }
 
    /// list all symbols (of category \b which) with names in \b from_to
@@ -142,7 +142,7 @@ public:
 
    /// add \b ufun to list of that were ⎕EX'ed while on the SI stack
    static void add_expunged_function(const UserFunction * ufun)
-      { the_workspace.expunged_functions.push_back(ufun); }
+      { the_workspace.expunged_functions.append(ufun); }
 
    /// return the symbol table of the current workspace.
    static const SymbolTable & get_symbol_table()
@@ -200,13 +200,13 @@ public:
    static Symbol * lookup_existing_symbol(const UCS_string & symbol_name);
 
    /// save this workspace
-   static void save_WS(ostream & out, vector<UCS_string> & lib_ws);
+   static void save_WS(ostream & out, UCS_string_vector & lib_ws);
 
    /// backup an existing file \b filename, return true on error
    static bool backup_existing_file(const char * filename);
 
    /// dump this workspace
-   static void dump_WS(ostream & out, vector<UCS_string> & lib_ws,
+   static void dump_WS(ostream & out, UCS_string_vector & lib_ws,
                        bool html, bool silent);
 
    /// set or inquire the workspace ID
@@ -215,14 +215,14 @@ public:
    /// load )DUMPed file from open file descriptor fd (closes fd)
    static void load_DUMP(ostream & out, const UTF8_string & filename, int fd,
                          LX_mode with_LX, bool silent,
-                         vector<UCS_string> * object_filter);
+                         UCS_string_vector * object_filter);
 
    /// load \b lib_ws into the_workspace, maybe set ⎕LX of the new WS.
-   static void load_WS(ostream & out, const vector<UCS_string> & lib_ws,
+   static void load_WS(ostream & out, const UCS_string_vector & lib_ws,
                        UCS_string & quad_lx, bool silent);
 
    /// copy objects from another workspace
-   static void copy_WS(ostream & out, vector<UCS_string> & lib_ws,
+   static void copy_WS(ostream & out, UCS_string_vector & lib_ws,
                        bool protection);
 
    /// return a token for system function or variable \b ucs
@@ -236,7 +236,7 @@ public:
 
    /// write symbols for )OUT command
    static void write_OUT(FILE * out, uint64_t & seq,
-                  const vector<UCS_string> & objects);
+                  const UCS_string_vector & objects);
 
    /// clear the marked flag in all values known in this workspace
    static void unmark_all_values();
@@ -282,7 +282,7 @@ protected:
    UCS_string prompt;
 
    /// user defined functions that were ⎕EX'ed while on the SI stack
-   vector<const UserFunction *> expunged_functions;
+   Simple_string<const UserFunction *> expunged_functions;
 
    /// more info about last error
    UCS_string more_error_info;

@@ -273,16 +273,16 @@ protected:
    UCS_string end_marker;
 
    /// the raw lines read from stdin
-   vector<UCS_string> raw_lines;
+   UCS_string_vector raw_lines;
 
    /// the line parts left of the escapes
-   vector<UCS_string> prefixes;
+   UCS_string_vector prefixes;
 
    /// the line parts to exe executed
-   vector<UCS_string> escapes;
+   UCS_string_vector escapes;
 
    /// the line parts right of the escapes
-   vector<UCS_string> suffixes;
+   UCS_string_vector suffixes;
 
    /// bool to prevent recursive ⎕INP calls
    bool Quad_INP_running;

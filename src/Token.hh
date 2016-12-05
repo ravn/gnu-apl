@@ -54,6 +54,15 @@ public:
    /// copy constructor
    Token(const Token & other);
 
+   /// copy \b src into \b this token
+   void copy_1(const Token & src, const char * loc);
+
+   /// move mutable \b src into \b this token
+   void move_1(Token & src, const char * loc);
+
+   /// clone const \b src into \b this token
+   void move_2(const Token & src, const char * loc);
+
    /// Construct a token without a value
    Token(TokenTag tg)
    : tag(tg) { Assert(get_ValueType() == TV_NONE);   value.int_vals[0] = 0; }
@@ -348,7 +357,7 @@ struct Token_loc
    void copy(const Token_loc & other, const char * loc)
       {
         pc = other.pc;
-        copy_1(tok, other.tok, loc);
+        tok.copy_1(other.tok, loc);
       }
 
    /// the token

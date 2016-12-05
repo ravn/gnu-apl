@@ -22,6 +22,7 @@
 #define __INPUT_FILE_HH_DEFINED__
 
 #include "UTF8_string.hh"
+#include "UCS_string.hh"
 
 /// an input file and its properties. the file can be an apl script(.asp) file
 /// or a testcase (.tc) file. The file names initially come from the command
@@ -139,7 +140,7 @@ protected:
    int  in_html;      ///< 0: no HTML, 1: in HTML file 2: in HTML header
 
    /// functions and vars that shoule be )COPIED
-   vector<UCS_string> object_filter;
+   UCS_string_vector object_filter;
 
    /// return true if current line belongs to a function. Cleared at final ∇
    bool in_function;

@@ -347,7 +347,7 @@ const Executable * uexec = ufun;
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::write_OUT(FILE * out, uint64_t & seq, const vector<UCS_string>
+Workspace::write_OUT(FILE * out, uint64_t & seq, const UCS_string_vector
                      & objects)
 {
    // if objects is empty then write all user define objects and some system
@@ -471,8 +471,8 @@ const int ret = the_workspace.expunged_functions.size();
 
    while(the_workspace.expunged_functions.size())
        {
-         const UserFunction * ufun = the_workspace.expunged_functions.back();
-         the_workspace.expunged_functions.pop_back();
+         const UserFunction * ufun = the_workspace.expunged_functions.last();
+         the_workspace.expunged_functions.pop();
          out << "finally deleting " << ufun->get_name() << "...";
          delete ufun;
          out << " OK" << endl;
@@ -542,7 +542,7 @@ Workspace::list_SI(ostream & out, SI_mode mode)
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::save_WS(ostream & out, vector<UCS_string> & lib_ws)
+Workspace::save_WS(ostream & out, UCS_string_vector & lib_ws)
 {
    // )SAVE
    // )SAVE wsname
@@ -564,8 +564,8 @@ bool name_from_WSID = false;
    // at this point, lib_ws.size() is 1 or 2.
 
 LibRef libref = LIB_NONE;
-UCS_string wname = lib_ws.back();
-   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws.front().atoi());
+UCS_string wname = lib_ws.last();
+   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws[0].atoi());
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, false,
                                                   ".xml", 0);
 
@@ -693,7 +693,7 @@ const int err = rename(filename, backup_filename.c_str());
 void
 Workspace::load_DUMP(ostream & out, const UTF8_string & filename, int fd,
                      LX_mode with_LX, bool silent,
-                     vector<UCS_string> * object_filter)
+                     UCS_string_vector * object_filter)
 {
    Log(LOG_command_IN)
       CERR << "loading )DUMP file " << filename << "..." << endl;
@@ -779,7 +779,7 @@ public:
 };
 //-----------------------------------------------------------------------------
 void
-Workspace::dump_WS(ostream & out, vector<UCS_string> & lib_ws, bool html,
+Workspace::dump_WS(ostream & out, UCS_string_vector & lib_ws, bool html,
                    bool silent)
 {
    // )DUMP
@@ -800,8 +800,8 @@ Workspace::dump_WS(ostream & out, vector<UCS_string> & lib_ws, bool html,
    // at this point, lib_ws.size() is 1 or 2.
 
 LibRef libref = LIB_NONE;
-const UCS_string wname = lib_ws.back();
-   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws.front().atoi());
+const UCS_string wname = lib_ws.last();
+   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws[0].atoi());
 const char * extension = html ? ".html" : ".apl";
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, false,
                                                   extension, 0);
@@ -939,7 +939,7 @@ int variable_count = 0;
 //-----------------------------------------------------------------------------
 // )LOAD WS, set ⎕LX of loaded WS on success
 void
-Workspace::load_WS(ostream & out, const vector<UCS_string> & lib_ws,
+Workspace::load_WS(ostream & out, const UCS_string_vector & lib_ws,
                    UCS_string & quad_lx, bool silent)
 {
    if (lib_ws.size() < 1 || lib_ws.size() > 2)   // no or too many argument(s)
@@ -950,8 +950,8 @@ Workspace::load_WS(ostream & out, const vector<UCS_string> & lib_ws,
       }
 
 LibRef libref = LIB_NONE;
-   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws.front().atoi());
-UCS_string wname = lib_ws.back();
+   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws[0].atoi());
+UCS_string wname = lib_ws.last();
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
                                                   ".xml", ".apl");
 
@@ -1009,7 +1009,7 @@ XML_Loading_Archive in(filename.c_str(), dump_fd);
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::copy_WS(ostream & out, vector<UCS_string> & lib_ws_objects,
+Workspace::copy_WS(ostream & out, UCS_string_vector & lib_ws_objects,
                    bool protection)
 {
    // )COPY wsname                              wsname /absolute or relative
@@ -1025,10 +1025,10 @@ Workspace::copy_WS(ostream & out, vector<UCS_string> & lib_ws_objects,
       }
 
 LibRef libref = LIB_NONE;
-   if (Avec::is_digit(lib_ws_objects.front()[0]))
+   if (Avec::is_digit(lib_ws_objects[0][0]))
       {
-        libref = (LibRef)(lib_ws_objects.front().atoi());
-        lib_ws_objects.erase(lib_ws_objects.begin());
+        libref = (LibRef)(lib_ws_objects[0].atoi());
+        lib_ws_objects.erase(0);
       }
 
    if (lib_ws_objects.size() < 1)   // at least workspace name is required
@@ -1038,8 +1038,8 @@ LibRef libref = LIB_NONE;
         return;
       }
 
-UCS_string wname = lib_ws_objects.front();
-   lib_ws_objects.erase(lib_ws_objects.begin());
+UCS_string wname = lib_ws_objects[0];
+   lib_ws_objects.erase(0);
 
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
                                                   ".xml", ".apl");

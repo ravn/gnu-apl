@@ -174,7 +174,7 @@ protected:
    const ParseMode pmode;
 
    /// the program text from which \b body was created
-   vector<UCS_string> text;
+   UCS_string_vector text;
 
    /// The token to be executed. They are organized line by line and
    /// statement by statement, but the token within a statement reversed

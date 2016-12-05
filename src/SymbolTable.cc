@@ -191,7 +191,7 @@ int symbol_count = 0;
       }
 
 const int count = list.size();
-vector<UCS_string> names;
+UCS_string_vector names;
    loop(l, count)
       {
         UCS_string name = list[l]->get_name();
@@ -211,7 +211,7 @@ const UCS_string ** sorted_names = new const UCS_string *[count];
    // figure column widths
    //
 const int qpw = Workspace::get_PW();
-vector<int> col_width;
+Simple_string<int> col_width;
    enum { tabsize = 4 };
    UCS_string::compute_column_width(col_width, sorted_names, count,
                                     tabsize, qpw);
@@ -278,7 +278,7 @@ SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
 }
 //-----------------------------------------------------------------------------
 void
-SymbolTable::erase_symbols(ostream & out, const vector<UCS_string> & symbols)
+SymbolTable::erase_symbols(ostream & out, const UCS_string_vector & symbols)
 {
 int error_count = 0;
    loop(s, symbols.size())
@@ -347,14 +347,17 @@ Symbol * symbol = lookup_existing_symbol(sym);
 
       if (symbol->is_erased())
          {
-           MORE_ERROR() << "Can't )ERASE symbol '"
-                        << sym << "': already erased";
-           return true;
-         }
-      else   // still holding a value
-         {
-           symbol->clear_vs();
-           return false;
+           if (symbol->value_stack.size() == 1)
+              {
+                MORE_ERROR() << "Can't )ERASE symbol '"
+                             << sym << "': already erased";
+                return true;
+              }
+           else   // still holding a value
+              {
+                symbol->clear_vs();
+                return false;
+              }
          }
 
    if (symbol->value_stack.size() != 1)

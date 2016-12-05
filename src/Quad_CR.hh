@@ -55,7 +55,7 @@ public:
    static Quad_CR  _fun;          ///< Built-in function.
 
    /// portable variable encoding of value \b name (varname or varname ⊂)
-   static void do_CR10_var(vector<UCS_string> & result, const UCS_string & name,
+   static void do_CR10_var(UCS_string_vector & result, const UCS_string & name,
                            const Value & value);
 
 protected:
@@ -144,12 +144,12 @@ protected:
       };
 
    /// compute 10 ⎕CR recursively
-   static void do_CR10_rec(vector<UCS_string> & result, const Value & value,
+   static void do_CR10_rec(UCS_string_vector & result, const Value & value,
                            Picker & picker, ShapeItem pidx);
 
    /// try to emit \b value in short format. Retrun true if that is not
    /// possible.
-   static bool short_ravel(vector<UCS_string> & result, bool & nested,
+   static bool short_ravel(UCS_string_vector & result, bool & nested,
                            const Value & value, const Picker & picker,
                            const UCS_string & left,
                            const UCS_string & shape_rho);
@@ -164,7 +164,7 @@ protected:
       };
 
    /// 10 ⎕CR symbol_name (variable or function name). Also used for )OUT
-   static void do_CR10(vector<UCS_string> & result, const Value & symbol_name);
+   static void do_CR10(UCS_string_vector & result, const Value & symbol_name);
 
    /// one ravel item in 10 ⎕CR symbol_name
    static V_mode do_CR10_item(UCS_string & item, const Cell & cell,

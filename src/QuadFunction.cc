@@ -364,7 +364,7 @@ Value_P Z(3, LOC);
         new (Z->next_ravel()) PointerCell(Z3, Z.getref());
 
         Z->check_value(LOC);
-        move_2(result, Token(TOK_APL_VALUE1, Z), LOC);
+        result.move_2(Token(TOK_APL_VALUE1, Z), LOC);
         return;
       }
 
@@ -415,7 +415,7 @@ Value_P Z2(2, LOC);
       }
 
    Z->check_value(LOC);
-   move_2(result, Token(TOK_APL_VALUE1, Z), LOC);
+   result.move_2(Token(TOK_APL_VALUE1, Z), LOC);
 }
 //=============================================================================
 Token
@@ -425,7 +425,7 @@ Quad_ENV::eval_B(Value_P B)
 
 const ShapeItem ec_B = B->element_count();
 
-vector<const char *> evars;
+Simple_string<const char *> evars;
 
    for (char **e = environ; *e; ++e)
        {
@@ -443,7 +443,7 @@ vector<const char *> evars;
                  }
             }
 
-         if (match)   evars.push_back(env);
+         if (match)   evars.append(env);
        }
 
 const Shape sh_Z(evars.size(), 2);
@@ -601,8 +601,7 @@ Quad_EX::eval_B(Value_P B)
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-vector<UCS_string> vars(var_count);
-   B->to_varnames(vars, false);
+const UCS_string_vector vars(B.getref(), false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -758,7 +757,7 @@ APL_Integer x = X->get_ravel(0).get_near_int();
 
 UCS_string end_marker(B->get_UCS_ravel());
 
-vector<UCS_string> lines;
+UCS_string_vector lines;
 Parser parser(PM_EXECUTE, LOC, false);
 
    for (;;)
@@ -952,8 +951,7 @@ Quad_NC::eval_B(Value_P B)
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-vector<UCS_string> vars(var_count);
-   B->to_varnames(vars, false);
+const UCS_string_vector vars(B.getref(), false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -1048,7 +1046,7 @@ int requested_NCs = 0;
 
    // 2, build a name table, starting with user defined names
    //
-vector<UCS_string> names;
+UCS_string_vector names;
    {
      Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,13 +27,13 @@
 
 class Workspace;
 
-/// result of tab expansion
+/// result of a tab expansion
 enum ExpandResult
 {
-   ER_IGNORE,    ///< do nothing
-   ER_REPLACE,   ///< replace characters
-   ER_APPEND,    ///< append characters
-   ER_AGAIN,     ///< again (matches have been shown)
+   ER_IGNORE  = 0,   ///< do nothing
+   ER_REPLACE = 1,   ///< replace characters
+   ER_APPEND  = 2,   ///< append characters
+   ER_AGAIN   = 3,   ///< again (matches have been shown)
 };
 
 /// tab completion hints
@@ -123,6 +123,18 @@ public:
    static void cmd_CHECK(ostream & out);
 
 protected:
+   /// tab-expand a user-defined name
+   static ExpandResult expand_user_name(UCS_string & user, int & replace_count);
+
+   /// tab-expand an APL command
+   static ExpandResult expand_APL_command(UCS_string & user,
+                                          int & replace_count,
+                                          bool have_trailing_blank);
+
+   /// tab-expand a system-defined name (⎕xxx)
+   static ExpandResult expand_distinguished_name(UCS_string & user,
+                                                 int & replace_count);
+
    /// show list of commands
    static void cmd_BOXING(ostream & out, const UCS_string & arg);
 
@@ -130,10 +142,10 @@ protected:
    static void cmd_CONTINUE(ostream & out);
 
    /// )DROP: delete a workspace file
-   static void cmd_DROP(ostream & out, const vector<UCS_string> & args);
+   static void cmd_DROP(ostream & out, const UCS_string_vector & args);
 
    /// )ERASE: erase symbols
-   static void cmd_ERASE(ostream & out, vector<UCS_string> & args);
+   static void cmd_ERASE(ostream & out, UCS_string_vector & args);
 
    /// show list of commands
    static void cmd_HELP(ostream & out);
@@ -145,7 +157,7 @@ protected:
    static void cmd_HOST(ostream & out, const UCS_string & arg);
 
    /// )IN: import a workspace file
-   static void cmd_IN(ostream & out, vector<UCS_string> & args, bool protect);
+   static void cmd_IN(ostream & out, UCS_string_vector & args, bool protect);
 
    /// show US keyboard layout
    static void cmd_KEYB(ostream & out);
@@ -173,17 +185,17 @@ protected:
    static void cmd_LOG(ostream & out, const UCS_string & arg);
 
    /// list paths of workspace and wslib directories
-   static void cmd_LIBS(ostream & out, const vector<UCS_string> & lib_ref);
+   static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
 
    /// print more error info
    static void cmd_MORE(ostream & out);
 
    /// )OUT: export a workspace file
-   static void cmd_OUT(ostream & out, vector<UCS_string> & args);
+   static void cmd_OUT(ostream & out, UCS_string_vector & args);
 
    /// create a user defined command
    static void cmd_USERCMD(ostream & out, const UCS_string & arg,
-                           vector<UCS_string> & args);
+                           UCS_string_vector & args);
 
    /// enable and disable colors
    static void cmd_XTERM(ostream & out, const UCS_string & args);
@@ -191,7 +203,7 @@ protected:
    /// execute a user defined command
    static void do_USERCMD(ostream & out, UCS_string & line,
                           const UCS_string & line1, const UCS_string & cmd,
-                          vector<UCS_string> & args, int uidx);
+                          UCS_string_vector & args, int uidx);
 
    /// check if a command name conflicts with an existing command
    static bool check_name_conflict(ostream & out, const UCS_string & cnew,
@@ -214,22 +226,22 @@ protected:
 
         /// process one record of a workspace file
         void process_record(const UTF8 * record,
-                            const vector<UCS_string> & objects);
+                            const UCS_string_vector & objects);
 
         /// get the name, rank, and shape of a 1 ⎕TF record
         uint32_t get_nrs(UCS_string & name, Shape & shape) const;
 
         /// process a 'A' (array in 2 ⎕TF format) item.
-        void array_2TF(const vector<UCS_string> & objects) const;
+        void array_2TF(const UCS_string_vector & objects) const;
 
         /// process a 'C' (character, in 1 ⎕TF format) item.
-        void chars_1TF(const vector<UCS_string> & objects) const;
+        void chars_1TF(const UCS_string_vector & objects) const;
 
         /// process an 'F' (function in 2 ⎕TF format) item.
-        void function_2TF(const vector<UCS_string> & objects) const;
+        void function_2TF(const UCS_string_vector & objects) const;
 
         /// process an 'N' (numeric in 1 ⎕TF format) item.
-        void numeric_1TF(const vector<UCS_string> & objects) const;
+        void numeric_1TF(const UCS_string_vector & objects) const;
 
         /// add \b len UTF8 bytes to \b this transfer_context
         void add(const UTF8 * str, int len);
@@ -280,16 +292,16 @@ protected:
 
    /// compute the lenght of the common part in all matches
    static int compute_common_length(int len,
-                                    const vector<UCS_string> & matches);
+                                    const UCS_string_vector & matches);
 
    /// read filenames in \b dir and append matching filenames to \b matches
    static void read_matching_filenames(DIR * dir, UTF8_string dirname,
                                        UTF8_string prefix, ExpandHint ehint,
-                                       vector<UCS_string> & matches);
+                                       UCS_string_vector & matches);
 
    /// show the different alternatives for tab expansions
    static ExpandResult show_alternatives(UCS_string & user, int prefix_len,
-                                         vector<UCS_string>matches);
+                                         UCS_string_vector & matches);
 
    /// format for ]BOXING
    static int boxing_format;

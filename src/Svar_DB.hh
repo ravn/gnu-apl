@@ -21,14 +21,15 @@
 #ifndef __SVAR_DB_HH_DEFINED__
 #define __SVAR_DB_HH_DEFINED__
 
-#include "Common.hh"
-#include "ProcessorID.hh"
-#include "Svar_record.hh"
-
 #include <stdint.h>
 #include <unistd.h>
 
 #include <iostream>
+
+#include "Common.hh"
+#include "ProcessorID.hh"
+#include "Simple_string.hh"
+#include "Svar_record.hh"
 
 using namespace std;
 
@@ -107,11 +108,11 @@ public:
    /// add processors with pending offers to \b to_proc. Duplicates
    /// are OK and will be removed later
    static void get_offering_processors(AP_num to_proc,
-                                       vector<AP_num> & processors);
+                                       Simple_string<AP_num> & processors);
 
    /// return all variables shared between \b to_proc and \b from_proc
    static void get_offered_variables(AP_num to_proc, AP_num from_proc,
-                                     vector<uint32_t> & varnames);
+                                     Simple_string<uint32_t> & varnames);
 
    /// return coupling of \b entry with \b key.
    static SV_Coupling get_coupling(SV_key key)

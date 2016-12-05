@@ -101,7 +101,7 @@ protected:
    const int max_lines;
 
    /// the history
-   vector<UCS_string> hist_lines;
+   UCS_string_vector hist_lines;
 };
 //-----------------------------------------------------------------------------
 /// a context for one user-input line

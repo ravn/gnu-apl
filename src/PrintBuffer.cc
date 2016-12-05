@@ -231,12 +231,12 @@ const bool nested = !value.is_simple();
      //    therefore we have (⍴,value) items. Items are rectangular.
      //
      PERFORMANCE_START(start_2)
-     vector<Rank> max_row_ranks;
+     Simple_string<Rank> max_row_ranks;
      max_row_ranks.reserve(rows);
      loop(y, rows)
         {
           ShapeItem max_row_height = 0;
-          max_row_ranks.push_back(0);
+          max_row_ranks.append(0);
 
           loop(x, cols)
               {
@@ -252,8 +252,8 @@ const bool nested = !value.is_simple();
                    {
                      Value_P sub_val = cell.get_pointer_value();
                      const Rank sub_rank = sub_val->get_rank();
-                     if (max_row_ranks.back() < sub_rank)
-                        max_row_ranks.back() = sub_rank;
+                     if (max_row_ranks.last() < sub_rank)
+                        max_row_ranks.last() = sub_rank;
                    }
 
                 if (max_row_height < item.get_height())
@@ -671,7 +671,7 @@ PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
    if (height > get_height())
       {
         UCS_string ucs(get_width(0), pad);
-        while (height > get_height())   buffer.insert(buffer.begin(), ucs);
+        while (height > get_height())   buffer.insert_before(0, ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -772,7 +772,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
 UCS_string hori(get_width(0), HORI);
 
-   buffer.insert(buffer.begin(), hori);
+   buffer.insert_before(0, hori);
    buffer.push_back(hori);
 
    // draw the corners
@@ -878,7 +878,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
 UCS_string hori(get_width(0), HORI);
 
-   buffer.insert(buffer.begin(), hori);
+   buffer.insert_before(0, hori);
    buffer.push_back(hori);
 
    // draw the corners

@@ -1532,90 +1532,6 @@ const ShapeItem ec = element_count();
 }
 //-----------------------------------------------------------------------------
 void
-Value::to_varnames(vector<UCS_string> & result, bool last) const
-{
-const ShapeItem var_count = get_rows();
-const ShapeItem name_len = get_cols();
-
-   loop(v, var_count)
-      {
-        ShapeItem nidx = v*name_len;
-        const ShapeItem end = nidx + name_len;
-        UCS_string & name = result[v];
-        loop(n, name_len)
-           {
-             const Unicode uni = get_ravel(nidx++).get_char_value();
-
-             if (n == 0 && Avec::is_quad(uni))   // leading ⎕
-                {
-                  name.append(uni);
-                  continue;
-                }
-
-             if (Avec::is_symbol_char(uni))   // valid symbol char
-                {
-                  name.append(uni);
-                  continue;
-                }
-
-             // end of (first) name reached. At this point we expect either
-             // spaces until 'end' or some spaces and another name.
-             //
-             if (uni != UNI_ASCII_SPACE)
-                {
-                  name.clear();
-                  break;
-                }
-
-             // we have reached the end of the first name. At this point
-             // there could bei:
-             //
-             // 1. spaces until 'end' (= one name), or
-             // 2. a second name (alias)
-
-             // skip spaces from nidx and subsequent spaces
-             //
-             while (nidx < end &&
-                    get_ravel(nidx).get_char_value() == UNI_ASCII_SPACE)
-                   ++nidx;
-
-             if (nidx == end)   break;   // only spaces (no second name)
-
-             // at this point we maybe have the start of a second name, which
-             // is an error (if last is false) or not. In both cases the first
-             // name can be ignored.
-             //
-             name.clear();
-             if (!last)   break;   // error
-
-             // 'last' is true thus to_varnames() was called from ⎕SVO and
-             // the line may contains two variable names.
-             // Return the second i.e. last) one)
-             //
-             last = false;
-             while (nidx < end)
-                {
-                  const Unicode uni = get_ravel(nidx++).get_char_value();
-                  if (Avec::is_symbol_char(uni))   // valid symbol char
-                     {
-                       name.append(uni);
-                     }
-                  else if (uni == UNI_ASCII_SPACE)
-                     {
-                       break;
-                     }
-                  else
-                     {
-                       name.clear();   // error
-                       break;
-                     }
-                }
-             break;
-           }
-      }
-}
-//-----------------------------------------------------------------------------
-void
 Value::to_proto()
 {
 const ShapeItem ec = nz_element_count();
@@ -1772,7 +1688,7 @@ const ShapeItem rows = ec/cols;
 int
 Value::print_incomplete(ostream & out)
 {
-vector<Value *> incomplete;
+Simple_string<Value *> incomplete;
 bool goon = true;
 
    for (const DynamicObject * dob = all_values.get_prev();
@@ -1784,7 +1700,7 @@ bool goon = true;
          if (val->is_complete())   continue;
 
          out << "incomplete value at " << (const void *)val << endl;
-         incomplete.push_back(val);
+         incomplete.append(val);
 
          if (!goon)
             {
@@ -1808,8 +1724,8 @@ bool goon = true;
 int
 Value::print_stale(ostream & out)
 {
-vector<Value *> stale_vals;
-vector<const DynamicObject *> stale_dobs;
+Simple_string<Value *> stale_vals;
+Simple_string<const DynamicObject *> stale_dobs;
 bool goon = true;
 int count = 0;
 
@@ -1824,8 +1740,8 @@ int count = 0;
          if (val->owner_count)   continue;
 
          out << "stale value at " << (const void *)val << endl;
-         stale_vals.push_back(val);
-         stale_dobs.push_back(dob);
+         stale_vals.append(val);
+         stale_dobs.append(dob);
 
          if (!goon)
             {

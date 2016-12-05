@@ -482,10 +482,6 @@ public:
    /// if the ravel contains non-char or nested cells.
    UCS_string get_UCS_ravel() const;
 
-   /// convert this character value (of rank <= 2) to an array of UCS_string,
-   /// one for each line
-   void to_varnames(vector<UCS_string> & result, bool last) const;
-
    /// recursively replace all ravel elements with 0
    void to_proto();
 

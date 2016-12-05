@@ -129,7 +129,7 @@ public:
    void clear_slot(ostream & out, int hash);
 
    /// erase symbols from \b this SymbolTable
-   void erase_symbols(ostream & out, const vector<UCS_string> & symbols);
+   void erase_symbols(ostream & out, const UCS_string_vector & symbols);
 
    /// List details of single symbol in buf.
    ostream & list_symbol(ostream & out, const UCS_string & buf) const;

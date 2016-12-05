@@ -256,7 +256,7 @@ void
 LineHistory::replace_line(const UCS_string & line)
 {
    if (put > 0)   hist_lines[put - 1] = line;
-   else           hist_lines.back() = line;
+   else           hist_lines.last() = line;
 }
 //-----------------------------------------------------------------------------
 const UCS_string *
@@ -504,8 +504,9 @@ LineEditContext::tab_expansion(LineInputMode mode)
 
 int replace_count = 0;
 UCS_string line = user_line;
+const ExpandResult expand_result = Command::expand_tab(line, replace_count);
 
-   switch(Command::expand_tab(line, replace_count))
+   switch(expand_result)
       {
         case ER_IGNORE: return;
 

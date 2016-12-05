@@ -25,6 +25,7 @@
 #include <fstream>
 
 #include "Assert.hh"
+#include "PrintOperator.hh"
 #include "Simple_string.hh"
 #include "UTF8_string.hh"
 

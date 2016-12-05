@@ -44,7 +44,7 @@ using namespace std;
 Backtrace::_lines_status 
        Backtrace::lines_status = Backtrace::LINES_not_checked;
 
-vector<Backtrace::PC_src> Backtrace::pc_2_src;
+Simple_string<Backtrace::PC_src> Backtrace::pc_2_src;
 
 //-----------------------------------------------------------------------------
 const char *
@@ -148,7 +148,7 @@ int64_t prev_pc = -1LL;
                       }
 
                    PC_src pcs = { pc, src_line };
-                   pc_2_src.push_back(pcs);
+                   pc_2_src.append(pcs);
                    prev_pc = pc;
                    new_line = false;
                  }

@@ -615,7 +615,7 @@ UCS_string line;
 
    line.remove_leading_and_trailing_whitespaces();
 
-   move_2(token, Bif_F1_EXECUTE::execute_statement(line), LOC);
+   token.move_2(Bif_F1_EXECUTE::execute_statement(line), LOC);
 }
 //=============================================================================
 Quad_QUOTE::Quad_QUOTE()

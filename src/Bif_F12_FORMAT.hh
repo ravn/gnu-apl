@@ -157,7 +157,7 @@ protected:
 
    /// split entire format string string into \b column format strings
    void split_example_into_columns(const UCS_string & format,
-                                   vector<UCS_string> & col_formats);
+                                   UCS_string_vector & col_formats);
 
    /// A character array with  a columns of B formatted by specification
    PrintBuffer format_col_spec(int width, int precision, const Cell * cB,
