@@ -602,8 +602,7 @@ LineInput::LineInput(bool do_read_history)
    //
    current_termios.c_iflag &= ~( ISTRIP | // don't strip off bit 8
                                  INLCR  | // don't NL → CR
-                                 IGNCR  | // don't ignore CR
-                                 IXON);   // don't enable XON/XOFF on output
+                                 IGNCR);  // don't ignore CR
    current_termios.c_iflag |=    IGNBRK | // ignore break
                                  IGNPAR |
                                  ICRNL  ; // CR → NL
