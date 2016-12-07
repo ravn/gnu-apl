@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "PrintBuffer.hh"
 #include "PrintOperator.hh"
 #include "Value.icc"
+#include "Workspace.hh"
 
 /// max sizes for arrays on the stack. Larger values are allocated with new()
 enum
@@ -48,7 +49,7 @@ PrintBuffer::PrintBuffer(const UCS_string & ucs, const ColInfo & ci)
    : col_info(ci),
      complete(true)
 {
-   buffer.push_back(ucs);
+   buffer.append(ucs);
 }
 //-----------------------------------------------------------------------------
 PrintBuffer::PrintBuffer(const Value & value, const PrintContext & _pctx,
@@ -161,10 +162,18 @@ const ShapeItem cols = value.get_last_shape_item();
            }
         else
            {
-             PrintBuffer * item_matrix = new PrintBuffer[ec];
+             PrintBuffer * item_matrix = 0;
+             try { item_matrix = new PrintBuffer[ec]; }
+             catch (...)
+                {
+                  MORE_ERROR() << "value too large to print ("
+                               << cols << " columns, " << ec << " items)";
+                  WS_FULL;
+                }
+
              do_PrintBuffer(value, pctx, out, outer_style,
-                            scaling.get_data(), pcols.get_data(),
-                            item_matrix);
+                                  scaling.get_data(), pcols.get_data(),
+                                  item_matrix);
              delete [] item_matrix;
            }
       }
@@ -180,7 +189,16 @@ const ShapeItem cols = value.get_last_shape_item();
            }
         else
            {
-             PrintBuffer * item_matrix = new PrintBuffer[ec];
+             PrintBuffer * item_matrix = 0;
+             try { item_matrix = new PrintBuffer[ec]; }
+             catch (...)
+                {
+                  delete [] pcols;
+                  delete [] scaling;
+                 MORE_ERROR() << "value too large to print ("
+                              << cols << " columns, " << ec << " items)";
+                  WS_FULL;
+                }
              do_PrintBuffer(value, pctx, out, outer_style,
                             scaling, pcols, item_matrix);
              delete [] item_matrix;
@@ -637,7 +655,10 @@ PrintBuffer::set_char(int x, int y, Unicode uc)
 void
 PrintBuffer::pad_l(Unicode pad, ShapeItem count)
 {
-   loop(y, get_height())   buffer[y].insert(0, count, pad);
+   loop(y, get_height())
+      {
+        loop(c, count)   buffer[y].insert_before(0, pad);
+      }
 }
 //-----------------------------------------------------------------------------
 void
@@ -653,7 +674,7 @@ PrintBuffer::pad_height(Unicode pad, ShapeItem height)
    if (height > get_height())
       {
         UCS_string ucs(get_width(0), pad);
-        while (height > get_height())   buffer.push_back(ucs);
+        while (height > get_height())   buffer.append(ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -743,12 +764,12 @@ Unicode HORI, VERT, NW, NE, SE, SW;
         UCS_string upper;
         upper.append(NE);
         upper.append(NW);
-        buffer.push_back(upper);
+        buffer.append(upper);
 
         UCS_string lower;
         lower.append(SE);
         lower.append(SW);
-        buffer.push_back(lower);
+        buffer.append(lower);
 
         Assert(is_rectangular());
         return;
@@ -758,7 +779,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
    loop(y, get_height())
       {
-        buffer[y].insert(0, 1, VERT);
+        buffer[y].insert_before(0, VERT);
         buffer[y].append(VERT);
 
         // change internal pad characters to ASCII_SPACE so that they will
@@ -773,7 +794,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
 UCS_string hori(get_width(0), HORI);
 
    buffer.insert_before(0, hori);
-   buffer.push_back(hori);
+   buffer.append(hori);
 
    // draw the corners
    //
@@ -850,12 +871,12 @@ Unicode HORI, VERT, NW, NE, SE, SW;
         UCS_string upper;
         upper.append(NE);
         upper.append(NW);
-        buffer.push_back(upper);
+        buffer.append(upper);
 
         UCS_string lower;
         lower.append(SE);
         lower.append(SW);
-        buffer.push_back(lower);
+        buffer.append(lower);
 
         Assert(is_rectangular());
         return;
@@ -865,7 +886,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
    loop(y, get_height())
       {
-        buffer[y].insert(0, 1, VERT);
+        buffer[y].insert_before(0, VERT);
         buffer[y].append(VERT);
 
         // change internal pad characters to ASCII_SPACE so that they will
@@ -879,7 +900,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
 UCS_string hori(get_width(0), HORI);
 
    buffer.insert_before(0, hori);
-   buffer.push_back(hori);
+   buffer.append(hori);
 
    // draw the corners
    //
@@ -939,24 +960,24 @@ PrintBuffer::append_ucs(const UCS_string & ucs)
 {
    if (buffer.size() == 0)   // empty
       {
-        buffer.push_back(ucs);
+        buffer.append(ucs);
       }
    else if (ucs.size() < get_width(0))
       {
         UCS_string ucs1(ucs);
         UCS_string pad(get_width(0) - ucs.size(), UNI_iPAD_L1);
         ucs1.append(pad);
-        buffer.push_back(ucs1);
+        buffer.append(ucs1);
       }
    else if (ucs.size() > get_width(0))
       {
         UCS_string pad(ucs.size() - get_width(0), UNI_iPAD_L2);
         loop(h, get_height())   buffer[h].append(pad);
-        buffer.push_back(ucs);
+        buffer.append(ucs);
       }
    else
       {
-        buffer.push_back(ucs);
+        buffer.append(ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -1058,7 +1079,7 @@ UCS_string ucs1;
    if (this_l > 0)   pad_l(UNI_ASCII_SPACE, this_l);
    if (this_r > 0)   pad_r(UNI_ASCII_SPACE, this_r);
 
-   buffer.push_back(ucs1);
+   buffer.append(ucs1);
 
    Assert(is_rectangular());
 }
@@ -1086,7 +1107,7 @@ PrintBuffer::add_column(Unicode pad, int32_t pad_count, const PrintBuffer & pb)
 void PrintBuffer::add_row(const PrintBuffer & pb)
 {
    buffer.reserve(buffer.size() + pb.get_height());
-   loop(h, pb.get_height())   buffer.push_back(pb.buffer[h]);
+   loop(h, pb.get_height())   buffer.append(pb.buffer[h]);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1309,7 +1330,7 @@ PrintBuffer::align_left(ColInfo & COL_INFO)
 const size_t diff = COL_INFO.int_len - col_info.int_len;
 
    if (buffer.size())   pad_r(UNI_iPAD_L3, diff);
-   else                 buffer.push_back(UCS_string(diff, UNI_iPAD_L3));
+   else                 buffer.append(UCS_string(diff, UNI_iPAD_L3));
 
    col_info.int_len = COL_INFO.int_len;
 

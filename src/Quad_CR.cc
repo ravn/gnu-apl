@@ -304,7 +304,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                         }
                     res.append(UNI_ASCII_R_CURLY);
 
-                    result.push_back(res);
+                    result.append(res);
                   }
                else
                   {
@@ -314,7 +314,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                        {
                          if (text[u] == '\n')
                              {
-                               result.push_back(res);
+                               result.append(res);
                                res.clear();
                                UCS_string next(text, u+1, text.size()-(u+1));
                                if (!next.is_comment_or_label() &&
@@ -328,7 +328,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                        }
                     res.append(ufun.get_exec_properties()[0]
                                ? UNI_DEL_TILDE : UNI_NABLA);
-                    result.push_back(res);
+                    result.append(res);
                   }
                return;
              }
@@ -406,7 +406,7 @@ UCS_string shape_rho;
         reshape.append_utf8("←");
         reshape.append(shape_rho);
         reshape.append(proto_name);
-        result.push_back(reshape);
+        result.append(reshape);
         result.last().append_utf8(" ⍝ proto 2");
         return;
       }
@@ -418,7 +418,7 @@ bool nested = false;
    //
    if (short_ravel(result, nested, value, picker, left, shape_rho))
       {
-        result.push_back(compute_prolog(picker.get_level(), left, value));
+        result.append(compute_prolog(picker.get_level(), left, value));
 
         ShapeItem pos = 0;
         V_mode mode = Vm_NONE;
@@ -453,7 +453,7 @@ bool nested = false;
                    pos += count;
                    count = 0;
 
-                   result.push_back(line);
+                   result.append(line);
                    rhs.clear();
                    mode = Vm_NONE;
                  }
@@ -474,7 +474,7 @@ bool nested = false;
      line.append_utf8("←");
      line.append(rhs);
 
-     result.push_back(line);
+     result.append(line);
    }
 
    // step 2: nested items
@@ -549,7 +549,7 @@ V_mode mode = Vm_NONE;
    //
    close_mode(line, mode);
 
-   result.push_back(line);
+   result.append(line);
    return false;
 }
 //-----------------------------------------------------------------------------

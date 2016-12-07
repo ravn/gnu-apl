@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,27 +46,27 @@ public:
    /// constructor: empty string
    UCS_string()
    : Simple_string<Unicode>(0, 0)
-   { ++total_count; }
+   { create(LOC); }
 
    /// constructor: one-element string
    UCS_string(Unicode uni)
    : Simple_string<Unicode>(1, uni)
-   { ++total_count; }
+   { create(LOC); }
 
    /// constructor: \b len Unicode characters, starting at \b data
    UCS_string(const Unicode * data, size_t len)
    : Simple_string<Unicode>(data, len)
-   { ++total_count; }
+   { create(LOC); }
 
    /// constructor: \b len times \b uni
    UCS_string(size_t len, Unicode uni)
    : Simple_string<Unicode>(len, uni)
-   { ++total_count; }
+   { create(LOC); }
 
    /// constructor: copy of another UCS_string
    UCS_string(const UCS_string & ucs, size_t pos, size_t len)
    : Simple_string<Unicode>(ucs, pos, len)
-   { ++total_count; }
+   { create(LOC); }
 
    /// constructor: UCS_string from UTF8_string
    UCS_string(const UTF8_string & utf);
@@ -88,7 +88,21 @@ public:
    UCS_string(const Value & value);
 
    ~UCS_string()
-   { --total_count; }
+      {
+        Assert(items);
+        --total_count;
+//      get_CERR() << "DEL @@" << total_id << " ##" << total_count
+//                 << " a=" << (const void *)items << endl;
+      }
+
+   void create(const char * loc)
+      { 
+        ++total_count;
+        ++total_id;
+        Assert(items);
+//      get_CERR() << "NEW @@" << total_id << " ##" << total_count
+//                 << " a=" << (const void *)items << " " << loc << endl;
+      }
 
    /// compute the length of an output row
    int compute_chunk_length(int quad_PW, int col) const;
@@ -211,10 +225,24 @@ public:
    UCS_string operator +(const UCS_string & other) const
       { UCS_string ret(*this);   ret.append(other);   return ret; }
 
-   /// set this string to the 0-terminated ASCII c_string (don't use for UTF8
-   /// encoded strings)
-   UCS_string & operator =(const char * c_string)
-      { new (this) UCS_string(c_string);   return *this; }
+   const UCS_string & operator =(const UCS_string & other)
+      {
+        items_valid = 0;
+        append(other);
+        return *this;
+      }
+
+   /// return true iff \b this is equal to \b other
+   bool operator ==(const UCS_string & other) const
+      {
+        if (size() != other.size())   return false;
+        loop(c, size())   if (at(c) != other.at(c))   return false;
+        return true;
+      }
+
+   /// return true iff \b this is different from \b other
+   bool operator !=(const UCS_string & other) const
+      { return !(*this == other); }
 
    UCS_string & operator <<(const char * str)
       { append_utf8(str);   return *this; }
@@ -227,6 +255,22 @@ public:
 
    UCS_string & operator <<(const UCS_string & other)
       { append(other);   return *this; }
+
+   /// compare \b this with UCS_string \b other
+   Comp_result compare(const UCS_string & other) const
+      {
+        const ShapeItem common_len = items_valid < other.items_valid
+                             ? items_valid : other.items_valid;
+        loop(c, common_len)
+            {
+              if (at(c) < other.at(c))   return COMP_LT;
+              if (at(c) > other.at(c))   return COMP_GT;
+            }
+
+        if (items_valid < other.items_valid)   return COMP_LT;
+        if (items_valid > other.items_valid)   return COMP_GT;
+        return COMP_EQ;
+      }
 
    /// append \b other in quotes, doubling quoted in \b other
    void append_quoted(const UCS_string & other);
@@ -351,33 +395,26 @@ protected:
       { return n2->compare(*n1) == COMP_LT; }
 
    static ShapeItem total_count;
-};
-//-----------------------------------------------------------------------------
-/// a singly linked list of UCS_strings.
-struct
-UCS_string_list
-{
-   /// the string
-   UCS_string string;
-
-   /// the previous string
-   UCS_string_list * prev;
-
-   /// constructor
-   UCS_string_list(const UCS_string & s, UCS_string_list * p)
-   : string(s),
-     prev(p)
-   {}
-
-   /// return the length of the list
-   static int length(const UCS_string_list * list)
-      {
-        for (int ret = 0; ; list = list->prev, ++ret)
-            { if (list == 0)   return ret; }
-      }
+   static ShapeItem total_id;
 };
 //-----------------------------------------------------------------------------
 /// a vector of UCS_strings.
+
+#define USE_VECTOR 0
+
+#if USE_VECTOR
+#include <vector>
+class
+UCS_string_vector : public vector<UCS_string>
+{
+public:
+   /// constructor: empty vector
+   UCS_string_vector()
+// : Simple_string<UCS_string>(0, 0)
+   {}
+
+#else
+
 class
 UCS_string_vector : public Simple_string<UCS_string>
 {
@@ -387,12 +424,10 @@ public:
    : Simple_string<UCS_string>(0, 0)
    {}
 
+#endif
+
    /// constructor: from APL character matrix (removes trailing blanks)
    UCS_string_vector(const Value & val, bool surrogate);
-
-   /// append another UCS_string
-   void push_back(const UCS_string & item)
-      { append(item, LOC); }
 
    void resize(ShapeItem new_size)
       {
@@ -413,6 +448,17 @@ public:
         for (++idx; idx < size(); ++idx)   (*this)[idx - 1].swap((*this)[idx]);
         pop();
       }
+
+#if USE_VECTOR
+      const UCS_string & last() const  { return back(); }
+            UCS_string & last()        { return back(); }
+    void pop()                         { pop_back(); }
+   void append(const UCS_string & t)   { push_back(t); }
+   void append(const UCS_string & t, const char *)   { push_back(t); }
+   void insert_before(ShapeItem pos, const UCS_string & t)   { insert(begin() + pos, t); }
+   void shrink(ShapeItem new_size)   { vector<UCS_string>::resize(new_size); }
+
+#endif
 };
 //-----------------------------------------------------------------------------
 inline void

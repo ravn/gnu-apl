@@ -816,8 +816,8 @@ Token::move_2(const Token & src, const char * loc)
 void
 Token_string::reverse_from_to(ShapeItem from, ShapeItem to)
 {
-Token * t1 = items + from;
-Token * t2 = items + to;
+Token * t1 = &at(from);
+Token * t2 = &at(to);
    Assert(0 <= from);
    Assert(from <= to);
    Assert(to <= size());
@@ -836,7 +836,7 @@ Token_string::print(ostream & out) const
 {
    loop(t, size())
        {
-         const Token & tok = (*this)[t];
+         const Token & tok = at(t);
          out << "`" << tok << "  ";
        }
 

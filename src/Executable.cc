@@ -48,17 +48,17 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
              switch (uni)
                 {
                   case UNI_ASCII_CR:                         break;
-                  case UNI_ASCII_LF: text.push_back(line);
+                  case UNI_ASCII_LF: text.append(line);
                                      line.clear();           break;
                   default:           line.append(uni);
                }
            }
 
-        if (line.size())   text.push_back(line);
+        if (line.size())   text.append(line);
       }
    else
       {
-        text.push_back(ucs);
+        text.append(ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -87,17 +87,17 @@ ShapeItem last_semi = -1;
       {
         for (ShapeItem t = last_semi; t < lambda_text.size(); ++t)
             header.append(lambda_text[t]);
-        text.push_back(header);
+        text.append(header);
 
         UCS_string new_body(lambda_text);
         new_body.shrink(last_semi);
         new_body.remove_trailing_whitespaces();
-        text.push_back(new_body);
+        text.append(new_body);
       }
    else
       {
-        text.push_back(header);
-        text.push_back(lambda_text);
+        text.append(header);
+        text.append(lambda_text);
      }
 }
 //-----------------------------------------------------------------------------

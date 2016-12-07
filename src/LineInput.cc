@@ -240,7 +240,7 @@ LineHistory::add_line(const UCS_string & line)
 
    if ((int)hist_lines.size() < max_lines)   // append
       {
-        hist_lines.push_back(line);
+        hist_lines.append(line);
         put = 0;
       }
    else                            // override
@@ -430,7 +430,7 @@ LineEditContext::insert_char(Unicode uni)
       }
    else if (ins_mode)              // insert char
       {
-        user_line.insert(uidx, 1, uni);
+        user_line.insert_before(uidx, uni);
         adjust_allocated_height();
         refresh_wrapped_cursor();
         refresh_from_cursor();
@@ -678,7 +678,7 @@ InputMux::get_line(LineInputMode mode, const UCS_string & prompt,
                               file_line.size() &&
                               file_line[0] == UNI_ASCII_BS)
                              {
-                               file_line.drop_leading(1);
+                               file_line.erase(0, 1);
                                line.pop();
                              }
                        line.append_utf8(file_line.c_str());

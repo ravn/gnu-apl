@@ -42,73 +42,54 @@ class Simple_string
 public:
    /// constructor: empty string
    Simple_string()
-   : items_allocated(MIN_ALLOC),
-     items_valid(0)
       {
-        items = new T[items_allocated];
+        allocate(0);
       }
 
    /// constructor: the first \b len items of \b data
    Simple_string(const T * data, ShapeItem len)
-   : items_allocated(len + ADD_ALLOC),
-     items_valid(len)
       {
-        Assert1(items_valid >= 0);
-        if (items_allocated < MIN_ALLOC)   items_allocated = MIN_ALLOC;
-        items = new T[items_allocated];
-        _copy(items, data, len);
+        allocate(len);
+        loop(l, items_valid)   new (items + l) T(data[l]);
       }
 
    /// constructor: \b len times \b data
    Simple_string(ShapeItem len, const T & data)
-   : items_allocated(len + ADD_ALLOC),
-     items_valid(len)
       {
-        Assert(items_valid >= 0);
-        if (items_allocated < MIN_ALLOC)   items_allocated = MIN_ALLOC;
-        items = new T[items_allocated];
-        for (ShapeItem l = 0; l < len; ++l)   items[l] = data;
+        allocate(len);
+        loop(l, items_valid)   new (items + l) T(data);
       }
 
    /// constructor: copy other string
    Simple_string(const Simple_string & other)
-   : items_allocated(other.items_valid + ADD_ALLOC),
-     items_valid(other.items_valid)
       {
-        Assert(items_valid >= 0);
-        items = new T[items_allocated];
-        _copy(items, other.items, items_valid);
+        allocate(other.items_valid);
+        loop(l, items_valid)   new (items + l) T(other.items[l]);
       }
 
-   /// constructor: copy other string, starting at pos, at most len
    Simple_string(const Simple_string & other, ShapeItem pos, ShapeItem len)
       {
-        if (len > other.items_valid - pos)   len = other.items_valid - pos;
-        if (len < 0)   len = 0;
-
-        items_valid = len;
-        items_allocated = items_valid + ADD_ALLOC;
-        if (items_allocated < MIN_ALLOC)   items_allocated = MIN_ALLOC;
-        items = new T[items_allocated];
-        _copy(items, other.items + pos, len);
+        Assert((pos + len) <= other.items_valid);
+        allocate(len);
+        loop(l, items_valid)   new (items + l) T(other.items[l + pos]);
       }
 
    /// destructor
    ~Simple_string()
       { destruct(); }
 
-   /// destructor
+   /// explicit destructor
    void destruct()
       { 
         delete [] items;
+        items = 0;
       }
 
    /// copy \b other
-   Simple_string & operator =(const Simple_string & other)
+   void operator =(const Simple_string & other)
       {
-        delete [] items;
+        destruct();
         new (this) Simple_string(other);
-        return *this;
       }
 
    /// return the items of the string (not 0-terminated)
@@ -117,78 +98,44 @@ public:
         return items;
       }
 
-   /// return true iff \b this is equal to \b other
-   bool operator ==(const Simple_string<T> & other) const
-      {
-        if (items_valid != other.items_valid)   return false;
-        for (ShapeItem c = 0; c < items_valid; ++c)
-            if (items[c] != other.items[c])   return false;
-        return true;
-      }
-
-   /// return true iff \b this is different from \b other
-   bool operator !=(const Simple_string<T> & other) const
-      { return !(*this == other); }
-
    /// return the number of characters in \b this string
    ShapeItem size() const
       { return items_valid; }
 
    /// return the idx'th character
    const T & operator[](ShapeItem idx) const
-      {
-        if ((items_valid - idx) <= 0)   Assert(0 && "Bad index");
-        return items[idx];
-      }
+      { return at(idx); }
 
    /// return the idx'th character
    T & operator[](ShapeItem idx)
-      {
-        if ((items_valid - idx) <= 0)   Assert(0 && "Bad index");
-        return items[idx];
-      }
+      { return at(idx); }
 
    /// append character \b t to \b this string
    void append(const T & t)
       {
-        if (items_valid - items_allocated >= 0)   extend();
+        if (items_valid - items_allocated >= 0)   extend(2*items_allocated);
         new (items + items_valid++) T(t);
       }
 
    /// append character \b t to \b this string
    void append(const T & t, const char * loc)
       {
-        if (items_valid - items_allocated >= 0)   extend();
+        if (items_valid - items_allocated >= 0)   extend(2*items_allocated);
         new (items + items_valid++) T(t);
       }
 
    /// append string \b other to \b this string
    void append(const Simple_string & other)
       {
-        if (other.items_valid)
-           {
-             extend(items_valid + other.items_valid);
-             _copy(items + items_valid, other.items, other.items_valid);
-             items_valid += other.items_valid;
-           }
-      }
-
-   /// insert character \b t after position \b pos
-   void insert_after(ShapeItem pos, const T & t)
-      {
-        Assert(pos < items_valid);
-        if (items_valid - items_allocated >= 0)   extend();
-        for (ShapeItem s = items_valid - 1; s > pos; --s)
-            items[s + 1] = items[s];
-        items[pos + 1] = t;
-        ++items_valid;
+        extend(items_valid + other.items_valid);
+        loop(o, other.items_valid)   append(other[o]);
       }
 
    /// insert character \b t before position \b pos
    void insert_before(ShapeItem pos, const T & t)
       {
         Assert(pos <= items_valid);
-        if (items_valid - items_allocated >= 0)   extend();
+        if (items_valid - items_allocated >= 0)   extend(2*items_allocated);
         for (ShapeItem s = items_valid - 1; s >= pos; --s)
             items[s + 1] = items[s];
         items[pos] = t;
@@ -202,33 +149,9 @@ public:
         items_valid = new_size;
       }
 
-   /// insert \b count characters \b t after position \b pos
-   void insert(ShapeItem pos, ShapeItem count, const T & t)
-      {
-        Assert(count >= 0);
-        Assert(pos <= items_valid);
-        extend(items_valid + count);
-        if (pos < items_valid)
-           copy_downwards(items + pos + count, items + pos, items_valid - pos);
-        for (ShapeItem c = 0; c < count; ++c)  items[pos + c] = t;
-        items_valid += count;
-      }
-
     /// forget last element
     void pop()
       { if (items_valid)   --items_valid; }
-
-   /// remove the first \b count elements
-   void drop_leading(ShapeItem count)
-      {
-        if (count <= 0)   return;
-        if (count >= items_valid)   items_valid = 0;
-        else
-           {
-             items_valid -= count;
-             _copy(items, items + count, items_valid);
-           }
-      }
 
    /// return a reference to the last item (size() MUST be checked beforehand)
    const T & last() const
@@ -262,33 +185,14 @@ public:
              return;
            }
 
-         _copy(items + pos, items + pos + count, rest);
+         loop(r, rest)   new(items + pos + r) T(items[pos + count + r]);
          items_valid -= count;
       }
-
-   /// erase first character
-   void remove_front()   { erase(0, 1); }
 
    /// extend allocated size
    void reserve(ShapeItem new_alloc_size)
       {
         extend(new_alloc_size);
-      }
-
-   /// compare strings
-   Comp_result compare(const Simple_string & other) const
-      {
-        const ShapeItem common_len = items_valid < other.items_valid
-                             ? items_valid : other.items_valid;
-        for (ShapeItem c = 0; c < common_len; ++c)
-            {
-              if (items[c] < other.items[c])   return COMP_LT;
-              if (items[c] > other.items[c])   return COMP_GT;
-            }
-
-        if (items_valid < other.items_valid)   return COMP_LT;
-        if (items_valid > other.items_valid)   return COMP_GT;
-        return COMP_EQ;
       }
 
    /// exchange this and other (without copying the data)
@@ -310,44 +214,30 @@ public:
 protected:
    enum
       {
-        ADD_ALLOC = 4,   ///< extra chars added when extending the string
+        ADD_ALLOC = 4,    ///< extra chars added when extending the string
         MIN_ALLOC = 16,   ///< min. size allocated
       };
 
-   /// double the allocated size
-   void extend()
+   void allocate(ShapeItem min_size)
       {
-        items_allocated += items_allocated;
-        T * new_items = new T[items_allocated];
-        _copy(new_items, items, items_valid);
-        delete [] items;
-        items = new_items;
+        Assert1(min_size >= 0);
+        items_valid = min_size;
+        items_allocated = items_valid + ADD_ALLOC;   // and a few more
+        if (items_allocated < MIN_ALLOC)   items_allocated = MIN_ALLOC;
+        items = new T[items_allocated];
       }
 
    /// increase the allocated size to at least new_size
    void extend(ShapeItem new_size)
       {
-        if ((items_allocated - new_size) >= 0)   return;
-
-        items_allocated = new_size + ADD_ALLOC;
-        T * new_items = new T[items_allocated];
-        _copy(new_items, items, items_valid);
-        delete [] items;
-        items = new_items;
-      }
-
-   /// copy \b count characters
-   static void _copy(T * dst, const T * src, ShapeItem count)
-      {
-        Assert1(count >= 0);
-        for (ShapeItem c = 0; c < count; ++c)  new(dst + c) T(src[c]);
-      }
-
-   /// copy \b count characters downwards (for overlapping src/dst
-   static void copy_downwards(T * dst, const T * src, ShapeItem count)
-      {
-        Assert(count >= 0);
-        for (ShapeItem c = count - 1; c >= 0; --c)  new (dst + c) T(src[c]);
+        if ((items_allocated - new_size) < 0)   // need more space
+           {
+             T * old_items = items;
+             items_allocated = new_size + ADD_ALLOC;
+             items = new T[items_allocated];
+             loop(c, items_valid)   new (items + c) T(old_items[c]);
+             delete [] old_items;
+           }
       }
 
    /// the number of characters allocated
@@ -358,6 +248,23 @@ protected:
 
    /// the items
    T * items;
+
+   /// return the idx'th character
+   const T & at(ShapeItem idx) const
+      {
+        if (idx < 0)                    Assert(0 && "Bad index");
+        if ((items_valid - idx) <= 0)   Assert(0 && "Bad index");
+        return items[idx];
+      }
+
+   /// return the idx'th character
+   T & at(ShapeItem idx)
+      {
+        if (idx < 0)                    Assert(0 && "Bad index");
+        if ((items_valid - idx) <= 0)   Assert(0 && "Bad index");
+        return items[idx];
+      }
+
 };
 //-----------------------------------------------------------------------------
 

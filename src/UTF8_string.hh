@@ -62,6 +62,14 @@ public:
    /// Non-ASCII The UCS characters will be UTF8 encoded.
    UTF8_string(const Value & value);
 
+   /// return true iff \b this is equal to \b other
+   bool operator ==(const UTF8_string & other) const
+      {
+        if (size() != other.size())   return false;
+        loop(c, size())   if (at(c) != other.at(c))   return false;
+        return true;
+      }
+
    /// display bytes in this UTF string
    ostream & dump_hex(ostream & out, int max_bytes) const;
 

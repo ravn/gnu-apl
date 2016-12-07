@@ -950,7 +950,7 @@ UCS_string_vector directories;
             {
               if (filename_utf8[0] == '.')   continue;
               filename.append(UNI_ASCII_SLASH);
-              directories.push_back(filename);
+              directories.append(filename);
               continue;
             }
 
@@ -960,19 +960,19 @@ UCS_string_vector directories;
               if (filename_utf8.ends_with(".apl"))
                  {
                    filename.shrink(filename.size() - 4);   // skip extension
-                   apl_files.push_back(filename);
+                   apl_files.append(filename);
                  }
               else if (filename_utf8.ends_with(".xml"))
                  {
                    filename.shrink(filename.size() - 4);   // skip extension
-                   xml_files.push_back(filename);
+                   xml_files.append(filename);
                  }
             }
          else
             {
               if (filename[0] == '.')   continue;         // skip dot files ...
               if (filename[dlen - 1] == '~')   continue;  // and editor backups
-              apl_files.push_back(filename);
+              apl_files.append(filename);
             }
        }
    closedir(dir);
@@ -1829,7 +1829,7 @@ UCS_string_vector matches;
 
         const UCS_string & sym_name = sym->get_name();
         if (!sym_name.starts_with(user))   continue;
-        matches.push_back(sym_name);
+        matches.append(sym_name);
       }
 
    if (matches.size() == 0)   return ER_IGNORE;   // no match
@@ -1867,7 +1867,7 @@ UCS_string arg;
 #define cmd_def(cmd_str, code, arg, hint)  \
    { UCS_string ustr(cmd_str);             \
      if (ustr.starts_iwith(cmd))           \
-        { matches.push_back(ustr); ehint = hint; shint = arg; } }
+        { matches.append(ustr); ehint = hint; shint = arg; } }
 #include "Command.def"
 
    // no match was found: ignore the TAB
@@ -1967,13 +1967,13 @@ int qpos = -1;
 
 
 #define ro_sv_def(_q, str, _txt) { UCS_string ustr(str);   \
-   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
+   if (ustr.size() && ustr.starts_iwith(qxx)) matches.append(ustr); }
 
 #define rw_sv_def(_q, str, _txt) { UCS_string ustr(str);   \
-   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
+   if (ustr.size() && ustr.starts_iwith(qxx)) matches.append(ustr); }
 
 #define sf_def(_q, str, _txt) { UCS_string ustr(str);   \
-   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
+   if (ustr.size() && ustr.starts_iwith(qxx)) matches.append(ustr); }
 
 #include "SystemVariable.def"
 
@@ -2094,8 +2094,8 @@ Command::expand_filename(UCS_string & user, bool have_trailing_blank,
 
          // discard library reference number
          //
-         if (arg.size() == 1)   arg.drop_leading(1);
-         else                   arg.drop_leading(2);
+         if (arg.size() == 1)   arg.erase(0, 1);
+         else                   arg.erase(0, 2);
          return expand_wsname(user, cmd, lib, arg);
       }
 
@@ -2289,7 +2289,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
                if (!is_wsname)   continue;
              }
 
-          matches.push_back(name);
+          matches.append(name);
        }
 }
 //-----------------------------------------------------------------------------

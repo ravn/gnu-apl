@@ -92,7 +92,7 @@ public:
 
    /// return the ravel of this CDR
    const uint8_t * ravel() const
-      { return items + 16 + 4*get_rank(); }
+      { return &(*this)[0] + 16 + 4*get_rank(); }
 
    /// return true if this CDR is bool or integer
    bool is_integer() const
@@ -125,14 +125,14 @@ public:
         if (error)   out << "(error " << error << ")";
         out << ":" << endl;
         loop(i, size())   cerr << " " << hex << setfill('0')
-                               << setw(2) << (get_items()[i] & 0xFF);
+                               << setw(2) << (at(i) & 0xFF);
               cerr << dec << setfill(' ') << endl;
       }
 
 protected:
    /// return 4 bytes of the header (the header is always big endian)
    uint32_t get_4(unsigned int offset) const
-      { return CDR_header::get_be32(items + offset); }
+      { return CDR_header::get_be32(&(*this)[0] + offset); }
 };
 
 #endif // __CDR_STRING_HH_DEFINED__

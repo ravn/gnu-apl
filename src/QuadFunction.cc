@@ -796,7 +796,7 @@ Parser parser(PM_EXECUTE, LOC, false);
                  }
 
             }
-         lines.push_back(line);
+         lines.append(line);
       }
 
 Value_P Z(lines.size(), LOC);
@@ -881,12 +881,12 @@ Quad_INP::read_strings()
         if (end != -1)   // end marker found
            {
              line.shrink(end);
-             if (line.size())   raw_lines.push_back(line);
+             if (line.size())   raw_lines.append(line);
              break;
            }
 
         if (eof && !line.size())   break;
-        raw_lines.push_back(line);
+        raw_lines.append(line);
         if (eof)   break;
       }
 }
@@ -901,9 +901,9 @@ UCS_string empty;
         const ShapeItem epos = line.substr_pos(esc1);
         if (esc1.size() == 0 || epos == -1)   // no escape in this line
            {
-             prefixes.push_back(line);
-             escapes.push_back(empty);
-             suffixes.push_back(empty);
+             prefixes.append(line);
+             escapes.append(empty);
+             suffixes.append(empty);
              continue;
            }
 
@@ -911,7 +911,7 @@ UCS_string empty;
         //
         UCS_string pref = line;
         pref.shrink(epos);
-        prefixes.push_back(pref);
+        prefixes.append(pref);
 
         line = line.drop(epos + esc1.size());   // skip prefix and esc1
         if (esc2.size())   // end defined
@@ -919,24 +919,24 @@ UCS_string empty;
              const ShapeItem eend = line.substr_pos(esc2);
              if (eend == -1)   // no exec end in this line
                 {
-                  escapes.push_back(line);
-                  suffixes.push_back(empty);
+                  escapes.append(line);
+                  suffixes.append(empty);
                   continue;
                 }
              else              // found an exec end in this line
                 {
                   UCS_string exec = line;
                   exec.shrink(eend);
-                  escapes.push_back(exec);
+                  escapes.append(exec);
                   line = line.drop(eend + esc2.size());   // skip exec and esc2
-                  suffixes.push_back(line);
+                  suffixes.append(line);
                   continue;
                 }
            }
         else               // no end defined
            {
-             escapes.push_back(line);
-             suffixes.push_back(empty);
+             escapes.append(line);
+             suffixes.append(empty);
            }
       }
 
@@ -1066,7 +1066,7 @@ UCS_string_vector names;
                if (!first_chars.contains(first_char))   continue;
              }
 
-          names.push_back(symbol->get_name());
+          names.append(symbol->get_name());
         }
    }
 
@@ -1077,15 +1077,15 @@ UCS_string_vector names;
 #define ro_sv_def(x, _str, _txt)                                   \
    { Symbol * symbol = &Workspace::get_v_ ## x();           \
      if ((requested_NCs & 1 << 5) && symbol->get_nc() != 0) \
-        names.push_back(symbol->get_name()); }
+        names.append(symbol->get_name()); }
 
 #define rw_sv_def(x, _str, _txt)                                   \
    { Symbol * symbol = &Workspace::get_v_ ## x();           \
      if ((requested_NCs & 1 << 5) && symbol->get_nc() != 0) \
-        names.push_back(symbol->get_name()); }
+        names.append(symbol->get_name()); }
 
 #define sf_def(x, _str, _txt)                                      \
-   { if (requested_NCs & 1 << 6)   names.push_back((x::fun->get_name())); }
+   { if (requested_NCs & 1 << 6)   names.append((x::fun->get_name())); }
 #include "SystemVariable.def"
       }
 

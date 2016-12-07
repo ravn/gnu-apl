@@ -32,12 +32,13 @@
 #include "Value.icc"
 
 ShapeItem UCS_string::total_count = 0;
+ShapeItem UCS_string::total_id = 0;
 
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const char * cstring)
    : Simple_string<Unicode>(0, 0)
 {
-   ++total_count;
+   create(LOC);
 
 const int len = strlen(cstring);
    extend(len + 1);
@@ -49,7 +50,7 @@ const int len = strlen(cstring);
 UCS_string::UCS_string(const UTF8_string & utf)
    : Simple_string<Unicode>(0, 0)
 {
-   ++total_count;
+   create(LOC);
 
    Log(LOG_char_conversion)
       CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
@@ -120,7 +121,7 @@ UCS_string::UCS_string(APL_Float value, bool & scaled,
                        const PrintContext & pctx)
    : Simple_string<Unicode>(0, 0)
 {
-   ++total_count;
+   create(LOC);
 
 int quad_pp = pctx.get_PP();
    if (quad_pp > MAX_Quad_PP)   quad_pp = MAX_Quad_PP;
@@ -293,7 +294,7 @@ const Unicode last = digits.last();
 UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
    : Simple_string<Unicode>(0, 0)
 {
-   ++total_count;
+   create(LOC);
 
    if (pb.get_height() == 0)   return;      // empty PrintBuffer
 
@@ -336,7 +337,7 @@ Simple_string<int> breakpoints;
    //
    loop(u, size())
        {
-         if (is_iPAD_char((*this)[u]))   (*this)[u] = UNI_ASCII_SPACE;
+         if (is_iPAD_char(at(u)))   at(u) = UNI_ASCII_SPACE;
        }
 }
 //-----------------------------------------------------------------------------
@@ -352,7 +353,7 @@ int pos = col + chunk_len;
 
    while (--pos > col)
       {
-         const Unicode uni = (*this)[pos];
+         const Unicode uni = at(pos);
          if (uni == UNI_iPAD_U2 || uni == UNI_iPAD_U3)
             {
                chunk_len = pos - col + 1;
@@ -376,9 +377,9 @@ UCS_string::remove_trailing_padchars()
    //
    loop(u, size())
        {
-         if ((*this)[u] == UNI_LINE_VERT)    break;
-         if ((*this)[u] == UNI_LINE_VERT2)   break;
-         if ((*this)[u] == UNI_iPAD_L0)
+         if (at(u) == UNI_LINE_VERT)    break;
+         if (at(u) == UNI_LINE_VERT2)   break;
+         if (at(u) == UNI_iPAD_L0)
             {
               clear();
               return;
@@ -413,11 +414,11 @@ UCS_string::remove_leading_whitespaces()
 int count = 0;
    loop(s, size())
       {
-        if (Avec::is_white((*this)[s]))   ++count;
-        else                                 break;
+        if (Avec::is_white(at(s)))   ++count;
+        else                         break;
       }
 
-   drop_leading(count);
+   erase(0, count);
 }
 //-----------------------------------------------------------------------------
 void
@@ -427,11 +428,11 @@ UCS_string::split_ws(UCS_string & rest)
 
    loop(clen, size())
        {
-         if (Avec::is_white((*this)[clen]))   // whilespace: end of command
+         if (Avec::is_white(at(clen)))   // whilespace: end of command
             {
               ShapeItem arg = clen;
-              while (arg < size() && Avec::is_white((*this)[arg]))   ++arg;
-              while (arg < size())   rest.append((*this)[arg++]);
+              while (arg < size() && Avec::is_white(at(arg)))   ++arg;
+              while (arg < size())   rest.append(at(arg++));
               shrink(clen);
               return;
             }
@@ -442,7 +443,7 @@ UCS_string::split_ws(UCS_string & rest)
 UCS_string::UCS_string(const Value & value)
    : Simple_string<Unicode>(0, 0)
 {
-   ++total_count;
+   create(LOC);
 
    if (value.get_rank() > 1) RANK_ERROR;
 
@@ -455,7 +456,7 @@ const ShapeItem ec = value.element_count();
 UCS_string::UCS_string(istream & in)
    : Simple_string<Unicode>(0, 0)
 {
-   ++total_count;
+   create(LOC);
 
    for (;;)
       {
@@ -483,7 +484,7 @@ UCS_string::copy_black_list(UCS_string_vector & dest) const
         copy_black(next, idx);
         if (next.size() == 0)   break;
 
-        dest.push_back(next);
+        dest.append(next);
       }
 }
 //-----------------------------------------------------------------------------
@@ -491,7 +492,7 @@ ShapeItem
 UCS_string::LF_count() const
 {
 ShapeItem count = 0;
-   loop(u, size())   if ((*this)[u] == UNI_ASCII_LF)   ++count;
+   loop(u, size())   if (at(u) == UNI_ASCII_LF)   ++count;
    return count;
 }
 //-----------------------------------------------------------------------------
@@ -515,7 +516,7 @@ const ShapeItem start_positions = 1 + size() - sub.size();
         bool mismatch = false;
         loop(u, sub.size())
            {
-             if ((*this)[start + u] != sub[u])
+             if (at(start + u) != sub[u])
                 {
                   mismatch = true;
                   break;
@@ -531,7 +532,7 @@ const ShapeItem start_positions = 1 + size() - sub.size();
 bool 
 UCS_string::has_black() const
 {
-   loop(s, size())   if (!Avec::is_white((*this)[s]))   return true;
+   loop(s, size())   if (!Avec::is_white(at(s)))   return true;
    return false;
 }
 //-----------------------------------------------------------------------------
@@ -543,7 +544,7 @@ UCS_string::starts_with(const char * prefix) const
         const char pc = *prefix++;
         if (pc == 0)   return true;   // prefix matches this string.
 
-        const Unicode uni = (*this)[s];
+        const Unicode uni = at(s);
         if (uni != Unicode(pc))   return false;
       }
 
@@ -557,7 +558,7 @@ UCS_string::starts_with(const UCS_string & prefix) const
 {
    if (prefix.size() > size())   return false;
 
-   loop(p, prefix.size())   if ((*this)[p] != prefix[p])   return false;
+   loop(p, prefix.size())   if (at(p) != prefix[p])   return false;
 
    return true;
 }
@@ -571,7 +572,7 @@ UCS_string::starts_iwith(const char * prefix) const
         if (pc == 0)   return true;   // prefix matches this string.
         if (pc >= 'a' && pc <= 'z')   pc -= 'a' - 'A';
 
-        int uni = (*this)[s];
+        int uni = at(s);
         if (uni >= 'a' && uni <= 'z')   uni -= 'a' - 'A';
 
         if (uni != Unicode(pc))   return false;
@@ -587,7 +588,7 @@ UCS_string::starts_iwith(const UCS_string & prefix) const
 
    loop(p, prefix.size())
       {
-        int c1 = (*this)[p];
+        int c1 = at(p);
         int c2 = prefix[p];
         if (c1 >= 'a' && c1 <= 'z')   c1 -= 'a' - 'A';
         if (c2 >= 'a' && c2 <= 'z')   c2 -= 'a' - 'A';
@@ -603,7 +604,7 @@ UCS_string::no_pad() const
 UCS_string ret;
    loop(s, size())
       {
-        Unicode uni = (*this)[s];
+        Unicode uni = at(s);
         if (is_iPAD_char(uni))   uni = UNI_ASCII_SPACE;
         ret.append(uni);
       }
@@ -616,7 +617,7 @@ UCS_string::map_pad()
 {
    loop(s, size())
       {
-        if (is_iPAD_char((*this)[s]))   (*this)[s] = UNI_ASCII_SPACE;
+        if (is_iPAD_char(at(s)))   at(s) = UNI_ASCII_SPACE;
       }
 }
 //-----------------------------------------------------------------------------
@@ -626,7 +627,7 @@ UCS_string::remove_pad() const
 UCS_string ret;
    loop(s, size())
       {
-        Unicode uni = (*this)[s];
+        Unicode uni = at(s);
         if (!is_iPAD_char(uni))   ret.append(uni);
       }
 
@@ -638,15 +639,15 @@ UCS_string::remove_lt_spaces()
 {
    // remove trailing spaces
    //
-   while (size() && (*this)[size() - 1] <= ' ')   shrink(size() - 1);
+   while (size() && at(size() - 1) <= ' ')   shrink(size() - 1);
 
    // count leading spaces
    //
 int count = 0;
    loop(s, size())
       {
-        if ((*this)[s] <= ' ')   ++count;
-        else                     break;
+        if (at(s) <= ' ')   ++count;
+        else                break;
       }
 
    // remove leading spaces
@@ -658,20 +659,20 @@ UCS_string
 UCS_string::reverse() const
 {
 UCS_string ret;
-   for (int s = size(); s > 0;)   ret.append((*this)[--s]);
+   for (int s = size(); s > 0;)   ret.append(at(--s));
    return ret;
 }
 //-----------------------------------------------------------------------------
 bool
 UCS_string::is_comment_or_label() const
 {
-   if (size() == 0)                               return false;
-   if ((*this)[0] == UNI_ASCII_NUMBER_SIGN)       return true;   // comment
-   if ((*this)[0] == UNI_COMMENT)                 return true;   // comment
+   if (size() == 0)                          return false;
+   if (at(0) == UNI_ASCII_NUMBER_SIGN)       return true;   // comment
+   if (at(0) == UNI_COMMENT)                 return true;   // comment
    loop(t, size())
        {
-         if ((*this)[t] == UNI_ASCII_COLON)       return true;   // label
-         if (!Avec::is_symbol_char((*this)[t]))   return false;
+         if (at(t) == UNI_ASCII_COLON)       return true;   // label
+         if (!Avec::is_symbol_char(at(t)))   return false;
        }
 
    return false;
@@ -767,17 +768,17 @@ size_t max_len = 0;
    result.clear();
    if (size() == 0)   return max_len;
 
-   result.push_back(UCS_string());
+   result.append(UCS_string());
    loop(s, size())
       {
-        const Unicode uni = (*this)[s];
+        const Unicode uni = at(s);
         if (uni == UNI_ASCII_LF)    // line done
            {
              const size_t len = result.last().size();
              if (max_len < len)   max_len = len;
 
              if (s < size() - 1)   // more coming
-                result.push_back(UCS_string());
+                result.append(UCS_string());
            }
         else
            {
@@ -800,7 +801,7 @@ int ret = 0;
 
    loop(s, size())
       {
-        const Unicode uni = (*this)[s];
+        const Unicode uni = at(s);
 
         if (!ret && Avec::is_white(uni))   continue;   // leading whitespace
 
@@ -870,8 +871,8 @@ UCS_string::lexical_before(const UCS_string other) const
    loop(u, size())
       {
         if (u >= other.size())   return false;   // other is a prefix of this
-        if ((*this)[u] < other[u])   return true;
-        if ((*this)[u] > other[u])   return false;
+        if (at(u) < other.at(u))   return true;
+        if (at(u) > other.at(u))   return false;
       }
 
    // at this point the common part of this and other is equal, If other
@@ -885,7 +886,7 @@ UCS_string::dump(ostream & out) const
    out << right << hex << uppercase << setfill('0');
    loop(s, size())
       {
-        out << " U+" << setw(4) << (int)((*this)[s]);
+        out << " U+" << setw(4) << (int)at(s);
       }
 
    return out << left << dec << nouppercase << setfill(' ');
@@ -1096,21 +1097,21 @@ UCS_string::round_last_digit()
       {
         for (int q = size() - 2; q >= 0; --q)
             {
-              const Unicode cc = items[q];
+              const Unicode cc = at(q);
               if (cc < UNI_ASCII_0)   continue;   // not a digit
               if (cc > UNI_ASCII_9)   continue;   // not a digit
 
-              items[q] = Unicode(cc + 1);   // round up
+              at(q) = Unicode(cc + 1);   // round up
               if (cc != UNI_ASCII_9)   break;    // 0-8 rounded up: stop
 
-              items[q] = UNI_ASCII_0;    // 9 rounded up: say 0 and repeat
+              at(q) = UNI_ASCII_0;    // 9 rounded up: say 0 and repeat
               if (q)   continue;   // not first difit
 
               // something like 9.xxx has been rounded up to, say, 0.xxx
               // but should be 10.xxx Fix it.
               //
-              for (int d = size() - 1; d > 0; --d)   items[d] = items[d - 1];
-              items[0] = UNI_ASCII_1;
+              for (int d = size() - 1; d > 0; --d)  at(d) = at(d - 1);
+              at(0) = UNI_ASCII_1;
             }
       }
 
@@ -1121,7 +1122,7 @@ UCS_string::round_last_digit()
 bool
 UCS_string::contains(Unicode uni)
 {
-   loop(u, size())   if ((*this)[u] == uni)   return true;
+   loop(u, size())   if (at(u) == uni)   return true;
    return false;
 }
 //----------------------------------------------------------------------------
@@ -1129,7 +1130,7 @@ UCS_string
 UCS_string::sort() const
 {
 UCS_string ret(*this);
-   Heapsort<Unicode>::sort(ret.items, ret.size(), 0, greater_uni);
+   Heapsort<Unicode>::sort(&ret[0], ret.size(), 0, greater_uni);
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1148,7 +1149,7 @@ UCS_string ret;
          if (sorted[j] != ret.back())   ret.append(sorted[j]);
        }
 
-   Heapsort<Unicode>::sort(ret.items, ret.size(), 0, greater_uni);
+   Heapsort<Unicode>::sort(&ret[0], ret.size(), 0, greater_uni);
    return ret;
 }
 //----------------------------------------------------------------------------

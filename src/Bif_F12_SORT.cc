@@ -62,7 +62,7 @@ UCS_string UA1 = UA.unique();
    loop(a, ec_A)
       {
         const Unicode uni = A.get_ravel(a).get_char_value();
-        CollatingCacheEntry & entry = (*this)[find_entry(uni)];
+        CollatingCacheEntry & entry = at(find_entry(uni));
 
         ShapeItem aq = a;
         loop(r, A.get_rank())

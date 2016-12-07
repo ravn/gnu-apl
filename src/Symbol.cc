@@ -452,7 +452,7 @@ const int sym_stack_size = value_stack_size();
 
    loop(s, sym_stack_size)
       {
-        const ValueStackItem & vsi = (*this)[s];
+        const ValueStackItem & vsi = value_stack[s];
         if (vsi.name_class != NC_FUNCTION)   continue;
         if (fun != vsi.sym_val.function)     continue;
 
@@ -1084,7 +1084,7 @@ const Cell * cV = &values->get_ravel(0);
 void
 Symbol::dump(ostream & out) const
 {
-const ValueStackItem & vs = (*this)[0];
+const ValueStackItem & vs = value_stack[0];
    if (vs.name_class == NC_VARIABLE)
       {
         UCS_string_vector CR10;

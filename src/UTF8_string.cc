@@ -136,7 +136,7 @@ UTF8_string::UTF8_string(const Value & value)
    : Simple_string<UTF8>((int)value.element_count(), (UTF8) 0)
 {
    loop(v, value.element_count())
-       (*this)[v] = value.get_ravel(v).get_char_value() & 0xFF;
+       at(v) = value.get_ravel(v).get_char_value() & 0xFF;
 }
 //-----------------------------------------------------------------------------
 ostream &
@@ -147,7 +147,7 @@ UTF8_string::dump_hex(ostream & out, int max_bytes) const
         if (b)   out << " ";
         if (b >= max_bytes)   return out << "...";
 
-         out << HEX2((*this)[b]);
+         out << HEX2(at(b));
       }
 
    return out;

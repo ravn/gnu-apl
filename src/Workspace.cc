@@ -552,7 +552,7 @@ bool name_from_WSID = false;
    if (lib_ws.size() == 0)   // no argument: use )WSID value
       {
         name_from_WSID = true;
-        lib_ws.push_back(the_workspace.WS_name);
+        lib_ws.append(the_workspace.WS_name);
       }
    else if (lib_ws.size() > 2)   // too many arguments
       {
@@ -788,7 +788,7 @@ Workspace::dump_WS(ostream & out, UCS_string_vector & lib_ws, bool html,
 
    if (lib_ws.size() == 0)   // no argument: use )WSID value
       {
-         lib_ws.push_back(the_workspace.WS_name);
+         lib_ws.append(the_workspace.WS_name);
       }
    else if (lib_ws.size() > 2)   // too many arguments
       {
@@ -1071,7 +1071,7 @@ XML_Loading_Archive in(filename.c_str(), dump_fd);
 void
 Workspace::wsid(ostream & out, UCS_string arg, bool silent)
 {
-   while (arg.size() && arg[0] <= ' ')       arg.remove_front();
+   while (arg.size() && arg[0] <= ' ')       arg.erase(0, 1);
    while (arg.size() && arg.back() <= ' ')   arg.pop();
 
    if (arg.size() == 0)   // inquire workspace name

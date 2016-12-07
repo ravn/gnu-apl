@@ -1576,6 +1576,13 @@ const int vid = find_int_attr("vid", false, 10);
    if (symbol.get_Id() == ID::Quad_SVE)           return;
    if (symbol.get_Id() == ID::Quad_SYL)           return;
 
+   if (vid == -1)   // stale variable
+      {
+        Log(LOG_archive)   CERR << "      " << symbol.get_name()
+                                << " looks like a stale variable" << endl;
+        return;
+      }
+
    if (!values[vid])   return;   // value filtered out
 
    if (d != 0)   symbol.push();
