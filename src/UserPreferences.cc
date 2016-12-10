@@ -683,7 +683,7 @@ const char * apl_args = argv[1];
    script_argc = 2;
    if (!strchr(apl_args, ' '))   return;   // single option
 
-   expanded_argv.erase(1, 1);
+   expanded_argv.erase(1);
    --script_argc;
    for (int index = 1;;)
        {

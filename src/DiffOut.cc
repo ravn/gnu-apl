@@ -75,7 +75,7 @@ bool eof = false;
         rep << "== " << apl << endl;
       }
 
-   aplout.clear();
+   aplout.shrink(0);
    PERFORMANCE_END(fs_COUT_B, cout_perf, 1)
    return 0;
 }

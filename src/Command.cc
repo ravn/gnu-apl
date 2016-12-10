@@ -51,7 +51,7 @@
 int Command::boxing_format = -1;
 ShapeItem Command::APL_expression_count = 0;
 
-Simple_string<Command::user_command> Command::user_commands;
+Simple_string<Command::user_command, false> Command::user_commands;
 
 //-----------------------------------------------------------------------------
 void
@@ -112,14 +112,13 @@ int len = 0;
    line.copy_black(cmd, len);
 
 UCS_string arg(line, len, line.size() - len);
-UCS_string_vector args;
-   arg.copy_black_list(args);
-   line.clear();
+UCS_string_vector args = split_arg(arg);
+   line.shrink(0);
    if (!cmd.starts_iwith(")MORE")) 
       {
         // clear )MORE info unless command is )MORE
         //
-        Workspace::more_error().clear();
+        Workspace::more_error().shrink(0);
       }
 
 #define cmd_def(cmd_str, code, _arg, _hint) \
@@ -144,7 +143,7 @@ UCS_string_vector args;
 void
 Command::do_APL_expression(UCS_string & line)
 {
-   Workspace::more_error().clear();
+   Workspace::more_error().shrink(0);
 
 Executable * statements = 0;
    try
@@ -325,7 +324,7 @@ check_EOC:
                    Workspace::pop_SI(LOC);
                    UCS_string pushed_command = Workspace::get_pushed_Command();
                    process_line(pushed_command);
-                   pushed_command.clear();
+                   pushed_command.shrink(0);
                    Workspace::push_Command(pushed_command);   // clear in
                    return;
                  }
@@ -411,6 +410,20 @@ Command::cmd_XTERM(ostream & out, const UCS_string & arg)
       {
         out << "BAD COMMAND" << endl;
         return;
+      }
+}
+//-----------------------------------------------------------------------------
+UCS_string_vector
+Command::split_arg(const UCS_string & arg)
+{
+UCS_string_vector result;
+   for (int idx = 0; ; )
+      {
+        UCS_string next;
+        arg.copy_black(next, idx);
+        if (next.size() == 0)   return result;
+
+        result.append(next);
       }
 }
 //-----------------------------------------------------------------------------
@@ -935,8 +948,7 @@ DIR * dir = open_LIB_dir(path, out, arg);
 
    // 2. collect files and directories
    //
-UCS_string_vector apl_files;
-UCS_string_vector xml_files;
+UCS_string_vector files;
 UCS_string_vector directories;
 
    for (;;)
@@ -960,93 +972,54 @@ UCS_string_vector directories;
               if (filename_utf8.ends_with(".apl"))
                  {
                    filename.shrink(filename.size() - 4);   // skip extension
-                   apl_files.append(filename);
+                   files.append(filename);
                  }
               else if (filename_utf8.ends_with(".xml"))
                  {
                    filename.shrink(filename.size() - 4);   // skip extension
-                   xml_files.append(filename);
+                   files.append(filename);
                  }
             }
          else
             {
-              if (filename[0] == '.')   continue;         // skip dot files ...
+              if (filename[0] == '.')          continue;  // skip dot files
               if (filename[dlen - 1] == '~')   continue;  // and editor backups
-              apl_files.append(filename);
+              files.append(filename);
             }
        }
    closedir(dir);
 
-   // 3. sort directories and filenames alphabetically
+   // 3. sort directories and filenames alphabetically and append files
+   //    to directories
    //
-DynArray(const UCS_string *, directory_names, directories.size());
-   loop(a, directories.size())   directory_names[a] = &directories[a];
-   UCS_string::sort_names(directory_names.get_data(), directories.size());
-
-DynArray(const UCS_string *, apl_filenames, apl_files.size());
-   loop(a, apl_files.size())   apl_filenames[a] = &apl_files[a];
-   UCS_string::sort_names(apl_filenames.get_data(), apl_files.size());
-
-DynArray(const UCS_string *, xml_filenames, xml_files.size());
-   loop(x, xml_files.size())   xml_filenames[x] = &xml_files[x];
-   UCS_string::sort_names(xml_filenames.get_data(), xml_files.size());
+   directories.sort();
+   files.sort();
+   loop(f, files.size())
+      {
+        if (directories.size()  && directories.last() == files[f])
+           {
+             // there were some file.apl and file.xml. Skip the second
+             //
+             continue;
+           }
+        directories.append(files[f]);
+      }
 
    // 4. list directories first, then files
    //
-DynArray(const UCS_string *, filenames, apl_files.size() + xml_files.size()
-                                        + directories.size()
-         );
-
-int count = 0;
-   loop(dd, directories.size())
-       filenames[count++] = directory_names[dd];
-
-   for (int a = 0, x = 0;;)
-       {
-         if (a >= (int)apl_files.size())   // end of apl_files reached
-            {
-              loop(xx, xml_files.size() - x)
-                  filenames[count++] = xml_filenames[x + xx];
-              break;
-            }
-
-         if (x >= (int)xml_files.size())   // end of xml_files reached
-            {
-              loop(aa, apl_files.size() - a)
-                  filenames[count++] = apl_filenames[a + aa];
-              break;
-            }
-
-         // both APL and XML files. Compare them
-         //
-         const Comp_result comp = apl_filenames[a]->compare(*xml_filenames[x]);
-         if (comp == COMP_LT)        // APL filename smaller
-            {
-              filenames[count++] = apl_filenames[a++];
-            }
-         else if (comp == COMP_GT)   // XML filename smaller
-            {
-              filenames[count++] = xml_filenames[x++];
-            }
-         else                        // same
-            {
-              ((UCS_string *)(apl_filenames[a]))->append(UNI_ASCII_PLUS);
-              filenames[count++] = apl_filenames[a++];   ++x;
-            }
-       }
         
    // figure column widths
    //
    enum { tabsize = 4 };
-Simple_string<int> col_width;
-   UCS_string::compute_column_width(col_width, filenames.get_data(), count,
-                                    tabsize, Workspace::get_PW());
 
-   loop(c, count)
+Simple_string<int, false> col_width =
+   directories.compute_column_width(tabsize);
+
+   loop(c, directories.size())
       {
         const size_t col = c % col_width.size();
-        out << *filenames[c];
-        if (col == (col_width.size() - 1) || c == (count - 1))
+        out << directories[c];
+        if (col == (col_width.size() - 1) || c == (directories.size() - 1))
            {
              // last column or last item: print newline
              //
@@ -1056,7 +1029,7 @@ Simple_string<int> col_width;
            {
              // intermediate column: print spaces
              //
-             const int len = tabsize*col_width[col] - filenames[c]->size();
+             const int len = tabsize*col_width[col] - directories[c].size();
              Assert(len > 0);
              loop(l, len)   out << " ";
            }
@@ -1231,7 +1204,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
 
   if (args.size() == 1 && args[0].starts_iwith("REMOVE-ALL"))
      {
-       user_commands.clear();
+       user_commands.shrink(0);
        out << "    All user-defined commands removed." << endl;
        return;
      }
@@ -1247,7 +1220,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                   //
                   out << "    User-defined command "
                       << user_commands[u].prefix << " removed." << endl;
-                  user_commands.erase(u, 1);
+                  user_commands.erase(u);
                   return;
                 }
            }
@@ -1344,8 +1317,7 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
 void
 Command::log_control(const UCS_string & arg)
 {
-UCS_string_vector args;
-   arg.copy_black_list(args);
+UCS_string_vector args = split_arg(arg);
 
    if (args.size() == 0 || arg[0] == UNI_ASCII_QUESTION)  // no arg or '?'
       {
@@ -1451,7 +1423,7 @@ const char sub_type = record[1];
              else if (item_type == 'N')   numeric_1TF(objects);
              else if (item_type == 'F')   function_2TF(objects);
              else                         CERR << "????: " << data << endl;
-             data.clear();
+             data.shrink(0);
            }
       }
    else
@@ -1506,7 +1478,7 @@ UCS_string var_name;
 Shape shape;
 int idx = get_nrs(var_name, shape);
 
-   if (objects.size() && !var_name.contained_in(objects))   return;
+   if (objects.size() && !objects.contains(var_name))   return;
 
 Symbol * sym = 0;
    if (Avec::is_quad(var_name[0]))   // system variable.
@@ -1567,7 +1539,7 @@ UCS_string var_name;
 Shape shape;
 int idx = get_nrs(var_name, shape);
 
-   if (objects.size() && !var_name.contained_in(objects))   return;
+   if (objects.size() && !objects.contains(var_name))   return;
 
 Symbol * sym = 0;
    if (Avec::is_quad(var_name[0]))   // system variable.
@@ -1620,7 +1592,7 @@ Command::transfer_context::array_2TF(const UCS_string_vector & objects) const
 {
    // an Array in 2 ⎕TF format
    //
-UCS_string data1(data.get_items() + 1, data.size() - 1);
+UCS_string data1(&data[1], data.size() - 1);
 UCS_string var_or_fun;
 
    // data1 is: VARNAME←data...
@@ -1635,7 +1607,7 @@ UCS_string var_or_fun;
              var_name.append(uni);
            }
 
-        if (!var_name.contained_in(objects))   return;
+        if (!objects.contains(var_name))   return;
       }
 
    var_or_fun = Quad_TF::tf2_inv(data1);
@@ -1657,7 +1629,7 @@ UCS_string fun_name;
         fun_name.append(data[idx++]);
    ++idx;
 
-   if (objects.size() && !fun_name.contained_in(objects))   return;
+   if (objects.size() && !objects.contains(fun_name))   return;
 
 UCS_string statement;
    while (idx < data.size())   statement.append(data[idx++]);
@@ -1726,8 +1698,8 @@ Command::parse_from_to(UCS_string & from, UCS_string & to,
    // 3b.       - TO
    // 3c.  FROM - TO
    //
-   from.clear();
-   to.clear();
+   from.shrink(0);
+   to.shrink(0);
 
 int s = 0;
 bool got_minus = false;
@@ -1819,7 +1791,7 @@ const bool have_trailing_blank = replace_count && user.last() == ' ';
 ExpandResult
 Command::expand_user_name(UCS_string & user, int & replace_count)
 {
-Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
+Simple_string<const Symbol *, false> symbols = Workspace::get_all_symbols();
 
 UCS_string_vector matches;
    loop(s, symbols.size())
@@ -1836,7 +1808,7 @@ UCS_string_vector matches;
    if (matches.size() > 1)   // multiple names match user input
       {
         const int user_len = user.size();
-        user.clear();
+        user.shrink(0);
         return show_alternatives(user, user_len, matches);
       }
 
@@ -1890,7 +1862,8 @@ UCS_string arg;
                 {
                   if (matches[m].size() != cmd.size())   // wrong match
                      {
-                       matches.erase_unsorted(m);
+                       matches[m].swap(matches.last());
+                       matches.pop();
                        goto again;
                      }
                 }
@@ -1902,7 +1875,7 @@ UCS_string arg;
    //
    if (matches.size() > 1)   // multiple commands match cmd
       {
-        user.clear();
+        user.shrink(0);
         return show_alternatives(user, cmd.size(), matches);
       }
 
@@ -1980,7 +1953,7 @@ int qpos = -1;
         if (matches.size() == 0)   return ER_IGNORE;
         if (matches.size() > 1)
            {
-            UCS_string::sort_names(matches);
+            matches.sort();
 
             const int common_len = compute_common_length(qxx.size(), matches);
             if (common_len == qxx.size())
@@ -2094,8 +2067,8 @@ Command::expand_filename(UCS_string & user, bool have_trailing_blank,
 
          // discard library reference number
          //
-         if (arg.size() == 1)   arg.erase(0, 1);
-         else                   arg.erase(0, 2);
+         if (arg.size() == 1)   arg.erase(0);
+         if (arg.size())        arg.erase(0);
          return expand_wsname(user, cmd, lib, arg);
       }
 

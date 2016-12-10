@@ -531,7 +531,7 @@ public:
    /// the number of fast (recycled) new() calls
    static uint64_t fast_new;
 
-   /// the number of slow ( malloc() baased) new() calls
+   /// the number of slow ( ::new() based) new() calls
    static uint64_t slow_new;
 
 protected:
@@ -585,7 +585,7 @@ protected:
            }
 
         ++slow_new;
-        return malloc(sz);
+        return ::operator new(sz);
       }
 
    /// free space for a new Value

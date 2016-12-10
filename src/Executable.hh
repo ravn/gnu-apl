@@ -23,6 +23,7 @@
 
 #include "Output.hh"
 #include "Parser.hh"
+#include "UCS_string_vector.hh"
 
 class UCS_string;
 class UserFunction;

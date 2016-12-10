@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@ ShapeItem UCS_string::total_id = 0;
 
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const char * cstring)
-   : Simple_string<Unicode>(0, 0)
 {
    create(LOC);
 
@@ -48,7 +47,6 @@ const int len = strlen(cstring);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UTF8_string & utf)
-   : Simple_string<Unicode>(0, 0)
 {
    create(LOC);
 
@@ -83,7 +81,7 @@ UCS_string::UCS_string(const UTF8_string & utf)
                       << " len " << utf.size() << " at " << LOC <<  endl;
                    if (utf.size() >= 40)
                       {
-                         UTF8_string end(utf.get_items() + utf.size() - 10, 10);
+                         const UTF8_string end(&utf[utf.size() - 10], 10);
                          end.dump_hex(CERR << endl << "(ending with : ", 20)
                                            << ")" << endl;
                       }
@@ -97,7 +95,7 @@ UCS_string::UCS_string(const UTF8_string & utf)
                       << " len " << utf.size() << " at " << LOC <<  endl;
                    if (utf.size() >= 40)
                       {
-                         UTF8_string end(utf.get_items() + utf.size() - 10, 10);
+                         const UTF8_string end(&utf[utf.size() - 10], 10);
                          end.dump_hex(CERR << endl << "(ending with : ", 20)
                                            << ")" << endl;
                       }
@@ -119,7 +117,6 @@ UCS_string::UCS_string(const UTF8_string & utf)
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(APL_Float value, bool & scaled,
                        const PrintContext & pctx)
-   : Simple_string<Unicode>(0, 0)
 {
    create(LOC);
 
@@ -292,7 +289,6 @@ const Unicode last = digits.last();
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
-   : Simple_string<Unicode>(0, 0)
 {
    create(LOC);
 
@@ -300,7 +296,7 @@ UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
 
 const int total_width = pb.get_width(0);
 
-Simple_string<int> breakpoints;
+Simple_string<int, false> breakpoints;
    breakpoints.reserve(2*total_width/quad_PW);
 
    // print rows, breaking at breakpoints
@@ -381,10 +377,9 @@ UCS_string::remove_trailing_padchars()
          if (at(u) == UNI_LINE_VERT2)   break;
          if (at(u) == UNI_iPAD_L0)
             {
-              clear();
+              shrink(0);
               return;
             }
-
        }
 
    while (size())
@@ -405,7 +400,7 @@ UCS_string::remove_trailing_padchars()
 void
 UCS_string::remove_trailing_whitespaces()
 {
-   while (size() && Avec::is_white(last()))   pop();
+   while (size() && last() <= UNI_ASCII_SPACE)   pop();
 }
 //-----------------------------------------------------------------------------
 void
@@ -414,11 +409,13 @@ UCS_string::remove_leading_whitespaces()
 int count = 0;
    loop(s, size())
       {
-        if (Avec::is_white(at(s)))   ++count;
-        else                         break;
+        if (at(s) <= UNI_ASCII_SPACE)   ++count;
+        else                            break;
       }
 
-   erase(0, count);
+   if (count == 0)        return;      // no leading whitspaces
+   if (count == size())   shrink(0);   // only whitespaces
+   else                   *this = UCS_string(*this, count, size() - count);
 }
 //-----------------------------------------------------------------------------
 void
@@ -441,7 +438,7 @@ UCS_string::split_ws(UCS_string & rest)
 //-----------------------------------------------------------------------------
 /// constructor
 UCS_string::UCS_string(const Value & value)
-   : Simple_string<Unicode>(0, 0)
+   : Simple_string<Unicode, false>(0, 0)
 {
    create(LOC);
 
@@ -454,7 +451,7 @@ const ShapeItem ec = value.element_count();
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(istream & in)
-   : Simple_string<Unicode>(0, 0)
+   : Simple_string<Unicode, false>(0, 0)
 {
    create(LOC);
 
@@ -475,36 +472,12 @@ UCS_string::copy_black(UCS_string & dest, int & idx) const
    while (idx < size() && operator[](idx) <= ' ')   ++idx;
 }
 //-----------------------------------------------------------------------------
-void
-UCS_string::copy_black_list(UCS_string_vector & dest) const
-{
-   for (int idx = 0; ; )
-      {
-        UCS_string next;
-        copy_black(next, idx);
-        if (next.size() == 0)   break;
-
-        dest.append(next);
-      }
-}
-//-----------------------------------------------------------------------------
 ShapeItem
 UCS_string::LF_count() const
 {
 ShapeItem count = 0;
    loop(u, size())   if (at(u) == UNI_ASCII_LF)   ++count;
    return count;
-}
-//-----------------------------------------------------------------------------
-bool
-UCS_string::contained_in(const UCS_string_vector & list) const
-{
-   loop(l, list.size())
-      {
-        if (*this == list[l])   return true;
-      }
-
-   return false;
 }
 //-----------------------------------------------------------------------------
 ShapeItem
@@ -634,27 +607,6 @@ UCS_string ret;
    return ret;
 }
 //-----------------------------------------------------------------------------
-void
-UCS_string::remove_lt_spaces()
-{
-   // remove trailing spaces
-   //
-   while (size() && at(size() - 1) <= ' ')   shrink(size() - 1);
-
-   // count leading spaces
-   //
-int count = 0;
-   loop(s, size())
-      {
-        if (at(s) <= ' ')   ++count;
-        else                break;
-      }
-
-   // remove leading spaces
-   //
-   erase(0, count);
-}
-//-----------------------------------------------------------------------------
 UCS_string
 UCS_string::reverse() const
 {
@@ -765,7 +717,7 @@ UCS_string::to_vector(UCS_string_vector & result) const
 {
 size_t max_len = 0;
 
-   result.clear();
+   result.shrink(0);
    if (size() == 0)   return max_len;
 
    result.append(UCS_string());
@@ -1151,203 +1103,5 @@ UCS_string ret;
 
    Heapsort<Unicode>::sort(&ret[0], ret.size(), 0, greater_uni);
    return ret;
-}
-//----------------------------------------------------------------------------
-void
-UCS_string::sort_names(const UCS_string ** names, int count)
-{
-   if (count < 2)   return;
-   Heapsort<const UCS_string *>::sort(names, count, 0, compare_names);
-}
-//----------------------------------------------------------------------------
-void
-UCS_string::sort_names(UCS_string_vector names)
-{
-   if (names.size() < 2)   return;
-
-   for (size_t h = 0; h < (names.size() - 1); ++h)
-       {
-         // find smallest above (including) h
-         //
-         int smallest = h;
-         for (size_t j = h + 1; j < names.size(); ++j)
-             {
-               if (names[smallest].compare(names[j]) == COMP_GT)
-                  {
-                    names[smallest].swap(names[j]);
-                  }
-             }
-       }
-}
-//----------------------------------------------------------------------------
-void
-UCS_string::compute_column_width(Simple_string<int> & result,
-                                 const UCS_string ** names, int name_count,
-                                 int tab_size, int quad_PW)
-{
-   if (name_count < 2)
-      {
-        result.clear();
-        if (name_count)   result.append(names[0]->size());
-        else              result.append(quad_PW);
-        return;
-      }
-
-   // compute block counts (one block having tab_size characters)
-   //
-const int max_blocks = (quad_PW + 1) / tab_size;
-DynArray(int, name_blocks, name_count);
-   loop(n, name_count)
-       {
-         name_blocks[n] = 1 + (1 + names[n]->size()) / tab_size;
-       }
-
-   // compute max number of column blocks based on first line blocks
-   //
-int max_col = -1;
-   {
-     int blocks = 0;
-     loop(n, name_count)
-         {
-           if ((blocks + name_blocks[n]) < max_blocks)   // name_blocks[n] fits
-              blocks += name_blocks[n];
-           else                                          // max_blocks exceeded
-             {
-               max_col = n - 1;
-               break;
-             }
-         }
-
-     if (max_col == -1)   // all blocks fit
-        {
-          result.clear();
-          loop(n, name_count)
-              {
-                result.append(name_blocks[n]);
-              }
-          return;
-        }
-   }
-
-   // decrease max_col until all names fit...
-   //
-   for (;max_col > 1; --max_col)
-      {
-        result.clear();
-        int free_blocks = max_blocks;
-        loop(n, name_count)   // try to fit blocks into result
-            {
-              const int col_n = n % max_col;
-              const int bn = name_blocks[n];
-              if (n < max_col)   // first row: append column
-                 {
-                   free_blocks -= bn;
-                   if (free_blocks < 0)   break;
-                   result.append(bn);
-                 }
-              else if (bn > result[col_n])   
-                 {
-                   free_blocks -= bn - result[col_n];
-                   if (free_blocks < 0)   break;
-                   result[col_n] = bn;
-                 }
-            }
-
-        if (free_blocks >= 0)   return;   // success
-      }
-
-   // single colums
-   //
-   result.clear();
-int max_nb = 0;
-   loop(n, name_count)
-      {
-        if (max_nb < name_blocks[n])   max_nb = name_blocks[n];
-      }
-   result.append(max_nb);
-}
-//----------------------------------------------------------------------------
-UCS_string_vector::UCS_string_vector(const Value & val, bool surrogate)
-{
-const ShapeItem var_count = val.get_rows();
-const ShapeItem name_len = val.get_cols();
-
-   loop(v, var_count)
-      {
-        ShapeItem nidx = v*name_len;
-        const ShapeItem end = nidx + name_len;
-        append(UCS_string());
-        UCS_string & name = last();
-        loop(n, name_len)
-           {
-             const Unicode uni = val.get_ravel(nidx++).get_char_value();
-
-             if (n == 0 && Avec::is_quad(uni))   // leading ⎕
-                {
-                  name.append(uni);
-                  continue;
-                }
-
-             if (Avec::is_symbol_char(uni))   // valid symbol char
-                {
-                  name.append(uni);
-                  continue;
-                }
-             // end of (first) name reached. At this point we expect either
-             // spaces until 'end' or some spaces and another name.
-             //
-             if (uni != UNI_ASCII_SPACE)
-                {
-                  name.clear();
-                  break;
-                }
-
-             // we have reached the end of the first name. At this point
-             // there could bei:
-             //
-             // 1. spaces until 'end' (= one name), or
-             // 2. a second name (alias)
-
-             // skip spaces from nidx and subsequent spaces
-             //
-             while (nidx < end &&
-                    val.get_ravel(nidx).get_char_value() == UNI_ASCII_SPACE)
-                   ++nidx;
-
-
-             if (nidx == end)   break;   // only spaces (no second name)
-
-             // at this point we maybe have the start of a second name, which
-             // is an error (if last is false) or not. In both cases the first
-             // name can be ignored.
-             //
-             name.clear();
-             if (!surrogate)   break;   // error
-
-             // 'last' is true thus to_varnames() was called from ⎕SVO and
-             // the line may contains two variable names.
-             // Return the second (i.e. surrogate name)
-             //
-             surrogate = false;
-             while (nidx < end)
-                {
-                  const Unicode uni = val.get_ravel(nidx++).get_char_value();
-                  if (Avec::is_symbol_char(uni))   // valid symbol char
-                     {
-                       name.append(uni);
-                     }
-                  else if (uni == UNI_ASCII_SPACE)
-                     {
-                       break;
-                     }
-                  else
-                     {
-                       name.clear();   // error
-                       break;
-                     }
-                }
-             break;
-           }
-      }
 }
 //----------------------------------------------------------------------------

@@ -28,7 +28,7 @@ struct CDR_header
 {
    uint32_t be_ptr;    ///< a value to figure the endian of the machine
    uint32_t be_nb;     ///< number of bytes in big endian
-   int32_t be_nelm;   ///< number of elements in big endian
+   int32_t  be_nelm;   ///< number of elements in big endian
    uint8_t  type;      ///< CDR_type
    uint8_t  rank;      ///< rank of the value
    uint8_t  fill[2];   ///< fill bytes
@@ -58,26 +58,30 @@ struct CDR_header
 };
 
 /// a string containing a CDR record
-class CDR_string : public Simple_string<uint8_t>
+class CDR_string : public Simple_string<uint8_t, false>
 {
 public:
    /// Constructor: An uninitialized CDR structure
    CDR_string()
-   : Simple_string<uint8_t>((const uint8_t *)0, 0)
+   : Simple_string<uint8_t, false>((const uint8_t *)0, 0)
    {}
 
    /// Constructor: CDR structure from uint8_t * and length
    CDR_string(const uint8_t * data, int len)
-   : Simple_string<uint8_t>(data, len)
+   : Simple_string<uint8_t, false>(data, len)
    {}
 
-   /// this cdr as a const CDR_header pointer
-   const CDR_header & header() const
-      { return *(const CDR_header *)get_items(); }
+   /// return the bytes of this CDR
+   const uint8_t * get_items() const
+      { return items; }
 
-   /// this cdr as a CDR_header pointer
+   /// return the header of this CDR
+   const CDR_header & header() const
+      { return *(const CDR_header *)items; }
+
+   /// return the header of this CDR
    CDR_header & header()
-      { return *(CDR_header *)get_items(); }
+      { return *(CDR_header *)items; }
 
    /// return the tag of this CDR
    int get_ptr() const   { return get_4(0); }

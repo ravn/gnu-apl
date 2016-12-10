@@ -141,7 +141,7 @@ struct PJob_scalar_B
 };
 
 /// all monadic scalar jobs
-static Parallel_job_list<PJob_scalar_B> joblist_B;
+static Parallel_job_list<PJob_scalar_B, false> joblist_B;
 
 /// one dyadic scalar job
 struct PJob_scalar_AB
@@ -211,7 +211,7 @@ struct PJob_scalar_AB
 };
 
 /// all dyadic scalar jobs
-static Parallel_job_list<PJob_scalar_AB> joblist_AB;
+static Parallel_job_list<PJob_scalar_AB, false> joblist_AB;
 
 //-----------------------------------------------------------------------------
 Token

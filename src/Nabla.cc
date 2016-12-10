@@ -55,7 +55,7 @@ Nabla::Nabla(const UCS_string & cmd)
      current_line(1),
      first_command(cmd)
 {
-   Workspace::more_error().clear();
+   Workspace::more_error().shrink(0);
 }
 //-----------------------------------------------------------------------------
 void
@@ -371,7 +371,7 @@ Nabla::parse_oper(UCS_string & oper, bool initial)
         while (oper.size() > 0 && oper.last() <= ' ')   oper.pop();
       }
 
-   current_text.clear();
+   current_text.shrink(0);
    ecmd = ECMD_NOP;
 
    if (oper.size() == 0 && do_close)   return 0;
@@ -739,7 +739,7 @@ const int idx_to = find_line(LineLabel(edit_to));
 
    if (edit_from == -1)   // delete single line
       {
-        lines.erase(idx_to, 1);
+        lines.erase(idx_to);
         return 0;
       }
 
@@ -749,7 +749,7 @@ const int idx_from = find_line(LineLabel(edit_from));
    if (idx_from == -1)       return "Bad line number M in [M∆N] ";
    if (idx_from >= idx_to)   return "M ≥ N in [M∆N] ";
 
-   lines.erase(idx_from, idx_to - idx_from);
+   loop(j, idx_to - idx_from)   lines.erase(idx_from);
    current_line = lines.last().label;
    return 0;
 }
@@ -863,7 +863,7 @@ const int idx_from = find_line(edit_from);
 const char *
 Nabla::execute_escape()
 {
-   lines.clear();
+   lines.shrink(0);
    lines.append(FunLine(0, fun_header));
    return 0;
 }

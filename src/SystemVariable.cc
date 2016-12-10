@@ -638,7 +638,7 @@ Quad_QUOTE::done(bool with_LF, const char * loc)
    if (prompt.size())
       {
         if (with_LF)   COUT << endl;
-        prompt.clear();
+        prompt.shrink(0);
       }
 }
 //-----------------------------------------------------------------------------

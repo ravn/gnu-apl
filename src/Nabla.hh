@@ -56,7 +56,7 @@ struct LineLabel
 
    /// invalidate the line number
    void clear()
-          { ln_major = -1;   ln_minor.clear(); }
+      { ln_major = -1;   ln_minor.shrink(0); }
 
    /// return true iff this line number is the header line [0]
    bool is_header_line_number() const
@@ -188,7 +188,7 @@ protected:
    Symbol * fun_symbol;
 
    /// the lines of the function.
-   Simple_string<FunLine> lines;
+   Simple_string<FunLine, false> lines;
 
    /// editor commands
    enum Ecmd

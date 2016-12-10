@@ -109,8 +109,8 @@ Error::init(ErrorCode ec, const char * loc)
    throw_loc = loc;
    error_message_1 = error_name(error_code);
    if (Workspace::more_error().size())   error_message_1.append(UNI_ASCII_PLUS);
-   error_message_2.clear();
-   symbol_name.clear();
+   error_message_2.shrink(0);
+   symbol_name.shrink(0);
    parser_loc = 0;
    show_locked = false;
    left_caret = -1;

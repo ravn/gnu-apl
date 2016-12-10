@@ -117,7 +117,7 @@ public:
 
    /// clear (after ^C)
    void clear()
-      { user_line.clear(); }
+      { user_line.shrink(0); }
 
    /// return the number of screen rows
    int get_screen_rows() const
@@ -235,7 +235,7 @@ protected:
    /// dito
    UCS_string user_line_before_history;
 
-   /// a biffer for ^K/^Y
+   /// a buffer for ^K/^Y
    static UCS_string cut_buffer;
 };
 //-----------------------------------------------------------------------------

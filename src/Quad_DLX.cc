@@ -221,7 +221,7 @@ public:
    ShapeItem get_cover_count() const      { return cover_count; }
 
    /// all solutions as len rows... len rows ...
-   Simple_string<ShapeItem> all_solutions;
+   Simple_string<ShapeItem, false> all_solutions;
 
 protected:
    /// the max. number of solutions to produce, 0 = all

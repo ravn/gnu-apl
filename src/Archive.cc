@@ -323,7 +323,7 @@ XML_Saving_Archive::save_prefix(const Prefix & prefix)
 void
 XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
 {
-Simple_string<const Symbol *> symbols = symtab.get_all_symbols();
+Simple_string<const Symbol *, false> symbols = symtab.get_all_symbols();
 
    // remove erased symbols
    //
@@ -1753,7 +1753,7 @@ Symbol * symbol = Workspace::lookup_existing_symbol(name_ucs);
    // 2.  there is an object list and this symbol is not contained in the list
    //
 const bool is_protected = symbol && protection;
-const bool is_selected = name_ucs.contained_in(allowed_objects);
+const bool is_selected = allowed_objects.contains(name_ucs);
 bool no_copy = is_protected || (have_allowed_objects && !is_selected);
 
    if (reading_vids)

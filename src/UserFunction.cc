@@ -547,7 +547,7 @@ DynArray(bool, ts_lines, line_starts.size());
 
    if (stop)
       {
-        stop_lines.clear();
+        stop_lines.shrink(0);
         loop(ts, line_starts.size())
            {
              if (ts_lines[ts])   stop_lines.append((Function_Line)ts);
@@ -555,7 +555,7 @@ DynArray(bool, ts_lines, line_starts.size());
       }
    else
       {
-        trace_lines.clear();
+        trace_lines.shrink(0);
         loop(ts, line_starts.size())
            {
              if (ts_lines[ts])   trace_lines.append((Function_Line)ts);
@@ -568,7 +568,7 @@ DynArray(bool, ts_lines, line_starts.size());
 void
 UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 {
-   line_starts.clear();
+   line_starts.shrink(0);
    line_starts.append(Function_PC_0);   // will be set later.
 
    clear_body();

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #include "PrintContext.hh"
 #include "PrintOperator.hh"
 #include "Shape.hh"
-#include "UCS_string.hh"
+#include "UCS_string_vector.hh"
 
 class Value;
 class Cell;
@@ -173,7 +173,7 @@ public:
 
    /// add empty rows to \b this PrintBuffer
    void add_empty_rows(ShapeItem count)
-      { buffer.resize(buffer.size() + count); }
+      { loop(c, count)   buffer.append(UCS_string()); }
 
    /// return the ColInfo of \b this PrintBuffer
    const ColInfo & get_info() const   { return col_info; }

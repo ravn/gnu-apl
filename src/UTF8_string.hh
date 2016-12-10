@@ -37,22 +37,21 @@ typedef uint8_t UTF8;
 
 //-----------------------------------------------------------------------------
 /// an UTF8 encoded Unicode (RFC 3629) string
-class UTF8_string :  public Simple_string<UTF8>
+class UTF8_string :  public Simple_string<UTF8, false>
 {
 public:
    /// constructor: empty UTF8_string
    UTF8_string()
-   : Simple_string<UTF8>((const UTF8 *)0, 0)
    {}
 
    /// constructor: UTF8_string from 0-terminated C string.
    UTF8_string(const char * str)
-   : Simple_string<UTF8>((const UTF8 *)str, str ? strlen(str) : 0)
+   : Simple_string<UTF8, false>((const UTF8 *)str, str ? strlen(str) : 0)
    {}
 
    /// constructor: copy of string, but at most len bytes
    UTF8_string(const UTF8 * string, size_t len)
-   : Simple_string<UTF8>(string, len)
+   : Simple_string<UTF8, false>(string, len)
    {}
 
    /// constructor: copy of UCS string. The UCS characters will be UTF8-encoded

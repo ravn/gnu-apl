@@ -22,7 +22,7 @@
 #define __INPUT_FILE_HH_DEFINED__
 
 #include "UTF8_string.hh"
-#include "UCS_string.hh"
+#include "UCS_string_vector.hh"
 
 /// an input file and its properties. The file can be an apl script(.apl) file
 /// or a testcase (.tc) file. The file names initially come from the command
@@ -126,7 +126,7 @@ struct InputFile
    static void randomize_files();
 
    /// files that need to be processed
-   static Simple_string<InputFile> files_todo;
+   static Simple_string<InputFile, false> files_todo;
 
    FILE       * file;       ///< file descriptor
    UTF8_string  filename;   ///< dito.

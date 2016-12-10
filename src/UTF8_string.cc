@@ -54,7 +54,6 @@
 
 //-----------------------------------------------------------------------------
 UTF8_string::UTF8_string(const UCS_string & ucs)
-   : Simple_string<UTF8>((const UTF8 *)0, 0)
 {
    Log(LOG_char_conversion)
       CERR << "UTF8_string::UTF8_string(ucs = " << ucs << ")" << endl;
@@ -133,7 +132,7 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
 }
 //-----------------------------------------------------------------------------
 UTF8_string::UTF8_string(const Value & value)
-   : Simple_string<UTF8>((int)value.element_count(), (UTF8) 0)
+   : Simple_string<UTF8, false>((int)value.element_count(), (UTF8) 0)
 {
    loop(v, value.element_count())
        at(v) = value.get_ravel(v).get_char_value() & 0xFF;

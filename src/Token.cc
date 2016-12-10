@@ -680,7 +680,7 @@ Token::short_class_name(TokenClass cls)
 }
 //-----------------------------------------------------------------------------
 void
-Token::print_token_list(ostream & out, const Source<Token> & src)
+Token::print_token_list(ostream & out, const Source<Token, true> & src)
 {
 const int len = src.rest();
    loop(t, len)   out << "`" << src[t] << "  ";

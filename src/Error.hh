@@ -61,7 +61,7 @@ struct Error
 
    /// clear error line 1
    void clear_error_line_1()
-      { error_message_1.clear(); }
+      { error_message_1.shrink(0); }
 
    /// return error_message_2. This is the second of 3 error lines.
    /// It contains the failed statement and is NOT subject to translation.

@@ -44,7 +44,7 @@ using namespace std;
 Backtrace::_lines_status 
        Backtrace::lines_status = Backtrace::LINES_not_checked;
 
-Simple_string<Backtrace::PC_src> Backtrace::pc_2_src;
+Simple_string<Backtrace::PC_src, false> Backtrace::pc_2_src;
 
 //-----------------------------------------------------------------------------
 const char *

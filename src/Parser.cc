@@ -74,9 +74,9 @@ Parser::parse(const Token_string & input, Token_string & tos) const
 
    // split input into statements.
    //
-Simple_string<Token_string *> statements;
+Simple_string<Token_string *, false> statements;
    {
-     Source<Token> src(input);
+     Source<Token, true> src(input);
      Token_string  * stat = new Token_string();
      while (src.rest())
         {
@@ -539,7 +539,7 @@ int dst = 0;
 ErrorCode
 Parser::match_par_bra(Token_string & tos, bool backwards)
 {
-Simple_string<ShapeItem> stack;
+Simple_string<ShapeItem, false> stack;
    loop(s, tos.size())
        {
          const ShapeItem t = backwards ? (tos.size() - 1) - s : s;

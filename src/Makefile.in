@@ -173,7 +173,8 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	IO_Files.cc IO_Files.hh Token.cc Token.def Token.hh \
 	TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
-	UCS_string.hh Unicode.hh UserFunction.cc UserFunction.hh \
+	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
+	Unicode.hh UserFunction.cc UserFunction.hh \
 	UserFunction_header.cc UserFunction_header.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
@@ -214,10 +215,11 @@ am__objects_1 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
 	libapl_la-Symbol.lo libapl_la-SymbolTable.lo \
 	libapl_la-SystemVariable.lo libapl_la-IO_Files.lo \
 	libapl_la-Token.lo libapl_la-Tokenizer.lo \
-	libapl_la-UCS_string.lo libapl_la-UserFunction.lo \
-	libapl_la-UserFunction_header.lo libapl_la-UserPreferences.lo \
-	libapl_la-UTF8_string.lo libapl_la-Value.lo \
-	libapl_la-ValueHistory.lo libapl_la-Workspace.lo
+	libapl_la-UCS_string.lo libapl_la-UCS_string_vector.lo \
+	libapl_la-UserFunction.lo libapl_la-UserFunction_header.lo \
+	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
+	libapl_la-Value.lo libapl_la-ValueHistory.lo \
+	libapl_la-Workspace.lo
 @WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_1) \
 @WANT_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
@@ -273,7 +275,8 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	IO_Files.cc IO_Files.hh Token.cc Token.def Token.hh \
 	TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
-	UCS_string.hh Unicode.hh UserFunction.cc UserFunction.hh \
+	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
+	Unicode.hh UserFunction.cc UserFunction.hh \
 	UserFunction_header.cc UserFunction_header.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
@@ -316,8 +319,8 @@ am__objects_2 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-Symbol.$(OBJEXT) apl-SymbolTable.$(OBJEXT) \
 	apl-SystemVariable.$(OBJEXT) apl-IO_Files.$(OBJEXT) \
 	apl-Token.$(OBJEXT) apl-Tokenizer.$(OBJEXT) \
-	apl-UCS_string.$(OBJEXT) apl-UserFunction.$(OBJEXT) \
-	apl-UserFunction_header.$(OBJEXT) \
+	apl-UCS_string.$(OBJEXT) apl-UCS_string_vector.$(OBJEXT) \
+	apl-UserFunction.$(OBJEXT) apl-UserFunction_header.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT)
@@ -692,6 +695,7 @@ Token.cc		Token.def		Token.hh		\
 						TokenEnums.hh		\
 Tokenizer.cc					Tokenizer.hh		\
 UCS_string.cc					UCS_string.hh		\
+UCS_string_vector.cc                            UCS_string_vector.hh    \
 						Unicode.hh		\
 UserFunction.cc					UserFunction.hh		\
 UserFunction_header.cc				UserFunction_header.hh	\
@@ -918,6 +922,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Token.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Tokenizer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-UCS_string.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-UCS_string_vector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-UTF8_string.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-UserFunction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-UserFunction_header.Po@am__quote@
@@ -1003,6 +1008,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Token.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Tokenizer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-UCS_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-UCS_string_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-UTF8_string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-UserFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-UserFunction_header.Plo@am__quote@
@@ -1576,6 +1582,13 @@ libapl_la-UCS_string.lo: UCS_string.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UCS_string.cc' object='libapl_la-UCS_string.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-UCS_string.lo `test -f 'UCS_string.cc' || echo '$(srcdir)/'`UCS_string.cc
+
+libapl_la-UCS_string_vector.lo: UCS_string_vector.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-UCS_string_vector.lo -MD -MP -MF $(DEPDIR)/libapl_la-UCS_string_vector.Tpo -c -o libapl_la-UCS_string_vector.lo `test -f 'UCS_string_vector.cc' || echo '$(srcdir)/'`UCS_string_vector.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-UCS_string_vector.Tpo $(DEPDIR)/libapl_la-UCS_string_vector.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UCS_string_vector.cc' object='libapl_la-UCS_string_vector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-UCS_string_vector.lo `test -f 'UCS_string_vector.cc' || echo '$(srcdir)/'`UCS_string_vector.cc
 
 libapl_la-UserFunction.lo: UserFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-UserFunction.lo -MD -MP -MF $(DEPDIR)/libapl_la-UserFunction.Tpo -c -o libapl_la-UserFunction.lo `test -f 'UserFunction.cc' || echo '$(srcdir)/'`UserFunction.cc
@@ -2724,6 +2737,20 @@ apl-UCS_string.obj: UCS_string.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UCS_string.cc' object='apl-UCS_string.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-UCS_string.obj `if test -f 'UCS_string.cc'; then $(CYGPATH_W) 'UCS_string.cc'; else $(CYGPATH_W) '$(srcdir)/UCS_string.cc'; fi`
+
+apl-UCS_string_vector.o: UCS_string_vector.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-UCS_string_vector.o -MD -MP -MF $(DEPDIR)/apl-UCS_string_vector.Tpo -c -o apl-UCS_string_vector.o `test -f 'UCS_string_vector.cc' || echo '$(srcdir)/'`UCS_string_vector.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-UCS_string_vector.Tpo $(DEPDIR)/apl-UCS_string_vector.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UCS_string_vector.cc' object='apl-UCS_string_vector.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-UCS_string_vector.o `test -f 'UCS_string_vector.cc' || echo '$(srcdir)/'`UCS_string_vector.cc
+
+apl-UCS_string_vector.obj: UCS_string_vector.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-UCS_string_vector.obj -MD -MP -MF $(DEPDIR)/apl-UCS_string_vector.Tpo -c -o apl-UCS_string_vector.obj `if test -f 'UCS_string_vector.cc'; then $(CYGPATH_W) 'UCS_string_vector.cc'; else $(CYGPATH_W) '$(srcdir)/UCS_string_vector.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-UCS_string_vector.Tpo $(DEPDIR)/apl-UCS_string_vector.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UCS_string_vector.cc' object='apl-UCS_string_vector.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-UCS_string_vector.obj `if test -f 'UCS_string_vector.cc'; then $(CYGPATH_W) 'UCS_string_vector.cc'; else $(CYGPATH_W) '$(srcdir)/UCS_string_vector.cc'; fi`
 
 apl-UserFunction.o: UserFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-UserFunction.o -MD -MP -MF $(DEPDIR)/apl-UserFunction.Tpo -c -o apl-UserFunction.o `test -f 'UserFunction.cc' || echo '$(srcdir)/'`UserFunction.cc

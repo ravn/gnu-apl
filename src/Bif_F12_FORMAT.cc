@@ -236,7 +236,7 @@ UCS_string_vector col_formats;
 
    // convert each column format string into a Format_LIFER
    //
-Simple_string<Format_LIFER> col_items;
+Simple_string<Format_LIFER, false> col_items;
    loop(c, col_formats.size())
        col_items.append(Format_LIFER(col_formats[c]));
 
@@ -318,7 +318,7 @@ UCS_string fmt;
          if ((cc == UNI_ASCII_SPACE) && fmt_seen)   // end of field
             {
               col_formats.append(fmt);
-              fmt.clear();    // start a new field;
+              fmt.shrink(0);    // start a new field;
               fmt_seen = false;
               continue;   // next char
             }
@@ -329,7 +329,7 @@ UCS_string fmt;
               if (f < format.size())   fmt.append(format[f]);
 
               col_formats.append(fmt);
-              fmt.clear();    // start a new field;
+              fmt.shrink(0);    // start a new field;
               fmt_seen = false;
               continue;   // next char
             }
@@ -752,7 +752,7 @@ const int ilen = int_end - &data_buf[0];
    if (  data_int.size() == 1
       && data_int[0] == UNI_ASCII_0
       && int_part.min_len == 0
-      && fract_part.size())   data_int.clear();
+      && fract_part.size())   data_int.shrink(0);
 
    Log(LOG_Bif_F12_FORMAT)
       {
@@ -833,7 +833,7 @@ size_t d = data.size();
          else                             overflow = true;
       }
 
-   if ((flt_mask & BIT_9) && ucs.all_zeroes())   ucs.clear();
+   if ((flt_mask & BIT_9) && ucs.all_zeroes())   ucs.shrink(0);
 
    return ucs.reverse();
 }
@@ -863,7 +863,7 @@ int d = 0;
             }
       }
 
-   if ((flt_mask & BIT_9) && ucs.all_zeroes())   ucs.clear();
+   if ((flt_mask & BIT_9) && ucs.all_zeroes())   ucs.shrink(0);
 
    return ucs;
 }
@@ -1070,21 +1070,21 @@ UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
         if (ret[0] == UNI_ASCII_0    &&
             ret[1] == UNI_ASCII_FULLSTOP)        // 0.xxx → .xxx
            {
-             ret.erase(0, 1);
+             ret.erase(0);
            }
         else if (ret[0] == UNI_OVERBAR     &&
                  ret[1] == UNI_ASCII_0     &&
                  ret[2] == UNI_ASCII_FULLSTOP)   //  ¯0.x → ¯.x
            {
              ret[1] = UNI_OVERBAR;
-             ret.erase(0, 1);
+             ret.erase(0);
            }
       }
    else if (ret.size() == 2       && 
             ret[0] == UNI_OVERBAR &&
             ret[1] == UNI_ASCII_0)               // ¯0 → 0
            {
-             ret.erase(0, 1);
+             ret.erase(0);
            }
 
    return ret;

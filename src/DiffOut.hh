@@ -39,11 +39,11 @@ public:
    DiffOut(bool _errout)
    : aplout(""),
      errout(_errout)
-   { aplout.clear(); }
+   { aplout.shrink(0); }
 
    /// discard all characters
    void reset()
-   { aplout.clear(); }
+   { aplout.shrink(0); }
 
 protected:
    /// overloaded filebuf::overflow()

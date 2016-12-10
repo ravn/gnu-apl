@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,19 +25,19 @@
 
 //-----------------------------------------------------------------------------
 /// A substring of a string for sequential access
-template<typename T>
+template<typename T, bool has_destructor = false>
 class Source
 {
 public:
    /// constructor: source is entire string.
-   Source(const Simple_string<T> & s)
+   Source(const Simple_string<T, has_destructor> & s)
    : str(s),
    idx(0),
    end(s.size())
    {}
 
    /// constructor: source is string from \b from to the end of the string
-   Source(const Source<T> & src, int32_t from)
+   Source(const Source<T, has_destructor> & src, int32_t from)
    : str(src.str),
      idx(src.idx + from),
      end(src.end)
@@ -46,7 +46,7 @@ public:
    }
 
    /// constructor: source is string from \b from to \b to
-   Source(const Source<T> & src, int32_t from, int32_t to)
+   Source(const Source<T, has_destructor> & src, int32_t from, int32_t to)
    : str(src.str),
      idx(src.idx + from),
      end(src.idx + from + to)
@@ -106,7 +106,7 @@ public:
 
 protected:
    /// the source string
-   const Simple_string<T> & str;
+   const Simple_string<T, has_destructor> & str;
 
    /// the current position
    int32_t idx;

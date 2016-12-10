@@ -108,7 +108,7 @@ protected:
    Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
 
    /// the open files
-   Simple_string<file_entry> open_files;
+   Simple_string<file_entry, false> open_files;
 };
 //-----------------------------------------------------------------------------
 #endif //  __QUAD_FIO_HH_DEFINED__

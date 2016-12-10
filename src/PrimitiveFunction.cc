@@ -2807,7 +2807,7 @@ UTF8_string result_utf8 = out.get_data();
        result_utf8.last() != UNI_ASCII_LF)
       result_utf8.append(UNI_ASCII_LF);
 
-Simple_string<ShapeItem> line_starts;
+Simple_string<ShapeItem, false> line_starts;
    line_starts.append(0);
    loop(r, result_utf8.size())
       {

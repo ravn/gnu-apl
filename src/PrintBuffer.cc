@@ -249,7 +249,7 @@ const bool nested = !value.is_simple();
      //    therefore we have (⍴,value) items. Items are rectangular.
      //
      PERFORMANCE_START(start_2)
-     Simple_string<Rank> max_row_ranks;
+     Simple_string<Rank, false> max_row_ranks;
      max_row_ranks.reserve(rows);
      loop(y, rows)
         {
@@ -655,9 +655,14 @@ PrintBuffer::set_char(int x, int y, Unicode uc)
 void
 PrintBuffer::pad_l(Unicode pad, ShapeItem count)
 {
-   loop(y, get_height())
+   if (count == 1)
       {
-        loop(c, count)   buffer[y].insert_before(0, pad);
+        loop(y, get_height())   buffer[y].prepend(pad);
+      }
+   else
+      {
+        UCS_string pads(count, pad);
+        loop(y, get_height())   buffer[y] = pads + buffer[y];
       }
 }
 //-----------------------------------------------------------------------------
@@ -779,7 +784,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
    loop(y, get_height())
       {
-        buffer[y].insert_before(0, VERT);
+        buffer[y].prepend(VERT);
         buffer[y].append(VERT);
 
         // change internal pad characters to ASCII_SPACE so that they will
@@ -886,7 +891,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
    loop(y, get_height())
       {
-        buffer[y].insert_before(0, VERT);
+        buffer[y].prepend(VERT);
         buffer[y].append(VERT);
 
         // change internal pad characters to ASCII_SPACE so that they will

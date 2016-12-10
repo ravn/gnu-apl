@@ -1024,7 +1024,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 DIR * dir = opendir(path.c_str());
                 if (dir == 0)   goto out_errno;
 
-                Simple_string<struct dirent> entries;
+                Simple_string<struct dirent, false> entries;
                 for (;;)
                     {
                       dirent * entry = readdir(dir);

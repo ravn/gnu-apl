@@ -30,7 +30,7 @@
 #include "Symbol.hh"
 #include "Workspace.hh"
 
-Simple_string<NativeFunction *> NativeFunction::valid_functions;
+Simple_string<NativeFunction *, false> NativeFunction::valid_functions;
 
 //-----------------------------------------------------------------------------
 NativeFunction::NativeFunction(const UCS_string & so_name,
@@ -144,7 +144,7 @@ const char * why = sym->cant_be_defined();
    if (is_operator())   sym->set_nc(NC_OPERATOR, this);
    else                 sym->set_nc(NC_FUNCTION, this);
 
-   Workspace::more_error().clear();
+   Workspace::more_error().shrink(0);
    valid = true;
    valid_functions.append(this);
 }
@@ -158,7 +158,7 @@ NativeFunction::~NativeFunction()
       {
         if (valid_functions[v] == this)
            {
-             valid_functions.erase(v, 1);
+             valid_functions.erase(v);
            }
       }
 }
@@ -199,7 +199,7 @@ NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
 {
    // prepare a )MORE error message containing the file names tried.
    //
-   t4.clear();
+   t4.shrink(0);
    t4.append_utf8("Could not find shared library '");
    t4.append(so_path);
    t4.append_utf8("'\n"
@@ -456,7 +456,7 @@ const int error = ((int (*)(const char *, const char *))emacs_start)
         return t4;
       }
 
-   t4.clear();   // success
+   t4.shrink(0);   // success
    return t4;
 }
 //-----------------------------------------------------------------------------

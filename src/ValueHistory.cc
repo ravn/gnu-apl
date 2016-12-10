@@ -71,7 +71,7 @@ print_history(ostream & out, const Value * val, const char * loc)
 {
    // search backwards for events of val.
    //
-Simple_string<const VH_entry *> var_events;
+Simple_string<const VH_entry *, false> var_events;
 int cidx = VH_entry::idx;
 
    loop(e, VALUEHISTORY_SIZE)

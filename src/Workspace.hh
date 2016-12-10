@@ -108,7 +108,7 @@ public:
       { return the_workspace.top_SI; }
 
    /// copy all allocated symbols into \b table of size \b table_size
-   static Simple_string<const Symbol *> get_all_symbols()
+   static Simple_string<const Symbol *, false> get_all_symbols()
       { return the_workspace.symbol_table.get_all_symbols(); }
 
    /// lookup an existing user defined symbol. If not found, create one
@@ -282,7 +282,7 @@ protected:
    UCS_string prompt;
 
    /// user defined functions that were ⎕EX'ed while on the SI stack
-   Simple_string<const UserFunction *> expunged_functions;
+   Simple_string<const UserFunction *, false> expunged_functions;
 
    /// more info about last error
    UCS_string more_error_info;
@@ -301,7 +301,7 @@ protected:
 inline UCS_string &
 MORE_ERROR()
 {
-   Workspace::more_error().clear();
+   Workspace::more_error().shrink(0);
    return Workspace::more_error();
 }
 //-----------------------------------------------------------------------------

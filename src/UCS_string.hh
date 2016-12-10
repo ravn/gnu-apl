@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "Backtrace.hh"
 #include "Common.hh"
 #include "Heapsort.hh"
 #include "Simple_string.hh"
@@ -40,32 +41,36 @@ class UCS_string_vector;
 
 //=============================================================================
 /// A string of Unicode characters (32-bit)
-class UCS_string : public  Simple_string<Unicode>
+class UCS_string : public  Simple_string<Unicode, false>
 {
 public:
    /// constructor: empty string
    UCS_string()
-   : Simple_string<Unicode>(0, 0)
    { create(LOC); }
 
    /// constructor: one-element string
    UCS_string(Unicode uni)
-   : Simple_string<Unicode>(1, uni)
+   : Simple_string<Unicode, false>(1, uni)
    { create(LOC); }
 
    /// constructor: \b len Unicode characters, starting at \b data
    UCS_string(const Unicode * data, size_t len)
-   : Simple_string<Unicode>(data, len)
+   : Simple_string<Unicode, false>(data, len)
    { create(LOC); }
 
    /// constructor: \b len times \b uni
    UCS_string(size_t len, Unicode uni)
-   : Simple_string<Unicode>(len, uni)
+   : Simple_string<Unicode, false>(len, uni)
+   { create(LOC); }
+
+   /// constructor: copy of another UCS_string
+   UCS_string(const UCS_string & ucs)
+   : Simple_string<Unicode, false>(ucs)
    { create(LOC); }
 
    /// constructor: copy of another UCS_string
    UCS_string(const UCS_string & ucs, size_t pos, size_t len)
-   : Simple_string<Unicode>(ucs, pos, len)
+   : Simple_string<Unicode, false>(ucs, pos, len)
    { create(LOC); }
 
    /// constructor: UCS_string from UTF8_string
@@ -89,7 +94,6 @@ public:
 
    ~UCS_string()
       {
-        Assert(items);
         --total_count;
 //      get_CERR() << "DEL @@" << total_id << " ##" << total_count
 //                 << " a=" << (const void *)items << endl;
@@ -98,8 +102,7 @@ public:
    void create(const char * loc)
       { 
         ++total_count;
-        ++total_id;
-        Assert(items);
+//      ++total_id;
 //      get_CERR() << "NEW @@" << total_id << " ##" << total_count
 //                 << " a=" << (const void *)items << " " << loc << endl;
       }
@@ -127,18 +130,12 @@ public:
    /// non-whitespaces (if any) to \b dest, and skip trailing whitespaces
    void copy_black(UCS_string & dest, int & idx) const;
 
-   /// copy names etc. separated by whitespaces to \b dest
-   void copy_black_list(UCS_string_vector & dest) const;
-
    /// \b this is a command with optional args. Remove leading and trailing
    /// whitespaces, append args to rest, and remove args from this.
    void split_ws(UCS_string & rest);
 
    /// return the number of LF characters in \b this string
    ShapeItem LF_count() const;
-
-   /// return \b true iff \b this string is contained in \b list
-   bool contained_in(const UCS_string_vector & list) const;
 
    /// return the start position of \b sub in \b this string or -1 if \b sub
    /// is not contained in \b this string
@@ -180,9 +177,6 @@ public:
    /// return a string like this, but with pad chars removed
    UCS_string remove_pad() const;
 
-   /// remove leading and trailing spaces from \b this string.
-   void remove_lt_spaces();
-
    /// remove the last character in \b this string
    void pop_back()
    { Assert(size() > 0);   shrink(size() - 1); }
@@ -193,7 +187,7 @@ public:
    /// return true if \b yhis string starts with # or ⍝ or x:
    bool is_comment_or_label() const;
 
-   /// return true if every char in \b this string is '0'
+   /// return true if every character in \b this string is the digit '0'
    bool all_zeroes()
       { loop(s, size())   if ((*this)[s] != UNI_ASCII_0)   return false;   
         return true;
@@ -221,13 +215,23 @@ public:
    void append_utf8(const char * str)
       { append_utf8((const UTF8 *)str); }
 
+   void prepend(Unicode uni)
+      {
+        if (size() == 0)   { append(uni);   return; }
+        
+        extend(size() + 1);
+        ++items_valid;
+        memmove(&at(1), &at(0), size() * sizeof(Unicode));
+        at(0) = uni;
+      }
+
    /// return \b this string and \b other concatenated
    UCS_string operator +(const UCS_string & other) const
       { UCS_string ret(*this);   ret.append(other);   return ret; }
 
    const UCS_string & operator =(const UCS_string & other)
       {
-        items_valid = 0;
+        shrink(0);
         append(other);
         return *this;
       }
@@ -373,92 +377,17 @@ public:
    /// return the characters in this string (sorted and duplicates removed)
    UCS_string unique() const;
 
-   /// sort a (small) number of UCS_strings (filenames, variables, or functions)
-   /// using a simple but quadratic time algorithm
-   static void sort_names(const UCS_string ** names, int count);
-
-   /// sort a (small) number of UCS_strings (filenames, variables, or functions)
-   /// using a simple but quadratic time algorithm
-   static void sort_names(UCS_string_vector names);
-
-   /// compute column widths so that names align nicely
-   static void compute_column_width(Simple_string<int> & result,
-                                    const UCS_string ** names, int name_count,
-                                    int tab_size, int quad_PW);
    static ShapeItem get_total_count()
       { return total_count; }
 
-protected:
    /// return true if n1 < n2
    static bool compare_names(const UCS_string * const & n1,
                              const UCS_string * const & n2, const void *)
       { return n2->compare(*n1) == COMP_LT; }
 
+protected:
    static ShapeItem total_count;
    static ShapeItem total_id;
-};
-//-----------------------------------------------------------------------------
-/// a vector of UCS_strings.
-
-#define USE_VECTOR 0
-
-#if USE_VECTOR
-#include <vector>
-class
-UCS_string_vector : public vector<UCS_string>
-{
-public:
-   /// constructor: empty vector
-   UCS_string_vector()
-// : Simple_string<UCS_string>(0, 0)
-   {}
-
-#else
-
-class
-UCS_string_vector : public Simple_string<UCS_string>
-{
-public:
-   /// constructor: empty vector
-   UCS_string_vector()
-   : Simple_string<UCS_string>(0, 0)
-   {}
-
-#endif
-
-   /// constructor: from APL character matrix (removes trailing blanks)
-   UCS_string_vector(const Value & val, bool surrogate);
-
-   void resize(ShapeItem new_size)
-      {
-        if (new_size <= size())   shrink(new_size);
-        else while (size() < new_size)   append(UCS_string(), LOC);
-      }
-
-   /// a quick erase() that does NOT keep the order of elements
-   void erase_unsorted(ShapeItem idx)
-      {
-        (*this)[idx].swap(last());
-        pop();
-      }
-
-   /// an erase() that keeps the order of elements
-   void erase(ShapeItem idx)
-      {
-        for (++idx; idx < size(); ++idx)   (*this)[idx - 1].swap((*this)[idx]);
-        pop();
-      }
-
-#if USE_VECTOR
-      const UCS_string & last() const  { return back(); }
-            UCS_string & last()        { return back(); }
-    void pop()                         { pop_back(); }
-   void append(const UCS_string & t)   { push_back(t); }
-   void append(const UCS_string & t, const char *)   { push_back(t); }
-   void insert_before(ShapeItem pos, const UCS_string & t)   { insert(begin() + pos, t); }
-   void shrink(ShapeItem new_size)   { vector<UCS_string>::resize(new_size); }
-
-#endif
 };
 //-----------------------------------------------------------------------------
 inline void

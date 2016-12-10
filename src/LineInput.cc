@@ -215,7 +215,7 @@ LineHistory::clear_history(ostream & out)
 {
    current_line = 0;
    put = 0;
-   hist_lines.resize(0);
+   hist_lines.shrink(0);
 UCS_string u("xxx");
    add_line(u);
 }
@@ -411,7 +411,7 @@ LineEditContext::delete_char()
       }
    else
       {
-        user_line.erase(uidx, 1);
+        user_line.erase(uidx);
         refresh_from_cursor();
       }
 
@@ -678,7 +678,7 @@ InputMux::get_line(LineInputMode mode, const UCS_string & prompt,
                               file_line.size() &&
                               file_line[0] == UNI_ASCII_BS)
                              {
-                               file_line.erase(0, 1);
+                               file_line.erase(0);
                                line.pop();
                              }
                        line.append_utf8(file_line.c_str());
@@ -830,7 +830,7 @@ LineInput::edit_line(LineInputMode mode, const UCS_string & prompt,
    tcsetattr(STDIN_FILENO, TCSANOW, &the_line_input->current_termios);
 #endif // WANT_LIBAPL
 
-   user_line.clear();
+   user_line.shrink(0);
 
 LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
 

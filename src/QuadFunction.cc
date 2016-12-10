@@ -425,7 +425,7 @@ Quad_ENV::eval_B(Value_P B)
 
 const ShapeItem ec_B = B->element_count();
 
-Simple_string<const char *> evars;
+Simple_string<const char *, false> evars;
 
    for (char **e = environ; *e; ++e)
        {
@@ -462,7 +462,7 @@ Value_P Z(sh_Z, LOC);
 
         Value_P varname(ucs, LOC);
 
-        ucs.clear();
+        ucs.shrink(0);
         while (*env)   ucs.append(Unicode(*env++));
 
         Value_P varval(ucs, LOC);
@@ -539,7 +539,7 @@ const ErrorCode ec = get_error_code(B);
       }
    else                                   //  ⎕ES B with unknown major/minor B
       {
-        error.error_message_1.clear();
+        error.error_message_1.shrink(0);
       }
 
    error.show_locked = true;
@@ -649,9 +649,9 @@ UCS_string e2;
    esc1 = e1;
    esc2 = e2;
 
-   prefixes.clear();
-   escapes.clear();
-   suffixes.clear();
+   prefixes.shrink(0);
+   escapes.shrink(0);
+   suffixes.shrink(0);
 
    read_strings();    // read lines from file or stdin
    split_strings();   // split lines into prefixes, escapes, and suffixes
@@ -868,7 +868,7 @@ Quad_INP::read_strings()
 {
    // read lines until an end-maker is detected
    //
-   raw_lines.clear();
+   raw_lines.shrink(0);
    for (;;)
       {
         bool eof = false;
@@ -1048,7 +1048,7 @@ int requested_NCs = 0;
    //
 UCS_string_vector names;
    {
-     Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
+     Simple_string<const Symbol *, false> symbols = Workspace::get_all_symbols();
 
      loop(s, symbols.size())
         {
@@ -1359,7 +1359,8 @@ UserFunction * ufun = fun->get_ufun1();
 }
 //-----------------------------------------------------------------------------
 Token
-Stop_Trace::reference(const Simple_string<Function_Line> & lines, bool assigned)
+Stop_Trace::reference(const Simple_string<Function_Line, false> & lines,
+                      bool assigned)
 {
 Value_P Z(lines.size(), LOC);
 

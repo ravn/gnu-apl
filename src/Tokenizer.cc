@@ -816,7 +816,7 @@ int expo = 0;
    //
    while (digits.size() && digits[0] == '0')
       {
-        digits.erase(0, 1);   // discard '0'
+        digits.erase(0);   // discard '0'
         --expo;
       }
 

@@ -87,14 +87,14 @@ ostream &
 SymbolTable::list_symbol(ostream & out, const UCS_string & buf) const
 {
 Token_string tos;
-      {
-        Tokenizer tokenizer(PM_STATEMENT_LIST, LOC, false);
-        if (tokenizer.tokenize(buf, tos) != E_NO_ERROR)
-           {
-             CERR << "invalid token" << endl;
-             return out;
-           }
-      }
+   {
+     Tokenizer tokenizer(PM_STATEMENT_LIST, LOC, false);
+     if (tokenizer.tokenize(buf, tos) != E_NO_ERROR)
+        {
+          CERR << "invalid token" << endl;
+          return out;
+        }
+   }
 
    if (tos.size() == 0)   // empty argument
       {
@@ -129,7 +129,7 @@ UCS_string to;
 
    // put those symbols into 'list' that satisfy 'which'
    //
-Simple_string<Symbol *> list;
+Simple_string<Symbol *, false> list;
 int symbol_count = 0;
    loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
@@ -203,23 +203,17 @@ UCS_string_vector names;
         names.append(name);
       }
 
-const UCS_string ** sorted_names = new const UCS_string *[count];
-   Assert(sorted_names);
-   loop(n, count)   sorted_names[n] = &names[n];
-   UCS_string::sort_names(sorted_names, count);
+   names.sort();
 
    // figure column widths
    //
-const int qpw = Workspace::get_PW();
-Simple_string<int> col_width;
    enum { tabsize = 4 };
-   UCS_string::compute_column_width(col_width, sorted_names, count,
-                                    tabsize, qpw);
+Simple_string<int, false> col_width = names.compute_column_width(tabsize);
 
    loop(c, count)
       {
         const size_t col = c % col_width.size();
-        out << *sorted_names[c];
+        out << names[c];
         if (col == (col_width.size() - 1) || c == (count - 1))
            {
              // last column or last item: print newline
@@ -230,13 +224,11 @@ Simple_string<int> col_width;
            {
              // intermediate column: print spaces
              //
-             const int len = tabsize*col_width[col] - sorted_names[c]->size();
+             const int len = tabsize*col_width[col] - names[c].size();
              Assert(len > 0);
              loop(l, len)   out << " ";
            }
       }
-
-   delete [] sorted_names;
 }
 //-----------------------------------------------------------------------------
 void
@@ -427,10 +419,10 @@ ValueStackItem & tos = symbol->value_stack[0];
    return true;
 }
 //-----------------------------------------------------------------------------
-Simple_string<const Symbol *>
+Simple_string<const Symbol *, false>
 SymbolTable::get_all_symbols() const
 {
-Simple_string<const Symbol *> ret;
+Simple_string<const Symbol *, false> ret;
    ret.reserve(1000);
 
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
@@ -447,7 +439,7 @@ Simple_string<const Symbol *> ret;
 void
 SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
 {
-Simple_string<const Symbol *> symbols;
+Simple_string<const Symbol *, false> symbols;
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)

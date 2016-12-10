@@ -79,7 +79,7 @@ operator << (ostream & out, const CollatingCacheEntry & entry)
 //-----------------------------------------------------------------------------
 /// A collating cache which is the internal representation of the left
 /// argument A of dydic A⍋B or A⍒B
-class CollatingCache : public Simple_string<CollatingCacheEntry>
+class CollatingCache : public Simple_string<CollatingCacheEntry, false>
 {
 public:
    /// constructor: cache of rank r and comparison length clen

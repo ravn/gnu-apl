@@ -286,7 +286,7 @@ protected:
    void (*monitor_callback)(const Symbol &, Symbol_Event sev);
 
    /// the value stack of \b this \b Symbol
-   Simple_string<ValueStackItem> value_stack;
+   Simple_string<ValueStackItem, true> value_stack;
 };
 //-----------------------------------------------------------------------------
 /// lambda result λ

@@ -236,11 +236,11 @@ public:
    void parse_body(const char * loc, bool tolerant, bool macro);
 
    /// return stop lines (from S∆fun ← lines)
-   const Simple_string<Function_Line> & get_stop_lines() const
+   const Simple_string<Function_Line, false> & get_stop_lines() const
       { return stop_lines; }
 
    /// return trace lines (from S∆fun ← lines)
-   const Simple_string<Function_Line> & get_trace_lines() const
+   const Simple_string<Function_Line, false> & get_trace_lines() const
       { return trace_lines; }
 
 protected:
@@ -295,13 +295,13 @@ protected:
       [N] TOK_RETURN_SYMBOL or TOK_RETURN_VOID   <--+
 
    **/
-   Simple_string<Function_PC> line_starts;
+   Simple_string<Function_PC, false> line_starts;
 
    /// stop lines (from S∆fun ← lines)
-   Simple_string<Function_Line> stop_lines;
+   Simple_string<Function_Line, false> stop_lines;
 
    /// trace lines (from S∆fun ← lines)
-   Simple_string<Function_Line> trace_lines;
+   Simple_string<Function_Line, false> trace_lines;
 
    /// execution properties as per 3⎕AT
    int exec_properties[4];

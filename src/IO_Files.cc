@@ -140,7 +140,7 @@ InputFile * input = InputFile::current_file();
                     const bool allowed = input->check_filter(file_line);
                     if (!allowed)
                        {
-                         file_line.clear();
+                         file_line.shrink(0);
                          continue;
                        }
                  }
@@ -270,12 +270,12 @@ IO_Files::end_of_current_file()
                   << endl 
                   << endl;
                   
-             InputFile::files_todo.clear();
+             InputFile::files_todo.shrink(0);
              return false;
            }
       }
 
-   InputFile::files_todo.erase(0, 1);
+   InputFile::files_todo.erase(0);
 
    Output::reset_dout();
    reset_errors();
@@ -348,7 +348,7 @@ IO_Files::open_next_file()
               {
                 CERR << "could not open "
                      << InputFile::current_filename() << endl;
-                InputFile::files_todo.erase(0, 1);
+                InputFile::files_todo.erase(0);
                 continue;
               }
 

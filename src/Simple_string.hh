@@ -23,6 +23,8 @@
 
 #include <iostream>
 
+#include <string.h>
+
 #ifdef AUXILIARY_PROCESSOR
 # define __ASSERT_HH_DEFINED__
 # include <assert.h>
@@ -36,66 +38,70 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 /// a simple string
-template <typename T>
+template <typename T, bool has_destructor>
 class Simple_string
 {
 public:
    /// constructor: empty string
    Simple_string()
-      {
-        allocate(0);
-      }
+   : items_allocated(0),
+     items_valid(0),
+     items(0)
+      {}
 
    /// constructor: the first \b len items of \b data
    Simple_string(const T * data, ShapeItem len)
       {
         allocate(len);
-        loop(l, items_valid)   new (items + l) T(data[l]);
+        loop(l, items_valid)
+           {
+             (items + l)->~T();
+             new (items + l) T(data[l]);
+           }
       }
 
    /// constructor: \b len times \b data
    Simple_string(ShapeItem len, const T & data)
       {
         allocate(len);
-        loop(l, items_valid)   new (items + l) T(data);
+        loop(l, items_valid)
+           {
+             (items + l)->~T();
+             new (items + l) T(data);
+           }
       }
 
    /// constructor: copy other string
    Simple_string(const Simple_string & other)
       {
         allocate(other.items_valid);
-        loop(l, items_valid)   new (items + l) T(other.items[l]);
+        loop(l, items_valid)
+           {
+             (items + l)->~T();
+             new (items + l) T(other.items[l]);
+           }
       }
 
    Simple_string(const Simple_string & other, ShapeItem pos, ShapeItem len)
       {
         Assert((pos + len) <= other.items_valid);
         allocate(len);
-        loop(l, items_valid)   new (items + l) T(other.items[l + pos]);
+        loop(l, items_valid)
+           {
+             (items + l)->~T();
+             new (items + l) T(other.items[l + pos]);
+           }
       }
 
    /// destructor
    ~Simple_string()
-      { destruct(); }
-
-   /// explicit destructor
-   void destruct()
-      { 
-        delete [] items;
-        items = 0;
-      }
+      { deallocate(); }
 
    /// copy \b other
    void operator =(const Simple_string & other)
       {
-        destruct();
+        deallocate();
         new (this) Simple_string(other);
-      }
-
-   /// return the items of the string (not 0-terminated)
-   const T * get_items() const
-      {
-        return items;
       }
 
    /// return the number of characters in \b this string
@@ -110,17 +116,19 @@ public:
    T & operator[](ShapeItem idx)
       { return at(idx); }
 
-   /// append character \b t to \b this string
-   void append(const T & t)
-      {
-        if (items_valid - items_allocated >= 0)   extend(2*items_allocated);
-        new (items + items_valid++) T(t);
-      }
+   /// return a reference to the last item (size() MUST be checked beforehand)
+   const T & last() const
+      { return at(items_valid - 1); }
+
+   /// return a reference to the last item (size() MUST be checked beforehand)
+   T & last()
+      { return at(items_valid - 1); }
 
    /// append character \b t to \b this string
-   void append(const T & t, const char * loc)
+   void append(const T & t, const char * loc = 0)
       {
-        if (items_valid - items_allocated >= 0)   extend(2*items_allocated);
+        extend(items_valid + 1);
+        (items + items_valid)->~T();
         new (items + items_valid++) T(t);
       }
 
@@ -135,58 +143,56 @@ public:
    void insert_before(ShapeItem pos, const T & t)
       {
         Assert(pos <= items_valid);
-        if (items_valid - items_allocated >= 0)   extend(2*items_allocated);
-        for (ShapeItem s = items_valid - 1; s >= pos; --s)
-            items[s + 1] = items[s];
-        items[pos] = t;
+        if (pos == items_valid)
+           {
+             append(t);
+             return;
+           }
+
+        extend(items_valid + 1);
+
+        (items + items_valid)->~T();
+        for (ShapeItem s = items_valid; s > pos; --s)   items[s] = items[s - 1];
+        (items + pos)->~T();
+        new (items + pos)   T(t);
         ++items_valid;
+      }
+
+   /// forget last element
+    void pop()
+      {
+        Assert(items_valid > 0);
+        --items_valid;
       }
 
    /// decrease size to \b new_size
    void shrink(ShapeItem new_size)
       {
         Assert((items_valid - new_size) >= 0);
+        if (has_destructor)   while (items_valid)   pop();
         items_valid = new_size;
       }
 
-    /// forget last element
-    void pop()
-      { if (items_valid)   --items_valid; }
-
-   /// return a reference to the last item (size() MUST be checked beforehand)
-   const T & last() const
-      { return items[items_valid - 1]; }
-
-   /// return a reference to the last item (size() MUST be checked beforehand)
-   T & last()
-      { return items[items_valid - 1]; }
-
-   /// shrink to size 0
-   void clear()
-      { items_valid = 0; }
-
-   /// erase \b count items, starting at \b pos
-   void erase(ShapeItem pos, ShapeItem count)
+   /// erase \b one item, at \b pos
+   void erase(ShapeItem pos)
       {
         if (pos >= items_valid)   return;   // nothing to erase
 
-         // rest is the number of items right of pos.
-         //
-         // before:     front     erased        rest
-         //             0                              
-         //             <- pos -> <-count->
-         //             <-  pos + count  ->     
-         //
-         const ShapeItem rest = items_valid - (pos + count);
+         const ShapeItem rest = items_valid - (pos + 1);
 
          if (rest < 0)   // erase more than we have, i.e. no rest
            {
-             items_valid = pos;
+             shrink(pos);
              return;
            }
 
-         loop(r, rest)   new(items + pos + r) T(items[pos + count + r]);
-         items_valid -= count;
+         loop(r, rest)
+            {
+              T * t = items + pos + r;
+              t->~T();
+              new (t) T(items[pos + 1 + r]);
+            }
+         --items_valid;
       }
 
    /// extend allocated size
@@ -230,14 +236,22 @@ protected:
    /// increase the allocated size to at least new_size
    void extend(ShapeItem new_size)
       {
-        if ((items_allocated - new_size) < 0)   // need more space
-           {
-             T * old_items = items;
-             items_allocated = new_size + ADD_ALLOC;
-             items = new T[items_allocated];
-             loop(c, items_valid)   new (items + c) T(old_items[c]);
-             delete [] old_items;
-           }
+        if ((items_allocated - new_size) >= 0)   return;   // large enough
+
+        T * old_items = items;
+        items_allocated = new_size + ADD_ALLOC;
+        items = new T[items_allocated];
+        loop(c, items_valid)   new (items + c) T(old_items[c]);
+        delete [] old_items;
+      }
+
+   /// deallocate memory
+   void deallocate()
+      { 
+        delete [] items;
+        items = 0;
+        items_valid = 0;
+        items_allocated = 0;
       }
 
    /// the number of characters allocated
@@ -252,6 +266,7 @@ protected:
    /// return the idx'th character
    const T & at(ShapeItem idx) const
       {
+        Assert(items);
         if (idx < 0)                    Assert(0 && "Bad index");
         if ((items_valid - idx) <= 0)   Assert(0 && "Bad index");
         return items[idx];
@@ -260,11 +275,11 @@ protected:
    /// return the idx'th character
    T & at(ShapeItem idx)
       {
+        Assert(items);
         if (idx < 0)                    Assert(0 && "Bad index");
         if ((items_valid - idx) <= 0)   Assert(0 && "Bad index");
         return items[idx];
       }
-
 };
 //-----------------------------------------------------------------------------
 

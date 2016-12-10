@@ -137,10 +137,10 @@ protected:
            const UCS_string & var_name;
 
            /// the shapes along the pick
-           Simple_string<Shape> shapes;
+           Simple_string<Shape, false> shapes;
 
            /// the indices along the pick
-           Simple_string<ShapeItem> indices;
+           Simple_string<ShapeItem, false> indices;
       };
 
    /// compute 10 ⎕CR recursively

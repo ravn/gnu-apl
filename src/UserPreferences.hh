@@ -90,10 +90,10 @@ struct UserPreferences
    void expand_argv(int argc, const char ** argv);
 
    /// argv/argc at startup
-   Simple_string<const char *>original_argv;
+   Simple_string<const char *, false>original_argv;
 
    /// argv/argc after expand_argv
-   Simple_string<const char *>expanded_argv;
+   Simple_string<const char *, false>expanded_argv;
 
    /// true if no banner/Goodbye is wanted.
    bool silent;

@@ -38,7 +38,7 @@ class IndexExpr;
 class LineLabel;
 class PrintBuffer;
 class Shape;
-template <class T> class Source;
+template <class T, bool> class Source;
 class Symbol;
 class Token;
 class Token_string;

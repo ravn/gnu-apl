@@ -315,7 +315,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                          if (text[u] == '\n')
                              {
                                result.append(res);
-                               res.clear();
+                               res.shrink(0);
                                UCS_string next(text, u+1, text.size()-(u+1));
                                if (!next.is_comment_or_label() &&
                                    u < (text.size() - 1))
@@ -454,7 +454,7 @@ bool nested = false;
                    count = 0;
 
                    result.append(line);
-                   rhs.clear();
+                   rhs.shrink(0);
                    mode = Vm_NONE;
                  }
 

@@ -495,7 +495,7 @@ Workspace::clear_WS(ostream & out, bool silent)
 
    // clear the )MORE error info
    //
-   more_error().clear();
+   more_error().shrink(0);
 
    // clear the value stacks of read/write system variables...
    //
@@ -1071,7 +1071,7 @@ XML_Loading_Archive in(filename.c_str(), dump_fd);
 void
 Workspace::wsid(ostream & out, UCS_string arg, bool silent)
 {
-   while (arg.size() && arg[0] <= ' ')       arg.erase(0, 1);
+   while (arg.size() && arg[0] <= ' ')       arg.erase(0);
    while (arg.size() && arg.back() <= ' ')   arg.pop();
 
    if (arg.size() == 0)   // inquire workspace name

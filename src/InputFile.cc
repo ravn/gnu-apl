@@ -32,7 +32,7 @@
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 
-Simple_string<InputFile> InputFile::files_todo;
+Simple_string<InputFile, false> InputFile::files_todo;
 int InputFile::stdin_line_no = 1;
 
 //-----------------------------------------------------------------------------
@@ -128,7 +128,7 @@ InputFile::check_filter(const UTF8_string & line)
 {
 bool ret = in_matched;
 UCS_string ucs_line(line);
-   ucs_line.remove_lt_spaces();   // remove leading and trailing spaces
+   ucs_line.remove_leading_and_trailing_whitespaces();
 
    if (in_function)
       {
@@ -182,7 +182,7 @@ UCS_string ucs_line(line);
              if (ucs_line[u] != UNI_LEFT_ARROW)   continue;   // not ←
 
              ucs_line.shrink(u);
-             ucs_line.remove_lt_spaces();
+             ucs_line.remove_leading_and_trailing_whitespaces();
              loop(n, object_filter.size())
                  {
                    if (ucs_line == object_filter[n])

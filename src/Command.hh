@@ -117,7 +117,7 @@ public:
       };
 
    /// one user defined command
-   static Simple_string<user_command> user_commands;
+   static Simple_string<user_command, false> user_commands;
 
    /// check workspace integrity (stale Value and IndexExpr objects, etc)
    static void cmd_CHECK(ostream & out);
@@ -199,6 +199,9 @@ protected:
 
    /// enable and disable colors
    static void cmd_XTERM(ostream & out, const UCS_string & args);
+
+   /// split whitespace separated arguments into individual arguments
+   static UCS_string_vector split_arg(const UCS_string & arg);
 
    /// execute a user defined command
    static void do_USERCMD(ostream & out, UCS_string & line,

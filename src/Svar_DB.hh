@@ -108,11 +108,11 @@ public:
    /// add processors with pending offers to \b to_proc. Duplicates
    /// are OK and will be removed later
    static void get_offering_processors(AP_num to_proc,
-                                       Simple_string<AP_num> & processors);
+                                    Simple_string<AP_num, false> & processors);
 
    /// return all variables shared between \b to_proc and \b from_proc
    static void get_offered_variables(AP_num to_proc, AP_num from_proc,
-                                     Simple_string<uint32_t> & varnames);
+                                     Simple_string<uint32_t, false> & varnames);
 
    /// return coupling of \b entry with \b key.
    static SV_Coupling get_coupling(SV_key key)

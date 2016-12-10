@@ -401,7 +401,7 @@ protected:
    static void init_all_CPUs(bool logit);
 
    /// the CPU numbers that can be used
-   static Simple_string<CPU_Number>all_CPUs;
+   static Simple_string<CPU_Number, false>all_CPUs;
 };
 //=============================================================================
 /// a number of jobs to be executed in parallel
@@ -420,7 +420,7 @@ public:
     job. If nested values are encountered they are not computed immediately
     but added to the joblist for later execution.
  **/
-template <class T>
+template <class T, bool has_destructor>
 class Parallel_job_list : public Parallel_job_list_base
 {
 public:
@@ -443,7 +443,7 @@ public:
 
          started_loc = loc;
          idx = 0;
-         jobs.clear();
+         jobs.shrink(0);
          jobs.append(first_job);
       }
 
@@ -484,7 +484,7 @@ public:
 
 protected:
    /// jobs to be performed
-   Simple_string<T> jobs;
+   Simple_string<T, has_destructor> jobs;
 
    /// last job
    int idx;

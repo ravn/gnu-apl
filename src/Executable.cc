@@ -49,7 +49,7 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
                 {
                   case UNI_ASCII_CR:                         break;
                   case UNI_ASCII_LF: text.append(line);
-                                     line.clear();           break;
+                                     line.shrink(0);         break;
                   default:           line.append(uni);
                }
            }
@@ -127,7 +127,7 @@ Executable::clear_body()
            }
       }
 
-   body.clear();   // resize to 0
+   body.shrink(0);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -161,7 +161,7 @@ ErrorCode
 Executable::parse_body_line(Function_Line line, const Token_string & in,
                             bool trace,  bool tolerant, const char * loc)
 {
-Source<Token> src(in);
+Source<Token, true> src(in);
 
    // handle labels (if any)
    //

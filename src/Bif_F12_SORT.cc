@@ -135,10 +135,11 @@ const Rank rank = cache.get_rank();
 ShapeItem
 CollatingCache::find_entry(Unicode uni) const
 {
-const CollatingCacheEntry * entries = get_items();
+const CollatingCacheEntry * entries = &at(0);
 const CollatingCacheEntry * entry =
-            Heapsort<CollatingCacheEntry>:: search<Unicode>
-                    (uni, entries, size(), CollatingCacheEntry::compare_chars);
+
+   Heapsort<CollatingCacheEntry>:: search<Unicode>(uni, entries, size(),
+                                           CollatingCacheEntry::compare_chars);
 
    if (entry)   return entry - entries;
    return size() - 1;   // the entry for characters not in A

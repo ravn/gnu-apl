@@ -536,7 +536,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 //-----------------------------------------------------------------------------
 void
 Svar_DB::get_offering_processors(AP_num to_proc,
-                                 Simple_string<AP_num> & processors)
+                                 Simple_string<AP_num, false> & processors)
 {
 const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
    if (tcp == NO_TCP_SOCKET)   return;
@@ -561,7 +561,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 //-----------------------------------------------------------------------------
 void
 Svar_DB::get_offered_variables(AP_num to_proc, AP_num from_proc,
-                               Simple_string<uint32_t> & varnames)
+                               Simple_string<uint32_t, false> & varnames)
 {
 const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
    if (tcp == NO_TCP_SOCKET)   return;
