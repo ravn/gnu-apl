@@ -428,7 +428,8 @@ Value_P Z(*shape_Z, LOC);
    {
      PJob_scalar_AB j(Z.getref(), &A->get_ravel(0), inc_A,
                                   &B->get_ravel(0), inc_B);
-     joblist_AB.start(j, LOC);
+     if (joblist_AB.get_size())   joblist_AB.add_job(j);
+     else                         joblist_AB.start(j, LOC);
    }
 
    for (PJob_scalar_AB * job = joblist_AB.next_job();

@@ -617,7 +617,7 @@ Quad_FIO::eval_B(Value_P B)
 const APL_Integer what = B->get_ravel(0).get_int_value();
    switch(what)
       {
-        // what < 0 are "hacker functions" that should no be used by
+        // what < 0 are "hacker functions" that should not be used by
         // normal mortals.
         //
         case -13: // total number of UCS strings
