@@ -358,7 +358,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
    if (count < 0)   count = all_CPUs.size();
 
    // if there are more CPUs than requested then limit all_CPUs accordingly
-   if ((int)all_CPUs.size() > count)   all_CPUs.resize(count);
+   if ((int)all_CPUs.size() > count)   all_CPUs.shrink(count);
 
    Log(LOG_Parallel || logit)
       {

@@ -26,7 +26,7 @@
 #include "UCS_string.hh"
 
 //-----------------------------------------------------------------------------
-/// common part of user-defined names and sistinguished names
+/// common part of user-defined names and distinguished names
 template <typename T, int SYMBOL_COUNT>
 class SymbolTableBase
 {
@@ -34,6 +34,17 @@ public:
    /// Construct an empty \b SymbolTable.
    SymbolTableBase()
      { memset(symbol_table, 0, sizeof(symbol_table)); }
+
+   ~SymbolTableBase()
+      {
+        loop(s, SYMBOL_COUNT)
+           for (T * sym = symbol_table[s]; sym;)
+           {
+              T * del = sym;
+              sym = sym->next;
+              delete del;
+           }
+      }
 
    /// return a \b Symbol with name \b name in \b this \b SymbolTable.
    T * lookup_existing_symbol(const UCS_string & name)
@@ -168,6 +179,7 @@ public:
    const UCS_string & get_name() const
       { return name; }
 
+   /// system variables are never erased
    bool is_erased() const   { return false; }
 
    /// Compare the name of \b this \b Symbol with \b ucs

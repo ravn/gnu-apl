@@ -44,34 +44,23 @@ class UCS_string_vector;
 class UCS_string : public  Simple_string<Unicode, false>
 {
 public:
-   /// constructor: empty string
-   UCS_string()
-   { create(LOC); }
+   /// default constructor: empty string
+   UCS_string();
 
    /// constructor: one-element string
-   UCS_string(Unicode uni)
-   : Simple_string<Unicode, false>(1, uni)
-   { create(LOC); }
+   UCS_string(Unicode uni);
 
    /// constructor: \b len Unicode characters, starting at \b data
-   UCS_string(const Unicode * data, size_t len)
-   : Simple_string<Unicode, false>(data, len)
-   { create(LOC); }
+   UCS_string(const Unicode * data, size_t len);
 
    /// constructor: \b len times \b uni
-   UCS_string(size_t len, Unicode uni)
-   : Simple_string<Unicode, false>(len, uni)
-   { create(LOC); }
+   UCS_string(size_t len, Unicode uni);
 
    /// constructor: copy of another UCS_string
-   UCS_string(const UCS_string & ucs)
-   : Simple_string<Unicode, false>(ucs)
-   { create(LOC); }
+   UCS_string(const UCS_string & ucs);
 
    /// constructor: copy of another UCS_string
-   UCS_string(const UCS_string & ucs, size_t pos, size_t len)
-   : Simple_string<Unicode, false>(ucs, pos, len)
-   { create(LOC); }
+   UCS_string(const UCS_string & ucs, size_t pos, size_t len);
 
    /// constructor: UCS_string from UTF8_string
    UCS_string(const UTF8_string & utf);
@@ -95,16 +84,19 @@ public:
    ~UCS_string()
       {
         --total_count;
-//      get_CERR() << "DEL @@" << total_id << " ##" << total_count
-//                 << " a=" << (const void *)items << endl;
+//      get_CERR() << setfill('0') << "@@ " << setw(5) << instance_id
+//                 << " DEL ##" << total_count << " c= "
+//                 << Backtrace::caller(2) << setfill(' ') << endl;
       }
 
+   /// common part of all constructors
    void create(const char * loc)
       { 
         ++total_count;
-//      ++total_id;
-//      get_CERR() << "NEW @@" << total_id << " ##" << total_count
-//                 << " a=" << (const void *)items << " " << loc << endl;
+        instance_id = ++total_id;
+//      get_CERR() << setfill('0') << "@@ " << setw(5) << instance_id
+//                 << " NEW ##" << total_count << " " << loc
+//                 << " c= " << Backtrace::caller(2) << setfill(' ') << endl;
       }
 
    /// compute the length of an output row
@@ -215,6 +207,7 @@ public:
    void append_utf8(const char * str)
       { append_utf8((const UTF8 *)str); }
 
+   /// reppend character \b uni
    void prepend(Unicode uni)
       {
         if (size() == 0)   { append(uni);   return; }
@@ -229,6 +222,7 @@ public:
    UCS_string operator +(const UCS_string & other) const
       { UCS_string ret(*this);   ret.append(other);   return ret; }
 
+   /// assigne UCS_string \b other
    const UCS_string & operator =(const UCS_string & other)
       {
         shrink(0);
@@ -248,15 +242,19 @@ public:
    bool operator !=(const UCS_string & other) const
       { return !(*this == other); }
 
+   /// append C-string \b str
    UCS_string & operator <<(const char * str)
       { append_utf8(str);   return *this; }
 
+   /// append number \b num
    UCS_string & operator <<(ShapeItem num)
       { append_number(num);   return *this; }
 
+   /// append character \b uni
    UCS_string & operator <<(Unicode uni)
       { append(uni);   return *this; }
 
+   /// append UCS_string \b other
    UCS_string & operator <<(const UCS_string & other)
       { append(other);   return *this; }
 
@@ -377,6 +375,7 @@ public:
    /// return the characters in this string (sorted and duplicates removed)
    UCS_string unique() const;
 
+   /// return the total number of UCS_strings
    static ShapeItem get_total_count()
       { return total_count; }
 
@@ -386,8 +385,17 @@ public:
       { return n2->compare(*n1) == COMP_LT; }
 
 protected:
+   /// the total number of UCS_strings
    static ShapeItem total_count;
+
+   /// a unique (?) number for \b this  UCS_string
    static ShapeItem total_id;
+
+   ShapeItem instance_id;
+
+private:
+   void * operator new[](size_t size);
+   void operator delete[](void *);
 };
 //-----------------------------------------------------------------------------
 inline void

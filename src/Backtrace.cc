@@ -267,8 +267,8 @@ Backtrace::show(const char * file, int line)
    cerr << "Cannot show function call stack since execinfo.h seems not"
            " to exist on this OS (WINDOWs ?)." << endl;
    return;
-#else
 
+#else
 
    open_lines_file();
 
@@ -301,5 +301,45 @@ char ** strings = backtrace_symbols(buffer, size);
 
 
 #endif
+}
+//-----------------------------------------------------------------------------
+int
+Backtrace::demangle_line(char * result, size_t result_max, const char * buf)
+{
+DynArray(char, tmp, result_max + 1);
+   strncpy(tmp.get_data(), buf, result_max);
+   tmp[result_max] = 0;
+
+char * e = 0;
+int status = 3;
+char * p = strchr(tmp.get_data(), '(');
+   if (p == 0)   goto error;
+   else          ++p;
+
+   e = strchr(p, '+');
+   if (e == 0)   goto error;
+   else *e = 0;
+
+// cerr << "mangled fun is: " << p << endl;
+   __cxxabiv1::__cxa_demangle(p, result, &result_max, &status);
+   if (status)   goto error;
+   return 0;
+
+error:
+   strncpy(result, buf, result_max);
+   result[result_max - 1] = 0;
+   return status;
+}
+//-----------------------------------------------------------------------------
+const char *
+Backtrace::caller(int offset)
+{
+void * buffer[200];
+const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
+char ** strings = backtrace_symbols(buffer, size);
+
+static char demangled[200] = { 0 };
+   demangle_line(demangled, sizeof(demangled), strings[offset]);
+   return demangled;
 }
 //-----------------------------------------------------------------------------

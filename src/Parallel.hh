@@ -432,6 +432,7 @@ public:
    /// start execution of \b jobs
    void start(const T & first_job, const char * loc)
       {
+#if 0
          if (started_loc)
             {
               PRINT_LOCKED(
@@ -440,6 +441,7 @@ public:
                    << " is not finished" << endl;
               Backtrace::show(__FILE__, __LINE__))
             }
+#endif
 
          started_loc = loc;
          idx = 0;

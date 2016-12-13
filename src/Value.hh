@@ -531,7 +531,7 @@ public:
    /// the number of fast (recycled) new() calls
    static uint64_t fast_new;
 
-   /// the number of slow ( ::new() based) new() calls
+   /// the number of slow (malloc() based) new() calls
    static uint64_t slow_new;
 
 protected:

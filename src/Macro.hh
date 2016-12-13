@@ -61,6 +61,16 @@ public:
    /// a vector of all macros
    static Macro * all_macros[MAC_COUNT];
 
+   /// a helper to destroy macros on exit()
+   class Cleaner
+      {
+        public:
+           Cleaner() {}
+           ~Cleaner();
+      };
+
+   static Cleaner cleaner;
+
 protected:
    /// A (compile-time) unique number for this macro
    const Macro_num macro_number;

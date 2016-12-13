@@ -106,7 +106,7 @@ Executable::~Executable()
    Log(LOG_UserFunction__fix)
       {
         CERR << "deleting Executable " << (const void *)this
-             << " (body size=" <<  body.size() << ")" << endl;
+             << " (body size=" << body.size() << ")" << endl;
       }
 
    clear_body();

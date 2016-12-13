@@ -82,6 +82,7 @@ public:
            }
       }
 
+   /// constructor: copy other string, starting at pos, max. len items
    Simple_string(const Simple_string & other, ShapeItem pos, ShapeItem len)
       {
         Assert((pos + len) <= other.items_valid);
@@ -218,12 +219,14 @@ public:
       }
 
 protected:
+   /// allocation tuning
    enum
       {
         ADD_ALLOC = 4,    ///< extra chars added when extending the string
         MIN_ALLOC = 16,   ///< min. size allocated
       };
 
+   /// allocate memory
    void allocate(ShapeItem min_size)
       {
         Assert1(min_size >= 0);
@@ -233,7 +236,7 @@ protected:
         items = new T[items_allocated];
       }
 
-   /// increase the allocated size to at least new_size
+   /// increase the allocated size to at least \b new_size items
    void extend(ShapeItem new_size)
       {
         if ((items_allocated - new_size) >= 0)   return;   // large enough

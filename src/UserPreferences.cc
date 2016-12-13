@@ -314,6 +314,7 @@ UserPreferences::parse_argv_2(bool logit)
               const UTF8_string & filename(val);
               InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
               InputFile::files_todo.append(fam);
+              InputFile::files_orig.append(fam);
               continue;
             }
 
@@ -538,6 +539,7 @@ UserPreferences::parse_argv_2(bool logit)
                     const UTF8_string & filename = expanded_argv[a];
                     InputFile fam(filename, 0, true, true, false, no_LX);
                     InputFile::files_todo.append(fam);
+                    InputFile::files_orig.append(fam);
                   }
 
               // 

@@ -94,6 +94,9 @@ protected:
    virtual int overflow(int c);
 
 public:
+   /// destructor
+   ~ErrOut()   { used = false; }
+
    /** a helper function telling whether the constructor for CERR was called
        if CERR is used before its constructor was called (which can happen in
        when constructors of static objects are called and use CERR) then a

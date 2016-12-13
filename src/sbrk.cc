@@ -24,7 +24,10 @@
 // without #including unistd.h. The reason is to avoid a weird warning on
 // Apple machines telling that 'sbrk' is deprecated
 
+/// the standard sbrk() function (known by everybody except Apple OS X)
 extern "C" void * sbrk(int increment);
+
+/// our sbrk() so that it compiles under Apple OS X
 long long  top_of_memory()   { return (long long)(sbrk(0)); }
 
 

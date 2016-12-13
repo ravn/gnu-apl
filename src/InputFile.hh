@@ -128,6 +128,9 @@ struct InputFile
    /// files that need to be processed
    static Simple_string<InputFile, false> files_todo;
 
+   /// the initial set of files provided on the command line
+   static Simple_string<InputFile, false> files_orig;
+
    FILE       * file;       ///< file descriptor
    UTF8_string  filename;   ///< dito.
 

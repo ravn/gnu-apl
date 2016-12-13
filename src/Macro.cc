@@ -28,6 +28,8 @@
 
 Macro * Macro::all_macros[MAC_COUNT];
 
+Macro::Cleaner Macro::cleaner;
+
 //-----------------------------------------------------------------------------
 Macro::Macro(Macro_num num, const char * text)
    : UserFunction(UCS_string(UTF8_string(text)), LOC, "Macro::Macro()",
@@ -49,13 +51,18 @@ Macro::Macro(Macro_num num, const char * text)
 //-----------------------------------------------------------------------------
 Macro::~Macro()
 {
-   Assert(0 && "~Macro() called");
 }
 //-----------------------------------------------------------------------------
 void
 Macro::init_macros()
 {
 #define mac_def(n, txt) n = new Macro(Macro::MAC_ ## n, txt);
+#include "Macro.def"
+}
+//-----------------------------------------------------------------------------
+Macro::Cleaner::~Cleaner()
+{
+#define mac_def(n, txt) delete n;
 #include "Macro.def"
 }
 //-----------------------------------------------------------------------------

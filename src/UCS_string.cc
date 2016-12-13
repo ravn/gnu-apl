@@ -35,6 +35,41 @@ ShapeItem UCS_string::total_count = 0;
 ShapeItem UCS_string::total_id = 0;
 
 //-----------------------------------------------------------------------------
+UCS_string::UCS_string()
+{
+   create(LOC);
+}
+//-----------------------------------------------------------------------------
+UCS_string::UCS_string(Unicode uni)
+   : Simple_string<Unicode, false>(1, uni)
+{
+  create(LOC);
+}
+//-----------------------------------------------------------------------------
+UCS_string::UCS_string(const Unicode * data, size_t len)
+   : Simple_string<Unicode, false>(data, len)
+{
+   create(LOC);
+}
+//-----------------------------------------------------------------------------
+UCS_string::UCS_string(size_t len, Unicode uni)
+   : Simple_string<Unicode, false>(len, uni)
+{
+   create(LOC);
+}
+//-----------------------------------------------------------------------------
+UCS_string::UCS_string(const UCS_string & ucs)
+   : Simple_string<Unicode, false>(ucs)
+{
+   create(LOC);
+}
+//-----------------------------------------------------------------------------
+UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
+   : Simple_string<Unicode, false>(ucs, pos, len)
+{
+   create(LOC);
+}
+//-----------------------------------------------------------------------------
 UCS_string::UCS_string(const char * cstring)
 {
    create(LOC);

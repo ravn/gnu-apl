@@ -29,10 +29,11 @@ Quad_DLX  Quad_DLX::_fun;
 Quad_DLX * Quad_DLX::fun = &Quad_DLX::_fun;
 
 //=============================================================================
+/// one '1' in a sparse constraint matrix
 class DLX_Node
 {
 public:
-   /// constructor for empty node array
+   /// default constructor for node allocation
    DLX_Node()
    : row(-1),
      col(-1),
@@ -42,6 +43,7 @@ public:
      right(this)
    {}
 
+   /// normal constructor
    DLX_Node(ShapeItem R, ShapeItem C,
             DLX_Node * u, DLX_Node * d, DLX_Node * l, DLX_Node * r)
    : row(R),
@@ -52,12 +54,19 @@ public:
       right(r)
    { insert_lr();   insert_ud(); }
 
+   /// (re-)insert \b this node horizontally (between left and right)
    void insert_lr()   { left->right = this;  right->left = this; }
+
+   /// (re-)insert \b this node vertically (between up and down)
    void insert_ud()   { up->down    = this;  down->up    = this; }
 
+   /// remove(unlink) \b this node horizontally
    void remove_lr()   { left->right = right; right->left = left; }
+
+   /// remove(unlink) \b this node vertically
    void remove_ud()   { up->down    = down;  down->up    = up; }
 
+   /// check the consistency of the \b up, \b down, \b left, and \b right links
    void check() const
       {
         Assert(up);    Assert(up->col    == col);
@@ -66,12 +75,14 @@ public:
         Assert(right); Assert(right->row == row);
       }
 
+   /// print the row and columns of \b this node
    ostream & print_RC(ostream & out) const
      {
        return out << std::right << setw(2) << row << ":"
                   << std::left  << setw(2) << col << std::right;
      }
 
+   /// print \b this node
    void print(ostream & out) const
       {
         print_RC(out);
@@ -86,23 +97,36 @@ public:
    /// the type of column
    enum Col_Type
       {
-        Col_INVALID   = -1,
-        Col_NULL      = 0,
-        Col_PRIMARY   = 1,
-        Col_SECONDARY = 2,
-        Col_UNKNOWN = Col_NULL
+        Col_INVALID   = -1,      ///< invalid (in input APL value)
+        Col_NULL      = 0,       ///< no 1 or 2 seen (yet)
+        Col_PRIMARY   = 1,       ///< primary column
+        Col_SECONDARY = 2,       ///< secondary column
+        Col_UNKNOWN = Col_NULL   ///< invalid (for default constructor)
       };
 
+   /// return  the type of column
    static Col_Type get_col_type(const Cell & cell);
 
+   /// the row of this node
    const ShapeItem row;
+
+   /// the column of this node
    const ShapeItem col;
+
+   /// link to the next node above
    DLX_Node * up;
+
+   /// link to the next node below
    DLX_Node * down;
+
+   /// link to the next node on the left
    DLX_Node * left;
+
+   /// link to the next node on the right
    DLX_Node * right;
 };
 //=============================================================================
+/// A (column-) header node
 class DLX_Header_Node : public DLX_Node
 {
 public:
@@ -158,20 +182,25 @@ DLX_Node::get_col_type(const Cell & cell)
    return Col_INVALID;
 }
 //=============================================================================
+/// The root node of the constraints matrix
 class DLX_Root_Node : public DLX_Node
 {
 public:
+   /// constructor
    DLX_Root_Node(ShapeItem rows, ShapeItem cols, ShapeItem max_sol,
                  const Value & B);
 
+   /// check of all nodes
    void deep_check() const;
 
+   /// indent for current level
    ostream & indent(ostream & out)
       {
         loop(s, level)   out << "  ";
         return out;
       }
 
+   /// cover columns j (see Knuth)
   void cover(ShapeItem j)
      {
        ++cover_count;
@@ -193,6 +222,7 @@ public:
            }
      }
 
+   /// uncover columns j (see Knuth)
    void uncover(ShapeItem j)
      {
        DLX_Header_Node & c = headers[j];
@@ -212,12 +242,19 @@ public:
        c.check();
      }
 
+   /// display the matrix
    void display(ostream & out) const;
 
+   /// solve the constraints matrix
    void solve();
 
+   /// return the number of solutions found
    ShapeItem get_solution_count() const   { return solution_count; }
+
+   /// return the number of items picked
    ShapeItem get_pick_count() const       { return pick_count; }
+
+   /// return the number of columns covered
    ShapeItem get_cover_count() const      { return cover_count; }
 
    /// all solutions as len rows... len rows ...

@@ -34,7 +34,13 @@ public:
    /// show the current function call stack.
    static void show(const char * file, int line);
 
+   /// show the current caller (only valid while being called)
+   static const char * caller(int offset);
+
 protected:
+   // demangle a line returned by backtrace_symbols()
+   static int demangle_line(char * result, size_t result_max, const char * buf);
+
    /// find the source for PC \b pc
    static const char * find_src(int64_t pc);
 
