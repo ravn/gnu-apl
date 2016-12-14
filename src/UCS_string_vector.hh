@@ -131,6 +131,10 @@ public:
 protected:
    /// the strings in this string vector
    Simple_string<UCS_string *, false> strings;
+
+private:
+   void * operator new(size_t size);
+   void * operator new[](size_t size);
 };
 //-----------------------------------------------------------------------------
 

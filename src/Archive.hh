@@ -273,8 +273,11 @@ protected:
    /// read ◊ Executable
    Executable * read_Statement();
 
-   /// read user defined Executable
+   /// read a user defined Executable
    Executable * read_UserFunction();
+
+   /// read a lambda
+   Executable * read_lambda(const UCS_string & lambda) const;
 
    /// read a token
    bool read_Token(Token_loc & tloc);

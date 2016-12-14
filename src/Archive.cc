@@ -1554,6 +1554,8 @@ Cell * end = C + count;
 void
 XML_Loading_Archive::read_unused_name(int d, Symbol & symbol)
 {
+   Log(LOG_archive)   CERR << "      [" << d << "] unused name" << endl;
+
    if (d == 0)   return;   // Symbol::Symbol has already created the top level
 
    symbol.push();
@@ -1565,7 +1567,7 @@ XML_Loading_Archive::read_Variable(int d, Symbol & symbol)
 const int vid = find_int_attr("vid", false, 10);
    Assert(vid < (int)values.size());
 
-   Log(LOG_archive)   CERR << "      read_Variable() vid=" << vid
+   Log(LOG_archive)   CERR << "      [" << d << "] read_Variable() vid=" << vid
                            << " name=" << symbol.get_name() << endl;
 
    // some system variables are  saved for troubleshooting purposes, but
@@ -1585,8 +1587,8 @@ const int vid = find_int_attr("vid", false, 10);
 
    if (!values[vid])   return;   // value filtered out
 
-   if (d != 0)   symbol.push();
-
+   while (symbol.value_stack_size() <= d)   symbol.push();
+// if (d != 0)   symbol.push();
 
    try
       {
@@ -1745,7 +1747,21 @@ const int depth = find_int_attr("stack-size", false, 10);
 
    // lookup symbol, trying ⎕xx first
    //
-Symbol * symbol = Workspace::lookup_existing_symbol(name_ucs);
+Symbol * symbol;
+   if (name_ucs[0] == UNI_LAMBDA && name_ucs.size() == 1)
+      symbol = &Workspace::get_v_LAMBDA();
+   else if (name_ucs[0] == UNI_ALPHA)
+      symbol = &Workspace::get_v_ALPHA();
+   else if (name_ucs[0] == UNI_ALPHA_UNDERBAR)
+      symbol = &Workspace::get_v_ALPHA_U();
+   else if (name_ucs[0] == UNI_CHI)
+      symbol = &Workspace::get_v_CHI();
+   else if (name_ucs[0] == UNI_OMEGA)
+      symbol = &Workspace::get_v_OMEGA();
+   else if (name_ucs[0] == UNI_OMEGA_UNDERBAR)
+      symbol = &Workspace::get_v_OMEGA_U();
+   else
+      symbol = Workspace::lookup_existing_symbol(name_ucs);
 
    // we do NOT copy if:
    //
@@ -1801,7 +1817,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
         no_copy = true;
       }
 
-   // in a )LOAD silentlr ignore ⎕TZ
+   // in a )LOAD silently ignore ⎕TZ
    //
    if (!copying                    &&   // )LOAD
         Avec::is_quad(name_ucs[0]) &&   // ⎕xx
@@ -1983,6 +1999,8 @@ const UTF8 * n  = name;
 UTF8_string name_utf(name, n - name);
 UCS_string name_ucs(name_utf);
 
+   if (name_ucs[0] == UNI_LAMBDA)   return read_lambda(name_ucs);
+
 Symbol * symbol = Workspace::lookup_symbol(name_ucs);
    Assert(symbol);
    Assert(level >= 0);
@@ -1995,6 +2013,32 @@ UserFunction * ufun = fun->get_ufun1();
    Assert(fun == ufun);
 
    return ufun;
+}
+//-----------------------------------------------------------------------------
+Executable *
+XML_Loading_Archive::read_lambda(const UCS_string & lambda) const
+{
+   for (StateIndicator * si = Workspace::SI_top(); si; si = si->get_parent())
+       {
+         const Executable * exec = si->get_executable();
+         Assert(exec);
+         const Token_string & body = exec->get_body();
+         loop(b, body.size())
+            {
+              const Token & tok = body[b];
+              if (!tok.is_function())   continue;
+              Function * fun = tok.get_function();
+              Assert(fun);
+              UserFunction * ufun = fun->get_ufun1();
+              if (!ufun)   continue;
+              if (ufun->get_name() == lambda)
+                 {
+                   return ufun;
+                 }
+            }
+       }
+
+   FIXME;
 }
 //-----------------------------------------------------------------------------
 void
