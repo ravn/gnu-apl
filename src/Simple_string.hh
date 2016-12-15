@@ -244,7 +244,11 @@ protected:
         T * old_items = items;
         items_allocated = new_size + ADD_ALLOC;
         items = new T[items_allocated];
-        loop(c, items_valid)   new (items + c) T(old_items[c]);
+        loop(c, items_valid)
+           {
+              if (has_destructor)   (items + c)->~T();
+              new (items + c) T(old_items[c]);
+           }
         delete [] old_items;
       }
 

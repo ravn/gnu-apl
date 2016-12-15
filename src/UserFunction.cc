@@ -126,6 +126,7 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
    parse_body_line(Function_Line_0, lambda_body, false, false, LOC);
    setup_lambdas();
    line_starts.append(Function_PC(lambda_body.size() - 1));
+   line_starts.append(Function_PC_0);
    error_line = -1;   // no error
    error_info = 0;
 }
@@ -1001,6 +1002,19 @@ int total_gaps = 0;
           line_starts[ls] = Function_PC(line_starts[ls] - total_gaps);
           total_gaps += gaps[ls];
        }
+}
+//-----------------------------------------------------------------------------
+Function_PC
+UserFunction::line_start(Function_Line line) const
+{
+   if (line < 0 || line >= line_starts.size())
+      {
+        Q1(line)
+        Q1(line_starts.size())
+        Assert(0);
+      }
+      
+   return line_starts[line];
 }
 //-----------------------------------------------------------------------------
 ostream &

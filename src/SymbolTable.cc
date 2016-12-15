@@ -84,32 +84,30 @@ Symbol * sym = new Symbol(sym_name, ID::USER_SYMBOL);
 }
 //-----------------------------------------------------------------------------
 ostream &
-SymbolTable::list_symbol(ostream & out, const UCS_string & buf) const
+SymbolTable::list_symbol(ostream & out, const UCS_string & buf1) const
 {
-Token_string tos;
-   {
-     Tokenizer tokenizer(PM_STATEMENT_LIST, LOC, false);
-     if (tokenizer.tokenize(buf, tos) != E_NO_ERROR)
-        {
-          CERR << "invalid token" << endl;
-          return out;
-        }
-   }
-
-   if (tos.size() == 0)   // empty argument
+UCS_string buf(buf1);
+   buf.remove_leading_and_trailing_whitespaces();
+   if (buf1.size() == 1)   switch(buf1[0])
       {
-        CERR << "no symbol" << endl;
-        return out;
+        case UNI_ALPHA:  return Workspace::get_v_ALPHA().print_verbose(out);
+        case UNI_ALPHA_UNDERBAR:
+                         return Workspace::get_v_ALPHA_U().print_verbose(out);
+        case UNI_OMEGA:  return Workspace::get_v_OMEGA().print_verbose(out);
+        case UNI_CHI:    return Workspace::get_v_CHI().print_verbose(out);
+        case UNI_OMEGA_UNDERBAR:
+                         return Workspace::get_v_OMEGA_U().print_verbose(out);
+        case UNI_LAMBDA: return Workspace::get_v_LAMBDA().print_verbose(out);
+        default:         break;
       }
 
-   if (tos[0].get_ValueType() != TV_SYM)
-      {
-        CERR << "not a symbol" << endl;
-        return out;
-      }
+const Symbol * sym = Workspace::lookup_existing_symbol(buf);
 
-Symbol * symbol = tos[0].get_sym_ptr();
-   return symbol->print_verbose(out);
+   if (sym)   return sym->print_verbose(out);
+
+   if (buf1[0] == UNI_Quad_Quad)   return out << "System Function" << endl;
+
+   return out << "no symbol '" << buf1 << "'" << endl;
 }
 //-----------------------------------------------------------------------------
 void

@@ -496,17 +496,17 @@ new_level:
 
    if (LOG_Quad_DLX || attention_is_raised())
       {
-         CERR << "⎕DLX[" << level << "]";
-         loop(s, level)
-             CERR << " " << (headers[s].item_r->row + Workspace::get_IO());
-         CERR << endl;
-         clear_attention_raised(LOC);
+        CERR << "⎕DLX[" << level << "]";
+        loop(s, level)
+            CERR << " " << (headers[s].item_r->row + Workspace::get_IO());
+        CERR << endl;
+        clear_attention_raised(LOC);
       }
 
    if (interrupt_is_raised())
       {
         clear_interrupt_raised(LOC);
-        INTERRUPT;
+        return;
       }
 
    // the problem is solved if there are no primary columns left

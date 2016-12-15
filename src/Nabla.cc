@@ -158,7 +158,6 @@ UCS_string fun_text;
           line_0.append(lines[0].text);
           line_0.remove_trailing_whitespaces();
           LineInput::replace_history_line(line_0);
-
         }
 
         for (size_t l = 1; l < lines.size(); ++l)
@@ -857,6 +856,7 @@ const int idx_from = find_line(edit_from);
       }
 
    current_line.next();
+
    return 0;
 }
 //-----------------------------------------------------------------------------

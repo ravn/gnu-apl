@@ -279,7 +279,7 @@ public:
    Symbol * next;
 
 protected:
-   /// The name of \b this \b Symbol
+   /// the name of \b this \b Symbol
    UCS_string name;
 
    /// called on symbol events (if non-0)

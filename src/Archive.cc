@@ -303,8 +303,12 @@ XML_Saving_Archive::save_prefix(const Prefix & prefix)
 {
    do_indent();
    out << "<Parser assign-pending=\"" << prefix.get_assign_state()
-       << "\" lookahead-high=\""      << prefix.get_lookahead_high()
-       << "\">" << endl;
+       << "\" action=\""              << prefix.action;
+
+   if (prefix.lookahead_valid())
+      out << "\" lookahead-high=\""   << prefix.get_lookahead_high();
+
+   out << "\">" << endl;
 
    // write the lookahead token, starting at the fifo's get position
    //
@@ -661,6 +665,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "                <!ELEMENT Parser (Token*)>\n"
 "                <!ATTLIST Parser assign-pending CDATA #REQUIRED>\n"
 "                <!ATTLIST Parser lookahead-high CDATA #REQUIRED>\n"
+"                <!ATTLIST Parser action CDATA #REQUIRED>\n"
 
 "                    <!ELEMENT Token (#PCDATA)>\n"
 "                    <!ATTLIST Token pc           CDATA #REQUIRED>\n"
@@ -1875,6 +1880,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
         else if (is_tag("Shared-Variable"))   read_Shared_Variable(d, *symbol);
       }
 
+   Assert(symbol->value_stack_size() == depth);
    next_tag(LOC);
    expect_tag("/Symbol", LOC);
 }
@@ -1927,6 +1933,7 @@ void
 XML_Loading_Archive::read_SI_entry(int lev)
 {
 const int level = find_int_attr("level", false, 10);
+const int pc = find_int_attr("pc", false, 10);
 
    Log(LOG_archive)   CERR << "    read_SI_entry() level=" << level << endl;
 
@@ -1937,12 +1944,14 @@ Executable * exec = 0;
    else if (is_tag("UserFunction"))   exec = read_UserFunction();
    else    Assert(0 && "Bad tag at " LOC); 
 
+
    Assert(lev == level);
    Assert(exec);
 
    Workspace::push_SI(exec, LOC);
 StateIndicator * si = Workspace::SI_top();
    Assert(si);
+   si->set_PC((Function_PC)pc);
    read_Parser(*si);
 
    for (;;)
@@ -1966,7 +1975,8 @@ UCS_string text;
    next_tag(LOC);
    expect_tag("/Execute", LOC);
 
-Executable * exec = new ExecuteList(text, LOC);
+ExecuteList * exec = ExecuteList::fix(text, LOC);
+   Assert(exec);
    return exec;
 }
 //-----------------------------------------------------------------------------
@@ -1982,7 +1992,8 @@ UCS_string text;
    next_tag(LOC);
    expect_tag("/Statements", LOC);
 
-Executable * exec = new StatementList(text, LOC);
+StatementList * exec = StatementList::fix(text, LOC);
+   Assert(exec);
    return exec;
 }
 //-----------------------------------------------------------------------------
@@ -2048,12 +2059,17 @@ XML_Loading_Archive::read_Parser(StateIndicator & si)
    expect_tag("Parser", LOC);
 
 const int ass_state = find_int_attr("assign-pending", false, 10);
-const int lah_high = find_int_attr("lookahead-high", false, 10);
+const int lah_high = find_int_attr("lookahead-high", true, 10);
+const int action = find_int_attr("action", false, 10);
 
 Prefix & parser = si.current_stack;
 
    parser.set_assign_state((Assign_state)ass_state);
-   parser.set_lookahead_high(Function_PC(lah_high));
+   parser.action = (R_action)action;
+   if (lah_high != -1)   // valid lookahead token
+      {
+        parser.set_lookahead_high(Function_PC(lah_high));
+      }
 
    for (;;)
        {

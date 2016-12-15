@@ -216,8 +216,7 @@ public:
    virtual UCS_string canonical(bool with_lines) const;
 
    /// overloaded Executable::line_start()
-   virtual Function_PC line_start(Function_Line line) const
-      { return line_starts[line]; }
+   virtual Function_PC line_start(Function_Line line) const;
 
    /// overloaded Executable::adjust_line_starts
    virtual void adjust_line_starts();

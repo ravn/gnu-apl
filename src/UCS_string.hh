@@ -84,9 +84,9 @@ public:
    ~UCS_string()
       {
         --total_count;
-//      get_CERR() << setfill('0') << "@@ " << setw(5) << instance_id
-//                 << " DEL ##" << total_count << " c= "
-//                 << Backtrace::caller(2) << setfill(' ') << endl;
+//      cerr << setfill('0') << "@@ " << setw(5) << instance_id
+//           << " DEL ##" << total_count << " c= "
+//           << Backtrace::caller(2) << setfill(' ') << endl;
       }
 
    /// common part of all constructors
@@ -94,9 +94,9 @@ public:
       { 
         ++total_count;
         instance_id = ++total_id;
-//      get_CERR() << setfill('0') << "@@ " << setw(5) << instance_id
-//                 << " NEW ##" << total_count << " " << loc
-//                 << " c= " << Backtrace::caller(2) << setfill(' ') << endl;
+//      cerr << setfill('0') << "@@ " << setw(5) << instance_id
+//           << " NEW ##" << total_count << " " << loc
+//           << " c= " << Backtrace::caller(2) << setfill(' ') << endl;
       }
 
    /// compute the length of an output row

@@ -83,7 +83,7 @@ public:
    void unmark_all_values() const;
 
    /// print all owners of \b value
-   int show_owners(const char * prefix, ostream & out, const Value & value) const;
+   int show_owners(const char * prfx, ostream & out, const Value & value) const;
 
    /// highest PC in current statement
    Function_PC get_range_high() const;
@@ -166,9 +166,19 @@ public:
    Function_PC get_lookahead_high() const
       { return lookahead_high; }
 
+   bool lookahead_valid() const
+      { return saved_lookahead.tok.get_tag() != TOK_VOID; }
+
    /// set the highest PC seen in the current statement
    void set_lookahead_high(Function_PC lah)
-      { lookahead_high = lah; }
+      {
+        lookahead_high = lah;
+        if (lah >= 0 && lah < body.size())
+           {
+             Token_loc tl(body[lah], lah);
+              saved_lookahead.copy(tl, LOC);
+           }
+      }
 
    /// read one more token (don't store yet)
    Token_loc lookahead()

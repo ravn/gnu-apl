@@ -59,6 +59,19 @@ public:
         return 0;
       }
 
+   /// return a \b Symbol with name \b name in \b this \b SymbolTable.
+   const T * lookup_existing_symbol(const UCS_string & name) const
+      {
+        const uint32_t hash = compute_hash(name);
+        for (const T * sym = symbol_table[hash]; sym; sym = sym->next)
+            {
+              if (!sym->equal(name))   continue;   // name mismatch
+              if (!sym->is_erased())      return sym;
+            }
+
+        return 0;
+      }
+
    /// add \b sym to the symbol table. The caller has checked
    /// that new_name does not yet exist in the symbol table
    void add_symbol(T * sym)

@@ -81,6 +81,10 @@ public:
                av == UNI_SINGLE_QUOTE1 ||
                av == UNI_SINGLE_QUOTE2; } 
 
+   static bool is_diamond(Unicode av)
+      { return av == UNI_DIAMOND || av == 0x22C4 || av == 0x2662 ||
+               av == 0x2B25      || av == 0x2B26      || av == 0x2B27; }
+
    /// return \b true iff \b av is a control char (ASCII 0..32 (excluding))
    static bool is_control(Unicode av)
       { return av >= 0 && av < ' '; }

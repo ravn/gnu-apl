@@ -309,7 +309,7 @@ int tidx = 0;
    while (stats_before)
       {
         Assert(tidx < line_txt.size());
-        if (line_txt[tidx++] == UNI_DIAMOND)   --stats_before;
+        if (Avec::is_diamond(line_txt[tidx++]))   --stats_before;
       }
 
    // skip leading spaces
@@ -319,7 +319,7 @@ int tidx = 0;
 UCS_string ret;
    while (tidx < line_txt.size())
       {
-        if (line_txt[tidx] == UNI_DIAMOND)    break;
+        if (Avec::is_diamond(line_txt[tidx]))    break;
         ret.append(line_txt[tidx++], LOC);
       }
 

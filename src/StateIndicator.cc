@@ -138,16 +138,16 @@ StateIndicator::print(ostream & out) const
    switch(get_parse_mode())
       {
         case PM_FUNCTION:
-             out << "Pmode:    ∇ "
+             out << "Pmode:      ∇ "
                  << executable->get_ufun()->get_name_and_line(get_PC());
              break;
 
         case PM_STATEMENT_LIST:
-             out << "Pmode:    ◊ " << " " << executable->get_text(0);
+             out << "Pmode:      ◊ " << " " << executable->get_text(0);
              break;
 
         case PM_EXECUTE:
-             out << "Pmode:    ⍎ " << " " << executable->get_text(0);
+             out << "Pmode:      ⍎ " << " " << executable->get_text(0);
              break;
 
         default:
@@ -155,16 +155,18 @@ StateIndicator::print(ostream & out) const
       }
    out << endl;
 
-   out << "PC:       " << get_PC();
+   out << "PC:         " << get_PC() << " (" << executable->get_body().size()
+                       << ")";
    out << " " << executable->get_body()[get_PC()] << endl;
-   out << "Stat:     " << executable->statement_text(get_PC());
+   out << "Stat:       " << executable->statement_text(get_PC());
    out << endl;
 
-   out << "err_code: " << HEX(error.error_code) << endl;
-   out << "thrown:   at " << error.throw_loc << endl;
-   out << "e_msg_1:  '" << error.get_error_line_1() << "'" << endl;
-   out << "e_msg_2:  '" << error.get_error_line_2() << "'" << endl;
-   out << "e_msg_3:  '" << error.get_error_line_3() << "'" << endl;
+   out << "err_code:   " << HEX(error.error_code) << endl;
+   if (error.error_code)
+      out << "thrown at:  " << error.throw_loc << endl
+       << "e_msg_1:    '" << error.get_error_line_1() << "'" << endl
+       << "e_msg_2:    '" << error.get_error_line_2() << "'" << endl
+       << "e_msg_3:    '" << error.get_error_line_3() << "'" << endl;
 
    out << endl;
 }

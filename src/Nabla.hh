@@ -188,7 +188,7 @@ protected:
    Symbol * fun_symbol;
 
    /// the lines of the function.
-   Simple_string<FunLine, false> lines;
+   Simple_string<FunLine, true> lines;
 
    /// editor commands
    enum Ecmd
