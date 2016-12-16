@@ -803,6 +803,24 @@ const ShapeItem ec = nz_element_count();
 }
 //-----------------------------------------------------------------------------
 bool
+Value::can_be_compared() const
+{
+const ShapeItem count = nz_element_count();
+   loop(c, count)
+      {
+       const Cell & cell = get_ravel(c);
+       const CellType ctype = cell.get_cell_type();
+       if (ctype & (CT_CHAR | CT_INT | CT_FLOAT))   continue;
+       if (cell.is_near_real())                     continue;
+       if (cell.is_pointer_cell() &&
+           cell.get_pointer_value()->can_be_compared())   continue;
+       return false;
+      }
+
+   return true;
+}
+//-----------------------------------------------------------------------------
+bool
 Value::is_simple() const
 {
 const ShapeItem count = element_count();

@@ -226,8 +226,7 @@ public:
 
    /// return true if this value can be compared. This is the case when all
    /// cells (including nested ones) are not complex
-   bool can_be_compared() const
-     { return (deep_cell_types() & CT_COMPLEX) == 0; }
+   bool can_be_compared() const;
 
    /// return a value containing pointers to all ravel cells of this value.
    Value_P get_cellrefs(const char * loc);

@@ -664,7 +664,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "\n"
 "                <!ELEMENT Parser (Token*)>\n"
 "                <!ATTLIST Parser assign-pending CDATA #REQUIRED>\n"
-"                <!ATTLIST Parser lookahead-high CDATA #REQUIRED>\n"
+"                <!ATTLIST Parser lookahead-high CDATA #IMPLIED>\n"
 "                <!ATTLIST Parser action CDATA #REQUIRED>\n"
 
 "                    <!ELEMENT Token (#PCDATA)>\n"

@@ -1376,8 +1376,16 @@ NumericCell::bif_binomial(Cell * Z, const Cell * A) const
         if (r_1_b < 0    && is_near_int(r_1_b))      return E_DOMAIN_ERROR;
         if (r_1_b__a < 0 && is_near_int(r_1_b__a))   return E_DOMAIN_ERROR;
 
-        new (Z) FloatCell(  tgamma(r_1_b) / (tgamma(r_1_a) * tgamma(r_1_b__a)));
-        return E_NO_ERROR;
+        const double rb = tgamma(r_1_b);
+        if (!isfinite(rb))   return E_DOMAIN_ERROR;
+
+        const double ra = tgamma(r_1_a);
+        if (!isfinite(ra))   return E_DOMAIN_ERROR;
+
+        const double r_b__a = tgamma(r_1_b__a);
+        if (!isfinite(r_b__a))   return E_DOMAIN_ERROR;
+
+        return FloatCell::zv(Z, (rb / ra) / r_b__a);
       }
 
    if (!A->is_near_int())   return E_DOMAIN_ERROR;
