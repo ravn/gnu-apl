@@ -620,6 +620,15 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
         // what < 0 are "hacker functions" that should not be used by
         // normal mortals.
         //
+        case -14: // print stacks. SI_top is the ⎕FIO call, so dont show it.
+                  for (StateIndicator * si = Workspace::SI_top()->get_parent();
+                       si; si = si->get_parent())
+                      {
+                        CERR << "[" << si->get_level() << "]: ";
+                        si->get_prefix().print_stack(CERR, ".");
+                      }
+                   return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+
         case -13: // total number of UCS strings
              return Token(TOK_APL_VALUE1,
                           IntScalar(UCS_string::get_total_count(), LOC));

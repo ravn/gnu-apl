@@ -57,7 +57,7 @@ public:
    void clear_body();
 
    /// return the name of this function, or ◊ or ⍎
-   virtual UCS_string get_name() const = 0;
+   virtual const UCS_string & get_name() const = 0;
 
    /// return true iff this Executable cannot be suspended
    virtual bool cannot_suspend() const
@@ -204,8 +204,8 @@ public:
 
 protected:
    /// overloaded Executable::get_name()
-   virtual UCS_string get_name() const
-      { return UCS_string(UTF8_string(ID::name(ID::F1_EXECUTE))); }
+   virtual const UCS_string & get_name() const
+      { return ID::get_name(ID::F1_EXECUTE); }
 };
 //-----------------------------------------------------------------------------
 /**
@@ -226,8 +226,8 @@ protected:
    {}
 
    /// overloaded Executable::get_name()
-   virtual UCS_string get_name() const
-      { return UCS_string(UTF8_string(ID::name(ID::DIAMOND))); }
+   virtual const UCS_string & get_name() const
+      { return ID::get_name(ID::DIAMOND); }
 };
 //-----------------------------------------------------------------------------
 

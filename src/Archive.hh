@@ -69,7 +69,7 @@ public:
                           const char * id_prefix, const Function & fun);
 
    /// write Prefix \b pfp
-   void save_prefix(const Prefix & pfp);
+   void save_Parser(const Prefix & pfp);
 
    /// write Symbol \b sym
    void save_symbol(const Symbol & sym);
@@ -265,7 +265,7 @@ protected:
    void read_SI_entry(int level);
 
    /// read parsers in SI entry
-   void read_Parser(StateIndicator & si);
+   void read_Parser(StateIndicator & si, int lev);
 
    /// read ⍎ Executable
    Executable * read_Execute();
@@ -277,7 +277,9 @@ protected:
    Executable * read_UserFunction();
 
    /// read a lambda
-   Executable * read_lambda(const UCS_string & lambda) const;
+   Executable * read_lambda(const UTF8 * lambda_name);
+
+   UCS_string read_UCS();
 
    /// read a token
    bool read_Token(Token_loc & tloc);
@@ -286,6 +288,9 @@ protected:
    /// functions with attributes 'ufun_prefix-ufun' and 'level_prefix-prefix'
    Function * read_Function_name(const char * ufun_name, const char * si_level,
                                  const char * sysfun_id);
+
+   /// find a lambda in the current SI entry
+   Function * find_lambda(const UCS_string & lambda);
 
    /// return true iff there is more data in the file
    bool more() const   { return data < file_end; }

@@ -43,7 +43,7 @@
 Symbol::Symbol(ID::Id id)
    : NamedObject(id),
      next(0),
-     name(UCS_string(UTF8_string(ID::name(id)))),
+     name(ID::get_name(id)),
      monitor_callback(0)
 {
    push();

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -583,14 +583,14 @@ UCS_string ucs;
         case TC_L_PARENT:
         case TC_R_CURLY:
         case TC_L_CURLY:
-             return UCS_string(UTF8_string(ID::name(get_Id())));
+             return ID::get_name(get_Id());
 
         case TC_FUN0:
         case TC_FUN12:
         case TC_OPER1:
         case TC_OPER2:
              if (get_Id() == ID::No_ID)   return get_function()->get_name();
-             return UCS_string(UTF8_string(ID::name(get_Id())));
+             return ID::get_name(get_Id());
 
         default:
              CERR << "Token: " << HEX4(tag) << " " << *this

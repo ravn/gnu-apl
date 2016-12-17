@@ -67,8 +67,8 @@ public:
    {}
 
    /// return the name of the named object
-   virtual UCS_string get_name() const
-      { return UCS_string(UTF8_string(ID::name(id))); }
+   virtual const UCS_string & get_name() const
+      { return ID::get_name(id); }
 
    /// return the function for this Id (if any) or 0 if this Id does
    /// (currently) represent a function.

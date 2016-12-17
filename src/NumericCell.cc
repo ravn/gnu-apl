@@ -1348,6 +1348,9 @@ double z  = tgamma(N + 1);          // N!
 ErrorCode
 NumericCell::bif_binomial(Cell * Z, const Cell * A) const
 {
+   if (!A->is_numeric())            return E_DOMAIN_ERROR;
+   if (A->get_real_value() > 170)   return E_DOMAIN_ERROR;
+
    if (!is_near_real() || !A->is_near_real())   // complex result
       {
         const APL_Float r_1_a    = A->get_real_value();
@@ -1390,6 +1393,9 @@ NumericCell::bif_binomial(Cell * Z, const Cell * A) const
 
    if (!A->is_near_int())   return E_DOMAIN_ERROR;
    if (!is_near_int())      return E_DOMAIN_ERROR;
+   if (is_float_cell() && get_real_value() > 0x7FFFFFFFFFFFFFFFLL)
+      return E_DOMAIN_ERROR;
+
 const APL_Integer a = A->get_checked_near_int();
 const APL_Integer b = get_checked_near_int();
 

@@ -276,7 +276,7 @@ XML_Saving_Archive::save_Function_name(const char * ufun_prefix,
         CERR << endl <<
 "WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
 "         such a state is currently not supported and WILL cause problems\n"
-"         when )LOADing the workspace. Please perform )SIC (or → and then\n"
+"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
 "         )SAVE this workspace again." << endl;
       }
 
@@ -299,26 +299,26 @@ const UserFunction * ufun = fun.get_ufun1();
 }
 //-----------------------------------------------------------------------------
 void
-XML_Saving_Archive::save_prefix(const Prefix & prefix)
+XML_Saving_Archive::save_Parser(const Prefix & prefix)
 {
    do_indent();
-   out << "<Parser assign-pending=\"" << prefix.get_assign_state()
-       << "\" action=\""              << prefix.action;
-
-   if (prefix.lookahead_valid())
-      out << "\" lookahead-high=\""   << prefix.get_lookahead_high();
-
-   out << "\">" << endl;
+    out << "<Parser size=\""      << prefix.size()
+        << "\" assign-pending=\"" << prefix.get_assign_state()
+        << "\" action=\""         << prefix.action
+        << "\" lookahead-high=\"" << prefix.get_lookahead_high()
+        << "\">" << endl;
 
    // write the lookahead token, starting at the fifo's get position
    //
    ++indent;
    loop(s, prefix.size())
       {
-        const Token_loc & tloc = prefix.at(s);
+        const Token_loc & tloc = prefix.at(prefix.size() - s - 1);
         save_token_loc(tloc);
       }
+   save_token_loc(prefix.saved_lookahead);
    --indent;
+
 
    do_indent();
    out << "</Parser>" << endl;
@@ -398,6 +398,16 @@ const Executable & exec = *si.get_executable();
                if (ufun->is_macro())
                   out << "<UserFunction macro-num=\"" << ufun->get_macnum()
                       << "\"/>" << endl;
+               else if (ufun->is_lambda())
+                  {
+                    out << "<UserFunction lambda-name=\"" << ufun->get_name()
+                        << "\">" << endl;
+                    ++indent;
+                    save_UCS(ufun->canonical(false));
+                    --indent;
+                    do_indent();
+                    out << "</UserFunction>" << endl;
+                  }
                else
                   out << "<UserFunction ufun-name=\"" << sym->get_name()
                       << "\" symbol-level=\"" << sym_depth << "\"/>" << endl;
@@ -427,7 +437,7 @@ const Executable & exec = *si.get_executable();
 
    // print the parser states...
    //
-   save_prefix(si.current_stack);
+   save_Parser(si.current_stack);
 
    --indent;
 
@@ -659,13 +669,16 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "                <!ELEMENT Execute (UCS)>\n"
 "\n"
 "                <!ELEMENT UserFunction (#PCDATA)>\n"
-"                <!ATTLIST UserFunction ufun-name       CDATA #REQUIRED>\n"
-"                <!ATTLIST UserFunction symbol-level    CDATA #REQUIRED>\n"
+"                <!ATTLIST UserFunction ufun-name       CDATA #IMPLIED>\n"
+"                <!ATTLIST UserFunction macro-num       CDATA #IMPLIED>\n"
+"                <!ATTLIST UserFunction lambda-name     CDATA #IMPLIED>\n"
+"                <!ATTLIST UserFunction symbol-level    CDATA #IMPLIED>\n"
 "\n"
 "                <!ELEMENT Parser (Token*)>\n"
+"                <!ATTLIST Parser size           CDATA #REQUIRED>\n"
 "                <!ATTLIST Parser assign-pending CDATA #REQUIRED>\n"
-"                <!ATTLIST Parser lookahead-high CDATA #IMPLIED>\n"
-"                <!ATTLIST Parser action CDATA #REQUIRED>\n"
+"                <!ATTLIST Parser lookahead-high CDATA #REQUIRED>\n"
+"                <!ATTLIST Parser action         CDATA #REQUIRED>\n"
 
 "                    <!ELEMENT Token (#PCDATA)>\n"
 "                    <!ATTLIST Token pc           CDATA #REQUIRED>\n"
@@ -1628,7 +1641,7 @@ const UTF8 * ep = find_attr("exec-properties", true);
       }
 
    Log(LOG_archive)
-      CERR << "      read_Function(" << symbol.get_name()
+      CERR << "      [" << d << "] read_Function(" << symbol.get_name()
            << ") native=" << native << endl;
 
    next_tag(LOC);
@@ -1937,13 +1950,12 @@ const int pc = find_int_attr("pc", false, 10);
 
    Log(LOG_archive)   CERR << "    read_SI_entry() level=" << level << endl;
 
-   next_tag(LOC);
 Executable * exec = 0;
+   next_tag(LOC);
    if      (is_tag("Execute"))        exec = read_Execute();
    else if (is_tag("Statements"))     exec = read_Statement();
    else if (is_tag("UserFunction"))   exec = read_UserFunction();
    else    Assert(0 && "Bad tag at " LOC); 
-
 
    Assert(lev == level);
    Assert(exec);
@@ -1952,7 +1964,7 @@ Executable * exec = 0;
 StateIndicator * si = Workspace::SI_top();
    Assert(si);
    si->set_PC((Function_PC)pc);
-   read_Parser(*si);
+   read_Parser(*si, lev);
 
    for (;;)
        {
@@ -2003,14 +2015,15 @@ XML_Loading_Archive::read_UserFunction()
 const int macro_num = find_int_attr("macro-num", true, 10);
    if (macro_num != -1)   return Macro::get_macro((Macro::Macro_num)macro_num);
 
+const UTF8 * lambda_name = find_attr("lambda-name", true);
+   if (lambda_name)   return read_lambda(lambda_name);
+
 const int level     = find_int_attr("symbol-level", false, 10);
 const UTF8 * name   = find_attr("ufun-name", false);
 const UTF8 * n  = name;
    while (*n != '"')   ++n;
 UTF8_string name_utf(name, n - name);
 UCS_string name_ucs(name_utf);
-
-   if (name_ucs[0] == UNI_LAMBDA)   return read_lambda(name_ucs);
 
 Symbol * symbol = Workspace::lookup_symbol(name_ucs);
    Assert(symbol);
@@ -2027,58 +2040,64 @@ UserFunction * ufun = fun->get_ufun1();
 }
 //-----------------------------------------------------------------------------
 Executable *
-XML_Loading_Archive::read_lambda(const UCS_string & lambda) const
+XML_Loading_Archive::read_lambda(const UTF8 * lambda_name)
 {
-   for (StateIndicator * si = Workspace::SI_top(); si; si = si->get_parent())
-       {
-         const Executable * exec = si->get_executable();
-         Assert(exec);
-         const Token_string & body = exec->get_body();
-         loop(b, body.size())
-            {
-              const Token & tok = body[b];
-              if (!tok.is_function())   continue;
-              Function * fun = tok.get_function();
-              Assert(fun);
-              UserFunction * ufun = fun->get_ufun1();
-              if (!ufun)   continue;
-              if (ufun->get_name() == lambda)
-                 {
-                   return ufun;
-                 }
-            }
-       }
+UCS_string lambda = read_UCS();
 
-   FIXME;
+Symbol dummy(ID::No_ID);
+UserFunction * ufun = UserFunction::fix_lambda(dummy, lambda);
+   Assert(ufun);
+   ufun->increment_refcount(LOC);   // since we push it below
+
+   next_tag(LOC);
+   expect_tag("/UserFunction", LOC);
+   return ufun;
+}
+//-----------------------------------------------------------------------------
+UCS_string
+XML_Loading_Archive::read_UCS()
+{
+   skip_to_tag("UCS");
+const UTF8 * uni = find_attr("uni", false);
+UCS_string text;
+   while (*uni != '"')   read_chars(text, uni);
+   return text;
 }
 //-----------------------------------------------------------------------------
 void
-XML_Loading_Archive::read_Parser(StateIndicator & si)
+XML_Loading_Archive::read_Parser(StateIndicator & si, int lev)
 {
    next_tag(LOC);
    expect_tag("Parser", LOC);
 
-const int ass_state = find_int_attr("assign-pending", false, 10);
-const int lah_high = find_int_attr("lookahead-high", true, 10);
-const int action = find_int_attr("action", false, 10);
+   Log(LOG_archive)   CERR << "        read_Parser() level=" << lev << endl;
+
+const int stack_size = find_int_attr("size",           false, 10);
+const int ass_state  = find_int_attr("assign-pending", false, 10);
+const int lah_high   = find_int_attr("lookahead-high", false, 10);
+const int action     = find_int_attr("action",         false, 10);
 
 Prefix & parser = si.current_stack;
 
    parser.set_assign_state((Assign_state)ass_state);
    parser.action = (R_action)action;
-   if (lah_high != -1)   // valid lookahead token
-      {
-        parser.set_lookahead_high(Function_PC(lah_high));
-      }
+   parser.lookahead_high = (Function_PC)lah_high;
 
    for (;;)
        {
-         Token_loc tloc;
-         const bool success = read_Token(tloc);
+         Token_loc tl;
+         const bool success = read_Token(tl);
          if (!success)   break;
 
-         parser.push(tloc);
+         if (parser.size() < stack_size)   parser.push(tl);
+         else                              parser.saved_lookahead.copy(tl, LOC);
        }
+
+   Log(LOG_archive)
+      {
+         CERR << "        ";
+         parser.print_stack(CERR, LOC);
+      }
 
    expect_tag("/Parser", LOC);
 }
@@ -2214,8 +2233,13 @@ const UTF8 * fun_name = find_attr(name_attr, true);
         while (*end != '"')   ++end;
         UTF8_string name_utf(fun_name, end - fun_name);
         UCS_string ucs(name_utf);
+        if (ucs[0] == UNI_LAMBDA)
+           {
+             Assert(level == -1);
+             return find_lambda(ucs);
+           }
+
         const Symbol & symbol = *Workspace::lookup_symbol(ucs);
-        if (level == -1)   level = 0;   // named lambda?
 
         Assert(level >= 0);
         Assert(level < symbol.value_stack_size());
@@ -2236,6 +2260,50 @@ const int fun_id = find_int_attr(id_attr, true, 16);
 
    // not found. This can happen when the function is optional.
    //
+   return 0;
+}
+//-----------------------------------------------------------------------------
+Function *
+XML_Loading_Archive::find_lambda(const UCS_string & lambda)
+{
+const StateIndicator & si = *Workspace::SI_top();
+const Executable & exec = *si.get_executable();
+const Token_string & body = exec.get_body();
+
+   loop(b, body.size())
+      {
+        const Token & tok = body[b];
+        if (tok.get_ValueType() == TV_SYM)
+           {
+             const Symbol * sym = tok.get_sym_ptr();
+             Assert(sym);
+             loop(v, sym->value_stack_size())
+                {
+                  const ValueStackItem & vs = (*sym)[v];
+                  if (vs.name_class == NC_FUNCTION ||
+                      vs.name_class == NC_OPERATOR)
+                     {
+                       if (vs.sym_val.function->get_name() == lambda)
+                          {
+                            return vs.sym_val.function;
+                          }
+                     }
+                }
+             continue;   // not found
+           }
+        else if (tok.get_ValueType() != TV_FUN)   continue;
+
+        Function * fun = tok.get_function();
+        Assert1(fun);
+        const UserFunction * ufun = fun->get_ufun1();
+        if (!ufun)   continue;   // not a user defined function
+
+        const UCS_string & fname = ufun->get_name();
+        if (fname == lambda)   return fun;
+      }
+
+   CERR << "find_lambda() failed for " << lambda
+        << " at )SI level=" << si.get_level() << endl;
    return 0;
 }
 //=============================================================================

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,29 +44,47 @@
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
-const char *
-ID::name(ID::Id id)
+/// an Id and how it looks like in APL
+struct Id_name
 {
-   switch(id)
-      {
-#define pp(i, _u, _v) case i:          return #i;
-#define qf(i,  u, _v)  case Quad_ ## i: return u;
-#define qv(i,  u, _v)  case Quad_ ## i: return u;
-#define sf(i,  u, _v)  case i:          return u;
-#define st(i,  u, _v)  case i:          return u;
+  /// constructor for primitives (⍴, ⍳, ...)
+  Id_name(ID::Id i, const char * n) : id(i), ucs_name(UTF8_string(n)) {}
+   
+  static int compare(const void * key, const void * item)
+     {
+       return *(const ID::Id *)key - ((const Id_name *)item)->id;
+     }
+
+  ID::Id id;
+  UCS_string ucs_name;
+};
+
+static Id_name id2ucs[] =
+{
+#define pp(i, _u, _v) Id_name(ID::i, #i), 
+#define qf(i,  u, _v) Id_name(ID::Quad_ ## i, u), 
+#define qv(i,  u, _v) Id_name(ID::Quad_ ## i, u), 
+#define sf(i,  u, _v) Id_name(ID::i, u), 
+#define st(i,  u, _v) Id_name(ID::i, u),
 
 #include "Id.def"
+};
 
-        default: break;
-      }
+const UCS_string &
+ID::get_name(Id id)
+{
+const void * result =
+    bsearch(&id, id2ucs, sizeof(id2ucs) / sizeof(Id_name),
+            sizeof(Id_name), Id_name::compare);
 
-   return "Unknown-ID";
+   if (result == 0)   return id2ucs[0].ucs_name;
+   return ((const Id_name *)result)->ucs_name;
 }
 //-----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, ID::Id id)
 {
-   return out << ID::name(id);
+   return out << ID::get_name(id);
 }
 //-----------------------------------------------------------------------------
 Function *

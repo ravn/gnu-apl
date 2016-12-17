@@ -25,18 +25,18 @@
 
 class Function;
 class Symbol;
+class UCS_string;
 
 /**
  An Identifier for each internal object (primitives, Quad-symbols, and more).
  The ID can be derived in different ways:
 
- 1. from the name of an ⎕AV element, e.g.  ID_F2_AND or ID_ASSIGN
- 2. from a name,                     e.g.  ID_APL_VALUE or ID_CHARACTER
- 3. from a distinguished var name,   e.g.  ID_Quad_AI or ID_Quad_AV
- 4. from a distinguished fun name,   e.g.  ID_Quad_AT or ID_Quad_EM
- 5. from a special token name              ID_L_PARENT1 or ID_R_PARENT1
+ 1. from a name,                     e.g.  ID_APL_VALUE or ID_CHARACTER
+ 2. from a distinguished var name,   e.g.  ID_Quad_AI or ID_Quad_AV
+ 3. from a distinguished fun name,   e.g.  ID_Quad_AT or ID_Quad_EM
+ 4. from a special token name              ID_L_PARENT1 or ID_R_PARENT1
 
-  This is controlled by 5 corresponding macros: av() pp() qv() qf() resp. st()
+  This is controlled by 5 corresponding macros: pp() qv() qf() resp. st()
  */
 
 //-----------------------------------------------------------------------------
@@ -46,7 +46,6 @@ public:
    /// an ID. Every object known to APL (primitive, ⎕xx, ...) has one
    enum Id
    {
-#define av(i, _u, v)          i v,
 #define pp(i, _u, v)          i v,
 #define qf(i, _u, v) Quad_ ## i v,
 #define qv(i, _u, v) Quad_ ## i v,
@@ -56,8 +55,8 @@ public:
 #include "Id.def"
    };
 
-   /// return the printable name for id
-  static const char * name(Id id);
+   /// return the printable name for id as UCS_string
+   static const UCS_string & get_name(Id id);
 
    /// If \b id is the ID of primitive function, primitive operator, or
    /// quad function, then return a pointer to it. Otherwise return 0.

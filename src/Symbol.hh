@@ -208,7 +208,7 @@ public:
    virtual const Function * get_function() const;
 
    /// The name of \b this \b Symbol
-   virtual UCS_string get_name() const   { return name; }
+   virtual const UCS_string & get_name() const   { return name; }
 
    /// overloaded NamedObject::get_function()
    virtual Function * get_function();
