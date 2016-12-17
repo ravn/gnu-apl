@@ -35,6 +35,12 @@ PERFORMANCE_START(cout_perf)
    Output::set_color_mode(errout ? Output::COLM_UERROR : Output::COLM_OUTPUT);
    cout << char(c);
 
+   if (!InputFile::is_validating())
+      {
+        PERFORMANCE_END(fs_COUT_B, cout_perf, 1)
+        return 0;
+      }
+
    if (c != '\n')   // not end of line
       {
         aplout.append(c);
@@ -42,11 +48,7 @@ PERFORMANCE_START(cout_perf)
         return 0;
       }
 
-   if (!InputFile::is_validating())
-      {
-        PERFORMANCE_END(fs_COUT_B, cout_perf, 1)
-        return 0;
-      }
+   // complete line received
 
 ofstream & rep = IO_Files::get_current_testreport();
    Assert(rep.is_open());
@@ -58,13 +60,8 @@ bool eof = false;
    if (eof)   // nothing in current_testfile
       {
         rep << "extra: " << apl << endl;
-        PERFORMANCE_END(fs_COUT_B, cout_perf, 1)
-        return 0;
       }
-
-   // print common part.
-   //
-   if (different((const UTF8 *)apl, (const UTF8 *)ref.c_str()))   // different
+   else if (different((const UTF8 *)apl, (const UTF8 *)ref.c_str()))
       {
         IO_Files::diff_error();
         rep << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl
