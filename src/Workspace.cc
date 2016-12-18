@@ -489,7 +489,7 @@ Workspace::clear_WS(ostream & out, bool silent)
    //
    clear_SI(out);
 
-   // clear the symbol table
+   // clear the symbol tables
    //
    the_workspace.symbol_table.clear(out);
 
@@ -508,7 +508,8 @@ Workspace::clear_WS(ostream & out, bool silent)
    //
 // Value::erase_all(out);
 
-#define rw_sv_def(x, _str, _txt) new  (&get_v_ ##x()) x;
+#define rw_sv_def(x, _str, _txt) \
+   { get_v_ ##x().~x();   new (&get_v_ ##x()) x; }
 #define ro_sv_def(x, _str, _txt)
 #include "SystemVariable.def"
 

@@ -49,13 +49,17 @@ struct Id_name
 {
   /// constructor for primitives (⍴, ⍳, ...)
   Id_name(ID::Id i, const char * n) : id(i), ucs_name(UTF8_string(n)) {}
-   
+
+  /// compare \b key with \b item (for bsearch())
   static int compare(const void * key, const void * item)
      {
        return *(const ID::Id *)key - ((const Id_name *)item)->id;
      }
 
+  /// the ID
   ID::Id id;
+
+   /// how \b id is being printed
   UCS_string ucs_name;
 };
 

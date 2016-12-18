@@ -121,9 +121,10 @@ Executable::clear_body()
 
         if (body[b].is_function())
            {
-              Function * fun = body[b].get_function();
-              UserFunction * ufun = fun->get_ufun1();
-              if (ufun && ufun->is_lambda())   ufun->decrement_refcount(LOC);
+             Function * fun = body[b].get_function();
+             UserFunction * ufun = fun->get_ufun1();
+             if (ufun && ufun->is_lambda())   ufun->decrement_refcount(LOC);
+             new (&body[b]) Token();
            }
       }
 
@@ -814,15 +815,16 @@ Executable::increment_refcount(const char * loc)
 void
 Executable::decrement_refcount(const char * loc)
 {
-   Assert1(get_ufun());
-   Assert(get_ufun()->is_lambda());
+UserFunction * ufun = get_ufun();
+   Assert1(ufun);
+   Assert(ufun->is_lambda());
 
    if (refcount <= 0)
       {
         CERR << "*** Warning: refcount of " << get_name() << " is " << refcount
              << ":" << endl;
         print_text(CERR);
-//     FIXME;
+        FIXME;
       }
 
    --refcount;
@@ -834,7 +836,8 @@ Executable::decrement_refcount(const char * loc)
    if (refcount <= 0)
       {
 //      CERR << "*** lambda died" << endl;
-        clear_body();
+//      clear_body();
+        delete ufun;
       }
 }
 //=============================================================================

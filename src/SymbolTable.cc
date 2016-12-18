@@ -484,6 +484,33 @@ Simple_string<const Symbol *, false> symbols;
 }
 //=============================================================================
 void
+SystemSymTab::clear(ostream & out)
+{
+   // SymbolTable::clear() should only be called after Workspace::clear_SI()
+   //
+   Assert(Workspace::SI_entry_count() == 0);
+
+   loop(hash, SYMBOL_HASH_TABLE_SIZE)   clear_slot(out, hash);
+}
+//-----------------------------------------------------------------------------
+void
+SystemSymTab::clear_slot(ostream & out, int hash)
+{
+SystemName * sym = symbol_table[hash];
+   symbol_table[hash] = 0;
+
+SystemName * next;   // the symbol after sym
+   for (; sym; sym = next)
+       {
+         next = sym->next;
+
+         // keep system-defined symbols
+         //
+         delete sym;
+       }
+}
+//-----------------------------------------------------------------------------
+void
 SystemSymTab::add_fun_or_var(const UCS_string & name, ID::Id id,
                        QuadFunction * function, SystemVariable * variable)
 {

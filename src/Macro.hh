@@ -69,6 +69,7 @@ public:
            ~Cleaner();
       };
 
+   /// static Cleaner instance whose destructor will be called when APL exits
    static Cleaner cleaner;
 
 protected:
@@ -82,5 +83,4 @@ private:
 //-----------------------------------------------------------------------------
 
 #endif // __MACRO_HH_DEFINED__
-
 

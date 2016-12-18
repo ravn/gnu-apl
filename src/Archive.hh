@@ -279,6 +279,7 @@ protected:
    /// read a lambda
    Executable * read_lambda(const UTF8 * lambda_name);
 
+   /// read an UCS string
    UCS_string read_UCS();
 
    /// read a token

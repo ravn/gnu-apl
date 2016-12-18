@@ -39,6 +39,9 @@ class Shape;
 class Value;
 class UCS_string_vector;
 
+/// track construction and destruction of UCS_strings
+#define UCS_tracking 0
+
 //=============================================================================
 /// A string of Unicode characters (32-bit)
 class UCS_string : public  Simple_string<Unicode, false>
@@ -84,19 +87,22 @@ public:
    ~UCS_string()
       {
         --total_count;
-//      cerr << setfill('0') << "@@ " << setw(5) << instance_id
-//           << " DEL ##" << total_count << " c= "
-//           << Backtrace::caller(2) << setfill(' ') << endl;
+#if UCS_tracking
+        cerr << setfill('0') << "@@ " << setw(5) << instance_id
+             << " DEL ##" << total_count << setfill(' ') << endl;
+#endif
       }
 
    /// common part of all constructors
    void create(const char * loc)
       { 
         ++total_count;
+#if UCS_tracking
         instance_id = ++total_id;
-//      cerr << setfill('0') << "@@ " << setw(5) << instance_id
-//           << " NEW ##" << total_count << " " << loc
-//           << " c= " << Backtrace::caller(2) << setfill(' ') << endl;
+        cerr << setfill('0') << "@@ " << setw(5) << instance_id
+             << " NEW ##" << total_count << " " << loc
+             << " c= " << Backtrace::caller(2) << setfill(' ') << endl;
+#endif
       }
 
    /// compute the length of an output row
@@ -388,10 +394,13 @@ protected:
    /// the total number of UCS_strings
    static ShapeItem total_count;
 
-   /// a unique (?) number for \b this  UCS_string
+   /// the next unique instance_id
    static ShapeItem total_id;
 
+#if UCS_tracking
+   /// a unique number for \b this  UCS_string
    ShapeItem instance_id;
+#endif
 
 private:
    void * operator new[](size_t size);

@@ -38,7 +38,7 @@ public:
    static const char * caller(int offset);
 
 protected:
-   // demangle a line returned by backtrace_symbols()
+   /// demangle a line returned by backtrace_symbols()
    static int demangle_line(char * result, size_t result_max, const char * buf);
 
    /// find the source for PC \b pc

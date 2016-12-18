@@ -171,7 +171,7 @@ protected:
    /// erase one symbol, return \b true on error, \b false on success
    bool erase_one_symbol(const UCS_string & sym);
 };
-//-----------------------------------------------------------------------------
+//=============================================================================
 class QuadFunction;
 class SystemVariable;
 
@@ -227,7 +227,7 @@ protected:
    /// the variable if the name refers to a system variable, or 0 if not
    SystemVariable * sysvar;
 };
-
+//-----------------------------------------------------------------------------
 /**
      A table containing system defined symbols (aka. distinguished names)
  */
@@ -235,9 +235,16 @@ protected:
 class SystemSymTab : public SymbolTableBase<SystemName, 256 - 1>
 {
 public:
+   // constructor
    SystemSymTab()
    : max_name_len(0)
    {}
+
+   /// clear this symbol table (remove all user-defined symbols)
+   void clear(ostream & out);
+
+   /// clear one slot (hash) in this symbol table
+   void clear_slot(ostream & out, int hash);
 
    /// add \b function to the symbol table
    void add_function(const UCS_string & name, ID::Id id,
@@ -261,6 +268,6 @@ protected:
    /// the length of the longest name
    int max_name_len;
 };
-//-----------------------------------------------------------------------------
+//=============================================================================
 
 #endif // __SYMBOLTABLE_HH_DEFINED__
