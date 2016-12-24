@@ -248,6 +248,9 @@ public:
    /// solve the constraints matrix
    void solve();
 
+   /// do some dance steps with the constraints matrix
+   Token preset(const Cell * steps, ShapeItem count, const Cell * cB);
+
    /// return the number of solutions found
    ShapeItem get_solution_count() const   { return solution_count; }
 
@@ -271,10 +274,10 @@ protected:
    const ShapeItem cols;
 
    /// the column headers
-   __DynArray<DLX_Header_Node> headers;
+   Simple_string<DLX_Header_Node, false> headers;
 
    /// the '1's and '2's in the (sparse) matrix
-   __DynArray<DLX_Node> nodes;
+   Simple_string<DLX_Node, false> nodes;
 
    /// the number of primary columns
    ShapeItem primary_count;
@@ -293,6 +296,9 @@ protected:
 
    /// the total number of covr operations
    ShapeItem cover_count;
+
+   /// the first 0 in the matrix (for figuring the format)
+   const Cell * first_0;
 };
 //-----------------------------------------------------------------------------
 DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
@@ -301,14 +307,13 @@ DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
      max_solutions(max_sol),
      rows(rs),
      cols(cs),
-     headers(0),
-     nodes(0),
      primary_count(0),
      secondary_count(0),
      solution_count(0),
      level(0),
      pick_count(0),
-     cover_count(0)
+     cover_count(0),
+     first_0(0)
 {
    // count the number of non-zero elemnts in the matrix
    //
@@ -336,23 +341,29 @@ const Cell * b = &B.get_ravel(0);
              DOMAIN_ERROR;
            }
         if (ct != Col_UNKNOWN)   ++ones;
+        else if (!first_0)   first_0 = &cell;
       }
 
    Log(LOG_Quad_DLX)   CERR << "Matrix has " << ones << " ones" << endl;
 
-   // set up column headers
+   // set up column headers. Simple_string::append may move the headers so
+   // we first append all headers and initialize then
    //
-   new (&headers) __DynArray<DLX_Header_Node>(cols);
+   headers.reserve(cols);
+   loop (c, cols)   headers.append(DLX_Header_Node());
    loop (c, cols)
       {
         if (c) new (&headers[c]) DLX_Header_Node(c, &headers[c - 1], this);
         else   new (&headers[c]) DLX_Header_Node(c, this,            this);
       }
 
-   // set up non-header nodes
+   // set up non-header nodes. Simple_string::append may move the headers so
+   // we first append all nodes and initialize then.
    //
    b = &B.get_ravel(0);
-   new (&nodes) __DynArray<DLX_Node>(ones);
+   nodes.reserve(ones);
+   loop(o, ones)   nodes.append(DLX_Node());
+
    DLX_Node * n = &nodes[0];
    loop (r, rows)
       {
@@ -385,11 +396,16 @@ const Cell * b = &B.get_ravel(0);
                 rm = new (n++)   DLX_Node(r, c, hdr.up, &hdr, rm, lm);
              ++headers[c].count;
            }
+      }
 
-        if (lm == rm) // there was no 1 in this row
+   // check that all columns have a 1 or 2
+   //
+   loop (c, cols)
+      {
+        if (headers[c].col_type == Col_UNKNOWN)
            {
-             MORE_ERROR() << "⎕DLX B with empty row B["
-                          << (r + qio) << ";]";
+             MORE_ERROR() << "⎕DLX B with empty column B[;"
+                          << (c + qio) << "]";
              DOMAIN_ERROR;
            }
       }
@@ -485,7 +501,6 @@ DLX_Root_Node::deep_check() const
        }
 }
 //-----------------------------------------------------------------------------
-
 void
 DLX_Root_Node::solve()
 {
@@ -621,28 +636,115 @@ level_done:
         goto rloop;
       }
 }
+//-----------------------------------------------------------------------------
+Token
+DLX_Root_Node::preset(const Cell * steps, ShapeItem step_count, const Cell * cB)
+{
+const int qio = Workspace::get_IO();
+   loop(a, step_count)
+      {
+        const APL_Integer row = steps++->get_int_value() - qio;
+        if (row < 0 || row >= rows)
+           {
+             MORE_ERROR() << "bad row: " << row;
+             DOMAIN_ERROR;
+           }
+
+        bool found_a = false;
+
+        // find a '1' or '2' item in row
+        //
+        loop(b, nodes.size())
+           {
+             const DLX_Node & n = nodes[b];
+             if (n.row == row)   // found '1' or '2'
+                {
+                  found_a = true;
+                  Log(LOG_Quad_DLX)
+                     n.print_RC(CERR << "Covering column " << n.col
+                                     << " of rightmost item ") << endl;
+                  cover(n.col);
+
+                  for (DLX_Node * j = n.right; j != &n; j = j->right)
+                      {
+                        Log(LOG_Quad_DLX)
+                           {
+                             CERR << "Covering column j=" << j->col << endl;
+                           }
+                        cover(j->col);
+                      }
+
+                  break;   // next row a
+                }
+           }
+        Assert(found_a);
+      }
+
+   // construct return value
+   //
+ShapeItem cols_Z = 0;
+   for (DLX_Node * h = right; h != this; h = h->right)   ++cols_Z;
+
+   // set al matrix elements to 0
+   //
+const Shape shape_Z(rows, cols_Z);
+Value_P Z(shape_Z, LOC);
+   loop(z, (rows*cols_Z))
+      {
+        if (first_0)   Z->next_ravel()->init(*first_0, Z.getref(), LOC);
+        else if (cB->is_integer_cell())   new (Z->next_ravel()) IntCell(0);
+        else                       new (Z->next_ravel()) CharCell(UNI_ASCII_0);
+      }
+
+ShapeItem c = 0;   // the column in the reduced matrix
+   for (DLX_Node * h = right; h != this; h = h->right)
+       {
+         for (DLX_Node * j = h->down; j != h; j = j->down)
+             {
+               Assert(h->col == j->col);
+               const Cell & src = cB[h->col + cols*j->row];
+               Z->get_ravel(c + cols_Z*j->row).init(src, Z.getref(), LOC);
+             }
+         ++c;
+       }
+
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
 //=============================================================================
 Token
 Quad_DLX::eval_AB(Value_P A, Value_P B)
 {
-   if (A->element_count() != 1)   LENGTH_ERROR;
+   if (A->get_rank() > 1)   RANK_ERROR;
+   if (A->element_count() < 1)   LENGTH_ERROR;
+
+   if (B->get_rank() != 2)   RANK_ERROR;
 const APL_Integer a0 = A->get_ravel(0).get_int_value();
 
-   if (a0 < -3)   DOMAIN_ERROR;
+   if (a0 < -4)   DOMAIN_ERROR;
+   if (a0 == -4)   // perform some dance steps with the constraints matrix
+      {
+        const ShapeItem rows = B->get_rows();
+        const ShapeItem cols = B->get_cols();
+        DLX_Root_Node root(rows, cols, 0, B.getref());
+        return root.preset(&A->get_ravel(1), A->element_count() - 1,
+                           &B->get_ravel(0));
+      }
 
+   if (A->element_count() != 1)   LENGTH_ERROR;
    return do_DLX(a0, B.getref());
 }
 //-----------------------------------------------------------------------------
 Token
 Quad_DLX::eval_B(Value_P B)
 {
+   if (B->get_rank() != 2)   RANK_ERROR;
    return do_DLX(0, B.getref());
 };
 //-----------------------------------------------------------------------------
 Token
 Quad_DLX::do_DLX(ShapeItem how, const Value & B)
 {
-   if (B.get_rank() != 2)   RANK_ERROR;
 
 const ShapeItem rows = B.get_rows();
 const ShapeItem cols = B.get_cols();

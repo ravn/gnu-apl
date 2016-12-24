@@ -1576,11 +1576,11 @@ File: apl.info,  Node: Section 3.15,  Next: Section 3.16,  Prev: Section 3.14,  
 3.15 ⎕DLX - Knuth’s Dancing Links Algorithm
 ===========================================
 
-⎕DLX is an implementation of Knuth’s Dancing Links Algorithm (called DLX
-by Knuth himself, but is sometimes also referred to as Knuth’s Algorithm
-X) ⎕DLX is a generic backtracking machinery that can be used to
-dramatically simplify problems like the 8 queens problem on a chess
-board or sudokus.
+⎕DLX is an implementation of Donald Knuth’s Dancing Links Algorithm
+(called DLX by Knuth himself, but is sometimes also referred to as
+Knuth’s Algorithm X) ⎕DLX is a generic backtracking machinery that can
+be used to dramatically simplify problems like the 8 queens problem on a
+chess board or sudokus.
 
    The monadic form of ⎕DLX, i.e.  ⎕DLX B, is a shortcut for 0 ⎕DLX B.
 It computes the first solution for the constraint matrix B.
@@ -1605,6 +1605,29 @@ number of link dances is returned as a 3-element numeric vector.
    A = ¯3: like A = ¯1 but instead of returning all solutions, the
 number of solutions, the number of backtracks, and the number of link
 dances is returned as a 3-element numeric vector.
+
+   A = ¯4: A number of single step in Knuth’s Algoritm are performed.
+Let e.g.  A←¯4 r1 r2 r3.  Then Z←A ⎕DLX B is the matrix B after 3 steps
+r1, r2, and r3 have been performed.  r1, r2, and r3 are valid (as per
+⎕IO) row numbers of B, and a step with a given row changes B as follows:
+   • the given row is set to 0 (this row becomes part of the final
+     result),
+   • all other rows that have a 1 or a 2 in the same column as B are set
+     to 0 (these 1s or 2s in the other rows conflict with the 1 or 2 in
+     the given row and are therefore reemoved from B), and
+   • all columns that have no 1s or 2s left are removed from B (these
+     columns habe a 1 or 2 in B and the constraint is therefore
+     satisfied).
+   The prupose of ¯4 ⎕DLX is:
+   • To demonstrate how Knuth’s algorithm works, and/or
+   • To preset some initial values in B. For example one can first
+     initialize the contraints for an empty Sudoku (which is the same
+     matrix for all Sudokus) and then enter the initial digits of a
+     particular Sudokus using 4 ⎕DLX. If thre are, say, 20 initial
+     digits in the Sudoku then A has 21 elements (¯4 plus the 20 rows
+     representing the 20 initial digits.  The result of ¯4 ⎕DLX B has
+     the same number of rows as B (with some rows now cleared), but
+     fewer columns than B.
 
    The right argument B of ⎕DLX B or A ⎕DLX B is a constraints matrix
 whose columns consist of either 0s and 1s (called a primary column) or
@@ -3163,15 +3186,15 @@ Node: Section 3.1248998
 Node: Section 3.1352953
 Node: Section 3.1453717
 Node: Section 3.1555706
-Node: Section 3.1664262
-Node: Chapter 466026
-Node: Chapter 567774
-Node: Chapter 668903
-Node: Section 6.169322
-Node: Section 6.270009
-Node: Chapter 770840
-Node: Section 7.171343
-Node: Section 7.296652
+Node: Section 3.1665617
+Node: Chapter 467381
+Node: Chapter 569129
+Node: Chapter 670258
+Node: Section 6.170677
+Node: Section 6.271364
+Node: Chapter 772195
+Node: Section 7.172698
+Node: Section 7.298007
 
 End Tag Table
 

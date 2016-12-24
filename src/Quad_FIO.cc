@@ -789,7 +789,8 @@ const int function_number = X->get_ravel(0).get_near_int();
 
          case 2:   // return strerror(B)
               {
-                const int b = B->get_ravel(0).get_near_int();
+                int b = B->get_ravel(0).get_near_int();
+                if (b < 0)   b = -b;
                 const char * text = strerror(b);
                 const int len = strlen(text);
                 Value_P Z(len, LOC);
