@@ -452,13 +452,13 @@ UserPreferences::parse_argv_2(bool logit)
                   exit(a);
                 }
 
+              initial_pw = atoi(val);
               if (initial_pw < MIN_Quad_PW || initial_pw > MAX_Quad_PW)
                 {
                   CERR << "bad --PW value (ignored)" << endl; 
                 }
               else
                 {
-                  initial_pw = atoi(val);
                   Workspace::set_PW(initial_pw, LOC);
                 }
               continue;
