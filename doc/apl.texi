@@ -246,6 +246,11 @@ troubleshoot a script).
 do not load a CONTINUE workspace on start-up.
 
 @item
+@option{--PW COLS}
+
+set the initial value of ⎕PW to COLS (min. 30, max. 10000)
+
+@item
 @option{--[no]SV}
 
 do [not] start APserver (a shared variable server) on start-up. This disables

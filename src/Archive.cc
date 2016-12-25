@@ -61,11 +61,22 @@ using namespace std;
 bool
 XML_Saving_Archive::xml_allowed(Unicode uni)
 {
-   if (uni < ' ')   return false;    // control chars and negative
-   if (uni > '~')   return false;    // allowed, but may not print properly
+   if (uni < ' ')    return false;    // control chars and negative
    if (uni == '<')   return false;   // < not allowed
    if (uni == '&')   return false;   // < not allowed
    if (uni == '"')   return false;   // not allowed in "..."
+   if (uni > '~')
+      {
+        // non-ASCII character. This is, in principle, allowed in XML but
+        // may not print properly if the font used does not provide the
+        // character. We therefore allow characters in ⎕AV and their alternate
+        // characters except our own type markers (⁰¹²...)
+        //
+        if (is_iPAD_char(uni))   return false;
+        if (Avec::find_char(uni) != Invalid_CHT)              return true;
+        if (Avec::map_alternative_char(uni) != Invalid_CHT)   return true;
+        return false;    // allowed, but may
+      }
    return true;
 }
 //-----------------------------------------------------------------------------
@@ -360,7 +371,7 @@ Simple_string<const Symbol *, false> symbols = symtab.get_all_symbols();
             }
 
         const Symbol * sym = symbols[idx];
-        save_symbol(*sym);
+        save_Symbol(*sym);
 
         symbols[idx] = symbols.last();
         symbols.pop();
@@ -446,7 +457,7 @@ const Executable & exec = *si.get_executable();
 }
 //-----------------------------------------------------------------------------
 void
-XML_Saving_Archive::save_symbol(const Symbol & sym)
+XML_Saving_Archive::save_Symbol(const Symbol & sym)
 {
    do_indent();
    out << "<Symbol name=\"" << sym.get_name() << "\" stack-size=\""
@@ -796,8 +807,8 @@ ShapeItem idx = 0;
 
    // save certain system variables
    //
-#define rw_sv_def(x, _str, _txt) save_symbol(Workspace::get_v_ ## x());
-#define ro_sv_def(x, _str, _txt) save_symbol(Workspace::get_v_ ## x());
+#define rw_sv_def(x, _str, _txt) save_Symbol(Workspace::get_v_ ## x());
+#define ro_sv_def(x, _str, _txt) save_Symbol(Workspace::get_v_ ## x());
 #include "SystemVariable.def"
 
    // save state indicator
@@ -1474,23 +1485,24 @@ XML_Loading_Archive::read_chars(UCS_string & ucs, const UTF8 * & utf)
        {
          if (*utf == '"')   break;   // end of attribute value
 
-          if (char_mode && *utf < 0x80 && *utf != '\n')
+         int len;
+         const Unicode uni = UTF8_string::toUni(utf, len, true);
+
+          if (char_mode && *utf != '\n' && uni != UNI_PAD_U0)
              {
-               ucs.append(Unicode(*utf++));
+               ucs.append(uni);
+               utf += len;
                continue;
              }
 
-         int len;
-         const Unicode type = UTF8_string::toUni(utf, len, true);
-
-         if (type == UNI_PAD_U2)   // start of char_mode
+         if (uni == UNI_PAD_U2)   // start of char_mode
             {
               utf += len;   // skip UNI_PAD_U2
               char_mode = true;
               continue;
             }
 
-         if (type == UNI_PAD_U1)   // start of hex mode
+         if (uni == UNI_PAD_U1)   // start of hex mode
             {
               utf += len;   // skip UNI_PAD_U1
               char_mode = false;
@@ -1501,14 +1513,14 @@ XML_Loading_Archive::read_chars(UCS_string & ucs, const UTF8 * & utf)
               continue;
             }
 
-         if (type == UNI_PAD_U0)   // end of char_mode
+         if (uni == UNI_PAD_U0)   // end of char_mode
             {
               utf += len;   // skip UNI_PAD_U0
               char_mode = false;
               continue;
             }
 
-         if (type == '\n')   // end of char_mode (fix old bug)
+         if (uni == '\n')   // end of char_mode (fix old bug)
             {
               // due to an old bug, the trailing UNI_PAD_U0 may be missing
               // at the end of the line. We therefore reset char_mode at the
@@ -1740,21 +1752,20 @@ XML_Loading_Archive::read_Symbol()
 {
    expect_tag("Symbol", LOC);
 
-UCS_string name_ucs;
-   {
-     const UTF8 * name = find_attr("name",  false);
-     const UTF8 * name_end = name;
-     while (*name_end != '"')   ++name_end;
-     UTF8_string name_utf(name, name_end - name);
-     name_ucs = UCS_string(name_utf);
-   }
+const UTF8 * name = find_attr("name",  false);
+const UTF8 * name_end = name;
+   while (*name_end != '"')   ++name_end;
 
-   Log(LOG_archive)   CERR << "    read_Symbol() name=" << name_ucs << endl;
+UTF8_string name_UTF(name, name_end - name);
+UCS_string  name_UCS(name_UTF);
 
-   // ⎕NLT was removed, but could lurk around in old workspaces.
+   Log(LOG_archive)   CERR << "    read_Symbol() name=" << name_UCS << endl;
+
+   // ⎕NLT and ⎕PT were removed, but could lurk around in old workspaces.
+   // ⎕PW and ⎕TZ are session variables that must not )LOADed (but might be
+   // )COPYd)
    //
-   if (name_ucs == UCS_string(UTF8_string("⎕NLT")) ||
-       name_ucs == UCS_string(UTF8_string("⎕PT")))
+   if (name_UTF == UTF8_string("⎕NLT") || name_UTF == UTF8_string("⎕PT"))
       {
         Log(LOG_archive)   CERR << "        skipped at " << LOC << endl;
         skip_to_tag("/Symbol");
@@ -1766,20 +1777,20 @@ const int depth = find_int_attr("stack-size", false, 10);
    // lookup symbol, trying ⎕xx first
    //
 Symbol * symbol;
-   if (name_ucs[0] == UNI_LAMBDA && name_ucs.size() == 1)
+   if (name_UCS == ID::get_name(ID::LAMBDA))
       symbol = &Workspace::get_v_LAMBDA();
-   else if (name_ucs[0] == UNI_ALPHA)
+   else if (name_UCS == ID::get_name(ID::ALPHA))
       symbol = &Workspace::get_v_ALPHA();
-   else if (name_ucs[0] == UNI_ALPHA_UNDERBAR)
+   else if (name_UCS == ID::get_name(ID::ALPHA_U))
       symbol = &Workspace::get_v_ALPHA_U();
-   else if (name_ucs[0] == UNI_CHI)
+   else if (name_UCS == ID::get_name(ID::CHI))
       symbol = &Workspace::get_v_CHI();
-   else if (name_ucs[0] == UNI_OMEGA)
+   else if (name_UCS == ID::get_name(ID::OMEGA))
       symbol = &Workspace::get_v_OMEGA();
-   else if (name_ucs[0] == UNI_OMEGA_UNDERBAR)
+   else if (name_UCS == ID::get_name(ID::OMEGA_U))
       symbol = &Workspace::get_v_OMEGA_U();
    else
-      symbol = Workspace::lookup_existing_symbol(name_ucs);
+      symbol = Workspace::lookup_existing_symbol(name_UCS);
 
    // we do NOT copy if:
    //
@@ -1787,7 +1798,7 @@ Symbol * symbol;
    // 2.  there is an object list and this symbol is not contained in the list
    //
 const bool is_protected = symbol && protection;
-const bool is_selected = allowed_objects.contains(name_ucs);
+const bool is_selected = allowed_objects.contains(name_UCS);
 bool no_copy = is_protected || (have_allowed_objects && !is_selected);
 
    if (reading_vids)
@@ -1819,29 +1830,24 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
    //
    if (!have_allowed_objects       &&   // no dedicated object list
         copying                    &&   // )COPY
-        Avec::is_quad(name_ucs[0]) &&   // ⎕xx
-        name_ucs.size() == 3       &&
-        ! (
-            ( name_ucs[1] == 'C' && name_ucs[2] == 'T' ) ||
-            ( name_ucs[1] == 'F' && name_ucs[2] == 'C' ) ||
-            ( name_ucs[1] == 'I' && name_ucs[2] == 'O' ) ||
-            ( name_ucs[1] == 'L' && name_ucs[2] == 'X' ) ||
-            ( name_ucs[1] == 'P' && name_ucs[2] == 'P' ) ||
-            ( name_ucs[1] == 'P' && name_ucs[2] == 'R' ) ||
-            ( name_ucs[1] == 'R' && name_ucs[2] == 'L' )
+        ! (name_UCS == ID::get_name(ID::Quad_CT) ||
+           name_UCS == ID::get_name(ID::Quad_FC) ||
+           name_UCS == ID::get_name(ID::Quad_IO) ||
+           name_UCS == ID::get_name(ID::Quad_LX) ||
+           name_UCS == ID::get_name(ID::Quad_PP) ||
+           name_UCS == ID::get_name(ID::Quad_PR) ||
+           name_UCS == ID::get_name(ID::Quad_RL)
           ))
       {
-        Log(LOG_archive)   CERR << name_ucs << " not copied at " << LOC << endl;
+        Log(LOG_archive)   CERR << name_UCS << " not copied at " << LOC << endl;
         no_copy = true;
       }
 
-   // in a )LOAD silently ignore ⎕TZ
+   // in a )LOAD silently ignore session variables (⎕PW and ⎕TZ)
    //
-   if (!copying                    &&   // )LOAD
-        Avec::is_quad(name_ucs[0]) &&   // ⎕xx
-        name_ucs.size() == 3       &&
-        ( name_ucs[1] == 'T' && name_ucs[2] == 'Z' )
-        )
+   if (!copying &&   // )LOAD
+        (name_UCS == ID::get_name(ID::Quad_PW) ||
+         name_UCS == ID::get_name(ID::Quad_TZ)))
       {
         skip_to_tag("/Symbol");
         return;
@@ -1861,7 +1867,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
    //
    loop(a, allowed_objects.size())
       {
-        if (allowed_objects[a] == name_ucs)
+        if (allowed_objects[a] == name_UCS)
              {
                allowed_objects[a] = allowed_objects.last();
                allowed_objects.pop();
@@ -1871,7 +1877,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
 
    if (symbol == 0)
       {
-        symbol = Workspace::lookup_symbol(name_ucs);
+        symbol = Workspace::lookup_symbol(name_UCS);
       }
    Assert(symbol);
 
@@ -2022,10 +2028,10 @@ const int level     = find_int_attr("symbol-level", false, 10);
 const UTF8 * name   = find_attr("ufun-name", false);
 const UTF8 * n  = name;
    while (*n != '"')   ++n;
-UTF8_string name_utf(name, n - name);
-UCS_string name_ucs(name_utf);
+UTF8_string name_UTF(name, n - name);
+UCS_string name_UCS(name_UTF);
 
-Symbol * symbol = Workspace::lookup_symbol(name_ucs);
+Symbol * symbol = Workspace::lookup_symbol(name_UCS);
    Assert(symbol);
    Assert(level >= 0);
    Assert(level < symbol->value_stack_size());
@@ -2153,12 +2159,12 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
                const UTF8 * sym_name = find_attr("sym", false);
                const UTF8 * end = sym_name;
                while (*end != '"')   ++end;
-               UTF8_string name_utf(sym_name, end - sym_name);
-               UCS_string name_ucs(name_utf);
+               UTF8_string name_UTF(sym_name, end - sym_name);
+               UCS_string name_UCS(name_UTF);
 
-               Symbol * symbol = Avec::is_quad(name_ucs[0])
-                               ? Workspace::lookup_existing_symbol(name_ucs)
-                               : Workspace::lookup_symbol(name_ucs);
+               Symbol * symbol = Avec::is_quad(name_UCS[0])
+                               ? Workspace::lookup_existing_symbol(name_UCS)
+                               : Workspace::lookup_symbol(name_UCS);
                new (&tloc.tok) Token(tag, symbol);
              }
              break;
@@ -2231,15 +2237,15 @@ const UTF8 * fun_name = find_attr(name_attr, true);
         int level = find_int_attr(level_attr, false, 10);
         const UTF8 * end = fun_name;
         while (*end != '"')   ++end;
-        UTF8_string name_utf(fun_name, end - fun_name);
-        UCS_string ucs(name_utf);
-        if (ucs[0] == UNI_LAMBDA)
+        UTF8_string name_UTF(fun_name, end - fun_name);
+        UCS_string name_UCS(name_UTF);
+        if (name_UCS == ID::get_name(ID::LAMBDA))
            {
              Assert(level == -1);
-             return find_lambda(ucs);
+             return find_lambda(name_UCS);
            }
 
-        const Symbol & symbol = *Workspace::lookup_symbol(ucs);
+        const Symbol & symbol = *Workspace::lookup_symbol(name_UCS);
 
         Assert(level >= 0);
         Assert(level < symbol.value_stack_size());

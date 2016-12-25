@@ -55,7 +55,8 @@ struct UserPreferences
      line_history_len(500),
      nabla_to_history(1),   // if function was modified
      control_Ds_to_exit(0),
-     raw_cin(false)
+     raw_cin(false),
+     initial_pw(DEFAULT_Quad_PW)
    {}
 
    /// read a \b preference file and update parameters set there
@@ -180,6 +181,9 @@ struct UserPreferences
 
    /// send no ESC sequences on stderr
    bool raw_cin;
+
+   /// initial value of ⎕PW
+   int initial_pw;
 
 protected:
    /// open a user-supplied config file (in $HOME or gnu-apl.d)

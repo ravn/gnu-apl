@@ -497,6 +497,11 @@ Workspace::clear_WS(ostream & out, bool silent)
    //
    more_error().shrink(0);
 
+   // ⎕PW and ⎕TZ shall survive )CLEAR (lrm p. 260);
+   //
+const int pw = the_workspace.v_Quad_PW[0].apl_val->get_sole_integer();
+const int tz = the_workspace.v_Quad_TZ.get_offset();
+
    // clear the value stacks of read/write system variables...
    //
 #define rw_sv_def(x, _str, _txt) get_v_ ## x().clear_vs();
@@ -514,6 +519,8 @@ Workspace::clear_WS(ostream & out, bool silent)
 #include "SystemVariable.def"
 
    get_v_Quad_RL().reset_seed();
+   Workspace::set_PW(pw, LOC);
+   the_workspace.v_Quad_TZ.set_offset(tz);
 
    // close open files in ⎕FIO
    Quad_FIO::fun->clear();

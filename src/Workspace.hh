@@ -99,6 +99,10 @@ public:
    static int get_PW()
       { return the_workspace.v_Quad_PW.current(); }
 
+   /// set the current ⎕PW
+   static void set_PW(int PW, const char * loc)
+      { the_workspace.v_Quad_PW.assign(IntScalar(PW, loc), false, loc); }
+
    /// the number of SI entries
    static int SI_entry_count()
       { return SI_top() ? (SI_top()->get_level() + 1) : 0; }

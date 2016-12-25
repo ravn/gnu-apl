@@ -567,7 +567,7 @@ const APL_Integer ps = value->get_sole_integer();
 Quad_PW::Quad_PW()
    : SystemVariable(ID::Quad_PW)
 {
-   Symbol::assign(IntScalar(DEFAULT_Quad_PW, LOC), false, LOC);
+   Symbol::assign(IntScalar(uprefs.initial_pw, LOC), false, LOC);
 }
 //-----------------------------------------------------------------------------
 void

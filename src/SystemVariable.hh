@@ -434,10 +434,10 @@ public:
    APL_Integer current() const
       { return get_first_cell()->get_int_value(); }
 
-protected:
    /// overloaded Symbol::assign().
    virtual void assign(Value_P value, bool clone, const char * loc);
 
+protected:
    // overloaded Symbol::push()
    virtual void push()
       {
@@ -592,6 +592,9 @@ public:
    /// we make this int64_t rather than int so that conversion to usec
    /// does not overflow
    int64_t get_offset() const   { return offset_seconds; }
+
+   void set_offset(int offset)
+      { offset_seconds = offset; }
 
    /// compute the offset (in seconds) from GMT
    static int compute_offset();

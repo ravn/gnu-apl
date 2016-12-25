@@ -72,7 +72,7 @@ public:
    void save_Parser(const Prefix & pfp);
 
    /// write Symbol \b sym
-   void save_symbol(const Symbol & sym);
+   void save_Symbol(const Symbol & sym);
 
    /// write SymbolTable \b symtab
    void save_symtab(const SymbolTable & symtab);

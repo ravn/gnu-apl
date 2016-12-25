@@ -40,6 +40,8 @@ extern const char * configure_args;
 #include "Output.hh"
 #include "ScalarFunction.hh"
 #include "UserPreferences.hh"
+#include "Workspace.hh"
+
 #include "Value.icc"
 
 UserPreferences uprefs;
@@ -95,6 +97,7 @@ char cc[4000];
 "    --LX expr            execute APL expression expr first\n"
 "    -p N                 use profile N in preferences files\n"
 "    --par proc           use processor parent ID proc (default: no parent)\n"
+"    --PW value           initial value of ⎕PW\n"
 "    -q, --silent         do not print the welcome banner\n"
 "    -s, --script         same as --silent --noCIN --noCONT --noColor\n"
 "    --safe               safe mode (no shared vars, no native functions)\n"
@@ -437,6 +440,27 @@ UserPreferences::parse_argv_2(bool logit)
                    exit(a);
                  }
               requested_par = atoi(val);
+              continue;
+            }
+
+         if (!strcmp(opt, "--PW"))
+            {
+              ++a;
+              if (!val)
+                {
+                  CERR << "--PW without screen width" << endl;
+                  exit(a);
+                }
+
+              if (initial_pw < MIN_Quad_PW || initial_pw > MAX_Quad_PW)
+                {
+                  CERR << "bad --PW value (ignored)" << endl; 
+                }
+              else
+                {
+                  initial_pw = atoi(val);
+                  Workspace::set_PW(initial_pw, LOC);
+                }
               continue;
             }
 

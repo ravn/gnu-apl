@@ -199,6 +199,10 @@ GNU APL understands the following command line options:
 
      do not load a CONTINUE workspace on start-up.
 
+   • ‘--PW COLS’
+
+     set the initial value of ⎕PW to COLS (min.  30, max.  10000)
+
    • ‘--[no]SV’
 
      do [not] start APserver (a shared variable server) on start-up.
@@ -3169,32 +3173,32 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 Tag Table:
 Node: Top383
 Node: Chapter 11408
-Node: Chapter 216955
-Node: Chapter 321224
-Node: Section 3.122071
-Node: Section 3.232974
-Node: Section 3.337360
-Node: Section 3.440219
-Node: Section 3.540514
-Node: Section 3.641127
-Node: Section 3.742414
-Node: Section 3.844345
-Node: Section 3.944518
-Node: Section 3.1047024
-Node: Section 3.1147602
-Node: Section 3.1248998
-Node: Section 3.1352953
-Node: Section 3.1453717
-Node: Section 3.1555706
-Node: Section 3.1665617
-Node: Chapter 467381
-Node: Chapter 569129
-Node: Chapter 670258
-Node: Section 6.170677
-Node: Section 6.271364
-Node: Chapter 772195
-Node: Section 7.172698
-Node: Section 7.298007
+Node: Chapter 217048
+Node: Chapter 321317
+Node: Section 3.122164
+Node: Section 3.233067
+Node: Section 3.337453
+Node: Section 3.440312
+Node: Section 3.540607
+Node: Section 3.641220
+Node: Section 3.742507
+Node: Section 3.844438
+Node: Section 3.944611
+Node: Section 3.1047117
+Node: Section 3.1147695
+Node: Section 3.1249091
+Node: Section 3.1353046
+Node: Section 3.1453810
+Node: Section 3.1555799
+Node: Section 3.1665710
+Node: Chapter 467474
+Node: Chapter 569222
+Node: Chapter 670351
+Node: Section 6.170770
+Node: Section 6.271457
+Node: Chapter 772288
+Node: Section 7.172791
+Node: Section 7.298100
 
 End Tag Table
 
