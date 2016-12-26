@@ -56,7 +56,8 @@ struct UserPreferences
      nabla_to_history(1),   // if function was modified
      control_Ds_to_exit(0),
      raw_cin(false),
-     initial_pw(DEFAULT_Quad_PW)
+     initial_pw(DEFAULT_Quad_PW),
+     WINCH_sets_pw(false)
    {}
 
    /// read a \b preference file and update parameters set there
@@ -184,6 +185,9 @@ struct UserPreferences
 
    /// initial value of ⎕PW
    int initial_pw;
+
+   /// true if the WINCH signal shall modify ⎕PW
+   bool WINCH_sets_pw;
 
 protected:
    /// open a user-supplied config file (in $HOME or gnu-apl.d)

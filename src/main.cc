@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-201c  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@
 #include <limits.h>
 #include <signal.h>
 #include <string.h>
+#include <termios.h>
+
+#include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -91,6 +94,33 @@ signal_SEGV_handler(int)
 
    Command::cmd_OFF(3);
 }
+//-----------------------------------------------------------------------------
+/// old sigaction argument for SIGWINCH
+static struct sigaction old_WINCH_action;
+
+/// new sigaction argument for SIGWINCH
+static struct sigaction new_WINCH_action;
+
+/// signal handler for SIGWINCH
+static void
+signal_WINCH_handler(int)
+{
+   // fgets() returns EOF when the WINCH signal is received. We remember
+   // this fact and repeat fgets() once after a WINCH signal
+   //
+   got_WINCH = true;
+
+struct winsize wsize;
+   // TIOCGWINSZ is 0x5413 on GNU/Linux. We use 0x5413 instead of TIOCGWINSZ
+   // because TIOCGWINSZ may not exist on all platforms
+   //
+   if (0 != ioctl(STDIN_FILENO, 0x5413, &wsize))   return;
+   if (wsize.ws_col < MIN_Quad_PW)   return;
+   if (wsize.ws_col > MAX_Quad_PW)   return;
+
+   Workspace::set_PW(wsize.ws_col, LOC);
+}
+
 //-----------------------------------------------------------------------------
 /// old sigaction argument for SIGUSR1
 static struct sigaction old_USR1_action;
@@ -245,22 +275,33 @@ const bool log_startup = uprefs.parse_argv_1();
    // should compile on GNU/Linux and also on other systems.
    //
    memset(&new_control_C_action, 0, sizeof(struct sigaction));
+   memset(&new_WINCH_action,     0, sizeof(struct sigaction));
    memset(&new_USR1_action,      0, sizeof(struct sigaction));
    memset(&new_SEGV_action,      0, sizeof(struct sigaction));
    memset(&new_TERM_action,      0, sizeof(struct sigaction));
    memset(&new_HUP_action,       0, sizeof(struct sigaction));
 
    new_control_C_action.sa_handler = &control_C;
+   new_WINCH_action    .sa_handler = &signal_WINCH_handler;
    new_USR1_action     .sa_handler = &signal_USR1_handler;
    new_SEGV_action     .sa_handler = &signal_SEGV_handler;
    new_TERM_action     .sa_handler = &signal_TERM_handler;
    new_HUP_action      .sa_handler = &signal_HUP_handler;
 
-   sigaction(SIGINT,  &new_control_C_action, &old_control_C_action);
-   sigaction(SIGUSR1, &new_USR1_action,      &old_USR1_action);
-   sigaction(SIGSEGV, &new_SEGV_action,      &old_SEGV_action);
-   sigaction(SIGTERM, &new_TERM_action,      &old_TERM_action);
-   sigaction(SIGHUP,  &new_HUP_action,       &old_HUP_action);
+   sigaction(SIGINT,   &new_control_C_action, &old_control_C_action);
+   sigaction(SIGUSR1,  &new_USR1_action,      &old_USR1_action);
+   sigaction(SIGSEGV,  &new_SEGV_action,      &old_SEGV_action);
+   sigaction(SIGTERM,  &new_TERM_action,      &old_TERM_action);
+   sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
+   if (uprefs.WINCH_sets_pw)
+      {
+        sigaction(SIGWINCH, &new_WINCH_action, &old_WINCH_action);
+        signal_WINCH_handler(0);   // pretend window size change
+      }
+   else
+      {
+        Workspace::set_PW(uprefs.initial_pw, LOC);
+      }
 
 #if PARALLEL_ENABLED
    memset(&new_control_BSL_action, 0, sizeof(struct sigaction));

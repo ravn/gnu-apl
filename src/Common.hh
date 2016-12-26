@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,6 +54,9 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #include "SystemLimits.hh"
 
 using namespace std;
+
+/// true when a WINCH (window size changed) signal was received
+extern bool got_WINCH;
 
 /// initialize
 extern void init_1(const char * argv0, bool log_startup);

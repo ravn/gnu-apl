@@ -962,7 +962,16 @@ LineInput::get_uni()
 again:
 
 const int b0 = fgetc(stdin);
-   if (b0 == EOF)   return UNI_EOF;
+   if (b0 == EOF)
+      {
+       if (got_WINCH)
+          {
+            got_WINCH = false;
+            goto again;
+          }
+
+         return UNI_EOF;
+      }
 
    if (b0 & 0x80)   // non-ASCII unicode
       {

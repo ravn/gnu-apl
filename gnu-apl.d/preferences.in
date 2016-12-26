@@ -352,3 +352,12 @@ BACKUP_BEFORE_SAVE  yes
 #
 CONTROL-Ds-TO-EXIT 0
 
+
+###############################################################################
+#
+# Normally GNU APL starts with a ⎕PW of 80
+#
+# If the terminal that you normally use has fewer or more columns, then you
+# may want to specify a different initial value for ⎕PWQ below.
+#
+INITIAL-⎕PW 80

@@ -42,6 +42,8 @@
 
 uint64_t total_memory = 0;
 
+bool got_WINCH = false;
+
 //-----------------------------------------------------------------------------
 static bool attention_raised = false;
 static uint64_t attention_count = 0;

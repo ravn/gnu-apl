@@ -1195,6 +1195,23 @@ int file_profile = 0;   // the current profile in the preferences file
             {
               control_Ds_to_exit = atoi(arg);
             }
+         else if (!strcasecmp(opt, "INITIAL-⎕PW"))
+            {
+              if (initial_pw >= MIN_Quad_PW && initial_pw <= MAX_Quad_PW)
+                 initial_pw = atoi(arg);
+              else
+                 CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
+                      << endl;
+            }
+         else if (!strcasecmp(opt, "WINCH-SETS-⎕PW"))
+            {
+              WINCH_sets_pw = yes;
+            }
+         else
+            {
+              CERR << "Invalid option '" << opt << " in preferences file "
+                   << filename << " (ignored)" << endl;
+            }
        }
 
    fclose(f);
