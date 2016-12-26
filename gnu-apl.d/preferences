@@ -358,6 +358,17 @@ CONTROL-Ds-TO-EXIT 0
 # Normally GNU APL starts with a ⎕PW of 80
 #
 # If the terminal that you normally use has fewer or more columns, then you
-# may want to specify a different initial value for ⎕PWQ below.
+# may want to specify a different initial value for ⎕PW below.
 #
-INITIAL-⎕PW 80
+# INITIAL-⎕PW 80
+
+
+###############################################################################
+#
+# With the option below you can cause the WINCH signal to change ⎕PW. The
+# intended effect is that resizing of the terminal window causes GNU APL
+# to adapt itself to the new window size. This seems to work on GNU/Linux but
+# may not work on other platforms! USE AT YOUR OWN RISK.
+#
+# WINCH-SETS-⎕PW  Yes
+
