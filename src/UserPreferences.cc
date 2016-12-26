@@ -986,6 +986,7 @@ int file_profile = 0;   // the current profile in the preferences file
          if (!strcasecmp(opt, "Profile"))   // Never ignore Profile entries
             {
               file_profile = atoi(arg);
+              continue;
             }
          if (file_profile && (file_profile != user_profile))   continue;
 
