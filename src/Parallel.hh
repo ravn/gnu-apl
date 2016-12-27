@@ -21,7 +21,7 @@
 #ifndef __PARALLEL_HH_DEFINED__
 #define __PARALLEL_HH_DEFINED__
 
-#include "../config.h"
+#include "Common.hh"
 
 // set PARALLEL_ENABLED if wanted and its prerequisites are satisfied
 //
