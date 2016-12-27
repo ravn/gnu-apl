@@ -746,11 +746,12 @@ ShapeItem  lastc = 0;
 
    if (lastv)
       {
-        DynArray(double, gemv_data, 2*N);   // double instead of T for OSX
-        Vector<T> gemv_result((T *)gemv_data.get_data(), N);
+        double * gemv_data = new double[2*N];
+        Vector<T> gemv_result((T *)gemv_data, N);
 
         gemv<T>(lastv, lastc, c, v, gemv_result);
         gerc<T>(lastv, lastc, -tau, v, gemv_result, c);
+        delete gemv_data;
       }
 }
 //-----------------------------------------------------------------------------
@@ -1138,8 +1139,7 @@ const ShapeItem N = A.get_column_count();
      // Initialize partial column norms.
      // the first N elements of WORK store the exact column norms.
      //
-     DynArray(double, vn12, 2*N);   // == vn1, vn2
-
+     double * vn12 = new double[2*N];
      for (int j_0 = 0; j_0 < N; ++j_0)
          {
            Vector<T> x(&A.at(0, j_0), M);
@@ -1148,7 +1148,8 @@ const ShapeItem N = A.get_column_count();
 
      // Use unblocked code to factor the last or only block
      //
-     laqp2<T>(A, pivot, tau, vn12.get_data());
+     laqp2<T>(A, pivot, tau, vn12);
+     delete vn12;
    }
 }
 //-----------------------------------------------------------------------------
@@ -1160,20 +1161,19 @@ int estimate_rank(const Matrix<T> & A, double rcond)
 
 const ShapeItem N = A.get_column_count();
 
+double smax = ABS(A.diag(0));
+double smin = smax;
+   if (smax == 0.0)   return 0;
+
    // store minima in work_min[ 0 ... N]
    // store maxima in work_max == work_min[N ... 2N]
    //
-DynArray(double, work_1, 4*N);   // double instead of T for OSX
-T * work_min = (T *)work_1.get_data();
+double * work_1 = new double[4*N];
+T * work_min = (T *)work_1;
 T * work_max = work_min + N;
 
    work_min[0] = 1.0;
    work_max[0] = 1.0;
-
-double smax = ABS(A.diag(0));
-double smin = smax;
-
-   if (smax == 0.0)   return 0;
 
    for (int RANK = 1; RANK < N; ++RANK)
        {
@@ -1196,7 +1196,11 @@ double smin = smax;
          laic1_min<T>(smin, alpha_min, gamma, sminpr, s1, c1);
          laic1_max<T>(smax, alpha_max, gamma, smaxpr, s2, c2);
 
-         if (smaxpr*rcond > sminpr)   return RANK;
+         if (smaxpr*rcond > sminpr)
+            {
+              delete work_1;
+              return RANK;
+            }
 
          loop(cI, RANK)
               {
@@ -1209,6 +1213,7 @@ double smin = smax;
          smax = smaxpr;
        }
 
+   delete work_1;
    return N;
 }
 //-----------------------------------------------------------------------------
@@ -1226,12 +1231,12 @@ const ShapeItem NRHS = B.get_column_count();
    // Compute QR factorization with column pivoting of A:
    // A * P = Q * R
    //
-DynArray(ShapeItem, pivot, N);
+char * pivot_tau_tmp = new char[N*(sizeof(ShapeItem) + 4*sizeof(double))];
+ShapeItem * pivot = (ShapeItem *)pivot_tau_tmp;   // N pivot items
+T * tau = (T *)(pivot + N);                       // N complex tau items
+T * tmp = tau + N;                                // N complex tmp1 items
 
-DynArray(double, tau1, 2*N);   // double instead of T for OSX
-T * tau = (T *)tau1.get_data();
-
-   geqp3<T>(A, pivot.get_data(), tau);
+   geqp3<T>(A, pivot, tau);
 
    // Details of Householder rotations stored in WORK(1:MN).
    //
@@ -1239,7 +1244,11 @@ T * tau = (T *)tau1.get_data();
    //
    {
      const int RANK = estimate_rank(A, rcond);
-     if (RANK < N)   return RANK;
+     if (RANK < N)
+        {
+          delete pivot_tau_tmp;
+          return RANK;
+        }
    }
 
    // from here on, RANK == N. We leave RANK in the comments but use N un
@@ -1270,12 +1279,11 @@ T * tau = (T *)tau1.get_data();
    //
    loop(j_0, NRHS)
       {
-        DynArray(double, tmp1, 2*N);   // double instead of T for OSX
-        T * tmp = (T *)tmp1.get_data();
         loop(i_0, N)   tmp[pivot[i_0]] = B.at(i_0, j_0);
         loop(i_0, N)   B.at(i_0, j_0) = tmp[i_0];
       }
 
+   delete pivot_tau_tmp;
    return N;
 }
 //-----------------------------------------------------------------------------

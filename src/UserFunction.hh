@@ -229,7 +229,7 @@ public:
       { return creator; }
 
    /// set trace or stop vector
-   void set_trace_stop(Function_Line * lines, int line_count, bool stop);
+   void set_trace_stop(Simple_string<Function_Line, false> & lines, bool stop);
 
    /// recompile the body
    void parse_body(const char * loc, bool tolerant, bool macro);

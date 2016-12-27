@@ -2846,20 +2846,20 @@ const ShapeItem len_B = B->element_count();
 
    // B is small, so an itertive search of unique elements is faster
    //
-DynArray(const Cell *, items_Z, len_B);
-ShapeItem len_Z = 0;
+Simple_string<const Cell *, false> items_Z;
+   items_Z.reserve(len_B);
 
    loop(b, len_B)
       {
         const Cell & cell = B->get_ravel(b);
-        if (is_unique(cell, items_Z.get_data(), len_Z, qct))
-           items_Z[len_Z++] = &cell;
+        if (is_unique(cell, items_Z, qct))   items_Z.append(&cell);
       }
 
    // build result value Z
    //
-Value_P Z(len_Z, LOC);
-   loop(z, len_Z)   Z->next_ravel()->init(*(items_Z[z]), Z.getref(), LOC);
+Value_P Z(items_Z.size(), LOC);
+   loop(z, items_Z.size())
+       Z->next_ravel()->init(*(items_Z[z]), Z.getref(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

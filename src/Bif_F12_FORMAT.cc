@@ -665,7 +665,10 @@ char format[40];
 const int data_buf_len = int_part.out_len + 1        // 123.
                        + fract_part.out_len          // 456
                        + 1 + exponent.out_len + 1;   // E-22
-DynArray(char, data_buf, data_buf_len);
+
+   if (data_buf_len > 100)   DOMAIN_ERROR;
+
+char data_buf[101];
 char * fract_end = 0;
 
    if (exponent.size())
@@ -704,9 +707,9 @@ char * fract_end = 0;
 
         // the int part could be longer than allowed by the exaple string.
         //
-        const char * dot = strchr(data_buf.get_data(), '.');
-        const int ilen = dot ? (dot - data_buf.get_data())
-                             : strlen(data_buf.get_data());
+        const char * dot = strchr(data_buf, '.');
+        const int ilen = dot ? (dot - data_buf)
+                             : strlen(data_buf);
         if (ilen > int_part.out_len)
            {
              if (Workspace::get_FC(3) == UNI_ASCII_0)   DOMAIN_ERROR;

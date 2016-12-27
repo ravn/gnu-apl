@@ -1373,17 +1373,17 @@ Value_P Z(lines.size(), LOC);
 void
 Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
 {
-DynArray(Function_Line, lines, new_value.element_count());
-int line_count = 0;
+Simple_string<Function_Line, false> lines;
+   lines.reserve(new_value.element_count());
 
    loop(l, new_value.element_count())
       {
          APL_Integer line = new_value.get_ravel(l).get_near_int();
          if (line < 1)   continue;
-         lines[line_count++] = (Function_Line)line;
+         lines.append((Function_Line)line);
       }
 
-   ufun->set_trace_stop(lines.get_data(), line_count, stop);
+   ufun->set_trace_stop(lines, stop);
 }
 //=============================================================================
 Token

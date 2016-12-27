@@ -83,20 +83,22 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
               //
               const size_t alen = strlen(argv0);
               const size_t plen = strlen(path);
-              DynArray(char, path1, plen + 1);
-              strncpy(&path1[0], path, plen + 1);
+              Simple_string<char, false>   path1;
+              path1.reserve(plen + 1);
+              loop(p, (plen + 1))   path1.append(path[p]);
               char * next = &path1[0];
               for (;;)
                   {
                     char * semi = strchr(next, ':');
                     if (semi)   *semi = 0;
-                    DynArray(char, filename, plen + alen + 10);
-                    snprintf(&filename[0], plen + alen + 8, "%s/%s",
-                             next, argv0);
+                    UTF8_string filename;
+                    for (const char * n = next; *n; ++n)   filename.append(*n);
+                    filename.append('/');
+                    for (const char * a = argv0; *a; ++a)   filename.append(*a);
 
-                    if (access(&filename[0], X_OK) == 0)
+                    if (access(filename.c_str(), X_OK) == 0)
                        {
-                         strncpy(APL_bin_path, filename.get_data(),
+                         strncpy(APL_bin_path, filename.c_str(),
                                  sizeof(APL_bin_path));
                          char * slash =   strrchr(APL_bin_path, '/');
                          Assert(slash);   // due to %s/%s above

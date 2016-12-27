@@ -149,63 +149,27 @@ const ShapeItem ec = value.element_count();
    //
 const ShapeItem cols = value.get_last_shape_item();
 
-   if (cols <= PB_MAX_COLS)   // few columns
-      {
-        DynArray(bool, scaling, cols);
-        DynArray(PrintBuffer, pcols, cols);
-        if (ec <= PB_MAX_ITEMS)
-           {
-             DynArray(PrintBuffer, item_matrix, ec);
-             do_PrintBuffer(value, pctx, out, outer_style,
-                            scaling.get_data(), pcols.get_data(),
-                            item_matrix.get_data());
-           }
-        else
-           {
-             PrintBuffer * item_matrix = 0;
-             try { item_matrix = new PrintBuffer[ec]; }
-             catch (...)
-                {
-                  MORE_ERROR() << "value too large to print ("
-                               << cols << " columns, " << ec << " items)";
-                  WS_FULL;
-                }
+Simple_string<bool, false> scaling;
+   scaling.reserve(cols);
+   loop(c, cols)   scaling.append(false);
 
-             do_PrintBuffer(value, pctx, out, outer_style,
-                                  scaling.get_data(), pcols.get_data(),
-                                  item_matrix);
-             delete [] item_matrix;
-           }
-      }
-   else                      // many columns
+Simple_string<PrintBuffer, true> pcols;
+   pcols.reserve(cols);
+   loop(c, cols)   pcols.append(PrintBuffer());
+
+PrintBuffer * item_matrix = 0;
+   try { item_matrix = new PrintBuffer[ec]; }
+   catch (...)
       {
-        bool * scaling = new bool[cols];
-        PrintBuffer * pcols = new PrintBuffer[cols];
-        if (ec <= PB_MAX_ITEMS)
-           {
-             DynArray(PrintBuffer, item_matrix, ec);
-             do_PrintBuffer(value, pctx, out, outer_style,
-                            scaling, pcols, item_matrix.get_data());
-           }
-        else
-           {
-             PrintBuffer * item_matrix = 0;
-             try { item_matrix = new PrintBuffer[ec]; }
-             catch (...)
-                {
-                  delete [] pcols;
-                  delete [] scaling;
-                 MORE_ERROR() << "value too large to print ("
-                              << cols << " columns, " << ec << " items)";
-                  WS_FULL;
-                }
-             do_PrintBuffer(value, pctx, out, outer_style,
-                            scaling, pcols, item_matrix);
-             delete [] item_matrix;
-           }
-        delete [] pcols;
-        delete [] scaling;
+        MORE_ERROR() << "value too large to print ("
+                     << cols << " columns, " << ec << " items)";
+        WS_FULL;
       }
+
+   do_PrintBuffer(value, pctx, out, outer_style,
+                            &scaling[0], &pcols[0],
+                            item_matrix);
+   delete [] item_matrix;
 
    PERFORMANCE_END(fs_PrintBuffer_B, start_0, ec)
 }

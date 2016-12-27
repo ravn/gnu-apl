@@ -195,18 +195,18 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
 
    // set stop and trace vectors
    //
-DynArray(Function_Line, stop_vec,  lines.size());
-DynArray(Function_Line, trace_vec, lines.size());
+Simple_string<Function_Line, false> stop_vec;
+Simple_string<Function_Line, false> trace_vec;
 int stop_count = 0;
 int trace_count = 0;
    loop(l, lines.size())
        {
-         if (lines[l].stop_flag)    stop_vec [stop_count++]  = Function_Line(l);
-         if (lines[l].trace_flag)   trace_vec[trace_count++] = Function_Line(l);
+         if (lines[l].stop_flag)    stop_vec.append(Function_Line(l));
+         if (lines[l].trace_flag)   trace_vec.append(Function_Line(l));
        }
 
-   ufun->set_trace_stop(stop_vec.get_data(),  stop_count,  true);
-   ufun->set_trace_stop(trace_vec.get_data(), trace_count, false);
+   ufun->set_trace_stop(stop_vec,  true);
+   ufun->set_trace_stop(trace_vec, false);
 }
 //-----------------------------------------------------------------------------
 const char *

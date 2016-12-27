@@ -306,13 +306,15 @@ char ** strings = backtrace_symbols(buffer, size);
 int
 Backtrace::demangle_line(char * result, size_t result_max, const char * buf)
 {
-DynArray(char, tmp, result_max + 1);
-   strncpy(tmp.get_data(), buf, result_max);
-   tmp[result_max] = 0;
+Simple_string<char, false> tmp;
+   tmp.reserve(result_max + 1);
+   for (const char * b = buf; *b && (buf - b) < result_max; ++b)
+       tmp.append(*b);
+   tmp.append(0);
 
 char * e = 0;
 int status = 3;
-char * p = strchr(tmp.get_data(), '(');
+char * p = strchr(&tmp[0], '(');
    if (p == 0)   goto error;
    else          ++p;
 

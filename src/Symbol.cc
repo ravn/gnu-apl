@@ -1054,17 +1054,18 @@ int count = 0;
 }
 //-----------------------------------------------------------------------------
 void
-Symbol::vector_assignment(Symbol * * symbols, int sym_count, Value_P values)
+Symbol::vector_assignment(Simple_string<Symbol *, false> & symbols,
+                          Value_P values)
 {
    if (values->get_rank() > 1)   RANK_ERROR;
    if (!values->is_scalar() &&
-       values->element_count() != sym_count)   LENGTH_ERROR;
+       values->element_count() != symbols.size())   LENGTH_ERROR;
 
 const int incr = values->is_scalar() ? 0 : 1;
 const Cell * cV = &values->get_ravel(0);
-   loop(s, sym_count)
+   loop(s, symbols.size())
       {
-        Symbol * sym = symbols[sym_count - s - 1];
+        Symbol * sym = symbols[symbols.size() - s - 1];
         if (cV->is_pointer_cell())
            {
              sym->assign(cV->get_pointer_value(), true, LOC);

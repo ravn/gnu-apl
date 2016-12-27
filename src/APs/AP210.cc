@@ -155,9 +155,7 @@ seek_variable(FILE * file, int code, int rn)
 
               const int nb = header.get_nb();
               const int rest = nb - sizeof(CDR_header);
-              DynArray(uint8_t, buffer, nb);
-              const int rlen = fread(&buffer[0], 1, rest, file);
-              if (rlen != rest)   return -44;   // delimiter not found
+              if (fseek(file, rest, SEEK_CUR))   return -44;   // no delimiter
             }
 
         return 0;
@@ -195,17 +193,18 @@ read_variable(FILE * file, int code, Coupled_var & var_D,
 
         const int nb = header.get_nb();
         const int rest = nb - sizeof(CDR_header);
-        DynArray(uint8_t, buffer, nb);
-        memcpy(&buffer[0], &header, sizeof(CDR_header));
+        uint8_t * buffer = new uint8_t[nb];
+        Assert(buffer);
+        memcpy(buffer, &header, sizeof(CDR_header));
         const int rlen = fread(&buffer[sizeof(CDR_header)], 1, rest, file);
         if (rlen != rest)   return -44;   // delimiter not found
 
         delete var_D.data;
-        var_D.data = new CDR_string(&buffer[0], nb);
-
+        var_D.data = new CDR_string(buffer, nb);
+        delete buffer;
         return 0;
       }
-   else if (code == 'D')   // char (var size
+   else if (code == 'D')   // char (var size)
       {
       }
    else if (code == 'T')   // translate

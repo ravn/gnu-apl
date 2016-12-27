@@ -534,13 +534,16 @@ UCS_string & message_2 = error.error_message_2;
 }
 //-----------------------------------------------------------------------------
 void
-UserFunction::set_trace_stop(Function_Line * lines, int line_count, bool stop)
+UserFunction::set_trace_stop(Simple_string<Function_Line, false> & lines,
+                             bool stop)
 {
    // Sort lines
    //
-DynArray(bool, ts_lines, line_starts.size());
-   loop(ts, line_starts.size())   ts_lines[ts] = false;
-   loop(ll, line_count)
+Simple_string<bool, false> ts_lines;
+   ts_lines.reserve(line_starts.size());
+
+   loop(ts, line_starts.size())   ts_lines.append(false);
+   loop(ll, lines.size())
       {
         Function_Line line = lines[ll];
         if (line >= 1 && line < (int)line_starts.size())  ts_lines[line] = true;
@@ -979,10 +982,11 @@ UserFunction::adjust_line_starts()
    // this function is called from Executable::setup_lambdas() just before
    // Parser::remove_void_token(body) in order to adjust line_starts
    //
-DynArray(ShapeItem, gaps, line_starts.size());   // count TOK_VOID in every line
+Simple_string<ShapeItem, false> gaps;
+   gaps.reserve(line_starts.size());   // count TOK_VOID in every line
    loop(ls, line_starts.size())
       {
-         gaps[ls] = 0;
+         gaps.append(0);
          if (ls == 0)   continue;   // function header (has no TOK_VOID)
 
          const ShapeItem from = line_starts[ls];
@@ -991,9 +995,8 @@ DynArray(ShapeItem, gaps, line_starts.size());   // count TOK_VOID in every line
 
         for (ShapeItem b = from; b < to; ++b)
             {
-             if (body[b].get_tag() == TOK_VOID)   ++gaps[ls];
+             if (body[b].get_tag() == TOK_VOID)   ++gaps.last();
             }
-
       }
 
 int total_gaps = 0;

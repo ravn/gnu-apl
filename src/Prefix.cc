@@ -1684,19 +1684,19 @@ const int count = vector_ass_count();
 
    // vector assignment.
    //
-DynArray(Symbol *, symbols, count + 1);
-   symbols[0] = at0().get_sym_ptr();
+Simple_string<Symbol *, false> symbols;
+   symbols.append(at0().get_sym_ptr());
    loop(c, count)
       {
         Token_loc tl = lookahead();
         Assert1(tl.tok.get_tag() == TOK_LSYMB2);   // by vector_ass_count()
         Symbol * V = tl.tok.get_sym_ptr();
         Assert(V);
-        symbols[c + 1] = V;
+        symbols.append(V);
       }
 
 Value_P B = at3().get_apl_val();
-   Symbol::vector_assignment(symbols.get_data(), count + 1, B);
+   Symbol::vector_assignment(symbols, B);
 
    set_assign_state(ASS_none);
 
