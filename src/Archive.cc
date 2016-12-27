@@ -1830,14 +1830,14 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
    //
    if (!have_allowed_objects       &&   // no dedicated object list
         copying                    &&   // )COPY
-        ! (name_UCS == ID::get_name(ID::Quad_CT) ||
-           name_UCS == ID::get_name(ID::Quad_FC) ||
-           name_UCS == ID::get_name(ID::Quad_IO) ||
-           name_UCS == ID::get_name(ID::Quad_LX) ||
-           name_UCS == ID::get_name(ID::Quad_PP) ||
-           name_UCS == ID::get_name(ID::Quad_PR) ||
-           name_UCS == ID::get_name(ID::Quad_RL)
-          ))
+        (name_UCS == ID::get_name(ID::Quad_CT) ||
+         name_UCS == ID::get_name(ID::Quad_FC) ||
+         name_UCS == ID::get_name(ID::Quad_IO) ||
+         name_UCS == ID::get_name(ID::Quad_LX) ||
+         name_UCS == ID::get_name(ID::Quad_PP) ||
+         name_UCS == ID::get_name(ID::Quad_PR) ||
+         name_UCS == ID::get_name(ID::Quad_RL)
+        ))
       {
         Log(LOG_archive)   CERR << name_UCS << " not copied at " << LOC << endl;
         no_copy = true;
