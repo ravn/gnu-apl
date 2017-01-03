@@ -81,7 +81,6 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
               // p1 p2 ... The variable next points to the start of each
               // string.
               //
-              const size_t alen = strlen(argv0);
               const size_t plen = strlen(path);
               Simple_string<char, false>   path1;
               path1.reserve(plen + 1);

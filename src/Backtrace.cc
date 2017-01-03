@@ -308,7 +308,7 @@ Backtrace::demangle_line(char * result, size_t result_max, const char * buf)
 {
 Simple_string<char, false> tmp;
    tmp.reserve(result_max + 1);
-   for (const char * b = buf; *b && (buf - b) < result_max; ++b)
+   for (const char * b = buf; *b &&  b < (buf + result_max); ++b)
        tmp.append(*b);
    tmp.append(0);
 

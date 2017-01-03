@@ -152,7 +152,7 @@ const char * why = sym->cant_be_defined();
 NativeFunction::~NativeFunction()
 {
   Log(LOG_UserFunction__enter_leave)
-      CERR << "Native function " << get_name() << " deleted." << endl;
+      get_CERR() << "Native function " << get_name() << " deleted." << endl;
 
    loop(v, valid_functions.size())
       {
@@ -308,19 +308,23 @@ NativeFunction::cleanup()
 {
    // delete in reverse construction order
    //
-   loop(v, valid_functions.size())
+   while(valid_functions.size())
       {
-        NativeFunction & fun = *valid_functions.last();
-        if (fun.close_fun && fun.handle)
+        NativeFunction * fun = valid_functions.last();
+        valid_functions.pop();
+        
+        if (fun->close_fun && fun->handle)
            {
-             const bool do_dlclose = (*fun.close_fun)(CAUSE_SHUTDOWN, &fun);
+             const bool do_dlclose = (*fun->close_fun)(CAUSE_SHUTDOWN, fun);
              if (do_dlclose)
                 {
-                  dlclose(fun.handle);
-                  fun.handle = 0;
+                  dlclose(fun->handle);
+                  fun->handle = 0;
                 }
            }
-        delete valid_functions[v];
+
+        // don't delete fun since this will be done when the symbol for the
+        // fun is being deleted
       }
 }
 //-----------------------------------------------------------------------------
@@ -371,9 +375,14 @@ NativeFunction::fix(const UCS_string & so_name,
       }
 
 NativeFunction * new_function = new NativeFunction(so_name, function_name);
+   Log(LOG_delete)
+      CERR << "new    " << (const void *)new_function << " at " LOC << endl;
+
 
    if (!new_function->valid)   // something went wrong
       {
+        Log(LOG_delete)
+          CERR << "delete " << (const void *)new_function << " at " LOC << endl;
         delete new_function;
         return 0;
       }
