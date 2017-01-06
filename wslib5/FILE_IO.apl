@@ -463,3 +463,35 @@ t←t⍪'INADDR_ANY' 0
  Z←Z⍪'Version'       '1.0'
 ∇
 
+⍝ A function that allows you to specify ⎕FIO functions as strings instead
+⍝ of numbers:
+⍝
+⍝ kindly sent by Christian Robert to bug-apl@gnu.org on Jan. 6, 2017
+⍝
+∇z←L FIO[X] R;a
+ →(2≠⎕nc 'X')/Noaxis
+ →(0=↑0⍴X)/Number
+ a←   ('errno'        1) ('strerror'    2) ('fopen'       3) ('fclose'       4)
+ a←a, ('ferrno'       5) ('fread'       6) ('fwrite'      7) ('fgets'        8)
+ a←a, ('fgetc'        9) ('feof'       10) ('ferror'     11) ('ftell'       12)
+ a←a, ('fseek_set'   13) ('fseek_cur'  14) ('fseek_end'  15) ('fflush'      16)
+ a←a, ('fsync'       17) ('fstat'      18) ('unlink'     19) ('mkdir'       20)
+ a←a, ('rmdir'       21) ('printf'     22) ('fwrite'     23) ('popen'       24)
+ a←a, ('pclose'      25) ('readfile'   26) ('rename'     27) ('dir'         28)
+ a←a, ('ls'          29) ('getcwd'     30) ('access'     31) ('socket'      32)
+ a←a, ('bind'        33) ('listen'     34) ('accept'     35) ('connect'     36)
+ a←a, ('recv'        37) ('send'       38) ('usend'      39) ('select'      40)
+ a←a, ('read'        41) ('write'      42) ('uwrite'     43) ('getsockname' 44)
+ a←a, ('getpeername' 45) ('getsockopt' 46) ('setsockopt' 47) ('fscanf'      48)
+ a←a, ('open'         3) ('close'       4) ⍝ And some handy aliases
+ →(0=↑⍴X←,⊃((⊂X) ≡¨↑¨a)/a)/Nomatch
+ X←¯1↑X
+Number:       →(2≠⎕nc 'L')/Monadic
+Diadic:       z← L ⎕FIO[X] R ◊ →0
+Monadic:      z←   ⎕FIO[X] R ◊ →0
+Nomatch:      "Unknown function:", X ◊ →0
+Noaxis:       →(2≠⎕nc 'L')/NoaxisMonadic
+NoaxisDiadic: z←L ⎕FIO R ◊ →0
+NoaxisMonadic:z←  ⎕FIO R ◊ →0
+∇ 
+
