@@ -652,7 +652,7 @@ Pfstat_ID iarg = PFS_ALL;
 void 
 Command::cmd_HELP(ostream & out)
 {
-   out << "APL Commands:" << endl;
+   out << left << "APL Commands:" << endl;
 #define cmd_def(cmd_str, _cod, arg, _hint) \
    out << "      " cmd_str " " arg << endl;
 #include "Command.def"
@@ -681,8 +681,8 @@ Command::cmd_HELP(ostream & out)
    out << endl << "System functions:" << endl;
 #define ro_sv_def(x, _str, _txt)
 #define rw_sv_def(x, _str, _txt)
-#define sf_def(q, _str, txt) \
-        out << "      " << setw(8) << q::fun->get_name() << txt << endl;
+#define sf_def(_q, str, txt) \
+        out << "      ⎕" << setw(7) << str << txt << endl;
 
 #include "SystemVariable.def"
 }

@@ -37,6 +37,7 @@
 #include "QuadFunction.hh"
 #include "Quad_DLX.hh"
 #include "Quad_FX.hh"
+#include "Quad_SQL.hh"
 #include "Quad_SVx.hh"
 #include "Quad_TF.hh"
 #include "ScalarFunction.hh"

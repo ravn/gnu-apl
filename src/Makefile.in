@@ -82,9 +82,26 @@ build_triplet = @build@
 host_triplet = @host@
 @WANT_ANDROID_FALSE@am__append_1 = APs emacs_mode sql workspaces
 @WANT_LIBAPL_TRUE@am__append_2 = libapl.la
-@DEVELOP_TRUE@@WANT_LIBAPL_TRUE@am__append_3 = -Werror -Wall -Wno-strict-aliasing
+@WANT_LIBAPL_TRUE@am__append_3 = -avoid-version -module -shared -export-dynamic
+@WANT_LIBAPL_TRUE@am__append_4 = $(GPROF_WANTED) $(CXX_RDYNAMIC)
+@DEVELOP_TRUE@@WANT_LIBAPL_TRUE@am__append_5 = -Werror -Wall -Wno-strict-aliasing
 @WANT_LIBAPL_FALSE@bin_PROGRAMS = apl$(EXEEXT)
-@DEVELOP_TRUE@am__append_4 = -Werror -Wall -Wno-strict-aliasing
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@am__append_6 = $(SQLITE3_CFLAGS)
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@am__append_7 = $(SQLITE3_LDFLAGS)
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@am__append_8 = sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh  \
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@               sql/SqliteConnection.cc     sql/SqliteConnection.hh      \
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@               sql/SqliteResultValue.cc    sql/SqliteResultValue.hh     \
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@               sql/SqliteProvider.cc       sql/SqliteProvider.hh        \
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@               sql/Connection.cc
+
+@POSTGRES_TRUE@@SQLITE3_FALSE@@WANT_LIBAPL_FALSE@am__append_9 = sql/Connection.cc
+@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@am__append_10 = $(POSTGRESQL_CFLAGS)
+@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@am__append_11 = $(POSTGRESQL_LDFLAGS)
+@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@am__append_12 = sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
+@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@                 sql/PostgresConnection.cc     sql/PostgresConnection.hh \
+@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@                 sql/PostgresProvider.cc       sql/PostgresProvider.hh
+
+@DEVELOP_TRUE@am__append_13 = -Werror -Wall -Wno-strict-aliasing
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp $(am__pkginclude_HEADERS_DIST)
@@ -161,11 +178,12 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	PrintContext.hh PrintOperator.hh QuadFunction.cc \
 	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
 	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FIO.cc Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_RL.cc Quad_RL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Parallel.cc Parallel.hh \
-	Performance.cc Performance.def Performance.hh RealCell.cc \
-	RealCell.hh sbrk.cc Shape.cc Shape.hh SharedValuePointer.hh \
-	Simple_string.hh ScalarFunction.cc ScalarFunction.hh Source.hh \
+	Quad_FX.cc Quad_FX.hh Quad_RL.cc Quad_RL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Parallel.cc Parallel.hh Performance.cc Performance.def \
+	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
+	Shape.hh SharedValuePointer.hh Simple_string.hh \
+	ScalarFunction.cc ScalarFunction.hh Source.hh \
 	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
 	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
 	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
@@ -206,10 +224,10 @@ am__objects_1 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
 	libapl_la-QuadFunction.lo libapl_la-ProcessorID.lo \
 	libapl_la-Quad_CR.lo libapl_la-Quad_DLX.lo \
 	libapl_la-Quad_FIO.lo libapl_la-Quad_FX.lo \
-	libapl_la-Quad_RL.lo libapl_la-Quad_SVx.lo \
-	libapl_la-Quad_TF.lo libapl_la-Parallel.lo \
-	libapl_la-Performance.lo libapl_la-RealCell.lo \
-	libapl_la-sbrk.lo libapl_la-Shape.lo \
+	libapl_la-Quad_RL.lo libapl_la-Quad_SQL.lo \
+	libapl_la-Quad_SVx.lo libapl_la-Quad_TF.lo \
+	libapl_la-Parallel.lo libapl_la-Performance.lo \
+	libapl_la-RealCell.lo libapl_la-sbrk.lo libapl_la-Shape.lo \
 	libapl_la-ScalarFunction.lo libapl_la-StateIndicator.lo \
 	libapl_la-Svar_DB.lo libapl_la-Svar_record.lo \
 	libapl_la-Symbol.lo libapl_la-SymbolTable.lo \
@@ -263,11 +281,12 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	PrintContext.hh PrintOperator.hh QuadFunction.cc \
 	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
 	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FIO.cc Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_RL.cc Quad_RL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Parallel.cc Parallel.hh \
-	Performance.cc Performance.def Performance.hh RealCell.cc \
-	RealCell.hh sbrk.cc Shape.cc Shape.hh SharedValuePointer.hh \
-	Simple_string.hh ScalarFunction.cc ScalarFunction.hh Source.hh \
+	Quad_FX.cc Quad_FX.hh Quad_RL.cc Quad_RL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Parallel.cc Parallel.hh Performance.cc Performance.def \
+	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
+	Shape.hh SharedValuePointer.hh Simple_string.hh \
+	ScalarFunction.cc ScalarFunction.hh Source.hh \
 	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
 	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
 	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
@@ -280,7 +299,14 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	UserFunction_header.cc UserFunction_header.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
-	ValueHistory.hh Workspace.cc Workspace.hh
+	ValueHistory.hh Workspace.cc Workspace.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
+	sql/PostgresConnection.cc sql/PostgresConnection.hh \
+	sql/PostgresProvider.cc sql/PostgresProvider.hh
 am__objects_2 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-Assert.$(OBJEXT) apl-Avec.$(OBJEXT) \
 	apl-Backtrace.$(OBJEXT) apl-Bif_F12_FORMAT.$(OBJEXT) \
@@ -310,10 +336,10 @@ am__objects_2 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-QuadFunction.$(OBJEXT) apl-ProcessorID.$(OBJEXT) \
 	apl-Quad_CR.$(OBJEXT) apl-Quad_DLX.$(OBJEXT) \
 	apl-Quad_FIO.$(OBJEXT) apl-Quad_FX.$(OBJEXT) \
-	apl-Quad_RL.$(OBJEXT) apl-Quad_SVx.$(OBJEXT) \
-	apl-Quad_TF.$(OBJEXT) apl-Parallel.$(OBJEXT) \
-	apl-Performance.$(OBJEXT) apl-RealCell.$(OBJEXT) \
-	apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
+	apl-Quad_RL.$(OBJEXT) apl-Quad_SQL.$(OBJEXT) \
+	apl-Quad_SVx.$(OBJEXT) apl-Quad_TF.$(OBJEXT) \
+	apl-Parallel.$(OBJEXT) apl-Performance.$(OBJEXT) \
+	apl-RealCell.$(OBJEXT) apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
 	apl-ScalarFunction.$(OBJEXT) apl-StateIndicator.$(OBJEXT) \
 	apl-Svar_DB.$(OBJEXT) apl-Svar_record.$(OBJEXT) \
 	apl-Symbol.$(OBJEXT) apl-SymbolTable.$(OBJEXT) \
@@ -324,14 +350,25 @@ am__objects_2 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@am__objects_3 = sql/apl-SqliteArgListBuilder.$(OBJEXT) \
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-SqliteConnection.$(OBJEXT) \
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-SqliteResultValue.$(OBJEXT) \
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-SqliteProvider.$(OBJEXT) \
+@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-Connection.$(OBJEXT)
+@POSTGRES_TRUE@@SQLITE3_FALSE@@WANT_LIBAPL_FALSE@am__objects_4 = sql/apl-Connection.$(OBJEXT)
+@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@am__objects_5 = sql/apl-PostgresArgListBuilder.$(OBJEXT) \
+@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-PostgresConnection.$(OBJEXT) \
+@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-PostgresProvider.$(OBJEXT)
 @WANT_LIBAPL_FALSE@am_apl_OBJECTS = apl-main.$(OBJEXT) \
-@WANT_LIBAPL_FALSE@	$(am__objects_2)
+@WANT_LIBAPL_FALSE@	$(am__objects_2) $(am__objects_3) \
+@WANT_LIBAPL_FALSE@	$(am__objects_4) $(am__objects_5)
 apl_OBJECTS = $(am_apl_OBJECTS)
 am__DEPENDENCIES_1 =
 apl_DEPENDENCIES = $(am__DEPENDENCIES_1)
 apl_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(apl_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+	$(CXXFLAGS) $(apl_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -602,6 +639,11 @@ EXTRA_DIRS = $(am__append_1)
 SUBDIRS = native $(EXTRA_DIRS)
 DIST_SUBDIRS = $(SUBDIRS) testcases
 distcleancheck_listfile = buildtag
+apl_CXXFLAGS = $(am__append_6) $(am__append_10) $(GPROF_WANTED) \
+	$(CXX_RDYNAMIC) -I sql $(am__append_13)
+apl_LDFLAGS = $(am__append_7) $(am__append_11)
+libapl_la_CXXFLAGS = $(am__append_4) $(am__append_5)
+libapl_la_LDFLAGS = $(am__append_3)
 common_sources = \
 			buildtag		buildtag.hh		\
 						../config.h		\
@@ -671,6 +713,7 @@ Quad_DLX.cc					Quad_DLX.hh		\
 Quad_FIO.cc					Quad_FIO.hh		\
 Quad_FX.cc					Quad_FX.hh		\
 Quad_RL.cc					Quad_RL.hh		\
+Quad_SQL.cc					Quad_SQL.hh		\
 Quad_SVx.cc					Quad_SVx.hh		\
 Quad_TF.cc					Quad_TF.hh		\
 Parallel.cc					Parallel.hh		\
@@ -708,12 +751,10 @@ Workspace.cc					Workspace.hh
 pkglib_LTLIBRARIES = $(am__append_2)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_sources) libapl.h libapl.cc
-@WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = -avoid-version -module -shared -export-dynamic
-@WANT_LIBAPL_TRUE@libapl_la_CXXFLAGS = $(GPROF_WANTED) $(CXX_RDYNAMIC) \
-@WANT_LIBAPL_TRUE@	$(am__append_3)
-@WANT_LIBAPL_FALSE@apl_SOURCES = main.cc $(common_sources)
+@WANT_LIBAPL_FALSE@apl_SOURCES = main.cc $(common_sources) \
+@WANT_LIBAPL_FALSE@	$(am__append_8) $(am__append_9) \
+@WANT_LIBAPL_FALSE@	$(am__append_12)
 AM_MAKEFLAGS = -j $(MAKE_J)
-apl_CXXFLAGS = $(GPROF_WANTED) $(CXX_RDYNAMIC) $(am__append_4)
 apl_LDADD = $(LIBS)
 all: all-recursive
 
@@ -836,6 +877,28 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+sql/$(am__dirstamp):
+	@$(MKDIR_P) sql
+	@: > sql/$(am__dirstamp)
+sql/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) sql/$(DEPDIR)
+	@: > sql/$(DEPDIR)/$(am__dirstamp)
+sql/apl-SqliteArgListBuilder.$(OBJEXT): sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/apl-SqliteConnection.$(OBJEXT): sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/apl-SqliteResultValue.$(OBJEXT): sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/apl-SqliteProvider.$(OBJEXT): sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/apl-Connection.$(OBJEXT): sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/apl-PostgresArgListBuilder.$(OBJEXT): sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/apl-PostgresConnection.$(OBJEXT): sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/apl-PostgresProvider.$(OBJEXT): sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
 
 apl$(EXEEXT): $(apl_OBJECTS) $(apl_DEPENDENCIES) $(EXTRA_apl_DEPENDENCIES) 
 	@rm -f apl$(EXEEXT)
@@ -843,6 +906,7 @@ apl$(EXEEXT): $(apl_OBJECTS) $(apl_DEPENDENCIES) $(EXTRA_apl_DEPENDENCIES)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f sql/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -908,6 +972,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_FIO.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_FX.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_RL.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_SQL.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_SVx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_TF.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-RealCell.Po@am__quote@
@@ -994,6 +1059,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_FIO.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_FX.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_RL.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_SQL.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_SVx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_TF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-RealCell.Plo@am__quote@
@@ -1019,6 +1085,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-configure_args.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-libapl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-sbrk.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-Connection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-PostgresArgListBuilder.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-PostgresConnection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-PostgresProvider.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteArgListBuilder.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteConnection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteProvider.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteResultValue.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1456,6 +1530,13 @@ libapl_la-Quad_RL.lo: Quad_RL.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_RL.cc' object='libapl_la-Quad_RL.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Quad_RL.lo `test -f 'Quad_RL.cc' || echo '$(srcdir)/'`Quad_RL.cc
+
+libapl_la-Quad_SQL.lo: Quad_SQL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Quad_SQL.lo -MD -MP -MF $(DEPDIR)/libapl_la-Quad_SQL.Tpo -c -o libapl_la-Quad_SQL.lo `test -f 'Quad_SQL.cc' || echo '$(srcdir)/'`Quad_SQL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Quad_SQL.Tpo $(DEPDIR)/libapl_la-Quad_SQL.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_SQL.cc' object='libapl_la-Quad_SQL.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Quad_SQL.lo `test -f 'Quad_SQL.cc' || echo '$(srcdir)/'`Quad_SQL.cc
 
 libapl_la-Quad_SVx.lo: Quad_SVx.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Quad_SVx.lo -MD -MP -MF $(DEPDIR)/libapl_la-Quad_SVx.Tpo -c -o libapl_la-Quad_SVx.lo `test -f 'Quad_SVx.cc' || echo '$(srcdir)/'`Quad_SVx.cc
@@ -2486,6 +2567,20 @@ apl-Quad_RL.obj: Quad_RL.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_RL.obj `if test -f 'Quad_RL.cc'; then $(CYGPATH_W) 'Quad_RL.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_RL.cc'; fi`
 
+apl-Quad_SQL.o: Quad_SQL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_SQL.o -MD -MP -MF $(DEPDIR)/apl-Quad_SQL.Tpo -c -o apl-Quad_SQL.o `test -f 'Quad_SQL.cc' || echo '$(srcdir)/'`Quad_SQL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_SQL.Tpo $(DEPDIR)/apl-Quad_SQL.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_SQL.cc' object='apl-Quad_SQL.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_SQL.o `test -f 'Quad_SQL.cc' || echo '$(srcdir)/'`Quad_SQL.cc
+
+apl-Quad_SQL.obj: Quad_SQL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_SQL.obj -MD -MP -MF $(DEPDIR)/apl-Quad_SQL.Tpo -c -o apl-Quad_SQL.obj `if test -f 'Quad_SQL.cc'; then $(CYGPATH_W) 'Quad_SQL.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_SQL.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_SQL.Tpo $(DEPDIR)/apl-Quad_SQL.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_SQL.cc' object='apl-Quad_SQL.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_SQL.obj `if test -f 'Quad_SQL.cc'; then $(CYGPATH_W) 'Quad_SQL.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_SQL.cc'; fi`
+
 apl-Quad_SVx.o: Quad_SVx.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_SVx.o -MD -MP -MF $(DEPDIR)/apl-Quad_SVx.Tpo -c -o apl-Quad_SVx.o `test -f 'Quad_SVx.cc' || echo '$(srcdir)/'`Quad_SVx.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_SVx.Tpo $(DEPDIR)/apl-Quad_SVx.Po
@@ -2850,6 +2945,118 @@ apl-Workspace.obj: Workspace.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Workspace.obj `if test -f 'Workspace.cc'; then $(CYGPATH_W) 'Workspace.cc'; else $(CYGPATH_W) '$(srcdir)/Workspace.cc'; fi`
 
+sql/apl-SqliteArgListBuilder.o: sql/SqliteArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-SqliteArgListBuilder.o -MD -MP -MF sql/$(DEPDIR)/apl-SqliteArgListBuilder.Tpo -c -o sql/apl-SqliteArgListBuilder.o `test -f 'sql/SqliteArgListBuilder.cc' || echo '$(srcdir)/'`sql/SqliteArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-SqliteArgListBuilder.Tpo sql/$(DEPDIR)/apl-SqliteArgListBuilder.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteArgListBuilder.cc' object='sql/apl-SqliteArgListBuilder.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-SqliteArgListBuilder.o `test -f 'sql/SqliteArgListBuilder.cc' || echo '$(srcdir)/'`sql/SqliteArgListBuilder.cc
+
+sql/apl-SqliteArgListBuilder.obj: sql/SqliteArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-SqliteArgListBuilder.obj -MD -MP -MF sql/$(DEPDIR)/apl-SqliteArgListBuilder.Tpo -c -o sql/apl-SqliteArgListBuilder.obj `if test -f 'sql/SqliteArgListBuilder.cc'; then $(CYGPATH_W) 'sql/SqliteArgListBuilder.cc'; else $(CYGPATH_W) '$(srcdir)/sql/SqliteArgListBuilder.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-SqliteArgListBuilder.Tpo sql/$(DEPDIR)/apl-SqliteArgListBuilder.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteArgListBuilder.cc' object='sql/apl-SqliteArgListBuilder.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-SqliteArgListBuilder.obj `if test -f 'sql/SqliteArgListBuilder.cc'; then $(CYGPATH_W) 'sql/SqliteArgListBuilder.cc'; else $(CYGPATH_W) '$(srcdir)/sql/SqliteArgListBuilder.cc'; fi`
+
+sql/apl-SqliteConnection.o: sql/SqliteConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-SqliteConnection.o -MD -MP -MF sql/$(DEPDIR)/apl-SqliteConnection.Tpo -c -o sql/apl-SqliteConnection.o `test -f 'sql/SqliteConnection.cc' || echo '$(srcdir)/'`sql/SqliteConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-SqliteConnection.Tpo sql/$(DEPDIR)/apl-SqliteConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteConnection.cc' object='sql/apl-SqliteConnection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-SqliteConnection.o `test -f 'sql/SqliteConnection.cc' || echo '$(srcdir)/'`sql/SqliteConnection.cc
+
+sql/apl-SqliteConnection.obj: sql/SqliteConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-SqliteConnection.obj -MD -MP -MF sql/$(DEPDIR)/apl-SqliteConnection.Tpo -c -o sql/apl-SqliteConnection.obj `if test -f 'sql/SqliteConnection.cc'; then $(CYGPATH_W) 'sql/SqliteConnection.cc'; else $(CYGPATH_W) '$(srcdir)/sql/SqliteConnection.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-SqliteConnection.Tpo sql/$(DEPDIR)/apl-SqliteConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteConnection.cc' object='sql/apl-SqliteConnection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-SqliteConnection.obj `if test -f 'sql/SqliteConnection.cc'; then $(CYGPATH_W) 'sql/SqliteConnection.cc'; else $(CYGPATH_W) '$(srcdir)/sql/SqliteConnection.cc'; fi`
+
+sql/apl-SqliteResultValue.o: sql/SqliteResultValue.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-SqliteResultValue.o -MD -MP -MF sql/$(DEPDIR)/apl-SqliteResultValue.Tpo -c -o sql/apl-SqliteResultValue.o `test -f 'sql/SqliteResultValue.cc' || echo '$(srcdir)/'`sql/SqliteResultValue.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-SqliteResultValue.Tpo sql/$(DEPDIR)/apl-SqliteResultValue.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteResultValue.cc' object='sql/apl-SqliteResultValue.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-SqliteResultValue.o `test -f 'sql/SqliteResultValue.cc' || echo '$(srcdir)/'`sql/SqliteResultValue.cc
+
+sql/apl-SqliteResultValue.obj: sql/SqliteResultValue.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-SqliteResultValue.obj -MD -MP -MF sql/$(DEPDIR)/apl-SqliteResultValue.Tpo -c -o sql/apl-SqliteResultValue.obj `if test -f 'sql/SqliteResultValue.cc'; then $(CYGPATH_W) 'sql/SqliteResultValue.cc'; else $(CYGPATH_W) '$(srcdir)/sql/SqliteResultValue.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-SqliteResultValue.Tpo sql/$(DEPDIR)/apl-SqliteResultValue.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteResultValue.cc' object='sql/apl-SqliteResultValue.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-SqliteResultValue.obj `if test -f 'sql/SqliteResultValue.cc'; then $(CYGPATH_W) 'sql/SqliteResultValue.cc'; else $(CYGPATH_W) '$(srcdir)/sql/SqliteResultValue.cc'; fi`
+
+sql/apl-SqliteProvider.o: sql/SqliteProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-SqliteProvider.o -MD -MP -MF sql/$(DEPDIR)/apl-SqliteProvider.Tpo -c -o sql/apl-SqliteProvider.o `test -f 'sql/SqliteProvider.cc' || echo '$(srcdir)/'`sql/SqliteProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-SqliteProvider.Tpo sql/$(DEPDIR)/apl-SqliteProvider.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteProvider.cc' object='sql/apl-SqliteProvider.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-SqliteProvider.o `test -f 'sql/SqliteProvider.cc' || echo '$(srcdir)/'`sql/SqliteProvider.cc
+
+sql/apl-SqliteProvider.obj: sql/SqliteProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-SqliteProvider.obj -MD -MP -MF sql/$(DEPDIR)/apl-SqliteProvider.Tpo -c -o sql/apl-SqliteProvider.obj `if test -f 'sql/SqliteProvider.cc'; then $(CYGPATH_W) 'sql/SqliteProvider.cc'; else $(CYGPATH_W) '$(srcdir)/sql/SqliteProvider.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-SqliteProvider.Tpo sql/$(DEPDIR)/apl-SqliteProvider.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteProvider.cc' object='sql/apl-SqliteProvider.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-SqliteProvider.obj `if test -f 'sql/SqliteProvider.cc'; then $(CYGPATH_W) 'sql/SqliteProvider.cc'; else $(CYGPATH_W) '$(srcdir)/sql/SqliteProvider.cc'; fi`
+
+sql/apl-Connection.o: sql/Connection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-Connection.o -MD -MP -MF sql/$(DEPDIR)/apl-Connection.Tpo -c -o sql/apl-Connection.o `test -f 'sql/Connection.cc' || echo '$(srcdir)/'`sql/Connection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-Connection.Tpo sql/$(DEPDIR)/apl-Connection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/Connection.cc' object='sql/apl-Connection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-Connection.o `test -f 'sql/Connection.cc' || echo '$(srcdir)/'`sql/Connection.cc
+
+sql/apl-Connection.obj: sql/Connection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-Connection.obj -MD -MP -MF sql/$(DEPDIR)/apl-Connection.Tpo -c -o sql/apl-Connection.obj `if test -f 'sql/Connection.cc'; then $(CYGPATH_W) 'sql/Connection.cc'; else $(CYGPATH_W) '$(srcdir)/sql/Connection.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-Connection.Tpo sql/$(DEPDIR)/apl-Connection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/Connection.cc' object='sql/apl-Connection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-Connection.obj `if test -f 'sql/Connection.cc'; then $(CYGPATH_W) 'sql/Connection.cc'; else $(CYGPATH_W) '$(srcdir)/sql/Connection.cc'; fi`
+
+sql/apl-PostgresArgListBuilder.o: sql/PostgresArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-PostgresArgListBuilder.o -MD -MP -MF sql/$(DEPDIR)/apl-PostgresArgListBuilder.Tpo -c -o sql/apl-PostgresArgListBuilder.o `test -f 'sql/PostgresArgListBuilder.cc' || echo '$(srcdir)/'`sql/PostgresArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-PostgresArgListBuilder.Tpo sql/$(DEPDIR)/apl-PostgresArgListBuilder.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresArgListBuilder.cc' object='sql/apl-PostgresArgListBuilder.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-PostgresArgListBuilder.o `test -f 'sql/PostgresArgListBuilder.cc' || echo '$(srcdir)/'`sql/PostgresArgListBuilder.cc
+
+sql/apl-PostgresArgListBuilder.obj: sql/PostgresArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-PostgresArgListBuilder.obj -MD -MP -MF sql/$(DEPDIR)/apl-PostgresArgListBuilder.Tpo -c -o sql/apl-PostgresArgListBuilder.obj `if test -f 'sql/PostgresArgListBuilder.cc'; then $(CYGPATH_W) 'sql/PostgresArgListBuilder.cc'; else $(CYGPATH_W) '$(srcdir)/sql/PostgresArgListBuilder.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-PostgresArgListBuilder.Tpo sql/$(DEPDIR)/apl-PostgresArgListBuilder.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresArgListBuilder.cc' object='sql/apl-PostgresArgListBuilder.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-PostgresArgListBuilder.obj `if test -f 'sql/PostgresArgListBuilder.cc'; then $(CYGPATH_W) 'sql/PostgresArgListBuilder.cc'; else $(CYGPATH_W) '$(srcdir)/sql/PostgresArgListBuilder.cc'; fi`
+
+sql/apl-PostgresConnection.o: sql/PostgresConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-PostgresConnection.o -MD -MP -MF sql/$(DEPDIR)/apl-PostgresConnection.Tpo -c -o sql/apl-PostgresConnection.o `test -f 'sql/PostgresConnection.cc' || echo '$(srcdir)/'`sql/PostgresConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-PostgresConnection.Tpo sql/$(DEPDIR)/apl-PostgresConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresConnection.cc' object='sql/apl-PostgresConnection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-PostgresConnection.o `test -f 'sql/PostgresConnection.cc' || echo '$(srcdir)/'`sql/PostgresConnection.cc
+
+sql/apl-PostgresConnection.obj: sql/PostgresConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-PostgresConnection.obj -MD -MP -MF sql/$(DEPDIR)/apl-PostgresConnection.Tpo -c -o sql/apl-PostgresConnection.obj `if test -f 'sql/PostgresConnection.cc'; then $(CYGPATH_W) 'sql/PostgresConnection.cc'; else $(CYGPATH_W) '$(srcdir)/sql/PostgresConnection.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-PostgresConnection.Tpo sql/$(DEPDIR)/apl-PostgresConnection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresConnection.cc' object='sql/apl-PostgresConnection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-PostgresConnection.obj `if test -f 'sql/PostgresConnection.cc'; then $(CYGPATH_W) 'sql/PostgresConnection.cc'; else $(CYGPATH_W) '$(srcdir)/sql/PostgresConnection.cc'; fi`
+
+sql/apl-PostgresProvider.o: sql/PostgresProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-PostgresProvider.o -MD -MP -MF sql/$(DEPDIR)/apl-PostgresProvider.Tpo -c -o sql/apl-PostgresProvider.o `test -f 'sql/PostgresProvider.cc' || echo '$(srcdir)/'`sql/PostgresProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-PostgresProvider.Tpo sql/$(DEPDIR)/apl-PostgresProvider.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresProvider.cc' object='sql/apl-PostgresProvider.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-PostgresProvider.o `test -f 'sql/PostgresProvider.cc' || echo '$(srcdir)/'`sql/PostgresProvider.cc
+
+sql/apl-PostgresProvider.obj: sql/PostgresProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT sql/apl-PostgresProvider.obj -MD -MP -MF sql/$(DEPDIR)/apl-PostgresProvider.Tpo -c -o sql/apl-PostgresProvider.obj `if test -f 'sql/PostgresProvider.cc'; then $(CYGPATH_W) 'sql/PostgresProvider.cc'; else $(CYGPATH_W) '$(srcdir)/sql/PostgresProvider.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/apl-PostgresProvider.Tpo sql/$(DEPDIR)/apl-PostgresProvider.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresProvider.cc' object='sql/apl-PostgresProvider.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o sql/apl-PostgresProvider.obj `if test -f 'sql/PostgresProvider.cc'; then $(CYGPATH_W) 'sql/PostgresProvider.cc'; else $(CYGPATH_W) '$(srcdir)/sql/PostgresProvider.cc'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -3065,6 +3272,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f sql/$(DEPDIR)/$(am__dirstamp)
+	-rm -f sql/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -3075,7 +3284,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-libtool \
 	clean-pkglibLTLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) sql/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -3121,7 +3330,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) sql/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

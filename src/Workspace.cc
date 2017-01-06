@@ -33,6 +33,7 @@ using namespace std;
 #include "LibPaths.hh"
 #include "Output.hh"
 #include "Quad_FX.hh"
+#include "Quad_SQL.hh"
 #include "Quad_TF.hh"
 #include "SystemVariable.hh"
 #include "UserFunction.hh"

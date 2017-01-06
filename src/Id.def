@@ -203,6 +203,7 @@ qv( SYL           , "⎕SYL"    ,          )
 pp( USER_SYMBOL   , ---       ,          )
 pp( STOP_LINE     , ---       ,          )
 qf( STOP          , "⎕STOP"   ,          )
+qf( SQL           , "⎕SQL"    ,          )
 
 sf( F12_TAKE      , "↑"       , = 0x5401 )
 qv( TC            , "⎕TC"     ,          )
