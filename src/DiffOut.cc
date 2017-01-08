@@ -33,6 +33,11 @@ DiffOut::overflow(int c)
 {
 PERFORMANCE_START(cout_perf)
    Output::set_color_mode(errout ? Output::COLM_UERROR : Output::COLM_OUTPUT);
+
+   // expand LF to CRLF if desired
+   //
+   if (expand_LF && c == '\n')   cout << "\r";
+
    cout << char(c);
 
    if (!InputFile::is_validating())
@@ -49,7 +54,7 @@ PERFORMANCE_START(cout_perf)
       }
 
    // complete line received
-
+   //
 ofstream & rep = IO_Files::get_current_testreport();
    Assert(rep.is_open());
 

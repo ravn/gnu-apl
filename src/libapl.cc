@@ -25,6 +25,7 @@
 #include <Workspace.hh>
 #include <Command.hh>
 #include <ComplexCell.hh>
+#include <DiffOut.hh>
 #include <LineInput.hh>
 #include <FloatCell.hh>
 #include <PointerCell.hh>
@@ -428,6 +429,14 @@ init_libapl(const char * progname, int log_startup)
 
    init_1(progname, log_startup);
    init_2(log_startup);
+}
+//-----------------------------------------------------------------------------
+extern DiffOut DOUT_filebuf;
+
+int
+expand_LF_to_CRLF(int on)
+{
+   return DOUT_filebuf.LF_to_CRLF(on != 0);
 }
 //-----------------------------------------------------------------------------
 get_line_from_user_cb * glfu = 0;

@@ -38,12 +38,17 @@ public:
    /// constructor
    DiffOut(bool _errout)
    : aplout(""),
-     errout(_errout)
+     errout(_errout),
+     expand_LF(false)
    { aplout.shrink(0); }
 
    /// discard all characters
    void reset()
    { aplout.shrink(0); }
+
+   /// set LF → CRLF expansion mode
+   int LF_to_CRLF(int on)
+      { const int old = expand_LF;   expand_LF = on;   return old; }
 
 protected:
    /// overloaded filebuf::overflow()
@@ -57,6 +62,9 @@ protected:
 
    /// true for error messages, false for normal APL output
    bool errout;
+
+   /// expand LF to CRLF
+   bool expand_LF;
 };
 
 #endif // __DIFFOUT_HH_DEFINED__

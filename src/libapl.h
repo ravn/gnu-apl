@@ -64,6 +64,9 @@ extern "C" {
 /// as needed
 extern void init_libapl(const char * progname, int log_startup);
 
+/// expand output LF to CR/LF, return current value
+extern int expand_LF_to_CRLF(int on);
+
 /// Pass `line` to the interpreter for immediate execution as APL code.
 extern void apl_exec(const char * line_utf8);
 

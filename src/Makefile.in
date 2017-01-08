@@ -81,27 +81,24 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @WANT_ANDROID_FALSE@am__append_1 = APs emacs_mode sql workspaces
-@WANT_LIBAPL_TRUE@am__append_2 = libapl.la
-@WANT_LIBAPL_TRUE@am__append_3 = -avoid-version -module -shared -export-dynamic
-@WANT_LIBAPL_TRUE@am__append_4 = $(GPROF_WANTED) $(CXX_RDYNAMIC)
-@DEVELOP_TRUE@@WANT_LIBAPL_TRUE@am__append_5 = -Werror -Wall -Wno-strict-aliasing
+@SQLITE3_TRUE@am__append_2 = $(SQLITE3_CFLAGS) -I sql
+@SQLITE3_TRUE@am__append_3 = $(SQLITE3_LDFLAGS)
+@SQLITE3_TRUE@am__append_4 = sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh  \
+@SQLITE3_TRUE@                  sql/SqliteConnection.cc     sql/SqliteConnection.hh      \
+@SQLITE3_TRUE@                  sql/SqliteResultValue.cc    sql/SqliteResultValue.hh     \
+@SQLITE3_TRUE@                  sql/SqliteProvider.cc       sql/SqliteProvider.hh        \
+@SQLITE3_TRUE@                  sql/Connection.cc
+
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__append_5 = sql/Connection.cc
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__append_6 = -I sql
+@POSTGRES_TRUE@am__append_7 = $(POSTGRESQL_CFLAGS) -I sql
+@POSTGRES_TRUE@am__append_8 = $(POSTGRESQL_LDFLAGS)
+@POSTGRES_TRUE@am__append_9 = sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
+@POSTGRES_TRUE@                  sql/PostgresConnection.cc     sql/PostgresConnection.hh \
+@POSTGRES_TRUE@                  sql/PostgresProvider.cc       sql/PostgresProvider.hh
+
+@WANT_LIBAPL_TRUE@am__append_10 = libapl.la
 @WANT_LIBAPL_FALSE@bin_PROGRAMS = apl$(EXEEXT)
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@am__append_6 = $(SQLITE3_CFLAGS)
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@am__append_7 = $(SQLITE3_LDFLAGS)
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@am__append_8 = sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh  \
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@               sql/SqliteConnection.cc     sql/SqliteConnection.hh      \
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@               sql/SqliteResultValue.cc    sql/SqliteResultValue.hh     \
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@               sql/SqliteProvider.cc       sql/SqliteProvider.hh        \
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@               sql/Connection.cc
-
-@POSTGRES_TRUE@@SQLITE3_FALSE@@WANT_LIBAPL_FALSE@am__append_9 = sql/Connection.cc
-@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@am__append_10 = $(POSTGRESQL_CFLAGS)
-@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@am__append_11 = $(POSTGRESQL_LDFLAGS)
-@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@am__append_12 = sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
-@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@                 sql/PostgresConnection.cc     sql/PostgresConnection.hh \
-@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@                 sql/PostgresProvider.cc       sql/PostgresProvider.hh
-
-@DEVELOP_TRUE@am__append_13 = -Werror -Wall -Wno-strict-aliasing
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp $(am__pkginclude_HEADERS_DIST)
@@ -196,8 +193,28 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	UserFunction_header.cc UserFunction_header.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
-	ValueHistory.hh Workspace.cc Workspace.hh libapl.h libapl.cc
-am__objects_1 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
+	ValueHistory.hh Workspace.cc Workspace.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
+	sql/PostgresConnection.cc sql/PostgresConnection.hh \
+	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
+	libapl.cc
+am__dirstamp = $(am__leading_dot)dirstamp
+@SQLITE3_TRUE@am__objects_1 = sql/libapl_la-SqliteArgListBuilder.lo \
+@SQLITE3_TRUE@	sql/libapl_la-SqliteConnection.lo \
+@SQLITE3_TRUE@	sql/libapl_la-SqliteResultValue.lo \
+@SQLITE3_TRUE@	sql/libapl_la-SqliteProvider.lo \
+@SQLITE3_TRUE@	sql/libapl_la-Connection.lo
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_2 =  \
+@POSTGRES_TRUE@@SQLITE3_FALSE@	sql/libapl_la-Connection.lo
+@POSTGRES_TRUE@am__objects_3 =  \
+@POSTGRES_TRUE@	sql/libapl_la-PostgresArgListBuilder.lo \
+@POSTGRES_TRUE@	sql/libapl_la-PostgresConnection.lo \
+@POSTGRES_TRUE@	sql/libapl_la-PostgresProvider.lo
+am__objects_4 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
 	libapl_la-Assert.lo libapl_la-Avec.lo libapl_la-Backtrace.lo \
 	libapl_la-Bif_F12_FORMAT.lo libapl_la-Bif_F12_SORT.lo \
 	libapl_la-Bif_OPER1_COMMUTE.lo libapl_la-Bif_OPER1_EACH.lo \
@@ -237,8 +254,9 @@ am__objects_1 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
 	libapl_la-UserFunction.lo libapl_la-UserFunction_header.lo \
 	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
 	libapl_la-Value.lo libapl_la-ValueHistory.lo \
-	libapl_la-Workspace.lo
-@WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_1) \
+	libapl_la-Workspace.lo $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3)
+@WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_4) \
 @WANT_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -307,7 +325,18 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
-am__objects_2 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
+@SQLITE3_TRUE@am__objects_5 = sql/apl-SqliteArgListBuilder.$(OBJEXT) \
+@SQLITE3_TRUE@	sql/apl-SqliteConnection.$(OBJEXT) \
+@SQLITE3_TRUE@	sql/apl-SqliteResultValue.$(OBJEXT) \
+@SQLITE3_TRUE@	sql/apl-SqliteProvider.$(OBJEXT) \
+@SQLITE3_TRUE@	sql/apl-Connection.$(OBJEXT)
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_6 =  \
+@POSTGRES_TRUE@@SQLITE3_FALSE@	sql/apl-Connection.$(OBJEXT)
+@POSTGRES_TRUE@am__objects_7 =  \
+@POSTGRES_TRUE@	sql/apl-PostgresArgListBuilder.$(OBJEXT) \
+@POSTGRES_TRUE@	sql/apl-PostgresConnection.$(OBJEXT) \
+@POSTGRES_TRUE@	sql/apl-PostgresProvider.$(OBJEXT)
+am__objects_8 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-Assert.$(OBJEXT) apl-Avec.$(OBJEXT) \
 	apl-Backtrace.$(OBJEXT) apl-Bif_F12_FORMAT.$(OBJEXT) \
 	apl-Bif_F12_SORT.$(OBJEXT) apl-Bif_OPER1_COMMUTE.$(OBJEXT) \
@@ -349,20 +378,10 @@ am__objects_2 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-UserFunction.$(OBJEXT) apl-UserFunction_header.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
-	apl-Workspace.$(OBJEXT)
-am__dirstamp = $(am__leading_dot)dirstamp
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@am__objects_3 = sql/apl-SqliteArgListBuilder.$(OBJEXT) \
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-SqliteConnection.$(OBJEXT) \
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-SqliteResultValue.$(OBJEXT) \
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-SqliteProvider.$(OBJEXT) \
-@SQLITE3_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-Connection.$(OBJEXT)
-@POSTGRES_TRUE@@SQLITE3_FALSE@@WANT_LIBAPL_FALSE@am__objects_4 = sql/apl-Connection.$(OBJEXT)
-@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@am__objects_5 = sql/apl-PostgresArgListBuilder.$(OBJEXT) \
-@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-PostgresConnection.$(OBJEXT) \
-@POSTGRES_TRUE@@WANT_LIBAPL_FALSE@	sql/apl-PostgresProvider.$(OBJEXT)
+	apl-Workspace.$(OBJEXT) $(am__objects_5) $(am__objects_6) \
+	$(am__objects_7)
 @WANT_LIBAPL_FALSE@am_apl_OBJECTS = apl-main.$(OBJEXT) \
-@WANT_LIBAPL_FALSE@	$(am__objects_2) $(am__objects_3) \
-@WANT_LIBAPL_FALSE@	$(am__objects_4) $(am__objects_5)
+@WANT_LIBAPL_FALSE@	$(am__objects_8)
 apl_OBJECTS = $(am_apl_OBJECTS)
 am__DEPENDENCIES_1 =
 apl_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -639,121 +658,74 @@ EXTRA_DIRS = $(am__append_1)
 SUBDIRS = native $(EXTRA_DIRS)
 DIST_SUBDIRS = $(SUBDIRS) testcases
 distcleancheck_listfile = buildtag
-apl_CXXFLAGS = $(am__append_6) $(am__append_10) $(GPROF_WANTED) \
-	$(CXX_RDYNAMIC) -I sql $(am__append_13)
-apl_LDFLAGS = $(am__append_7) $(am__append_11)
-libapl_la_CXXFLAGS = $(am__append_4) $(am__append_5)
-libapl_la_LDFLAGS = $(am__append_3)
-common_sources = \
-			buildtag		buildtag.hh		\
-						../config.h		\
-						APL_types.hh		\
-Archive.cc					Archive.hh		\
-ArrayIterator.cc				ArrayIterator.hh	\
-Assert.cc					Assert.hh		\
-Avec.cc			Avec.def		Avec.hh			\
-Backtrace.cc					Backtrace.hh		\
-Bif_F12_FORMAT.cc				Bif_F12_FORMAT.hh	\
-Bif_F12_SORT.cc					Bif_F12_SORT.hh		\
-Bif_OPER1_COMMUTE.cc				Bif_OPER1_COMMUTE.hh	\
-Bif_OPER1_EACH.cc				Bif_OPER1_EACH.hh	\
-Bif_OPER2_POWER.cc				Bif_OPER2_POWER.hh	\
-Bif_OPER2_INNER.cc				Bif_OPER2_INNER.hh	\
-Bif_OPER2_OUTER.cc				Bif_OPER2_OUTER.hh	\
-Bif_OPER2_RANK.cc				Bif_OPER2_RANK.hh	\
-Bif_OPER1_REDUCE.cc				Bif_OPER1_REDUCE.hh	\
-Bif_OPER1_SCAN.cc				Bif_OPER1_SCAN.hh	\
-CDR.cc						CDR.hh			\
-Cell.cc						Cell.hh			\
-CharCell.cc					CharCell.hh		\
-Command.cc		Command.def		Command.hh		\
-Common.cc					Common.hh		\
-ComplexCell.cc				    	ComplexCell.hh		\
-configure_args.cc							\
-DiffOut.cc					DiffOut.hh		\
-DynamicObject.cc				DynamicObject.hh	\
-Error.cc		Error.def		Error.hh		\
-						ErrorCode.hh		\
-Executable.cc					Executable.hh		\
-FloatCell.cc					FloatCell.hh		\
-Function.cc					Function.hh		\
-DerivedFunction.cc				DerivedFunction.hh	\
-						Heapsort.hh		\
-Id.cc			Id.def			Id.hh			\
-IndexExpr.cc					IndexExpr.hh		\
-IndexIterator.cc				IndexIterator.hh	\
-InputFile.cc					InputFile.hh		\
-IntCell.cc					IntCell.hh		\
-LApack.cc					LApack.hh		\
-LibPaths.cc					LibPaths.hh		\
-LineInput.cc					LineInput.hh		\
-Logging.cc	    Logging.def			Logging.hh		\
-LvalCell.cc					LvalCell.hh		\
-						makefile.h		\
-Malloc_hooks.cc								\
-Nabla.cc					Nabla.hh		\
-Macro.cc		Macro.def		Macro.hh		\
-NamedObject.cc					NamedObject.hh		\
-NativeFunction.cc				NativeFunction.hh	\
-						Native_interface.hh	\
-NumericCell.cc					NumericCell.hh		\
-Output.cc					Output.hh		\
-Parser.cc					Parser.hh		\
-Prefix.cc		Prefix.def		Prefix.hh		\
-PointerCell.cc					PointerCell.hh		\
-PrimitiveFunction.cc				PrimitiveFunction.hh	\
-PrimitiveOperator.cc				PrimitiveOperator.hh	\
-PrintBuffer.cc					PrintBuffer.hh		\
-						PrintContext.hh		\
-						PrintOperator.hh	\
-QuadFunction.cc					QuadFunction.hh		\
-ProcessorID.cc					ProcessorID.hh		\
-Quad_CR.cc					Quad_CR.hh		\
-Quad_DLX.cc					Quad_DLX.hh		\
-Quad_FIO.cc					Quad_FIO.hh		\
-Quad_FX.cc					Quad_FX.hh		\
-Quad_RL.cc					Quad_RL.hh		\
-Quad_SQL.cc					Quad_SQL.hh		\
-Quad_SVx.cc					Quad_SVx.hh		\
-Quad_TF.cc					Quad_TF.hh		\
-Parallel.cc					Parallel.hh		\
-Performance.cc		Performance.def		Performance.hh		\
-RealCell.cc					RealCell.hh		\
-sbrk.cc									\
-Shape.cc					Shape.hh		\
-						SharedValuePointer.hh	\
-						Simple_string.hh	\
-ScalarFunction.cc				ScalarFunction.hh	\
-						Source.hh		\
-StateIndicator.cc				StateIndicator.hh	\
-Svar_DB.cc					Svar_DB.hh		\
-Svar_record.cc					Svar_record.hh		\
-tcp_signal.m4		Svar_signals.def	Svar_signals.hh		\
-Symbol.cc					Symbol.hh		\
-SymbolTable.cc					SymbolTable.hh		\
-			SystemLimits.def	SystemLimits.hh		\
-SystemVariable.cc	SystemVariable.def	SystemVariable.hh	\
-IO_Files.cc					IO_Files.hh		\
-Token.cc		Token.def		Token.hh		\
-						TokenEnums.hh		\
-Tokenizer.cc					Tokenizer.hh		\
-UCS_string.cc					UCS_string.hh		\
-UCS_string_vector.cc                            UCS_string_vector.hh    \
-						Unicode.hh		\
-UserFunction.cc					UserFunction.hh		\
-UserFunction_header.cc				UserFunction_header.hh	\
-UserPreferences.cc				UserPreferences.hh	\
-UTF8_string.cc					UTF8_string.hh		\
-Value.cc		Value.icc		Value.hh		\
-ValueHistory.cc					ValueHistory.hh		\
-Workspace.cc					Workspace.hh
 
-pkglib_LTLIBRARIES = $(am__append_2)
+# common means common to the apl and libapl builds
+#
+common_CXXFLAGS = -Werror -Wall -Wno-strict-aliasing $(am__append_2) \
+	$(am__append_6) $(am__append_7)
+common_LDFLAGS = $(am__append_3) $(am__append_8)
+common_SOURCES = buildtag buildtag.hh ../config.h APL_types.hh \
+	Archive.cc Archive.hh ArrayIterator.cc ArrayIterator.hh \
+	Assert.cc Assert.hh Avec.cc Avec.def Avec.hh Backtrace.cc \
+	Backtrace.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
+	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.hh CharCell.cc CharCell.hh Command.cc \
+	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
+	ComplexCell.hh configure_args.cc DiffOut.cc DiffOut.hh \
+	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
+	DerivedFunction.hh Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
+	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
+	InputFile.hh IntCell.cc IntCell.hh LApack.cc LApack.hh \
+	LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh Logging.cc \
+	Logging.def Logging.hh LvalCell.cc LvalCell.hh makefile.h \
+	Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc Macro.def Macro.hh \
+	NamedObject.cc NamedObject.hh NativeFunction.cc \
+	NativeFunction.hh Native_interface.hh NumericCell.cc \
+	NumericCell.hh Output.cc Output.hh Parser.cc Parser.hh \
+	Prefix.cc Prefix.def Prefix.hh PointerCell.cc PointerCell.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FIO.cc Quad_FIO.hh \
+	Quad_FX.cc Quad_FX.hh Quad_RL.cc Quad_RL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Parallel.cc Parallel.hh Performance.cc Performance.def \
+	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
+	Shape.hh SharedValuePointer.hh Simple_string.hh \
+	ScalarFunction.cc ScalarFunction.hh Source.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	IO_Files.cc IO_Files.hh Token.cc Token.def Token.hh \
+	TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
+	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
+	Unicode.hh UserFunction.cc UserFunction.hh \
+	UserFunction_header.cc UserFunction_header.hh \
+	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
+	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
+	ValueHistory.hh Workspace.cc Workspace.hh $(am__append_4) \
+	$(am__append_5) $(am__append_9)
+pkglib_LTLIBRARIES = $(am__append_10)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
-@WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_sources) libapl.h libapl.cc
-@WANT_LIBAPL_FALSE@apl_SOURCES = main.cc $(common_sources) \
-@WANT_LIBAPL_FALSE@	$(am__append_8) $(am__append_9) \
-@WANT_LIBAPL_FALSE@	$(am__append_12)
+@WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
+@WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version \
+@WANT_LIBAPL_TRUE@	-module -shared -export-dynamic
+@WANT_LIBAPL_TRUE@libapl_la_CXXFLAGS = $(common_CXXFLAGS) \
+@WANT_LIBAPL_TRUE@	$(GPROF_WANTED) $(CXX_RDYNAMIC)
+@WANT_LIBAPL_FALSE@apl_SOURCES = main.cc $(common_SOURCES)
+@WANT_LIBAPL_FALSE@apl_CXXFLAGS = $(common_CXXFLAGS) $(GPROF_WANTED) \
+@WANT_LIBAPL_FALSE@	$(CXX_RDYNAMIC)
+@WANT_LIBAPL_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
 AM_MAKEFLAGS = -j $(MAKE_J)
 apl_LDADD = $(LIBS)
 all: all-recursive
@@ -825,6 +797,28 @@ clean-pkglibLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
+sql/$(am__dirstamp):
+	@$(MKDIR_P) sql
+	@: > sql/$(am__dirstamp)
+sql/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) sql/$(DEPDIR)
+	@: > sql/$(DEPDIR)/$(am__dirstamp)
+sql/libapl_la-SqliteArgListBuilder.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/libapl_la-SqliteConnection.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/libapl_la-SqliteResultValue.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/libapl_la-SqliteProvider.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/libapl_la-Connection.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/libapl_la-PostgresArgListBuilder.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/libapl_la-PostgresConnection.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/libapl_la-PostgresProvider.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
 
 libapl.la: $(libapl_la_OBJECTS) $(libapl_la_DEPENDENCIES) $(EXTRA_libapl_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libapl_la_LINK) $(am_libapl_la_rpath) $(libapl_la_OBJECTS) $(libapl_la_LIBADD) $(LIBS)
@@ -877,12 +871,6 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-sql/$(am__dirstamp):
-	@$(MKDIR_P) sql
-	@: > sql/$(am__dirstamp)
-sql/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) sql/$(DEPDIR)
-	@: > sql/$(DEPDIR)/$(am__dirstamp)
 sql/apl-SqliteArgListBuilder.$(OBJEXT): sql/$(am__dirstamp) \
 	sql/$(DEPDIR)/$(am__dirstamp)
 sql/apl-SqliteConnection.$(OBJEXT): sql/$(am__dirstamp) \
@@ -907,6 +895,7 @@ apl$(EXEEXT): $(apl_OBJECTS) $(apl_DEPENDENCIES) $(EXTRA_apl_DEPENDENCIES)
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f sql/*.$(OBJEXT)
+	-rm -f sql/*.lo
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -1093,6 +1082,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteConnection.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteProvider.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteResultValue.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-Connection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-PostgresArgListBuilder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-PostgresConnection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-PostgresProvider.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-SqliteArgListBuilder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-SqliteConnection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-SqliteProvider.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-SqliteResultValue.Plo@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1719,6 +1716,62 @@ libapl_la-Workspace.lo: Workspace.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Workspace.cc' object='libapl_la-Workspace.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Workspace.lo `test -f 'Workspace.cc' || echo '$(srcdir)/'`Workspace.cc
+
+sql/libapl_la-SqliteArgListBuilder.lo: sql/SqliteArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/libapl_la-SqliteArgListBuilder.lo -MD -MP -MF sql/$(DEPDIR)/libapl_la-SqliteArgListBuilder.Tpo -c -o sql/libapl_la-SqliteArgListBuilder.lo `test -f 'sql/SqliteArgListBuilder.cc' || echo '$(srcdir)/'`sql/SqliteArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/libapl_la-SqliteArgListBuilder.Tpo sql/$(DEPDIR)/libapl_la-SqliteArgListBuilder.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteArgListBuilder.cc' object='sql/libapl_la-SqliteArgListBuilder.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/libapl_la-SqliteArgListBuilder.lo `test -f 'sql/SqliteArgListBuilder.cc' || echo '$(srcdir)/'`sql/SqliteArgListBuilder.cc
+
+sql/libapl_la-SqliteConnection.lo: sql/SqliteConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/libapl_la-SqliteConnection.lo -MD -MP -MF sql/$(DEPDIR)/libapl_la-SqliteConnection.Tpo -c -o sql/libapl_la-SqliteConnection.lo `test -f 'sql/SqliteConnection.cc' || echo '$(srcdir)/'`sql/SqliteConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/libapl_la-SqliteConnection.Tpo sql/$(DEPDIR)/libapl_la-SqliteConnection.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteConnection.cc' object='sql/libapl_la-SqliteConnection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/libapl_la-SqliteConnection.lo `test -f 'sql/SqliteConnection.cc' || echo '$(srcdir)/'`sql/SqliteConnection.cc
+
+sql/libapl_la-SqliteResultValue.lo: sql/SqliteResultValue.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/libapl_la-SqliteResultValue.lo -MD -MP -MF sql/$(DEPDIR)/libapl_la-SqliteResultValue.Tpo -c -o sql/libapl_la-SqliteResultValue.lo `test -f 'sql/SqliteResultValue.cc' || echo '$(srcdir)/'`sql/SqliteResultValue.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/libapl_la-SqliteResultValue.Tpo sql/$(DEPDIR)/libapl_la-SqliteResultValue.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteResultValue.cc' object='sql/libapl_la-SqliteResultValue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/libapl_la-SqliteResultValue.lo `test -f 'sql/SqliteResultValue.cc' || echo '$(srcdir)/'`sql/SqliteResultValue.cc
+
+sql/libapl_la-SqliteProvider.lo: sql/SqliteProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/libapl_la-SqliteProvider.lo -MD -MP -MF sql/$(DEPDIR)/libapl_la-SqliteProvider.Tpo -c -o sql/libapl_la-SqliteProvider.lo `test -f 'sql/SqliteProvider.cc' || echo '$(srcdir)/'`sql/SqliteProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/libapl_la-SqliteProvider.Tpo sql/$(DEPDIR)/libapl_la-SqliteProvider.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteProvider.cc' object='sql/libapl_la-SqliteProvider.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/libapl_la-SqliteProvider.lo `test -f 'sql/SqliteProvider.cc' || echo '$(srcdir)/'`sql/SqliteProvider.cc
+
+sql/libapl_la-Connection.lo: sql/Connection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/libapl_la-Connection.lo -MD -MP -MF sql/$(DEPDIR)/libapl_la-Connection.Tpo -c -o sql/libapl_la-Connection.lo `test -f 'sql/Connection.cc' || echo '$(srcdir)/'`sql/Connection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/libapl_la-Connection.Tpo sql/$(DEPDIR)/libapl_la-Connection.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/Connection.cc' object='sql/libapl_la-Connection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/libapl_la-Connection.lo `test -f 'sql/Connection.cc' || echo '$(srcdir)/'`sql/Connection.cc
+
+sql/libapl_la-PostgresArgListBuilder.lo: sql/PostgresArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/libapl_la-PostgresArgListBuilder.lo -MD -MP -MF sql/$(DEPDIR)/libapl_la-PostgresArgListBuilder.Tpo -c -o sql/libapl_la-PostgresArgListBuilder.lo `test -f 'sql/PostgresArgListBuilder.cc' || echo '$(srcdir)/'`sql/PostgresArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/libapl_la-PostgresArgListBuilder.Tpo sql/$(DEPDIR)/libapl_la-PostgresArgListBuilder.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresArgListBuilder.cc' object='sql/libapl_la-PostgresArgListBuilder.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/libapl_la-PostgresArgListBuilder.lo `test -f 'sql/PostgresArgListBuilder.cc' || echo '$(srcdir)/'`sql/PostgresArgListBuilder.cc
+
+sql/libapl_la-PostgresConnection.lo: sql/PostgresConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/libapl_la-PostgresConnection.lo -MD -MP -MF sql/$(DEPDIR)/libapl_la-PostgresConnection.Tpo -c -o sql/libapl_la-PostgresConnection.lo `test -f 'sql/PostgresConnection.cc' || echo '$(srcdir)/'`sql/PostgresConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/libapl_la-PostgresConnection.Tpo sql/$(DEPDIR)/libapl_la-PostgresConnection.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresConnection.cc' object='sql/libapl_la-PostgresConnection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/libapl_la-PostgresConnection.lo `test -f 'sql/PostgresConnection.cc' || echo '$(srcdir)/'`sql/PostgresConnection.cc
+
+sql/libapl_la-PostgresProvider.lo: sql/PostgresProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/libapl_la-PostgresProvider.lo -MD -MP -MF sql/$(DEPDIR)/libapl_la-PostgresProvider.Tpo -c -o sql/libapl_la-PostgresProvider.lo `test -f 'sql/PostgresProvider.cc' || echo '$(srcdir)/'`sql/PostgresProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/libapl_la-PostgresProvider.Tpo sql/$(DEPDIR)/libapl_la-PostgresProvider.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresProvider.cc' object='sql/libapl_la-PostgresProvider.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/libapl_la-PostgresProvider.lo `test -f 'sql/PostgresProvider.cc' || echo '$(srcdir)/'`sql/PostgresProvider.cc
 
 libapl_la-libapl.lo: libapl.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-libapl.lo -MD -MP -MF $(DEPDIR)/libapl_la-libapl.Tpo -c -o libapl_la-libapl.lo `test -f 'libapl.cc' || echo '$(srcdir)/'`libapl.cc
@@ -3062,6 +3115,7 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf sql/.libs sql/_libs
 install-pkgincludeHEADERS: $(pkginclude_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(pkginclude_HEADERS)'; test -n "$(pkgincludedir)" || list=; \

@@ -18,20 +18,23 @@ The following main facilities are provided:
 
 @table @asis
 @item @code{apl_exec}
-
 pass a C string to the interpreter for immediate execution as APL code.
-@item @code{apl_command}
 
+@item @code{apl_command}
 pass an APL command to the command processor and return its output.
 @item @code{APL_value}
 
 a pointer to an opaque structure Value, supported by over 30 functions allowing one to construct a new Value and to gain access to its rank, shape and ravel. In this document, the terms "Value" and "APL value" are not interchangeable; they refer respectively to a structure and to a pointer.
+
 @item @code{get_var_value}
-
 return an APL value pointing to the contents of a variable in the current workspace.
-@item @code{set_var_value}
 
+@item @code{set_var_value}
 set the contents of a variable in the workspace to that of the given APL value.
+
+@item @code{expand_LF_to_CRLF}
+this function controls whether linefeed (LF) characters shall be expanded to CR/LF on output. The default is no expansion. Please note that LF expansion may be triggered in other places, therefore expand_LF_to_CRLF(0) alone does not guarantee that no CR characters are being printed.
+
 @end table
 
 No other GNU APL header is exposed.

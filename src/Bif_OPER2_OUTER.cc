@@ -142,17 +142,17 @@ void
 Bif_OPER2_OUTER::scalar_outer_product() const
 {
 #ifdef PERFORMANCE_COUNTERS_WANTED
-#ifdef HAVE_RDTSC
+# ifdef HAVE_RDTSC
 const uint64_t start_1 = cycle_counter();
-#endif
+# endif
 #endif
 
   // the empty cases have been handled already in eval_ALRB()
 
-const ShapeItem Z_len = job.ZAh * job.ZBl;
    job.ec = E_NO_ERROR;
 
 #if PARALLEL_ENABLED
+const ShapeItem Z_len = job.ZAh * job.ZBl;
    if (  Parallel::run_parallel
       && Thread_context::get_active_core_count() > 1
       && Z_len > get_dyadic_threshold())

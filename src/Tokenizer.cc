@@ -510,6 +510,8 @@ Tokenizer::tokenize_string2(Source<Unicode> & src, Token_string & tos)
    // skip the leading "
    {
      const Unicode uni = src.get();
+     if (uni)   { /* do nothing, needed for -Wall */ }
+
      Assert1(uni == UNI_ASCII_DOUBLE_QUOTE);
    }
 

@@ -794,6 +794,7 @@ Token::move_1(Token & src, const char * loc)
    if (src.is_apl_val())
       {
         Value * val = src.get_apl_val_pointer();
+        if (val)   { /* do nothing, needed for -Wall */ }
 	ADD_EVENT(val, VHE_TokMove1, src.value_use_count() - 1, loc);
         src.clear(loc);
       }
@@ -808,6 +809,7 @@ Token::move_2(const Token & src, const char * loc)
    if (src.is_apl_val())
       {
         Value * val = src.get_apl_val_pointer();
+        if (val)   { /* do nothing, needed for -Wall */ }
         ADD_EVENT(val, VHE_TokMove2, src.value_use_count() - 1, loc);
         ((Token &)src).clear(loc);
       }

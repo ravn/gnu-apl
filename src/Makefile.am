@@ -10,13 +10,11 @@ localedir = $(datadir)/locale
 
 distcleancheck_listfile = buildtag
 
-apl_CXXFLAGS =
-apl_LDFLAGS =
-libapl_la_CXXFLAGS =
-libapl_la_LDFLAGS =
-
-common_sources = \
-			buildtag		buildtag.hh		\
+# common means common to the apl and libapl builds
+#
+common_CXXFLAGS = -Werror -Wall -Wno-strict-aliasing
+common_LDFLAGS =
+common_SOURCES =        buildtag		buildtag.hh		\
 						../config.h		\
 						APL_types.hh		\
 Archive.cc					Archive.hh		\
@@ -119,42 +117,46 @@ Value.cc		Value.icc		Value.hh		\
 ValueHistory.cc					ValueHistory.hh		\
 Workspace.cc					Workspace.hh
 
-pkglib_LTLIBRARIES =
-if WANT_LIBAPL
-pkglib_LTLIBRARIES += libapl.la
-pkginclude_HEADERS = libapl.h
-libapl_la_SOURCES = $(common_sources) libapl.h libapl.cc
-libapl_la_LDFLAGS += -avoid-version -module -shared -export-dynamic
-libapl_la_CXXFLAGS += $(GPROF_WANTED) $(CXX_RDYNAMIC)
-if DEVELOP
-     libapl_la_CXXFLAGS += -Werror -Wall -Wno-strict-aliasing
-endif
-else
-
-bin_PROGRAMS = apl
-apl_SOURCES = main.cc $(common_sources)
-
 if SQLITE3
-apl_CXXFLAGS += $(SQLITE3_CFLAGS)
-apl_LDFLAGS  += $(SQLITE3_LDFLAGS)
-apl_SOURCES += sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh  \
-               sql/SqliteConnection.cc     sql/SqliteConnection.hh      \
-               sql/SqliteResultValue.cc    sql/SqliteResultValue.hh     \
-               sql/SqliteProvider.cc       sql/SqliteProvider.hh        \
-               sql/Connection.cc
+common_CXXFLAGS += $(SQLITE3_CFLAGS) -I sql
+common_LDFLAGS  += $(SQLITE3_LDFLAGS)
+common_SOURCES += sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh  \
+                  sql/SqliteConnection.cc     sql/SqliteConnection.hh      \
+                  sql/SqliteResultValue.cc    sql/SqliteResultValue.hh     \
+                  sql/SqliteProvider.cc       sql/SqliteProvider.hh        \
+                  sql/Connection.cc
 endif
 
 if POSTGRES
 if !SQLITE3
-apl_SOURCES += sql/Connection.cc
+common_SOURCES  += sql/Connection.cc
+common_CXXFLAGS += -I sql
 endif
 
-apl_CXXFLAGS += $(POSTGRESQL_CFLAGS)
-apl_LDFLAGS  += $(POSTGRESQL_LDFLAGS)
-apl_SOURCES +=   sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
-                 sql/PostgresConnection.cc     sql/PostgresConnection.hh \
-                 sql/PostgresProvider.cc       sql/PostgresProvider.hh
+common_CXXFLAGS += $(POSTGRESQL_CFLAGS) -I sql
+common_LDFLAGS  += $(POSTGRESQL_LDFLAGS)
+common_SOURCES += sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
+                  sql/PostgresConnection.cc     sql/PostgresConnection.hh \
+                  sql/PostgresProvider.cc       sql/PostgresProvider.hh
 endif
+
+pkglib_LTLIBRARIES =
+if WANT_LIBAPL
+pkglib_LTLIBRARIES += libapl.la
+pkginclude_HEADERS = libapl.h
+libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
+libapl_la_LDFLAGS = $(common_LDFLAGS)
+libapl_la_LDFLAGS += -avoid-version -module -shared -export-dynamic
+libapl_la_CXXFLAGS = $(common_CXXFLAGS)
+libapl_la_CXXFLAGS += $(GPROF_WANTED) $(CXX_RDYNAMIC)
+
+else
+
+bin_PROGRAMS = apl
+apl_SOURCES = main.cc $(common_SOURCES)
+apl_CXXFLAGS = $(common_CXXFLAGS)
+apl_CXXFLAGS += $(GPROF_WANTED) $(CXX_RDYNAMIC)
+apl_LDFLAGS = $(common_LDFLAGS)
 
 endif
 
@@ -170,11 +172,6 @@ AM_MAKEFLAGS = -j $(MAKE_J)
 .PHONY:	update-svar_signals
 update-svar_signals:
 	m4 -D protocol=Svar_signals tcp_signal.m4 > Svar_signals.hh
-
-apl_CXXFLAGS += $(GPROF_WANTED) $(CXX_RDYNAMIC) -I sql
-if DEVELOP
-   apl_CXXFLAGS       += -Werror -Wall -Wno-strict-aliasing
-endif
 
 apl_LDADD = $(LIBS)
 

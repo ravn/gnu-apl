@@ -59,25 +59,29 @@ Next: <a href="#Vague-details-of-the-GNU-APL-implementation" accesskey="n" rel="
 </p>
 <dl compact="compact">
 <dt><code>apl_exec</code></dt>
-<dd>
-<p>pass a C string to the interpreter for immediate execution as APL code.
-</p></dd>
+<dd><p>pass a C string to the interpreter for immediate execution as APL code.
+</p>
+</dd>
 <dt><code>apl_command</code></dt>
-<dd>
-<p>pass an APL command to the command processor and return its output.
+<dd><p>pass an APL command to the command processor and return its output.
 </p></dd>
 <dt><code>APL_value</code></dt>
 <dd>
 <p>a pointer to an opaque structure Value, supported by over 30 functions allowing one to construct a new Value and to gain access to its rank, shape and ravel. In this document, the terms &quot;Value&quot; and &quot;APL value&quot; are not interchangeable; they refer respectively to a structure and to a pointer.
-</p></dd>
+</p>
+</dd>
 <dt><code>get_var_value</code></dt>
-<dd>
-<p>return an APL value pointing to the contents of a variable in the current workspace.
-</p></dd>
+<dd><p>return an APL value pointing to the contents of a variable in the current workspace.
+</p>
+</dd>
 <dt><code>set_var_value</code></dt>
-<dd>
-<p>set the contents of a variable in the workspace to that of the given APL value.
-</p></dd>
+<dd><p>set the contents of a variable in the workspace to that of the given APL value.
+</p>
+</dd>
+<dt><code>expand_LF_to_CRLF</code></dt>
+<dd><p>this function controls whether linefeed (LF) characters shall be expanded to CR/LF on output. The default is no expansion. Please note that LF expansion may be triggered in other places, therefore expand_LF_to_CRLF(0) alone does not guarantee that no CR characters are being printed.
+</p>
+</dd>
 </dl>
 
 <p>No other GNU APL header is exposed.

@@ -1956,6 +1956,7 @@ Prefix::reduce_RETC___()
 
              {
                const UserFunction * ufun = si.get_executable()->get_ufun();
+               if (ufun)   { /* do nothing, needed for -Wall */ }
                Assert1(ufun);
                at0().clear(LOC);
              }
