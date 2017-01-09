@@ -29,22 +29,22 @@
 #include "Unicode.hh"
 
 struct AP_num3;
-class Cell;
-class DynamicObject;
+class  Cell;
+class  DynamicObject;
 struct Format_sub;
-class Function;
+class  Function;
 struct Function_PC2;
-class IndexExpr;
-class LineLabel;
-class PrintBuffer;
-class Shape;
+class  IndexExpr;
+struct LineLabel;
+class  PrintBuffer;
+class  Shape;
 template <class T, bool> class Source;
-class Symbol;
-class Token;
-class Token_string;
-class UCS_string;
-class UTF8_string;
-class Value;
+class  Symbol;
+class  Token;
+class  Token_string;
+class  UCS_string;
+class  UTF8_string;
+class  Value;
 
 ostream & operator << (ostream &, const AP_num3 &);
 ostream & operator << (ostream &, const Format_sub &);

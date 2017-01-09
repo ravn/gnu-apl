@@ -70,8 +70,17 @@ extern int expand_LF_to_CRLF(int on);
 /// Pass `line` to the interpreter for immediate execution as APL code.
 extern int apl_exec(const char * line_utf8);
 
+/// Pass `line` to the interpreter for immediate execution as APL code.
+/// line_ucs is a 0-terminated string of unicode integers
+extern int apl_exec_ucs(const unsigned int * line_ucs);
+
 /// Pass `command` to the command processor and return its output.
-extern const char * apl_command(const char* command_utf8);
+extern const char * apl_command(const char * command_utf8);
+
+/// Pass `command` to the command processor and return its output. line_ucs
+/// is a 0-terminated string of unicode integers (and so is the result)
+/// caller shall free() the returned unsigned int *.
+extern const unsigned int * apl_command_ucs(const unsigned int * command_ucs);
 
 struct Value;
 typedef struct Value * APL_value;

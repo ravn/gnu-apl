@@ -195,7 +195,7 @@ ofstream outf(filename);
       }
 
 int count = 0;
-   for (size_t p = put + 1; p < hist_lines.size(); ++p)
+   for (int p = put + 1; p < hist_lines.size(); ++p)
       {
         outf << hist_lines[p] << endl;
         ++count;
@@ -223,7 +223,7 @@ UCS_string u("xxx");
 void
 LineHistory::print_history(ostream & out)
 {
-   for (size_t p = put + 1; p < hist_lines.size(); ++p)
+   for (int p = put + 1; p < hist_lines.size(); ++p)
       {
         out << "      " << hist_lines[p] << endl;
       }

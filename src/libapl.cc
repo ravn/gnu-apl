@@ -160,7 +160,8 @@ get_type(const APL_value val, uint64_t idx)
 }
 //-----------------------------------------------------------------------------
 /// return non-0 if val is a simple character vector.
-int is_string(const APL_value val)
+int
+is_string(const APL_value val)
 {
    return val->is_char_vector();
 }
@@ -318,17 +319,54 @@ const StateIndicator * si = Workspace::SI_top();
    return E_UNKNOWN_ERROR;
 } 
 //-----------------------------------------------------------------------------
+int
+apl_exec_ucs(const unsigned int * line_ucs)
+{ 
+UCS_string line;
+   line.reserve(200);
+   while (*line_ucs)   line.append((Unicode)*line_ucs++);
+
+const StateIndicator * si = Workspace::SI_top();
+  Command::process_line(line);
+   if (si == Workspace::SI_top())   return E_NO_ERROR;
+
+   si = Workspace::SI_top_error();
+   if (si)   return si->get_error().error_code;
+   return E_UNKNOWN_ERROR;
+} 
+//-----------------------------------------------------------------------------
 const char *
 apl_command(const char * command)
 {
 UTF8_string command_utf8(command);
 UCS_string command_ucs(command_utf8);
-stringstream out;
 
+ostringstream out;
   Command::do_APL_command(out, command_ucs);
 
-const string st = out.str();
-  return strndup(st.data(), st.size());
+  return strndup(out.str().data(), out.str().size());
+}
+//-----------------------------------------------------------------------------
+const unsigned int *
+apl_command_ucs(const unsigned int * command)
+{
+UCS_string command_ucs;
+   command_ucs.reserve(200);
+   while (*command)   command_ucs.append((Unicode)*command++);
+
+ostringstream out;
+  Command::do_APL_command(out, command_ucs);
+
+UTF8_string result_utf8(out.str().c_str());
+   if (result_utf8.size() == 0)   return 0;   // no output
+
+UCS_string result_ucs(result_utf8);
+
+unsigned int * ret = (unsigned int *)
+                     malloc((result_ucs.size() + 1) * sizeof(int));
+   loop(l, result_ucs.size())   ret[l] = result_ucs[l];
+   ret[result_ucs.size()] = 0;
+   return ret;
 }
 //-----------------------------------------------------------------------------
 APL_value
