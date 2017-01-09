@@ -86,32 +86,8 @@ int Output::color_CERR_background = 8;
 int Output::color_UERR_foreground = 5;
 int Output::color_UERR_background = 8;
 
-/// a filebuf for stderr output
-class ErrOut : public filebuf
-{
-protected:
-   /// overloaded filebuf::overflow()
-   virtual int overflow(int c);
-
-public:
-   /// destructor
-   ~ErrOut()   { used = false; }
-
-   /** a helper function telling whether the constructor for CERR was called
-       if CERR is used before its constructor was called (which can happen in
-       when constructors of static objects are called and use CERR) then a
-       segmentation fault would occur.
-
-       We avoid that by using get_CERR() instead of CERR in such constructors.
-       get_CERR() checks \b used and returns cerr instead of CERR if it is
-       false.
-    **/
-   filebuf * use()   { used = true;   return this; }
-
-   /// true iff the constructor for CERR was called
-   static bool used;   // set when CERR is constructed
-
-} CERR_filebuf;   ///< a filebuf for CERR
+/// a filebuf for CERR
+ErrOut CERR_filebuf;
 
 bool ErrOut::used = false;
 

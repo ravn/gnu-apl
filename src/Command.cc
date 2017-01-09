@@ -1017,7 +1017,7 @@ Simple_string<int, false> col_width =
 
    loop(c, directories.size())
       {
-        const size_t col = c % col_width.size();
+        const int col = c % col_width.size();
         out << directories[c];
         if (col == (col_width.size() - 1) || c == (directories.size() - 1))
            {

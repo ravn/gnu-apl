@@ -31,6 +31,7 @@
 
 using namespace std;
 
+//=============================================================================
 /// a filebuf that compares its output with a file.
 class DiffOut : public filebuf
 {
@@ -66,5 +67,44 @@ protected:
    /// expand LF to CRLF
    bool expand_LF;
 };
+//=============================================================================
+/// a filebuf for stderr output
+class ErrOut : public filebuf
+{
+protected:
+   /// overloaded filebuf::overflow()
+   virtual int overflow(int c);
+
+public:
+   /// constructor
+   ErrOut()
+   : expand_LF(false)
+   {}
+
+   /// destructor
+   ~ErrOut()   { used = false; }
+
+   /// set LF → CRLF expansion mode
+   int LF_to_CRLF(int on)
+      { const int old = expand_LF;   expand_LF = on;   return old; }
+
+   /** a helper function telling whether the constructor for CERR was called
+       if CERR is used before its constructor was called (which can happen in
+       when constructors of static objects are called and use CERR) then a
+       segmentation fault would occur.
+
+       We avoid that by using get_CERR() instead of CERR in such constructors.
+       get_CERR() checks \b used and returns cerr instead of CERR if it is
+       false.
+    **/
+   filebuf * use()   { used = true;   return this; }
+
+   /// true iff the constructor for CERR was called
+   static bool used;   // set when CERR is constructed
+
+   /// expand LF to CRLF
+   bool expand_LF;
+};
+//=============================================================================
 
 #endif // __DIFFOUT_HH_DEFINED__

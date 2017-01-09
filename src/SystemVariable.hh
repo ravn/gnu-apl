@@ -79,7 +79,7 @@ protected:
    virtual void push() {}
 
    /// overloaded Symbol::push_label()
-   virtual void push_label(int label) {}
+   virtual void push_label(Function_Line label) {}
 
    /// overloaded Symbol::push_function()
    virtual void push_function(Function * function) {}

@@ -54,15 +54,15 @@ Error::print(ostream & out) const
              out << endl;
            }
 
-        if (parser_loc)   out << "   Parser LOC: " << parser_loc << endl;
-        if (print_loc)    out << "   Print LOC:  " << print_loc  << endl;
+        if (parser_loc)   out << "   Parser LOC: " << parser_loc  << endl;
+        if (print_loc)    out << "   Print LOC:  " << print_loc   << endl;
 
         if (symbol_name.size())
-                          out << "   Symbol:     " << symbol_name << endl;
+           out                << "   Symbol:     " << symbol_name << endl;
 
-                          out << "   Thrown at:  " << throw_loc << endl
-                              << "--------------------------"   << endl
-                              << endl;
+        out <<                   "   Thrown at:  " << throw_loc   << endl
+            <<                   "--------------------------"     << endl
+                                                                  << endl;
       }
 }
 //-----------------------------------------------------------------------------

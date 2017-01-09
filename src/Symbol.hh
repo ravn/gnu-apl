@@ -36,8 +36,9 @@ class UserFunction;
 /// One entry of the value stack for \b this symbol. The value stack
 /// is pushed/poped when the symbol is localized on entry/return of
 /// a user defined function.
-struct ValueStackItem
+class ValueStackItem
 {
+public:
    /// constructor: ValueStackItem for an unused symbol
    ValueStackItem() : name_class(NC_UNUSED_USER_NAME)
       { memset(&sym_val, 0, sizeof(sym_val)); }

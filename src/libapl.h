@@ -68,7 +68,7 @@ extern void init_libapl(const char * progname, int log_startup);
 extern int expand_LF_to_CRLF(int on);
 
 /// Pass `line` to the interpreter for immediate execution as APL code.
-extern void apl_exec(const char * line_utf8);
+extern int apl_exec(const char * line_utf8);
 
 /// Pass `command` to the command processor and return its output.
 extern const char * apl_command(const char* command_utf8);

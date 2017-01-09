@@ -679,8 +679,8 @@ UCS_string lambda_text;
 
 int level = 0;   // {/} nesting level
 bool copying = false;
-size_t tidx = 0;   // the current line in text[]
-int tcol = 0;      // the current column in text[tidx];
+int tidx = 0;    // the current line in text[]
+int tcol = 0;    // the current column in text[tidx];
 bool in_single_quotes = false;
 bool in_double_quotes = false;
 

@@ -26,6 +26,7 @@
 #include <Command.hh>
 #include <ComplexCell.hh>
 #include <DiffOut.hh>
+#include <Error.hh>
 #include <LineInput.hh>
 #include <FloatCell.hh>
 #include <PointerCell.hh>
@@ -303,12 +304,18 @@ Cell * cell = &val->get_ravel(idx);
    5. other
  */
 
-void
+int
 apl_exec(const char* line)
 { 
 UTF8_string line_utf8(line);
 UCS_string line_ucs(line_utf8);
+const StateIndicator * si = Workspace::SI_top();
   Command::process_line(line_ucs);
+   if (si == Workspace::SI_top())   return E_NO_ERROR;
+
+   si = Workspace::SI_top_error();
+   if (si)   return si->get_error().error_code;
+   return E_UNKNOWN_ERROR;
 } 
 //-----------------------------------------------------------------------------
 const char *
@@ -432,11 +439,17 @@ init_libapl(const char * progname, int log_startup)
 }
 //-----------------------------------------------------------------------------
 extern DiffOut DOUT_filebuf;
+extern DiffOut UERR_filebuf;
+extern ErrOut  CERR_filebuf;
 
 int
 expand_LF_to_CRLF(int on)
 {
-   return DOUT_filebuf.LF_to_CRLF(on != 0);
+const int ret = DOUT_filebuf.LF_to_CRLF(on != 0);
+                UERR_filebuf.LF_to_CRLF(on != 0);
+                CERR_filebuf.LF_to_CRLF(on != 0);
+
+   return ret;
 }
 //-----------------------------------------------------------------------------
 get_line_from_user_cb * glfu = 0;
