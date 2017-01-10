@@ -174,8 +174,6 @@ StateIndicator::print(ostream & out) const
 void
 StateIndicator::list(ostream & out, SI_mode mode) const
 {
-   Assert(this);
-
    if (mode & SIM_debug)   // command ]SI or ]SIS
       {
         print(out);

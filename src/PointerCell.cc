@@ -27,7 +27,7 @@
 //-----------------------------------------------------------------------------
 PointerCell::PointerCell(Value_P sub_val, Value & cell_owner)
 {
-   new (&value._valp()) Value_P(sub_val, LOC);
+   new (&value.u_valp) Value_P(sub_val, LOC);
    value2.owner = &cell_owner;
 
    Assert(value2.owner != sub_val.get());   // typical cut-and-paste error

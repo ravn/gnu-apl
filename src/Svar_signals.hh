@@ -665,9 +665,8 @@ protected:
          string buffer;
          store(buffer);
 
-         char ll[sizeof(uint32_t)];
-         *(uint32_t *)ll = htonl(buffer.size());
-         send(tcp_sock, ll, 4, 0);
+         const uint32_t bsize =  htonl(buffer.size());
+         send(tcp_sock, &bsize, sizeof(bsize), 0);
          ssize_t sent = send(tcp_sock, buffer.data(), buffer.size(), 0);
          return sent;
        }

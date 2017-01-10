@@ -140,7 +140,8 @@ const uint32_t nelm = val.element_count();
         loop(e, nelm)
            {
              const double v = val.get_ravel(e).get_real_value();
-             uint64_t i = *(uint64_t *)&v;
+             const double * dv = &v;
+             uint64_t i = *(const uint64_t *)dv;
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
@@ -156,7 +157,8 @@ const uint32_t nelm = val.element_count();
         loop(e, nelm)
            {
              double v = val.get_ravel(e).get_real_value();
-             uint64_t i = *(uint64_t *)&v;
+             const double * dv = &v;
+             uint64_t i = *(uint64_t *)dv;
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
@@ -167,7 +169,8 @@ const uint32_t nelm = val.element_count();
              result.append(Unicode(i & 0xFF));   i >>= 8;
 
              v = val.get_ravel(e).get_imag_value();
-             i = *(uint64_t *)&v;
+             dv = &v;
+             i = *(uint64_t *)dv;
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;

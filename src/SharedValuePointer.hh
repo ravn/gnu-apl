@@ -35,14 +35,42 @@ class PrintBuffer;
 
 #define ptr_clear(p, l) p.reset()
 
+/** NOTE: the inline functions below require Value.hh (which in turn
+    requireis the classes nelow). These inline functions are therefore
+    implemented in Value.icc (after both Value.hh AND SharedValuePointer
+    have been #included.
+**/
+
+//-----------------------------------------------------------------------------
+class Value_P_Base
+{
+public:
+   /// decrement owner-count and reset pointer to 0
+   inline void reset();
+
+   /// reset and add value event
+   inline void clear(const char * loc);
+
+protected:
+   /// pointer to the value
+   Value * value_p;
+
+   /// decrement the owner count of \b val. The function bidy requires Value.hh
+   /// and is therefore implemented in Value.icc.
+   static inline void decrement_owner_count(Value * & val, const char * loc);
+
+   /// increment the owner count of \b val. The function body requires Value.hh
+   /// and is therefore implemented in Value.icc.
+   static inline void increment_owner_count(Value * val, const char * loc);
+};
+//-----------------------------------------------------------------------------
 /// a smart pointer to a Value
-class Value_P
+class Value_P : public Value_P_Base
 {
 public:
    /// Constructor: 0 pointer
    Value_P()
-   : value_p(0)
-   {}
+   { value_p = 0; }
 
    /// a new scalar value with un-initialized ravel
    inline Value_P(const char * loc);
@@ -81,19 +109,13 @@ public:
    inline Value_P(const Value_P & other);
 
    /// copy operator
-   Value_P & operator =(const Value_P & other);
+   void operator =(const Value_P & other);
 
    /// Destructor
    inline ~Value_P();
 
    /// return the number of Value_P that point to \b value_p
    inline int use_count() const;
-
-   /// decrement owner-count and reset pointer to 0
-   inline void reset();
-
-   /// reset and add value event
-   inline void clear(const char * loc);
 
    /// return a const pointer to the Value (overloaded ->)
    const Value * operator->()  const
@@ -130,21 +152,11 @@ public:
    /// return true if this Value_P points to a different Value than \b other
    bool operator !=(const Value_P & other) const
       { return value_p != other.value_p; }
-
-   /// decrement the owner count of \b val
-   static inline void decrement_owner_count(Value * & val, const char * loc);
-
-   /// increment the owner count of \b val
-   static inline void increment_owner_count(Value * val, const char * loc);
-
-protected:
-   /// pointer to the value
-   Value * value_p;
 };
 
 /// macro to facilitate Value_P in unions
-#define VALUE_P(x) /** space for a Value_P **/ char u_ ## x[sizeof(Value_P)]; \
-   /** return Value_P **/ Value_P & _ ## x() const { return (Value_P &) u_ ## x; }
+#define VALUE_P(x) /** space for a Value_P **/ Value_P_Base u_ ## x; \
+ /** return Value_P **/ Value_P & _ ## x() const { return (Value_P &) u_ ## x; }
 
 //-----------------------------------------------------------------------------
 

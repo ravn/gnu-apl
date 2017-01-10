@@ -52,6 +52,7 @@ class Thread_context;
 class Value : public DynamicObject
 {
    friend class Value_P;
+   friend class Value_P_Base;
    friend class PointerCell;   // needs & for &cell_owner
 
 protected:
