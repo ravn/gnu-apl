@@ -210,7 +210,7 @@ Simple_string<int, false> col_width = names.compute_column_width(tabsize);
 
    loop(c, count)
       {
-        const size_t col = c % col_width.size();
+        const int col = c % col_width.size();
         out << names[c];
         if (col == (col_width.size() - 1) || c == (count - 1))
            {

@@ -98,9 +98,12 @@ Shape::insert_axis(Axis axis, ShapeItem len) const
    // insert after (including) axis
    //
 Shape ret;
-   loop(r, axis)                ret.add_shape_item(get_shape_item(r));
-                                ret.add_shape_item(len);
-   loop(r, get_rank() - axis)   ret.add_shape_item(get_shape_item(r + axis));
+   loop(r, axis)
+       ret.add_shape_item(get_shape_item(r));
+
+   ret.add_shape_item(len);
+   loop(r, get_rank() - axis)
+       ret.add_shape_item(get_shape_item(r + axis));
 
    return ret;
 }

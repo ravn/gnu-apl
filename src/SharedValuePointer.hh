@@ -144,7 +144,7 @@ protected:
 
 /// macro to facilitate Value_P in unions
 #define VALUE_P(x) /** space for a Value_P **/ char u_ ## x[sizeof(Value_P)]; \
-   /** return Value_P **/ Value_P & _ ## x() const { return *(Value_P *) & u_ ## x; }
+   /** return Value_P **/ Value_P & _ ## x() const { return (Value_P &) u_ ## x; }
 
 //-----------------------------------------------------------------------------
 

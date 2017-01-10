@@ -12,7 +12,8 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Werror -Wall -Wno-strict-aliasing
+common_CXXFLAGS = -Werror -Wall -Wno-strict-aliasing \
+                          -Wno-deprecated-declarations
 common_LDFLAGS =
 common_SOURCES =        buildtag		buildtag.hh		\
 						../config.h		\

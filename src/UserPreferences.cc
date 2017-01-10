@@ -182,7 +182,7 @@ bool
 UserPreferences::parse_argv_1()
 {
 bool log_startup = false;
-   for (size_t a = 1; a < expanded_argv.size(); )
+   for (int a = 1; a < expanded_argv.size(); )
        {
          const char * opt = expanded_argv[a++];
          const char * val = (a < expanded_argv.size()) ? expanded_argv[a] : 0;
@@ -239,7 +239,7 @@ UserPreferences::parse_argv_2(bool logit)
          }
    }
 
-   for (size_t a = 1; a < expanded_argv.size(); )
+   for (int a = 1; a < expanded_argv.size(); )
        {
          if ((int)a == script_argc)   { ++a;   continue; }   // skip scriptname
 
@@ -1262,17 +1262,21 @@ int line = 0;
          //
          {
            const char * param = strchr(p, '(');
-           if (param == 0)   goto param_error;   skip_spaces(++param);
+           if (param == 0)   goto param_error;
+           skip_spaces(++param);
 
            const char * p_ab = strchr(param, ',');
-           if (p_ab == 0)   goto param_error;   skip_spaces(++p_ab);
+           if (p_ab == 0)   goto param_error;
+           skip_spaces(++p_ab);
            const int i_ab = p_ab[1] == 'A' ? 2 : 1;
 
            const char * p_txt = strchr(p_ab, ',');
-           if (p_txt == 0)   goto param_error;   skip_spaces(++p_txt);
+           if (p_txt == 0)   goto param_error;
+           skip_spaces(++p_txt);
 
            const char * p_be = strchr(p_txt, ',');
-           if (p_be == 0)   goto param_error;   skip_spaces(++p_be);
+           if (p_be == 0)   goto param_error;
+           skip_spaces(++p_be);
 
            const ShapeItem value = strtoll(p_be, 0, 0);
 

@@ -36,8 +36,6 @@ Token::Token(const Token & other)
 //-----------------------------------------------------------------------------
 Token::Token(TokenTag tg, IndexExpr & idx)
 {
-   Assert(&idx);
-
    if (tg == TOK_PINDEX)
       {
         // this token is a partial index in the prefix parser.

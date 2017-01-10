@@ -751,7 +751,7 @@ ShapeItem  lastc = 0;
 
         gemv<T>(lastv, lastc, c, v, gemv_result);
         gerc<T>(lastv, lastc, -tau, v, gemv_result, c);
-        delete gemv_data;
+        delete[] gemv_data;
       }
 }
 //-----------------------------------------------------------------------------
@@ -1149,7 +1149,7 @@ const ShapeItem N = A.get_column_count();
      // Use unblocked code to factor the last or only block
      //
      laqp2<T>(A, pivot, tau, vn12);
-     delete vn12;
+     delete[] vn12;
    }
 }
 //-----------------------------------------------------------------------------
@@ -1198,7 +1198,7 @@ T * work_max = work_min + N;
 
          if (smaxpr*rcond > sminpr)
             {
-              delete work_1;
+              delete[] work_1;
               return RANK;
             }
 
@@ -1213,7 +1213,7 @@ T * work_max = work_min + N;
          smax = smaxpr;
        }
 
-   delete work_1;
+   delete[] work_1;
    return N;
 }
 //-----------------------------------------------------------------------------
@@ -1246,7 +1246,7 @@ T * tmp = tau + N;                                // N complex tmp1 items
      const int RANK = estimate_rank(A, rcond);
      if (RANK < N)
         {
-          delete pivot_tau_tmp;
+          delete[] pivot_tau_tmp;
           return RANK;
         }
    }
@@ -1283,7 +1283,7 @@ T * tmp = tau + N;                                // N complex tmp1 items
         loop(i_0, N)   B.at(i_0, j_0) = tmp[i_0];
       }
 
-   delete pivot_tau_tmp;
+   delete[] pivot_tau_tmp;
    return N;
 }
 //-----------------------------------------------------------------------------

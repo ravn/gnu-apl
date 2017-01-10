@@ -263,12 +263,12 @@ UserFunction::eval_LB(Token & LO, Value_P B)
 
    Workspace::push_SI(this, LOC);
 
-   if (header.Z())         header.Z()->push();
-   if (header.A())         header.A()->push();
+   if (header.Z())         header.Z() ->push();
+   if (header.A())         header.A() ->push();
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());
-   if (header.X())         header.X()->push();
-                           header.B()->push_value(B);
+   if (header.X())         header.X() ->push();
+   header                        .B() ->push_value(B);
 
    header.eval_common();
 
@@ -295,7 +295,7 @@ UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B)
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());
    if (header.X())         header.X()->push_value(X);
-                           header.B()->push_value(B);
+   header                        .B()->push_value(B);
 
    header.eval_common();
 
@@ -321,10 +321,10 @@ UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B)
    if (header.X())         header.X()->push();
 
    if (header.Z())         header.Z()->push();
-                           header.A()->push_value(A);
+   header                        .A()->push_value(A);
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());
-                           header.B()->push_value(B);
+   header                        .B()->push_value(B);
 
    header.eval_common();
 
@@ -349,11 +349,11 @@ UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
    Workspace::push_SI(this, LOC);
 
    if (header.Z())         header.Z()->push();
-                           header.A()->push_value(A);
+   header                        .A()->push_value(A);
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());
    if (header.X())         header.X()->push_value(X);
-                           header.B()->push_value(B);
+   header                        .B()->push_value(B);
 
    header.eval_common();
 
@@ -382,8 +382,8 @@ UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B)
    else                    header.LO()->push_value(LO.get_apl_val());
    if (RO.is_function())   header.RO()->push_function(RO.get_function());
    else                    header.RO()->push_value(RO.get_apl_val());
-   if (header.X())         header.X()->push();
-                           header.B()->push_value(B);
+   if (header.X())         header.X() ->push();
+   header                        .B() ->push_value(B);
 
    header.eval_common();
 
@@ -413,7 +413,7 @@ UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
    if (RO.is_function())   header.RO()->push_function(RO.get_function());
    if (header.X())         header.X()->push_value(X);
    else                    header.RO()->push_value(RO.get_apl_val());
-                           header.B()->push_value(B);
+   header                        .B()->push_value(B);
 
    header.eval_common();
 
@@ -439,13 +439,13 @@ UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
 
    if (header.Z())         header.Z()->push();
 
-                           header.A()->push_value(A);
+   header                        .A()->push_value(A);
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());
    if (RO.is_function())   header.RO()->push_function(RO.get_function());
    else                    header.RO()->push_value(RO.get_apl_val());
    if (header.X())         header.X()->push();
-                           header.B()->push_value(B);
+   header                        .B()->push_value(B);
 
    header.eval_common();
 
@@ -472,13 +472,13 @@ UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
    Workspace::push_SI(this, LOC);
 
    if (header.Z())         header.Z()->push();
-                           header.A()->push_value(A);
+   header                        .A()->push_value(A);
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());
    if (RO.is_function())   header.RO()->push_function(RO.get_function());
    else                    header.RO()->push_value(RO.get_apl_val());
    if (header.X())         header.X()->push_value(X);
-                           header.B()->push_value(B);
+   header                        .B()->push_value(B);
 
    header.eval_common();
 

@@ -596,7 +596,7 @@ Simple_string<int32_t, false> sorted;
         // find smallest
         //
         int smallest = processors[0];
-        for (size_t s = 1; s < processors.size(); ++s)
+        for (int s = 1; s < processors.size(); ++s)
             if (smallest > processors[s])   smallest = processors[s];
 
        // add smallest to sorted
@@ -605,7 +605,7 @@ Simple_string<int32_t, false> sorted;
 
        // remove smallest from processors
        //
-        for (size_t s = 0; s < processors.size();)
+        for (int s = 0; s < processors.size();)
             {
               if (processors[s] != smallest)
                  {

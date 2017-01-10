@@ -228,7 +228,7 @@ UCS_string ucs;
 Value_P
 Quad_TF::tf1_inv(const UCS_string & ravel)
 {
-const size_t len = ravel.size();
+const int len = ravel.size();
 
    if (len < 2)
       {
@@ -325,7 +325,7 @@ NamedObject * sym_or_fun = Workspace::lookup_existing_name(name);
            }
      }
 
-const size_t data_chars = len - idx;
+const int data_chars = len - idx;
 
    if (mode == UNI_ASCII_F)   // function
       {

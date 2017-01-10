@@ -1201,8 +1201,8 @@ const int function_number = X->get_ravel(0).get_near_int();
                           {
                             const APL_Integer fd =
                                   vex->get_ravel(l).get_int_value();
-                            if (fd < 0)                  DOMAIN_ERROR;
-                            if (fd > 8*sizeof(fd_set))   DOMAIN_ERROR;
+                            if (fd < 0)                         DOMAIN_ERROR;
+                            if (fd > (int)(8*sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &exceptfds);
                             if (max_fd < fd)   max_fd = fd;
                             ex = &exceptfds;
@@ -1216,8 +1216,8 @@ const int function_number = X->get_ravel(0).get_near_int();
                           {
                             const APL_Integer fd =
                                   vwr->get_ravel(l).get_int_value();
-                            if (fd < 0)                  DOMAIN_ERROR;
-                            if (fd > 8*sizeof(fd_set))   DOMAIN_ERROR;
+                            if (fd < 0)                         DOMAIN_ERROR;
+                            if (fd > (int)(8*sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &writefds);
                             if (max_fd < fd)   max_fd = fd;
                             wr = &writefds;
@@ -1231,8 +1231,8 @@ const int function_number = X->get_ravel(0).get_near_int();
                           {
                             const APL_Integer fd =
                                   vrd->get_ravel(l).get_int_value();
-                            if (fd < 0)                  DOMAIN_ERROR;
-                            if (fd > 8*sizeof(fd_set))   DOMAIN_ERROR;
+                            if (fd < 0)                         DOMAIN_ERROR;
+                            if (fd > (int)(8*sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &readfds);
                             if (max_fd < fd)   max_fd = fd;
                             rd = &readfds;
