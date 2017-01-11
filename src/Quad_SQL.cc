@@ -188,9 +188,9 @@ Connection *conn = connections[db_id];
     return Token( TOK_APL_VALUE1, Str0( LOC ) );
 }
 //-----------------------------------------------------------------------------
-static Value_P run_generic_one_query( ArgListBuilder *arg_list,
-                                      Value_P B, int start, int num_args,
-                                      bool ignore_result )
+static Value_P
+run_generic_one_query(ArgListBuilder *arg_list, Value_P B, int start,
+                      int num_args, bool ignore_result )
 {
     for( int i = 0 ; i < num_args ; i++ ) {
         const Cell &cell = B->get_ravel( start + i );
@@ -219,51 +219,53 @@ static Value_P run_generic_one_query( ArgListBuilder *arg_list,
     return arg_list->run_query( ignore_result );
 }
 //-----------------------------------------------------------------------------
-static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
+static Value_P
+run_generic(Connection *conn, Value_P A, Value_P B, bool query)
 {
-    if( !A->is_char_string() ) {
+   if (!A->is_char_string())
+      {
         MORE_ERROR() << "Illegal query argument type";
         VALUE_ERROR;
-    }
+      }
 
-    string statement = conn->replace_bind_args( to_string( A->get_UCS_ravel() ) );
-    ArgListBuilder *builder;
-    if( query ) {
-        builder = conn->make_prepared_query( statement );
-    }
-    else {
-        builder = conn->make_prepared_update( statement );
-    }
-    auto_ptr<ArgListBuilder> arg_list( builder );
+string statement = conn->replace_bind_args(to_string( A->get_UCS_ravel()));
+ArgListBuilder * builder;
+    if (query)   builder = conn->make_prepared_query( statement );
+    else         builder = conn->make_prepared_update( statement );
 
-    const Shape &shape = B->get_shape();
-    if( shape.get_rank() == 0 || shape.get_rank() == 1 ) {
+const Shape &shape = B->get_shape();
+    if (shape.get_rank() == 0 || shape.get_rank() == 1) {
         int num_args = shape.get_volume();
-        return run_generic_one_query( arg_list.get(), B, 0, num_args, false );
+        Value_P result = run_generic_one_query( builder, B, 0, num_args, false);
+        delete builder;
+        return result;
     }
-    else if( shape.get_rank() == 2 ) {
+
+    if (shape.get_rank() == 2) {
         int rows = shape.get_rows();
         int cols = shape.get_cols();
         if( rows == 0 ) {
+            delete builder;
             return Idx0( LOC );
         }
         else {
             Assert_fatal( rows > 0 );
             Value_P result;
-            for( int row = 0 ; row < rows ; row++ ) {
-                bool not_last = row < rows - 1;
-                result = run_generic_one_query( arg_list.get(), B, row * cols, cols, not_last );
-                if( not_last ) {
-                    arg_list->clear_args();
-                }
-            }
+            loop (row, rows)
+                 {
+                   const bool not_last = row < rows - 1;
+                   result = run_generic_one_query(builder, B, row * cols,
+                                                  cols, not_last );
+                   if (not_last)   builder->clear_args();
+                 }
+            delete builder;
             return result;
         }
     }
-    else {
-        MORE_ERROR() << "Bind params have illegal rank";
-        RANK_ERROR;
-    }
+
+   delete builder;
+   MORE_ERROR() << "Bind params have illegal rank";
+   RANK_ERROR;
 }
 //-----------------------------------------------------------------------------
 static Token run_query( Connection *conn, Value_P A, Value_P B )

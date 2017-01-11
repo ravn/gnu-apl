@@ -661,8 +661,7 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Werror -Wall -Wno-strict-aliasing \
-	-Wno-deprecated-declarations $(am__append_2) $(am__append_6) \
+common_CXXFLAGS = -Werror -Wall $(am__append_2) $(am__append_6) \
 	$(am__append_7)
 common_LDFLAGS = $(am__append_3) $(am__append_8)
 common_SOURCES = buildtag buildtag.hh ../config.h APL_types.hh \
