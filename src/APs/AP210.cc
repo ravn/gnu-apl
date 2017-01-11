@@ -201,7 +201,7 @@ read_variable(FILE * file, int code, Coupled_var & var_D,
 
         delete var_D.data;
         var_D.data = new CDR_string(buffer, nb);
-        delete buffer;
+        delete[] buffer;
         return 0;
       }
    else if (code == 'D')   // char (var size)

@@ -44,12 +44,50 @@ class PrintBuffer;
 //-----------------------------------------------------------------------------
 class Value_P_Base
 {
+   friend class PointerCell;
+
 public:
    /// decrement owner-count and reset pointer to 0
    inline void reset();
 
    /// reset and add value event
    inline void clear(const char * loc);
+
+   /// return true if the pointer is invalid
+   bool operator!() const
+      { return value_p == 0; }
+
+   /// return true if this Value_P points to the same Value as \b other
+   bool operator ==(const Value_P_Base & other) const
+      { return value_p == other.value_p; }
+
+   /// return true if this Value_P points to a different Value than \b other
+   bool operator !=(const Value_P_Base & other) const
+      { return value_p != other.value_p; }
+
+   /// return a const pointer to the Value (overloaded ->)
+   const Value * operator->()  const
+      { return value_p; }
+
+   /// return a pointer to the Value (overloaded ->)
+   Value * operator->()
+      { return value_p; }
+
+   /// return a const reference to the Value
+   const Value & operator*() const
+      { return *value_p; }
+
+   /// return a const pointer to the Value
+   const Value * get() const
+      { return value_p; }
+
+   /// return a pointer to the Value
+   Value * get()
+      { return value_p; }
+
+   /// return a pointer to the Value
+   Value & getref()
+      { return *value_p; }
 
 protected:
    /// pointer to the value
@@ -116,48 +154,7 @@ public:
 
    /// return the number of Value_P that point to \b value_p
    inline int use_count() const;
-
-   /// return a const pointer to the Value (overloaded ->)
-   const Value * operator->()  const
-      { return value_p; }
-
-   /// return a pointer to the Value (overloaded ->)
-   Value * operator->()
-      { return value_p; }
-
-   /// return a const reference to the Value
-   const Value & operator*()  const
-      { return *value_p; }
-
-   /// return a const pointer to the Value
-   const Value * get() const
-      { return value_p; }
-
-   /// return a pointer to the Value
-   Value * get()
-      { return value_p; }
-
-   /// return a pointer to the Value
-   Value & getref()
-      { return *value_p; }
-
-   /// return true if the pointer is invalid
-   bool operator!() const
-      { return value_p == 0; }
-
-   /// return true if this Value_P points to the same Value as \b other
-   bool operator ==(const Value_P & other) const
-      { return value_p == other.value_p; }
-
-   /// return true if this Value_P points to a different Value than \b other
-   bool operator !=(const Value_P & other) const
-      { return value_p != other.value_p; }
 };
-
-/// macro to facilitate Value_P in unions
-#define VALUE_P(x) /** space for a Value_P **/ Value_P_Base u_ ## x; \
- /** return Value_P **/ Value_P & _ ## x() const { return (Value_P &) u_ ## x; }
-
 //-----------------------------------------------------------------------------
 
 #endif // __SHARED_VALUE_POINTER_HH_DEFINED__

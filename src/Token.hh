@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ public:
    Token(TokenTag tg, Value_P vp)
    : tag(tg)
    { Assert1(get_ValueType() == TV_VAL);
-     Assert(!!vp);   new (&value._apl_val()) Value_P(vp); }
+     Assert(!!vp);   new (&value.apl_val) Value_P(vp); }
 
    /// Construct a token for an index
    Token(TokenTag tg, IndexExpr & idx);
@@ -190,26 +190,22 @@ public:
    /// return the Value_P value of this token. The token could be TOK_NO_VALUE;
    /// in that case VALUE_ERROR is thrown.
    Value_P get_apl_val() const
-      { if (!is_apl_val())   VALUE_ERROR;   return value._apl_val(); }
+      { if (is_apl_val())   return value._apl_val();   VALUE_ERROR; }
 
    /// return the address of the Value_P value of this token.
    Value_P * get_apl_valp() const
-      { if (!is_apl_val())   VALUE_ERROR;   return &value._apl_val(); }
-
-   /// return the Value * of this token, or 0 for non-value token
-   Value * get_apl_val_pointer() const
-      { return is_apl_val() ? value._apl_val().get() : 0; }
+      { if (is_apl_val())   return &value._apl_val();   VALUE_ERROR; }
 
    /// clear this token, properly clearing Value token
    void clear(const char * loc)
       {
-         if (is_apl_val())   ptr_clear(value._apl_val(), loc);
+         if (is_apl_val())   value.apl_val.reset();
          new (this) Token();
       }
 
    /// return the axis specification of this token (expect non-zero axes)
    Value_P get_nonzero_axes() const
-      { Assert1(!!value._apl_val() && (get_tag() == TOK_AXES));
+      { Assert1(!!value.apl_val && (get_tag() == TOK_AXES));
         return value._apl_val(); }
 
    /// return the axis specification of this token
@@ -236,7 +232,7 @@ public:
    int value_use_count() const;
 
    /// clear the Value_P value (if any) of this token
-   void extract_apl_val(const char * loc) const;
+   void extract_apl_val(const char * loc);
 
    /// change the tag (within the same TokenValueType)
    void ChangeTag(TokenTag new_tag);
@@ -280,7 +276,8 @@ public:
         Function_Line   fun_line;        ///< the function line for TV_LIN
         IndexExpr     * index_val;       ///< the index for TV_INDEX
         Function      * function;        ///< the function for TV_FUN
-        VALUE_P(        apl_val)         ///< the value for TV_VAL
+        Value_P_Base    apl_val;         ///< the APL value for TV_VAL
+        Value_P &       _apl_val() const   { return (Value_P &) apl_val; }
       };
 
    /// the name of \b tc

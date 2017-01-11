@@ -601,7 +601,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         bool imag_need_float = false;
         const bool imag_valid = tokenize_real(src, imag_need_float,
                                               imag_flt, imag_int);
-        if (!imag_need_float)   imag_flt = imag_flt;
+        if (!imag_need_float)   imag_flt = imag_int;
 
         if (!imag_valid)
            {
@@ -634,7 +634,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         bool imag_need_float = false;
         const bool imag_valid = tokenize_real(src, imag_need_float,
                                               degrees_flt, degrees_int);
-        if (!imag_need_float)   degrees_flt = degrees_flt;
+        if (!imag_need_float)   degrees_flt = degrees_int;
 
         if (!imag_valid)
            {

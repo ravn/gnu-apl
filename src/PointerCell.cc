@@ -27,7 +27,7 @@
 //-----------------------------------------------------------------------------
 PointerCell::PointerCell(Value_P sub_val, Value & cell_owner)
 {
-   new (&value.u_valp) Value_P(sub_val, LOC);
+   new (&value.valp) Value_P(sub_val, LOC);
    value2.owner = &cell_owner;
 
    Assert(value2.owner != sub_val.get());   // typical cut-and-paste error
@@ -52,7 +52,7 @@ PointerCell::release(const char * loc)
 // const ShapeItem sub_len = sub->nz_element_count();
 //    loop(s, sub_len)   sub->get_ravel(s).release(loc);
 
-   ptr_clear(value._valp(), loc);
+   value.valp.reset();
    new (this) IntCell(0);
 }
 //-----------------------------------------------------------------------------
@@ -132,7 +132,8 @@ const Cell * C2 = &v2->get_ravel(0);
 Value_P
 PointerCell::get_pointer_value() const
 {
-Value_P ret = value._valp();
+Value * vp = const_cast<Value *>(value.valp.get());
+Value_P ret(vp, LOC);   // Value_P constructor increments owner_count
    return ret;
 }
 //-----------------------------------------------------------------------------

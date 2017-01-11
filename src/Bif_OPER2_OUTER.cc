@@ -152,10 +152,9 @@ const uint64_t start_1 = cycle_counter();
    job.ec = E_NO_ERROR;
 
 #if PARALLEL_ENABLED
-const ShapeItem Z_len = job.ZAh * job.ZBl;
    if (  Parallel::run_parallel
       && Thread_context::get_active_core_count() > 1
-      && Z_len > get_dyadic_threshold())
+      && job.ZAh * job.ZBl > get_dyadic_threshold())
       {
         job.cores = Thread_context::get_active_core_count();
         Thread_context::do_work = PF_scalar_outer_product;
@@ -173,7 +172,8 @@ const ShapeItem Z_len = job.ZAh * job.ZBl;
 #ifdef PERFORMANCE_COUNTERS_WANTED
 #ifdef HAVE_RDTSC
 const uint64_t end_1 = cycle_counter();
-   Performance::fs_OPER2_OUTER_AB.add_sample(end_1 - start_1, Z_len);
+   Performance::fs_OPER2_OUTER_AB.add_sample(end_1 - start_1,
+                                             job.ZAh * job.ZBl);
 #endif
 #endif
 }

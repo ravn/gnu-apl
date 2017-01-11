@@ -468,9 +468,9 @@ t←t⍪'INADDR_ANY' 0
 ⍝
 ⍝ kindly sent by Christian Robert to bug-apl@gnu.org on Jan. 6, 2017
 ⍝
-∇z←L FIO[X] R;a
- →(2≠⎕nc 'X')/Noaxis
- →(0=↑0⍴X)/Number
+∇z←L FIO[X] R;a;x
+→(2≠⎕nc 'X')/Noaxis
+→(0=↑0⍴X)/Number
  a←   ('errno'        1) ('strerror'    2) ('fopen'       3) ('fclose'       4)
  a←a, ('ferrno'       5) ('fread'       6) ('fwrite'      7) ('fgets'        8)
  a←a, ('fgetc'        9) ('feof'       10) ('ferror'     11) ('ftell'       12)
@@ -484,14 +484,19 @@ t←t⍪'INADDR_ANY' 0
  a←a, ('read'        41) ('write'      42) ('uwrite'     43) ('getsockname' 44)
  a←a, ('getpeername' 45) ('getsockopt' 46) ('setsockopt' 47) ('fscanf'      48)
  a←a, ('open'         3) ('close'       4) ⍝ And some handy aliases
- →(0=↑⍴X←,⊃((⊂X) ≡¨↑¨a)/a)/Nomatch
- X←¯1↑X
+ →(0=↑⍴x←,⊃((⊂X) ≡¨↑¨a)/a)/Nomatch
+ X←¯1↑x
+ →(30≠X)/Number          ⍝ Not a Special case
+ R←X ◊ →NoaxisMonadic    ⍝ Special case for getpwd, should be called with a dummy right arg.
+⍝
+⍝ possible cases ..
+⍝
 Number:       →(2≠⎕nc 'L')/Monadic
 Diadic:       z← L ⎕FIO[X] R ◊ →0
 Monadic:      z←   ⎕FIO[X] R ◊ →0
-Nomatch:      "Unknown function:", X ◊ →0
+Nomatch:      "Unknown function: ", X ◊ →0
 Noaxis:       →(2≠⎕nc 'L')/NoaxisMonadic
 NoaxisDiadic: z←L ⎕FIO R ◊ →0
 NoaxisMonadic:z←  ⎕FIO R ◊ →0
-∇ 
+∇
 

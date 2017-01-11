@@ -216,7 +216,7 @@ public:
         void         *vptr;   ///< a void pointer
         Cell         *next;   ///< pointer to the next (unused) cell
         Cell         *lval;   ///< left value (for selective assignment)
-        VALUE_P(      valp)   ///< pointer to a nested sub-array
+        Value_P_Base  valp;
       };
 
    /// additional data for ComplexCells and PointerCells

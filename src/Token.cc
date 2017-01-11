@@ -54,11 +54,11 @@ Token::Token(TokenTag tg, IndexExpr & idx)
              tag = TOK_AXES;
              if (idx.value_count() == 0)   // []
                 {
-                  new (&value._apl_val()) Value_P;
+                  new (&value.apl_val) Value_P;
                 }
              else                          // [x]
                 {
-                  new (&value._apl_val())   Value_P(idx.extract_value(0));
+                  new (&value.apl_val)   Value_P(idx.extract_value(0));
                 }
            }
         else                         // [idx; ...]
@@ -245,15 +245,15 @@ Token::ChangeTag(TokenTag new_tag)
 int
 Token::value_use_count() const
 {
-   if (!is_apl_val())       return 0;
-   if (!value._apl_val())   return -98;
-   return value._apl_val()->get_owner_count();
+   if (!is_apl_val())    return 0;
+   if (!value.apl_val)   return -98;
+   return value.apl_val->get_owner_count();
 }
 //-----------------------------------------------------------------------------
 void
-Token::extract_apl_val(const char * loc) const
+Token::extract_apl_val(const char * loc)
 {
-   if (is_apl_val())   ptr_clear(value._apl_val(), loc);
+   if (is_apl_val())   value.apl_val.reset();
 }
 //-----------------------------------------------------------------------------
 ostream &
@@ -388,7 +388,7 @@ Token::print_value(ostream & out) const
         case TOK_APL_VALUE1:
         case TOK_APL_VALUE3:
              {
-               Value_P v = value._apl_val();
+               const Value * v = value.apl_val.get();
                if (v->get_rank() == 0)   out << "''";
                loop(r, v->get_rank())
                    {
@@ -769,7 +769,7 @@ Token::copy_1(const Token & src, const char * loc)
    clear(loc);
    if (src.is_apl_val())
       {
-        Value * val = src.get_apl_val_pointer();
+        const Value * val = src.value.apl_val.get();
         if (val)
            {
              ADD_EVENT(val, VHE_TokCopy1, src.value_use_count(), loc);
@@ -791,10 +791,12 @@ Token::move_1(Token & src, const char * loc)
 
    if (src.is_apl_val())
       {
-        Value * val = src.get_apl_val_pointer();
-        if (val)   { /* do nothing, needed for -Wall */ }
-	ADD_EVENT(val, VHE_TokMove1, src.value_use_count() - 1, loc);
-        src.clear(loc);
+        const Value * val = src.value.apl_val.get();
+        if (val)
+           {
+	     ADD_EVENT(val, VHE_TokMove1, src.value_use_count() - 1, loc);
+             src.clear(loc);
+           }
       }
 }
 //-----------------------------------------------------------------------------
@@ -806,10 +808,12 @@ Token::move_2(const Token & src, const char * loc)
 
    if (src.is_apl_val())
       {
-        Value * val = src.get_apl_val_pointer();
-        if (val)   { /* do nothing, needed for -Wall */ }
-        ADD_EVENT(val, VHE_TokMove2, src.value_use_count() - 1, loc);
-        ((Token &)src).clear(loc);
+        const Value * val = src.value.apl_val.get();
+        if (val)
+           {
+             ADD_EVENT(val, VHE_TokMove2, src.value_use_count() - 1, loc);
+             ((Token &)src).clear(loc);
+           }
       }
 }
 //-----------------------------------------------------------------------------
