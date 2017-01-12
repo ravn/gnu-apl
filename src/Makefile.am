@@ -12,7 +12,7 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Werror -Wall
+common_CXXFLAGS = -Werror -Wall -I sql
 common_LDFLAGS =
 common_SOURCES =        buildtag		buildtag.hh		\
 						../config.h		\
@@ -118,7 +118,7 @@ ValueHistory.cc					ValueHistory.hh		\
 Workspace.cc					Workspace.hh
 
 if SQLITE3
-common_CXXFLAGS += $(SQLITE3_CFLAGS) -I sql
+common_CXXFLAGS += $(SQLITE3_CFLAGS)
 common_LDFLAGS  += $(SQLITE3_LDFLAGS)
 common_SOURCES += sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh  \
                   sql/SqliteConnection.cc     sql/SqliteConnection.hh      \
@@ -130,10 +130,9 @@ endif
 if POSTGRES
 if !SQLITE3
 common_SOURCES  += sql/Connection.cc
-common_CXXFLAGS += -I sql
 endif
 
-common_CXXFLAGS += $(POSTGRESQL_CFLAGS) -I sql
+common_CXXFLAGS += $(POSTGRESQL_CFLAGS)
 common_LDFLAGS  += $(POSTGRESQL_LDFLAGS)
 common_SOURCES += sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
                   sql/PostgresConnection.cc     sql/PostgresConnection.hh \

@@ -81,7 +81,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @WANT_ANDROID_FALSE@am__append_1 = APs emacs_mode sql workspaces
-@SQLITE3_TRUE@am__append_2 = $(SQLITE3_CFLAGS) -I sql
+@SQLITE3_TRUE@am__append_2 = $(SQLITE3_CFLAGS)
 @SQLITE3_TRUE@am__append_3 = $(SQLITE3_LDFLAGS)
 @SQLITE3_TRUE@am__append_4 = sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh  \
 @SQLITE3_TRUE@                  sql/SqliteConnection.cc     sql/SqliteConnection.hh      \
@@ -90,14 +90,13 @@ host_triplet = @host@
 @SQLITE3_TRUE@                  sql/Connection.cc
 
 @POSTGRES_TRUE@@SQLITE3_FALSE@am__append_5 = sql/Connection.cc
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__append_6 = -I sql
-@POSTGRES_TRUE@am__append_7 = $(POSTGRESQL_CFLAGS) -I sql
-@POSTGRES_TRUE@am__append_8 = $(POSTGRESQL_LDFLAGS)
-@POSTGRES_TRUE@am__append_9 = sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
+@POSTGRES_TRUE@am__append_6 = $(POSTGRESQL_CFLAGS)
+@POSTGRES_TRUE@am__append_7 = $(POSTGRESQL_LDFLAGS)
+@POSTGRES_TRUE@am__append_8 = sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 @POSTGRES_TRUE@                  sql/PostgresConnection.cc     sql/PostgresConnection.hh \
 @POSTGRES_TRUE@                  sql/PostgresProvider.cc       sql/PostgresProvider.hh
 
-@WANT_LIBAPL_TRUE@am__append_10 = libapl.la
+@WANT_LIBAPL_TRUE@am__append_9 = libapl.la
 @WANT_LIBAPL_FALSE@bin_PROGRAMS = apl$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -661,9 +660,8 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Werror -Wall $(am__append_2) $(am__append_6) \
-	$(am__append_7)
-common_LDFLAGS = $(am__append_3) $(am__append_8)
+common_CXXFLAGS = -Werror -Wall -I sql $(am__append_2) $(am__append_6)
+common_LDFLAGS = $(am__append_3) $(am__append_7)
 common_SOURCES = buildtag buildtag.hh ../config.h APL_types.hh \
 	Archive.cc Archive.hh ArrayIterator.cc ArrayIterator.hh \
 	Assert.cc Assert.hh Avec.cc Avec.def Avec.hh Backtrace.cc \
@@ -714,8 +712,8 @@ common_SOURCES = buildtag buildtag.hh ../config.h APL_types.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
 	ValueHistory.hh Workspace.cc Workspace.hh $(am__append_4) \
-	$(am__append_5) $(am__append_9)
-pkglib_LTLIBRARIES = $(am__append_10)
+	$(am__append_5) $(am__append_8)
+pkglib_LTLIBRARIES = $(am__append_9)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 @WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version \
