@@ -702,6 +702,7 @@ between GNU APL and IBM APL2.
 * Section 3.14::   ⎕SI - State Indicator
 * Section 3.15::   ⎕DLX: Knuth's Dancing Links Algorithm
 * Section 3.16::   History and TAB completion
+* Section 3.17::   ⎕SQL - SQL Database Interface
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -1905,6 +1906,127 @@ recalling function lines (and which are not fully supported in GNU APL).
 
 2d. Input starting with letters, ∆, or ⍙ is completed as a user defined
     function or variable name.
+
+
+@node    Section 3.17
+@section ⎕SQL - SQL Database Interface
+
+As of GNU APL 1.6, the native function SQL has been replaced by the
+system function ⎕SQL, described below.
+
+@verbatim 
+      ⎕sql[0]''
+Available function numbers:
+type  ⎕SQL[1] file      - open a database file, return reference ID for it
+      ⎕SQL[2] ref       - close database
+query ⎕SQL[3,db] params - send SQL query
+query ⎕SQL[4,db] params - send SQL update
+      ⎕SQL[5] ref       - begin a transaction
+      ⎕SQL[6] ref       - commit current transaction
+      ⎕SQL[7] ref       - rollback current transaction
+      ⎕SQL[8] ref       - list tables
+ref   ⎕SQL[9] table     - list columns for table
+@end verbatim
+
+@verbatim
+      type  ⎕SQL[1] file
+@end verbatim
+
+Connect to database of type L using connection arguments R.
+
+L must be a string indicating the database type. Current supported
+values are 'postgresql' and 'sqlite'.
+
+R is the connection parameters which depends on the type of
+database:
+
+  - For type≡'sqlite': the argument is string pointing to the
+    database file.
+
+  - For type≡'postgresql', the argument is a standard connect
+    string as described in the PostgreSQL documentation.
+
+This function returns a database handle that should be used when
+using other SQL functions. This value should be seen as an opaque
+handle. It is, however, guaranteed that the handle is a scalar
+value.
+
+@verbatim
+      ⎕SQL[2] ref
+@end verbatim
+
+Disconnect from database R.
+
+R is the database handle that should be disconnected. After this
+function has been called, no further operations are to be performed
+on this handle. Future calls to SQL∆Connect may reuse previously
+disconnected handles.
+
+@verbatim
+      query ⎕SQL[3,db] params
+@end verbatim
+
+Execute a select statement and return the result table.
+
+The axis parameter indicates the database handle.
+
+L is a select statement to be executed. Positional parameters can
+be supplied by specifying a question mark "?" in the statemement.
+
+R is an array containing the values for the positional parameters.
+If the array is of rank 2, the statement will be executed multiple
+times with each row being the values for each call.
+
+The return value is a rank-2 array representing the result of the
+select statement. Null values are returned as ⍬ and empty strings
+are returned as ''.
+
+@verbatim
+      query ⎕SQL[4,db] params
+@end verbatim
+
+Execute an SQL statement that does not return a result.
+
+This function is identical to SQL∆Select with the exception that it
+is used on statements which do not return a result table.
+
+@verbatim
+      ⎕SQL[5] ref
+@end verbatim
+
+Begin a transaction.
+
+@verbatim
+      ⎕SQL[6] ref
+@end verbatim
+
+Commit a transaction.
+
+@verbatim
+      ⎕SQL[7] ref
+@end verbatim
+
+Rolls back the current transaction.
+
+@verbatim
+      ⎕SQL[8] ref
+@end verbatim
+
+Return an array containing the name of all tables.
+
+@verbatim
+      ref   ⎕SQL[9] table
+@end verbatim
+
+Return an array containing information about the columns in the
+given table. Currently, the column layout is as follows:
+
+  Name
+  Type
+
+More columns containing extra information may be added in a future
+release.
+
 
 @c ----------------------------------------------------------------------------
 @node Chapter 4

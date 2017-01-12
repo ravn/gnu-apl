@@ -115,6 +115,7 @@ ul.no-bullet {list-style: none}
     <li><a name="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-3_002e14">3.14 ⎕SI - State Indicator</a></li>
     <li><a name="toc-_005b_003f_005dDLX-_002d-Knuth_0027s-Dancing-Links-Algorithm" href="#Section-3_002e15">3.15 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</a></li>
     <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e16">3.16 History and TAB completion</a></li>
+    <li><a name="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-3_002e17">3.17 ⎕SQL - SQL Database Interface</a></li>
   </ul></li>
   <li><a name="toc-Limitations-and-Missing-Features" href="#Chapter-4">4 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -799,6 +800,8 @@ Next: <a href="#Chapter-4" accesskey="n" rel="next">Chapter 4</a>, Previous: <a 
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e15">Section 3.15</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕DLX: Knuth&rsquo;s Dancing Links Algorithm
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e16">Section 3.16</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">History and TAB completion
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e17">Section 3.17</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SQL - SQL Database Interface
 </td></tr>
 </table>
 
@@ -1992,7 +1995,7 @@ a little more complicated, but the principle is the same.
 <a name="Section-3_002e16"></a>
 <div class="header">
 <p>
-Previous: <a href="#Section-3_002e15" accesskey="p" rel="prev">Section 3.15</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e17" accesskey="n" rel="next">Section 3.17</a>, Previous: <a href="#Section-3_002e15" accesskey="p" rel="prev">Section 3.15</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="History-and-TAB-completion"></a>
 <h3 class="section">3.16 History and TAB completion</h3>
@@ -2035,6 +2038,113 @@ recalling function lines (and which are not fully supported in GNU APL).
 <p>2d. Input starting with letters, ∆, or ⍙ is completed as a user defined
     function or variable name.
 </p>
+
+<hr>
+<a name="Section-3_002e17"></a>
+<div class="header">
+<p>
+Previous: <a href="#Section-3_002e16" accesskey="p" rel="prev">Section 3.16</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<a name="g_t_005b_003f_005dSQL-_002d-SQL-Database-Interface"></a>
+<h3 class="section">3.17 ⎕SQL - SQL Database Interface</h3>
+
+<p>As of GNU APL 1.6, the native function SQL has been replaced by the
+system function ⎕SQL, described below.
+</p>
+<pre class="verbatim">      ⎕sql[0]''
+Available function numbers:
+type  ⎕SQL[1] file      - open a database file, return reference ID for it
+      ⎕SQL[2] ref       - close database
+query ⎕SQL[3,db] params - send SQL query
+query ⎕SQL[4,db] params - send SQL update
+      ⎕SQL[5] ref       - begin a transaction
+      ⎕SQL[6] ref       - commit current transaction
+      ⎕SQL[7] ref       - rollback current transaction
+      ⎕SQL[8] ref       - list tables
+ref   ⎕SQL[9] table     - list columns for table
+</pre>
+<pre class="verbatim">      type  ⎕SQL[1] file
+</pre>
+<p>Connect to database of type L using connection arguments R.
+</p>
+<p>L must be a string indicating the database type. Current supported
+values are &rsquo;postgresql&rsquo; and &rsquo;sqlite&rsquo;.
+</p>
+<p>R is the connection parameters which depends on the type of
+database:
+</p>
+<p>- For type≡&rsquo;sqlite&rsquo;: the argument is string pointing to the
+    database file.
+</p>
+<p>- For type≡&rsquo;postgresql&rsquo;, the argument is a standard connect
+    string as described in the PostgreSQL documentation.
+</p>
+<p>This function returns a database handle that should be used when
+using other SQL functions. This value should be seen as an opaque
+handle. It is, however, guaranteed that the handle is a scalar
+value.
+</p>
+<pre class="verbatim">      ⎕SQL[2] ref
+</pre>
+<p>Disconnect from database R.
+</p>
+<p>R is the database handle that should be disconnected. After this
+function has been called, no further operations are to be performed
+on this handle. Future calls to SQL∆Connect may reuse previously
+disconnected handles.
+</p>
+<pre class="verbatim">      query ⎕SQL[3,db] params
+</pre>
+<p>Execute a select statement and return the result table.
+</p>
+<p>The axis parameter indicates the database handle.
+</p>
+<p>L is a select statement to be executed. Positional parameters can
+be supplied by specifying a question mark &quot;?&quot; in the statemement.
+</p>
+<p>R is an array containing the values for the positional parameters.
+If the array is of rank 2, the statement will be executed multiple
+times with each row being the values for each call.
+</p>
+<p>The return value is a rank-2 array representing the result of the
+select statement. Null values are returned as ⍬ and empty strings
+are returned as &rdquo;.
+</p>
+<pre class="verbatim">      query ⎕SQL[4,db] params
+</pre>
+<p>Execute an SQL statement that does not return a result.
+</p>
+<p>This function is identical to SQL∆Select with the exception that it
+is used on statements which do not return a result table.
+</p>
+<pre class="verbatim">      ⎕SQL[5] ref
+</pre>
+<p>Begin a transaction.
+</p>
+<pre class="verbatim">      ⎕SQL[6] ref
+</pre>
+<p>Commit a transaction.
+</p>
+<pre class="verbatim">      ⎕SQL[7] ref
+</pre>
+<p>Rolls back the current transaction.
+</p>
+<pre class="verbatim">      ⎕SQL[8] ref
+</pre>
+<p>Return an array containing the name of all tables.
+</p>
+<pre class="verbatim">      ref   ⎕SQL[9] table
+</pre>
+<p>Return an array containing information about the columns in the
+given table. Currently, the column layout is as follows:
+</p>
+<p>Name
+  Type
+</p>
+<p>More columns containing extra information may be added in a future
+release.
+</p>
+
 <hr>
 <a name="Chapter-4"></a>
 <div class="header">

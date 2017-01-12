@@ -643,6 +643,7 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.14::   ⎕SI - State Indicator
 * Section 3.15::   ⎕DLX: Knuth’s Dancing Links Algorithm
 * Section 3.16::   History and TAB completion
+* Section 3.17::   ⎕SQL - SQL Database Interface
 
 There are a few possibly useful features in GNU APL:
 
@@ -1803,7 +1804,7 @@ problems that can be solved by ⎕DLX contain 3 steps:
 matrix is a little more complicated, but the principle is the same.
 
 
-File: apl.info,  Node: Section 3.16,  Prev: Section 3.15,  Up: Chapter 3
+File: apl.info,  Node: Section 3.16,  Next: Section 3.17,  Prev: Section 3.15,  Up: Chapter 3
 
 3.16 History and TAB completion
 ===============================
@@ -1847,6 +1848,105 @@ a system variable name.
 
    2d.  Input starting with letters, ∆, or ⍙ is completed as a user
 defined function or variable name.
+
+
+File: apl.info,  Node: Section 3.17,  Prev: Section 3.16,  Up: Chapter 3
+
+3.17 ⎕SQL - SQL Database Interface
+==================================
+
+As of GNU APL 1.6, the native function SQL has been replaced by the
+system function ⎕SQL, described below.
+
+      ⎕sql[0]''
+Available function numbers:
+type  ⎕SQL[1] file      - open a database file, return reference ID for it
+      ⎕SQL[2] ref       - close database
+query ⎕SQL[3,db] params - send SQL query
+query ⎕SQL[4,db] params - send SQL update
+      ⎕SQL[5] ref       - begin a transaction
+      ⎕SQL[6] ref       - commit current transaction
+      ⎕SQL[7] ref       - rollback current transaction
+      ⎕SQL[8] ref       - list tables
+ref   ⎕SQL[9] table     - list columns for table
+
+      type  ⎕SQL[1] file
+
+   Connect to database of type L using connection arguments R.
+
+   L must be a string indicating the database type.  Current supported
+values are ’postgresql’ and ’sqlite’.
+
+   R is the connection parameters which depends on the type of database:
+
+   - For type≡’sqlite’: the argument is string pointing to the database
+file.
+
+   - For type≡’postgresql’, the argument is a standard connect string as
+described in the PostgreSQL documentation.
+
+   This function returns a database handle that should be used when
+using other SQL functions.  This value should be seen as an opaque
+handle.  It is, however, guaranteed that the handle is a scalar value.
+
+      ⎕SQL[2] ref
+
+   Disconnect from database R.
+
+   R is the database handle that should be disconnected.  After this
+function has been called, no further operations are to be performed on
+this handle.  Future calls to SQL∆Connect may reuse previously
+disconnected handles.
+
+      query ⎕SQL[3,db] params
+
+   Execute a select statement and return the result table.
+
+   The axis parameter indicates the database handle.
+
+   L is a select statement to be executed.  Positional parameters can be
+supplied by specifying a question mark "?"  in the statemement.
+
+   R is an array containing the values for the positional parameters.
+If the array is of rank 2, the statement will be executed multiple times
+with each row being the values for each call.
+
+   The return value is a rank-2 array representing the result of the
+select statement.  Null values are returned as ⍬ and empty strings are
+returned as ”.
+
+      query ⎕SQL[4,db] params
+
+   Execute an SQL statement that does not return a result.
+
+   This function is identical to SQL∆Select with the exception that it
+is used on statements which do not return a result table.
+
+      ⎕SQL[5] ref
+
+   Begin a transaction.
+
+      ⎕SQL[6] ref
+
+   Commit a transaction.
+
+      ⎕SQL[7] ref
+
+   Rolls back the current transaction.
+
+      ⎕SQL[8] ref
+
+   Return an array containing the name of all tables.
+
+      ref   ⎕SQL[9] table
+
+   Return an array containing information about the columns in the given
+table.  Currently, the column layout is as follows:
+
+   Name Type
+
+   More columns containing extra information may be added in a future
+release.
 
 
 File: apl.info,  Node: Chapter 4,  Next: Chapter 5,  Prev: Chapter 3,  Up: Top
@@ -3175,30 +3275,31 @@ Node: Top383
 Node: Chapter 11408
 Node: Chapter 217048
 Node: Chapter 321317
-Node: Section 3.122164
-Node: Section 3.233067
-Node: Section 3.337453
-Node: Section 3.440312
-Node: Section 3.540607
-Node: Section 3.641220
-Node: Section 3.742507
-Node: Section 3.844438
-Node: Section 3.944611
-Node: Section 3.1047117
-Node: Section 3.1147695
-Node: Section 3.1249091
-Node: Section 3.1353046
-Node: Section 3.1453810
-Node: Section 3.1555799
-Node: Section 3.1665710
-Node: Chapter 467474
-Node: Chapter 569222
-Node: Chapter 670351
-Node: Section 6.170770
-Node: Section 6.271457
-Node: Chapter 772288
-Node: Section 7.172791
-Node: Section 7.298100
+Node: Section 3.122215
+Node: Section 3.233118
+Node: Section 3.337504
+Node: Section 3.440363
+Node: Section 3.540658
+Node: Section 3.641271
+Node: Section 3.742558
+Node: Section 3.844489
+Node: Section 3.944662
+Node: Section 3.1047168
+Node: Section 3.1147746
+Node: Section 3.1249142
+Node: Section 3.1353097
+Node: Section 3.1453861
+Node: Section 3.1555850
+Node: Section 3.1665761
+Node: Section 3.1767546
+Node: Chapter 470629
+Node: Chapter 572377
+Node: Chapter 673506
+Node: Section 6.173925
+Node: Section 6.274612
+Node: Chapter 775443
+Node: Section 7.175946
+Node: Section 7.2101255
 
 End Tag Table
 
