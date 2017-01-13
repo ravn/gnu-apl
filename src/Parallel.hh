@@ -63,8 +63,22 @@
 
 // define some atomic functions (even if the platform does not support them)
 //
-#if HAVE_EXT_ATOMICITY_H
+#ifndef PARALLEL_ENABLED
+   //
+   // parallel execution disabled, no need for atomicity
+   //
+inline int atomic_fetch_add(volatile _Atomic_word & counter, int increment)
+   { const int ret = counter;   counter += increment;   return ret; }
 
+/// read \b counter
+inline int atomic_read(volatile _Atomic_word & counter)
+   { return counter; }
+
+/// add to \b counter
+inline void atomic_add(volatile _Atomic_word & counter, int increment)
+   { counter += increment; }
+
+#elif HAVE_EXT_ATOMICITY_H
 #include <ext/atomicity.h>
 
 /// atomic \b counter += \b increment, return old value

@@ -82,6 +82,9 @@ extern const char * apl_command(const char * command_utf8);
 /// caller shall free() the returned unsigned int *.
 extern const unsigned int * apl_command_ucs(const unsigned int * command_ucs);
 
+/// print \b string_ucs to \b out (for debugging purposes)
+extern void print_ucs(FILE * out, const unsigned int * string_ucs);
+
 struct Value;
 typedef struct Value * APL_value;
 

@@ -369,6 +369,17 @@ unsigned int * ret = (unsigned int *)
    return ret;
 }
 //-----------------------------------------------------------------------------
+void
+print_ucs(FILE * out, const unsigned int * string_ucs)
+{
+UCS_string ucs;
+   ucs.reserve(200);
+   while (*string_ucs)   ucs.append((Unicode)*string_ucs++);
+
+UTF8_string utf8(ucs);
+   fprintf(out, "%s", utf8.c_str());
+}
+//-----------------------------------------------------------------------------
 APL_value
 get_var_value(const char * var_name, const char * loc)
 {

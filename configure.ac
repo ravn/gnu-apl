@@ -201,6 +201,8 @@ AC_MSG_RESULT([$HAVE_AFFINITY_NP])
 # check for alternatives for ext/atomicity.h on OS/X 
 #
 AC_MSG_CHECKING([whether OSAtomicAdd32Barrier() is available])
+apl_save_CXXFLAGS=$CXXFLAGS
+CXXFLAGS=-Wall -Werror
 AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM([ [#include <libkern/OSAtomic.h>] ],
  	             [ [OSAtomicAdd32Barrier(0, 0);]   ])],
@@ -209,6 +211,7 @@ AC_COMPILE_IFELSE(
                           [Define to 1 if OSAtomicAdd32Barrier() is available])
     ],
     [HAVE_OSX_ATOMIC=no])
+CXXFLAGS=$apl_save_CXXFLAGS
 AC_MSG_RESULT([$HAVE_OSX_ATOMIC])
 
 
@@ -244,10 +247,26 @@ AM_CONDITIONAL(WANT_ANDROID, test "x$user_wants_android" = xyes)
 AC_MSG_RESULT([$user_wants_android])
 
 
+# check if the user wants the Erlang interface (and therefore also libapl)
+#
+AC_MSG_CHECKING([if we want to build an erlang inteface (implies libapl.so)])
+user_wants_erlang=no
+AC_ARG_WITH( [erlang],
+             [AS_HELP_STRING([--with-erlang],
+                             [enable to build the Erlang interface])],
+             [user_wants_erlang=yes])
+
+if test "x$user_wants_libapl" = xyes ; then
+   AC_DEFINE([WANT_ERLANG], [1], [Define if building the Erlang interface])
+fi
+
+AM_CONDITIONAL(WANT_ERLANG, test "x$user_wants_erlang" = xyes)
+AC_MSG_RESULT([$user_wants_erlang])
+
 # check if the user wants libapl.so
 #
 AC_MSG_CHECKING([if we want to build libapl.so])
-user_wants_libapl=no
+user_wants_libapl=$user_wants_erlang   # Erlang needs libapl
 AC_ARG_WITH( [libapl],
              [AS_HELP_STRING([--with-libapl],
                              [enable to build libapl.so])],
@@ -265,6 +284,8 @@ AC_CONFIG_FILES([Makefile
                  debian/Makefile
                  debian/source/Makefile
                  doc/Makefile
+                 erlang/Makefile
+                 erlang/apl.erl
                  gnu-apl.d/Makefile
                  rpm/Makefile
 		 rpm/apl.spec

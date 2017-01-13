@@ -239,6 +239,9 @@
 /* Define if compiling for Android */
 #undef WANT_ANDROID
 
+/* Define if building the Erlang interface */
+#undef WANT_ERLANG
+
 /* Define if building libapl.so */
 #undef WANT_LIBAPL
 
