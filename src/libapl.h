@@ -214,6 +214,9 @@ extern APL_value get_value(const APL_value val, uint64_t idx);
 /******************************************************************************
    4. write access to APL values. All ravel indices count from ⎕IO←0.
  */
+/// var_name←shape⍴0
+extern APL_value assign_var(const unsigned int * var_name, uint64_t * shape);
+
 /// val[idx]←unicode
 extern void set_char(int unicode, APL_value val, uint64_t idx);
 

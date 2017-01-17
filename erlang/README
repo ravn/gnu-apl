@@ -1,0 +1,206 @@
+
+0. Introduction
+===============
+
+The GNU APL interpreter can be called directly from Erlang programs.
+
+Calling into APL from Erlang is a way to improve on the Erlang performance
+when doing calculations involving large amounts of data.
+
+The interface between Erlang and APL uses the Erlang native function interface
+(NIF) on the Erlang side and libapl, kindly contributed by Dr. Dirk Laurie, on
+the APL side. Almost all features of the GNU APL interpreter, that is commands,
+expressions, variables, user-defined functions, and workspaces, are accessible
+from Erlang.
+
+In the simplest case one can call a APL function with Erlang values as
+arguments and returning the result as Erlang value. This is not very efficient,
+ though, because the conversion between Erlang values and back may take more
+time than the computation on the APL side itself.
+
+A more advanced approach is to create APL variables and possibly APL functions
+on the APL side and to exchange only the absolute minimum between Erlang and
+APL. The APL functions and variables can be saved and restored on the APL side
+into separate files (but under the control of Erlang). It is also possible
+to load APL workspaces that were not developed for the use with Erlang and
+call their functions from Erlang. As a matter of fact, the APL interpreter
+is not even aware of Erlang's presence.
+
+1. Building the interface
+=========================
+
+A. Although not strictly required, it is a good idea to build the command-line
+   version. See the README files in the top-level directory for details. For
+   the impatient, this is the usual
+
+   ./configure
+   make
+   sudo make install
+
+   This build a binary called 'apl'. Although you can create all APL functions
+   and variables that you need from Erlang, it is simpler to create an APL
+   workspace or script separately and then load the entire workspace or script
+   with an APL command executed from Erlang.
+
+B. A prerequisite is the installation of Erlang and, in particular, the header
+   files for the NIF interface.
+
+C. Now you can build the Erlang interface to APL:
+
+   ./configure --with-erlang
+   make
+   sudo make install
+
+   This creates two files: an Erlang module 'apl.erl', and a shared
+   library 'erlang_APL_nif.so'. Both files are being installed in the directory
+   for all other APL related libraries. That directory is normally
+   /usr/local/lib/apl or /usr/lib/apl. but this can be changed with ./configure
+   options. Please note that 'apl.erl' contains the absolute path to
+   'erlang_APL_nif.so', so if you move 'erlang_APL_nif.so' (why would you?)
+   then you have to change and recompile 'apl.erl' accordingly. On the other
+   side, 'apl.erl' or 'apl.beam' after compiling can be moved to other places
+   where Erlang finds them.
+
+   The file 'apl.erl' contains a few examples (see example/0) of how to use
+   the interface to APL. You can use them to test if the interface works and
+   remove them if they are no longer needed.
+
+D. Using the interface
+
+   The Erlang module 'apl' has be initialized before using it:
+
+   apl:init().
+
+   After that you can execute APL commands in the APL interpreter or
+   evaluate APL expressions, define APL functions, set APL variables and so
+   on. This is done by the functions apl:command/1 and apl:statement/1.
+
+D1. apl:command/1 executes an APL command like )LOAD workspace or )SAVE
+    workspace and returns the printout of the command to Erlang. If you are
+    new to APL then 
+
+    apl_help() -> io:format("~ts~n", [command(")HELP")]).
+
+    might be handy. GNU APL characters are always Unicode, which means that
+    strings from APL are integer lists in Erlang (therefore "~ts~n" in
+    io:format which displays Unicode strings in a more readable form.
+
+D2. apl:statement/1 performs one or more APL statements and returns a result
+    for each of them. In order to avoid the exchange of too much data between
+    Erlang and APL, a committed APL value (i.e. an APL value that was assigned
+    to an APL variable) is not transferred back to Erlang but replaced by an
+    Erlang atom 'committed_value'. If you still need the value then you can
+    read the APL variable later on or, more elegantly, use the APL functions
+    ⊢ and ⊣ to convert between committed APL values and normal APL values.
+
+D3. fix_function/1 creates a function on the APL side. The argument is a list
+    of lines, each line being an Erlang string. For example:
+
+   fix_function([ "Z←FOO B",
+                  "Z←B + 1" ]).
+
+   creates an APL function named FOO which returns its argument incremented
+   by 1. As an aside, it could be a good strategy to use lowercase names for
+   functions and variables on the Erlang side and uppercase names for functions
+   and variables on the APL side.
+
+D4. reading APL variables is fairly simple: just execute a statement with only
+    the name of the variable, just like in an Erlang shell. If you need only
+    a part of a variable, say a row or a columns of a variable, then it is
+    ALWAYS better to do the selection on the APL side as to minimize the amount
+    of data exchanged between Erlang and APL. Examples:
+
+    apl:statement('A').       % read entire APL variable A
+    apl:statement('A[3;]').   % read row 3 of APL variable A
+    apl:statement('A[;3]').   % read column 3 of APL variable A
+    apl:statement('A[2;3]').  % read element in row 2 and column 3 of A
+
+D5. writing an Erlang value to an APL variable can be done in several ways.
+    For small values you use apl:statement/1 with the value being encoded in
+    the statement:
+
+    apl:statement('A←10 10⍴0').  % set A to 10 rows and 10 columns containing 0
+    apl:statement('A[3;←1').     % set row 3 of APL variable A to 1
+    apl:statement('A[;3]←2').    % set column 3 of APL variable A to 2
+    apl:statement('A[2;3]←3').   % set element in row 2 and column 3 of A to 3
+
+    If the APL value can be computed from other APL variables, possibly using
+    built-in or user-defined APL functions, then You use apl:statement/1 as
+    well:
+
+    apl:statement('B←10 100⍴A').  % set B to A,A,A,A,A,A,A,A,A,A
+
+    The above methods involve transformations of the value on the Erlang side
+    and parsing of the value on the APL side. If the value is huge, then this
+    can become fairly inefficient. For that reason, there exists a function
+    apl:set_variable/3 which sets an APL variable to an Erlang value, for
+    example:
+
+   apl:set_variable("Z", [5], [1,2,3,4,5]).
+
+   The arguments of set_variable/3 are: (1) the name of the variable, (2) the
+   structure (called the 'shape' in APL) of the variable, and (3) the elements
+   of the variable.
+
+   The shape tells in which form (like vectors, matrices, the elements are
+   arranged:
+
+   shape         elements
+   []            single element (scalar APL value)
+   [V]           N elements (1-dimensional APL vector)
+   [R,C]         R×C elements (APL matrix with R roes and C columns)
+   [B,R,C]       B×R×C elements (3-dimensional APL value)
+   ...           up to 8 dimensions
+
+D5. Mapping between items in Erlang values and items in APL values.
+    When values are exchanged between Erlang and APL then the following mapping
+    is used for the items in the values:
+
+    APL                    Erlang
+    -----------------------------
+    integer                integer
+    double                 double
+    complex                {double, double}
+    character (Unicode)    integer
+    nested value           [value]
+
+   On the interface between Erlang and APL, a non-committed APL value is
+   returned as a tuple {value, [s1, s2...], [e1, e2, ...]} with sN being the
+   0 or more elements of the shape and eN being the 0 or more elements being
+   arranged according to the shape. APL values are always rectangular.
+
+   Characters (and therefore also strings) in GNU APL are always Unicodes,
+   which are represented as integers in Erlang. To display APL strings
+   properly, you can either display them on the APL side (displaying the
+   value is the default behavior of APL unless the value is committed) or
+   use io:format with format string "~ts" on the Erlang side. Conversely, an
+   Erlang string, possibly containing APL characters like, for example "∆∇"
+   remains the same on the APL side. This is because Erlang has no data type
+   for characters and uses strings instead.
+
+E. Erlang considerations. Multiple erlang processes can use the interface
+   to APL at the same. There is a semaphore in the interface that makes the
+   Erlang functions discussed above atomic. Needless to say that chaos can
+   still break out if different processes update the same variable(s) at the
+   same time.
+
+   Also APL is executed in the same thread as the caller in Erlang. The
+   Erlang functions in apl.erl are marked with the DIRTY_FLAG, telling the
+   Erlang scheduler that the functions will not yield to other Erlang processes
+   in the same thread of the operating system. This flag is, however, not
+   supported in older OTP versions, and will negatively impact the Erlang
+   real-time performance if the computations on the APL side take a longer time.
+
+F. Unicode versus UTF8. Some of the functions in apl.erl, in particular
+   command/1 and statement/1 have two internal function variants ending with
+   _ucs resp. _utf8. The _ucs variant uses strings with 1 integer per
+   character, and that integer can be larger than 255. In contrast, The
+   _utf8 variant uses possibly more than one integer per character (like 2 or
+   3 for APL characters) but each integer fits into a byte. For example,
+   the Erlang string "∆∇" has two integers 16#2206 and 16#2207 on the Erlang
+   side and two Unicode characters on the APL side. The UTF8 encoding of the 
+   same Erlang string "∆∇" has UTF8 encodings e2 88 86 and e2 88 86 for a total
+   of 6 characters. In most cases you will not care about UTF8 encodings, but
+   sometimes, for example when handling web pages (which are normally UTF8
+   encoded) you can avoid unnecessary trans-coding between Unicode and UTF8.
+

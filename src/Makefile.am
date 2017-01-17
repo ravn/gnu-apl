@@ -227,11 +227,3 @@ help:
 	@echo "    make update-svar_signals     - remake Svar_signals.hh"
 	@echo ""
 
-%.Po:
-	@mkdir -p `dirname $@`
-	@touch $@
-
-%.Plo:
-	@mkdir -p `dirname $@`
-	@touch $@
-

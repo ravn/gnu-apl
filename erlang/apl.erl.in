@@ -2,43 +2,21 @@
 
 -module(apl).
 -export([init/0, command/1, statement/1]).
--export([start/0]).
 
 % functions defined in erlang_APL_nif.c and dummy implementations for them...
 %
--export([command_utf8/1, command_ucs/1,
-         statement_utf8/1, statement_ucs/1,
-         fix_function_ucs/1]).   % in erlang_APL_nif.c
+-export([command_utf8/1,     command_ucs/1,
+         statement_utf8/1,   statement_ucs/1,
+         fix_function_ucs/1, set_variable/3]).   % in erlang_APL_nif.c
 command_utf8(_)     -> exit(nif_library_not_loaded).
 command_ucs(_)      -> exit(nif_library_not_loaded).
 statement_utf8(_)   -> exit(nif_library_not_loaded).
 statement_ucs(_)    -> exit(nif_library_not_loaded).
 fix_function_ucs(_) -> exit(nif_library_not_loaded).
+set_variable(_,_,_) -> exit(nif_library_not_loaded).
 
-init() -> erlang:load_nif("/usr/local/lib/apl/erlang_APL_nif", 0).
+init() -> erlang:load_nif("@prefix@/lib/@PACKAGE@/erlang_APL_nif", 0).
 
-start() ->
-  init(),
-  io:format("Statement result: ~w~n", [statement("Z←4 4⍴⍳99")]),
-  io:format("Statement result: ~p~n", [statement("4 4⍴⍳99")]),
-  io:format("Statement result: ~p~n", [statement("Z←3 3⍴⍳99 ◊ Z")]),
-  io:format("Statement result: ~w~n", [statement("Z++")]),
-  io:format("Command output:~n~ts~n", [command(")VARS")]),
-  io:format("⎕FX result: ~w~n", [fix_FOO()]),
-  io:format("Command output:~n~ts~n", [command(")FNS")]),
-  io:format("⎕CR result: ~tp~n", [statement("⎕CR 'FOO'")]).
-
-fix_FOO() ->
-   fix_function_ucs([
-"Z←FOO B",
-"Z←B + 1"
-]).
-
-command(C) -> command_ucs(C).
-statement(S) ->
-   APL_results = statement_ucs(S),
-   case APL_results of
-      { 'APL_error', N } -> { 'APL_error', N bsr 16, N band 16#FFFF };
-      _                  -> lists:reverse(APL_results)
-   end.
+command(C)   -> command_ucs(C).
+statement(S) -> statement_ucs(S).
 

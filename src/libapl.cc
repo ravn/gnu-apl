@@ -209,12 +209,55 @@ Value_P sub = val->get_ravel(idx).get_pointer_value();
    Value_P::increment_owner_count(sub.get(), LOC);
    return sub.get();
 }
-
-
 /******************************************************************************
    4. write access to APL values. All ravel indices count from ⎕IO←0.
  */
 
+//-----------------------------------------------------------------------------
+APL_value
+assign_var(const unsigned int * var_name_ucs, uint64_t * shape)
+{
+Shape sh;
+   while (*shape)   sh.add_shape_item(*shape++);
+
+Value_P Z(sh, LOC);
+   loop(z, Z->nz_element_count())   new (Z->next_ravel())   IntCell(0);
+   Z->check_value(LOC);
+
+   if (var_name_ucs == 0)
+      {
+        // the caller wants only q value initialized to 0 without
+        // assigning it to a value. We have to increment the owner count
+        // and the caller is responsiblr fopr decrementing it when the
+        // value is no longer needed.
+        //
+        Value_P::increment_owner_count(Z.get(), LOC);
+        return Z.get();
+      }
+
+   if (!Avec::is_first_symbol_char((Unicode)*var_name_ucs))   return 0;
+
+UCS_string var_name;
+   var_name.reserve(40);
+   while (*var_name_ucs)
+      {
+        const Unicode uni = (Unicode)*var_name_ucs++;
+        if (!Avec::is_symbol_char(uni))   return 0;
+        var_name.append(uni);
+      }
+
+Symbol * symbol = Workspace::lookup_symbol(var_name);
+   if (!symbol)   return 0;
+   if (!symbol->can_be_assigned())   return 0;
+
+   symbol->assign(Z, false, LOC);
+
+   // at this point owner_count shall be at least 2 so we can return a pointer
+   // to Z without Z gettting deleted when we return from this function;
+   //
+   if (Z->get_owner_count() < 2)   return 0;
+   return Z.get();
+}
 //-----------------------------------------------------------------------------
 /// val[idx]←unicode
 void

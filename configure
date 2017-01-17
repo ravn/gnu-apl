@@ -18261,7 +18261,7 @@ $as_echo "$HAVE_AFFINITY_NP" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether OSAtomicAdd32Barrier() is available" >&5
 $as_echo_n "checking whether OSAtomicAdd32Barrier() is available... " >&6; }
 apl_save_CXXFLAGS=$CXXFLAGS
-CXXFLAGS=-Wall -Werror
+CXXFLAGS="-Wall -Werror"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
  #include <libkern/OSAtomic.h>
@@ -18354,8 +18354,8 @@ $as_echo "$user_wants_android" >&6; }
 
 # check if the user wants the Erlang interface (and therefore also libapl)
 #
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build an erlang inteface (implies libapl.so)" >&5
-$as_echo_n "checking if we want to build an erlang inteface (implies libapl.so)... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build an erlang interface (implies libapl.so)" >&5
+$as_echo_n "checking if we want to build an erlang interface (implies libapl.so)... " >&6; }
 user_wants_erlang=no
 
 # Check whether --with-erlang was given.

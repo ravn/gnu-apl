@@ -202,7 +202,7 @@ AC_MSG_RESULT([$HAVE_AFFINITY_NP])
 #
 AC_MSG_CHECKING([whether OSAtomicAdd32Barrier() is available])
 apl_save_CXXFLAGS=$CXXFLAGS
-CXXFLAGS=-Wall -Werror
+CXXFLAGS="-Wall -Werror"
 AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM([ [#include <libkern/OSAtomic.h>] ],
  	             [ [OSAtomicAdd32Barrier(0, 0);]   ])],
@@ -249,7 +249,7 @@ AC_MSG_RESULT([$user_wants_android])
 
 # check if the user wants the Erlang interface (and therefore also libapl)
 #
-AC_MSG_CHECKING([if we want to build an erlang inteface (implies libapl.so)])
+AC_MSG_CHECKING([if we want to build an erlang interface (implies libapl.so)])
 user_wants_erlang=no
 AC_ARG_WITH( [erlang],
              [AS_HELP_STRING([--with-erlang],

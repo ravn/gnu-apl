@@ -79,7 +79,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = erlang
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(srcdir)/apl.erl.in
+	$(srcdir)/apl.erl.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
@@ -256,9 +256,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+EXTRA_DIST = erlang_APL_nif.c README apl_example.erl
+distdir = $(pkglibdir)
 all: all-am
 
 .SUFFIXES:
+.SUFFIXES: .beam .erl
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -338,7 +341,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile
 installdirs:
-install: install-am
+@WANT_ERLANG_FALSE@install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -448,6 +451,22 @@ uninstall-am:
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags-am uninstall uninstall-am
 
+
+# for some reason, using libtool causes Erlang to try to load the file
+# erlang_APL_nif.so.so instead of erlang_APL_nif.so. We therefore do not
+# use libtool but create the make targets manually. This seems to work on
+# Ubuntu but may require manual fixes on other platforms.
+#
+@WANT_ERLANG_TRUE@all: apl.beam apl_example.beam erlang_APL_nif.so
+@WANT_ERLANG_TRUE@.erl.beam:
+@WANT_ERLANG_TRUE@	erl -compile $<
+
+@WANT_ERLANG_TRUE@erlang_APL_nif.so: erlang_APL_nif.c
+@WANT_ERLANG_TRUE@	gcc -o $@ -Wall -Werror -fpic -shared -rdynamic -pthread \
+@WANT_ERLANG_TRUE@ erlang_APL_nif.c -L/usr/local/lib/apl -lapl
+
+@WANT_ERLANG_TRUE@install: erlang_APL_nif.so apl.erl apl_example.erl
+@WANT_ERLANG_TRUE@	sudo $(INSTALL) $^ $(pkglibdir)/
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

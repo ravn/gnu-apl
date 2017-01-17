@@ -53,20 +53,18 @@ Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
 inline void
 init_provider_map()
 {
-Provider * p;
 #ifdef HAVE_SQLITE3
-
-   p = new SqliteProvider();
-   Assert(p);
-   providers.append(p);
+   Provider *sqliteProvider = new SqliteProvider();
+   Assert(sqliteProvider);
+   providers.append(sqliteProvider);
 #elif REALLY_WANT_SQLITE3
 # warning "SQLite3 unavailable since ./configure could not detect it"
 #endif
 
 #ifdef USABLE_PostgreSQL
-   p = new PostgresProvider();
-   Assert(p);
-   providers.append(p);
+   Provider *postgresProvider = new PostgresProvider();
+   Assert(postgresProvider);
+   providers.append(postgresProvider);
 #elif REALLY_WANT_PostgreSQL
 #  warning "PostgreSQL unavailable since ./configure could not detect it."
 # if HAVE_POSTGRESQL
