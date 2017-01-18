@@ -407,7 +407,13 @@ const bool log_startup = uprefs.parse_argv_1();
         Command::process_line(lx);
       }
 
-   if (uprefs.do_CONT)
+   // maybe )LOAD the CONTINUE workspace. Do that unless the user has given
+   //
+   // (1) --noCONT, or
+   // (2) --script, or
+   // (3)  -L wsname
+   //
+   if (uprefs.do_CONT && !uprefs.initial_workspace.size())
       {
          UCS_string cont("CONTINUE");
          UTF8_string filename =
@@ -428,7 +434,7 @@ const bool log_startup = uprefs.parse_argv_1();
          // the user has provided a workspace name via -L
          //
          UCS_string init_ws(uprefs.initial_workspace);
-          const char * cmd = uprefs.silent ? ")QLOAD " : ")LOAD ";
+         const char * cmd = uprefs.silent ? ")QLOAD " : ")LOAD ";
          UCS_string load_cmd(cmd);
          load_cmd.append(init_ws);
          Command::process_line(load_cmd);
