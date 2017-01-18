@@ -594,6 +594,7 @@ Quad_FIO::list_functions(ostream & out)
 "   Zi ← Ai ⎕FIO[46] Bh    getsockopt(Bh, A_level, A_optname, Zi)\n"
 "   Ze ← Ai ⎕FIO[47] Bh    setsockopt(Bh, A_level, A_optname, A_optval)\n"
 "   Ze ← As ⎕FIO[48] Bh    fscanf(Bh, As)\n"
+"   Zs ←    ⎕FIO[49] Bs    return entire file Bs as nested lines\n"
 "\n"
 "Benchmarking functions:\n"
 "\n"
@@ -1010,9 +1011,9 @@ const int function_number = X->get_ravel(0).get_near_int();
                      DOMAIN_ERROR;
                    }
 
-                ShapeItem len = st.st_size;
-                unsigned char * data = (unsigned char *)mmap(0, len, PROT_READ,
-                                MAP_SHARED, fd, 0);
+                const ShapeItem len = st.st_size;
+                uint8_t * data = (uint8_t *)mmap(0, len, PROT_READ,
+                                  MAP_SHARED, fd, 0);
                 close(fd);
                 if (data == 0)   goto out_errno;
 
@@ -1306,6 +1307,75 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
+         case 49:   // read entire file as nested lines
+              {
+                errno = 0;
+                UTF8_string path(*B.get());
+                int fd = open(path.c_str(), O_RDONLY);
+                if (fd == -1)   goto out_errno;
+
+                struct stat st;
+                if (fstat(fd, &st))
+                   {
+                     close(fd);
+                     goto out_errno;
+                   }
+
+                if (!S_ISREG(st.st_mode))
+                   {
+                     close(fd);
+                     MORE_ERROR() << path << " is not a regular file";
+                     DOMAIN_ERROR;
+                   }
+
+                const ShapeItem len = st.st_size;
+                uint8_t * data = (uint8_t *)mmap(0, len, PROT_READ,
+                                  MAP_SHARED, fd, 0);
+                close(fd);
+                if (data == 0)   goto out_errno;
+
+                // count number of LFs in the file
+                //
+                ShapeItem line_count = 0;
+                loop(l, len)
+                    {
+                      if (data[l] == '\n')   ++line_count;
+                    }
+                if (data[len - 1] != '\n')   ++line_count;
+
+                Value_P Z(line_count, LOC);
+                Z->set_proto_Spc();
+
+                uint8_t * from = data;
+                loop(l, len)
+                    {
+                      if (data[l] != '\n')   continue;
+
+                      uint8_t * end = data + l;
+                      if (end[-1] == '\r')   --end;   // discard trailing CR
+                      UTF8_string utf(from, end - from);
+                      UCS_string ucs(utf);
+                      Value_P ZZ(ucs, LOC);
+                      new (Z->next_ravel())  PointerCell(ZZ, Z.getref());
+                      from = data + l + 1;
+                    }
+
+                if (data[len - 1] != '\n')   // incomplete final line
+                   {
+                      uint8_t * end = data + len;
+                      if (end[-1] == '\r')   --end;   // discard trailing CR
+                      UTF8_string utf(from, end - from);
+                      UCS_string ucs(utf);
+                      Value_P ZZ(ucs, LOC);
+                      new (Z->next_ravel())  PointerCell(ZZ, Z.getref());
+                   }
+
+                munmap((char *)data, len);
+
+                Z->set_default_Spc();
+                Z->check_value(LOC);
+                return Token(TOK_APL_VALUE1, Z);
+              }
 
          case 200:   // clear statistics Bi
          case 201:   // get statistics Bi

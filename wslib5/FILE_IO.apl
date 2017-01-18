@@ -483,6 +483,7 @@ t←t⍪'INADDR_ANY' 0
  a←a, ('recv'        37) ('send'       38) ('usend'      39) ('select'      40)
  a←a, ('read'        41) ('write'      42) ('uwrite'     43) ('getsockname' 44)
  a←a, ('getpeername' 45) ('getsockopt' 46) ('setsockopt' 47) ('fscanf'      48)
+ a←a, ('readlines'   49)
  a←a, ('open'         3) ('close'       4) ⍝ And some handy aliases
  →(0=↑⍴x←,⊃((⊂X) ≡¨↑¨a)/a)/Nomatch
  X←¯1↑x

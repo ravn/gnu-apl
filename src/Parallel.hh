@@ -67,6 +67,8 @@
    //
    // parallel execution disabled, no need for atomicity
    //
+typedef int _Atomic_word;
+
 inline int atomic_fetch_add(volatile _Atomic_word & counter, int increment)
    { const int ret = counter;   counter += increment;   return ret; }
 

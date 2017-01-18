@@ -61,9 +61,9 @@ public:
 
    /// constructor: shape of another shape
    Shape(const Shape & other)
-   : rho_rho(0),
-     volume(1)
-   { loop(r, other.rho_rho)   add_shape_item(other.rho[r]); }
+   {
+      memcpy(this, &other, sizeof (Shape));   // to avoid bogus warnings
+   }
 
    /// constructor: shape defined by the ravel of an APL value \b val
    /// throw RANK or LENGTH error where needed. Negative values are allowed

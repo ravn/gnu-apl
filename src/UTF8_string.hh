@@ -93,7 +93,7 @@ public:
    void append_str(const char * str)
       { const UTF8_string str_utf(str);  append(str_utf); }
 
-   /// convert the first char in UTF8-encoded string to Unicode, set
+   /// convert the first char in UTF8-encoded string to Unicode,
    /// setting len to the number of bytes in the UTF8 encoding of the char
    static Unicode toUni(const UTF8 * string, int & len, bool verbose);
 
