@@ -499,14 +499,14 @@ SystemSymTab::clear_slot(ostream & out, int hash)
 SystemName * sym = symbol_table[hash];
    symbol_table[hash] = 0;
 
-SystemName * next;   // the symbol after sym
-   for (; sym; sym = next)
+   while (sym)
        {
-         next = sym->next;
-
-         // keep system-defined symbols
+         // remember sym->next (since sym is being deleted)
          //
+         SystemName * next = sym->next;
+
          delete sym;
+         sym = next;
        }
 }
 //-----------------------------------------------------------------------------
