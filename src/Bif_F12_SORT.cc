@@ -33,7 +33,8 @@ Bif_F12_SORT_ASC * Bif_F12_SORT_ASC::fun = &Bif_F12_SORT_ASC::_fun;
 Bif_F12_SORT_DES * Bif_F12_SORT_DES::fun = &Bif_F12_SORT_DES::_fun;
 
 //-----------------------------------------------------------------------------
-CollatingCache::CollatingCache(const Value & A, const Cell * base, ShapeItem clen)
+CollatingCache::CollatingCache(const Value & A, const Cell * base,
+                               ShapeItem clen)
    : rank(A.get_rank()),
      base_B1(base),
      comp_len(clen)

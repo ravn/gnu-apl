@@ -33,7 +33,7 @@ public:
    Shape()
    : rho_rho(0),
      volume(1)
-   {}
+   { memset(&rho, 0, sizeof(rho)); }
 
    /// constructor: shape of a vector of length \b len
    Shape(ShapeItem len)
