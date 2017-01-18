@@ -77,7 +77,6 @@ UCS_string UA1 = UA.unique();
            }
       }
 
-
    // add one entry for all characters in B that are not in A
    //
 CollatingCacheEntry others(Invalid_Unicode, A.get_shape());

@@ -137,7 +137,7 @@ public:
    void set_last_shape_item(ShapeItem sh)
       { set_shape_item(rho_rho - 1, sh); }
 
-   /// add a dimension of length \b sh at the end
+   /// add a dimension of length \b len at the end
    void add_shape_item(ShapeItem len)
       { if (rho_rho >= MAX_RANK)   LIMIT_ERROR_RANK;
         rho[rho_rho++] = len;   volume *= len; }

@@ -31,6 +31,8 @@ template <typename T, int SYMBOL_COUNT>
 class SymbolTableBase
 {
 public:
+   enum { max_symbol_count = SYMBOL_COUNT };
+
    /// Construct an empty \b SymbolTable.
    SymbolTableBase()
      { memset(symbol_table, 0, sizeof(symbol_table)); }

@@ -293,7 +293,7 @@ SymbolTable::clear(ostream & out)
    //
    Assert(Workspace::SI_entry_count() == 0);
 
-   loop(hash, SYMBOL_HASH_TABLE_SIZE)   clear_slot(out, hash);
+   loop(hash, max_symbol_count)   clear_slot(out, hash);
 }
 //-----------------------------------------------------------------------------
 void
@@ -490,7 +490,7 @@ SystemSymTab::clear(ostream & out)
    //
    Assert(Workspace::SI_entry_count() == 0);
 
-   loop(hash, SYMBOL_HASH_TABLE_SIZE)   clear_slot(out, hash);
+   loop(hash, max_symbol_count)   clear_slot(out, hash);
 }
 //-----------------------------------------------------------------------------
 void
