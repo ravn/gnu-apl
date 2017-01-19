@@ -21,6 +21,7 @@
 #ifndef __QUAD_FIO_HH_DEFINED__
 #define __QUAD_FIO_HH_DEFINED__
 
+#include "PrimitiveOperator.hh"
 #include "QuadFunction.hh"
 
 //-----------------------------------------------------------------------------
@@ -31,6 +32,9 @@
 class Quad_FIO : public QuadFunction
 {
 public:
+   /// overloaded Function::is_operator()
+   virtual bool is_operator() const   { return true; }
+
    /// the default buffer size if the user does not provide one
    enum { SMALL_BUF = 5000 };
 
@@ -51,6 +55,9 @@ public:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+
+   /// overloaded Function::eval_AXB().
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
 
    /// close all open files
    void clear();

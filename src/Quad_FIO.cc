@@ -34,6 +34,7 @@
 
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER2_OUTER.hh"
+#include "Bif_OPER1_EACH.hh"
 #include "Common.hh"
 #include "FloatCell.hh"
 #include "IntCell.hh"
@@ -773,6 +774,16 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
 }
 //-----------------------------------------------------------------------------
 Token
+Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B)
+{
+const APL_Integer function_number = X->get_ravel(0).get_int_value();
+   if (function_number != 49)   DOMAIN_ERROR;
+
+Token lines_B = eval_XB(X, B);
+   return Bif_OPER1_EACH::fun->eval_LB(LO, lines_B.get_apl_val());
+}
+//-----------------------------------------------------------------------------
+Token
 Quad_FIO::eval_XB(Value_P X, Value_P B)
 {
    if (B->get_rank() > 1)   RANK_ERROR;
@@ -1307,6 +1318,54 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
+         case 200:   // clear statistics Bi
+         case 201:   // get statistics Bi
+              {
+                const Pfstat_ID b = (Pfstat_ID)B->get_ravel(0).get_int_value();
+                Statistics * stat = Performance::get_statistics(b);
+                if (stat == 0)   DOMAIN_ERROR;   // bad statistics ID
+
+                if (function_number == 200)   // reset statistics
+                   {
+                     stat->reset();
+                     return Token(TOK_APL_VALUE1, IntScalar(b, LOC));
+                   }
+
+                // get statistics
+                //
+                 const int t = Performance::get_statistics_type(b);
+                 UCS_string stat_name(stat->get_name());
+                 Value_P Z1(stat_name, LOC);
+                 if (t <= 2)   // cell function statistics
+                    {
+                       const Statistics_record * r1 = stat->get_first_record();
+                       const Statistics_record * rN = stat->get_record();
+                       Value_P Z(8, LOC);
+                       new (Z->next_ravel())   IntCell(t);
+                       new (Z->next_ravel())   PointerCell(Z1, Z.getref());
+                       new (Z->next_ravel())   IntCell(r1->get_count());
+                       new (Z->next_ravel())   IntCell(r1->get_sum());
+                       new (Z->next_ravel())   FloatCell(r1->get_sum2());
+                       new (Z->next_ravel())   IntCell(rN->get_count());
+                       new (Z->next_ravel())   IntCell(rN->get_sum());
+                       new (Z->next_ravel())   FloatCell(rN->get_sum2());
+                       Z->check_value(LOC);
+                       return Token(TOK_APL_VALUE1, Z);
+                    }
+                 else           // function statistics
+                    {
+                       const Statistics_record * r = stat->get_record();
+                       Value_P Z(5, LOC);
+                       new (Z->next_ravel())   IntCell(t);
+                       new (Z->next_ravel())   PointerCell(Z1, Z.getref());
+                       new (Z->next_ravel())   IntCell(r->get_count());
+                       new (Z->next_ravel())   IntCell(r->get_sum());
+                       new (Z->next_ravel())   FloatCell(r->get_sum2());
+                       Z->check_value(LOC);
+                       return Token(TOK_APL_VALUE1, Z);
+                    }
+              }
+
          case 49:   // read entire file as nested lines
               {
                 errno = 0;
@@ -1377,54 +1436,6 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
-         case 200:   // clear statistics Bi
-         case 201:   // get statistics Bi
-              {
-                const Pfstat_ID b = (Pfstat_ID)B->get_ravel(0).get_int_value();
-                Statistics * stat = Performance::get_statistics(b);
-                if (stat == 0)   DOMAIN_ERROR;   // bad statistics ID
-
-                if (function_number == 200)   // reset statistics
-                   {
-                     stat->reset();
-                     return Token(TOK_APL_VALUE1, IntScalar(b, LOC));
-                   }
-
-                // get statistics
-                //
-                 const int t = Performance::get_statistics_type(b);
-                 UCS_string stat_name(stat->get_name());
-                 Value_P Z1(stat_name, LOC);
-                 if (t <= 2)   // cell function statistics
-                    {
-                       const Statistics_record * r1 = stat->get_first_record();
-                       const Statistics_record * rN = stat->get_record();
-                       Value_P Z(8, LOC);
-                       new (Z->next_ravel())   IntCell(t);
-                       new (Z->next_ravel())   PointerCell(Z1, Z.getref());
-                       new (Z->next_ravel())   IntCell(r1->get_count());
-                       new (Z->next_ravel())   IntCell(r1->get_sum());
-                       new (Z->next_ravel())   FloatCell(r1->get_sum2());
-                       new (Z->next_ravel())   IntCell(rN->get_count());
-                       new (Z->next_ravel())   IntCell(rN->get_sum());
-                       new (Z->next_ravel())   FloatCell(rN->get_sum2());
-                       Z->check_value(LOC);
-                       return Token(TOK_APL_VALUE1, Z);
-                    }
-                 else           // function statistics
-                    {
-                       const Statistics_record * r = stat->get_record();
-                       Value_P Z(5, LOC);
-                       new (Z->next_ravel())   IntCell(t);
-                       new (Z->next_ravel())   PointerCell(Z1, Z.getref());
-                       new (Z->next_ravel())   IntCell(r->get_count());
-                       new (Z->next_ravel())   IntCell(r->get_sum());
-                       new (Z->next_ravel())   FloatCell(r->get_sum2());
-                       Z->check_value(LOC);
-                       return Token(TOK_APL_VALUE1, Z);
-                    }
-              }
-
          case 202:   // get monadic parallel threshold
          case 203:   // get dyadicadic parallel threshold
               {
@@ -1464,6 +1475,9 @@ const int function_number = X->get_ravel(0).get_near_int();
 
         default: break;
       }
+
+   MORE_ERROR() << "bad function number " << function_number <<
+                   " in Quad_FIO::eval_XB()";
 
    CERR << "Bad eval_XB() function number: " << function_number << endl;
    DOMAIN_ERROR;
@@ -1910,6 +1924,9 @@ const int function_number = X->get_ravel(0).get_near_int();
 
         default: break;
       }
+
+   MORE_ERROR() << "bad function number " << function_number <<
+                   " in Quad_FIO::eval_AXB()";
 
    CERR << "eval_AXB() function number: " << function_number << endl;
    DOMAIN_ERROR;

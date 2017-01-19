@@ -1149,6 +1149,22 @@ File: apl.info,  Node: Section 3.4,  Next: Section 3.5,  Prev: Section 3.3,  Up:
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
 system function ⎕FIO. See the FILE_IO section below for details.
 
+   A new feature of ⎕FIO (which is not available with the native
+function FILE_IO) is ⎕FIO[49].  ⎕FIO[49] is a monadic operator which
+takes a monadic conversion function as function argument.  For example:
+
+     Z←F ⎕FIO[49] 'filename'
+
+   reads the file named filename line by line.  For every line read, the
+conversion function F is called and the result returned by F is enclosed
+and stored in F. In other words,
+
+     Z←F ⎕FIO[49] 'filename'
+
+   does:
+
+     Z F¨Z←⎕FIO[49] 'filename'
+
 
 File: apl.info,  Node: Section 3.5,  Next: Section 3.6,  Prev: Section 3.4,  Up: Chapter 3
 
@@ -3279,27 +3295,27 @@ Node: Section 3.122215
 Node: Section 3.233118
 Node: Section 3.337504
 Node: Section 3.440363
-Node: Section 3.540658
-Node: Section 3.641271
-Node: Section 3.742558
-Node: Section 3.844489
-Node: Section 3.944662
-Node: Section 3.1047168
-Node: Section 3.1147746
-Node: Section 3.1249142
-Node: Section 3.1353097
-Node: Section 3.1453861
-Node: Section 3.1555850
-Node: Section 3.1665761
-Node: Section 3.1767546
-Node: Chapter 470629
-Node: Chapter 572377
-Node: Chapter 673506
-Node: Section 6.173925
-Node: Section 6.274612
-Node: Chapter 775443
-Node: Section 7.175946
-Node: Section 7.2101255
+Node: Section 3.541166
+Node: Section 3.641779
+Node: Section 3.743066
+Node: Section 3.844997
+Node: Section 3.945170
+Node: Section 3.1047676
+Node: Section 3.1148254
+Node: Section 3.1249650
+Node: Section 3.1353605
+Node: Section 3.1454369
+Node: Section 3.1556358
+Node: Section 3.1666269
+Node: Section 3.1768054
+Node: Chapter 471137
+Node: Chapter 572885
+Node: Chapter 674014
+Node: Section 6.174433
+Node: Section 6.275120
+Node: Chapter 775951
+Node: Section 7.176454
+Node: Section 7.2101763
 
 End Tag Table
 

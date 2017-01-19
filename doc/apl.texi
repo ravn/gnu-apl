@@ -1229,6 +1229,29 @@ conversions.
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
 system function ⎕FIO. See the FILE_IO section below for details.
 
+A new feature of ⎕FIO (which is not available with the native function FILE_IO)
+is ⎕FIO[49]. ⎕FIO[49] is a monadic operator which takes a monadic conversion
+function as function argument. For example:
+
+@smallexample
+Z←F ⎕FIO[49] 'filename'
+@end smallexample
+
+reads the file named filename line by line. For every line read, the conversion
+function F is called and the result returned by F is enclosed and stored in F.
+In other words,
+
+@smallexample
+Z←F ⎕FIO[49] 'filename'
+@end smallexample
+
+does:
+
+@smallexample
+Z F¨Z←⎕FIO[49] 'filename'
+@end smallexample
+
+
 @node    Section 3.5
 @section Debug Commands
 

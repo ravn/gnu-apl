@@ -974,6 +974,21 @@ Prefix::reduce_MISC_F_C_B()
       }
    if (!at1().get_apl_val())              SYNTAX_ERROR;
 
+   if (at0().get_tag() == TOK_Quad_FIO &&
+       saved_lookahead.tok.get_Class() == TC_FUN12)
+      {
+        DerivedFunction * derived =
+                          Workspace::SI_top()->fun_oper_cache.get(LOC);
+        new (derived)   DerivedFunction(saved_lookahead.tok,
+                                        at0().get_function(),
+                                        at1().get_apl_val(),  LOC);
+        saved_lookahead.tok.clear(LOC);
+        prefix_len = 2;   // only f ⎕FIO
+        pop_args_push_result(Token(TOK_FUN2, derived));
+        action = RA_CONTINUE;
+        return;
+      }
+
 Token result = at0().get_function()->eval_XB(at1().get_apl_val(),
                                              at2().get_apl_val());
    if (result.get_tag() == TOK_ERROR)
