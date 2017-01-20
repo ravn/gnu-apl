@@ -682,7 +682,13 @@ Quad_CR::do_CR10_item(UCS_string & item, const Cell & cell, V_mode mode,
 
    if (cell.is_integer_cell())
       {
-        item.append_number(cell.get_int_value());
+        APL_Integer aint = cell.get_int_value();
+        if (aint < 0)
+           {
+             item.append(UNI_OVERBAR);
+             aint = -aint;
+           }
+        item.append_number(aint);
         return Vm_NUM;
       }
 
