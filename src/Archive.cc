@@ -767,28 +767,49 @@ ShapeItem idx = 0;
    
    // set up parents of values
    //
-   loop(p, value_count)
+   loop(p, value_count)   // for every (parent-) value
       {
         const Value & parent = *values[p]._val;
         const ShapeItem ec = parent.nz_element_count();
-        const Cell * cP = &parent.get_ravel(0);
-        loop(e, ec)
+        loop(e, ec)   // for every ravel cell of the (parent-) value
             {
-              if (cP->is_pointer_cell())
+              const Cell & cP = parent.get_ravel(e);
+              if (cP.is_pointer_cell())
                  {
-                   const Value * sub = cP->get_pointer_value().get();
+                   const Value * sub = cP.get_pointer_value().get();
                    Assert1(sub);
                    const Vid sub_idx = find_vid(sub);
                    Assert(sub_idx < value_count);
-                   Assert(values[sub_idx]._par == INVALID_VID);
+                   if (values[sub_idx]._par != INVALID_VID)
+                      {
+                        // sub already has a parent, which supposedly cannot
+                        // happen. print out some more information about this
+                        // case.
+                        CERR << "*** Sub-Value " << (void *)sub
+                             << " has two parents "
+                             << (void *)(values[sub_idx]._par)
+                             << " and " << (void *)values[p]._val
+                             << "." << endl;
+
+#if VALUE_HISTORY_WANTED
+print_history(CERR, sub, 0);
+print_history(CERR, values[sub_idx]._par, 0);
+print_history(CERR, values[p]._val, 0);
+#endif
+
+   CERR << endl <<
+"The workspace will be )SAVEd, but using it for anything other than for\n"
+" recovering its content (i.e. defined functions or variables) means asking\n"
+" for BIG trouble!" << endl;
+                      }
+
                    values[sub_idx] = _val_par(values[sub_idx]._val, (Vid)p);
                  }
-              else if (cP->is_lval_cell())
+              else if (cP.is_lval_cell())
                  {
                    Log(LOG_archive)
                       CERR << "LVAL CELL in " << p << " at " LOC << endl;
                  }
-              ++cP;
             }
       }
 

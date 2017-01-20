@@ -382,7 +382,7 @@ public:
    static void init();
 
 /// maybe enable LOC for set/clear of flags
-#if defined(VF_TRACING_WANTED) || defined(VALUE_CHECK_WANTED)   // enable LOC
+#if defined(VF_TRACING_WANTED) || defined(VALUE_HISTORY_WANTED)   // enable LOC
 # define _LOC LOC
 # define _loc loc
 # define _loc_type const char *

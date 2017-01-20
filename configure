@@ -18457,6 +18457,8 @@ fi
 
 
 # APL: performance counters desired ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether internal performance counters shall be enabled)" >&5
+$as_echo_n "checking whether internal performance counters shall be enabled)... " >&6; }
 
 if test "x$PERFORMANCE_COUNTERS_WANTED" = "xyes"; then
 
@@ -18464,10 +18466,15 @@ cat >>confdefs.h <<_ACEOF
 #define PERFORMANCE_COUNTERS_WANTED yes
 _ACEOF
 
+else PERFORMANCE_COUNTERS_WANTED="no"
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PERFORMANCE_COUNTERS_WANTED" >&5
+$as_echo "$PERFORMANCE_COUNTERS_WANTED" >&6; }
 
 
 # APL: ADD_EVENT() macro and friends desired ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to remember the history of APL values (debug feature)" >&5
+$as_echo_n "checking whether to remember the history of APL values (debug feature)... " >&6; }
 
 if test "x$VALUE_HISTORY_WANTED" = "xyes"; then
 
@@ -18475,15 +18482,24 @@ cat >>confdefs.h <<_ACEOF
 #define VALUE_HISTORY_WANTED yes
 _ACEOF
 
+else VALUE_HISTORY_WANTED="no"
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $VALUE_HISTORY_WANTED" >&5
+$as_echo "$VALUE_HISTORY_WANTED" >&6; }
 
 
 # APL: gprof profiling ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gprof profiling shall be enabled" >&5
+$as_echo_n "checking whether gprof profiling shall be enabled... " >&6; }
 
 if test "x$GPROF_WANTED" = "xyes"; then
    GPROF_WANTED=-pg
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
 else
    GPROF_WANTED=
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
 fi
 
 
@@ -18494,6 +18510,8 @@ _ACEOF
 
 
 # APL: dynamic logging desired ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether dynamic logging shall be enabled" >&5
+$as_echo_n "checking whether dynamic logging shall be enabled... " >&6; }
 
 if test "x$DYNAMIC_LOG_WANTED" = "xyes"; then
 
@@ -18501,10 +18519,15 @@ cat >>confdefs.h <<_ACEOF
 #define DYNAMIC_LOG_WANTED yes
 _ACEOF
 
+else DYNAMIC_LOG_WANTED="no"
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $DYNAMIC_LOG_WANTED" >&5
+$as_echo "$DYNAMIC_LOG_WANTED" >&6; }
 
 
 # APL: tracing of value flags (produces lots of messages) desired ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether value flags shall be traced" >&5
+$as_echo_n "checking whether value flags shall be traced... " >&6; }
 
 if test "x$VF_TRACING_WANTED" = "xyes"; then
 
@@ -18512,10 +18535,15 @@ cat >>confdefs.h <<_ACEOF
 #define VF_TRACING_WANTED yes
 _ACEOF
 
+else VF_TRACING_WANTED="no"
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $VF_TRACING_WANTED" >&5
+$as_echo "$VF_TRACING_WANTED" >&6; }
 
 
 # APL: desired assert level ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how picky internal tests shall be" >&5
+$as_echo_n "checking how picky internal tests shall be... " >&6; }
 
 if test "x$ASSERT_LEVEL_WANTED" = "x"; then ASSERT_LEVEL_WANTED=1; fi
 
@@ -18523,8 +18551,12 @@ cat >>confdefs.h <<_ACEOF
 #define ASSERT_LEVEL_WANTED $ASSERT_LEVEL_WANTED
 _ACEOF
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ASSERT_LEVEL_WANTED" >&5
+$as_echo "$ASSERT_LEVEL_WANTED" >&6; }
 
 # APL: number of cores ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how many CPU cores shall be used by APL (experimental!)" >&5
+$as_echo_n "checking how many CPU cores shall be used by APL (experimental!)... " >&6; }
 
 if test "x$CORE_COUNT_WANTED" = "x";     then CORE_COUNT_WANTED=0;  fi
 if test "x$CORE_COUNT_WANTED" = "xall";  then CORE_COUNT_WANTED=-1; fi
@@ -18538,8 +18570,12 @@ cat >>confdefs.h <<_ACEOF
 #define CORE_COUNT_WANTED $CORE_COUNT_WANTED
 _ACEOF
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $CORE_COUNT_WANTED" >&5
+$as_echo "$CORE_COUNT_WANTED" >&6; }
 
 # APL: APserver transport ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which type of socket APserver shall use" >&5
+$as_echo_n "checking which type of socket APserver shall use... " >&6; }
 
 if test "x$APSERVER_TRANSPORT" = "x";        then APSERVER_TRANSPORT=0;  fi
 if test "x$APSERVER_TRANSPORT" = "xTCP";     then APSERVER_TRANSPORT=0;  fi
@@ -18550,8 +18586,12 @@ cat >>confdefs.h <<_ACEOF
 #define APSERVER_TRANSPORT $APSERVER_TRANSPORT
 _ACEOF
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $APSERVER_TRANSPORT" >&5
+$as_echo "$APSERVER_TRANSPORT" >&6; }
 
 # APL: APserver TCP port ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which port number APserver shall use for TCP or UDP sockets" >&5
+$as_echo_n "checking which port number APserver shall use for TCP or UDP sockets... " >&6; }
 
 if test "x$APSERVER_PORT" = "x";   then APSERVER_PORT=16366;  fi
 
@@ -18559,8 +18599,12 @@ cat >>confdefs.h <<_ACEOF
 #define APSERVER_PORT $APSERVER_PORT
 _ACEOF
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $APSERVER_PORT" >&5
+$as_echo "$APSERVER_PORT" >&6; }
 
 # APL: APserver port name ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which port name APserver shall use for unix ports" >&5
+$as_echo_n "checking which port name APserver shall use for unix ports... " >&6; }
 
 if test "x$APSERVER_PATH" = "x";   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi
 
@@ -18568,8 +18612,12 @@ cat >>confdefs.h <<_ACEOF
 #define APSERVER_PATH "$APSERVER_PATH"
 _ACEOF
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $APSERVER_PATH" >&5
+$as_echo "$APSERVER_PATH" >&6; }
 
 # APL: desired cellcount of short values ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how long a short APL value shall be at most" >&5
+$as_echo_n "checking how long a short APL value shall be at most... " >&6; }
 
 if test "x$SHORT_VALUE_LENGTH_WANTED" = "x"; then SHORT_VALUE_LENGTH_WANTED=12; fi
 
@@ -18577,8 +18625,13 @@ cat >>confdefs.h <<_ACEOF
 #define SHORT_VALUE_LENGTH_WANTED $SHORT_VALUE_LENGTH_WANTED
 _ACEOF
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SHORT_VALUE_LENGTH_WANTED" >&5
+$as_echo "$SHORT_VALUE_LENGTH_WANTED" >&6; }
+
 
 # APL: visible markers (debug only option) ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether visible markers shall be used" >&5
+$as_echo_n "checking whether visible markers shall be used... " >&6; }
 
 if test "x$VISIBLE_MARKERS_WANTED" = "xyes"; then
 
@@ -18586,8 +18639,15 @@ cat >>confdefs.h <<_ACEOF
 #define VISIBLE_MARKERS_WANTED yes
 _ACEOF
 
+else VISIBLE_MARKERS_WANTED="no"
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $VISIBLE_MARKERS_WANTED" >&5
+$as_echo "$VISIBLE_MARKERS_WANTED" >&6; }
+
+
 # check if we are on i686 (to fix a strange rpmbuild problem
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we compile for an i686 CPU" >&5
+$as_echo_n "checking whether we compile for an i686 CPU... " >&6; }
  if test `uname -m` = i686; then
   ON_i686_TRUE=
   ON_i686_FALSE='#'
@@ -18596,6 +18656,13 @@ else
   ON_i686_FALSE=
 fi
 
+if test `uname -m` = "i686" ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
 
 # check if we want development options
  if test x$DEVELOP_WANTED    = xyes; then

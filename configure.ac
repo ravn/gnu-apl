@@ -350,30 +350,39 @@ fi
 
 
 # APL: performance counters desired ?
+AC_MSG_CHECKING([whether internal performance counters shall be enabled)])
 AC_ARG_VAR(PERFORMANCE_COUNTERS_WANTED,
    [ enable performance counters (see README-2-configure) default: no ])
 if test "x$PERFORMANCE_COUNTERS_WANTED" = "xyes"; then
 AC_DEFINE_UNQUOTED([PERFORMANCE_COUNTERS_WANTED], [yes],
                    [ define to enable performance counters ])
+else PERFORMANCE_COUNTERS_WANTED="no"
 fi
+AC_MSG_RESULT([$PERFORMANCE_COUNTERS_WANTED])
 
 
 # APL: ADD_EVENT() macro and friends desired ?
+AC_MSG_CHECKING([whether to remember the history of APL values (debug feature)])
 AC_ARG_VAR(VALUE_HISTORY_WANTED,
    [ enable CHECK() macro (see README-2-configure) default: no ])
 if test "x$VALUE_HISTORY_WANTED" = "xyes"; then
 AC_DEFINE_UNQUOTED([VALUE_HISTORY_WANTED], [yes],
                    [ define to enable CHECK macro ])
+else VALUE_HISTORY_WANTED="no"
 fi
+AC_MSG_RESULT([$VALUE_HISTORY_WANTED])
 
 
 # APL: gprof profiling ?
+AC_MSG_CHECKING([whether gprof profiling shall be enabled])
 AC_ARG_VAR(GPROF_WANTED,
    [ enable gprof (-pg) (see README-2-configure) default: no ])
 if test "x$GPROF_WANTED" = "xyes"; then
    GPROF_WANTED=-pg
+   AC_MSG_RESULT([yes])
 else
    GPROF_WANTED=
+   AC_MSG_RESULT([no])
 fi
 
 AC_DEFINE_UNQUOTED([GPROF_WANTED], [-pg],
@@ -381,31 +390,40 @@ AC_DEFINE_UNQUOTED([GPROF_WANTED], [-pg],
 
 
 # APL: dynamic logging desired ?
+AC_MSG_CHECKING([whether dynamic logging shall be enabled])
 AC_ARG_VAR(DYNAMIC_LOG_WANTED,
    [ enable dynamic logging (see README-2-configure) default: no ])
 if test "x$DYNAMIC_LOG_WANTED" = "xyes"; then
 AC_DEFINE_UNQUOTED([DYNAMIC_LOG_WANTED], [yes],
                    [ define to enable dynamic logging ])
+else DYNAMIC_LOG_WANTED="no"
 fi
+AC_MSG_RESULT([$DYNAMIC_LOG_WANTED])
 
 
 # APL: tracing of value flags (produces lots of messages) desired ?
+AC_MSG_CHECKING([whether value flags shall be traced])
 AC_ARG_VAR(VF_TRACING_WANTED,
    [ enable tracing of value flags (see README-2-configure) default: no ])
 if test "x$VF_TRACING_WANTED" = "xyes"; then
 AC_DEFINE_UNQUOTED([VF_TRACING_WANTED], [yes],
                    [ define to enable tracing of value flags ])
+else VF_TRACING_WANTED="no"
 fi
+AC_MSG_RESULT([$VF_TRACING_WANTED])
 
 
 # APL: desired assert level ?
+AC_MSG_CHECKING([how picky internal tests shall be])
 AC_ARG_VAR(ASSERT_LEVEL_WANTED,
    [ Assert level (see README-2-configure) default: 1) ])
 if test "x$ASSERT_LEVEL_WANTED" = "x"; then ASSERT_LEVEL_WANTED=1; fi
 AC_DEFINE_UNQUOTED([ASSERT_LEVEL_WANTED], [$ASSERT_LEVEL_WANTED],
                    [assert level])
+AC_MSG_RESULT([$ASSERT_LEVEL_WANTED])
 
 # APL: number of cores ?
+AC_MSG_CHECKING([how many CPU cores shall be used by APL (experimental!)])
 AC_ARG_VAR(CORE_COUNT_WANTED,
    [ Core count (see README-2-configure) default: 0) ])
 if test "x$CORE_COUNT_WANTED" = "x";     then CORE_COUNT_WANTED=0;  fi
@@ -417,8 +435,10 @@ if test "x$CORE_COUNT_WANTED" = "xsyl";  then CORE_COUNT_WANTED=-3; fi
 if test "x$CORE_COUNT_WANTED" = "xSYL";  then CORE_COUNT_WANTED=-3; fi
 AC_DEFINE_UNQUOTED([CORE_COUNT_WANTED], [$CORE_COUNT_WANTED],
                    [core count])
+AC_MSG_RESULT([$CORE_COUNT_WANTED])
 
 # APL: APserver transport ?
+AC_MSG_CHECKING([which type of socket APserver shall use])
 AC_ARG_VAR(APSERVER_TRANSPORT,
    [ APserver transport (see README-2-configure) default: TCP) ])
 if test "x$APSERVER_TRANSPORT" = "x";        then APSERVER_TRANSPORT=0;  fi
@@ -427,37 +447,56 @@ if test "x$APSERVER_TRANSPORT" = "xLINUX";   then APSERVER_TRANSPORT=1;  fi
 if test "x$APSERVER_TRANSPORT" = "xUNIX";    then APSERVER_TRANSPORT=2;  fi
 AC_DEFINE_UNQUOTED([APSERVER_TRANSPORT], [$APSERVER_TRANSPORT],
                    [APserver transport: TCP=0, LINUX=1, UNIX=2])
+AC_MSG_RESULT([$APSERVER_TRANSPORT])
 
 # APL: APserver TCP port ?
+AC_MSG_CHECKING([which port number APserver shall use for TCP or UDP sockets])
 AC_ARG_VAR(APSERVER_PORT,
    [ APserver transport (see README-2-configure) default: TCP) ])
 if test "x$APSERVER_PORT" = "x";   then APSERVER_PORT=16366;  fi
 AC_DEFINE_UNQUOTED([APSERVER_PORT], [$APSERVER_PORT],
                    [APserver TCP listen port])
+AC_MSG_RESULT([$APSERVER_PORT])
 
 # APL: APserver port name ?
+AC_MSG_CHECKING([which port name APserver shall use for unix ports])
 AC_ARG_VAR(APSERVER_PATH,
    [ APserver transport (see README-2-configure) default: TCP) ])
 if test "x$APSERVER_PATH" = "x";   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi
 AC_DEFINE_UNQUOTED([APSERVER_PATH], ["$APSERVER_PATH"],
                    [APserver listen port name])
+AC_MSG_RESULT([$APSERVER_PATH])
 
 # APL: desired cellcount of short values ?
+AC_MSG_CHECKING([how long a short APL value shall be at most])
 AC_ARG_VAR(SHORT_VALUE_LENGTH_WANTED,
     [ Cellcount of short values (see README-2-configure) default: 12) ])
 if test "x$SHORT_VALUE_LENGTH_WANTED" = "x"; then SHORT_VALUE_LENGTH_WANTED=12; fi
 AC_DEFINE_UNQUOTED([SHORT_VALUE_LENGTH_WANTED], [$SHORT_VALUE_LENGTH_WANTED],
                    [short value cellcount])
+AC_MSG_RESULT([$SHORT_VALUE_LENGTH_WANTED])
+
 
 # APL: visible markers (debug only option) ?
+AC_MSG_CHECKING([whether visible markers shall be used])
 AC_ARG_VAR(VISIBLE_MARKERS_WANTED,
    [ enable CHECK() macro (see README-2-configure) default: no ])
 if test "x$VISIBLE_MARKERS_WANTED" = "xyes"; then
 AC_DEFINE_UNQUOTED([VISIBLE_MARKERS_WANTED], [yes],
                    [ define to have visible markers (DONT!)])
+else VISIBLE_MARKERS_WANTED="no"
 fi
+AC_MSG_RESULT([$VISIBLE_MARKERS_WANTED])
+
+
 # check if we are on i686 (to fix a strange rpmbuild problem
+AC_MSG_CHECKING([whether we compile for an i686 CPU])
 AM_CONDITIONAL([ON_i686], [test `uname -m` = i686])
+if test `uname -m` = "i686" ; then
+    AC_MSG_RESULT([yes])
+else
+    AC_MSG_RESULT([no])
+fi
 
 # check if we want development options
 AM_CONDITIONAL([DEVELOP],  [test x$DEVELOP_WANTED    = xyes])
