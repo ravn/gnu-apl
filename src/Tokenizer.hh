@@ -45,7 +45,7 @@ public:
    static Token tokenize_function(Unicode uni);
 
 protected:
-   /// tokenize UTF-8 string \b input into token string \b tos.
+   /// tokenize UCS string \b input into token string \b tos.
    void do_tokenize(const UCS_string & input, Token_string & tos);
 
    /// tokenize a function

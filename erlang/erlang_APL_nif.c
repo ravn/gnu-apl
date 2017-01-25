@@ -18,6 +18,8 @@
 # define DIRTY_FLAG
 #endif
 
+#define HERE printf("at %s\r\n", LOC);
+
 //=============================================================================
 static int init_done = 0;
 
@@ -53,7 +55,9 @@ static unsigned int UCS_buffer[UCS_maxbuf + 1];
 static int buffer_idx = 0;
 
 /// convert an APL value into an Erlang Term to be transmitted over the nif.
-static ERL_NIF_TERM make_value(const APL_value value);
+static ERL_NIF_TERM aval2eterm(const APL_value value);
+
+/// convert an Erlang Term into an APL value
 
 //-----------------------------------------------------------------------------
 
@@ -76,22 +80,37 @@ make_cell(const APL_value value, uint64_t idx)
                                     enif_make_double(vc_ctx.env,
                                                      get_imag(value, idx)));
 
-        case CCT_POINTER: return make_value(get_value(value, idx));
+        case CCT_POINTER: return aval2eterm(get_value(value, idx));
       }
 
    return enif_make_atom(vc_ctx.env, "bad_cell");
 }
 //-----------------------------------------------------------------------------
 static ERL_NIF_TERM
-bad_argument(const char * function, int line)
+bad_argument(const char * function, const char * loc)
 {
-   fprintf(stderr, "\r\n*** Bad argument in function %s at %s:%d\r\n",
-           __FILE__, function, line);
+   fprintf(stderr, "\r\n*** Bad argument in function %s() at %s\r\n",
+           function, loc);
    return enif_make_badarg(vc_ctx.env);
 }
 //-----------------------------------------------------------------------------
 static ERL_NIF_TERM
-make_value(const APL_value value)
+erl_result(const char * function, const char * loc, int err, ERL_NIF_TERM res)
+{
+   if (err == 0)   return res;
+
+char cc[40];
+   snprintf(cc, sizeof(cc), "bad-arg-#%u", err);
+
+   return enif_make_tuple4(vc_ctx.env,
+                           enif_make_atom(vc_ctx.env, "error"),
+                           enif_make_atom(vc_ctx.env, function),
+                           enif_make_atom(vc_ctx.env, cc),
+                           enif_make_atom(vc_ctx.env, loc));
+}
+//-----------------------------------------------------------------------------
+static ERL_NIF_TERM
+aval2eterm(const APL_value value)
 {
 const int64_t element_count = get_element_count(value);
 ERL_NIF_TERM shape;
@@ -276,7 +295,7 @@ value_callback(const APL_value result, int committed)
       }
    else
       {
-        TERM_buffer[vc_ctx.retval_idx++] = make_value(result);
+        TERM_buffer[vc_ctx.retval_idx++] = aval2eterm(result);
         return 1;   // print it
       }
 }
@@ -303,7 +322,7 @@ ERL_NIF_TERM ret;
 
    if (!enif_get_string(vc_ctx.env, argv[0], UTF8_buffer, UTF8_maxbuf,
                         ERL_NIF_LATIN1))
-      return bad_argument(__FUNCTION__, __LINE__);
+      return bad_argument(__FUNCTION__, LOC);
 
 const char * result = apl_command(UTF8_buffer);
    ret = enif_make_string(vc_ctx.env, result, ERL_NIF_LATIN1);
@@ -336,7 +355,7 @@ const unsigned int * r;
               enif_is_list(vc_ctx.env, list)                     &&
               enif_get_list_cell(vc_ctx.env, list, &head, &list) &&
               enif_get_uint(vc_ctx.env, head, UCS_buffer + buffer_idx))) 
-           return bad_argument(__FUNCTION__, __LINE__);
+           return bad_argument(__FUNCTION__, LOC);
       }
    UCS_buffer[buffer_idx] = 0;
 
@@ -383,7 +402,7 @@ do_statement_UTF8(const ERL_NIF_TERM argv[])
 int j;
    if (!enif_get_string(vc_ctx.env, argv[0], UTF8_buffer,
                         UTF8_maxbuf, ERL_NIF_LATIN1))
-      return bad_argument(__FUNCTION__, __LINE__);
+      return bad_argument(__FUNCTION__, LOC);
 
    vc_ctx.statement_result = -1;
    vc_ctx.retval_idx = 0;
@@ -438,7 +457,7 @@ int j;
               enif_is_list(vc_ctx.env, list)                     &&
               enif_get_list_cell(vc_ctx.env, list, &head, &list) &&
               enif_get_uint(vc_ctx.env, head, UCS_buffer + buffer_idx)))
-           return bad_argument(__FUNCTION__, __LINE__);
+           return bad_argument(__FUNCTION__, LOC);
       }
    UCS_buffer[buffer_idx] = 0;
 
@@ -500,7 +519,7 @@ int j;
         // extract one line from line_list and initialize char_list with it
         //
        if (!enif_get_list_cell(vc_ctx.env, line_list, &char_list, &line_list))
-           return bad_argument(__FUNCTION__, __LINE__);
+           return bad_argument(__FUNCTION__, LOC);
 
        UCS_buffer[buffer_idx++] = ' ';
        UCS_buffer[buffer_idx++] = '\'';
@@ -511,7 +530,7 @@ int j;
                     enif_is_list(vc_ctx.env, line_list)                          &&
                     enif_get_list_cell(vc_ctx.env, char_list, &head, &char_list) &&
                     enif_get_uint(vc_ctx.env, head, UCS_buffer + buffer_idx++)))
-                 return bad_argument(__FUNCTION__, __LINE__);
+                 return bad_argument(__FUNCTION__, LOC);
 
               if (UCS_buffer[buffer_idx] == '\'')   // duplicate single quotes
                  {
@@ -563,6 +582,26 @@ ERL_NIF_TERM ret = do_fix_function_UCS(argv);
    return ret;
 }
 //=============================================================================
+static int
+fill_shape(ERL_NIF_TERM var_shape, uint64_t * shape, uint64_t * ravel_len)
+{
+int rank = 0;
+ERL_NIF_TERM head;
+
+   *ravel_len = 1;
+   for (; !enif_is_empty_list(vc_ctx.env, var_shape); ++rank)
+      {
+        if (!(rank < 8                                                     &&
+              enif_is_list(vc_ctx.env, var_shape)                          &&
+              enif_get_list_cell(vc_ctx.env, var_shape, &head, &var_shape) &&
+              enif_get_uint64(vc_ctx.env, head, shape + rank)))
+           return -1;
+        *ravel_len *= shape[rank];
+      }
+
+   return rank;
+}
+//-----------------------------------------------------------------------------
 static ERL_NIF_TERM
 fill_variable(const unsigned int * var_name, ERL_NIF_TERM var_shape,
               ERL_NIF_TERM var_ravel, APL_value * aval)
@@ -572,25 +611,16 @@ uint64_t ravel_len = 1;
 ERL_NIF_TERM head;
 
 uint64_t shape[8];
-int shape_idx = 0;
-   for (shape_idx = 0; !enif_is_empty_list(vc_ctx.env, var_shape); ++shape_idx)
-      {
-        if (!(shape_idx < 8                                                &&
-              enif_is_list(vc_ctx.env, var_shape)                          &&
-              enif_get_list_cell(vc_ctx.env, var_shape, &head, &var_shape) &&
-              enif_get_uint64(vc_ctx.env, head, shape + shape_idx)))
-           return bad_argument(__FUNCTION__, __LINE__);
-        ravel_len *= shape[shape_idx];
-      }
-   shape[shape_idx] = 0;
+int rank = fill_shape(var_shape, shape, &ravel_len);
+   if (rank < 0)   return bad_argument(__FUNCTION__, LOC);
 
    // get a variable with the given shape and its ravel set to 0, so that the
    // variable will be properly initialized even if setting of the ravel below
    // should fail.
    //
    if (ravel_len == 0)   ravel_len = 1;   // empty value: need at least 1 item
-APL_value var = *aval = assign_var(var_name, shape);
-   if (var == 0)     return bad_argument(__FUNCTION__, __LINE__);
+APL_value var = * aval = assign_var(var_name, rank, shape);
+   if (var == 0)     return bad_argument(__FUNCTION__, LOC);
 
    for (ravel_idx = 0; ravel_idx < ravel_len; ++ravel_idx)
       {
@@ -600,7 +630,7 @@ APL_value var = *aval = assign_var(var_name, shape);
         if (enif_is_empty_list(vc_ctx.env, var_ravel))   break;
 
         if (!enif_get_list_cell(vc_ctx.env, var_ravel, &head, &var_ravel))
-           return bad_argument(__FUNCTION__, __LINE__);
+           return bad_argument(__FUNCTION__, LOC);
 
         ErlNifSInt64 int_num = 0;
         if (enif_get_int64(vc_ctx.env, head, &int_num))   // integer value
@@ -616,56 +646,65 @@ APL_value var = *aval = assign_var(var_name, shape);
              continue;
            }
 
-        // last chance: complex {real,imag} or nested value {shape,ravel}
+        // last chance: { complex, real, imag } or { value, shape, ravel }
         //
         int tuple_arity = 0;
         const ERL_NIF_TERM * tuple_items = 0;
         if (!enif_get_tuple(vc_ctx.env, head, &tuple_arity, &tuple_items))
-           return bad_argument(__FUNCTION__, __LINE__);
+           return bad_argument(__FUNCTION__, LOC);
 
+        if (tuple_items == 0)   return bad_argument(__FUNCTION__, LOC);
+        if (tuple_arity != 3)   return bad_argument(__FUNCTION__, LOC);
 
-        if (tuple_items == 0)   return bad_argument(__FUNCTION__,__LINE__);
-        if (tuple_arity != 2)   return bad_argument(__FUNCTION__,__LINE__);
+        const ERL_NIF_TERM T0 = tuple_items[0];
+        char tag[10];
+        if (!enif_get_atom(vc_ctx.env, T0, tag, sizeof(tag), ERL_NIF_LATIN1))
+           return bad_argument(__FUNCTION__, LOC);
 
-        ERL_NIF_TERM T0  = tuple_items[0];
-        ERL_NIF_TERM T1  = tuple_items[1];
-        if (enif_is_list(vc_ctx.env, T0))   // shape of a value
+        const ERL_NIF_TERM T1 = tuple_items[1];
+        const ERL_NIF_TERM T2 = tuple_items[2];
+        if (!strcmp(tag, "value"))   // nested APL value
            {
              APL_value asub = 0;
-             ERL_NIF_TERM sub = fill_variable(0, T0, T1, &asub);
+             ERL_NIF_TERM sub = fill_variable(0, T1, T2, &asub);
              if (asub == 0)   return sub;
              if (!enif_get_int64(vc_ctx.env, sub, &int_num))
-                return bad_argument(__FUNCTION__, __LINE__);
+                return bad_argument(__FUNCTION__, LOC);
              if (int_num != 0)
-                return bad_argument(__FUNCTION__, __LINE__);
+                return bad_argument(__FUNCTION__, LOC);
 
              set_value(asub, var, ravel_idx);
-             release_value(asub, "erlang_APL_nif.c:691");
+             release_value(asub, LOC);
              continue;
            }
 
-        // complex: {real,imag}
+        // {complex, real, imag}
         //
-        if (enif_get_int64(vc_ctx.env, T0, &int_num))
-           {
-             double_real = int_num;
-           }
-        else if (!enif_get_double(vc_ctx.env, T0, &double_real))
-           {
-             return bad_argument(__FUNCTION__, __LINE__);
-           }
+        else if (!strcmp(tag, "complex"))
+          {
+            if (enif_get_int64(vc_ctx.env, T1, &int_num))
+               {
+                 double_real = int_num;
+               }
+            else if (!enif_get_double(vc_ctx.env, T1, &double_real))
+               {
+                 return bad_argument(__FUNCTION__, LOC);
+               }
      
-        double double_imag = 0;
-        if (enif_get_int64(vc_ctx.env, T1, &int_num))
-           {
-             double_imag = int_num;
-           }
-        else if (!enif_get_double(vc_ctx.env, T1, &double_imag))
-           {
-             return bad_argument(__FUNCTION__, __LINE__);
-           }
+            double double_imag = 0;
+            if (enif_get_int64(vc_ctx.env, T2, &int_num))
+               {
+                 double_imag = int_num;
+               }
+            else if (!enif_get_double(vc_ctx.env, T2, &double_imag))
+               {
+                 return bad_argument(__FUNCTION__, LOC);
+               }
 
-        set_complex(double_real, double_imag, var, ravel_idx);
+            set_complex(double_real, double_imag, var, ravel_idx);
+          }
+
+        else    return bad_argument(__FUNCTION__, LOC);
       }
 
    return enif_make_int64(vc_ctx.env, 0);
@@ -684,7 +723,7 @@ APL_value dummy;
               enif_is_list(vc_ctx.env, var_name)                         &&
               enif_get_list_cell(vc_ctx.env, var_name, &head, &var_name) &&
               enif_get_uint(vc_ctx.env, head, UCS_buffer + buffer_idx)))
-           return bad_argument(__FUNCTION__, __LINE__);
+           return bad_argument(__FUNCTION__, LOC);
       }
    UCS_buffer[buffer_idx] = 0;
    fill_variable(UCS_buffer, argv[1], argv[2], &dummy);
@@ -701,6 +740,418 @@ ERL_NIF_TERM ret = do_set_variable(argv);
    return ret;
 }
 //=============================================================================
+static APL_function
+eterm2function(ERL_NIF_TERM fun_name, APL_function * L, APL_function * R)
+{
+ERL_NIF_TERM head;
+   for (buffer_idx = 0; !enif_is_empty_list(vc_ctx.env, fun_name); ++buffer_idx)
+      {
+        if (!(buffer_idx < UCS_maxbuf                                    &&
+              enif_is_list(vc_ctx.env, fun_name)                         &&
+              enif_get_list_cell(vc_ctx.env, fun_name, &head, &fun_name) &&
+              enif_get_uint(vc_ctx.env, head, UCS_buffer + buffer_idx)))
+           return 0;
+      }
+
+   UCS_buffer[buffer_idx] = 0;
+   return get_function_ucs(UCS_buffer, L, R);
+}
+//-----------------------------------------------------------------------------
+static APL_value
+eterm2value(ERL_NIF_TERM fun_arg)
+{
+int tuple_arity = 0;
+const ERL_NIF_TERM * tuple_items = 0;
+   if (!enif_get_tuple(vc_ctx.env, fun_arg, &tuple_arity, &tuple_items))
+      return 0;
+
+   if (tuple_items == 0)   return 0;
+   if (tuple_arity != 3)   return 0;
+
+const ERL_NIF_TERM T0 = tuple_items[0];
+const ERL_NIF_TERM T1 = tuple_items[1];
+const ERL_NIF_TERM T2 = tuple_items[2];
+char tag[10];
+   if (!enif_get_atom(vc_ctx.env, T0, tag, sizeof(tag), ERL_NIF_LATIN1))
+      return 0;
+
+   if (strcmp(tag, "value"))   return 0;   // wrong tag
+
+APL_value B = 0;
+   fill_variable(0, T1, T2, &B);
+   return B;
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_(const ERL_NIF_TERM argv[])
+{
+APL_value    Z = 0;
+APL_function fun = eterm2function(argv[0], 0, 0);
+int e = 0;
+
+   if (fun == 0 && (e = 1))    goto done; 
+
+   Z = eval__fun(fun);
+   if ((Z == 0 && (e = 2)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(Z, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_AB(const ERL_NIF_TERM argv[])
+{
+APL_value    Z   = 0;
+APL_value    A   = eterm2value   (argv[0]);
+APL_function fun = eterm2function(argv[1], 0, 0);
+APL_value    B   = eterm2value   (argv[2]);
+int e = 0;
+
+   if ((A   == 0 && (e = 1)) ||
+       (fun == 0 && (e = 2)) ||
+       (B   == 0 && (e = 3)))    goto done;
+
+   Z = eval__A_fun_B(A, fun, B);
+   if ((Z == 0 && (e = 4)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(A, LOC);
+   release_value(B, LOC);
+   release_value(Z, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_ALB(const ERL_NIF_TERM argv[])
+{
+APL_value    Z    = 0;
+APL_function L    = 0;
+APL_value    A    = eterm2value   (argv[0]);
+APL_function oper = eterm2function(argv[1], &L, 0);
+APL_value    B    = eterm2value   (argv[3]);
+int e = 0;
+
+   if ((A    == 0 && (e = 1)) ||
+       (L == 0    && (e = 2)) ||
+       (oper == 0 && (e = 2)) ||
+       (B    == 0 && (e = 3)))    goto done;
+
+   Z = eval__A_L_oper_B(A, L, oper, B);
+   if ((Z == 0 && (e = 4)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(Z, LOC);
+   release_value(A, LOC);
+   release_value(B, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_ALRB(const ERL_NIF_TERM argv[])
+{
+APL_value    Z    = 0;
+APL_function L    = 0;
+APL_function R    = 0;
+APL_value    A    = eterm2value   (argv[0]);
+APL_function oper = eterm2function(argv[1], &L, &R);
+APL_value    B    = eterm2value   (argv[2]);
+int e = 0;
+
+   if ((A    == 0 && (e = 1)) ||
+       (L == 0    && (e = 2)) ||
+       (oper == 0 && (e = 2)) ||
+       (R == 0    && (e = 2)) ||
+       (B    == 0 && (e = 4)))    goto done;
+
+   Z = eval__A_L_oper_R_B(A, L, oper, R, B);
+   if ((Z == 0 && (e = 5)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(A, LOC);
+   release_value(B, LOC);
+   release_value(Z, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_AXB(const ERL_NIF_TERM argv[])
+{
+APL_value    Z    = 0;
+APL_value    A    = eterm2value   (argv[0]);
+APL_function L    = 0;
+APL_function oper = eterm2function(argv[1], &L, 0);
+APL_value    B    = eterm2value   (argv[3]);
+int e = 0;
+
+   if ((A    == 0 && (e = 1)) ||
+       (L == 0    && (e = 2)) ||
+       (oper == 0 && (e = 2)) ||
+       (B    == 0 && (e = 3)))    goto done;
+
+   Z = eval__A_L_oper_B(A, L, oper, B);
+   if ((Z == 0 && (e = 4)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(Z, LOC);
+   release_value(A, LOC);
+   release_value(B, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_ALXB(const ERL_NIF_TERM argv[])
+{
+APL_value    Z    = 0;
+APL_value    A    = eterm2value   (argv[0]);
+APL_function L    = 0;
+APL_function oper = eterm2function(argv[1], &L, 0);
+APL_value    X    = eterm2value   (argv[2]);
+APL_value    B    = eterm2value   (argv[3]);
+int e = 0;
+
+   if ((A    == 0 && (e = 1)) ||
+       (L == 0    && (e = 2)) ||
+       (oper == 0 && (e = 2)) ||
+       (X == 0    && (e = 3)) ||
+       (B    == 0 && (e = 4)))    goto done;
+
+   Z = eval__A_L_oper_X_B(A, L, oper, X, B);
+   if ((Z == 0 && (e = 5)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(Z, LOC);
+   release_value(A, LOC);
+   release_value(B, LOC);
+   release_value(X, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_ALRXB(const ERL_NIF_TERM argv[])
+{
+APL_value    Z    = 0;
+APL_value    A    = eterm2value   (argv[0]);
+APL_function L    = 0;
+APL_function R    = 0;
+APL_function oper = eterm2function(argv[1], &L, &R);
+APL_value    X    = eterm2value   (argv[2]);
+APL_value    B    = eterm2value   (argv[3]);
+int e = 0;
+
+   if ((A    == 0 && (e = 1)) ||
+       (L == 0    && (e = 2)) ||
+       (oper == 0 && (e = 2)) ||
+       (R == 0    && (e = 2)) ||
+       (X == 0    && (e = 3)) ||
+       (B    == 0 && (e = 4)))    goto done;
+
+   Z = eval__A_L_oper_R_X_B(A, L, oper, R, X, B);
+   if ((Z == 0 && (e = 5)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(Z, LOC);
+   release_value(A, LOC);
+   release_value(X, LOC);
+   release_value(B, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_B(const ERL_NIF_TERM argv[])
+{
+APL_function fun = eterm2function(argv[0], 0, 0);
+APL_value B      = eterm2value   (argv[1]);
+APL_value Z = 0;
+int e = 0;
+
+   if ((fun == 0 && (e = 2)) ||
+       (B   == 0 && (e = 3)))    goto done;
+
+   Z = eval__fun_B(fun, B);
+   if ((Z == 0 && (e = 4)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(B, LOC);
+   release_value(Z, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_LB(const ERL_NIF_TERM argv[])
+{
+APL_value    Z    = 0;
+APL_function L    = 0;
+APL_function oper = eterm2function(argv[0], &L, 0);
+APL_value    B    = eterm2value   (argv[1]);
+int e = 0;
+
+   if ((L   ==  0 && (e = 1)) ||
+       (oper == 0 && (e = 2)) ||
+       (B   == 0 && (e = 3)))    goto done;
+
+   Z = eval__L_oper_B(L, oper, B);
+   if ((Z == 0 && (e = 4)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(B, LOC);
+   release_value(Z, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_XB(const ERL_NIF_TERM argv[])
+{
+APL_function fun = eterm2function(argv[1], 0, 0);
+APL_value    X   = eterm2value   (argv[2]);
+APL_value    B   = eterm2value   (argv[3]);
+APL_value    Z   = 0;
+int e = 0;
+
+   if ((fun == 0 && (e = 1)) ||
+       (X   == 0 && (e = 2)) ||
+       (B   == 0 && (e = 3)))    goto done;
+
+   Z = eval__fun_X_B(fun, X, B);
+   if ((Z == 0 && (e = 4)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(X, LOC);
+   release_value(B, LOC);
+   release_value(Z, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_LXB(const ERL_NIF_TERM argv[])
+{
+APL_function L    = 0;
+APL_function oper = eterm2function(argv[1], &L, 0);
+APL_value    X    = eterm2value   (argv[2]);
+APL_value    B    = eterm2value   (argv[3]);
+APL_value    Z    = 0;
+int e = 0;
+
+   if ((L == 0    && (e = 1)) ||
+       (oper == 0 && (e = 2)) ||
+       (X == 0    && (e = 3)) ||
+       (B    == 0 && (e = 4)))    goto done;
+
+   Z = eval__L_oper_X_B(L, oper, X, B);
+   if ((Z == 0 && (e = 5)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(X, LOC);
+   release_value(B, LOC);
+   release_value(Z, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_LRB(const ERL_NIF_TERM argv[])
+{
+APL_value    A    = eterm2value   (argv[0]);
+APL_function L    = 0;
+APL_function R    = 0;
+APL_function oper = eterm2function(argv[1], &L, &R);
+APL_value    B    = eterm2value   (argv[2]);
+APL_value    Z    = 0;
+int e = 0;
+
+   if ((L == 0    && (e = 1)) ||
+       (oper == 0 && (e = 2)) ||
+       (R == 0    && (e = 2)) ||
+       (B    == 0 && (e = 3)))    goto done;
+
+   Z = eval__A_L_oper_R_B(A, L, oper, R, B);
+   if ((Z == 0 && (e = 4)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(B, LOC);
+   release_value(Z, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+static ERL_NIF_TERM
+do_eval_LRXB(const ERL_NIF_TERM argv[])
+{
+APL_value    A    = eterm2value   (argv[0]);
+APL_function L    = 0;
+APL_function R    = 0;
+APL_function oper = eterm2function(argv[1], &L, &R);
+APL_value    X    = eterm2value   (argv[2]);
+APL_value    B    = eterm2value   (argv[3]);
+APL_value    Z    = 0;
+int e = 0;
+
+   if ((L == 0    && (e = 1)) ||
+       (oper == 0 && (e = 2)) ||
+       (R == 0    && (e = 2)) ||
+       (X == 0    && (e = 3)) ||
+       (B    == 0 && (e = 4)))    goto done;
+
+   Z = eval__A_L_oper_R_X_B(A, L, oper, R, X, B);
+   if ((Z == 0 && (e = 5)))      goto done;
+const ERL_NIF_TERM ret = aval2eterm(Z);
+   e = 0;
+
+done:
+   release_value(X, LOC);
+   release_value(B, LOC);
+   release_value(Z, LOC);
+   return erl_result(__FUNCTION__, LOC, e, ret);
+}
+//=============================================================================
+/** macro protect(X) defines a static function eval_X() that calls the
+    corresponding function do_eval_X() above, but protected by if_sema, so that
+    only one function at a time can use the interfscer to APL.
+ **/
+#define protect(X)                             \
+static ERL_NIF_TERM                            \
+eval_ ## X (ErlNifEnv * env, int argc,         \
+                  const ERL_NIF_TERM argv[])   \
+{                                              \
+   sem_wait(&if_sema);                         \
+   vc_ctx.env = env;                           \
+ERL_NIF_TERM ret = do_eval_ ## X(argv);        \
+   sem_post(&if_sema);                         \
+   return ret;                                 \
+}                                              \
+
+protect()
+protect(AB)      protect(B)
+protect(ALB)     protect(LB)
+protect(AXB)     protect(XB)
+protect(ALXB)    protect(LXB)
+protect(ALRB)    protect(LRB)
+protect(ALRXB)   protect(LRXB)
+
+//=============================================================================
 static ErlNifFunc
 nif_funcs[] = {
      // erlang name      #args   C function       flags (if supported)
@@ -709,7 +1160,20 @@ nif_funcs[] = {
    { "statement_utf8",   1,      statement_UTF8   DIRTY_FLAG },
    { "statement_ucs",    1,      statement_UCS    DIRTY_FLAG },
    { "fix_function_ucs", 1,      fix_function_UCS DIRTY_FLAG },
-   { "set_variable",     3,      set_variable     DIRTY_FLAG }
+   { "set_variable",     3,      set_variable     DIRTY_FLAG },
+   { "eval_",            1,      eval_            DIRTY_FLAG },
+   { "eval_AB",          3,      eval_AB          DIRTY_FLAG },
+   { "eval_ALB",         3,      eval_ALB         DIRTY_FLAG },
+   { "eval_AXB",         4,      eval_AXB         DIRTY_FLAG },
+   { "eval_ALRB",        3,      eval_ALRB        DIRTY_FLAG },
+   { "eval_ALXB",        4,      eval_ALXB        DIRTY_FLAG },
+   { "eval_ALRXB",       4,      eval_ALRXB       DIRTY_FLAG },
+   { "eval_B",           2,      eval_B           DIRTY_FLAG },
+   { "eval_LB",          2,      eval_LB          DIRTY_FLAG },
+   { "eval_XB",          3,      eval_XB          DIRTY_FLAG },
+   { "eval_LRB",         2,      eval_LRB         DIRTY_FLAG },
+   { "eval_LXB",         3,      eval_LXB         DIRTY_FLAG },
+   { "eval_LRXB",        3,      eval_LRXB        DIRTY_FLAG }
 };
 //-----------------------------------------------------------------------------
 

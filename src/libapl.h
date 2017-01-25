@@ -87,9 +87,14 @@ extern void print_ucs(FILE * out, const unsigned int * string_ucs);
 
 struct Value;
 typedef struct Value * APL_value;
+struct Function;
+typedef struct Function * APL_function;
 
 /** a function called with the final value of an APL statement.
-    int committed says if the value was committed (aka. assigned to a variable).    The int returned by the callback tells if the result shall be printed (0)
+    int \b committed says if the value was committed (aka. assigned to a
+    variable).
+
+    The int returned by the callback tells if the result shall be printed (0)
     or not (non-0).
 
     The APL_value result MUST NOT be released with release_value() below.
@@ -215,7 +220,8 @@ extern APL_value get_value(const APL_value val, uint64_t idx);
    4. write access to APL values. All ravel indices count from ⎕IO←0.
  */
 /// var_name←shape⍴0
-extern APL_value assign_var(const unsigned int * var_name, uint64_t * shape);
+extern APL_value assign_var(const unsigned int * var_name,
+                            int rank,  uint64_t * shape);
 
 /// val[idx]←unicode
 extern void set_char(int unicode, APL_value val, uint64_t idx);
@@ -265,6 +271,67 @@ typedef const char * get_line_from_user_cb(
 /// install new callback (old one will be returned)
 extern get_line_from_user_cb *
  install_get_line_from_user_cb(get_line_from_user_cb * new_callback);
+
+/// return the number of owners of value val. An owner count of 1 means that
+/// the next \b release_value(val) will delete the value val. If the APL
+/// command )CHECK reports "stale values" then they might be caused by
+/// missing calls of \b release_value(); in this case get_owner_count() can
+/// be used to trouble-shoot the cause for stale values.
+extern int get_owner_count(APL_value val);
+
+/// return APL primitive or user defined function or operator \b name
+/// and maybe its left and right function arguments L and R (if non-0)
+extern APL_function
+get_function_ucs(const unsigned int * name, APL_function * L, APL_function * R);
+
+/// evaluate niladic function f
+extern APL_value eval__fun(APL_function fun);
+
+/// dyadic function fun with arguments A and B
+extern APL_value eval__A_fun_B(APL_value A, APL_function fun, APL_value B);
+
+/// monadic operator oper with function L arguments A and B
+extern APL_value eval__A_L_oper_B(APL_value A, APL_function L, APL_function fun,
+                                  APL_value B);
+
+/// dyadic function fun with axis X and arguments A and B
+extern APL_value eval__A_fun_X_B(APL_value A, APL_function fun, APL_value X,
+                                 APL_value B);
+
+/// dyadic operator oper with functions L and R and arguments A and B
+extern APL_value eval__A_L_oper_R_B(APL_value A, APL_function L,
+                                    APL_function fun, APL_function R,
+                                    APL_value B);
+
+/// monadic operator oper with functions L, axis X, and arguments A and B
+extern APL_value eval__A_L_oper_X_B(APL_value A, APL_function L,
+                                    APL_function fun, APL_value X, APL_value B);
+
+/// dyadic operator oper with functions L and R, axis X, and arguments A and B
+extern APL_value eval__A_L_oper_R_X_B(APL_value A, APL_function L,
+                                      APL_function fun, APL_function R,
+                                      APL_value X, APL_value B);
+
+/// monadic function fun with argument B
+extern APL_value eval__fun_B(APL_function fun, APL_value B);
+
+/// monadic operator oper with function L argument B
+extern APL_value eval__L_oper_B(APL_function L, APL_function fun, APL_value B);
+
+/// monadic function fun with axis X and argument B
+extern APL_value eval__fun_X_B(APL_function fun, APL_value X, APL_value B);
+
+/// dyadic operator oper with functions L and R and argument B
+extern APL_value eval__L_oper_R_B(APL_function L, APL_function fun,
+                                  APL_function R, APL_value B);
+
+/// monadic operator oper with function L, axis X, and argument B
+extern APL_value eval__L_oper_X_B(APL_function L, APL_function fun,
+                                  APL_value X, APL_value B);
+
+/// dyadic operator oper with functions L and R, axis X, and argument B
+extern APL_value eval__L_oper_R_X_B(APL_function L, APL_function fun,
+                                    APL_function R, APL_value X, APL_value B);
 
 #ifdef __cplusplus
 }

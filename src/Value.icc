@@ -185,7 +185,20 @@ Value_P_Base::clear(const char * loc)
      {
        decrement_owner_count(value_p, loc);
        ADD_EVENT(value_p, VHE_PtrClr,
-                      value_p ? value_p->owner_count : -99, loc);
+                 value_p ? value_p->owner_count : -99, loc);
+
+       value_p = 0;
+     }
+}
+//-----------------------------------------------------------------------------
+inline void
+Value_P_Base::clear_pointer(const char * loc)
+{
+  if (value_p)
+     {
+       // do NOT decrement_owner_count() !
+       ADD_EVENT(value_p, VHE_PtrClr,
+                 value_p ? value_p->owner_count : -99, loc);
 
        value_p = 0;
      }

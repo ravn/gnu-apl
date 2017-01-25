@@ -54,13 +54,16 @@ public:
    /// copy constructor
    Token(const Token & other);
 
-   /// copy \b src into \b this token
+   /// copy \b src into \b this token. leaving APL value pointer in
+   /// src (if any) and add events as needed
    void copy_1(const Token & src, const char * loc);
 
-   /// move mutable \b src into \b this token
+   /// move mutable \b src into \b this token. clears APL value pointer in
+   /// src (if any) and add events as needed
    void move_1(Token & src, const char * loc);
 
-   /// clone const \b src into \b this token
+   /// move const \b src into \b this token. clears APL value pointer in
+   /// src (if any) and add events as needed
    void move_2(const Token & src, const char * loc);
 
    /// Construct a token without a value
@@ -231,8 +234,13 @@ public:
    /// return value usage counter
    int value_use_count() const;
 
-   /// clear the Value_P value (if any) of this token
+   /// clear the Value_P value (if any) of this token, updating
+   /// its refcount as needed
    void extract_apl_val(const char * loc);
+
+   /// clear the Value_P (if any) without updating its refcount. Return 
+   /// the old Value * that was overridden
+   Value * extract_and_keep(const char * loc);
 
    /// change the tag (within the same TokenValueType)
    void ChangeTag(TokenTag new_tag);
@@ -257,7 +265,7 @@ public:
    /// return the number of characters printed.
    int error_info(UCS_string & out) const;
 
-   /// copy src to \b this token
+   /// copy src to \b this token, updating ref counts for APL values
    void copy_N(const Token & src);
 
    /// return a brief token class name for debugging purposes

@@ -256,6 +256,16 @@ Token::extract_apl_val(const char * loc)
    if (is_apl_val())   value.apl_val.reset();
 }
 //-----------------------------------------------------------------------------
+Value *
+Token::extract_and_keep(const char * loc)
+{
+   if (!is_apl_val())   return 0;
+
+Value * ret = value.apl_val.get();
+   value.apl_val.clear_pointer(loc);
+   return ret;
+}
+//-----------------------------------------------------------------------------
 ostream &
 Token::print_function(ostream & out) const
 {

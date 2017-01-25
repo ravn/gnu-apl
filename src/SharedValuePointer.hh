@@ -89,6 +89,8 @@ public:
    Value & getref()
       { return *value_p; }
 
+   inline void clear_pointer(const char * loc);
+
    /// decrement the owner count of \b val. The function bidy requires Value.hh
    /// and is therefore implemented in Value.icc.
    static inline void decrement_owner_count(Value * & val, const char * loc);
@@ -100,7 +102,6 @@ public:
 protected:
    /// pointer to the value
    Value * value_p;
-
 };
 //-----------------------------------------------------------------------------
 /// a smart pointer to a Value

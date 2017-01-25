@@ -85,6 +85,9 @@ public:
    /// process \b line which contains APL statements
    static void do_APL_expression(UCS_string & line);
 
+   /// finish the current SI->top() and pop it when done
+   static void finish_context();
+
    /// parse user-suplied argument (of )VARS, )OPS, or )NMS commands)
    /// into strings from and to
    static bool parse_from_to(UCS_string & from, UCS_string & to,

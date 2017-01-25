@@ -210,7 +210,12 @@ Executable * statements = 0;
    // push a new context for the statements.
    //
    Workspace::push_SI(statements, LOC);
-
+   finish_context();
+}
+//-----------------------------------------------------------------------------
+void
+Command::finish_context()
+{
    for (;;)
        {
          //

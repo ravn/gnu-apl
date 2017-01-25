@@ -30,9 +30,10 @@ example() ->
   io:format("~nShow all APL variables...~n"),
   io:format("~ts~n", [apl:command(")VARS")]),
 
-  % create an APL function named FOO
+  % create an APL functions named FOO and TIME
   io:format("~nCreate (aka. fix) APL function FOO...~n"),
   io:format("~w~n", [fix_FOO()]),
+  io:format("~w~n", [fix_TIME()]),
 
   % show all APL functions
   io:format("~nShow all APL functions...~n"),
@@ -42,11 +43,12 @@ example() ->
   io:format("~ndisplay APL function FOO...~n"),
   io:format("~tp~n", [apl:statement("⎕CR 'FOO'")]),
 
-  % create a 10 by 30 integer matrix of 0s and and initialize the first
+  % create a 10 by 30 integer matrix of 0s and initialize the first
   % few elements of it from an Erlang value with integers floats, and complex
-  io:format("~nSet variabe Y directly from Erlang...~n"),
+  io:format("~nSet variabe Y directly from Erlang...~n"
+            "NOTE: missing items are set to 0~n"),
   io:format("~s~n", [apl:set_variable("Y", [10,30],
-                                      [1, 2.2, {3,4},{[3],"BAR"}])]),
+                        [1, 2.2, {complex,3,4.4},{value,[3],"BAR"}])]),
 
   % display Y
   io:format("~nDisplay Y...~n"),
@@ -61,6 +63,27 @@ example() ->
   io:format("~nDisplay V...~n"),
   io:format("~w~n", [apl:statement("V")]),
 
+   % call monadic APL function with Erlang term [1 2 3]
+  io:format("~ncall monadic APL function '○' (aka. Pi times) with Erlang "
+            " term [1, 2.2, 3.3]...~n"),
+  io:format("result: ~tp~n", [apl:eval_B("○", apl:e2a([1, 2.2, 3.3]))]),
+   
+   % call dyadic APL function '+' with Erlang terms [1 2 3] and [4 5 6]
+  io:format("~ncall dyadic APL function '+' with Erlang"
+            " terms [1,2,3] and [4,5,6]...~n"),
+  io:format("result: ~tp~n", [apl:eval_AB(apl:e2a([1,2,3]), "+",
+                                          apl:e2a([4,5,6]))]),
+   
+   % call monadic APL operator '+/' with Erlang term [1 2 3 4 5 6]
+  io:format("~ncall monadic APL operator '+/' with Erlang"
+            " term [1,2,3,4,5,6]...~n"),
+  io:format("result: ~tp~n", [apl:eval_LB("+/", apl:e2a([4,5,6]))]),
+   
+   % call niladic APL function 'TIME'
+  apl:command("]log 32"),
+  io:format("~ncall niladic APL function 'TIME'...~n"),
+  io:format("result: ~tp~n", [apl:eval_("TIME")]),
+   
   ok.
 
 % create a two-line APL function named FOO. FOO has one argument B and returns
@@ -69,7 +92,15 @@ example() ->
 % the lines of the function body. In APL, 'fixing a function' is APL % slang
 % and means defining or changing a user-defined function.
 %
-fix_FOO() -> apl:fix_function_ucs([
+fix_FOO() ->
+apl:fix_function_ucs([
 "Z←FOO B",
-"Z←B + 1"                         ]).
+"Z←B + 1"            ]).
+
+% create a niladic APL function named TIME, which returns the current time.
+%
+fix_TIME() ->
+apl:fix_function_ucs([
+"Z←TIME",
+"Z←⎕TS"              ]).
 
