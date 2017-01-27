@@ -308,14 +308,14 @@
  Z←As ⎕FIO[48] Bh
 ∇
 
-∇Z← FIO∆read_lines Bh
- ⍝⍝ return Z with Z[i] ← line i of file Bh
- Z←⎕FIO[49] Bh
+∇Z← FIO∆read_lines Bs
+ ⍝⍝ return Z with Z[i] ← line i of the file named Bs
+ Z←⎕FIO[49] Bs
 ∇
 
-∇Z← (LO FIO∆transform_lines) Bh
- ⍝⍝ return Z with Z[i] ← LO (line i of file Bh)
- Z←LO ⎕FIO[49] Bh
+∇Z← (LO FIO∆transform_lines) Bs
+ ⍝⍝ return Z with Z[i] ← LO (line i of the file named Bs)
+ Z←LO ⎕FIO[49] Bs
 ∇
 
  
