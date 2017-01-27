@@ -303,11 +303,22 @@
 ∇
 
 ∇Z ← As FIO∆fscanf Bh
- ⍝⍝ fscanf from a file
+ ⍝⍝ fscanf from a file Bh
  ⍝⍝ As is the format string
  Z←As ⎕FIO[48] Bh
 ∇
 
+∇Z← FIO∆read_lines Bh
+ ⍝⍝ return Z with Z[i] ← line i of file Bh
+ Z←⎕FIO[49] Bh
+∇
+
+∇Z← (LO FIO∆transform_lines) Bh
+ ⍝⍝ return Z with Z[i] ← LO (line i of file Bh)
+ Z←LO ⎕FIO[49] Bh
+∇
+
+ 
 ∇FIO∆clear_statistics Bi
  ⍝⍝ clear performance statistics with ID Bi
  Zn ← ⎕FIO[200] Bi

@@ -303,6 +303,7 @@ value_callback(const APL_value result, int committed)
 static int
 load(ErlNifEnv * env, void ** priv_data, ERL_NIF_TERM load_info)
 {
+   fprintf(stderr, "load called.\r\n");
    if (init_done)   return 0;   // already called
 
    sem_init(&if_sema, 0, 1);
@@ -1131,25 +1132,41 @@ done:
     corresponding function do_eval_X() above, but protected by if_sema, so that
     only one function at a time can use the interfscer to APL.
  **/
-#define protect(X)                             \
-static ERL_NIF_TERM                            \
-eval_ ## X (ErlNifEnv * env, int argc,         \
-                  const ERL_NIF_TERM argv[])   \
-{                                              \
-   sem_wait(&if_sema);                         \
-   vc_ctx.env = env;                           \
-ERL_NIF_TERM ret = do_eval_ ## X(argv);        \
-   sem_post(&if_sema);                         \
-   return ret;                                 \
-}                                              \
+#define protect(X)                                 \
+static ERL_NIF_TERM X(ErlNifEnv * env, int argc,   \
+                      const ERL_NIF_TERM argv[])   \
+{                                                  \
+   sem_wait(&if_sema);                             \
+   vc_ctx.env = env;                               \
+ERL_NIF_TERM ret = do_ ## X(argv);                 \
+   sem_post(&if_sema);                             \
+   return ret;                                     \
+}                                                  \
 
-protect()
-protect(AB)      protect(B)
-protect(ALB)     protect(LB)
-protect(AXB)     protect(XB)
-protect(ALXB)    protect(LXB)
-protect(ALRB)    protect(LRB)
-protect(ALRXB)   protect(LRXB)
+protect(eval_)
+protect(eval_AB)      protect(eval_B)
+protect(eval_ALB)     protect(eval_LB)
+protect(eval_AXB)     protect(eval_XB)
+protect(eval_ALXB)    protect(eval_LXB)
+protect(eval_ALRB)    protect(eval_LRB)
+protect(eval_ALRXB)   protect(eval_LRXB)
+
+extern void * dummy[];
+void * dummy[] = {
+   eval_,
+   eval_ALB,
+   eval_AB,
+   eval_AXB,
+   eval_ALRB,
+   eval_ALXB,
+   eval_ALRXB,
+   eval_B,
+   eval_LB,
+   eval_XB,
+   eval_LRB,
+   eval_LXB,
+   eval_LRXB,
+   dummy };
 
 //=============================================================================
 static ErlNifFunc
@@ -1161,19 +1178,21 @@ nif_funcs[] = {
    { "statement_ucs",    1,      statement_UCS    DIRTY_FLAG },
    { "fix_function_ucs", 1,      fix_function_UCS DIRTY_FLAG },
    { "set_variable",     3,      set_variable     DIRTY_FLAG },
+/*
    { "eval_",            1,      eval_            DIRTY_FLAG },
    { "eval_AB",          3,      eval_AB          DIRTY_FLAG },
    { "eval_ALB",         3,      eval_ALB         DIRTY_FLAG },
-   { "eval_AXB",         4,      eval_AXB         DIRTY_FLAG },
    { "eval_ALRB",        3,      eval_ALRB        DIRTY_FLAG },
    { "eval_ALXB",        4,      eval_ALXB        DIRTY_FLAG },
    { "eval_ALRXB",       4,      eval_ALRXB       DIRTY_FLAG },
+   { "eval_AXB",         4,      eval_AXB         DIRTY_FLAG },
    { "eval_B",           2,      eval_B           DIRTY_FLAG },
    { "eval_LB",          2,      eval_LB          DIRTY_FLAG },
    { "eval_XB",          3,      eval_XB          DIRTY_FLAG },
    { "eval_LRB",         2,      eval_LRB         DIRTY_FLAG },
    { "eval_LXB",         3,      eval_LXB         DIRTY_FLAG },
    { "eval_LRXB",        3,      eval_LRXB        DIRTY_FLAG }
+*/
 };
 //-----------------------------------------------------------------------------
 

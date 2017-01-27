@@ -2,8 +2,8 @@ Keyboard
 ========
 
 For a really luxurious keyboard experience, the APL keyboard should be
-installed system-wide. The instructions below apply to Ubuntu 14.04 LTS, 
-for which 
+installed system-wide. The instructions below apply to Ubuntu 14.04 and 16.04
+LTS, for which 
 
     XKB=/usr/share/X11/xkb 
 
@@ -31,17 +31,20 @@ The following files for use with `setxkbmap` are provided:
 :   This is a human-friendly list of variants, not actually used by 
     any program.
 
-Backup the following fies so that you can recover them if necessary.
+Now backup the current files and replaced them by the new ones. That is,
+from the directory containing the file you are reading now, run
 
-    $XKB/symbols/apl
-    $XKB/symbols/us
-    $XKB/rules/evdef.lst
-    $XKB/rules/evdef.xml
+    sudo cp $XKB/symbols/apl $XKB/symbols/apl.orig
+    sudo cp symbols-apl $XKB/symbols/apl
+    sudo cp $XKB/symbols/us $XKB/symbols/us.orig
+    sudo cp symbols-us $XKB/symbols/us
+    sudo cp $XKB/rules/evdev.lst  $XKB/rules/evdev.lst.orig
+    sudo cp rules-evdev.lst $XKB/rules/evdev.lst
+    sudo cp $XKB/rules/evdev.xml  $XKB/rules/evdev.xml.orig
+    sudo cp rules-evdev.xml $XKB/rules/evdev.xml
 
-Replace the files by the provided files, i.e. `symbols-apl` replaces 
-the existing  `/usr/share/X11/xkb/symbols/apl` etc.
-
-In order to register the changes with the X server, run
+In order to delete previous instances of the keyboard and to register 
+the changes  with the X server, run
     
     sudo rm /var/lib/xkb/server-*
     udevadm trigger --subsystem-match=input --action=change
@@ -50,22 +53,32 @@ You can now load the US APL keyboard with
 
     setxkbmap us usapl
 
+If it does not work immediately, read the next paragraph.
+
 Level 3 and Compose keys
 ------------------------
 
 The new APL keyboard is only available if you have a Level 3 selector
-key. This is set, as is the Compose key, when you install Ubuntu.  
-The power-on settings can be viewed in `/etc/default/keyboard`. 
-If you don't like them, don't just edit that file. The right way under 
-Ubuntu 14.04 is to run
- 
-    sudo dpkg-reconfigure keyboard-configuration 
+key. This is set, as is the Compose key, when you install Ubuntu.
+In a running session, you can override those settings from the System 
+Settings menu (see the last section below).
 
-The same menu is offered that was available at install time.
+But unfortunately the change lasts only until the next reboot. To make
+then last, you need to change the power-on settings in 
+`/etc/default/keyboard`. There is a comment in there asking you to 
+read a certain file, which recommends that you should run
+`dpkg-reconfigure`.  
 
-From Ubuntu 8.10 to at least Ubuntu 12.04, it was possible to select 
-the Level 3 modifier key and Compose keys from the System Settings menu. 
-Why this highly useful feature was abolished remains a mystery.
+I found it easier to edit `/etc/default/keyboard` so that it has:
+
+    XKBLAYOUT="us"
+    XKBVARIANT="usapl"
+    XKBOPTIONS="lv3:lalt_switch,compose:ralt"
+
+You will need to reboot for these changes to take effect.
+
+If your APL keyboard still does not work
+----------------------------------------
 
 Changing the default settings is not enough if your preferred Level 3 
 and Compose keys have been grabbed by Unity (Ubuntu's desktop manager) 

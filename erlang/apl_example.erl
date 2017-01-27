@@ -4,7 +4,9 @@
 -export([start/0]).
 
 start() ->
+   io:format("starting apl_example...~n"),
   apl:init(),
+   io:format("module apl initialized...~n"),
   example(),
   ok.
 
@@ -83,7 +85,12 @@ example() ->
   apl:command("]log 32"),
   io:format("~ncall niladic APL function 'TIME'...~n"),
   io:format("result: ~tp~n", [apl:eval_("TIME")]),
-   
+
+  % display an Erlang term returned from an APL interface function
+  %
+  io:format("~ncreate 4-4 unity matrixc and display it"),
+  I6 = apl:apl_command("(⍳6)∘.=⍳6"),
+  show(I6),
   ok.
 
 % create a two-line APL function named FOO. FOO has one argument B and returns
@@ -103,4 +110,14 @@ fix_TIME() ->
 apl:fix_function_ucs([
 "Z←TIME",
 "Z←⎕TS"              ]).
+
+% display an Erlang term returned from an APL interface function
+%
+show(Val) ->
+   {value, Shape, Ravel} = apl:eval_B("⍕", Val),   % format Val in APL
+   [Rows, Cols] = Shape,
+   io:format("~ts", [show(Rows, Cols, 0, 0, Ravel)]).
+
+show(_Rows, _Cols, _R, _C, Ravel) -> Ravel.
+
 

@@ -3,19 +3,29 @@
 -module(apl).
 -export([init/0, command/1, statement/1]).
 
-% functions defined in erlang_APL_nif.c and dummy implementations for them...
+% functions defined in erlang_APL_nif.c
 %
--export([command_utf8/1,     command_ucs/1,
-         statement_utf8/1,   statement_ucs/1,
-         fix_function_ucs/1, set_variable/3,
-         eval_B/2]).                    % implemented in erlang_APL_nif.c
-command_utf8(_)     -> exit(nif_library_not_loaded).
-command_ucs(_)      -> exit(nif_library_not_loaded).
-statement_utf8(_)   -> exit(nif_library_not_loaded).
-statement_ucs(_)    -> exit(nif_library_not_loaded).
-fix_function_ucs(_) -> exit(nif_library_not_loaded).
-set_variable(_,_,_) -> exit(nif_library_not_loaded).
-eval_B(_,_)         -> exit(nif_library_not_loaded).
+-export([ command_utf8/1,     command_ucs/1,
+          statement_utf8/1,   statement_ucs/1,
+          fix_function_ucs/1, set_variable/3,
+          eval_AB/3,
+          eval_B/2,
+          e2c/1,
+          e2a/1
+          ]).
+
+init() -> erlang:load_nif("@prefix@/lib/@PACKAGE@/erlang_APL_nif", 0).
+
+% dummy implementations for the functions defined in erlang_APL_nif.c...
+%
+command_utf8(_UTF8_string)       -> exit(command_utf8__not_loaded).
+command_ucs(_)         -> exit(command_ucs__not_loaded).
+statement_utf8(_UTF8_string)     -> exit(statement_utf8__not_loaded).
+statement_ucs(_)       -> exit(statement_ucs__not_loaded).
+fix_function_ucs(_UCS_string)    -> exit(fix_function_ucs__not_loaded).
+set_variable(_UCS,_Shape,_Ravel) -> exit(set_variable___not_loaded).
+eval_AB(_A, _Fun, _B)            -> exit(eval_AB__not_loaded).
+eval_B(_Fun, _B)                 -> exit(eval_B__not_loaded).
 
 % convert Erlang term X to a APL value cell
 %
@@ -36,9 +46,6 @@ e2a(X) when is_list(X) ->                                % vector
    Fun = fun(T, Acc) -> [e2c(T)|Acc] end,
    {value, [length(X)], lists:reverse(lists:foldl(Fun, [], X))};
 e2a(X) -> {error, e2a, 'Invalid eterm', X}.
-
-
-init() -> erlang:load_nif("@prefix@/lib/@PACKAGE@/erlang_APL_nif", 0).
 
 command(C)   -> command_ucs(C).
 statement(S) -> statement_ucs(S).
