@@ -156,7 +156,16 @@ struct PJob_scalar_AB
 {
    /// default constructor
    PJob_scalar_AB()
-   : value_Z(*(Value *)0)
+   : value_Z(*(Value *)0),
+     len_Z(0),
+     cZ(0),
+     cA(0),
+     inc_A(0),
+     cB(0),
+     inc_B(0),
+     error(E_NO_ERROR),
+     fun(0),
+     fun2(0)
    {}
 
    /// assign \b other to \b this
@@ -172,7 +181,9 @@ struct PJob_scalar_AB
      inc_A(iA),
      cB(_cB),
      inc_B(iB),
-     error(E_NO_ERROR)
+     error(E_NO_ERROR),
+     fun(0),
+     fun2(0)
    {}
 
    /// A value (e.g parallel ~Value())
