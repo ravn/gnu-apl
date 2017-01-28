@@ -98,7 +98,9 @@ struct PJob_scalar_B
      len_Z(0),
      cZ(0),
      cB(0),
-     error(E_NO_ERROR)
+     error(E_NO_ERROR),
+     fun(0),
+     fun1(0)
    {}
 
    /// assign \b other to \b this
@@ -111,7 +113,9 @@ struct PJob_scalar_B
      len_Z(Z.nz_element_count()),
      cZ(&Z.get_ravel(0)),
      cB(&B.get_ravel(0)),
-     error(E_NO_ERROR)
+     error(E_NO_ERROR),
+     fun(0),
+     fun1(0)
    {}
 
    /// the value being computed
