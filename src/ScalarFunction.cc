@@ -94,7 +94,11 @@ struct PJob_scalar_B
 {
    /// default constructor
    PJob_scalar_B()
-   : value_Z(*(Value *)0)
+   : value_Z(*(Value *)0),
+     len_Z(0),
+     cZ(0),
+     cB(0),
+     error(E_NO_ERROR)
    {}
 
    /// assign \b other to \b this

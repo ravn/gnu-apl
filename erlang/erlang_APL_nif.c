@@ -6,7 +6,7 @@
 #include <erl_nif.h>
 #include <apl/libapl.h>
 
-#if ERL_NIF_MAJOR_VERSION == 2 && ERL_NIF_MINOR_VERSION >= 11
+#if ERL_NIF_MAJOR_VERSION == 2 && ERL_NIF_MINOR_VERSION >= 7 /* see erl_nif.c:3277 */
 # define HAVE_DIRTY
 #elif ERL_NIF_MAJOR_VERSION > 2
 # define HAVE_DIRTY   /* we hope so */
