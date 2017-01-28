@@ -708,8 +708,8 @@ Prefix::dont_reduce(TokenClass next) const
 bool
 Prefix::replace_AB(Value_P old_value, Value_P new_value)
 {
-   Assert(old_value);
-   Assert(new_value);
+   Assert(!!old_value);
+   Assert(!!new_value);
 
    loop(s, size())
      {

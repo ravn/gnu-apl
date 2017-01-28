@@ -153,7 +153,7 @@ PrintBuffer
 PointerCell::character_representation(const PrintContext & pctx) const
 {
 Value_P val = get_pointer_value();
-   Assert(val);
+   Assert(!!val);
 
    if (pctx.get_style() & PST_QUOTE_CHARS)
       {
