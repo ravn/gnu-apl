@@ -1779,6 +1779,12 @@ const UTF8 * name_end = name;
 
 UTF8_string name_UTF(name, name_end - name);
 UCS_string  name_UCS(name_UTF);
+   if (name_UCS.size() == 0)
+      {
+        CERR << "*** Warning: empty Symbol name in XML archive " << filename
+             << " around line " << line_no << endl;
+        return;
+      }
 
    Log(LOG_archive)   CERR << "    read_Symbol() name=" << name_UCS << endl;
 
