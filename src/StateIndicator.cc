@@ -123,7 +123,8 @@ StateIndicator::function_name() const
              }
       }
 
-   Assert(0);
+   FIXME;
+   return UCS_string();
 } 
 //-----------------------------------------------------------------------------
 void
@@ -589,7 +590,8 @@ StateIndicator::get_parse_mode_name() const
      }
 
    CERR << "pmode = " << get_parse_mode() << endl;
-   Assert(0 && "bad pmode");
+   FIXME;
+   return Invalid_Unicode;
 }
 //-----------------------------------------------------------------------------
 

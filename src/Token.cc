@@ -137,7 +137,7 @@ operator << (ostream & out, const Token & token)
         else if (token.get_tag() == TOK_APL_VALUE3)   out << "VALUE3";
         else                                          out << "VALUE???";
         Value_P value = token.get_apl_val();
-        Assert(value);
+        Assert(!!value);
         const Depth depth = value->compute_depth();
         out << "«";
         for (Depth d = 0; d < depth; ++d)   out << "≡";
