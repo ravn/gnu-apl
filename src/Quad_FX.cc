@@ -143,7 +143,7 @@ UCS_string text;
 
              if (!cell.is_pointer_cell())   DOMAIN_ERROR;
              Value_P line = cell.get_pointer_value();
-             Assert(line);
+             Assert(!!line);
 
              Log(LOG_quad_FX)
                 {
