@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,19 +39,6 @@ using namespace std;
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
-
-/* define 'all_values' and 'all_index_exprs' here so that they will be
-   constructed BEFORE Workspace::the_workspace !
-
-   See also 3.6.2 of "ISO standard Programming Languages — C++"
-*/
-
-DynamicObject DynamicObject::all_values(LOC);
-DynamicObject DynamicObject::all_index_exprs(LOC);
-
-// now Workspace::the_workspace can be constructed
-//
-Workspace Workspace::the_workspace;
 
 //-----------------------------------------------------------------------------
 Workspace::Workspace()

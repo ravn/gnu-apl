@@ -31,7 +31,6 @@
 #define sem_init(x, y, z)
 #endif // PARALLEL_ENABLED
 
-Simple_string<CPU_Number, false>Parallel::all_CPUs;
 CoreCount Thread_context::active_core_count = CCNT_1;   // the master
 
 Thread_context * Thread_context::thread_contexts = 0;
