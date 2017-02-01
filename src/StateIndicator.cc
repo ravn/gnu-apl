@@ -537,7 +537,7 @@ bool print_value = tag == TOK_APL_VALUE1 || tag == TOK_APL_VALUE3;
    Quad_QUOTE::done(false, LOC);
 
 const int boxing_format = Command::get_boxing_format();
-   if (boxing_format == -1)
+   if (boxing_format == 0)   // no boxing
       {
         if (Quad_SYL::print_length_limit &&
             B->element_count() >= Quad_SYL::print_length_limit)
@@ -565,6 +565,15 @@ const int boxing_format = Command::get_boxing_format();
              CERR << "      *** display of value was truncated (limit "
                      "⎕SYL[⎕IO + " << Quad_SYL::SYL_PRINT_LIMIT
                   << "] reached)  ***" << endl;
+           }
+        else if (boxing_format < 0)
+           {
+             const PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
+             Value_P B1 = Quad_CR::do_CR(-boxing_format, B.get(), pctx);
+             if (B1->get_rows() >= Workspace::get_PW())   // too large
+                B->print(COUT);   // don't box
+             else
+                B1->print(COUT);   // do box
            }
         else
            {

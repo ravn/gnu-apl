@@ -785,12 +785,19 @@ int
 UCS_string::atoi() const
 {
 int ret = 0;
+bool negative = false;
 
    loop(s, size())
       {
         const Unicode uni = at(s);
 
         if (!ret && Avec::is_white(uni))   continue;   // leading whitespace
+
+        if (uni == UNI_ASCII_MINUS || uni == UNI_OVERBAR)
+           {
+             negative = true;
+             continue;
+           }
 
         if (uni < UNI_ASCII_0)                break;      // non-digit
         if (uni > UNI_ASCII_9)                break;      // non-digit
@@ -799,7 +806,7 @@ int ret = 0;
         ret += uni - UNI_ASCII_0;
       }
 
-   return ret;
+   return negative ? -ret : ret;
 }
 //-----------------------------------------------------------------------------
 ostream &

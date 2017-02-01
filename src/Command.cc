@@ -48,7 +48,7 @@
 #include "Value.icc"
 #include "Workspace.hh"
 
-int Command::boxing_format = -1;
+int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;
 
 Simple_string<Command::user_command, false> Command::user_commands;
@@ -441,16 +441,22 @@ int format = arg.atoi();
       {
         
         out << "]BOXING ";
-        if (boxing_format == -1) out << "OFF"; else out << boxing_format;
+        if (boxing_format == 0) out << "OFF";
+        else out << boxing_format;
         out << endl;
         return;
       }
 
-   if (arg.starts_iwith("OFF"))   format = -1;
+   if (arg.starts_iwith("OFF"))   format = 0;
 
    switch (format)
       {
-        case -1:
+        case -29:
+        case -25: case -24: case -23:
+        case -22: case -21: case -20:
+        case -9: case  -8: case  -7:
+        case -4: case  -3: case  -2:
+        case 0:
         case  2: case   3: case   4:
         case  7: case   8: case   9:
         case 20: case  21: case  22:
@@ -461,7 +467,7 @@ int format = arg.atoi();
       }
 
    out << "Bad ]BOXING parameter " << arg
-       << ". Valid values are: OFF, 2-4, 7-9, 20-25, and 29." << endl;
+       << ". Valid values are: OFF, and ± 2-4, 7-9, 20-25, and 29." << endl;
 }
 //-----------------------------------------------------------------------------
 void 
