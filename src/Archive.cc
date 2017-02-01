@@ -1783,6 +1783,7 @@ UCS_string  name_UCS(name_UTF);
       {
         CERR << "*** Warning: empty Symbol name in XML archive " << filename
              << " around line " << line_no << endl;
+        skip_to_tag("/Symbol");
         return;
       }
 

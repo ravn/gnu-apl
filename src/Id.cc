@@ -48,9 +48,6 @@
 /// an Id and how it looks like in APL
 struct Id_name
 {
-  /// constructor for primitives (⍴, ⍳, ...)
-  Id_name(ID::Id i, const char * n) : id(i), ucs_name(UTF8_string(n)) {}
-
   /// compare \b key with \b item (for bsearch())
   static int compare(const void * key, const void * item)
      {
@@ -61,16 +58,16 @@ struct Id_name
   ID::Id id;
 
    /// how \b id is being printed
-  UCS_string ucs_name;
+  const UCS_string * ucs_name;
 };
 
 static Id_name id2ucs[] =
 {
-#define pp(i, _u, _v) Id_name(ID::i, #i), 
-#define qf(i,  u, _v) Id_name(ID::Quad_ ## i, u), 
-#define qv(i,  u, _v) Id_name(ID::Quad_ ## i, u), 
-#define sf(i,  u, _v) Id_name(ID::i, u), 
-#define st(i,  u, _v) Id_name(ID::i, u),
+#define pp(i, _u, _v) { ID::i, 0}, 
+#define qf(i,  _u, _v) {ID::Quad_ ## i, 0}, 
+#define qv(i,  _u, _v) {ID::Quad_ ## i, 0}, 
+#define sf(i,  _u, _v) {ID::i, 0}, 
+#define st(i,  _u, _v) {ID::i, 0},
 
 #include "Id.def"
 };
@@ -82,8 +79,28 @@ const void * result =
     bsearch(&id, id2ucs, sizeof(id2ucs) / sizeof(Id_name),
             sizeof(Id_name), Id_name::compare);
 
-   if (result == 0)   return id2ucs[0].ucs_name;
-   return ((const Id_name *)result)->ucs_name;
+   Assert(result);
+Id_name * idn = (Id_name *) result;
+   if (const UCS_string * ucs = idn->ucs_name)   return *ucs; 
+
+   // the name was not yet constructed. Do it now
+   //
+const char * name = "unknown ID";
+   switch(id)
+       {
+#define pp(i, _u, _v) case ID::i:          name = #i;   break;
+#define qf(i,  u, _v) case ID::Quad_ ## i: name = u;   break;
+#define qv(i,  u, _v) case ID::Quad_ ## i: name = u;   break;
+#define sf(i,  u, _v) case ID::i:          name = u;   break;
+#define st(i,  u, _v) case ID::i:          name = u;   break;
+
+#include "Id.def"
+       }
+
+UTF8_string utf(name);
+UCS_string * ucs = new UCS_string(utf);
+   idn->ucs_name = ucs;
+   return *ucs;
 }
 //-----------------------------------------------------------------------------
 ostream &
