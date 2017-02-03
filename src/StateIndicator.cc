@@ -566,19 +566,19 @@ const int boxing_format = Command::get_boxing_format();
                      "⎕SYL[⎕IO + " << Quad_SYL::SYL_PRINT_LIMIT
                   << "] reached)  ***" << endl;
            }
-        else if (boxing_format < 0)
-           {
-             const PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
-             Value_P B1 = Quad_CR::do_CR(-boxing_format, B.get(), pctx);
-             if (B1->get_rows() >= Workspace::get_PW())   // too large
-                B->print(COUT);   // don't box
-             else
-                B1->print(COUT);   // do box
-           }
-        else
+        else   // no print length limit or small B
            {
              B->print(COUT);
            }
+      }
+   else if (boxing_format < 0)
+      {
+        const PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
+        Value_P B1 = Quad_CR::do_CR(-boxing_format, B.get(), pctx);
+        if (B1->get_cols() >= Workspace::get_PW())   // too large
+           B->print(COUT);   // don't box
+        else
+           B1->print(COUT);   // do box
       }
    else
       {

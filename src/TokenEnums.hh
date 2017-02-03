@@ -40,7 +40,7 @@ enum TokenClass
    //
    TC_ASSIGN        = 0x01,   ///< ←
    TC_R_ARROW       = 0x02,   ///< →N
-   TC_L_BRACK       = 0x03,   ///< [
+   TC_L_BRACK       = 0x03,   ///< [ or ;
    TC_R_BRACK       = 0x04,   ///< ]
    TC_END           = 0x05,   ///< left end of statement
    TC_FUN0          = 0x06,   ///< niladic function
