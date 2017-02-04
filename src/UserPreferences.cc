@@ -716,15 +716,26 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
    --script_argc;
    for (int index = 1;;)
        {
+         // skip leading whitespace
+         //
          while (*apl_args && *apl_args <= ' ')   ++apl_args;
+
          if (*apl_args == 0)   break;
 
-         if (!strcmp(apl_args, "--") ||      // "--" at end of apl_args
-             !strncmp(apl_args, "-- ", 3))   // "--" somewhere in apl_args
+         if (!strcmp(apl_args, "--"))        // "--" at end of apl_args
             {
               expanded_argv.insert_before(index++, "--");
               ++script_argc;
-              break;
+              break;   // done
+            }
+
+         if (!strncmp(apl_args, "-- ", 2) &&
+               apl_args[2] <= ' ')   // "--" somewhere in apl_args
+            {
+              expanded_argv.insert_before(index++, "--");
+              ++script_argc;
+              apl_args += 2;   // skip "--"
+              continue;
             }
 
          const char * arg_end = strchr(apl_args, ' ');
