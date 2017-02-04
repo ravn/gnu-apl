@@ -657,7 +657,7 @@ UserPreferences::parse_argv_2(bool logit)
     3. as a script with arguments on the first script line, e.g.
        /usr/bin/apl 'line 1 arguments' SCRIPT.apl [ scriptargs... ]
 
-    4. On a non-GNU/linux OS; the saemantics of the first script line
+    4. On a non-GNU/linux OS; the semantics of the first script line
        is unknown.
 
     To make this work, 2, should be avoided and 4. should use exactly one
@@ -705,9 +705,12 @@ UserPreferences::expand_argv(int argc, const char ** argv)
    //
    // expand argv[1], stopping at --
    //
-const char * apl_args = argv[1];
+const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
    script_argc = 2;
-   if (!strchr(apl_args, ' '))   return;   // single option
+   if (!strchr(apl_args, ' '))   // single option
+      {
+        return;
+      }
 
    expanded_argv.erase(1);
    --script_argc;
@@ -716,8 +719,13 @@ const char * apl_args = argv[1];
          while (*apl_args && *apl_args <= ' ')   ++apl_args;
          if (*apl_args == 0)   break;
 
-         if (!strcmp(apl_args, "--"))        break;
-         if (!strncmp(apl_args, "-- ", 3))   break;
+         if (!strcmp(apl_args, "--") ||      // "--" at end of apl_args
+             !strncmp(apl_args, "-- ", 3))   // "--" somewhere in apl_args
+            {
+              expanded_argv.insert_before(index++, "--");
+              ++script_argc;
+              break;
+            }
 
          const char * arg_end = strchr(apl_args, ' ');
          if (arg_end)   // more arguments
