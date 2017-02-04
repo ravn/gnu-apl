@@ -55,19 +55,44 @@ Next: <a href="#Vague-details-of-the-GNU-APL-implementation" accesskey="n" rel="
 <a name="Top-1"></a>
 <h1 class="top">Top</h1>
 
-<p>The following main facilities are provided:
+<p>The following main facilities are provided. Some functions come in two varieties: one whose
+argument is a (0-terminated and UTF8-encoded) C-strings (that is, const char *) as argument
+and one whose argument is a const unsigned int * to a 0-terminated array of Unicodes.
 </p>
 <dl compact="compact">
-<dt><code>apl_exec</code></dt>
-<dd><p>pass a C string to the interpreter for immediate execution as APL code.
+<dt><code>apl_exec(const char * line_utf8)</code></dt>
+<dt><code>apl_exec_ucs(const unsigned int * line_ucs)</code></dt>
+<dd><p>pass a UTF8 encoded C string resp. an unsigned int * (0-terminated) to the interpreter for
+immediate execution as APL code. 
 </p>
 </dd>
-<dt><code>apl_command</code></dt>
+<dt><code>apl_command(const char * line_utf8</code></dt>
+<dt><code>apl_command(const unsigned int * line_ucs</code></dt>
 <dd><p>pass an APL command to the command processor and return its output.
-</p></dd>
+</p>
+</dd>
 <dt><code>APL_value</code></dt>
-<dd>
-<p>a pointer to an opaque structure Value, supported by over 30 functions allowing one to construct a new Value and to gain access to its rank, shape and ravel. In this document, the terms &quot;Value&quot; and &quot;APL value&quot; are not interchangeable; they refer respectively to a structure and to a pointer.
+<dd><p>a pointer to an opaque structure Value, supported by over 30 functions allowing one to construct a new Value and to gain access to its rank, shape and ravel. In this document, the terms &quot;Value&quot; and &quot;APL value&quot; are not interchangeable; they refer respectively to a structure and to a pointer.
+</p>
+</dd>
+<dt><code>APL_function</code></dt>
+<dd><p>a pointer to an opaque structure Function, which is a defined APL function or a built-in function of the interpreter. This pointer provides direct access of the eval__XXX() functions that are impemented by the function. In this document, the terms &quot;Function&quot; and &quot;APL function&quot; are not interchangeable; they refer respectively to a structure and to a pointer. Every function implements a (typically small) subset of eval__XXX() functions that differ by the arguments that the take. The XXX stands for the signature of the function, e.g. eval__fun_B for a monadic function, eval__A_fun_B for a dyafic function, and so on. The possible arguments (in that order are: A (left value), L (left function of a dyadic operator), R (right function of an operator), X (axis argument of a function or operator), and B (right value).
+</p>
+</dd>
+<dt><code>eval__fun(APL_function fun)</code></dt>
+<dt><code>eval__A_fun_B(APL_function fun, APL_value B)</code></dt>
+<dt><code>eval__A_fun_B(APL_value A, APL_function fun, APL_value B)</code></dt>
+<dt><code>eval__A_L_oper_B(APL_value A, APL_function L, APL_function fun, APL_value B)</code></dt>
+<dt><code>eval__A_fun_X_B(APL_value A, APL_function fun, APL_value X, APL_value B)</code></dt>
+<dt><code>eval__A_L_oper_R_B(APL_value A, APL_function L, APL_function fun, APL_function R, APL_value B)</code></dt>
+<dt><code>eval__A_L_oper_R_X_B(APL_value A, APL_function L, APL_function fun, APL_function R, APL_value X, APL_value B)</code></dt>
+<dt><code>eval__fun_B(APL_function fun, APL_value B)</code></dt>
+<dt><code>eval__fun_B(APL_function fun, APL_value B)</code></dt>
+<dt><code>eval__L_oper_B(APL_function L, APL_function fun, APL_value B)</code></dt>
+<dt><code>eval__fun_X_B(APL_function fun, APL_value X, APL_value B)</code></dt>
+<dt><code>eval__L_oper_R_B(APL_value A, APL_function L, APL_function fun, APL_function R, APL_value B)</code></dt>
+<dt><code>eval__L_oper_R_X_B(APL_function L, APL_function fun, APL_function R, APL_value X, APL_value B)</code></dt>
+<dd><p>These are the possible eval functions. The APL_value returned by an eval__XXX() function shall be released with release_value() by the caller.
 </p>
 </dd>
 <dt><code>get_var_value</code></dt>
