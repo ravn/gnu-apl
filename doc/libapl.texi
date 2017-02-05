@@ -1,6 +1,8 @@
 \input texinfo
 @documentencoding UTF-8
 @setfilename libapl.info
+@settitle libAPL
+
 
 @dircategory GNU programming tools
 @direntry
@@ -12,27 +14,45 @@
 @paragraphindent 0
 @end ifnottex
 @node Top
-@top Top
+@top libAPL
 
-The following main facilities are provided. Some functions come in two varieties: one whose
-argument is a (0-terminated and UTF8-encoded) C-strings (that is, const char *) as argument
-and one whose argument is a const unsigned int * to a 0-terminated array of Unicodes.
+libapl is a C library, kindly contrinuted to the GNU APL project by Dr. Dirk
+Laurie, that gives C programs access to GNU APL.
+
+Almost everything that a user can do interactively with GNU APL can also be
+done programmatically with libapl. You can )LOAD and )SAVE workspaces,
+evaluate APL expression, create Variables, and even call APL primitives
+directly with values originating from in your C code.
+
+The main facilities provided by libapl are listed in the following.
+
+Some functions come in two flavours: one whose argument is a (0-terminated and
+UTF8-encoded) C-strings (that is, a const char *) and one whose argument is a
+const unsigned int * to a 0-terminated array of Unicodes.
 
 @table @asis
 @item @code{apl_exec(const char * line_utf8)}
 @item @code{apl_exec_ucs(const unsigned int * line_ucs)}
-pass a UTF8 encoded C string resp. an unsigned int * (0-terminated) to the interpreter for
-immediate execution as APL code. 
+pass a line to the interpreter for immediate execution as APL code. For example,
 
-@item @code{apl_command(const char * line_utf8}
-@item @code{apl_command(const unsigned int * line_ucs}
-pass an APL command to the command processor and return its output.
+apl_exec("1 2 3 + 4 5 6")
+
+should return the APL vector 5 7 9, which can then be accessed with other
+libapl functions such as get_rank(), get_axis(), etc.
+
+@item @code{apl_command(const char * line_utf8)}
+@item @code{apl_command_ucs(const unsigned int * line_ucs)}
+pass an APL command to the command processor and return its output. For example,
+
+apl_command(")CLEAR")
+
+should clear the current workspace and return "CLEAR WS".
 
 @item @code{APL_value}
-a pointer to an opaque structure Value, supported by over 30 functions allowing one to construct a new Value and to gain access to its rank, shape and ravel. In this document, the terms "Value" and "APL value" are not interchangeable; they refer respectively to a structure and to a pointer.
+APL_value is a convenience typedef for a pointer to an opaque structure Value, supported by over 30 functions allowing one to construct a new Value and to gain access to its rank, shape and ravel. In this document, the terms "Value" and "APL value" are not interchangeable; they refer respectively to a structure and to a pointer.
 
 @item @code{APL_function}
-a pointer to an opaque structure Function, which is a defined APL function or a built-in function of the interpreter. This pointer provides direct access of the eval__XXX() functions that are impemented by the function. In this document, the terms "Function" and "APL function" are not interchangeable; they refer respectively to a structure and to a pointer. Every function implements a (typically small) subset of eval__XXX() functions that differ by the arguments that the take. The XXX stands for the signature of the function, e.g. eval__fun_B for a monadic function, eval__A_fun_B for a dyafic function, and so on. The possible arguments (in that order are: A (left value), L (left function of a dyadic operator), R (right function of an operator), X (axis argument of a function or operator), and B (right value).
+APL_function is a convenience typedef for a pointer to an opaque structure Function, which is a defined APL function or a built-in function of the interpreter. This pointer provides direct access of the eval__XXX() functions that are impemented by the function. In this document, the terms "Function" and "APL function" are not interchangeable; they refer respectively to a structure and to a pointer. Every function implements a (typically small) subset of eval__XXX() functions that differ by the arguments that the take. The XXX stands for the signature of the function, e.g. eval__fun_B for a monadic function, eval__A_fun_B for a dyafic function, and so on. The possible arguments (in that order are: A (left value), L (left function of a dyadic operator), R (right function of an operator), X (axis argument of a function or operator), and B (right value).
 
 @item @code{eval__fun(APL_function fun)}
 @item @code{eval__A_fun_B(APL_function fun, APL_value B)}
@@ -49,10 +69,10 @@ a pointer to an opaque structure Function, which is a defined APL function or a 
 @item @code{eval__L_oper_R_X_B(APL_function L, APL_function fun, APL_function R, APL_value X, APL_value B)}
 These are the possible eval functions. The APL_value returned by an eval__XXX() function shall be released with release_value() by the caller.
 
-@item @code{get_var_value}
+@item @code{get_var_value(const char * var_name_utf8, const char * loc)}
 return an APL value pointing to the contents of a variable in the current workspace.
 
-@item @code{set_var_value}
+@item @code{set_var_value(const char * var_name_utf8, const APL_value new_value, const char * loc)}
 set the contents of a variable in the workspace to that of the given APL value.
 
 @item @code{expand_LF_to_CRLF}

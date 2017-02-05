@@ -2,10 +2,10 @@
 <html>
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>Top</title>
+<title>libAPL</title>
 
-<meta name="description" content="Top">
-<meta name="keywords" content="Top">
+<meta name="description" content="libAPL">
+<meta name="keywords" content="libAPL">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -45,6 +45,8 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<h1 class="settitle" align="center">libAPL</h1>
+
 
 
 <a name="Top"></a>
@@ -52,31 +54,49 @@ ul.no-bullet {list-style: none}
 <p>
 Next: <a href="#Vague-details-of-the-GNU-APL-implementation" accesskey="n" rel="next">Vague details of the GNU APL implementation</a>, Up: <a href="dir.html#Top" accesskey="u" rel="up">(dir)</a> &nbsp; </p>
 </div>
-<a name="Top-1"></a>
-<h1 class="top">Top</h1>
+<a name="libAPL"></a>
+<h1 class="top">libAPL</h1>
 
-<p>The following main facilities are provided. Some functions come in two varieties: one whose
-argument is a (0-terminated and UTF8-encoded) C-strings (that is, const char *) as argument
-and one whose argument is a const unsigned int * to a 0-terminated array of Unicodes.
+<p>libapl is a C library, kindly contrinuted to the GNU APL project by Dr. Dirk
+Laurie, that gives C programs access to GNU APL.
+</p>
+<p>Almost everything that a user can do interactively with GNU APL can also be
+done programmatically with libapl. You can )LOAD and )SAVE workspaces,
+evaluate APL expression, create Variables, and even call APL primitives
+directly with values originating from in your C code.
+</p>
+<p>The main facilities provided by libapl are listed in the following.
+</p>
+<p>Some functions come in two flavours: one whose argument is a (0-terminated and
+UTF8-encoded) C-strings (that is, a const char *) and one whose argument is a
+const unsigned int * to a 0-terminated array of Unicodes.
 </p>
 <dl compact="compact">
 <dt><code>apl_exec(const char * line_utf8)</code></dt>
 <dt><code>apl_exec_ucs(const unsigned int * line_ucs)</code></dt>
-<dd><p>pass a UTF8 encoded C string resp. an unsigned int * (0-terminated) to the interpreter for
-immediate execution as APL code. 
+<dd><p>pass a line to the interpreter for immediate execution as APL code. For example,
+</p>
+<p>apl_exec(&quot;1 2 3 + 4 5 6&quot;)
+</p>
+<p>should return the APL vector 5 7 9, which can then be accessed with other
+libapl functions such as get_rank(), get_axis(), etc.
 </p>
 </dd>
-<dt><code>apl_command(const char * line_utf8</code></dt>
-<dt><code>apl_command(const unsigned int * line_ucs</code></dt>
-<dd><p>pass an APL command to the command processor and return its output.
+<dt><code>apl_command(const char * line_utf8)</code></dt>
+<dt><code>apl_command_ucs(const unsigned int * line_ucs)</code></dt>
+<dd><p>pass an APL command to the command processor and return its output. For example,
+</p>
+<p>apl_command(&quot;)CLEAR&quot;)
+</p>
+<p>should clear the current workspace and return &quot;CLEAR WS&quot;.
 </p>
 </dd>
 <dt><code>APL_value</code></dt>
-<dd><p>a pointer to an opaque structure Value, supported by over 30 functions allowing one to construct a new Value and to gain access to its rank, shape and ravel. In this document, the terms &quot;Value&quot; and &quot;APL value&quot; are not interchangeable; they refer respectively to a structure and to a pointer.
+<dd><p>APL_value is a convenience typedef for a pointer to an opaque structure Value, supported by over 30 functions allowing one to construct a new Value and to gain access to its rank, shape and ravel. In this document, the terms &quot;Value&quot; and &quot;APL value&quot; are not interchangeable; they refer respectively to a structure and to a pointer.
 </p>
 </dd>
 <dt><code>APL_function</code></dt>
-<dd><p>a pointer to an opaque structure Function, which is a defined APL function or a built-in function of the interpreter. This pointer provides direct access of the eval__XXX() functions that are impemented by the function. In this document, the terms &quot;Function&quot; and &quot;APL function&quot; are not interchangeable; they refer respectively to a structure and to a pointer. Every function implements a (typically small) subset of eval__XXX() functions that differ by the arguments that the take. The XXX stands for the signature of the function, e.g. eval__fun_B for a monadic function, eval__A_fun_B for a dyafic function, and so on. The possible arguments (in that order are: A (left value), L (left function of a dyadic operator), R (right function of an operator), X (axis argument of a function or operator), and B (right value).
+<dd><p>APL_function is a convenience typedef for a pointer to an opaque structure Function, which is a defined APL function or a built-in function of the interpreter. This pointer provides direct access of the eval__XXX() functions that are impemented by the function. In this document, the terms &quot;Function&quot; and &quot;APL function&quot; are not interchangeable; they refer respectively to a structure and to a pointer. Every function implements a (typically small) subset of eval__XXX() functions that differ by the arguments that the take. The XXX stands for the signature of the function, e.g. eval__fun_B for a monadic function, eval__A_fun_B for a dyafic function, and so on. The possible arguments (in that order are: A (left value), L (left function of a dyadic operator), R (right function of an operator), X (axis argument of a function or operator), and B (right value).
 </p>
 </dd>
 <dt><code>eval__fun(APL_function fun)</code></dt>
@@ -95,11 +115,11 @@ immediate execution as APL code.
 <dd><p>These are the possible eval functions. The APL_value returned by an eval__XXX() function shall be released with release_value() by the caller.
 </p>
 </dd>
-<dt><code>get_var_value</code></dt>
+<dt><code>get_var_value(const char * var_name_utf8, const char * loc)</code></dt>
 <dd><p>return an APL value pointing to the contents of a variable in the current workspace.
 </p>
 </dd>
-<dt><code>set_var_value</code></dt>
+<dt><code>set_var_value(const char * var_name_utf8, const APL_value new_value, const char * loc)</code></dt>
 <dd><p>set the contents of a variable in the workspace to that of the given APL value.
 </p>
 </dd>
