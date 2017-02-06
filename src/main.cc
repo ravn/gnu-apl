@@ -187,6 +187,13 @@ show_argv(int argc, const char ** argv)
 {
    CERR << "argc: " << argc << endl;
    loop(a, argc)   CERR << "  argv[" << a << "]: '" << argv[a] << "'" << endl;
+
+   // tell if stdin is open or closed
+   //
+   if (fcntl(STDIN_FILENO, F_GETFD))
+      CERR << "stdin is: CLOSED" << endl;
+   else
+      CERR << "stdin is: OPEN" << endl;
 }
 //-----------------------------------------------------------------------------
 /// print a welcome message (copyright notice)
