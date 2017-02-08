@@ -721,16 +721,19 @@ FILE * file = fdopen(fd, "r");
       {
         if (filename == InputFile::files_todo[f].filename)   // same filename
            {
-             CERR << ")COPY " << filename << " causes recursion" << endl;
+             CERR << "*** )COPY " << filename
+                  << " would cause recursion (NOT COPIED)" << endl;
              return;
            }
       }
 
 InputFile fam(filename, file, false, false, true, with_LX);
-   if (object_filter)
+   if (object_filter)   // therefore )COPY, not )LOAD
       {
         loop(o, object_filter->size())
             fam.add_filter_object((*object_filter)[o]);
+        fam.set_COPY();
+        ++Bif_F1_EXECUTE::copy_pending;
       }
    InputFile::files_todo.insert_before(0, fam);
 }

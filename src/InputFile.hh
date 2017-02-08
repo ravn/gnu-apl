@@ -47,8 +47,13 @@ struct InputFile
      in_html  (0),
      in_function(false),
      in_variable(false),
-     in_matched(false)
+     in_matched(false),
+     from_COPY(false)
    {}
+
+   /// set the from_COPY flag
+   void set_COPY()
+      { from_COPY = true; }
 
    /// set the current line number
    void set_line_no(int num)
@@ -151,8 +156,11 @@ protected:
    /// return true if current line belongs to a variable. Cleared by empty line
    bool in_variable;
 
-   /// true if current function or variable was mentioned in object_filte
+   /// true if current function or variable was mentioned in object_filter
    bool in_matched;
+
+   /// true if this file comes from a )COPY XXX.apl (but not XXX.xml
+   bool from_COPY;
 
    /// line number in stdin
    static int stdin_line_no;

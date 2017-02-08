@@ -36,7 +36,22 @@ enum C_CellType
 };
 
 #ifdef __cplusplus
+
+class Value;
+typedef Value * APL_value;
+
+class Function;
+typedef Function * APL_function;
 extern "C" {
+
+#else   // C
+
+struct Value;
+typedef struct Value * APL_value;
+
+struct Function;
+typedef struct Function * APL_function;
+
 #endif
 
 /* Application Program Interface for GNU APL...
@@ -84,11 +99,6 @@ extern const unsigned int * apl_command_ucs(const unsigned int * command_ucs);
 
 /// print \b string_ucs to \b out (for debugging purposes)
 extern void print_ucs(FILE * out, const unsigned int * string_ucs);
-
-struct Value;
-typedef struct Value * APL_value;
-struct Function;
-typedef struct Function * APL_function;
 
 /** a function called with the final value of an APL statement.
     int \b committed says if the value was committed (aka. assigned to a

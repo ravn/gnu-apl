@@ -86,6 +86,7 @@ err_def(INDEX_ERROR,            "INDEX ERROR"                    , 5,      5 )
 err_def(AXIS_ERROR,             "AXIS ERROR"                     , 5,      6 )
 
 err_def(COMMAND_PUSHED,         "Command Pushed"                 , 9,      1 )
+err_def(COPY_PENDING,           "*** )COPY Pending"              , 9,      2 )
 
 err_def(QUAD_EA_EXEC,           "⎕EA execute"                    ,10,      1 )
 

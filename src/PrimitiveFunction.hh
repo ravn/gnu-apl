@@ -142,6 +142,9 @@ public:
    /// overladed Function::eval_B()
    virtual Token eval_B(Value_P B);
 
+   /// the number of outstanding )COPYs with APL scipts
+   static int copy_pending;
+
 protected:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return true; }

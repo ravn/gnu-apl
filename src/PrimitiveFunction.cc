@@ -102,6 +102,8 @@ Bif_F2_RIGHT      * Bif_F2_RIGHT     ::fun = &Bif_F2_RIGHT     ::_fun;
 const CharCell PrimitiveFunction::c_filler(UNI_ASCII_SPACE);
 const IntCell  PrimitiveFunction::n_filler(0);
 
+int Bif_F1_EXECUTE::copy_pending = 0;
+
 //-----------------------------------------------------------------------------
 Token
 PrimitiveFunction::eval_fill_AB(Value_P A, Value_P B)
@@ -2784,6 +2786,19 @@ ExecuteList * fun = ExecuteList::fix(statement.no_pad(), LOC);
 Token
 Bif_F1_EXECUTE::execute_command(UCS_string & command)
 {
+   if (copy_pending &&
+       (
+//      command.starts_iwith(")COPY")    ||
+        command.starts_iwith(")ERASE")   ||
+        command.starts_iwith(")FNS")     ||
+        command.starts_iwith(")NMS")     ||
+        command.starts_iwith(")QLOAD")   ||
+        command.starts_iwith(")SYMBOLS") ||
+        command.starts_iwith(")VARS")))
+      {
+        throw_apl_error(E_COPY_PENDING, LOC);
+      }
+
    if (command.starts_iwith(")LOAD")  ||
        command.starts_iwith(")QLOAD") ||
        command.starts_iwith(")CLEAR") ||

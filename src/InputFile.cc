@@ -28,6 +28,7 @@
 #include "Common.hh"
 #include "InputFile.hh"
 #include "IO_Files.hh"
+#include "PrimitiveFunction.hh"
 #include "PrintOperator.hh"
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
@@ -56,13 +57,22 @@ InputFile::open_current_file()
 void
 InputFile::close_current_file()
 {
-   if (files_todo.size() && files_todo[0].file)
+   if (files_todo.size())   // there are input files
       {
-        if (files_todo[0].file != stdin)
+        if (files_todo[0].from_COPY)
            {
-             fclose(files_todo[0].file);
-             files_todo[0].file = 0;
-             files_todo[0].line_no = -1;
+              files_todo[0].from_COPY = false;
+              --Bif_F1_EXECUTE::copy_pending;
+           }
+
+        if (files_todo[0].file)   // and the first file is open
+           {
+             if (files_todo[0].file != stdin)
+                {
+                  fclose(files_todo[0].file);
+                  files_todo[0].file = 0;
+                  files_todo[0].line_no = -1;
+                }
            }
       }
 }
