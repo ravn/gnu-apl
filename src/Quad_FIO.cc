@@ -527,6 +527,12 @@ Quad_FIO::list_functions(ostream & out)
 "           i - integer\n"
 "           n - names (nested vector of strings)\n"
 "           s - string\n"
+"           u - time divisor: 1       - second\n"
+"                             1000    - milli second\n"
+"                             1000000 - micro second\n"
+"           y4 - seconds, wday, yday, dst (\n"
+"           y67- year, mon, day, hour, minute, second, [dst]\n"
+"           y9 - year, mon, day, hour, minute, second, wday, yday, dst\n"
 "           A1, A2, ...  nested vector with elements A1, A2, ...\n"
 "\n"
 "           ⎕FIO     ''    print this text on stderr\n"
@@ -596,6 +602,10 @@ Quad_FIO::list_functions(ostream & out)
 "   Ze ← Ai ⎕FIO[47] Bh    setsockopt(Bh, A_level, A_optname, A_optval)\n"
 "   Ze ← As ⎕FIO[48] Bh    fscanf(Bh, As)\n"
 "   Zs ←    ⎕FIO[49] Bs    return entire file Bs as nested lines\n"
+"   Zi ←    ⎕FIO[50] Bu    gettimeofday()\n"
+"   Zy4←    ⎕FIO[51] By67  mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...\n"
+"   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
+"   Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "\n"
 "Benchmarking functions:\n"
 "\n"
@@ -789,7 +799,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B)
    if (B->get_rank() > 1)   RANK_ERROR;
    if (X->get_rank() > 1)   RANK_ERROR;
 
-const int function_number = X->get_ravel(0).get_near_int();
+const APL_Integer function_number = X->get_ravel(0).get_near_int();
 
    switch(function_number)
       {
@@ -1436,8 +1446,83 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
+         case 50:   // gettimeofday
+              {
+                const APL_Integer unit = B->get_ravel(0).get_near_int();
+                if (unit < 1)         DOMAIN_ERROR;
+                if (unit > 1000000)   DOMAIN_ERROR;
+                timeval tv;
+                gettimeofday(&tv, 0);
+                int64_t usec = tv.tv_sec;
+                usec *= 1000000;
+                usec += tv.tv_sec;
+                APL_Integer z = 0;
+                if      (unit == 1)         z = usec/1000000;
+                else if (unit == 1000)      z = usec/1000;
+                else if (unit == 1000000)   z = usec;
+                else
+                   {
+                     MORE_ERROR() <<
+       "Invalid time unit (use 1 for seconds, 1000 for ms, or 1000000 for μs)";
+                     DOMAIN_ERROR;
+                   }
+                return Token(TOK_APL_VALUE1, IntScalar(z, LOC));
+              }
+
+         case 51:   // mktime
+              {
+                if (B->element_count() < 6 || B->element_count() > 9)
+                   LENGTH_ERROR;
+
+                tm t;
+                t.tm_year = B->get_ravel(0).get_int_value() - 1900;
+                t.tm_mon  = B->get_ravel(1).get_int_value() - 1;
+                t.tm_mday = B->get_ravel(2).get_int_value();
+                t.tm_hour = B->get_ravel(3).get_int_value();
+                t.tm_min  = B->get_ravel(4).get_int_value();
+                t.tm_sec  = B->get_ravel(5).get_int_value();
+                if (B->element_count() > 6)   // dst provided
+                   t.tm_isdst = B->get_ravel(6).get_int_value();
+                else
+                   t.tm_isdst = -1;
+
+               const time_t seconds = mktime(&t);
+               if (seconds == (time_t)-1)   DOMAIN_ERROR;
+
+                Value_P Z(4, LOC);
+                new (Z->next_ravel()) IntCell(seconds);
+                new (Z->next_ravel()) IntCell(t.tm_wday);
+                new (Z->next_ravel()) IntCell(t.tm_yday);
+                new (Z->next_ravel()) IntCell(t.tm_isdst);
+                Z->check_value(LOC);
+                return Token(TOK_APL_VALUE1, Z);
+              }
+
+         case 52:   // localtime
+         case 53:   // gmtime
+              {
+                if (B->element_count() != 1)   LENGTH_ERROR;
+                const time_t t = B->get_ravel(0).get_int_value();
+                const tm * tmp = (function_number == 52) ? localtime(&t)
+                                                         : gmtime(&t);
+                if (tmp == 0)   DOMAIN_ERROR;
+
+                Value_P Z(9, LOC);
+                new (Z->next_ravel()) IntCell(tmp->tm_year + 1900);
+                new (Z->next_ravel()) IntCell(tmp->tm_mon + 1);
+                new (Z->next_ravel()) IntCell(tmp->tm_mday);
+                new (Z->next_ravel()) IntCell(tmp->tm_hour);
+                new (Z->next_ravel()) IntCell(tmp->tm_min);
+                new (Z->next_ravel()) IntCell(tmp->tm_sec);
+                new (Z->next_ravel()) IntCell(tmp->tm_wday);
+                new (Z->next_ravel()) IntCell(tmp->tm_yday);
+                new (Z->next_ravel()) IntCell(tmp->tm_isdst);
+                Z->check_value(LOC);
+                return Token(TOK_APL_VALUE1, Z);
+              }
+
          case 202:   // get monadic parallel threshold
-         case 203:   // get dyadicadic parallel threshold
+         case 203:   // get dyadic  parallel threshold
               {
                 const Function * fun = 0;
                 if (B->element_count() == 3)   // dyadic operator

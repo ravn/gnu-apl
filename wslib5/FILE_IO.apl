@@ -318,6 +318,25 @@
  Z←LO ⎕FIO[49] Bs
 ∇
 
+∇Zi ← FIO∆gettimeofday Bu
+ ⍝⍝ return time of day in unit Bu (1 = seconds, 1000 = ms, or 1000000 = μs)
+ Zi←⎕FIO[50] Bu
+∇
+ 
+∇Zy4 ← FIO∆mktime By67
+ ⍝⍝ return seconds since Jan 1, 1970 for broken down calender time By67
+ Zy4←⎕FIO[51] By67
+∇
+ 
+∇Zy9 ← FIO∆localtime Bi
+ ⍝⍝ return broken down calender time Zy9 for Bi seconds since Jan 1, 1970
+ Zy9←⎕FIO[52] Bi
+∇
+ 
+∇Zy9 ← FIO∆gmtime Bi
+ ⍝⍝ return broken down calender time Zy9 for Bi seconds since Jan 1, 1970
+ Zy9←⎕FIO[53] Bi
+∇
  
 ∇FIO∆clear_statistics Bi
  ⍝⍝ clear performance statistics with ID Bi
@@ -494,7 +513,8 @@ t←t⍪'INADDR_ANY' 0
  a←a, ('recv'        37) ('send'       38) ('usend'      39) ('select'      40)
  a←a, ('read'        41) ('write'      42) ('uwrite'     43) ('getsockname' 44)
  a←a, ('getpeername' 45) ('getsockopt' 46) ('setsockopt' 47) ('fscanf'      48)
- a←a,⊂('readlines'   49)
+ a←a, ('readlines'   49) ('gettimeofday' 50) ('mktime'   51) ('localtime'   52)
+ a←a,⊂('gmtime'      53)
  a←a, ('open'         3) ('close'       4) ⍝ And some handy aliases
  →(0=↑⍴x←,⊃((⊂X) ≡¨↑¨a)/a)/Nomatch
  X←¯1↑x
