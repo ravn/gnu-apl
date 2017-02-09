@@ -1449,13 +1449,11 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
          case 50:   // gettimeofday
               {
                 const APL_Integer unit = B->get_ravel(0).get_near_int();
-                if (unit < 1)         DOMAIN_ERROR;
-                if (unit > 1000000)   DOMAIN_ERROR;
                 timeval tv;
                 gettimeofday(&tv, 0);
                 int64_t usec = tv.tv_sec;
                 usec *= 1000000;
-                usec += tv.tv_sec;
+                usec += tv.tv_usec;
                 APL_Integer z = 0;
                 if      (unit == 1)         z = usec/1000000;
                 else if (unit == 1000)      z = usec/1000;
