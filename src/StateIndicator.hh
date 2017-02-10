@@ -53,6 +53,11 @@ public:
    /// retry this StateIndicator (after →'')
    void retry(const char * loc);
 
+   /// return true iff
+   ///  (1) this SI entry is executing \b funname, or
+   ///  (2) has resolved \b funname on its prefix parser stack
+   bool uses_function(const UserFunction * ufun) const;
+
    /// Return the function name, or "*" for an immediate execution context
    UCS_string function_name() const;
 

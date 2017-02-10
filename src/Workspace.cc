@@ -324,11 +324,9 @@ const Function * fun = current_referent->get_function();
 const UserFunction * ufun = fun->get_ufun1();
    if (!ufun)   return false;         // not a defined function
 
-const Executable * uexec = ufun;
-
    for (const StateIndicator * si = SI_top(); si; si = si->get_parent())
       {
-       if (uexec == si->get_executable())   return true;
+        if (si->uses_function(ufun))   return true;
       }
 
    return false;

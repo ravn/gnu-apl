@@ -598,7 +598,7 @@ Function * function = fun_symbol->get_function();
       return "function is a lambda";
 
    if (Workspace::is_called(fun_symbol->get_name()))
-      return "function is pendent or suspended";
+      return "function is used, pendent or suspended";
 
 const UserFunction * ufun = function->get_ufun1();
    if (ufun == 0)

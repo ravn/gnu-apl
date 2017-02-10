@@ -103,6 +103,22 @@ Prefix::syntax_error(const char * loc)
 }
 //-----------------------------------------------------------------------------
 bool
+Prefix::uses_function(const UserFunction * ufun) const
+{
+   loop (s, size())
+      {
+        const Token & tok = at(s).tok;
+        if (tok.get_ValueType() == TV_FUN &&
+            tok.get_function() == ufun)   return true;
+      }
+
+   if (saved_lookahead.tok.get_ValueType() == TV_FUN &&
+            saved_lookahead.tok.get_function() == ufun)   return true;
+
+   return false;
+}
+//-----------------------------------------------------------------------------
+bool
 Prefix::is_value_parent(int pc) const
 {
    // we have ) XXX with XXX on the stack and need to know if the evaluation

@@ -98,6 +98,21 @@ StateIndicator::retry(const char * loc)
       CERR << endl << "RETRY " << loc << ")" << endl;
 }
 //-----------------------------------------------------------------------------
+bool
+StateIndicator::uses_function(const UserFunction * ufun) const
+{
+const Executable * uexec = ufun;
+
+   // case 1: ufun is the currently executing function
+   //
+   if (uexec == get_executable())   return true;
+
+   // case 2: ufun is used on the prefix parser stack
+   //
+   if (current_stack.uses_function(ufun))   return true;
+   return false;
+}
+//-----------------------------------------------------------------------------
 UCS_string
 StateIndicator::function_name() const
 {

@@ -489,35 +489,48 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
       {
         case TV_NONE:  break;
 
-        case TV_CHAR:  out << " char=\"" << int(tok.get_char_val()) << "\"";
+        case TV_CHAR:  Log(LOG_archive)   CERR << "Saving TV_SYM Token" << endl;
+                       out << " char=\"" << int(tok.get_char_val()) << "\"";
                        break;
 
-        case TV_INT:   out << " int=\"" << tok.get_int_val() << "\"";
+        case TV_INT:   Log(LOG_archive)   CERR << "Saving TV_INT Token" << endl;
+                       out << " int=\"" << tok.get_int_val() << "\"";
                        break;
 
-        case TV_FLT:   out << " float=\"" << tok.get_flt_val() << "\"";
+        case TV_FLT:   Log(LOG_archive)   CERR << "Saving TV_FLT Token" << endl;
+                       out << " float=\"" << tok.get_flt_val() << "\"";
                        break;
 
-        case TV_CPX:   out << " real=\"" << tok.get_cpx_real()
+        case TV_CPX:   Log(LOG_archive)   CERR << "Saving TV_CPX Token" << endl;
+                       out << " real=\"" << tok.get_cpx_real()
                            << "\" imag=\"" << tok.get_cpx_imag() << "\"";
                        break;
 
-        case TV_SYM:   {
+        case TV_SYM:   Log(LOG_archive)   CERR << "Saving TV_SYM Token" << endl;
+                       {
                          Symbol * sym = tok.get_sym_ptr();
                          const UCS_string name = sym->get_name();
                          out << " sym=\"" << name << "\"";
                        }
                        break;
 
-        case TV_LIN:   out << " line=\"" << tok.get_fun_line() << "\"";
+        case TV_LIN:   Log(LOG_archive)   CERR << "Saving TV_LIN Token" << endl;
+                       out << " line=\"" << tok.get_fun_line() << "\"";
                        break;
 
-        case TV_VAL:   { const Vid vid = find_vid(tok.get_apl_val().get());
+        case TV_VAL:   {
+                         Log(LOG_archive)
+                            CERR << "Saving TV_VAL Token" << endl;
+
+                         const Vid vid = find_vid(tok.get_apl_val().get());
                          out << " vid=\"" << vid << "\"";
                        }
                        break;
 
-        case TV_INDEX: { const IndexExpr & idx = tok.get_index_val();
+        case TV_INDEX: {
+                         Log(LOG_archive)
+                            CERR << "Saving TV_INDEX Token" << endl;
+                         const IndexExpr & idx = tok.get_index_val();
                          const int rank = idx.value_count();
                          out << " index=\"";
                          loop(i, rank)
@@ -532,6 +545,9 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
                        break;
 
         case TV_FUN:   {
+                         Log(LOG_archive)
+                            CERR << "Saving TV_FUN Token" << endl;
+
                          Function * fun = tok.get_function();
                          Assert1(fun);
                          save_Function_name("ufun", "symbol", "fun", *fun);

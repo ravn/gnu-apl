@@ -70,6 +70,9 @@ public:
    enum { MAX_CONTENT   = 10*MAX_REDUCTION_LEN,
           MAX_CONTENT_1 = MAX_CONTENT - 1 };
 
+   /// return true if ufun is on the stack
+   bool uses_function(const UserFunction * ufun) const;
+
    /// print the state of this parser
    void print(ostream & out, int indent) const;
 
