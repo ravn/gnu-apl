@@ -125,6 +125,23 @@ public:
    /// check workspace integrity (stale Value and IndexExpr objects, etc)
    static void cmd_CHECK(ostream & out);
 
+   // a helper for finding sub-values with two parents
+   struct val_val
+      {
+        /// the parent (0 unless child is a sub-value
+        const Value * parent;
+
+        /// the value (always valid)
+        const Value * child;
+
+        /// compare function for Heapsort::sort()
+        static bool compare_val_val(const val_val & A, const val_val & B,
+                                     const void *);
+
+        /// compare function for bsearch()
+        static int compare_val_val1(const void * key, const void * B);
+      };
+
 protected:
    /// tab-expand a user-defined name
    static ExpandResult expand_user_name(UCS_string & user, int & replace_count);
@@ -315,4 +332,9 @@ protected:
    /// the number of APL expressions entered in immediate execution mode
    static ShapeItem APL_expression_count;
 };
+//-----------------------------------------------------------------------------
+inline void Hswap(Command::val_val & vp1, Command::val_val & vp2)
+{
+const Command::val_val tmp = vp1;   vp1 = vp2;   vp2 = tmp;
+}
 //-----------------------------------------------------------------------------

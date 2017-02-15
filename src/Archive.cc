@@ -29,6 +29,7 @@
 #include "Archive.hh"
 #include "buildtag.hh"   // for ARCHIVE_SVN
 #include "Common.hh"
+#include "Command.hh"
 #include "CharCell.hh"
 #include "ComplexCell.hh"
 #include "Executable.hh"
@@ -801,11 +802,21 @@ ShapeItem idx = 0;
                         // sub already has a parent, which supposedly cannot
                         // happen. print out some more information about this
                         // case.
+                        //
                         CERR << "*** Sub-Value " << (void *)sub
-                             << " has two parents "
-                             << (void *)(values[sub_idx]._par)
-                             << " and " << (void *)values[p]._val
-                             << "." << endl;
+                             << " has two parents." << endl
+                             << "Child: vid=" << sub_idx << ", _val="
+                             << values[sub_idx]._val << "_par="
+                             << (void *)values[sub_idx]._par  << endl
+                             << "Parent 2: vid=" << p <<  ", _val="
+                             << values[p]._val << "_par="
+                             << (void *)values[p]._par  << endl
+                             << "Call stack:" << endl;
+                             BACKTRACE
+                        CERR << endl << " Running )CHECK..." << endl;
+                        Command::cmd_CHECK(CERR);
+                        CERR << endl;
+                        
 
 #if VALUE_HISTORY_WANTED
 print_history(CERR, sub, 0);

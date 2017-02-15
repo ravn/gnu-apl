@@ -470,6 +470,20 @@ int format = arg.atoi();
        << ". Valid values are: OFF, and ± 2-4, 7-9, 20-25, and 29." << endl;
 }
 //-----------------------------------------------------------------------------
+bool
+Command::val_val::compare_val_val(const val_val & A,
+                                  const val_val & B, const void *)
+{
+   return A.child > B.child;
+}
+//-----------------------------------------------------------------------------
+int
+Command::val_val::compare_val_val1(const void * key, const void * B)
+{
+const void * Bv = ((const val_val *)B)->child;
+   return (const char *)key - (const char *)Bv;
+}
+//-----------------------------------------------------------------------------
 void 
 Command::cmd_CHECK(ostream & out)
 {
@@ -504,6 +518,72 @@ Command::cmd_CHECK(ostream & out)
         }
      else out << "OK      - no stale indices" << endl;
    }
+
+   // discover duplicate parents
+   //
+Simple_string<val_val, false> values;
+ShapeItem duplicate_parents = 0;
+   for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
+        obj != DynamicObject::get_all_values(); obj = obj->get_next())
+       {
+         const Value * val = (const Value *)obj;
+
+         val_val vv = { 0, val };   // no parent
+         values.append(vv, LOC);
+       }
+
+   Heapsort<val_val>::sort(&values[0], values.size(), 0,
+                           &val_val::compare_val_val);
+   loop(v, (values.size() - 1))
+       Assert(&values[v].child < &values[v + 1].child);
+
+   /// set parents
+   loop(v, values.size())   // for every .child (acting as parent here)
+      {
+        const Value * val = values[v].child;
+        const ShapeItem ec = val->nz_element_count();
+        loop(e, ec)   // for every ravel cell of the (parent-) value
+            {
+              const Cell & cP = val->get_ravel(e);
+              if (!cP.is_pointer_cell())   continue;   // not a parent
+
+              const Value * sub = cP.get_pointer_value().get();
+              Assert1(sub);
+
+              val_val * vvp = (val_val *)
+                    bsearch(sub, &values[0], values.size(), sizeof(val_val),
+                            val_val::compare_val_val1);
+              Assert(vvp);
+              if (vvp->parent == 0)   // child has no parent
+                 {
+                   vvp->parent = val;
+                 }
+              else
+                 {
+                   ++duplicate_parents;
+                   out << "Value * vvp=" << (void *)vvp
+                       << " already has parent " << (void *)vvp->parent
+                       << " when checking Value * val=" << (void *)vvp
+                       << endl;
+
+                   out << "History of the child:" << endl;
+                   print_history(out, vvp->child, LOC);
+                   out << "History of the first parent:" << endl;
+                   print_history(out, vvp->parent, LOC);
+                   out << "History of the second parent:" << endl;
+                   print_history(out, val, LOC);
+                   out << endl;
+                 }
+           }
+      }
+
+   if (duplicate_parents)
+        {
+          out << "ERROR   - " << duplicate_parents
+              << " duplicate parents" << endl;
+          IO_Files::apl_error(LOC);
+        }
+   else out << "OK      - no duplicate parents" << endl;
 }
 //-----------------------------------------------------------------------------
 void 

@@ -371,6 +371,7 @@ A ⎕CR B with invalid A
 OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices
+OK      - no duplicate parents
 
 ⍝ ==================================
 
