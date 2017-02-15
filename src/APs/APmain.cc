@@ -67,7 +67,7 @@ vector<Coupled_var> coupled_vars;
 string error_loc = "?";
 
 /// the name of this AP (aplXXX where XXX is the processor number)
-char AP_NAME[40] = "apl" STR(AP_NUM);
+char AP_NAME[40] = "ap" STR(AP_NUM);
 
 AP_num3 ProcessorID::id(NO_AP, AP_NULL, AP_NULL);
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2013  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,9 +74,9 @@ void
 handle_var(Coupled_var & var)
 {
 FILE * fp = 0;
-const char * cmd = 0;
-
 const CDR_string & cdr = *var.data;
+const CDR_header & header = cdr.header();
+   Q(header.get_nelm());
    if (cdr.size() < 20)   // less than min. size of CDR header
       {
         get_CERR() << "CDR record too short (" << cdr.size()
@@ -85,7 +85,6 @@ const CDR_string & cdr = *var.data;
         return;
       }
 
-
    if (cdr[13] != 1)   // not a vector
       {
         get_CERR() << "Bad CDR rank (" << int(cdr[13]) << endl;
@@ -93,39 +92,40 @@ const CDR_string & cdr = *var.data;
         return;
       }
 
-         if (cdr[12] != 4)   // not a char vector
-            {
-              get_CERR() << "Bad CDR record type (" << int(cdr[12]) << endl;
-              set_ACK(var, 446);
-              return;
-            }
+   if (cdr[12] != 4)   // not a char vector
+      {
+        get_CERR() << "Bad CDR record type (" << int(cdr[12]) << endl;
+        set_ACK(var, 446);
+        return;
+      }
 
-         cmd = string((const char *)cdr.get_items() + 20,
-                      cdr.size() - 20).c_str();
+const string cmd((const char *)cdr.get_items() + 20, header.get_nelm());
 
-         if (verbose)   get_CERR() << pref << " got command " << cmd << endl;
+   if (verbose)   get_CERR() << pref << " got command[" << cmd.size() << "] '"
+                             << cmd << "'" << endl;
 
-         fp = popen(cmd, "r");
-         if (fp == 0)   // bad command
-            {
-              get_CERR() << pref << " popen() failed" << endl;
-              set_ACK(var, 1);  // 1 := INVALID COMMAND
-              return;
-            }
+   fp = popen(cmd.c_str(), "r");
+   if (fp == 0)   // bad command
+      {
+        get_CERR() << pref << " popen() failed" << endl;
+        set_ACK(var, 1);  // 1 := INVALID COMMAND
+        return;
+      }
 
-         for (;;)
-             {
-               const int cc = fgetc(fp);
-               if (cc == EOF)   break;
-               get_CERR() << char(cc);
-             }
+   for (;;)
+       {
+         const int cc = fgetc(fp);
+         if (cc == EOF)   break;
+         get_CERR() << char(cc);
+       }
 
-         get_CERR() << flush;
-         const int result = pclose(fp);
-         if (verbose)   get_CERR() << pref << " finished command with exit code "
-                             << result << endl;
+   get_CERR() << flush;
+const int result = pclose(fp);
+   if (verbose)
+   get_CERR() << pref << " finished command with exit code "
+              << result << endl;
 
-         set_ACK(var, WEXITSTATUS(result));
+   set_ACK(var, WEXITSTATUS(result));
 }
 //-----------------------------------------------------------------------------
 bool
