@@ -76,7 +76,6 @@ handle_var(Coupled_var & var)
 FILE * fp = 0;
 const CDR_string & cdr = *var.data;
 const CDR_header & header = cdr.header();
-   Q(header.get_nelm());
    if (cdr.size() < 20)   // less than min. size of CDR header
       {
         get_CERR() << "CDR record too short (" << cdr.size()
