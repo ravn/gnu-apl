@@ -60,7 +60,7 @@ void ResultRow::add_values( sqlite3_stmt *statement )
         int type = sqlite3_column_type( statement, i );
         switch( type ) {
         case SQLITE_INTEGER:
-            value = new IntResultValue( sqlite3_column_int( statement, i ) );
+            value = new IntResultValue( sqlite3_column_int64( statement, i ) );
             break;
         case SQLITE_FLOAT:
             value = new DoubleResultValue( sqlite3_column_double( statement, i ) );

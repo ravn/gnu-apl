@@ -36,12 +36,12 @@ public:
 
 class IntResultValue : public ResultValue {
 public:
-    IntResultValue( int value_in ) : value( value_in ) {}
+    IntResultValue( APL_Integer value_in ) : value( value_in ) {}
     virtual ~IntResultValue() {}
     virtual void update( Cell *cell, Value & cell_owner ) const;
 
 private:
-    int value;
+    APL_Integer value;
 };
 
 class DoubleResultValue : public ResultValue {
