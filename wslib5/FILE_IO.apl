@@ -338,6 +338,11 @@
  Zy9←⎕FIO[53] Bi
 ∇
  
+∇Z ← FIO∆chdir Bs
+ ⍝⍝ chdir to string from Bs
+ Z← ⎕FIO[54] Bs
+∇
+
 ∇FIO∆clear_statistics Bi
  ⍝⍝ clear performance statistics with ID Bi
  Zn ← ⎕FIO[200] Bi
@@ -514,7 +519,7 @@ t←t⍪'INADDR_ANY' 0
  a←a, ('read'        41) ('write'      42) ('uwrite'     43) ('getsockname' 44)
  a←a, ('getpeername' 45) ('getsockopt' 46) ('setsockopt' 47) ('fscanf'      48)
  a←a, ('readlines'   49) ('gettimeofday' 50) ('mktime'   51) ('localtime'   52)
- a←a,⊂('gmtime'      53)
+ a←a, ('gmtime'      53) ('chdir'      54)
  a←a, ('open'         3) ('close'       4) ⍝ And some handy aliases
  →(0=↑⍴x←,⊃((⊂X) ≡¨↑¨a)/a)/Nomatch
  X←¯1↑x

@@ -606,6 +606,8 @@ Quad_FIO::list_functions(ostream & out)
 "   Zy4←    ⎕FIO[51] By67  mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
+"   Zi ←    ⎕FIO[54] Bs    chdir(Bs)\n"
+
 "\n"
 "Benchmarking functions:\n"
 "\n"
@@ -1519,6 +1521,13 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
+         case 54:    // chdir
+              {
+                UTF8_string path(*B.get());
+                errno = chdir(path.c_str());
+                goto out_errno;
+              }
+ 
          case 202:   // get monadic parallel threshold
          case 203:   // get dyadic  parallel threshold
               {
