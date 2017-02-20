@@ -1,0 +1,443 @@
+⍝ Quad_TF.tc
+⍝ ----------------------------------
+
+      )ERASE Z
+
+      )ERASE ITEMS
+∇Z←ITEMS R
+Z←1
+→(0∈⍴R)/0
+Z←×/⍴R
+∇
+
+⍝ Function ----------------------------------
+
+      ⍝ MIGRATION TRANSFER FORM
+
+      Z←1 ⎕TF 'ITEMS'
+      ⍴Z
+49
+
+      Z
+FITEMS 2 4 9 Z←ITEMS RZ←1      →(0∈⍴R)/0Z←×/⍴R   
+
+
+      ⍝ EXTENDED TRANSFER FORM
+      Z←2 ⎕TF 'ITEMS'
+      ⍴Z
+42
+
+      Z
+⎕FX 'Z←ITEMS R' 'Z←1' '→(0∈⍴R)/0' 'Z←×/⍴R'
+
+⍝ simple variable ----------------------------------
+
+      A←''
+
+      1 ⎕TF 'A'
+CA 1 0 
+
+      2 ⎕TF 'A'
+A←''
+
+
+      A←2 3⍴1⌽ι6
+
+      1 ⎕TF 'A'
+NA 2 2 3 2 3 4 5 6 1
+
+      2 ⎕TF 'A'
+A←(2 3⍴2 3 4 5 6 1)
+
+      A←' Don''t '
+
+      1 ⎕TF 'A'
+CA 1 7  Don't 
+
+      2 ⎕TF 'A'
+A←' Don''t '
+
+
+      A←.000000000001
+
+      1 ⎕TF 'A'
+NA 0 1E¯12
+
+      2 ⎕TF 'A'
+A←1E¯12
+
+⍝ APL2 variable ----------------------------------
+
+      A←('' (ι0)) ('Q' 3.2000000000000002) (2+3×ι4) 'Don''t'
+      4⎕CR A
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━┓ ┏→━━━━┓ ┏→━━━━━━━━┓ ┏→━━━━┓┃
+┃┃┏⊖┓ ┏⊖┓┃ ┃Q 3.2┃ ┃5 8 11 14┃ ┃Don't┃┃
+┃┃┃ ┃ ┃0┃┃ ┗━━━━━┛ ┗━━━━━━━━━┛ ┗━━━━━┛┃
+┃┃┗━┛ ┗━┛┃                            ┃
+┃┗∊━━━━━━┛                            ┃
+┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+      2 ⎕TF 'A'
+A←('' (0⍴0)) ('Q' 3.2000000000000002) (5 8 11 14) 'Don''t'
+
+
+      B←⊂(⊂1 0 1) (2 3ρ4 6)
+      4⎕CR B
+┏━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━━━━━━━━━━━┓┃
+┃┃┏━━━━━━━┓ ┏→━━━━┓┃┃
+┃┃┃┏→━━━━┓┃ ↓4 6 4┃┃┃
+┃┃┃┃1 0 1┃┃ ┃6 4 6┃┃┃
+┃┃┃┗━━━━━┛┃ ┗━━━━━┛┃┃
+┃┃┗∊━━━━━━┛        ┃┃
+┃┗∊∊━━━━━━━━━━━━━━━┛┃
+┗∊∊∊━━━━━━━━━━━━━━━━┛
+
+      2 ⎕TF 'B'
+B←(((1 0 1)) (2 3⍴4 6 4 6 4 6))
+
+
+      C←⎕UCS 256⊥¨(⊂300 66),¨⎕AF 'AB' ⍝ Kanji
+      4⎕CR C
+┏→━┓
+┃����������┃
+┗━━┛
+
+      2 ⎕TF 'C'
+C←⎕UCS 19677761 19677762
+
+⍝ external object ----------------------------------
+
+⍝ TODO
+
+⍝ system variable ----------------------------------
+
+      1 ⎕TF '⎕TS'
+N⎕TS 1 7 ⁰ ⁰ ⁰ ⁰ ⁰ ⁰ ⁰
+
+      2 ⎕TF '⎕TS'
+⎕TS←⁰ ⁰ ⁰ ⁰ ⁰ ⁰ ⁰
+
+⍝ system function ----------------------------------
+
+      1 ⎕TF '⎕DL'
+
+      2 ⎕TF '⎕DL'
+
+⍝ shared variable ----------------------------------
+
+⍝ TODO
+
+⍝ Inverse 1 ⎕TF, Integer  ----------------------------------
+
+      SCORES←  34   18   20
+      R←1 ⎕TF 'SCORES'
+      R
+NSCORES 1 3 34 18 20
+
+      ⎕NC 'SCORES'
+2
+
+      )ERASE SCORES
+      ⎕NC 'SCORES'
+0
+
+      1 ⎕TF R
+SCORES
+
+      ⎕NC 'SCORES'
+2
+
+    SCORES
+34 18 20
+
+⍝ Inverse 1 ⎕TF, Chars  ----------------------------------
+
+      X←2 2 3⍴'ABC123abc@#$'
+      X
+ABC
+123
+
+abc
+@#$
+
+      R←1 ⎕TF 'X'
+      R
+CX 3 2 2 3 ABC123abc@#$
+
+      ⎕NC 'X'
+2
+
+      )ERASE X
+      ⎕NC 'X'
+0
+
+      1 ⎕TF R
+X
+
+      X
+ABC
+123
+
+abc
+@#$
+
+⍝ Inverse 1 ⎕TF, Function  ----------------------------------
+
+      )ERASE FOO
+∇R←A FOO B;C;D
+C←A ◊ D←B
+L2: →99
+∇
+
+      R←1 ⎕TF 'FOO'
+      R
+FFOO 2 3 13 R←A FOO B;C;DC←A ◊ D←B    L2: →99      
+
+      ⎕NC 'FOO'
+3
+
+      )ERASE FOO
+
+      ⎕NC 'FOO'
+0
+
+      1 ⎕TF R
+FOO
+
+∇FOO[⎕]∇
+    ∇
+[0]   R←A FOO B;C;D
+[1]   C←A ◊ D←B    
+[2]  L2: →99      
+    ∇
+
+⍝ Inverse 1 ⎕TF, system variable  ----------------------------------
+
+      ⎕IO←0
+      R←1 ⎕TF '⎕IO'
+      R
+N⎕IO 0 0
+
+      ⎕IO←1
+      1 ⎕TF R
+⎕IO
+
+      ⎕IO
+0
+
+      ⎕IO←1
+
+⍝ Inverse 2 ⎕TF, Integer  ----------------------------------
+
+      SCORES←  34   18   20
+      R←2 ⎕TF 'SCORES'
+      R
+SCORES←34 18 20
+
+      ⎕NC 'SCORES'
+2
+
+      )ERASE SCORES
+      ⎕NC 'SCORES'
+0
+
+      2 ⎕TF R
+SCORES
+
+      ⎕NC 'SCORES'
+2
+
+    SCORES
+34 18 20
+
+⍝ Inverse 2 ⎕TF, Chars  ----------------------------------
+
+      X←2 2 3⍴'ABC123abc@#$'
+      X
+ABC
+123
+
+abc
+@#$
+
+      R←2 ⎕TF 'X'
+      R
+X←(2 2 3⍴'ABC123abc@#$')
+
+      ⎕NC 'X'
+2
+
+      )ERASE X
+      ⎕NC 'X'
+0
+
+      2 ⎕TF R
+X
+
+      X
+ABC
+123
+
+abc
+@#$
+
+⍝ Inverse 2 ⎕TF, Function  ----------------------------------
+
+      )ERASE FOO
+∇R←A FOO B;C;D
+C←A ◊ D←B
+L2: →99
+∇
+
+      R←2 ⎕TF 'FOO'
+      R
+⎕FX 'R←A FOO B;C;D' 'C←A ◊ D←B' 'L2: →99'
+
+      ⎕NC 'FOO'
+3
+
+      )ERASE FOO
+      ⎕NC 'FOO'
+0
+
+      2 ⎕TF R
+FOO
+
+∇FOO[⎕]∇
+    ∇
+[0]   R←A FOO B;C;D
+[1]   C←A ◊ D←B
+[2]  L2: →99
+    ∇
+
+⍝ Inverse 2 ⎕TF, system variable  ----------------------------------
+
+      ⎕IO←0
+      R←2 ⎕TF '⎕IO'
+      R
+⎕IO←0
+
+      ⎕IO←1
+      2 ⎕TF R
+⎕IO
+
+      ⎕IO
+0
+
+      ⎕IO←1
+
+⍝ Regression (David B. Lamkins)
+
+      ⎕←zzzz←'elan' 77 (2 3⍴⍳2)
+ elan 77   1 2 1 
+           2 1 2 
+
+      ⎕←yyyy←2⎕TF 'zzzz'
+zzzz←'elan' 77 (2 3⍴1 2 1 2 1 2)
+
+      )ERASE zzzz
+      ⍎yyyy
+      zzzz
+ elan 77   1 2 1 
+           2 1 2 
+
+
+      ⎕←zzzz←'elan' 77 (2 3⍴⍬)
+ elan 77   0 0 0 
+           0 0 0 
+      ⎕←yyyy←2⎕TF 'zzzz'
+zzzz←'elan' 77 (2 3⍴0 0 0 0 0 0)
+      )ERASE zzzz
+      ⍎yyyy
+      zzzz
+ elan 77   0 0 0 
+           0 0 0 
+
+      ⎕←zzzz←'elan' 77 (2 3⍴'ab')
+ elan 77  aba 
+          bab 
+      ⎕←yyyy←2⎕TF 'zzzz'
+zzzz←'elan' 77 (2 3⍴'ababab')
+      )ERASE zzzz
+      ⍎yyyy
+      zzzz
+ elan 77  aba 
+          bab 
+
+
+      ⎕←zzzz←'elan' 77 (2 3⍴'')
+ elan 77      
+              
+      2⎕TF 'zzzz'
+zzzz←'elan' 77 (2 3⍴'      ')
+      ⎕←yyyy←2⎕TF 'zzzz'
+zzzz←'elan' 77 (2 3⍴'      ')
+      )ERASE zzzz
+      ⍎yyyy
+      zzzz
+ elan 77      
+              
+
+
+      ⎕←zzzz←'elan' 77 'abc'
+ elan 77 abc 
+      ⎕←yyyy←2⎕TF 'zzzz'
+zzzz←'elan' 77 'abc'
+      )ERASE zzzz
+      ⍎yyyy
+      zzzz
+ elan 77 abc 
+
+
+      ⎕←zzzz←'elan' 77 ''
+ elan 77  
+      ⎕←yyyy←2⎕TF 'zzzz'
+zzzz←'elan' 77 ''
+      )ERASE zzzz
+      ⍎yyyy
+      zzzz
+ elan 77  
+
+⍝ Regression
+
+      4 ⎕CR var←'kelvin' (,'v') 'some text'
+┏→━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━┓ ┏→┓ ┏→━━━━━━━━┓┃
+┃┃kelvin┃ ┃v┃ ┃some text┃┃
+┃┗━━━━━━┛ ┗━┛ ┗━━━━━━━━━┛┃
+┗∊━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⎕ ← tf2 ← 2 ⎕TF 'var'
+var←'kelvin' (,'v') 'some text'
+
+      )ERASE var
+
+      ⍎tf2
+
+      4 ⎕CR var
+┏→━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━┓ ┏→┓ ┏→━━━━━━━━┓┃
+┃┃kelvin┃ ┃v┃ ┃some text┃┃
+┃┗━━━━━━┛ ┗━┛ ┗━━━━━━━━━┛┃
+┗∊━━━━━━━━━━━━━━━━━━━━━━━┛
+
+⍝ Regression (Mike Duvos)
+
+      )ERASE M
+      2 ⎕TF 'M←¯12-⎕IO-⍳25'
+M
+      M
+¯12 ¯11 ¯10 ¯9 ¯8 ¯7 ¯6 ¯5 ¯4 ¯3 ¯2 ¯1 0 1 2 3 4 5 6 7 8 9 10 11 12
+
+      2 ⎕TF 'M←¯12-5×⎕IO-⍳25'
+M
+      M
+¯60 ¯55 ¯50 ¯45 ¯40 ¯35 ¯30 ¯25 ¯20 ¯15 ¯10 ¯5 0 5 10 15 20 25 30 35 40 45 50 
+      55 60
+
+
+⍝ ==================================
+

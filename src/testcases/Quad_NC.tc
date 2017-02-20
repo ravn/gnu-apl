@@ -1,0 +1,28 @@
+⍝ Quad_NC
+⍝ ----------------------------------
+
+      )CLEAR
+CLEAR WS
+
+   A←1
+
+      )ERASE OP1
+∇A (LO OP1 RO) B
+∇
+
+      )ERASE LL
+
+      )ERASE FOO
+∇FOO
+LL: ⎕NC 6 3⍴' ÷ ÷  LL A  FOOOP1'
+∇
+
+      FOO
+¯1 ¯1 1 2 3 4
+
+      ⎕NC 6 3⍴' ÷ ÷  LL A  FOOOP1'
+¯1 ¯1 0 2 3 4
+
+⍝ ==================================
+
+

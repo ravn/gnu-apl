@@ -1,0 +1,154 @@
+⍝ Quad_SYL
+⍝ ----------------------------------
+
+      ⎕IO←1
+
+⍝ SI limit ----------------------------------
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )SIC
+
+      ⎕SYL[1;2]
+0
+
+      ⍝ system limit on SI depth
+      ⍝
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+      ⎕SYL[1;2]←10
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+      ⎕SYL[1;2]
+10
+
+
+      ⎕SYL[1]←12
+      ⎕SYL[1;2]
+12
+
+      ⍝ a function with infinite recursion
+      ⍝
+      )ERASE FOO
+∇A FOO B;C;D;E;F;G;H;I;J;K;L
+ C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
+ A FOO B+1
+∇
+
+      0 FOO 0
+INTERRUPT+
+FOO[1]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
+³
+
+
+      ⎕SYL[1;2]
+0
+
+      )SI
+FOO[1]
+FOO[2]
+FOO[2]
+FOO[2]
+FOO[2]
+FOO[2]
+FOO[2]
+FOO[2]
+FOO[2]
+FOO[2]
+FOO[2]
+FOO[2]
+FOO[2]
+⋆
+
+      )MORE
+NO MORE ERROR INFO
+
+      )SIC
+      )SI
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+⍝ value count limit ----------------------------------
+
+      ⎕SYL[2;2]
+0
+
+      ⍝ system limit on value count
+      ⍝
+      ⎕SYL[2;2]←300
+      ⎕SYL[2;2]
+300
+
+      ⎕SYL[2]←400
+      ⎕SYL[2;2]
+400
+
+      0 FOO 0
+INTERRUPT+
+FOO[1]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
+³
+
+      )MORE
+the system limit on the APL value count (as set in ⎕SYL) was reached
+(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).
+
+      ⎕SYL[2;2]
+0
+
+      )SIC
+      )SI
+
+⍝ ravel cell memory limit ----------------------------------
+
+      ⎕SYL[3;2]
+0
+
+      ⍝ system limit on ravel cell memory
+      ⍝
+      ⎕SYL[3;2]←3000000
+      ⎕SYL[3;2]
+3000000
+
+      ⎕SYL[3]←3600000
+      ⎕SYL[3;2]
+3600000
+
+      100 FOO 0
+INTERRUPT+
+FOO[1]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
+³
+
+      ⎕SYL[3;2]
+0
+
+      )SIC
+
+      )ERASE FOO
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+⍝ ==================================

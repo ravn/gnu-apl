@@ -1,0 +1,76 @@
+⍝ Quad_AT.tc
+⍝ ----------------------------------
+
+⍝ A←1 valences ----------------------------------
+
+      ⎕FX 'TOTAL R' '⎕←''TOTAL IS'',+/R'
+TOTAL
+
+      1 ⎕AT 'TOTAL'
+0 1 0
+
+      ⎕FX 'Z←TOTAL R' 'Z←+/R'
+TOTAL
+
+      1 ⎕AT 'TOTAL'
+1 1 0
+
+      ANSWER←TOTAL 1 9 3
+      1 ⎕AT 2 6ρ'TOTAL ANSWER'
+1 1 0
+1 0 0
+
+⍝ A←2 : creation time ----------------------------------
+
+      2 ⎕AT 'TOTAL'
+⁰ ⁰ ⁰ ⁰ ⁰ ⁰ ⁰
+
+⍝ A←3 : execution properties ----------------------------------
+
+      3 ⎕AT 'TOTAL'
+0 0 0 0
+
+1 0 0 0 ⎕FX ⎕CR 'TOTAL'
+TOTAL
+
+      3 ⎕AT 'TOTAL'
+1 0 0 0
+
+      3 ⎕AT '⎕FX'
+1 1 1 0
+
+⍝ A←4 : CDR sizes ----------------------------------
+
+      4 ⎕AT 'TOTAL'
+0 0
+
+      4 ⎕AT '⎕FX'
+0 0
+
+      VARIABLE←10 20 30
+      4 ⎕AT 'VARIABLE'
+32 12
+
+      VARIABLE←'ABC'
+      4 ⎕AT 'VARIABLE'
+32 3
+
+      VARIABLE←'A' 'BC'
+      4 ⎕AT 'VARIABLE'
+96 3
+
+      VARIABLE←''
+      4 ⎕AT 'VARIABLE'
+32 1
+
+      VARIABLE←⍳0
+      4 ⎕AT 'VARIABLE'
+32 1
+
+      4 ⎕AT '⎕IO'
+32 1
+
+⍝ ==================================
+
+   )ERASE TOTAL
+

@@ -1,0 +1,26 @@
+⍝ ZZ13_Regression.tc
+⍝ ----------------------------------
+
+      ⍝ problem reported by Elias
+      ⍝ 
+      ⍝ 
+      )ERASE foo
+
+∇foo[N] X
+'N =' N
+'X =' X
+∇
+
+      foo[2] 4
+ N = 2 
+ X = 4 
+
+      foo[2;3] 4
+SYNTAX ERROR
+      foo[2;3]4
+      ^      ^
+
+   →
+
+⍝ ==================================
+

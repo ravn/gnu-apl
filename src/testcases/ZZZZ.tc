@@ -1,0 +1,30 @@
+
+      ]PSTAT SAVE
+      ]PSTAT
+
+      'APL expression lines:' ⎕AI[5]
+ APL expression lines: ⁰ 
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )CLEAR
+CLEAR WS
+      )HISTORY CLEAR
+"UCS strings:" (⎕FIO ¯13)
+ UCS strings: 441 
+
+           ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+          ⍝⍝                               ⍝⍝
+         ⍝⍝   ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝   ⍝⍝
+        ⍝⍝   ⍝⍝                         ⍝⍝   ⍝⍝
+       ⍝⍝   ⍝⍝       !  SUCCESS  !       ⍝⍝   ⍝⍝
+        ⍝⍝   ⍝⍝                         ⍝⍝   ⍝⍝
+         ⍝⍝   ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝   ⍝⍝
+          ⍝⍝                               ⍝⍝
+           ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+
+

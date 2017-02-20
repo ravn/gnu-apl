@@ -1,0 +1,25 @@
+⍝ Quad_SVE
+⍝ ----------------------------------
+
+      ⍝ clear all events
+      ⍝
+      ⎕SVE←0
+      ⎕SVE
+0
+
+      ⎕SVE←1.9
+      100 ⎕SVO 'OS' ◊ ⎕SVE
+1
+⁰.⁰
+
+      ⍝ assignment clears events
+      OS←'pwd'
+      ⎕SVE←0.2
+      ⎕SVE
+²
+
+      ⎕SVR 'OS'
+2
+
+⍝ ==================================
+

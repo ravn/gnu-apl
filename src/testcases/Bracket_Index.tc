@@ -1,0 +1,202 @@
+⍝ Bracket_Index.tc
+⍝ ----------------------------------
+
+      LANG←'APPLE PIE'
+      LANG[1 7 4]
+APL
+      M1←2 2⍴⍳4
+      M1[;2]
+2 4
+
+⍝ Check ⎕IO ----------------------------------
+
+      ⎕IO←1
+      'CURTAIL'[1 2 4]
+CUT
+      ⎕IO←0
+      'CURTAIL'[0 1 3]
+CUT
+
+      ⎕IO←1
+
+⍝ Index vector ----------------------------------
+
+      A←23 9 6.3 8 ¯3 7
+      Z←A[3]
+      Z
+6.3
+      ρZ
+
+
+
+      Z←A[2 5 1]
+      Z
+9 ¯3 23
+      ρZ
+3
+
+      B←2 3ρ1 4 3 2 6 5
+      B
+1 4 3
+2 6 5
+      ρB
+2 3
+
+      Q←A[B]
+      Q
+23 8  6.3
+ 9 7 ¯3
+      ρQ
+2 3
+
+⍝ Index matrix ----------------------------------
+
+      ⎕←C←3 6ρ'ABCDEFGHIJKLMNOPQR'
+ABCDEF
+GHIJKL
+MNOPQR
+      J←C[2;3]
+J
+I
+      ρJ
+
+      P←C[1;3 1 4]
+      P
+CAD
+      ρP
+3
+      M←C[1 2;1 3]
+      M
+AC
+GI
+      ρM
+2 2
+      N←C[1 3;2 3ρ6 1 3 4 5 2]
+      N
+FAC
+DEB
+
+RMO
+PQN
+      ρN
+2 2 3
+
+⍝ Elided index ----------------------------------
+
+      D←3 4ρC[1 2;]
+      D
+ABCD
+EFGH
+IJKL
+      D[;1]
+AEI
+      D[3;]
+IJKL
+
+⍝ repeated index values ----------------------------------
+
+      H←2 4ρ3 4 1 2 2 3 4 1
+      H
+3 4 1 2
+2 3 4 1
+      'EMIT'[H]
+ITEM
+MITE
+      'NAB'[3 2 1 2 1 2]
+BANANA
+
+⍝ higher rank index ----------------------------------
+
+      U←2 3 4ρ(,C),'STUVWX'
+      U
+ABCD
+EFGH
+IJKL
+
+MNOP
+QRST
+UVWX
+      U[1;2;4]
+H
+      U[2;1;1 3 4]
+MOP
+      U[;2;4]
+HT
+      U[1;1 3;2 4]
+BD
+JL
+      U[1;;3]
+CGK
+      U[2;1;]
+MNOP
+      U[;3;]
+IJKL
+UVWX
+
+⍝ nested array index ----------------------------------
+
+      V←'H' 'HI' ('HIM' 'HIS')
+      Z←V[1]
+      Z
+H
+      ≡Z
+0
+      ρρZ
+0
+      E←V[2]
+      E
+ HI 
+      ≡E
+2
+      S←V[3]
+      S
+  HIM HIS  
+      ≡S
+3
+      ρρS
+0
+
+⍝ selective specification ----------------------------------
+
+      ρV
+3
+      ≡V
+3
+      V[3]←'H'
+      V
+ H HI H 
+      ≡V
+2
+      W←2 3ρ'ABCDEF'
+      W[1;1 3]←8 9
+      W
+8 B 9
+D E F
+      B←3 4 5
+      B[]←9
+B
+9 9 9
+
+      ⍝ Regression
+      ⍝
+      (1 1⍴0)[0;]
+INDEX ERROR
+      (1 1⍴0)[0;]
+      ^      ^
+
+      →
+
+      ⍝ Regression
+      ⍝
+      A ← 'ZIPPITY' 'DOO' 'DAH'
+      (∊A[2]) ← 0
+      A
+ ZIPPITY  0 0 0  DAH 
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

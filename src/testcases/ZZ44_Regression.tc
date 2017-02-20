@@ -1,0 +1,49 @@
+⍝ ZZ44_Regression.tc
+⍝ ----------------------------------
+
+
+      )CLEAR
+CLEAR WS
+
+      FOO←{⍺+LOCAL←⍵;LOCAL}
+      ⎕CR 'FOO'
+λ←⍺ λ1 ⍵;LOCAL
+λ←⍺+LOCAL←⍵   
+
+      )WSID TEST
+WAS CLEAR WS
+
+      )DUMP
+20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+      )SAVE
+20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+
+      )LOAD TEST.apl
+DUMPED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+
+      ⎕CR 'FOO'
+λ←⍺ λ1 ⍵;LOCAL
+λ←⍺+LOCAL←⍵   
+
+      LOCAL←'local1'
+      2 FOO 4
+6
+      LOCAL
+local1
+
+      )LOAD TEST.xml
+SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+
+      ⎕CR 'FOO'
+λ←⍺ λ0 ⍵;LOCAL
+λ←⍺+LOCAL←⍵   
+
+      LOCAL←'local2'
+      2 FOO 4
+6
+      LOCAL
+local2
+
+
+  
+

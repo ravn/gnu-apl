@@ -1,0 +1,148 @@
+⍝ Quad_FX.tc
+⍝ ----------------------------------
+
+      ⎕FX 'Z←FMT R' 'Z←R'
+FMT
+
+      FMT 'ABCDEF'
+ABCDEF
+
+
+      ⎕FX 'Z←FACTR R' '''⎕ET'' ⎕EA ''Z←!R'''
+FACTR
+
+      FACTR 5
+120
+
+⍝ Invalid definition ----------------------------------
+
+      ⎕FX 'Z←FN R' 'Z←1+R×2' ⎕AV[37]
+3
+
+      ⎕IO←0
+      ⎕FX 'Z←FN R' 'Z←1+R×2' ⎕AV[37]
+2
+
+      ⎕IO←1
+
+⍝ suspended or pendant function ----------------------------------
+
+      ⎕FX 'FUNC' '1' '2' '!¯3' '4'
+FUNC
+
+      FUNC
+1
+2
+DOMAIN ERROR
+FUNC[3]  !¯3
+         ^
+
+      )SI
+FUNC[3]
+⋆
+
+   →4
+4
+
+      ⎕FX 'FUNC' '21' '22' '23' '24'
+FUNC
+
+      FUNC
+21
+22
+23
+24
+
+⍝ execution properties [1] ----------------------------------
+
+      )ERASE FACTR
+      1 0 0 0 ⎕FX 'Z←FACTR B' 'Z←!B'
+FACTR
+
+      ∇FACTR[⎕]∇
+DEFN ERROR+
+      ∇FACTR[⎕]∇
+               ^
+      ]EXPECT 1
+
+      )SIC
+      )ERASE foo bar
+∇foo
+ 1
+ bar
+ 3
+∇
+
+      0 0 0 0 ⎕FX 'bar' '++'
+bar
+
+      foo
+1
+SYNTAX ERROR
+bar[1]  ++
+        ^^
+
+      )SI
+bar[1]
+foo[2]
+⋆
+
+      )SIC
+      0 1 0 0 ⎕FX 'bar' '++'
+bar
+
+      foo
+1
+SYNTAX ERROR
+      bar
+      ^ ^
+
+      )SI
+foo[2]
+⋆
+
+      )SIC
+      )ERASE foo bar
+
+⍝ execution properties [2] ----------------------------------
+
+      0 1 0 0 ⎕FX 'Z←FACTR B' 'Z←!B'
+FACTR
+
+      FACTR ¯3
+DOMAIN ERROR
+      FACTR ¯3
+      ^      ^
+
+      →
+
+⍝ execution properties [3] ----------------------------------
+
+      0 0 1 0 ⎕FX 'Z←FACTR B' 'Z←!B'
+FACTR
+
+⍝     S∆FACTR←1
+      FACTR 4
+24
+
+⍝ execution properties [4] ----------------------------------
+
+      0 0 0 1 ⎕FX 'Z←L INDEX R' 'Z←R[L]'
+INDEX
+
+      3 INDEX 3 4
+DOMAIN ERROR+
+INDEX[1]  Z←R[L]
+            ^^
+      →
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+⍝ ==================================
+
+

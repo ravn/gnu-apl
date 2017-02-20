@@ -1,0 +1,49 @@
+⍝ COPY.tc
+⍝ ----------------------------------
+
+)CLEAR
+CLEAR WS
+
+
+∇Z←A FUN1 B
+ Z←'1'
+∇
+
+∇Z←A FUN2 B
+ Z←'2'
+∇
+
+VAR1←'V1'
+VAR2←'V2'
+
+)WSID xxx
+WAS CLEAR WS
+
+)DUMP xxx
+³
+
+)CLEAR
+CLEAR WS
+
+)COPY xxx.apl FUN1 VAR2
+DUMPED ³
+
+)VARS
+VAR2
+
+)FNS
+FUN1
+
+VAR2
+V2
+
+FUN1 4
+1
+
+)DROP xxx
+
+
+
+
+⍝ ==================================
+

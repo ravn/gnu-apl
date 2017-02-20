@@ -1,0 +1,101 @@
+⍝ Rotate.tc
+⍝ ----------------------------------
+
+      A←1 2 3 4 5 6 7
+      1⌽A
+2 3 4 5 6 7 1
+
+
+      B←2 5ρ'ANGLEASIDE'
+      B
+ANGLE
+ASIDE
+
+      2⌽B
+GLEAN
+IDEAS
+
+⍝ negative A ----------------------------------
+
+      ¯2⌽A
+6 7 1 2 3 4 5
+
+
+      D←2 4ρ'ACHEINKS'
+      D
+ACHE
+INKS
+
+      ¯1⌽D
+EACH
+SINK
+
+
+      H←3 3ρ'ATEEATTEA'
+      H
+ATE
+EAT
+TEA
+
+      ¯1 0 1⌽H
+EAT
+EAT
+EAT
+
+
+      K←2 3ρ'CAT' 'BEAR' 'PONY' 'GNU' 'BIRD' 'FOX'
+      K
+ CAT BEAR PONY 
+ GNU BIRD FOX  
+
+      ρK
+2 3
+
+      ≡K
+2
+
+      1 2⌽K
+ BEAR PONY CAT  
+ FOX  GNU  BIRD 
+
+⍝ left arg for 3 dimensions ----------------------------------
+
+      S←2 3 5ρ'TARESSMARTEARTHSETONLAGERSHEAR'
+      S
+TARES
+SMART
+EARTH
+
+SETON
+LAGER
+SHEAR
+
+      ρS
+2 3 5
+
+      Q←2 3ρ4 0 ¯1 ¯2 5 1
+      Q
+ 4 0 ¯1
+¯2 5  1
+
+      Q⌽S
+STARE
+SMART
+HEART
+
+ONSET
+LAGER
+HEARS
+
+⍝ selective spec ----------------------------------
+
+      W←'STRIPE'
+      2⌽W
+RIPEST
+
+      (2⌽W)←'THERMO'
+      W
+MOTHER
+
+⍝ ==================================
+

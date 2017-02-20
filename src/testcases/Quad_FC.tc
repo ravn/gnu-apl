@@ -1,0 +1,46 @@
+⍝ Quad_FC.tc
+⍝ ----------------------------------
+
+      ⎕IO
+1
+
+      ⍝  indexed assignment
+      ⍝
+      ⎕FC[1]←'u'
+      ⎕FC[2 3]←'vw'
+      ⎕FC[4 5 6]←'xyz'
+      ⎕FC
+uvwxyz
+
+      ⍝ set default values if B is too short
+      ⍝
+      ⎕FC←''
+      ⎕FC
+.,⋆0_¯
+
+      ⍝  non-indexed assignment
+      ⍝
+      ⎕FC←'pqrstu'
+      ⎕FC
+pqrstu
+
+      ⎕FC←1 2 3
+DOMAIN ERROR
+      ⎕FC←1 2 3
+      ^  ^
+
+      →
+
+⍝ ----------------------------------
+
+      ⎕FC←''
+      N←123.456
+      N
+123.456
+
+      ⎕FC[1]←'∆' ◊ N
+123∆456
+
+      ⎕FC←''
+⍝ ==================================
+

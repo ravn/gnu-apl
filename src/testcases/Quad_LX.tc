@@ -1,0 +1,16 @@
+⍝ Quad_LX
+⍝ ----------------------------------
+
+      ⎕LX←"'Hello World'"
+
+      )WSID quad_lx
+WAS ³
+      )SAVE quad_lx
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰)
+
+      )LOAD quad_lx
+SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+Hello World
+
+⍝ ==================================
+

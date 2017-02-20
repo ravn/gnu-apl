@@ -1,0 +1,87 @@
+⍝ Quad_EA.tc
+⍝ ----------------------------------
+
+      '⍳3' ⎕EA '⍳4.5'
+1 2 3
+ 
+      '⍳3' ⎕EA '⍳4'
+1 2 3 4
+
+
+      '⍳3.3' ⎕EA '⍳4.5'
+DOMAIN ERROR
+      ⍳3.3
+      ^
+⍝     '⍳3.3' ⎕EA '⍳4.5'
+⍝     ^      ^
+
+      →
+
+      '"ERR"' ⎕EA '⍳4.5'
+ERR
+
+      'Z←⍳8' ⎕EA 'Z←!¯3'
+      Z
+1 2 3 4 5 6 7 8
+
+
+      ⍝ )SI unchanged after failure of user-defined function
+      ⍝
+      )ERASE foo_fails
+
+∇foo_fails B
+ →(B>0)⍴⎕LC+1 ◊ ÷0
+ foo_fails B-1
+∇
+
+      )SIC
+      ⎕SI 2
+0
+
+      foo_fails 2
+DOMAIN ERROR
+foo_fails[1]  ÷0
+              ^
+      ⎕SI 2
+0 2 2 1 0
+
+      'ι3' ⎕EA 'foo_fails'
+1 2 3
+
+      ⎕SI 2
+0 2 2 1 0
+      )SIC
+
+   ⍝ ⎕EA with branch
+   ⍝
+∇foo_branch
+ 1
+ '→ERR' ⎕EA '++'
+ 3 ◊ →0
+ERR: 'B1 failed'
+ 5
+ 'OK' ⎕EA '→OK'
+ 7 ◊ →0
+OK: 'B2 succeeded'
+∇
+
+      foo_branch
+1
+B1 failed
+5
+B2 succeeded
+
+      )SI
+
+      )SIC
+      )ERASE foo_fails foo_branch
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+⍝ ==================================
+

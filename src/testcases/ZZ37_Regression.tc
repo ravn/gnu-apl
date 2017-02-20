@@ -1,0 +1,13 @@
+⍝ ZZ37_Regression.tc
+⍝ ----------------------------------
+
+      )CLEAR
+CLEAR WS
+
+      integrated_by ← { ⍵[;2] +.× ⍶ ⍵[;1] }
+      * integrated_by 2 2 ⍴ ¯1 1 1 1
+3.08616127
+
+      )CLEAR
+CLEAR WS
+

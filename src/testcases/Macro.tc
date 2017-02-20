@@ -1,0 +1,125 @@
+⍝ Macro.tc
+⍝ ----------------------------------
+
+   )CLEAR
+CLEAR WS
+
+      ⍝ define some helper functions passed to operators
+      ⍝
+∇Z←NEG B
+ Z←-B
+∇
+
+∇Z←NEG_ERR5 B
+ Z←-B ◊ →(B≠5)⍴0
+ ← ⍝ trigger SYNTAX ERROR
+∇
+
+∇Z←A MINUS B
+ Z←A-B
+∇
+
+NEG_LAMBDA ← { -⍵ }
+
+      ⍝ EACH varieties with user defined LO
+      ⍝
+   NEG ¨ 4 3⍴⍳99
+ ¯1  ¯2  ¯3
+ ¯4  ¯5  ¯6
+ ¯7  ¯8  ¯9
+¯10 ¯11 ¯12
+
+   NEG_LAMBDA ¨ 4 3⍴⍳99
+ ¯1  ¯2  ¯3
+ ¯4  ¯5  ¯6
+ ¯7  ¯8  ¯9
+¯10 ¯11 ¯12
+
+   NEG_ERR5 ¨ 4 3⍴⍳99
+SYNTAX ERROR
+NEG_ERR5[2]  ←
+             ^
+      )SI
+NEG_ERR5[2]
+μ-Z__LO_EACH_B[2]
+⋆
+
+      vB←3×vA←4 3⍴⍳sA←23+sB←40
+      (sA MINUS ¨ sB) ≡ sA -¨ sB
+1
+      (sA MINUS ¨ vB) ≡ sA -¨ vB
+1
+      (vA MINUS ¨ sB) ≡ vA -¨ sB
+1
+      (vA MINUS ¨ vB) ≡ vA -¨ vB
+1
+
+
+      ⍝ OUTER PRODUCT
+      ⍝
+      (vA ∘.MINUS vB) ≡ vA ∘.- vB
+1
+
+      ⍝ RANK
+      ⍝
+      N233←2 3 3⍴111 112 113 121 122 123 131 132 133 211 212 213 221 222 223 231 232 233 
+
+      ⍉⍤2 N233
+111 121 131
+112 122 132
+113 123 133
+
+211 221 231
+212 222 232
+213 223 233
+
+      {⍉⍵}⍤2 N233
+111 121 131
+112 122 132
+113 123 133
+
+211 221 231
+212 222 232
+213 223 233
+
+
+
+
+      ⍝ )SAVE and )LOAD
+      ⍝
+      )wsid test
+WAS CLEAR WS
+
+      )save
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) test
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )load test.xml
+SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )SI
+NEG_ERR5[2]
+μ-Z__LO_EACH_B[2]
+⋆
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+⍝ ==================================
+

@@ -686,7 +686,7 @@ Quad_QUOTE::get_apl_value() const
 
    // get_quad_cr_line() may call done(), so we save the current prompt.
    //
-const UCS_string old_prompt(prompt);
+const UCS_string old_prompt = prompt.no_pad();
 
 bool eof = false;
 UCS_string line;

@@ -1,0 +1,23 @@
+⍝ Intersection.tc
+⍝ ----------------------------------
+
+    1 2 3 4 ∩ 3 4 5 6
+3 4
+
+    4 3 2 1 ∩ 3 4 5 6
+4 3
+
+      ⍝ complex numbers use a different algorithm
+      ⍝
+    1 2 3J3 4 ∩ 3J3 4 5 6
+3J3 4
+
+      'we' 'are' 'so' 'happy' ∩ 'are' 'you' 'so' 'tired?'
+ are so 
+
+      'if' 'we' 'had' 'had' 'a' 'car' ∩ 'have' 'you' 'had' 'lunch' '?'
+ had had 
+
+⍝ ==================================
+
+

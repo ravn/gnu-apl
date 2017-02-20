@@ -1,0 +1,63 @@
+⍝ Nabla
+⍝ ----------------------------------
+
+   )SIC
+   )ERASE FOO BAR
+
+      ⍝ new function
+      ⍝
+      ∇FOO
+F1
+F2
+F3
+      ∇
+
+      ⍝ display
+      ⍝
+      ∇FOO[⎕]∇
+    ∇
+[0]   FOO
+[1]   F1
+[2]   F2
+[3]   F3
+    ∇
+
+      ⍝ edit line
+      ⍝
+      ∇FOO
+[2] F2-changed
+      ∇
+
+      ∇FOO[⎕]∇
+    ∇
+[0]   FOO
+[1]   F1
+[2]   F2-changed
+[3]   F3
+    ∇
+
+      ⍝ change name
+      ⍝
+      ∇FOO
+[0] BAR
+[2] F2-bar
+      ∇
+
+      ∇FOO[⎕]∇
+    ∇
+[0]   FOO
+[1]   F1
+[2]   F2-changed
+[3]   F3
+    ∇
+
+      ∇BAR[⎕]∇
+    ∇
+[0]   BAR
+[1]   F1
+[2]   F2-bar
+[3]   F3
+    ∇
+
+⍝ ==================================
+
