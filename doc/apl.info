@@ -1318,6 +1318,19 @@ FILE_IO
    Zh ←    FUN[ 3] Bs    fopen(Bs, "r") filename Bs
       ...
 
+   Current versions of GNU APL have replaced the native FILE_IO function
+above by the sustem function ⎕FIO. ⎕FIO need not be ⎕FX’ed and is
+otherwise backward compatible to the native function.  New function
+numbers are, however, only added to ⎕FIO and not to the old native
+function FILE_IO. The parameters of the functions are described in the
+man pages for, e.g.  strerror, fopen, ...  and are fairly obvious.
+
+   Many functions in FILE_IO have byte vectors as arguments or return
+byte vectors.  A byte vector is an integer vector whose numbers fit into
+a byte (so they are integers between -128 and 255).  Often ⎕UCS and the
+functions in dyadic ⎕CR are used to convert such byte vectors to/from,
+for example, Unicode strings.
+
    The GNU APL package also contains other shared libraries as templates
 for your own native functions.  Copy one of the files
 src/native/template_F0.cc (for niladic native functions),
@@ -3302,22 +3315,22 @@ Node: Section 3.641910
 Node: Section 3.743197
 Node: Section 3.845128
 Node: Section 3.945301
-Node: Section 3.1047807
-Node: Section 3.1148385
-Node: Section 3.1249781
-Node: Section 3.1353736
-Node: Section 3.1454500
-Node: Section 3.1556489
-Node: Section 3.1666400
-Node: Section 3.1768185
-Node: Chapter 471268
-Node: Chapter 573016
-Node: Chapter 674145
-Node: Section 6.174564
-Node: Section 6.275251
-Node: Chapter 776082
-Node: Section 7.176585
-Node: Section 7.2101894
+Node: Section 3.1048551
+Node: Section 3.1149129
+Node: Section 3.1250525
+Node: Section 3.1354480
+Node: Section 3.1455244
+Node: Section 3.1557233
+Node: Section 3.1667144
+Node: Section 3.1768929
+Node: Chapter 472012
+Node: Chapter 573760
+Node: Chapter 674889
+Node: Section 6.175308
+Node: Section 6.275995
+Node: Chapter 776826
+Node: Section 7.177329
+Node: Section 7.2102638
 
 End Tag Table
 
