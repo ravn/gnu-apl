@@ -1161,8 +1161,10 @@ is printed instead of VALUE. The shape SH is computed like this:
 The ⎕CR function has an optional left argument that selects one of several
 formatting styles and conversions in addition to the well-known monadic form.
 
-Say a @b{byte vector} is a character vector with each character having an
-8-bit value (i.e. a value from -128 to 255 inclusive). Let Z←A ⎕CR B.
+Say a @b{byte vector} is an integer vector with numbers having a (signed or
+unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte
+vectors are returned by several ⎕FIO functions and expected as arguments by 
+several other ⎕FIO function. Let Z←A ⎕CR B.
 
 Then the left argument A of ⎕CR selects one of the following:
 

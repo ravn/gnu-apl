@@ -1073,8 +1073,10 @@ The ⎕CR function has an optional left argument that selects one of
 several formatting styles and conversions in addition to the well-known
 monadic form.
 
-   Say a byte vector is a character vector with each character having an
-8-bit value (i.e.  a value from -128 to 255 inclusive).  Let Z←A ⎕CR B.
+   Say a byte vector is an integer vector with numbers having a (signed
+or unsigned) 8-bit value (i.e.  a value from -128 to 255 inclusive).
+Such byte vectors are returned by several ⎕FIO functions and expected as
+arguments by several other ⎕FIO function.  Let Z←A ⎕CR B.
 
    Then the left argument A of ⎕CR selects one of the following:
 
@@ -3294,28 +3296,28 @@ Node: Chapter 321317
 Node: Section 3.122215
 Node: Section 3.233118
 Node: Section 3.337504
-Node: Section 3.440363
-Node: Section 3.541166
-Node: Section 3.641779
-Node: Section 3.743066
-Node: Section 3.844997
-Node: Section 3.945170
-Node: Section 3.1047676
-Node: Section 3.1148254
-Node: Section 3.1249650
-Node: Section 3.1353605
-Node: Section 3.1454369
-Node: Section 3.1556358
-Node: Section 3.1666269
-Node: Section 3.1768054
-Node: Chapter 471137
-Node: Chapter 572885
-Node: Chapter 674014
-Node: Section 6.174433
-Node: Section 6.275120
-Node: Chapter 775951
-Node: Section 7.176454
-Node: Section 7.2101763
+Node: Section 3.440494
+Node: Section 3.541297
+Node: Section 3.641910
+Node: Section 3.743197
+Node: Section 3.845128
+Node: Section 3.945301
+Node: Section 3.1047807
+Node: Section 3.1148385
+Node: Section 3.1249781
+Node: Section 3.1353736
+Node: Section 3.1454500
+Node: Section 3.1556489
+Node: Section 3.1666400
+Node: Section 3.1768185
+Node: Chapter 471268
+Node: Chapter 573016
+Node: Chapter 674145
+Node: Section 6.174564
+Node: Section 6.275251
+Node: Chapter 776082
+Node: Section 7.176585
+Node: Section 7.2101894
 
 End Tag Table
 
