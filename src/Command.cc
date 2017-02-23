@@ -1277,6 +1277,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
    // ]USERCMD REMOVE        ]existing-command
    // ]USERCMD ]new-command  APL-fun
    // ]USERCMD ]new-command  APL-fun  mode
+   // ]USERCMD ]new-command  { ... }
    //
    if (args.size() == 0)
       {
@@ -1321,14 +1322,54 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
        return;
      }
 
-   if (args.size() > 3)
+  // check if the user command is not followed by the string
+  if (args.size() == 1)
+     {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "user command syntax in ]USERCMD: ]new-command  APL-fun  [mode]";
+        return;
+     }
+   UCS_string command_name = args[0];
+   UCS_string apl_fun = args[1];
+   int mode = 0;
+
+   // check if lambda
+   bool is_lambda = false;
+   if (apl_fun[0] == '{')
+      {
+         // looks like the user command is a lambda function.
+         UCS_string result;
+         // lambdas could contain spaces, collect all arguments in one string
+         for (int i = 1; i < args.size(); ++ i)
+            {
+               result << args[i];
+            }
+         // check if lamda-function closed properly
+         if (result.last() == '}')
+            {
+               is_lambda = true;
+               apl_fun = result;
+               // determine the mode: if both alpha and omega present, assume dyadic,
+               // otherwise - monadic usage
+               mode = (apl_fun.contains(UNI_OMEGA) && apl_fun.contains(UNI_ALPHA)) ? 1 : 0;
+            }
+         else
+            {
+               out << "BAD COMMAND+" << endl;
+               MORE_ERROR() << "not found closing } in lambda function";
+               return;
+            }
+      }
+
+   if (args.size() > 3 && !is_lambda)
       {
         out << "BAD COMMAND+" << endl;
         MORE_ERROR() << "too many parameters in command ]USERCMD";
         return;
       }
 
-const int mode = (args.size() == 3) ? args[2].atoi() : 0;
+   // check mode
+   if (!is_lambda && args.size() == 3)   mode = args[2].atoi();
    if (mode < 0 || mode > 1)
       {
         out << "BAD COMMAND+" << endl;
@@ -1339,11 +1380,11 @@ const int mode = (args.size() == 3) ? args[2].atoi() : 0;
 
    // check command name
    //
-   loop(c, args[0].size())
+   loop(c, command_name.size())
       {
         bool error = false;
-        if (c == 0)   error = error || args[0][c] != ']';
-        else          error = error || !Avec::is_symbol_char(args[0][c]);
+        if (c == 0)   error = error || command_name[c] != ']';
+        else          error = error || !Avec::is_symbol_char(command_name[c]);
         if (error)
            {
              out << "BAD COMMAND+" << endl;
@@ -1355,28 +1396,31 @@ const int mode = (args.size() == 3) ? args[2].atoi() : 0;
    // check conflicts with existing commands
    //
 #define cmd_def(cmd_str, _cod, _arg, _hint) \
-   if (check_name_conflict(out, cmd_str, args[0]))   return;
+   if (check_name_conflict(out, cmd_str, command_name))   return;
 #include "Command.def"
-   if (check_redefinition(out, args[0], args[1], mode))
+   if (check_redefinition(out, command_name, apl_fun, mode))
      {
        out << "    User-defined command "
-           << args[0] << " installed." << endl;
+           << command_name << " installed." << endl;
        return;
      }
 
    // check APL function name
-   //
-   loop(c, args[1].size())
+   // Only needed when not a lambda function
+   if (!is_lambda)
       {
-        if (!Avec::is_symbol_char(args[1][c]))
-           {
-             out << "BAD COMMAND+" << endl;
-             MORE_ERROR() << "bad APL function name in command ]USERCMD";
-             return;
-           }
+         loop(c, apl_fun.size())
+            {
+               if (!Avec::is_symbol_char(apl_fun[c]))
+                  {
+                     out << "BAD COMMAND+" << endl;
+                     MORE_ERROR() << "bad APL function name in command ]USERCMD";
+                     return;
+                  }
+            }
       }
 
-user_command new_user_command = { args[0], args[1], mode };
+user_command new_user_command = { command_name, apl_fun, mode };
    user_commands.append(new_user_command);
 
    out << "    User-defined command "
