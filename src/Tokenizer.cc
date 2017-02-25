@@ -78,7 +78,7 @@ Tokenizer::do_tokenize(const UCS_string & input, Token_string & tos)
 Source<Unicode> src(input);
    while ((rest_1 = rest_2 = src.rest()) != 0)
       {
-        const Unicode uni = *src;
+        Unicode uni = *src;
         if (uni == UNI_COMMENT)             break;   // ⍝ comment
         if (uni == UNI_ASCII_NUMBER_SIGN)   break;   // # comment
 
@@ -206,7 +206,7 @@ Source<Unicode> src(input);
                         if (src.rest() == 1)   // syntax error
                            throw_parse_error(E_SYNTAX_ERROR, LOC, loc);
 
-                        const Unicode uni_1 = src[1];
+                        Unicode uni_1 = src[1];
                         const Token tok_1 = Avec::uni_to_token(uni_1, LOC);
                         if ((tok_1.get_tag() & TC_MASK) == TC_NUMERIC)
                            tokenize_number(src, tos);

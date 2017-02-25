@@ -446,7 +446,7 @@ const bool log_startup = uprefs.parse_argv_1();
             {
               // SETUP workspace exists and was not inhibited by --noCONT
               //
-              UCS_string load_cmd(")LOAD CONTINUE");
+              UCS_string load_cmd(")LOAD SETUP");
               Command::process_line(load_cmd);
               return 0;
             }
