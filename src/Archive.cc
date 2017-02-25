@@ -473,6 +473,30 @@ XML_Saving_Archive::save_Symbol(const Symbol & sym)
 }
 //-----------------------------------------------------------------------------
 void
+XML_Saving_Archive::save_user_commands(
+               const Simple_string<Command::user_command, false> & cmds)
+{
+   if (cmds.size() == 0)   return;
+
+   do_indent();
+   out << "<Commands size=\"" << cmds.size() << "\">" << endl;
+
+   ++indent;
+   loop(u, cmds.size())
+      {
+        const Command::user_command & ucmd = cmds[u];
+        do_indent();
+        out << "<Command name=\"" << ucmd.prefix
+            << "\" mode=\"" << ucmd.mode
+            << "\" fun=\"" <<  ucmd.apl_function << "\"/>" << endl;
+      }
+
+   --indent;
+   do_indent();
+   out << "</Commands>" << endl << endl;
+}
+//-----------------------------------------------------------------------------
+void
 XML_Saving_Archive::save_token_loc(const Token_loc & tloc)
 {
    do_indent();
@@ -630,7 +654,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "\n"
 "<!DOCTYPE Workspace\n"
 "[\n"
-"    <!ELEMENT Workspace (Value*,Ravel*,SymbolTable,Symbol*,StateIndicator)>\n"
+"    <!ELEMENT Workspace (Value*,Ravel*,SymbolTable,Symbol*,Commands,StateIndicator)>\n"
 "    <!ATTLIST Workspace  wsid       CDATA #REQUIRED>\n"
 "    <!ATTLIST Workspace  year       CDATA #REQUIRED>\n"
 "    <!ATTLIST Workspace  month      CDATA #REQUIRED>\n"
@@ -683,6 +707,14 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "\n"
 "        <!ELEMENT UCS (#PCDATA)>\n"
 "        <!ATTLIST UCS uni CDATA #REQUIRED>\n"
+"\n"
+"        <!ELEMENT Commands (Command*)>\n"
+"        <!ATTLIST Commands size CDATA #REQUIRED>\n"
+"\n"
+"            <!ELEMENT Command (#PCDATA)>\n"
+"            <!ATTLIST Command name       CDATA #REQUIRED>\n"
+"            <!ATTLIST Command mode       CDATA #REQUIRED>\n"
+"            <!ATTLIST Command fun       CDATA #REQUIRED>\n"
 "\n"
 "        <!ELEMENT StateIndicator (SI-entry*)>\n"
 "        <!ATTLIST StateIndicator levels CDATA #REQUIRED>\n"
@@ -858,6 +890,10 @@ print_history(CERR, values[p]._val, 0);
 #define rw_sv_def(x, _str, _txt) save_Symbol(Workspace::get_v_ ## x());
 #define ro_sv_def(x, _str, _txt) save_Symbol(Workspace::get_v_ ## x());
 #include "SystemVariable.def"
+
+   // save user-defined commands (if any)
+   //
+   save_user_commands(Workspace::get_user_commands());
 
    // save state indicator
    //
@@ -1293,6 +1329,7 @@ const char * tag_order[] =
   "Ravel",
   "SymbolTable",
   "Symbol",
+  "Commands",
   "StateIndicator",
   "/Workspace",
   0
@@ -1312,6 +1349,7 @@ const char ** tag_pos = tag_order;
                   {
                      if (*tag_pos == 0)      DOMAIN_ERROR;   // end of list
                      if (is_tag(*tag_pos))   break;          // found
+                     ++tag_pos;
                   }
             }
 
@@ -1319,6 +1357,7 @@ const char ** tag_pos = tag_order;
          else if (is_tag("Ravel"))            read_Ravel();
          else if (is_tag("SymbolTable"))      read_SymbolTable();
          else if (is_tag("Symbol"))           read_Symbol();
+         else if (is_tag("Commands"))         read_Commands();
          else if (copying)                    break;
          else if (is_tag("StateIndicator"))   read_StateIndicator();
          else if (is_tag("/Workspace"))       break;
@@ -1783,7 +1822,7 @@ XML_Loading_Archive::read_SymbolTable()
 {
 const int size = find_int_attr("size", false, 10);
 
-   Log(LOG_archive)   CERR << "  read_SymbolTable() vid=" << endl;
+   Log(LOG_archive)   CERR << "  read_SymbolTable()" << endl;
 
    loop(s, size)
       {
@@ -1957,6 +1996,46 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
    Assert(symbol->value_stack_size() == depth);
    next_tag(LOC);
    expect_tag("/Symbol", LOC);
+}
+//-----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_Commands()
+{
+const int size = find_int_attr("size", false, 10);
+
+   Log(LOG_archive)   CERR << "  read_Commands()" << endl;
+
+   loop(s, size)
+      {
+        next_tag(LOC);
+        read_Command();
+      }
+
+   next_tag(LOC);
+   expect_tag("/Commands", LOC);
+}
+//-----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_Command()
+{
+   expect_tag("Command", LOC);
+
+const UTF8 * name = find_attr("name",  false);
+const UTF8 * name_end = name;
+   while (*name_end != '"')   ++name_end;
+UTF8_string name_UTF(name, name_end - name);
+UCS_string  name_UCS(name_UTF);
+
+const UTF8 * fun = find_attr("fun",  false);
+const UTF8 * fun_end = fun;
+   while (*fun_end != '"')   ++fun_end;
+UTF8_string fun_UTF(fun, fun_end - fun);
+UCS_string  fun_UCS(fun_UTF);
+
+const int mode = find_int_attr("mode", false, 10);
+
+Command::user_command ucmd = { name_UCS, fun_UCS, mode };
+   Workspace::get_user_commands().append(ucmd);
 }
 //-----------------------------------------------------------------------------
 void

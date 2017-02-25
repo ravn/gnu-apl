@@ -25,6 +25,8 @@
 #include "SystemLimits.hh"
 #include "UCS_string.hh"
 #include "UTF8_string.hh"
+#include "Workspace.hh"
+
 #include "Value.icc"
 
 class Cell;
@@ -73,6 +75,9 @@ public:
 
    /// write Symbol \b sym
    void save_Symbol(const Symbol & sym);
+
+   /// write all user defined commands
+   void save_user_commands(const Simple_string<Command::user_command, false> & cmds);
 
    /// write SymbolTable \b symtab
    void save_symtab(const SymbolTable & symtab);
@@ -257,6 +262,12 @@ protected:
 
    /// read next Symbol element
    void read_Symbol();
+
+   /// read all user-defined commands
+   void read_Commands();
+
+   /// read next Command element
+   void read_Command();
 
    /// read next StateIndicator element
    void read_StateIndicator();

@@ -85,15 +85,15 @@ char cc[4000];
 
    snprintf(cc, sizeof(cc),
 "    --cfg                show ./configure options used and exit\n"
-"    --noCIN              do not echo input(for scripting)\n"
+"    --noCIN              do not echo input (for scripting)\n"
 "    --echoCIN            echo (final) input to COUT\n"
 "    --rawCIN             do not emit escape sequences\n"
 "    --[no]Color          start with ]XTERM ON [OFF])\n"
-"    --noCONT             do not )LOAD CONTINUE workspace on startup)\n"
+"    --noCONT             do not )LOAD CONTINUE or SETUP workspace on startup\n"
 "    --emacs              run in (classical) emacs mode\n"
 "    --emacs_arg arg      run in emacs mode with argument arg\n"
 "    --gpl                show license (GPL) and exit\n"
-"    -L wsname            )LOAD wsname on startup\n"
+"    -L wsname            )LOAD wsname (and not SETUP or CONTINUE) on startup\n"
 "    --LX expr            execute APL expression expr first\n"
 "    -p N                 use profile N in preferences files\n"
 "    --par proc           use processor parent ID proc (default: no parent)\n"

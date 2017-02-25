@@ -243,7 +243,7 @@ troubleshoot a script).
 @item
 @option{--noCONT}
 
-do not load a CONTINUE workspace on start-up.
+do not load a SETUP or CONTINUE workspace on start-up.
 
 @item
 @option{--PW COLS}

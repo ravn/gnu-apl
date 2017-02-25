@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef __COMMAND_HH_DEFINED__
+#define __COMMAND_HH_DEFINED__
+
 #include <dirent.h>
 
 #include "Value.icc"
@@ -118,9 +121,6 @@ public:
         UCS_string apl_function;   ///< APL function implementing the command
         int        mode;           ///< how left arg of apl_function is computed
       };
-
-   /// one user defined command
-   static Simple_string<user_command, false> user_commands;
 
    /// check workspace integrity (stale Value and IndexExpr objects, etc)
    static void cmd_CHECK(ostream & out);
@@ -338,3 +338,4 @@ inline void Hswap(Command::val_val & vp1, Command::val_val & vp2)
 const Command::val_val tmp = vp1;   vp1 = vp2;   vp2 = tmp;
 }
 //-----------------------------------------------------------------------------
+#endif // __COMMAND_HH_DEFINED__

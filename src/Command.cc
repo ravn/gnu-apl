@@ -51,8 +51,6 @@
 int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;
 
-Simple_string<Command::user_command, false> Command::user_commands;
-
 //-----------------------------------------------------------------------------
 void
 Command::process_line()
@@ -127,9 +125,9 @@ UCS_string_vector args = split_arg(arg);
 
    // check for user defined commands...
    //
-   loop(u, user_commands.size())
+   loop(u, Workspace::get_user_commands().size())
        {
-         if (cmd.starts_iwith(user_commands[u].prefix))
+         if (cmd.starts_iwith(Workspace::get_user_commands()[u].prefix))
             {
               do_USERCMD(out, line, line1, cmd, args, u);
               return true;
@@ -748,15 +746,18 @@ Command::cmd_HELP(ostream & out)
    out << "      " cmd_str " " arg << endl;
 #include "Command.def"
 
-  if (user_commands.size())
+  if (Workspace::get_user_commands().size())
      {
        out << endl << "User defined commands:" << endl;
-       loop(u, user_commands.size())
+       loop(u, Workspace::get_user_commands().size())
            {
-             out << "      " << user_commands[u].prefix << " [args]  calls:  ";
-             if (user_commands[u].mode)   out << "tokenized-args ";
+             out << "      " << Workspace::get_user_commands()[u].prefix
+                 << " [args]  calls:  ";
+             if (Workspace::get_user_commands()[u].mode)
+                out << "tokenized-args ";
  
-             out << user_commands[u].apl_function << " quoted-args" << endl;
+             out << Workspace::get_user_commands()[u].apl_function
+                 << " quoted-args" << endl;
            }
      }
 
@@ -1247,11 +1248,11 @@ bool
 Command::check_redefinition(ostream & out, const UCS_string & cnew,
                             const UCS_string fnew, const int mnew)
 {
-   loop(u, user_commands.size())
+   loop(u, Workspace::get_user_commands().size())
      {
-       const UCS_string cold = user_commands[u].prefix;
-       const UCS_string fold = user_commands[u].apl_function;
-       const int mold = user_commands[u].mode;
+       const UCS_string cold = Workspace::get_user_commands()[u].prefix;
+       const UCS_string fold = Workspace::get_user_commands()[u].apl_function;
+       const int mold = Workspace::get_user_commands()[u].mode;
 
        if (cnew != cold)   continue;
 
@@ -1281,14 +1282,15 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
    //
    if (args.size() == 0)
       {
-        if (user_commands.size())
+        if (Workspace::get_user_commands().size())
            {
-             loop(u, user_commands.size())
+             loop(u, Workspace::get_user_commands().size())
                 {
-                  out << user_commands[u].prefix << " → ";
-                  if (user_commands[u].mode)   out << "A ";
-                  out << user_commands[u].apl_function << " B"
-                      << " (mode " << user_commands[u].mode << ")" << endl;
+                  out << Workspace::get_user_commands()[u].prefix << " → ";
+                  if (Workspace::get_user_commands()[u].mode)   out << "A ";
+                  out << Workspace::get_user_commands()[u].apl_function << " B"
+                      << " (mode " << Workspace::get_user_commands()[u].mode
+                      << ")" << endl;
                 }
            }
         return;
@@ -1296,23 +1298,26 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
 
   if (args.size() == 1 && args[0].starts_iwith("REMOVE-ALL"))
      {
-       user_commands.shrink(0);
+       Workspace::get_user_commands().shrink(0);
        out << "    All user-defined commands removed." << endl;
        return;
      }
 
   if (args.size() == 2 && args[0].starts_iwith("REMOVE"))
      {
-       loop(u, user_commands.size())
+       loop(u, Workspace::get_user_commands().size())
            {
-             if (user_commands[u].prefix.starts_iwith(args[1]) &&
-                 args[1].starts_iwith(user_commands[u].prefix))   // same
+             if (Workspace::get_user_commands()[u].prefix
+                                                  .starts_iwith(args[1]) &&
+                 args[1].starts_iwith(Workspace::get_user_commands()[u]
+                                                          .prefix))   // same
                 {
                   // print first and remove then!
                   //
                   out << "    User-defined command "
-                      << user_commands[u].prefix << " removed." << endl;
-                  user_commands.erase(u);
+                      << Workspace::get_user_commands()[u].prefix
+                      << " removed." << endl;
+                  Workspace::get_user_commands().erase(u);
                   return;
                 }
            }
@@ -1326,9 +1331,11 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
   if (args.size() == 1)
      {
         out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "user command syntax in ]USERCMD: ]new-command  APL-fun  [mode]";
+        MORE_ERROR() << "user command syntax in ]USERCMD:"
+                        " ]new-command  APL-fun  [mode]";
         return;
      }
+
    UCS_string command_name = args[0];
    UCS_string apl_fun = args[1];
    int mode = 0;
@@ -1349,9 +1356,10 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
             {
                is_lambda = true;
                apl_fun = result;
-               // determine the mode: if both alpha and omega present, assume dyadic,
-               // otherwise - monadic usage
-               mode = (apl_fun.contains(UNI_OMEGA) && apl_fun.contains(UNI_ALPHA)) ? 1 : 0;
+               // determine the mode: if both alpha and omega present then
+               // assume dyadic, otherwise monadic usage
+               mode = (apl_fun.contains(UNI_OMEGA) &&
+                       apl_fun.contains(UNI_ALPHA)) ? 1 : 0;
             }
          else
             {
@@ -1414,14 +1422,15 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                if (!Avec::is_symbol_char(apl_fun[c]))
                   {
                      out << "BAD COMMAND+" << endl;
-                     MORE_ERROR() << "bad APL function name in command ]USERCMD";
+                     MORE_ERROR() <<
+                          "bad APL function name in command ]USERCMD";
                      return;
                   }
             }
       }
 
 user_command new_user_command = { command_name, apl_fun, mode };
-   user_commands.append(new_user_command);
+   Workspace::get_user_commands().append(new_user_command);
 
    out << "    User-defined command "
        << new_user_command.prefix << " installed." << endl;
@@ -1432,7 +1441,7 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
                     const UCS_string & line, const UCS_string & cmd,
                     UCS_string_vector & args, int uidx)
 {
-  if (user_commands[uidx].mode > 0)   // dyadic
+  if (Workspace::get_user_commands()[uidx].mode > 0)   // dyadic
      {
         apl_cmd.append_quoted(cmd);
         apl_cmd.append(UNI_ASCII_SPACE);
@@ -1443,7 +1452,7 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
            }
      }
 
-   apl_cmd.append(user_commands[uidx].apl_function);
+   apl_cmd.append(Workspace::get_user_commands()[uidx].apl_function);
    apl_cmd.append(UNI_ASCII_SPACE);
    apl_cmd.append_quoted(line);
 }

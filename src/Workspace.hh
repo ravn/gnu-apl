@@ -21,6 +21,7 @@
 #ifndef __WORKSPACE_HH_DEFINED__
 #define __WORKSPACE_HH_DEFINED__
 
+#include "Command.hh"
 #include "PrimitiveOperator.hh"
 #include "PrintContext.hh"
 #include "QuadFunction.hh"
@@ -164,6 +165,9 @@ public:
    static void set_WS_name(const UCS_string & new_name)
       { the_workspace.WS_name = new_name; }
 
+   static Simple_string<Command::user_command, false> & get_user_commands()
+      {  return the_workspace.user_commands; }
+
    /// Create a new SI-entry on the SI stack.
    static void push_SI(Executable * fun, const char * loc);
 
@@ -212,6 +216,9 @@ public:
    /// dump this workspace
    static void dump_WS(ostream & out, UCS_string_vector & lib_ws,
                        bool html, bool silent);
+
+   /// dump the commands in this workspace
+   static void dump_commands(ostream & out);
 
    /// set or inquire the workspace ID
    static void wsid(ostream & out, UCS_string arg, bool silent);
@@ -296,6 +303,9 @@ protected:
 
    /// )LOAD, )QLOAD, )CLEAR, or )SIC
    UCS_string pushed_command;
+
+   /// user defined commands
+   Simple_string<Command::user_command, false> user_commands;
 
    /// the current workspace (for objects that need one but don't have one).
    static Workspace the_workspace;

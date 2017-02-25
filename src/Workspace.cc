@@ -471,6 +471,10 @@ const int ret = the_workspace.expunged_functions.size();
 void
 Workspace::clear_WS(ostream & out, bool silent)
 {
+   // remove user-defined commands
+   //
+   get_user_commands().shrink(0);
+
    // clear the SI (pops all localized symbols)
    //
    clear_SI(out);
@@ -904,6 +908,7 @@ const char * tz_sign = (offset < 0) ? "" : "+";
 int function_count = 0;
 int variable_count = 0;
    the_workspace.symbol_table.dump(*sout, function_count, variable_count);
+   the_workspace.dump_commands(*sout);
 
    // system variables
    //
@@ -932,6 +937,19 @@ int variable_count = 0;
             << " (" << function_count << " FUNCTIONS, " << variable_count
             << " VARIABLES)" << endl;
       }
+}
+//-----------------------------------------------------------------------------
+void
+Workspace::dump_commands(ostream & out)
+{
+Simple_string<Command::user_command, false> & cmds = get_user_commands();
+
+   loop(c, cmds.size())
+      out << "]USERCMD " << cmds[c].prefix
+          << " " << cmds[c].apl_function
+          << " " << cmds[c].mode << endl;
+
+   if (cmds.size())   out << endl;
 }
 //-----------------------------------------------------------------------------
 // )LOAD WS, set ⎕LX of loaded WS on success

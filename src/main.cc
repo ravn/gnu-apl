@@ -414,10 +414,11 @@ const bool log_startup = uprefs.parse_argv_1();
         Command::process_line(lx);
       }
 
-   // maybe )LOAD the CONTINUE workspace. Do that unless the user has given
+   // maybe )LOAD the CONTINUE or SETUP workspace. Do that unless the user 
+   // has given
    //
    // (1) --noCONT, or
-   // (2) --script, or
+   // (2) --script (which implies --noCONT), or
    // (3)  -L wsname
    //
    if (uprefs.do_CONT && !uprefs.initial_workspace.size())
@@ -429,6 +430,21 @@ const bool log_startup = uprefs.parse_argv_1();
          if (access(filename.c_str(), F_OK) == 0)
             {
               // CONTINUE workspace exists and was not inhibited by --noCONT
+              //
+              UCS_string load_cmd(")LOAD CONTINUE");
+              Command::process_line(load_cmd);
+              return 0;
+            }
+
+         // no CONTINUE workspace but maybe SETUP
+         //
+         cont = UCS_string("SETUP");
+         filename =
+            LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
+
+         if (access(filename.c_str(), F_OK) == 0)
+            {
+              // SETUP workspace exists and was not inhibited by --noCONT
               //
               UCS_string load_cmd(")LOAD CONTINUE");
               Command::process_line(load_cmd);
