@@ -155,7 +155,7 @@ public:
    {}
 
    /// destructor
-   ~Statistics();
+   virtual ~Statistics();
 
    /// print statistics
    virtual void print(ostream & out) = 0;
