@@ -534,6 +534,7 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CXX_RDYNAMIC = @CXX_RDYNAMIC@
+CXX_WERROR = @CXX_WERROR@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -662,7 +663,8 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Werror -Wall -I sql $(am__append_2) $(am__append_6)
+common_CXXFLAGS = $(CXX_WERROR) -Wall -I sql $(am__append_2) \
+	$(am__append_6)
 common_LDFLAGS = $(am__append_3) $(am__append_7)
 common_SOURCES = buildtag buildtag.hh ../config.h APL_types.hh \
 	Archive.cc Archive.hh ArrayIterator.cc ArrayIterator.hh \

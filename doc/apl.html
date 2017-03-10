@@ -706,7 +706,7 @@ shall be decided. The options are:
 </p>
 <p>(c) theoretically a combination of (a) and (b)
 </p>
-<p>The advantage of (a) is less reunite overhead which is important because / is
+<p>The advantage of (a) is less run-time overhead which is important because / is
 probably the most frequently used APL operator. As will be explained below
 there are cases where (a) fails. The advantage of (b), at first glance,
 seems to be that it always gives the correct (more precisely: the expected
@@ -715,11 +715,11 @@ reveals, however, that this is only true for the most simple cases but not
 in general.
 </p>
 <p>To give you an idea where (b) becomes tricky is this (there are more of
-that kind:
+that kind):
 </p>
 <p>A[FOO]/B   ⍝ where FOO could define A via ⎕FX or do A←
 </p>
-<p>Io is still possible to resolve the last example at run time, but the parser
+<p>It is still possible to resolve the last example at run time, but the parser
 would become far more complex to do that. The same holds for (c).
 </p>
 <p>For these reasons the decision was made in favor of (a) with a syntactic
@@ -731,16 +731,19 @@ involved. The algorithm used in GNU APL for classifying / and friend is
 </p>
 <p>1. / ⌿ \ and ⍀ are tokenized as operators
 </p>
-<p>2. Scan the tokenized statement from left to right to find  / ⌿ \ or ⍀
+<p>2. Scan the tokenized statement from left to right to find / ⌿ \ or ⍀
 </p>
-<p>3. If found, go backwards until a constant, a function, or a user-defined
-   name is found:
+<p>3. If a / ⌿ \ or ⍀ is found, go backwards until a constant, or a function,
+   or a user-defined  name is found:
 3a. if a constant, a function, or a user-defined name is found then →4
-3b. if ) is seen then skip over it
-3c. if ] is seen then skip until the corresponding [ is found
+3b. if ) is seen then skip over it, That is, a parenthesized expression is
+    entered.
+3c. if ] is seen then skip until the corresponding [ is found, That is an
+    index list or axis is skipped over.
 3d. otherwise: SYNTAX ERROR
 </p>
-<p>4. decide the role of (for example) / based on the token found in 3a:
+<p>4. decide the role of / \ ⌿ or ⍀ based on the kind of token that was found
+   in 3a:
 4a. function: leave / as operator as initially tokenized
 4b. constant: change / from operator to function (compress)
 4c. see below

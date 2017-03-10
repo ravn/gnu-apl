@@ -16,7 +16,7 @@ APserver_SOURCES = APserver.cc				\
 
 AM_CXXFLAGS = $(CXX_RDYNAMIC) -I $(srcdir)/.. -g -O2
 if DEVELOP
-   AM_CXXFLAGS += -Werror -Wall -Wno-strict-aliasing
+   AM_CXXFLAGS += $(WERROR) -Wall -Wno-strict-aliasing
 endif
 
 AP100_CXXFLAGS    = $(AM_CXXFLAGS) -DAP_NUM=100

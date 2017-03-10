@@ -13,7 +13,7 @@ all: apl.beam apl_example.beam erlang_APL_nif.so
 	erl -compile $<
 
 erlang_APL_nif.so: erlang_APL_nif.c
-	gcc -o $@ -Wall -Werror -fpic -shared -rdynamic -pthread \
+	gcc -o $@ -Wall $(WERROR) -fpic -shared -rdynamic -pthread \
  erlang_APL_nif.c -L/usr/local/lib/apl -lapl
 
 

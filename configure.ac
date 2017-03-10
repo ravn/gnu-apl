@@ -314,8 +314,14 @@ AC_CONFIG_FILES([Makefile
 
 # AM_MAKEFLAGS: desired -j count ?
 AC_ARG_VAR(MAKE_J,
-   [ make job count (-j, see README-2-configure) default: 4) ])
+   [ job count (-j) for make, (see README-2-configure) default: 4) ])
 if test "x$MAKE_J" = "x"; then MAKE_J=4; fi
+
+# AM_CXXFLAGS: do/dont -Werror ?
+AC_ARG_VAR(CXX_WERROR,
+   [ turn warnings into errors (compiler flag -Werror) default: yes) ])
+if test "x$CXX_WERROR" = "xno"; then CXX_WERROR="";
+                                else CXX_WERROR="-Werror"; fi
 
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden

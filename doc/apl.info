@@ -565,7 +565,7 @@ time’ similar to compile-time for compiler languages), or
 
    (c) theoretically a combination of (a) and (b)
 
-   The advantage of (a) is less reunite overhead which is important
+   The advantage of (a) is less run-time overhead which is important
 because / is probably the most frequently used APL operator.  As will be
 explained below there are cases where (a) fails.  The advantage of (b),
 at first glance, seems to be that it always gives the correct (more
@@ -574,11 +574,11 @@ specification).  A closer look reveals, however, that this is only true
 for the most simple cases but not in general.
 
    To give you an idea where (b) becomes tricky is this (there are more
-of that kind:
+of that kind):
 
    A[FOO]/B ⍝ where FOO could define A via ⎕FX or do A←
 
-   Io is still possible to resolve the last example at run time, but the
+   It is still possible to resolve the last example at run time, but the
 parser would become far more complex to do that.  The same holds for
 (c).
 
@@ -594,15 +594,17 @@ classifying / and friend is (simplified) this:
    2.  Scan the tokenized statement from left to right to find / ⌿ \ or
 ⍀
 
-   3.  If found, go backwards until a constant, a function, or a
-user-defined name is found: 3a.  if a constant, a function, or a
-user-defined name is found then →4 3b.  if ) is seen then skip over it
-3c.  if ] is seen then skip until the corresponding [ is found 3d.
-otherwise: SYNTAX ERROR
+   3.  If a / ⌿ \ or ⍀ is found, go backwards until a constant, or a
+function, or a user-defined name is found: 3a.  if a constant, a
+function, or a user-defined name is found then →4 3b.  if ) is seen then
+skip over it, That is, a parenthesized expression is entered.  3c.  if ]
+is seen then skip until the corresponding [ is found, That is an index
+list or axis is skipped over.  3d.  otherwise: SYNTAX ERROR
 
-   4.  decide the role of (for example) / based on the token found in
-3a: 4a.  function: leave / as operator as initially tokenized 4b.
-constant: change / from operator to function (compress) 4c.  see below
+   4.  decide the role of / \ ⌿ or ⍀ based on the kind of token that was
+found in 3a: 4a.  function: leave / as operator as initially tokenized
+4b.  constant: change / from operator to function (compress) 4c.  see
+below
 
    This works fine except in case 4c.  which cannot be resolved at ⎕FX
 time.  For this case we introduce the following convention:
@@ -3305,32 +3307,32 @@ Tag Table:
 Node: Top383
 Node: Chapter 11408
 Node: Chapter 217057
-Node: Chapter 321326
-Node: Section 3.122224
-Node: Section 3.233127
-Node: Section 3.337513
-Node: Section 3.440503
-Node: Section 3.541306
-Node: Section 3.641919
-Node: Section 3.743206
-Node: Section 3.845137
-Node: Section 3.945310
-Node: Section 3.1048560
-Node: Section 3.1149138
-Node: Section 3.1250534
-Node: Section 3.1354489
-Node: Section 3.1455253
-Node: Section 3.1557242
-Node: Section 3.1667153
-Node: Section 3.1768938
-Node: Chapter 472021
-Node: Chapter 573769
-Node: Chapter 674898
-Node: Section 6.175317
-Node: Section 6.276004
-Node: Chapter 776835
-Node: Section 7.177338
-Node: Section 7.2102647
+Node: Chapter 321468
+Node: Section 3.122366
+Node: Section 3.233269
+Node: Section 3.337655
+Node: Section 3.440645
+Node: Section 3.541448
+Node: Section 3.642061
+Node: Section 3.743348
+Node: Section 3.845279
+Node: Section 3.945452
+Node: Section 3.1048702
+Node: Section 3.1149280
+Node: Section 3.1250676
+Node: Section 3.1354631
+Node: Section 3.1455395
+Node: Section 3.1557384
+Node: Section 3.1667295
+Node: Section 3.1769080
+Node: Chapter 472163
+Node: Chapter 573911
+Node: Chapter 675040
+Node: Section 6.175459
+Node: Section 6.276146
+Node: Chapter 776977
+Node: Section 7.177480
+Node: Section 7.2102789
 
 End Tag Table
 

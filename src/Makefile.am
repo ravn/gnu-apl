@@ -12,7 +12,7 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Werror -Wall -I sql
+common_CXXFLAGS = $(CXX_WERROR) -Wall -I sql
 common_LDFLAGS =
 common_SOURCES =        buildtag		buildtag.hh		\
 						../config.h		\

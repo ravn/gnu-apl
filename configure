@@ -660,6 +660,7 @@ PERFORMANCE_COUNTERS_WANTED
 VALUE_CHECK_WANTED
 MAX_RANK_WANTED
 DEVELOP_WANTED
+CXX_WERROR
 MAKE_J
 WANT_LIBAPL_FALSE
 WANT_LIBAPL_TRUE
@@ -835,6 +836,7 @@ CXXFLAGS
 CCC
 CXXCPP
 MAKE_J
+CXX_WERROR
 DEVELOP_WANTED
 MAX_RANK_WANTED
 VALUE_CHECK_WANTED
@@ -1511,7 +1513,8 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
-  MAKE_J      make job count (-j, see README-2-configure) default: 4)
+  MAKE_J      job count (-j) for make, (see README-2-configure) default: 4)
+  CXX_WERROR  turn warnings into errors (compiler flag -Werror) default: yes)
   DEVELOP_WANTED
               set development options (see README-2-configure) default: no
   MAX_RANK_WANTED
@@ -18417,6 +18420,11 @@ ac_config_files="$ac_config_files Makefile debian/Makefile debian/source/Makefil
 # AM_MAKEFLAGS: desired -j count ?
 
 if test "x$MAKE_J" = "x"; then MAKE_J=4; fi
+
+# AM_CXXFLAGS: do/dont -Werror ?
+
+if test "x$CXX_WERROR" = "xno"; then CXX_WERROR="";
+                                else CXX_WERROR="-Werror"; fi
 
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden
