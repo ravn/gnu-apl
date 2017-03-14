@@ -144,12 +144,12 @@ MAKE_J
 
     ./configure MAKE_J=8
 
-CXX_WERROR
-    Add -Werror to the compiler flags. Normally GNU APL is being compiled with
-    -Werror, which turns compiler warnings into compiler errors so that the
-    build fails if the compiler issues warnings. However, some older compilers
-    produce lots of bogus warnings that cannot be fixed in a reasonable way.
-    In such cases you can, for example:
+CXX_WERROR=yes/no
+    Do (not) add -Werror to the compiler flags. By default GNU APL is being
+    compiled with -Werror, which turns compiler warnings into compiler errors
+    so that the  build fails if the compiler issues warnings. However, some
+    older compilers produce lots of bogus warnings that cannot be fixed in a
+    reasonable way. In such cases you can, for example:
 
     ./configure CXX_WERROR=no
 

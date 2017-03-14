@@ -796,35 +796,26 @@ const Comp_result comp = compare(other);
 Comp_result
 ComplexCell::compare(const Cell & other) const
 {
-   // comparison of complex numbers gives DOMAN ERROR if one of the cells
-   // is not near-real.
-   //
-   if (!is_near_real())   DOMAIN_ERROR;
-
-const APL_Float breal = get_real_value();
-   if (other.is_integer_cell())   // integer
-      {
-        if (equal(other, Workspace::get_CT()))   return COMP_EQ;
-        return (breal < other.get_int_value()) ? COMP_LT : COMP_GT;
-      }
-
-   if (other.is_float_cell())
-      {
-        if (equal(other, Workspace::get_CT()))   return COMP_EQ;
-        return (breal < other.get_real_value()) ? COMP_LT : COMP_GT;
-      }
-
-   if (other.is_complex_cell())   // complex
-      {
-        if (!other.is_near_real())      DOMAIN_ERROR;
-
-        if (equal(other, Workspace::get_CT()))   return COMP_EQ;
-        return (breal < other.get_real_value()) ? COMP_LT : COMP_GT;
-      }
-
    if (other.is_character_cell())   return COMP_GT;
+   if (!other.is_numeric())   DOMAIN_ERROR;
 
-   DOMAIN_ERROR;
+const APL_Float qct = Workspace::get_CT();
+   if (equal(other, qct))   return COMP_EQ;
+
+APL_Float areal = other.get_real_value();
+APL_Float breal = get_real_value();
+
+   // we compare complex numbers by their real part unless the real parsts
+   // are equal. In that case we compare the imag parts. The reason for
+   // comparing this way is compatibility with the comparison of real numbers
+   //
+   if (tolerantly_equal(areal, breal, qct))
+      {
+        areal = other.get_imag_value();
+        breal = get_imag_value();
+      }
+
+   return (breal < areal) ? COMP_LT : COMP_GT;
 }
 //-----------------------------------------------------------------------------
 PrintBuffer

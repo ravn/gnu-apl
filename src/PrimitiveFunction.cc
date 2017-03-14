@@ -337,18 +337,16 @@ Value_P Z(B->get_shape(), LOC);
    loop(bz, len_BZ)
        {
          const Cell & cell_B = B->get_ravel(bz);
-         bool found = false;
+         APL_Integer z = len_A;   // assume cell_B is not in A
          loop(a, len_A)
              {
                if (cell_B.equal(A->get_ravel(a), qct))
                   {
-                    new (Z->next_ravel()) IntCell(qio + a);
-                    found = true;
+                    z = a;
                     break;
                   }
              }
-         if (!found)
-            new (Z->next_ravel()) IntCell(qio + len_A);
+         new (Z->next_ravel()) IntCell(qio + z);
        }
 
    Z->check_value(LOC);

@@ -706,6 +706,7 @@ between GNU APL and IBM APL2.
 * Section 3.15::   ⎕DLX: Knuth's Dancing Links Algorithm
 * Section 3.16::   History and TAB completion
 * Section 3.17::   ⎕SQL - SQL Database Interface
+* Section 3.18::   Comparison Rules
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -2068,6 +2069,72 @@ given table. Currently, the column layout is as follows:
 More columns containing extra information may be added in a future
 release.
 
+@node    Section 3.18
+@section Comparison Rules
+
+Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥, and
+> (but not = or ≠) are integer or real numbers, and that the argument of monadic
+⍋ or ⍒ is a vector of integer or real numbers. In contrast GNU APL also allows
+the comparison of characters and numbers or the comparison of complex numbers
+according to the following, more general, rules.
+
+Let A and B two APL values to be compared. The first comparison below that
+succeeds (i.e. returns a result) is then the result of comparing A and B.
+ 
+1. If (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
+
+2. If (⍴A) < (⍴B) then A < B. And vice versa.
+
+3. Otherwise ⍴A and ⍴B are equal. If all corresponding ravel elements of A
+   and B are equal (i.e. tolerantly equal within ⎕CT as defined in the ISO
+   standard) then A = B. Otherwise let A1 and B1 the first corresponding
+   ravel elements of A and B with A1≠B1.
+
+4. If A1 and B1 are both character values and (⎕UCS A1) < (⎕UCS B1) then
+   A < B. And vice versa.
+
+5. If A1 is a character and B1 is numeric, then A < B. And vice versa.
+
+6. If A1 and B1 are both numeric values then:
+
+6a. If (9○A1) < (9○B1) then A < B. And vice versa.
+
+6a. Otherwise if (11○A1) < (11○B1) then A < B. And vice versa.
+
+Another way of describing the rules above is that the comparison of two values
+is comprised of sub-comparisons of certain properties of the values in the
+following order:
+
+@itemize
+@item ranks of the values
+@item shapes of the values
+@item type (character vs. numeric) of the values,
+@item unicodes of character values,
+@item real parts of numeric values,
+@item imaginary parts of numeric values,
+@end itemize
+
+Note: Rules 1. and 2. above are only relevant for comparisons made in the
+context of sorting (i.e. for ⍋ or ⍒). This is because for =, ≠, <, ≤, ≥,
+or > either a RANK ERROR or a LENGTH ERROR is raised if the ranks or shapes
+of A and B do not match:
+
+@verbatim
+      (9 8) < (1 2 3)
+LENGTH ERROR
+      9 8<1 2 3
+      ^  ^
+
+      ⍋(9 8) (1 2 3)
+1 2
+@end verbatim
+
+The reason for comparing complex numbers first by their real parts and then
+by their imaginary part and not, for example, first by their magnitude and
+then by their angle is that the chosen order gives more consistent results
+when comparing near-complex numbers or their true real compagnions. For
+example, a magnitude first comparison of complex numbers would make ¯1 < ¯2J∈
+for a near-complex ¯2J∈ but ¯1 > ¯2 for a true real ¯2.
 
 @c ----------------------------------------------------------------------------
 @node Chapter 4

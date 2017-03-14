@@ -116,6 +116,7 @@ ul.no-bullet {list-style: none}
     <li><a name="toc-_005b_003f_005dDLX-_002d-Knuth_0027s-Dancing-Links-Algorithm" href="#Section-3_002e15">3.15 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</a></li>
     <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e16">3.16 History and TAB completion</a></li>
     <li><a name="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-3_002e17">3.17 ⎕SQL - SQL Database Interface</a></li>
+    <li><a name="toc-Comparison-Rules" href="#Section-3_002e18">3.18 Comparison Rules</a></li>
   </ul></li>
   <li><a name="toc-Limitations-and-Missing-Features" href="#Chapter-4">4 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -805,6 +806,8 @@ Next: <a href="#Chapter-4" accesskey="n" rel="next">Chapter 4</a>, Previous: <a 
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e16">Section 3.16</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">History and TAB completion
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e17">Section 3.17</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SQL - SQL Database Interface
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e18">Section 3.18</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Comparison Rules
 </td></tr>
 </table>
 
@@ -2084,7 +2087,7 @@ recalling function lines (and which are not fully supported in GNU APL).
 <a name="Section-3_002e17"></a>
 <div class="header">
 <p>
-Previous: <a href="#Section-3_002e16" accesskey="p" rel="prev">Section 3.16</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e18" accesskey="n" rel="next">Section 3.18</a>, Previous: <a href="#Section-3_002e16" accesskey="p" rel="prev">Section 3.16</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="g_t_005b_003f_005dSQL-_002d-SQL-Database-Interface"></a>
 <h3 class="section">3.17 ⎕SQL - SQL Database Interface</h3>
@@ -2185,7 +2188,77 @@ given table. Currently, the column layout is as follows:
 <p>More columns containing extra information may be added in a future
 release.
 </p>
+<hr>
+<a name="Section-3_002e18"></a>
+<div class="header">
+<p>
+Previous: <a href="#Section-3_002e17" accesskey="p" rel="prev">Section 3.17</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<a name="Comparison-Rules"></a>
+<h3 class="section">3.18 Comparison Rules</h3>
 
+<p>Both IBM APL2 and the ISO standard require that the arguments of &lt;, ≤, ≥, and
+&gt; (but not = or ≠) are integer or real numbers, and that the argument of monadic
+⍋ or ⍒ is a vector of integer or real numbers. In contrast GNU APL also allows
+the comparison of characters and numbers or the comparison of complex numbers
+according to the following, more general, rules.
+</p>
+<p>Let A and B two APL values to be compared. The first comparison below that
+succeeds (i.e. returns a result) is then the result of comparing A and B.
+</p> 
+<p>1. If (⍴⍴A) &lt; (⍴⍴B) then A &lt; B. And vice versa.
+</p>
+<p>2. If (⍴A) &lt; (⍴B) then A &lt; B. And vice versa.
+</p>
+<p>3. Otherwise ⍴A and ⍴B are equal. If all corresponding ravel elements of A
+   and B are equal (i.e. tolerantly equal within ⎕CT as defined in the ISO
+   standard) then A = B. Otherwise let A1 and B1 the first corresponding
+   ravel elements of A and B with A1≠B1.
+</p>
+<p>4. If A1 and B1 are both character values and (⎕UCS A1) &lt; (⎕UCS B1) then
+   A &lt; B. And vice versa.
+</p>
+<p>5. If A1 is a character and B1 is numeric, then A &lt; B. And vice versa.
+</p>
+<p>6. If A1 and B1 are both numeric values then:
+</p>
+<p>6a. If (9○A1) &lt; (9○B1) then A &lt; B. And vice versa.
+</p>
+<p>6a. Otherwise if (11○A1) &lt; (11○B1) then A &lt; B. And vice versa.
+</p>
+<p>Another way of describing the rules above is that the comparison of two values
+is comprised of sub-comparisons of certain properties of the values in the
+following order:
+</p>
+<ul>
+<li> ranks of the values
+</li><li> shapes of the values
+</li><li> type (character vs. numeric) of the values,
+</li><li> unicodes of character values,
+</li><li> real parts of numeric values,
+</li><li> imaginary parts of numeric values,
+</li></ul>
+
+<p>Note: Rules 1. and 2. above are only relevant for comparisons made in the
+context of sorting (i.e. for ⍋ or ⍒). This is because for =, ≠, &lt;, ≤, ≥,
+or &gt; either a RANK ERROR or a LENGTH ERROR is raised if the ranks or shapes
+of A and B do not match:
+</p>
+<pre class="verbatim">      (9 8) &lt; (1 2 3)
+LENGTH ERROR
+      9 8&lt;1 2 3
+      ^  ^
+
+      ⍋(9 8) (1 2 3)
+1 2
+</pre>
+<p>The reason for comparing complex numbers first by their real parts and then
+by their imaginary part and not, for example, first by their magnitude and
+then by their angle is that the chosen order gives more consistent results
+when comparing near-complex numbers or their true real compagnions. For
+example, a magnitude first comparison of complex numbers would make ¯1 &lt; ¯2J∈
+for a near-complex ¯2J∈ but ¯1 &gt; ¯2 for a true real ¯2.
+</p>
 <hr>
 <a name="Chapter-4"></a>
 <div class="header">
