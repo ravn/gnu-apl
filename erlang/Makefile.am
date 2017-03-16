@@ -8,9 +8,13 @@ if WANT_ERLANG
 # use libtool but create the make targets manually. This seems to work on
 # Ubuntu but may require manual fixes on other platforms.
 #
+FILES = apl.beam apl_example.beam erlang_APL_nif.so
+
+CLEANFILES = ${FILES}
+
 all: apl.beam apl_example.beam erlang_APL_nif.so
 .erl.beam:
-	erl -compile $<
+	erlc $<
 
 erlang_APL_nif.so: erlang_APL_nif.c
 	gcc -o $@ -Wall $(WERROR) -fpic -shared -rdynamic -pthread \
@@ -20,4 +24,12 @@ erlang_APL_nif.so: erlang_APL_nif.c
 install: erlang_APL_nif.so apl.erl apl_example.erl
 	sudo $(INSTALL) $^ $(pkglibdir)/
 
+else
+
+.PHONY:	all
+all:
+	echo "nothing to be done because GNU APL was NOT \
+              configured --with-erlang"
+
 endif
+

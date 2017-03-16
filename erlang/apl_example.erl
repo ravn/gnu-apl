@@ -88,8 +88,8 @@ example() ->
 
   % display an Erlang term returned from an APL interface function
   %
-  io:format("~ncreate 4-4 unity matrixc and display it"),
-  I6 = apl:apl_command("(⍳6)∘.=⍳6"),
+  io:format("~ncreate 4-4 unity matrix and display it.~n"),
+  [I6] = apl:statement("(⍳6)∘.=⍳6"),
   show(I6),
   ok.
 
@@ -114,10 +114,5 @@ apl:fix_function_ucs([
 % display an Erlang term returned from an APL interface function
 %
 show(Val) ->
-   {value, Shape, Ravel} = apl:eval_B("⍕", Val),   % format Val in APL
-   [Rows, Cols] = Shape,
-   io:format("~ts", [show(Rows, Cols, 0, 0, Ravel)]).
-
-show(_Rows, _Cols, _R, _C, Ravel) -> Ravel.
-
+   {value, _Shape, _Ravel} = apl:eval_B("⍕", Val).  % format and show Val in APL
 

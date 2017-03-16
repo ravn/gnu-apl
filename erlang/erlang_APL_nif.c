@@ -474,9 +474,14 @@ const int err = apl_exec_ucs(UCS_buffer);
         // extent reasonable) the same as defined for ⎕ET on page 287 of the
         // IBM APL2 language Reference manual.
         //
-        return enif_make_tuple2(vc_ctx.env,
-                                enif_make_atom(vc_ctx.env, "APL_error"),
-                                enif_make_int(vc_ctx.env, err));
+        ERL_NIF_TERM etuple = 
+        enif_make_tuple3(vc_ctx.env,
+                         enif_make_atom(vc_ctx.env, "APL_error"),
+                         enif_make_int(vc_ctx.env, err >> 16),
+                         enif_make_int(vc_ctx.env, err & 0xFFFF));
+
+        ERL_NIF_TERM list = enif_make_list1(vc_ctx.env, etuple);
+        return list;
       }
 
    if (vc_ctx.retval_idx == 0)   return enif_make_list(vc_ctx.env, 0);
@@ -764,7 +769,22 @@ eterm2value(ERL_NIF_TERM fun_arg)
 int tuple_arity = 0;
 const ERL_NIF_TERM * tuple_items = 0;
    if (!enif_get_tuple(vc_ctx.env, fun_arg, &tuple_arity, &tuple_items))
-      return 0;
+      {
+        fprintf(stderr, "Erlang Term is not {Rank, Shape, Ravel} but ");
+         if (enif_is_atom(vc_ctx.env, fun_arg))
+              fprintf(stderr, "an Erlang atom\n");
+         else if (enif_is_binary(vc_ctx.env, fun_arg))
+              fprintf(stderr, "an Erlang binary\n");
+         else if (enif_is_list(vc_ctx.env, fun_arg))
+              fprintf(stderr, "an Erlang list\n");
+         else if (enif_is_port(vc_ctx.env, fun_arg))
+              fprintf(stderr, "an Erlang port\n");
+         else if (enif_is_ref(vc_ctx.env, fun_arg))
+              fprintf(stderr, "an Erlang ref\n");
+         else if (enif_is_port(vc_ctx.env, fun_arg))
+              fprintf(stderr, "an Erlang pid\n");
+        return 0;
+      }
 
    if (tuple_items == 0)   return 0;
    if (tuple_arity != 3)   return 0;
@@ -787,7 +807,7 @@ static ERL_NIF_TERM
 do_eval_(const ERL_NIF_TERM argv[])
 {
 APL_value    Z = 0;
-APL_function fun = eterm2function(argv[0], 0, 0);
+APL_function fun = eterm2function(argv[1], 0, 0);
 int e = 0;
 
    if (fun == 0 && (e = 1))    goto done; 
@@ -809,7 +829,7 @@ do_eval_AB(const ERL_NIF_TERM argv[])
 APL_value    Z   = 0;
 APL_value    A   = eterm2value   (argv[0]);
 APL_function fun = eterm2function(argv[1], 0, 0);
-APL_value    B   = eterm2value   (argv[2]);
+APL_value    B   = eterm2value   (argv[3]);
 int e = 0;
 
    if ((A   == 0 && (e = 1)) ||
@@ -863,7 +883,7 @@ APL_function L    = 0;
 APL_function R    = 0;
 APL_value    A    = eterm2value   (argv[0]);
 APL_function oper = eterm2function(argv[1], &L, &R);
-APL_value    B    = eterm2value   (argv[2]);
+APL_value    B    = eterm2value   (argv[3]);
 int e = 0;
 
    if ((A    == 0 && (e = 1)) ||
@@ -976,9 +996,9 @@ done:
 static ERL_NIF_TERM
 do_eval_B(const ERL_NIF_TERM argv[])
 {
-APL_function fun = eterm2function(argv[0], 0, 0);
-APL_value B      = eterm2value   (argv[1]);
-APL_value Z = 0;
+APL_function fun = eterm2function(argv[1], 0, 0);
+APL_value    B   = eterm2value   (argv[3]);
+APL_value    Z   = 0;
 int e = 0;
 
    if ((fun == 0 && (e = 2)) ||
@@ -1000,8 +1020,8 @@ do_eval_LB(const ERL_NIF_TERM argv[])
 {
 APL_value    Z    = 0;
 APL_function L    = 0;
-APL_function oper = eterm2function(argv[0], &L, 0);
-APL_value    B    = eterm2value   (argv[1]);
+APL_function oper = eterm2function(argv[1], &L, 0);
+APL_value    B    = eterm2value   (argv[3]);
 int e = 0;
 
    if ((L   ==  0 && (e = 1)) ||
@@ -1078,7 +1098,7 @@ APL_value    A    = eterm2value   (argv[0]);
 APL_function L    = 0;
 APL_function R    = 0;
 APL_function oper = eterm2function(argv[1], &L, &R);
-APL_value    B    = eterm2value   (argv[2]);
+APL_value    B    = eterm2value   (argv[3]);
 APL_value    Z    = 0;
 int e = 0;
 
@@ -1128,46 +1148,36 @@ done:
    return erl_result(__FUNCTION__, LOC, e, ret);
 }
 //=============================================================================
-/** macro protect(X) defines a static function eval_X() that calls the
-    corresponding function do_eval_X() above, but protected by if_sema, so that
-    only one function at a time can use the interfscer to APL.
- **/
-#define protect(X)                                 \
-static ERL_NIF_TERM X(ErlNifEnv * env, int argc,   \
-                      const ERL_NIF_TERM argv[])   \
-{                                                  \
-   sem_wait(&if_sema);                             \
-   vc_ctx.env = env;                               \
-ERL_NIF_TERM ret = do_ ## X(argv);                 \
-   sem_post(&if_sema);                             \
-   return ret;                                     \
-}                                                  \
+static ERL_NIF_TERM
+eval_mux(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
+{
+   sem_wait(&if_sema);
+   vc_ctx.env = env;
+int signature = -1;
+   if (!enif_get_int(env, argv[4], &signature))   signature = -1;
+ERL_NIF_TERM ret;
 
-protect(eval_)
-protect(eval_AB)      protect(eval_B)
-protect(eval_ALB)     protect(eval_LB)
-protect(eval_AXB)     protect(eval_XB)
-protect(eval_ALXB)    protect(eval_LXB)
-protect(eval_ALRB)    protect(eval_LRB)
-protect(eval_ALRXB)   protect(eval_LRXB)
+   switch(signature)
+      {
+        case  0: ret = do_eval_(argv);        break;
+        case  1: ret = do_eval_B(argv);       break;
+        case  2: ret = do_eval_ALB(argv);     break;
+        case  3: ret = do_eval_XB(argv);      break;
+        case  4: ret = do_eval_AB(argv);      break;
+        case  5: ret = do_eval_LB (argv);     break;
+        case  6: ret = do_eval_AXB(argv);     break;
+        case  7: ret = do_eval_LXB(argv);     break;
+        case  8: ret = do_eval_ALXB(argv);    break;
+        case  9: ret = do_eval_LRB(argv);     break;
+        case 10: ret = do_eval_ALRB(argv);    break;
+        case 11: ret = do_eval_LRXB(argv);    break;
+        case 12: ret = do_eval_ALRXB(argv);   break;
+        default: ret = enif_make_badarg(env);
+      }
 
-extern void * dummy[];
-void * dummy[] = {
-   eval_,
-   eval_ALB,
-   eval_AB,
-   eval_AXB,
-   eval_ALRB,
-   eval_ALXB,
-   eval_ALRXB,
-   eval_B,
-   eval_LB,
-   eval_XB,
-   eval_LRB,
-   eval_LXB,
-   eval_LRXB,
-   dummy };
-
+   sem_post(&if_sema);
+   return ret;
+}
 //=============================================================================
 static ErlNifFunc
 nif_funcs[] = {
@@ -1178,21 +1188,7 @@ nif_funcs[] = {
    { "statement_ucs",    1,      statement_UCS    DIRTY_FLAG },
    { "fix_function_ucs", 1,      fix_function_UCS DIRTY_FLAG },
    { "set_variable",     3,      set_variable     DIRTY_FLAG },
-/*
-   { "eval_",            1,      eval_            DIRTY_FLAG },
-   { "eval_AB",          3,      eval_AB          DIRTY_FLAG },
-   { "eval_ALB",         3,      eval_ALB         DIRTY_FLAG },
-   { "eval_ALRB",        3,      eval_ALRB        DIRTY_FLAG },
-   { "eval_ALXB",        4,      eval_ALXB        DIRTY_FLAG },
-   { "eval_ALRXB",       4,      eval_ALRXB       DIRTY_FLAG },
-   { "eval_AXB",         4,      eval_AXB         DIRTY_FLAG },
-   { "eval_B",           2,      eval_B           DIRTY_FLAG },
-   { "eval_LB",          2,      eval_LB          DIRTY_FLAG },
-   { "eval_XB",          3,      eval_XB          DIRTY_FLAG },
-   { "eval_LRB",         2,      eval_LRB         DIRTY_FLAG },
-   { "eval_LXB",         3,      eval_LXB         DIRTY_FLAG },
-   { "eval_LRXB",        3,      eval_LRXB        DIRTY_FLAG }
-*/
+   { "eval_mux",         5,      eval_mux         DIRTY_FLAG },
 };
 //-----------------------------------------------------------------------------
 
