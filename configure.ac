@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([GNU APL], [1.6], [bug-apl@gnu.org])
+AC_INIT([GNU APL], [1.7], [bug-apl@gnu.org])
 AC_PREFIX_DEFAULT( /usr/local )
 AC_CONFIG_AUX_DIR([.])
 AC_USE_SYSTEM_EXTENSIONS
@@ -287,6 +287,7 @@ AC_CONFIG_FILES([Makefile
                  erlang/Makefile
                  erlang/apl.erl
                  gnu-apl.d/Makefile
+                 gnu-apl.d/preferences
                  rpm/Makefile
 		 rpm/apl.spec
                  src/Makefile

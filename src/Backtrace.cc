@@ -303,6 +303,7 @@ char ** strings = backtrace_symbols(buffer, size);
 #endif
 }
 //-----------------------------------------------------------------------------
+#ifdef HAVE_EXECINFO_H
 int
 Backtrace::demangle_line(char * result, size_t result_max, const char * buf)
 {
@@ -345,3 +346,4 @@ static char demangled[200] = { 0 };
    return demangled;
 }
 //-----------------------------------------------------------------------------
+#endif // HAVE_EXECINFO_H
