@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ struct PJob_scalar_B
 {
    /// default constructor
    PJob_scalar_B()
-   : value_Z(*(Value *)0),
+   : value_Z(0),
      len_Z(0),
      cZ(0),
      cB(0),
@@ -108,10 +108,10 @@ struct PJob_scalar_B
       { memcpy(this, &other, sizeof(*this)); }
 
    /// constructor
-   PJob_scalar_B(Value & Z, const Value & B)
+   PJob_scalar_B(Value * Z, const Value & B)
    : value_Z(Z),
-     len_Z(Z.nz_element_count()),
-     cZ(&Z.get_ravel(0)),
+     len_Z(Z->nz_element_count()),
+     cZ(&Z->get_ravel(0)),
      cB(&B.get_ravel(0)),
      error(E_NO_ERROR),
      fun(0),
@@ -119,7 +119,7 @@ struct PJob_scalar_B
    {}
 
    /// the value being computed
-   Value & value_Z;
+   Value * value_Z;
 
    /// the length of the result
    ShapeItem len_Z;
@@ -156,7 +156,7 @@ struct PJob_scalar_AB
 {
    /// default constructor
    PJob_scalar_AB()
-   : value_Z(*(Value *)0),
+   : value_Z(0),
      len_Z(0),
      cZ(0),
      cA(0),
@@ -173,10 +173,10 @@ struct PJob_scalar_AB
       { memcpy(this, &other, sizeof(*this)); }
 
    /// constructor
-   PJob_scalar_AB(Value & Z, const Cell * _cA, int iA, const Cell * _cB, int iB)
+   PJob_scalar_AB(Value * Z, const Cell * _cA, int iA, const Cell * _cB, int iB)
    : value_Z(Z),
-     len_Z(Z.nz_element_count()),
-     cZ(&Z.get_ravel(0)),
+     len_Z(Z->nz_element_count()),
+     cZ(&Z->get_ravel(0)),
      cA(_cA),
      inc_A(iA),
      cB(_cB),
@@ -187,7 +187,7 @@ struct PJob_scalar_AB
    {}
 
    /// A value (e.g parallel ~Value())
-   Value & value_Z;
+   Value * value_Z;
 
    /// the length of the result
    ShapeItem len_Z;
@@ -249,7 +249,7 @@ Value_P Z(B->get_shape(), LOC);
    // copying of worklist items.
    //
    {
-     PJob_scalar_B j(Z.getref(), B.getref());
+     PJob_scalar_B j(Z.get(), B.getref());
      joblist_B.start(j, LOC);
    }
 
@@ -288,9 +288,9 @@ Value_P Z(B->get_shape(), LOC);
                        POOL_LOCK(joblist_B.parallel_jobs_lock,
                           Value_P B1 = cell_B.get_pointer_value();
                           Value_P Z1(B1->get_shape(), LOC);
-                          new (&cell_Z) PointerCell(Z1, job->value_Z);
+                          new (&cell_Z) PointerCell(Z1, *job->value_Z);
 
-                          PJob_scalar_B j1(Z1.getref(), B1.getref());
+                          PJob_scalar_B j1(Z1.get(), B1.getref());
                           joblist_B.add_job(j1))
                      }
                   else
@@ -308,7 +308,7 @@ CELL_PERFORMANCE_END(get_statistics_B(), start_2, z)
                      }
                 }
            }
-        job->value_Z.check_value(LOC);
+        job->value_Z->check_value(LOC);
       }
 
    Z->check_value(LOC);
@@ -347,16 +347,16 @@ ShapeItem end_z = z + slice_len;
                       Value_P Z1= B1->clone(LOC);
                       Z1->to_proto();
                       Z1->check_value(LOC);
-                      new (&cell_Z) PointerCell(Z1, job.value_Z))
+                      new (&cell_Z) PointerCell(Z1, *job.value_Z))
                  }
               else
                  {
                    POOL_LOCK(joblist_B.parallel_jobs_lock,
                       Value_P B1 = cell_B.get_pointer_value();
                       Value_P Z1(B1->get_shape(), LOC);
-                      new (&cell_Z) PointerCell(Z1, job.value_Z);
+                      new (&cell_Z) PointerCell(Z1, *job.value_Z);
 
-                      PJob_scalar_B j1(Z1.getref(), B1.getref());
+                      PJob_scalar_B j1(Z1.get(), B1.getref());
                       joblist_B.add_job(j1))
                  }
             }
@@ -445,8 +445,8 @@ Value_P Z(*shape_Z, LOC);
    // copying of worklist items.
    //
    {
-     PJob_scalar_AB j(Z.getref(), &A->get_ravel(0), inc_A,
-                                  &B->get_ravel(0), inc_B);
+     PJob_scalar_AB j(Z.get(), &A->get_ravel(0), inc_A,
+                               &B->get_ravel(0), inc_B);
      joblist_AB.start(j, LOC);
    }
 
@@ -513,9 +513,9 @@ Value_P Z(*shape_Z, LOC);
                           POOL_LOCK(joblist_AB.parallel_jobs_lock,
                              Value_P Z1(*sh_Z1, LOC);
                              Z1->set_complete();
-                             new (&cell_Z) PointerCell(Z1, job->value_Z);
+                             new (&cell_Z) PointerCell(Z1, *job->value_Z);
 
-                             PJob_scalar_AB j1(Z1.getref(),
+                             PJob_scalar_AB j1(Z1.get(),
                                                &A1->get_ravel(0), inc_A1,
                                                &B1->get_ravel(0), inc_B1);
                              joblist_AB.add_job(j1))
@@ -534,16 +534,16 @@ Value_P Z(*shape_Z, LOC);
                                Value_P Z1 = A1->clone(LOC);
                                Z1->to_proto();
                                Z1->check_value(LOC);
-                               new (&cell_Z) PointerCell(Z1, job->value_Z);
+                               new (&cell_Z) PointerCell(Z1, *job->value_Z);
                              }
                           else
                              {
                                 POOL_LOCK(joblist_AB.parallel_jobs_lock,
                                   Value_P Z1(A1->get_shape(), LOC);
                                   Z1->set_complete();
-                                  new (&cell_Z) PointerCell(Z1, job->value_Z);
+                                  new (&cell_Z) PointerCell(Z1, *job->value_Z);
 
-                                  PJob_scalar_AB j1(Z1.getref(),
+                                  PJob_scalar_AB j1(Z1.get(),
                                                     &A1->get_ravel(0), inc_A1,
                                                     &cell_B, 0);
                                   joblist_AB.add_job(j1))
@@ -564,16 +564,16 @@ Value_P Z(*shape_Z, LOC);
                                Value_P Z1= B1->clone(LOC);
                                Z1->to_proto();
                                Z1->check_value(LOC);
-                               new (&cell_Z) PointerCell(Z1, job->value_Z);
+                               new (&cell_Z) PointerCell(Z1, *job->value_Z);
                              }
                           else
                              {
                                POOL_LOCK(joblist_AB.parallel_jobs_lock,
                                   Value_P Z1(B1->get_shape(), LOC);
-                                  new (&cell_Z) PointerCell(Z1, job->value_Z);
+                                  new (&cell_Z) PointerCell(Z1, *job->value_Z);
                                   Z1->set_complete();
 
-                                  PJob_scalar_AB j1(Z1.getref(),
+                                  PJob_scalar_AB j1(Z1.get(),
                                                     &cell_A, 0,
                                                     &B1->get_ravel(0), inc_B1);
                                   joblist_AB.add_job(j1))
@@ -596,7 +596,7 @@ CELL_PERFORMANCE_END(get_statistics_AB(), start_2, z)
                         }
                 }
            }
-        job->value_Z.check_value(LOC);
+        job->value_Z->check_value(LOC);
       }
 
    joblist_AB.cancel_jobs();
@@ -660,9 +660,9 @@ ShapeItem end_z = z + slice_len;
                      POOL_LOCK(joblist_AB.parallel_jobs_lock,
                         Value_P Z1(*sh_Z1, LOC);
                         Z1->set_complete();
-                        new (&cell_Z) PointerCell(Z1, job.value_Z);
+                        new (&cell_Z) PointerCell(Z1, *job.value_Z);
 
-                        PJob_scalar_AB j1(Z1.getref(),
+                        PJob_scalar_AB j1(Z1.get(),
                                           &A1->get_ravel(0), inc_A1,
                                           &B1->get_ravel(0), inc_B1);
                         joblist_AB.add_job(j1))
@@ -680,16 +680,16 @@ ShapeItem end_z = z + slice_len;
                           Value_P Z1= A1->clone(LOC);
                           Z1->to_proto();
                           Z1->check_value(LOC);
-                          new (&cell_Z) PointerCell(Z1, job.value_Z);
+                          new (&cell_Z) PointerCell(Z1, *job.value_Z);
                         }
                      else
                         {
                           POOL_LOCK(joblist_AB.parallel_jobs_lock,
                              Value_P Z1(A1->get_shape(), LOC);
-                             new (&cell_Z) PointerCell(Z1, job.value_Z);
+                             new (&cell_Z) PointerCell(Z1, *job.value_Z);
                              Z1->set_complete();
 
-                             PJob_scalar_AB j1(Z1.getref(),
+                             PJob_scalar_AB j1(Z1.get(),
                                                &A1->get_ravel(0), inc_A1,
                                                &cell_B, 0);
                              joblist_AB.add_job(j1))
@@ -709,16 +709,16 @@ ShapeItem end_z = z + slice_len;
                           Value_P Z1= B1->clone(LOC);
                           Z1->to_proto();
                           Z1->check_value(LOC);
-                          new (&cell_Z) PointerCell(Z1, job.value_Z);
+                          new (&cell_Z) PointerCell(Z1, *job.value_Z);
                         }
                      else
                         {
                           POOL_LOCK(joblist_AB.parallel_jobs_lock,
                              Value_P Z1(B1->get_shape(), LOC);
-                             new (&cell_Z) PointerCell(Z1, job.value_Z);
+                             new (&cell_Z) PointerCell(Z1, *job.value_Z);
                              Z1->set_complete();
 
-                             PJob_scalar_AB j1(Z1.getref(),
+                             PJob_scalar_AB j1(Z1.get(),
                                                &cell_A, 0,
                                                &B1->get_ravel(0), inc_B1);
                              joblist_AB.add_job(j1))
