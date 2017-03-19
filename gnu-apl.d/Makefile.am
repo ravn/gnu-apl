@@ -10,7 +10,7 @@ sedcmd2 = "s|@GNU_APL_ETC@|${sysconfdir}|"
 
 # update preferences when eg. ./configure --prefix is executed
 #
-preferences: preferences.in Makefile
-	echo ${sedcmd}
-	cat $< | sed -e ${sedcmd1} | sed -e ${sedcmd2} > $@
+#preferences: preferences.in Makefile
+#	echo ${sedcmd}
+#	cat $< | sed -e ${sedcmd1} | sed -e ${sedcmd2} > $@
 

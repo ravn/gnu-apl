@@ -512,9 +512,9 @@ uninstall-am: uninstall-distDATA
 
 # update preferences when eg. ./configure --prefix is executed
 #
-preferences: preferences.in Makefile
-	echo ${sedcmd}
-	cat $< | sed -e ${sedcmd1} | sed -e ${sedcmd2} > $@
+#preferences: preferences.in Makefile
+#	echo ${sedcmd}
+#	cat $< | sed -e ${sedcmd1} | sed -e ${sedcmd2} > $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
