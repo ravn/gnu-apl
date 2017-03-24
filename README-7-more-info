@@ -59,3 +59,126 @@ Much more information about APL can be found at Sam Sirlin's APL FAQ at:
     home.earthlink.net/~swsirlin/apl.faq.html
 
 
+The GNU APL )HELP command output
+--------------------------------
+)HELP
+APL Commands:
+      )CHECK 
+      )CLEAR 
+      )CONTINUE 
+      )COPY [lib] wsname [object ...]
+      )DROP [[lib] wsname]
+      )ERASE symbol ...
+      )DUMP-HTML [[lib] wsname]
+      )DUMPV [[lib] wsname]
+      )DUMP [[lib] wsname]
+      )FNS [from-to]
+      )HELP 
+      )HIST [CLEAR]
+      )HOST command
+      )IN filename [object ...]
+      )LIBS [[lib] path]
+      )LIB [lib|path]
+      )LOAD [lib] wsname
+      )MORE 
+      )NMS [from-to]
+      )OFF 
+      )OPS [from-to]
+      )OUT filename [object ...]
+      )PCOPY [lib] wsname [object ...]
+      )PIN filename [object ...]
+      )QLOAD [lib] wsname
+      )RESET 
+      )SAVE [[lib] wsname]
+      )SIC 
+      )SINL 
+      )SIS 
+      )SI 
+      )SYMBOLS [count]
+      )VALUES 
+      )VARS [from-to]
+      )WSID [wsname]
+      ]BOXING [OFF|2|3|4|7|8|9]
+      ]COLOR [ON|OFF]
+      ]NEXTFILE 
+      ]EXPECT error_count
+      ]HELP 
+      ]KEYB 
+      ]LIB [lib|path]
+      ]LOG [facility [ON|OFF]]
+      ]OWNERS 
+      ]PSTAT [CLEAR|SAVE]
+      ]SIS 
+      ]SI 
+      ]SVARS 
+      ]SYMBOL symbol
+      ]USERCMD [ ]ucmd APL_fun [mode]
+               | ]ucmd { ... }
+               | REMOVE ]ucmd
+               | REMOVE-ALL
+               ]
+      ]XTERM [ON|OFF]
+
+System variables:
+      ⎕AI     Account Information
+      ⎕ARG    command line ARGuments of the interpreter
+      ⎕AV     Atomic Vector
+      ⎕CT     Comparison Tolerance
+      ⎕EM     Event Message
+      ⎕ET     Event Type
+      ⎕FC     Format Control
+      ⎕IO     Index Origin
+      ⎕L      Left Argument
+      ⎕LC     Line Counters
+      ⎕LX     Latent Expression
+      ⎕PP     Printing Precision
+      ⎕PR     Prompt Replacement
+      ⎕PS     Print Style
+      ⎕PW     Print Width
+      ⎕R      Right Argment
+      ⎕RL     Random Link
+      ⎕SVE    Shared Variable Event
+      ⎕SYL    SYstem Limits
+      ⎕TC     Terminal Control characters
+      ⎕TS     Time Stamp
+      ⎕TZ     Time Zone
+      ⎕UL     User Load
+      ⎕X      aXis Argument
+      ⎕WA     Workspace Available
+      λ       { ... } result
+      ⍺       { ... } left value argument
+      ⍵       { ... } right value argument
+      χ       { ... } axis argument
+      ⍶       { ... } left function argument
+      ⍹       { ... } right function argument
+
+System functions:
+      ⎕AF     Atomic Function
+      ⎕AT     Attributes
+      ⎕CR     Character Representation
+      ⎕DL     Delay
+      ⎕DLX    D. Knuth's Dancing Links
+      ⎕EA     Execute Alternate
+      ⎕EB     Execute Both
+      ⎕EC     Execute Controlled
+      ⎕ENV    ENvironment Variables
+      ⎕ES     Event Simulate
+      ⎕EX     EXpunge
+      ⎕FIO    File I/O
+      ⎕FX     FiX
+      ⎕INP    INPut from script
+      ⎕NA     Name Association
+      ⎕NC     Name Class
+      ⎕NL     Name List
+      ⎕SI     State Indicator
+      ⎕SQL    SQL functions
+      ⎕SVC    Shared Variable Control
+      ⎕SVO    Shared Variable Offer
+      ⎕SVQ    Shared Variable Query
+      ⎕SVR    Shared Variable Retraction
+      ⎕SVS    Shared Variable State
+      ⎕STOP   STOP vector
+      ⎕TF     Transfer Form
+      ⎕TRACE  TRACE vector
+      ⎕UCS    Universal Character Set (aka. Unicode)
+

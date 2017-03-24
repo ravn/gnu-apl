@@ -34,14 +34,22 @@ The following extensions are provided:
 
 * various debug commands, see )HELP
 
-* dyadic ⎕CR   (DISPLAY-like value output)
+* dyadic ⎕CR   (DISPLAY-like value output,
+                several conversions of bytes and characters).
+                Canonical Representation)
+
+* ⎕DLT         (Knuth's Dancing links algorithm, aka Algorithm X)
+
+* ⎕ENV B       (environment variables)
+               return the values of environment variables whose names starts
+               with B. The result is a N by 2 matrix, with column 1 containing
+               environment variable names and column 2 their values.  
+
+* ⎕FIO         (several FILE I/O functions)
+
+* ⎕SQL         (access to SQL databases)
 
 * 3 ⎕TF        (⎕TF with CDR format)
-
-* ⎕ENV B (environment variables)
-    return the values of environment variables whose names starts with B.
-    Return N by 2 matrix, with column 1 containing environment variable names
-    and column 2 their values.
 
 * APL scripting
     text files beginning with:

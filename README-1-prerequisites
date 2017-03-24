@@ -17,4 +17,6 @@ for example:
 
 On Linux Mint 14.1, GNU APL compiled out-of--the-box.
 
+On Fedora22+        dnf group install "C Development Tools and Libraries"
 
+On Centos           yum install gcc g++ make    
