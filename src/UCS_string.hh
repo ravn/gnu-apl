@@ -368,7 +368,7 @@ public:
    static UCS_string from_double_fixed_prec(double value, int fract_digits);
 
    /// convert double \b value to an UCS_string with \b quad_pp significant
-   /// digits in acaled (exponential) format
+   /// digits in scaled (exponential) format
    static UCS_string from_double_expo_pp(double value, int quad_pp);
 
    /// convert double \b value to an UCS_string with \b quad_pp significant

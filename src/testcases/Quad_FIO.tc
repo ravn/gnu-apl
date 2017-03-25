@@ -246,7 +246,8 @@ World!
       Filename← 'FILE_IO.test1'
       ⎕←Handle←'w' FIO∆fopen Filename
 ⁰
-      DATA←'int 22 perc % doub 3.14 char C chars DEFGH qqq str st⍴ing'
+      ⍴DATA←'int 22 perc % doub 3.14 char C chars DEFGH qqq str st⍴ing'
+57
       FMT←'int %d perc %% doub %f char %c chars %5c qqq str %s %n'
       DATA FIO∆fwrite_utf8 Handle
 59
@@ -255,11 +256,20 @@ World!
 0
       ⎕←Handle←'r' FIO∆fopen Filename
 ⁰
-      FMT FIO∆fscanf Handle ⍝ close file
- 22 3.14 C DEFGH st⍴ing 53 
+      FMT FIO∆fscanf Handle
+ 22 3.14 C DEFGH st⍴ing 59 
 
       FIO∆fclose Handle ⍝ close file
 0
+
+
+      ⍝ sscanf
+      ⍝
+      ⍴DATA←'int 22 perc % doub 3.14 char C chars DEFGH qqq str st⍴ing'
+57
+      FMT←'int %d perc %% doub %f char %c chars %5c qqq str %s %n'
+      FMT FIO∆sscanf DATA
+ 22 3.14 C DEFGH st⍴ing 57 
 
 
       )ERASE FORMAT Handle Handle1 Handle2 Command AF_INET SOCK_STREAM

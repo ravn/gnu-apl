@@ -248,10 +248,18 @@ World!
       ⎕←Handle←'r' FIO∆fopen Filename
 ⁰
       FMT FIO∆fscanf Handle ⍝ close file
- 22 3.14 C DEFGH st⍴ing 53 
+ 22 3.14 C DEFGH st⍴ing 59 
 
       FIO∆fclose Handle ⍝ close file
 0
+
+      ⍝ sscanf
+      ⍝
+      ⍴DATA←'int 22 perc % doub 3.14 char C chars DEFGH qqq str st⍴ing'
+57
+      FMT←'int %d perc %% doub %f char %c chars %5c qqq str %s %n'
+      FMT FIO∆sscanf DATA
+ 22 3.14 C DEFGH st⍴ing 57 
 
 
       )ERASE FORMAT Handle Handle1 Handle2 Command AF_INET SOCK_STREAM

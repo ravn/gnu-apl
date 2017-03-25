@@ -340,8 +340,160 @@ uint32_t uni = 0;
    return Unicode(bx | uni);
 }
 //-----------------------------------------------------------------------------
+/// a Unicode source from either a file or a UCS_string
+class File_or_String
+{
+public:
+   File_or_String(FILE * f)
+   : file(f),
+     string(0),
+     next(Invalid_Unicode),
+     out_len(0)
+   { sidx = ftell(f);  }
+
+   File_or_String(const UCS_string * u)
+   : file(0),
+     string(u),
+     sidx(0),
+     next(Invalid_Unicode),
+     out_len(0)
+   {}
+
+   ShapeItem get_count() const
+      {
+        if (file)    return ftell(file) - sidx;
+        return out_len;
+      }
+
+   Unicode get_next()
+      {
+        if (next != Invalid_Unicode)   // there is a unget'ed char
+           {
+             const Unicode ret = next;
+             next = Invalid_Unicode;
+             // counted already, so don't count it twice
+             return ret;
+           }
+
+         if (file)   // data comes from a UTF-8 encoded file
+            {
+              ShapeItem utf8_len = 0;
+              const Unicode ret = Quad_FIO::fget_utf8(file, utf8_len);
+              if (ret != UNI_EOF)   ++out_len;
+              return ret;
+            }
+         else   // data comes from a UCS_string
+            {
+              if (sidx >= string->size())   return UNI_EOF;
+              ++out_len;
+              return (*string)[sidx++];
+            }
+      }
+
+   void unget(Unicode uni)
+      {
+        Assert(next == Invalid_Unicode);
+        next = uni;
+      }
+
+   int scanf_long_long(const char * fmt, long long * val)
+      {
+         if (file)
+            {
+              if (next != Invalid_Unicode)
+                 {
+                   ungetc(next, file);
+                   next = Invalid_Unicode;
+                 }
+              return fscanf(file, fmt, val);
+            }
+
+         // string input...
+         //
+         char cc[40];
+         unsigned int cidx = 0;
+         if (next == UNI_OVERBAR)
+            {
+              cc[cidx++] = '-';
+              next = Invalid_Unicode;
+            }
+         else if (next != Invalid_Unicode)
+            {
+              cc[cidx++] = next;
+              next = Invalid_Unicode;
+            }
+
+         while (cidx < (sizeof(cc) - 1) && sidx < string->size())
+            {
+              const Unicode uni = get_next();
+              if (Avec::is_digit(uni))           cc[cidx++] = uni;   // 0-9
+              else if (uni == UNI_OVERBAR)       cc[cidx++] = '-';   // ¯
+              else if (uni == UNI_ASCII_MINUS)   cc[cidx++] = '-';   // -
+              else { unget(uni);   break; }
+            }
+
+         cc[cidx] = 0;
+         return sscanf(cc, fmt, val);
+      }
+
+   int scanf_double(const char * fmt, double * val)
+      {
+         if (file)
+            {
+              if (next != Invalid_Unicode)
+                 {
+                   ungetc(next, file);
+                   next = Invalid_Unicode;
+                 }
+              return fscanf(file, fmt, val);
+            }
+
+         // string input...
+         //
+         char cc[40];
+         unsigned int cidx = 0;
+         if (next == UNI_OVERBAR)
+            {
+              cc[cidx++] = '-';
+              next = Invalid_Unicode;
+            }
+         else if (next != Invalid_Unicode)
+            {
+              cc[cidx++] = next;
+              next = Invalid_Unicode;
+            }
+
+         while (cidx < (sizeof(cc)) - 1 && sidx < string->size())
+            {
+              const Unicode uni = get_next();
+              if (uni == UNI_OVERBAR)                  cc[cidx++] = '-';   // ¯
+              else if(strchr(".0123456789eE-", uni))   cc[cidx++] = uni;
+              else { unget(uni);   break; }
+            }
+
+         cc[cidx] = 0;
+         return sscanf(cc, fmt, val);
+      }
+
+protected:
+   /// UTF8-ecnoded source
+   FILE * file;
+
+   /// UCS_string source
+   const UCS_string * string;
+
+   /// next character in string
+   ShapeItem sidx;
+
+   /// ungotten char
+   Unicode next;
+
+   /// number of chars consumed thus far
+   ShapeItem out_len;
+};
+//-----------------------------------------------------------------------------
 Token
-Quad_FIO::do_scanf(FILE * file, const UCS_string & format)
+Quad_FIO::do_scanf(File_or_String & input, const UCS_string & format)
 {
 ShapeItem count = 0;
    if (format.size() == 0)   LENGTH_ERROR;
@@ -353,13 +505,11 @@ ShapeItem count = 0;
         if (format[f] == UNI_ASCII_PERCENT)   ++count;
       }
 
-ShapeItem fget_count = 0;   // number of input characters (not bytes!) read
-
 Value_P Z(count, LOC);
    loop(z, count)   new (Z->next_ravel())   IntCell(0);
 ShapeItem z = 0;
 
-Unicode lookahead = fget_utf8(file, fget_count);
+Unicode lookahead = input.get_next();
    if (lookahead == UNI_EOF)   goto out;
 
    loop(f, format.size())
@@ -367,11 +517,11 @@ Unicode lookahead = fget_utf8(file, fget_count);
         const Unicode fmt_ch = format[f];
         if (fmt_ch == UNI_ASCII_SPACE)
            {
-             // one space in the format matches 0 or more spaces in the file.
+             // one space in the format matches 0 or more spaces in the input
              //
              while (lookahead == UNI_ASCII_SPACE)
                 {
-                 lookahead = fget_utf8(file, fget_count);
+                 lookahead = input.get_next();
                  if (lookahead == UNI_EOF)   goto out;
                 }
              continue;
@@ -379,11 +529,11 @@ Unicode lookahead = fget_utf8(file, fget_count);
 
         if (fmt_ch != UNI_ASCII_PERCENT)
            {
-             // normal character in format: match with file
+             // normal character in format: match with input
              //
              match:
              if (fmt_ch != lookahead)   goto out;
-             lookahead = fget_utf8(file, fget_count);
+             lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
              continue;
            }
@@ -434,11 +584,11 @@ Unicode lookahead = fget_utf8(file, fget_count);
 
         if (strchr("dDiouxX", conv))  // integer conversion
            {
-             ungetc(lookahead, file);   // let fscanf() read it
+             input.unget(lookahead);   // let scanf_long_long() read it
              const char fmt[] = { '%', 'l', 'l', (char)conv, 0 };
              long long val = 0;
-             const int count = fscanf(file, fmt, &val);
-             lookahead = fget_utf8(file, fget_count);
+             const int count = input.scanf_long_long(fmt, & val);
+             lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
              if (count != 1)   goto out;
 
@@ -446,11 +596,11 @@ Unicode lookahead = fget_utf8(file, fget_count);
            }
         else if (strchr("fFeg", conv))  // float conversion
            {
-             ungetc(lookahead, file);   // let fscanf() read it
+             input.unget(lookahead);   // let scanf_double() read it
              const char fmt[] = { '%', 'l', (char)conv, 0 };
              double val = 0;
-             const int count = fscanf(file, fmt, &val);
-             lookahead = fget_utf8(file, fget_count);
+             const int count = input.scanf_double(fmt, &val);
+             lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
              if (count != 1)   goto out;
 
@@ -461,7 +611,7 @@ Unicode lookahead = fget_utf8(file, fget_count);
              if (conv_len == 0)   // default: single char
                 {
                   if (!suppress)   new (&Z->get_ravel(z++)) CharCell(lookahead);
-                  lookahead = fget_utf8(file, fget_count);
+                  lookahead = input.get_next();
                   if (lookahead == UNI_EOF)   goto out;
                 }
              else
@@ -470,7 +620,7 @@ Unicode lookahead = fget_utf8(file, fget_count);
                   loop(c, conv_len)
                      {
                        ucs.append(lookahead);
-                       lookahead = fget_utf8(file, fget_count);
+                       lookahead = input.get_next();
                        if (lookahead == UNI_EOF)   break;
                      }
 
@@ -488,7 +638,7 @@ Unicode lookahead = fget_utf8(file, fget_count);
                  {
                    ucs.append(lookahead);
                    if (conv_len && ucs.size() >= conv_len)   break;
-                   lookahead = fget_utf8(file, fget_count);
+                   lookahead = input.get_next();
                    if (lookahead == UNI_EOF)   break;
                  }
 
@@ -500,7 +650,8 @@ Unicode lookahead = fget_utf8(file, fget_count);
            }
         else if (conv == UNI_ASCII_n)  // characters consumed thus far
            {
-             if (!suppress)   new (&Z->get_ravel(z++))   IntCell(fget_count);
+             if (!suppress)   new (&Z->get_ravel(z++))
+                                  IntCell(input.get_count());
            }
       }
 
@@ -607,6 +758,7 @@ Quad_FIO::list_functions(ostream & out)
 "   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zi ←    ⎕FIO[54] Bs    chdir(Bs)\n"
+"   Ze ← As ⎕FIO[55] Bh    sscanf(Bs, As) As is the format string\n"
 
 "\n"
 "Benchmarking functions:\n"
@@ -1977,7 +2129,16 @@ const int function_number = X->get_ravel(0).get_near_int();
               {
                 FILE * file = get_FILE(*B.get());
                 const UCS_string format(*A.get());
-                return do_scanf(file, format);
+                File_or_String fos(file);
+                return do_scanf(fos, format);
+              }
+
+         case 55:   // sscanf(Bh, A_format)
+              {
+                const UCS_string format(*A.get());
+                const UCS_string data(*B.get());
+                File_or_String fos(&data);
+                return do_scanf(fos, format);
               }
 
          case 202:   // set monadic parallel threshold

@@ -24,6 +24,8 @@
 #include "PrimitiveOperator.hh"
 #include "QuadFunction.hh"
 
+class File_or_String;
+
 //-----------------------------------------------------------------------------
 
 /**
@@ -61,6 +63,9 @@ public:
 
    /// close all open files
    void clear();
+
+   /// get one Unicode from file
+   static Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
 
 protected:
    /// one file (openend with open() or with fopen()
@@ -109,10 +114,7 @@ protected:
    Token do_printf(FILE * out, Value_P A);
 
    /// perform an fscanf() from file
-   Token do_scanf(FILE * file, const UCS_string & format);
-
-   /// get one Unicode from file
-   Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
+   Token do_scanf(File_or_String & input, const UCS_string & format);
 
    /// the open files
    Simple_string<file_entry, false> open_files;
