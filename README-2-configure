@@ -1,26 +1,33 @@
-
-The APL interpreter can be configured by means of ./configure options (see
-also file INSTALL in this directory). In addition to the standard options
+/****************************************************************************
+     if none of the following options are provided 
+     what are the useful options that gnu apl provides
+     If I want to use a keyed or sequential file system
+     is that standard with your apl interpreter?      
+****************************************************************************/
+The APL interpreter can be configured by means of ./configure options (refer
+to file INSTALL in this directory). In addition to the standard options
 provided by ./configure (that are described in file INSTALL),
 the following GNU APL specific ./configure options are recognized:
 
 --with-android
    This option prevents the instantiation of CIN, COUT, and CERR. This may
    be needed when GNU APL is compiled for Android, since Android applications
-   are using a different I/O model than standard C++ programs.
+   are using a different I/O model than are standard C++ programs.
 
 --with-libapl
    This option builds GNU APL as a shared library (libapl.so) rather than an
-   executable. This option is often combined with option --with-android even
-   though the library is not built for Android, but because the executable
-   that is linked with libapl.so) has its own I/O channels.
+   integrated executable. This option is often combined with option
+   --with-android, and is automatically set by option --with-erlang. The
+   --with-libapl option not only builds approproate Makefiles, but it also
+   changes the GNU APL code in some places.
+   
 
 --with-sqlite3=[ARG]
-   Build the native function for SQL using sqlite3. ARG may provide a
+   Build the native function for SQL using sqlite3. ARG may provide the
    non-default location of the sqlite3 library.
 
 --with-postgresql=[ARG]
-   Build the native function for SQL using PostgreSQL. ARG may provide a
+   Build the native function for SQL using PostgreSQL. ARG may provide the
    non-default location of the postgresql library.
 
 ASSERT_LEVEL_WANTED=n
@@ -58,7 +65,7 @@ APSERVER_PATH
 
       ./configure APSERVER_TRANSPORT=TCP   APSERVER_PORT=40000
 
-   2. Abstract Unix domain sockets are a GNU/linux specific variant that allows
+   2. Abstract Unix domain sockets are a GNU/linux specific variant that 
       allows for sockets without a corresponding file in the file system.
       APserver listens on socket named "/tmp/GNU-APL/APserver" by default;
       the name can be changed with APSERVER_PATH like this:
@@ -78,9 +85,10 @@ APSERVER_PATH
       ./configure APSERVER_TRANSPORT=UNIX   APSERVER_PATH=my-APserver-path
 
 CORE_COUNT_WANTED
-   This experimental option specifies the number of CPU cores to be used.
-   The value is a number, 'all', 'argv', or 'syl'. The interpreter has 
-   sequential code and parallel code which is selected as follows:
+   This experimental option specifies the number of CPU cores the 
+   intepreter is to use. The value is a number, 'all', 'argv', or 'syl'. 
+   The interpreter has sequential code and parallel code which is selected 
+    as follows:
 
    value    code
          0  sequential  (default, one core is used)
@@ -106,11 +114,11 @@ RESET_COLORS_WANTED
    Output coloring can now specified in GNU APL's preference file. This
    is more flexible than configuring the colors at compile time.
 
-
 DYNAMIC_LOG_WANTED=yes
     The APL interpreter has more than 30 log categories. Each log category can
-    be turned on or off in order to troubleshoot the APL interpreter. There are
-    two ways to control the logging categories: statically or dynamically.
+    be turned on or off if needed in order to troubleshoot the APL interpreter. 
+    There are two ways to control the logging categories: statically or
+    dynamically.
 
     Statically means that it is decided at compile time if a log category
     shall be on or off. Dynamically means that a log category can be turned
@@ -126,10 +134,10 @@ DYNAMIC_LOG_WANTED=yes
    the logging categories at start-up of the APL interpreter. If the first 
    argument of the log_def() macro is 0 then the log category is initially
    disabled (and remains disabled if static logging is used); if it is 1 
-   then the log category is initially enabled. Example:
+   then the log category is initially enabled. The default for this option
+   is static logging. Example:
 
     ./configure DYNAMIC_LOG_WANTED=yes
-
 
 MAKE_J
     Set the -j command line option for make that shall be used when GNU APL
