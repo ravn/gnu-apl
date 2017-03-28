@@ -59,6 +59,14 @@ Much more information about APL can be found at Sam Sirlin's APL FAQ at:
     home.earthlink.net/~swsirlin/apl.faq.html
 
 
+The doc directory in the GNU APL package
+----------------------------------------
+The doc directory contains some more files in different formats. Most of them
+are installed in other places, for example in the info system, or (in HTML) at:
+https://www.gnu.org/software/apl/apl.html.  Some of the filesin the doc
+directory are targeting specific platforms, for example the file
+APL-on-Macintosh.pdf written by Peter Teeson.
+
 The GNU APL )HELP command output
 --------------------------------
 )HELP
