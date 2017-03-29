@@ -1056,8 +1056,10 @@ const Cell * cI = &X->get_ravel(0);
          const ShapeItem idx = cI++->get_near_int() - qio;
          if (idx < 0 || idx >= max_idx)
             {
-              MORE_ERROR() << "⎕IO=" << qio << " offending index=" << idx
-                           << " max index=" << max_idx;
+              MORE_ERROR() << "min index=⎕IO (=" << qio
+                           <<  "), offending index=" << (idx + qio)
+                           << ", max index=⎕IO+" << (max_idx - 1)
+                           << " (=" << (max_idx + qio - 1) << ")";
               Z->rollback(Z->valid_ravel_items, LOC);
               INDEX_ERROR;
             }
