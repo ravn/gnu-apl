@@ -1,13 +1,10 @@
-/****************************************************************************
-     if none of the following options are provided 
-     what are the useful options that gnu apl provides
-     If I want to use a keyed or sequential file system
-     is that standard with your apl interpreter?      
-****************************************************************************/
 The APL interpreter can be configured by means of ./configure options (refer
 to file INSTALL in this directory). In addition to the standard options
 provided by ./configure (that are described in file INSTALL),
-the following GNU APL specific ./configure options are recognized:
+the following GNU APL specific ./configure options are recognized.
+If no options are given then either the default value (for those options that
+have one) as given below is used, or else the described behavior will not
+occur.
 
 --with-android
    This option prevents the instantiation of CIN, COUT, and CERR. This may
@@ -31,7 +28,7 @@ the following GNU APL specific ./configure options are recognized:
    non-default location of the postgresql library.
 
 ASSERT_LEVEL_WANTED=n
-   There are numerous Assert() and Assert1 macros in the source code of the
+   There are numerous Assert() and Assert1() macros in the source code of the
    APL interpreter. These macros check more (Assert1) or less (Assert)
    obvious assumptions that throw exceptions if they turn out to be wrong.
    Like for dynamic logging, these macros have negative performance impacts
@@ -41,10 +38,10 @@ ASSERT_LEVEL_WANTED=n
    and enables the Assert() macro
 
    ASSERT_LEVEL_WANTED=2 enables both macros.
-
-   ASSERT_LEVEL_WANTED=0 disables both macros; this gives the maximum
+   ASSERT_LEVEL_WANTED=1 (default) enable Assert(), but disable Assert1().
+   ASSERT_LEVEL_WANTED=0 disable both macros; this gives the maximum
    performance, but at the same time bears the risk that internal errors
-   of the APL interpreter are not detected. Example:
+   of the APL interpreter are not being detected. Example:
 
     ./configure ASSERT_LEVEL_WANTED=2
 
