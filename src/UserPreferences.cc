@@ -798,6 +798,10 @@ UserPreferences::show_configure_options()
         << is_default(ASSERT_LEVEL_WANTED == 1)
    << endl <<
 
+   "    SECURITY_LEVEL_WANTED=" << SECURITY_LEVEL_WANTED
+        << is_default(SECURITY_LEVEL_WANTED == 0)
+   << endl <<
+
    "    APSERVER_PATH=" << APSERVER_PATH
         << is_default(!strcmp(APSERVER_PATH, "/tmp/GNU-APL/APserver"))
    << endl <<
@@ -1227,6 +1231,12 @@ int file_profile = 0;   // the current profile in the preferences file
             {
               WINCH_sets_pw = yes;
             }
+
+         // security facilities...
+         //
+#define sec_def(X) else if (!strcasecmp(opt, #X)) X = yes;
+#include "Security.def"
+
          else
             {
               CERR << "Invalid option '" << opt << " in preferences file "

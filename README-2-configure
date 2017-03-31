@@ -45,6 +45,15 @@ ASSERT_LEVEL_WANTED=n
 
     ./configure ASSERT_LEVEL_WANTED=2
 
+SECURITY_LEVEL_WANTED=n
+   Some capabilities of the APL intepreter can be disabled in order to improve
+   the security of, for example, a web server that uses CGI scripts written
+   in APL.
+   SECURITY_LEVEL_WANTED=2 disables all capabilities that can be disabled
+   SECURITY_LEVEL_WANTED=1 disables those capabilities that are configured in
+                           one of the preferences files.
+   SECURITY_LEVEL_WANTED=0 enables all capabilities. This level is the default
+                           and gives the maximum performance of the interpreter.
 
 APSERVER_TRANSPORT
 APSERVER_PORT

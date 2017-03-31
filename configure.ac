@@ -429,6 +429,15 @@ AC_DEFINE_UNQUOTED([ASSERT_LEVEL_WANTED], [$ASSERT_LEVEL_WANTED],
                    [assert level])
 AC_MSG_RESULT([$ASSERT_LEVEL_WANTED])
 
+# APL: desired security level ?
+AC_MSG_CHECKING([security level (0=none, 1=configured in preferences, 2=all)])
+AC_ARG_VAR(SECURITY_LEVEL_WANTED,
+   [ Assert level (see README-2-configure) default: 0) ])
+if test "x$SECURITY_LEVEL_WANTED" = "x"; then SECURITY_LEVEL_WANTED=0; fi
+AC_DEFINE_UNQUOTED([SECURITY_LEVEL_WANTED], [$SECURITY_LEVEL_WANTED],
+                   [security level])
+AC_MSG_RESULT([$SECURITY_LEVEL_WANTED])
+
 # APL: number of cores ?
 AC_MSG_CHECKING([how many CPU cores shall be used by APL (experimental!)])
 AC_ARG_VAR(CORE_COUNT_WANTED,

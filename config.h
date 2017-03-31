@@ -191,6 +191,9 @@
 /* ./configure with --with-sqlite3 */
 /* #undef REALLY_WANT_SQLITE3 */
 
+/* security level */
+#define SECURITY_LEVEL_WANTED 0
+
 /* short value cellcount */
 #define SHORT_VALUE_LENGTH_WANTED 12
 

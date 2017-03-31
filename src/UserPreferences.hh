@@ -57,6 +57,8 @@ struct UserPreferences
      control_Ds_to_exit(0),
      raw_cin(false),
      initial_pw(DEFAULT_Quad_PW),
+#define sec_def(X) X(false),
+#include "Security.def"
      WINCH_sets_pw(false)
    {}
 
@@ -185,6 +187,10 @@ struct UserPreferences
 
    /// initial value of ⎕PW
    int initial_pw;
+
+#define sec_def(X) \
+   bool X;   ///< true if X is disabled dor security reasons
+#include "Security.def"
 
    /// true if the WINCH signal shall modify ⎕PW
    bool WINCH_sets_pw;

@@ -372,3 +372,22 @@ CONTROL-Ds-TO-EXIT 0
 #
 # WINCH-SETS-⎕PW  Yes
 
+###############################################################################
+#
+# The following lines show examples of GNU APL capabilities that can be
+# disabled. The security settings are put into profile [1] which means that
+# they only have an effect if:
+#
+# (1) GNU APL was ./configured with SECURITY_LEVEL_WANTED=1 and
+# (2) the profile with which GNU APL was started matches the profile for
+#     which the setting was made (if any)
+#
+# If a disabled capability is being used then it will throw a DOMAIN_ERROR
+# and )MORE will indicate a security violation.
+#
+Profile 1
+  disable_Quad_SQL          yes    # disable ⎕SQL
+  disable_Quad_FIO          no     # do not disable ⎕FIO
+  disable_native_functions  yes    # disable A ⎕FX B (native fnctions)
+
+

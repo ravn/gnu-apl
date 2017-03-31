@@ -24,6 +24,7 @@
 #include "IntCell.hh"
 #include "NativeFunction.hh"
 #include "Quad_FX.hh"
+#include "Security.hh"
 #include "Symbol.hh"
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
@@ -43,6 +44,8 @@ static const int eprops[] = { 0, 0, 0, 0 };
 Token
 Quad_FX::eval_AB(Value_P A, Value_P B)
 {
+   CHECK_SECURITY(disable_native_functions);
+
    if (A->get_rank() > 1)         RANK_ERROR;
 
    // dyadic ⎕FX supports the following formats:
@@ -103,6 +106,8 @@ UTF8_string creator("⎕FX");
 Token
 Quad_FX::eval_AXB(Value_P A, Value_P X, Value_P B)
 {
+   CHECK_SECURITY(disable_native_functions);
+
    if (!X->is_scalar_or_len1_vector())   AXIS_ERROR;
    if (A->get_rank() > 1)                RANK_ERROR;
    if (!A->is_char_string())             DOMAIN_ERROR;

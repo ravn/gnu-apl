@@ -41,6 +41,7 @@
 #include "PointerCell.hh"
 #include "Quad_FIO.hh"
 #include "Performance.hh"
+#include "Security.hh"
 #include "Tokenizer.hh"
 #include "Workspace.hh"
 
@@ -776,6 +777,8 @@ Quad_FIO::list_functions(ostream & out)
 Token
 Quad_FIO::eval_B(Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_FIO);
+
    if (B->get_rank() > 1)   RANK_ERROR;
 
    if (!B->get_ravel(0).is_integer_cell())     return list_functions(COUT);
@@ -898,6 +901,8 @@ out_errno:
 Token
 Quad_FIO::eval_AB(Value_P A, Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_FIO);
+
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
 
@@ -940,6 +945,8 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
 Token
 Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_FIO);
+
 const APL_Integer function_number = X->get_ravel(0).get_int_value();
    if (function_number != 49)   DOMAIN_ERROR;
 
@@ -950,6 +957,8 @@ Token lines_B = eval_XB(X, B);
 Token
 Quad_FIO::eval_XB(Value_P X, Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_FIO);
+
    if (B->get_rank() > 1)   RANK_ERROR;
    if (X->get_rank() > 1)   RANK_ERROR;
 
@@ -1733,6 +1742,8 @@ out_errno:
 Token
 Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_FIO);
+
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
    if (X->get_rank() > 1)   RANK_ERROR;

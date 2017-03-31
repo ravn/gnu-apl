@@ -179,14 +179,14 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	Parallel.cc Parallel.hh Performance.cc Performance.def \
 	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
 	Shape.hh SharedValuePointer.hh Simple_string.hh \
-	ScalarFunction.cc ScalarFunction.hh Source.hh \
-	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
-	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
-	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	IO_Files.cc IO_Files.hh Token.cc Token.def Token.hh \
-	TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh Source.hh StateIndicator.cc StateIndicator.hh \
+	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
+	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
+	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
+	SystemLimits.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh IO_Files.cc IO_Files.hh Token.cc Token.def \
+	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
 	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
 	Unicode.hh UserFunction.cc UserFunction.hh \
 	UserFunction_header.cc UserFunction_header.hh \
@@ -245,17 +245,18 @@ am__objects_4 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
 	libapl_la-Quad_SVx.lo libapl_la-Quad_TF.lo \
 	libapl_la-Parallel.lo libapl_la-Performance.lo \
 	libapl_la-RealCell.lo libapl_la-sbrk.lo libapl_la-Shape.lo \
-	libapl_la-ScalarFunction.lo libapl_la-StateIndicator.lo \
-	libapl_la-Svar_DB.lo libapl_la-Svar_record.lo \
-	libapl_la-Symbol.lo libapl_la-SymbolTable.lo \
-	libapl_la-SystemVariable.lo libapl_la-IO_Files.lo \
-	libapl_la-Token.lo libapl_la-Tokenizer.lo \
-	libapl_la-UCS_string.lo libapl_la-UCS_string_vector.lo \
-	libapl_la-UserFunction.lo libapl_la-UserFunction_header.lo \
-	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
-	libapl_la-Value.lo libapl_la-ValueHistory.lo \
-	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
-	$(am__objects_1) $(am__objects_2) $(am__objects_3)
+	libapl_la-ScalarFunction.lo libapl_la-Security.lo \
+	libapl_la-StateIndicator.lo libapl_la-Svar_DB.lo \
+	libapl_la-Svar_record.lo libapl_la-Symbol.lo \
+	libapl_la-SymbolTable.lo libapl_la-SystemVariable.lo \
+	libapl_la-IO_Files.lo libapl_la-Token.lo \
+	libapl_la-Tokenizer.lo libapl_la-UCS_string.lo \
+	libapl_la-UCS_string_vector.lo libapl_la-UserFunction.lo \
+	libapl_la-UserFunction_header.lo libapl_la-UserPreferences.lo \
+	libapl_la-UTF8_string.lo libapl_la-Value.lo \
+	libapl_la-ValueHistory.lo libapl_la-Workspace.lo \
+	libapl_la-static_Objects.lo $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3)
 @WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_4) \
 @WANT_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
@@ -304,14 +305,14 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	Parallel.cc Parallel.hh Performance.cc Performance.def \
 	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
 	Shape.hh SharedValuePointer.hh Simple_string.hh \
-	ScalarFunction.cc ScalarFunction.hh Source.hh \
-	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
-	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
-	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	IO_Files.cc IO_Files.hh Token.cc Token.def Token.hh \
-	TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh Source.hh StateIndicator.cc StateIndicator.hh \
+	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
+	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
+	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
+	SystemLimits.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh IO_Files.cc IO_Files.hh Token.cc Token.def \
+	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
 	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
 	Unicode.hh UserFunction.cc UserFunction.hh \
 	UserFunction_header.cc UserFunction_header.hh \
@@ -370,13 +371,14 @@ am__objects_8 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-Quad_SVx.$(OBJEXT) apl-Quad_TF.$(OBJEXT) \
 	apl-Parallel.$(OBJEXT) apl-Performance.$(OBJEXT) \
 	apl-RealCell.$(OBJEXT) apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
-	apl-ScalarFunction.$(OBJEXT) apl-StateIndicator.$(OBJEXT) \
-	apl-Svar_DB.$(OBJEXT) apl-Svar_record.$(OBJEXT) \
-	apl-Symbol.$(OBJEXT) apl-SymbolTable.$(OBJEXT) \
-	apl-SystemVariable.$(OBJEXT) apl-IO_Files.$(OBJEXT) \
-	apl-Token.$(OBJEXT) apl-Tokenizer.$(OBJEXT) \
-	apl-UCS_string.$(OBJEXT) apl-UCS_string_vector.$(OBJEXT) \
-	apl-UserFunction.$(OBJEXT) apl-UserFunction_header.$(OBJEXT) \
+	apl-ScalarFunction.$(OBJEXT) apl-Security.$(OBJEXT) \
+	apl-StateIndicator.$(OBJEXT) apl-Svar_DB.$(OBJEXT) \
+	apl-Svar_record.$(OBJEXT) apl-Symbol.$(OBJEXT) \
+	apl-SymbolTable.$(OBJEXT) apl-SystemVariable.$(OBJEXT) \
+	apl-IO_Files.$(OBJEXT) apl-Token.$(OBJEXT) \
+	apl-Tokenizer.$(OBJEXT) apl-UCS_string.$(OBJEXT) \
+	apl-UCS_string_vector.$(OBJEXT) apl-UserFunction.$(OBJEXT) \
+	apl-UserFunction_header.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
@@ -590,6 +592,7 @@ POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
 RANLIB = @RANLIB@
+SECURITY_LEVEL_WANTED = @SECURITY_LEVEL_WANTED@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -702,14 +705,14 @@ common_SOURCES = buildtag buildtag.hh ../config.h APL_types.hh \
 	Parallel.cc Parallel.hh Performance.cc Performance.def \
 	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
 	Shape.hh SharedValuePointer.hh Simple_string.hh \
-	ScalarFunction.cc ScalarFunction.hh Source.hh \
-	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
-	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
-	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
-	SystemVariable.cc SystemVariable.def SystemVariable.hh \
-	IO_Files.cc IO_Files.hh Token.cc Token.def Token.hh \
-	TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh Source.hh StateIndicator.cc StateIndicator.hh \
+	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
+	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
+	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
+	SystemLimits.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh IO_Files.cc IO_Files.hh Token.cc Token.def \
+	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
 	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
 	Unicode.hh UserFunction.cc UserFunction.hh \
 	UserFunction_header.cc UserFunction_header.hh \
@@ -969,6 +972,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_TF.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-RealCell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-ScalarFunction.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Security.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Shape.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-StateIndicator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Svar_DB.Po@am__quote@
@@ -1057,6 +1061,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_TF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-RealCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-ScalarFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Security.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Shape.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-StateIndicator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Svar_DB.Plo@am__quote@
@@ -1595,6 +1600,13 @@ libapl_la-ScalarFunction.lo: ScalarFunction.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ScalarFunction.cc' object='libapl_la-ScalarFunction.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-ScalarFunction.lo `test -f 'ScalarFunction.cc' || echo '$(srcdir)/'`ScalarFunction.cc
+
+libapl_la-Security.lo: Security.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Security.lo -MD -MP -MF $(DEPDIR)/libapl_la-Security.Tpo -c -o libapl_la-Security.lo `test -f 'Security.cc' || echo '$(srcdir)/'`Security.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Security.Tpo $(DEPDIR)/libapl_la-Security.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Security.cc' object='libapl_la-Security.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Security.lo `test -f 'Security.cc' || echo '$(srcdir)/'`Security.cc
 
 libapl_la-StateIndicator.lo: StateIndicator.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-StateIndicator.lo -MD -MP -MF $(DEPDIR)/libapl_la-StateIndicator.Tpo -c -o libapl_la-StateIndicator.lo `test -f 'StateIndicator.cc' || echo '$(srcdir)/'`StateIndicator.cc
@@ -2757,6 +2769,20 @@ apl-ScalarFunction.obj: ScalarFunction.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ScalarFunction.cc' object='apl-ScalarFunction.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-ScalarFunction.obj `if test -f 'ScalarFunction.cc'; then $(CYGPATH_W) 'ScalarFunction.cc'; else $(CYGPATH_W) '$(srcdir)/ScalarFunction.cc'; fi`
+
+apl-Security.o: Security.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Security.o -MD -MP -MF $(DEPDIR)/apl-Security.Tpo -c -o apl-Security.o `test -f 'Security.cc' || echo '$(srcdir)/'`Security.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Security.Tpo $(DEPDIR)/apl-Security.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Security.cc' object='apl-Security.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Security.o `test -f 'Security.cc' || echo '$(srcdir)/'`Security.cc
+
+apl-Security.obj: Security.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Security.obj -MD -MP -MF $(DEPDIR)/apl-Security.Tpo -c -o apl-Security.obj `if test -f 'Security.cc'; then $(CYGPATH_W) 'Security.cc'; else $(CYGPATH_W) '$(srcdir)/Security.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Security.Tpo $(DEPDIR)/apl-Security.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Security.cc' object='apl-Security.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Security.obj `if test -f 'Security.cc'; then $(CYGPATH_W) 'Security.cc'; else $(CYGPATH_W) '$(srcdir)/Security.cc'; fi`
 
 apl-StateIndicator.o: StateIndicator.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-StateIndicator.o -MD -MP -MF $(DEPDIR)/apl-StateIndicator.Tpo -c -o apl-StateIndicator.o `test -f 'StateIndicator.cc' || echo '$(srcdir)/'`StateIndicator.cc

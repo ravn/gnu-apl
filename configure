@@ -651,6 +651,7 @@ APSERVER_PATH
 APSERVER_PORT
 APSERVER_TRANSPORT
 CORE_COUNT_WANTED
+SECURITY_LEVEL_WANTED
 ASSERT_LEVEL_WANTED
 VF_TRACING_WANTED
 DYNAMIC_LOG_WANTED
@@ -846,6 +847,7 @@ GPROF_WANTED
 DYNAMIC_LOG_WANTED
 VF_TRACING_WANTED
 ASSERT_LEVEL_WANTED
+SECURITY_LEVEL_WANTED
 CORE_COUNT_WANTED
 APSERVER_TRANSPORT
 APSERVER_PORT
@@ -1534,6 +1536,8 @@ Some influential environment variables:
               no
   ASSERT_LEVEL_WANTED
               Assert level (see README-2-configure) default: 1)
+  SECURITY_LEVEL_WANTED
+              Assert level (see README-2-configure) default: 0)
   CORE_COUNT_WANTED
               Core count (see README-2-configure) default: 0)
   APSERVER_TRANSPORT
@@ -18561,6 +18565,19 @@ _ACEOF
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ASSERT_LEVEL_WANTED" >&5
 $as_echo "$ASSERT_LEVEL_WANTED" >&6; }
+
+# APL: desired security level ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking security level (0=none, 1=configured in preferences, 2=all)" >&5
+$as_echo_n "checking security level (0=none, 1=configured in preferences, 2=all)... " >&6; }
+
+if test "x$SECURITY_LEVEL_WANTED" = "x"; then SECURITY_LEVEL_WANTED=0; fi
+
+cat >>confdefs.h <<_ACEOF
+#define SECURITY_LEVEL_WANTED $SECURITY_LEVEL_WANTED
+_ACEOF
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SECURITY_LEVEL_WANTED" >&5
+$as_echo "$SECURITY_LEVEL_WANTED" >&6; }
 
 # APL: number of cores ?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking how many CPU cores shall be used by APL (experimental!)" >&5
