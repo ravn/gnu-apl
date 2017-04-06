@@ -1,10 +1,14 @@
+/*************************************************************************
+  what about your documentation within
+    apl-1.7/doc
+*************************************************************************/
 
 If you have reached this file, then GNU APL is hopefully running well for
-you and you may have more questions that are related to APL in general
+you. You may have more questions that are related to APL in general
 rather than to GNU APL in particular.
 
 The following is a list of web links that may be used as starting points
-for more information on the web. This list is admittedly rather arbitrary
+for more information about APL. This list is admittedly rather arbitrary
 and by no means complete.
 
 
@@ -190,3 +194,7 @@ System functions:
       ⎕TRACE  TRACE vector
       ⎕UCS    Universal Character Set (aka. Unicode)
 
+Other Documentation
+The distribution has a doc subdirectory in which you will find
+html formatted documentation and *.info documentation.
+ 
