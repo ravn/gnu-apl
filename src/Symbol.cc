@@ -307,20 +307,39 @@ const int incr_B = (ec_B == 1) ? 0 : 1;
    if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
 }
 //-----------------------------------------------------------------------------
-void
+bool
 Symbol::assign_named_lambda(Function * lambda, const char * loc)
 {
 ValueStackItem & vs = value_stack.last();
 UserFunction * ufun = lambda->get_ufun1();
    Assert(ufun);
+const Executable * uexec = ufun;
+   Assert(uexec);
 
    switch(vs.name_class)
       {
         case NC_FUNCTION:
         case NC_OPERATOR:
-             if (!vs.sym_val.function->is_lambda())   SYNTAX_ERROR;
-             Assert(vs.sym_val.function->get_ufun1());
-             vs.sym_val.function->get_ufun1()->decrement_refcount(LOC);
+             {
+               Function * old_fun = vs.sym_val.function;
+               Assert(old_fun);
+               if (!old_fun->is_lambda())   SYNTAX_ERROR;
+               UserFunction * old_ufun = old_fun->get_ufun1();
+               Assert(old_ufun);
+               for (StateIndicator * si = Workspace::SI_top();
+                    si; si = si->get_parent())
+                   {
+//                   if (uexec == si->get_executable())
+                     if (si->uses_function(old_ufun))
+                        {
+                          MORE_ERROR() << "function " << get_name()
+                                       << " is suspended or used";
+                          return true;
+                        }
+                   }
+
+               vs.sym_val.function->get_ufun1()->decrement_refcount(LOC);
+             }
 
              /* fall through */
 
@@ -331,10 +350,12 @@ UserFunction * ufun = lambda->get_ufun1();
              vs.sym_val.function = ufun;
              ufun->increment_refcount(LOC);
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
-             return;
+             return false;
 
         default: SYNTAX_ERROR;
       }
+
+   return false;
 }
 //-----------------------------------------------------------------------------
 void

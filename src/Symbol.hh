@@ -158,7 +158,7 @@ public:
    virtual void assign_indexed(Value_P index, Value_P value);
 
    /// assign lambda, eg. V←{ ... }
-   virtual void assign_named_lambda(Function * lambda, const char * loc);
+   virtual bool assign_named_lambda(Function * lambda, const char * loc);
 
    /// Print \b this \b Symbol to \b out
    virtual ostream & print(ostream & out) const;
