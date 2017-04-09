@@ -358,8 +358,8 @@ one of the following directories:
    • in the sub-directory gnu-apl.d of the system configuration
      directory, or
 
-   • in the sub-directory .gnu-apl of the user’s home directory (as per
-     $HOME).
+   • in the sub-directory .config/gnu-apl of the user’s home directory
+     (as per $HOME).
 
    The system configuration directory is usually /etc or /usr/local/etc
 and is configurable via ‘./configure --sysconfdir’.  An empty (i.e.  all
@@ -3377,34 +3377,34 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 Tag Table:
 Node: Top383
 Node: Chapter 11408
-Node: Chapter 217057
-Node: Chapter 321468
-Node: Section 3.122402
-Node: Section 3.233305
-Node: Section 3.337691
-Node: Section 3.440681
-Node: Section 3.541484
-Node: Section 3.642097
-Node: Section 3.743384
-Node: Section 3.845315
-Node: Section 3.945488
-Node: Section 3.1048738
-Node: Section 3.1149316
-Node: Section 3.1250712
-Node: Section 3.1354667
-Node: Section 3.1455431
-Node: Section 3.1557420
-Node: Section 3.1667332
-Node: Section 3.1769117
-Node: Section 3.1872221
-Node: Chapter 474826
-Node: Chapter 576574
-Node: Chapter 677703
-Node: Section 6.178122
-Node: Section 6.278809
-Node: Chapter 779640
-Node: Section 7.180143
-Node: Section 7.2105452
+Node: Chapter 217064
+Node: Chapter 321475
+Node: Section 3.122409
+Node: Section 3.233312
+Node: Section 3.337698
+Node: Section 3.440688
+Node: Section 3.541491
+Node: Section 3.642104
+Node: Section 3.743391
+Node: Section 3.845322
+Node: Section 3.945495
+Node: Section 3.1048745
+Node: Section 3.1149323
+Node: Section 3.1250719
+Node: Section 3.1354674
+Node: Section 3.1455438
+Node: Section 3.1557427
+Node: Section 3.1667339
+Node: Section 3.1769124
+Node: Section 3.1872228
+Node: Chapter 474833
+Node: Chapter 576581
+Node: Chapter 677710
+Node: Section 6.178129
+Node: Section 6.278816
+Node: Chapter 779647
+Node: Section 7.180150
+Node: Section 7.2105459
 
 End Tag Table
 

@@ -426,7 +426,8 @@ the following directories:
 in the sub-directory gnu-apl.d of the system configuration directory, or
 
 @item
-in the sub-directory .gnu-apl of the user's home directory (as per $HOME).
+in the sub-directory .config/gnu-apl of the user's home directory (as per
+$HOME).
 
 @end itemize
 
