@@ -748,20 +748,20 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
    switch(arity)
       {
         case -4: out << "   dyadic operator:   Z ← A (F "
-                     << prim << " G)";                            break;
+                     << prim << " G) B";                                  break;
         case -3: out << "   dyadic operator:   Z ← (F "
-                     << prim << " G)";                            break;
+                     << prim << " G) B";                                  break;
         case -2: out << "   monadic operator:  Z ← A (F "
-                     << prim << ")";                              break;
+                     << prim << ") B";                                    break;
         case -1: out << "   monadic operator:  Z ← (F "
-                     << prim << ")";                              break;
-        case 1:  out << "    monadic function: Z ← " << prim;     break;
-        case 2:  out << "    dyadic function:  Z ← A " << prim;   break;
+                     << prim << ") B";                                    break;
+        case 0:  out << "    niladic function: Z ← " << prim;             break;
+        case 1:  out << "    monadic function: Z ← " << prim << " B";     break;
+        case 2:  out << "    dyadic function:  Z ← A " << prim << " B";   break;
         default: FIXME;
       }
 
-   out << " B"
-       << " (" << name  <<  ")" << endl
+   out << "  (" << name  <<  ")" << endl
        << "    " << brief << endl;
 
    if (descr)   out << descr << endl;

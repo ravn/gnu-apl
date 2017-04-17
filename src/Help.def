@@ -20,6 +20,7 @@
 
 // APL primitive functions...
 //
+help_def(0, "⍬", "Zilde",                     "Z is the empty character vector (aka. 0⍴' ')",                                                    "")
 
 // scalar functions...
 //
@@ -144,6 +145,11 @@ help_def(-1, "¨",  "Each",                    "Z[i] is F B[i] for all valid ind
 help_def(-2, "¨",  "Each",                    "Z[i] is A[i] F B[i] for all valid indices i (with scalar extended A or B)\n",                     "")
 help_def(-2, ".",  "Outer Product",           "Z[i;j] is A[i] F B[j] for all valid indices i of A and j of B\n",                                 "")
 help_def(-4, ".",  "Inner Product",           "for matrices A and B: Z[i;j] is F/A[i;] G B[;j] (higher ranks accordingly)\n",                    "")
-
+help_def(-3, "⍤",  "Rank",                    "Call F GB with each of the rank-G cells GB of B\n",                                               "")
+help_def(-4, "⍤",  "Rank",                    "Call GA F GB with each of the corresponing rank-G cells GA of A and GB of B\n",                   "")
+help_def(-3, "⍣",  "Power Operator",          "repeat G times: B ← F B                       (numeric scalar G)\n",                              "")
+help_def(-3, "⍣",  "Power Operator",          "repeat: B ← F B until (F B) G B is true       (function G)\n",                                    "")
+help_def(-4, "⍣",  "Power Operator",          "repeat G times: B ← A F B                     (numeric scalar G)\n",                              "")
+help_def(-3, "⍣",  "Power Operator",          "repeat: B ← A F B until (A F B) G B is true   (function G)\n",                                    "")
 #undef help_def
 
