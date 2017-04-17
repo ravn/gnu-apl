@@ -270,8 +270,8 @@ const bool log_startup = uprefs.parse_argv_1();
 
    init_1(argv[0], log_startup);
 
-   uprefs.read_config_file(true,  log_startup);   // /etc/gnu-apl.d/preferences
-   uprefs.read_config_file(false, log_startup);   // $HOME/.gnu_apl/preferences
+   uprefs.read_config_file(true,  log_startup);   // in /etc/gnu-apl.d/
+   uprefs.read_config_file(false, log_startup);   // in $HOME/.config/gnu_apl/
    uprefs.read_threshold_file(true,  log_startup);  // dito parallel_thresholds
    uprefs.read_threshold_file(false, log_startup);  // dito parallel_thresholds
 

@@ -47,6 +47,7 @@ Executable.cc					Executable.hh		\
 FloatCell.cc					FloatCell.hh		\
 Function.cc					Function.hh		\
 DerivedFunction.cc				DerivedFunction.hh	\
+			Help.def					\
 						Heapsort.hh		\
 Id.cc			Id.def			Id.hh			\
 IndexExpr.cc					IndexExpr.hh		\

@@ -1,0 +1,149 @@
+/*
+    This file is part of GNU APL, a free implementation of the
+    ISO/IEC Standard 13751, "Programming Language APL, Extended"
+
+    Copyright (C) 2017  Alexey Veretennikov
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+// APL primitive functions...
+//
+
+// scalar functions...
+//
+help_def(1, "+", "Conjugate",                 "Returns the conjugate of B",
+                                              "If B is a real number, return B. If B is complex, return\n"
+                                              "B with the imaginary part negated.")
+help_def(2, "+", "Addition",                  "Returns the sum of A and B",                                                                      "")
+help_def(1, "-", "Negation",                  "Negate B",                                                                                        "")
+help_def(2, "-", "Subtraction",               "Subtract B from A",                                                                               "")
+help_def(1, "×", "Signum",                    "¯1 if B<0; 0 if B=0; 1 if B>0",                                                                   "")
+help_def(2, "×", "Multiply",                  "A multiplied by B",                                                                               "")
+help_def(1, "÷", "Reciprocal",                "1 divided by B",                                                                                  "")
+help_def(2, "÷", "Division ",                 "A divided by B",                                                                                  "")
+help_def(1, "⋆", "Exponential",               "e to the Bth power",                                                                              "")
+help_def(2, "⋆", "Exponentiation",            "A raised to the Bth power",                                                                       "")
+help_def(1, "⍟", "Logarithm",                 "Natural logarithm of B",                                                                          "")
+help_def(2, "⍟", "Logarithm",                 "Logarithm of B to base A",                                                                        "")
+help_def(1, "⌈", "Ceiling",                   "Least integer greater than or equal to B",                                                        "")
+help_def(2, "⌈", "Maximum",                   "The greater value of A or B",                                                                     "")
+help_def(1, "⌊", "Floor",                     "Greatest integer less than or equal to B",                                                        "")
+help_def(2, "⌊", "Minimum",                   "The smaller value of A or B",                                                                     "")
+help_def(1, "∣", "Absolute value",            "Magnitude of B",                                                                                  "")
+help_def(2, "∣", "Modulo",                    "R modulo A",                                                                                      "")
+help_def(1, "∼", "Not",                       "Boolean inverse: Z[i] is 1 - B[i], all B[i] must be 0 or 1",                                      "")
+help_def(2, "∼", "Without",                   "Z is A with the values from B removed.",                                                          "")
+help_def(1, "!", "Factorial",                 "Product of integers 1 to B",                                                                      "")
+help_def(2, "!", "Combinations",              "Number of combinations of B items taken A at a time",                                             "")
+help_def(2, "<", "Less than",                 "1 if A is less than B, 0 if not",                                                                 "")
+help_def(2, "≤", "Less than or equal",        "1 if A is less than or equal to B, 0 if not",                                                     "")
+help_def(2, "=", "Equality",                  "Comparison: 1 if A and B are equal, 0 if not",                                                    "")
+help_def(2, "≥", "Greater than or equal",     "1 if A is greater than or equal to B, 0 if not",                                                  "")
+help_def(2, ">", "Greater than",              "1 if A is greater than B, 0 if not",                                                              "")
+help_def(2, "≠", "Not equal",                 "1 if A is different than B, 0 if not",                                                            "")
+help_def(2, "∨", "Logical disjunction",       "Boolean arguments: 0 if A and B are 0; 1 if not",                                                 "")
+help_def(2, "∨", "GCD",                       "non-Boolean arguments: greatest common divisor",                                                  "")
+help_def(2, "∧", "Logical conjunction",       "Boolean arguments: 1 if A and B are 1; 0 if not",                                                 "")
+help_def(2, "∧", "LCM",                       "non-Boolean arguments: Numeric arguments: least common multiple",                                 "")
+help_def(2, "⍱", "Logical Nor"              , "Logic: 1 if both A and B are 0; if not 0",                                                        "")
+help_def(2, "⍲", "Logical Nand",              "Logic: 0 if both A and B are 1; if not 1",                                                        "")
+help_def(1, "○", "Pi times",                  "Multiply by π",                                                                                   "")
+help_def(2, "○", "Circle Functions",
+         "Trigonometric functions of B selected by A",
+         "The value of A selects one of the following functions:\n\n"
+"    A=  0:   Z ← (1-B×B)⋆0.5\n"
+"    A= ¯1:   Z ← arcsin B               A= 1:   Z ← sin B\n"
+"    A= ¯2:   Z ← arccos B               A= 2:   Z ← cos B\n"
+"    A= ¯3:   Z ← arctan B               A= 3:   Z ← tan B\n"
+"    A= ¯4:   Z ← sqrt(¯1+B×B)           A= 4:   Z ← sqrt(1+B×B)\n"
+"    A= ¯5:   Z ← arcsinh B              A= 5:   Z ← sinh B\n"
+"    A= ¯6:   Z ← arccosh B              A= 6:   Z ← cosh B\n"
+"    A= ¯7:   Z ← arctanh B              A= 7:   Z ← tanh B\n"
+"    A= ¯8:   Z ← -(8○B)                 A= 8:   Z ← -sqrt(¯1+B×B) if B ≥ 0\n"
+"                                                Z ←  sqrt(¯1+B×B) if B < 0\n"
+"    A= ¯9:   Z ← B                      A= 9:   Z ← Real part of B\n"
+"    A=¯10:   Z ← +B                     A=10:   Z ← |B\n"
+"    A=¯11:   Z ← 0J1×B                  A=11:   Z ← Imaginary part of B\n"
+"    A=¯12:   Z ← ⋆0J1×B                 A=12:   Z ← Arc B")
+
+help_def(1, "?", "Roll",                      "integer selected randomly from ⍳B",                                                               "")
+help_def(2, "?", "Deal",                      "A distinct integers selected randomly from ⍳B",                                                   "")
+help_def(1, "∊", "Enlist",                    "Create a vector containing all scalars in B",                                                     "")
+help_def(2, "∊", "Membership",                "1 for elements of A present in B; 0 where not.",                                                  "")
+help_def(2, "⍷", "Find",                      "Find subsequence in array. 1 for position each position that contains the array A in B",          "")
+help_def(1, "⍴", "Shape",                     "Length of each axis of B",                                                                        "")
+help_def(2, "⍴", "Reshape",                   "Array of shape A with data B",                                                                    "")
+help_def(1, "↑", "First",                     "Select the first element of B",                                                                   "")
+help_def(2, "↑", "Take",                      "Z is the first (if A ≥ 0) or last (if A < 0) A elements of B (along each axis)",                  "")
+help_def(2, "↓", "Drop ",                     "Z is B with the first (if A ≥ 0) or last (if A < 0) A elements (along each axis) removed",        "")
+help_def(1, ",", "Ravel",                     "Reshapes B into a vector (in row-major order)",                                                   "")
+help_def(2, ",", "Catenate",                  "Elements of B appended to the elements of A (last axis)",                                         "")
+help_def(2, "\\","Expand",                    "Insert zeros (or blanks) in B corresponding to zeros in A",                                       "")
+help_def(-1, "\\", "Scan",                    "Reduce of all prefixes of B along the last axis with function F",                                 "")
+help_def(2, "⍀", "Expand",                    "Insert zeros (or blanks) in B corresponding to zeros in A",                                       "")
+help_def(-1, "⍀",  "Scan",                    "Reduce of all prefixes of B along the first axis with function F",                                "")
+help_def(2, "/", "Compress",                  "Select elements in B corresponding to ones in A",                                                 "")
+help_def(-1, "/",  "Reduce",                  "Reduce B along the last axis with function F",                                                    "")
+help_def(2, "⌿", "Compress",                  "Select elements in B corresponding to ones in A",                                                 "")
+help_def(-1, "⌿",  "Reduce",                  "Reduce B along the first axis with function F",                                                   "")
+help_def(1, "⍳", "Index generator",           "Vector of the first B integers (starting from 0 or 1, see ⎕IO)",                                  "")
+help_def(2, "⍳", "Index of",                  "The location (index) of B in A; 1+⌈/⍳⍴L if not found",                                            "")
+help_def(1, "⌹", "Matrix inverse",            "Inverse of matrix B",                                                                             "")
+help_def(2, "⌹", "Matrix divide",             "Solution to system of linear equations Ax = B",                                                   "")
+help_def(1, "⌽", "Reversal",                  "Reverse elements of B along last axis",                                                           "")
+help_def(2, "⌽", "Rotation",                  "The elements of B are rotated A positions along the last axis",                                   "")
+help_def(1, "⊖", "Reversal",                  "Reverse elements of B along first axis",                                                          "")
+help_def(2, "⊖", "Rotation",                  "The elements of B are rotated A positions along the first axis",                                  "")
+help_def(1, "⍕", "Format",                    "A character representation of B",                                                                 "")
+help_def(2, "⍕", "Format",                    "Format B into a character matrix according to A",                                                 "")
+help_def(1, "⍉", "Transpose",                 "Reverse the axes of B",                                                                           "")
+help_def(2, "⍉", "Transpose",                 "The axes of B are ordered by A",                                                                  "")
+help_def(1, "⍋", "Grade up",                  "Indices of B so that B[Z] is sorted ascendingly",                                                 "")
+help_def(2, "⍋", "Grade up with collating sequence", "⍋B with sorting order defined by collating sequence A",                                    "")
+help_def(1, "⍒", "Grade down",                "Indices of B so that B[Z] is sorted descendingly",                                                "")
+help_def(2, "⍒", "Grade down with collating sequence", "⍒B with sorting order defined by collating sequence A",                                  "")
+help_def(1, "⍎", "Execute",                   "Execute an APL expression",                                                                       "")
+help_def(1, "⊂", "Enclose",                   "Produce a scalar from B",                                                                         "")
+help_def(2, "⊂", "Partition",                 "Divide B into vectors based on A",                                                                "")
+help_def(1, "⊃", "Disclose",                  "Produce an array from B",                                                                         "")
+help_def(2, "⊃", "Pick",                      "Select a value from B based on A",                                                                "")
+help_def(1, "∪", "Unique",                    "Return an array of all unique elements in B",                                                     "")
+help_def(1, "≡", "Depth",                     "Return the levels of nesting in B",                                                               "")
+help_def(2, "≡", "Match",                     "Returns 1 if A has the same shape and ravel as B",                                                "")
+help_def(1, "≢", "Tally",                     "Returns the number of elements in the first dimension of B.",                                     "")
+help_def(2, "≢", "Not match",                 "Returns 1 if A has not the same shape and ravel as B.",                                           "")
+help_def(2, "⊥", "Decode",                    "Z is the values of array A evaluated in a number system with radices B",                          "")
+help_def(2, "⊤", "Encode",                    "Z is the representation of A in the number system whose radices are B",                           "")
+help_def(1, "⊢", "Identity",                  "Return B as non-committed value",                                                                 "")
+help_def(2, "⊢", "Right",                     "Return B.",                                                                                       "")
+help_def(1, "⊣", "Hide",                      "B as committed value.",                                                                           "")
+help_def(2, "⊣", "Left",                      "Return A.",                                                                                       "")
+help_def(1, "⍪", "Table",                     "Return a matrix by ravelling the subarrays of B",                                                 "")
+help_def(2, "⍪", "Catenate",                  "Append A and B along first axis",                                                                 "")
+help_def(2, "←", "Assignment",                "Assign the value of B to A",                                                                      "")
+help_def(1, "→", "Goto",                      "Go to line B",                                                                                    "")
+help_def(1, "∇", "Function definition",       "Enter or leave the del editor for defined functions",                                             "")
+
+// APL primitive operators (except those that are also functions)
+//
+help_def(-1, "⍨",  "Duplicate",               "(⍨ F) B is (B F B).\n",                                                                           "")
+help_def(-2, "⍨",  "Commute",                 "A (⍨ F) B is (B F A).\n",                                                                         "")
+help_def(-1, "¨",  "Each",                    "Z[i] is F B[i] for all valid indices i\n",                                                        "")
+help_def(-2, "¨",  "Each",                    "Z[i] is A[i] F B[i] for all valid indices i (with scalar extended A or B)\n",                     "")
+help_def(-2, ".",  "Outer Product",           "Z[i;j] is A[i] F B[j] for all valid indices i of A and j of B\n",                                 "")
+help_def(-4, ".",  "Inner Product",           "for matrices A and B: Z[i;j] is F/A[i;] G B[;j] (higher ranks accordingly)\n",                    "")
+
+#undef help_def
+

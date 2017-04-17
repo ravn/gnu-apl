@@ -738,9 +738,50 @@ Pfstat_ID iarg = PFS_ALL;
    Performance::print(iarg, out);
 }
 //-----------------------------------------------------------------------------
-void 
-Command::cmd_HELP(ostream & out)
+void
+Command::primitive_help(ostream & out, const char * arg, int arity,
+                        const char * prim, const char * name,
+                        const char * brief, const char * descr)
 {
+   if (strcmp(arg, prim))   return;
+
+   switch(arity)
+      {
+        case -4: out << "   dyadic operator:   Z ← A (F "
+                     << prim << " G)";                            break;
+        case -3: out << "   dyadic operator:   Z ← (F "
+                     << prim << " G)";                            break;
+        case -2: out << "   monadic operator:  Z ← A (F "
+                     << prim << ")";                              break;
+        case -1: out << "   monadic operator:  Z ← (F "
+                     << prim << ")";                              break;
+        case 1:  out << "    monadic function: Z ← " << prim;     break;
+        case 2:  out << "    dyadic function:  Z ← A " << prim;   break;
+        default: FIXME;
+      }
+
+   out << " B"
+       << " (" << name  <<  ")" << endl
+       << "    " << brief << endl;
+
+   if (descr)   out << descr << endl;
+}
+//-----------------------------------------------------------------------------
+void 
+Command::cmd_HELP(ostream & out, const UCS_string & arg)
+{
+   if (arg.size() == 1)   // help for an APL  primitive
+      {
+        UTF8_string arg_utf(arg);
+        const char * arg_cp = arg_utf.c_str();
+
+#define help_def(ar, prim, name, title, descr)              \
+   primitive_help(out, arg_cp, ar, prim, name, title, descr);
+#include "Help.def"
+
+         return;
+      }
+
    out << left << "APL Commands:" << endl;
 #define cmd_def(cmd_str, _cod, arg, _hint) \
    out << "      " cmd_str " " arg << endl;
@@ -1980,9 +2021,9 @@ UCS_string cmd = user;
 UCS_string arg;
    cmd.split_ws(arg);
 
-#define cmd_def(cmd_str, code, arg, hint)  \
-   { UCS_string ustr(cmd_str);             \
-     if (ustr.starts_iwith(cmd))           \
+#define cmd_def(cmd_str, code, arg, hint)                \
+   { UCS_string ustr(cmd_str);                           \
+     if (ustr.starts_iwith(cmd))                         \
         { matches.append(ustr); ehint = hint; shint = arg; } }
 #include "Command.def"
 
@@ -2135,6 +2176,26 @@ int qpos = -1;
 }
 //-----------------------------------------------------------------------------
 ExpandResult
+Command::show_primitives()
+{
+   CIN << "\n";
+   CERR << "Help topics (APL primitives) are:" << endl;
+
+const char * last = "";
+int len = 0;
+
+#define help_def(_ar, prim, _name, _title, _descr)                          \
+   if (strcmp(prim, last))                                                  \
+      { CERR << " " << (last = prim);   len += 2;                           \
+        if (len > (Workspace::get_PW() - 4))   { CERR << endl;   len = 0; } \
+      }
+#include "Help.def"
+
+   CERR << endl;
+   return ER_AGAIN;
+}
+//-----------------------------------------------------------------------------
+ExpandResult
 Command::expand_command_arg(UCS_string & user, bool have_trailing_blank,
                             ExpandHint ehint, const char * shint,
                             const UCS_string cmd, const UCS_string arg)
@@ -2151,6 +2212,8 @@ Command::expand_command_arg(UCS_string & user, bool have_trailing_blank,
         case EH_WSNAME:    return expand_filename(user, have_trailing_blank,
                                                   ehint, shint, cmd, arg);
 
+        case EH_PRIMITIVE: return show_primitives();
+             
         default:
              CIN << endl;
              CERR << cmd << " " << shint << endl;

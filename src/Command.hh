@@ -64,7 +64,8 @@ enum ExpandHint
    EH_HOSTCMD,        ///< host command
    EH_UCOMMAND,       ///< user-defined command
    EH_COUNT,          ///< count
-   EH_BOXING,         ///< boxcxing parameter
+   EH_BOXING,         ///< boxing parameter
+   EH_PRIMITIVE       ///< apl primitive
 };
 //-----------------------------------------------------------------------------
 /*!
@@ -155,6 +156,9 @@ protected:
    static ExpandResult expand_distinguished_name(UCS_string & user,
                                                  int & replace_count);
 
+   /// tab-expand a primitive name
+   static ExpandResult show_primitives();
+
    /// show list of commands
    static void cmd_BOXING(ostream & out, const UCS_string & arg);
 
@@ -168,7 +172,12 @@ protected:
    static void cmd_ERASE(ostream & out, UCS_string_vector & args);
 
    /// show list of commands
-   static void cmd_HELP(ostream & out);
+   static void cmd_HELP(ostream & out, const UCS_string & arg);
+
+   /// show help for APL primitives
+   static void primitive_help(ostream & out, const char * arg, int arity,
+                              const char * prim, const char * name,
+                              const char * title, const char * descr);
 
    /// show or clear input history
    static void cmd_HISTORY(ostream & out, const UCS_string & arg);

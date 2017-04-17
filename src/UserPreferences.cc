@@ -887,7 +887,7 @@ FILE *
 UserPreferences::open_user_file(const char * fname, char * filename,
                                 bool sys, bool log_startup)
 {
-   if (sys)   // eg. /etc/gnu-apl.d/preferences
+   if (sys)   // filename in /etc/gnu-apl.d/preferences
       {
         snprintf(filename, APL_PATH_MAX,
                  "%s/gnu-apl.d/%s", Makefile__sysconfdir, fname);
