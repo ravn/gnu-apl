@@ -102,7 +102,7 @@ help_def(-1, "⌿",  "Reduce",                  "Reduce B along the first axis w
 help_def(1, "⍳", "Index generator",           "Vector of the first B integers (starting from 0 or 1, see ⎕IO)",                                  "")
 help_def(2, "⍳", "Index of",                  "The location (index) of B in A; 1+⌈/⍳⍴L if not found",                                            "")
 help_def(1, "⌹", "Matrix inverse",            "Inverse of matrix B",                                                                             "")
-help_def(2, "⌹", "Matrix divide",             "Solution to system of linear equations Ax = B",                                                   "")
+help_def(2, "⌹", "Matrix divide",             "Z is a minimal (least square) solution of the system of linear equations A = B +.× Z",            "")
 help_def(1, "⌽", "Reversal",                  "Reverse elements of B along last axis",                                                           "")
 help_def(2, "⌽", "Rotation",                  "The elements of B are rotated A positions along the last axis",                                   "")
 help_def(1, "⊖", "Reversal",                  "Reverse elements of B along first axis",                                                          "")
