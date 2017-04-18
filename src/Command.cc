@@ -747,6 +747,8 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
 
    switch(arity)
       {
+        case -5: out << "   quasi-dyadic operator:   Z ← A (∘ "
+                     << prim << " G) B";                                  break;
         case -4: out << "   dyadic operator:   Z ← A (F "
                      << prim << " G) B";                                  break;
         case -3: out << "   dyadic operator:   Z ← (F "
@@ -802,13 +804,13 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
            }
      }
 
-   out << endl << "System variables:" << endl;
+   out << endl << "System variables:" << endl
+       << "      ⍞       Character Input/Output" << endl
+       << "      ⎕       Evaluated Input/Output" << endl;
 #define ro_sv_def(x, _str, txt)                                           \
    { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();  \
         out << "      " << setw(8) << ucs << txt << endl; }
-#define rw_sv_def(x, _str, txt)                                           \
-   { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();  \
-        out << "      " << setw(8) << ucs << txt << endl; }
+#define rw_sv_def(x, str, txt) ro_sv_def(x, str, txt)
 #include "SystemVariable.def"
 
    out << endl << "System functions:" << endl;
@@ -816,7 +818,6 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
 #define rw_sv_def(x, _str, _txt)
 #define sf_def(_q, str, txt) \
         out << "      ⎕" << setw(7) << str << txt << endl;
-
 #include "SystemVariable.def"
 }
 //-----------------------------------------------------------------------------
