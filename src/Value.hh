@@ -291,7 +291,7 @@ public:
    ostream & print1(ostream & out, PrintContext pctx) const;
 
    /// print the properties (shape, flags etc) of \b this value
-   ostream & print_properties(ostream & out, int indent) const;
+   ostream & print_properties(ostream & out, int indent, bool help) const;
 
    /// debug-print \b this value
    void debug(const char * info) const;

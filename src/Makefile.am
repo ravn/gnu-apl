@@ -104,6 +104,7 @@ Symbol.cc					Symbol.hh		\
 SymbolTable.cc					SymbolTable.hh		\
 			SystemLimits.def	SystemLimits.hh		\
 SystemVariable.cc	SystemVariable.def	SystemVariable.hh	\
+TabExpansion.cc					TabExpansion.hh		\
 IO_Files.cc					IO_Files.hh		\
 Token.cc		Token.def		Token.hh		\
 						TokenEnums.hh		\

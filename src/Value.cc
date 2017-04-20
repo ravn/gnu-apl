@@ -1503,20 +1503,31 @@ PrintBuffer pb(*this, pctx, &out);
 }
 //-----------------------------------------------------------------------------
 ostream &
-Value::print_properties(ostream & out, int indent) const
+Value::print_properties(ostream & out, int indent, bool help) const
 {
 UCS_string ind(indent, UNI_ASCII_SPACE);
-   out << ind << "Addr:    " << (const void *)this << endl
-       << ind << "Rank:    " << get_rank()  << endl
-       << ind << "Shape:   " << get_shape() << endl
-       << ind << "Flags:   " << get_flags();
-   if (is_complete())   out << " VF_complete";
-   if (is_marked())     out << " VF_marked";
-   out << endl
-       << ind << "First:   " << get_ravel(0)  << endl
-       << ind << "Dynamic: ";
+   if (help)
+      {
+        out << ind << "Rank:  " << get_rank()  << endl
+            << ind << "Shape:";
+        loop(r, get_rank())   out << " " << get_shape_item(r);
+        out << endl
+            << ind << "Depth: " << compute_depth()   << endl;
+      }
+   else
+      {
+        out << ind << "Addr:    " << (const void *)this << endl
+            << ind << "Rank:    " << get_rank()  << endl
+            << ind << "Shape:   " << get_shape() << endl
+            << ind << "Flags:   " << get_flags();
+        if (is_complete())   out << " VF_complete";
+        if (is_marked())     out << " VF_marked";
+        out << endl
+             << ind << "First:   " << get_ravel(0)  << endl
+             << ind << "Dynamic: ";
 
-   DynamicObject::print(out);
+        DynamicObject::print(out);
+      }
    return out;
 }
 //-----------------------------------------------------------------------------

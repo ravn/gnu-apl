@@ -30,6 +30,7 @@
 #include "Nabla.hh"
 #include "Parallel.hh"
 #include "SystemVariable.hh"
+#include "TabExpansion.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
@@ -502,9 +503,9 @@ LineEditContext::tab_expansion(LineInputMode mode)
 {
    if (mode != LIM_ImmediateExecution)   return;
 
-int replace_count = 0;
 UCS_string line = user_line;
-const ExpandResult expand_result = Command::expand_tab(line, replace_count);
+TabExpansion tab_exp(line);
+const ExpandResult expand_result = tab_exp.expand_tab(line);
 
    switch(expand_result)
       {
@@ -519,7 +520,7 @@ const ExpandResult expand_result = Command::expand_tab(line, replace_count);
              return;
 
         case ER_REPLACE:
-             user_line.shrink(user_line.size() - replace_count);
+             user_line.shrink(0);
              user_line.append(line);
              uidx = 0;
              refresh_from_cursor();

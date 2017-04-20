@@ -146,6 +146,9 @@ public:
    /// Overloaded Function::destroy()
    virtual void destroy();
 
+   /// print help for this function on out (for the )HELP command)
+   void help(ostream & out) const;
+
    /// Load this function into the workspace named \b workspace.
    static void load(const char * workspace, const char * function,
                     UserFunction * & fun);

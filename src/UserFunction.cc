@@ -901,6 +901,42 @@ UserFunction::destroy()
    else               delete this;
 }
 //-----------------------------------------------------------------------------
+void 
+UserFunction::help(ostream & out) const
+{
+   CERR << "    Header: " << get_text(0) << endl;
+
+bool got_lamps = false;
+bool toronto = false;
+const UCS_string two_lamps(UTF8_string("⍝⍝"));
+   for (int l = 1; l < get_text_size(); ++l)
+       {
+         UCS_string line(get_text(l));
+         line.remove_leading_and_trailing_whitespaces();
+         if (line.size() < 2)          continue;   // too short
+
+         if (line[0] != UNI_COMMENT)   // not a comment
+            {
+              toronto = false;
+              continue;
+            }
+
+         const bool double_lamps = line[1] == UNI_COMMENT;   // ⍝⍝ line
+         if (line[1] == UNI_ASCII_FULLSTOP)                  // ⍝. line
+            {
+              toronto = true;
+            }
+
+         if (double_lamps || toronto)
+            {
+              got_lamps = true;
+              CERR << "    " << line << endl;
+            }
+       }
+
+   if (!got_lamps)   CERR << "    (no ⍝⍝ or ⍝. comment lines)" << endl;
+}
+//-----------------------------------------------------------------------------
 ostream &
 UserFunction::print(ostream & out) const
 {

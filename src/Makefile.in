@@ -185,19 +185,19 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
 	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
 	SystemLimits.hh SystemVariable.cc SystemVariable.def \
-	SystemVariable.hh IO_Files.cc IO_Files.hh Token.cc Token.def \
-	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
-	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
-	Unicode.hh UserFunction.cc UserFunction.hh \
-	UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
-	ValueHistory.hh Workspace.cc Workspace.hh static_Objects.cc \
-	static_Objects.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh IO_Files.cc \
+	IO_Files.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	ValueHistory.cc ValueHistory.hh Workspace.cc Workspace.hh \
+	static_Objects.cc static_Objects.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
@@ -249,14 +249,14 @@ am__objects_4 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
 	libapl_la-StateIndicator.lo libapl_la-Svar_DB.lo \
 	libapl_la-Svar_record.lo libapl_la-Symbol.lo \
 	libapl_la-SymbolTable.lo libapl_la-SystemVariable.lo \
-	libapl_la-IO_Files.lo libapl_la-Token.lo \
-	libapl_la-Tokenizer.lo libapl_la-UCS_string.lo \
-	libapl_la-UCS_string_vector.lo libapl_la-UserFunction.lo \
-	libapl_la-UserFunction_header.lo libapl_la-UserPreferences.lo \
-	libapl_la-UTF8_string.lo libapl_la-Value.lo \
-	libapl_la-ValueHistory.lo libapl_la-Workspace.lo \
-	libapl_la-static_Objects.lo $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3)
+	libapl_la-TabExpansion.lo libapl_la-IO_Files.lo \
+	libapl_la-Token.lo libapl_la-Tokenizer.lo \
+	libapl_la-UCS_string.lo libapl_la-UCS_string_vector.lo \
+	libapl_la-UserFunction.lo libapl_la-UserFunction_header.lo \
+	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
+	libapl_la-Value.lo libapl_la-ValueHistory.lo \
+	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
+	$(am__objects_1) $(am__objects_2) $(am__objects_3)
 @WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_4) \
 @WANT_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
@@ -311,19 +311,19 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
 	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
 	SystemLimits.hh SystemVariable.cc SystemVariable.def \
-	SystemVariable.hh IO_Files.cc IO_Files.hh Token.cc Token.def \
-	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
-	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
-	Unicode.hh UserFunction.cc UserFunction.hh \
-	UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
-	ValueHistory.hh Workspace.cc Workspace.hh static_Objects.cc \
-	static_Objects.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh IO_Files.cc \
+	IO_Files.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	ValueHistory.cc ValueHistory.hh Workspace.cc Workspace.hh \
+	static_Objects.cc static_Objects.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
@@ -375,10 +375,10 @@ am__objects_8 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-StateIndicator.$(OBJEXT) apl-Svar_DB.$(OBJEXT) \
 	apl-Svar_record.$(OBJEXT) apl-Symbol.$(OBJEXT) \
 	apl-SymbolTable.$(OBJEXT) apl-SystemVariable.$(OBJEXT) \
-	apl-IO_Files.$(OBJEXT) apl-Token.$(OBJEXT) \
-	apl-Tokenizer.$(OBJEXT) apl-UCS_string.$(OBJEXT) \
-	apl-UCS_string_vector.$(OBJEXT) apl-UserFunction.$(OBJEXT) \
-	apl-UserFunction_header.$(OBJEXT) \
+	apl-TabExpansion.$(OBJEXT) apl-IO_Files.$(OBJEXT) \
+	apl-Token.$(OBJEXT) apl-Tokenizer.$(OBJEXT) \
+	apl-UCS_string.$(OBJEXT) apl-UCS_string_vector.$(OBJEXT) \
+	apl-UserFunction.$(OBJEXT) apl-UserFunction_header.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
@@ -711,16 +711,16 @@ common_SOURCES = buildtag buildtag.hh ../config.h APL_types.hh \
 	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
 	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
 	SystemLimits.hh SystemVariable.cc SystemVariable.def \
-	SystemVariable.hh IO_Files.cc IO_Files.hh Token.cc Token.def \
-	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
-	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
-	Unicode.hh UserFunction.cc UserFunction.hh \
-	UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
-	ValueHistory.hh Workspace.cc Workspace.hh static_Objects.cc \
-	static_Objects.hh $(am__append_4) $(am__append_5) \
-	$(am__append_8)
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh IO_Files.cc \
+	IO_Files.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	ValueHistory.cc ValueHistory.hh Workspace.cc Workspace.hh \
+	static_Objects.cc static_Objects.hh $(am__append_4) \
+	$(am__append_5) $(am__append_8)
 pkglib_LTLIBRARIES = $(am__append_9)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
@@ -980,6 +980,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Symbol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-SymbolTable.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-SystemVariable.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-TabExpansion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Token.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Tokenizer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-UCS_string.Po@am__quote@
@@ -1069,6 +1070,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Symbol.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-SymbolTable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-SystemVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-TabExpansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Token.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Tokenizer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-UCS_string.Plo@am__quote@
@@ -1649,6 +1651,13 @@ libapl_la-SystemVariable.lo: SystemVariable.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='SystemVariable.cc' object='libapl_la-SystemVariable.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-SystemVariable.lo `test -f 'SystemVariable.cc' || echo '$(srcdir)/'`SystemVariable.cc
+
+libapl_la-TabExpansion.lo: TabExpansion.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-TabExpansion.lo -MD -MP -MF $(DEPDIR)/libapl_la-TabExpansion.Tpo -c -o libapl_la-TabExpansion.lo `test -f 'TabExpansion.cc' || echo '$(srcdir)/'`TabExpansion.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-TabExpansion.Tpo $(DEPDIR)/libapl_la-TabExpansion.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='TabExpansion.cc' object='libapl_la-TabExpansion.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-TabExpansion.lo `test -f 'TabExpansion.cc' || echo '$(srcdir)/'`TabExpansion.cc
 
 libapl_la-IO_Files.lo: IO_Files.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-IO_Files.lo -MD -MP -MF $(DEPDIR)/libapl_la-IO_Files.Tpo -c -o libapl_la-IO_Files.lo `test -f 'IO_Files.cc' || echo '$(srcdir)/'`IO_Files.cc
@@ -2867,6 +2876,20 @@ apl-SystemVariable.obj: SystemVariable.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='SystemVariable.cc' object='apl-SystemVariable.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-SystemVariable.obj `if test -f 'SystemVariable.cc'; then $(CYGPATH_W) 'SystemVariable.cc'; else $(CYGPATH_W) '$(srcdir)/SystemVariable.cc'; fi`
+
+apl-TabExpansion.o: TabExpansion.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-TabExpansion.o -MD -MP -MF $(DEPDIR)/apl-TabExpansion.Tpo -c -o apl-TabExpansion.o `test -f 'TabExpansion.cc' || echo '$(srcdir)/'`TabExpansion.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-TabExpansion.Tpo $(DEPDIR)/apl-TabExpansion.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='TabExpansion.cc' object='apl-TabExpansion.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-TabExpansion.o `test -f 'TabExpansion.cc' || echo '$(srcdir)/'`TabExpansion.cc
+
+apl-TabExpansion.obj: TabExpansion.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-TabExpansion.obj -MD -MP -MF $(DEPDIR)/apl-TabExpansion.Tpo -c -o apl-TabExpansion.obj `if test -f 'TabExpansion.cc'; then $(CYGPATH_W) 'TabExpansion.cc'; else $(CYGPATH_W) '$(srcdir)/TabExpansion.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-TabExpansion.Tpo $(DEPDIR)/apl-TabExpansion.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='TabExpansion.cc' object='apl-TabExpansion.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-TabExpansion.obj `if test -f 'TabExpansion.cc'; then $(CYGPATH_W) 'TabExpansion.cc'; else $(CYGPATH_W) '$(srcdir)/TabExpansion.cc'; fi`
 
 apl-IO_Files.o: IO_Files.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-IO_Files.o -MD -MP -MF $(DEPDIR)/apl-IO_Files.Tpo -c -o apl-IO_Files.o `test -f 'IO_Files.cc' || echo '$(srcdir)/'`IO_Files.cc
