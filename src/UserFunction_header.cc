@@ -376,6 +376,18 @@ UserFunction_header::print_local_vars(ostream & out) const
 }
 //-----------------------------------------------------------------------------
 void
+UserFunction_header::reverse_local_vars()
+{
+const ShapeItem half = local_vars.size() / 2;   // = rounded down!
+   loop(v, half)
+      {
+        Symbol * tmp = local_vars[v];
+        local_vars[v] = local_vars[local_vars.size() - v - 1];
+        local_vars[local_vars.size() - v - 1] = tmp;
+      }
+}
+//-----------------------------------------------------------------------------
+void
 UserFunction_header::remove_duplicate_local_variables()
 {
    // remove local vars that are also labels, arguments or return values.

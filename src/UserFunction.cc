@@ -123,6 +123,10 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
         lambda_body.pop();   // semicolon
       }
 
+   // order of local vars is reversed. Fix that.
+   //
+   header.reverse_local_vars();
+
    parse_body_line(Function_Line_0, lambda_body, false, false, LOC);
    setup_lambdas();
    line_starts.append(Function_PC(lambda_body.size() - 1));
@@ -905,6 +909,19 @@ void
 UserFunction::help(ostream & out) const
 {
    CERR << "    Header: " << get_text(0) << endl;
+
+   if (is_lambda())
+      {
+         UCS_string body(get_text(1), 2, get_text(1).size() - 2);
+         CERR << "Lambda: { " << body << " ";
+         loop(v, local_var_count())
+            {
+              const Symbol & sym = get_local_var(v);
+              CERR << ";" << sym.get_name();
+            }
+         CERR << " }" << endl;
+         return;
+      }
 
 bool got_lamps = false;
 bool toronto = false;

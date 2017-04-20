@@ -1468,7 +1468,16 @@ const APL_Float qct = Workspace::get_CT();
         APL_Integer gcd;
         const ErrorCode err = int_gcd(gcd, a, b);
         if (err)   return err;
-        new (Z) IntCell(a * (b / gcd));
+        const double lcm_double = ((double)a) * ((double)b) / ((double)gcd);
+        if (lcm_double > LARGE_INT || lcm_double < SMALL_INT)
+           {
+             new (Z) FloatCell(lcm_double);
+           }
+        else
+           {
+             new (Z) IntCell(a * (b / gcd));
+           }
+
         return E_NO_ERROR;
       }
 

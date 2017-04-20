@@ -115,6 +115,9 @@ public:
    /// print the local variables for command )SINL
    void print_local_vars(ostream & out) const;
 
+   /// reverse the order of the local vars (if parsed back-to-front)
+   void reverse_local_vars();
+
    /// add a label
    void add_label(Symbol * sym, Function_Line line)
       {
