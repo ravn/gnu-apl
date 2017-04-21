@@ -1660,6 +1660,15 @@ ErrorCode
 NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b,
                      APL_Float qct)
 {
+   if (is_near_zero(a.imag()) && is_near_zero(b.imag()))
+      {
+        APL_Float zz = 0;
+        ErrorCode err = flt_gcd(zz, a.real(), b.real(), qct);
+        if (err)   return err;
+        z = APL_Complex(zz, 0);
+        return E_NO_ERROR;
+      }
+
    if (!is_near_int(a.real()))   return E_DOMAIN_ERROR;
    if (!is_near_int(a.imag()))   return E_DOMAIN_ERROR;
    if (!is_near_int(b.real()))   return E_DOMAIN_ERROR;
@@ -1679,7 +1688,12 @@ NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b,
                a = _b;
             }
 
-         if (abs(a) < 0.2)   { z = b;   return E_NO_ERROR; }
+         if (abs(a) < 0.2)
+            {
+              z = b;
+//            if (z.real() < 0)   z = -b;
+              return E_NO_ERROR;
+            }
 
          const APL_Complex xy = b/a;
          const APL_Complex q(round(xy.real()), round(xy.imag()));
