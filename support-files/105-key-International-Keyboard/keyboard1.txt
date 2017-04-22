@@ -1,0 +1,48 @@
+Name 	   Leslie Satenstein
+Date 	   2017Apr21
+Copyright  Copyright (C) 2017 by Author 
+License    Same License as gnu-apl (GPL)
+
+email	   lsatenstein@yahoo.com
+           leslie.satenstein@yahoo.com
+Portability APL #.7 or more recent. Not tested with earlier versions
+
+Purpose  To distinguish the international pc105 keyboard layout from the 
+         pc104 American version.
+
+Description 
+         The United States standard keyboard follows the pc104 layout.
+         Refer to the keyboard1.txt image for a description
+
+The pc105 layout shown below is called the international keyboard layout. 
+It has a slightly different arrangement as follows:
+1) An extra key between the left shift and the Z.  
+2) The TAB row has one key(|⊣  \⊢  ) from the pc104 layout relocated 
+   down one row at the end of the CAPS LOCK row. 
+3) The Return key is trivially smaller, as shown.
+4) Many countries (eg. Canada, England) use the pc105 keyboard layout.
+5) The following graphic may be copied to the appropriate location
+   as a replacement keyboard1.txt, if your physical keyboard appears as below.
+Implementation
+6) To incorporate this adjustment modify the 'Preferences' file 
+   located within /usr/local/etc/gnu-apl.d, or '/home(yourLinuxID)/.gnu.apl' . 
+
+   The keyboard parameter string is around line 340. My change was as follows
+   # KEYBOARD_LAYOUT_FILE  @GNU_APL_ETC@/gnu-apl.d/keyboard1.txt 
+   KEYBOARD_LAYOUT_FILE    /home/leslie/.gnu-apl/keyboard105.txt 
+
+pc105 International Keyboard 
+╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════════════╗
+║ ~  ║ !⌶ ║ @⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║            ║
+║ `◊ ║ 1¨ ║ 2¯ ║ 3< ║ 4≤ ║ 5= ║ 6≥ ║ 7> ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKSP     ║
+╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═════════╣
+║       ║ Q  ║ W⍹ ║ E⍷ ║ R  ║ T⍨ ║ Y¥ ║ U€ ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║         ║  
+║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║ RETURN  ║    
+╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╗       ║   
+║ (CAPS   ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H∆ ║ J⍤ ║ K⌸ ║ L⌷ ║ :≡ ║ "≢ ║ |⊣ ║       ║  
+║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ k' ║ l⎕ ║ ;⍎ ║ '⍕ ║ \⊢ ║       ║  
+╠════════╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩════╩═══════╣
+║        ║ < ¦║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?⍠ ║             ║
+║  SHIFT ║ > °║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT      ║
+╚════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩═════════════╝
+

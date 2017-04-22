@@ -304,6 +304,7 @@ AC_CONFIG_FILES([Makefile
 		 support-files/Unicomp-Keyboard/Makefile
 		 support-files/WASD-Keyboard/Makefile
 		 support-files/Dirk/Makefile
+		 support-files/105-key-International-Keyboard/Makefile
                  tools/Makefile
                  workspaces/Makefile
                  wslib3/Makefile

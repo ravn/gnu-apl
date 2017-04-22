@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2017  Alexey Veretennikov
+    Copyright (C) 2017  Elias Mårtenson, Alexey Veretennikov
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,22 +20,89 @@
 
 // APL primitive functions...
 //
-help_def(0, "⍬", "Zilde",                     "Z is the empty character vector (aka. 0⍴' ')",                                                    "")
-
+help_def(0, "⍬", "Zilde",                     "Zilde is the empty numeric vector (aka. ⍳0)",
+                                              "Not a function but rather an alias for the empty\n"
+                                              "vector:\n"
+                                              "      ⍬≡⍳0\n"
+                                              "1")
 // scalar functions...
 //
-help_def(1, "+", "Conjugate",                 "Returns the conjugate of B",
+help_def(1, "+", "Conjugate",                 "Returns the conjugate of B.",
                                               "If B is a real number, return B. If B is complex, return\n"
-                                              "B with the imaginary part negated.")
-help_def(2, "+", "Addition",                  "Returns the sum of A and B",                                                                      "")
-help_def(1, "-", "Negation",                  "Negate B",                                                                                        "")
-help_def(2, "-", "Subtraction",               "Subtract B from A",                                                                               "")
-help_def(1, "×", "Signum",                    "¯1 if B<0; 0 if B=0; 1 if B>0",                                                                   "")
-help_def(2, "×", "Multiply",                  "A multiplied by B",                                                                               "")
-help_def(1, "÷", "Reciprocal",                "1 divided by B",                                                                                  "")
-help_def(2, "÷", "Division ",                 "A divided by B",                                                                                  "")
-help_def(1, "⋆", "Exponential",               "e to the Bth power",                                                                              "")
-help_def(2, "⋆", "Exponentiation",            "A raised to the Bth power",                                                                       "")
+                                              "B with the imaginary part negated:\n"
+                                              "      +100\n"
+                                              "100\n"
+                                              "      +1J2\n"
+                                              "1J¯2\n"
+                                              "      +1J2 2J¯3 ¯3J4\n"
+                                              "1J¯2 2J3 ¯3J¯4")
+help_def(2, "+", "Addition",                  "Returns the sum of A and B",
+                                              "A and B must be numeric values or arrays:\n"
+                                              "      1+1\n"
+                                              "2\n"
+                                              "      1 2 3 + ¯1 ¯2 ¯3\n"
+                                              "0 0 0\n"
+                                              "      1 2 3 + 10\n"
+                                              "11 12 13")
+help_def(1, "-", "Negation",                  "Negate B",
+                                              "B must be a number [array]. Example:\n"
+                                              "      - 1 2 ¯3\n"
+                                              "¯1 ¯2 3")
+help_def(2, "-", "Subtraction",               "Subtract B from A",
+                                              "B and A must be numbers. Example:\n"
+                                              "      1 2 3 - 10\n"
+                                              "¯9 ¯8 ¯7\n"
+                                              "      (2 2⍴⍳4) - 10\n"
+                                              "¯9 ¯8\n"
+                                              "¯7 ¯6")
+help_def(1, "×", "Signum(Direction)",         "¯1 if B<0; 0 if B=0; 1 if B>0",
+                                              "For B = 0: 0\n"
+                                              "Otherwise: B divided by Magnitude of B\n"
+                                              "Example:\n"
+                                              "      × 10 ¯10 0 3J¯2\n"
+                                              "1 ¯1 0 0.8320502943J¯0.5547001962")
+help_def(2, "×", "Times(Multiply by)",        "A multiplied by B",
+                                              "A and B must be numbers. Return A times B. Example:\n"
+                                              "      1 2 3 × ¯1\n"
+                                              "¯1 ¯2 ¯3\n"
+                                              "      0J¯1 × 0J¯1\n"
+                                              "¯1")
+help_def(1, "÷", "Reciprocal",                "1 divided by B",
+                                              "B must be nonzero number. Example:\n"
+                                              "      ÷ 10 ¯10 2 3J¯2\n"
+                                              "0.1 ¯0.1 0.5 0.2307692308J0.1538461538")
+help_def(2, "÷", "Division",                  "A divided by B",
+                                              "A and B must be numbers.\n"
+                                              "Signals the error if If B is 0 and A is not 0.\n"
+                                              "If B is 0 and A is 0 returns 1. Example:\n"
+                                              "      1 2 0 1J2 ÷ 2 2 0 1J1\n"
+                                              "0.5 1 1 1.5J0.5")
+help_def(1, "⋆", "Exponential",               "e to the Bth power",
+                                              "B must be a number.\n"
+                                              "Raise the base of the natural algorithm e (2.718281...) to the power of B\n"
+                                              "Example:\n"
+                                              "      *1\n"
+                                              "2.718281828\n"
+                                              "      *0 0J1\n"
+                                              "1 0.5403023059J0.8414709848")
+help_def(2, "⋆", "Power",                     "A raised to the Bth power",
+                                              "Raise the A to the power of B. A and B must be numbers.\n"
+                                              "Example:\n"
+                                              "      2*3 ¯2 1j2\n"
+                                              "8 0.25 0.3669139495J1.966055481")
+help_def(1, "*", "Exponential",               "e to the Bth power",
+                                              "B must be a number.\n"
+                                              "Raise the base of the natural algorithm e (2.718281...) to the power of B\n"
+                                              "Example:\n"
+                                              "      *1\n"
+                                              "2.718281828\n"
+                                              "      *0 0J1\n"
+                                              "1 0.5403023059J0.8414709848")
+help_def(2, "*", "Power",                     "A raised to the Bth power",
+                                              "Raise the A to the power of B. A and B must be numbers.\n"
+                                              "Example:\n"
+                                              "      2*3 ¯2 1j2\n"
+                                              "8 0.25 0.3669139495J1.966055481")
 help_def(1, "⍟", "Logarithm",                 "Natural logarithm of B",                                                                          "")
 help_def(2, "⍟", "Logarithm",                 "Logarithm of B to base A",                                                                        "")
 help_def(1, "⌈", "Ceiling",                   "Least integer greater than or equal to B",                                                        "")
