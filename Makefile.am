@@ -108,7 +108,14 @@ Makefile.dist:
 	echo "make $@"		>> $@
 	echo 			>> $@
 
-# make dist and then add Makefile,dist as Makefile to the tar file directory
+# perform 'make dist' and then add file './Makefile.dist' as 'Makefile' to
+# the GNU APL project tar file created by 'make dist'.
+#
+# This is a trick to enable the building of make targets that do not need
+# ./configure (i.e. help, develop, develop_lib, parallel, and parallel1)
+# before ./configure is run. This avoids running ./configyre if not needed
+# or running ./configure twice (e.g. for make develop)
+#
 DIST:	dist Makefile.dist
 	pwd
 	mkdir -p tmp
