@@ -13,7 +13,7 @@ help:
 	@echo ""
 	@echo "    make help    - print this text"
 	@echo "    make DIST    - dist + a Makefile that calls ./configure"
-	@echo "    make DOXY    - create Dougen documentation"
+	@echo "    make DOXY    - create Doxygen documentation"
 	@echo "    make RPM     - create (source and binary) RPMs"
 	@echo "    make DEB     - create debian packages"
 	@echo ""
