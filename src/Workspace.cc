@@ -957,7 +957,18 @@ void
 Workspace::load_WS(ostream & out, const UCS_string_vector & lib_ws,
                    UCS_string & quad_lx, bool silent)
 {
-   if (lib_ws.size() < 1 || lib_ws.size() > 2)   // no or too many argument(s)
+   // )LOAD wsname                              wsname /absolute or relative
+   // )LOAD libnum wsname                       wsname relative
+   //
+
+   if (lib_ws.size() < 1)   // no argument
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "no parameters in command )LOAD";
+        return;
+      }
+
+   if (lib_ws.size() > 2)   // no or too many argument(s)
       {
         out << "BAD COMMAND+" << endl;
         MORE_ERROR() << "too many parameters in command )LOAD";
@@ -967,6 +978,15 @@ Workspace::load_WS(ostream & out, const UCS_string_vector & lib_ws,
 LibRef libref = LIB_NONE;
    if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws[0].atoi());
 UCS_string wname = lib_ws.last();
+
+   if (UTF8_string(wname).ends_with(".bak"))
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << wname <<
+        " is a backup file! You need to rename it before it can be )LOADed";
+        return;
+      }
+
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
                                                   ".xml", ".apl");
 

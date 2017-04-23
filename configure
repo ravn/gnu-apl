@@ -21431,7 +21431,7 @@ echo
 #
 echo "configure: creating $srcdir/src//buildtag.hh"
 rm -f $srcdir/src/buildtag.hh
-cd $srcdir/src ; source ./buildtag ; cd ..
+cd $srcdir/src ; . ./buildtag ; cd ..
 
 # create src/makefile.h
 #

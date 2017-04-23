@@ -1512,7 +1512,16 @@ UCS_string ind(indent, UNI_ASCII_SPACE);
             << ind << "Shape:";
         loop(r, get_rank())   out << " " << get_shape_item(r);
         out << endl
-            << ind << "Depth: " << compute_depth()   << endl;
+            << ind << "Depth: " << compute_depth()   << endl
+            << ind << "Type:  ";
+
+       const CellType types = deep_cell_types();
+       if (!(types & CT_CHAR))           // no chars in this value
+          out << "numeric";
+       else if (!(types & CT_NUMERIC))   // no numbers in this value
+          out << "character";
+       else                              // chars and numbers in this value
+          out << "mixed";
       }
    else
       {
