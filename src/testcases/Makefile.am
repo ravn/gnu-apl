@@ -90,6 +90,7 @@ dist_noinst_DATA =				           \
         Oper_negative.tc                                   \
         OperPower.tc                                       \
         Oper_userfun.tc                                    \
+        Or.tc                                              \
         OuterProduct.tc                                    \
         Partition.tc                                       \
         Partition_with_axis.tc                             \

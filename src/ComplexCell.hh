@@ -192,7 +192,10 @@ protected:
 
    /// overloaded Cell::get_checked_near_int()
    virtual APL_Integer get_checked_near_int()  const
-      { return APL_Integer(value.cval_r + 0.3); }
+      {
+        if (value.cval_r < 0)   return APL_Integer(value.cval_r - 0.3);
+        else                    return APL_Integer(value.cval_r + 0.3);
+      }
 
    /// overloaded Cell::is_near_int()
    virtual bool is_near_int() const;

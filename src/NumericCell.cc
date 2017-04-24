@@ -1556,8 +1556,6 @@ const APL_Float qct = Workspace::get_CT();
    //
    if (A->is_near_int() && is_near_int())
       {
-        if (!A->is_near_int())   return E_DOMAIN_ERROR;
-        if (!is_near_int())      return E_DOMAIN_ERROR;
         const APL_Integer a = A->get_checked_near_int();
         const APL_Integer b =    get_checked_near_int();
         APL_Integer gcd;
@@ -1660,8 +1658,10 @@ ErrorCode
 NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b,
                      APL_Float qct)
 {
+Q(LOC)
    if (is_near_zero(a.imag()) && is_near_zero(b.imag()))
       {
+Q(LOC)
         APL_Float zz = 0;
         ErrorCode err = flt_gcd(zz, a.real(), b.real(), qct);
         if (err)   return err;
