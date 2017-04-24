@@ -1658,10 +1658,8 @@ ErrorCode
 NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b,
                      APL_Float qct)
 {
-Q(LOC)
    if (is_near_zero(a.imag()) && is_near_zero(b.imag()))
       {
-Q(LOC)
         APL_Float zz = 0;
         ErrorCode err = flt_gcd(zz, a.real(), b.real(), qct);
         if (err)   return err;
