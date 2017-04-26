@@ -875,10 +875,31 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
          return;
       }
 
+   enum { COL2 = 40 };   ///< where the second column starts
+
+UCS_string_vector commands;
+   commands.reserve(60);
+
    out << left << "APL Commands:" << endl;
 #define cmd_def(cmd_str, _cod, arg, _hint) \
-   out << "      " cmd_str " " arg << endl;
+   { UCS_string c(cmd_str " " arg);   commands.append(c); }
 #include "Command.def"
+
+bool left_col = true;
+   loop(c, commands.size())
+      {
+        const UCS_string & cmd = commands[c];
+        if (left_col)
+           {
+              out << "      " << setw(COL2 - 2) << cmd;
+              left_col = false;
+           }
+        else
+           {
+              out << cmd << endl;
+              left_col = true;
+           }
+      }
 
   if (Workspace::get_user_commands().size())
      {
@@ -896,19 +917,26 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
      }
 
    out << endl << "System variables:" << endl
-       << "      ⍞       Character Input/Output" << endl
-       << "      ⎕       Evaluated Input/Output" << endl;
-#define ro_sv_def(x, _str, txt)                                           \
-   { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();  \
-        out << "      " << setw(8) << ucs << txt << endl; }
+       << "      " << setw(COL2)
+       << "⍞       Character Input/Output"
+       << "⎕       Evaluated Input/Output" << endl;
+   left_col = true;
+#define ro_sv_def(x, _str, txt)                                            \
+   { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
+     if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
+     else            out << setw(8) << ucs << txt << endl;                 \
+        left_col = !left_col; }
 #define rw_sv_def(x, str, txt) ro_sv_def(x, str, txt)
 #include "SystemVariable.def"
 
    out << endl << "System functions:" << endl;
+   left_col = true;
 #define ro_sv_def(x, _str, _txt)
 #define rw_sv_def(x, _str, _txt)
-#define sf_def(_q, str, txt) \
-        out << "      ⎕" << setw(7) << str << txt << endl;
+#define sf_def(_q, str, txt)                                              \
+   if (left_col)   out << "      ⎕" << setw(7) << str << setw(30) << txt; \
+   else            out << "⎕" << setw(7) << str << txt << endl;           \
+   left_col = !left_col;
 #include "SystemVariable.def"
 }
 //-----------------------------------------------------------------------------

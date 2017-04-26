@@ -74,15 +74,18 @@ cmd_def("]PSTAT"    , cmd_PSTAT(out, arg);                  , "[CLEAR|SAVE]"    
 cmd_def("]SIS"      , Workspace::list_SI(out, SIM_SIS_dbg); , ""                       , EH_NO_PARAM)
 cmd_def("]SI"       , Workspace::list_SI(out, SIM_SI_dbg);  , ""                       , EH_NO_PARAM)
 cmd_def("]SVARS"    , Svar_DB::print(out);                  , ""                       , EH_NO_PARAM)
-cmd_def("]SYMBOL"   , Workspace::get_symbol_table().list_symbol(out, arg); ,
-                                                              "symbol"                 , EH_SYMNAME)
-cmd_def("]USERCMD"  , cmd_USERCMD(out, arg, args);          ,
-            "[ ]ucmd APL_fun [mode]\n"
-            "               | ]ucmd { ... }\n"
-            "               | REMOVE ]ucmd\n"
-            "               | REMOVE-ALL\n"
-            "               ]"
-       , EH_UCOMMAND)
+cmd_def("]SYMBOL"   , Workspace::get_symbol_table()
+                                    .list_symbol(out, arg); , "symbol"                 , EH_SYMNAME)
+cmd_def("]USERCMD"  , cmd_USERCMD(out, arg, args);          , "[ ]ucmd APL_fun [mode]" , EH_UCOMMAND)
+cmd_def("        "  , {}                                    , ""                       , EH_NO_PARAM)
+cmd_def("        "  , {}                                    , "| ]ucmd { ... }"        , EH_NO_PARAM)
+cmd_def("        "  , {}                                    , ""                       , EH_NO_PARAM)
+cmd_def("        "  , {}                                    , "| REMOVE ]ucmd"         , EH_NO_PARAM)
+cmd_def("        "  , {}                                    , ""                       , EH_NO_PARAM)
+cmd_def("        "  , {}                                    , "| REMOVE-ALL"           , EH_NO_PARAM)
+cmd_def("        "  , {}                                    , ""                       , EH_NO_PARAM)
+cmd_def("        "  , {}                                    , "]"                      , EH_NO_PARAM)
+
 cmd_def("]XTERM"    , cmd_XTERM(out, arg)                   , "[ON|OFF]"               , EH_oON_OFF)
 
 #undef cmd_def
