@@ -318,25 +318,33 @@ const APL_Complex a = A->get_complex_value();
    // floor(A ÷ B) or ceil(A ÷ B).
    //
 const APL_Float qct = Workspace::get_CT();
+
+   // ISO p.89: If comparison-tolerance is not zero, and B divided-by A
+   // is integral-within comparison-tolerance, return zero.
+   //
+   // In other words: B is an integer multiple of A
+   //
    if (qct != 0)
       {
         const APL_Complex quot = cval() / a;
-        const APL_Float qfr = floor(quot.real());
-        const APL_Float qfi = floor(quot.imag());
-        const APL_Float qcr = ceil(quot.real());
-        const APL_Float qci = ceil(quot.imag());
+        const APL_Float qfr = floor(quot.real());   // real quot rounded down
+        const APL_Float qfi = floor(quot.imag());   // imag quot rounded down
+        const APL_Float qcr = ceil(quot.real());    // real quot rounded up
+        const APL_Float qci = ceil(quot.imag());    // imag quot rounded down
 
-       if (quot.real() > (qcr - qct) && quot.imag() > (qci - qct)) 
-          return IntCell::z0(Z);   // quot is close to its ceiling
+                                                 // Examples: ⎕CT = 0.001
+        const bool real_int = quot.real() > (qcr - qct)    // e.g. 6.9995
+                           || quot.real() < (qfr - qct);   // e.g. 7.0005
+        const bool imag_int = quot.imag() > (qci - qct)    // e.g. 1.9995
+                           || quot.imag() < (qfi - qct);   // e.g. 2.0005
 
-       if (quot.real() < (qfr - qct) && quot.imag() < (qfi - qct)) 
-          return IntCell::z0(Z);   // quot is close to its floor
+        if (real_int && imag_int)   return IntCell::z0(Z);
       }
 
-   // We divide A by B, round down the result, and subtract.
+   // divide A by B, round down the quotient, and return B - A×quotient.
    //
-   new (Z) ComplexCell(cval() / a);
-   Z->bif_floor(Z);            // Z = A/B rounded down.
+   new (Z) ComplexCell(cval() / a);   // Z = A÷B
+   Z->bif_floor(Z);                   // Z = A÷B rounded down.
    return zv(Z, cval() - a * Z->get_complex_value());
 }
 //-----------------------------------------------------------------------------
