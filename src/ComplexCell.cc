@@ -334,9 +334,9 @@ const APL_Float qct = Workspace::get_CT();
 
                                                  // Examples: ⎕CT = 0.001
         const bool real_int = quot.real() > (qcr - qct)    // e.g. 6.9995
-                           || quot.real() < (qfr - qct);   // e.g. 7.0005
+                           || quot.real() < (qfr + qct);   // e.g. 7.0005
         const bool imag_int = quot.imag() > (qci - qct)    // e.g. 1.9995
-                           || quot.imag() < (qfi - qct);   // e.g. 2.0005
+                           || quot.imag() < (qfi + qct);   // e.g. 2.0005
 
         if (real_int && imag_int)   return IntCell::z0(Z);
       }
