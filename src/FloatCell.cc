@@ -27,8 +27,10 @@
 #include "FloatCell.hh"
 #include "IntCell.hh"
 #include "UTF8_string.hh"
-#include "Value.icc"
 #include "Workspace.hh"
+
+#include "Cell.icc"
+#include "Value.icc"
 
 //-----------------------------------------------------------------------------
 bool

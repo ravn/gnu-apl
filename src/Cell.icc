@@ -1,0 +1,125 @@
+
+/*
+    This file is part of GNU APL, a free implementation of the
+    ISO/IEC Standard 13751, "Programming Language APL, Extended"
+
+    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef __CELL_ICC_DEFINED__
+#define __CELL_ICC_DEFINED__
+
+//-----------------------------------------------------------------------------
+inline bool
+Cell::tolerantly_equal(APL_Float A, APL_Float B, APL_Float C)
+{
+   // if the signs of A and B differ then they are unequal (ISO standard
+   // page 19). We treat exact 0.0 as having both signs
+   //
+   if (A == B)               return true;
+   if (A < 0.0 && B > 0.0)   return false;
+   if (A > 0.0 && B < 0.0)   return false;
+
+APL_Float mag_A = A < 0 ? -A : A;
+APL_Float mag_B = B < 0 ? -B : B;
+APL_Float mag_max = (mag_A > mag_B) ? mag_A : mag_B;
+
+const APL_Float dist_A_B = (A > B) ? (A - B) : (B - A);
+
+   return (dist_A_B < C*mag_max);
+}
+//-----------------------------------------------------------------------------
+inline bool
+Cell::tolerantly_equal(APL_Complex A, APL_Complex B, APL_Float C)
+{
+   // if A equals B, return true
+   //
+   if (A == B) return true;
+
+   // if A and B are not in the same half-plane, return false.
+   //
+   // Implementation: If A and B are in the same real half-plane then
+   //                 the product of their real parts is ≥ 0,
+   //
+   //                 If A and B are in the same imag half-plane then
+   //                 the product of their imag parts is ≥ 0,
+   //
+   //                 Otherwise: they are not in the same half-plane
+   //                 and we return false;
+   //
+   if (A.real() * B.real() < 0.0 &&
+       A.imag() * B.imag() < 0.0)   return false;
+
+   // If the distance-between A and B is ≤ C times the larger-magnitude
+   // of A and B, return true
+   //
+   // Implementation: Instead of mag(A-B)  ≤ C × max(mag(A),   mag(B))
+   // we compute                 mag²(A-B) ≤ C² × max(mag²(A), mag²(B))
+   //
+   // 1. compute max(mag²A, mag²B)
+   //
+const APL_Float mag2_A   = A.real() * A.real() + A.imag() * A.imag();
+const APL_Float mag2_B   = B.real() * B.real() + B.imag() * B.imag();
+const APL_Float mag2_max = mag2_A > mag2_B ? mag2_A : mag2_B;
+
+   // 2. compute mag²(A-B)
+   //
+const APL_Complex A_B = A - B;
+const APL_Float dist2_A_B = A_B.real() * A_B.real()
+                          + A_B.imag() * A_B.imag();
+   // compare
+   //
+
+   return dist2_A_B <= C*C*mag2_max;
+}
+//-----------------------------------------------------------------------------
+inline APL_Complex
+Cell::tolerant_floor(APL_Complex A , APL_Float B)
+{
+const APL_Float C_real =  floor(A.real());
+const APL_Float C_imag =  floor(A.imag());
+const APL_Float D_real = A.real() - C_real;
+const APL_Float D_imag = A.imag() - C_imag;
+const APL_Float D_sum = D_real + D_imag;
+
+   // If the sum of the real and imaginary parts of D is tolerantly-less-than
+   // one within B, then Z is C. The problem is that ISO uses the term
+   // tolerantly-less-than, but does not define it. We assume that
+   // tolerantly-less-than means "less than and not tolerantly-equal".
+   //
+   if (D_sum < 1.0 && !tolerantly_equal(D_sum, 1.0, B))
+      return APL_Complex(C_real, C_imag);
+
+   // Otherwise, if the imaginary-part of D is greater-than the real-part of
+   // D, then Z is C plus imaginary-one.
+   //
+   if (D_imag > D_real)   return APL_Complex(C_real, C_imag + 1);
+
+   // Otherwise, Z is C plus one.
+   //
+   return APL_Complex(C_real + 1, C_imag);
+}
+//-----------------------------------------------------------------------------
+inline bool
+Cell::integral_within(APL_Complex A, APL_Float B)
+{
+const APL_Complex C = -A;
+   return tolerant_floor(C, B) == tolerant_floor(A, B);
+}
+//-----------------------------------------------------------------------------
+
+#endif // __CELL_ICC_DEFINED__
+

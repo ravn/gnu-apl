@@ -153,25 +153,25 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
 	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.hh CharCell.cc CharCell.hh Command.cc \
-	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
-	ComplexCell.hh configure_args.cc DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
-	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
-	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
-	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
-	InputFile.cc InputFile.hh IntCell.cc IntCell.hh LApack.cc \
-	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
-	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
-	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh Parser.cc \
-	Parser.hh Prefix.cc Prefix.def Prefix.hh PointerCell.cc \
-	PointerCell.hh PrimitiveFunction.cc PrimitiveFunction.hh \
-	PrimitiveOperator.cc PrimitiveOperator.hh PrintBuffer.cc \
-	PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	CDR.hh Cell.cc Cell.icc Cell.hh CharCell.cc CharCell.hh \
+	Command.cc Command.def Command.hh Common.cc Common.hh \
+	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
+	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
+	Error.def Error.hh ErrorCode.hh Executable.cc Executable.hh \
+	FloatCell.cc FloatCell.hh Function.cc Function.hh \
+	DerivedFunction.cc DerivedFunction.hh Help.def Heapsort.hh \
+	Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh IndexIterator.cc \
+	IndexIterator.hh InputFile.cc InputFile.hh IntCell.cc \
+	IntCell.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
+	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FIO.cc \
 	Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_RL.cc Quad_RL.hh \
@@ -279,25 +279,25 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
 	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.hh CharCell.cc CharCell.hh Command.cc \
-	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
-	ComplexCell.hh configure_args.cc DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
-	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
-	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
-	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
-	InputFile.cc InputFile.hh IntCell.cc IntCell.hh LApack.cc \
-	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
-	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
-	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh Parser.cc \
-	Parser.hh Prefix.cc Prefix.def Prefix.hh PointerCell.cc \
-	PointerCell.hh PrimitiveFunction.cc PrimitiveFunction.hh \
-	PrimitiveOperator.cc PrimitiveOperator.hh PrintBuffer.cc \
-	PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	CDR.hh Cell.cc Cell.icc Cell.hh CharCell.cc CharCell.hh \
+	Command.cc Command.def Command.hh Common.cc Common.hh \
+	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
+	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
+	Error.def Error.hh ErrorCode.hh Executable.cc Executable.hh \
+	FloatCell.cc FloatCell.hh Function.cc Function.hh \
+	DerivedFunction.cc DerivedFunction.hh Help.def Heapsort.hh \
+	Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh IndexIterator.cc \
+	IndexIterator.hh InputFile.cc InputFile.hh IntCell.cc \
+	IntCell.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
+	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FIO.cc \
 	Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_RL.cc Quad_RL.hh \
@@ -679,25 +679,25 @@ common_SOURCES = buildtag buildtag.hh ../config.h APL_types.hh \
 	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
 	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.hh CharCell.cc CharCell.hh Command.cc \
-	Command.def Command.hh Common.cc Common.hh ComplexCell.cc \
-	ComplexCell.hh configure_args.cc DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
-	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
-	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
-	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
-	InputFile.cc InputFile.hh IntCell.cc IntCell.hh LApack.cc \
-	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
-	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
-	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh Parser.cc \
-	Parser.hh Prefix.cc Prefix.def Prefix.hh PointerCell.cc \
-	PointerCell.hh PrimitiveFunction.cc PrimitiveFunction.hh \
-	PrimitiveOperator.cc PrimitiveOperator.hh PrintBuffer.cc \
-	PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	CDR.hh Cell.cc Cell.icc Cell.hh CharCell.cc CharCell.hh \
+	Command.cc Command.def Command.hh Common.cc Common.hh \
+	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
+	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
+	Error.def Error.hh ErrorCode.hh Executable.cc Executable.hh \
+	FloatCell.cc FloatCell.hh Function.cc Function.hh \
+	DerivedFunction.cc DerivedFunction.hh Help.def Heapsort.hh \
+	Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh IndexIterator.cc \
+	IndexIterator.hh InputFile.cc InputFile.hh IntCell.cc \
+	IntCell.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
+	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FIO.cc \
 	Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_RL.cc Quad_RL.hh \

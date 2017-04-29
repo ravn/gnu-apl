@@ -33,7 +33,7 @@ Bif_OPER2_RANK.cc				Bif_OPER2_RANK.hh	\
 Bif_OPER1_REDUCE.cc				Bif_OPER1_REDUCE.hh	\
 Bif_OPER1_SCAN.cc				Bif_OPER1_SCAN.hh	\
 CDR.cc						CDR.hh			\
-Cell.cc						Cell.hh			\
+Cell.cc			Cell.icc		Cell.hh			\
 CharCell.cc					CharCell.hh		\
 Command.cc		Command.def		Command.hh		\
 Common.cc					Common.hh		\
@@ -57,7 +57,7 @@ IntCell.cc					IntCell.hh		\
 LApack.cc					LApack.hh		\
 LibPaths.cc					LibPaths.hh		\
 LineInput.cc					LineInput.hh		\
-Logging.cc	    Logging.def			Logging.hh		\
+Logging.cc		Logging.def		Logging.hh		\
 LvalCell.cc					LvalCell.hh		\
 						makefile.h		\
 Malloc_hooks.cc								\

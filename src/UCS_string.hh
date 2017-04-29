@@ -213,7 +213,7 @@ public:
    void append_utf8(const char * str)
       { append_utf8((const UTF8 *)str); }
 
-   /// reppend character \b uni
+   /// prepend character \b uni
    void prepend(Unicode uni)
       {
         if (size() == 0)   { append(uni);   return; }

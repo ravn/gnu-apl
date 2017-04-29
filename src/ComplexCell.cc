@@ -31,6 +31,8 @@
 #include "Output.hh"
 #include "Workspace.hh"
 
+#include "Cell.icc"
+
 //-----------------------------------------------------------------------------
 ComplexCell::ComplexCell(APL_Complex c)
 {
@@ -308,7 +310,7 @@ const APL_Complex a = A->get_complex_value();
    if (a.real() == 0.0 && a.imag() == 0.0)
       return zv(Z, value.cval_r, value2.cval_i);
 
-   // IBM: if B is zero , return B
+   // IBM: if B is zero , return 0
    //
    if (value.cval_r == 0.0 && value2.cval_i == 0.0)   return IntCell::z0(Z);
 
@@ -318,34 +320,20 @@ const APL_Complex a = A->get_complex_value();
    // floor(A ÷ B) or ceil(A ÷ B).
    //
 const APL_Float qct = Workspace::get_CT();
+const APL_Complex quotient = cval() / a;
 
    // ISO p.89: If comparison-tolerance is not zero, and B divided-by A
    // is integral-within comparison-tolerance, return zero.
    //
    // In other words: B is an integer multiple of A
    //
-   if (qct != 0)
-      {
-        const APL_Complex quot = cval() / a;
-        const APL_Float qfr = floor(quot.real());   // real quot rounded down
-        const APL_Float qfi = floor(quot.imag());   // imag quot rounded down
-        const APL_Float qcr = ceil(quot.real());    // real quot rounded up
-        const APL_Float qci = ceil(quot.imag());    // imag quot rounded down
-
-                                                 // Examples: ⎕CT = 0.001
-        const bool real_int = quot.real() > (qcr - qct)    // e.g. 6.9995
-                           || quot.real() < (qfr + qct);   // e.g. 7.0005
-        const bool imag_int = quot.imag() > (qci - qct)    // e.g. 1.9995
-                           || quot.imag() < (qfi + qct);   // e.g. 2.0005
-
-        if (real_int && imag_int)   return IntCell::z0(Z);
-      }
+   if (qct != 0 && integral_within(quotient, qct))   return IntCell::z0(Z);
 
    // divide A by B, round down the quotient, and return B - A×quotient.
    //
-   new (Z) ComplexCell(cval() / a);   // Z = A÷B
-   Z->bif_floor(Z);                   // Z = A÷B rounded down.
-   return zv(Z, cval() - a * Z->get_complex_value());
+   new (Z) ComplexCell(quotient);                       // Z = A÷B
+   Z->bif_floor(Z);                                     // Z = ⌊A÷B
+   return zv(Z, cval() - a * Z->get_complex_value());   // Z = A - A×⌊A÷B
 }
 //-----------------------------------------------------------------------------
 ErrorCode

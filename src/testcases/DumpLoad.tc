@@ -89,6 +89,7 @@ DUMPED ³
 CLEAR WS
 
       )DROP test.apl
+⍝³
 
       )wsid test
 WAS CLEAR WS

@@ -586,11 +586,40 @@ ShapeItem duplicate_parents = 0;
 void 
 Command::cmd_CONTINUE(ostream & out)
 {
-   Workspace::wsid(out, UCS_string("CONTINUE"), false);
+UCS_string wsname("CONTINUE");
+   Workspace::wsid(out, wsname, LIB0, false);     // )WSID CONTINUE
+   Workspace::save_WS(out, LIB0, wsname, true);   // )SAVE
+   cmd_OFF(0);                                    // )OFF
+}
+//-----------------------------------------------------------------------------
+void 
+Command::cmd_COPY(ostream & out, UCS_string_vector & args, bool protection)
+{
+   if (args.size() == 0)   // at least workspace name is required
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "missing workspace name in command )COPY or )PCOPY";
+        return;
+      }
 
-UCS_string_vector vcont;
-   Workspace::save_WS(out, vcont);
-   cmd_OFF(0);
+LibRef libref = LIB0;
+const Unicode l = args[0][0];
+      if (Avec::is_digit(l))
+      {
+        libref = (LibRef)(l - '0');
+        args.erase(0);
+      }
+
+   if (args.size() == 0)   // at least workspace name is required
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "missing workspace name in command )COPY or )PCOPY";
+        return;
+      }
+
+UCS_string wsname = args[0];
+   args.erase(0);
+   Workspace::copy_WS(out, libref, wsname, args, protection);
 }
 //-----------------------------------------------------------------------------
 void 
@@ -620,7 +649,7 @@ Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
    //
 LibRef libref = LIB_NONE;
 UCS_string wname = lib_ws.last();
-   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws[0].atoi());
+   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws[0][0] - '0');
 
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
                                                   ".xml", ".apl");
@@ -631,6 +660,61 @@ const int result = unlink(filename.c_str());
         out << wname << " NOT DROPPED: " << strerror(errno) << endl;
         MORE_ERROR() << "could not unlink file " << filename;
       }
+}
+//-----------------------------------------------------------------------------
+void 
+Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
+                  bool html, bool silent)
+{
+   // )DUMP
+   // )DUMP workspace
+   // )DUMP lib workspace
+   //
+   if (args.size() > 2)
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "too many parameters in command )DUMP";
+        return;
+      }
+
+   if (args.size() == 2)   // )DUMP lib workspace
+      {
+        const Unicode l = args[0][0];
+        if (Avec::is_digit(l))
+           {
+             LibRef lib = (LibRef)(l - '0');
+             Workspace::dump_WS(out, lib, args[1], html, silent);
+           }
+        return;
+      }
+
+   if (args.size() == 1)   // )DUMP workspace: use default lib (0)
+      {
+        Workspace::dump_WS(out, LIB0, args[0], html, silent);
+        return;
+      }
+
+   // )DUMP: use )WSID unless CLEAR WS
+   //
+LibRef wsid_lib = LIB0;
+UCS_string wsid_name = Workspace::get_WS_name();
+   if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
+      {
+        wsid_lib = (LibRef)(wsid_name[0] - '0');
+        wsid_name.erase(0);
+        wsid_name.remove_leading_whitespaces();
+      }
+
+   if (wsid_name.compare(UCS_string("CLEAR WS")) == 0)   // don't dump CLEAR WS
+      {
+        COUT << "NOT DUMPED: THIS WS IS CLEAR WS" << endl;
+        MORE_ERROR() <<
+        "the workspace was not dumped because 'CLEAR WS' is a special \n"
+        "workspace name that cannot be dumped. Use )WSID <name> first.";
+        return;
+      }
+
+   Workspace::dump_WS(out, wsid_lib, wsid_name, html, silent);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1048,6 +1132,36 @@ transfer_context tctx(protection);
 }
 //-----------------------------------------------------------------------------
 void 
+Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
+                  UCS_string & quad_lx, bool silent)
+{
+   if (args.size() == 0)   // at least workspace name is required
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "missing workspace name in command )LOAD";
+        return;
+      }
+
+LibRef libref = LIB0;
+const Unicode l = args[0][0];
+      if (Avec::is_digit(l))
+      {
+        libref = (LibRef)(l - '0');
+        args.erase(0);
+      }
+
+   if (args.size() == 0)   // at least workspace name is required
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "missing workspace name in command )LOAD";
+        return;
+      }
+
+UCS_string wsname = args[0];
+   Workspace::load_WS(out, libref, wsname, quad_lx, silent);
+}
+//-----------------------------------------------------------------------------
+void 
 Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 {
    // Command is:
@@ -1059,7 +1173,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
    if (args.size() >= 2)   // set individual dir
       {
         const UCS_string & libref_ucs = args[0];
-        const int libref = libref_ucs.atoi();
+        const int libref = libref_ucs[0] - '0';
         if (libref_ucs.size() != 1 || libref < 0 || libref > 9)
            {
              CERR << "Invalid library referenc " << libref_ucs << "'" << endl;
@@ -1131,7 +1245,7 @@ Command::open_LIB_dir(UTF8_string & path, ostream & out, const UCS_string & arg)
       }
    else if (arg.size() == 1 && Avec::is_digit((Unicode)arg[0]))   // case 2.
       {
-        path = LibPaths::get_lib_dir((LibRef)(arg.atoi()));
+        path = LibPaths::get_lib_dir((LibRef)(arg[0] - '0'));
       }
    else  // case 3.
       {
@@ -1428,6 +1542,60 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
      }
 
    return false;
+}
+//-----------------------------------------------------------------------------
+void 
+Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
+{
+   // )SAVE
+   // )SAVE workspace
+   // )SAVE lib workspace
+   //
+   if (args.size() > 2)
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "too many parameters in command )SAVE";
+        return;
+      }
+
+   if (args.size() == 2)   // )SAVE lib workspace
+      {
+        const Unicode l = args[0][0];
+        if (Avec::is_digit(l))
+           {
+             LibRef lib = (LibRef)(l - '0');
+             Workspace::save_WS(out, lib, args[1], false);
+           }
+        return;
+      }
+
+   if (args.size() == 1)   // )SAVE workspace: use default lib (0)
+      {
+        Workspace::save_WS(out, LIB0, args[0], false);
+        return;
+      }
+
+   // )SAVE: use )WSID unless CLEAR WS
+   //
+LibRef wsid_lib = LIB0;
+UCS_string wsid_name = Workspace::get_WS_name();
+   if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
+      {
+        wsid_lib = (LibRef)(wsid_name[0] - '0');
+        wsid_name.erase(0);
+        wsid_name.remove_leading_whitespaces();
+      }
+
+   if (wsid_name.compare(UCS_string("CLEAR WS")) == 0)   // don't save CLEAR WS
+      {
+        COUT << "NOT SAVED: THIS WS IS CLEAR WS" << endl;
+        MORE_ERROR() <<
+        "the workspace was not saved because 'CLEAR WS' is a special \n"
+        "workspace name that cannot be saved. Use )WSID <name> first.";
+        return;
+      }
+
+   Workspace::save_WS(out, wsid_lib, wsid_name, true);
 }
 //-----------------------------------------------------------------------------
 void

@@ -23,6 +23,7 @@
 
 #include <complex>
 
+#include "Common.hh"
 #include "ErrorCode.hh"
 #include "PrintBuffer.hh"
 
@@ -69,7 +70,7 @@ public:
 
    /// Return \b true if \b this cell is greater than \b other, with:
    /// 1. PointerCell > NumericCell > CharCell
-   /// 2a. NumericCells sorted by get_real_value().
+   /// 2a. NumericCells sorted by get_real_value(). then by get_imag_value()
    /// 2b. CharCells sorted by get_char_value()
    /// 2c. PointerCells sorted by rank, then shape, then ravel
    virtual bool greater(const Cell & other) const;
@@ -77,11 +78,18 @@ public:
    /// return \b true if \b this cell is equal to \b other
    virtual bool equal(const Cell & other, APL_Float qct) const;
 
-   /// return \b true if A is tolerantly equal to B within C
+   /// ISO p.19: return \b true if real A is tolerantly equal to real B within C
    static bool tolerantly_equal(APL_Float A, APL_Float B, APL_Float C);
 
-   /// return \b true if A is tolerantly equal to B within C
+   /// ISO p. 19: return \b true if complex A and B are tolerantly equal
+   /// within real C
    static bool tolerantly_equal(APL_Complex A, APL_Complex B, APL_Float C);
+
+   /// ISO p. 19: return the tolerant floor of complex A within real B
+   static APL_Complex tolerant_floor(APL_Complex A, APL_Float B);
+
+   /// ISO p. 19: A is integral (close to a Gaussian Integer) within B
+   static bool integral_within(APL_Complex A, APL_Float C);
 
    /// Return the character value of a cell
    virtual Unicode get_char_value() const   { DOMAIN_ERROR; }

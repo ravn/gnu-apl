@@ -113,8 +113,16 @@ protected:
    /// )SAVE active WS as CONTINUE and )OFF
    static void cmd_CONTINUE(ostream & out);
 
+   /// )COPY: copy a workspace file
+   static void cmd_COPY(ostream & out, UCS_string_vector & args,
+                        bool protection);
+
    /// )DROP: delete a workspace file
    static void cmd_DROP(ostream & out, const UCS_string_vector & args);
+
+   /// )DUMP: dump a workspace file (.apl)
+   static void cmd_DUMP(ostream & out, const UCS_string_vector & args,
+                        bool html, bool silent);
 
    /// )ERASE: erase symbols
    static void cmd_ERASE(ostream & out, UCS_string_vector & args);
@@ -139,6 +147,10 @@ protected:
    /// show US keyboard layout
    static void cmd_KEYB(ostream & out);
 
+   /// )LOAD: load a workspace file
+   static void cmd_LOAD(ostream & out, UCS_string_vector & args, 
+                        UCS_string & quad_lx, bool silent);
+
    /// show performance counters
    static void cmd_PSTAT(ostream & out, const UCS_string & arg);
 
@@ -155,7 +167,7 @@ protected:
    /// list content of workspace and wslib directories: ]LIB [N]
    static void cmd_LIB2(ostream & out, const UCS_string & args);
 
-   /// show list of commands
+   /// control logging facilities
    static void cmd_LOG(ostream & out, const UCS_string & arg);
 
    /// list paths of workspace and wslib directories
@@ -166,6 +178,9 @@ protected:
 
    /// )OUT: export a workspace file
    static void cmd_OUT(ostream & out, UCS_string_vector & args);
+
+   /// )SAVE: save a workspace file (.xml)
+   static void cmd_SAVE(ostream & out, const UCS_string_vector & args);
 
    /// create a user defined command
    static void cmd_USERCMD(ostream & out, const UCS_string & arg,

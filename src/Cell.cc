@@ -31,6 +31,8 @@
 #include "SystemLimits.hh"
 #include "Workspace.hh"
 
+#include "Cell.icc"
+
 //-----------------------------------------------------------------------------
 void *
 Cell::operator new(std::size_t s, void * pos)
@@ -117,69 +119,6 @@ Cell::equal(const Cell & other, APL_Float qct) const
    MORE_ERROR() << "Cell::equal() : Objects of class " << get_classname()
                 << " cannot be compared";
    DOMAIN_ERROR;
-}
-//-----------------------------------------------------------------------------
-bool
-Cell::tolerantly_equal(APL_Complex A, APL_Complex B, APL_Float C)
-{
-   // if A equals B, return true
-   //
-   if (A == B) return true;
-
-   // if A and B are not in the same half-plane, return false.
-   //
-   // Implementation: If A and B are in the same real half-plane then
-   //                 the product of their real parts is ≥ 0,
-   //
-   //                 If A and B are in the same imag half-plane then
-   //                 the product of their imag parts is ≥ 0,
-   //
-   //                 Otherwise: they are not in the same half-plane
-   //                 and we return false;
-   //
-   if (A.real() * B.real() < 0.0 &&
-       A.imag() * B.imag() < 0.0)   return false;
-
-   // If the distance-between A and B is ≤ C times the larger-magnitude
-   // of A and B, return true
-   //
-   // Implementation: Instead of mag(A-B)  ≤ C × max(mag(A),   mag(B))
-   // we compute                 mag²(A-B) ≤ C² × max(mag²(A), mag²(B))
-   //
-   // 1. compute max(mag²A, mag²B)
-   //
-const APL_Float mag2_A   = A.real() * A.real() + A.imag() * A.imag();
-const APL_Float mag2_B   = B.real() * B.real() + B.imag() * B.imag();
-const APL_Float mag2_max = mag2_A > mag2_B ? mag2_A : mag2_B;
-
-   // 2. compute mag²(A-B)
-   //
-const APL_Complex A_B = A - B;
-const APL_Float dist2_A_B = A_B.real() * A_B.real()
-                          + A_B.imag() * A_B.imag();
-   // compare
-   //
-
-   return dist2_A_B <= C*C*mag2_max;
-}
-//-----------------------------------------------------------------------------
-bool
-Cell::tolerantly_equal(APL_Float A, APL_Float B, APL_Float C)
-{
-   // if the signs of A and B differ then they are unequal (ISO standard
-   // page 19). We treat exact 0.0 as having both signs
-   //
-   if (A == B)               return true;
-   if (A < 0.0 && B > 0.0)   return false;
-   if (A > 0.0 && B < 0.0)   return false;
-
-APL_Float mag_A = A < 0 ? -A : A;
-APL_Float mag_B = B < 0 ? -B : B;
-APL_Float mag_max = (mag_A > mag_B) ? mag_A : mag_B;
-
-const APL_Float dist_A_B = (A > B) ? (A - B) : (B - A);
-
-   return (dist_A_B < C*mag_max);
 }
 //-----------------------------------------------------------------------------
 bool

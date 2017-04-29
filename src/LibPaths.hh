@@ -40,6 +40,7 @@ enum LibRef
    LIB8 = 8,         ///< library 8
    LIB9 = 9,         ///< library 9
    LIB_MAX,          ///< valid library references are smaller than this
+   LIB_WSNAME,       ///< WS name may start with a library reference
    LIB_NONE = LIB0   ///< no library reference specified.
 };
 //-----------------------------------------------------------------------------

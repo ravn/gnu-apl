@@ -208,20 +208,21 @@ public:
    static Symbol * lookup_existing_symbol(const UCS_string & symbol_name);
 
    /// save this workspace
-   static void save_WS(ostream & out, UCS_string_vector & lib_ws);
+   static void save_WS(ostream & out, LibRef lib, const UCS_string & wsname,
+                       bool name_from_WSID);
 
    /// backup an existing file \b filename, return true on error
    static bool backup_existing_file(const char * filename);
 
    /// dump this workspace
-   static void dump_WS(ostream & out, UCS_string_vector & lib_ws,
+   static void dump_WS(ostream & out, LibRef lib, const UCS_string & wsname,
                        bool html, bool silent);
 
    /// dump the commands in this workspace
    static void dump_commands(ostream & out);
 
    /// set or inquire the workspace ID
-   static void wsid(ostream & out, UCS_string arg, bool silent);
+   static void wsid(ostream & out, UCS_string arg, LibRef lib, bool silent);
 
    /// load )DUMPed file from open file descriptor fd (closes fd)
    static void load_DUMP(ostream & out, const UTF8_string & filename, int fd,
@@ -229,12 +230,12 @@ public:
                          UCS_string_vector * object_filter);
 
    /// load \b lib_ws into the_workspace, maybe set ⎕LX of the new WS.
-   static void load_WS(ostream & out, const UCS_string_vector & lib_ws,
+   static void load_WS(ostream & out, LibRef lib, const UCS_string & wsname,
                        UCS_string & quad_lx, bool silent);
 
    /// copy objects from another workspace
-   static void copy_WS(ostream & out, UCS_string_vector & lib_ws,
-                       bool protection);
+   static void copy_WS(ostream & out, LibRef lib, const UCS_string & wsname,
+                       UCS_string_vector & objects, bool protection);
 
    /// return a token for system function or variable \b ucs
    static Token get_quad(const UCS_string & ucs, int & len);
