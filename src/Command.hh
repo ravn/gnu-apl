@@ -205,6 +205,10 @@ protected:
    static bool check_redefinition(ostream & out, const UCS_string & cnew,
                                   const UCS_string fnew, const int mnew);
 
+   /// check the number of parameters in a command
+   static bool check_params(ostream & out, const char * command, int argc,
+                            const char * args);
+
    /// a helper struct for the )IN command
    struct transfer_context
       {

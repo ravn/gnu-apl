@@ -118,8 +118,10 @@ UCS_string_vector args = split_arg(arg);
         Workspace::more_error().shrink(0);
       }
 
-#define cmd_def(cmd_str, code, _arg, _hint) \
-   if (cmd.starts_iwith(cmd_str)) { code; return false; }
+#define cmd_def(cmd_str, code, garg, _hint)                          \
+   if (cmd.starts_iwith(cmd_str))                                    \
+      { if (check_params(out, cmd_str, args.size(), garg))   return true; \
+        code; return false; }
 #include "Command.def"
 
    // check for user defined commands...
@@ -135,6 +137,65 @@ UCS_string_vector args = split_arg(arg);
 
      out << "BAD COMMAND" << endl;
      return false;
+}
+//-----------------------------------------------------------------------------
+bool
+Command::check_params(ostream & out, const char * command, int argc,
+                      const char * args)
+{
+   // allow everythoing for ]USERCMD
+   //
+   if (!strcmp(command, "]USERCMD"))   return false;
+
+   // analyze args to figure the number of parametes expected.
+   //
+int mandatory_args = 0;
+int opt_args = 0;
+int brackets = 0;
+bool in_param = false;
+bool many = false;
+
+   for (const char * a = args; *a; ++a)   switch(*a)
+       {
+         case '[':   ++brackets;   in_param = false;   continue;
+         case ']':   --brackets;   in_param = false;   continue;
+         case '|':                 in_param = false;   continue;  // range
+         case '.': if (a[1] == '.' && a[2] == '.')
+                      many = true;                     continue;  // ...
+         case 'A' ... 'Z':
+         case 'a' ... 'z':
+         case '-': if (!in_param)   // start of a name or range
+                      {
+                        if (brackets)   ++opt_args;
+                        else            ++mandatory_args;
+                        in_param = true;
+                      }
+                   continue;
+         case ' ':                 in_param = false;   continue;
+         default: Q(*args)
+       }
+
+   if (argc < mandatory_args)   // too few parameters
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "missing parameter(s) in command " << command
+                     << ". Usage:\n"
+                     << "      " << command << " " << args;
+        return true;
+      }
+
+   if (many)   return false;
+
+   if (argc > (mandatory_args + opt_args))   // too many parameters
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "too many (" << argc<< ") parameter(s) in command "
+                     << command << ". Usage:\n"
+                     << "      " << command << " " << args;
+        return true;
+      }
+
+   return false;   // OK
 }
 //-----------------------------------------------------------------------------
 void
@@ -393,7 +454,7 @@ check_EOC:
 void 
 Command::cmd_XTERM(ostream & out, const UCS_string & arg)
 {
-   const char * term = getenv("TERM");
+const char * term = getenv("TERM");
    if (!strncmp(term, "dumb", 4) && arg.starts_iwith("ON"))
       {
         out << "impossible on dumb terminal" << endl;
@@ -595,13 +656,6 @@ UCS_string wsname("CONTINUE");
 void 
 Command::cmd_COPY(ostream & out, UCS_string_vector & args, bool protection)
 {
-   if (args.size() == 0)   // at least workspace name is required
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "missing workspace name in command )COPY or )PCOPY";
-        return;
-      }
-
 LibRef libref = LIB0;
 const Unicode l = args[0][0];
       if (Avec::is_digit(l))
@@ -628,24 +682,7 @@ Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
    // )DROP wsname
    // )DROP libnum wsname
 
-   // check number of arguments (1 or 2)
-   //
-   if (lib_ws.size() == 0)   // missing argument
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "missing workspace name in command )DROP";
-        return;
-      }
-
-   if (lib_ws.size() > 2)   // too many arguments
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "too many parameters in command )DROP";
-        return;
-      }
-
-   // at this point, lib_ws.size() is 1 or 2. If 2 then the first
-   // is the lib number
+   // lib_ws.size() is 1 or 2. If 2 then the first is the lib number
    //
 LibRef libref = LIB_NONE;
 UCS_string wname = lib_ws.last();
@@ -670,13 +707,6 @@ Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
    // )DUMP workspace
    // )DUMP lib workspace
    //
-   if (args.size() > 2)
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "too many parameters in command )DUMP";
-        return;
-      }
-
    if (args.size() == 2)   // )DUMP lib workspace
       {
         const Unicode l = args[0][0];
@@ -1063,12 +1093,7 @@ int result = pclose(pipe);
 void
 Command::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
 {
-   if (args.size() == 0)
-      {
-        out << "BAD COMMAND" << endl;
-        MORE_ERROR() << "missing filename in command )IN";
-        return;
-      }
+   // IN filename [objects...]
 
 UCS_string fname = args[0];
    args[0] = args.last();
@@ -1135,26 +1160,12 @@ void
 Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
                   UCS_string & quad_lx, bool silent)
 {
-   if (args.size() == 0)   // at least workspace name is required
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "missing workspace name in command )LOAD";
-        return;
-      }
-
 LibRef libref = LIB0;
 const Unicode l = args[0][0];
       if (Avec::is_digit(l))
       {
         libref = (LibRef)(l - '0');
         args.erase(0);
-      }
-
-   if (args.size() == 0)   // at least workspace name is required
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "missing workspace name in command )LOAD";
-        return;
       }
 
 UCS_string wsname = args[0];
@@ -1170,7 +1181,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
    // )LIB path           (set libroot to path)
    // )LIB                (display root and path states)
    //
-   if (args.size() >= 2)   // set individual dir
+   if (args.size() == 2)   // set individual dir
       {
         const UCS_string & libref_ucs = args[0];
         const int libref = libref_ucs[0] - '0';
@@ -1468,13 +1479,6 @@ Command::cmd_OFF(int exit_val)
 void
 Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
-   if (args.size() == 0)
-      {
-        out << "BAD COMMAND" << endl;
-        MORE_ERROR() << "missing filename in command )OUT";
-        return;
-      }
-
 UCS_string fname = args[0];
    args.erase(0);
 
@@ -1551,13 +1555,6 @@ Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
    // )SAVE workspace
    // )SAVE lib workspace
    //
-   if (args.size() > 2)
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "too many parameters in command )SAVE";
-        return;
-      }
-
    if (args.size() == 2)   // )SAVE lib workspace
       {
         const Unicode l = args[0][0];
@@ -1693,7 +1690,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
          else
             {
                out << "BAD COMMAND+" << endl;
-               MORE_ERROR() << "not found closing } in lambda function";
+               MORE_ERROR() << "closing } in lambda function not found";
                return;
             }
       }
