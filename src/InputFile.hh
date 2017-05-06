@@ -38,7 +38,7 @@ struct InputFile
    InputFile(const UTF8_string & _filename, FILE * _file,
                      bool _test, bool _echo, bool _is_script, LX_mode LX)
    : file     (_file),
-     filename (_filename),
+     filename (&_filename[0], _filename.size()),
      test     (_test),
      echo     (_echo),
      is_script(_is_script),

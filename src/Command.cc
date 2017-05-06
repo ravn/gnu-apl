@@ -157,11 +157,11 @@ bool many = false;
 
    for (const char * a = args; *a; ++a)   switch(*a)
        {
-         case '[':   ++brackets;   in_param = false;   continue;
-         case ']':   --brackets;   in_param = false;   continue;
-         case '|':                 in_param = false;   continue;  // range
-         case '.': if (a[1] == '.' && a[2] == '.')
-                      many = true;                     continue;  // ...
+         case '[': ++brackets;   in_param = false;   continue;
+         case ']': --brackets;   in_param = false;   continue;
+         case '|':               in_param = false;   continue;  // range
+         case '.': if (a[1] == '.' && a[2] == '.')   many = true;
+                   continue;
          case 'A' ... 'Z':
          case 'a' ... 'z':
          case '-': if (!in_param)   // start of a name or range
