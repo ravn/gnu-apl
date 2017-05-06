@@ -209,6 +209,9 @@ protected:
    static bool check_params(ostream & out, const char * command, int argc,
                             const char * args);
 
+   static bool resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
+                                  LibRef &lib, UCS_string & wsname);
+
    /// a helper struct for the )IN command
    struct transfer_context
       {

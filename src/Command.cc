@@ -706,21 +706,13 @@ Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
    // )DUMP
    // )DUMP workspace
    // )DUMP lib workspace
-   //
-   if (args.size() == 2)   // )DUMP lib workspace
-      {
-        const Unicode l = args[0][0];
-        if (Avec::is_digit(l))
-           {
-             LibRef lib = (LibRef)(l - '0');
-             Workspace::dump_WS(out, lib, args[1], html, silent);
-           }
-        return;
-      }
 
-   if (args.size() == 1)   // )DUMP workspace: use default lib (0)
+   if (args.size() > 0)   // workspace or lib workspace
       {
-        Workspace::dump_WS(out, LIB0, args[0], html, silent);
+        LibRef lib;
+        UCS_string wsname;
+        if (resolve_lib_wsname(out, args, lib, wsname))   return;   // error
+        Workspace::dump_WS(out, lib, wsname, html, silent);
         return;
       }
 
@@ -1160,16 +1152,14 @@ void
 Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
                   UCS_string & quad_lx, bool silent)
 {
-LibRef libref = LIB0;
-const Unicode l = args[0][0];
-      if (Avec::is_digit(l))
-      {
-        libref = (LibRef)(l - '0');
-        args.erase(0);
-      }
+   // LOAD wsname
+   // LOAD libnum wsname
 
-UCS_string wsname = args[0];
-   Workspace::load_WS(out, libref, wsname, quad_lx, silent);
+LibRef lib;
+UCS_string wsname;
+   if (resolve_lib_wsname(out, args, lib, wsname))   return;   // error
+
+   Workspace::load_WS(out, lib, wsname, quad_lx, silent);
 }
 //-----------------------------------------------------------------------------
 void 
@@ -1517,7 +1507,7 @@ int len = cnew.size();
         if (l && (c1 != c2))   return false;   // OK: different
      }
 
-   out << "BAD COMMAND" << endl;
+   out << "BAD COMMAND+" << endl;
    MORE_ERROR() << "conflict with existing command name in command ]USERCMD";
 
    return true;
@@ -1554,25 +1544,17 @@ Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
    // )SAVE
    // )SAVE workspace
    // )SAVE lib workspace
-   //
-   if (args.size() == 2)   // )SAVE lib workspace
+
+   if (args.size() > 0)   // workspace or lib workspace
       {
-        const Unicode l = args[0][0];
-        if (Avec::is_digit(l))
-           {
-             LibRef lib = (LibRef)(l - '0');
-             Workspace::save_WS(out, lib, args[1], false);
-           }
+        LibRef lib;
+        UCS_string wsname;
+        if (resolve_lib_wsname(out, args, lib, wsname))   return;   // error
+        Workspace::save_WS(out, lib, wsname, false);
         return;
       }
 
-   if (args.size() == 1)   // )SAVE workspace: use default lib (0)
-      {
-        Workspace::save_WS(out, LIB0, args[0], false);
-        return;
-      }
-
-   // )SAVE: use )WSID unless CLEAR WS
+   // )SAVE without arguments: use )WSID unless CLEAR WS
    //
 LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
@@ -1593,6 +1575,30 @@ UCS_string wsid_name = Workspace::get_WS_name();
       }
 
    Workspace::save_WS(out, wsid_lib, wsid_name, true);
+}
+//-----------------------------------------------------------------------------
+bool
+Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
+                            LibRef &lib, UCS_string & wsname)
+{
+   Assert(args.size() > 0);
+   if (args.size() == 1)   // name without libnum
+      {
+        lib = LIB0;
+        wsname = args[0];
+        return false;   // OK
+      }
+
+   if (!(args[0].size() != 1 && !Avec::is_digit(args[0][0])))
+      {
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << "invalid library reference '" << args[0] << "'";
+        return true;   // error
+      }
+
+   lib = (LibRef)(args[0][0] - '0');
+   wsname = args[1];
+   return false;   // OK
 }
 //-----------------------------------------------------------------------------
 void
