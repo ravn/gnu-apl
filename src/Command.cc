@@ -1158,8 +1158,6 @@ Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
 LibRef lib;
 UCS_string wsname;
    if (resolve_lib_wsname(out, args, lib, wsname))   return;   // error
-Q(lib)
-Q(wsname)
 
    Workspace::load_WS(out, lib, wsname, quad_lx, silent);
 }
@@ -1591,7 +1589,7 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
         return false;   // OK
       }
 
-   if (!(args[0].size() != 1 && Avec::is_digit(args[0][0])))
+   if (!(args[0].size() == 1 && Avec::is_digit(args[0][0])))
       {
         out << "BAD COMMAND+" << endl;
         MORE_ERROR() << "invalid library reference '" << args[0] << "'";

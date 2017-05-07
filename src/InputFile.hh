@@ -131,15 +131,22 @@ struct InputFile
    static void randomize_files();
 
    /// files that need to be processed
-   static Simple_string<InputFile, false> files_todo;
+   static Simple_string<InputFile, true> files_todo;
 
    /// the initial set of files provided on the command line
-   static Simple_string<InputFile, false> files_orig;
+   static Simple_string<InputFile, true> files_orig;
 
-   FILE       * file;       ///< file descriptor
-   UTF8_string  filename;   ///< dito.
+   /// FILE * from fopen (or 0 if file is closed)
+   FILE       * file;
+
+   /// the file name
+   UTF8_string  filename;
+
+   // copy operator
+   InputFile & operator =(const InputFile &);
 
 protected:
+
    bool test;         ///< true for -T testfile, false for -f APL file
    bool echo;         ///< echo stdin
    bool is_script;    ///< script (override existing functions)

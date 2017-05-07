@@ -33,10 +33,18 @@
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 
-Simple_string<InputFile, false> InputFile::files_todo;
-Simple_string<InputFile, false> InputFile::files_orig;
+Simple_string<InputFile, true> InputFile::files_todo;
+Simple_string<InputFile, true> InputFile::files_orig;
 int InputFile::stdin_line_no = 1;
 
+//-----------------------------------------------------------------------------
+InputFile & InputFile::operator =(const InputFile & other)
+{
+   memcpy(this, &other, sizeof(InputFile));   // illegally duplicates strings!
+   ::new (&object_filter)   UCS_string_vector(other.object_filter);
+   new (&filename) UTF8_string(&other.filename[0], other.filename.size());
+   return *this;
+}
 //-----------------------------------------------------------------------------
 void
 InputFile::open_current_file()
