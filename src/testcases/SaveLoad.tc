@@ -29,6 +29,7 @@ SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 CLEAR WS
 
       )DROP test.xml
+³
 
       )WSID test
 WAS CLEAR WS

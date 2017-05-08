@@ -44,8 +44,9 @@
 #include "Tokenizer.hh"
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
-#include "Value.icc"
 #include "Workspace.hh"
+
+#include "Value.icc"
 
 int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;
@@ -697,6 +698,23 @@ const int result = unlink(filename.c_str());
         out << wname << " NOT DROPPED: " << strerror(errno) << endl;
         MORE_ERROR() << "could not unlink file " << filename;
       }
+   else
+      {
+        const APL_time_us offset = Workspace::get_v_Quad_TZ().get_offset();
+        const YMDhmsu time(now() + 1000000*offset);
+        const char * tz_sign = (offset < 0) ? "" : "+";
+
+        ostringstream os;
+        os << setfill('0') << time.year  << "-"
+           << setw(2)      << time.month << "-"
+           << setw(2)      << time.day   << "  "
+           << setw(2)      << time.hour  << ":"
+           << setw(2)      << time.minute << ":"
+           << setw(2)      << time.second << " (GMT"
+           << tz_sign      << offset/3600 << ")";
+
+        out << os.str() << endl;
+      }
 }
 //-----------------------------------------------------------------------------
 void 
@@ -731,8 +749,9 @@ UCS_string wsid_name = Workspace::get_WS_name();
       {
         COUT << "NOT DUMPED: THIS WS IS CLEAR WS" << endl;
         MORE_ERROR() <<
-        "the workspace was not dumped because 'CLEAR WS' is a special \n"
-        "workspace name that cannot be dumped. Use )WSID <name> first.";
+        "the workspace was not dumped because 'CLEAR WS' is a special\n"
+        "workspace name that cannot be dumped. "
+        "First create WS name with )WSID <name>."; 
         return;
       }
 
@@ -1569,8 +1588,9 @@ UCS_string wsid_name = Workspace::get_WS_name();
       {
         COUT << "NOT SAVED: THIS WS IS CLEAR WS" << endl;
         MORE_ERROR() <<
-        "the workspace was not saved because 'CLEAR WS' is a special \n"
-        "workspace name that cannot be saved. Use )WSID <name> first.";
+        "the workspace was not saved because 'CLEAR WS' is a special\n"
+        "workspace name that cannot be saved. "
+        "First create WS name with )WSID <name>."; 
         return;
       }
 
