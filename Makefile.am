@@ -6,15 +6,16 @@ APL_DIRS	= workspaces wslib3 wslib4 wslib5
 SUBDIRS		= doc erlang gnu-apl.d src support-files tools $(APL_DIRS)
 DIST_SUBDIRS	= $(SUBDIRS) rpm debian
 
-dist_doc_DATA = README			\
-		README-1-prerequisites	\
-		README-2-configure	\
-		README-3-keyboard	\
-		README-4-compliance	\
-		README-5-WINDOWS	\
-                README-6-porting	\
-		README-7-more-info	\
-		README-8-parallel
+dist_doc_DATA = README			   \
+		README-1-prerequisites	   \
+		README-2-configure	   \
+		README-3-keyboard	   \
+		README-4-compliance	   \
+		README-5-WINDOWS	   \
+                README-6-porting	   \
+		README-7-more-info	   \
+		README-8-parallel          \
+                README-9-post-installation
 
 nobase_dist_sysconf_DATA = gnu-apl.d/preferences
 
