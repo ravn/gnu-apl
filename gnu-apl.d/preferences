@@ -2,12 +2,12 @@
 #
 # this file contains user preferences for GNU APL.
 #
-# It should live in:
+# It should be placed into
 #
-# (1) in folder gnu-apl of the system configuration directory. or
-# (2) in folder .gnu-apl in the user's home
+# (1) in sub-directory gnu-apl.d of the system configuration directory, and/or
+# (2) in folder .config/gnu-apl/ in the user's home directory.
 #
-# In both cases the file name should be 'preferences'
+# In both cases the file name must be 'preferences'.
 #
 # The system configuration directory is usually /etc or /etc/local
 # It can be overridden by  ./configure --sysconfdir=something-else
@@ -15,13 +15,16 @@
 # If both files are present then (1) is read before (2) so that for
 # duplicate settings in both files (2) prevails.
 #
-# Command line options take precedence over settings in any of these files.
+# Many settings can also be changed by command line options; the command line
+# options take precedence over settings in (1) or (2).
 #
 # The initial content of this files contains all possible settings, but
 # commented out. You should not remove lines but rather comment or
 # uncomment them.
 #
-
+# The meaning of most settings should be obvious; if not, then please refer to
+# the more detailed desctption in the file README-9-Post-Installation, located
+# in the top-level directory of the GNU APL package.
 
 ###############################################################################
 #
@@ -33,6 +36,7 @@
 #
   Welcome       Yes	(default)
 # Welcome       No
+#
 
 
 ###############################################################################
