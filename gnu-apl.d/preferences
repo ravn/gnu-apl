@@ -338,11 +338,12 @@ BACKUP_BEFORE_SAVE  yes
 # providing your own keyboard file which (when specified) is shown by the
 # ]KEYB command instead of the assumed layout.
 #
-# You can use one of the files called 'keyboard1.txt' somewhere below the
+# You can use one of the files called 'keyboard*.txt' somewhere below the
 # directory named 'support-files' as a starting point for your own layout
 # and uncomment the following setting:
 #
-# KEYBOARD_LAYOUT_FILE  @GNU_APL_ETC@/gnu-apl.d/keyboard1.txt
+# KEYBOARD_LAYOUT_FILE  /usr/local/etc/gnu-apl.d/keyboard1.txt
+# KEYBOARD_LAYOUT_FILE  /usr/local/etc/gnu-apl.d/keyboard2.txt
 #
 
 ###############################################################################

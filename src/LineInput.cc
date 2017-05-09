@@ -171,8 +171,8 @@ int count = 0;
          buffer[sizeof(buffer) - 1] = 0;
 
          int slen = strlen(buffer);
-         if (buffer[slen - 1] == '\n')   buffer[--slen] = 0;
-         if (buffer[slen - 1] == '\r')   buffer[--slen] = 0;
+         if (slen && (buffer[slen - 1] == '\n'))   buffer[--slen] = 0;
+         if (slen && (buffer[slen - 1] == '\r'))   buffer[--slen] = 0;
          ++count;
          UTF8_string utf(buffer);
          UCS_string ucs(utf);

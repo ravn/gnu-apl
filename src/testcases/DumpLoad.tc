@@ -15,7 +15,7 @@ CLEAR WS
 ┗∊∊━━━━━━━━━━━━━┛
 
       )DROP dump_load_SI
-⍝³
+³
 
       )DUMP dump_load_SI
 ³
@@ -46,7 +46,7 @@ DUMPED ³
 CLEAR WS
 
       )DROP dump_load_SI
-⍝³
+³
 
 ∆length←'meter' (2 5⍴'dc' 'meter' 'km' 'lightyear' 'parsec' 'v÷10' 'v' 'v×1000' 'v×9454254955488000' 'v×3.0856776E16')
 
@@ -89,7 +89,7 @@ DUMPED ³
 CLEAR WS
 
       )DROP test.apl
-⍝³
+³
 
       )wsid test
 WAS CLEAR WS

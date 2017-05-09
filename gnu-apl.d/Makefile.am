@@ -5,12 +5,14 @@ dist_DATA = preferences keyboard1.txt parallel_thresholds
 
 distdir = ${sysconfdir}/gnu-apl.d
 
-sedcmd1 = "s|@GNU_APL_LIBS@|${pkglibdir}|"
-sedcmd2 = "s|@GNU_APL_ETC@|${sysconfdir}|"
-
-# update preferences when eg. ./configure --prefix is executed
+# update preferences when eg. ./configure --prefix is executed.
+# See autoconf.pdf page 29
 #
-#preferences: preferences.in Makefile
-#	echo ${sedcmd}
-#	cat $< | sed -e ${sedcmd1} | sed -e ${sedcmd2} > $@
+edit = sed -e 's|@prefix[@]|$(prefix)|g'
+
+# build preferences after configure
+preferences: Makefile $(srcdir)/preferences.in
+	rm -f $@; srcdir=''; \
+	test -f ./$@.in || srcdir=$(srcdir)/; \
+	$(edit) $${srcdir}$@.in >$@
 
