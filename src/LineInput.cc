@@ -714,8 +714,8 @@ InputMux::get_line(LineInputMode mode, const UCS_string & prompt,
         buffer[sizeof(buffer) - 1] = 0;
 
         int slen = strlen(buffer);
-        if (buffer[slen - 1] == '\n')   buffer[--slen] = 0;
-        if (buffer[slen - 1] == '\r')   buffer[--slen] = 0;
+        if (slen && buffer[slen - 1] == '\n')   buffer[--slen] = 0;
+        if (slen && buffer[slen - 1] == '\r')   buffer[--slen] = 0;
 
         UTF8_string line_utf(buffer);
         line = UCS_string(line_utf);

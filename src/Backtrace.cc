@@ -121,8 +121,9 @@ int64_t prev_pc = -1LL;
          if (s == 0)   break;   // end of file.
 
          buffer[sizeof(buffer) - 1] = 0;
-         const int len = strlen(buffer);
-         if (buffer[len - 1] == '\n')   buffer[len - 1] = 0;
+         int slen = strlen(buffer);
+         if (slen && buffer[slen - 1] == '\n')   buffer[--slen] = 0;
+         if (slen && buffer[slen - 1] == '\r')   buffer[--slen] = 0;
 
          // we look for 2 types of line: abolute source file paths
          // and code lines.
