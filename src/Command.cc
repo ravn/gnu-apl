@@ -701,20 +701,7 @@ const int result = unlink(filename.c_str());
       }
    else
       {
-        const APL_time_us offset = Workspace::get_v_Quad_TZ().get_offset();
-        const YMDhmsu time(now() + 1000000*offset);
-        const char * tz_sign = (offset < 0) ? "" : "+";
-
-        ostringstream os;
-        os << setfill('0') << time.year  << "-"
-           << setw(2)      << time.month << "-"
-           << setw(2)      << time.day   << "  "
-           << setw(2)      << time.hour  << ":"
-           << setw(2)      << time.minute << ":"
-           << setw(2)      << time.second << " (GMT"
-           << tz_sign      << offset/3600 << ")";
-
-        out << os.str() << endl;
+        Workspace::get_v_Quad_TZ().print_timestamp(out, now()) << endl;
       }
 }
 //-----------------------------------------------------------------------------

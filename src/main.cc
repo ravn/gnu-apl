@@ -463,6 +463,7 @@ const bool log_startup = uprefs.parse_argv_1();
          Command::process_line(load_cmd);
       }
 
+   Quad_TZ::compute_offset();
    return 0;
 }
 //-----------------------------------------------------------------------------

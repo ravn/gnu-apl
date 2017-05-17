@@ -589,23 +589,9 @@ XML_Saving_Archive ar(outf);
    ar.save();
 
    // print time and date to COUT
-   {
-     const APL_time_us offset = get_v_Quad_TZ().get_offset();
-     const YMDhmsu time(now() + 1000000*offset);
-     const char * tz_sign = (offset < 0) ? "" : "+";
-
-     ostringstream os;
-     os << setfill('0') << time.year  << "-"
-        << setw(2)      << time.month << "-"
-        << setw(2)      << time.day   << "  " 
-        << setw(2)      << time.hour  << ":"
-        << setw(2)      << time.minute << ":"
-        << setw(2)      << time.second << " (GMT"
-        << tz_sign      << offset/3600 << ")";
-
-     if (name_from_WSID)   os << " " << the_workspace.WS_name;
-     out << os.str() << endl;
-   }
+   get_v_Quad_TZ().print_timestamp(out, now());
+   if (name_from_WSID)   out << " " << the_workspace.WS_name;
+   out << endl;
 }
 //-----------------------------------------------------------------------------
 bool
@@ -669,19 +655,8 @@ Workspace::load_DUMP(ostream & out, const UTF8_string & filename, int fd,
    {
      struct stat st;
      fstat(fd, &st);
-     const int offset = Quad_TZ::compute_offset();  // call BEFORE localtime() !
-     tm * t = localtime(&st.st_mtime);
-     const char * tz_sign = offset < 0 ? "" : "+";
-
-      out << "DUMPED "
-          << setfill('0') << (1900 + t->tm_year) << "-"
-          << setw(2)      << (t->tm_mon + 1)     << "-"
-          << setw(2)      << t->tm_mday          << " "
-          << setw(2)      << t->tm_hour          << ":"
-          << setw(2)      << t->tm_min           << ":"
-          << setw(2)      << t->tm_sec           << " (GMT"
-          << tz_sign      << offset/3600 << ")"
-          << setfill(' ') <<  endl;
+     const APL_time_us when = 1000000ULL * st.st_mtime;
+     Workspace::get_v_Quad_TZ().print_timestamp(out << "DUMPED ", when) << endl;
    }
 
 FILE * file = fdopen(fd, "r");
@@ -792,10 +767,9 @@ ostream * sout = &outf;
    // print header line, workspace name, time, and date to outf
    //
 const APL_time_us offset = get_v_Quad_TZ().get_offset();
-const YMDhmsu time(now() + 1000000*offset);
-const char * tz_sign = (offset < 0) ? "" : "+";
+const APL_time_us gmt = now();
+const YMDhmsu time(gmt + 1000000*offset);
    {
-
      if (html)
         {
           outf <<
@@ -803,7 +777,7 @@ const char * tz_sign = (offset < 0) ? "" : "+";
 "                      \"http://www.w3.org/TR/html4/strict.dtd\">"  << endl <<
 "<html>"                                                            << endl <<
 "  <head>"                                                          << endl <<
-"    <title>" << wsname << ".apl</title> "                           << endl <<
+"    <title>" << wsname << ".apl</title> "                          << endl <<
 "    <meta http-equiv=\"content-type\" "                            << endl <<
 "          content=\"text/html; charset=UTF-8\">"                   << endl <<
 "    <meta name=\"author\" content=\"??????\">"                     << endl <<
@@ -845,16 +819,8 @@ const char * tz_sign = (offset < 0) ? "" : "+";
 
      *sout << " ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝" << endl
           << "⍝" << endl
-          << "⍝ " << wsname << " "
-          << setfill('0') << time.year  << "-"
-          << setw(2)      << time.month << "-"
-          << setw(2)      << time.day   << " " 
-          << setw(2)      << time.hour  << ":"
-          << setw(2)      << time.minute << ":"
-          << setw(2)      << time.second << " (GMT"
-          << tz_sign      << offset/3600 << ")"
-          << setfill(' ') << endl
-          << "⍝" << endl
+          << "⍝ " << wsname << " ";
+     get_v_Quad_TZ().print_timestamp(*sout, gmt) << endl
           << " ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝" << endl
           << endl;
    }
@@ -875,14 +841,7 @@ int variable_count = 0;
 
    if (silent)
       {
-        out << setfill('0') << time.year        << "-"
-            << setw(2)      << time.month       << "-"
-            << setw(2)      << time.day         << " "
-            << setw(2)      << time.hour        << ":"
-            << setw(2)      << time.minute      << ":"
-            << setw(2)      << time.second      << " (GMT"
-            << tz_sign      << offset/3600 << ")"
-            << setfill(' ') <<  endl;
+        get_v_Quad_TZ().print_timestamp(out, gmt) << endl;
       }
    else
       {

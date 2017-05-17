@@ -599,6 +599,9 @@ public:
    /// compute the offset (in seconds) from GMT
    static int compute_offset();
 
+   /// print e.g. 2017-05-17  15:09:12 (GMT+2) to out (no trailing endl)
+   ostream & print_timestamp(ostream & out, APL_time_us when) const;
+
 protected:
    /// overloaded Symbol::assign().
    virtual void assign(Value_P value, bool clone, const char * loc);

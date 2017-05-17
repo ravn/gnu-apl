@@ -934,6 +934,25 @@ int diff_minutes = local_minutes - gm_minutes;
    return 60*diff_minutes;
 }
 //-----------------------------------------------------------------------------
+ostream &
+Quad_TZ::print_timestamp(ostream & out, APL_time_us when) const
+{
+const APL_time_us offset = get_offset();
+const YMDhmsu time(when + 1000000*offset);
+const char * tz_sign = (offset < 0) ? "" : "+";
+
+ostringstream os;
+   os << setfill('0') << time.year  << "-"
+      << setw(2)      << time.month << "-"
+      << setw(2)      << time.day   << "  "
+      << setw(2)      << time.hour  << ":"
+      << setw(2)      << time.minute << ":"
+      << setw(2)      << time.second << " (GMT"
+      << tz_sign      << offset/3600 << ")";
+
+   return out << os.str();
+}
+//-----------------------------------------------------------------------------
 void
 Quad_TZ::assign(Value_P value, bool clone, const char * loc)
 {
