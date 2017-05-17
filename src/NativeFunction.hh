@@ -34,6 +34,14 @@
 class NativeFunction : public Function
 {
 public:
+   /// return the name of the .so library that implements this function
+   const UCS_string & get_so_path() const
+      { return so_path; }
+
+   /// return true if the .so library was successfully loaded
+   bool is_valid() const
+      { return valid; }
+
    /// ⎕FX a native funtion from a shared library (dlopen) handle
    static NativeFunction * fix(const UCS_string & so_name,
                                const UCS_string & apl_name);

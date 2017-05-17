@@ -33,6 +33,7 @@
 #include "IO_Files.hh"
 #include "LineInput.hh"
 #include "Nabla.hh"
+#include "NativeFunction.hh"
 #include "Output.hh"
 #include "Parser.hh"
 #include "Prefix.hh"
@@ -952,6 +953,16 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                   {
                     Function * fun = sym->get_function();
                     Assert(fun);
+                    if (fun->is_native())
+                       {
+                         const NativeFunction *nf = (const NativeFunction *)fun;
+                         CERR << "is a native function implemented in "
+                              << nf->get_so_path() << endl
+                              << "    load state: " << (nf->is_valid() ?
+                                 "OK (loaded)" : "error") << endl;
+                         return;
+                       }
+
                     CERR << "is a ";
                     if      (fun->get_fun_valence() == 2)   CERR << "dyadic";
                     else if (fun->get_fun_valence() == 1)   CERR << "monadic";
@@ -1196,7 +1207,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
         const int libref = libref_ucs[0] - '0';
         if (libref_ucs.size() != 1 || libref < 0 || libref > 9)
            {
-             CERR << "Invalid library referenc " << libref_ucs << "'" << endl;
+             CERR << "Invalid library reference " << libref_ucs << "'" << endl;
              return;
            }
 
