@@ -120,8 +120,9 @@ UCS_string to;
      const bool bad_from_to = Command::parse_from_to(from, to, from_to);
      if (bad_from_to)
         {
-          CERR << "bad range argument " << from_to
-               << ", expecting from - to" << endl;
+          CERR << "bad range argument" << endl;
+          MORE_ERROR() << "bad range argument " << from_to
+               << ", expecting from-to";
           return;
         }
    }

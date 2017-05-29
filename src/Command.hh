@@ -156,16 +156,17 @@ protected:
 
    /// open directory arg and follow symlinks
    static DIR * open_LIB_dir(UTF8_string & path, ostream & out,
-                            const UCS_string & arg);
+                            const UCS_string_vector & args);
 
    /// list library: common helper
-   static void lib_common(ostream & out, const UCS_string & args, int variant);
+   static void lib_common(ostream & out, const UCS_string_vector & args,
+                          int variant);
 
    /// list content of workspace and wslib directories: )LIB [N]
-   static void cmd_LIB1(ostream & out, const UCS_string & args);
+   static void cmd_LIB1(ostream & out, const UCS_string_vector & args);
 
    /// list content of workspace and wslib directories: ]LIB [N]
-   static void cmd_LIB2(ostream & out, const UCS_string & args);
+   static void cmd_LIB2(ostream & out, const UCS_string_vector & args);
 
    /// control logging facilities
    static void cmd_LOG(ostream & out, const UCS_string & arg);

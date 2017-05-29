@@ -502,9 +502,9 @@ UCS_string::UCS_string(istream & in)
 void
 UCS_string::copy_black(UCS_string & dest, int & idx) const
 {
-   while (idx < size() && operator[](idx) <= ' ')   ++idx;
-   while (idx < size() && operator[](idx) >  ' ')   dest.append(operator[](idx++));
-   while (idx < size() && operator[](idx) <= ' ')   ++idx;
+   while (idx < size() && at(idx) <= ' ')   ++idx;
+   while (idx < size() && at(idx) >  ' ')   dest.append(at(idx++));
+   while (idx < size() && at(idx) <= ' ')   ++idx;
 }
 //-----------------------------------------------------------------------------
 ShapeItem

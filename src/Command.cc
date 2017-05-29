@@ -161,7 +161,9 @@ bool many = false;
        {
          case '[': ++brackets;   in_param = false;   continue;
          case ']': --brackets;   in_param = false;   continue;
-         case '|':               in_param = false;   continue;  // range
+         case '|':               in_param = false;
+              if (brackets)   --opt_args;
+              else            --mandatory_args;      continue;
          case '.': if (a[1] == '.' && a[2] == '.')   many = true;
                    continue;
          case 'A' ... 'Z':
@@ -681,6 +683,8 @@ UCS_string wsname = args[0];
 void 
 Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
 {
+   // Command is:
+   //
    // )DROP wsname
    // )DROP libnum wsname
 
@@ -709,6 +713,8 @@ void
 Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
                   bool html, bool silent)
 {
+   // Command is:
+   //
    // )DUMP
    // )DUMP workspace
    // )DUMP lib workspace
@@ -1102,6 +1108,8 @@ int result = pclose(pipe);
 void
 Command::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
 {
+   // Command is:
+   //
    // IN filename [objects...]
 
 UCS_string fname = args[0];
@@ -1169,6 +1177,8 @@ void
 Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
                   UCS_string & quad_lx, bool silent)
 {
+   // Command is:
+   //
    // LOAD wsname
    // LOAD libnum wsname
 
@@ -1249,28 +1259,35 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 }
 //-----------------------------------------------------------------------------
 DIR *
-Command::open_LIB_dir(UTF8_string & path, ostream & out, const UCS_string & arg)
+Command::open_LIB_dir(UTF8_string & path, ostream & out,
+                      const UCS_string_vector & args)
 {
-   // arg is '' or '0'-'9' or path from:
+   // args can be one of:
+   //                              example:
+   // 1.                           )LIB
+   // 2.  N                        )LIB 1
+   // 3.  )LIB directory-name      )LIB /usr/lib/...
    //
-   // 1.  )LIB          meaning )LIB 0
-   // 2.  )LIB 1
-   // 3.  )LIB directory-name
-   //
-   if (arg.size() == 0)   // case 1.
+
+UCS_string arg("0");
+   if (args.size())   arg = args[0];
+
+   if (args.size() == 0)                       // case 1.
       {
         path = LibPaths::get_lib_dir(LIB0);
       }
-   else if (arg.size() == 1 && Avec::is_digit((Unicode)arg[0]))   // case 2.
+   else if (arg.size() == 1 &&
+            Avec::is_digit((Unicode)arg[0]))   // case 2.
       {
         path = LibPaths::get_lib_dir((LibRef)(arg[0] - '0'));
       }
-   else  // case 3.
+   else                                        // case 3.
       {
         path = UTF8_string(arg);
       }
 
-   // follow symbolic links...
+   // follow symbolic links, but not too often (because symbolic links may
+   // form an endless loop)...
    //
    loop(depth, 20)
        {
@@ -1299,7 +1316,7 @@ DIR * dir = opendir(path.c_str());
 
         MORE_ERROR() <<
         "path '" << path << "' could not be openend as directory: " << why;
-        return 0;
+        return 0;   // error
       }
 
    return dir;
@@ -1323,15 +1340,75 @@ DIR * dir = opendir(filename.c_str());
 }
 //-----------------------------------------------------------------------------
 void 
-Command::lib_common(ostream & out, const UCS_string & arg, int variant)
+Command::lib_common(ostream & out, const UCS_string_vector & args_range,
+                    int variant)
 {
-   // 1. open directory
+   // 1. check for (and then extract) an optional range parameter...
+   //
+UCS_string_vector args;
+const UCS_string * range = 0;
+   loop(a, args_range.size())
+      {
+        const UCS_string & arg = args_range[a];
+        bool is_range = false;
+        bool is_path = false;
+        loop(aa, arg.size())
+            {
+              const Unicode uni = arg[aa];
+              if (uni == UNI_ASCII_MINUS)
+                 {
+                   is_range = true;
+                   break;
+                 }
+
+              if (!Avec::is_symbol_char(uni))
+                 {
+                   is_path = true;
+                   break;
+                 }
+            }
+
+         if (is_path)   // normal (non-range) arg
+            {
+              args.append(arg);
+            }
+         else if (!is_range)   // normal (non-range) arg
+            {
+              args.append(arg);
+            }
+         else if (range)   // second non-range arg
+            {
+              MORE_ERROR() <<
+              "multiple range parameters in )LIB or ]LIB command";
+              return;
+            }
+         else
+            {
+              range = &arg;
+            }
+      }
+
+UCS_string from;
+UCS_string to;
+   if (range)
+      {
+        const bool bad_from_to = parse_from_to(from, to, *range);
+        if (bad_from_to)
+           {
+             CERR << "bad range argument" << endl;
+             MORE_ERROR() << "bad range argument " << *range
+                  << ", expecting from-to";
+             return;
+           }
+      }
+
+   // 2. open directory
    //
 UTF8_string path;
-DIR * dir = open_LIB_dir(path, out, arg);
+DIR * dir = open_LIB_dir(path, out, args);
    if (dir == 0)   return;
 
-   // 2. collect files and directories
+   // 3. collect files and directories
    //
 UCS_string_vector files;
 UCS_string_vector directories;
@@ -1343,6 +1420,12 @@ UCS_string_vector directories;
 
          UTF8_string filename_utf8(entry->d_name);
          UCS_string filename(filename_utf8);
+
+         // check range (if any)...
+         //
+         if (from.size() && filename.lexical_before(from))   continue;
+         if (to.size() && to.lexical_before(filename))       continue;
+
          if (is_directory(entry, path))
             {
               if (filename_utf8[0] == '.')   continue;
@@ -1374,7 +1457,7 @@ UCS_string_vector directories;
        }
    closedir(dir);
 
-   // 3. sort directories and filenames alphabetically and append files
+   // 4. sort directories and filenames alphabetically and append files
    //    to directories
    //
    directories.sort();
@@ -1390,7 +1473,7 @@ UCS_string_vector directories;
         directories.append(files[f]);
       }
 
-   // 4. list directories first, then files
+   // 5. list directories first, then files
    //
         
    // figure column widths
@@ -1422,15 +1505,29 @@ Simple_string<int, false> col_width =
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_LIB1(ostream & out, const UCS_string & arg)
+Command::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 {
-   Command::lib_common(out, arg, 1);
+   // Command is:
+   //
+   // )LIB                (same as )LIB 0)
+   // )LIB N              (show workspaces in library N without extensions)
+   // )LIB from-to        (show workspaces named from-to in library 0
+   // )LIB N from-to      (show workspaces named from-to in library N
+
+   Command::lib_common(out, args, 1);
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_LIB2(ostream & out, const UCS_string & arg)
+Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 {
-   Command::lib_common(out, arg, 2);
+   // Command is:
+   //
+   // ]LIB                (same as )LIB 0)
+   // ]LIB N              (show workspaces in library N with extensions)
+   // ]LIB from-to        (show workspaces named from-to in library 0
+   // ]LIB N from-to      (show workspaces named from-to in library N
+
+   Command::lib_common(out, args, 2);
 }
 //-----------------------------------------------------------------------------
 void 
