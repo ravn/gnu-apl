@@ -163,7 +163,8 @@ bool many = false;
          case ']': --brackets;   in_param = false;   continue;
          case '|':               in_param = false;
               if (brackets)   --opt_args;
-              else            --mandatory_args;      continue;
+              else            --mandatory_args;
+              continue;
          case '.': if (a[1] == '.' && a[2] == '.')   many = true;
                    continue;
          case 'A' ... 'Z':
