@@ -145,7 +145,7 @@ bool
 Command::check_params(ostream & out, const char * command, int argc,
                       const char * args)
 {
-   // allow everythoing for ]USERCMD
+   // allow everything for ]USERCMD
    //
    if (!strcmp(command, "]USERCMD"))   return false;
 
@@ -157,7 +157,8 @@ int brackets = 0;
 bool in_param = false;
 bool many = false;
 
-   for (const char * a = args; *a; ++a)   switch(*a)
+UCS_string args_ucs(args);
+   loop (a, args_ucs.size())   switch(args_ucs[a])
        {
          case '[': ++brackets;   in_param = false;   continue;
          case ']': --brackets;   in_param = false;   continue;
@@ -165,10 +166,13 @@ bool many = false;
               if (brackets)   --opt_args;
               else            --mandatory_args;
               continue;
-         case '.': if (a[1] == '.' && a[2] == '.')   many = true;
-                   continue;
+         case '.':
+              if (args_ucs[1] == '.' && args_ucs[2] == '.')   many = true;
+              continue;
+         case '0' ... '9':
          case 'A' ... 'Z':
          case 'a' ... 'z':
+         case UNI_OVERBAR:
          case '-': if (!in_param)   // start of a name or range
                       {
                         if (brackets)   ++opt_args;
@@ -177,7 +181,7 @@ bool many = false;
                       }
                    continue;
          case ' ':                 in_param = false;   continue;
-         default: Q(*args)
+         default: Q(args_ucs[a])   // should not happen
        }
 
    if (argc < mandatory_args)   // too few parameters
@@ -502,7 +506,6 @@ int format = arg.atoi();
 
    if (arg.size() == 0)
       {
-        
         out << "]BOXING ";
         if (boxing_format == 0) out << "OFF";
         else out << boxing_format;
@@ -511,7 +514,6 @@ int format = arg.atoi();
       }
 
    if (arg.starts_iwith("OFF"))   format = 0;
-
    switch (format)
       {
         case -29:
@@ -519,7 +521,7 @@ int format = arg.atoi();
         case -22: case -21: case -20:
         case -9: case  -8: case  -7:
         case -4: case  -3: case  -2:
-        case 0:
+        case  0:
         case  2: case   3: case   4:
         case  7: case   8: case   9:
         case 20: case  21: case  22:
@@ -529,8 +531,10 @@ int format = arg.atoi();
                  return;
       }
 
-   out << "Bad ]BOXING parameter " << arg
-       << ". Valid values are: OFF, and ± 2-4, 7-9, 20-25, and 29." << endl;
+   out << "BAD ]BOXING PARAMETER+" << endl;
+   MORE_ERROR() << "Parameter " << arg << " is not valid for command ]BOXING.\n"
+      "  Valid parameters are OFF, N, and -N with\n"
+      "  N ∈ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
 }
 //-----------------------------------------------------------------------------
 bool
