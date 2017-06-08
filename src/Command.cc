@@ -167,7 +167,9 @@ UCS_string args_ucs(args);
               else            --mandatory_args;
               continue;
          case '.':
-              if (args_ucs[1] == '.' && args_ucs[2] == '.')   many = true;
+              if (a < (args_ucs.size() - 2) &&
+                  args_ucs[a + 1] == '.'    &&
+                  args_ucs[a + 2] == '.')   many = true;
               continue;
          case '0' ... '9':
          case 'A' ... 'Z':
