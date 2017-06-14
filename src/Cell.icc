@@ -117,7 +117,7 @@ inline bool
 Cell::integral_within(APL_Complex A, APL_Float B)
 {
 const APL_Complex C = -A;
-   return tolerant_floor(C, B) == tolerant_floor(A, B);
+   return tolerant_floor(C, B) == - tolerant_floor(A, B);
 }
 //-----------------------------------------------------------------------------
 
