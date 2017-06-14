@@ -78,6 +78,9 @@ public:
    /// return \b true if \b this cell is equal to \b other
    virtual bool equal(const Cell & other, APL_Float qct) const;
 
+   /// ISO p.15: return \b true if A and B are on the same half-plane
+   static bool same_half_plane(APL_Complex A, APL_Complex B);
+
    /// ISO p.19: return \b true if real A is tolerantly equal to real B within C
    static bool tolerantly_equal(APL_Float A, APL_Float B, APL_Float C);
 

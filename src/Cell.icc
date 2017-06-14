@@ -43,6 +43,18 @@ const APL_Float dist_A_B = (A > B) ? (A - B) : (B - A);
 }
 //-----------------------------------------------------------------------------
 inline bool
+Cell::same_half_plane(APL_Complex A, APL_Complex B)
+{
+   if (A.real() > 0 && B.real() > 0)   return true;
+   if (A.real() < 0 && B.real() < 0)   return true;
+
+   if (A.imag() > 0 && B.imag() > 0)   return true;
+   if (A.imag() < 0 && B.imag() < 0)   return true;
+
+   return false;
+}
+//-----------------------------------------------------------------------------
+inline bool
 Cell::tolerantly_equal(APL_Complex A, APL_Complex B, APL_Float C)
 {
    // if A equals B, return true
@@ -51,17 +63,7 @@ Cell::tolerantly_equal(APL_Complex A, APL_Complex B, APL_Float C)
 
    // if A and B are not in the same half-plane, return false.
    //
-   // Implementation: If A and B are in the same real half-plane then
-   //                 the product of their real parts is ≥ 0,
-   //
-   //                 If A and B are in the same imag half-plane then
-   //                 the product of their imag parts is ≥ 0,
-   //
-   //                 Otherwise: they are not in the same half-plane
-   //                 and we return false;
-   //
-   if (A.real() * B.real() < 0.0 &&
-       A.imag() * B.imag() < 0.0)   return false;
+   if (!same_half_plane(A, B))   return false;
 
    // If the distance-between A and B is ≤ C times the larger-magnitude
    // of A and B, return true
