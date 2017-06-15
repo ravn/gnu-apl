@@ -61,31 +61,38 @@ Cell::tolerantly_equal(APL_Complex A, APL_Complex B, APL_Float C)
    //
    if (A == B) return true;
 
-   // if A and B are not in the same half-plane, return false.
+   // ISO: if A and B are not in the same half-plane, return false.
    //
-   if (!same_half_plane(A, B))   return false;
+   // Note: this leads to problems with complex modulo of Gaussian integers, so
+   //       we do not do it.
+   //
+   // if (!same_half_plane(A, B))   return false;
 
    // If the distance-between A and B is ≤ C times the larger-magnitude
    // of A and B, return true
    //
    // Implementation: Instead of mag(A-B)  ≤ C × max(mag(A),   mag(B))
-   // we compute                 mag²(A-B) ≤ C² × max(mag²(A), mag²(B))
+   // we compute:                mag²(A-B) ≤ C² × max(mag²(A), mag²(B))
+   //                                      == max(mag²(C×A), mag²(C×B))
    //
-   // 1. compute max(mag²A, mag²B)
+   // that avoids unneccessary computations of sqrt().
    //
-const APL_Float mag2_A   = A.real() * A.real() + A.imag() * A.imag();
-const APL_Float mag2_B   = B.real() * B.real() + B.imag() * B.imag();
-const APL_Float mag2_max = mag2_A > mag2_B ? mag2_A : mag2_B;
 
-   // 2. compute mag²(A-B)
+   // 1. compute left side: mag²(A-B)
    //
 const APL_Complex A_B = A - B;
 const APL_Float dist2_A_B = A_B.real() * A_B.real()
                           + A_B.imag() * A_B.imag();
+
+   // 2. compute right side: max(mag²C×A, mag²C×B)
+   //
+const APL_Float mag2_CA   = C * (A.real() * A.real() + A.imag() * A.imag());
+const APL_Float mag2_CB   = C * (B.real() * B.real() + B.imag() * B.imag());
+const APL_Float mag2_max = mag2_CA > mag2_CB ? mag2_CA : mag2_CB;
+
    // compare
    //
-
-   return dist2_A_B <= C*C*mag2_max;
+   return dist2_A_B <= mag2_max;
 }
 //-----------------------------------------------------------------------------
 inline APL_Complex
@@ -116,10 +123,24 @@ const APL_Float D_sum = D_real + D_imag;
 }
 //-----------------------------------------------------------------------------
 inline bool
-Cell::integral_within(APL_Complex A, APL_Float B)
+Cell::integral_within(APL_Complex A, APL_Float qct)
 {
-const APL_Complex C = -A;
-   return tolerant_floor(C, B) == - tolerant_floor(A, B);
+   // Note: despite its name (coming from the ISO standard) this implementation
+   // of integral_within is NOT the one described in the ISO standard. The
+   // description in the standard was leading to problems in bif_residue
+   //
+
+   // 1, scale qct to the magnitude of A
+   //
+   qct *= A.real() * A.real() + A.imag() * A.imag();
+
+const APL_Float real_up = ceil (A.real()) - qct;
+const APL_Float real_dn = floor(A.real()) + qct;
+const APL_Float imag_up = ceil (A.imag()) - qct;
+const APL_Float imag_dn = floor(A.imag()) + qct;
+
+   return (A.real() > real_up || A.real() < real_dn)   // real part is near int
+       && (A.imag() > imag_up || A.imag() < imag_dn);  // imag part is near int
 }
 //-----------------------------------------------------------------------------
 
