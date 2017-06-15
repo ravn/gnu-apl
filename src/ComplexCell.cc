@@ -304,28 +304,23 @@ ComplexCell::bif_residue(Cell * Z, const Cell * A) const
    if (!A->is_numeric())   return E_DOMAIN_ERROR;
 
 const APL_Complex a = A->get_complex_value();
+const APL_Complex b = get_complex_value();
 
    // if A is zero , return B
    //
    if (a.real() == 0.0 && a.imag() == 0.0)
-      return zv(Z, value.cval_r, value2.cval_i);
+      return zv(Z, b);
 
    // IBM: if B is zero , return 0
    //
-   if (value.cval_r == 0.0 && value2.cval_i == 0.0)   return IntCell::z0(Z);
+   if (b.real() == 0.0 && b.imag() == 0.0)
+      return IntCell::z0(Z);
 
-   // if ⎕CT != 0 and B ÷ A is close to an integer within ⎕CT then return 0.
-   //
-   // Note: In that case, the integer to which A ÷ B is close is either
-   // floor(A ÷ B) or ceil(A ÷ B).
-   //
 const APL_Float qct = Workspace::get_CT();
-const APL_Complex quotient = cval() / a;
+const APL_Complex quotient = b / a;
 
    // ISO p.89: If comparison-tolerance is not zero, and B divided-by A
    // is integral-within comparison-tolerance, return zero.
-   //
-   // In other words: B is an integer multiple of A
    //
    if (qct != 0 && integral_within(quotient, qct))   return IntCell::z0(Z);
 
@@ -333,7 +328,7 @@ const APL_Complex quotient = cval() / a;
    //
    new (Z) ComplexCell(quotient);                       // Z = A÷B
    Z->bif_floor(Z);                                     // Z = ⌊A÷B
-   return zv(Z, cval() - a * Z->get_complex_value());   // Z = A - A×⌊A÷B
+   return zv(Z, b - a * Z->get_complex_value());   // Z = A - A×⌊A÷B
 }
 //-----------------------------------------------------------------------------
 ErrorCode
