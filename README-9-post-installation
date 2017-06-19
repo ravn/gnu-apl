@@ -17,21 +17,21 @@ The description below assume that ./configure of GNU APL was executed without a
 prefix= option. If the prefix option was used then some of the paths further
 down in this document may differ accordingly.
 
-The "make install" procedure should have created a directory	
+The "make install" procedure should have created a directory
 
-	/usr/local/etc/gnu.apl.d 
- 	
-		or
+        /usr/local/etc/gnu-apl.d 
+        
+        or
 
-	    /etc/gnu.apl.d 
+        /etc/gnu-apl.d 
 
 
 This directory contains:
 
-	keyboard1.txt		a default USA PC104 keyboard layout
-	keyboard2.txt		a default International PC105 layout
-	parallel_thresholds	a presentation settings for apl  multitasking 
-	preferences		a file to tailor apl for your system
+        keyboard1.txt           a default USA PC104 keyboard layout
+        keyboard2.txt           a default International PC105 layout
+        parallel_thresholds     a presentation settings for apl  multitasking 
+        preferences             a file to tailor apl for your system
 
 This next section describes configuring GNU-APL using the preferences file.
 The preference file comes pre-configured, but in some instances, the 
@@ -51,8 +51,8 @@ directories in your ./configure command.
        
 1.1   KEYBOARDS
 ===============
-There are two physical keyboards predominately in use.  One is the popular American 
-keyboard layout, model pc104, shown below as Keyboard1.txt:
+There are two physical keyboards predominately in use. One is the popular
+American  keyboard layout, model pc104, shown below as Keyboard1.txt:
 
 PC104 USA Standard Keyboard:
 ===========================
@@ -89,8 +89,8 @@ PC105 International standard Keyboard
 ║  SHIFT ║ > °║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT      ║
 ╚════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩═════════════╝
 
-The 'preference' file will have a parameter setting to select one or other layout.
-More about this later.  
+The 'preference' file will have a parameter setting to select one or other
+layout. More about this later.  
 
 
 2.0 The preferences file(s)
@@ -106,10 +106,10 @@ options in every invocation of GNU APL.
 
 The settings will allow you to:
  
-    o	set text and background colors, 
-    o	assign directories and workspace locations, 
-    o	location of logs and history file(s), and 
-    o	other operational parameters.
+    o   set text and background colors, 
+    o   assign directories and workspace locations, 
+    o   location of logs and history file(s), and 
+    o   other operational parameters.
 
 
 The 'preferences' file should reside:
@@ -121,9 +121,9 @@ The 'preferences' file should reside:
  In both cases the configuration file name within each must be 'preferences'
 
 The system configuration directory is usually for GNU/Linux is /usr/local/etc/ 
-or  /etc. During the setup of GNU-APL (refer to README-2-configuration) you have the 
-opportunity to choose a different location. It can be overridden at compile time
-by  
+or  /etc. During the setup of GNU-APL (refer to README-2-configuration) you have
+the  opportunity to choose a different location. It can be overridden at compile
+time by  
 
   (a)  ./configure --sysconfdir=somewhere-else
   (b)  ./configure --sysconfdir=/home(yourlogon)/.GNU-APL 
@@ -135,7 +135,7 @@ To create your own preference file, create the following directory.
 
      /home(yourlogon)/.gnu-apl 
 
-copy the system installed /usr/local/etc/gnu.apl.d  to
+copy the system installed /usr/local/etc/gnu-apl.d  to
 
      /home(yourlogon)/.gnu-apl 
 
@@ -146,7 +146,7 @@ the settings common to both files.
  
 Command line options take precedence over settings made in any of these files.
 
-The initial content of this 'preference. file contains a commented list of  all 
+The initial content of this 'preference. file contains a commented list of all 
 possible settings. You should not remove parameter setting lines but rather
 comment or uncomment them.
 
@@ -161,8 +161,8 @@ The corresponding command line option for no welcome message is --silent.
 
 The default setting in the preferences file(s) is:
 #
-  Welcome       Yes	(default)
-# Welcome       No	
+  Welcome       Yes     (default)
+# Welcome       No      
 #  
 
 
@@ -201,8 +201,8 @@ terminal type definitions for  your choice.
 The default setting in the preferences file(s) is:
 #
   Color         ANSI (default)
-# Color 	CURSES
-# Color 	No
+# Color         CURSES
+# Color         No
 #
 
  
@@ -210,11 +210,11 @@ After starting APL you may want to disable coloring initially, but switch
 to curses the command ]COLOR  can be given later on. you can enter the 
 color command twice: 
 
-	]color
-	]COLOR ON
-      	]color off
-      	]color
-	]COLOR/XTERM OFF
+        ]color
+        ]COLOR ON
+        ]color off
+        ]color
+        ]COLOR/XTERM OFF
 
 
 3.2  GNU-APL Terminal handling
@@ -253,7 +253,7 @@ determines which sequence is sent:
 Output coloring is implemented as described below, 
 When the interpreter exists, then the sequence
 
-	RESET-SEQUENCE CLEAR-EOL
+        RESET-SEQUENCE CLEAR-EOL
 
 is sent to the terminal to cause it to set its the display colors 
 to their initial state.
@@ -360,8 +360,8 @@ in each method.
 =========================
 
 Below is a brief explanation of how you can configure the ESC (escape or other) 
-sequence sent by the terminal's  cursor-up,  cursor-down, cursor-left, cursor-right, Home, End, 
-Ins, and Del keys. 
+sequence sent by the terminal's  cursor-up,  cursor-down, cursor-left,
+cursor-right, Home, End, Ins, and Del keys. 
 
 The sequences can be set explicitly (in the following) or via CURSES
 The latter (CURSES) may fail to work because the sequences reported by
@@ -391,13 +391,13 @@ must follow a discipline. The variables involved with this discipline are
 listed below.
 
 Shared variables are represented by: 
-offer to share 		(⎕SVO), 
-share var retraction 	(⎕SVR),
+offer to share          (⎕SVO), 
+share var retraction    (⎕SVR),
 shared variable Control (⎕SVC),
-shared variable Query  	(⎕SVQ),    
-shared variable State 	(⎕SVS) 
+shared variable Query   (⎕SVQ),    
+shared variable State   (⎕SVS) 
 
-Using 'Shared variables' starts(forks) an independent helper process (APserver) 
+Using 'Shared variables' starts (forks) an independent helper process (APserver)
 to communicate with other APL processors. 
 
 If you do not need all the above functions then you can (and should) prevent
@@ -408,7 +408,7 @@ SharedVars are disabled  then GNU APL starts a little faster and, of course,
 The default setting in the preferences file(s) is:
 # The corresponding command line options are --SV and --noSV
 #
-  SharedVars    Enabled	    (default)
+  SharedVars    Enabled     (default)
 # SharedVars    Disabled
 
 
