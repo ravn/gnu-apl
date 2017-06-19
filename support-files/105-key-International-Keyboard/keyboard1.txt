@@ -25,7 +25,7 @@ It has a slightly different arrangement as follows:
    as a replacement keyboard1.txt, if your physical keyboard appears as below.
 Implementation
 6) To incorporate this adjustment modify the 'Preferences' file 
-   located within /usr/local/etc/gnu-apl.d, or '/home(yourLinuxID)/.gnu.apl' . 
+   located within /usr/local/etc/gnu-apl.d, or '/home(yourLinuxID)/.gnu-apl' . 
 
    The keyboard parameter string is around line 340. My change was as follows
    # KEYBOARD_LAYOUT_FILE  @GNU_APL_ETC@/gnu-apl.d/keyboard1.txt 
