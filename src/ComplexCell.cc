@@ -227,9 +227,9 @@ ErrorCode
 ComplexCell::bif_floor(Cell * Z) const
 {
 const APL_Float fr = floor(value.cval_r);    // fr ≤ value.cval_r
-const APL_Float Dr = value.cval_r - fr;      // Dr ≥ 0
+const APL_Float Dr = value.cval_r - fr;      // 0 ≤ Dr < 1
 const APL_Float fi = floor(value2.cval_i);   // fi ≤ value2.cval_i
-const APL_Float Di = value2.cval_i - fi;     // Di ≥ 0
+const APL_Float Di = value2.cval_i - fi;     // 0 ≤ Di < 1
 const APL_Float D = Dr + Di;                 // 0 ≤ D < 2
 
    // ISO: if D is tolerantly less than 1 return fr + 0J1×fi
@@ -317,18 +317,18 @@ const APL_Complex b = get_complex_value();
       return IntCell::z0(Z);
 
 const APL_Float qct = Workspace::get_CT();
-const APL_Complex quotient = b / a;
+APL_Complex quotient = b / a;
 
    // ISO p.89: If comparison-tolerance is not zero, and B divided-by A
    // is integral-within comparison-tolerance, return zero.
    //
    if (qct != 0 && integral_within(quotient, qct))   return IntCell::z0(Z);
 
-   // divide A by B, round down the quotient, and return B - A×quotient.
+   // round down the quotient, and return B - A×quotient.
    //
-   new (Z) ComplexCell(quotient);                       // Z = A÷B
-   Z->bif_floor(Z);                                     // Z = ⌊A÷B
-   return zv(Z, b - a * Z->get_complex_value());   // Z = A - A×⌊A÷B
+   quotient = APL_Complex(floor(quotient.real()), floor(quotient.imag()));
+   
+   return zv(Z, b - a * quotient);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
