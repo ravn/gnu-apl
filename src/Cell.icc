@@ -143,6 +143,27 @@ const APL_Float imag_dn = floor(A.imag()) + qct;
        && (A.imag() > imag_up || A.imag() < imag_dn);  // imag part is near int
 }
 //-----------------------------------------------------------------------------
+inline bool
+Cell::integral_within(APL_Float A, APL_Float qct)
+{
+   if (A < (floor(A) + qct))   return true;
+   if (A > (ceil(A) - qct))   return true;
+   return false;
+
+   // Note: despite its name (coming from the ISO standard) this implementation
+   // of integral_within is NOT the one described in the ISO standard. The
+   // description in the standard was leading to problems in bif_residue
+   //
+   // 1, scale qct to the magnitude of A
+   //
+   qct *= A * A;
+
+const APL_Float real_up = ceil (A) - qct;
+const APL_Float real_dn = floor(A) + qct;
+
+   return A > real_up || A < real_dn;
+}
+//-----------------------------------------------------------------------------
 
 #endif // __CELL_ICC_DEFINED__
 

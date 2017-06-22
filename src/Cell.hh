@@ -94,6 +94,9 @@ public:
    /// ISO p. 19: A is integral (close to a Gaussian Integer) within B
    static bool integral_within(APL_Complex A, APL_Float C);
 
+   /// ISO p. 19: A is integral (close to a Gaussian Integer) within B
+   static bool integral_within(APL_Float A, APL_Float C);
+
    /// Return the character value of a cell
    virtual Unicode get_char_value() const   { DOMAIN_ERROR; }
 

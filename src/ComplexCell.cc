@@ -303,12 +303,12 @@ ComplexCell::bif_residue(Cell * Z, const Cell * A) const
 {
    if (!A->is_numeric())   return E_DOMAIN_ERROR;
 
-const APL_Complex a = A->get_complex_value();
+const APL_Complex mod = A->get_complex_value();
 const APL_Complex b = get_complex_value();
 
    // if A is zero , return B
    //
-   if (a.real() == 0.0 && a.imag() == 0.0)
+   if (mod.real() == 0.0 && mod.imag() == 0.0)
       return zv(Z, b);
 
    // IBM: if B is zero , return 0
@@ -317,18 +317,22 @@ const APL_Complex b = get_complex_value();
       return IntCell::z0(Z);
 
 const APL_Float qct = Workspace::get_CT();
-APL_Complex quotient = b / a;
+const APL_Complex quotient = b / mod;
 
    // ISO p.89: If comparison-tolerance is not zero, and B divided-by A
    // is integral-within comparison-tolerance, return zero.
    //
    if (qct != 0 && integral_within(quotient, qct))   return IntCell::z0(Z);
 
-   // round down the quotient, and return B - A×quotient.
+   // round the quotient, and return B - A × quotient. The rounding direction
+   // depends on A (aka. mod) but not on B
    //
-   quotient = APL_Complex(floor(quotient.real()), floor(quotient.imag()));
+const APL_Float quot_int_real = mod.real() < 0 ? ceil (quotient.real())
+                                               : floor(quotient.real());
+const APL_Float quot_int_imag = mod.imag() < 0 ? ceil (quotient.imag())
+                                               : floor(quotient.imag());
    
-   return zv(Z, b - a * quotient);
+   return zv(Z, b - mod * APL_Complex(quot_int_real, quot_int_imag));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
