@@ -144,16 +144,14 @@ ErrorCode
 ComplexCell::bif_direction(Cell * Z) const
 {
 const APL_Float mag = abs(cval());
-   if (mag == 0.0)   new (Z) IntCell(0);
-   else              new (Z) ComplexCell(cval()/mag);
-   return E_NO_ERROR;
+   if (mag == 0.0)   return IntCell::zv(Z, 0);
+   else              return ComplexCell::zv(Z, cval()/mag);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 ComplexCell::bif_magnitude(Cell * Z) const
 {
-   new (Z) FloatCell(abs(cval()));
-   return E_NO_ERROR;
+   return FloatCell::zv(Z, abs(cval()));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -184,8 +182,7 @@ const APL_Integer set_size = get_checked_near_int();
    if (set_size <= 0)   return E_DOMAIN_ERROR;
 
 const uint64_t rnd = Workspace::get_RL(set_size);
-   new (Z) IntCell(qio + (rnd % set_size));
-   return E_NO_ERROR;
+   return IntCell::zv(Z, qio + (rnd % set_size));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -205,15 +202,6 @@ ComplexCell::bif_pi_times_inverse(Cell * Z) const
 ErrorCode
 ComplexCell::bif_ceiling(Cell * Z) const
 {
-   // fully compliant implementation: ⌈X  ←→  -⌊-X
-   //
-   bif_negative(Z);         // Z ← - B
-   Z->bif_floor(Z);         // Z ← ⌊ Z
-   Z->bif_negative(Z);      // Z ← -Z
-   return E_NO_ERROR;
-
-   // more efficient implementation
-   //
 const APL_Float cr = ceil(value.cval_r);    // cr ≥ value.cval_r
 const APL_Float Dr = cr - value.cval_r;     // Dr ≥ 0
 const APL_Float ci = ceil(value2.cval_i);   // ci ≥ value2.cval_i
@@ -229,7 +217,6 @@ const APL_Float D = Dr + Di;                // 0 ≤ D < 2
 
    if (Di > Dr)   return zv(Z, cr, ci - 1.0);
    else           return zv(Z, cr - 1.0, ci);
-
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -300,7 +287,7 @@ ComplexCell::bif_divide(Cell * Z, const Cell * A) const
       {
         if (A->get_real_value() != 0.0)   return E_DOMAIN_ERROR;
         if (A->get_imag_value() != 0.0)   return E_DOMAIN_ERROR;
-        new (Z) IntCell(1);   // 0÷0 is 1 in APL
+        return IntCell::zv(Z, 1);   // 0÷0 is 1 in APL
       }
 
    new (Z) ComplexCell(A->get_complex_value() / get_complex_value());
@@ -339,24 +326,6 @@ Q(b)
    Z->bif_multiply(Z, A);       // Z←A×Z    ⌊B÷A+A=0     A×⌊B÷A+A=0
    Z->bif_subtract(Z, this);    // Z←A-Z    A×⌊B÷A+A=0   B-A×⌊B÷A+A=0
    return E_NO_ERROR;
-
-const APL_Float qct = Workspace::get_CT();
-const APL_Complex quotient = b / mod;
-
-   // ISO p.89: If comparison-tolerance is not zero, and B divided-by A
-   // is integral-within comparison-tolerance, return zero.
-   //
-   if (qct != 0 && integral_within(quotient, qct))   return IntCell::z0(Z);
-
-   // round the quotient, and return B - A × quotient. The rounding direction
-   // depends on A (aka. mod) but not on B
-   //
-const APL_Float quot_int_real = mod.real() < 0 ? ceil (quotient.real())
-                                               : floor(quotient.real());
-const APL_Float quot_int_imag = mod.imag() < 0 ? ceil (quotient.imag())
-                                               : floor(quotient.imag());
-   
-   return zv(Z, b - mod * APL_Complex(quot_int_real, quot_int_imag));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -365,31 +334,22 @@ ComplexCell::bif_maximum(Cell * Z, const Cell * A) const
    // maximum of complex numbers gives DOMAN ERROR if one of the cells
    // is not near-real.
    //
-   if (!is_near_real())      return E_DOMAIN_ERROR;
+   if (!is_near_real())         return E_DOMAIN_ERROR;
+   if (!A->is_near_real())      return E_DOMAIN_ERROR;
 
 const APL_Float breal = get_real_value();
 
    if (A->is_integer_cell())
       {
-         const APL_Integer a = A->get_int_value();
-         if (APL_Float(a) >= breal)   new (Z) IntCell(a);
-         else                        new (Z) FloatCell(breal);
-      }
-   else if (A->is_float_cell())
-      {
-         const APL_Float a = A->get_real_value();
-         if (a >= breal)   new (Z) FloatCell(a);
-         else             new (Z) FloatCell(breal);
-      }
-   else
-      {
-        if (!A->is_near_real())   return E_DOMAIN_ERROR;
-        const APL_Float a = A->get_real_value();
-        if (a >= breal)   new (Z) FloatCell(a);
-        else             new (Z) FloatCell(breal);
+        const APL_Integer a = A->get_int_value();
+        return a >= breal ? IntCell::zv(Z, a) : FloatCell::zv(Z, breal);
       }
 
-   return E_NO_ERROR;
+   // both A and B are near-real, therefore they must be numeric and have no
+   // non-0 imag part
+   //
+const APL_Float a = A->get_real_value();
+   return FloatCell::zv(Z, a >= breal ? a : breal);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -399,30 +359,21 @@ ComplexCell::bif_minimum(Cell * Z, const Cell * A) const
    // is not near real.
    //
    if (!is_near_real())      return E_DOMAIN_ERROR;
+   if (!A->is_near_real())   return E_DOMAIN_ERROR;
 
 const APL_Float breal = get_real_value();
 
    if (A->is_integer_cell())
       {
-         const APL_Integer a = A->get_int_value();
-         if (APL_Float(a) <= breal)   new (Z) IntCell(a);
-         else                        new (Z) FloatCell(breal);
+        const APL_Integer a = A->get_int_value();
+        return a <= breal ? IntCell::zv(Z, a) : FloatCell::zv(Z, breal);
       }
-   else if (A->is_float_cell())
-      {
-         const APL_Float a = A->get_real_value();
-         if (a <= breal)   new (Z) FloatCell(a);
-         else             new (Z) FloatCell(breal);
-      }
-   else
-      {
-        if (!A->is_near_real())   return E_DOMAIN_ERROR;
 
-        const APL_Float a = A->get_real_value();
-        if (a <= breal)   new (Z) FloatCell(a);
-        else             new (Z) FloatCell(breal);
-      }
-   return E_NO_ERROR;
+   // both A and B are near-real, therefore they must be numeric and have no
+   // non-0 imag part
+   //
+const APL_Float a = A->get_real_value();
+   return FloatCell::zv(Z, a <= breal ? a : breal);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
