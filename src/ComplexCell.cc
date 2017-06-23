@@ -228,12 +228,7 @@ const APL_Float fi = floor(value2.cval_i);   // fi ≤ value2.cval_i
 const APL_Float Di = value2.cval_i - fi;     // 0 ≤ Di < 1
 const APL_Float D = Dr + Di;                 // 0 ≤ D < 2
 
-   // ISO: if D is tolerantly less than 1 return fr + 0J1×fi
-   // IBM: if D is            less than 1 return fr + 0J1×fi
-   // However, ISO examples follow IBM (and so do we)
-   //
-// if (D < 1.0 + Workspace::get_CT())   return zv(Z, fr, fi);   // ISO
-   if (D < 1.0)    return zv(Z, fr, fi);   // IBM and examples in ISO
+   if (D < 1.0 - Workspace::get_CT())   return zv(Z, fr, fi);
 
    if (Di > Dr)   return zv(Z, fr, fi + 1.0);
    else           return zv(Z, fr + 1.0, fi);
