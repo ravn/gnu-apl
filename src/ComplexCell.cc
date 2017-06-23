@@ -302,8 +302,6 @@ ComplexCell::bif_residue(Cell * Z, const Cell * A) const
 const APL_Complex mod = A->get_complex_value();
 const APL_Complex b = get_complex_value();
 
-Q(mod)
-Q(b)
    // if A is zero , return B
    //
    if (mod.real() == 0.0 && mod.imag() == 0.0)
