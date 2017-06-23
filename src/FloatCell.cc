@@ -462,17 +462,10 @@ const APL_Float b = value.fval;
    // Note: In that case, the integer to which A ÷ B is close is either
    // floor(A ÷ B) or ceil(A ÷ B).
    //
-const APL_Float quot = b / a;
-const APL_Float qf = floor(quot);
 APL_Float qct = Workspace::get_CT();
+const APL_Float quotient = b / a;
 
-   if (qct != 0)
-      {
-        const APL_Float qc = ceil(quot);
-
-        if (quot < qf + qct)   return IntCell::z0(Z);
-        if (quot > qc - qct)   return IntCell::z0(Z);
-      }
+   if ((qct != 0) && integral_within(quotient, qct))   return IntCell::z0(Z);
 
    // Otherwise return B mod A
    //
@@ -480,7 +473,8 @@ APL_Float qct = Workspace::get_CT();
    // IBM: if A > 0  then 0 ≤ Z < A
    //                else 0 ≥ Z > A
    //
-APL_Float z = b - a * qf;
+const APL_Float quot_int = floor(quotient);
+APL_Float z = b - a * quot_int;
    if (a < 0)   // Z ≤ 0
       {
          while (z > 0)    z += a;

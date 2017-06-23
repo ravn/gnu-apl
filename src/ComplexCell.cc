@@ -205,6 +205,15 @@ ComplexCell::bif_pi_times_inverse(Cell * Z) const
 ErrorCode
 ComplexCell::bif_ceiling(Cell * Z) const
 {
+   // fully compliant implementation: ⌈X  ←→  -⌊-X
+   //
+   bif_negative(Z);         // Z ← - B
+   Z->bif_floor(Z);         // Z ← ⌊ Z
+   Z->bif_negative(Z);      // Z ← -Z
+   return E_NO_ERROR;
+
+   // more efficient implementation
+   //
 const APL_Float cr = ceil(value.cval_r);    // cr ≥ value.cval_r
 const APL_Float Dr = cr - value.cval_r;     // Dr ≥ 0
 const APL_Float ci = ceil(value2.cval_i);   // ci ≥ value2.cval_i
@@ -306,6 +315,8 @@ ComplexCell::bif_residue(Cell * Z, const Cell * A) const
 const APL_Complex mod = A->get_complex_value();
 const APL_Complex b = get_complex_value();
 
+Q(mod)
+Q(b)
    // if A is zero , return B
    //
    if (mod.real() == 0.0 && mod.imag() == 0.0)
@@ -315,6 +326,19 @@ const APL_Complex b = get_complex_value();
    //
    if (b.real() == 0.0 && b.imag() == 0.0)
       return IntCell::z0(Z);
+
+   // compliant implementation: B-A×⌊B÷A+A=0
+   // The b=0 case may still exist due to ⎕CT
+   //
+   //                          	// op       Z before     Z after
+   new (Z) IntCell(0);          // Z←0      any          0
+   Z->bif_equal(Z, A);          // Z←A=Z    0            A=0
+   Z->bif_add(Z, A);           	// Z←A+Z    A=0          A+A=0
+   Z->bif_divide(Z, this);      // Z←B÷Z    A+A=0        B÷A+A=0
+   Z->bif_floor(Z);             // Z←⌊Z     B÷A+A=0      ⌊B÷A+A=0
+   Z->bif_multiply(Z, A);       // Z←A×Z    ⌊B÷A+A=0     A×⌊B÷A+A=0
+   Z->bif_subtract(Z, this);    // Z←A-Z    A×⌊B÷A+A=0   B-A×⌊B÷A+A=0
+   return E_NO_ERROR;
 
 const APL_Float qct = Workspace::get_CT();
 const APL_Complex quotient = b / mod;
@@ -408,26 +432,25 @@ const APL_Float qct = Workspace::get_CT();
    if (A->is_complex_cell())
       {
         const APL_Complex diff = A->get_complex_value() - get_complex_value();
-        if      (diff.real()      >  qct)   new (Z) IntCell(0);
-        else if (diff.real()      < -qct)   new (Z) IntCell(0);
-        else if (diff.imag()      >  qct)   new (Z) IntCell(0);
-        else if (diff.imag()      < -qct)   new (Z) IntCell(0);
-        else                                new (Z) IntCell(1);
+        if (diff.real() >  qct)   return IntCell::zv(Z, 0);
+        if (diff.real() < -qct)   return IntCell::zv(Z, 0);
+        if (diff.imag() >  qct)   return IntCell::zv(Z, 0);
+        if (diff.imag() < -qct)   return IntCell::zv(Z, 0);
+        return IntCell::zv(Z, 1);
       }
-   else if (A->is_numeric())
+
+   if (A->is_numeric())
       {
+        if (get_imag_value() >  qct)   return IntCell::zv(Z, 0);
+        if (get_imag_value() < -qct)   return IntCell::zv(Z, 0);
+
         const APL_Float diff = A->get_real_value() - get_real_value();
-        if      (diff             >  qct)   new (Z) IntCell(0);
-        else if (diff             < -qct)   new (Z) IntCell(0);
-        else if (get_imag_value() >  qct)   new (Z) IntCell(0);
-        else if (get_imag_value() < -qct)   new (Z) IntCell(0);
-        else                                new (Z) IntCell(1);
+        if (diff >  qct)   return IntCell::zv(Z, 0);
+        if (diff < -qct)   return IntCell::zv(Z, 0);
+        return IntCell::zv(Z, 1);
       }
-   else
-      {
-        new (Z) IntCell(0);
-      }
-   return E_NO_ERROR;
+
+   return IntCell::zv(Z, 1);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
