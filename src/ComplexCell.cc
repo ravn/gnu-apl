@@ -226,12 +226,12 @@ const APL_Float fr = floor(value.cval_r);    // fr ≤ value.cval_r
 const APL_Float Dr = value.cval_r - fr;      // 0 ≤ Dr < 1
 const APL_Float fi = floor(value2.cval_i);   // fi ≤ value2.cval_i
 const APL_Float Di = value2.cval_i - fi;     // 0 ≤ Di < 1
-const APL_Float D = Dr + Di;                 // 0 ≤ D < 2
+const APL_Float D  = Dr + Di;                // 0 ≤ D < 2
 
    if (D < 1.0 - Workspace::get_CT())   return zv(Z, fr, fi);
 
-   if (Di > Dr)   return zv(Z, fr, fi + 1.0);
-   else           return zv(Z, fr + 1.0, fi);
+   if (Dr < Di - Workspace::get_CT())   return zv(Z, fr, fi + 1.0);
+   else                                 return zv(Z, fr + 1.0, fi);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
