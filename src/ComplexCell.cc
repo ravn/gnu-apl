@@ -222,16 +222,38 @@ const APL_Float D = Dr + Di;                // 0 ≤ D < 2
 ErrorCode
 ComplexCell::bif_floor(Cell * Z) const
 {
-const APL_Float fr = floor(value.cval_r);    // fr ≤ value.cval_r
-const APL_Float Dr = value.cval_r - fr;      // 0 ≤ Dr < 1
-const APL_Float fi = floor(value2.cval_i);   // fi ≤ value2.cval_i
-const APL_Float Di = value2.cval_i - fi;     // 0 ≤ Di < 1
-const APL_Float D  = Dr + Di;                // 0 ≤ D < 2
+APL_Float fr = floor(value.cval_r);    // fr ≤ value.cval_r
+APL_Float Dr = value.cval_r - fr;      // 0 ≤ Dr < 1
+APL_Float fi = floor(value2.cval_i);   // fi ≤ value2.cval_i
+APL_Float Di = value2.cval_i - fi;     // 0 ≤ Di < 1
+const APL_Float qct = Workspace::get_CT();   // ⎕CT
+const APL_Float limit = 1.0 - qct;
 
-   if (D < 1.0 - Workspace::get_CT())   return zv(Z, fr, fi);
+   if (Dr > limit)
+      {
+        fr += 1.0;
+        Dr = 0.0;
+      }
 
-   if (Dr < Di - Workspace::get_CT())   return zv(Z, fr, fi + 1.0);
-   else                                 return zv(Z, fr + 1.0, fi);
+   if (Di > limit)
+      {
+        fi += 1.0;
+        Di = 0.0;
+      }
+
+   if ((Dr + Di) < limit)
+      {
+        return zv(Z, fr, fi);
+      }
+
+   if (Dr < (Di - qct))
+      {
+        return zv(Z, fr, fi + 1.0);
+      }
+   else
+      {
+        return zv(Z, fr + 1.0, fi);
+      }
 }
 //-----------------------------------------------------------------------------
 ErrorCode

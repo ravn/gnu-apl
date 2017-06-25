@@ -18418,7 +18418,7 @@ fi
 $as_echo "$user_wants_libapl" >&6; }
 
 
-ac_config_files="$ac_config_files Makefile debian/Makefile debian/source/Makefile doc/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/Dyalog-Keyboard/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile support-files/Dirk/Makefile support-files/105-key-International-Keyboard/Makefile tools/Makefile workspaces/Makefile wslib3/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/iso-apl-cf/Makefile"
+ac_config_files="$ac_config_files Makefile debian/Makefile debian/source/Makefile doc/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Dyalog-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile support-files/old-Keyboard/Makefile support-files/Dirk/Makefile tools/Makefile workspaces/Makefile wslib3/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/iso-apl-cf/Makefile"
 
 
 # AM_MAKEFLAGS: desired -j count ?
@@ -19887,13 +19887,13 @@ do
     "src/testcases/Makefile") CONFIG_FILES="$CONFIG_FILES src/testcases/Makefile" ;;
     "src/workspaces/Makefile") CONFIG_FILES="$CONFIG_FILES src/workspaces/Makefile" ;;
     "support-files/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/Makefile" ;;
+    "support-files/105-key-International-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/105-key-International-Keyboard/Makefile" ;;
     "support-files/Dyalog-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/Dyalog-Keyboard/Makefile" ;;
-    "support-files/old-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/old-Keyboard/Makefile" ;;
     "support-files/OS-X-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/OS-X-Keyboard/Makefile" ;;
     "support-files/Unicomp-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/Unicomp-Keyboard/Makefile" ;;
     "support-files/WASD-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/WASD-Keyboard/Makefile" ;;
+    "support-files/old-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/old-Keyboard/Makefile" ;;
     "support-files/Dirk/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/Dirk/Makefile" ;;
-    "support-files/105-key-International-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/105-key-International-Keyboard/Makefile" ;;
     "tools/Makefile") CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
     "workspaces/Makefile") CONFIG_FILES="$CONFIG_FILES workspaces/Makefile" ;;
     "wslib3/Makefile") CONFIG_FILES="$CONFIG_FILES wslib3/Makefile" ;;
