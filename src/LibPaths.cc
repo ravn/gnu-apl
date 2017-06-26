@@ -181,11 +181,8 @@ const char * path = getenv("APL_LIB_ROOT");
    // search from "." to "/" for  a valid lib-root
    //
    unused = realpath(".", APL_lib_root);
-Q(APL_lib_root)
    while (strlen(APL_lib_root))
       {
-Q(APL_lib_root)
-Q(is_lib_root(APL_lib_root))
         if (is_lib_root(APL_lib_root))   return;   // lib-root found
         if (char * s = strrchr(APL_lib_root, '/'))         *s = 0;
         else if (char * s = strrchr(APL_lib_root, '\\'))   *s = 0;
