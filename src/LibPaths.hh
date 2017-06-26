@@ -64,7 +64,7 @@ public:
            {
              CSRC_NONE      = 0,   ///< not at all
              CSRC_ENV       = 1,   ///< lib root from env. variable APL_LIB_ROOT
-             CSRC_ARGV0     = 2,   ///< lib root from apl binary location
+             CSRC_PWD       = 2,   ///< lib root from current directory
              CSRC_PREF_SYS  = 3,   ///< path from preferences file below /etc/
              CSRC_PREF_HOME = 4,   ///< path from preferences file below $HOME
              CSRC_CMD       = 5,   ///< lib root from )LIBS command

@@ -1249,7 +1249,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
                 case LibPaths::LibDir::CSRC_NONE:      out << "NONE" << endl;
                                                      continue;
                 case LibPaths::LibDir::CSRC_ENV:       out << "ENV   ";   break;
-                case LibPaths::LibDir::CSRC_ARGV0:     out << "BIN   ";   break;
+                case LibPaths::LibDir::CSRC_PWD:       out << "PWD   ";   break;
                 case LibPaths::LibDir::CSRC_PREF_SYS:  out << "PSYS  ";   break;
                 case LibPaths::LibDir::CSRC_PREF_HOME: out << "PUSER ";   break;
                 case LibPaths::LibDir::CSRC_CMD:       out << "CMD   ";   break;
@@ -1322,7 +1322,7 @@ DIR * dir = opendir(path.c_str());
         out << "IMPROPER LIBRARY REFERENCE '" << arg << "': " << why << endl;
 
         MORE_ERROR() <<
-        "path '" << path << "' could not be openend as directory: " << why;
+        "path '" << path << "' could not be opened as directory: " << why;
         return 0;   // error
       }
 

@@ -50,8 +50,8 @@ LibPaths::init(const char * argv0, bool logit)
 
    loop(d, LIB_MAX)
       {
-        if (root_from_env)        lib_dirs[d].cfg_src = LibDir::CSRC_ENV;
-        else if (root_from_pwd)   lib_dirs[d].cfg_src = LibDir::CSRC_ARGV0;
+        if      (root_from_env)   lib_dirs[d].cfg_src = LibDir::CSRC_ENV;
+        else if (root_from_pwd)   lib_dirs[d].cfg_src = LibDir::CSRC_PWD;
         else                      lib_dirs[d].cfg_src = LibDir::CSRC_NONE;
       }
 }
@@ -166,6 +166,8 @@ char filename[APL_PATH_MAX + 1];
 void
 LibPaths::search_APL_lib_root()
 {
+   APL_lib_root[0] = 0;
+
 const char * path = getenv("APL_LIB_ROOT");
    if (path)
       {
@@ -174,36 +176,28 @@ const char * path = getenv("APL_LIB_ROOT");
         return;
       }
 
+   root_from_pwd = true;
+
    // search from "." to "/" for  a valid lib-root
    //
-int last_len = 2*APL_PATH_MAX;
-   APL_lib_root[0] = '.';
-   APL_lib_root[1] = 0;
-   for (;;)
-       {
-         unused = realpath(APL_lib_root, APL_lib_root);
-         int len = strlen(APL_lib_root);
-
-         if (is_lib_root(APL_lib_root))   return;   // lib-rot found
-
-         // if length has not decreased then we stop in order to
-         // avoid an endless loop.
-         //
-         if (len >= last_len)   break;
-         last_len = len;
-
-         // move up by appending /..
-         //
-         APL_lib_root[len++] = '/';
-         APL_lib_root[len++] = '.';
-         APL_lib_root[len++] = '.';
-         APL_lib_root[len++] = 0;
-       }
-
-   // no lib-root found. use ".";
-   //
    unused = realpath(".", APL_lib_root);
-   root_from_pwd = true;
+Q(APL_lib_root)
+   while (strlen(APL_lib_root))
+      {
+Q(APL_lib_root)
+Q(is_lib_root(APL_lib_root))
+        if (is_lib_root(APL_lib_root))   return;   // lib-root found
+        if (char * s = strrchr(APL_lib_root, '/'))         *s = 0;
+        else if (char * s = strrchr(APL_lib_root, '\\'))   *s = 0;
+        else
+           {
+             CERR << "*** Cannot locate APL_lib_root: no / or \\ in "
+                  << APL_lib_root << endl;
+             break;
+           }
+      }
+
+   unused = realpath(".", APL_lib_root);
 }
 //-----------------------------------------------------------------------------
 void
@@ -227,11 +221,11 @@ LibPaths::get_lib_dir(LibRef libref)
         case LibDir::CSRC_NONE:      return UTF8_string();
 
         case LibDir::CSRC_ENV:
-        case LibDir::CSRC_ARGV0:     break;   // continue below
+        case LibDir::CSRC_PWD:       break;   // continue below
 
         case LibDir::CSRC_PREF_SYS:
         case LibDir::CSRC_PREF_HOME:
-        case LibDir::CSRC_CMD:     return lib_dirs[libref].dir_path;
+        case LibDir::CSRC_CMD:       return lib_dirs[libref].dir_path;
       }
 
 UTF8_string ret(APL_lib_root);
@@ -283,7 +277,7 @@ int name_has_extension = 0;   // assume name has neither extension ext1 nor ext2
        name.starts_with("../"))
       {
         // paths from / or ./ are fallbacks for the case where the library
-        // path setup id wrong. So that the user can survive by using an
+        // path setup is wrong. So that the user can survive by using an
         // explicit path
         //
         if (name_has_extension)   return name;
