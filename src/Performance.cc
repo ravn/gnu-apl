@@ -27,6 +27,13 @@
 #include "PrintOperator.hh"
 #include "UCS_string.hh"
 
+/* Note:
+   perfo_1: monadic cell statistics
+   perfo_2: dyadic cell statistics
+   perfo_3: monadic function statistics
+   perfo_4: dyadic function statistics
+ */
+
 #define perfo_1(id, ab, _name, _thr) \
    CellFunctionStatistics Performance::cfs_ ## id ## ab(PFS_## id ## ab);
 #define perfo_2(id, ab, _name, _thr) \
@@ -90,8 +97,8 @@ Statistics::get_name(Pfstat_ID id)
 #define perfo_3(id, ab, name, _thr)   case PFS_ ## id ## ab:   return name;
 #define perfo_4(id, ab, name, _thr)   case PFS_ ## id ## ab:   return name;
 #include "Performance.def"
-        case PFS_SCALAR_B_overhead:  return "  f B overhead";
-        case PFS_SCALAR_AB_overhead: return "A f B overhead";
+        case PFS_SCALAR_B_overhead:  return "  f B+overhead";
+        case PFS_SCALAR_AB_overhead: return "A f B+overhead";
         default: return "Unknown Pfstat_ID";
       }
 
@@ -134,23 +141,75 @@ Performance::print(Pfstat_ID which, ostream & out)
          return;
       }
 
-   // print all statistics
+   // print all statistics and compute column sums
    //
+uint64_t sum_first_N_B       = 0;
+uint64_t sum_first_cycles_B  = 0;
+uint64_t sum_subsq_N_B       = 0;
+uint64_t sum_subsq_cycles_B  = 0;
+uint64_t sum_first_N_AB      = 0;
+uint64_t sum_first_cycles_AB = 0;
+uint64_t sum_subsq_N_AB      = 0;
+uint64_t sum_subsq_cycles_AB = 0;
+
    out <<
 "╔═════════════════════════════════════════════════════════════════════╗\n"
-"║                 Performance Statistics (CPU cycles)                 ║\n"
+"║         Performance Statistics (CPU cycles per vector item)         ║\n"
 "╠═════════════════╦═════════════════════════╦═════════════════════════╣\n"
 "║                 ║        first pass       ║    subsequent passes    ║\n"
 "║      Cell       ╟───────┬───────┬─────────╫───────┬───────┬─────────╢\n"
-"║    Function     ║     N │⌀cycles│   σ÷μ % ║     N │⌀cycles│   σ÷μ % ║\n"
+"║    Function     ║   N   │⌀cycles│   σ÷μ % ║   N   │⌀cycles│   σ÷μ % ║\n"
 "╠═════════════════╬═══════╪═══════╪═════════╬═══════╪═══════╪═════════╣\n";
 
 
-#define perfo_1(id, ab, _name, _thr)   cfs_ ## id ## ab.print(out);
-#define perfo_2(id, ab, _name, _thr)   cfs_ ## id ## ab.print(out);
+#define perfo_1(id, ab, _name, _thr)                                     \
+   cfs_ ## id ## ab.print(out);                                          \
+   sum_first_N_B += cfs_ ## id ## ab.get_first_record()->get_count();    \
+   sum_first_cycles_B += cfs_ ## id ## ab.get_first_record()->get_sum(); \
+   sum_subsq_N_B += cfs_ ## id ## ab.get_record()->get_count();          \
+   sum_subsq_cycles_B += cfs_ ## id ## ab.get_record()->get_sum();
+
+#define perfo_2(id, ab,  name,  thr)                                      \
+   cfs_ ## id ## ab.print(out);                                           \
+   sum_first_N_AB += cfs_ ## id ## ab.get_first_record()->get_count();    \
+   sum_first_cycles_AB += cfs_ ## id ## ab.get_first_record()->get_sum(); \
+   sum_subsq_N_AB += cfs_ ## id ## ab.get_record()->get_count();          \
+   sum_subsq_cycles_AB += cfs_ ## id ## ab.get_record()->get_sum();
 #define perfo_3(id, ab, _name, _thr)
 #define perfo_4(id, ab, _name, _thr)
 #include "Performance.def"
+
+const uint64_t first_avg_B = Statistics_record::average(sum_first_cycles_B,
+                                                        sum_first_N_B);
+const uint64_t subsq_avg_B = Statistics_record::average(sum_subsq_cycles_B,
+                                                      sum_subsq_N_B);
+
+   out <<
+"╟─────────────────╫───────┼───────┼─────────╫───────┼───────┼─────────╢\n"
+"║           SUM B ║ ";
+   Statistics_record::print5(out, sum_first_N_B);
+   out <<                 " │ ";
+   Statistics_record::print5(out, first_avg_B);
+   out <<                        " │         ║ ";
+   Statistics_record::print5(out, sum_subsq_N_B);
+   out <<                                          " │ ";
+   Statistics_record::print5(out, subsq_avg_B);
+   out <<                                                  " │         ║\n";
+
+const uint64_t first_avg_AB = Statistics_record::average(sum_first_cycles_AB,
+                                                         sum_first_N_AB);
+const uint64_t subsq_avg_AB = Statistics_record::average(sum_subsq_cycles_AB,
+                                                         sum_subsq_N_AB);
+   out <<
+"║          SUM AB ║ ";
+   Statistics_record::print5(out, sum_first_N_AB);
+   out <<                 " │ ";
+   Statistics_record::print5(out, first_avg_AB);
+   out <<                        " │         ║ ";
+   Statistics_record::print5(out, sum_subsq_N_AB);
+   out <<                                          " │ ";
+   Statistics_record::print5(out, subsq_avg_AB);
+   out <<                                                  " │         ║\n";
 
    out <<
 "╚═════════════════╩═══════╧═══════╧═════════╩═══════╧═══════╧═════════╝\n"
@@ -161,69 +220,12 @@ Performance::print(Pfstat_ID which, ostream & out)
 "╟─────────────────╫───────┼───────┼───────┼───────┼───────╢"
        << endl;
 
-   // subtract cell statistics from function statistics
+   // other statistics...
    //
-uint64_t cycles_B = fs_SCALAR_B .get_data().get_sum ();
-uint64_t count1_B = 0;
-uint64_t countN_B = 0;
-
-uint64_t cycles_AB = fs_SCALAR_AB.get_data().get_sum ();
-uint64_t count1_AB = 0;
-uint64_t countN_AB = 0;
-
-#define perfo_1(id, ab, _name, _thr)                                  \
-                           cycles_B   -= cfs_ ## id ## ab.get_sum();  \
-                           count1_B += cfs_ ## id ## ab.get_count1(); \
-                           countN_B += cfs_ ## id ## ab.get_countN();
-
-#define perfo_2(id, ab, _name, _thr)                                   \
-                           cycles_AB  -= cfs_ ## id ## ab.get_sum();   \
-                           count1_AB += cfs_ ## id ## ab.get_count1(); \
-                           countN_AB += cfs_ ## id ## ab.get_countN();
-
-#define perfo_3(id, ab, _name, _thr)
-#define perfo_4(id, ab, _name, _thr)
-#include "Performance.def"
-
-   {
-     const uint64_t vlen_B = count1_B ? (count1_B + countN_B)/count1_B : 1;
-     const uint64_t div1_B  = count1_B ? count1_B : 1;
-     const uint64_t div2_B  = count1_B + countN_B ? count1_B + countN_B : 1;
-
-     out << "║   f B overhead  ║ ";
-     Statistics_record::print5(out, fs_SCALAR_B.get_data().get_count());
-     out << " │ ";
-     Statistics_record::print5(out, cycles_B);
-     out << " │ ";
-     Statistics_record::print5(out, vlen_B);
-     out << " │ ";
-     Statistics_record::print5(out, cycles_B/div1_B);
-     out << " │ ";
-     Statistics_record::print5(out, cycles_B/div2_B);
-     out << " ║"  << endl;
-   }
-
-   {
-     const uint64_t vlen_AB = count1_AB ? (count1_AB + countN_AB)/count1_AB : 1;
-     const uint64_t div1_AB = count1_AB ? count1_AB : 1;
-     const uint64_t div2_AB = count1_AB + countN_AB ? count1_AB + countN_AB : 1;
-     out << "║ A f B overhead  ║ ";
-     Statistics_record::print5(out, fs_SCALAR_AB.get_data().get_count());
-     out << " │ ";   
-     Statistics_record::print5(out, cycles_AB);
-     out << " │ ";
-     Statistics_record::print5(out, vlen_AB);
-     out << " │ ";   
-     Statistics_record::print5(out, cycles_AB/div1_AB);
-     out << " │ ";   
-     Statistics_record::print5(out, cycles_AB/div2_AB);
-     out << " ║"  << endl;
-   }
-
 #define perfo_1(id, ab, _name, _thr)
 #define perfo_2(id, ab, _name, _thr)
 #define perfo_3(id, ab, _name, _thr) fs_ ## id ## ab.print(out);
-#define perfo_4(id, ab, _name, _thr) fs_ ## id ## ab.print(out);
+#define perfo_4(id, ab, name, thr) perfo_3(id, ab, name, thr)
 
 #include "Performance.def"
 
@@ -290,41 +292,29 @@ double sigma = 0;
 void
 Statistics_record::print5(ostream & out, uint64_t num)
 {
-   if (num < 100000)   // no multiplier
+char cc[40];
+   if (num < 100000)   // special case: no multiplier
       {
-        const ios::fmtflags flgs = out.flags();
-        out << right << setw(5) << num;
-        out.flags(flgs);
+        snprintf(cc, sizeof(cc), "%5llu", num);
+        out << cc;
         return;
       }
 
-   // kilo, mega, giga, tera, peta, exa, zeitta, yotta, xona, weka, vunda, una
-const char * multiplier = "-KMGTPEZYXWVU";
-uint64_t num1 = 0;
+   // kilo, Mega, Giga, Tera, Peta, Exa, Zetta, Yotta, Xona, Weka, Vunda, Una
+   // 1E3   1E6   1E9   1E12  1E15  1E18
+   // max uint64_t is 1.8E19 = 18 Exa
+   //
+const char * units = "-kMGTPE??????";
+double fnum = num;
+   while (fnum > 1E3)
+      {
+        ++units;
+        fnum /= 1E3;
+      }
 
-   while (num >= 1000)
-         {
-           num += 500;   // rounding
-           num1 = num;
-           num /= 1000;
-           ++multiplier;
-         }
-
-   if (num >= 100)       // e.g.  '345 M', num1 is 345678
-      {
-        out << num << " " << *multiplier;
-      }
-   else if (num >= 10)   // e.g.  '34.5M', num1 is 34567
-      {
-        out << num << "." << ((num1/100)%10) << *multiplier;
-      }
-   else                  // e.g.  '3.45M', num1 is 3456
-      {
-        int num2 = (num1/10)%100;
-        if (num2 < 10)   num2 *= 10;   // add trailing 0
-        if (num2 == 0)   out << num << ".00" << *multiplier;
-        else             out << num << "." << num2 << *multiplier;
-      }
+   snprintf(cc, sizeof(cc), "%f", fnum);
+   if (cc[3] == '.')    { cc[3] = 0;   out << " " << cc << *units; }
+   else                 { cc[4] = 0;   out << cc << *units;        }
 }
 //============================================================================
 void

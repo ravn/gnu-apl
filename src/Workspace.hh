@@ -165,6 +165,7 @@ public:
    static void set_WS_name(const UCS_string & new_name)
       { the_workspace.WS_name = new_name; }
 
+   /// Return all user-defined commands
    static Simple_string<Command::user_command, false> & get_user_commands()
       {  return the_workspace.user_commands; }
 

@@ -31,10 +31,16 @@ public:
    /// destructor
    ~static_Objects();
 
+   /// object description
    const char * what;
+
+   /// where the object was created (source location)
    const char * loc;
 
+   /// enable debug output for construction
    static bool show_constructors;
+
+   /// enable debug output for destruction
    static bool show_destructors;
 };
 

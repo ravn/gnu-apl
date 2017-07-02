@@ -26,6 +26,7 @@
 #include "IndexExpr.hh"
 #include "IndexIterator.hh"
 #include "IntCell.hh"
+#include "PJob.hh"
 #include "Parallel.hh"
 #include "PointerCell.hh"
 #include "ScalarFunction.hh"
@@ -88,251 +89,134 @@ Bif_F12_STILE   * Bif_F12_STILE  ::fun         = &Bif_F12_STILE  ::_fun;
 Bif_F12_LOGA    * Bif_F12_LOGA   ::fun         = &Bif_F12_LOGA   ::_fun;
 Bif_F12_WITHOUT * Bif_F12_WITHOUT::fun         = &Bif_F12_WITHOUT::_fun;
 
-
-/// one monadic scalar job
-struct PJob_scalar_B
-{
-   /// default constructor
-   PJob_scalar_B()
-   : value_Z(0),
-     len_Z(0),
-     cZ(0),
-     cB(0),
-     error(E_NO_ERROR),
-     fun(0),
-     fun1(0)
-   {}
-
-   /// assign \b other to \b this
-   void operator =(const PJob_scalar_B & other)
-      { memcpy(this, &other, sizeof(*this)); }
-
-   /// constructor
-   PJob_scalar_B(Value * Z, const Value & B)
-   : value_Z(Z),
-     len_Z(Z->nz_element_count()),
-     cZ(&Z->get_ravel(0)),
-     cB(&B.get_ravel(0)),
-     error(E_NO_ERROR),
-     fun(0),
-     fun1(0)
-   {}
-
-   /// the value being computed
-   Value * value_Z;
-
-   /// the length of the result
-   ShapeItem len_Z;
-
-   /// ravel of the result
-   Cell * cZ;
-
-   /// ravel of the right argument
-   const Cell * cB;
-
-   /// an error detected during computation of, eg. fun1 or fun2
-   ErrorCode error;
-
-   /// the APL function being computed
-   PrimitiveFunction * fun;   // not initialized by constructor!
-
-   /// the monadic cell function to be computed
-   prim_f1 fun1;   // not initialized by constructor!
-
-   /// return B[z]
-   const Cell & B_at(ShapeItem z) const
-      { return cB[z]; }
-
-   /// return Z[z]
-   Cell & Z_at(ShapeItem z) const
-      { return cZ[z]; }
-};
-
-/// all monadic scalar jobs
-static Parallel_job_list<PJob_scalar_B, false> joblist_B;
-
-/// one dyadic scalar job
-struct PJob_scalar_AB
-{
-   /// default constructor
-   PJob_scalar_AB()
-   : value_Z(0),
-     len_Z(0),
-     cZ(0),
-     cA(0),
-     inc_A(0),
-     cB(0),
-     inc_B(0),
-     error(E_NO_ERROR),
-     fun(0),
-     fun2(0)
-   {}
-
-   /// assign \b other to \b this
-   void operator =(const PJob_scalar_AB & other)
-      { memcpy(this, &other, sizeof(*this)); }
-
-   /// constructor
-   PJob_scalar_AB(Value * Z, const Cell * _cA, int iA, const Cell * _cB, int iB)
-   : value_Z(Z),
-     len_Z(Z->nz_element_count()),
-     cZ(&Z->get_ravel(0)),
-     cA(_cA),
-     inc_A(iA),
-     cB(_cB),
-     inc_B(iB),
-     error(E_NO_ERROR),
-     fun(0),
-     fun2(0)
-   {}
-
-   /// A value (e.g parallel ~Value())
-   Value * value_Z;
-
-   /// the length of the result
-   ShapeItem len_Z;
-
-   /// ravel of the result
-   Cell * cZ;
-
-   /// ravel of the left argument
-   const Cell * cA;
-
-   /// 0 (for scalar A) or 1
-   int inc_A;
-
-   /// ravel of the right argument
-   const Cell * cB;
-
-   /// 0 (for scalar B) or 1
-   int inc_B;
-
-   /// an error detected during computation of, eg. fun1 or fun2
-   ErrorCode error;
-
-   /// the APL function being computed
-   PrimitiveFunction * fun;   // not initialized by constructor!
-
-   /// the dyadic cell function to be computed
-   prim_f2 fun2;   // not initialized by constructor!
-
-   /// return A[z]
-   const Cell & A_at(ShapeItem z) const
-      { return cA[z * inc_A]; }
-
-   /// return B[z]
-   const Cell & B_at(ShapeItem z) const
-      { return cB[z * inc_B]; }
-
-   /// return Z[z]
-   Cell & Z_at(ShapeItem z) const
-      { return cZ[z]; }
-};
-
-/// all dyadic scalar jobs
-static Parallel_job_list<PJob_scalar_AB, false> joblist_AB;
+static volatile _Atomic_word parallel_jobs_lock = 0;
 
 //-----------------------------------------------------------------------------
 Token
 ScalarFunction::eval_scalar_B(Value_P B, prim_f1 fun)
 {
-PERFORMANCE_START(start_1)
-
 const ShapeItem len_Z = B->element_count();
    if (len_Z == 0)   return eval_fill_B(B);
 
-Value_P Z(B->get_shape(), LOC);
+PERFORMANCE_START(start)
 
-   // create a worklist with one item that computes Z. If nested values are
-   // detected when computing Z then jobs for them are added to the worklist.
-   // Finished jobs are NOT removed from the list to avoid unnecessary
-   // copying of worklist items.
-   //
-   {
-     PJob_scalar_B j(Z.get(), B.getref());
-     joblist_B.start(j, LOC);
-   }
-
-   for (PJob_scalar_B * job = joblist_B.next_job();
-        job; job = joblist_B.next_job())
+ErrorCode ec = E_NO_ERROR;
+Value_P Z = do_scalar_B(ec, B, fun);
+   if (ec != E_NO_ERROR)
       {
-#if PARALLEL_ENABLED
-        if (  Parallel::run_parallel
-           && Thread_context::get_active_core_count() > 1
-           && job->len_Z > get_monadic_threshold())
-           {
-            job->fun = this;
-            job->error = E_NO_ERROR;
-            job->fun1 = fun;
-            Thread_context::do_work = PF_eval_scalar_B;
-            Thread_context::M_fork("eval_scalar_B");   // start pool
-            PF_eval_scalar_B(Thread_context::get_master());
-            Thread_context::M_join();
-            if (job->error != E_NO_ERROR)
-               {
-                 joblist_B.cancel_jobs();
-                 throw_apl_error(job->error, LOC);
-              }
-           }
-        else   // sequential
-#endif // PARALLEL_ENABLED
-
-           {
-             loop(z, job->len_Z)
-                {
-                  const Cell & cell_B = job->B_at(z);
-                  Cell & cell_Z       = job->Z_at(z);
-
-                  if (cell_B.is_pointer_cell())
-                     {
-                       POOL_LOCK(joblist_B.parallel_jobs_lock,
-                          Value_P B1 = cell_B.get_pointer_value();
-                          Value_P Z1(B1->get_shape(), LOC);
-                          new (&cell_Z) PointerCell(Z1, *job->value_Z);
-
-                          PJob_scalar_B j1(Z1.get(), B1.getref());
-                          joblist_B.add_job(j1))
-                     }
-                  else
-                     {
-PERFORMANCE_START(start_2)
-
-                       const ErrorCode ec = (cell_B.*fun)(&cell_Z);
-                       if (ec != E_NO_ERROR)
-                          {
-                            joblist_B.cancel_jobs();
-                            throw_apl_error(ec, LOC);
-                          }
-
-CELL_PERFORMANCE_END(get_statistics_B(), start_2, z)
-                     }
-                }
-           }
-        job->value_Z->check_value(LOC);
+        loop(a, Thread_context::get_active_core_count())
+            Thread_context::get_context((CoreNumber)a)->joblist_B.cancel_jobs();
+        throw_apl_error(ec, LOC);
       }
 
-   Z->check_value(LOC);
+PERFORMANCE_END(fs_SCALAR_B, start, Z->nz_element_count());
 
-PERFORMANCE_END(fs_SCALAR_B, start_1, Z->nz_element_count());
+   loop(a, Thread_context::get_active_core_count())
+       Assert(Thread_context::get_context((CoreNumber)a)
+                            ->joblist_B.get_size() == 0);
 
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
+Value_P
+ScalarFunction::do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun)
+{
+Value_P Z(B->get_shape(), LOC);
+
+   // create a worklist with one item that computes Z. If nested values are
+   // detected when computing Z then jobs for them are added to the worklist.
+   //
+   {
+     PJob_scalar_B job_B(Z.get(), B.getref());
+     Thread_context::get_master().joblist_B.start(job_B, LOC);
+   }
+
+#if PARALLEL_ENABLED
+const bool maybe_parallel = Parallel::run_parallel &&
+                            Thread_context::get_active_core_count() > 1;
+#endif
+
+   for (;;)
+       {
+         PJob_scalar_B * job_B = 0;
+         loop(a, Thread_context::get_active_core_count())
+             {
+               job_B = Thread_context::get_context((CoreNumber)a)
+                                   ->joblist_B.next_job();
+               if (job_B)   break;
+             }
+         if (job_B == 0)   break;   // all jobs done
+
+#if PARALLEL_ENABLED
+         if (maybe_parallel && job_B->len_Z > get_monadic_threshold())
+            {
+              // parallel execution...
+              //
+              job_B->fun = this;
+              job_B->fun1 = fun;
+              Thread_context::do_work = PF_scalar_B;
+              Thread_context::M_fork("eval_scalar_B");   // start pool
+              PF_scalar_B(Thread_context::get_master());
+PERFORMANCE_START(start_M_join)
+              Thread_context::M_join();
+              if (job_B->error != E_NO_ERROR)
+                 {
+                   ec =job_B->error;
+                   return Value_P();
+                 }
+PERFORMANCE_END(fs_M_join_B, start_M_join, 1);
+            }
+         else
+#endif // PARALLEL_ENABLED
+            {
+              // sequential execution...
+              //
+              loop(z, job_B->len_Z)
+                 {
+                   const Cell & cell_B = job_B->B_at(z);
+                   Cell & cell_Z       = job_B->Z_at(z);
+
+                   if (cell_B.is_pointer_cell())
+                      {
+                        Value_P B1 = cell_B.get_pointer_value();
+                        Value_P Z1(B1->get_shape(), LOC);
+                        new (&cell_Z) PointerCell(Z1, *job_B->value_Z);
+
+                        PJob_scalar_B j1(Z1.get(), B1.getref());
+                        Thread_context::get_master().joblist_B.add_job(j1);
+                      }
+                   else
+                      {
+PERFORMANCE_START(start_2)
+                        ec = (cell_B.*fun)(&cell_Z);
+                        if (ec != E_NO_ERROR)   return Value_P();
+CELL_PERFORMANCE_END(get_statistics_B(), start_2, z)
+                      }
+                 }
+           }
+        job_B->value_Z->check_value(LOC);
+      }
+
+   Z->check_value(LOC);
+
+   return Z;
+}
+//-----------------------------------------------------------------------------
 void
-ScalarFunction::PF_eval_scalar_B(Thread_context & tctx)
+ScalarFunction::PF_scalar_B(Thread_context & tctx)
 {
 const int cores = Thread_context::get_active_core_count();
-PJob_scalar_B & job = joblist_B.get_current_job();
+PJob_scalar_B & job_B = tctx.joblist_B.get_current_job();
 
-const ShapeItem slice_len = (job.len_Z + cores - 1) / cores;
+const ShapeItem slice_len = (job_B.len_Z + cores - 1) / cores;
 ShapeItem z = tctx.get_N() * slice_len;
 ShapeItem end_z = z + slice_len;
-   if (end_z > job.len_Z)   end_z = job.len_Z;
+   if (end_z > job_B.len_Z)   end_z = job_B.len_Z;
 
    for (; z < end_z; ++z)
        {
-         const Cell & cell_B = job.B_at(z);
-         Cell & cell_Z       = job.Z_at(z);
+         const Cell & cell_B = job_B.B_at(z);
+         Cell & cell_Z       = job_B.Z_at(z);
 
          if (cell_B.is_pointer_cell())
             {
@@ -340,24 +224,22 @@ ShapeItem end_z = z + slice_len;
               //
               Value_P B1 = cell_B.get_pointer_value();
 
-              const ShapeItem len_Z1 = B1->get_shape().get_volume();
+              const ShapeItem len_Z1 = B1->element_count();
               if (len_Z1 == 0)
                  {
-                   POOL_LOCK(joblist_B.parallel_jobs_lock,
-                      Value_P Z1= B1->clone(LOC);
-                      Z1->to_proto();
-                      Z1->check_value(LOC);
-                      new (&cell_Z) PointerCell(Z1, *job.value_Z))
+                   POOL_LOCK(parallel_jobs_lock,
+                             Value_P Z1 = B1->clone(LOC))
+                    Z1->to_proto();
+                    new (&cell_Z) PointerCell(Z1, *job_B.value_Z);
                  }
               else
                  {
-                   POOL_LOCK(joblist_B.parallel_jobs_lock,
-                      Value_P B1 = cell_B.get_pointer_value();
-                      Value_P Z1(B1->get_shape(), LOC);
-                      new (&cell_Z) PointerCell(Z1, *job.value_Z);
+                   POOL_LOCK(parallel_jobs_lock,
+                             Value_P Z1(B1->get_shape(), LOC))
+                   new (&cell_Z) PointerCell(Z1, *job_B.value_Z);
 
-                      PJob_scalar_B j1(Z1.get(), B1.getref());
-                      joblist_B.add_job(j1))
+                   PJob_scalar_B j1(Z1.get(), B1.getref());
+                   tctx.joblist_B.add_job(j1);
                  }
             }
          else
@@ -365,10 +247,10 @@ ShapeItem end_z = z + slice_len;
                   // B not nested: execute fun
                   //
 PERFORMANCE_START(start_2)
-                  const ErrorCode ec = (cell_B.*job.fun1)(&cell_Z);
-                  if (ec != E_NO_ERROR)   return;
+                  job_B.error = (cell_B.*job_B.fun1)(&cell_Z);
+                  if (job_B.error != E_NO_ERROR)   return;
 
-CELL_PERFORMANCE_END(job.fun->get_statistics_B(), start_2, z)
+CELL_PERFORMANCE_END(job_B.fun->get_statistics_B(), start_2, z)
             }
        }
 }
@@ -382,30 +264,30 @@ ScalarFunction::expand_pointers(Cell * cell_Z, Value & Z_owner,
       {
         if (cell_B->is_pointer_cell())   // A and B are both pointers
            {
-             POOL_LOCK(joblist_AB.parallel_jobs_lock,
-                Value_P value_A = cell_A->get_pointer_value();
-                Value_P value_B = cell_B->get_pointer_value();
-                Token token = eval_scalar_AB(value_A, value_B, fun);
-                new (cell_Z) PointerCell(token.get_apl_val(), Z_owner))
+             Value_P value_A = cell_A->get_pointer_value();
+             Value_P value_B = cell_B->get_pointer_value();
+             POOL_LOCK(parallel_jobs_lock,
+                       Token token = eval_scalar_AB(value_A, value_B, fun))
+             new (cell_Z) PointerCell(token.get_apl_val(), Z_owner);
            }
         else                             // A is pointer, B is simple
            {
-             POOL_LOCK(joblist_AB.parallel_jobs_lock,
-                Value_P value_A = cell_A->get_pointer_value();
-                Value_P scalar_B(*cell_B, LOC);
-             Token token = eval_scalar_AB(value_A, scalar_B, fun);
-             new (cell_Z) PointerCell(token.get_apl_val(), Z_owner))
+             Value_P value_A = cell_A->get_pointer_value();
+             Value_P scalar_B(*cell_B, LOC);
+             POOL_LOCK(parallel_jobs_lock,
+                       Token token = eval_scalar_AB(value_A, scalar_B, fun))
+             new (cell_Z) PointerCell(token.get_apl_val(), Z_owner);
            }
       }
    else                                  // A is simple
       {
         if (cell_B->is_pointer_cell())   // A is simple, B is pointer
            {
-             POOL_LOCK(joblist_AB.parallel_jobs_lock,
-                Value_P scalar_A(*cell_A, LOC);
-                Value_P value_B = cell_B->get_pointer_value();
-                Token token = eval_scalar_AB(scalar_A, value_B, fun);
-                new (cell_Z) PointerCell(token.get_apl_val(), Z_owner))
+             Value_P scalar_A(*cell_A, LOC);
+             Value_P value_B = cell_B->get_pointer_value();
+             POOL_LOCK(parallel_jobs_lock,
+                       Token token = eval_scalar_AB(scalar_A, value_B, fun))
+             new (cell_Z) PointerCell(token.get_apl_val(), Z_owner);
            }
    else                                // A and B are both plain
          {
@@ -417,10 +299,32 @@ ScalarFunction::expand_pointers(Cell * cell_Z, Value & Z_owner,
 Token
 ScalarFunction::eval_scalar_AB(Value_P A, Value_P B, prim_f2 fun)
 {
-PERFORMANCE_START(start_1)
+PERFORMANCE_START(start)
 
-const int inc_A = A->is_scalar_extensible() ? 0 : 1;
-const int inc_B = B->is_scalar_extensible() ? 0 : 1;
+ErrorCode ec = E_NO_ERROR;
+Value_P Z = do_scalar_AB(ec, A, B, fun);
+   if (ec != E_NO_ERROR)
+      {
+        loop(a, Thread_context::get_active_core_count())
+           Thread_context::get_context((CoreNumber)a)->joblist_AB.cancel_jobs();
+        throw_apl_error(ec, LOC);
+      }
+
+PERFORMANCE_END(fs_SCALAR_AB, start, Z->nz_element_count());
+
+   loop(a, Thread_context::get_active_core_count())
+       Assert(Thread_context::get_context((CoreNumber)a)
+                            ->joblist_AB.get_size() == 0);
+
+   return Token(TOK_APL_VALUE1, Z);
+}
+//-----------------------------------------------------------------------------
+Value_P
+ScalarFunction::do_scalar_AB(ErrorCode & ec, Value_P A, Value_P B, prim_f2 fun)
+{
+const int inc_A = A->get_increment();
+const int inc_B = B->get_increment();
+
 const Shape * shape_Z = 0;
    if      (A->is_scalar())      shape_Z = &B->get_shape();
    else if (B->is_scalar())      shape_Z = &A->get_shape();
@@ -429,201 +333,197 @@ const Shape * shape_Z = 0;
    else if (A->same_shape(*B))   shape_Z = &B->get_shape();
    else 
       {
-        joblist_AB.cancel_jobs();
-        if (!A->same_rank(*B))   RANK_ERROR;
-        else                     LENGTH_ERROR;
+        if (!A->same_rank(*B))   ec = E_RANK_ERROR;
+        else                     ec = E_LENGTH_ERROR;
+        return Value_P();
       }
 
 const ShapeItem len_Z = shape_Z->get_volume();
-   if (len_Z == 0)   return eval_fill_AB(A, B);
+   if (len_Z == 0)   return eval_fill_AB(A, B).get_apl_val();
 
 Value_P Z(*shape_Z, LOC);
 
    // create a worklist with one item that computes Z. If nested values are
    // detected when computing Z then jobs for them are added to the worklist.
-   // Finished jobs are NOT removed from the list to avoid unnecessary
-   // copying of worklist items.
    //
    {
-     PJob_scalar_AB j(Z.get(), &A->get_ravel(0), inc_A,
-                               &B->get_ravel(0), inc_B);
-     joblist_AB.start(j, LOC);
+     PJob_scalar_AB job_AB(Z.get(), &A->get_ravel(0), inc_A,
+                                    &B->get_ravel(0), inc_B);
+     Thread_context::get_master().joblist_AB.start(job_AB, LOC);
    }
 
-   for (PJob_scalar_AB * job = joblist_AB.next_job();
-        job; job = joblist_AB.next_job())
-      {
 #if PARALLEL_ENABLED
-        if (  Parallel::run_parallel
-           && Thread_context::get_active_core_count() > 1
-           && job->len_Z > get_dyadic_threshold())
-           {
-            job->fun = this;
-            job->error = E_NO_ERROR;
-            job->fun2 = fun;
-            Thread_context::do_work = PF_eval_scalar_AB;
-            Thread_context::M_fork("eval_scalar_AB");   // start pool
-            PF_eval_scalar_AB(Thread_context::get_master());
-            Thread_context::M_join();
-            if (job->error != E_NO_ERROR)
-               {
-                 joblist_AB.cancel_jobs();
-                 throw_apl_error(job->error, LOC);
-               }
-           }
-        else
+const bool maybe_parallel = Parallel::run_parallel &&
+                           Thread_context::get_active_core_count() > 1;
+#endif
+
+   for (;;)
+       {
+         PJob_scalar_AB * job_AB = 0;
+         loop(a, Thread_context::get_active_core_count())
+             {
+               job_AB = Thread_context::get_context((CoreNumber)a)
+                                   ->joblist_AB.next_job();
+               if (job_AB)   break;
+             }
+         if (job_AB == 0)   break;   // all jobs done
+
+#if PARALLEL_ENABLED
+         if (maybe_parallel && job_AB->len_Z > get_dyadic_threshold())
+            {
+              // parallel execution...
+              //
+              job_AB->fun = this;
+              job_AB->fun2 = fun;
+              Thread_context::do_work = PF_scalar_AB;
+              Thread_context::M_fork("eval_scalar_AB");   // start pool
+              PF_scalar_AB(Thread_context::get_master());
+PERFORMANCE_START(start_M_join)
+              Thread_context::M_join();
+              ec = job_AB->error;
+              if (ec != E_NO_ERROR)   return Value_P();
+PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
+            }
+         else
 #endif // PARALLEL_ENABLED
-           {
-             loop(z, job->len_Z)
-                {
-                  const Cell & cell_A = job->A_at(z);
-                  const Cell & cell_B = job->B_at(z);
-                  Cell & cell_Z       = job->Z_at(z);
+            {
+              // sequential execution...
+              //
+              loop(z, job_AB->len_Z)
+                 {
+                   const Cell & cell_A = job_AB->A_at(z);
+                   const Cell & cell_B = job_AB->B_at(z);
+                   Cell & cell_Z       = job_AB->Z_at(z);
 
-                  if (cell_A.is_pointer_cell())
-                     if (cell_B.is_pointer_cell())
-                        {
-                          // both A and B are nested
-                          //
-                          Value_P A1 = cell_A.get_pointer_value();
-                          Value_P B1 = cell_B.get_pointer_value();
-                          const int inc_A1 =
-                                    A1->is_scalar_extensible() ? 0 : 1;
-                          const int inc_B1 =
-                                    B1->is_scalar_extensible() ? 0 : 1;
-                          const Shape * sh_Z1 = &B1->get_shape();
-                          if      (A1->is_scalar())   sh_Z1 = &B1->get_shape();
-                          else if (B1->is_scalar())   sh_Z1 = &A1->get_shape();
-                          else if (inc_B1 == 0)       sh_Z1 = &A1->get_shape();
+                   if (cell_A.is_pointer_cell())
+                      if (cell_B.is_pointer_cell())
+                         {
+                           // both A and B are nested
+                           //
+                           Value_P A1 = cell_A.get_pointer_value();
+                           Value_P B1 = cell_B.get_pointer_value();
+                           const int inc_A1 = A1->get_increment();
+                           const int inc_B1 = B1->get_increment();
+                           const Shape * sh_Z1 = &B1->get_shape();
+                           if      (A1->is_scalar())   sh_Z1 = &B1->get_shape();
+                           else if (B1->is_scalar())   sh_Z1 = &A1->get_shape();
+                           else if (inc_B1 == 0)       sh_Z1 = &A1->get_shape();
 
-                          if (inc_A1 && inc_B1 && !A1->same_shape(*B1))
-                             {
-                               joblist_AB.cancel_jobs();
-                               if (!A1->same_rank(*B1))   RANK_ERROR;
-                               else                       LENGTH_ERROR;
+                           if (inc_A1 && inc_B1 && !A1->same_shape(*B1))
+                              {
+                                if (!A1->same_rank(*B1))   ec = E_RANK_ERROR;
+                                else                       ec = E_LENGTH_ERROR;
+                                return Value_P();
+                              }
+
+                           const ShapeItem len_Z1 = sh_Z1->get_volume();
+                           if (len_Z1 == 0)
+                              {
+                                Value_P Z1 = eval_fill_AB(A1, B1).get_apl_val();
+                                new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                                continue;
+                              }
+
+                           Value_P Z1(*sh_Z1, LOC);
+                           new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+
+                           PJob_scalar_AB j1(Z1.get(),
+                                                &A1->get_ravel(0), inc_A1,
+                                                &B1->get_ravel(0), inc_B1);
+                           Thread_context::get_master()
+                                          .joblist_AB.add_job(j1);
+                         }
+                      else
+                         {
+                           // A is nested, B is not
+                           //
+                           Value_P A1 = cell_A.get_pointer_value();
+                           const int inc_A1 = A1->get_increment();
+
+                           const ShapeItem len_Z1 = A1->element_count();
+                           if (len_Z1 == 0)
+                              {
+                                Value_P Z1 = A1->clone(LOC);
+                                Z1->to_proto();
+                                Z1->check_value(LOC);
+                                new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                              }
+                           else
+                              {
+                                 Value_P Z1(A1->get_shape(), LOC);
+                                 new (&cell_Z) PointerCell(Z1,*job_AB->value_Z);
+
+                                 PJob_scalar_AB j1(Z1.get(),
+                                                  &A1->get_ravel(0), inc_A1,
+                                                  &cell_B, 0);
+                                 Thread_context::get_master().joblist_AB
+                                                             .add_job(j1);
+                              }
+                         }
+                   else
+                      if (cell_B.is_pointer_cell())
+                         {
+                           // A is not nested, B is nested
+                           //
+                           Value_P B1 = cell_B.get_pointer_value();
+                           const int inc_B1 = B1->get_increment();
+
+                           const ShapeItem len_Z1 = B1->element_count();
+                           if (len_Z1 == 0)
+                              {
+                                Value_P Z1= B1->clone(LOC);
+                                Z1->to_proto();
+                                Z1->check_value(LOC);
+                                new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                              }
+                           else
+                              {
+                                Value_P Z1(B1->get_shape(), LOC);
+                                new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+
+                                PJob_scalar_AB j1(Z1.get(), &cell_A, 0,
+                                                  &B1->get_ravel(0), inc_B1);
+                                Thread_context::get_master()
+                                               .joblist_AB.add_job(j1);
                              }
-
-                          const ShapeItem len_Z1 = sh_Z1->get_volume();
-                          if (len_Z1 == 0)
-                             {
-                               joblist_AB.cancel_jobs();
-                               return eval_fill_AB(A1, B1);
-                             }
-
-                          POOL_LOCK(joblist_AB.parallel_jobs_lock,
-                             Value_P Z1(*sh_Z1, LOC);
-                             Z1->set_complete();
-                             new (&cell_Z) PointerCell(Z1, *job->value_Z);
-
-                             PJob_scalar_AB j1(Z1.get(),
-                                               &A1->get_ravel(0), inc_A1,
-                                               &B1->get_ravel(0), inc_B1);
-                             joblist_AB.add_job(j1))
-                        }
-                     else
-                        {
-                          // A is nested, B is not
-                          //
-                          Value_P A1 = cell_A.get_pointer_value();
-                          const int inc_A1 =
-                                    A1->is_scalar_extensible() ? 0 : 1;
-
-                          const ShapeItem len_Z1 = A1->get_shape().get_volume();
-                          if (len_Z1 == 0)
-                             {
-                               Value_P Z1 = A1->clone(LOC);
-                               Z1->to_proto();
-                               Z1->check_value(LOC);
-                               new (&cell_Z) PointerCell(Z1, *job->value_Z);
-                             }
-                          else
-                             {
-                                POOL_LOCK(joblist_AB.parallel_jobs_lock,
-                                  Value_P Z1(A1->get_shape(), LOC);
-                                  Z1->set_complete();
-                                  new (&cell_Z) PointerCell(Z1, *job->value_Z);
-
-                                  PJob_scalar_AB j1(Z1.get(),
-                                                    &A1->get_ravel(0), inc_A1,
-                                                    &cell_B, 0);
-                                  joblist_AB.add_job(j1))
-                             }
-                        }
-                  else
-                     if (cell_B.is_pointer_cell())
-                        {
-                          // A is not nested, B is nested
-                          //
-                          Value_P B1 = cell_B.get_pointer_value();
-                          const int inc_B1 =
-                                    B1->is_scalar_extensible() ? 0 : 1;
-
-                          const ShapeItem len_Z1 = B1->get_shape().get_volume();
-                          if (len_Z1 == 0)
-                             {
-                               Value_P Z1= B1->clone(LOC);
-                               Z1->to_proto();
-                               Z1->check_value(LOC);
-                               new (&cell_Z) PointerCell(Z1, *job->value_Z);
-                             }
-                          else
-                             {
-                               POOL_LOCK(joblist_AB.parallel_jobs_lock,
-                                  Value_P Z1(B1->get_shape(), LOC);
-                                  new (&cell_Z) PointerCell(Z1, *job->value_Z);
-                                  Z1->set_complete();
-
-                                  PJob_scalar_AB j1(Z1.get(),
-                                                    &cell_A, 0,
-                                                    &B1->get_ravel(0), inc_B1);
-                                  joblist_AB.add_job(j1))
-                            }
-                        }
-                     else
-                        {
-                          // neither A nor B are nested: execute fun
-                          //
+                         }
+                      else
+                         {
+                           // neither A nor B are nested: execute fun
+                           //
 PERFORMANCE_START(start_2)
 
-                          const ErrorCode ec = (cell_B.*fun)(&cell_Z, &cell_A);
-                          if (ec != E_NO_ERROR)
-                             {
-                               joblist_AB.cancel_jobs();
-                               throw_apl_error(ec, LOC);
-                             }
-
+                           ec = (cell_B.*fun)(&cell_Z, &cell_A);
+                           if (ec != E_NO_ERROR)   return Value_P();
 CELL_PERFORMANCE_END(get_statistics_AB(), start_2, z)
-                        }
-                }
+                         }
+                 }
            }
-        job->value_Z->check_value(LOC);
+        job_AB->value_Z->check_value(LOC);
       }
 
-   joblist_AB.cancel_jobs();
    Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
 
-PERFORMANCE_END(fs_SCALAR_AB, start_1, len_Z)
-
-   return Token(TOK_APL_VALUE1, Z);
+   return Z;
 }
 //-----------------------------------------------------------------------------
 void
-ScalarFunction::PF_eval_scalar_AB(Thread_context & tctx)
+ScalarFunction::PF_scalar_AB(Thread_context & tctx)
 {
 const CoreCount cores = Thread_context::get_active_core_count();
-PJob_scalar_AB & job = joblist_AB.get_current_job();
+PJob_scalar_AB & job_AB = tctx.joblist_AB.get_current_job();
 
-const ShapeItem slice_len = (job.len_Z + cores - 1) / cores;
+const ShapeItem slice_len = (job_AB.len_Z + cores - 1) / cores;
 ShapeItem z = tctx.get_N() * slice_len;
 ShapeItem end_z = z + slice_len;
-   if (end_z > job.len_Z)   end_z = job.len_Z;
+   if (end_z > job_AB.len_Z)   end_z = job_AB.len_Z;
 
    for (; z < end_z; ++z)
        {
-             const Cell & cell_A = job.A_at(z);
-             const Cell & cell_B = job.B_at(z);
-             Cell & cell_Z       = job.Z_at(z);
+             const Cell & cell_A = job_AB.A_at(z);
+             const Cell & cell_B = job_AB.B_at(z);
+             Cell & cell_Z       = job_AB.Z_at(z);
 
              if (cell_A.is_pointer_cell())
                 if (cell_B.is_pointer_cell())
@@ -632,8 +532,8 @@ ShapeItem end_z = z + slice_len;
                      //
                      Value_P A1 = cell_A.get_pointer_value();
                      Value_P B1 = cell_B.get_pointer_value();
-                     const int inc_A1 = A1->is_scalar_extensible() ? 0 : 1;
-                     const int inc_B1 = B1->is_scalar_extensible() ? 0 : 1;
+                     const int inc_A1 = A1->get_increment();
+                     const int inc_B1 = B1->get_increment();
                      const Shape * sh_Z1 = &B1->get_shape();
                      if      (A1->is_scalar())   sh_Z1 = &B1->get_shape();
                      else if (B1->is_scalar())   sh_Z1 = &A1->get_shape();
@@ -641,7 +541,7 @@ ShapeItem end_z = z + slice_len;
 
                      if (inc_A1 && inc_B1 && !A1->same_shape(*B1))
                         {
-                          job.error = A1->same_rank(*B1) ? E_LENGTH_ERROR
+                          job_AB.error = A1->same_rank(*B1) ? E_LENGTH_ERROR
                                                          : E_RANK_ERROR;
                           return;
                         }
@@ -649,50 +549,47 @@ ShapeItem end_z = z + slice_len;
                      const ShapeItem len_Z1 = sh_Z1->get_volume();
                      if (len_Z1 == 0)
                         {
-                          Token result =job.fun->eval_fill_AB(A1, B1);
+                          Token result =job_AB.fun->eval_fill_AB(A1, B1);
                           if (result.get_tag() == TOK_ERROR)
                              {
-                               job.error = (ErrorCode)(result.get_int_val());
+                               job_AB.error = (ErrorCode)(result.get_int_val());
                                return;
                              }
                         }
 
-                     POOL_LOCK(joblist_AB.parallel_jobs_lock,
-                        Value_P Z1(*sh_Z1, LOC);
-                        Z1->set_complete();
-                        new (&cell_Z) PointerCell(Z1, *job.value_Z);
+                     POOL_LOCK(parallel_jobs_lock,
+                               Value_P Z1(*sh_Z1, LOC))
+                        new (&cell_Z) PointerCell(Z1, *job_AB.value_Z);
 
                         PJob_scalar_AB j1(Z1.get(),
                                           &A1->get_ravel(0), inc_A1,
                                           &B1->get_ravel(0), inc_B1);
-                        joblist_AB.add_job(j1))
+                        tctx.joblist_AB.add_job(j1);
                    }
                 else
                    {
                      // A is nested, B is not
                      //
                      Value_P A1 = cell_A.get_pointer_value();
-                     const int inc_A1 = A1->is_scalar_extensible() ? 0 : 1;
+                     const int inc_A1 = A1->get_increment();
 
-                     const ShapeItem len_Z1 = A1->get_shape().get_volume();
+                     const ShapeItem len_Z1 = A1->element_count();
                      if (len_Z1 == 0)
                         {
                           Value_P Z1= A1->clone(LOC);
                           Z1->to_proto();
                           Z1->check_value(LOC);
-                          new (&cell_Z) PointerCell(Z1, *job.value_Z);
+                          new (&cell_Z) PointerCell(Z1, *job_AB.value_Z);
                         }
                      else
                         {
-                          POOL_LOCK(joblist_AB.parallel_jobs_lock,
-                             Value_P Z1(A1->get_shape(), LOC);
-                             new (&cell_Z) PointerCell(Z1, *job.value_Z);
-                             Z1->set_complete();
+                          Value_P Z1(A1->get_shape(), LOC);
+                          new (&cell_Z) PointerCell(Z1, *job_AB.value_Z);
 
-                             PJob_scalar_AB j1(Z1.get(),
-                                               &A1->get_ravel(0), inc_A1,
-                                               &cell_B, 0);
-                             joblist_AB.add_job(j1))
+                          PJob_scalar_AB j1(Z1.get(),
+                                            &A1->get_ravel(0), inc_A1,
+                                            &cell_B, 0);
+                          tctx.joblist_AB.add_job(j1);
                         }
                    }
              else
@@ -701,27 +598,25 @@ ShapeItem end_z = z + slice_len;
                      // A is not nested, B is nested
                      //
                      Value_P B1 = cell_B.get_pointer_value();
-                     const int inc_B1 = B1->is_scalar_extensible() ? 0 : 1;
+                     const int inc_B1 = B1->get_increment();
 
-                     const ShapeItem len_Z1 = B1->get_shape().get_volume();
+                     const ShapeItem len_Z1 = B1->element_count();
                      if (len_Z1 == 0)
                         {
                           Value_P Z1= B1->clone(LOC);
                           Z1->to_proto();
                           Z1->check_value(LOC);
-                          new (&cell_Z) PointerCell(Z1, *job.value_Z);
+                          new (&cell_Z) PointerCell(Z1, *job_AB.value_Z);
                         }
                      else
                         {
-                          POOL_LOCK(joblist_AB.parallel_jobs_lock,
-                             Value_P Z1(B1->get_shape(), LOC);
-                             new (&cell_Z) PointerCell(Z1, *job.value_Z);
-                             Z1->set_complete();
+                          POOL_LOCK(parallel_jobs_lock,
+                                    Value_P Z1(B1->get_shape(), LOC))
+                          new (&cell_Z) PointerCell(Z1, *job_AB.value_Z);
 
-                             PJob_scalar_AB j1(Z1.get(),
-                                               &cell_A, 0,
-                                               &B1->get_ravel(0), inc_B1);
-                             joblist_AB.add_job(j1))
+                          PJob_scalar_AB j1(Z1.get(), &cell_A, 0,
+                                           &B1->get_ravel(0), inc_B1);
+                          tctx.joblist_AB.add_job(j1);
                        }
                    }
                 else
@@ -730,10 +625,10 @@ ShapeItem end_z = z + slice_len;
                      //
 PERFORMANCE_START(start_2)
 
-                     const ErrorCode ec = (cell_B.*job.fun2)(&cell_Z, &cell_A);
-                     if (ec != E_NO_ERROR)   return;
+                     job_AB.error = (cell_B.*job_AB.fun2)(&cell_Z, &cell_A);
+                     if (job_AB.error != E_NO_ERROR)   return;
 
-CELL_PERFORMANCE_END(job.fun->get_statistics_AB(), start_2, z)
+CELL_PERFORMANCE_END(job_AB.fun->get_statistics_AB(), start_2, z)
                    }
        }
 }
@@ -809,15 +704,14 @@ const Cell & cell_FI0 = FI0->get_ravel(0);
       {
         // create a value like ↑B but with all ravel elements like FI0...
         //
-        POOL_LOCK(joblist_B.parallel_jobs_lock,
-           Value_P sub(proto_B.get_pointer_value()->get_shape(),LOC);
+        POOL_LOCK(parallel_jobs_lock,
+           Value_P sub(proto_B.get_pointer_value()->get_shape(),LOC))
         const ShapeItem len_sub = sub->nz_element_count();
-        Cell * csub = &sub->get_ravel(0);
-        loop(s, len_sub)   csub++->init(cell_FI0, sub.getref(), LOC);
+        loop(s, len_sub)   sub->next_ravel()->init(cell_FI0, sub.getref(), LOC);
         sub->check_value(LOC);
 
         while (Z->more())
-           new (Z->next_ravel()) PointerCell(sub->clone(LOC), Z.getref()))
+           new (Z->next_ravel()) PointerCell(sub->clone(LOC), Z.getref());
       }
    else
       {
@@ -888,7 +782,7 @@ ScalarFunction::eval_scalar_AXB(Value_P A, bool * axis_in_X,
    // B the value with the larger rank.
    //
    // If (reversed) then A and B have changed roles (in order to
-   /// make A is the value with the smaller rank).
+   /// make A the value with the smaller rank).
 
    // check that A and B agree on the axes in X
    //
@@ -989,8 +883,7 @@ CELL_PERFORMANCE_END(get_statistics_AB(), start_2, zi.get_total())
 done:
    Z->check_value(LOC);
 
-PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count());
-
+PERFORMANCE_END(fs_SCALAR_AB, start_1, len_Z);
    return Token(TOK_APL_VALUE1, Z);
 }
 //=============================================================================

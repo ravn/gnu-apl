@@ -1583,7 +1583,19 @@ Command::cmd_OFF(int exit_val)
 {
    cleanup(true);
    COUT << endl;
-   if (!uprefs.silent)   COUT << "Goodbye." << endl;
+   if (!uprefs.silent)
+      {
+
+        timeval end;
+        gettimeofday(&end, 0);
+        end.tv_sec -= uprefs.session_start.tv_sec;
+        end.tv_usec -= uprefs.session_start.tv_usec;
+        if (end.tv_usec < 1000000)   { end.tv_usec += 1000000;   --end.tv_sec; }
+        COUT << "Goodbye." << endl
+             << "Session duration: " << (end.tv_sec + 0.000001*end.tv_usec)
+             << " seconds " << endl;
+
+      }
    exit(exit_val);
 }
 //-----------------------------------------------------------------------------

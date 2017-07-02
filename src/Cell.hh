@@ -227,10 +227,10 @@ public:
         ErrorCode     eval;    ///< an error code
         APL_Float     fval;    ///< a floating point number
         APL_Float     cval_r;  ///< the real part of a complex number
-        void         *vptr;   ///< a void pointer
-        Cell         *next;   ///< pointer to the next (unused) cell
-        Cell         *lval;   ///< left value (for selective assignment)
-        Value_P_Base  valp;
+        void         *vptr;    ///< a void pointer
+        Cell         *next;    ///< pointer to the next (unused) cell
+        Cell         *lval;    ///< left value (for selective assignment)
+        Value_P_Base  valp;    ///< a pointer to a value
       };
 
    /// additional data for ComplexCells and PointerCells

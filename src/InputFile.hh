@@ -142,7 +142,7 @@ struct InputFile
    /// the file name
    UTF8_string  filename;
 
-   // copy operator
+   /// copy operator
    InputFile & operator =(const InputFile &);
 
 protected:

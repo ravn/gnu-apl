@@ -345,6 +345,7 @@ uint32_t uni = 0;
 class File_or_String
 {
 public:
+   /// constructor: from file
    File_or_String(FILE * f)
    : file(f),
      string(0),
@@ -352,6 +353,7 @@ public:
      out_len(0)
    { sidx = ftell(f);  }
 
+   /// constructor: from string
    File_or_String(const UCS_string * u)
    : file(0),
      string(u),
@@ -360,12 +362,14 @@ public:
      out_len(0)
    {}
 
+   /// return the number of characters
    ShapeItem get_count() const
       {
         if (file)    return ftell(file) - sidx;
         return out_len;
       }
 
+   /// get the next character
    Unicode get_next()
       {
         if (next != Invalid_Unicode)   // there is a unget'ed char
@@ -391,12 +395,14 @@ public:
             }
       }
 
+   /// unget uni
    void unget(Unicode uni)
       {
         Assert(next == Invalid_Unicode);
         next = uni;
       }
 
+   /// scan a long long in string or file
    int scanf_long_long(const char * fmt, long long * val)
       {
          if (file)
@@ -437,6 +443,7 @@ public:
          return sscanf(cc, fmt, val);
       }
 
+   /// scan a double in string or file
    int scanf_double(const char * fmt, double * val)
       {
          if (file)

@@ -86,7 +86,7 @@ public:
    /// check workspace integrity (stale Value and IndexExpr objects, etc)
    static void cmd_CHECK(ostream & out);
 
-   // a helper for finding sub-values with two parents
+   /// a helper for finding sub-values with two parents
    struct val_val
       {
         /// the parent (0 unless child is a sub-value
@@ -210,6 +210,7 @@ protected:
    static bool check_params(ostream & out, const char * command, int argc,
                             const char * args);
 
+   /// resolve an optional lib followed by a WS name
    static bool resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
                                   LibRef &lib, UCS_string & wsname);
 

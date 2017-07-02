@@ -66,9 +66,11 @@ enum ExpandHint
    EH_PRIMITIVE       ///< apl primitive
 };
 //-----------------------------------------------------------------------------
+/// a class for doing interactivw Tab-expansion on input lines
 class TabExpansion
 {
 public:
+   /// constructor
    TabExpansion(UCS_string & line);
 
    /// perform tab expansion

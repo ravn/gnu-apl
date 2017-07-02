@@ -285,6 +285,8 @@ public:
         IndexExpr     * index_val;       ///< the index for TV_INDEX
         Function      * function;        ///< the function for TV_FUN
         Value_P_Base    apl_val;         ///< the APL value for TV_VAL
+
+        /// a shortcut for accessing apl_val
         Value_P &       _apl_val() const   { return (Value_P &) apl_val; }
       };
 

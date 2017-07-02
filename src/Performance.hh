@@ -37,8 +37,6 @@
      CellFunctionStatistics * stat = get_stat;             \
      if (stat)   stat->add_sample(end - counter, subseq); }
 
-
-
 #else
 
 # define PERFORMANCE_START(counter)
@@ -103,11 +101,20 @@ public:
    {}
 
    /// reset record to count 0, mean 0, variance 0
-   void reset()   { count = 0;   data = 0;   data2 = 0; }
+   void reset()
+      {
+        count = 0;
+        data = 0;
+        data2 = 0;
+      }
 
    /// add one sample
    void add_sample(uint64_t val)
-      { ++count;   data += val;   data2 += val*val; }
+      {
+        ++count;
+        data += val;
+        data2 += val*val;
+      }
 
    /// print count, data, and data2
    void print(ostream & out);
@@ -125,13 +132,17 @@ public:
 
    /// return the average
    uint64_t get_average() const
-      { return count ? data/count : 0; }
+      { return average(data, count); }
 
    /// return the sum of squares
    double get_sum2() const
       { return data2; }
 
-   /// print num as 5 characters (digits, dot, and multiplier (k, m, g, ...
+   /// the average of \b count items with sum \b sum
+   static uint64_t average(uint64_t sum, uint64_t count)
+      { return count ? sum/count : 0; }
+
+   /// print num as 5 characters (digits, dot, and multiplier (k, m, g, ...)
    static void print5(ostream & out, uint64_t num);
 
 protected:
@@ -217,14 +228,14 @@ public:
       { return vec_cycles; }
 
    /// add a sample
-   void add_sample(uint64_t val, uint64_t veclen)
+   void add_sample(uint64_t cycles, uint64_t veclen)
       {
-         vec_cycles.add_sample(val);
+         vec_cycles.add_sample(cycles);
          vec_lengths.add_sample(veclen);
        }
 
 protected:
-   /// the vector lengths
+   /// a statistics of vector lengths
    Statistics_record vec_lengths;
 
    /// the cycles executed

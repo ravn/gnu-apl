@@ -23,10 +23,12 @@
 
 #include <semaphore.h>
 
+#include "Id.hh"
 #include "Parallel.hh"
 #include "PrimitiveFunction.hh"
+#include "Thread_context.hh"
+
 #include "Value.icc"
-#include "Id.hh"
 
 //-----------------------------------------------------------------------------
 /** Base class for scalar functions (functions whose monadic and/or dyadic
@@ -68,6 +70,12 @@ public:
    virtual bool has_result() const   { return true; }
 
 protected:
+   /// compute the monadic scalar function \b fun along one ravel
+   Value_P do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun);
+
+   /// compute the dyadic scalar function \b fun along one ravel
+   Value_P do_scalar_AB(ErrorCode & ec, Value_P A, Value_P B, prim_f2 fun);
+
    /// Apply a function to a nested sub array.
    void expand_pointers(Cell * cell_Z, Value & Z_owner, const Cell * cell_A,
                         const Cell * cell_B, prim_f2 fun);
@@ -80,10 +88,10 @@ protected:
    Token eval_scalar_identity_fun(Value_P B, Axis axis, Value_P FI0);
 
    /// parallel eval_scalar_AB
-   static Thread_context::PoolFunction PF_eval_scalar_AB;
+   static Thread_context::PoolFunction PF_scalar_AB;
 
    /// parallel eval_scalar_B
-   static Thread_context::PoolFunction PF_eval_scalar_B;
+   static Thread_context::PoolFunction PF_scalar_B;
 };
 
 #define PERF_A(x)   TOK_F2_ ## x,                           \

@@ -21,6 +21,8 @@
 #ifndef __USER_PREFERENCES_HH_DEFINED__
 #define __USER_PREFERENCES_HH_DEFINED__
 
+#include <sys/time.h>
+
 #include "Parallel.hh"
 #include "UTF8_string.hh"
 
@@ -60,7 +62,7 @@ struct UserPreferences
 #define sec_def(X) X(false),
 #include "Security.def"
      WINCH_sets_pw(false)
-   {}
+   { gettimeofday(&session_start, 0); }
 
    /// read a \b preference file and update parameters set there
    void read_config_file(bool sys, bool log_startup);
@@ -98,6 +100,9 @@ struct UserPreferences
 
    /// argv/argc after expand_argv
    Simple_string<const char *, false>expanded_argv;
+
+   /// when apl was started
+   timeval session_start;
 
    /// true if no banner/Goodbye is wanted.
    bool silent;

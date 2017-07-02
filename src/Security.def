@@ -20,11 +20,12 @@
 
 /** definitions of facilities inside the GNU APL interpreter that can be
     disabled (by means of preference file entries) for security reasons
-*/
+**/
 
-sec_def( disable_Quad_SQL )
-sec_def( disable_Quad_FIO )
-sec_def( disable_native_functions )
+
+sec_def( disable_Quad_SQL )           ///< disable ⎕SQL
+sec_def( disable_Quad_FIO )           ///< disable ⎕FIO
+sec_def( disable_native_functions )   ///< disable dyadic ⎕FX
 
 #undef sec_def
 

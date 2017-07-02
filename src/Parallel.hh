@@ -52,12 +52,12 @@
    { sem_wait(&Parallel::print_sema); x; sem_post(&Parallel::print_sema); }
 
 # define POOL_LOCK(l, x) \
-   { Parallel::acquire_lock(l); { x; } Parallel::release_lock(l); }
+     Parallel::acquire_lock(l); x; Parallel::release_lock(l);
 
 #else
 
-# define PRINT_LOCKED(x) { x; }
-# define POOL_LOCK(l, x) { x; }
+# define PRINT_LOCKED(x) x;
+# define POOL_LOCK(l, x) x;
 
 #endif // PARALLEL_ENABLED
 
@@ -177,7 +177,7 @@ using namespace std;
   Multi-core GNU APL uses a pool of threads numbered 0, 1, ... core_count()-1
 
   (master-) thread 0 is the interpreter (which also performs parallel work),
-  while (worker-) threads 1 ... are only activated when some paralle work
+  while (worker-) threads 1 ... are only activated when some parallel work
   is available.
 
   The worker threads 1... are either working, or busy-waiting for work, or
@@ -192,9 +192,10 @@ using namespace std;
       blocked ←→ busy-waiting
 
   occur before and after the master thread waits for terminal input or when
-  the number of cores is changed (with ⎕SYL[26;2]). That is,
-  the worker threads are blocked while the master thread waits for terminal
-  input.
+  the number of cores is being changed (with ⎕SYL[26;2]). The workers are
+  blocked while the master thread waits for terminal input. The reason for this
+  is that a busy-waiting worker is consuming power for no reason (to the extent
+  that the CPU fan turns on even though there is no useful work in sight).
 
   The transitions
 
@@ -205,144 +206,6 @@ using namespace std;
   sufficiently long).
 
  **/
-//=============================================================================
-class Thread_context
-{
-public:
-   /// a function that is executed by the pool (i.e. in parallel)
-   typedef void PoolFunction(Thread_context & ctx);
-
-   /// constructor
-   Thread_context();
-
-   /// return the number of the core executing \b this context
-   CoreNumber get_N() const
-       { return N; }
-
-   /// start parallel execution of work at the master
-   static void M_fork(const char * jname)
-      {
-        get_master().job_name = jname;
-        atomic_add(busy_worker_count, active_core_count - 1);
-        atomic_add(get_master().job_number, 1);
-      }
-
-   /// start parallel execution of work in a worker
-   void PF_fork()
-      {
-        while (atomic_read(get_master().job_number) == job_number)
-              /* busy wait */ ;
-      }
-
-   /// end parallel execution of work at the master
-   static void M_join()
-      {
-        while (atomic_read(busy_worker_count) != 0)   /* busy wait */ ;
-      }
-
-   /// end parallel execution of work in a worker
-   void PF_join()
-      {
-        atomic_add(busy_worker_count, -1);   // we are ready
-        atomic_add(job_number, 1);            // we reached master job_number
-
-        // wait until all workers finished or new job from master
-        while (atomic_read(busy_worker_count) != 0 &&
-               atomic_read(get_master().job_number) == job_number)
-              /* busy wait */ ;
-      }
-
-   /// bind thread to core
-   void bind_to_cpu(CPU_Number cpu, bool logit);
-
-   /// print all TaskTree nodes
-   static void print_all(ostream & out);
-
-   /// print all mileages nodes
-   static void print_mileages(ostream & out, const char * loc);
-
-   /// print this TaskTree node
-   void print(ostream & out) const;
-
-   /// initialize all thread contexts (set all but N and thread)
-   static void init_parallel(CoreCount thread_count, bool logit);
-
-   /// initialize all thread contexts (set all but N and thread)
-   static void init_sequential(bool logit);
-
-   /// return the context for core \b n
-   static Thread_context * get_context(CoreNumber n)
-      { return thread_contexts + n; }
-
-   /// return the context of the master
-   static Thread_context & get_master()
-      { return thread_contexts[CNUM_MASTER]; }
-
-   /// make all workers lock on pool_sema
-   void M_lock_pool();
-
-   /// terminate all worker threads
-   static void kill_pool();
-
-   /// the next work to be done
-   static PoolFunction * do_work;
-
-   /// a thread-function that should not be called
-   static PoolFunction PF_no_work;
-
-   /// block/unblock on the pool semaphore
-   static PoolFunction PF_lock_unlock_pool;
-
-   /// number of currently used cores
-   static CoreCount get_active_core_count()
-      { return active_core_count; }
-
-   /// set the number of currently used cores
-   static void set_active_core_count(CoreCount new_count)
-      { active_core_count = new_count; }
-
-protected:
-   /// thread number (0 = interpreter, 1... worker threads
-   CoreNumber N;
-
-   /// initialize thread_contexts[n]
-   void init_entry(CoreNumber n);
-
-   /// the cpu core to which this thread is bound
-   CPU_Number CPU;
-
-public:
-   /// the thread executing this context
-   pthread_t thread;
-
-   /// a counter controlling the start of parallel jobs
-   volatile int job_number;
-
-   /// return the name of this context
-   const char * job_name;
-
-   /// true if this context shall join (i.e. is not the master)
-   bool do_join;
-
-   /// a semaphore to block this context
-   sem_t pool_sema;
-
-   /// true if blocked on pool_sema
-   bool blocked;
-
-protected:
-   /// all thread contexts
-   static Thread_context * thread_contexts;
-
-   /// the number of thread contexts
-   static CoreCount thread_contexts_count;
-
-   /// the number of unfinished workers (excluding master)
-   static volatile _Atomic_word busy_worker_count;
-
-   /// the number of cores currently used
-   static CoreCount active_core_count;
-};
 //=============================================================================
 /// a class coordinating the different cores working in prallel
 class Parallel
@@ -418,97 +281,6 @@ protected:
 
    /// the CPU numbers that can be used
    static Simple_string<CPU_Number, false>all_CPUs;
-};
-//=============================================================================
-/// a number of jobs to be executed in parallel
-class Parallel_job_list_base
-{
-public:
-   /// a lock protecting \b jobs AND Value::Value() constructors
-   static volatile _Atomic_word parallel_jobs_lock;
-
-   /// from where the joblist was started
-   static const char * started_loc;
-};
-
-/** a list of parallel jobs. It is used to control the parallel computation
-    of nested results. Initially the Parallel_job_list is create with one
-    job. If nested values are encountered they are not computed immediately
-    but added to the joblist for later execution.
- **/
-template <class T, bool has_destructor>
-class Parallel_job_list : public Parallel_job_list_base
-{
-public:
-   /// constructor: empty job list
-   Parallel_job_list()
-   : idx(0)
-   {} 
-
-   /// start execution of \b jobs
-   void start(const T & first_job, const char * loc)
-      {
-#if 0
-         if (started_loc)
-            {
-              PRINT_LOCKED(
-              CERR << endl << "*** Attempt to start a new joblist at " << loc
-                   << " while joblist from " << started_loc
-                   << " is not finished" << endl;
-              Backtrace::show(__FILE__, __LINE__))
-            }
-#endif
-
-         started_loc = loc;
-         idx = 0;
-         jobs.shrink(0);
-         jobs.append(first_job);
-      }
-
-   /// cancel a job list
-   void cancel_jobs()
-      { idx = jobs.size();   started_loc = 0; }
-
-   /// set current job. CAUTION: jobs may be modified by the
-   /// execution of current_job. Therefore we copy current_job from
-   /// jobs (and can then safely use current_job *).
-   T * next_job()
-      { if (idx == jobs.size()) { started_loc = 0;   return 0; }
-        current_job = jobs[idx++];   return &current_job; }
-
-   /// return the current job
-   T & get_current_job()
-      { return current_job; }
-
-   /// return the current size
-   int get_size()
-      { return jobs.size(); }
-
-   /// return the current index
-   int get_index()
-      { return idx; }
-
-   /// add \b job to \b jobs
-   void add_job(T & job)
-      { jobs.append(job); }
-
-   /// return true if not all jobs are done yet
-   bool busy()
-      { return started_loc != 0; }
-
-   /// where joblist was started (also an indicator if all jobs were done)
-   const char * get_started_loc()
-      { return started_loc; }
-
-protected:
-   /// jobs to be performed
-   Simple_string<T, has_destructor> jobs;
-
-   /// last job
-   int idx;
-
-   /// the currently executed worklist item
-   T current_job;
 };
 //=============================================================================
 

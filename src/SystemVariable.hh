@@ -593,6 +593,7 @@ public:
    /// does not overflow
    int64_t get_offset() const   { return offset_seconds; }
 
+   /// set the timezone offset
    void set_offset(int offset)
       { offset_seconds = offset; }
 

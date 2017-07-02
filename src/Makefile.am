@@ -54,6 +54,7 @@ IndexExpr.cc					IndexExpr.hh		\
 IndexIterator.cc				IndexIterator.hh	\
 InputFile.cc					InputFile.hh		\
 IntCell.cc					IntCell.hh		\
+IO_Files.cc					IO_Files.hh		\
 LApack.cc					LApack.hh		\
 LibPaths.cc					LibPaths.hh		\
 LineInput.cc					LineInput.hh		\
@@ -68,6 +69,7 @@ NativeFunction.cc				NativeFunction.hh	\
 						Native_interface.hh	\
 NumericCell.cc					NumericCell.hh		\
 Output.cc					Output.hh		\
+						PJob.hh		\
 Parser.cc					Parser.hh		\
 Prefix.cc		Prefix.def		Prefix.hh		\
 PointerCell.cc					PointerCell.hh		\
@@ -105,7 +107,7 @@ SymbolTable.cc					SymbolTable.hh		\
 			SystemLimits.def	SystemLimits.hh		\
 SystemVariable.cc	SystemVariable.def	SystemVariable.hh	\
 TabExpansion.cc					TabExpansion.hh		\
-IO_Files.cc					IO_Files.hh		\
+			Thread_context.cc	Thread_context.hh	\
 Token.cc		Token.def		Token.hh		\
 						TokenEnums.hh		\
 Tokenizer.cc					Tokenizer.hh		\

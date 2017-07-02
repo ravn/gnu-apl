@@ -127,6 +127,11 @@ public:
    bool is_scalar_extensible() const
       { return element_count() == 1; }
 
+   /// return the increment for iterators of this value. The increment is used
+   /// for scalar-extension of 1-element values
+   int get_increment() const
+      { return element_count() == 1 ? 0 : 1; }
+
    /// return \b true iff \b this value is a simple character scalar or vector.
    bool is_char_string() const
       { return get_rank() <= 1 && is_char_array(); }

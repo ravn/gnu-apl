@@ -38,7 +38,7 @@ class PrintBuffer;
 /** NOTE: the inline functions below require Value.hh (which in turn
     requireis the classes nelow). These inline functions are therefore
     implemented in Value.icc (after both Value.hh AND SharedValuePointer
-    have been #included.
+    have been included.
 **/
 
 //-----------------------------------------------------------------------------
@@ -89,6 +89,7 @@ public:
    Value & getref()
       { return *value_p; }
 
+   /// clear the pointer (and possibly add an event)
    inline void clear_pointer(const char * loc);
 
    /// decrement the owner count of \b val. The function bidy requires Value.hh
