@@ -295,7 +295,7 @@ Statistics_record::print5(ostream & out, uint64_t num)
 char cc[40];
    if (num < 100000)   // special case: no multiplier
       {
-        snprintf(cc, sizeof(cc), "%5llu", num);
+        snprintf(cc, sizeof(cc), "%5u", (unsigned int)num);
         out << cc;
         return;
       }
