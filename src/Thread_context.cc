@@ -69,12 +69,8 @@ Thread_context::print_all(ostream & out)
 void
 Thread_context::print(ostream & out) const
 {
-int semval = 42;
-   sem_getvalue((sem_t *)&pool_sema, &semval);
-
    out << "thread #"     << setw(2) << N
        << ":"            << setw(16)  << (void *)thread
-       << " pool sema: " << setw(2) << semval
        << (blocked ? " BLKD" : " RUN ")
        << " job:"        << setw(4) << (int)job_number << " " << job_name
        << endl;

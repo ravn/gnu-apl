@@ -28,7 +28,6 @@
 #include "UserPreferences.hh"
 
 #if !PARALLEL_ENABLED
-#define sem_getvalue(x, y) *y = 1
 #define sem_init(x, y, z)
 #endif // PARALLEL_ENABLED
 
@@ -294,17 +293,10 @@ Parallel::unlock_pool(bool logit)
             {
               PRINT_LOCKED(CERR << "Parallel::unlock_pool() : " << endl; )
               Thread_context * tc = Thread_context::get_context((CoreNumber)a);
-              int old_val = 42;
-              sem_getvalue(&tc->pool_sema, &old_val);
-
               sem_post(&tc->pool_sema);
-
-              int new_val = 42;
-              sem_getvalue(&tc->pool_sema, &new_val);
               PRINT_LOCKED(
-              CERR << "    pool_sema of thread #"
-                   << a << " incremented from " << old_val << " to "
-                   << new_val << endl;)
+              CERR << "    pool_sema of thread #" << a << " incremented."
+                   << endl;)
             }
      }
    else
