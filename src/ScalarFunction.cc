@@ -89,7 +89,9 @@ Bif_F12_STILE   * Bif_F12_STILE  ::fun         = &Bif_F12_STILE  ::_fun;
 Bif_F12_LOGA    * Bif_F12_LOGA   ::fun         = &Bif_F12_LOGA   ::_fun;
 Bif_F12_WITHOUT * Bif_F12_WITHOUT::fun         = &Bif_F12_WITHOUT::_fun;
 
+#ifdef PARALLEL_ENABLED
 static volatile _Atomic_word parallel_jobs_lock = 0;
+#endif
 
 PJob_scalar_AB * job_AB = 0;
 PJob_scalar_B  * job_B = 0;
