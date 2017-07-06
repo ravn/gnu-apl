@@ -82,6 +82,13 @@ Function * RO = _RO.get_function();   Assert(RO);
              condition->get_ravel(0).get_near_int() == 1)
             return Token(TOK_APL_VALUE1, LO_Z);
 
+         if (interrupt_is_raised())
+            {
+              clear_attention_raised(LOC);
+              clear_interrupt_raised(LOC);
+              INTERRUPT
+            }
+
         B = LO_Z;
         LO_Z.clear(LOC);
       }

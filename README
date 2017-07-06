@@ -11,11 +11,15 @@ for details.
 More information about the installation of GNU APL can be found in the
 following files in the same directory as this file:
 
-INSTALL:		  general installation information (aka. ./configure)
-README-1-prerequisites:   what else is needed to install GNU APL
-README-2-configure:       GNU APL specific ./configure options
-README-3-keyboard:        how to set up your keyboard for APL characters
-README-4-compliance:      compliance information
-README-5-WINDOWS:         notes for Windows users
-README-6-porting:         notes for various operating systems
+INSTALL:		     general installation information (aka. ./configure)
+README-1-prerequisites:      what else is needed to install GNU APL
+README-2-configure:          GNU APL specific ./configure options
+README-3-keyboard:           how to set up your keyboard for APL characters
+README-4-compliance:         compliance information
+README-5-WINDOWS:            notes for Windows users
+README-6-porting:            notes for various operating systems
+README-7-more-info:          some pointers to other information related to APL
+README-8-parallel:           notes for parallel (multi-core) execution
+README-9-post-installation:  things to do after GNU APL was installed
+
 
