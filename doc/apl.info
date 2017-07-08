@@ -642,12 +642,11 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.11::   User-defined Commands
 * Section 3.12::   Direct Functions (Lambdas)
 * Section 3.13::   Axis argument in defined functions
-* Section 3.14::   Axis argument in primitive functions
-* Section 3.15::   ⎕SI - State Indicator
-* Section 3.16::   ⎕DLX: Knuth’s Dancing Links Algorithm
-* Section 3.17::   History and TAB completion
-* Section 3.18::   ⎕SQL - SQL Database Interface
-* Section 3.19::   Comparison Rules
+* Section 3.14::   ⎕SI - State Indicator
+* Section 3.15::   ⎕DLX: Knuth’s Dancing Links Algorithm
+* Section 3.16::   History and TAB completion
+* Section 3.17::   ⎕SQL - SQL Database Interface
+* Section 3.18::   Comparison Rules
 
 There are a few possibly useful features in GNU APL:
 
@@ -1547,21 +1546,7 @@ other APL interpreters.  Use this feature carefully!
 
 File: apl.info,  Node: Section 3.14,  Next: Section 3.15,  Prev: Section 3.13,  Up: Chapter 3
 
-3.14 Axis argument in primitive functions
-=========================================
-
-In order to minimize the syntactical differences between primitive APL
-functions (aka.  built-in functions) and defined functions, all
-primitive function can be called with an axis argument.  Those primitive
-functions for which the standard does not define an axis variant simply
-ignore the axis argument.  The value of the axis argument is still
-computed, so this axis argument can be used for side effects such as
-counting the number of function calls in some unrelated variable.
-
-
-File: apl.info,  Node: Section 3.15,  Next: Section 3.16,  Prev: Section 3.14,  Up: Chapter 3
-
-3.15 ⎕SI - State Indicator
+3.14 ⎕SI - State Indicator
 ==========================
 
 ⎕SI returns aspects of the current State Indicator, similar to the
@@ -1625,9 +1610,9 @@ while negative A count from the latest to the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 3.16,  Next: Section 3.17,  Prev: Section 3.15,  Up: Chapter 3
+File: apl.info,  Node: Section 3.15,  Next: Section 3.16,  Prev: Section 3.14,  Up: Chapter 3
 
-3.16 ⎕DLX - Knuth’s Dancing Links Algorithm
+3.15 ⎕DLX - Knuth’s Dancing Links Algorithm
 ===========================================
 
 ⎕DLX is an implementation of Donald Knuth’s Dancing Links Algorithm
@@ -1853,9 +1838,9 @@ problems that can be solved by ⎕DLX contain 3 steps:
 matrix is a little more complicated, but the principle is the same.
 
 
-File: apl.info,  Node: Section 3.17,  Next: Section 3.18,  Prev: Section 3.16,  Up: Chapter 3
+File: apl.info,  Node: Section 3.16,  Next: Section 3.17,  Prev: Section 3.15,  Up: Chapter 3
 
-3.17 History and TAB completion
+3.16 History and TAB completion
 ===============================
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive
@@ -1899,9 +1884,9 @@ a system variable name.
 defined function or variable name.
 
 
-File: apl.info,  Node: Section 3.18,  Next: Section 3.19,  Prev: Section 3.17,  Up: Chapter 3
+File: apl.info,  Node: Section 3.17,  Next: Section 3.18,  Prev: Section 3.16,  Up: Chapter 3
 
-3.18 ⎕SQL - SQL Database Interface
+3.17 ⎕SQL - SQL Database Interface
 ==================================
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -1998,9 +1983,9 @@ table.  Currently, the column layout is as follows:
 release.
 
 
-File: apl.info,  Node: Section 3.19,  Prev: Section 3.18,  Up: Chapter 3
+File: apl.info,  Node: Section 3.18,  Prev: Section 3.17,  Up: Chapter 3
 
-3.19 Comparison Rules
+3.18 Comparison Rules
 =====================
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤,
@@ -3394,33 +3379,32 @@ Node: Top383
 Node: Chapter 11408
 Node: Chapter 217064
 Node: Chapter 321475
-Node: Section 3.122465
-Node: Section 3.233368
-Node: Section 3.337754
-Node: Section 3.440744
-Node: Section 3.541547
-Node: Section 3.642160
-Node: Section 3.743447
-Node: Section 3.845378
-Node: Section 3.945551
-Node: Section 3.1048801
-Node: Section 3.1149379
-Node: Section 3.1250775
-Node: Section 3.1354730
-Node: Section 3.1455494
-Node: Section 3.1556159
-Node: Section 3.1658148
-Node: Section 3.1768060
-Node: Section 3.1869845
-Node: Section 3.1972949
-Node: Chapter 475554
-Node: Chapter 577302
-Node: Chapter 678431
-Node: Section 6.178850
-Node: Section 6.279537
-Node: Chapter 780368
-Node: Section 7.180871
-Node: Section 7.2106180
+Node: Section 3.122409
+Node: Section 3.233312
+Node: Section 3.337698
+Node: Section 3.440688
+Node: Section 3.541491
+Node: Section 3.642104
+Node: Section 3.743391
+Node: Section 3.845322
+Node: Section 3.945495
+Node: Section 3.1048745
+Node: Section 3.1149323
+Node: Section 3.1250719
+Node: Section 3.1354674
+Node: Section 3.1455438
+Node: Section 3.1557427
+Node: Section 3.1667339
+Node: Section 3.1769124
+Node: Section 3.1872228
+Node: Chapter 474833
+Node: Chapter 576581
+Node: Chapter 677710
+Node: Section 6.178129
+Node: Section 6.278816
+Node: Chapter 779647
+Node: Section 7.180150
+Node: Section 7.2105459
 
 End Tag Table
 

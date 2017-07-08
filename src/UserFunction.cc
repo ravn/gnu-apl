@@ -189,6 +189,7 @@ UserFunction::eval_XB(Value_P X, Value_P B)
              << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
+   if (!header.X())    AXIS_ERROR;
    if (header.LO())    SYNTAX_ERROR;   // defined as operator
 
    Workspace::push_SI(this, LOC);
@@ -240,6 +241,7 @@ UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
 
    if (header.LO())    SYNTAX_ERROR;    // defined as operator
    if (!header.A())    VALENCE_ERROR;   // monadic
+   if (!header.X())    AXIS_ERROR;
 
    Workspace::push_SI(this, LOC);
 
@@ -291,6 +293,7 @@ UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B)
       }
 
    if (header.RO())    SYNTAX_ERROR;   // dyadic operator called monadically
+   if (!header.X())    AXIS_ERROR;
 
    Workspace::push_SI(this, LOC);
 
@@ -349,6 +352,7 @@ UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
 
    if (header.RO())    SYNTAX_ERROR;    // defined as dyadic operator
    if (!header.A())    VALENCE_ERROR;   // monadic
+   if (!header.X())    AXIS_ERROR;
 
    Workspace::push_SI(this, LOC);
 
@@ -406,7 +410,8 @@ UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
              << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
-   if (!header.RO())    SYNTAX_ERROR;   // not defined as dyadic operator
+   if (!header.RO())   SYNTAX_ERROR;   // not defined as dyadic operator
+   if (!header.X())    AXIS_ERROR;
 
    Workspace::push_SI(this, LOC);
 
@@ -472,6 +477,7 @@ UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
 
    if (!header.RO())   SYNTAX_ERROR;   // defined monadic op called dyadically
    if (!header.A())    VALENCE_ERROR;   // monadic
+   if (!header.X())    AXIS_ERROR;
 
    Workspace::push_SI(this, LOC);
 

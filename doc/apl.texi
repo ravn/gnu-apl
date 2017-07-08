@@ -703,12 +703,11 @@ between GNU APL and IBM APL2.
 * Section 3.11::   User-defined Commands
 * Section 3.12::   Direct Functions (Lambdas)
 * Section 3.13::   Axis argument in defined functions
-* Section 3.14::   Axis argument in primitive functions
-* Section 3.15::   ⎕SI - State Indicator
-* Section 3.16::   ⎕DLX: Knuth's Dancing Links Algorithm
-* Section 3.17::   History and TAB completion
-* Section 3.18::   ⎕SQL - SQL Database Interface
-* Section 3.19::   Comparison Rules
+* Section 3.14::   ⎕SI - State Indicator
+* Section 3.15::   ⎕DLX: Knuth's Dancing Links Algorithm
+* Section 3.16::   History and TAB completion
+* Section 3.17::   ⎕SQL - SQL Database Interface
+* Section 3.18::   Comparison Rules
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -1614,17 +1613,6 @@ doing so will make your APL code incompatible with other APL interpreters.
 Use this feature carefully!
 
 @node    Section 3.14
-@section Axis argument in primitive functions
-
-In order to minimize the syntactical differences between primitive APL
-functions (aka. built-in functions) and defined functions, all primitive
-function can be called with an axis argument. Those primitive functions
-for which the standard does not define an axis variant simply ignore
-the axis argument. The value of the axis argument is still computed, so this
-axis argument can be used for side effects such as counting the number of
-function calls in some unrelated variable.
-
-@node    Section 3.15
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -1687,7 +1675,7 @@ A count from the latest to the oldest level.
 For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
-@node    Section 3.16
+@node    Section 3.15
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
@@ -1921,7 +1909,7 @@ Another application of ⎕DLX is solving sudokus. The constraints matrix is
 a little more complicated, but the principle is the same.
 
 
-@node    Section 3.17
+@node    Section 3.16
 @section History and TAB completion
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user
@@ -1963,7 +1951,7 @@ recalling function lines (and which are not fully supported in GNU APL).
     function or variable name.
 
 
-@node    Section 3.18
+@node    Section 3.17
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -2082,7 +2070,7 @@ given table. Currently, the column layout is as follows:
 More columns containing extra information may be added in a future
 release.
 
-@node    Section 3.19
+@node    Section 3.18
 @section Comparison Rules
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥, and

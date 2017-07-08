@@ -112,12 +112,11 @@ ul.no-bullet {list-style: none}
       <li><a name="toc-Limitations-of-Lambdas" href="#Limitations-of-Lambdas">3.12.3 Limitations of Lambdas</a></li>
     </ul></li>
     <li><a name="toc-Axis-argument-in-defined-functions" href="#Section-3_002e13">3.13 Axis argument in defined functions</a></li>
-    <li><a name="toc-Axis-argument-in-primitive-functions" href="#Section-3_002e14">3.14 Axis argument in primitive functions</a></li>
-    <li><a name="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-3_002e15">3.15 ⎕SI - State Indicator</a></li>
-    <li><a name="toc-_005b_003f_005dDLX-_002d-Knuth_0027s-Dancing-Links-Algorithm" href="#Section-3_002e16">3.16 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</a></li>
-    <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e17">3.17 History and TAB completion</a></li>
-    <li><a name="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-3_002e18">3.18 ⎕SQL - SQL Database Interface</a></li>
-    <li><a name="toc-Comparison-Rules" href="#Section-3_002e19">3.19 Comparison Rules</a></li>
+    <li><a name="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-3_002e14">3.14 ⎕SI - State Indicator</a></li>
+    <li><a name="toc-_005b_003f_005dDLX-_002d-Knuth_0027s-Dancing-Links-Algorithm" href="#Section-3_002e15">3.15 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</a></li>
+    <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e16">3.16 History and TAB completion</a></li>
+    <li><a name="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-3_002e17">3.17 ⎕SQL - SQL Database Interface</a></li>
+    <li><a name="toc-Comparison-Rules" href="#Section-3_002e18">3.18 Comparison Rules</a></li>
   </ul></li>
   <li><a name="toc-Limitations-and-Missing-Features" href="#Chapter-4">4 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -801,17 +800,15 @@ Next: <a href="#Chapter-4" accesskey="n" rel="next">Chapter 4</a>, Previous: <a 
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e13">Section 3.13</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Axis argument in defined functions
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e14">Section 3.14</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Axis argument in primitive functions
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e14">Section 3.14</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SI - State Indicator
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e15">Section 3.15</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SI - State Indicator
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e15">Section 3.15</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕DLX: Knuth&rsquo;s Dancing Links Algorithm
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e16">Section 3.16</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕DLX: Knuth&rsquo;s Dancing Links Algorithm
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e16">Section 3.16</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">History and TAB completion
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e17">Section 3.17</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">History and TAB completion
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e17">Section 3.17</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SQL - SQL Database Interface
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e18">Section 3.18</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SQL - SQL Database Interface
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e19">Section 3.19</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Comparison Rules
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e18">Section 3.18</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Comparison Rules
 </td></tr>
 </table>
 
@@ -1749,25 +1746,8 @@ Use this feature carefully!
 <p>
 Next: <a href="#Section-3_002e15" accesskey="n" rel="next">Section 3.15</a>, Previous: <a href="#Section-3_002e13" accesskey="p" rel="prev">Section 3.13</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<a name="Axis-argument-in-primitive-functions"></a>
-<h3 class="section">3.14 Axis argument in primitive functions</h3>
-
-<p>In order to minimize the syntactical differences between primitive APL
-functions (aka. built-in functions) and defined functions, all primitive
-function can be called with an axis argument. Those primitive functions
-for which the standard does not define an axis variant simply ignore
-the axis argument. The value of the axis argument is still computed, so this
-axis argument can be used for side effects such as counting the number of
-function calls in some unrelated variable.
-</p>
-<hr>
-<a name="Section-3_002e15"></a>
-<div class="header">
-<p>
-Next: <a href="#Section-3_002e16" accesskey="n" rel="next">Section 3.16</a>, Previous: <a href="#Section-3_002e14" accesskey="p" rel="prev">Section 3.14</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
-</div>
 <a name="g_t_005b_003f_005dSI-_002d-State-Indicator"></a>
-<h3 class="section">3.15 ⎕SI - State Indicator</h3>
+<h3 class="section">3.14 ⎕SI - State Indicator</h3>
 
 <p>⎕SI returns aspects of the current State Indicator, similar to the standard
 command )SI. This can be used, for example, to create debug functions similar
@@ -1828,13 +1808,13 @@ A count from the latest to the oldest level.
 the caller, and so on.
 </p>
 <hr>
-<a name="Section-3_002e16"></a>
+<a name="Section-3_002e15"></a>
 <div class="header">
 <p>
-Next: <a href="#Section-3_002e17" accesskey="n" rel="next">Section 3.17</a>, Previous: <a href="#Section-3_002e15" accesskey="p" rel="prev">Section 3.15</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e16" accesskey="n" rel="next">Section 3.16</a>, Previous: <a href="#Section-3_002e14" accesskey="p" rel="prev">Section 3.14</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="g_t_005b_003f_005dDLX-_002d-Knuth_0027s-Dancing-Links-Algorithm"></a>
-<h3 class="section">3.16 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</h3>
+<h3 class="section">3.15 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</h3>
 
 <p>⎕DLX is an implementation of Donald Knuth&rsquo;s Dancing Links Algorithm (called
 DLX by Knuth himself, but is sometimes also referred to as Knuth&rsquo;s Algorithm X)
@@ -2057,13 +2037,13 @@ a little more complicated, but the principle is the same.
 </p>
 
 <hr>
-<a name="Section-3_002e17"></a>
+<a name="Section-3_002e16"></a>
 <div class="header">
 <p>
-Next: <a href="#Section-3_002e18" accesskey="n" rel="next">Section 3.18</a>, Previous: <a href="#Section-3_002e16" accesskey="p" rel="prev">Section 3.16</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e17" accesskey="n" rel="next">Section 3.17</a>, Previous: <a href="#Section-3_002e15" accesskey="p" rel="prev">Section 3.15</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="History-and-TAB-completion"></a>
-<h3 class="section">3.17 History and TAB completion</h3>
+<h3 class="section">3.16 History and TAB completion</h3>
 
 <p>Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user
 input. libreadline did provide two useful features: tab expansion (the tab
@@ -2105,13 +2085,13 @@ recalling function lines (and which are not fully supported in GNU APL).
 </p>
 
 <hr>
-<a name="Section-3_002e18"></a>
+<a name="Section-3_002e17"></a>
 <div class="header">
 <p>
-Next: <a href="#Section-3_002e19" accesskey="n" rel="next">Section 3.19</a>, Previous: <a href="#Section-3_002e17" accesskey="p" rel="prev">Section 3.17</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e18" accesskey="n" rel="next">Section 3.18</a>, Previous: <a href="#Section-3_002e16" accesskey="p" rel="prev">Section 3.16</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="g_t_005b_003f_005dSQL-_002d-SQL-Database-Interface"></a>
-<h3 class="section">3.18 ⎕SQL - SQL Database Interface</h3>
+<h3 class="section">3.17 ⎕SQL - SQL Database Interface</h3>
 
 <p>As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below.
@@ -2210,13 +2190,13 @@ given table. Currently, the column layout is as follows:
 release.
 </p>
 <hr>
-<a name="Section-3_002e19"></a>
+<a name="Section-3_002e18"></a>
 <div class="header">
 <p>
-Previous: <a href="#Section-3_002e18" accesskey="p" rel="prev">Section 3.18</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Previous: <a href="#Section-3_002e17" accesskey="p" rel="prev">Section 3.17</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="Comparison-Rules"></a>
-<h3 class="section">3.19 Comparison Rules</h3>
+<h3 class="section">3.18 Comparison Rules</h3>
 
 <p>Both IBM APL2 and the ISO standard require that the arguments of &lt;, ≤, ≥, and
 &gt; (but not = or ≠) are integer or real numbers, and that the argument of monadic

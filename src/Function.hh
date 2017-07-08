@@ -174,19 +174,19 @@ public:
 
    /// plain function, 2 arguments, with axis
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
-      { return eval_AB(A, B); }
+      { AXIS_ERROR; }
 
    /// dyadic operator, 2 arguments
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B);
 
    /// monadic operator, 2 arguments, with axis
    virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
-      { return eval_ALB(A, LO, B); }
+      { AXIS_ERROR; }
 
    /// dyadic operator, 2 arguments, with axis
    virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
                             Value_P X, Value_P B)
-      { return eval_ALRB(A, LO, RO, B); }
+      { AXIS_ERROR; }
 
    /// plain function, 1 argument
    virtual Token eval_B(Value_P B);
@@ -196,18 +196,18 @@ public:
 
    /// plain function, 1 arguments, with axis
    virtual Token eval_XB(Value_P X, Value_P B)
-      { return eval_B(B); }
+      { AXIS_ERROR; }
 
    /// monadic operator, 1 arguments, with axis
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B)
-      { return eval_LB(LO, B); }
+      { AXIS_ERROR; }
 
    /// dyadic operator, 1 arguments
    virtual Token eval_LRB(Token & LO, Token & RO, Value_P B);
 
    /// dyadic operator, 1 arguments, with axis
    virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
-      { return eval_LRB(LO, RO, B); }
+      { AXIS_ERROR; }
 
    /// Evaluate \b the fill function.
    virtual Token eval_fill_B(Value_P B)
