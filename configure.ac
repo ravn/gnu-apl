@@ -333,11 +333,12 @@ AC_ARG_VAR(DEVELOP_WANTED,
 if test "x$DEVELOP_WANTED" = "xyes"; then
    AC_DEFINE_UNQUOTED([DEVELOP_WANTED], [yes],
                    [define to set options typical for software development])
-   VALUE_CHECK_WANTED=yes
-   PERFORMANCE_COUNTERS_WANTED=yes
-   VALUE_HISTORY_WANTED=yes
-   DYNAMIC_LOG_WANTED=yes
    ASSERT_LEVEL_WANTED=2
+   DYNAMIC_LOG_WANTED=yes
+   PERFORMANCE_COUNTERS_WANTED=yes
+   RATIONAL_NUMBERS_WANTED=yes
+   VALUE_CHECK_WANTED=yes
+   VALUE_HISTORY_WANTED=yes
 fi
 
 # APL: max. rank ?
@@ -372,10 +373,10 @@ AC_MSG_RESULT([$PERFORMANCE_COUNTERS_WANTED])
 # APL: ADD_EVENT() macro and friends desired ?
 AC_MSG_CHECKING([whether to remember the history of APL values (debug feature)])
 AC_ARG_VAR(VALUE_HISTORY_WANTED,
-   [ enable CHECK() macro (see README-2-configure) default: no ])
+   [ enable value events (a debug facility, see README-2-configure) default: no ])
 if test "x$VALUE_HISTORY_WANTED" = "xyes"; then
 AC_DEFINE_UNQUOTED([VALUE_HISTORY_WANTED], [yes],
-                   [ define to enable CHECK macro ])
+                   [ define to enable value events])
 else VALUE_HISTORY_WANTED="no"
 fi
 AC_MSG_RESULT([$VALUE_HISTORY_WANTED])
@@ -497,7 +498,7 @@ AC_MSG_RESULT([$SHORT_VALUE_LENGTH_WANTED])
 # APL: visible markers (debug only option) ?
 AC_MSG_CHECKING([whether visible markers shall be used])
 AC_ARG_VAR(VISIBLE_MARKERS_WANTED,
-   [ enable CHECK() macro (see README-2-configure) default: no ])
+   [ enable visible formatting markers (debug facility, see README-2-configure) default: no ])
 if test "x$VISIBLE_MARKERS_WANTED" = "xyes"; then
 AC_DEFINE_UNQUOTED([VISIBLE_MARKERS_WANTED], [yes],
                    [ define to have visible markers (DONT!)])
@@ -505,6 +506,16 @@ else VISIBLE_MARKERS_WANTED="no"
 fi
 AC_MSG_RESULT([$VISIBLE_MARKERS_WANTED])
 
+# APL: support for rational numbers ?
+AC_MSG_CHECKING([whether support for rational numbers is desired ])
+AC_ARG_VAR(RATIONAL_NUMBERS_WANTED,
+   [ enable support for rational numbers (see README-2-configure) default: no ])
+if test "x$RATIONAL_NUMBERS_WANTED" = "xyes"; then
+AC_DEFINE_UNQUOTED([RATIONAL_NUMBERS_WANTED], [yes],
+                   [ define to have support for rational numbers (EXPERIMENTAL!)])
+else RATIONAL_NUMBERS_WANTED="no"
+fi
+AC_MSG_RESULT([$VISIBLE_MARKERS_WANTED])
 
 # check if we are on i686 (to fix a strange rpmbuild problem
 AC_MSG_CHECKING([whether we compile for an i686 CPU])

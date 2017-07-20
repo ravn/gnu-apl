@@ -545,23 +545,107 @@ UCS_string ucs = value->get_UCS_ravel();
 }
 //=============================================================================
 Quad_PS::Quad_PS()
-   : SystemVariable(ID::Quad_PS)
+   : SystemVariable(ID::Quad_PS),
+     print_quotients(false),
+     style(Command::boxing_format)
 {
-   Symbol::assign(IntScalar(0, LOC), false, LOC);
+Value_P val(2, LOC);
+   new (val->next_ravel())   IntCell(print_quotients);
+   new (val->next_ravel())   IntCell(style);
+   val->check_value(LOC);
+   Symbol::assign(val, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_PS::assign(Value_P value, bool clone, const char * loc)
+Quad_PS::assign(Value_P B, bool clone, const char * loc)
 {
-const APL_Integer ps = value->get_sole_integer();
-   switch(ps)
+   if (B->get_rank() != 1)        RANK_ERROR;
+   if (B->element_count() != 2)   LENGTH_ERROR;
+
+const APL_Integer B_quot  = B->get_ravel(0).get_near_bool();
+const APL_Integer B_style = B->get_ravel(1).get_near_int();
+
+   switch(B_style) // boxing format
       {
-        case 0:
-        case 1:
-        case 2:
-        case 3:  Symbol::assign(IntScalar(ps, LOC), false, LOC);   return;
+        case -29:
+        case -25: case -24: case -23:
+        case -22: case -21: case -20:
+        case -9: case  -8: case  -7:
+        case -4: case  -3: case  -2:
+        case  0:
+        case  2: case   3: case   4:
+        case  7: case   8: case   9:
+        case 20: case  21: case  22:
+        case 23: case  24: case  25:
+        case 29: break;   // OK
+
         default: DOMAIN_ERROR;
       }
+ 
+   // values in B are valid
+   //
+   Command::boxing_format = B_style;
+   print_quotients = B_quot;
+   style = B_style;
+   Symbol::assign(B, clone, LOC);
+   return;
+}
+//-----------------------------------------------------------------------------
+void
+Quad_PS::assign_indexed(Value_P X, Value_P B)
+{
+   if (!(X->is_int_scalar() || X->is_int_vector()))   INDEX_ERROR;
+   if (!(B->is_int_scalar() || B->is_int_vector()))   DOMAIN_ERROR;
+   if (X->element_count() != B->element_count())      LENGTH_ERROR;
+
+const ShapeItem ec = X->element_count();
+const APL_Integer qio = Workspace::get_IO();
+
+APL_Integer Z_quot = print_quotients;
+APL_Integer Z_style = style;
+   loop(e, ec)
+      {
+        const APL_Integer x = X->get_ravel(e).get_near_int() - qio;
+        const APL_Integer b = B->get_ravel(e).get_near_int();
+
+        if (x == 0)   // display quotients
+           {
+             if (b < 0)   DOMAIN_ERROR;
+             if (b > 1)   DOMAIN_ERROR;
+             Z_quot = b;
+           }
+        else if (x == 1)   switch(b) // boxing format
+           {
+             case -29:
+             case -25: case -24: case -23:
+             case -22: case -21: case -20:
+             case -9: case  -8: case  -7:
+             case -4: case  -3: case  -2:
+             case  0:
+             case  2: case   3: case   4:
+             case  7: case   8: case   9:
+             case 20: case  21: case  22:
+             case 23: case  24: case  25:
+             case 29: Z_style = b;
+                  Command::boxing_format = b;
+                  break;
+ 
+             default:
+                  MORE_ERROR() <<
+                       "Invalid print style (try 0, 2-4, 7-9, 20-25, or 29)";
+                  DOMAIN_ERROR;
+           }
+        else
+           {
+             INDEX_ERROR;
+           }
+      }
+
+Value_P Z(2, LOC);
+   new (Z->next_ravel())   IntCell(Z_quot);
+   new (Z->next_ravel())   IntCell(Z_style);
+   Z->check_value(LOC);
+   Symbol::assign(Z, false, LOC);
 }
 //=============================================================================
 Quad_PW::Quad_PW()
@@ -973,10 +1057,10 @@ Cell & cell = value->get_ravel(0);
 
    if (cell.is_float_cell())
       {
-        const APL_Float fval = cell.get_real_value();
-        if (fval < -12.1)   return;
-        if (fval > 14.1)    return;
-        offset_seconds = int(0.5 + fval*3600);
+        const APL_Float hours = cell.get_real_value();
+        if (hours < -12.1)   return;
+        if (hours > 14.1)    return;
+        offset_seconds = int(0.5 + hours*3600);
         Symbol::assign(value, clone, LOC);
         return;
       }

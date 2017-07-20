@@ -393,11 +393,15 @@ IntCell::bif_reciprocal(Cell * Z) const
    switch(value.ival)
       {
         case  0: return E_DOMAIN_ERROR;
-        case  1: new (Z) IntCell(1);    return E_NO_ERROR;
-        case -1: new (Z) IntCell(-1);   return E_NO_ERROR;
-        default: new (Z) FloatCell(1.0/value.ival);
+        case  1: return IntCell::zv(Z,  1);
+        case -1: return IntCell::zv(Z, -1);
       }
-   return E_NO_ERROR;
+
+#ifdef RATIONAL_NUMBERS_WANTED
+   return FloatCell::zv(Z, 1, value.ival);
+#endif
+
+   return FloatCell::zv(Z, 1.0/value.ival);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -524,8 +528,8 @@ IntCell::bif_divide(Cell * Z, const Cell * A) const
       {
         // both cells are integers.
         //
-        const APL_Integer a = A->get_int_value();
-        const APL_Integer b =    get_int_value();
+        APL_Integer a = A->get_int_value();
+        APL_Integer b =    get_int_value();
 
         if (b == 0)   // a ÷ 0 is allowed iff a == 0
            {
@@ -533,12 +537,22 @@ IntCell::bif_divide(Cell * Z, const Cell * A) const
              return IntCell::z1(Z);   // 0÷0 is 1 in APL
            }
 
+#ifdef RATIONAL_NUMBERS_WANTED
+        if (b < 0)   // make denominator positive
+           {
+             a = -a;
+             b = -b;
+           }
+        const APL_Integer gcd = FloatCell::gcd(b, a);
+        if (b == gcd)   return IntCell::zv(Z, a/gcd);
+        return FloatCell::zv(Z, a/gcd, b/gcd);
+#else
         const APL_Float i_quot = a / b;
         const APL_Float r_quot = a / (APL_Float)b;
 
-        if (a != i_quot * b)   new (Z) FloatCell(r_quot);
-        else                   new (Z) IntCell(i_quot);
-        return E_NO_ERROR;
+        if (a != i_quot * b)   return FloatCell::zv(Z, r_quot);
+        else                   return IntCell::zv(Z, i_quot);
+#endif
       }
 
    // delegate to A

@@ -23,6 +23,8 @@
 
 #include <complex>
 
+#include "../config.h"   // for RATIONAL_NUMBERS_WANTED
+
 #include "Common.hh"
 #include "ErrorCode.hh"
 #include "PrintBuffer.hh"
@@ -222,22 +224,24 @@ public:
    /// The possible cell values
    union SomeValue
       {
-        Unicode       aval;    ///< a character
-        APL_Integer   ival;    ///< an integer
-        ErrorCode     eval;    ///< an error code
-        APL_Float     fval;    ///< a floating point number
-        APL_Float     cval_r;  ///< the real part of a complex number
-        void         *vptr;    ///< a void pointer
-        Cell         *next;    ///< pointer to the next (unused) cell
-        Cell         *lval;    ///< left value (for selective assignment)
-        Value_P_Base  valp;    ///< a pointer to a value
+        Unicode       aval;        ///< a character
+        APL_Integer   ival;        ///< an integer
+	APL_Integer   numerator;   ///< the numerator of a rational number
+        ErrorCode     eval;        ///< an error code
+        APL_Float     fval;        ///< a floating point number
+        APL_Float     cval_r;      ///< the real part of a complex number
+        void         *vptr;        ///< a void pointer
+        Cell         *next;        ///< pointer to the next (unused) cell
+        Cell         *lval;        ///< left value (for selective assignment)
+        Value_P_Base  valp;        ///< a pointer to a value
       };
 
    /// additional data for ComplexCells and PointerCells
    union SomeValue2
       {
-        APL_Float     cval_i;    ///< the imag part of a complex number
-        Value        *owner;     ///< the value containing a PointerCell
+        APL_Float     cval_i;      ///< the imag part of a complex number
+        Value        *owner;       ///< the value containing a PointerCell
+	APL_Integer   denominator; ///< the denominator of a rational number
       };
 
    /// return the type of \b this cell
@@ -394,6 +398,39 @@ public:
    virtual ErrorCode bif_circle_fun_inverse(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
+#ifdef RATIONAL_NUMBERS_WANTED
+   virtual APL_Integer get_numerator() const   { FIXME }
+   virtual APL_Integer get_denominator() const { FIXME }
+#endif
+
+   /// return \b true if adding a and b will (probably) overflow.
+   /// For some huge a or b the result may incorrectly return true.
+   static bool sum_overflow(int64_t a, int64_t b)
+      {
+        const int64_t sum = (a >> 4) + (b >> 4);
+        return sum >=  0x0FFFFFFFFFFFFFFELL
+            || sum <= -0x0FFFFFFFFFFFFFFELL;
+      }
+
+   /// return \b true if subtracting b from a will (probably) overflow.
+   /// For some huge a or b the result may incorrectly return true.
+   static bool diff_overflow(int64_t a, int64_t b)
+      {
+        const int64_t sum = (a >> 4) - (b >> 4);
+        return sum >=  0x0FFFFFFFFFFFFFFELL
+            || sum <= -0x0FFFFFFFFFFFFFFELL;
+      }
+
+   /// return \b true if multiplying a and b will (probably) overflow.
+   /// For some huge a or b the result may incorrectly return true.
+   /// a or b the result may incorrectly return true.
+   static bool prod_overflow(int64_t a, int64_t b)
+      {
+        const int64_t prod = (a >> 32) + (b >> 32);
+        return prod >=  0x100000000LL
+            || prod <= -0x100000000LL;
+      }
+
    /// placement new
    void * operator new(std::size_t, void *);
 
@@ -431,6 +468,7 @@ public:
 
    /// raw pointer to the secondary value (for 28 ⎕CR)
    const void * get_u1() const   { return &value2; }
+
 protected:
    /// the primary value of \b this cell
    SomeValue value;

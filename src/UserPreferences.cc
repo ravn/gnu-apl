@@ -839,6 +839,13 @@ UserPreferences::show_configure_options()
         << is_default(MAX_RANK_WANTED == 8)
    << endl <<
 
+#ifdef RATIONAL_NUMBERS_WANTED
+   "    RATIONAL_NUMBERS_WANTED=yes"
+#else
+   "    RATIONAL_NUMBERS_WANTED=no (default)"
+#endif
+   << endl <<
+
    "    SHORT_VALUE_LENGTH_WANTED=" << SHORT_VALUE_LENGTH_WANTED
         << is_default(SHORT_VALUE_LENGTH_WANTED == 1)
         << ", therefore:" << endl <<

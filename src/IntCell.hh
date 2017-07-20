@@ -21,6 +21,7 @@
 #ifndef __INTCELL_HH_DEFINED__
 #define __INTCELL_HH_DEFINED__
 
+#include "../config.h"   // for RATIONAL_NUMBERS_WANTED
 #include "RealCell.hh"
 
 //-----------------------------------------------------------------------------
@@ -127,6 +128,16 @@ public:
    /// According to lrm p. 13, integer cells ignore ⎕PP an never use scaling
    virtual bool need_scaling(const PrintContext &pctx) const
       { return false; }
+
+#ifdef RATIONAL_NUMBERS_WANTED
+   /// overloaded Cell::get_numerator()
+   virtual APL_Integer get_numerator() const
+      { return value.ival; }
+
+   /// overloaded Cell::get_denominator()
+   virtual APL_Integer get_denominator() const
+      { return 1; }
+#endif
 
    /// initialize Z to integer 0
    static ErrorCode z0(Cell * Z)

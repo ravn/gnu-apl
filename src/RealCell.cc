@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ RealCell::bif_circle_fun(Cell * Z, const Cell * A) const
    if (!A->is_near_int())   return E_DOMAIN_ERROR;
 const APL_Integer fun = A->get_checked_near_int();
 
-   new (Z) FloatCell(0);   // prepare for DOMAIN ERROR
+   FloatCell::zv(Z, 0);   // prepare for DOMAIN ERROR
 
 const ErrorCode ret = do_bif_circle_fun(Z, fun);
    if (!Z->is_finite())   return E_DOMAIN_ERROR;
@@ -75,7 +75,7 @@ RealCell::bif_circle_fun_inverse(Cell * Z, const Cell * A) const
    if (!A->is_near_int())   return E_DOMAIN_ERROR;
 const APL_Integer fun = A->get_checked_near_int();
 
-   new (Z) FloatCell(0);   // prepare for DOMAIN ERROR
+   FloatCell::zv(Z, 0);   // prepare for DOMAIN ERROR
 
 ErrorCode ret = E_DOMAIN_ERROR;
    switch(fun)

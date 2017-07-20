@@ -632,7 +632,7 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.1::    APL Scripting
 * Section 3.2::    ⎕SYL - System limits
 * Section 3.3::    Dyadic ⎕CR
-* Section 3.4::    ⎕FIO: File I/O Functions
+* Section 3.4::    ⎕FIO - File I/O Functions
 * Section 3.5::    Debug Commands
 * Section 3.6::    Colored Output
 * Section 3.7::    Logging Facilities
@@ -646,7 +646,9 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.15::   ⎕DLX: Knuth’s Dancing Links Algorithm
 * Section 3.16::   History and TAB completion
 * Section 3.17::   ⎕SQL - SQL Database Interface
-* Section 3.18::   Comparison Rules
+* Section 3.18::   ⎕PS - Print Style
+* Section 3.19::   Rational Numbers
+* Section 3.20::   Comparison Rules
 
 There are a few possibly useful features in GNU APL:
 
@@ -1148,8 +1150,8 @@ byte vector → hex or byte vector → base64 conversions.
 
 File: apl.info,  Node: Section 3.4,  Next: Section 3.5,  Prev: Section 3.3,  Up: Chapter 3
 
-3.4 ⎕FIO: File I/O Functions
-============================
+3.4 ⎕FIO - File I/O Functions
+=============================
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
 system function ⎕FIO. See the FILE_IO section below for details.
@@ -1983,9 +1985,52 @@ table.  Currently, the column layout is as follows:
 release.
 
 
-File: apl.info,  Node: Section 3.18,  Prev: Section 3.17,  Up: Chapter 3
+File: apl.info,  Node: Section 3.18,  Next: Section 3.19,  Prev: Section 3.17,  Up: Chapter 3
 
-3.18 Comparison Rules
+3.18 ⎕PS - Print Style
+======================
+
+⎕PS is an integer vector that currently (read: SVN 982) contains two
+integers which control some details of how APL values are being printed.
+The default value of ⎕PS is 0 0.  ⎕PS is a session variable which
+survives )LOADing of workspaces
+
+   ⎕PS[0] = 0: print rational quotients normal floating point number
+⎕PS[0] = 1: print rational quotients as A÷B
+
+   ⎕PS[0] has only an effect if rational numbers was ./configure’d.
+
+   ⎕PS[1] = 0: no "boxing" of APL values ⎕PS[1] > 0: "boxing" of APL
+values
+
+   Setting ⎕PS[1] has the same effect as the debug command ]BOXING and
+uses the same values.
+
+
+File: apl.info,  Node: Section 3.19,  Next: Section 3.20,  Prev: Section 3.18,  Up: Chapter 3
+
+3.19 Rational Numbers
+=====================
+
+GNU APL has limited support for rational numbers.  Instead of dividing
+integers (and possibly causing rounding errors), integer quotionts are
+kept undivided internally until some function requires a conversion to a
+floating point (double) value.
+
+   Currently only +, -, ×, and ÷ preserve rational numbers where
+possible, but this list may grow in the future.
+
+   A quotient is internally stored as a 64-bit numerator and a 64-bit
+denominator.  In some cases arithmetic with rational numbers is faster
+than with doubles, but in most cases it is slower.
+
+   For that reason support for rational numbers is disabled by default
+and must be enabled via ./configure (see README-2-configure).
+
+
+File: apl.info,  Node: Section 3.20,  Prev: Section 3.19,  Up: Chapter 3
+
+3.20 Comparison Rules
 =====================
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤,
@@ -3379,32 +3424,34 @@ Node: Top383
 Node: Chapter 11408
 Node: Chapter 217064
 Node: Chapter 321475
-Node: Section 3.122409
-Node: Section 3.233312
-Node: Section 3.337698
-Node: Section 3.440688
-Node: Section 3.541491
-Node: Section 3.642104
-Node: Section 3.743391
-Node: Section 3.845322
-Node: Section 3.945495
-Node: Section 3.1048745
-Node: Section 3.1149323
-Node: Section 3.1250719
-Node: Section 3.1354674
-Node: Section 3.1455438
-Node: Section 3.1557427
-Node: Section 3.1667339
-Node: Section 3.1769124
-Node: Section 3.1872228
-Node: Chapter 474833
-Node: Chapter 576581
-Node: Chapter 677710
-Node: Section 6.178129
-Node: Section 6.278816
-Node: Chapter 779647
-Node: Section 7.180150
-Node: Section 7.2105459
+Node: Section 3.122485
+Node: Section 3.233388
+Node: Section 3.337774
+Node: Section 3.440764
+Node: Section 3.541569
+Node: Section 3.642182
+Node: Section 3.743469
+Node: Section 3.845400
+Node: Section 3.945573
+Node: Section 3.1048823
+Node: Section 3.1149401
+Node: Section 3.1250797
+Node: Section 3.1354752
+Node: Section 3.1455516
+Node: Section 3.1557505
+Node: Section 3.1667417
+Node: Section 3.1769202
+Node: Section 3.1872306
+Node: Section 3.1973068
+Node: Section 3.2073900
+Node: Chapter 476505
+Node: Chapter 578253
+Node: Chapter 679382
+Node: Section 6.179801
+Node: Section 6.280488
+Node: Chapter 781319
+Node: Section 7.181822
+Node: Section 7.2107131
 
 End Tag Table
 

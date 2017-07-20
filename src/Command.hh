@@ -106,6 +106,9 @@ public:
    /// return true if entry is a directory
    static bool is_directory(dirent * entry, const UTF8_string & path);
 
+   /// format for ]BOXING
+   static int boxing_format;
+
 protected:
    /// )BOXING command
    static void cmd_BOXING(ostream & out, const UCS_string & arg);
@@ -271,9 +274,6 @@ protected:
 
    /// parse the argument of the ]LOG command and set logging accordingly
    static void log_control(const UCS_string & args);
-
-   /// format for ]BOXING
-   static int boxing_format;
 
    /// the number of APL expressions entered in immediate execution mode
    static ShapeItem APL_expression_count;

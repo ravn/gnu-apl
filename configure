@@ -645,6 +645,7 @@ DEVELOP_FALSE
 DEVELOP_TRUE
 ON_i686_FALSE
 ON_i686_TRUE
+RATIONAL_NUMBERS_WANTED
 VISIBLE_MARKERS_WANTED
 SHORT_VALUE_LENGTH_WANTED
 APSERVER_PATH
@@ -853,7 +854,8 @@ APSERVER_TRANSPORT
 APSERVER_PORT
 APSERVER_PATH
 SHORT_VALUE_LENGTH_WANTED
-VISIBLE_MARKERS_WANTED'
+VISIBLE_MARKERS_WANTED
+RATIONAL_NUMBERS_WANTED'
 
 
 # Initialize some variables set by options.
@@ -1526,7 +1528,8 @@ Some influential environment variables:
   PERFORMANCE_COUNTERS_WANTED
               enable performance counters (see README-2-configure) default: no
   VALUE_HISTORY_WANTED
-              enable CHECK() macro (see README-2-configure) default: no
+              enable value events (a debug facility, see README-2-configure)
+              default: no
   GPROF_WANTED
               enable gprof (-pg) (see README-2-configure) default: no
   DYNAMIC_LOG_WANTED
@@ -1549,7 +1552,11 @@ Some influential environment variables:
   SHORT_VALUE_LENGTH_WANTED
               Cellcount of short values (see README-2-configure) default: 12)
   VISIBLE_MARKERS_WANTED
-              enable CHECK() macro (see README-2-configure) default: no
+              enable visible formatting markers (debug facility, see
+              README-2-configure) default: no
+  RATIONAL_NUMBERS_WANTED
+              enable support for rational numbers (see README-2-configure)
+              default: no
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -18440,11 +18447,12 @@ cat >>confdefs.h <<_ACEOF
 #define DEVELOP_WANTED yes
 _ACEOF
 
-   VALUE_CHECK_WANTED=yes
-   PERFORMANCE_COUNTERS_WANTED=yes
-   VALUE_HISTORY_WANTED=yes
-   DYNAMIC_LOG_WANTED=yes
    ASSERT_LEVEL_WANTED=2
+   DYNAMIC_LOG_WANTED=yes
+   PERFORMANCE_COUNTERS_WANTED=yes
+   RATIONAL_NUMBERS_WANTED=yes
+   VALUE_CHECK_WANTED=yes
+   VALUE_HISTORY_WANTED=yes
 fi
 
 # APL: max. rank ?
@@ -18669,6 +18677,20 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $VISIBLE_MARKERS_WANTED" >&5
 $as_echo "$VISIBLE_MARKERS_WANTED" >&6; }
 
+# APL: support for rational numbers ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether support for rational numbers is desired " >&5
+$as_echo_n "checking whether support for rational numbers is desired ... " >&6; }
+
+if test "x$RATIONAL_NUMBERS_WANTED" = "xyes"; then
+
+cat >>confdefs.h <<_ACEOF
+#define RATIONAL_NUMBERS_WANTED yes
+_ACEOF
+
+else RATIONAL_NUMBERS_WANTED="no"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $VISIBLE_MARKERS_WANTED" >&5
+$as_echo "$VISIBLE_MARKERS_WANTED" >&6; }
 
 # check if we are on i686 (to fix a strange rpmbuild problem
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we compile for an i686 CPU" >&5

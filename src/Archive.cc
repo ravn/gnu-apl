@@ -207,8 +207,20 @@ char cc[80];
                  NEED(1 + strlen(cc)) << UNI_PAD_U3 << decr(--space, cc);
                  break;
 
-            case CT_FLOAT:   // uses UNI_PAD_U4
+            case CT_FLOAT:   // uses UNI_PAD_U4 or UNI_PAD_U8
                  space -= leave_char_mode();
+#ifdef RATIONAL_NUMBERS_WANTED
+                 {
+                 const FloatCell * flt = (const FloatCell *)&cell;
+                 if (const APL_Integer denom = flt->get_denominator())
+                    {
+                      const APL_Integer numer = flt->get_numerator();
+                      snprintf(cc, sizeof(cc), "%lld÷%lld", numer, denom);
+                      NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
+                      break;
+                    }
+                 }
+#endif
                  snprintf(cc, sizeof(cc), "%.17g", cell.get_real_value());
                  NEED(1 + strlen(cc)) << UNI_PAD_U4 << decr(--space, cc);
                  break;
@@ -1559,6 +1571,32 @@ const Unicode type = UTF8_string::toUni(first, len, true);
                 }
              break;
 
+        case UNI_PAD_U8: // rational quotient
+             //
+             // we should understand rational quotients even if we are
+             // not ./configured for them..
+             //
+             first += len;
+             {
+               char * end = 0;
+               const uint64_t numer = strtoll((const char *)first, &end, 10);
+               first = (const UTF8 *)end;
+
+               // skip ÷ (which is is C3 B7 in UTF8)
+               Assert((*end++ & 0xFF) == 0xC3);
+               Assert((*end++ & 0xFF) == 0xB7);
+               const uint64_t denom = strtoll(end, &end, 10);
+               Assert(denom > 0);
+#ifdef RATIONAL_NUMBERS_WANTED
+               new (C++) FloatCell(numer, denom);
+#else
+               new (C++) FloatCell(((double)numer)/denom);
+#endif
+               first = (const UTF8 *)end;
+             }
+             break;
+
+
         default: Q1(type) Q1(line_no) DOMAIN_ERROR;
       }
 }
@@ -1687,13 +1725,14 @@ const int vid = find_int_attr("vid", false, 10);
    Log(LOG_archive)   CERR << "      [" << d << "] read_Variable() vid=" << vid
                            << " name=" << symbol.get_name() << endl;
 
-   // some system variables are  saved for troubleshooting purposes, but
+   // some system variables are saved for troubleshooting purposes, but
    // should not be loaded...
    //
    if (symbol.is_readonly())                     return;
-   if (symbol.get_name().starts_iwith("⎕NLT"))   return;
+   if (symbol.get_name().starts_iwith("⎕NLT"))   return;   // extinct
    if (symbol.get_Id() == ID::Quad_SVE)           return;
    if (symbol.get_Id() == ID::Quad_SYL)           return;
+   if (symbol.get_Id() == ID::Quad_PS)            return;
 
    if (vid == -1)   // stale variable
       {
@@ -2275,8 +2314,8 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 
         case TV_FLT:   
              {
-               const double fval = find_float_attr("float");
-               new (&tloc.tok) Token(tag, fval);
+               const double val = find_float_attr("float");
+               new (&tloc.tok) Token(tag, val);
              }
              break;
 

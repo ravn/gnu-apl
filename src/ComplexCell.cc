@@ -113,17 +113,12 @@ ComplexCell::bif_factorial(Cell * Z) const
    if (is_near_real())
       {
         const FloatCell fc(get_real_value());
-        fc.bif_factorial(Z);
-        return E_NO_ERROR;
+        return fc.bif_factorial(Z);
       }
 
-const APL_Float zr = get_real_value() + 1.0;
-const APL_Float zi = get_imag_value();
-const APL_Complex z(zr, zi);
-
-   new (Z) ComplexCell(gamma(get_real_value(), get_imag_value()));
+ErrorCode ret = ComplexCell::zv(Z, gamma(get_real_value(), get_imag_value()));
    if (errno)   return E_DOMAIN_ERROR;
-   return E_NO_ERROR;
+   return ret;
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -275,15 +270,13 @@ ComplexCell::bif_nat_log(Cell * Z) const
 ErrorCode
 ComplexCell::bif_add(Cell * Z, const Cell * A) const
 {
-   new (Z) ComplexCell(A->get_complex_value() + get_complex_value());
-   return E_NO_ERROR;
+   return ComplexCell::zv(Z, A->get_complex_value() + get_complex_value());
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 ComplexCell::bif_subtract(Cell * Z, const Cell * A) const
 {
-   new (Z) ComplexCell(A->get_complex_value() - get_complex_value());
-   return E_NO_ERROR;
+   return ComplexCell::zv(Z, A->get_complex_value() - get_complex_value());
 }
 //-----------------------------------------------------------------------------
 ErrorCode

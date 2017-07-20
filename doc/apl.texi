@@ -693,7 +693,7 @@ between GNU APL and IBM APL2.
 * Section 3.1::    APL Scripting
 * Section 3.2::    ⎕SYL - System limits
 * Section 3.3::    Dyadic ⎕CR
-* Section 3.4::    ⎕FIO: File I/O Functions
+* Section 3.4::    ⎕FIO - File I/O Functions
 * Section 3.5::    Debug Commands
 * Section 3.6::    Colored Output
 * Section 3.7::    Logging Facilities
@@ -707,7 +707,9 @@ between GNU APL and IBM APL2.
 * Section 3.15::   ⎕DLX: Knuth's Dancing Links Algorithm
 * Section 3.16::   History and TAB completion
 * Section 3.17::   ⎕SQL - SQL Database Interface
-* Section 3.18::   Comparison Rules
+* Section 3.18::   ⎕PS - Print Style
+* Section 3.19::   Rational Numbers
+* Section 3.20::   Comparison Rules
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -1231,7 +1233,7 @@ then be used as input for e.g. byte vector → hex or byte vector → base64
 conversions.
 
 @node    Section 3.4
-@section ⎕FIO: File I/O Functions
+@section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
 system function ⎕FIO. See the FILE_IO section below for details.
@@ -2071,6 +2073,43 @@ More columns containing extra information may be added in a future
 release.
 
 @node    Section 3.18
+@section ⎕PS - Print Style
+
+⎕PS is an integer vector that currently (read: SVN 982) contains two integers
+which control some details of how APL values are being printed. The default
+value of ⎕PS is 0 0. ⎕PS is a session variable which survives )LOADing of
+workspaces
+
+⎕PS[0] = 0: print rational quotients normal floating point number
+⎕PS[0] = 1: print rational quotients as A÷B
+
+⎕PS[0] has only an effect if rational numbers was ./configure'd.
+
+⎕PS[1] = 0: no "boxing" of APL values
+⎕PS[1] > 0: "boxing" of APL values
+
+Setting ⎕PS[1] has the same effect as the debug command ]BOXING and uses
+the same values.
+
+@node    Section 3.19
+@section Rational Numbers
+
+GNU APL has limited support for rational numbers. Instead of dividing integers
+(and possibly causing rounding errors), integer quotionts are kept undivided
+internally until some function requires a conversion to a floating point
+(double) value.
+
+Currently only +, -, ×, and ÷ preserve rational numbers where possible, but
+this list may grow in the future.
+
+A quotient is internally stored as a 64-bit numerator and a 64-bit denominator.
+In some cases arithmetic with rational numbers is faster than with doubles, but
+in most cases it is slower.
+
+For that reason support for rational numbers is disabled by default and must
+be enabled via ./configure (see README-2-configure).
+
+@node    Section 3.20
 @section Comparison Rules
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥, and

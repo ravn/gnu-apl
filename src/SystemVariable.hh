@@ -398,7 +398,7 @@ public:
    /// Return the current print style. MUST NOT CALL get_apl_value()
    /// because it can be called from parallel Cell functions
    PrintStyle current() const
-      { switch (get_first_cell()->get_int_value())
+      { switch (style)
            {
              case 0: return PR_APL;
              case 1: return PR_APL_FUN;
@@ -408,16 +408,29 @@ public:
            }
       }
 
+   /// return the quotient print style
+   bool get_print_quotients() const
+      { return print_quotients; }
+
 protected:
    /// overloaded Symbol::assign().
    virtual void assign(Value_P value, bool clone, const char * loc);
 
-   // overloaded Symbol::push()
+   /// overloaded Symbol::assign_indexed()
+   virtual void assign_indexed(Value_P X, Value_P value);
+
+   /// overloaded Symbol::push()
    virtual void push()
       {
         Symbol::push();
         Symbol::assign(IntScalar(0, LOC), false, LOC);
       }
+
+   /// true if quotients shall be printed as A÷B
+   bool print_quotients;
+
+   /// the current style
+   int style;
 };
 //-----------------------------------------------------------------------------
 /**

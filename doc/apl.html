@@ -93,7 +93,7 @@ ul.no-bullet {list-style: none}
       <li><a name="toc-_005b_003f_005dSYL_005b27_003b_005d" href="#g_t_005b_003f_005dSYL_005b27_003b_005d">3.2.4 ⎕SYL[27;]</a></li>
     </ul></li>
     <li><a name="toc-Dyadic-_005b_003f_005dCR" href="#Section-3_002e3">3.3 Dyadic ⎕CR</a></li>
-    <li><a name="toc-_005b_003f_005dFIO_003a-File-I_002fO-Functions" href="#Section-3_002e4">3.4 ⎕FIO: File I/O Functions</a></li>
+    <li><a name="toc-_005b_003f_005dFIO-_002d-File-I_002fO-Functions" href="#Section-3_002e4">3.4 ⎕FIO - File I/O Functions</a></li>
     <li><a name="toc-Debug-Commands" href="#Section-3_002e5">3.5 Debug Commands</a></li>
     <li><a name="toc-Colored-Output" href="#Section-3_002e6">3.6 Colored Output</a></li>
     <li><a name="toc-Logging-Facilities" href="#Section-3_002e7">3.7 Logging Facilities</a>
@@ -116,7 +116,9 @@ ul.no-bullet {list-style: none}
     <li><a name="toc-_005b_003f_005dDLX-_002d-Knuth_0027s-Dancing-Links-Algorithm" href="#Section-3_002e15">3.15 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</a></li>
     <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e16">3.16 History and TAB completion</a></li>
     <li><a name="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-3_002e17">3.17 ⎕SQL - SQL Database Interface</a></li>
-    <li><a name="toc-Comparison-Rules" href="#Section-3_002e18">3.18 Comparison Rules</a></li>
+    <li><a name="toc-_005b_003f_005dPS-_002d-Print-Style" href="#Section-3_002e18">3.18 ⎕PS - Print Style</a></li>
+    <li><a name="toc-Rational-Numbers" href="#Section-3_002e19">3.19 Rational Numbers</a></li>
+    <li><a name="toc-Comparison-Rules" href="#Section-3_002e20">3.20 Comparison Rules</a></li>
   </ul></li>
   <li><a name="toc-Limitations-and-Missing-Features" href="#Chapter-4">4 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -780,7 +782,7 @@ Next: <a href="#Chapter-4" accesskey="n" rel="next">Chapter 4</a>, Previous: <a 
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e3" accesskey="3">Section 3.3</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Dyadic ⎕CR
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e4" accesskey="4">Section 3.4</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕FIO: File I/O Functions
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e4" accesskey="4">Section 3.4</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕FIO - File I/O Functions
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e5" accesskey="5">Section 3.5</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Debug Commands
 </td></tr>
@@ -808,7 +810,11 @@ Next: <a href="#Chapter-4" accesskey="n" rel="next">Chapter 4</a>, Previous: <a 
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e17">Section 3.17</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SQL - SQL Database Interface
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e18">Section 3.18</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Comparison Rules
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e18">Section 3.18</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕PS - Print Style
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e19">Section 3.19</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Rational Numbers
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e20">Section 3.20</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Comparison Rules
 </td></tr>
 </table>
 
@@ -1317,8 +1323,8 @@ conversions.
 <p>
 Next: <a href="#Section-3_002e5" accesskey="n" rel="next">Section 3.5</a>, Previous: <a href="#Section-3_002e3" accesskey="p" rel="prev">Section 3.3</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<a name="g_t_005b_003f_005dFIO_003a-File-I_002fO-Functions"></a>
-<h3 class="section">3.4 ⎕FIO: File I/O Functions</h3>
+<a name="g_t_005b_003f_005dFIO-_002d-File-I_002fO-Functions"></a>
+<h3 class="section">3.4 ⎕FIO - File I/O Functions</h3>
 
 <p>As of GNU APL 1.6, the native function FILE_IO has been replaced by the
 system function ⎕FIO. See the FILE_IO section below for details.
@@ -2193,10 +2199,59 @@ release.
 <a name="Section-3_002e18"></a>
 <div class="header">
 <p>
-Previous: <a href="#Section-3_002e17" accesskey="p" rel="prev">Section 3.17</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e19" accesskey="n" rel="next">Section 3.19</a>, Previous: <a href="#Section-3_002e17" accesskey="p" rel="prev">Section 3.17</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<a name="g_t_005b_003f_005dPS-_002d-Print-Style"></a>
+<h3 class="section">3.18 ⎕PS - Print Style</h3>
+
+<p>⎕PS is an integer vector that currently (read: SVN 982) contains two integers
+which control some details of how APL values are being printed. The default
+value of ⎕PS is 0 0. ⎕PS is a session variable which survives )LOADing of
+workspaces
+</p>
+<p>⎕PS[0] = 0: print rational quotients normal floating point number
+⎕PS[0] = 1: print rational quotients as A÷B
+</p>
+<p>⎕PS[0] has only an effect if rational numbers was ./configure&rsquo;d.
+</p>
+<p>⎕PS[1] = 0: no &quot;boxing&quot; of APL values
+⎕PS[1] &gt; 0: &quot;boxing&quot; of APL values
+</p>
+<p>Setting ⎕PS[1] has the same effect as the debug command ]BOXING and uses
+the same values.
+</p>
+<hr>
+<a name="Section-3_002e19"></a>
+<div class="header">
+<p>
+Next: <a href="#Section-3_002e20" accesskey="n" rel="next">Section 3.20</a>, Previous: <a href="#Section-3_002e18" accesskey="p" rel="prev">Section 3.18</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<a name="Rational-Numbers"></a>
+<h3 class="section">3.19 Rational Numbers</h3>
+
+<p>GNU APL has limited support for rational numbers. Instead of dividing integers
+(and possibly causing rounding errors), integer quotionts are kept undivided
+internally until some function requires a conversion to a floating point
+(double) value.
+</p>
+<p>Currently only +, -, ×, and ÷ preserve rational numbers where possible, but
+this list may grow in the future.
+</p>
+<p>A quotient is internally stored as a 64-bit numerator and a 64-bit denominator.
+In some cases arithmetic with rational numbers is faster than with doubles, but
+in most cases it is slower.
+</p>
+<p>For that reason support for rational numbers is disabled by default and must
+be enabled via ./configure (see README-2-configure).
+</p>
+<hr>
+<a name="Section-3_002e20"></a>
+<div class="header">
+<p>
+Previous: <a href="#Section-3_002e19" accesskey="p" rel="prev">Section 3.19</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="Comparison-Rules"></a>
-<h3 class="section">3.18 Comparison Rules</h3>
+<h3 class="section">3.20 Comparison Rules</h3>
 
 <p>Both IBM APL2 and the ISO standard require that the arguments of &lt;, ≤, ≥, and
 &gt; (but not = or ≠) are integer or real numbers, and that the argument of monadic

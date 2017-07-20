@@ -185,6 +185,9 @@
 /* define to enable performance counters */
 /* #undef PERFORMANCE_COUNTERS_WANTED */
 
+/* define to have support for rational numbers (EXPERIMENTAL!) */
+/* #undef RATIONAL_NUMBERS_WANTED */
+
 /* ./configure with --with-postgresql */
 /* #undef REALLY_WANT_PostgreSQL */
 
@@ -228,7 +231,7 @@
 /* define to enable CHECK macro */
 /* #undef VALUE_CHECK_WANTED */
 
-/* define to enable CHECK macro */
+/* define to enable value events */
 /* #undef VALUE_HISTORY_WANTED */
 
 /* Version number of package */
