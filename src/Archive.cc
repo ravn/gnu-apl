@@ -215,7 +215,8 @@ char cc[80];
                  if (const APL_Integer denom = flt->get_denominator())
                     {
                       const APL_Integer numer = flt->get_numerator();
-                      snprintf(cc, sizeof(cc), "%lld÷%lld", numer, denom);
+                      snprintf(cc, sizeof(cc), "%lld÷%lld", (long long)numer,
+                               (long long)denom);
                       NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
                       break;
                     }
