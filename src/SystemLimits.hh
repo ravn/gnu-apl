@@ -43,8 +43,8 @@ enum
 /// these numbers shall have an integer log₁₀ !
 #define MAX_Quad_CT       (1.0e-9)
 #define DEFAULT_Quad_CT   (1.0e-13)
-#define REAL_TOLERANCE    (1.0e-10)   // ≤ MAX_Quad_CT
-#define INTEGER_TOLERANCE (1.0e-10)   // ≤ MAX_Quad_CT
+#define REAL_TOLERANCE    (1.0e-12)   // ≥ MAX_Quad_CT
+#define INTEGER_TOLERANCE (1.0e-12)   // ≥ MAX_Quad_CT
 
 #define BIG_INT64_F 9223372036854775807.0
 #define BIG_FLOAT   1.79769313486231470e308

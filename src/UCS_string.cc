@@ -191,8 +191,6 @@ int expo = 0;
        while (value < 1.0)     { value *= 10.0;   --expo;     }
       }
 
-Q(value)
-
    // In theory, at this point, 1.0 ≤ value < 10.0. In reality value can
    // be outside, though, due to rounding errors.
 
