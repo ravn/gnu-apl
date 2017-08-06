@@ -37,10 +37,6 @@ public:
    IntCell(APL_Integer i)
       { value.ival = i; }
 
-   /// Construct an integer cell with near-int value \b f
-   IntCell(APL_Float f, APL_Float qct)
-      { value.ival = near_int(f); }
-
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
       const { new (other)   IntCell(value.ival); }
@@ -53,7 +49,7 @@ public:
    virtual bool greater(const Cell & other) const;
 
    /// overloaded Cell::equal()
-   virtual bool equal(const Cell & other, APL_Float qct) const;
+   virtual bool equal(const Cell & other, double qct) const;
 
    /// overloaded Cell::bif_add()
    virtual ErrorCode bif_add(Cell * Z, const Cell * A) const;
@@ -175,7 +171,7 @@ protected:
    virtual CellType get_cell_subtype() const;
 
    /// overloaded Cell::get_real_value()
-   virtual APL_Float get_real_value() const   { return double(value.ival);  }
+   virtual APL_Float get_real_value() const   { return APL_Float(value.ival);  }
 
    /// overloaded Cell::get_imag_value()
    virtual APL_Float get_imag_value() const   { return 0.0;  }

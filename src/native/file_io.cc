@@ -42,12 +42,18 @@ static Token eval_AXB(Value_P A, Value_P X,
 void *
 get_function_mux(const char * function_name)
 {
-   if (!strcmp(function_name, "get_signature"))   return (void *)&get_signature;
-   if (!strcmp(function_name, "close_fun"))       return (void *)&close_fun;
-   if (!strcmp(function_name, "eval_B"))          return (void *)&eval_B;
-   if (!strcmp(function_name, "eval_AB"))         return (void *)&eval_AB;
-   if (!strcmp(function_name, "eval_XB"))         return (void *)&eval_XB;
-   if (!strcmp(function_name, "eval_AXB"))        return (void *)&eval_AXB;
+   if (!strcmp(function_name, "get_signature"))
+      return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "close_fun"))
+      return reinterpret_cast<void *>(&close_fun);
+   if (!strcmp(function_name, "eval_B"))
+      return reinterpret_cast<void *>(&eval_B);
+   if (!strcmp(function_name, "eval_AB"))
+      return reinterpret_cast<void *>(&eval_AB);
+   if (!strcmp(function_name, "eval_XB"))
+      return reinterpret_cast<void *>(&eval_XB);
+   if (!strcmp(function_name, "eval_AXB"))
+      return reinterpret_cast<void *>(&eval_AXB);
    return 0;
 }
 //-----------------------------------------------------------------------------

@@ -75,7 +75,7 @@
 
 using namespace std;
 /// a real number
-typedef double DD;
+typedef APL_Float DD;
 
 /// a complex number
 class ZZ
@@ -88,37 +88,37 @@ public:
    {}
 
    /// rJ0
-   ZZ(double r)
+   ZZ(APL_Float r)
    : _r(r),
      _i(0)
    {}
 
    /// rJi
-   ZZ(double r, double i)
+   ZZ(APL_Float r, APL_Float i)
    : _r(r),
      _i(i)
    {}
 
    /// return the real part of \b this
-   double real() const       { return _r; }
+   APL_Float real() const       { return _r; }
 
    /// set the real part of \b this
-   void set_real(double x)   { _r = x; }
+   void set_real(APL_Float x)   { _r = x; }
 
    /// return the imag part of \b this
-   double imag() const    { return _i; }
+   APL_Float imag() const    { return _i; }
 
    /// set the imag part of \b this
-   void set_imag(double x)   { _i = x; }
+   void set_imag(APL_Float x)   { _i = x; }
 
    /// conjugate \b this
    void conjugate()   { _i = - _i; }
 
    /// return true if \b this is real and not equal to \b dd
-   bool operator != (double dd) const   { return _r != dd || _i != 0; }
+   bool operator != (APL_Float dd) const   { return _r != dd || _i != 0.0; }
 
    /// return true if \b this is real and equal to \b dd
-   bool operator == (double dd) const   { return _r == dd && _i == 0; }
+   bool operator == (APL_Float dd) const   { return _r == dd && _i == 0.0; }
 
    /// add \b r zz to \b this
    ZZ operator +(const ZZ & zz) const
@@ -138,23 +138,23 @@ public:
                   _i * zz._r + _r * zz._i); }
 
    /// divide \b this by \b d
-   ZZ operator /(double d) const
+   ZZ operator /(APL_Float d) const
       { return ZZ(_r/d, _i/d); }
 
    /// divide \b this by \b zz
    ZZ operator /(const ZZ & zz) const
       { 
-        const double denom = zz._r * zz._r + zz._i * zz._i;
+        const APL_Float denom = zz._r * zz._r + zz._i * zz._i;
          return ZZ((_r * zz._r + _i * zz._i) / denom,
                    (_i * zz._r - _r * zz._i) / denom);
       }
 
 protected:
    /// the real part
-  double _r;
+  APL_Float _r;
 
    /// the imaginary part
-  double _i;
+  APL_Float _i;
 };
 
 /// the maximum of \b x and \b y
@@ -174,16 +174,16 @@ public:
    static bool is_ZZ(ZZ z)   { return true;  }
 
    /// return the real part of \b x
-   static double get_real(DD x)   { return x;   }
+   static APL_Float get_real(DD x)   { return x;   }
 
    /// return the imaginary part of \b x
-   static double get_imag(DD x)   { return 0.0; }
+   static APL_Float get_imag(DD x)   { return 0.0; }
 
    /// return the real part of \b x
-   static double get_real(ZZ z)   { return z.real(); }
+   static APL_Float get_real(ZZ z)   { return z.real(); }
 
    /// return the imaginary part of \b x
-   static double get_imag(ZZ z)   { return z.imag(); }
+   static APL_Float get_imag(ZZ z)   { return z.imag(); }
 
    /// set the real part of \b x
    static void set_real(DD & y, DD x)   { y = x; }
@@ -215,33 +215,33 @@ public:
    /// return the inverse of \b zz
    static inline ZZ inv(const ZZ & zz)
       {
-        const double denom = zz.real() * zz.real() + zz.imag() * zz.imag();
+        const APL_Float denom = zz.real() * zz.real() + zz.imag() * zz.imag();
         return ZZ(zz.real()/denom, - zz.imag()/denom);
       }
 };
 
 /// return the real part of \b x
-template<typename T> double REAL(T x)        { return DZ::get_real(x);    }
+template<typename T> APL_Float REAL(T x)        { return DZ::get_real(x);    }
 
 /// return the imaginary part of \b x
-template<typename T> double IMAG(T x)        { return DZ::get_imag(x);    }
+template<typename T> APL_Float IMAG(T x)        { return DZ::get_imag(x);    }
 
 /// set the real part of \b x
-template<typename T> void  SREAL(T & y, double x)   { DZ::set_real(y, x); }
+template<typename T> void  SREAL(T & y, APL_Float x)   { DZ::set_real(y, x); }
 
 /// set the imaginary part of \b x
-template<typename T> void  SIMAG(T & y, double x)   { DZ::set_imag(y, x); }
+template<typename T> void  SIMAG(T & y, APL_Float x)   { DZ::set_imag(y, x); }
 
 /// set the real and imaginary parts of \b y
-template<typename T> void Sri(T & y, double xr, double xi)
+template<typename T> void Sri(T & y, APL_Float xr, APL_Float xi)
    { SREAL<T>(y, xr);   SIMAG<T>(y, xi); }
 
 /// set the real part of \b y and clear its imaginary part
-template<typename T> void Sri(T & y, double xr)
+template<typename T> void Sri(T & y, APL_Float xr)
    { SREAL<T>(y, xr);   SIMAG<T>(y, 0); }
 
 /// return the absolute value of a
-inline DD ABS(DD a) { return a < 0 ? -a : a; }
+inline DD ABS(DD a) { return a < 0.0 ? DD(-a) : a; }
 
 /// return the square of the absolute value of a
 inline DD ABS_2(DD a) { return a*a; }
@@ -253,9 +253,9 @@ inline DD ABS(ZZ z) { return sqrt(z.real()*z.real() + z.imag()*z.imag()); }
 inline DD ABS_2(ZZ z) { return z.real()*z.real() + z.imag()*z.imag(); }
 
 /// return abs(a) with the sign of b
-inline double SIGN(double a, double b)
+inline APL_Float SIGN(APL_Float a, APL_Float b)
 {
-   if (b < 0)  return -ABS(a);
+   if (b < 0.0)  return -ABS(a);
    else        return  ABS(a);
 }
 
@@ -301,50 +301,50 @@ public:
    bool is_ZZ() const   { return DZ::is_ZZ(*data); }
 
    /// the norm of \b this
-   double norm() const
+   APL_Float norm() const
       {
 //     if (len < 1)   return 0.0;
-//     double scale = 0.0;
-//     double ssq = 1.0;
+//     APL_Float scale = 0.0;
+//     APL_Float ssq = 1.0;
 
-        double ret = 0.0;
+        APL_Float ret = 0.0;
         const T * dj = data;
         loop(j, len)
            {
-             const double re = REAL(*dj);
-             if (re != 0)
+             const APL_Float re = REAL(*dj);
+             if (re != 0.0)
                 {
 /***
-                  const double temp = ABS(re);
+                  const APL_Float temp = ABS(re);
                   if (scale < temp)
                      {
-                       const double scale_temp = scale/temp;
+                       const APL_Float scale_temp = scale/temp;
                        ssq = 1.0 + ssq*scale_temp*scale_temp;
                        scale = temp;
                      }
                   else
                      {
-                       const double temp_scale = temp/scale;
+                       const APL_Float temp_scale = temp/scale;
                        ssq += temp_scale*temp_scale;
                      }
 ***/
                   ret += re*re;
                 }
 
-             const double im = IMAG(*dj);
-             if (im != 0)
+             const APL_Float im = IMAG(*dj);
+             if (im != 0.0)
                 {
 /***
-                  const double temp = ABS(im);
+                  const APL_Float temp = ABS(im);
                   if (scale < temp)
                      {
-                       const double scale_temp = scale/temp;
+                       const APL_Float scale_temp = scale/temp;
                        ssq = 1.0 + ssq*scale_temp*scale_temp;
                        scale = temp;
                      }
                   else
                      {
-                       const double temp_scale = temp/scale;
+                       const APL_Float temp_scale = temp/scale;
                        ssq += temp_scale*temp_scale;
                      }
 ***/
@@ -380,8 +380,8 @@ public:
         const T * dj = data;
         loop(j, count)
            {
-             if (IMAG(*dj) != 0)     return false;
-             if (REAL(*dj++) != 0)   return false;
+             if (IMAG(*dj) != 0.0)     return false;
+             if (REAL(*dj++) != 0.0)   return false;
            }
         return true;
       }
@@ -508,25 +508,25 @@ public:
    ShapeItem get_dx() const   { return dx; }
 
    /// return the length of the largest element
-   double max_norm() const
+   APL_Float max_norm() const
       {
         const ShapeItem len = rows * cols;
         if (is_ZZ())   // complex max. norm
            {
-             double ret2 = 0;
+             APL_Float ret2 = 0;
              loop(l, len)
                 {
-                  const double a2 = ABS_2(data[l]);
+                  const APL_Float a2 = ABS_2(data[l]);
                   if (ret2 < a2)   ret2 = a2;
                 }
              return sqrt(ret2);
            }
         else           // real max norm
            {
-             double ret = 0;
+             APL_Float ret = 0;
              loop(l, len)
                 {
-                  const double a = DZ::get_real(data[l]);
+                  const APL_Float a = DZ::get_real(data[l]);
                   if (ret < a)         ret = a;
                   else if (ret < -a)   ret = -a;
                 }
@@ -572,22 +572,22 @@ protected:
 #define dlamch_E 1.11022e-16
 #define dlamch_S 2.22507e-308
 #define dlamch_P 2.22045e-16
-static const double small_number = dlamch_S / dlamch_P;
-static const double big_number   = 1.0 / small_number;
-static const double safe_min     =  dlamch_S / dlamch_E;
-static const double inv_safe_min = 1.0 / safe_min;
-static const double tol3z        = sqrt(dlamch_E);
+static const APL_Float small_number = dlamch_S / dlamch_P;
+static const APL_Float big_number   = 1.0 / small_number;
+static const APL_Float safe_min     =  dlamch_S / dlamch_E;
+static const APL_Float inv_safe_min = 1.0 / safe_min;
+static const APL_Float tol3z        = sqrt(dlamch_E);
 
 //-----------------------------------------------------------------------------
 /// return the offset of the largest element in vec
 inline ShapeItem
-max_pos(const double * vec, ShapeItem len)
+max_pos(const APL_Float * vec, ShapeItem len)
 {
 ShapeItem imax = 0;
-double dmax = ABS(vec[0]); 
+APL_Float dmax = ABS(vec[0]); 
    for (ShapeItem j = 1; j < len; ++j)
        {
-         const double dj = ABS(vec[j]);
+         const APL_Float dj = ABS(vec[j]);
          if (dmax < dj )   { dmax = dj;   imax = j; }
        }
 
@@ -599,15 +599,15 @@ template<typename T> T larfg(ShapeItem N, T & ALPHA, Vector<T> &x)
 {
    assert(N > 0);
 
-   if (N == 1)   return 0.0;
+   if (N == 1)   return T(0.0);
 
-double xnorm = x.norm();
-double alpha_r = REAL(ALPHA);
-double alpha_i = IMAG(ALPHA);
+APL_Float xnorm = x.norm();
+APL_Float alpha_r = REAL(ALPHA);
+APL_Float alpha_i = IMAG(ALPHA);
 
-   if (xnorm == 0.0 && alpha_i == 0.0)   return 0.0;
+   if (xnorm == 0.0 && alpha_i == 0.0)   return T(0.0);
 
-double beta = -SIGN(sqrt(alpha_r*alpha_r + alpha_i*alpha_i + xnorm*xnorm),
+APL_Float beta = -SIGN(sqrt(alpha_r*alpha_r + alpha_i*alpha_i + xnorm*xnorm),
                     alpha_r);
 
 int kcnt = 0;
@@ -618,8 +618,8 @@ int kcnt = 0;
               ++kcnt;
               x.scale(inv_safe_min);
               beta = beta * inv_safe_min;
-              alpha_r *= inv_safe_min;
-              alpha_i *= inv_safe_min;
+              alpha_r = alpha_r * inv_safe_min;
+              alpha_i = alpha_i * inv_safe_min;
             }
 
          xnorm = x.norm();
@@ -634,7 +634,7 @@ T tau;
 const T factor = DZ::inv(ALPHA - beta);
    x.scale(factor);
 
-   loop(k, kcnt)   beta *= safe_min;
+   loop(k, kcnt)   beta = beta * safe_min;
    Sri<T>(ALPHA, beta);
 
    return tau;
@@ -695,7 +695,7 @@ inline void gemv(int M, int N, const Matrix<T> & A, const Vector<T> &x,
 {
    loop(j, N)
        {
-         T temp = 0;
+         T temp(0.0);
          loop(i, M)   temp = temp + DZ::CONJ(A.at(i, j)) * x.at(i);
          y.at(j) = temp;
        }
@@ -746,8 +746,8 @@ ShapeItem  lastc = 0;
 
    if (lastv)
       {
-        double * gemv_data = new double[2*N];
-        Vector<T> gemv_result((T *)gemv_data, N);
+        APL_Float * gemv_data = new APL_Float[2*N];
+        Vector<T> gemv_result(reinterpret_cast<T *>(gemv_data), N);
 
         gemv<T>(lastv, lastc, c, v, gemv_result);
         gerc<T>(lastv, lastc, -tau, v, gemv_result, c);
@@ -757,12 +757,12 @@ ShapeItem  lastc = 0;
 //-----------------------------------------------------------------------------
 /// LApack function laqp2
 template<typename T>
-void laqp2(Matrix<T> & A, ShapeItem * pivot, T * tau, double * vn1)
+void laqp2(Matrix<T> & A, ShapeItem * pivot, T * tau, APL_Float * vn1)
 {
 const ShapeItem M = A.get_row_count();
 const ShapeItem N = A.get_column_count();
 
-double * vn2 = vn1 + N;
+APL_Float * vn2 = vn1 + N;
 
    loop(i_0, N)
       {
@@ -802,7 +802,7 @@ double * vn2 = vn1 + N;
              // Apply H(i)**H to A(offset+i:m,i+1:n) from the left.
              //
              const T Aii = A.diag(i_0);   // save diag
-             A.diag(i_0) = 1.0;
+             A.diag(i_0) = APL_Float(1.0);
                 Vector<T> v(&A.diag(i_0), M - i_0);
                 Matrix<T> c = A.sub_yx(i_0, i_0 + 1);
                 larf<T>(v, DZ::CONJ(tau_i), c);
@@ -813,13 +813,13 @@ double * vn2 = vn1 + N;
         //
         for (ShapeItem j_0 = i_0 + 1; j_0 < N; ++j_0)
             {
-              if (vn1[j_0] != 0)
+              if (vn1[j_0] != 0.0)
                  {
-                   double temp = ABS(A.at(i_0, j_0)) / vn1[j_0];
+                   APL_Float temp = ABS(A.at(i_0, j_0)) / vn1[j_0];
                    temp = 1.0 - temp*temp;
-                   temp = MAX(temp, 0.0);
+                   temp = MAX(temp, APL_Float(0.0));
 
-                   double temp2 = vn1[j_0] / vn2[j_0];
+                   APL_Float temp2 = vn1[j_0] / vn2[j_0];
                    temp2 = temp * temp2 * temp2;
                    if (temp2 <= tol3z)
                       {
@@ -837,7 +837,7 @@ double * vn2 = vn1 + N;
                       }
                    else
                       {
-                        vn1[j_0] *= sqrt(temp);
+                        vn1[j_0] = vn1[j_0] * sqrt(temp);
                       }
                  }
             }
@@ -846,12 +846,12 @@ double * vn2 = vn1 + N;
 //-----------------------------------------------------------------------------
 /// LApack function laic1 (maximum case)
 template<typename T>
-void laic1_max(double SEST, T alpha, T GAMMA, double &SESTPR, T &S, T &C)
+void laic1_max(APL_Float SEST, T alpha, T GAMMA, APL_Float &SESTPR, T &S, T &C)
 {
-const double eps = dlamch_E;
-const double abs_alpha = ABS(alpha);
-const double abs_gamma = ABS(GAMMA);
-const double abs_estimate = ABS(SEST);
+const APL_Float eps = dlamch_E;
+const APL_Float abs_alpha = ABS(alpha);
+const APL_Float abs_gamma = ABS(GAMMA);
+const APL_Float abs_estimate = ABS(SEST);
 
    //    Estimating largest singular value ...
    //
@@ -860,11 +860,11 @@ const double abs_estimate = ABS(SEST);
    //
    if (SEST == 0.0)
       {
-        const double s1 = MAX(abs_gamma, abs_alpha);
+        const APL_Float s1 = MAX(abs_gamma, abs_alpha);
         if (s1 == 0.0)
            {
-             S = 0.0;
-             C = 1.0;
+             S = T(0.0);
+             C = T(1.0);
              SESTPR = 0.0;
            }
         else
@@ -872,7 +872,7 @@ const double abs_estimate = ABS(SEST);
              S = alpha / s1;
              C = GAMMA / s1;
 
-             const double tmp = sqrt(ABS_2(S) + ABS_2(C));
+             const APL_Float tmp = sqrt(ABS_2(S) + ABS_2(C));
              S = S / tmp;
              C = C / tmp;
              SESTPR = s1*tmp;
@@ -882,29 +882,29 @@ const double abs_estimate = ABS(SEST);
 
    if (abs_gamma <= eps*abs_estimate)
       {
-        S = 1.0;
-        C = 0.0;
-        double tmp = MAX(abs_estimate, abs_alpha);
-        const double s1 = abs_estimate / tmp;
-        const double s2 = abs_alpha / tmp;
+        S = T(1.0);
+        C = T(0.0);
+        APL_Float tmp = MAX(abs_estimate, abs_alpha);
+        const APL_Float s1 = abs_estimate / tmp;
+        const APL_Float s2 = abs_alpha / tmp;
         SESTPR = tmp*sqrt(s1*s1 + s2*s2);
         return;
       }
 
    if (abs_alpha <= eps*abs_estimate)
       {
-        const double s1 = abs_gamma;
-        const double s2 = abs_estimate;
+        const APL_Float s1 = abs_gamma;
+        const APL_Float s2 = abs_estimate;
         if (s1 <= s2)
            {
-             S = 1.0;
-             C = 0.0;
+             S = T(1.0);
+             C = T(0.0);
              SESTPR = s2;
            }
         else
            {
-             S = 0.0;
-             C = 1.0;
+             S = T(0.0);
+             C = T(1.0);
              SESTPR = s1;
            }
         return;
@@ -912,20 +912,20 @@ const double abs_estimate = ABS(SEST);
 
    if (abs_estimate <= eps*abs_alpha || abs_estimate <= eps*abs_gamma)
       {
-        const double s1 = abs_gamma;
-        const double s2 = abs_alpha;
+        const APL_Float s1 = abs_gamma;
+        const APL_Float s2 = abs_alpha;
         if (s1 <= s2)
            {
-             const double tmp = s1 / s2;
-             const double scl = sqrt(1.0 + tmp*tmp);
+             const APL_Float tmp = s1 / s2;
+             const APL_Float scl = sqrt(1.0 + tmp*tmp);
              SESTPR = s2*scl;
              S = (alpha / s2) / scl;
              C = (GAMMA / s2) / scl;
            }
         else
            {
-             const double tmp = s2 / s1;
-             const double scl = sqrt(1.0 + tmp*tmp);
+             const APL_Float tmp = s2 / s1;
+             const APL_Float scl = sqrt(1.0 + tmp*tmp);
              SESTPR = s1*scl;
              S = (alpha / s1) / scl;
              C = (GAMMA / s1) / scl;
@@ -935,31 +935,31 @@ const double abs_estimate = ABS(SEST);
 
    // normal case
    //
-const double zeta1 = abs_alpha / abs_estimate;
-const double zeta2 = abs_gamma / abs_estimate;
-const double b = (1.0 - zeta1*zeta1 - zeta2*zeta2)*0.5;
-const double zeta1_2 = zeta1*zeta1;
-double t;
+const APL_Float zeta1 = abs_alpha / abs_estimate;
+const APL_Float zeta2 = abs_gamma / abs_estimate;
+const APL_Float b = (1.0 - zeta1*zeta1 - zeta2*zeta2)*0.5;
+const APL_Float zeta1_2 = zeta1*zeta1;
+APL_Float t;
 
    if (b > 0.0)  t = zeta1_2 / (b + sqrt(b*b + zeta1_2));
    else          t = sqrt(b*b + zeta1_2) - b;
 
 const T sine = -( alpha / abs_estimate ) / t;
 const T cosine = -( GAMMA / abs_estimate ) / ( 1.0 + t);
-const double tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
+const APL_Float tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
    S = sine / tmp;
    C = cosine / tmp;
    SESTPR = sqrt(t + 1.0) * abs_estimate;
 }
 //-----------------------------------------------------------------------------
-/// LApack function laic1 (iniimum case)
+/// LApack function laic1 (minimum case)
 template<typename T>
-void laic1_min(double SEST, T alpha, T GAMMA, double &SESTPR, T &S, T &C)
+void laic1_min(APL_Float SEST, T alpha, T GAMMA, APL_Float &SESTPR, T &S, T &C)
 {
-const double eps = dlamch_E;
-const double abs_alpha = ABS(alpha);
-const double abs_gamma = ABS(GAMMA);
-const double abs_estimate = ABS(SEST);
+const APL_Float eps = dlamch_E;
+const APL_Float abs_alpha = ABS(alpha);
+const APL_Float abs_gamma = ABS(GAMMA);
+const APL_Float abs_estimate = ABS(SEST);
 
    //    Estimating smallest singular value ...
    //
@@ -969,22 +969,22 @@ const double abs_estimate = ABS(SEST);
    if (SEST == 0.0)
       {
         SESTPR = 0.0;
-        T sine = 1.0;
-        T cosine = 0.0;
+        T sine(1.0);
+        T cosine(0.0);
         if (abs_gamma > 0.0 || abs_alpha > 0.0)
            {
              sine   = -DZ::CONJ(GAMMA);
              cosine =  DZ::CONJ(alpha);
            }
 
-        const double abs_sine = ABS(sine);
-        const double abs_cosine = ABS(cosine);
-        const double s1 = MAX(abs_sine, abs_cosine);
+        const APL_Float abs_sine = ABS(sine);
+        const APL_Float abs_cosine = ABS(cosine);
+        const APL_Float s1 = MAX(abs_sine, abs_cosine);
         const T sine_s1 = sine / s1;
         const T cosine_s1 = cosine / s1;
         S = sine_s1;
         C = cosine_s1;
-        const double tmp = sqrt(ABS_2(sine_s1) + ABS_2(cosine_s1));
+        const APL_Float tmp = sqrt(ABS_2(sine_s1) + ABS_2(cosine_s1));
         S = S / tmp;
         C = C / tmp;
         return;
@@ -992,27 +992,27 @@ const double abs_estimate = ABS(SEST);
 
    if (abs_gamma <= eps*abs_estimate)
       {
-        S = 0.0;
-        C = 1.0;
+        S = T(0.0);
+        C = T(1.0);
         SESTPR = abs_gamma;
         return;
       }
 
    if (abs_alpha <= eps*abs_estimate)
       {
-        const double s1 = abs_gamma;
-        const double s2 = abs_estimate;
+        const APL_Float s1 = abs_gamma;
+        const APL_Float s2 = abs_estimate;
 
         if (s1 <= s2)
           {
-            S = 0.0;
-            C = 1.0;
+            S = T(0.0);
+            C = T(1.0);
             SESTPR = s1;
           }
         else
           {
-            S = 1.0;
-            C = 0.0;
+            S = T(1.0);
+            C = T(0.0);
             SESTPR = s2;
           }
         return;
@@ -1020,24 +1020,25 @@ const double abs_estimate = ABS(SEST);
 
    if (abs_estimate <= eps*abs_alpha || abs_estimate <= eps*abs_gamma)
       {
-        const double s1 = abs_gamma;
-        const double s2 = abs_alpha;
+        const APL_Float s1 = abs_gamma;
+        const APL_Float s2 = abs_alpha;
         const T conj_gamma = DZ::CONJ(GAMMA);
         const T conj_alpha = DZ::CONJ(alpha);
 
         if (s1 <= s2)
            {
-             const double tmp = s1 / s2;
-             const double scl = sqrt(1.0 + tmp*tmp);
+             const APL_Float tmp = s1 / s2;
+             const APL_Float scl = sqrt(1.0 + tmp*tmp);
+             const APL_Float tmp_scl = tmp / scl;
 
-             SESTPR = abs_estimate*(tmp/scl);
+             SESTPR = abs_estimate * tmp_scl;
              S = -(conj_gamma / s2 ) / scl;
              C =  (conj_alpha / s2 ) / scl;
            }
         else
            {
-             const double tmp = s2 / s1;
-             const double scl = sqrt(1.0 + tmp*tmp);
+             const APL_Float tmp = s2 / s1;
+             const APL_Float scl = sqrt(1.0 + tmp*tmp);
 
              SESTPR = abs_estimate / scl;
              S = -( conj_gamma / s1 ) / scl;
@@ -1048,23 +1049,23 @@ const double abs_estimate = ABS(SEST);
 
    // normal case
    //
-const double zeta1 = abs_alpha / abs_estimate;
-const double zeta2 = abs_gamma / abs_estimate;
+const APL_Float zeta1 = abs_alpha / abs_estimate;
+const APL_Float zeta2 = abs_gamma / abs_estimate;
 
-const double norma_1 = 1.0 + zeta1*zeta1 + zeta1*zeta2;
-const double norma_2 = zeta1*zeta2 + zeta2*zeta2;
-const double norma = MAX(norma_1, norma_2);
+const APL_Float norma_1 = 1.0 + zeta1*zeta1 + zeta1*zeta2;
+const APL_Float norma_2 = zeta1*zeta2 + zeta2*zeta2;
+const APL_Float norma = MAX(norma_1, norma_2);
 
-const double test = 1.0 + 2.0*(zeta1-zeta2)*(zeta1+zeta2);
+const APL_Float test = 1.0 + 2.0*(zeta1-zeta2)*(zeta1+zeta2);
 T sine;
 T cosine;
    if (test >= 0.0 )
       {
         // root is close to zero, compute directly
         //
-        const double b = (zeta1*zeta1 + zeta2*zeta2 + 1.0)*0.5;
-        const double zeta2_2 = zeta2*zeta2;
-        const double t = zeta2_2 / (b + sqrt(ABS(b*b - zeta2_2)));
+        const APL_Float b = (zeta1*zeta1 + zeta2*zeta2 + 1.0)*0.5;
+        const APL_Float zeta2_2 = zeta2*zeta2;
+        const APL_Float t = zeta2_2 / (b + sqrt(ABS(b*b - zeta2_2)));
         sine = (alpha / abs_estimate) / (1.0 - t);
         cosine = -( GAMMA / abs_estimate ) / t;
         SESTPR = sqrt(t + 4.0*eps*eps*norma)*abs_estimate;
@@ -1073,9 +1074,9 @@ T cosine;
       {
         // root is closer to ONE, shift by that amount
         //
-        const double b = (zeta2*zeta2 + zeta1*zeta1 - 1.0)*0.5;
-        const double zeta1_2 = zeta1*zeta1;
-        double t;
+        const APL_Float b = (zeta2*zeta2 + zeta1*zeta1 - 1.0)*0.5;
+        const APL_Float zeta1_2 = zeta1*zeta1;
+        APL_Float t;
         if (b >= 0.0)   t = -zeta1_2 / (b+sqrt(b*b + zeta1_2));
         else            t = b - sqrt(b*b + zeta1_2);
 
@@ -1084,7 +1085,7 @@ T cosine;
         SESTPR = sqrt(1.0 + t + 4.0*eps*eps*norma)*abs_estimate;
       }
 
-const double tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
+const APL_Float tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
    S = sine / tmp;
    C = cosine / tmp;
 }
@@ -1110,7 +1111,7 @@ const ShapeItem M = c.get_row_count();
          const T taui = DZ::CONJ(tau[i_0]);
 
          const T Aii = A.diag(i_0);
-         A.diag(i_0) = 1.0;
+         A.diag(i_0) = APL_Float(1.0);
             Vector<T> v(&A.diag(i_0), MM);
             Matrix<T> c1 = c.sub_yx(i_0, 0);
             larf<T>(v, taui, c1);
@@ -1139,7 +1140,7 @@ const ShapeItem N = A.get_column_count();
      // Initialize partial column norms.
      // the first N elements of WORK store the exact column norms.
      //
-     double * vn12 = new double[2*N];
+     APL_Float * vn12 = new APL_Float[2*N];
      for (int j_0 = 0; j_0 < N; ++j_0)
          {
            Vector<T> x(&A.at(0, j_0), M);
@@ -1155,38 +1156,38 @@ const ShapeItem N = A.get_column_count();
 //-----------------------------------------------------------------------------
 /// LApack function estimating the rank of \b A
 template<typename T>
-int estimate_rank(const Matrix<T> & A, double rcond)
+int estimate_rank(const Matrix<T> & A, APL_Float rcond)
 {
    // Determine RANK using incremental condition estimation...
 
 const ShapeItem N = A.get_column_count();
 
-double smax = ABS(A.diag(0));
-double smin = smax;
+APL_Float smax = ABS(A.diag(0));
+APL_Float smin = smax;
    if (smax == 0.0)   return 0;
 
    // store minima in work_min[ 0 ... N]
    // store maxima in work_max == work_min[N ... 2N]
    //
-double * work_1 = new double[4*N];
-T * work_min = (T *)work_1;
+APL_Float * work_1 = new APL_Float[4*N];
+T * work_min = reinterpret_cast<T *>(work_1);
 T * work_max = work_min + N;
 
-   work_min[0] = 1.0;
-   work_max[0] = 1.0;
+   work_min[0] = T(1.0);
+   work_max[0] = T(1.0);
 
    for (int RANK = 1; RANK < N; ++RANK)
        {
-         double sminpr = 0.0;
-         double smaxpr = 0.0;
-         T s1 = 0.0;
-         T s2 = 0.0;
-         T c1 = 0.0;
-         T c2 = 0.0;
-         const T gamma = A.diag(RANK);
+         APL_Float sminpr(0.0);
+         APL_Float smaxpr(0.0);
+         T s1(0.0);
+         T s2(0.0);
+         T c1(0.0);
+         T c2(0.0);
+         const T gamma(A.diag(RANK));
 
-         T alpha_min = 0.0;
-         T alpha_max = 0.0;
+         T alpha_min(0.0);
+         T alpha_max(0.0);
          for (int r = 0; r < RANK; ++r)
              {
                alpha_min = alpha_min + DZ::CONJ(work_min[r] * A.at(r, RANK));
@@ -1231,9 +1232,11 @@ const ShapeItem NRHS = B.get_column_count();
    // Compute QR factorization with column pivoting of A:
    // A * P = Q * R
    //
-char * pivot_tau_tmp = new char[N*(sizeof(ShapeItem) + 4*sizeof(double))];
-ShapeItem * pivot = (ShapeItem *)pivot_tau_tmp;   // N pivot items
-T * tau = (T *)(pivot + N);                       // N complex tau items
+char * pivot_tau_tmp = new char[N*(sizeof(ShapeItem) + 4*sizeof(APL_Float))];
+
+   // N pivot items
+ShapeItem * pivot = reinterpret_cast<ShapeItem *>(pivot_tau_tmp);
+T * tau = reinterpret_cast<T *>(pivot + N);       // N complex tau items
 T * tmp = tau + N;                                // N complex tmp1 items
 
    geqp3<T>(A, pivot, tau);
@@ -1288,7 +1291,7 @@ T * tmp = tau + N;                                // N complex tmp1 items
 }
 //-----------------------------------------------------------------------------
 template<typename T>
-int gelsy(Matrix<T> & A, Matrix<T> &B, double rcond)
+int gelsy(Matrix<T> & A, Matrix<T> &B, APL_Float rcond)
 {
 const ShapeItem M    = A.get_row_count();
 const ShapeItem N    = A.get_column_count();
@@ -1302,18 +1305,18 @@ const ShapeItem NRHS = B.get_column_count();
    // between small_number and big_number. Then call scaled_gelsy() and
    // scale the result back by the same factors.
    //
-double scale_A = 1.0;
+APL_Float scale_A = 1.0;
    {
-     const double norm_A = A.max_norm();
+     const APL_Float norm_A = A.max_norm();
 
      if (norm_A == 0.0)                return 0;   // A is rank-deficient
      else if (norm_A < small_number)   A.scale(scale_A = big_number);
      else if (norm_A > big_number)     A.scale(scale_A = small_number);
    }
 
-double scale_B = 1.0;
+APL_Float scale_B = 1.0;
    {
-     const double norm_B = B.max_norm();
+     const APL_Float norm_B = B.max_norm();
 
      if (norm_B == 0.0)                /* OK */ ;
      else if (norm_B < small_number)   B.scale(scale_B = big_number);
@@ -1331,7 +1334,7 @@ double scale_B = 1.0;
       {
         Matrix<T> A1 = A.sub_len(N, N);
         Matrix<T> B1 = B.sub_len(N, NRHS);
-        B1.scale(1/scale_A);
+        B1.scale(APL_Float(1.0/scale_A));
         A1.scale(scale_A);
       }
 

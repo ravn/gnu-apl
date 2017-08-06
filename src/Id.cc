@@ -51,7 +51,8 @@ struct Id_name
   /// compare \b key with \b item (for bsearch())
   static int compare(const void * key, const void * item)
      {
-       return *(const ID::Id *)key - ((const Id_name *)item)->id;
+       return *reinterpret_cast<const ID::Id *>(key)
+            - reinterpret_cast<const Id_name *>(item)->id;
      }
 
   /// the ID
@@ -75,12 +76,12 @@ static Id_name id2ucs[] =
 const UCS_string &
 ID::get_name(Id id)
 {
-const void * result =
+void * result =
     bsearch(&id, id2ucs, sizeof(id2ucs) / sizeof(Id_name),
             sizeof(Id_name), Id_name::compare);
 
    Assert(result);
-Id_name * idn = (Id_name *) result;
+Id_name * idn = reinterpret_cast<Id_name *>(result);
    if (const UCS_string * ucs = idn->ucs_name)   return *ucs; 
 
    // the name was not yet constructed. Do it now

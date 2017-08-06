@@ -324,7 +324,7 @@ Value_P Zsub(3, LOC);
    new (Zsub->next_ravel())   PointerCell(Idx0(LOC), Zsub.getref());
    Zsub->check_value(LOC);
 
-Value_P Z((ShapeItem)0, LOC);
+Value_P Z(static_cast<ShapeItem>(0), LOC);
   new (&Z->get_ravel(0))   PointerCell(Zsub, Z.getref());
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -1381,7 +1381,7 @@ Simple_string<Function_Line, false> lines;
       {
          APL_Integer line = new_value.get_ravel(l).get_near_int();
          if (line < 1)   continue;
-         lines.append((Function_Line)line);
+         lines.append(static_cast<Function_Line>(line));
       }
 
    ufun->set_trace_stop(lines, stop);

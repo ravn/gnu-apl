@@ -54,7 +54,7 @@ Value_P Z(loc);
 //-----------------------------------------------------------------------------
 /// A new floating point scalar.
 APL_value
-double_scalar(double val, const char * loc)
+double_scalar(APL_Float val, const char * loc)
 {
 Value_P Z(loc);
    new (Z->next_ravel()) FloatCell(val);
@@ -64,7 +64,7 @@ Value_P Z(loc);
 //-----------------------------------------------------------------------------
 /// A new complex scalar.
 APL_value
-complex_scalar(double real, double imag, const char * loc)
+complex_scalar(APL_Float real, APL_Float imag, const char * loc)
 {
 Value_P Z(loc);
    new (Z->next_ravel()) ComplexCell(real, imag);
@@ -185,7 +185,7 @@ get_int(const APL_value val, uint64_t idx)
 //-----------------------------------------------------------------------------
 
 /// return the real part of val[idx] (after having checked is_numeric())
-double
+APL_Float
 get_real(const APL_value val, uint64_t idx)
 {
    return val->get_ravel(idx).get_real_value();
@@ -193,7 +193,7 @@ get_real(const APL_value val, uint64_t idx)
 //-----------------------------------------------------------------------------
 
 /// return the imag part of val[idx] (after having checked is_numeric())
-double
+APL_Float
 get_imag(const APL_value val, uint64_t idx)
 {
    return val->get_ravel(idx).get_imag_value();
@@ -292,7 +292,7 @@ Cell * cell = &val->get_ravel(idx);
 
 /// val[idx]←new_double
 void
-set_double(double new_double, APL_value val, uint64_t idx)
+set_double(APL_Float new_double, APL_value val, uint64_t idx)
 {
 Cell * cell = &val->get_ravel(idx);
    if (cell->is_pointer_cell())
@@ -307,7 +307,7 @@ Cell * cell = &val->get_ravel(idx);
 
 /// val[idx]←new_complex
 void
-set_complex(double new_real, double new_imag, APL_value val, uint64_t idx)
+set_complex(APL_Float new_real, APL_Float new_imag, APL_value val, uint64_t idx)
 {
 Cell * cell = &val->get_ravel(idx);
    if (cell->is_pointer_cell())

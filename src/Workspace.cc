@@ -87,7 +87,7 @@ Workspace::push_SI(Executable * fun, const char * loc)
              << " exec=" << fun << " "
              << fun->get_name();
 
-        CERR << " new SI is " << (const void *)SI_top()
+        CERR << " new SI is " << CVOIP(SI_top())
              << " at " << loc << endl;
       }
 }
@@ -107,7 +107,8 @@ const Executable * exec = SI_top()->get_executable();
 
         if (exec->get_ufun())   CERR << exec->get_ufun()->get_name();
         else                    CERR << SI_top()->get_parse_mode_name();
-        CERR << " " << (const void *)SI_top() << " at " << loc << endl;
+        CERR << " " << CVOIP(SI_top())
+             << " at " << loc << endl;
       }
 
    // remove the top SI
@@ -434,7 +435,7 @@ int count = 0;
    loop(f, the_workspace.expunged_functions.size())
        {
          char cc[100];
-         snprintf(cc, sizeof(cc), "    ⎕EX[%lld] ", (long long)f);
+         snprintf(cc, sizeof(cc), "    ⎕EX[%lld] ", static_cast<long long>(f));
          count += the_workspace.expunged_functions[f]
                                ->show_owners(cc, out, value);
        }
@@ -704,7 +705,7 @@ public:
               case '&':  out_file << "&#38;";   break;
               case '<':  out_file << "&lt;";    break;
               case '>':  out_file << "&gt;";    break;
-              default:   out_file << (char)(c & 0xFF);
+              default:   out_file << char(c & 0xFF);
            }
         return 0;
       }
@@ -907,7 +908,7 @@ XML_Loading_Archive in(filename.c_str(), dump_fd);
            wsid_end[-3] == 'a' &&
            wsid_end[-2] == 'p' &&
            wsid_end[-1] == 'l')   wsid_end -= 4;   // skip .apl extension
-        const UTF8_string wsid_utf8((const UTF8 *)wsid_start,
+        const UTF8_string wsid_utf8(reinterpret_cast<const UTF8 *>(wsid_start),
                                     wsid_end - wsid_start);
         const UCS_string wsid_ucs(wsid_utf8);
         wsid(out, wsid_ucs, libref, true);
@@ -988,7 +989,7 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
       {
         if (arg[0] >= '0' && arg[0] <= '9')   // it does
            {
-             lib = (LibRef)(arg[0] - '0');
+             lib = static_cast<LibRef>(arg[0] - '0');
              arg.erase(0);                       // skip the library number
              arg.remove_leading_whitespaces();   // and blanks after it
            }
@@ -1011,7 +1012,7 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
    if (lib != LIB0)
       {
         arg.prepend(UNI_ASCII_SPACE);
-        arg.prepend((Unicode)('0' + lib));
+        arg.prepend(static_cast<Unicode>('0' + lib));
       }
    the_workspace.WS_name = arg;
 }

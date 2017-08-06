@@ -66,7 +66,8 @@ void * fmux = dlsym(handle, "get_function_mux");
           return;
         }
 
-void * (*get_function_mux)(const char *) = (void * (*)(const char *))fmux;
+void * (*get_function_mux)(const char *) =
+                 reinterpret_cast<void * (*)(const char *)>(fmux);
 
    // get the mandatory function get_signature() which returns
    //  the function signature
@@ -83,14 +84,15 @@ void * (*get_function_mux)(const char *) = (void * (*)(const char *))fmux;
         }
 
 
-     signature = ((Fun_signature (*)())get_sig)();
+     signature = reinterpret_cast<Fun_signature (*)()>(get_sig)();
    }
 
    // get the optional function close_fun(), which is called before
    // this function disappears
    {
      void * cfun = get_function_mux("close_fun");
-     if (cfun)   close_fun = (bool (*)(Cause, const NativeFunction *))cfun;
+     if (cfun)   close_fun = reinterpret_cast
+                             <bool (*)(Cause, const NativeFunction *)>(cfun);
      else        close_fun = 0;
    }
 
@@ -110,7 +112,8 @@ const char * why = sym->cant_be_defined();
    //
 #define Th const NativeFunction * th
 
-#define ev(fun, args) f_ ## fun = (Token (*) args ) get_function_mux(#fun)
+#define ev(fun, args) \
+   f_ ## fun = reinterpret_cast<Token (*) args>(get_function_mux(#fun))
 
    ev(eval_        , (                                Th));
 
@@ -376,13 +379,13 @@ NativeFunction::fix(const UCS_string & so_name,
 
 NativeFunction * new_function = new NativeFunction(so_name, function_name);
    Log(LOG_delete)
-      CERR << "new    " << (const void *)new_function << " at " LOC << endl;
+      CERR << "new    " << CVOIP(new_function) << " at " LOC << endl;
 
 
    if (!new_function->valid)   // something went wrong
       {
         Log(LOG_delete)
-          CERR << "delete " << (const void *)new_function << " at " LOC << endl;
+          CERR << "delete " << CVOIP(new_function) << " at " LOC << endl;
         delete new_function;
         return 0;
       }
@@ -455,8 +458,9 @@ void * emacs_start = dlsym(handle, "emacs_start");
       }
 
 UTF8_string so_path_utf(so_path);
-const int error = ((int (*)(const char *, const char *))emacs_start)
-                  (emacs_arg, (const char *)so_path_utf.c_str());
+const int error =
+    reinterpret_cast<int (*)(const char *, const char *)>(emacs_start)
+            (emacs_arg, reinterpret_cast<const char *>(so_path_utf.c_str()));
    if (error)
       {
         t4.append_utf8(", but emacs_start()  returned error ");

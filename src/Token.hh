@@ -98,11 +98,11 @@ public:
    : tag(tg) { value.int_vals[0] = ival; }
 
    /// Construct a token for a single floating point value.
-   Token(TokenTag tg, double flt)
+   Token(TokenTag tg, APL_Float flt)
    : tag(tg) { value.float_vals[0] = flt; }
 
    /// Construct a token for a single complex value.
-   Token(TokenTag tg, double r, double i)
+   Token(TokenTag tg, APL_Float r, APL_Float i)
    : tag(tg)
      {
        value.float_vals[0] = r;
@@ -152,7 +152,7 @@ public:
    ErrorCode get_ErrorCode() const
       { Assert1(get_tag() == TOK_ERROR);
         Assert1(get_ValueType() == TV_INT);
-        return (ErrorCode)(value.int_vals[0]); }
+        return static_cast<ErrorCode>(value.int_vals[0]); }
 
    /// set the integer value of this token
    void set_int_val(int64_t val)
@@ -167,11 +167,11 @@ public:
       { Assert(get_ValueType() == TV_FLT);   return value.float_vals[0]; }
 
    /// return the complex real value of this token
-   double get_cpx_real() const
+   APL_Float get_cpx_real() const
       { Assert(get_ValueType() == TV_CPX);   return value.float_vals[0]; }
 
    /// return the complex imag value of this token
-   double get_cpx_imag() const
+   APL_Float get_cpx_imag() const
       { Assert(get_ValueType() == TV_CPX);   return value.float_vals[1]; }
 
    /// return the Symbol * value of this token
@@ -279,7 +279,7 @@ public:
       {
         Unicode         char_val;        ///< the Unicode for CTV_CHARTV_
         int64_t         int_vals[2];     ///< the integer for TV_INT
-        APL_Float       float_vals[2];   ///< the doubles for TV_FLT and TV_CPX
+        APL_Float_Base   float_vals[2];  ///< the doubles for TV_FLT and TV_CPX
         Symbol        * sym_ptr;         ///< the symbol for TV_SYM
         Function_Line   fun_line;        ///< the function line for TV_LIN
         IndexExpr     * index_val;       ///< the index for TV_INDEX
@@ -287,7 +287,9 @@ public:
         Value_P_Base    apl_val;         ///< the APL value for TV_VAL
 
         /// a shortcut for accessing apl_val
-        Value_P &       _apl_val() const   { return (Value_P &) apl_val; }
+        Value_P & _apl_val() const
+           { return reinterpret_cast<Value_P &>
+                    (const_cast<Value_P_Base &>(apl_val)); }
       };
 
    /// the name of \b tc
@@ -330,8 +332,8 @@ public:
    /// reversde the token order from \b from to \b to (including)
    void reverse_from_to(ShapeItem from, ShapeItem to);
 
-   /// print the token string, starting at \b from
-   void print(ostream & out) const;
+   /// print this token string
+   void print(ostream & out, bool details) const;
 
 private:
    // prevent accidental copying

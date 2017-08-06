@@ -53,7 +53,8 @@ const Function * function = 0;
       {
         loop(m, Macro::MAC_COUNT)
             {
-              Macro * macro = Macro::get_macro((Macro::Macro_num)m);
+              const Macro * macro =
+                    Macro::get_macro(static_cast<Macro::Macro_num>(m));
               if (symbol_name == macro->get_name())
                  {
                    function = macro;
@@ -232,8 +233,8 @@ const Cell * cB = &B.get_ravel(0);
          const int val = cB++->get_char_value() & 0x00FF;
          const int h = alpha[val >> 4];
          const int l = alpha[val & 0x0F];
-         new (Z->next_ravel())   CharCell((Unicode)h);
-         new (Z->next_ravel())   CharCell((Unicode)l);
+         new (Z->next_ravel())   CharCell(static_cast<Unicode>(h));
+         new (Z->next_ravel())   CharCell(static_cast<Unicode>(l));
        }
 
    Z->set_default_Spc();
@@ -734,7 +735,8 @@ CDR_string cdr;
 
 const ShapeItem len = cdr.size();
 Value_P Z(len, LOC);
-   loop(l, len)   new (Z->next_ravel()) CharCell((Unicode)(0xFF & cdr[l]));
+   loop(l, len)
+       new (Z->next_ravel()) CharCell(static_cast<Unicode>(0xFF & cdr[l]));
 
    Z->set_default_Spc();
    Z->check_value(LOC);
@@ -846,10 +848,10 @@ const Cell * cB = &B.get_ravel(0);
         const int z3 = (b2 & 0x0F) << 2 | (b3 & 0xC0) >> 6;
         const int z4 =  b3 & 0x3F;
 
-        new (Z->next_ravel()) CharCell((Unicode)alpha[z1]);
-        new (Z->next_ravel()) CharCell((Unicode)alpha[z2]);
-        new (Z->next_ravel()) CharCell((Unicode)alpha[z3]);
-        new (Z->next_ravel()) CharCell((Unicode)alpha[z4]);
+        new (Z->next_ravel()) CharCell(static_cast<Unicode>(alpha[z1]));
+        new (Z->next_ravel()) CharCell(static_cast<Unicode>(alpha[z2]));
+        new (Z->next_ravel()) CharCell(static_cast<Unicode>(alpha[z3]));
+        new (Z->next_ravel()) CharCell(static_cast<Unicode>(alpha[z4]));
       }
 
    // process final bytes
@@ -866,10 +868,10 @@ const Cell * cB = &B.get_ravel(0);
                   const int z1 = b1 >> 2;
                   const int z2 = (b1 & 0x03) << 4 | (b2 & 0xF0) >> 4;
 
-                  new (Z->next_ravel()) CharCell((Unicode)alpha[z1]);
-                  new (Z->next_ravel()) CharCell((Unicode)alpha[z2]);
-                  new (Z->next_ravel()) CharCell((Unicode)'=');
-                  new (Z->next_ravel()) CharCell((Unicode)'=');
+                  new(Z->next_ravel())CharCell(static_cast<Unicode>(alpha[z1]));
+                  new(Z->next_ravel())CharCell(static_cast<Unicode>(alpha[z2]));
+                  new (Z->next_ravel()) CharCell(static_cast<Unicode>('='));
+                  new (Z->next_ravel()) CharCell(static_cast<Unicode>('='));
                 }
                 break;
 
@@ -883,10 +885,10 @@ const Cell * cB = &B.get_ravel(0);
                   const int z2 = (b1 & 0x03) << 4 | (b2 & 0xF0) >> 4;
                   const int z3 = (b2 & 0x0F) << 2 | (b3 & 0xC0) >> 6;
 
-                  new (Z->next_ravel()) CharCell((Unicode)alpha[z1]);
-                  new (Z->next_ravel()) CharCell((Unicode)alpha[z2]);
-                  new (Z->next_ravel()) CharCell((Unicode)alpha[z3]);
-                  new (Z->next_ravel()) CharCell((Unicode)'=');
+                  new(Z->next_ravel())CharCell(static_cast<Unicode>(alpha[z1]));
+                  new(Z->next_ravel())CharCell(static_cast<Unicode>(alpha[z2]));
+                  new(Z->next_ravel())CharCell(static_cast<Unicode>(alpha[z3]));
+                  new(Z->next_ravel())CharCell(static_cast<Unicode>('='));
                 }
                 break;
       }
@@ -937,18 +939,18 @@ const Cell * cB = &B.get_ravel(0);
 
          if (q < (quantums - 1) || missing == 0)
             {
-              new (Z->next_ravel())   CharCell((Unicode)z1);
-              new (Z->next_ravel())   CharCell((Unicode)z2);
-              new (Z->next_ravel())   CharCell((Unicode)z3);
+              new (Z->next_ravel())   CharCell(static_cast<Unicode>(z1));
+              new (Z->next_ravel())   CharCell(static_cast<Unicode>(z2));
+              new (Z->next_ravel())   CharCell(static_cast<Unicode>(z3));
             }
          else if (missing == 1)   // k6 k2l4 l20000 =
             {
-              new (Z->next_ravel())   CharCell((Unicode)z1);
-              new (Z->next_ravel())   CharCell((Unicode)z2);
+              new (Z->next_ravel())   CharCell(static_cast<Unicode>(z1));
+              new (Z->next_ravel())   CharCell(static_cast<Unicode>(z2));
             }
          else                     // k6 k20000 = =
             {
-              new (Z->next_ravel())   CharCell((Unicode)z1);
+              new (Z->next_ravel())   CharCell(static_cast<Unicode>(z1));
             }
        }
 
@@ -1031,7 +1033,7 @@ Value_P Z(len, LOC);
                    if (cB.get_cell_type() == CT_CHAR)
                       data = cB.get_char_value();
                    else if (cB.get_cell_type() == CT_CELLREF)
-                      data = (APL_Integer)cB.get_lval_value();
+                      data = reinterpret_cast<APL_Integer>(cB.get_lval_value());
                    else
                       memcpy(&data, cB.get_u0(), sizeof(data));
                  }
@@ -1040,7 +1042,9 @@ Value_P Z(len, LOC);
                    if (cB.get_cell_type() == CT_COMPLEX)
                       memcpy(&data, cB.get_u1(), sizeof(data));
                    else if (cB.get_cell_type() == CT_CELLREF)
-                      data = (APL_Integer)(*(LvalCell *)&cB).get_cell_owner();
+                      data = reinterpret_cast<APL_Integer>
+                           (reinterpret_cast<const LvalCell *>(&cB)
+                              ->get_cell_owner());
                  }
 
               new (cZ)   IntCell(data);

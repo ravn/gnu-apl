@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,10 +48,10 @@ IndexIterator::increment()
 ostream &
 IndexIterator::print(ostream & out) const
 {
-   out << "Iterator "        << HEX(this) << ":"  << endl
-       << "   upper:       " << HEX(upper)        << endl
-       << "   value:       " << get_value()       << endl
-       << "   indices[" << get_index_count() << "] :";
+   out << "Iterator "     << CVOIP(this) << ":"  << endl
+       << "   upper:       " << CVOIP(upper)     << endl
+       << "   value:       " << get_value()      << endl
+       << "   indices[" << get_index_count()     << "] :";
 
    loop(i, get_index_count())   out << " " << get_pos(i);
 
@@ -118,18 +118,17 @@ ShapeItem weight = 1;
          IndexIterator * new_it;
          if (!I)   // elided index
             {
-              new_it = (IndexIterator *)(new ElidedIndexIterator(weight, sh_r));
+              new_it = new ElidedIndexIterator(weight, sh_r);
               if (sh_r == 0)   empty = true;
             }
          else
             {
-              new_it = (IndexIterator *)
-                       (new TrueIndexIterator(weight, I, IDX.quad_io, sh_r));
+              new_it = new TrueIndexIterator(weight, I, IDX.quad_io, sh_r);
               if (I->element_count() == 0)   empty = true;
             }
 
          Log(LOG_delete)
-            CERR << "new    " << (const void *)new_it << " at " LOC << endl;
+            CERR << "new    " << CVOIP(new_it) << " at " LOC << endl;
 
          if (last_it)   last_it->set_upper(new_it);
          else           lowest_it = new_it;
@@ -145,7 +144,9 @@ MultiIndexIterator::~MultiIndexIterator()
        {
          IndexIterator * del = it;
          it = it->get_upper();
-         Log(LOG_delete)   CERR << "delete " HEX(del) << " at " LOC << endl;
+         Log(LOG_delete)
+            CERR << "delete " HEX(reinterpret_cast<uint64_t>(del))
+                 << " at " LOC << endl;
          delete del;
        }
 }

@@ -55,8 +55,8 @@ using namespace std;
 
 /// if there is less than x chars left on the current line then leave
 /// char mode and start a new line indented.
-#define NEED(x)   if (space < (int)(x))   { leave_char_mode();   out << "\n"; \
-                                            space = do_indent(); } out
+#define NEED(x)   if (space < int(x)) \
+   { leave_char_mode();   out << "\n";   space = do_indent(); } out
 
 //-----------------------------------------------------------------------------
 bool
@@ -103,7 +103,7 @@ XML_Saving_Archive::find_vid(const Value * val)
 const void * item = bsearch(val, values, value_count, sizeof(_val_par),
                       _val_par::compare_val_par1);
    if (item == 0)   return INVALID_VID;
-   return (Vid)((const _val_par *)item - values);
+   return static_cast<Vid>(reinterpret_cast<const _val_par *>(item) - values);
 }
 //-----------------------------------------------------------------------------
 void
@@ -203,7 +203,7 @@ char cc[80];
             case CT_INT:   // uses UNI_PAD_U3
                  space -= leave_char_mode();
                  snprintf(cc, sizeof(cc), "%lld",
-                          (long long)cell.get_int_value());
+                          static_cast<long long>(cell.get_int_value()));
                  NEED(1 + strlen(cc)) << UNI_PAD_U3 << decr(--space, cc);
                  break;
 
@@ -215,21 +215,23 @@ char cc[80];
                  if (const APL_Integer denom = flt->get_denominator())
                     {
                       const APL_Integer numer = flt->get_numerator();
-                      snprintf(cc, sizeof(cc), "%lld÷%lld", (long long)numer,
-                               (long long)denom);
+                      snprintf(cc, sizeof(cc), "%lld÷%lld", static_cast<long long>(numer),
+                               static_cast<long long>(denom));
                       NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
                       break;
                     }
                  }
 #endif
-                 snprintf(cc, sizeof(cc), "%.17g", cell.get_real_value());
+                 snprintf(cc, sizeof(cc), "%.17g",
+                          double(cell.get_real_value()));
                  NEED(1 + strlen(cc)) << UNI_PAD_U4 << decr(--space, cc);
                  break;
 
             case CT_COMPLEX:   // uses UNI_PAD_U5
                  space -= leave_char_mode();
                  snprintf(cc, sizeof(cc), "%17gJ%17g",
-                          cell.get_real_value(), cell.get_imag_value());
+                          double(cell.get_real_value()),
+                          double(cell.get_imag_value()));
                  NEED(1 + strlen(cc)) << UNI_PAD_U5 << decr(--space, cc);
                  break;
 
@@ -249,7 +251,8 @@ char cc[80];
                    if (cp)   // valid Cell *
                       {
                         const Value * cp_owner =
-                              ((const LvalCell *)&cell)->get_cell_owner();
+                                      reinterpret_cast<const LvalCell *>
+                                                      (&cell)->get_cell_owner();
                         const long long offset = cp_owner->get_offset(cp);
                         const Vid vid = find_vid(cp_owner);
                         snprintf(cc, sizeof(cc), "%d[%lld]", vid, offset);
@@ -644,8 +647,9 @@ XML_Saving_Archive::_val_par::compare_val_par(const _val_par & A,
 int
 XML_Saving_Archive::_val_par::compare_val_par1(const void * key, const void * B)
 {
-const void * Bv = ((const _val_par *)B)->_val;
-   return (const char *)key - (const char *)Bv;
+const void * Bv = (reinterpret_cast<const _val_par *>(B))->_val;
+   return reinterpret_cast<const char *>(key)
+        - reinterpret_cast<const char *>(Bv);
 }
 //-----------------------------------------------------------------------------
 XML_Saving_Archive &
@@ -798,7 +802,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
    for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
         obj != DynamicObject::get_all_values(); obj = obj->get_next())
        {
-         const Value & val(*(const Value *)obj);
+         const Value & val(*static_cast<const Value *>(obj));
 
          if (val.is_marked())    continue;   // stale
 
@@ -811,7 +815,7 @@ ShapeItem idx = 0;
    for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
         obj != DynamicObject::get_all_values(); obj = obj->get_next())
        {
-         const Value * val = (const Value *)obj;
+         const Value * val = static_cast<const Value *>(obj);
 
          if (val->is_marked())    continue;   // stale
 
@@ -848,14 +852,14 @@ ShapeItem idx = 0;
                         // happen. print out some more information about this
                         // case.
                         //
-                        CERR << "*** Sub-Value " << (void *)sub
-                             << " has two parents." << endl
+                        CERR << "*** Sub-Value "
+                             << CVOIP(sub) << " has two parents." << endl
                              << "Child: vid=" << sub_idx << ", _val="
                              << values[sub_idx]._val << "_par="
-                             << (void *)values[sub_idx]._par  << endl
+                             << values[sub_idx]._par << endl
                              << "Parent 2: vid=" << p <<  ", _val="
                              << values[p]._val << "_par="
-                             << (void *)values[p]._par  << endl
+                             << values[p]._par << endl
                              << "Call stack:" << endl;
                              BACKTRACE
                         CERR << endl << " Running )CHECK..." << endl;
@@ -875,7 +879,8 @@ print_history(CERR, values[p]._val, 0);
 " for BIG trouble!" << endl;
                       }
 
-                   values[sub_idx] = _val_par(values[sub_idx]._val, (Vid)p);
+                   values[sub_idx] = _val_par(values[sub_idx]._val,
+                                              static_cast<Vid>(p));
                  }
               else if (cP.is_lval_cell())
                  {
@@ -888,11 +893,11 @@ print_history(CERR, values[p]._val, 0);
 
    // save all values (without their ravel)
    //
-   loop(vid, value_count)   save_shape((Vid)vid);
+   loop(vid, value_count)   save_shape(static_cast<Vid>(vid));
 
    // save ravels of all values
    //
-   loop(vid, value_count)   save_Ravel((Vid)vid);
+   loop(vid, value_count)   save_Ravel(static_cast<Vid>(vid));
 
    // save user defined symbols
    //
@@ -992,14 +997,14 @@ struct stat st;
 
    // success
    //
-   file_start = (const UTF8 *)map_start;
+   file_start = reinterpret_cast<const UTF8 *>(map_start);
    file_end = file_start + map_length;
 
    reset();
 
-   if (!strncmp((const char *)file_start, "#!", 2) ||   // )DUMP file
-       !strncmp((const char *)file_start, "<!", 2) ||   // )DUMP-HTML file
-       !strncmp((const char *)file_start, "⍝!", 4))     // a library
+   if (!strncmp(reinterpret_cast<const char *>(file_start), "#!", 2) ||   // )DUMP file
+       !strncmp(reinterpret_cast<const char *>(file_start), "<!", 2) ||   // )DUMP-HTML file
+       !strncmp(reinterpret_cast<const char *>(file_start), "⍝!", 4))     // a library
       {
         // the file was either written with )DUMP or is a library.
         // Return the open file descriptor (the destructor will unmap())
@@ -1009,7 +1014,7 @@ struct stat st;
         return;
       }
 
-   if (strncmp((const char *)file_start, "<?xml", 5))   // not an xml file
+   if (strncmp(reinterpret_cast<const char *>(file_start), "<?xml", 5))   // not an xml file
       {
         CERR << "file " << filename << " does not " << endl
              << "have the format of a GNU APL .xml or .apl file" << endl;
@@ -1021,7 +1026,7 @@ struct stat st;
 //-----------------------------------------------------------------------------
 XML_Loading_Archive::~XML_Loading_Archive()
 {
-   if (map_start)   munmap((char *)map_start, map_length);
+   if (map_start)   munmap(reinterpret_cast<char *>(map_start), map_length);
    if (fd != -1)   close(fd);
 }
 //-----------------------------------------------------------------------------
@@ -1095,7 +1100,7 @@ int len = 0;
 bool
 XML_Loading_Archive::is_tag(const char * prefix) const
 {
-   return !strncmp((const char *)tag_name, prefix, strlen(prefix));
+   return !strncmp(reinterpret_cast<const char *>(tag_name), prefix, strlen(prefix));
 }
 //-----------------------------------------------------------------------------
 void
@@ -1124,7 +1129,7 @@ const int att_len = strlen(att_name);
 
    for (const UTF8 * d = attributes; d < end_attr; ++d)
        {
-         if (strncmp(att_name, (const char *)d, att_len))   continue;
+         if (strncmp(att_name, reinterpret_cast<const char *>(d), att_len))   continue;
          const UTF8 * dd = d + att_len;
          while (*dd <= ' ')   ++dd;   // skip whitespaces
          if (*dd++ != '=')   continue;
@@ -1152,15 +1157,15 @@ XML_Loading_Archive::find_int_attr(const char * attrib, bool optional, int base)
 const UTF8 * value = find_attr(attrib, optional);
    if (value == 0)   return -1;   // not found
 
-const int64_t val = strtoll((const char *)value, 0, base);
+const int64_t val = strtoll(reinterpret_cast<const char *>(value), 0, base);
    return val;
 }
 //-----------------------------------------------------------------------------
-double
+APL_Float
 XML_Loading_Archive::find_float_attr(const char * attrib)
 {
 const UTF8 * value = find_attr(attrib, false);
-const double val = strtod((const char *)value, 0);
+const APL_Float val = strtod(reinterpret_cast<const char *>(value), 0);
    return val;
 }
 //-----------------------------------------------------------------------------
@@ -1317,7 +1322,7 @@ bool prev_month = false;
    //
    for (const UTF8 * c = file_end - 12; (c > data) && (c > file_end - 200); --c)
        {
-         if (!strncmp((const char *)c, "</Workspace>", 12))
+         if (!strncmp(reinterpret_cast<const char *>(c), "</Workspace>", 12))
             {
               file_is_complete = true;
               break;
@@ -1435,7 +1440,7 @@ Shape sh_value;
         char sh[20];
         snprintf(sh, sizeof(sh), "sh-%d", int(r));
         const UTF8 * sh_r = find_attr(sh, false);
-        sh_value.add_shape_item(atoll((const char *)sh_r));
+        sh_value.add_shape_item(atoll(reinterpret_cast<const char *>(sh_r)));
       }
 
    // if we do )COPY or )PCOPY and vid is not in vids_COPY list, then we
@@ -1450,7 +1455,7 @@ bool no_copy = false;   // assume the value is needed
         int parent = vid;
         for (;;)
             {
-              Assert(parent < (int)parents.size());
+              Assert(parent < int(parents.size()));
               if (parents[parent] == -1)   break;   // topmost owner found
               parent = parents[parent];
             }
@@ -1472,7 +1477,7 @@ bool no_copy = false;   // assume the value is needed
       }
    else
       {
-        Assert(vid == (int)values.size());
+        Assert(vid == int(values.size()));
 
         Value_P val(sh_value, LOC);
         values.append(val);
@@ -1508,9 +1513,10 @@ const Unicode type = UTF8_string::toUni(first, len, true);
              first += len;
              {
                char * end = 0;
-               const long long int val = strtoll((const char *)first, &end, 10);
+               const long long int val = strtoll(
+                             reinterpret_cast<const char *>(first), &end, 10);
                new (C++) IntCell(val);
-               first = (const UTF8 *)end;
+               first = reinterpret_cast<const UTF8 *>(end);
              }
              break;
 
@@ -1518,9 +1524,9 @@ const Unicode type = UTF8_string::toUni(first, len, true);
              first += len;
              {
                char * end = 0;
-               const double val = strtod((const char *)first, &end);
+               const APL_Float val = strtod(reinterpret_cast<const char *>(first), &end);
                new (C++) FloatCell(val);
-               first = (const UTF8 *)end;
+               first = reinterpret_cast<const UTF8 *>(end);
              }
              break;
 
@@ -1528,13 +1534,13 @@ const Unicode type = UTF8_string::toUni(first, len, true);
              first += len;
              {
                char * end = 0;
-               const double real = strtod((const char *)first, &end);
-               first = (const UTF8 *)end;
+               const APL_Float real = strtod(reinterpret_cast<const char *>(first), &end);
+               first = reinterpret_cast<const UTF8 *>(end);
                Assert(*end == 'J');
                ++end;
-               const double imag = strtod(end, &end);
+               const APL_Float imag = strtod(end, &end);
                new (C++) ComplexCell(real, imag);
-               first = (const UTF8 *)end;
+               first = reinterpret_cast<const UTF8 *>(end);
              }
              break;
 
@@ -1542,11 +1548,11 @@ const Unicode type = UTF8_string::toUni(first, len, true);
              first += len;
              {
                char * end = 0;
-               const int vid = strtol((const char *)first, &end, 10);
+               const int vid = strtol(reinterpret_cast<const char *>(first), &end, 10);
                Assert(vid >= 0);
-               Assert(vid < (int)values.size());
+               Assert(vid < int(values.size()));
                new (C++) PointerCell(values[vid], C_owner);
-               first = (const UTF8 *)end;
+               first = reinterpret_cast<const UTF8 *>(end);
              }
              break;
 
@@ -1560,15 +1566,15 @@ const Unicode type = UTF8_string::toUni(first, len, true);
              else
                 {
                   char * end = 0;
-                  const int vid = strtol((const char *)first, &end, 16);
+                  const int vid = strtol(reinterpret_cast<const char *>(first), &end, 16);
                   Assert(vid >= 0);
-                  Assert(vid < (int)values.size());
+                  Assert(vid < int(values.size()));
                   Assert(*end == '[');   ++end;
                   const ShapeItem offset = strtoll(end, &end, 16);
                   Assert(*end == ']');   ++end;
                   new (C++) LvalCell(&values[vid]->get_ravel(offset),
                                      values[vid].get());
-                  first = (const UTF8 *)end;
+                  first = reinterpret_cast<const UTF8 *>(end);
                 }
              break;
 
@@ -1580,8 +1586,8 @@ const Unicode type = UTF8_string::toUni(first, len, true);
              first += len;
              {
                char * end = 0;
-               const uint64_t numer = strtoll((const char *)first, &end, 10);
-               first = (const UTF8 *)end;
+               const uint64_t numer = strtoll(reinterpret_cast<const char *>(first), &end, 10);
+               first = reinterpret_cast<const UTF8 *>(end);
 
                // skip ÷ (which is is C3 B7 in UTF8)
                Assert((*end++ & 0xFF) == 0xC3);
@@ -1591,9 +1597,9 @@ const Unicode type = UTF8_string::toUni(first, len, true);
 #ifdef RATIONAL_NUMBERS_WANTED
                new (C++) FloatCell(numer, denom);
 #else
-               new (C++) FloatCell(((double)numer)/denom);
+               new (C++) FloatCell((static_cast<APL_Float>(numer))/denom);
 #endif
-               first = (const UTF8 *)end;
+               first = reinterpret_cast<const UTF8 *>(end);
              }
              break;
 
@@ -1633,9 +1639,9 @@ XML_Loading_Archive::read_chars(UCS_string & ucs, const UTF8 * & utf)
               utf += len;   // skip UNI_PAD_U1
               char_mode = false;
               char * end = 0;
-              const int hex = strtol((const char *)utf, &end, 16);
+              const int hex = strtol(reinterpret_cast<const char *>(utf), &end, 16);
               ucs.append(Unicode(hex));
-              utf = (const UTF8 *)end;
+              utf = reinterpret_cast<const UTF8 *>(end);
               continue;
             }
 
@@ -1674,7 +1680,7 @@ const UTF8 * cells = find_attr("cells", false);
 
    Log(LOG_archive)   CERR << "    read_Ravel() vid=" << vid << endl;
 
-   Assert(vid < (int)values.size());
+   Assert(vid < int(values.size()));
 Value_P val = values[vid];
 
    if (!val)   // )COPY with vids_COPY or static value
@@ -1721,7 +1727,7 @@ void
 XML_Loading_Archive::read_Variable(int d, Symbol & symbol)
 {
 const int vid = find_int_attr("vid", false, 10);
-   Assert(vid < (int)values.size());
+   Assert(vid < int(values.size()));
 
    Log(LOG_archive)   CERR << "      [" << d << "] read_Variable() vid=" << vid
                            << " name=" << symbol.get_name() << endl;
@@ -1775,7 +1781,7 @@ int eprops[4] = { 0, 0, 0, 0 };
 const UTF8 * ep = find_attr("exec-properties", true);
    if (ep)
       {
-        sscanf((const char *)ep, "%d,%d,%d,%d",
+        sscanf(reinterpret_cast<const char *>(ep), "%d,%d,%d,%d",
                eprops, eprops + 1, eprops + 2, eprops+ 3);
       }
 
@@ -2143,7 +2149,7 @@ Executable * exec = 0;
    Workspace::push_SI(exec, LOC);
 StateIndicator * si = Workspace::SI_top();
    Assert(si);
-   si->set_PC((Function_PC)pc);
+   si->set_PC(static_cast<Function_PC>(pc));
    read_Parser(*si, lev);
 
    for (;;)
@@ -2193,7 +2199,8 @@ Executable *
 XML_Loading_Archive::read_UserFunction()
 {
 const int macro_num = find_int_attr("macro-num", true, 10);
-   if (macro_num != -1)   return Macro::get_macro((Macro::Macro_num)macro_num);
+   if (macro_num != -1)
+      return Macro::get_macro(static_cast<Macro::Macro_num>(macro_num));
 
 const UTF8 * lambda_name = find_attr("lambda-name", true);
    if (lambda_name)   return read_lambda(lambda_name);
@@ -2259,9 +2266,9 @@ const int action     = find_int_attr("action",         false, 10);
 
 Prefix & parser = si.current_stack;
 
-   parser.set_assign_state((Assign_state)ass_state);
-   parser.action = (R_action)action;
-   parser.lookahead_high = (Function_PC)lah_high;
+   parser.set_assign_state(static_cast<Assign_state>(ass_state));
+   parser.action = static_cast<R_action>(action);
+   parser.lookahead_high = static_cast<Function_PC>(lah_high);
 
    for (;;)
        {
@@ -2315,15 +2322,15 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 
         case TV_FLT:   
              {
-               const double val = find_float_attr("float");
+               const APL_Float val = find_float_attr("float");
                new (&tloc.tok) Token(tag, val);
              }
              break;
 
         case TV_CPX:
              {
-               const double real = find_float_attr("real");
-               const double imag = find_float_attr("imag");
+               const APL_Float real = find_float_attr("real");
+               const APL_Float imag = find_float_attr("imag");
                new (&tloc.tok) Token(tag, real, imag);
              }
              break;
@@ -2353,14 +2360,15 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
         case TV_VAL:   
              {
                const int vid = find_int_attr("vid", false, 10);
-               Assert(vid < (int)values.size());
+               Assert(vid < int(values.size()));
                new (&tloc.tok) Token(tag, values[vid]);
              }
              break;
 
         case TV_INDEX: 
              {
-               char * vids = (char *)find_attr("index", false);
+               char * vids = reinterpret_cast<char *>
+                            (const_cast<UTF8 *>(find_attr("index", false)));
                IndexExpr & idx = *new IndexExpr(ASS_none, LOC);
                while (*vids != '"')
                   {
@@ -2376,7 +2384,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
                          Assert1(*vids == 'd');   ++vids;
                          Assert1(*vids == '_');   ++vids;
                          const int vid = strtol(vids, &vids, 10);
-                         Assert(vid < (int)values.size());
+                         Assert(vid < int(values.size()));
                          idx.add(values[vid]);
                        }
                   }

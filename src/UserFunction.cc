@@ -556,7 +556,8 @@ Simple_string<bool, false> ts_lines;
    loop(ll, lines.size())
       {
         Function_Line line = lines[ll];
-        if (line >= 1 && line < (int)line_starts.size())  ts_lines[line] = true;
+        if (line >= 1 && line < int(line_starts.size()))
+           ts_lines[line] = true;
       }
 
    if (stop)
@@ -564,7 +565,8 @@ Simple_string<bool, false> ts_lines;
         stop_lines.shrink(0);
         loop(ts, line_starts.size())
            {
-             if (ts_lines[ts])   stop_lines.append((Function_Line)ts);
+             if (ts_lines[ts])
+                stop_lines.append(static_cast<Function_Line>(ts));
            }
       }
    else
@@ -572,7 +574,8 @@ Simple_string<bool, false> ts_lines;
         trace_lines.shrink(0);
         loop(ts, line_starts.size())
            {
-             if (ts_lines[ts])   trace_lines.append((Function_Line)ts);
+             if (ts_lines[ts])
+                trace_lines.append(static_cast<Function_Line>(ts));
            }
       }
 
@@ -715,7 +718,7 @@ struct stat st;
 off_t len = st.st_size;
 void * start = mmap(0, len, PROT_READ, MAP_SHARED, in, 0);
 
-   if (start == (const void *)-1)
+   if (start == reinterpret_cast<const void *>(-1))
       {
         CERR << "Can't mmap() workspace file '" 
              << filename << "': " << strerror(errno) << endl;
@@ -723,16 +726,16 @@ void * start = mmap(0, len, PROT_READ, MAP_SHARED, in, 0);
         throw_apl_error(E_WS_MMAP, LOC);
       }
 
-UTF8_string utf((const UTF8 *)start, len);
+UTF8_string utf(reinterpret_cast<const UTF8 *>(start), len);
 
    // skip trailing \r and \n.
    //
    while (utf.size() && (utf.last() == '\r' || utf.last() == '\n'))   utf.pop();
 
-UCS_string ucs(utf);
-   munmap((char *)start, st.st_size);
+   munmap(start, st.st_size);
    close(in);
 
+UCS_string ucs(utf);
 int error_line = -1;
    fun = fix(ucs, error_line, false, LOC, filename, false);
 }
@@ -740,8 +743,9 @@ int error_line = -1;
 Function_PC
 UserFunction::pc_for_line(Function_Line line) const
 {
-   if (line < 1)                          return Function_PC(body.size() - 1);
-   if (line >= (int)line_starts.size())   return Function_PC(body.size() - 1);
+   if (line < 1 || line >= int(line_starts.size()))
+      return Function_PC(body.size() - 1);
+
    return line_starts[line];
 }
 //-----------------------------------------------------------------------------
@@ -817,7 +821,7 @@ Function * old_function = symbol->get_function();
 
    Log(LOG_UserFunction__fix)
       {
-        CERR << " addr " << (const void *)ufun << endl;
+        CERR << " addr " << CVOIP(ufun) << endl;
         ufun->print(CERR);
       }
 
@@ -897,7 +901,7 @@ const ErrorCode ec = parser.parse(body_text, body);
         return 0;
       }
 
-UserFunction * ufun = new UserFunction((Fun_signature)signature, 0,
+UserFunction * ufun = new UserFunction(static_cast<Fun_signature>(signature), 0,
                                        body_text, body);
    return ufun;
 }

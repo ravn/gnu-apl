@@ -159,41 +159,39 @@ int quad_pp = pctx.get_PP();
    if (quad_pp > MAX_Quad_PP)   quad_pp = MAX_Quad_PP;
    if (quad_pp < MIN_Quad_PP)   quad_pp = MIN_Quad_PP;
 
-const bool negative = (value < 0);
+const bool negative = (value < 0.0);
    if (negative)   value = -value;
 
 int expo = 0;
 
    if (value >= 10.0)   // large number, positive exponent
       {
-       while (value >= 1e16)
-             {
-               if (value > 1e307)
-                  {
-                    if (negative)   append_utf8("¯∞");
-                    else            append_utf8("∞");
-                    FloatCell::map_FC(*this);
-                    return;
-                  }
-               value *= 1e-16;   expo += 16;
-             }
+        if (value > 1e307)
+           {
+             if (negative)   append_utf8("¯∞");
+             else            append_utf8("∞");
+             FloatCell::map_FC(*this);
+             return;
+           }
+
+       while (value >= 1e16)   { value *= 1e-16;   expo += 16; }
        while (value >= 1e4)    { value *= 1e-4;    expo +=  4; }
        while (value >= 1e1)    { value *= 1e-1;    ++expo;     }
       }
    else if (value < 1.0)   // small number, negative exponent
       {
-       while (value < 1e-16)
-             {
-               if (value < 1e-305)   // very small number: make it 0
-                  {
-                    append(UNI_ASCII_0);
-                    return;
-                  }
-               value *= 1e16;   expo -= 16;
-             }
+       if (value < 1e-305)   // very small number: make it 0
+          {
+            append(UNI_ASCII_0);
+            return;
+          }
+
+       while (value < 1e-16)   { value *= 1e16;   expo -= 16; }
        while (value < 1e-4)    { value *= 1e4;    expo -=  4; }
        while (value < 1.0)     { value *= 10.0;   --expo;     }
       }
+
+Q(value)
 
    // In theory, at this point, 1.0 ≤ value < 10.0. In reality value can
    // be outside, though, due to rounding errors.
@@ -206,20 +204,25 @@ UCS_string digits;
       {
         if (value >= 10.0)
            {
-             digits.append((Unicode)(10 + '0'));
-             value = 0.0;
+             // 10.0 or more is a rounding error from 9,999...
+             digits.append(static_cast<Unicode>(10 + '0'));
+             while (digits.size() < (quad_pp + 2))   digits.append(UNI_ASCII_0);
+             break;
            }
         else if (value < 0.0)
            {
-             digits.append((Unicode)('0'));
+             // less than 0.0 is a rounding error from 0.000...
+             while (digits.size() < (quad_pp + 2))   digits.append(UNI_ASCII_0);
+             break;
+             digits.append(UNI_ASCII_0);
              value = 0.0;
            }
         else
            {
-             const int dig = (int)value;
+             const int dig = int(value);
              value -= dig;
-             value *= 10;
-             digits.append((Unicode)(dig + '0'));
+             value *= 10.0;
+             digits.append(static_cast<Unicode>(dig + '0'));
            }
       }
 
@@ -230,7 +233,7 @@ UCS_string digits;
 const Unicode last = digits.last();
    digits.pop();
 
-   if (last >= '5')   digits.last() = (Unicode)(digits.last() + 1);
+   if (last >= '5')   digits.last() = static_cast<Unicode>(digits.last() + 1);
  
    // adjust carries of 2nd to last digit
    //
@@ -238,8 +241,8 @@ const Unicode last = digits.last();
        {
         if (digits[d] > '9')
            {
-             digits[d] =     (Unicode)(digits[d]     - 10);
-             digits[d - 1] = (Unicode)(digits[d - 1] +  1);
+             digits[d] =     static_cast<Unicode>(digits[d]     - 10);
+             digits[d - 1] = static_cast<Unicode>(digits[d - 1] +  1);
            }
        }
 
@@ -247,7 +250,7 @@ const Unicode last = digits.last();
    //
    if (digits[0] > '9')
       {
-        digits[0] = (Unicode)(digits[0] - 10);
+        digits[0] = static_cast<Unicode>(digits[0] - 10);
         digits.insert_before(0, UNI_ASCII_1);
         ++expo;
         digits.pop();
@@ -255,7 +258,7 @@ const Unicode last = digits.last();
 
    // remove trailing zeros
    //
-   while (digits.size() && digits.last() == UNI_ASCII_0)   digits.pop();
+   while (digits.size() > 1 && digits.last() == UNI_ASCII_0)   digits.pop();
 
    // force scaled format if:
    //
@@ -668,7 +671,7 @@ UCS_string::is_comment_or_label() const
 void
 UCS_string::append_utf8(const UTF8 * str)
 {
-const size_t len = strlen((const char *)str);
+const size_t len = strlen(reinterpret_cast<const char *>(str));
 const UTF8_string utf(str, len);
 const UCS_string ucs(utf);
 
@@ -698,7 +701,7 @@ void
 UCS_string::append_number(ShapeItem num)
 {
 char cc[40];
-   snprintf(cc, sizeof(cc) - 1, "%lld", (long long)num);
+   snprintf(cc, sizeof(cc) - 1, "%lld", static_cast<long long>(num));
    loop(c, sizeof(cc))
       {
         if (cc[c])   append(Unicode(cc[c]));
@@ -711,7 +714,7 @@ UCS_string::append_hex(ShapeItem num, bool uppercase)
 {
 const char * format = uppercase ? "%llX" : "%llx";
 char cc[40];
-   snprintf(cc, sizeof(cc) - 1, format, (long long)num);
+   snprintf(cc, sizeof(cc) - 1, format, static_cast<long long>(num));
    loop(c, sizeof(cc))
       {
         if (cc[c])   append(Unicode(cc[c]));
@@ -736,10 +739,10 @@ UCS_string::append_shape(const Shape & shape)
 }
 //-----------------------------------------------------------------------------
 void
-UCS_string::append_float(double num)
+UCS_string::append_float(APL_Float num)
 {
 char cc[60];
-   snprintf(cc, sizeof(cc) - 1, "%lf", num);
+   snprintf(cc, sizeof(cc) - 1, "%lf", double(num));
    loop(c, sizeof(cc))
       {
         if (cc[c])   append(Unicode(cc[c]));
@@ -812,32 +815,32 @@ bool negative = false;
 ostream &
 operator << (ostream & os, Unicode uni)
 {       
-   if (uni < 0x80)      return os << (char)uni;
+   if (uni < 0x80)      return os << char(uni);
         
-   if (uni < 0x800)     return os << (char)(0xC0 | (uni >> 6))
-                                  << (char)(0x80 | (uni & 0x3F));
+   if (uni < 0x800)     return os << char(0xC0 | (uni >> 6))
+                                  << char(0x80 | (uni & 0x3F));
         
-   if (uni < 0x10000)    return os << (char)(0xE0 | (uni >> 12))
-                                   << (char)(0x80 | (uni >>  6 & 0x3F))
-                                   << (char)(0x80 | (uni       & 0x3F));
+   if (uni < 0x10000)    return os << char(0xE0 | (uni >> 12))
+                                   << char(0x80 | (uni >>  6 & 0x3F))
+                                   << char(0x80 | (uni       & 0x3F));
 
-   if (uni < 0x200000)   return os << (char)(0xF0 | (uni >> 18))
-                                   << (char)(0x80 | (uni >> 12 & 0x3F))
-                                   << (char)(0x80 | (uni >>  6 & 0x3F))
-                                   << (char)(0x80 | (uni       & 0x3F));
+   if (uni < 0x200000)   return os << char(0xF0 | (uni >> 18))
+                                   << char(0x80 | (uni >> 12 & 0x3F))
+                                   << char(0x80 | (uni >>  6 & 0x3F))
+                                   << char(0x80 | (uni       & 0x3F));
 
-   if (uni < 0x4000000)  return os << (char)(0xF8 | (uni >> 24))
-                                   << (char)(0x80 | (uni >> 18 & 0x3F))
-                                   << (char)(0x80 | (uni >> 12 & 0x3F))
-                                   << (char)(0x80 | (uni >>  6 & 0x3F))
-                                   << (char)(0x80 | (uni       & 0x3F));
+   if (uni < 0x4000000)  return os << char(0xF8 | (uni >> 24))
+                                   << char(0x80 | (uni >> 18 & 0x3F))
+                                   << char(0x80 | (uni >> 12 & 0x3F))
+                                   << char(0x80 | (uni >>  6 & 0x3F))
+                                   << char(0x80 | (uni       & 0x3F));
 
-   return os << (char)(0xFC | (uni >> 30))
-             << (char)(0x80 | (uni >> 24 & 0x3F))
-             << (char)(0x80 | (uni >> 18 & 0x3F))
-             << (char)(0x80 | (uni >> 12 & 0x3F))
-             << (char)(0x80 | (uni >>  6 & 0x3F))
-             << (char)(0x80 | (uni       & 0x3F));
+   return os << char(0xFC | (uni >> 30))
+             << char(0x80 | (uni >> 24 & 0x3F))
+             << char(0x80 | (uni >> 18 & 0x3F))
+             << char(0x80 | (uni >> 12 & 0x3F))
+             << char(0x80 | (uni >>  6 & 0x3F))
+             << char(0x80 | (uni       & 0x3F));
 }
 //-----------------------------------------------------------------------------
 ostream &
@@ -880,7 +883,7 @@ UCS_string::dump(ostream & out) const
    out << right << hex << uppercase << setfill('0');
    loop(s, size())
       {
-        out << " U+" << setw(4) << (int)at(s);
+        out << " U+" << setw(4) << int(at(s));
       }
 
    return out << left << dec << nouppercase << setfill(' ');
@@ -916,9 +919,9 @@ UCS_string ret;
 }
 //-----------------------------------------------------------------------------
 UCS_string
-UCS_string::from_big(double & val)
+UCS_string::from_big(APL_Float & val)
 {
-   Assert(val >= 0);
+   Assert(val >= 0.0);
 
 long double value = val;
 int digits[320];   // DBL_MAX is 1.79769313486231470E+308
@@ -929,7 +932,7 @@ long double fract;
    for (; value >= 1.0; ++d)
       {
          fract = modf(value / 10.0, &value);   // U.x -> .U
-         *d = (int)((fract + .02) * 10.0);
+         *d = int((fract + .02) * 10.0);
          fract -= 0.1 * *d;
       }
 
@@ -943,7 +946,7 @@ UCS_string ret;
 }
 //-----------------------------------------------------------------------------
 UCS_string
-UCS_string::from_double_expo_prec(double v, int fract_digits)
+UCS_string::from_double_expo_prec(APL_Float v, int fract_digits)
 {
 UCS_string ret;
 
@@ -960,7 +963,7 @@ UCS_string ret;
         return ret;
       }
 
-   if (v < 0)   { ret.append(UNI_OVERBAR);   v = - v; }
+   if (v < 0.0)   { ret.append(UNI_OVERBAR);   v = - v; }
 
 int expo = 0;
    while (v >= 1.0E1)
@@ -968,33 +971,33 @@ int expo = 0;
         if (v >= 1.0E9)
            if (v >= 1.0E13)
               if (v >= 1.0E15)
-                 if     (v >= 1.0E16)      { v *= 1.0E-16;   expo += 16; }
-                 else /* v >= 1.0E15 */    { v *= 1.0E-15;   expo += 15; }
+                 if     (v >= 1.0E16)      { v = v * 1.0E-16;   expo += 16; }
+                 else /* v >= 1.0E15 */    { v = v * 1.0E-15;   expo += 15; }
               else
-                 if     (v >= 1.0E14)      { v *= 1.0E-14;   expo += 14; }
-                 else /* v >= 1.0E13 */    { v *= 1.0E-13;   expo += 13; }
+                 if     (v >= 1.0E14)      { v = v * 1.0E-14;   expo += 14; }
+                 else /* v >= 1.0E13 */    { v = v * 1.0E-13;   expo += 13; }
            else
               if (v >= 1.0E11)
-                 if     (v >= 1.0E12)      { v *= 1.0E-12;   expo += 12; }
-                 else /* v >= 1.0E11 */    { v *= 1.0E-11;   expo += 11; }
+                 if     (v >= 1.0E12)      { v = v * 1.0E-12;   expo += 12; }
+                 else /* v >= 1.0E11 */    { v = v * 1.0E-11;   expo += 11; }
               else
-                 if     (v >= 1.0E10)      { v *= 1.0E-10;   expo += 10; }
-                 else /* v >= 1.0E9 */     { v *= 1.0E-9;    expo += 9;  }
+                 if     (v >= 1.0E10)      { v = v * 1.0E-10;   expo += 10; }
+                 else /* v >= 1.0E9 */     { v = v * 1.0E-9;    expo += 9;  }
         else
            if (v >= 1.0E5)
               if (v >= 1.0E7)
-                 if     (v >= 1.0E8)       { v *= 1.0E-8;    expo += 8;  }
-                 else /* v >= 1.0E7 */     { v *= 1.0E-7;    expo += 7;  }
+                 if     (v >= 1.0E8)       { v = v * 1.0E-8;    expo += 8;  }
+                 else /* v >= 1.0E7 */     { v = v * 1.0E-7;    expo += 7;  }
               else
-                 if     (v >= 1.0E6)       { v *= 1.0E-6;    expo += 6;  }
-                 else /* v >= 1.0E5 */     { v *= 1.0E-5;    expo += 5;  }
+                 if     (v >= 1.0E6)       { v = v * 1.0E-6;    expo += 6;  }
+                 else /* v >= 1.0E5 */     { v = v * 1.0E-5;    expo += 5;  }
            else
               if (v >= 1.0E3)
-                 if     (v >= 1.0E4)       { v *= 1.0E-4;    expo += 4;  }
-                 else /* v >= 1.0E3 */     { v *= 1.0E-3;    expo += 3;  }
+                 if     (v >= 1.0E4)       { v = v * 1.0E-4;    expo += 4;  }
+                 else /* v >= 1.0E3 */     { v = v * 1.0E-3;    expo += 3;  }
               else
-                 if     (v >= 1.0E2)       { v *= 1.0E-2;    expo += 2;  }
-                 else /* v >= 1.0E1 */     { v *= 1.0E-1;    expo += 1;  }
+                 if     (v >= 1.0E2)       { v = v * 1.0E-2;    expo += 2;  }
+                 else /* v >= 1.0E1 */     { v = v * 1.0E-1;    expo += 1;  }
       }
 
    while (v < 1.0E0)
@@ -1002,33 +1005,33 @@ int expo = 0;
         if (v < 1.0E-8)
            if (v < 1.0E-12)
               if (v < 1.0E-14)
-                 if     (v < 1.0E-15)      { v *= 1.0E-16;   expo += 16; }
-                 else /* v < 1.0E-14 */    { v *= 1.0E-15;   expo += 15; }
+                 if     (v < 1.0E-15)      { v = v * 1.0E-16;   expo += 16; }
+                 else /* v < 1.0E-14 */    { v = v * 1.0E-15;   expo += 15; }
               else
-                 if     (v < 1.0E-13)      { v *= 1.0E-14;   expo += 14; }
-                 else /* v < 1.0E-12 */    { v *= 1.0E-13;   expo += 13; }
+                 if     (v < 1.0E-13)      { v = v * 1.0E-14;   expo += 14; }
+                 else /* v < 1.0E-12 */    { v = v * 1.0E-13;   expo += 13; }
            else
               if (v < 1.0E-10)
-                 if     (v < 1.0E-11)      { v *= 1.0E12;   expo += -12; }
-                 else /* v < 1.0E-10 */    { v *= 1.0E11;   expo += -11; }
+                 if     (v < 1.0E-11)      { v = v * 1.0E12;   expo += -12; }
+                 else /* v < 1.0E-10 */    { v = v * 1.0E11;   expo += -11; }
               else
-                 if     (v < 1.0E-9 )      { v *= 1.0E10;   expo += -10; }
-                 else /* v < 1.0E-8 */     { v *= 1.0E9;    expo += -9;  }
+                 if     (v < 1.0E-9 )      { v = v * 1.0E10;   expo += -10; }
+                 else /* v < 1.0E-8 */     { v = v * 1.0E9;    expo += -9;  }
         else
            if (v < 1.0E-4)
               if (v < 1.0E-6)
-                 if     (v < 1.0E-7)       { v *= 1.0E8;    expo += -8;  }
-                 else /* v < 1.0E-6 */     { v *= 1.0E7;    expo += -7;  }
+                 if     (v < 1.0E-7)       { v = v * 1.0E8;    expo += -8;  }
+                 else /* v < 1.0E-6 */     { v = v * 1.0E7;    expo += -7;  }
               else
-                 if     (v < 1.0E-5)       { v *= 1.0E6;    expo += -6;  }
-                 else /* v < 1.0E-4 */     { v *= 1.0E5;    expo += -5;  }
+                 if     (v < 1.0E-5)       { v = v * 1.0E6;    expo += -6;  }
+                 else /* v < 1.0E-4 */     { v = v * 1.0E5;    expo += -5;  }
            else
               if (v < 1.0E-2)
-                 if     (v < 1.0E-3)       { v *= 1.0E4;    expo += -4;  }
-                 else /* v < 1.0E-2 */     { v *= 1.0E3;    expo += -3;  }
+                 if     (v < 1.0E-3)       { v = v * 1.0E4;    expo += -4;  }
+                 else /* v < 1.0E-2 */     { v = v * 1.0E3;    expo += -3;  }
               else
-                 if     (v < 1.0E-1)       { v *= 1.0E2;    expo += -2;  }
-                 else /* v < 1.0E0  */     { v *= 1.0E1;    expo += -1;  }
+                 if     (v < 1.0E-1)       { v = v * 1.0E2;    expo += -2;  }
+                 else /* v < 1.0E0  */     { v = v * 1.0E1;    expo += -1;  }
       }
 
    Assert(v >= 1.0);
@@ -1055,11 +1058,11 @@ UCS_string mantissa = from_double_fixed_prec(v, fract_digits);
 }
 //-----------------------------------------------------------------------------
 UCS_string
-UCS_string::from_double_fixed_prec(double v, int fract_digits)
+UCS_string::from_double_fixed_prec(APL_Float v, int fract_digits)
 {
 UCS_string ret;
 
-   if (v < 0)   { ret.append(UNI_OVERBAR);   v = - v; }
+   if (v < 0.0)   { ret.append(UNI_OVERBAR);   v = - v; }
 
    // in the loop below, there could be rounding errors when casting float
    // to int. We therefore increase v slighly (by 0.3 of the rounded digit)
@@ -1073,7 +1076,7 @@ UCS_string ret;
 
    loop(f, fract_digits + 1)
       {
-        v *= 10;
+        v = v * 10.0;
         const int vv = v;   // subject to rounding errors!
         ret.append(Unicode(UNI_ASCII_0 + vv));
         v -= vv;

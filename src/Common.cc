@@ -85,9 +85,9 @@ rlimit rl;
    total_memory = rl.rlim_cur;
 
    if (log_startup)
-      CERR << "sizeof(Svar_record) is    " << sizeof(Svar_record) << endl
-           << "sizeof(Svar_partner) is   " << sizeof(Svar_partner)
-           << endl;
+      CERR << "sizeof(Cell) is          " << sizeof(Cell)          << endl
+           << "sizeof(Svar_record) is   " << sizeof(Svar_record)   << endl
+           << "sizeof(Svar_partner) is   " << sizeof(Svar_partner) << endl;
 
    // CYGWIN does not have RLIMIT_NPROC
    //
@@ -180,7 +180,8 @@ void *
 common_new(size_t size)
 {
 void * ret = malloc(size);
-   CERR << "NEW " << HEX(ret) << "-" << HEX((const char *)ret + size)
+const uint64_t iret = reinterpret_cast<uint64_t>(ret);
+   CERR << "NEW " << HEX(iret) << "-" << HEX(iret + size)
         << "  (" << HEX(size) << ")" << endl;
    return ret;
 }
@@ -188,7 +189,7 @@ void * ret = malloc(size);
 void
 common_delete(void * p)
 {
-   CERR << "DEL " << HEX(p) << endl;
+   CERR << "DEL " << HEX(reinterpret_cast<uint64_t>(p)) << endl;
    free(p);
 }
 //-----------------------------------------------------------------------------
@@ -326,7 +327,7 @@ Value_P Z(loc);
 Value_P
 Idx0(const char * loc)
 {
-Value_P Z((ShapeItem)0, loc);
+Value_P Z(static_cast<ShapeItem>(0), loc);
    Z->check_value(LOC);
    return Z;
 }
@@ -334,7 +335,7 @@ Value_P Z((ShapeItem)0, loc);
 Value_P
 Str0(const char * loc)
 {
-Value_P Z((ShapeItem)0, loc);
+Value_P Z(static_cast<ShapeItem>(0), loc);
    Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
@@ -343,7 +344,7 @@ Value_P Z((ShapeItem)0, loc);
 Value_P
 Str0_0(const char * loc)
 {
-Shape sh((ShapeItem)0, (ShapeItem)0);
+Shape sh(static_cast<ShapeItem>(0), static_cast<ShapeItem>(0));
 Value_P Z(sh, loc);
    Z->set_proto_Spc();
    Z->check_value(LOC);
@@ -353,7 +354,7 @@ Value_P Z(sh, loc);
 Value_P
 Idx0_0(const char * loc)
 {
-Shape sh((ShapeItem)0, (ShapeItem)0);
+Shape sh(static_cast<ShapeItem>(0), static_cast<ShapeItem>(0));
 Value_P Z(sh, loc);
    Z->check_value(LOC);
    return Z;

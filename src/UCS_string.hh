@@ -211,7 +211,7 @@ public:
 
    /// same as app(const UTF8 * str)
    void append_utf8(const char * str)
-      { append_utf8((const UTF8 *)str); }
+      { append_utf8(reinterpret_cast<const UTF8 *>(str)); }
 
    /// prepend character \b uni
    void prepend(Unicode uni)
@@ -293,7 +293,7 @@ public:
    void append_shape(const Shape & shape);
 
    /// append number (in ASCII encoding like %lf) to this string
-   void append_float(double num);
+   void append_float(APL_Float num);
 
    /// split \b this multi-line string into individual lines,
    /// removing the CR and NL chars in \b this string.
@@ -357,23 +357,23 @@ public:
 
    /// convert the integer part of value to an UCS_string and remove it
    /// from value
-   static UCS_string from_big(double & value);
+   static UCS_string from_big(APL_Float & value);
 
    /// convert double \b value to an UCS_string with \b fract_digits fractional
    /// digits in scaled (exponential) format
-   static UCS_string from_double_expo_prec(double value, int fract_digits);
+   static UCS_string from_double_expo_prec(APL_Float value, int fract_digits);
 
    /// convert double \b value to an UCS_string with \b fract_digits fractional
    /// digits in fixed point format
-   static UCS_string from_double_fixed_prec(double value, int fract_digits);
+   static UCS_string from_double_fixed_prec(APL_Float value, int fract_digits);
 
    /// convert double \b value to an UCS_string with \b quad_pp significant
    /// digits in scaled (exponential) format
-   static UCS_string from_double_expo_pp(double value, int quad_pp);
+   static UCS_string from_double_expo_pp(APL_Float value, int quad_pp);
 
    /// convert double \b value to an UCS_string with \b quad_pp significant
    /// digits in fixed point format
-   static UCS_string from_double_fixed_pp(double value, int quad_pp);
+   static UCS_string from_double_fixed_pp(APL_Float value, int quad_pp);
 
    /// sort the characters in this string by their Unicode
    UCS_string sort() const;

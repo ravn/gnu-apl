@@ -181,14 +181,15 @@ Svar_record::set_control(Svar_Control ctl)
         offering.set_control(ctl);
         if (get_coupling() == SV_COUPLED)   // fully coupled: inform peer
            {
-              accepting.events = (Svar_event)
+              accepting.events = static_cast<Svar_event>
                                  (accepting.events | SVE_ACCESS_CONTROL);
            }
       }
    else if (ProcessorID::get_id() == accepting.id)   // hence fully coupled
       {
         accepting.set_control(mirror(ctl));
-        offering.events = (Svar_event)(offering.events | SVE_ACCESS_CONTROL);
+        offering.events = static_cast<Svar_event>
+                          (offering.events | SVE_ACCESS_CONTROL);
       }
    else
       {
@@ -272,7 +273,8 @@ Svar_partner * peer = 0;
    //
    if (peer && event != SVE_NO_EVENTS)
       {
-        peer->events = (Svar_event)(peer->events | event);
+        peer->events = static_cast<Svar_event>
+                       (peer->events | event);
       }
 }
 //-----------------------------------------------------------------------------
@@ -290,7 +292,7 @@ const int restriction = control & state;
 
         if (accepting.is_active() && (attempt == 0))
            {
-             accepting.events = (Svar_event)
+             accepting.events = static_cast<Svar_event>
                                 (accepting.events | SVE_USE_BY_OFF_FAILED);
            }
         return false;
@@ -302,8 +304,8 @@ const int restriction = control & state;
 
         if (offering.is_active() && (attempt == 0))   // maybe send event to peer
            {
-             offering.events = (Svar_event)
-                               (offering.events | SVE_USE_BY_ACC_FAILED);
+             offering.events = static_cast<Svar_event>
+                                      (offering.events | SVE_USE_BY_ACC_FAILED);
            }
         return false;
       }
@@ -326,8 +328,8 @@ const int restriction = control & state;
 
         if (accepting.is_active() && (attempt == 0))   // maybe send event to peer
            {
-             accepting.events = (Svar_event)
-                                (accepting.events | SVE_SET_BY_OFF_FAILED);
+             accepting.events = static_cast<Svar_event>
+                                     (accepting.events | SVE_SET_BY_OFF_FAILED);
            }
         return false;
       }
@@ -338,8 +340,8 @@ const int restriction = control & state;
 
         if (offering.is_active() && (attempt == 0))   // maybe send event to peer
            {
-             offering.events = (Svar_event)
-                               (offering.events | SVE_SET_BY_ACC_FAILED);
+             offering.events = static_cast<Svar_event>
+                                      (offering.events | SVE_SET_BY_ACC_FAILED);
            }
         return false;
       }

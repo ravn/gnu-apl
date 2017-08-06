@@ -66,7 +66,8 @@ bool eof = false;
       {
         rep << "extra: " << apl << endl;
       }
-   else if (different((const UTF8 *)apl, (const UTF8 *)ref.c_str()))
+   else if (different(reinterpret_cast<const UTF8 *>(apl),
+                      reinterpret_cast<const UTF8 *>(ref.c_str())))
       {
         IO_Files::diff_error();
         rep << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl

@@ -82,7 +82,7 @@ public:
 
    /// print this user defined executable to \b out
    virtual ostream & print(ostream & out) const
-      { Q(LOC) print_token(out);   return out; }
+      { print_token(out);   return out; }
 
    /// print this user defined executable to \b out
    void print_token(ostream & out) const;

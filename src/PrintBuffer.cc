@@ -603,16 +603,16 @@ ShapeItem ret = 0;
 Unicode
 PrintBuffer::get_char(int x, int y) const
 { 
-   Assert(y < (int)buffer.size());
-   Assert(x < (int)buffer[y].size());
+   Assert(y < int(buffer.size()));
+   Assert(x < int(buffer[y].size()));
    return buffer[y][x];
 }
 //-----------------------------------------------------------------------------
 void
 PrintBuffer::set_char(int x, int y, Unicode uc)
 {
-   Assert(y < (int)buffer.size());
-   Assert(x < (int)buffer[y].size());
+   Assert(y < int(buffer.size()));
+   Assert(x < int(buffer[y].size()));
    buffer[y][x] = uc;
 }
 //-----------------------------------------------------------------------------

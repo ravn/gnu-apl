@@ -27,12 +27,16 @@
 
 #include <complex>
 #include <memory>
+
+#include <math.h>
 #include <stdint.h>
 
 #include "../config.h"
 #include "Unicode.hh"
 
 using namespace std;
+
+#define APL_Float_is_class 0
 
 //////////////////////////////////////////////////////////////
 // A. typedefs						    //
@@ -53,20 +57,37 @@ typedef Unicode APL_Char;
 /// One APL integer value.
 typedef int64_t APL_Integer;
 
-/// One APL complex value.
-typedef std::complex<double> APL_Complex;
-
 /// One (real) APL floating point value.
-typedef double APL_Float;
+#if APL_Float_is_class // APL_Float is a class
 
-/// microseconds since Jan. 1. 1970 00:00:00 UTC
+#include "APL_Float_as_class.hh"
+
+inline void release_APL_Float(APL_Float * x)   { x->~APL_Float(); }
+
+#else   // APL_Float is a POD (double)
+
+typedef double APL_Float_Base;
+typedef APL_Float_Base APL_Float;
+
+#define complex_exponent(x) exp(x)
+#define complex_power(x, y) pow((x), (y))
+#define complex_sqrt(x)     sqrt(x)
+#define release_APL_Float(x)
+
+#endif // APL_Float is class vs. POD
+
+//------------------------------------------------------------------------------
+/// One APL complex value.
+typedef complex<APL_Float> APL_Complex;
+//------------------------------------------------------------------------------
+/// APL time = microseconds since Jan. 1. 1970 00:00:00 UTC
 typedef int64_t APL_time_us;
 
 class Symbol;
 class Value;
 
 //////////////////////////////////////////////////////////////
-// B enums             i                                    //
+// B. enums            i                                    //
 //////////////////////////////////////////////////////////////
 
 /// The possible cell types (in the ravel of an APL value)
@@ -452,16 +473,17 @@ enum Symbol_Event
 /// Auxiliary processor numbers
 enum AP_num
 {
-  NO_AP         = -1,     ///< invalid AP
-  AP_NULL       = 0,      ///< invalid AP for structs using memset(0)
-  AP_GENERAL    = 0,      ///< AP for generic offers
-  AP_FIRST_USER = 1001,   ///< the first AP for APL interpreters
+  NO_AP          = -1,     ///< invalid AP
+  AP_NULL        = 0,      ///< invalid AP for structs using memset(0)
+  AP_GENERAL     = 0,      ///< AP for generic offers
+  AP_INTERPRETER = 1000,   ///< the AP for the APL interpreters
+  AP_FIRST_USER  = 1001,   ///< the first AP for APL users
 };
 //-----------------------------------------------------------------------------
 /// longest filename
 enum {  APL_PATH_MAX = 4096 };
 //////////////////////////////////////////////////////////////
-// C structs           i                                    //
+// C. structs          i                                    //
 //////////////////////////////////////////////////////////////
 
 /// three AP numbers that uniquely identify a processor

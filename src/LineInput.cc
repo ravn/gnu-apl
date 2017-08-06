@@ -239,14 +239,14 @@ LineHistory::add_line(const UCS_string & line)
 {
    if (!line.has_black())   return;
 
-   if ((int)hist_lines.size() < max_lines)   // append
+   if (int(hist_lines.size()) < max_lines)   // append
       {
         hist_lines.append(line);
         put = 0;
       }
    else                            // override
       {
-        if (put >= (int)hist_lines.size())   put = 0;   // wrap
+        if (put >= int(hist_lines.size()))   put = 0;   // wrap
         hist_lines[put++] = line;
       }
 
@@ -279,7 +279,8 @@ LineHistory::down()
    if (current_line == put)   return 0;
 
 int new_current_line = current_line + 1;
-   if (new_current_line >= (int)hist_lines.size())   new_current_line = 0;   // wrap
+   if (new_current_line >= int(hist_lines.size()))
+      new_current_line = 0;   // wrap
    if (new_current_line == put)   return 0;
 
    return &hist_lines[current_line = new_current_line];
@@ -317,7 +318,7 @@ LineEditContext::~LineEditContext()
    //
    if (!Output::use_curses)
       {
-        if (!ins_mode)   CIN << (char)0x1B << "[1 q" << flush;
+        if (!ins_mode)   CIN << "\x1B[1 q" << flush;
       }
 }
 //-----------------------------------------------------------------------------
@@ -493,8 +494,8 @@ LineEditContext::toggle_ins_mode()
 
    if (!Output::use_curses)
       {
-        if (ins_mode)   CIN << (char)0x1B << "[0 q" << flush;
-        else            CIN << (char)0x1B << "[3 q" << flush;
+        if (ins_mode)   CIN << "\x1B[0 q" << flush;
+        else            CIN << "\x1B[3 q" << flush;
       }
 }
 //-----------------------------------------------------------------------------
@@ -1005,7 +1006,7 @@ const int b0 = fgetc(stdin);
               uni |= subc & 0x3F;
             }
 
-        return (Unicode)(bx | uni);
+        return static_cast<Unicode>(bx | uni);
       }
 
    if (b0 == UNI_ASCII_ESC)
@@ -1058,6 +1059,6 @@ const int b0 = fgetc(stdin);
       }
    else if (b0 == UNI_ASCII_DELETE)   return UNI_ASCII_BS;
 
-   return (Unicode)b0;
+   return static_cast<Unicode>(b0);
 }
 //-----------------------------------------------------------------------------

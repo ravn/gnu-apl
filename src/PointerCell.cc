@@ -27,10 +27,10 @@
 //-----------------------------------------------------------------------------
 PointerCell::PointerCell(Value_P sub_val, Value & cell_owner)
 {
-   new (&value.valp) Value_P(sub_val, LOC);
-   value2.owner = &cell_owner;
+   new (&value.pval.valp) Value_P(sub_val, LOC);
+   value.pval.owner = &cell_owner;
 
-   Assert(value2.owner != sub_val.get());   // typical cut-and-paste error
+   Assert(value.pval.owner != sub_val.get());   // typical cut-and-paste error
    cell_owner.increment_pointer_cell_count();
    cell_owner.add_subcount(sub_val->nz_element_count());
 }
@@ -45,19 +45,19 @@ PointerCell::init_other(void * other, Value & cell_owner,
 void
 PointerCell::release(const char * loc)
 {
-   value2.owner->decrement_pointer_cell_count();
-   value2.owner->add_subcount(-get_pointer_value()->nz_element_count());
+   value.pval.owner->decrement_pointer_cell_count();
+   value.pval.owner->add_subcount(-get_pointer_value()->nz_element_count());
 
 // Value * sub = (Value *)value.vptr;
 // const ShapeItem sub_len = sub->nz_element_count();
 //    loop(s, sub_len)   sub->get_ravel(s).release(loc);
 
-   value.valp.reset();
+   value.pval.valp.reset();
    new (this) IntCell(0);
 }
 //-----------------------------------------------------------------------------
 bool
-PointerCell::equal(const Cell & other, APL_Float qct) const
+PointerCell::equal(const Cell & other, double qct) const
 {
    if (!other.is_pointer_cell())   return false;
 
@@ -132,7 +132,7 @@ const Cell * C2 = &v2->get_ravel(0);
 Value_P
 PointerCell::get_pointer_value() const
 {
-Value * vp = const_cast<Value *>(value.valp.get());
+Value * vp = const_cast<Value *>(value.pval.valp.get());
 Value_P ret(vp, LOC);   // Value_P constructor increments owner_count
    return ret;
 }

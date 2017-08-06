@@ -253,7 +253,7 @@ const Error * err = 0;
       {
         // return 3 0⍴' '
         //
-        Shape sh((ShapeItem)3, (ShapeItem)0);
+        Shape sh(static_cast<ShapeItem>(3), static_cast<ShapeItem>(0));
         Value_P Z(sh, LOC);
         Z->set_proto_Spc();
         Z->check_value(LOC);
@@ -1057,7 +1057,7 @@ Cell & cell = value->get_ravel(0);
 
    if (cell.is_float_cell())
       {
-        const APL_Float hours = cell.get_real_value();
+        const double hours = cell.get_real_value();
         if (hours < -12.1)   return;
         if (hours > 14.1)    return;
         offset_seconds = int(0.5 + hours*3600);

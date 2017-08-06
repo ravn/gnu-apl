@@ -41,7 +41,9 @@ public:
 
    /// return the TokenTag for this system variable
    Token get_token() const
-      { return Token((TokenTag)ID::get_token_tag(get_Id()), (Symbol *)this); }
+      { return Token(static_cast<TokenTag>(ID::get_token_tag(get_Id())),
+                     reinterpret_cast<Symbol *>
+                    (const_cast<SystemVariable *>(this))); }
 
    /// overloaded Symbol::print().
    virtual ostream & print(ostream & out) const;

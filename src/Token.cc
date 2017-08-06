@@ -239,7 +239,7 @@ Token::ChangeTag(TokenTag new_tag)
 {
    Assert((tag & TV_MASK) == (new_tag & TV_MASK));
    // tag is ia const TokenTag, so we cheat a little here.
-   (TokenTag &)tag = new_tag;
+   const_cast<TokenTag &>(tag) = new_tag;
 }
 //-----------------------------------------------------------------------------
 int
@@ -517,7 +517,8 @@ const Value & val = *get_apl_val();
       }
    else                  // matrix or higher
       {
-        pctx.set_style((PrintStyle)(pctx.get_style() | PST_NO_FRACT_0));
+        pctx.set_style(static_cast<PrintStyle>
+                                    (pctx.get_style() | PST_NO_FRACT_0));
       }
 
 PrintBuffer pb(val, pctx, 0);
@@ -603,7 +604,7 @@ UCS_string ucs;
         default:
              CERR << "Token: " << HEX4(tag) << " " << *this
                   << " at " << LOC << endl;
-             Q1((void *)get_Class())
+             Q1(get_Class())
              Backtrace::show(__FILE__, __LINE__);
              FIXME;
       }
@@ -822,7 +823,7 @@ Token::move_2(const Token & src, const char * loc)
         if (val)
            {
              ADD_EVENT(val, VHE_TokMove2, src.value_use_count() - 1, loc);
-             ((Token &)src).clear(loc);
+             const_cast<Token &>(src).clear(loc);
            }
       }
 }
@@ -846,12 +847,18 @@ Token * t2 = &at(to);
 }
 //-----------------------------------------------------------------------------
 void
-Token_string::print(ostream & out) const
+Token_string::print(ostream & out, bool details) const
 {
    loop(t, size())
        {
          const Token & tok = at(t);
-         out << "`" << tok << "  ";
+         out << "`" << tok;
+         if (details)   switch(tok.get_ValueType())
+            {
+              case TV_FLT: out << " " << tok.get_flt_val();   break;
+              default:                                        break;
+            }
+         out << "  ";
        }
 
    out << endl;

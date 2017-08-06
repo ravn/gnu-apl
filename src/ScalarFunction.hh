@@ -631,7 +631,7 @@ protected:
 
    /// recursively check that all ravel elements of B are integers ≥ 0 and
    /// return \b true iff not.
-   static bool check_B(const Value & B, const APL_Float qct);
+   static bool check_B(const Value & B, double qct);
 };
 //-----------------------------------------------------------------------------
 /** Scalar function not and non-scalar function without.

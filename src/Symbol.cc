@@ -68,7 +68,7 @@ ostream &
 Symbol::print_verbose(ostream & out) const
 {
    out << "Symbol ";
-   print(out) << " " << (const void *)this << endl;
+   print(out) << " " << CVOIP(this) << endl;
 
    loop(v, value_stack.size())
        {
@@ -91,7 +91,7 @@ Symbol::print_verbose(ostream & out) const
               case NC_VARIABLE:
                    {
                       Value_P val = item.apl_val;
-                      out << "Variable at " << (const void *)val.get() << endl;
+                      out << "Variable at " << CVOIP(val.get()) << endl;
                       val->print_properties(out, 8, false);
                       out << endl;
                    }
@@ -104,10 +104,8 @@ Symbol::print_verbose(ostream & out) const
                      Assert(fun);
 
                      fun->print_properties(out, 4);
-                     out << "    ⎕NC:            " << item.name_class
-                         << endl
-                         << "    addr:           " << (const void *)fun
-                         << endl;
+                     out << "    ⎕NC:            " << item.name_class << endl
+                         << "    addr:           " << CVOIP(fun) << endl;
 
                      out << endl;
                    }
@@ -377,7 +375,7 @@ const ValueStackItem & vs = value_stack.last();
              CERR << "-pop-value " << name
                   << " flags " << ret->get_flags() << " ";
              if (value_stack.size() == 0)   CERR << " (last)";
-             CERR << " addr " << (const void *)ret.get() << endl;
+             CERR << " addr " << CVOIP(ret.get()) << endl;
            }
 
         // unlike vector<ValueStackItem>, Simple_string<ValueStackItem>.pop()
@@ -435,7 +433,7 @@ Symbol::push_function(Function * function)
 {
    Log(LOG_SYMBOL_push_pop)
       {
-        CERR << "+push_function " << name << " " << (const void *)function;
+        CERR << "+push_function " << name << " " << CVOIP(function);
         if (value_stack.size() == 0)   CERR << " (initial)";
         CERR << endl;
       }
@@ -461,14 +459,14 @@ ValueStackItem vs;
         CERR << "+push-value " << name << " flags ";
         print_flags(CERR, get_value()->get_flags()) << " ";
         if (value_stack.size() == 0)   CERR << " (initial)";
-        CERR << " addr " << (const void *)get_value().get() << endl;
+        CERR << " addr " << CVOIP(get_value().get()) << endl;
       }
 }
 //-----------------------------------------------------------------------------
 int
 Symbol::get_ufun_depth(const UserFunction * ufun)
 {
-const Function * fun = (Function *)ufun;
+const Function * fun = ufun;
 const int sym_stack_size = value_stack_size();
 
    loop(s, sym_stack_size)
@@ -969,7 +967,8 @@ UCS_string data;
 
                for (char * cp = buffer + strlen(buffer);
                     cp < (buffer + 72); )   *cp++ = ' ';
-                sprintf(buffer + 72, "%8.8lld\r\n", (long long)(seq++));
+                sprintf(buffer + 72, "%8.8lld\r\n", 
+                        static_cast<long long>(seq++));
                 fwrite(buffer, 1, 82, out);
 
                // write function record(s)
@@ -996,7 +995,7 @@ UCS_string data;
              buffer[1 + uu] = cc;
            }
 
-        sprintf(buffer + 72, "%8.8lld\r\n", (long long)(seq++));
+        sprintf(buffer + 72, "%8.8lld\r\n", static_cast<long long>(seq++));
         fwrite(buffer, 1, 82, out);
       }
 }
@@ -1061,7 +1060,7 @@ int count = 0;
                         {
                           char cc[100];
                           snprintf(cc, sizeof(cc), "    VS[%lld] ",
-                                   (long long)v);
+                                   static_cast<long long>(v));
                           count += ufun->show_owners(cc, out, value);
                         }
                    }
@@ -1239,7 +1238,7 @@ CDR_string cdr;
    CDR::to_CDR(cdr, *new_value);
    if (cdr.size() > MAX_SVAR_SIZE)   LIMIT_ERROR_SVAR;
 
-string data((const char *)cdr.get_items(), cdr.size());
+string data(reinterpret_cast<const char *>(cdr.get_items()), cdr.size());
 
    // wait for shared variable to be ready
    //
@@ -1265,7 +1264,7 @@ const bool ws_to_ws = Svar_DB::is_ws_to_ws(get_SV_key());
                    for (const uint32_t * varname =
                                          Svar_DB::get_svar_name(get_SV_key());
                         varname && *varname; ++varname)
-                       CERR << (Unicode)(*varname++);
+                       CERR << static_cast<Unicode>(*varname++);
                    CERR << " is blocked on set. Waiting ...";
                  }
             }
@@ -1356,7 +1355,7 @@ const bool ws_to_ws = Svar_DB::is_ws_to_ws(get_SV_key());
                    for (const uint32_t * varname =
                                          Svar_DB::get_svar_name(get_SV_key());
                         varname && *varname; ++varname)
-                       CERR << (Unicode)(*varname++);
+                       CERR << static_cast<Unicode>(*varname++);
                    CERR << " is blocked on use. Waiting ...";
                  }
             }

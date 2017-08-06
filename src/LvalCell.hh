@@ -49,7 +49,7 @@ public:
 
    /// return the owner of the cell pointed to
    Value * get_cell_owner() const
-      { return value2.owner; }
+      { return value.pval.owner; }
 
 protected:
    ///  Overloaded Cell::get_cell_type()

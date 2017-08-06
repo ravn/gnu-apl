@@ -64,11 +64,11 @@ protected:
 
    /// return the greatest common divisor of real a and b
    static ErrorCode flt_gcd(APL_Float & z, APL_Float a, APL_Float b,
-                            APL_Float qct);
+                            double qct);
 
    /// return the greatest common divisor of complex a and b
    static ErrorCode cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b,
-                              APL_Float qct);
+                              double qct);
 
    /// multiply \b a by 1, -1, i, or -i so that a.real is maximal
    static APL_Complex cpx_max_real(APL_Complex a);

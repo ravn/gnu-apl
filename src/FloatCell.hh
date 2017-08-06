@@ -31,60 +31,92 @@
  implementations.
 
  The actual APL floating point value is either rational (and then defined by
- value.numerator ÷ value2.denominator, not not (and then value2.denominator
- is 0 and value.fval (!) contains the double)
+ value.numerator ÷ value.fval.denominator, or not (and then
+ value.fval.denominator is 0 and value.fval.u1.flt contains the double value)
  */
-class FloatCell : public RealCell {
+class FloatCell : public RealCell
+{
 public:
    /// Construct an floating point cell from a double \b r.
    FloatCell(APL_Float r)
-      { value.fval = r;   value2.denominator = 0; }
+      { value.fval.u1.flt = r;   value.fval.denominator = 0; }
 
 #ifdef RATIONAL_NUMBERS_WANTED
    /// Construct an floating point cell from a quotient of integers. The caller
    /// must ensure that denom > 0 and common divisors have been removed!
    FloatCell(APL_Integer numer, APL_Integer denom)
-      { value.numerator = numer;   value2.denominator = denom; }
+      { value.fval.u1.num = numer;   value.fval.denominator = denom; }
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner,
                            const char * loc) const
-      { if (value2.denominator)
-           new (other)   FloatCell(value.numerator, value2.denominator);
+      { if (value.fval.denominator)
+           new (other)   FloatCell(value.fval.u1.num,
+                                   value.fval.denominator);
         else
-           new (other)   FloatCell(value.fval);
+           new (other)   FloatCell(value.fval.u1.flt);
       }
 
    /// return the numerator for rational numbers, undefined for others)
    virtual APL_Integer get_numerator() const
-      { return value.numerator; }
+      { return value.fval.u1.num; }
 
    /// return the denominator (> 0 for rational numbers, 0 for others)
    virtual APL_Integer get_denominator() const
-      { return value2.denominator; }
+      { return value.fval.denominator; }
 
    /// return the value of \b this cell as a double (even if the value is
    /// rational)
-   APL_Float fval() const
+   APL_Float dfval() const
       {
         if (const APL_Integer denom = get_denominator())
-           return ((double)get_numerator())/denom;
-        return value.fval;
+           return ((APL_Float)get_numerator())/(APL_Float)denom;
+        return value.fval.u1.flt;
       }
 
    /// initialize Z to quotient numer÷denom
    static ErrorCode zv(Cell * Z, APL_Integer numer, APL_Integer denom)
       { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }
 
+   ErrorCode zv(Cell * Z) const
+      {
+        if (const APL_Integer denom = get_denominator())
+           new (Z) FloatCell(get_numerator(), denom);
+        else
+           new (Z) FloatCell(dfval());
+        return E_NO_ERROR;
+      }
+
+# if APL_Float_is_class
+   /// overloaded Cell::release()
+   virtual void release(const char * loc)
+      {
+        if (get_denominator() == 0)   // APL_Float class used
+           release_APL_Float((APL_Float *)&value.fval.u1.flt);
+      }
+# endif
+
 #else // no RATIONAL_NUMBERS_WANTED
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
-      const { new (other)   FloatCell(fval()); }
+      const { new (other)   FloatCell(dfval()); }
 
    /// return the value of \b this cell as a double (even if the value is
    /// rational)
-   APL_Float fval() const
-      { return value.fval; }
+   APL_Float dfval() const
+      { return value.fval.u1.flt; }
+
+   ErrorCode zv(Cell * Z) const
+      {
+        new (Z) FloatCell(dfval());   return E_NO_ERROR;
+      }
+
+# if APL_Float_is_class
+   /// overloaded Cell::release()
+   virtual void release(const char * loc)
+      { release_APL_Float(reinterpret_cast<APL_Float *>(&value.fval.u1.flt)); }
+# endif
+
 #endif
 
    /// Overloaded Cell::is_float_cell().
@@ -92,13 +124,13 @@ public:
 
    /// Overloaded Cell::is_finite().
    virtual bool is_finite() const
-      { return isfinite(fval()); }
+      { return isfinite(dfval()); }
 
    /// Overloaded Cell::greater().
    virtual bool greater(const Cell & other) const;
 
    /// Overloaded Cell::equal().
-   virtual bool equal(const Cell & other, APL_Float qct) const;
+   virtual bool equal(const Cell & other, double qct) const;
 
    /// Overloaded Cell::bif_add().
    virtual ErrorCode bif_add(Cell * Z, const Cell * A) const;
@@ -171,7 +203,7 @@ public:
 
    /// return true iff this cell needs scaling (exponential format) in pctx.
    virtual bool need_scaling(const PrintContext &pctx) const
-      { return need_scaling(fval(), pctx.get_PP()); }
+      { return need_scaling(dfval(), pctx.get_PP()); }
 
    /// return true if the integer part of val is longer than ⎕PP
    static bool is_big(APL_Float val, int quad_pp);
@@ -230,42 +262,42 @@ protected:
       { return CT_FLOAT; }
 
    /// Overloaded Cell::get_real_value().
-   virtual APL_Float    get_real_value() const   { return fval();  }
+   virtual APL_Float get_real_value() const   { return dfval();  }
 
    /// Overloaded Cell::get_imag_value().
    virtual APL_Float get_imag_value() const   { return 0.0;  }
 
    /// Overloaded Cell::get_complex_value()
    virtual APL_Complex get_complex_value() const
-      { return APL_Complex(fval(), 0.0); }
+      { return APL_Complex(dfval(), 0.0); }
 
    /// Overloaded Cell::get_near_bool().
    virtual bool get_near_bool()  const;
 
    /// Overloaded Cell::get_near_int().
    virtual APL_Integer get_near_int()  const
-      { return near_int(fval()); }
+      { return near_int(dfval()); }
 
    /// Overloaded Cell::get_checked_near_int().
    virtual APL_Integer get_checked_near_int()  const
       { 
-        if (fval() < 0)   return APL_Integer(fval() - 0.3);
-        else                  return APL_Integer(fval() + 0.3);
+        if (dfval() < 0.0)   return APL_Integer(dfval() - 0.3);
+        else                return APL_Integer(dfval() + 0.3);
       }
 
    /// Overloaded Cell::is_near_int().
    virtual bool is_near_int() const
-      { return Cell::is_near_int(fval()); }
+      { return Cell::is_near_int(dfval()); }
 
    /// Overloaded Cell::is_near_zero().
    virtual bool is_near_zero() const
-      { return fval() >= -INTEGER_TOLERANCE
-            && fval() <   INTEGER_TOLERANCE; }
+      { return dfval() >= -INTEGER_TOLERANCE
+            && dfval() <   INTEGER_TOLERANCE; }
 
    /// Overloaded Cell::is_near_one().
    virtual bool is_near_one() const
-      { return fval() >= (1.0 - INTEGER_TOLERANCE)
-            && fval() <  (1.0 + INTEGER_TOLERANCE); }
+      { return dfval() >= (1.0 - INTEGER_TOLERANCE)
+            && dfval() <  (1.0 + INTEGER_TOLERANCE); }
 
    /// Overloaded Cell::is_near_real().
    virtual bool is_near_real() const

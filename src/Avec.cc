@@ -248,7 +248,7 @@ Avec::map_alternative_char(Unicode alt_av)
    // map characters that look similar to characters used in GNU APL
    // to the GNU APL character.
    //
-   switch((int)alt_av)
+   switch(alt_av)
       {
         case 0x005E: return AV_AND;              //  map ^ to ∧
         case 0x007C: return AV_DIVIDES;          //  map | to ∣
@@ -425,7 +425,7 @@ static const int ibm_av[] =
 const Unicode *
 Avec::IBM_quad_AV()
 {
-   return (const Unicode *)ibm_av;
+   return reinterpret_cast<const Unicode *>(ibm_av);
 }
 //-----------------------------------------------------------------------------
 Avec::Unicode_to_IBM_codepoint Avec::inverse_ibm_av[256] =
@@ -547,8 +547,8 @@ Unicode_to_IBM_codepoint * map = inverse_ibm_av;
 int
 Avec::compare_uni(const void * key, const void * entry)
 {
-   return *(const Unicode *)key -
-          ((const Unicode_to_IBM_codepoint *)entry)->uni;
+   return *reinterpret_cast<const Unicode *>(key) -
+           reinterpret_cast<const Unicode_to_IBM_codepoint *>(entry)->uni;
 }
 //-----------------------------------------------------------------------------
 unsigned char
@@ -573,7 +573,7 @@ const void * where = bsearch(&uni, inverse_ibm_av, 256,
       }
 
    Assert(where);
-   return ((const Unicode_to_IBM_codepoint *)where)->cp;
+   return reinterpret_cast<const Unicode_to_IBM_codepoint *>(where)->cp;
 }
 //-----------------------------------------------------------------------------
 

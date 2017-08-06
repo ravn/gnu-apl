@@ -87,7 +87,8 @@ bool
 CollatingCache::greater_vec(const IntCell & Za, const IntCell & Zb,
                             const void * comp_arg)
 {
-CollatingCache & cache = *(CollatingCache *)comp_arg;
+const CollatingCache & cache =
+                      *reinterpret_cast<const CollatingCache *>(comp_arg);
 const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
 const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
 
@@ -112,7 +113,8 @@ bool
 CollatingCache::smaller_vec(const IntCell & Za, const IntCell & Zb,
                             const void * comp_arg)
 {
-CollatingCache & cache = *(CollatingCache *)comp_arg;
+const CollatingCache & cache =
+                      *reinterpret_cast<const CollatingCache *>(comp_arg);
 const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
 const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
 const Rank rank = cache.get_rank();
@@ -170,11 +172,11 @@ const Cell * base = &B->get_ravel(0) - qio*comp_len;
 const struct { const Cell * base; ShapeItem comp_len; } ctx = { base, comp_len};
 
    if (order == SORT_ASCENDING)
-      Heapsort<IntCell>::sort((IntCell *)&Z->get_ravel(0), len_BZ, &ctx,
-                               &Cell::greater_vec);
+      Heapsort<IntCell>::sort(reinterpret_cast<IntCell *>(&Z->get_ravel(0)),
+                              len_BZ, &ctx, &Cell::greater_vec);
    else
-      Heapsort<IntCell>::sort((IntCell *)&Z->get_ravel(0), len_BZ, &ctx,
-                               &Cell::smaller_vec);
+      Heapsort<IntCell>::sort(reinterpret_cast<IntCell *>(&Z->get_ravel(0)),
+                               len_BZ, &ctx, &Cell::smaller_vec);
 
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -219,7 +221,7 @@ CollatingCache cache(A.getref(), base_B1, comp_len);
 
    // then sort Z (actually re-arrange Z so that B[Z] is sorted)
    //
-IntCell * z0 = (IntCell *)&Z->get_ravel(0);
+IntCell * z0 = reinterpret_cast<IntCell *>(&Z->get_ravel(0));
    if (order == SORT_ASCENDING)
       Heapsort<IntCell>::sort(z0, len_BZ, &cache, &CollatingCache::greater_vec);
    else

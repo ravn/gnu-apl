@@ -244,7 +244,8 @@ char obuf[200] = "@@@@";
 
 // cerr << setw(2) << idx << ": ";
 
-   cerr << (const void *)pc;
+   cerr << HEX(pc);
+
 // cerr << left << setw(20) << s << right << " ";
 
    // indent.

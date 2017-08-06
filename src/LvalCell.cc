@@ -27,7 +27,7 @@
 LvalCell::LvalCell(Cell * cell, Value * cell_owner)
 {
    value.lval = cell;
-   value2.owner = cell_owner;
+   value.pval.owner = cell_owner;
 }
 //-----------------------------------------------------------------------------
 Cell *

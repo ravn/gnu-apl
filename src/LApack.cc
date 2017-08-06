@@ -49,19 +49,21 @@ divide_matrix(Cell * cZ, bool need_complex,
        {
          if (need_complex)
             {
-              double * ad = (double *)malloc(rows * cols_A * 2*sizeof(double));
+              APL_Float * ad = reinterpret_cast<APL_Float *>(
+                               malloc(rows * cols_A * 2*sizeof(APL_Float)));
               if (ad == 0)   WS_FULL
-              ZZ * const a = (ZZ *)ad;
+              ZZ * const a = reinterpret_cast<ZZ *>(ad);
               loop(r, rows)
                   {
                     new (a + r) ZZ(cA[r*cols_A + c].get_real_value(),
                                    cA[r*cols_A + c].get_imag_value());
                   }
 
-              double * bd = (double *)malloc(rows * cols_B * 2*sizeof(double));
+              APL_Float * bd = reinterpret_cast<APL_Float *>(
+                               malloc(rows * cols_B * 2*sizeof(APL_Float)));
               if (bd == 0)   { free(a);   WS_FULL }
 
-              ZZ * const b = (ZZ *)bd;
+              ZZ * const b = reinterpret_cast<ZZ *>(bd);
               ZZ * bb = b;
               loop(rr, cols_B)
               loop(cc, rows)
@@ -93,17 +95,19 @@ divide_matrix(Cell * cZ, bool need_complex,
             }
          else   // real
             {
-              double * a = (double *)malloc(rows * cols_A * sizeof(double));
+              APL_Float * a = reinterpret_cast<APL_Float *>(
+                              malloc(rows * cols_A * sizeof(APL_Float)));
               if (a == 0)   WS_FULL
               loop(r, rows)
                  {
                    a[r] = cA[r*cols_A + c].get_real_value();
                  }
 
-              double * b = (double *)malloc(rows * cols_B * sizeof(double));
+              APL_Float * b = reinterpret_cast<APL_Float *>(
+                              malloc(rows * cols_B * sizeof(APL_Float)));
               if (b == 0)   { free(a);   WS_FULL }
 
-              double * bb = b;
+              APL_Float * bb = b;
               loop(rr, cols_B)
               loop(cc, rows)
                  {

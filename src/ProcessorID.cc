@@ -48,8 +48,9 @@ ProcessorID::init(bool log_startup)
              << "uprefs.requested_par:   " << uprefs.requested_par   << endl;
       }
 
-   id.proc = (AP_num)uprefs.requested_id;
-   id.parent = uprefs.requested_par ? (AP_num)uprefs.requested_par : AP_NULL;
+   id.proc = static_cast<AP_num>(uprefs.requested_id);
+   id.parent = uprefs.requested_par ? static_cast<AP_num>(uprefs.requested_par)
+                                    : AP_NULL;
    id.grand = AP_NULL;
 
    if (!uprefs.system_do_svars)
@@ -58,7 +59,7 @@ ProcessorID::init(bool log_startup)
         // we use id.proc of 1000 if no ID is provided and otherwise
         // trust the provided ID.
         //
-        if (id.proc == 0)   id.proc = (AP_num)1000;
+        if (id.proc == 0)   id.proc = AP_INTERPRETER;
         if (log_startup)   CERR << "id.proc: " << id.proc << " at " LOC << endl;
         return false;
       }
@@ -173,7 +174,7 @@ const char * loc = 0;
          if (!strcmp(s, ":userid,"))
             {
               s += 8;
-              for (int u = 1; u < (int)sizeof(svopid.user); ++u)
+              for (unsigned int u = 1; u < sizeof(svopid.user); ++u)
                   {
                     if (*s < ' ')   break;
                     svopid.user[u - 1] = *s++;

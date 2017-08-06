@@ -549,8 +549,9 @@ Command::val_val::compare_val_val(const val_val & A,
 int
 Command::val_val::compare_val_val1(const void * key, const void * B)
 {
-const void * Bv = ((const val_val *)B)->child;
-   return (const char *)key - (const char *)Bv;
+const void * Bv = reinterpret_cast<const val_val *>(B)->child;
+   return reinterpret_cast<const char *>(key)
+        - reinterpret_cast<const char *>(Bv);
 }
 //-----------------------------------------------------------------------------
 void 
@@ -595,7 +596,7 @@ ShapeItem duplicate_parents = 0;
    for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
         obj != DynamicObject::get_all_values(); obj = obj->get_next())
        {
-         const Value * val = (const Value *)obj;
+         const Value * val = static_cast<const Value *>(obj);
 
          val_val vv = { 0, val };   // no parent
          values.append(vv, LOC);
@@ -619,9 +620,9 @@ ShapeItem duplicate_parents = 0;
               const Value * sub = cP.get_pointer_value().get();
               Assert1(sub);
 
-              val_val * vvp = (val_val *)
-                    bsearch(sub, &values[0], values.size(), sizeof(val_val),
-                            val_val::compare_val_val1);
+              val_val * vvp = reinterpret_cast<val_val *>
+                    (bsearch(sub, &values[0], values.size(), sizeof(val_val),
+                            val_val::compare_val_val1));
               Assert(vvp);
               if (vvp->parent == 0)   // child has no parent
                  {
@@ -630,10 +631,9 @@ ShapeItem duplicate_parents = 0;
               else
                  {
                    ++duplicate_parents;
-                   out << "Value * vvp=" << (void *)vvp
-                       << " already has parent " << (void *)vvp->parent
-                       << " when checking Value * val=" << (void *)vvp
-                       << endl;
+                   out << "Value * vvp=" << CVOIP(vvp) << " already has parent "
+                       << CVOIP(vvp->parent) << " when checking Value * val="
+                       << CVOIP(vvp) << endl;
 
                    out << "History of the child:" << endl;
                    print_history(out, vvp->child, LOC);
@@ -671,7 +671,7 @@ LibRef libref = LIB0;
 const Unicode l = args[0][0];
       if (Avec::is_digit(l))
       {
-        libref = (LibRef)(l - '0');
+        libref = static_cast<LibRef>(l - '0');
         args.erase(0);
       }
 
@@ -699,7 +699,7 @@ Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
    //
 LibRef libref = LIB_NONE;
 UCS_string wname = lib_ws.last();
-   if (lib_ws.size() == 2)   libref = (LibRef)(lib_ws[0][0] - '0');
+   if (lib_ws.size() == 2)   libref = static_cast<LibRef>(lib_ws[0][0] - '0');
 
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
                                                   ".xml", ".apl");
@@ -741,7 +741,7 @@ LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
    if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
       {
-        wsid_lib = (LibRef)(wsid_name[0] - '0');
+        wsid_lib = static_cast<LibRef>(wsid_name[0] - '0');
         wsid_name.erase(0);
         wsid_name.remove_leading_whitespaces();
       }
@@ -786,7 +786,7 @@ Command::cmd_KEYB(ostream & out)
                  {
                     const int cc = fgetc(layout);
                     if (cc == EOF)   break;
-                    out << (char)cc;
+                    out << char(cc);
                  }
              out << endl;
              return;
@@ -858,7 +858,7 @@ Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
       }
 
 Pfstat_ID iarg = PFS_ALL;
-   if (arg.size() > 0)   iarg = (Pfstat_ID)(arg.atoi());
+   if (arg.size() > 0)   iarg = static_cast<Pfstat_ID>(arg.atoi());
 
    Performance::print(iarg, out);
 }
@@ -955,7 +955,8 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                     Assert(fun);
                     if (fun->is_native())
                        {
-                         const NativeFunction *nf = (const NativeFunction *)fun;
+                         const NativeFunction *nf =
+                               reinterpret_cast<const NativeFunction *>(fun);
                          CERR << "is a native function implemented in "
                               << nf->get_so_path() << endl
                               << "    load state: " << (nf->is_valid() ?
@@ -1105,7 +1106,7 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
        {
          const int cc = fgetc(pipe);
          if (cc == EOF)   break;
-         out << (char)cc;
+         out << char(cc);
        }
 
 int result = pclose(pipe);
@@ -1216,7 +1217,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
            }
 
         UTF8_string path(args[1]);
-        LibPaths::set_lib_dir((LibRef)libref, path.c_str(),
+        LibPaths::set_lib_dir(static_cast<LibRef>(libref), path.c_str(),
                                LibPaths::LibDir::CSRC_CMD);
         out << "LIBRARY REFERENCE " << libref << " SET TO " << path << endl;
         return;
@@ -1242,9 +1243,9 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 
    loop(d, 10)
        {
-          UTF8_string path = LibPaths::get_lib_dir((LibRef)d);
+          UTF8_string path = LibPaths::get_lib_dir(static_cast<LibRef>(d));
           out << " " << d << " ";
-          switch(LibPaths::get_cfg_src((LibRef)d))
+          switch(LibPaths::get_cfg_src(static_cast<LibRef>(d)))
              {
                 case LibPaths::LibDir::CSRC_NONE:      out << "NONE" << endl;
                                                      continue;
@@ -1284,9 +1285,9 @@ UCS_string arg("0");
         path = LibPaths::get_lib_dir(LIB0);
       }
    else if (arg.size() == 1 &&
-            Avec::is_digit((Unicode)arg[0]))   // case 2.
+            Avec::is_digit(static_cast<Unicode>(arg[0])))   // case 2.
       {
-        path = LibPaths::get_lib_dir((LibRef)(arg[0] - '0'));
+        path = LibPaths::get_lib_dir(static_cast<LibRef>(arg[0] - '0'));
       }
    else                                        // case 3.
       {
@@ -1309,7 +1310,7 @@ UCS_string arg("0");
             }
           else                   // relative path
             {
-              path.append((UTF8)'/');
+              path.append(UNI_ASCII_SLASH);
               path.append(UTF8_string(buffer));
             }
        }
@@ -1693,7 +1694,7 @@ LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
    if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
       {
-        wsid_lib = (LibRef)(wsid_name[0] - '0');
+        wsid_lib = static_cast<LibRef>(wsid_name[0] - '0');
         wsid_name.erase(0);
         wsid_name.remove_leading_whitespaces();
       }
@@ -1730,7 +1731,7 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
         return true;   // error
       }
 
-   lib = (LibRef)(args[0][0] - '0');
+   lib = static_cast<LibRef>(args[0][0] - '0');
    wsname = args[1];
    return false;   // OK
 }
@@ -1982,7 +1983,8 @@ const char sub_type = record[1];
                   case '(': {
                               stype = " timestamp";
                               YMDhmsu t(now());   // fallback if sscanf() != 7
-                              if (7 == sscanf((const char *)(record + 1),
+                              if (7 == sscanf(
+                                    reinterpret_cast<const char *>(record + 1),
                                               "(%d %d %d %d %d %d %d)",
                                               &t.year, &t.month, &t.day,
                                               &t.hour, &t.minute, &t.second,
@@ -2352,7 +2354,7 @@ bool got_minus = false;
 
    // "increment" TO so that we can compare ITEM < TO
    //
-   if (to.size())   to.last() = (Unicode)(to.last() + 1);
+   if (to.size())   to.last() = static_cast<Unicode>(to.last() + 1);
    
    return false;   // OK
 }

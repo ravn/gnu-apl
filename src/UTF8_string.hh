@@ -46,7 +46,7 @@ public:
 
    /// constructor: UTF8_string from 0-terminated C string.
    UTF8_string(const char * str)
-   : Simple_string<UTF8, false>((const UTF8 *)str, str ? strlen(str) : 0)
+   : Simple_string<UTF8, false>(reinterpret_cast<const UTF8 *>(str), str ? strlen(str) : 0)
    {}
 
    /// constructor: copy of string, but at most len bytes
@@ -77,7 +77,7 @@ public:
       {
         extend(items_valid + 1);
         items[items_valid] = 0;   // the terminating 0
-        return (const char *)items;
+        return reinterpret_cast<const char *>(items);
       }
 
    /// return true iff string ends with ext (usually a file name extennsion)

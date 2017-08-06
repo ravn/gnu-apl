@@ -127,7 +127,7 @@ public:
                                      const UCS_string data_expo);
 
         /// Print \b value into int, fract, and expo fields
-        void fill_data_fields(double value, UCS_string & data_int,
+        void fill_data_fields(APL_Float value, UCS_string & data_int,
                               UCS_string & data_fract, UCS_string & data_expo,
                               bool & overflow);
 

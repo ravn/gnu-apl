@@ -29,7 +29,7 @@ m4_signal(RETRACT_VAR,      x64,    key)
 /// set state of shared var \b key
 m4_signal(SET_STATE,        x64,    key,
                             u8,     new_state,
-                            string, loc)
+                            string, sloc)
 
 /// set control of shared var \b key
 m4_signal(SET_CONTROL,      x64,    key,

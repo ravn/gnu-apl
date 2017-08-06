@@ -28,6 +28,6 @@
 extern "C" void * sbrk(int increment);
 
 /// our sbrk() so that it compiles under Apple OS X
-long long  top_of_memory()   { return (long long)(sbrk(0)); }
+long long top_of_memory()   { return reinterpret_cast<long long>(sbrk(0)); }
 
 

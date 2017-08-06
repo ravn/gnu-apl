@@ -89,11 +89,16 @@ static Token eval_(const NativeFunction * caller);
 void *
 get_function_mux(const char * function_name)
 {
-   if (!strcmp(function_name, "get_signature"))   return (void *)&get_signature;
-   if (!strcmp(function_name, "eval_"))           return (void *)&eval_;
-   if (!strcmp(function_name, "eval_fill_B"))     return (void *)&eval_fill_B;
-   if (!strcmp(function_name, "eval_fill_AB"))    return (void *)&eval_fill_AB;
-   if (!strcmp(function_name, "eval_ident_Bx"))   return (void *)&eval_ident_Bx;
+   if (!strcmp(function_name, "get_signature"))
+      return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "eval_"))
+      return reinterpret_cast<void *>(&eval_);
+   if (!strcmp(function_name, "eval_fill_B"))
+      return reinterpret_cast<void *>(&eval_fill_B);
+   if (!strcmp(function_name, "eval_fill_AB"))
+      return reinterpret_cast<void *>(&eval_fill_AB);
+   if (!strcmp(function_name, "eval_ident_Bx"))
+      return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
 
@@ -120,14 +125,22 @@ static Token eval_AXB(Value_P A, Value_P X, Value_P B,
 void *
 get_function_mux(const char * function_name)
 {
-   if (!strcmp(function_name, "get_signature"))   return (void *)&get_signature;
-   if (!strcmp(function_name, "eval_B"))          return (void *)&eval_B;
-   if (!strcmp(function_name, "eval_AB"))         return (void *)&eval_AB;
-   if (!strcmp(function_name, "eval_XB"))         return (void *)&eval_XB;
-   if (!strcmp(function_name, "eval_AXB"))        return (void *)&eval_AXB;
-   if (!strcmp(function_name, "eval_fill_B"))     return (void *)&eval_fill_B;
-   if (!strcmp(function_name, "eval_fill_AB"))    return (void *)&eval_fill_AB;
-   if (!strcmp(function_name, "eval_ident_Bx"))   return (void *)&eval_ident_Bx;
+   if (!strcmp(function_name, "get_signature"))
+      return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "eval_B"))
+      return reinterpret_cast<void *>(&eval_B);
+   if (!strcmp(function_name, "eval_AB"))
+      return reinterpret_cast<void *>(&eval_AB);
+   if (!strcmp(function_name, "eval_XB"))
+      return reinterpret_cast<void *>(&eval_XB);
+   if (!strcmp(function_name, "eval_AXB"))
+      return reinterpret_cast<void *>(&eval_AXB);
+   if (!strcmp(function_name, "eval_fill_B"))
+      return reinterpret_cast<void *>(&eval_fill_B);
+   if (!strcmp(function_name, "eval_fill_AB"))
+      return reinterpret_cast<void *>(&eval_fill_AB);
+   if (!strcmp(function_name, "eval_ident_Bx"))
+      return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -183,14 +196,22 @@ static Token eval_ALXB(Value_P A, Function & LO, Value_P X, Value_P B,
 void *
 get_function_mux(const char * function_name)
 {
-   if (!strcmp(function_name, "get_signature"))   return (void *)&get_signature;
-   if (!strcmp(function_name, "eval_LB"))         return (void *)&eval_LB;
-   if (!strcmp(function_name, "eval_ALB"))        return (void *)&eval_ALB;
-   if (!strcmp(function_name, "eval_LXB"))        return (void *)&eval_LXB;
-   if (!strcmp(function_name, "eval_ALXB"))       return (void *)&eval_ALXB;
-   if (!strcmp(function_name, "eval_fill_B"))     return (void *)&eval_fill_B;
-   if (!strcmp(function_name, "eval_fill_AB"))    return (void *)&eval_fill_AB;
-   if (!strcmp(function_name, "eval_ident_Bx"))   return (void *)&eval_ident_Bx;
+   if (!strcmp(function_name, "get_signature"))
+      return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "eval_LB"))
+      return reinterpret_cast<void *>(&eval_LB);
+   if (!strcmp(function_name, "eval_ALB"))
+      return reinterpret_cast<void *>(&eval_ALB);
+   if (!strcmp(function_name, "eval_LXB"))
+      return reinterpret_cast<void *>(&eval_LXB);
+   if (!strcmp(function_name, "eval_ALXB"))
+      return reinterpret_cast<void *>(&eval_ALXB);
+   if (!strcmp(function_name, "eval_fill_B"))
+      return reinterpret_cast<void *>(&eval_fill_B);
+   if (!strcmp(function_name, "eval_fill_AB"))
+      return reinterpret_cast<void *>(&eval_fill_AB);
+   if (!strcmp(function_name, "eval_ident_Bx"))
+      return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -248,14 +269,22 @@ static Token eval_ALRXB(Value_P A, Function & LO, Function & RO, Value_P X,
 void *
 get_function_mux(const char * function_name)
 {
-   if (!strcmp(function_name, "get_signature"))   return (void *)&get_signature;
-   if (!strcmp(function_name, "eval_LRB"))        return (void *)&eval_LRB;
-   if (!strcmp(function_name, "eval_ALRB"))       return (void *)&eval_ALRB;
-   if (!strcmp(function_name, "eval_LRXB"))       return (void *)&eval_LRXB;
-   if (!strcmp(function_name, "eval_ALRXB"))      return (void *)&eval_ALRXB;
-   if (!strcmp(function_name, "eval_fill_B"))     return (void *)&eval_fill_B;
-   if (!strcmp(function_name, "eval_fill_AB"))    return (void *)&eval_fill_AB;
-   if (!strcmp(function_name, "eval_ident_Bx"))   return (void *)&eval_ident_Bx;
+   if (!strcmp(function_name, "get_signature"))
+      return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "eval_LRB"))
+      return reinterpret_cast<void *>(&eval_LRB);
+   if (!strcmp(function_name, "eval_ALRB"))
+      return reinterpret_cast<void *>(&eval_ALRB);
+   if (!strcmp(function_name, "eval_LRXB"))
+      return reinterpret_cast<void *>(&eval_LRXB);
+   if (!strcmp(function_name, "eval_ALRXB"))
+      return reinterpret_cast<void *>(&eval_ALRXB);
+   if (!strcmp(function_name, "eval_fill_B"))
+      return reinterpret_cast<void *>(&eval_fill_B);
+   if (!strcmp(function_name, "eval_fill_AB"))
+      return reinterpret_cast<void *>(&eval_fill_AB);
+   if (!strcmp(function_name, "eval_ident_Bx"))
+      return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
 //-----------------------------------------------------------------------------

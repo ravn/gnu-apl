@@ -110,7 +110,8 @@ DerivedFunction::eval_B(Value_P B)
    Log(LOG_FunOperX)
       {
         print(CERR << "entering DerivedFunction");
-        CERR << "::eval_B() , this = " << (void *)this << endl;
+        CERR << "::eval_B() , this = "
+             << CVOIP(this) << endl;
       }
 
    if (left_fun.get_tag() == TOK_VOID)   // function bound to axis
@@ -135,7 +136,8 @@ DerivedFunction::eval_XB(Value_P X, Value_P B)
    Log(LOG_FunOperX)
       {
         print(CERR << "entering DerivedFunction");
-        CERR << "::eval_XB() , this = " << (void *)this << endl;
+        CERR << "::eval_XB() , this = "
+             << CVOIP(this) << endl;
       }
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
@@ -241,8 +243,10 @@ DerivedFunctionCache::DerivedFunctionCache()
 {
    Log(LOG_FunOperX)
       {
-         CERR << "DerivedFunctionCache created, cache at " << (const void *)cache
-              << "..." << (const void *)(cache + MAX_FUN_OPER) << endl;
+         CERR << "DerivedFunctionCache created, cache at "
+              << CVOIP(cache) << "..."
+              << CVOIP(cache + MAX_FUN_OPER)
+              << endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -250,8 +254,10 @@ DerivedFunctionCache::~DerivedFunctionCache()
 {
    Log(LOG_FunOperX)
       {
-         CERR << "DerivedFunctionCache deleted, cache at " << (const void *)cache
-              << "..." << (const void *)(cache + MAX_FUN_OPER) << endl;
+         CERR << "DerivedFunctionCache deleted, cache at "
+              << CVOIP(cache) << "..."
+              << CVOIP(cache + MAX_FUN_OPER)
+              << endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -262,8 +268,10 @@ DerivedFunctionCache::reset()
 
    Log(LOG_FunOperX)
       {
-         CERR << "DerivedFunctionCache reset, cache at " << (const void *)cache
-              << "..." << (const void *)(cache + MAX_FUN_OPER) << endl;
+         CERR << "DerivedFunctionCache reset, cache at "
+              << CVOIP(cache) << "..."
+              << CVOIP(cache + MAX_FUN_OPER)
+              << endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -275,8 +283,8 @@ DerivedFunctionCache::get(const char * loc)
    Log(LOG_FunOperX)
       {
          CERR << "DerivedFunctionCache get( " << idx << " ), cache at "
-              << (const void *)cache << "..."
-              << (const void *)(cache + MAX_FUN_OPER)
+              << CVOIP(cache) << "..."
+              << CVOIP(cache + MAX_FUN_OPER)
               << " at " << loc << endl;
       }
 

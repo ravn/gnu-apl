@@ -326,9 +326,8 @@ protected:
          string buffer;
          store(buffer);
 
-         char ll[sizeof(uint32_t)];
-         *(uint32_t *)ll = htonl(buffer.size());
-         send(tcp_sock, ll, 4, 0);
+         uint32_t ll = htonl(buffer.size());
+         send(tcp_sock, &ll, 4, 0);
          ssize_t sent = send(tcp_sock, buffer.data(), buffer.size(), 0);
          return sent;
        }
@@ -428,7 +427,7 @@ ssize_t siglen = 0;
 //    debug && *debug << "rx_bytes is " << rx_bytes
 //                    << " when reading siglen in in recv_TCP()" << endl;
 
-   siglen = ntohl(*(uint32_t *)buffer);
+   siglen = ntohl(*reinterpret_cast<uint32_t *>(buffer));
    if (siglen == 0)   return 0;   // close
 
 // debug && *debug << "signal length is " << siglen << " in recv_TCP()" << endl;
@@ -472,7 +471,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
 
 // debug && *debug << "rx_bytes is " << rx_bytes << " in recv_TCP()" << endl;
 
-const uint8_t * b = (const uint8_t *)rx_buf;
+const uint8_t * b = reinterpret_cast<const uint8_t *>(rx_buf);
 Sig_item_u16 signal_id(b);
 
 Signal_base * ret = 0;

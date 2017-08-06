@@ -78,26 +78,20 @@ public:
    virtual bool greater(const Cell & other) const;
 
    /// return \b true if \b this cell is equal to \b other
-   virtual bool equal(const Cell & other, APL_Float qct) const;
+   virtual bool equal(const Cell & other, double qct) const;
 
    /// ISO p.15: return \b true if A and B are on the same half-plane
    static bool same_half_plane(APL_Complex A, APL_Complex B);
 
    /// ISO p.19: return \b true if real A is tolerantly equal to real B within C
-   static bool tolerantly_equal(APL_Float A, APL_Float B, APL_Float C);
+   static bool tolerantly_equal(APL_Float A, APL_Float B, double qct);
 
    /// ISO p. 19: return \b true if complex A and B are tolerantly equal
-   /// within real C
-   static bool tolerantly_equal(APL_Complex A, APL_Complex B, APL_Float C);
+   /// within real qct
+   static bool tolerantly_equal(APL_Complex A, APL_Complex B, double qct);
 
-   /// ISO p. 19: return the tolerant floor of complex A within real B
-   static APL_Complex tolerant_floor(APL_Complex A, APL_Float B);
-
-   /// ISO p. 19: A is integral (close to a Gaussian Integer) within B
-   static bool integral_within(APL_Complex A, APL_Float C);
-
-   /// ISO p. 19: A is integral (close to a Gaussian Integer) within B
-   static bool integral_within(APL_Float A, APL_Float C);
+   /// ISO p. 19: A is integral (close to a Gaussian Integer) within qct
+   static bool integral_within(APL_Float A, double qct);
 
    /// Return the character value of a cell
    virtual Unicode get_char_value() const   { DOMAIN_ERROR; }
@@ -224,24 +218,28 @@ public:
    /// The possible cell values
    union SomeValue
       {
-        Unicode       aval;        ///< a character
-        APL_Integer   ival;        ///< an integer
-	APL_Integer   numerator;   ///< the numerator of a rational number
-        ErrorCode     eval;        ///< an error code
-        APL_Float     fval;        ///< a floating point number
-        APL_Float     cval_r;      ///< the real part of a complex number
-        void         *vptr;        ///< a void pointer
-        Cell         *next;        ///< pointer to the next (unused) cell
-        Cell         *lval;        ///< left value (for selective assignment)
-        Value_P_Base  valp;        ///< a pointer to a value
-      };
+        Unicode        aval;        ///< a character
+        APL_Float_Base cval[2];
+        ErrorCode      eval;        ///< an error code
+        APL_Integer    ival;        ///< an integer
+        struct _fval                ///< a floating point value
+           {
+             union _flt_num
+                {
+                  APL_Float_Base flt;   ///< the non-rational value
+	          APL_Integer    num;   ///< the numerator of the quotient
+                } u1;
+	     APL_Integer denominator;       ///< the denominator of the quotient
+           }           fval;
+        void          *vptr;        ///< a void pointer
+        Cell          *next;        ///< pointer to the next (unused) cell
+        Cell          *lval;        ///< left value (for selective assignment)
+        struct _pval
+           {
+             Value_P_Base valp;     ///< a pointer to a value
+             Value       *owner;    ///< the value containing a PointerCell
+           }           pval;
 
-   /// additional data for ComplexCells and PointerCells
-   union SomeValue2
-      {
-        APL_Float     cval_i;      ///< the imag part of a complex number
-        Value        *owner;       ///< the value containing a PointerCell
-	APL_Integer   denominator; ///< the denominator of a rational number
       };
 
    /// return the type of \b this cell
@@ -464,17 +462,14 @@ public:
                            const void * arg);
 
    /// raw pointer to the primary value (for 27 ⎕CR)
-   const void * get_u0() const   { return &value; }
+   const void * get_u0() const   { return &value.cval[0]; }
 
    /// raw pointer to the secondary value (for 28 ⎕CR)
-   const void * get_u1() const   { return &value2; }
+   const void * get_u1() const   { return &value.cval[1]; }
 
 protected:
    /// the primary value of \b this cell
    SomeValue value;
-
-   /// the additional value of \b this cell
-   SomeValue2 value2;
 
 private:
    /// Cells that are allocated with new() shall always be contained in

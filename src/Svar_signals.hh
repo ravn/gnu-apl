@@ -393,8 +393,8 @@ public:
       { bad_get("SET_STATE", "key"); return 0; }
    virtual uint8_t get__SET_STATE__new_state() const   ///< dito
       { bad_get("SET_STATE", "new_state"); return 0; }
-   virtual string get__SET_STATE__loc() const   ///< dito
-      { bad_get("SET_STATE", "loc"); return 0; }
+   virtual string get__SET_STATE__sloc() const   ///< dito
+      { bad_get("SET_STATE", "sloc"); return 0; }
 
 
 /// set control of shared var \b key
@@ -665,8 +665,8 @@ protected:
          string buffer;
          store(buffer);
 
-         const uint32_t bsize =  htonl(buffer.size());
-         send(tcp_sock, &bsize, sizeof(bsize), 0);
+         uint32_t ll = htonl(buffer.size());
+         send(tcp_sock, &ll, 4, 0);
          ssize_t sent = send(tcp_sock, buffer.data(), buffer.size(), 0);
          return sent;
        }
@@ -832,10 +832,10 @@ public:
    SET_STATE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u8 _new_state,
-                Sig_item_string sloc)
+                Sig_item_string _sloc)
    : key(_key),
      new_state(_new_state),
-     loc(sloc)
+     sloc(_sloc)
    { send_TCP(s); }
 
    /// construct (deserialize) this item from a (received) buffer
@@ -843,7 +843,7 @@ public:
    SET_STATE_c(const uint8_t * & buffer)
    : key(buffer),
      new_state(buffer),
-     loc(buffer)
+     sloc(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
@@ -853,7 +853,7 @@ public:
          signal_id.store(buffer);
         key.store(buffer);
         new_state.store(buffer);
-        loc.store(buffer);
+        sloc.store(buffer);
        }
 
    /// print this signal on out.
@@ -862,7 +862,7 @@ public:
         out << "SET_STATE(";
         key.print(out);   out << ", ";
         new_state.print(out);   out << ", ";
-        loc.print(out);
+        sloc.print(out);
         return out << ")" << endl;
       }
 
@@ -878,14 +878,14 @@ public:
   /// return item new_state of this signal 
    virtual uint8_t get__SET_STATE__new_state() const { return new_state.get_value(); }
 
-  /// return item loc of this signal 
-   virtual string get__SET_STATE__loc() const { return loc.get_value(); }
+  /// return item sloc of this signal 
+   virtual string get__SET_STATE__sloc() const { return sloc.get_value(); }
 
 
 protected:
    Sig_item_x64 key;   ///< key
    Sig_item_u8 new_state;   ///< new_state
-   Sig_item_string loc;   ///< loc
+   Sig_item_string sloc;   ///< sloc
 };
 
 /// set control of shared var \b key
@@ -2861,7 +2861,7 @@ ssize_t siglen = 0;
 //    debug && *debug << "rx_bytes is " << rx_bytes
 //                    << " when reading siglen in in recv_TCP()" << endl;
 
-   siglen = ntohl(*(uint32_t *)buffer);
+   siglen = ntohl(*reinterpret_cast<uint32_t *>(buffer));
    if (siglen == 0)   return 0;   // close
 
 // debug && *debug << "signal length is " << siglen << " in recv_TCP()" << endl;
@@ -2905,7 +2905,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
 
 // debug && *debug << "rx_bytes is " << rx_bytes << " in recv_TCP()" << endl;
 
-const uint8_t * b = (const uint8_t *)rx_buf;
+const uint8_t * b = reinterpret_cast<const uint8_t *>(rx_buf);
 Sig_item_u16 signal_id(b);
 
 Signal_base * ret = 0;

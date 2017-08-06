@@ -232,9 +232,9 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
                                }
                             else
                                {
-                                 const APL_Float fv = cell.get_real_value();
-                                 if (fv < 0)   iv = -int(-fv);
-                                 else          iv = int(fv);
+                                 const double fv = cell.get_real_value();
+                                 if (fv < 0.0)   iv = -int(-fv);
+                                 else            iv = int(fv);
                                }
                             fmt[fm++] = un1;   fmt[fm] = 0;
                             out_len += fprintf(out, fmt, iv);
@@ -317,7 +317,7 @@ const int b0 = fgetc(file);
    if (b0 == EOF)   return UNI_EOF;
 
    ++fget_count;
-   if (!(b0 & 0x80))   return (Unicode)b0;   // ASCII
+   if (!(b0 & 0x80))   return static_cast<Unicode>(b0);   // ASCII
 
 int len,bx;
    if      ((b0 & 0xE0) == 0xC0)   { len = 2;   bx = b0 & 0x1F; }
@@ -444,7 +444,7 @@ public:
       }
 
    /// scan a double in string or file
-   int scanf_double(const char * fmt, double * val)
+   int scanf_double(const char * fmt, APL_Float * val)
       {
          if (file)
             {
@@ -593,7 +593,7 @@ Unicode lookahead = input.get_next();
         if (strchr("dDiouxX", conv))  // integer conversion
            {
              input.unget(lookahead);   // let scanf_long_long() read it
-             const char fmt[] = { '%', 'l', 'l', (char)conv, 0 };
+             const char fmt[] = { '%', 'l', 'l', char(conv), 0 };
              long long val = 0;
              const int count = input.scanf_long_long(fmt, & val);
              lookahead = input.get_next();
@@ -605,8 +605,8 @@ Unicode lookahead = input.get_next();
         else if (strchr("fFeg", conv))  // float conversion
            {
              input.unget(lookahead);   // let scanf_double() read it
-             const char fmt[] = { '%', 'l', (char)conv, 0 };
-             double val = 0;
+             const char fmt[] = { '%', 'l', char(conv), 0 };
+             APL_Float val = 0;
              const int count = input.scanf_double(fmt, &val);
              lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
@@ -831,7 +831,7 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
                CERR << "NOTE: Triggering a segfault (keeping the current "
                        "SIGSEGV handler)..." << endl;
 
-               const APL_Integer result = *(char *)4343;
+               const APL_Integer result = *reinterpret_cast<char *>(4343);
                CERR << "NOTE: Throwing a segfault failed." << endl;
                return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
              }
@@ -847,7 +847,7 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
                memset(&action, 0, sizeof(struct sigaction));
                action.sa_handler = SIG_DFL;
                sigaction(SIGSEGV, &action, 0);
-               const APL_Integer result = *(char *)4343;
+               const APL_Integer result = *reinterpret_cast<char *>(4343);
                CERR << "NOTE: Throwing a segfault failed." << endl;
                return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
              }
@@ -986,8 +986,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 const char * text = strerror(b);
                 const int len = strlen(text);
                 Value_P Z(len, LOC);
-                loop(t, len)
-                    new (Z->next_ravel())   CharCell((Unicode)(text[t]));
+                loop(t, len)   new (Z->next_ravel())
+                               CharCell(static_cast<Unicode>(text[t]));
 
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -1203,15 +1203,16 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                    }
 
                 const ShapeItem len = st.st_size;
-                uint8_t * data = (uint8_t *)mmap(0, len, PROT_READ,
-                                  MAP_SHARED, fd, 0);
+                uint8_t * data = reinterpret_cast<uint8_t *>
+                                 (mmap(0, len, PROT_READ, MAP_SHARED, fd, 0));
                 close(fd);
                 if (data == 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
                 Z->set_proto_Spc();
-                loop(z, len)   new (Z->next_ravel()) CharCell((Unicode)data[z]);
-                munmap((char *)data, len);
+                loop(z, len) new (Z->next_ravel())
+                             CharCell(static_cast<Unicode>(data[z]));
+                munmap(data, len);
 
                 Z->set_default_Spc();
                 Z->check_value(LOC);
@@ -1331,7 +1332,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 errno = 0;
                 sockaddr_in addr;
                 socklen_t alen = sizeof(addr);
-                const int sock = accept(fd, (sockaddr *)&addr, &alen);
+                const int sock = accept(fd, reinterpret_cast<sockaddr *>
+                                                               (&addr), &alen);
                 if (sock == -1)   goto out_errno;
 
                 file_entry nfe (0, sock);
@@ -1393,8 +1395,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                           {
                             const APL_Integer fd =
                                   vex->get_ravel(l).get_int_value();
-                            if (fd < 0)                         DOMAIN_ERROR;
-                            if (fd > (int)(8*sizeof(fd_set)))   DOMAIN_ERROR;
+                            if (fd < 0)                  DOMAIN_ERROR;
+                            if (fd > 8*sizeof(fd_set))   DOMAIN_ERROR;
                             FD_SET(fd, &exceptfds);
                             if (max_fd < fd)   max_fd = fd;
                             ex = &exceptfds;
@@ -1408,8 +1410,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                           {
                             const APL_Integer fd =
                                   vwr->get_ravel(l).get_int_value();
-                            if (fd < 0)                         DOMAIN_ERROR;
-                            if (fd > (int)(8*sizeof(fd_set)))   DOMAIN_ERROR;
+                            if (fd < 0)                  DOMAIN_ERROR;
+                            if (fd > 8*sizeof(fd_set))   DOMAIN_ERROR;
                             FD_SET(fd, &writefds);
                             if (max_fd < fd)   max_fd = fd;
                             wr = &writefds;
@@ -1424,7 +1426,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                             const APL_Integer fd =
                                   vrd->get_ravel(l).get_int_value();
                             if (fd < 0)                         DOMAIN_ERROR;
-                            if (fd > (int)(8*sizeof(fd_set)))   DOMAIN_ERROR;
+                            if (fd > (8*sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &readfds);
                             if (max_fd < fd)   max_fd = fd;
                             rd = &readfds;
@@ -1470,7 +1472,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 errno = 0;
                 sockaddr_in addr;
                 socklen_t alen = sizeof(addr);
-                const int ret = getsockname(fd, (sockaddr *)&addr, &alen);
+                const int ret = getsockname(fd, reinterpret_cast<sockaddr *>
+                                                               (&addr), &alen);
                 if (ret == -1)   goto out_errno;
 
                 Value_P Z(3, LOC);
@@ -1487,7 +1490,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 errno = 0;
                 sockaddr_in addr;
                 socklen_t alen = sizeof(addr);
-                const int ret = getpeername(fd, (sockaddr *)&addr, &alen);
+                const int ret = getpeername(fd, reinterpret_cast<sockaddr *>
+                                                                (&addr), &alen);
                 if (ret == -1)   goto out_errno;
 
                 Value_P Z(3, LOC);
@@ -1501,7 +1505,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
          case 200:   // clear statistics Bi
          case 201:   // get statistics Bi
               {
-                const Pfstat_ID b = (Pfstat_ID)B->get_ravel(0).get_int_value();
+                const Pfstat_ID b = static_cast<Pfstat_ID>
+                                    (B->get_ravel(0).get_int_value());
                 Statistics * stat = Performance::get_statistics(b);
                 if (stat == 0)   DOMAIN_ERROR;   // bad statistics ID
 
@@ -1550,7 +1555,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
               {
                 errno = 0;
                 UTF8_string path(*B.get());
-                int fd = open(path.c_str(), O_RDONLY);
+                const int fd = open(path.c_str(), O_RDONLY);
                 if (fd == -1)   goto out_errno;
 
                 struct stat st;
@@ -1568,8 +1573,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                    }
 
                 const ShapeItem len = st.st_size;
-                uint8_t * data = (uint8_t *)mmap(0, len, PROT_READ,
-                                  MAP_SHARED, fd, 0);
+                UTF8 * data = reinterpret_cast<UTF8 *>
+                              (mmap(0, len, PROT_READ, MAP_SHARED, fd, 0));
                 close(fd);
                 if (data == 0)   goto out_errno;
 
@@ -1585,7 +1590,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 Value_P Z(line_count, LOC);
                 Z->set_proto_Spc();
 
-                uint8_t * from = data;
+                UTF8 * from = data;
                 loop(l, len)
                     {
                       if (data[l] != '\n')   continue;
@@ -1609,7 +1614,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                       new (Z->next_ravel())  PointerCell(ZZ, Z.getref());
                    }
 
-                munmap((char *)data, len);
+                munmap(data, len);
 
                 Z->set_default_Spc();
                 Z->check_value(LOC);
@@ -1655,7 +1660,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                    t.tm_isdst = -1;
 
                const time_t seconds = mktime(&t);
-               if (seconds == (time_t)-1)   DOMAIN_ERROR;
+               if (seconds == static_cast<time_t>(-1))   DOMAIN_ERROR;
 
                 Value_P Z(4, LOC);
                 new (Z->next_ravel()) IntCell(seconds);
@@ -1793,14 +1798,14 @@ const int function_number = X->get_ravel(0).get_near_int();
          case 6:   // fread(Zi, 1, Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
-                const int bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_ravel(0).get_near_int();
                 FILE * file = get_FILE(*B.get());
                 clearerr(file);
 
                 char small_buffer[SMALL_BUF];
                 char * buffer = small_buffer;
                 char * del = 0;
-                if (bytes > (int)sizeof(small_buffer))
+                if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
                 const size_t len = fread(buffer, 1, bytes, file);
@@ -1816,13 +1821,13 @@ const int function_number = X->get_ravel(0).get_near_int();
          case 7:   // fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
-                const int bytes = A->element_count();
+                const size_t bytes = A->element_count();
                 FILE * file = get_FILE(*B.get());
 
                 char small_buffer[SMALL_BUF];
                 char * buffer = small_buffer;
                 char * del = 0;
-                if (bytes > (int)sizeof(small_buffer))
+                if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
                 loop(z, bytes)   buffer[z] = A->get_ravel(z).get_near_int();
@@ -1836,14 +1841,14 @@ const int function_number = X->get_ravel(0).get_near_int();
          case 8:   // fgets(Zi, Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
-                const int bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_ravel(0).get_near_int();
                 FILE * file = get_FILE(*B.get());
                 clearerr(file);
 
                 char small_buffer[SMALL_BUF];
                 char * buffer = small_buffer;
                 char * del = 0;
-                if (bytes > (int)sizeof(buffer))
+                if (bytes > sizeof(buffer))
                    buffer = del = new char[bytes + 1];
 
                 const char * s = fgets(buffer, bytes, file);
@@ -1980,7 +1985,8 @@ const int function_number = X->get_ravel(0).get_near_int();
                 addr.sin_addr.s_addr = htonl(A->get_ravel(1).get_int_value());
                 addr.sin_port        = htons(A->get_ravel(2).get_int_value());
                 errno = 0;
-                bind(fd, (const sockaddr *)&addr, sizeof(addr));
+                bind(fd, reinterpret_cast<const sockaddr *>(&addr),
+                     sizeof(addr));
                 goto out_errno;
               }
 
@@ -2006,20 +2012,21 @@ const int function_number = X->get_ravel(0).get_near_int();
                 addr.sin_addr.s_addr = htonl(A->get_ravel(1).get_int_value());
                 addr.sin_port        = htons(A->get_ravel(2).get_int_value());
                 errno = 0;
-                connect(fd, (const sockaddr *)&addr, sizeof(addr));
+                connect(fd, reinterpret_cast<const sockaddr *>(&addr),
+                        sizeof(addr));
                 goto out_errno;
               }
 
          case 37:   // recv(Bh, Zi, Ai, 0) 1 byte per Zi
               {
-                const int bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_ravel(0).get_near_int();
                 const int fd = get_fd(*B.get());
                 errno = 0;
 
                 char small_buffer[SMALL_BUF];
                 char * buffer = small_buffer;
                 char * del = 0;
-                if (bytes > (int)sizeof(small_buffer))
+                if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
                 const ssize_t len = recv(fd, buffer, bytes, 0);
@@ -2035,13 +2042,13 @@ const int function_number = X->get_ravel(0).get_near_int();
          case 38:   // send(Bh, Ai, ⍴Ai, 0) 1 byte per Zi
               {
                 errno = 0;
-                const int bytes = A->element_count();
+                const size_t bytes = A->element_count();
                 const int fd = get_fd(*B.get());
 
                 char small_buffer[SMALL_BUF];
                 char * buffer = small_buffer;
                 char * del = 0;
-                if (bytes > (int)sizeof(small_buffer))
+                if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
                 loop(z, bytes)   buffer[z] = A->get_ravel(z).get_near_int();
@@ -2067,13 +2074,13 @@ const int function_number = X->get_ravel(0).get_near_int();
 
          case 41:   // read(Bh, Zi, Ai) 1 byte per Zi
               {
-                const int bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_ravel(0).get_near_int();
                 const int fd = get_fd(*B.get());
 
                 char small_buffer[SMALL_BUF];
                 char * buffer = small_buffer;
                 char * del = 0;
-                if (bytes > (int)sizeof(small_buffer))
+                if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
                 errno = 0;
@@ -2089,13 +2096,13 @@ const int function_number = X->get_ravel(0).get_near_int();
 
          case 42:   // write(Bh, Ai, ⍴Ai) 1 byte per Zi
               {
-                const int bytes = A->element_count();
+                const size_t bytes = A->element_count();
                 const int fd = get_fd(*B.get());
 
                 char small_buffer[SMALL_BUF];
                 char * buffer = small_buffer;
                 char * del = 0;
-                if (bytes > (int)sizeof(small_buffer))
+                if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
                 loop(z, bytes)   buffer[z] = A->get_ravel(z).get_near_int();

@@ -119,7 +119,7 @@ inline uint64_t cycle_counter()
 {
 uint32_t lo, hi;
    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-   return ((uint64_t)hi << 32) | lo;
+   return uint64_t(hi) << 32 | lo;
 }
 
 #else
@@ -155,7 +155,7 @@ public:
 
    /// init the p'th probe
    static int init(int p)
-      { if (p >= (int)PROBE_COUNT)   return -3;
+      { if (p >= PROBE_COUNT)   return -3;
         probes[p].init();
         return 0;
       }
@@ -359,7 +359,7 @@ extern uint64_t total_memory;
 /// Function_Line ++ (post increment)
 inline int operator ++(Function_Line & fl, int)
 {
-   return ((int &)fl)++;
+   return (reinterpret_cast<int &>(fl))++;
 }
 //=============================================================================
 inline void skip_spaces(const char * & p)
@@ -370,13 +370,13 @@ inline void skip_spaces(const char * & p)
 inline Function_PC
 operator +(Function_PC pc, int offset)
 {
-   return Function_PC((int)pc + offset);
+   return Function_PC(int(pc) + offset);
 }
 //-----------------------------------------------------------------------------
 inline Function_PC
 operator -(Function_PC pc, int offset)
 {
-   return Function_PC((int)pc - offset);
+   return Function_PC(int(pc) - offset);
 }
 //-----------------------------------------------------------------------------
 /// Function_PC ++ (post increment)
@@ -410,12 +410,15 @@ operator --(Function_PC & pc)
 #define nohex std::dec << nouppercase << setfill(' ')
 
 /// formatting for hex (and similar) values
-#define HEX(x)     "0x" << uhex <<                 int64_t(x) << nohex
+#define HEX(x)     "0x" << uhex <<             static_cast<int64_t>(x) << nohex
 #define HEX2(x)    "0x" << uhex << std::right << \
                            setw(2) << int(x) << std::left << nohex
 #define HEX4(x)    "0x" << uhex << std::right << \
                            setw(4) << int(x) << std::left << nohex
-#define UNI(x)     "U+" << uhex <<          setw(4) << int(x) << nohex
+#define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
+
+/// force a cast to a cont void *
+inline const void * CVOIP(const void * addr) { return addr; }
 
 //-----------------------------------------------------------------------------
 

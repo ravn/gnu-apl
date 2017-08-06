@@ -241,7 +241,7 @@ UserPreferences::parse_argv_2(bool logit)
 
    for (int a = 1; a < expanded_argv.size(); )
        {
-         if ((int)a == script_argc)   { ++a;   continue; }   // skip scriptname
+         if (a == script_argc)   { ++a;   continue; }   // skip scriptname
 
          const char * opt = expanded_argv[a++];
          const char * val = (a < expanded_argv.size()) ? expanded_argv[a] : 0;
@@ -1069,85 +1069,85 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          else if (!strcasecmp(opt, "CIN-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_CIN[p] = (char)(d[p] & 0xFF);
+              loop(p, count - 1)   Output::color_CIN[p] = char(d[p] & 0xFF);
               Output::color_CIN[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "COUT-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_COUT[p] = (char)(d[p] & 0xFF);
+              loop(p, count - 1)   Output::color_COUT[p] = char(d[p] & 0xFF);
               Output::color_COUT[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "CERR-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_CERR[p] = (char)(d[p] & 0xFF);
+              loop(p, count - 1)   Output::color_CERR[p] = char(d[p] & 0xFF);
               Output::color_CERR[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "UERR-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_UERR[p] = (char)(d[p] & 0xFF);
+              loop(p, count - 1)   Output::color_UERR[p] = char(d[p] & 0xFF);
               Output::color_UERR[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "RESET-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_RESET[p] = (char)(d[p] & 0xFF);
+              loop(p, count - 1)   Output::color_RESET[p] = char(d[p] & 0xFF);
               Output::color_RESET[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "CLEAR-EOL-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::clear_EOL[p] = (char)(d[p] & 0xFF);
+              loop(p, count - 1)   Output::clear_EOL[p] = char(d[p] & 0xFF);
               Output::clear_EOL[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "CLEAR-EOS-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::clear_EOS[p] = (char)(d[p] & 0xFF);
+              loop(p, count - 1)   Output::clear_EOS[p] = char(d[p] & 0xFF);
               Output::clear_EOS[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-UP"))
             {
               loop(p, count - 1)
-                  Output::ESC_CursorUp[p] = (char)(d[p] & 0xFF);
+                  Output::ESC_CursorUp[p] = char(d[p] & 0xFF);
               Output::ESC_CursorUp[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-DOWN"))
             {
               loop(p, count - 1)
-                  Output::ESC_CursorDown[p] = (char)(d[p] & 0xFF);
+                  Output::ESC_CursorDown[p] = char(d[p] & 0xFF);
               Output::ESC_CursorDown[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-RIGHT"))
             {
               loop(p, count - 1)
-                  Output::ESC_CursorRight[p] = (char)(d[p] & 0xFF);
+                  Output::ESC_CursorRight[p] = char(d[p] & 0xFF);
               Output::ESC_CursorRight[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-LEFT"))
             {
               loop(p, count - 1)
-                  Output::ESC_CursorLeft[p] = (char)(d[p] & 0xFF);
+                  Output::ESC_CursorLeft[p] = char(d[p] & 0xFF);
               Output::ESC_CursorLeft[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-END"))
             {
               loop(p, count - 1)
-                  Output::ESC_CursorEnd[p] = (char)(d[p] & 0xFF);
+                  Output::ESC_CursorEnd[p] = char(d[p] & 0xFF);
               Output::ESC_CursorEnd[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-HOME"))
             {
               loop(p, count - 1)
-                  Output::ESC_CursorHome[p] = (char)(d[p] & 0xFF);
+                  Output::ESC_CursorHome[p] = char(d[p] & 0xFF);
               Output::ESC_CursorHome[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "KEY-INSMODE"))
             {
               loop(p, count - 1)
-                  Output::ESC_InsertMode[p] = (char)(d[p] & 0xFF);
+                  Output::ESC_InsertMode[p] = char(d[p] & 0xFF);
               Output::ESC_InsertMode[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "KEY-DELETE"))
             {
               loop(p, count - 1)
-                  Output::ESC_Delete[p] = (char)(d[p] & 0xFF);
+                  Output::ESC_Delete[p] = char(d[p] & 0xFF);
               Output::ESC_Delete[count - 1] = 0;
             }
          else if (!strcasecmp(opt, "CIN-FOREGROUND"))
@@ -1193,7 +1193,7 @@ int file_profile = 0;   // the current profile in the preferences file
                    continue;
                  }
 
-              LibPaths::set_lib_dir((LibRef)lib_ref, arg,
+              LibPaths::set_lib_dir(static_cast<LibRef>(lib_ref), arg,
                                     sys ? LibPaths::LibDir::CSRC_PREF_SYS
                                         : LibPaths::LibDir::CSRC_PREF_HOME);
             }

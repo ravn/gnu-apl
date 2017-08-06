@@ -120,7 +120,8 @@ public:
    void sort()
       {
         if (strings.size() < 2)   return;
-        Heapsort<const UCS_string *>::sort((const UCS_string **)&strings[0],
+        Heapsort<const UCS_string *>::sort(const_cast<const UCS_string **>
+                                                      (&strings[0]),
                                            strings.size(), 0,
                                            UCS_string::compare_names);
       }

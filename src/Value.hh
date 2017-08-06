@@ -451,7 +451,7 @@ public:
    int32_t get_col_spacing(bool & numeric, ShapeItem col, bool framed) const;
 
    /// list a value
-   ostream & list_one(ostream & out, bool show_owners);
+   ostream & list_one(ostream & out, bool show_owners) const;
 
    /// check \b that this value is completely initialized, and set complete flag
    void check_value(const char * loc);
@@ -584,7 +584,7 @@ protected:
            {
              --deleted_values_count;
              void * ret = deleted_values;
-             deleted_values = *(void **)deleted_values;
+             deleted_values = *reinterpret_cast<void **>(deleted_values);
              ++fast_new;
              return ret;
            }
@@ -599,7 +599,7 @@ protected:
         if (deleted_values_count < deleted_values_MAX)   // we have space
            {
              ++deleted_values_count;
-             *(void **)ptr = deleted_values;
+             *reinterpret_cast<void **>(ptr) = deleted_values;
              deleted_values = ptr;
            }
         else                                             // no more space

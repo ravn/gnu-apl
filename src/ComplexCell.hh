@@ -37,7 +37,7 @@ public:
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
-      const { new (other)   ComplexCell(value.cval_r, value2.cval_i); }
+      const { new (other)   ComplexCell(value.cval[0], value.cval[1]); }
 
    /// Construct an complex number cell from real part \b r and imag part \b i.
    ComplexCell(APL_Float r, APL_Float i);
@@ -47,13 +47,13 @@ public:
 
    /// Overloaded Cell::is_finite().
    virtual bool is_finite() const
-      { return isfinite(value.cval_r) && isfinite(value2.cval_i); }
+      { return isfinite(value.cval[0]) && isfinite(value.cval[1]); }
 
    /// overloaded Cell::greater().
    virtual bool greater(const Cell & other) const;
 
    /// overloaded Cell::equal().
-   virtual bool equal(const Cell & other, APL_Float qct) const;
+   virtual bool equal(const Cell & other, double qct) const;
 
    /// overloaded Cell::compare()
    virtual Comp_result compare(const Cell & other) const;
@@ -139,9 +139,17 @@ public:
    /// return true iff this cell needs scaling (exponential format) in pctx.
    virtual bool need_scaling(const PrintContext &pctx) const;
 
+   /// the square of the magnitude of aJb (= a² + b²)
+   APL_Float mag2() const
+      { return value.cval[0] * value.cval[0] + value.cval[1] * value.cval[1]; }
+
+   /// the square of the magnitude (a² + b² for aJb)
+   static APL_Float mag2(APL_Complex A)
+      { return A.real() * A.real() + A.imag() * A.imag(); }
+
    /// initialize Z to real r
    static ErrorCode zv(Cell * Z, APL_Float r)
-      { new (Z) ComplexCell(r, 0);   return E_NO_ERROR; }
+      { new (Z) ComplexCell(r, 0.0);   return E_NO_ERROR; }
 
    /// initialize Z to complex r + ij
    static ErrorCode zv(Cell * Z, APL_Float r, APL_Float j)
@@ -152,7 +160,7 @@ public:
       { new (Z) ComplexCell(v.real(), v.imag());   return E_NO_ERROR; }
 
    /// the lanczos approximation for gamma(1.0 + x + iy) for x >= 0.
-   static APL_Complex gamma(APL_Float x, const APL_Float y);
+   static APL_Complex gamma(APL_Float x, const APL_Float & y);
 
    /// compute circle function \b fun
    static ErrorCode do_bif_circle_fun(Cell * Z, int fun, APL_Complex b);
@@ -160,7 +168,7 @@ public:
 protected:
    /// return the complex value of \b this cell
    APL_Complex cval() const
-      { return APL_Complex(value.cval_r, value2.cval_i); }
+      { return APL_Complex(value.cval[0], value.cval[1]); }
 
    /// 1.0
    static APL_Complex ONE()       { return APL_Complex(1, 0); }
@@ -193,8 +201,8 @@ protected:
    /// overloaded Cell::get_checked_near_int()
    virtual APL_Integer get_checked_near_int()  const
       {
-        if (value.cval_r < 0)   return APL_Integer(value.cval_r - 0.3);
-        else                    return APL_Integer(value.cval_r + 0.3);
+        if (value.cval[0] < 0.0)   return APL_Integer(value.cval[0] - 0.3);
+        else                       return APL_Integer(value.cval[0] + 0.3);
       }
 
    /// overloaded Cell::is_near_int()

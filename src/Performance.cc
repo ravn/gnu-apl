@@ -264,7 +264,7 @@ int sigma_percent = 0;
       {
         mu = data/count;
         const double sigma = sqrt(data2/count - mu*mu);
-        sigma_percent = (int)((sigma/mu)*100);
+        sigma_percent = int((sigma/mu)*100);
       }
 
                  print5(out, count);
@@ -286,7 +286,7 @@ double sigma = 0;
 
    outf << setw(8) << count << ","
         << setw(8) << mu << ","
-        << setw(8) << (uint64_t)(sigma + 0.5);
+        << setw(8) << uint64_t(sigma + 0.5);
 }
 //----------------------------------------------------------------------------
 void
@@ -295,7 +295,7 @@ Statistics_record::print5(ostream & out, uint64_t num)
 char cc[40];
    if (num < 100000)   // special case: no multiplier
       {
-        snprintf(cc, sizeof(cc), "%5u", (unsigned int)num);
+        snprintf(cc, sizeof(cc), "%5u", static_cast<unsigned int>(num));
         out << cc;
         return;
       }
@@ -306,10 +306,10 @@ char cc[40];
    //
 const char * units = "-kMGTPE??????";
 double fnum = num;
-   while (fnum > 1E3)
+   while (fnum > 1000.0)
       {
         ++units;
-        fnum /= 1E3;
+        fnum = fnum / 1000.0;
       }
 
    snprintf(cc, sizeof(cc), "%f", fnum);

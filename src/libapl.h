@@ -125,10 +125,10 @@ extern APL_value get_var_value(const char * var_name_utf8, const char * loc);
 extern APL_value int_scalar(int64_t val, const char * loc);
 
 /// A new floating point scalar.
-extern APL_value double_scalar(double val, const char * loc);
+extern APL_value double_scalar(APL_Float val, const char * loc);
 
 /// A new complex scalar.
-extern APL_value complex_scalar(double real, double imag, const char * loc);
+extern APL_value complex_scalar(APL_Float real, APL_Float imag, const char * loc);
 
 /// A new character scalar.
 extern APL_value char_scalar(int unicode, const char * loc);
@@ -216,10 +216,10 @@ extern int get_char(const APL_value val, uint64_t idx);
 extern int64_t get_int(const APL_value val, uint64_t idx);
 
 /// return the double val[idx] (after having checked is_double())
-extern double get_real(const APL_value val, uint64_t idx);
+extern APL_Float get_real(const APL_value val, uint64_t idx);
 
 /// return the complex val[idx] (after having checked is_complex())
-extern double get_imag(const APL_value val, uint64_t idx);
+extern APL_Float get_imag(const APL_value val, uint64_t idx);
 
 /// return the (nested) value val[idx] (after having checked is_value()).
 /// The APL_value returned must be released with release_value() later on.
@@ -240,10 +240,10 @@ extern void set_char(int unicode, APL_value val, uint64_t idx);
 extern void set_int(int64_t new_double, APL_value val, uint64_t idx);
 
 /// val[idx]←new_double
-extern void set_double(double new_real, APL_value val, uint64_t idx);
+extern void set_double(APL_Float new_real, APL_value val, uint64_t idx);
 
 /// val[idx]←new_real J new_imag
-extern void set_complex(double new_real, double new_imag, APL_value val, uint64_t idx);
+extern void set_complex(APL_Float new_real, APL_Float new_imag, APL_value val, uint64_t idx);
 
 /// val[idx]←new_value
 extern void set_value(APL_value new_value, APL_value val, uint64_t idx);

@@ -22,6 +22,9 @@
 #include <string.h>
 #include <math.h>
 
+#include <complex>
+
+#include "Common.hh"
 #include "ComplexCell.hh"
 #include "Error.hh"
 #include "FloatCell.hh"
@@ -34,7 +37,7 @@
 
 //-----------------------------------------------------------------------------
 bool
-FloatCell::equal(const Cell & A, APL_Float qct) const
+FloatCell::equal(const Cell & A, double qct) const
 {
    if (!A.is_numeric())       return false;
    if (A.is_complex_cell())   return A.equal(*this, qct);
@@ -50,7 +53,7 @@ const APL_Float this_val  = get_real_value();
       {
         case CT_INT:
              {
-               const APL_Integer other_val = other.get_int_value();
+               const APL_Float other_val(other.get_int_value());
                if (this_val == other_val)   return this > &other;
                return this_val > other_val;
              }
@@ -77,16 +80,16 @@ const Comp_result comp = compare(other);
 bool
 FloatCell::get_near_bool()  const
 {
-   if (fval() > INTEGER_TOLERANCE)   // maybe 1
+   if (dfval() > INTEGER_TOLERANCE)   // maybe 1
       {
-        if (fval() > (1.0 + INTEGER_TOLERANCE))   DOMAIN_ERROR;
-        if (fval() < (1.0 - INTEGER_TOLERANCE))   DOMAIN_ERROR;
+        if (dfval() > (1.0 + INTEGER_TOLERANCE))   DOMAIN_ERROR;
+        if (dfval() < (1.0 - INTEGER_TOLERANCE))   DOMAIN_ERROR;
         return true;
       }
 
-   // maybe 0. We already know that fval() ≤ qct
+   // maybe 0. We already know that dfval() ≤ qct
    //
-   if (fval() < -INTEGER_TOLERANCE)   DOMAIN_ERROR;
+   if (dfval() < -INTEGER_TOLERANCE)   DOMAIN_ERROR;
    return false;
 }
 //-----------------------------------------------------------------------------
@@ -95,19 +98,19 @@ FloatCell::compare(const Cell & other) const
 {
    if (other.is_integer_cell())   // integer
       {
-        const APL_Float qct = Workspace::get_CT();
+        const double qct = Workspace::get_CT();
         if (equal(other, qct))   return COMP_EQ;
-        return (fval() <= other.get_int_value())  ? COMP_LT : COMP_GT;
+        return (dfval() <= other.get_int_value())  ? COMP_LT : COMP_GT;
       }
 
    if (other.is_float_cell())
       {
-        const APL_Float qct = Workspace::get_CT();
+        const double qct = Workspace::get_CT();
         if (equal(other, qct))   return COMP_EQ;
-        return (fval() <= other.get_real_value()) ? COMP_LT : COMP_GT;
+        return (dfval() <= other.get_real_value()) ? COMP_LT : COMP_GT;
       }
 
-   if (other.is_complex_cell())   return (Comp_result)(-other.compare(*this));
+   if (other.is_complex_cell())   return static_cast<Comp_result>(-other.compare(*this));
 
    DOMAIN_ERROR;
 }
@@ -119,17 +122,17 @@ FloatCell::bif_factorial(Cell * Z) const
 {
    // max N! that fits into double is about 170
    //
-   if (fval() > 170)   return E_DOMAIN_ERROR;
+   if (dfval() > 170.0)   return E_DOMAIN_ERROR;
 
-const APL_Float arg = fval() + 1.0;
+const APL_Float arg = dfval() + 1.0;
    return FloatCell::zv(Z, tgamma(arg));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 FloatCell::bif_conjugate(Cell * Z) const
 {
-   // cnvert quotients (if any) to double
-   return zv(Z, fval());
+   // convert quotients (if any) to double
+   return zv(Z, dfval());
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -140,7 +143,7 @@ FloatCell::bif_negative(Cell * Z) const
       return zv(Z, -get_numerator(), denom);
 #endif
 
-   return zv(Z, - fval());
+   return zv(Z, - dfval());
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -157,8 +160,8 @@ FloatCell::bif_direction(Cell * Z) const
       }
 #endif
 
-   if (fval() > 0)   return IntCell::zv(Z,  1);
-   if (fval() < 0)   return IntCell::zv(Z, -1);
+   if (dfval() > 0.0)   return IntCell::zv(Z,  1);
+   if (dfval() < 0.0)   return IntCell::zv(Z, -1);
    return IntCell::zv(Z, 0);
 }
 //-----------------------------------------------------------------------------
@@ -173,8 +176,8 @@ FloatCell::bif_magnitude(Cell * Z) const
       }
 #endif
 
-   if (fval() < 0.0)   return FloatCell::zv(Z, -fval());
-   else                return FloatCell::zv(Z, fval());
+   if (dfval() < 0.0)   return FloatCell::zv(Z, -dfval());
+   else                return FloatCell::zv(Z, dfval());
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -188,10 +191,10 @@ FloatCell::bif_reciprocal(Cell * Z) const
       }
 #endif
 
-const APL_Float z = 1.0/fval();
+const APL_Float z = 1.0/dfval();
    if (!isfinite(z))   return E_DOMAIN_ERROR;
 
-   return FloatCell::zv(Z, 1.0/fval());
+   return FloatCell::zv(Z, 1.0/dfval());
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -209,13 +212,13 @@ const uint64_t rnd = Workspace::get_RL(set_size);
 ErrorCode
 FloatCell::bif_pi_times(Cell * Z) const
 {
-   return zv(Z, fval() * M_PI);
+   return zv(Z, dfval() * M_PI);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 FloatCell::bif_pi_times_inverse(Cell * Z) const
 {
-   return zv(Z, fval() / M_PI);
+   return zv(Z, dfval() / M_PI);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -235,7 +238,7 @@ FloatCell::bif_ceiling(Cell * Z) const
 
    // see comments for bif_floor below.
 
-const double b = fval();
+const APL_Float b = dfval();
    // if b is large then return it as is.
    //
    if (b >= LARGE_INT)   return zv(Z, b);
@@ -246,9 +249,9 @@ APL_Integer bi = b;
    while ((bi - 1) > b)   --bi;
    if (bi == b)   return IntCell::zv(Z, bi);   // b already equal to its floor
 
-const double D = bi - b;
+const APL_Float D = bi - b;
 
-   if (D >= (1 - Workspace::get_CT()))   --bi;
+   if (D >= (1.0 - Workspace::get_CT()))   --bi;
    return IntCell::zv(Z, bi);
 }
 //-----------------------------------------------------------------------------
@@ -302,7 +305,7 @@ FloatCell::bif_floor(Cell * Z) const
    of double, it is already equal to its floor and we return it unchanged.
 */
 
-const double b = fval();
+const APL_Float b = dfval();
    // if b is large then return it as is.
    //
    if (b >= LARGE_INT)   return zv(Z, b);
@@ -313,9 +316,9 @@ APL_Integer bi = b;
    while ((bi + 1) < b)   ++bi;
    if (bi == b)   return IntCell::zv(Z, bi);   // b already equal to its floor
 
-const double D = b - bi;
+const APL_Float D = b - bi;
 
-   if (D >= (1 - Workspace::get_CT()))   ++bi;
+   if (D >= (1.0 - Workspace::get_CT()))   ++bi;
    return IntCell::zv(Z, bi);
 }
 //-----------------------------------------------------------------------------
@@ -324,16 +327,16 @@ FloatCell::bif_exponential(Cell * Z) const
 {
    // e to the B-th power
    //
-   return FloatCell::zv(Z, exp(fval()));
+   return FloatCell::zv(Z, exp(dfval()));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 FloatCell::bif_nat_log(Cell * Z) const
 {
-const APL_Float val = fval();
-   if (val == 0)     return E_DOMAIN_ERROR;
+const APL_Float val = dfval();
+   if (val == 0.0)     return E_DOMAIN_ERROR;
 
-   if (val > 0)   // real result
+   if (val > 0.0)   // real result
       {
         return FloatCell::zv(Z, log(val));
       }
@@ -438,7 +441,8 @@ FloatCell::bif_subtract(Cell * Z, const Cell * A) const
 
    if (A->is_complex_cell())   // complex result
       {
-       return ComplexCell::zv(Z, A->get_complex_value() - get_real_value());
+       return ComplexCell::zv(Z, A->get_real_value() - get_real_value(),
+                                 A->get_imag_value());
       }
 
    return E_DOMAIN_ERROR;
@@ -483,18 +487,18 @@ const APL_Float ai = A->get_imag_value();
 
    if (ai == 0.0)   // real result
       {
-        const APL_Float z = ar * fval();
+        const APL_Float z = ar * dfval();
         if (!isfinite(z))   return E_DOMAIN_ERROR;
         return FloatCell::zv(Z, z);
       } 
 
    // complex result
    //
-const APL_Complex a(ar, ai);
-const APL_Complex z = a * fval();
-   if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
-   if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
-   return ComplexCell::zv(Z, z);
+const double zar = ar * dfval();
+const double zai = ai * dfval();
+   if (!isfinite(zar))   return E_DOMAIN_ERROR;
+   if (!isfinite(zai))   return E_DOMAIN_ERROR;
+   return ComplexCell::zv(Z, ar, ai);
 }     
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -515,7 +519,7 @@ FloatCell::bif_divide(Cell * Z, const Cell * A) const
 const APL_Float ar = A->get_real_value();
 const APL_Float ai = A->get_imag_value();
 
-   if (fval() == 0.0)   // A ÷ 0
+   if (dfval() == 0.0)   // A ÷ 0
       {
          if (ar != 0.0)   return E_DOMAIN_ERROR;
          if (ai != 0.0)   return E_DOMAIN_ERROR;
@@ -526,17 +530,17 @@ const APL_Float ai = A->get_imag_value();
 
    if (ai == 0.0)   // real result
       {
-        const APL_Float real = ar / fval() ;
+        const APL_Float real = ar / dfval() ;
         return FloatCell::zv(Z, real);
       }
 
    // complex result
    //
-const APL_Complex a(ar, ai);
-const APL_Complex z = a / fval();
-   if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
-   if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
-   return ComplexCell::zv(Z, z);
+const double zar = ar / dfval();
+const double zai = ai / dfval();
+   if (!isfinite(zar))   return E_DOMAIN_ERROR;
+   if (!isfinite(zai))   return E_DOMAIN_ERROR;
+   return ComplexCell::zv(Z, ar, ai);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -553,9 +557,9 @@ const APL_Float ai = A->get_imag_value();
    //
    if (ar == 0.0 && ai == 0.0)
        {
-         if (fval() == 0.0)   return IntCell::z1(Z);   // 0⋆0 is 1
-         if (fval() > 0)      return IntCell::z0(Z);   // 0⋆N is 0
-         return E_DOMAIN_ERROR;                            // 0⋆¯N = 1÷0
+         if (dfval() == 0.0)   return IntCell::z1(Z);   // 0⋆0 is 1
+         if (dfval()  > 0.0)   return IntCell::z0(Z);   // 0⋆N is 0
+         return E_DOMAIN_ERROR;                        // 0⋆¯N = 1÷0
        }
 
    // 2. real A > 0   (real result)
@@ -563,7 +567,7 @@ const APL_Float ai = A->get_imag_value();
    if (ai == 0.0)
       {
         if (ar  == 1.0)   return IntCell::z1(Z);   // 1⋆b = 1
-        const APL_Float z = pow(ar, fval());
+        const APL_Float z = pow(ar, dfval());
         if (isfinite(z)) return zv(Z, z);
 
         /* fall through */
@@ -572,7 +576,7 @@ const APL_Float ai = A->get_imag_value();
    // 3. complex result
    //
 const APL_Complex a(ar, ai);
-const APL_Complex z = pow(a, fval());
+const APL_Complex z = complex_power(a, dfval());
    if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
    if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
 
@@ -584,16 +588,16 @@ FloatCell::bif_residue(Cell * Z, const Cell * A) const
 {
    if (!A->is_numeric())   return E_DOMAIN_ERROR;
 
-   if (A->get_imag_value() != 0)   // complex A
+   if (A->get_imag_value() != 0.0)   // complex A
       {
-        ComplexCell B(get_real_value(), 0);
+        ComplexCell B(get_real_value());
         return B.bif_residue(Z, A);
       }
 
    // if A is zero , return B
    //
 const APL_Float a = A->get_real_value();
-const APL_Float b = fval();
+const APL_Float b = dfval();
    if (a == 0.0)   return zv(Z, b);
 
    // IBM: if B is zero , return B
@@ -605,7 +609,7 @@ const APL_Float b = fval();
    // Note: In that case, the integer to which A ÷ B is close is either
    // floor(A ÷ B) or ceil(A ÷ B).
    //
-APL_Float qct = Workspace::get_CT();
+double qct = Workspace::get_CT();
 const APL_Float quotient = b / a;
 
    if ((qct != 0) && integral_within(quotient, qct))   return IntCell::z0(Z);
@@ -618,18 +622,18 @@ const APL_Float quotient = b / a;
    //
 const APL_Float quot_int = floor(quotient);
 APL_Float z = b - a * quot_int;
-   if (a < 0)   // Z ≤ 0
+   if (a < 0.0)   // Z ≤ 0
       {
-         while (z > 0)    z += a;
-         while (z <= a)   z -= a;
+         while (z > 0.0)    z = z + a;
+         while (z <= a)     z = z - a;
       }
    else         // Z ≥ 0
       {
-         while (z < 0)    z += a;
-         while (z >= a)   z -= a;
+         while (z < 0.0)    z = z + a;
+         while (z >= a)     z = z - a;
       }
 
-   Assert(z*a >= 0);
+   Assert(z*a >= 0.0);
    return zv(Z, z);
 }
 //-----------------------------------------------------------------------------
@@ -639,15 +643,16 @@ FloatCell::bif_maximum(Cell * Z, const Cell * A) const
    if (A->is_integer_cell())
       {
          const APL_Integer a = A->get_int_value();
-         if (APL_Float(a) >= fval())   return IntCell::zv(Z, a);
-         else                          return FloatCell::zv(Z, fval());
+         if (a >= dfval())   return IntCell::zv(Z, a);
+         else                          return this->zv(Z);    // copy as is
       }
 
    if (A->is_float_cell())
       {
          const APL_Float a = A->get_real_value();
-         if (a >= fval())   return FloatCell::zv(Z, a);
-         else               return FloatCell::zv(Z, fval());
+         if (a >= dfval())
+            return reinterpret_cast<const FloatCell *>(A)->zv(Z);  // copy as is
+         else               return this->zv(Z);               // copy as is
       }
 
    // delegate to A
@@ -661,15 +666,16 @@ FloatCell::bif_minimum(Cell * Z, const Cell * A) const
    if (A->is_integer_cell())
       {
          const APL_Integer a = A->get_int_value();
-         if (APL_Float(a) <= fval())   return IntCell::zv(Z, a);
-         else                          return FloatCell::zv(Z, fval());
+         if (a <= dfval())   return IntCell::zv(Z, a);
+         else                          return this->zv(Z);    // copy as is
       }
 
    if (A->is_float_cell())
       {
          const APL_Float a = A->get_real_value();
-         if (a <= fval())   return FloatCell::zv(Z, a);
-         else               return FloatCell::zv(Z, fval());
+         if (a <= dfval())
+            return reinterpret_cast<const FloatCell *>(A)->zv(Z);  // copy as is
+         else               return this->zv(Z);               // copy as is
       }
 
    // delegate to A
@@ -709,7 +715,7 @@ FloatCell::character_representation(const PrintContext & pctx) const
 #endif
 
 bool scaled = pctx.get_scaled();   // may be changed by print function
-UCS_string ucs = UCS_string(fval(), scaled, pctx);
+UCS_string ucs = UCS_string(dfval(), scaled, pctx);
 
 ColInfo info;
    info.flags |= CT_FLOAT;
@@ -781,7 +787,7 @@ FloatCell::need_scaling(APL_Float val, int quad_pp)
    // (2b) its integer part is 0, and
    // (2c) its fractional part starts with at least 5 zeroes.
    //
-   if (val < 0)   val = - val;   // simplify comparisons
+   if (val < 0.0)   val = - val;   // simplify comparisons
 
    if (is_big(val, quad_pp))        return true;    // case 1.
 

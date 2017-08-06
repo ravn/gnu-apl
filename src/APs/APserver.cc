@@ -828,7 +828,7 @@ AP3_fd * ap_fd = 0;
                Svar_record * svar = db.find_var(key, LOC);
 
                if (svar)   svar->set_state(request->get__SET_STATE__new_state(),
-                                       request->get__SET_STATE__loc().c_str());
+                                       request->get__SET_STATE__sloc().c_str());
                else cerr << "*** key not in db at " << LOC << endl;
              }
              return;

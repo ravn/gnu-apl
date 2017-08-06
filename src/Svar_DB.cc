@@ -108,7 +108,7 @@ FILE * fp = popen(popen_args, "r");
 
    for (int cc; (cc = getc(fp)) != EOF;)
        {
-         logit && get_CERR() << (char)cc;
+         logit && get_CERR() << char(cc);
        }
 
    logit && get_CERR() << endl;
@@ -155,7 +155,7 @@ char peer[100];
         server_sockname = 0;
         logit && get_CERR() << "Using TCP socket towards APserver..."
                             << endl;
-        sock = (TCP_socket)(socket(AF_INET, SOCK_STREAM, 0));
+        sock = static_cast<TCP_socket>(socket(AF_INET, SOCK_STREAM, 0));
         if (sock == NO_TCP_SOCKET)
            {
              get_CERR() << "*** socket(AF_INET, SOCK_STREAM, 0) failed at "
@@ -176,7 +176,8 @@ char peer[100];
         local.sin_family = AF_INET;
         local.sin_addr.s_addr = htonl(0x7F000001);
 
-        if (::bind(sock, (const sockaddr *)&local, sizeof(sockaddr_in)))
+        if (::bind(sock, reinterpret_cast<const sockaddr *>(&local),
+                         sizeof(sockaddr_in)))
            {
              get_CERR() << "bind(127.0.0.1) failed:" << strerror(errno) << endl;
              ::close(sock);
@@ -203,7 +204,7 @@ char peer[100];
              remote.sun_family = AF_UNIX;
              strcpy(remote.sun_path + ABSTRACT_OFFSET, server_sockname);
 
-             if (::connect(sock, (sockaddr *)&remote,
+             if (::connect(sock, reinterpret_cast<sockaddr *>(&remote),
                            sizeof(remote)) == 0)   break;   // success
            }
         else   // TCP
@@ -215,7 +216,7 @@ char peer[100];
              remote.sin_port = htons(APserver_port);
              remote.sin_addr.s_addr = htonl(0x7F000001);
 
-             if (::connect(sock, (sockaddr *)&remote,
+             if (::connect(sock, reinterpret_cast<sockaddr *>(&remote),
                            sizeof(remote)) == 0)   break;   // success
            }
 
@@ -269,7 +270,7 @@ char peer[100];
    usleep(50000);
    logit && get_CERR() << "connected to APserver, socket is " << sock << endl;
 
-   return (TCP_socket)sock;
+   return static_cast<TCP_socket>(sock);
 }
 //-----------------------------------------------------------------------------
 void
@@ -347,7 +348,8 @@ uint32_t vname1[MAX_SVAR_NAMELEN];
         else                break;
       }
 
-string vname((const char *)vname1, MAX_SVAR_NAMELEN*sizeof(uint32_t));
+string vname(reinterpret_cast<const char *>(vname1),
+                     MAX_SVAR_NAMELEN*sizeof(uint32_t));
 
 MATCH_OR_MAKE_c request(tcp, vname,
                              to.proc,      to.parent,      to.grand,
@@ -382,12 +384,12 @@ GET_EVENTS_c request(tcp, id.proc, id.parent, id.grand);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
-Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+Signal_base * response =
+                    Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0);
 
    if (response)
       {
-        events = (Svar_event)response->get__EVENTS_ARE__events();
+        events = static_cast<Svar_event>(response->get__EVENTS_ARE__events());
         const SV_key ret = response->get__EVENTS_ARE__key();
         delete response;
         return ret;
@@ -417,7 +419,8 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    if (response)
       {
-        const Svar_event ret = (Svar_event)response->get__EVENTS_ARE__events();
+        const Svar_event ret = static_cast<Svar_event>
+                                          (response->get__EVENTS_ARE__events());
         delete response;
         return ret;
       }
@@ -525,9 +528,12 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    if (response)
       {
-         offering_id.proc   = (AP_num)(response->get__OFFERING_ID_IS__proc());
-         offering_id.parent = (AP_num)(response->get__OFFERING_ID_IS__parent());
-         offering_id.grand  = (AP_num)(response->get__OFFERING_ID_IS__grand());
+         offering_id.proc =
+                  static_cast<AP_num>(response->get__OFFERING_ID_IS__proc());
+         offering_id.parent =
+                  static_cast<AP_num>(response->get__OFFERING_ID_IS__parent());
+         offering_id.grand =
+                  static_cast<AP_num>(response->get__OFFERING_ID_IS__grand());
         delete response;
       }
        
@@ -551,7 +557,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
    if (response)
       {
         const string & op = response->get__OFFERING_PROCS_ARE__offering_procs();
-        const AP_num * procs = (const AP_num *)(op.data());
+        const AP_num * procs = reinterpret_cast<const AP_num *>(op.data());
         const size_t count = op.size() / sizeof(AP_num);
 
         loop(c, count)   processors.append(*procs++);
@@ -576,7 +582,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
    if (response)
       {
         const string & ov = response->get__OFFERED_VARS_ARE__offered_vars();
-        const uint32_t * names = (const uint32_t *)(ov.data());
+        const uint32_t * names = reinterpret_cast<const uint32_t *>(ov.data());
         const size_t count = ov.size() / sizeof(uint32_t);
 
         loop(c, count)   varnames.append(*names++);

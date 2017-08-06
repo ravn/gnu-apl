@@ -656,8 +656,8 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
 
         // real_flt is the magnitude and the angle is in degrees.
         //
-        APL_Float real = real_flt * cos(M_PI*degrees_flt / 180);
-        APL_Float imag = real_flt * sin(M_PI*degrees_flt / 180);
+        APL_Float real = real_flt * cos(M_PI*degrees_flt / 180.0);
+        APL_Float imag = real_flt * sin(M_PI*degrees_flt / 180.0);
         tos.append(Token(TOK_COMPLEX, real, imag));
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex " << real
                                  << "J" << imag << endl;

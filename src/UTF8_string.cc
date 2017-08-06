@@ -132,7 +132,8 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
 }
 //-----------------------------------------------------------------------------
 UTF8_string::UTF8_string(const Value & value)
-   : Simple_string<UTF8, false>((int)value.element_count(), (UTF8) 0)
+   : Simple_string<UTF8, false>(int(value.element_count())
+     , static_cast<UTF8>(0))
 {
    loop(v, value.element_count())
        {
@@ -282,7 +283,7 @@ int dest = 0;
 bool got_tag = false;
    loop(src, size())
       {
-        const char cc = (char)(items[src]);
+        const char cc = char(items[src]);
         if (in_HTML == 2)   // in HTML header, i.e. < seen
            {
              if (cc == '>')   in_HTML = 1;   // in HTML but not in HTML tag
@@ -305,8 +306,9 @@ bool got_tag = false;
         const int rest = size() - src;
         if (rest > 5 && items[src + 1] == '#' && items[src + 4] == ';')
            {
-             const long val = strtol((const char *)(items + src + 2), 0, 10);
-             items[dest++] = (char)val;
+             const long val = strtol(
+                        reinterpret_cast<const char *>(items + src + 2), 0, 10);
+             items[dest++] = char(val);
              src += 4;
            }
         else if (rest > 4 && items[src + 1] == 'g' &&
@@ -344,7 +346,7 @@ operator<<(ostream & os, const UTF8_string & utf)
 int
 UTF8_filebuf::overflow(int c)
 {
-   data.append((UTF8)c);
+   data.append(static_cast<UTF8>(c));
    return 0;
 }
 //=============================================================================

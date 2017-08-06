@@ -445,15 +445,17 @@ Quad_SQL::eval_AXB(const Value_P A, const Value_P X, const Value_P B)
     }
 }
 //-----------------------------------------------------------------------------
-static const UCS_string ucs_string_from_string( const std::string &string )
+static const UCS_string
+ucs_string_from_string( const std::string &string )
 {
-    size_t length = string.size();
-    const char *buf = string.c_str();
-    UTF8_string utf( (const UTF8 *)buf, length );
-    return UCS_string( utf );
+const size_t length = string.size();
+const char * buf = string.c_str();
+UTF8_string utf(reinterpret_cast<const UTF8 *>(buf), length);
+    return UCS_string(utf);
 }
 //-----------------------------------------------------------------------------
-Value_P make_string_cell( const std::string &string, const char *loc )
+Value_P
+make_string_cell( const std::string &string, const char *loc )
 {
     UCS_string s = ucs_string_from_string( string );
     Shape shape( s.size() );

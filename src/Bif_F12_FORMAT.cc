@@ -175,7 +175,7 @@ Bif_F12_FORMAT::monadic_format(Value_P B)
 {
    Assert(B->get_rank() <= 2);
 
-const PrintStyle style((PrintStyle)(PR_APL | PST_NO_FRACT_0));
+const PrintStyle style(static_cast<PrintStyle>(PR_APL | PST_NO_FRACT_0));
 const PrintContext pctx = Workspace::get_PrintContext(style);
 
 const PrintBuffer pb(*B, pctx, 0);
@@ -232,7 +232,7 @@ UCS_string_vector col_formats;
            }
       }
 
-   if (cols != (ShapeItem)(col_formats.size()))   LENGTH_ERROR;
+   if (cols != static_cast<ShapeItem>(col_formats.size()))   LENGTH_ERROR;
 
    // convert each column format string into a Format_LIFER
    //
@@ -351,7 +351,7 @@ Bif_F12_FORMAT::Format_LIFER::format_example(APL_Float value)
 UCS_string data_int;
 UCS_string data_fract;
 UCS_string data_expo;
-const double val_1 = (value < 0) ? -value : value;
+const APL_Float val_1 = (value < 0.0) ? APL_Float(-value) : value;
 
 bool overflow = false;
    fill_data_fields(val_1, data_int, data_fract, data_expo, overflow);
@@ -364,11 +364,11 @@ bool overflow = false;
       }
    if (overflow)   return UCS_string(out_size(), Workspace::get_FC(3));
 
-const UCS_string left = format_left_side(data_int, value < 0, overflow);
+const UCS_string left = format_left_side(data_int, value < 0.0, overflow);
    if (overflow)   return UCS_string(out_size(), Workspace::get_FC(3));
    Assert(left.size() == (left_deco.out_len + int_part.out_len));
 
-const UCS_string right = format_right_side(data_fract, value<0, data_expo);
+const UCS_string right = format_right_side(data_fract, value < 0.0, data_expo);
    Assert(right.size() == (fract_part.out_len + expo_deco.out_len +
                            exponent.out_len + right_deco.out_len));
 
@@ -657,7 +657,7 @@ Format_sub::print(ostream & out) const
 }
 //-----------------------------------------------------------------------------
 void
-Bif_F12_FORMAT::Format_LIFER::fill_data_fields(double value,
+Bif_F12_FORMAT::Format_LIFER::fill_data_fields(APL_Float value,
                 UCS_string & data_int, UCS_string & data_fract,
                 UCS_string & data_expo, bool & overflow)
 {
@@ -676,8 +676,8 @@ char * fract_end = 0;
         // create a format like %.5E (if fract_part has 5 digits)
         //
         const int flen = snprintf(format, sizeof(format), "%%.%luE",
-                                  (unsigned long)fract_part.size());
-        Assert(flen < (int)sizeof(format));   // format was big enough.
+                                static_cast<unsigned long>(fract_part.size()));
+        Assert(flen < int(sizeof(format)));   // format was big enough.
 
         const int dlen = snprintf(&data_buf[0], data_buf_len, format, value);
         Assert(dlen < data_buf_len);
@@ -699,8 +699,8 @@ char * fract_end = 0;
    else   // no exponent in format string.
       {
         const int flen = snprintf(format, sizeof(format), "%%.%luf",
-                                  (unsigned long)fract_part.size());
-        Assert(flen < (int)sizeof(format));   // assume no snprintf() overflow
+                                 static_cast<unsigned long>(fract_part.size()));
+        Assert(flen < int(sizeof(format)));   // assume no snprintf() overflow
 
         const int dlen = snprintf(&data_buf[0], data_buf_len, format, value);
         data_buf[data_buf_len - 1] = 0;

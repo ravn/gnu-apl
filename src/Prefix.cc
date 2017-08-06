@@ -926,7 +926,8 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
 
                   const APL_Integer major = info[2].get_int_value();
                   const APL_Integer minor = info[3].get_int_value();
-                  const ErrorCode ec = (ErrorCode)(major << 16 | minor);
+                  const ErrorCode ec =
+                                  static_cast<ErrorCode>(major << 16 | minor);
                   Workspace::SI_top()->get_parent()->get_error().init(ec, LOC);
                 }
               else              // committed value
@@ -983,7 +984,7 @@ Prefix::reduce_MISC_F_C_B()
    if (at1().get_ValueType() != TV_VAL)   // [i1;i2...] instead of [axis]
       {
         IndexExpr * idx = &at1().get_index_val();
-        Log(LOG_delete)   CERR << "delete " HEX(idx) << " at " LOC << endl;
+        Log(LOG_delete)   CERR << "delete " << CVOIP(idx) << " at " LOC << endl;
         delete idx;
          at1().clear(LOC);
          SYNTAX_ERROR;
@@ -1402,13 +1403,14 @@ Value_P Z;
         try
            {
              Z = A->index(*idx);
-             Log(LOG_delete)   CERR << "delete " HEX(idx) << " at " LOC << endl;
+             Log(LOG_delete)   CERR << "delete " << CVOIP(idx) << " at " LOC << endl;
              delete idx;
            }
         catch (Error err)
            {
              Token result = Token(TOK_ERROR, err.error_code);
-             Log(LOG_delete)   CERR << "delete " HEX(idx) << " at " LOC << endl;
+             Log(LOG_delete)   CERR << "delete " << CVOIP(idx)
+                                    << " at " LOC << endl;
              delete idx;
              pop_args_push_result(result);
              set_action(result);
@@ -1463,7 +1465,8 @@ Value_P B = at3().get_apl_val();
         try
            {
              V->assign_indexed(*idx, B);
-             Log(LOG_delete)   CERR << "delete " HEX(idx) << " at " LOC << endl;
+             Log(LOG_delete)   CERR << "delete " << CVOIP(idx)
+                                    << " at " LOC << endl;
              delete idx;
            }
         catch (Error err)
@@ -1471,7 +1474,8 @@ Value_P B = at3().get_apl_val();
              Token result = Token(TOK_ERROR, err.error_code);
              at1().clear(LOC);
              at3().clear(LOC);
-             Log(LOG_delete)   CERR << "delete " HEX(idx) << " at " LOC << endl;
+             Log(LOG_delete)   CERR << "delete " << CVOIP(idx)
+                                    << " at " LOC << endl;
              delete idx;
              pop_args_push_result(result);
              set_assign_state(ASS_none);
@@ -1586,7 +1590,7 @@ Prefix::reduce_RBRA___()
    //
 IndexExpr * idx = new IndexExpr(get_assign_state(), LOC);
    Log(LOG_delete)
-      CERR << "new    " << (const void *)idx << " at " LOC << endl;
+      CERR << "new    " << CVOIP(idx) << " at " LOC << endl;
 
    new (&at0()) Token(TOK_PINDEX, *idx);
    set_assign_state(ASS_none);
@@ -1609,7 +1613,8 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);
         Token result = Token(TOK_INDEX, idx);
         pop_args_push_result(result);
         action = RA_CONTINUE;
-        Log(LOG_delete)   CERR << "delete " HEX(&idx) << " at " LOC << endl;
+        Log(LOG_delete)   CERR << "delete " << CVOIP(&idx)
+                               << " at " LOC << endl;
         delete &idx;
         return;
       }
@@ -1658,7 +1663,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
              Assert1(!!X);
              I.move_2(Token(TOK_AXES, X), LOC);
              Log(LOG_delete)
-                CERR << "delete " HEX(&idx) << " at " LOC << endl;
+                CERR << "delete " << CVOIP(&idx) << " at " LOC << endl;
              delete &idx;
            }
         else

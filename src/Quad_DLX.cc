@@ -426,7 +426,8 @@ ShapeItem pcnt = 0;
    out << endl << "  N:";
    for (const DLX_Node * x = right; x != this; x = x->right)
        {
-         const DLX_Header_Node & hdr = *(const DLX_Header_Node *)x;
+         const DLX_Header_Node & hdr =
+               *reinterpret_cast<const DLX_Header_Node *>(x);
          Assert(hdr.row == -1);
          if (hdr.col_type == Col_PRIMARY)   ++pcnt;
          out << " " << setw(w) << hdr.count;
@@ -434,7 +435,8 @@ ShapeItem pcnt = 0;
    out << endl << "Col:";
    for (const DLX_Node * x = right; x != this; x = x->right)
        {
-         const DLX_Header_Node & hdr = *(const DLX_Header_Node *)x;
+         const DLX_Header_Node & hdr =
+               *reinterpret_cast<const DLX_Header_Node *>(x);
          Assert(hdr.row == -1);
          out << " " << setw(w) << hdr.col;
        }
@@ -488,7 +490,8 @@ DLX_Root_Node::deep_check() const
 {
    for (const DLX_Node * x = right; x != this; x = x->right)
        {
-         const DLX_Header_Node & hdr = *(const DLX_Header_Node *)x;
+         const DLX_Header_Node & hdr =
+               *reinterpret_cast<const DLX_Header_Node *>(x);
          Assert(hdr.row == -1);
          hdr.check();
          ShapeItem ones = 0;

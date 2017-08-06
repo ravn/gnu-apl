@@ -335,7 +335,7 @@ protected:
    int64_t find_int_attr(const char * att_name, bool optional, int base);
 
    /// return floating point value of attribute \b att_name
-   double find_float_attr(const char * att_name);
+   APL_Float find_float_attr(const char * att_name);
 
    /// the file descriptor for the mmap()ed workspace.xml file
    int fd;

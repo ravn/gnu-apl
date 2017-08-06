@@ -24,7 +24,7 @@
 
 //-----------------------------------------------------------------------------
 inline bool
-Cell::tolerantly_equal(APL_Float A, APL_Float B, APL_Float C)
+Cell::tolerantly_equal(APL_Float A, APL_Float B, double C)
 {
    // if the signs of A and B differ then they are unequal (ISO standard
    // page 19). We treat exact 0.0 as having both signs
@@ -33,29 +33,29 @@ Cell::tolerantly_equal(APL_Float A, APL_Float B, APL_Float C)
    if (A < 0.0 && B > 0.0)   return false;
    if (A > 0.0 && B < 0.0)   return false;
 
-APL_Float mag_A = A < 0 ? -A : A;
-APL_Float mag_B = B < 0 ? -B : B;
-APL_Float mag_max = (mag_A > mag_B) ? mag_A : mag_B;
+const APL_Float mag_A = A < 0.0 ? APL_Float(-A) : A;
+const APL_Float mag_B = B < 0.0 ? APL_Float(-B) : B;
+const APL_Float mag_max = mag_A > mag_B ? mag_A : mag_B;
 
-const APL_Float dist_A_B = (A > B) ? (A - B) : (B - A);
+const APL_Float dist_A_B = A > B ? (A - B) : (B - A);
 
-   return (dist_A_B < C*mag_max);
+   return dist_A_B < C*mag_max;
 }
 //-----------------------------------------------------------------------------
 inline bool
 Cell::same_half_plane(APL_Complex A, APL_Complex B)
 {
-   if (A.real() > 0 && B.real() > 0)   return true;
-   if (A.real() < 0 && B.real() < 0)   return true;
+   if (A.real() > 0.0 && B.real() > 0.0)   return true;
+   if (A.real() < 0.0 && B.real() < 0.0)   return true;
 
-   if (A.imag() > 0 && B.imag() > 0)   return true;
-   if (A.imag() < 0 && B.imag() < 0)   return true;
+   if (A.imag() > 0.0 && B.imag() > 0.0)   return true;
+   if (A.imag() < 0.0 && B.imag() < 0.0)   return true;
 
    return false;
 }
 //-----------------------------------------------------------------------------
 inline bool
-Cell::tolerantly_equal(APL_Complex A, APL_Complex B, APL_Float C)
+Cell::tolerantly_equal(APL_Complex A, APL_Complex B, double C)
 {
    // if A equals B, return true
    //
@@ -86,68 +86,20 @@ const APL_Float dist2_A_B = A_B.real() * A_B.real()
 
    // 2. compute right side: max(mag²C×A, mag²C×B)
    //
-const APL_Float mag2_CA   = C * (A.real() * A.real() + A.imag() * A.imag());
-const APL_Float mag2_CB   = C * (B.real() * B.real() + B.imag() * B.imag());
-const APL_Float mag2_max = mag2_CA > mag2_CB ? mag2_CA : mag2_CB;
+const APL_Float Cmag2_A   = C * ComplexCell::mag2(A);
+const APL_Float Cmag2_B   = C * ComplexCell::mag2(B);
+const APL_Float mag2_max = Cmag2_A > Cmag2_B ? Cmag2_A : Cmag2_B;
 
    // compare
    //
    return dist2_A_B <= mag2_max;
 }
 //-----------------------------------------------------------------------------
-inline APL_Complex
-Cell::tolerant_floor(APL_Complex A , APL_Float B)
-{
-const APL_Float C_real =  floor(A.real());
-const APL_Float C_imag =  floor(A.imag());
-const APL_Float D_real = A.real() - C_real;
-const APL_Float D_imag = A.imag() - C_imag;
-const APL_Float D_sum = D_real + D_imag;
-
-   // If the sum of the real and imaginary parts of D is tolerantly-less-than
-   // one within B, then Z is C. The problem is that ISO uses the term
-   // tolerantly-less-than, but does not define it. We assume that
-   // tolerantly-less-than means "less than and not tolerantly-equal".
-   //
-   if (D_sum < 1.0 && !tolerantly_equal(D_sum, 1.0, B))
-      return APL_Complex(C_real, C_imag);
-
-   // Otherwise, if the imaginary-part of D is greater-than the real-part of
-   // D, then Z is C plus imaginary-one.
-   //
-   if (D_imag > D_real)   return APL_Complex(C_real, C_imag + 1);
-
-   // Otherwise, Z is C plus one.
-   //
-   return APL_Complex(C_real + 1, C_imag);
-}
-//-----------------------------------------------------------------------------
 inline bool
-Cell::integral_within(APL_Complex A, APL_Float qct)
-{
-   // Note: despite its name (coming from the ISO standard) this implementation
-   // of integral_within is NOT the one described in the ISO standard. The
-   // description in the standard was leading to problems in bif_residue
-   //
-
-   // 1, scale qct to the magnitude of A
-   //
-   qct *= A.real() * A.real() + A.imag() * A.imag();
-
-const APL_Float real_up = ceil (A.real()) - qct;
-const APL_Float real_dn = floor(A.real()) + qct;
-const APL_Float imag_up = ceil (A.imag()) - qct;
-const APL_Float imag_dn = floor(A.imag()) + qct;
-
-   return (A.real() > real_up || A.real() < real_dn)   // real part is near int
-       && (A.imag() > imag_up || A.imag() < imag_dn);  // imag part is near int
-}
-//-----------------------------------------------------------------------------
-inline bool
-Cell::integral_within(APL_Float A, APL_Float qct)
+Cell::integral_within(APL_Float A, double qct)
 {
    if (A < (floor(A) + qct))   return true;
-   if (A > (ceil(A) - qct))   return true;
+   if (A > (ceil(A)  - qct))   return true;
    return false;
 
    // Note: despite its name (coming from the ISO standard) this implementation
@@ -156,7 +108,7 @@ Cell::integral_within(APL_Float A, APL_Float qct)
    //
    // 1, scale qct to the magnitude of A
    //
-   qct *= A * A;
+   qct = A * A * qct;
 
 const APL_Float real_up = ceil (A) - qct;
 const APL_Float real_dn = floor(A) + qct;

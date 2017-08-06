@@ -139,9 +139,9 @@ const uint32_t nelm = val.element_count();
       {
         loop(e, nelm)
            {
-             const double v = val.get_ravel(e).get_real_value();
-             const double * dv = &v;
-             uint64_t i = *(const uint64_t *)dv;
+             const APL_Float v = val.get_ravel(e).get_real_value();
+             const APL_Float * dv = &v;
+             uint64_t i = *reinterpret_cast<const uint64_t *>(dv);
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
@@ -156,9 +156,9 @@ const uint32_t nelm = val.element_count();
       {
         loop(e, nelm)
            {
-             double v = val.get_ravel(e).get_real_value();
-             const double * dv = &v;
-             uint64_t i = *(uint64_t *)dv;
+             APL_Float v = val.get_ravel(e).get_real_value();
+             const APL_Float * dv = &v;
+             uint64_t i = *reinterpret_cast<const uint64_t *>(dv);
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
@@ -170,7 +170,7 @@ const uint32_t nelm = val.element_count();
 
              v = val.get_ravel(e).get_imag_value();
              dv = &v;
-             i = *(uint64_t *)dv;
+             i = *reinterpret_cast<const uint64_t *>(dv);
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
              result.append(Unicode(i & 0xFF));   i >>= 8;
@@ -319,7 +319,7 @@ struct tf3_header
 const uint8_t * data = cdr.get_items();
 
 const uint32_t nelm = get_4_be(data + 8);
-const CDR_type vtype = (CDR_type)(data[12]);
+const CDR_type vtype = static_cast<CDR_type>(data[12]);
 const Rank rank = data[13];
 Shape shape;
    loop(r, rank)
@@ -345,7 +345,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
       {
         loop(n, nelm)
            {
-             APL_Integer d = *(const uint32_t *)(ravel + 4*n);
+             APL_Integer d = *reinterpret_cast<const uint32_t *>(ravel + 4*n);
              if (d & 0x80000000)   d |= 0xFFFFFFFF00000000ULL;
              new (&ret->get_ravel(n)) IntCell(d);
            }
@@ -354,7 +354,8 @@ const uint8_t * ravel = data + 16 + 4*rank;
       {
         loop(n, nelm)
            {
-             const double v = *(const double *)(ravel + 8*n);
+             const APL_Float v =
+                  *reinterpret_cast<const APL_Float *>(ravel + 8*n);
              new (&ret->get_ravel(n)) FloatCell(v);
            }
       }
@@ -362,8 +363,10 @@ const uint8_t * ravel = data + 16 + 4*rank;
       {
         loop(n, nelm)
            {
-             const double vr = *(const double *)(ravel + 16*n);
-             const double vi = *(const double *)(ravel + 16*n + 8);
+             const APL_Float vr =
+                  *reinterpret_cast<const APL_Float *>(ravel + 16*n);
+             const APL_Float vi =
+                  *reinterpret_cast<const APL_Float *>(ravel + 16*n + 8);
              new (&ret->get_ravel(n)) ComplexCell(vr, vi);
            }
       }
@@ -380,7 +383,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
       {
         loop(n, nelm)
            {
-             const uint32_t d = *(const uint32_t *)(ravel + 4*n);
+             const uint32_t d = *reinterpret_cast<const uint32_t *>(ravel+4*n);
              new (&ret->get_ravel(n)) CharCell(Unicode(d));
            }
       }
@@ -388,7 +391,8 @@ const uint8_t * ravel = data + 16 + 4*rank;
       {
         loop(n, nelm)
             {
-              APL_Integer offset = *(const uint32_t *)(ravel + 4*n);
+              APL_Integer offset =
+                         *reinterpret_cast<const uint32_t *>(ravel + 4*n);
               const uint8_t * sub_data = data + offset;
               const uint32_t sub_vtype = sub_data[12];
               const Rank sub_rank = sub_data[13];
@@ -408,23 +412,26 @@ const uint8_t * ravel = data + 16 + 4*rank;
 
                    if (sub_vtype == 1)        // 4 byte int
                       {
-                        new (&ret->get_ravel(n))
-                            IntCell(*(uint32_t *)(sub_ravel));
+                        new (&ret->get_ravel(n)) IntCell(
+                               *reinterpret_cast<const uint32_t *>(sub_ravel));
                         continue;   // next n
                       }
 
                    if (sub_vtype == 2)        // 8 byte real
                       {
                         new (&ret->get_ravel(n))
-                            FloatCell(*(const double *)sub_ravel);
+                            FloatCell(*reinterpret_cast<const APL_Float *>
+                                                       (sub_ravel));
                         continue;   // next n
                       }
 
                    if (sub_vtype == 3)        // 16 byte complex
                       {
                         new (&ret->get_ravel(n))
-                            ComplexCell(*(const double *)sub_ravel,
-                                        *(const double *)(sub_ravel + 8));
+                            ComplexCell(*reinterpret_cast<const APL_Float *>
+                                                         (sub_ravel),
+                                        *reinterpret_cast<const APL_Float *>
+                                                         (sub_ravel + 8));
                         continue;   // next n
                       }
 

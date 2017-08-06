@@ -170,7 +170,7 @@ PERFORMANCE_START(cerr_perf)
    if (!InputFile::echo_current_file())   return 0;
 
    Output::set_color_mode(Output::COLM_INPUT);
-   cerr << (char)c;
+   cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
@@ -182,7 +182,7 @@ ErrOut::overflow(int c)
 PERFORMANCE_START(cerr_perf)
 
    Output::set_color_mode(Output::COLM_ERROR);
-   cerr << (char)c;
+   cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
@@ -289,7 +289,7 @@ Output::read_ESC_sequence(char * dest, int destlen, int append,
         return 1;
       }
 
-   if (str == (char *)-1)
+   if (str == reinterpret_cast<char *>(-1))
       {
         const char * term = getenv("TERM");
         CERR << "capability '" << capname 

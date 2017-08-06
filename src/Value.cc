@@ -105,7 +105,8 @@ const ShapeItem length = shape.get_volume();
 
         try
            {
-             Cell * long_ravel = (Cell *)(new char[length * sizeof(Cell)]);
+             Cell * long_ravel = reinterpret_cast<Cell *>
+                                 (new char[length * sizeof(Cell)]);
 //           Cell * long_ravel =  new Cell[length];
              ravel = long_ravel;
            }
@@ -130,7 +131,7 @@ const ShapeItem length = shape.get_volume();
    //
    new (ravel)   IntCell(0);
 
-   check_ptr = (const char *)this + 7;
+   check_ptr = reinterpret_cast<const char *>(this) + 7;
 }
 //-----------------------------------------------------------------------------
 Value::Value(const char * loc)
@@ -198,7 +199,8 @@ Value::Value(const UTF8_string & utf, const char * loc)
    init_ravel();
 
    new (&get_ravel(0)) CharCell(UNI_ASCII_SPACE);   // prototype
-   loop(l, utf.size())   new (next_ravel()) CharCell((Unicode)(utf[l] & 0xFF));
+   loop(l, utf.size())
+       new (next_ravel()) CharCell(static_cast<Unicode>(utf[l] & 0xFF));
    set_complete();
 }
 //-----------------------------------------------------------------------------
@@ -238,7 +240,7 @@ const ShapeItem width = pb.get_width(0);
 //-----------------------------------------------------------------------------
 Value::Value(const char * loc, const Shape * sh)
    : DynamicObject(loc, &all_values),
-     shape((ShapeItem)sh->get_rank()),
+     shape(static_cast<ShapeItem>(sh->get_rank())),
      flags(VF_NONE),
      valid_ravel_items(0)
 {
@@ -260,7 +262,10 @@ Value::~Value()
 
 const ShapeItem length = nz_element_count();
 
+#if !APL_Float_is_class
+   // APL_Float is NOT a class, Therefore release only PointerCells
    if (get_pointer_cell_count() > 0)
+#endif
       {
         Cell * cZ = &get_ravel(0);
         if (is_complete())   // OK to release
@@ -283,7 +288,7 @@ const ShapeItem length = nz_element_count();
         delete [] ravel;
       }
 
-   Assert(check_ptr == (const char *)this + 7);
+   Assert(check_ptr == reinterpret_cast<const char *>(this) + 7);
    check_ptr = 0;
 }
 //-----------------------------------------------------------------------------
@@ -367,7 +372,7 @@ const Cell * C = &get_ravel(0);
    loop(e, ec)
       {
         if (C->is_lval_cell())
-           return ((const LvalCell *)C)->get_cell_owner();
+           return reinterpret_cast<const LvalCell *>(C)->get_cell_owner();
 
         if (C->is_pointer_cell())
            return  C->get_pointer_value()->get_lval_cellowner();
@@ -407,9 +412,9 @@ const char * sc = set ? " SET " : " CLEAR ";
 const int new_flags = set ? flags | flag : flags & ~flag;
 const char * chg = flags == new_flags ? " (no change)" : " (changed)";
 
-   CERR << "Value " << (const void *)this
-        << sc << flag_name << " (" << (const void *)flag << ")"
-        << " at " << loc << " now = " << (const void *)(intptr_t)new_flags
+   CERR << "Value " << CVOIP(this)
+        << sc << flag_name << " (" << HEX(flag) << ")"
+        << " at " << loc << " now = " << HEX(new_flags)
         << chg << endl;
 }
 //-----------------------------------------------------------------------------
@@ -425,10 +430,10 @@ Value::init()
 void
 Value::mark_all_dynamic_values()
 {
-   for (const DynamicObject * dob = DynamicObject::all_values.get_prev();
+   for (DynamicObject * dob = DynamicObject::all_values.get_prev();
         dob != &all_values; dob = dob->get_prev())
        {
-         Value * val = (Value *)dob;
+         Value * val = static_cast<Value *>(dob);
          val->set_marked();
        }
 }
@@ -457,16 +462,16 @@ Value::rollback(ShapeItem items, const char * loc)
    //
    while (items < nz_element_count())   new (&get_ravel(items++)) IntCell(0);
 
-   ((Value *)this)->alloc_loc = loc;
+   const_cast<Value *>(this)->alloc_loc = loc;
 }
 //-----------------------------------------------------------------------------
 void
 Value::erase_all(ostream & out)
 {
-   for (DynamicObject * vb = DynamicObject::all_values.get_next();
+   for (const DynamicObject * vb = DynamicObject::all_values.get_next();
         vb != &DynamicObject::all_values; vb = vb->get_next())
        {
-         Value * v = (Value *)vb;
+         const Value * v = static_cast<const Value *>(vb);
          out << "erase_all sees Value:" << endl
              << "  Allocated by " << v->where_allocated() << endl
              << "  ";
@@ -489,24 +494,26 @@ int count = 0;
             {
               CERR << "A loop in DynamicObject::all_values (detected in "
                       "function erase_stale() at object "
-                   << (const void *)obj << "): " << endl;
+                   << CVOIP(obj) << "): " << endl;
               all_values.print_chain(CERR);
               CERR << endl;
 
               CERR << " DynamicObject: " << obj << endl;
-              CERR << " Value:         " << (Value *)obj << endl;
-              CERR << *(Value *)obj << endl;
+              CERR << " Value:         " << reinterpret_cast<Value *>(obj)
+                   << endl;
+              CERR << *static_cast<Value *>(obj) << endl;
             }
 
          Assert(obj != obj->get_next());
-         Value * v = (Value *)obj;
+         Value * v = static_cast<Value *>(obj);
          if (v->owner_count)   continue;
 
          ADD_EVENT(v, VHE_Stale, v->owner_count, loc);
 
          Log(LOG_Value__erase_stale)
             {
-              CERR << "Erasing stale Value " << (const void *)obj << ":" << endl
+              CERR << "Erasing stale Value "
+                   << CVOIP(obj) << ":" << endl
                    << "  Allocated by " << v->where_allocated() << endl
                    << "  ";
               v->list_one(CERR, false);
@@ -555,17 +562,18 @@ int count = 0;
             {
               CERR << "A loop in DynamicObject::all_values (detected in "
                       "function Value::finish_incomplete() at object "
-                   << (const void *)obj << "): " << endl;
+                   << CVOIP(obj) << "): " << endl;
               all_values.print_chain(CERR);
               CERR << endl;
 
               CERR << " DynamicObject: " << obj << endl;
-              CERR << " Value:         " << (Value *)obj << endl;
-              CERR << *(Value *)obj << endl;
+              CERR << " Value:         " << reinterpret_cast<Value *>(obj)
+                   << endl;
+              CERR << static_cast<Value *>(obj) << endl;
             }
 
          Assert(obj != obj->get_next());
-         Value * v = (Value *)obj;
+         Value * v = static_cast<Value *>(obj);
          if (v->flags & VF_complete)   continue;
 
          ADD_EVENT(v, VHE_Completed, v->owner_count, LOC);
@@ -578,7 +586,7 @@ int count = 0;
          Log(LOG_Value__erase_stale)
             {
               CERR << "Fixed incomplete Value "
-                   << (const void *)obj << ":" << endl
+                   << CVOIP(obj) << ":" << endl
                    << "  Allocated by " << v->where_allocated() << endl
                    << "  ";
               v->list_one(CERR, false);
@@ -591,7 +599,7 @@ int count = 0;
 }
 //-----------------------------------------------------------------------------
 ostream &
-Value::list_one(ostream & out, bool show_owners)
+Value::list_one(ostream & out, bool show_owners) const
 {
    if (flags)
       {
@@ -613,7 +621,7 @@ Value::list_one(ostream & out, bool show_owners)
 
    // print owners...
    //
-   out << "Owners of " << (const void *)(intptr_t)this << ":" << endl;
+   out << "Owners of " << CVOIP(this) << ":" << endl;
 
    Workspace::show_owners(out, *this);
 
@@ -625,11 +633,11 @@ ostream &
 Value::list_all(ostream & out, bool show_owners)
 {
 int num = 0;
-   for (DynamicObject * vb = all_values.get_prev();
+   for (const DynamicObject * vb = all_values.get_prev();
         vb != &all_values; vb = vb->get_prev())
        {
          out << "Value #" << num++ << ":";
-         ((Value *)vb)->list_one(out, show_owners);
+         static_cast<const Value *>(vb)->list_one(out, show_owners);
        }
 
    return out << endl;
@@ -693,7 +701,8 @@ ShapeItem ec = element_count();
             }
          else if (left)
             {
-              new (dest++) LvalCell((Cell *)&cell, &dest_owner);
+              new (dest++)
+                  LvalCell(const_cast<Cell *>(&cell), &dest_owner);
             }
          else
             {
@@ -1476,7 +1485,7 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
       }
    else                  // matrix or higher
       {
-        pctx.set_style((PrintStyle)(pctx.get_style() | PST_NO_FRACT_0));
+        pctx.set_style(static_cast<PrintStyle>(pctx.get_style() | PST_NO_FRACT_0));
       }
 
 PrintBuffer pb(*this, pctx, &out);   // constructor prints it
@@ -1496,7 +1505,7 @@ int style = pctx.get_style();
         style |= PST_NO_FRACT_0;
       }
 
-   pctx.set_style((PrintStyle)style);
+   pctx.set_style(static_cast<PrintStyle>(style));
 
 PrintBuffer pb(*this, pctx, &out);
    return out;
@@ -1525,7 +1534,7 @@ UCS_string ind(indent, UNI_ASCII_SPACE);
       }
    else
       {
-        out << ind << "Addr:    " << (const void *)this << endl
+        out << ind << "Addr:    " << CVOIP(this) << endl
             << ind << "Rank:    " << get_rank()  << endl
             << ind << "Shape:   " << get_shape() << endl
             << ind << "Flags:   " << get_flags();
@@ -1591,7 +1600,7 @@ Value::print_structure(ostream & out, int indent, ShapeItem idx) const
 {
    loop(i, indent)   out << "    ";
    if (indent)   out << "[" << idx << "] ";
-   out << "addr=" << (const void *)this
+   out << "addr=" << CVOIP(this)
        << " ≡" << compute_depth()
        << " ⍴" << get_shape()
        << " flags: " << HEX4(get_flags()) << "   "
@@ -1731,15 +1740,15 @@ Value::print_incomplete(ostream & out)
 Simple_string<Value *, false> incomplete;
 bool goon = true;
 
-   for (const DynamicObject * dob = all_values.get_prev();
+   for (DynamicObject * dob = all_values.get_prev();
         goon && (dob != &all_values); dob = dob->get_prev())
        {
-         Value * val = (Value *)dob;
+         Value * val = static_cast<Value *>(dob);
          goon = (dob != dob->get_prev());
 
          if (val->is_complete())   continue;
 
-         out << "incomplete value at " << (const void *)val << endl;
+         out << "incomplete value at " << CVOIP(val) << endl;
          incomplete.append(val);
 
          if (!goon)
@@ -1754,8 +1763,7 @@ bool goon = true;
    loop(s, incomplete.size())
       {
         incomplete[s]->print_stale_info(out,
-               (const DynamicObject *)
-               incomplete[s]);
+               static_cast<const DynamicObject *>(incomplete[s]));
        }
 
    return incomplete.size();
@@ -1771,15 +1779,15 @@ int count = 0;
 
    // first print addresses and remember stale values
    //
-   for (const DynamicObject * dob = all_values.get_prev();
+   for (DynamicObject * dob = all_values.get_prev();
         goon && (dob != &all_values); dob = dob->get_prev())
        {
-         Value * val = (Value *)dob;
+         Value * val = static_cast<Value *>(dob);
          goon = (dob == dob->get_prev());
 
          if (val->owner_count)   continue;
 
-         out << "stale value at " << (const void *)val << endl;
+         out << "stale value at " << CVOIP(val) << endl;
          stale_vals.append(val);
          stale_dobs.append(dob);
 
@@ -1808,10 +1816,10 @@ int count = 0;
 
    // print all values that are still marked
    //
-   for (const DynamicObject * dob = all_values.get_prev();
+   for (DynamicObject * dob = all_values.get_prev();
         dob != &all_values; dob = dob->get_prev())
        {
-         Value * val = (Value *)dob;
+         Value * val = static_cast<Value *>(dob);
 
          // don't print values found in the previous round.
          //
@@ -1843,7 +1851,7 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob)
    out << "print_stale_info():   alloc(" << dob->where_allocated()
        << ") flags(" << get_flags() << ")" << endl;
 
-   print_history(out, (const Value *)dob, LOC);
+   print_history(out, static_cast<const Value *>(dob), LOC);
 
    try 
       {

@@ -46,7 +46,7 @@ public:
    virtual bool greater(const Cell & other) const;
 
    /// overloaded Cell::equal()
-   virtual bool equal(const Cell & other, APL_Float qct) const;
+   virtual bool equal(const Cell & other, double qct) const;
 
    /// overloaded Cell::is_example_field()
    virtual bool is_example_field() const;

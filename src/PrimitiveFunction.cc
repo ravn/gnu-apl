@@ -322,7 +322,7 @@ Value_P Z(sh, LOC);
 Token
 Bif_F12_INDEX_OF::eval_AB(Value_P A, Value_P B)
 {
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 const APL_Integer qio = Workspace::get_IO();
 
    // Index of
@@ -723,7 +723,7 @@ const APL_Integer qio = Workspace::get_IO();
         if (B->get_rank() == MAX_RANK)   INDEX_ERROR;
 
         const APL_Float new_axis = X->get_ravel(0).get_real_value() - qio;
-        const Axis axis((new_axis < 0) ? -1 : new_axis);
+        Axis axis = new_axis;   if (new_axis < 0.0)   axis = -1;
         const Shape shape_Z = B->get_shape().insert_axis(axis + 1, 1);
         return ravel(shape_Z, B);
       }
@@ -820,9 +820,10 @@ const APL_Integer qio = Workspace::get_IO();
       }
 
 const APL_Float axis = cX.get_real_value() - qio;
-   if (axis <= -1.0)                                                 AXIS_ERROR;
-   if (axis >= (A->get_rank() + 1) && axis >= (B->get_rank() + 1))   AXIS_ERROR;
-   return laminate(A, Axis(axis + 1), B);
+   if (axis <= -1.0)   AXIS_ERROR;
+   if (axis >= (A->get_rank() + 1.0) &&
+       axis >= (B->get_rank() + 1.0))   AXIS_ERROR;
+   return laminate(A, Axis(axis + 1.0), B);
 }
 //-----------------------------------------------------------------------------
 Token
@@ -877,7 +878,7 @@ Bif_F12_DOMINO::eval_B(Value_P B)
 
    if (B->get_rank() == 1)   // inversion at the unit sphere
       {
-        const APL_Float qct = Workspace::get_CT();
+        const double qct = Workspace::get_CT();
         const ShapeItem len = B->get_shape_item(0);
         APL_Complex r2(0.0);
         loop(l, len)
@@ -1338,7 +1339,7 @@ const ShapeItem l_len_B = shape_B1.get_volume();
 
    if ((l_len_A != 1) && (h_len_B != 1) && (l_len_A != h_len_B))   LENGTH_ERROR;
 
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 
 const Shape shape_Z = shape_A1 + shape_B1;
 
@@ -1426,13 +1427,13 @@ const ShapeItem len = (len_A == 1) ? len_B : len_A;
         if (weight_f < SMALL_INT)   return true;
 
         const APL_Integer vB = cB[0].get_near_int();
-        value   += weight*vB;
-        value_f += weight_f*vB;
+        value   = value   + weight   * vB;
+        value_f = value_f + weight_f * vB;
         if (value_f > LARGE_INT)   return true;
         if (value_f < SMALL_INT)   return true;
 
-        weight   *= cA[0].get_near_int();
-        weight_f *= cA[0].get_near_int();
+        weight   = weight   * cA[0].get_near_int();
+        weight_f = weight_f * cA[0].get_near_int();
         if (len_A != 1)   --cA;
         if (len_B != 1)   cB -= dB;
       }
@@ -1461,8 +1462,10 @@ const ShapeItem len = (len_A == 1) ? len_B : len_A;
         if (len_B != 1)   cB -= dB;
       }
 
-   if (value < LARGE_INT && value > SMALL_INT && Cell::is_near_int(value))
-      new (cZ)   IntCell(value);
+   if (value < LARGE_INT &&
+       value > SMALL_INT &&
+       Cell::is_near_int(value))
+      new (cZ)   IntCell(Cell::near_int(value));
    else
       new (cZ)   FloatCell(value);
 }
@@ -1490,8 +1493,9 @@ const ShapeItem len = (len_A == 1) ? len_B : len_A;
       new (cZ)   ComplexCell(value);
    else if (value.imag() < -qct)
       new (cZ)   ComplexCell(value);
-   else if (value.real() < LARGE_INT && value.real() > SMALL_INT
-                              && Cell::is_near_int(value.real()))
+   else if (value.real() < LARGE_INT
+         && value.real() > SMALL_INT
+         && Cell::is_near_int(value.real()))
       new (cZ)   IntCell(value.real());
    else
       new (cZ)   FloatCell(value.real());
@@ -1515,7 +1519,7 @@ const ShapeItem ec_B = B->element_count();
 const ShapeItem ah = A->get_shape_item(0);    // first dimension
 const ShapeItem al = A->element_count()/ah;   // remaining dimensions
 
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 
 const Shape shape_Z = A->get_shape() + B->get_shape();
 const ShapeItem dZ = shape_Z.get_volume()/shape_Z.get_shape_item(0);
@@ -1672,7 +1676,7 @@ Bif_F12_ELEMENT::eval_AB(Value_P A, Value_P B)
 {
    // member
    //
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 const ShapeItem len_Z = A->element_count();
 const ShapeItem len_B = B->element_count();
 Value_P Z(A->get_shape(), LOC);
@@ -2689,7 +2693,7 @@ Bif_F12_EQUIV::eval_AB(Value_P A, Value_P B)
    // match
    //
 
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 const ShapeItem count = A->nz_element_count();  // compare at least prototype
 
    if (!A->same_shape(*B))   return Token(TOK_APL_VALUE1, IntScalar(0, LOC));   // no match
@@ -2719,7 +2723,7 @@ Bif_F12_NEQUIV::eval_AB(Value_P A, Value_P B)
    // match
    //
 
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 const ShapeItem count = A->nz_element_count();  // compare at least prototype
 
    if (!A->same_shape(*B))   return Token(TOK_APL_VALUE1, IntScalar(1, LOC));   // no match
@@ -2827,7 +2831,7 @@ Simple_string<ShapeItem, false> line_starts;
         if (result_utf8[r] == UNI_ASCII_LF)   line_starts.append(r + 1);
       }
 
-Value_P Z((ShapeItem)line_starts.size() - 1, LOC);
+Value_P Z(static_cast<ShapeItem>(line_starts.size() - 1), LOC);
    loop(l, line_starts.size() - 1)
       {
         ShapeItem len;
@@ -2851,7 +2855,7 @@ Bif_F12_UNION::eval_B(Value_P B)
 {
    if (B->get_rank() > 1)   RANK_ERROR;
 
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 const ShapeItem len_B = B->element_count();
    if (len_B <= 1)   return Token(TOK_APL_VALUE1, B->clone(LOC));
    if (len_B >= SHORT_VALUE_LENGTH_WANTED && !B->is_complex(false))

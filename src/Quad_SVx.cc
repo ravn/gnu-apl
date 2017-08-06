@@ -145,7 +145,7 @@ FILE * fp = popen(filename, "r");
         return;
       }
 
-   for (int cc; (cc = getc(fp)) != EOF;)   CERR << (char)cc;
+   for (int cc; (cc = getc(fp)) != EOF;)   CERR << char(cc);
    CERR << endl;
 
    pclose(fp);
@@ -304,7 +304,7 @@ Quad_SVE::get_apl_value() const
    //
 const APL_Float remaining = timer_end - now();
 
-   if (remaining < 0)   return IntScalar(0, LOC);
+   if (remaining < 0.0)   return IntScalar(0, LOC);
 
 Value_P Z(LOC);
    new (Z->next_ravel())   FloatCell(0.000001 * remaining);
@@ -578,7 +578,7 @@ const char * dirs[] = { "", "/APs" };
                 snprintf(expected, sizeof(expected), "AP%u", apnum);
                 if (strcmp(entry->d_name, expected))   continue;
 
-                processors.append((AP_num)apnum);
+                processors.append(static_cast<AP_num>(apnum));
              }
 
          closedir(dir);

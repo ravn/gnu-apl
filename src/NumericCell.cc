@@ -1322,7 +1322,7 @@ NumericCell::do_binomial(Cell * Z, APL_Integer K, APL_Integer N, bool negate)
 
         // the first element in the table is the max. N (including) for K
         //
-        if ((uint64_t)N <= table_K[0])
+        if (uint64_t(N) <= table_K[0])
            {
              const APL_Integer z = table_K[1 + (N - K)];
              if (negate)   new (Z) IntCell(-z);
@@ -1338,9 +1338,9 @@ non_integer:
    //
    if (N > 170)   DOMAIN_ERROR;
 
-double z  = tgamma(N + 1);          // N!
-       z /= tgamma(K + 1);          // ÷ K!
-       z /= tgamma((N - K) + 1);    // ÷ (N-K)!
+APL_Float z  = tgamma(N + 1);            // N!
+          z = z / tgamma(K + 1);         // ÷ K!
+          z = z / tgamma((N - K) + 1);   // ÷ (N-K)!
 
    new (Z) FloatCell(z);
 }
@@ -1348,8 +1348,8 @@ double z  = tgamma(N + 1);          // N!
 ErrorCode
 NumericCell::bif_binomial(Cell * Z, const Cell * A) const
 {
-   if (!A->is_numeric())            return E_DOMAIN_ERROR;
-   if (A->get_real_value() > 170)   return E_DOMAIN_ERROR;
+   if (!A->is_numeric())              return E_DOMAIN_ERROR;
+   if (A->get_real_value() > 170.0)   return E_DOMAIN_ERROR;
 
    if (!is_near_real() || !A->is_near_real())   // complex result
       {
@@ -1375,17 +1375,17 @@ NumericCell::bif_binomial(Cell * Z, const Cell * A) const
         const APL_Float r_1_b    = 1.0 + get_real_value();
         const APL_Float r_1_b__a = r_1_b - A->get_real_value();
 
-        if (r_1_a < 0    && is_near_int(r_1_a))      return E_DOMAIN_ERROR;
-        if (r_1_b < 0    && is_near_int(r_1_b))      return E_DOMAIN_ERROR;
-        if (r_1_b__a < 0 && is_near_int(r_1_b__a))   return E_DOMAIN_ERROR;
+        if (r_1_a < 0.0    && is_near_int(r_1_a))      return E_DOMAIN_ERROR;
+        if (r_1_b < 0.0    && is_near_int(r_1_b))      return E_DOMAIN_ERROR;
+        if (r_1_b__a < 0.0 && is_near_int(r_1_b__a))   return E_DOMAIN_ERROR;
 
-        const double rb = tgamma(r_1_b);
+        const APL_Float rb = tgamma(r_1_b);
         if (!isfinite(rb))   return E_DOMAIN_ERROR;
 
-        const double ra = tgamma(r_1_a);
+        const APL_Float ra = tgamma(r_1_a);
         if (!isfinite(ra))   return E_DOMAIN_ERROR;
 
-        const double r_b__a = tgamma(r_1_b__a);
+        const APL_Float r_b__a = tgamma(r_1_b__a);
         if (!isfinite(r_b__a))   return E_DOMAIN_ERROR;
 
         return FloatCell::zv(Z, (rb / ra) / r_b__a);
@@ -1393,7 +1393,7 @@ NumericCell::bif_binomial(Cell * Z, const Cell * A) const
 
    if (!A->is_near_int())   return E_DOMAIN_ERROR;
    if (!is_near_int())      return E_DOMAIN_ERROR;
-   if (is_float_cell() && get_real_value() > 0x7FFFFFFFFFFFFFFFLL)
+   if (is_float_cell() && 0x7FFFFFFFFFFFFFFFLL < get_real_value())
       return E_DOMAIN_ERROR;
 
 const APL_Integer a = A->get_checked_near_int();
@@ -1422,7 +1422,7 @@ int how = 0;
 ErrorCode
 NumericCell::bif_and(Cell * Z, const Cell * A) const
 {
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 
    // if either value is 0 then return 0
    //
@@ -1468,8 +1468,9 @@ const APL_Float qct = Workspace::get_CT();
         APL_Integer gcd;
         const ErrorCode err = int_gcd(gcd, a, b);
         if (err)   return err;
-        const double lcm_double = ((double)a) * ((double)b) / ((double)gcd);
-        if (lcm_double > LARGE_INT || lcm_double < SMALL_INT)
+        const APL_Float lcm_double = 1.0 * a * b / gcd;
+        if (lcm_double > LARGE_INT ||
+            lcm_double < SMALL_INT)
            {
              new (Z) FloatCell(lcm_double);
            }
@@ -1490,7 +1491,8 @@ const APL_Float qct = Workspace::get_CT();
         APL_Float gcd;
         const ErrorCode err = flt_gcd(gcd, a, b, qct);
         if (err)   return err;
-        new (Z) FloatCell(a * (b / gcd));
+        const APL_Float b_gcd = b / gcd;
+        new (Z) FloatCell(a * b_gcd);
         return E_NO_ERROR;
       }
 
@@ -1516,7 +1518,7 @@ NumericCell::bif_nor(Cell * Z, const Cell * A) const
 ErrorCode
 NumericCell::bif_or(Cell * Z, const Cell * A) const
 {
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 
    // if both args are boolean then return the classical A ∨ B
    //
@@ -1584,8 +1586,8 @@ const APL_Float qct = Workspace::get_CT();
 APL_Complex
 NumericCell::cpx_max_real(APL_Complex a)
 {
-const double r_abs = a.real() < 0 ? -a.real() : a.real();
-const double i_abs = a.imag() < 0 ? -a.imag() : a.imag();
+APL_Float r_abs = a.real();   if (r_abs < 0.0) r_abs = -r_abs;
+APL_Float i_abs = a.imag();   if (i_abs < 0.0) i_abs = -i_abs;
 APL_Complex z;
 
    if (r_abs < i_abs)   // multiply by i in order to exchange real and imag
@@ -1597,7 +1599,7 @@ APL_Complex z;
         z = a;
      }
 
-   if (z.real() < 0)   // multiply by -1 in order to make z.real positive
+   if (z.real() < 0.0)   // multiply by -1 in order to make z.real positive
       {
         z = APL_Complex(- z.real(), - z.imag());
       }
@@ -1608,34 +1610,17 @@ APL_Complex z;
 ErrorCode
 NumericCell::int_gcd(APL_Integer & z, APL_Integer a, APL_Integer b)
 {
-   if ((uint64_t)a == 0x8000000000000000ULL)   return E_DOMAIN_ERROR;
-   if ((uint64_t)b == 0x8000000000000000ULL)   return E_DOMAIN_ERROR;
-
-   if (a < 0)   a = - a;
-   if (b < 0)   b = - b;
-   if (b < a)
-      {
-         const APL_Integer _b = b;
-         b = a;
-         a = _b;
-      }
-
-   // at this point 0 ≤ a ≤ b
-   //
-   for (;;)
-       {
-         if (a == 0)   { z = b;   return E_NO_ERROR; }
-         const APL_Integer r = b%a;
-         b = a;
-         a = r;
-       }
+   if (uint64_t(a) == 0x8000000000000000ULL)   return E_DOMAIN_ERROR;
+   if (uint64_t(b) == 0x8000000000000000ULL)   return E_DOMAIN_ERROR;
+   z = FloatCell::gcd(a, b);
+   return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------
 ErrorCode
-NumericCell::flt_gcd(APL_Float & z, APL_Float a, APL_Float b, APL_Float qct)
+NumericCell::flt_gcd(APL_Float & z, APL_Float a, APL_Float b, double qct)
 {
-   if (a < 0)   a = - a;
-   if (b < 0)   b = - b;
+   if (a < 0.0)   a = - a;
+   if (b < 0.0)   b = - b;
    if (b < a)
       {
          const APL_Float _b = b;
@@ -1655,18 +1640,24 @@ NumericCell::flt_gcd(APL_Float & z, APL_Float a, APL_Float b, APL_Float qct)
 }
 //-----------------------------------------------------------------------------
 ErrorCode
-NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b,
-                     APL_Float qct)
+NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b, double qct)
 {
+   // compute the GCD of complex a and b; a and b must either i(1) be both real
+   // or (2) both be GAUSSIAN integers. Return E_DOMAIN_ERROR otherwise.
+   //
    if (is_near_zero(a.imag()) && is_near_zero(b.imag()))
       {
-        APL_Float zz = 0;
+        // case (1): a and b are real...
+        //
+        APL_Float zz;
         ErrorCode err = flt_gcd(zz, a.real(), b.real(), qct);
         if (err)   return err;
-        z = APL_Complex(zz, 0);
+        z = APL_Complex(zz, 0.0);
         return E_NO_ERROR;
       }
 
+   // case (2) ?
+   //
    if (!is_near_int(a.real()))   return E_DOMAIN_ERROR;
    if (!is_near_int(a.imag()))   return E_DOMAIN_ERROR;
    if (!is_near_int(b.real()))   return E_DOMAIN_ERROR;
@@ -1693,8 +1684,8 @@ NumericCell::cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b,
               return E_NO_ERROR;
             }
 
-         const APL_Complex xy = b/a;
-         const APL_Complex q(round(xy.real()), round(xy.imag()));
+         const APL_Complex quot = b/a;
+         const APL_Complex q(round(quot.real()), round(quot.imag()));
          const APL_Complex r(b - q*a);
 
          b = a;

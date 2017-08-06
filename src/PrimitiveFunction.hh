@@ -747,7 +747,7 @@ protected:
    /// return \b true iff \b cell is different from all \b others within \b qct
    static bool is_unique(const Cell & cell,
                          Simple_string<const Cell *, false> & others,
-                         APL_Float qct)
+                         double qct)
       { loop(z, others.size())
             { if (others[z]->equal(cell, qct))  return false; }
         return true;

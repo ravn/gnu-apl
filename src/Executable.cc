@@ -105,7 +105,7 @@ Executable::~Executable()
 {
    Log(LOG_UserFunction__fix)
       {
-        CERR << "deleting Executable " << (const void *)this
+        CERR << "deleting Executable " << CVOIP(this)
              << " (body size=" << body.size() << ")" << endl;
       }
 
@@ -241,7 +241,7 @@ Token_string out;
    Log(LOG_UserFunction__set_line)
       {
         CERR << "[final line " << line << "] ";
-        out.print(CERR);
+        out.print(CERR, false);
       } 
 
    loop(t, out.size())   body.append(out[t], LOC);
@@ -268,7 +268,7 @@ Executable::print_token(ostream & out) const
    out << endl
        <<  "Function body [" << body.size() << " token]:" << endl;
 
-   body.print(out);
+   body.print(out, false);
 }
 //-----------------------------------------------------------------------------
 void
@@ -668,7 +668,7 @@ int level = 0;
         lambda_body.append(ret_void, LOC);
       }
 
-   return (Fun_signature)signature;
+   return static_cast<Fun_signature>(signature);
 }
 //-----------------------------------------------------------------------------
 UCS_string
@@ -855,7 +855,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
    Log(LOG_UserFunction__fix)
       {
         CERR << "fix pmode=execute list:" << endl << data
-             << " addr " << (const void *)fun << endl
+             << " addr " << CVOIP(fun) << endl
              << "------------------- ExecuteList::fix() --" << endl;
       }
 
@@ -909,7 +909,7 @@ StatementList * fun = new StatementList(data, loc);
    Log(LOG_UserFunction__fix)
       {
         CERR << "fix pmode=statement list:" << endl << data << endl
-             << " addr " << (const void *)fun << endl
+             << " addr " << CVOIP(fun) << endl
              << "------------------- StatementList::fix() --" << endl;
       }
 

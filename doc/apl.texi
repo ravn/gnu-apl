@@ -2080,15 +2080,15 @@ which control some details of how APL values are being printed. The default
 value of ⎕PS is 0 0. ⎕PS is a session variable which survives )LOADing of
 workspaces
 
-⎕PS[0] = 0: print rational quotients normal floating point number
-⎕PS[0] = 1: print rational quotients as A÷B
+⎕PS[1] = 0: print rational quotients normal floating point number
+⎕PS[1] = 1: print rational quotients as A÷B
 
-⎕PS[0] has only an effect if rational numbers was ./configure'd.
+⎕PS[1] has only an effect if rational numbers was ./configure'd.
 
-⎕PS[1] = 0: no "boxing" of APL values
-⎕PS[1] > 0: "boxing" of APL values
+⎕PS[2] = 0: no "boxing" of APL values
+⎕PS[2] > 0: "boxing" of APL values
 
-Setting ⎕PS[1] has the same effect as the debug command ]BOXING and uses
+Setting ⎕PS[2] has the same effect as the debug command ]BOXING and uses
 the same values.
 
 @node    Section 3.19
@@ -2100,7 +2100,8 @@ internally until some function requires a conversion to a floating point
 (double) value.
 
 Currently only +, -, ×, and ÷ preserve rational numbers where possible, but
-this list may grow in the future.
+this list may grow in the future. Monadic + (a noop for non-complex numbers)
+explicitly converts rational numbers to floating point numbers.
 
 A quotient is internally stored as a 64-bit numerator and a 64-bit denominator.
 In some cases arithmetic with rational numbers is faster than with doubles, but

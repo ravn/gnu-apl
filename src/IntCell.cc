@@ -46,71 +46,73 @@ IntCell::get_cell_subtype() const
    if (value.ival < 0)   // negative integer (only fits in signed containers)
       {
         if (-value.ival <= 0x80)
-           return (CellType)(CT_INT | CTS_S8 | CTS_S16 | CTS_S32 | CTS_S64);
+           return static_cast<CellType>(CT_INT |
+                                        CTS_S8 | CTS_S16 | CTS_S32 | CTS_S64);
 
         if (-value.ival <= 0x8000)
-           return (CellType)(CT_INT | CTS_S16 | CTS_S32 | CTS_S64);
+           return static_cast<CellType>(CT_INT |
+                                        CTS_S16 | CTS_S32 | CTS_S64);
 
         if (-value.ival <= 0x80000000)
-           return (CellType)(CT_INT | CTS_S32 | CTS_S64);
+           return static_cast<CellType>(CT_INT | CTS_S32 | CTS_S64);
 
-        return (CellType)(CT_INT | CTS_S64);
+        return static_cast<CellType>(CT_INT | CTS_S64);
       }
 
    // positive integer
    //
    if (value.ival == 0)   // 0: bit (fits in all containers)
-      return (CellType)(CT_INT | CTS_BIT |
-                                 CTS_X8  | CTS_S8  | CTS_U8  |
-                                 CTS_X16 | CTS_S16 | CTS_U16 |
-                                 CTS_X32 | CTS_S32 | CTS_U32 |
-                                 CTS_X64 | CTS_S64 | CTS_U64);
+      return static_cast<CellType>(CT_INT | CTS_BIT |
+                                   CTS_X8  | CTS_S8  | CTS_U8  |
+                                   CTS_X16 | CTS_S16 | CTS_U16 |
+                                   CTS_X32 | CTS_S32 | CTS_U32 |
+                                   CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival == 1)   // 1: bit (fits in all containers)
-      return (CellType)(CT_INT | CTS_BIT |
-                                 CTS_X8  | CTS_S8  | CTS_U8  |
-                                 CTS_X16 | CTS_S16 | CTS_U16 |
-                                 CTS_X32 | CTS_S32 | CTS_U32 |
-                                 CTS_X64 | CTS_S64 | CTS_U64);
+      return static_cast<CellType>(CT_INT | CTS_BIT |
+                                   CTS_X8  | CTS_S8  | CTS_U8  |
+                                   CTS_X16 | CTS_S16 | CTS_U16 |
+                                   CTS_X32 | CTS_S32 | CTS_U32 |
+                                   CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0x7F)
-      return (CellType)(CT_INT | CTS_X8  | CTS_S8  | CTS_U8  |
-                                 CTS_X16 | CTS_S16 | CTS_U16 |
-                                 CTS_X32 | CTS_S32 | CTS_U32 |
-                                 CTS_X64 | CTS_S64 | CTS_U64);
+      return static_cast<CellType>(CT_INT | CTS_X8  | CTS_S8  | CTS_U8  |
+                                   CTS_X16 | CTS_S16 | CTS_U16 |
+                                   CTS_X32 | CTS_S32 | CTS_U32 |
+                                   CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0xFF)
-      return (CellType)(CT_INT |                     CTS_U8  |
-                                 CTS_X16 | CTS_S16 | CTS_U16 |
-                                 CTS_X32 | CTS_S32 | CTS_U32 |
-                                 CTS_X64 | CTS_S64 | CTS_U64);
+      return static_cast<CellType>(CT_INT |                     CTS_U8  |
+                                   CTS_X16 | CTS_S16 | CTS_U16 |
+                                   CTS_X32 | CTS_S32 | CTS_U32 |
+                                   CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0x7FFF)
-      return (CellType)(CT_INT | CTS_X16 | CTS_S16 | CTS_U16 |
-                                 CTS_X32 | CTS_S32 | CTS_U32 |
-                                 CTS_X64 | CTS_S64 | CTS_U64);
+      return static_cast<CellType>(CT_INT | CTS_X16 | CTS_S16 | CTS_U16 |
+                                   CTS_X32 | CTS_S32 | CTS_U32 |
+                                   CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0xFFFF)
-      return (CellType)(CT_INT |                     CTS_U16 |
-                                 CTS_X32 | CTS_S32 | CTS_U32 |
-                                 CTS_X64 | CTS_S64 | CTS_U64);
+      return static_cast<CellType>(CT_INT |                     CTS_U16 |
+                                   CTS_X32 | CTS_S32 | CTS_U32 |
+                                   CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0x7FFFFFFF)
-      return (CellType)(CT_INT | CTS_X32 | CTS_S32 | CTS_U32 |
-                                 CTS_X64 | CTS_S64 | CTS_U64);
+      return static_cast<CellType>(CT_INT | CTS_X32 | CTS_S32 | CTS_U32 |
+                                   CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0xFFFFFFFF)
-      return (CellType)(CT_INT |                     CTS_U32 |
-                                 CTS_X64 | CTS_S64 | CTS_U64);
+      return static_cast<CellType>(CT_INT |                     CTS_U32 |
+                                   CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0x7FFFFFFFFFFFFFFFLL)   // note: this is always the case
-      return (CellType)(CT_INT | CTS_X64 | CTS_S64 | CTS_U64);
+      return static_cast<CellType>(CT_INT | CTS_X64 | CTS_S64 | CTS_U64);
 
-   return (CellType)(CT_INT | CTS_U64);
+   return static_cast<CellType>(CT_INT | CTS_U64);
 }
 //-----------------------------------------------------------------------------
 bool
-IntCell::equal(const Cell & other, APL_Float qct) const
+IntCell::equal(const Cell & other, double qct) const
 {
    if (other.is_integer_cell())    return value.ival == other.get_int_value();
    if (!other.is_numeric())        return false;
@@ -363,7 +365,7 @@ IntCell::bif_conjugate(Cell * Z) const
 ErrorCode
 IntCell::bif_negative(Cell * Z) const
 {
-   if ((uint64_t)value.ival == 0x8000000000000000LL)   // integer overflow
+   if (uint64_t(value.ival) == 0x8000000000000000LL)   // integer overflow
       new (Z) FloatCell(- value.ival);
    else
       new (Z) IntCell(- value.ival);
@@ -447,7 +449,7 @@ IntCell::bif_exponential(Cell * Z) const
 {
    // e to the B-th power
    //
-   new (Z) FloatCell(exp((APL_Float)value.ival));
+   new (Z) FloatCell(exp(APL_Float(value.ival)));
    return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -458,7 +460,7 @@ IntCell::bif_nat_log(Cell * Z) const
 
    if (value.ival > 0)
       {
-        new (Z) FloatCell(log((APL_Float)value.ival));
+        new (Z) FloatCell(log(APL_Float(value.ival)));
       }
    else
       {
@@ -485,10 +487,11 @@ IntCell::bif_add(Cell * Z, const Cell * A) const
         //
         const APL_Integer a = A->get_int_value();
         const APL_Integer b =    get_int_value();
-        const APL_Float sum = a + (APL_Float)b;
+        const APL_Float sum = APL_Float(a) + APL_Float(b);
 
-        if (sum > LARGE_INT || sum < SMALL_INT)   new (Z) FloatCell(sum);
-        else                                      new (Z) IntCell(a + b);
+        if (sum > LARGE_INT ||
+            sum < SMALL_INT)   new (Z) FloatCell(sum);
+        else                   new (Z) IntCell(a + b);
         return E_NO_ERROR;
       }
 
@@ -506,10 +509,11 @@ IntCell::bif_subtract(Cell * Z, const Cell * A) const
         //
         const APL_Integer a = A->get_int_value();
         const APL_Integer b =    get_int_value();
-        const APL_Float diff = a - (APL_Float)b;
+        const APL_Float diff = a - APL_Float(b);
 
-        if (diff > LARGE_INT || diff < SMALL_INT)   new (Z) FloatCell(diff);
-        else                                        new (Z) IntCell(a - b);
+        if (diff > LARGE_INT ||
+            diff < SMALL_INT)   new (Z) FloatCell(diff);
+        else                    new (Z) IntCell(a - b);
         return E_NO_ERROR;
       }
 
@@ -548,7 +552,7 @@ IntCell::bif_divide(Cell * Z, const Cell * A) const
         return FloatCell::zv(Z, a/gcd, b/gcd);
 #else
         const APL_Float i_quot = a / b;
-        const APL_Float r_quot = a / (APL_Float)b;
+        const APL_Float r_quot = a / APL_Float(b);
 
         if (a != i_quot * b)   return FloatCell::zv(Z, r_quot);
         else                   return IntCell::zv(Z, i_quot);
@@ -570,10 +574,11 @@ IntCell::bif_multiply(Cell * Z, const Cell * A) const
         //
         const APL_Integer a = A->get_int_value();
         const APL_Integer b =    get_int_value();
-        const APL_Float prod = a * (APL_Float)b;
+        const APL_Float prod = APL_Float(a) * APL_Float(b);
 
-        if (prod > LARGE_INT || prod < SMALL_INT)   new (Z) FloatCell(prod);
-        else                                        new (Z) IntCell(a * b);
+        if (prod > LARGE_INT ||
+            prod < SMALL_INT)   new (Z) FloatCell(prod);
+        else                    new (Z) IntCell(a * b);
         return E_NO_ERROR;
       }
 
@@ -637,7 +642,7 @@ const bool invert_Z = b < 0;
            {
              if (b1 & 1)
                 {
-                  if ((uint64_t)zi >= 0x7FFFFFFFFFFFFFFFULL / a_2_n)
+                  if (uint64_t(zi) >= 0x7FFFFFFFFFFFFFFFULL/a_2_n)
                      {
                        overflow = true;
                        break;
@@ -672,7 +677,9 @@ const bool invert_Z = b < 0;
 
         // A and B are integers, but Z is too big for integers
         //
-        APL_Float z = pow((APL_Float)a, (APL_Float)b);
+        const APL_Float af(a);
+        const APL_Float bf(b);
+        APL_Float z = pow(af, bf);
 
         if (negate_Z)   z = - z;
         if (invert_Z)   z = 1.0 / z;
@@ -682,34 +689,33 @@ const bool invert_Z = b < 0;
 
    if (A->is_float_cell())
       {
-        APL_Float a = A->get_real_value();
-        const bool negate_Z = (a < 0) && (b & 1);
-        if (a < 0)   a = -a;
+        APL_Float af = A->get_real_value();
+        const APL_Float bf(b);
+        const bool negate_Z = (af < 0.0) && (b & 1);
+        if (af < 0.0)   af = -af;
 
-        APL_Float z = pow(a, (APL_Float)b);
+        APL_Float z = pow(af, bf);
         if (negate_Z)   z = - z;
         if (invert_Z)
            {
              if (z == 0.0)   return E_DOMAIN_ERROR;
              z = 1.0 / z;
            }
-        new (Z) FloatCell(z);
-        return E_NO_ERROR;
+        return FloatCell::zv(Z, z);
       }
 
    // complex A to the B-th power
    //
    {
-     APL_Complex a = A->get_complex_value();
+     APL_Complex ca = A->get_complex_value();
+     APL_Complex cb(APL_Float(b), 0.0);
 
-     APL_Complex z = pow(a, (APL_Complex)b);
-     if (invert_Z)
-        {
-             if (z == 0.0)   return E_DOMAIN_ERROR;
-             z = 1.0 / z;
-        }
-        new (Z) ComplexCell(z);
-        return E_NO_ERROR;
+     APL_Complex z = complex_power(ca, cb);
+     const APL_Float denom = ComplexCell::mag2(z);
+     if (!invert_Z)   return ComplexCell::zv(Z, z);
+
+     if (denom == 0.0)   return E_DOMAIN_ERROR;
+     return ComplexCell::zv(Z, z.real() / denom, - z.imag() / denom);
    }
 }
 //-----------------------------------------------------------------------------
@@ -718,7 +724,7 @@ IntCell::bif_residue(Cell * Z, const Cell * A) const
 {
    if (!A->is_numeric())   return E_DOMAIN_ERROR;
 
-   if (A->get_imag_value() != 0)   // complex A
+   if (A->get_imag_value() != 0.0)   // complex A
       {
         ComplexCell B(value.ival, 0);
         return B.bif_residue(Z, A);
@@ -737,7 +743,7 @@ const APL_Float a = A->get_real_value();
    //
 const APL_Float quot = value.ival / a;
 const APL_Float qf = floor(quot);
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
    if (qct != 0)
       {
         const APL_Float qc = ceil(quot);
@@ -770,8 +776,8 @@ APL_Float z = value.ival - a * qf;
 
    // make ×Z == ×A
    //
-   if      (a < 0 && z > 0)   z += a;   // += since a < 0
-   else if (a > 0 && z < 0)   z += a;
+   if      (a < 0.0 && z > 0.0)   z = z + a;   // += since a < 0
+   else if (a > 0.0 && z < 0.0)   z = z + a;
 
    return FloatCell::zv(Z, z);
 }
@@ -826,7 +832,7 @@ IntCell::compare(const Cell & other) const
 
    if (other.is_numeric())   // float or complex
       {
-        return (Comp_result)(-other.compare(*this));
+        return static_cast<Comp_result>(-other.compare(*this));
       }
 
    DOMAIN_ERROR;
@@ -875,7 +881,7 @@ IntCell::character_representation(const PrintContext & pctx) const
       }
 
 char cc[40];
-int len = snprintf(cc, sizeof(cc), "%lld", (long long)(value.ival));
+int len = snprintf(cc, sizeof(cc), "%lld", static_cast<long long>(value.ival));
 
 UCS_string ucs;
 

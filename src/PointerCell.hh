@@ -49,9 +49,9 @@ public:
    virtual bool greater(const Cell & other) const;
 
    /// overloaded Cell::equal()
-   virtual bool equal(const Cell & other, APL_Float qct) const;
+   virtual bool equal(const Cell & other, double qct) const;
 
-   /// compare this with other, throw DOMAIN ERROR on illegal comparisons
+   /// compare \b this with other, throw DOMAIN ERROR on illegal comparisons
    virtual Comp_result compare(const Cell & other) const;
 
    /// overloaded Cell::release()
@@ -62,7 +62,7 @@ public:
 
    /// return the owner of this PointerCell
    Value * get_cell_owner() const
-      { return value2.owner; }
+      { return value.pval.owner; }
 
 protected:
    ///  overloaded Cell::get_cell_type()

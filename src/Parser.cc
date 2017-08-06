@@ -68,7 +68,7 @@ Parser::parse(const Token_string & input, Token_string & tos) const
    Log(LOG_parse)
       {
         CERR << "parse 1 [" << input.size() << "]: ";
-        input.print(CERR);
+        input.print(CERR, true);
         CERR << endl;
       }
 
@@ -132,7 +132,7 @@ Parser::parse_statement(Token_string & tos)
    Log(LOG_parse)
       {
         CERR << "parse 2 [" << tos.size() << "]: ";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 
    // 2. convert groups like '(' val val...')' into single APL values
@@ -148,7 +148,7 @@ Parser::parse_statement(Token_string & tos)
    Log(LOG_parse)
       {
         CERR << "parse 3 [" << tos.size() << "]: ";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 
    // 3. convert vectors like 1 2 3 or '1' 2 '3' into single APL values
@@ -167,7 +167,7 @@ Parser::parse_statement(Token_string & tos)
    Log(LOG_parse)
       {
         CERR << "parse 4 [" << tos.size() << "]: ";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 
    // 4. mark symbol left of ← as LSYMB
@@ -176,7 +176,7 @@ Parser::parse_statement(Token_string & tos)
    Log(LOG_parse)
       {
         CERR << "parse 5 [" << tos.size() << "]: ";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 
    // 5. update distances between (), [], and {}
@@ -199,7 +199,7 @@ Parser::collect_constants(Token_string & tos)
    Log(LOG_collect_constants)
       {
         CERR << "collect_constants [" << tos.size() << " token] in: ";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 
    // convert several items in vector notation into a single APL value
@@ -209,12 +209,12 @@ Parser::collect_constants(Token_string & tos)
         int to;
         switch(tos[t].get_tag())
            {
-             case TOK_CHARACTER:
-             case TOK_INTEGER:
-             case TOK_REAL:
-             case TOK_COMPLEX:
              case TOK_APL_VALUE1:
              case TOK_APL_VALUE3:
+             case TOK_CHARACTER:
+             case TOK_COMPLEX:
+             case TOK_INTEGER:
+             case TOK_REAL:
                   break;          // continue below
 
              default: continue;   // nex token
@@ -259,7 +259,7 @@ Parser::collect_constants(Token_string & tos)
    Log(LOG_collect_constants)
       {
         CERR << "collect_constants [" << tos.size() << " token] out: ";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 }
 //-----------------------------------------------------------------------------
@@ -269,7 +269,7 @@ Parser::collect_groups(Token_string & tos)
    Log(LOG_collect_constants)
       {
         CERR << "collect_groups [" << tos.size() << " token] in: ";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 
 int opening = -1;
@@ -309,7 +309,7 @@ int opening = -1;
                       {
                         CERR << "collect_groups [" << tos.size()
                              << " token] out: ";
-                        tos.print(CERR);
+                        tos.print(CERR, true);
                       }
                    return true;
 
@@ -602,7 +602,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
       {
         CERR << "create_value(" << __LINE__ << ") tos[" << tos.size()
              <<  "]  pos " << pos << " count " << count << " in:";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 
    if (count == 1)   create_scalar_value(tos[pos]);
@@ -612,7 +612,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
       {
         CERR << "create_value(" << __LINE__ << ") tos[" << tos.size()
              <<  "]  pos " << pos << " count " << count << " out:";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 }
 //-----------------------------------------------------------------------------
@@ -729,7 +729,7 @@ Token tok(TOK_APL_VALUE3, vector);
    Log(LOG_create_value)
       {
         CERR << "create_value [" << tos.size() << " token] out: ";
-        tos.print(CERR);
+        tos.print(CERR, true);
       }
 }
 //-----------------------------------------------------------------------------

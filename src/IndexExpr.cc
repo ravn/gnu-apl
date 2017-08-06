@@ -137,7 +137,7 @@ int count = 0;
    for (const DynamicObject * dob = all_index_exprs.get_next();
         dob != &all_index_exprs; dob = dob->get_next())
        {
-         const IndexExpr * idx = (const IndexExpr *)dob;
+         const IndexExpr * idx = reinterpret_cast<const IndexExpr *>(dob);
 
          out << dob->where_allocated();
 
@@ -161,7 +161,7 @@ IndexExpr::erase_stale(const char * loc)
    for (DynamicObject * vb = all_index_exprs.get_next();
         vb != &all_index_exprs; vb = vb->get_next())
        {
-         IndexExpr * v = (IndexExpr *)vb;
+         IndexExpr * v = reinterpret_cast<IndexExpr *>(vb);
 
          Log(LOG_Value__erase_stale)
             {
@@ -170,8 +170,8 @@ IndexExpr::erase_stale(const char * loc)
             }
 
          vb = vb->get_prev();
-         ((IndexExpr *)(vb->get_next()))->unlink();
-         delete (IndexExpr *)(vb->get_next());
+         reinterpret_cast<IndexExpr *>(vb->get_next())->unlink();
+         delete reinterpret_cast<IndexExpr *>(vb->get_next());
        }
 }
 //-----------------------------------------------------------------------------

@@ -83,7 +83,7 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
    else if (other.is_lval_cell())
       {
         new (this) LvalCell(other.get_lval_value(),
-                            ((const LvalCell *)&other)->get_cell_owner());
+                 reinterpret_cast<const LvalCell *>(&other)->get_cell_owner());
       }
    else if (other.is_character_cell())
       {
@@ -114,7 +114,7 @@ Cell::greater(const Cell & other) const
 }
 //-----------------------------------------------------------------------------
 bool
-Cell::equal(const Cell & other, APL_Float qct) const
+Cell::equal(const Cell & other, double qct) const
 {
    MORE_ERROR() << "Cell::equal() : Objects of class " << get_classname()
                 << " cannot be compared";
@@ -127,8 +127,8 @@ Cell::is_near_int(APL_Float value)
    if (value > LARGE_INT)   return true;
    if (value < SMALL_INT)   return true;
 
-const double result = nearbyint(value);
-const double diff = value - result;
+const APL_Float result = nearbyint(value);
+const APL_Float diff = value - result;
    if (diff >= INTEGER_TOLERANCE)    return false;
    if (diff <= -INTEGER_TOLERANCE)   return false;
 
@@ -141,24 +141,24 @@ Cell::near_int(APL_Float value)
    if (value >= LARGE_INT)   DOMAIN_ERROR;
    if (value <= SMALL_INT)   DOMAIN_ERROR;
 
-const double result = nearbyint(value);
-const double diff = value - result;
-   if (diff > INTEGER_TOLERANCE)    DOMAIN_ERROR;
+const APL_Float result = nearbyint(value);
+const APL_Float diff = value - result;
+   if (diff >  INTEGER_TOLERANCE)   DOMAIN_ERROR;
    if (diff < -INTEGER_TOLERANCE)   DOMAIN_ERROR;
 
-   if (result > 0)   return   APL_Integer(0.3 + result);
-   else              return - APL_Integer(0.3 - result);
+   if (result > 0.0)   return   APL_Integer(0.3 + result);
+   else                return - APL_Integer(0.3 - result);
 }
 //-----------------------------------------------------------------------------
 bool
 Cell::greater_vec(const IntCell & Za, const IntCell & Zb, const void * comp_arg)
 {
 struct _ctx { const Cell * base;   ShapeItem comp_len; };
-const _ctx * ctx = (const _ctx *)comp_arg;
+const _ctx * ctx = reinterpret_cast<const _ctx *>(comp_arg);
 const Cell * ca = ctx->base + ctx->comp_len * Za.get_int_value();
 const Cell * cb = ctx->base + ctx->comp_len * Zb.get_int_value();
 
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 
    // most frequently comp_len is 1, so we optimize for this case.
    //
@@ -185,11 +185,11 @@ bool
 Cell::smaller_vec(const IntCell & Za, const IntCell & Zb, const void * comp_arg)
 {
 struct _ctx { const Cell * base;   ShapeItem comp_len; };
-const _ctx * ctx = (const _ctx *)comp_arg;
+const _ctx * ctx = reinterpret_cast<const _ctx *>(comp_arg);
 const Cell * ca = ctx->base + ctx->comp_len * Za.get_int_value();
 const Cell * cb = ctx->base + ctx->comp_len * Zb.get_int_value();
 
-const APL_Float qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 
    // most frequently comp_len is 1, so we optimize for this case.
    //
