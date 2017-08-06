@@ -69,9 +69,6 @@ public:
         return true;
       }
 
-   /// display bytes in this UTF string
-   ostream & dump_hex(ostream & out, int max_bytes) const;
-
    /// return this string as a C-string (appending a 0-byte)
    const char * c_str()
       {
@@ -79,6 +76,13 @@ public:
         items[items_valid] = 0;   // the terminating 0
         return reinterpret_cast<const char *>(items);
       }
+
+   /// append a 0-terminated C string
+   void append_str(const char * str)
+      { const UTF8_string str_utf(str);  append(str_utf); }
+
+   /// display bytes in this UTF string
+   ostream & dump_hex(ostream & out, int max_bytes) const;
 
    /// return true iff string ends with ext (usually a file name extennsion)
    bool ends_with(const char * ext) const;
@@ -89,9 +93,10 @@ public:
    /// skip over < ... > and expand &lt; and friends
    int un_HTML(int in_HTML);
 
-   /// append a 0-terminated C string
-   void append_str(const char * str)
-      { const UTF8_string str_utf(str);  append(str_utf); }
+   /// round a digit string is the fractional part of a number between
+   /// 0.0... and 0.9... up or down according to its last digit, return true
+   /// if the exponent shall be increased (because 1.0 -> 0.1)
+   bool round_0_1();
 
    /// convert the first char in UTF8-encoded string to Unicode,
    /// setting len to the number of bytes in the UTF8 encoding of the char

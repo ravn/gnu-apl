@@ -159,19 +159,20 @@ public:
         ++items_valid;
       }
 
-   /// forget last element
+   /// forget (snf maybe desctruct) the last item
     void pop()
       {
         Assert(items_valid > 0);
         --items_valid;
+        if (has_destructor)  (items + items_valid)->~T();
       }
 
    /// decrease size to \b new_size
    void shrink(ShapeItem new_size)
       {
         Assert((items_valid - new_size) >= 0);
-        if (has_destructor)   while (items_valid)   pop();
-        items_valid = new_size;
+        if (has_destructor)   while ((items_valid - new_size) > 0)   pop();
+        else                  items_valid = new_size;
       }
 
    /// erase \b one item, at \b pos

@@ -70,7 +70,8 @@ public:
    APL_Float dfval() const
       {
         if (const APL_Integer denom = get_denominator())
-           return ((APL_Float)get_numerator())/(APL_Float)denom;
+           return static_cast<APL_Float>(get_numerator())
+                / static_cast<APL_Float>(denom);
         return value.fval.u1.flt;
       }
 
@@ -92,7 +93,7 @@ public:
    virtual void release(const char * loc)
       {
         if (get_denominator() == 0)   // APL_Float class used
-           release_APL_Float((APL_Float *)&value.fval.u1.flt);
+           release_APL_Float(reinterpret_cast<APL_Float *>&value.fval.u1.flt);
       }
 # endif
 

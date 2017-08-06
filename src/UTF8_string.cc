@@ -336,6 +336,37 @@ bool got_tag = false;
    return in_HTML;
 }
 //-----------------------------------------------------------------------------
+bool
+UTF8_string::round_0_1()
+{
+   if (last() >= '5')   // round up
+      {
+        // rounding up of the last digit creates a carry
+        //
+        for (int j = size() - 2; j >= 0; --j)
+            {
+              if (at(j) == '9')   // propagate carry
+                 {
+                   at(j) = '0';
+                   continue;      // carry survived
+                 }
+
+              // eat carry
+              //
+              ++at(j);
+              pop();   // discard last digit.
+              return false;   // no carry
+            }
+      }
+
+   // if carry survived then digits were 0.999... and were then rounded
+   // up to 1.000...
+   //
+   at(0) = '1';
+   pop();
+   return true;   // 1.0 → 0.1
+}
+//-----------------------------------------------------------------------------
 ostream &
 operator<<(ostream & os, const UTF8_string & utf)
 {

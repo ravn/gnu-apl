@@ -904,7 +904,8 @@ const APL_Integer qio = Workspace::get_IO();
         else if (x == SYL_CURRENT_CORES)   // number of cores
            {
 #if PARALLEL_ENABLED
-             if (Parallel::set_core_count((CoreCount)b, false))   DOMAIN_ERROR;
+             if (Parallel::set_core_count(static_cast<CoreCount>(b), false))
+                DOMAIN_ERROR;
 #else
              DOMAIN_ERROR;
 #endif

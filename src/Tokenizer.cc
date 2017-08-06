@@ -734,6 +734,47 @@ done:
       }
 }
 //-----------------------------------------------------------------------------
+
+enum { MAX_TOKENIZE_DIGITS_1 = 20,                       // incl. rounding digit
+       MAX_TOKENIZE_DIGITS = MAX_TOKENIZE_DIGITS_1 - 1   // excl. rounding digit
+     };
+
+#define dval(exp) { 0.0,     1E##exp, 2E##exp, 3E##exp, 4E##exp, \
+                    5E##exp, 6E##exp, 7E##exp, 8E##exp, 9E##exp }
+static const struct _digvals { long double d[10]; }
+digvals[MAX_TOKENIZE_DIGITS_1] =
+{
+  dval(0),  dval(1),  dval(2),  dval(3),  dval(4),
+  dval(5),  dval(6),  dval(7),  dval(8),  dval(9),
+  dval(10), dval(11), dval(12), dval(13), dval(14),
+  dval(15), dval(16), dval(17), dval(18), dval(19)
+};
+
+#define exp_0_9(x) x ## 0L, x ## 1L, x ## 2L, x ## 3L, x ## 4L,  \
+                           x ## 5L, x ## 6L, x ## 7L, x ## 8L, x ## 9L, 
+
+static const long double expo_tab[310] = 
+{
+   exp_0_9(1E)   exp_0_9(1E1)  exp_0_9(1E2)  exp_0_9(1E3)  exp_0_9(1E4)
+   exp_0_9(1E5)  exp_0_9(1E6)  exp_0_9(1E7)  exp_0_9(1E8)  exp_0_9(1E9)
+   exp_0_9(1E10) exp_0_9(1E11) exp_0_9(1E12) exp_0_9(1E13) exp_0_9(1E14)
+   exp_0_9(1E15) exp_0_9(1E16) exp_0_9(1E17) exp_0_9(1E18) exp_0_9(1E19)
+   exp_0_9(1E20) exp_0_9(1E21) exp_0_9(1E22) exp_0_9(1E23) exp_0_9(1E24)
+   exp_0_9(1E25) exp_0_9(1E26) exp_0_9(1E27) exp_0_9(1E28) exp_0_9(1E29)
+   exp_0_9(1E30)
+};
+
+static const long double nexpo_tab[310] = 
+{
+   exp_0_9(1E-)   exp_0_9(1E-1)  exp_0_9(1E-2)  exp_0_9(1E-3)  exp_0_9(1E-4)
+   exp_0_9(1E-5)  exp_0_9(1E-6)  exp_0_9(1E-7)  exp_0_9(1E-8)  exp_0_9(1E-9)
+   exp_0_9(1E-10) exp_0_9(1E-11) exp_0_9(1E-12) exp_0_9(1E-13) exp_0_9(1E-14)
+   exp_0_9(1E-15) exp_0_9(1E-16) exp_0_9(1E-17) exp_0_9(1E-18) exp_0_9(1E-19)
+   exp_0_9(1E-20) exp_0_9(1E-21) exp_0_9(1E-22) exp_0_9(1E-23) exp_0_9(1E-24)
+   exp_0_9(1E-25) exp_0_9(1E-26) exp_0_9(1E-27) exp_0_9(1E-28) exp_0_9(1E-29)
+   exp_0_9(1E-30)
+};
+
 bool
 Tokenizer::tokenize_real(Source<Unicode> & src, bool & need_float,
                          APL_Float & flt_val, APL_Integer & int_val)
@@ -741,77 +782,93 @@ Tokenizer::tokenize_real(Source<Unicode> & src, bool & need_float,
    int_val = 0;
    need_float = false;
    
-UTF8_string digits;
-UTF8_string fract_part;
-UTF8_string expo_part;
+UTF8_string int_digits;
+UTF8_string fract_digits;
+UTF8_string expo_digits;
 bool negative = false;
 bool expo_negative = false;
 bool skipped_0 = false;
 bool dot_seen = false;
 
-   // leading sign
+   // 1. split src into integer, fractional, and exponent parts, removing:
+   // 1a. a leading sign of the integer part
+   // 1b. leading zeros of the integer part
+   // 1c. the . between the integer and fractional parts
+   // 1d. trailing zeros of the fractional part
+   // 1e. the E between the fractional and exponent parts
+   // 1f. a sign of the exponent part
    //
-   if (src.rest() && *src == UNI_OVERBAR)
+   if (src.rest() && *src == UNI_OVERBAR)   // 1a.
       {
         negative = true;
         ++src;
       }
 
-   // skip leading zeros in integer part
+   // 1b. skip leading zeros in integer part
    //
    while (src.rest() && *src == '0')   { ++src;   skipped_0 = true; }
 
    // integer part
    //
-   while (src.rest() && Avec::is_digit(*src))   digits.append(src.get());
+   while (src.rest() && Avec::is_digit(*src))   int_digits.append(src.get());
 
    // fractional part
    //
-   if (src.rest() &&  *src == UNI_ASCII_FULLSTOP)   // fract part present
+   if (src.rest() && *src == UNI_ASCII_FULLSTOP)   // fract part present
       {
-        ++src;   // skip '.'
+        ++src;   // 1c. skip '.'
         dot_seen = true;
         while (src.rest() && Avec::is_digit(*src))
            {
-             fract_part.append(src.get());
+             fract_digits.append(src.get());
            }
+
+        while (fract_digits.size() && fract_digits.last() == '0')   // 1d.
+           fract_digits.pop();
       }
 
    // require at least one integer or fractional digit
    //
-   if (digits.size() == 0      &&
-       fract_part.size() == 0  &&
-       !skipped_0)   return false;
+   if (int_digits.size() == 0    &&
+       fract_digits.size() == 0  &&
+       !skipped_0)   return false;   // error
 
-   // exponent part
+   // exponent part (but could also be a name starting with E or e)
    //
    if (src.rest() >= 2 &&   // at least E and a digit or ¯
        (*src == UNI_ASCII_E || *src == UNI_ASCII_e))   // maybe exponent
       {
-        expo_negative = src[1] == UNI_OVERBAR;
-        if (Avec::is_digit(src[1]) ||
-            (expo_negative && src.rest() > 2 && Avec::is_digit(src[2])))
+        expo_negative = (src[1] == UNI_OVERBAR);
+        if (expo_negative   &&
+            src.rest() >= 3 &&
+            Avec::is_digit(src[2]))                    // E¯nnn
            {
              need_float = true;
              ++src;                        // skip e/E
-             if (expo_negative)   ++src;   // skip ¯
-
+             ++src;                        // skip ¯
              while (src.rest() && Avec::is_digit(*src))
-                {
-                  expo_part.append(src.get());
-                }
+                  expo_digits.append(src.get());
+           }
+        else if (Avec::is_digit(src[1]))               // Ennn
+           {
+             need_float = true;
+             ++src;                        // skip e/E
+             while (src.rest() && Avec::is_digit(*src))
+                  expo_digits.append(src.get());
            }
       }
 
    // second dot ?
-   if (dot_seen && src.rest() && *src == UNI_ASCII_FULLSTOP)   return false;
+   if (dot_seen && src.rest() && *src == UNI_ASCII_FULLSTOP)
+      return false;   // error
 
 int expo = 0;
-   loop(d, expo_part.size())   expo = 10*expo + (expo_part[d] - '0');
+   loop(d, expo_digits.size())   expo = 10*expo + (expo_digits[d] - '0');
    if (expo_negative)   expo = - expo;
-   expo += digits.size();
+   expo += int_digits.size();
 
-   digits.append(fract_part);
+UTF8_string digits = int_digits;
+   digits.append(fract_digits);
 
    // at this point, digits is the fractional part ff... of 0.ff... ×10⋆expo
    // discard leading fractional 0s and adjust expo accordingly
@@ -829,62 +886,32 @@ int expo = 0;
    // which has 19 decimal digits. Discard all after first 20 digits and
    // round according to the last digit.
    //
-   if (digits.size() > 20)   digits.shrink(20);
+   if (digits.size() > MAX_TOKENIZE_DIGITS_1)
+      digits.shrink(MAX_TOKENIZE_DIGITS_1);
 
-   if (digits.size() == 20)
+   if (digits.size() == MAX_TOKENIZE_DIGITS_1)
       {
-        bool carry = false;
-        if (digits.last() >= '5')   // round up
-           {
-             carry = true;
-             for (int j = digits.size() - 2; j >= 0; --j)
-                 {
-                   if (digits[j] == '9')   // propagate carry
-                      {
-                         digits[j] = '0';
-                      }
-                   else                    // eat carry
-                      {
-                         ++digits[j];
-                         carry = false;
-                         break;
-                      }
-                 }
-           }
-
-
-        // if carry survived then digits were 0.999... which was then rounded
-        // up to 1.000...
-        //
-        if (carry)
-           {
-             ++expo;   // 1.0 → 0.1
-             digits.shrink(1);
-             digits[0] = '1';
-           }
-        else
-           {
-             digits.pop();   // discard 20th digit.
-           }
+        if (digits.round_0_1())   ++expo;
       }
 
    // special cases: all digits 0 or very small number
    //
-   if (digits.size() == 0)   return true;   // all digits were 0
-   if (expo <= -307)         return true;   // very small number
+   if (digits.size() == 0)   return true;   // OK: all digits were 0
+   if (expo <= -307)         return true;   // OK: very small number
 
-   Assert(digits.size() <= 19);
+   Assert(digits.size() <= MAX_TOKENIZE_DIGITS);
 
-   if (expo > 19)   need_float = true;   /// large integer
+   if (expo > MAX_TOKENIZE_DIGITS)   need_float = true;   /// large integer
 
    // special case: integer between 9223372036854775807 and 9999999999999999999
    //
-   if (expo == 19 && digits[0] == '9')
+   if (expo == MAX_TOKENIZE_DIGITS && digits[0] == '9')
       {
+        // a uint64_t compare might overflow, so we compare the digit string
         const char * maxint = "9223372036854775807";
         loop(j, digits.size())
             {
-               if (digits[j] < maxint[j])   break;
+               if (digits[j] < maxint[j])    break;
                if (digits[j] == maxint[j])   continue;
                need_float = true;
                break;
@@ -904,35 +931,22 @@ int expo = 0;
             --expo;
           }
 
-        // perfom the scaling in higher precision to avoid rounding errors
-        //
-        long double dval = v;
         if (expo > 0)
            {
-             if (expo >= 256)   { expo -= 256;   dval *= 1E256; }
-             if (expo >= 128)   { expo -= 128;   dval *= 1E128; }
-             if (expo >=  64)   { expo -=  64;   dval *= 1E64;  }
-             if (expo >=  32)   { expo -=  32;   dval *= 1E32;  }
-             if (expo >=  16)   { expo -=  16;   dval *= 1E16;  }
-             if (expo >=   8)   { expo -=   8;   dval *= 1E8;   }
-             if (expo >=   4)   { expo -=   4;   dval *= 1E4;   }
-             if (expo >=   2)   { expo -=   2;   dval *= 1E2;   }
-             if (expo >=   1)   { expo -=   1;   dval *= 1E1;   }
+             if (negative)   flt_val = - v * expo_tab[expo];
+             else            flt_val =   v * expo_tab[expo];
+             return true;   // OK
            }
         else if (expo < 0)
            {
-             if (expo <= -256)   { expo += 256;   dval /= 1E256; }
-             if (expo <= -128)   { expo += 128;   dval /= 1E128; }
-             if (expo <=  -64)   { expo +=  64;   dval /= 1E64;  }
-             if (expo <=  -32)   { expo +=  32;   dval /= 1E32;  }
-             if (expo <=  -16)   { expo +=  16;   dval /= 1E16;  }
-             if (expo <=   -8)   { expo +=   8;   dval /= 1E8;   }
-             if (expo <=   -4)   { expo +=   4;   dval /= 1E4;   }
-             if (expo <=   -2)   { expo +=   2;   dval /= 1E2;   }
-             if (expo <=   -1)   { expo +=   1;   dval /= 1E1;   }
+             if (negative)   flt_val = - v * nexpo_tab[-expo];
+             else            flt_val =   v * nexpo_tab[-expo];
+             return true;   // OK
            }
-        if (negative)   dval = - dval;
-        flt_val = dval;
+
+        if (negative)   flt_val = - v;
+        else            flt_val =   v;
+        return true;   // OK
       }
    else
       {
@@ -940,9 +954,8 @@ int expo = 0;
         loop(j, digits.size())   int_val = 10*int_val + (digits[j] - '0');
         if (negative)   int_val = - int_val;
         flt_val = int_val;
+        return true;   // OK
       }
-
-   return true;
 }
 //-----------------------------------------------------------------------------
 void
