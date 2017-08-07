@@ -92,12 +92,29 @@ build_one $build_name
 cp "$SRC_dir/apl" "$BUILD_dir/apl-$build_name"
 test_one $build_name
 
+# apl as library
+#
 build_name="libapl"
 cd $ROOT_dir
 ./configure --with-libapl 
 build_one $build_name
 ls "$SRC_dir/.libs/"
 cp "$SRC_dir/.libs/libapl.so" "$BUILD_dir/apl-lib.so"
+
+# parallel benchmarking
+#
+build_name="parallel_bench"
+cd $ROOT_dir
+./configure --enable-maintainer-mode                    \
+                    VALUE_CHECK_WANTED=no               \
+                    VALUE_HISTORY_WANTED=no             \
+                    PERFORMANCE_COUNTERS_WANTED=yes     \
+                    DYNAMIC_LOG_WANTED=yes              \
+                    ASSERT_LEVEL_WANTED=0               \
+                    CORE_COUNT_WANTED=-3
+build_one $build_name
+ls "$SRC_dir/.libs/"
+cp "$SRC_dir/apl" "$BUILD_dir/apl-parallel_bench"
 
 cat "$BUILD_dir/summary"
 

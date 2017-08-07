@@ -96,7 +96,7 @@ rlimit rl;
    if (log_startup)
       CERR << "increasing rlimit RLIMIT_NPROC from " <<  rl.rlim_cur
            << " to infinity" << endl;
-   rl.rlim_cur = RLIM_INFINITY;
+   rl.rlim_cur =  ~0;   // RLIM_INFINITY fails on Raspberry
    setrlimit(RLIMIT_NPROC, &rl);
 #endif
 

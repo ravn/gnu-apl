@@ -120,18 +120,18 @@ file_entry & fe = get_file(handle);
 }
 //-----------------------------------------------------------------------------
 Value_P
-Quad_FIO::fds_to_val(const fd_set * fds, int max_fd)
+Quad_FIO::fds_to_val(fd_set * fds, int max_fd)
 {
-ShapeItem fd_count = 0;
+int fd_count = 0;
    if (fds)
       {
-        loop(m, max_fd)   if (FD_ISSET(m, fds))   ++fd_count;
+        for (int m = 0; m < max_fd; ++m)   if (FD_ISSET(m, fds))   ++fd_count;
       }
 
-Value_P Z(fd_count, LOC);
+Value_P Z(ShapeItem(fd_count), LOC);
    if (fds)
       {
-        loop(m, max_fd)
+        for (int m = 0; m < max_fd; ++m)
             if (FD_ISSET(m, fds))   new (Z->next_ravel())   IntCell(m);
       }
 
@@ -845,7 +845,8 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
                //
                struct sigaction action;
                memset(&action, 0, sizeof(struct sigaction));
-               action.sa_handler = SIG_DFL;
+               action.sa_handler = reinterpret_cast<typeof(action.sa_handler)>
+                                                    (0);
                sigaction(SIGSEGV, &action, 0);
                const APL_Integer result = *reinterpret_cast<char *>(4343);
                CERR << "NOTE: Throwing a segfault failed." << endl;
@@ -1393,10 +1394,9 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                       Value_P vex = B->get_ravel(2).get_pointer_value();
                       loop(l, vex->element_count())
                           {
-                            const APL_Integer fd =
-                                  vex->get_ravel(l).get_int_value();
-                            if (fd < 0)                  DOMAIN_ERROR;
-                            if (fd > 8*sizeof(fd_set))   DOMAIN_ERROR;
+                            const int fd(vex->get_ravel(l).get_int_value());
+                            if (fd < 0)                       DOMAIN_ERROR;
+                            if (fd > 8*int(sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &exceptfds);
                             if (max_fd < fd)   max_fd = fd;
                             ex = &exceptfds;
@@ -1410,8 +1410,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                           {
                             const APL_Integer fd =
                                   vwr->get_ravel(l).get_int_value();
-                            if (fd < 0)                  DOMAIN_ERROR;
-                            if (fd > 8*sizeof(fd_set))   DOMAIN_ERROR;
+                            if (fd < 0)                       DOMAIN_ERROR;
+                            if (fd > 8*int(sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &writefds);
                             if (max_fd < fd)   max_fd = fd;
                             wr = &writefds;
@@ -1426,7 +1426,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                             const APL_Integer fd =
                                   vrd->get_ravel(l).get_int_value();
                             if (fd < 0)                         DOMAIN_ERROR;
-                            if (fd > (8*sizeof(fd_set)))   DOMAIN_ERROR;
+                            if (fd > (8*int(sizeof(fd_set))))   DOMAIN_ERROR;
                             FD_SET(fd, &readfds);
                             if (max_fd < fd)   max_fd = fd;
                             rd = &readfds;

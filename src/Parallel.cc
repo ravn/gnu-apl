@@ -63,7 +63,8 @@ Parallel::init(bool logit)
    Thread_context::get_context(CNUM_MASTER)->thread = pthread_self();
    for (int w = CNUM_WORKER1; w < get_max_core_count(); ++w)
        {
-         Thread_context * tctx = Thread_context::get_context((CoreNumber)w);
+         Thread_context * tctx = Thread_context::get_context(
+                                                 static_cast<CoreNumber>(w));
          const int result = pthread_create(&(tctx->thread), /* attr */ 0,
                                              worker_main, tctx);
          if (result)
@@ -81,7 +82,7 @@ Parallel::init(bool logit)
    // bind threads to cores
    //
    loop(c, get_max_core_count())
-       Thread_context::get_context((CoreNumber)c)
+       Thread_context::get_context(static_cast<CoreNumber>(c))
                        ->bind_to_cpu(all_CPUs[c], logit);
 
    if (logit)   Thread_context::print_all(CERR);

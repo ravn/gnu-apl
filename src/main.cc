@@ -81,7 +81,7 @@ signal_SEGV_handler(int)
            "SEGMENTATION FAULT" << endl;
 
 #if PARALLEL_ENABLED
-   CERR << "thread: " << (const void *)pthread_self() << endl;
+   CERR << "thread: " << reinterpret_cast<const void *>(pthread_self()) << endl;
    Thread_context::print_all(CERR);
 #endif // PARALLEL_ENABLED
 

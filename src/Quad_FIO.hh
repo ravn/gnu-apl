@@ -108,7 +108,7 @@ protected:
    Token list_functions(ostream & out);
 
    /// convert bits set in \b fds to an APL integer vector
-   Value_P fds_to_val(const fd_set * fds, int max_fd);
+   Value_P fds_to_val(fd_set * fds, int max_fd);
 
    /// print A to \b out
    Token do_printf(FILE * out, Value_P A);

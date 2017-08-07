@@ -988,7 +988,7 @@ struct stat st;
 
    map_length = st.st_size;
    map_start = mmap(0, map_length, PROT_READ, MAP_SHARED, fd, 0);
-   if (map_start == MAP_FAILED)
+   if (map_start == reinterpret_cast<const void *>(-1))
       {
         CERR << "mmap() failed: " << strerror(errno) << endl;
         close(fd);
