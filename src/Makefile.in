@@ -573,7 +573,6 @@ LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
-MAKE_J = @MAKE_J@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MAX_RANK_WANTED = @MAX_RANK_WANTED@
 MKDIR_P = @MKDIR_P@
@@ -672,9 +671,8 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-# common_CXXFLAGS = $(CXX_WERROR) -Wall -I sql
-common_CXXFLAGS = -Wall -I sql -Wold-style-cast $(am__append_2) \
-	$(am__append_6)
+common_CXXFLAGS = -Wall -I sql -Wold-style-cast $(CXX_WERROR) \
+	$(am__append_2) $(am__append_6)
 common_LDFLAGS = $(am__append_3) $(am__append_7)
 common_SOURCES = buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
@@ -741,7 +739,6 @@ pkglib_LTLIBRARIES = $(am__append_9)
 @WANT_LIBAPL_FALSE@apl_CXXFLAGS = $(common_CXXFLAGS) $(GPROF_WANTED) \
 @WANT_LIBAPL_FALSE@	$(CXX_RDYNAMIC)
 @WANT_LIBAPL_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
-AM_MAKEFLAGS = -j $(MAKE_J)
 apl_LDADD = $(LIBS)
 all: all-recursive
 

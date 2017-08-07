@@ -12,8 +12,7 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-# common_CXXFLAGS = $(CXX_WERROR) -Wall -I sql
-common_CXXFLAGS = -Wall -I sql -Wold-style-cast
+common_CXXFLAGS = -Wall -I sql -Wold-style-cast $(CXX_WERROR)
 common_LDFLAGS =
 common_SOURCES =        buildtag		buildtag.hh		\
 						../config.h		\
@@ -166,8 +165,6 @@ apl_CXXFLAGS += $(GPROF_WANTED) $(CXX_RDYNAMIC)
 apl_LDFLAGS = $(common_LDFLAGS)
 
 endif
-
-AM_MAKEFLAGS = -j $(MAKE_J)
 
 # normally we would say:
 #

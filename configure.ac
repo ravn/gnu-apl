@@ -281,6 +281,7 @@ AC_MSG_RESULT([$user_wants_libapl])
 
 
 AC_CONFIG_FILES([Makefile
+                 build/Makefile
                  debian/Makefile
                  debian/source/Makefile
                  doc/Makefile
@@ -313,11 +314,6 @@ AC_CONFIG_FILES([Makefile
                  wslib5/APLComponentFiles/Makefile
                  wslib5/iso-apl-cf/Makefile
                 ])
-
-# AM_MAKEFLAGS: desired -j count ?
-AC_ARG_VAR(MAKE_J,
-   [ job count (-j) for make, (see README-2-configure) default: 4) ])
-if test "x$MAKE_J" = "x"; then MAKE_J=4; fi
 
 # AM_CXXFLAGS: do/dont -Werror ?
 AC_ARG_VAR(CXX_WERROR,
@@ -470,7 +466,7 @@ AC_MSG_RESULT([$APSERVER_TRANSPORT])
 # APL: APserver TCP port ?
 AC_MSG_CHECKING([which port number APserver shall use for TCP or UDP sockets])
 AC_ARG_VAR(APSERVER_PORT,
-   [ APserver transport (see README-2-configure) default: TCP) ])
+   [ APserver transport (see README-2-configure) default: 16366) ])
 if test "x$APSERVER_PORT" = "x";   then APSERVER_PORT=16366;  fi
 AC_DEFINE_UNQUOTED([APSERVER_PORT], [$APSERVER_PORT],
                    [APserver TCP listen port])
@@ -479,7 +475,7 @@ AC_MSG_RESULT([$APSERVER_PORT])
 # APL: APserver port name ?
 AC_MSG_CHECKING([which port name APserver shall use for unix ports])
 AC_ARG_VAR(APSERVER_PATH,
-   [ APserver transport (see README-2-configure) default: TCP) ])
+   [ APserver transport (see README-2-configure) default: /tmp/GNU-APL/APserver) ])
 if test "x$APSERVER_PATH" = "x";   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi
 AC_DEFINE_UNQUOTED([APSERVER_PATH], ["$APSERVER_PATH"],
                    [APserver listen port name])

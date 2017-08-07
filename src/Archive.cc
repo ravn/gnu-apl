@@ -211,7 +211,8 @@ char cc[80];
                  space -= leave_char_mode();
 #ifdef RATIONAL_NUMBERS_WANTED
                  {
-                 const FloatCell * flt = (const FloatCell *)&cell;
+                 const FloatCell * flt = reinterpret_cast<const FloatCell *>
+                                                         (&cell);
                  if (const APL_Integer denom = flt->get_denominator())
                     {
                       const APL_Integer numer = flt->get_numerator();

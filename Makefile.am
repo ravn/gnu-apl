@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I m4
 DISTCHECK_CONFIGURE_FLAGS =--enable-maintainer-mode=no
 
 APL_DIRS	= workspaces wslib3 wslib4 wslib5
-SUBDIRS		= doc erlang gnu-apl.d src support-files tools $(APL_DIRS)
+SUBDIRS		= build doc erlang gnu-apl.d src support-files tools $(APL_DIRS)
 DIST_SUBDIRS	= $(SUBDIRS) rpm debian
 
 dist_doc_DATA = README			   \

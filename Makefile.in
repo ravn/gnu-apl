@@ -284,7 +284,6 @@ LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
-MAKE_J = @MAKE_J@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MAX_RANK_WANTED = @MAX_RANK_WANTED@
 MKDIR_P = @MKDIR_P@
@@ -379,7 +378,7 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 DISTCHECK_CONFIGURE_FLAGS = --enable-maintainer-mode=no
 APL_DIRS = workspaces wslib3 wslib4 wslib5
-SUBDIRS = doc erlang gnu-apl.d src support-files tools $(APL_DIRS)
+SUBDIRS = build doc erlang gnu-apl.d src support-files tools $(APL_DIRS)
 DIST_SUBDIRS = $(SUBDIRS) rpm debian
 dist_doc_DATA = README			   \
 		README-1-prerequisites	   \
@@ -962,11 +961,6 @@ help:
 develop:
 	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes
 	make all
-
-.PHONY: develop4
-develop1:
-	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes
-	make all4
 
 ###############################################################################
 # a shortcut to ./configure for profiling using gprof

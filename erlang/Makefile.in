@@ -167,7 +167,6 @@ LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
-MAKE_J = @MAKE_J@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MAX_RANK_WANTED = @MAX_RANK_WANTED@
 MKDIR_P = @MKDIR_P@
@@ -477,8 +476,7 @@ uninstall-am:
 
 @WANT_ERLANG_FALSE@.PHONY:	all
 @WANT_ERLANG_FALSE@all:
-@WANT_ERLANG_FALSE@	echo "nothing to be done because GNU APL was NOT \
-@WANT_ERLANG_FALSE@              configured --with-erlang"
+@WANT_ERLANG_FALSE@	echo "nothing to be done because GNU APL was NOT configured --with-erlang"
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

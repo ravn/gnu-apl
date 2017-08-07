@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# this script builds different GNU APL variants and test some of them
+
+# figure and normalize some directory names
+#
+LOG_dir="/tmp"    # where to store build logs
+START_dir=`pwd`
+cd `dirname $0` ; BUILD_dir=`pwd`
+cd ..           ; ROOT_dir=`pwd`
+cd src          ; SRC_dir=`pwd`
+
+# remove old build results
+#
+rm "$BUILD_dir"/apl-*
+echo "build summary:" > "$BUILD_dir/summary"
+
+# build one configuration
+#
+build_one()
+{
+   echo "building configuration \"$1\"..."
+   local time_FROM=`date +%s`
+   cd $ROOT_dir
+   {
+     echo "building \"$1\"..."
+     make clean
+     echo "
+======== make clean done ======================================================
+"
+     make -j4 all
+   } > "/tmp/build-$build_name.log"
+   local make_result=$?
+   local time_TO=`date +%s`
+   local secs=$(( $time_TO - $time_FROM ))
+   if [ $make_result -eq 0 ] 
+      then echo "    build $build_name: OK ($secs seconds)"     \
+           >> "$BUILD_dir/summary"
+      else echo "*** build $build_name: FAILED ($secs seconds)" \
+           >> "$BUILD_dir/summary"
+   fi
+}
+
+# test one configuration
+#
+test_one()
+{
+   echo "testing configuration \"$1\"..."
+   local time_FROM=`date +%s`
+   cd $SRC_dir
+   make test > /dev/null 2>&1
+   local make_result=$?
+   local time_TO=`date +%s`
+   local secs=$(( $time_TO - $time_FROM ))
+   if [ $make_result -eq 0 ] 
+      then echo "    test $build_name: OK ($secs seconds)"     \
+           >> "$BUILD_dir/summary"
+      else echo "*** test $build_name: FAILED ($secs seconds)" \
+           >> "$BUILD_dir/summary"
+   fi
+}
+
+cd $ROOT_dir
+autoreconf
+
+# the standard configuration
+#
+build_name="standard"
+cd $ROOT_dir
+./configure >/dev/null 2>&1
+build_one $build_name
+cp "$SRC_dir/apl" "$BUILD_dir/apl-$build_name"
+test_one $build_name
+
+# the developer configuration
+#
+build_name="develop"
+cd $ROOT_dir
+./configure --enable-maintainer-mode DEVELOP_WANTED=yes
+build_one $build_name
+cp "$SRC_dir/apl" "$BUILD_dir/apl-$build_name"
+test_one $build_name
+
+# the developer configuration with rational number support
+#
+build_name="rational"
+cd $ROOT_dir
+./configure --enable-maintainer-mode \
+   DEVELOP_WANTED=yes \
+   RATIONAL_NUMBERS_WANTED=yes
+build_one $build_name
+cp "$SRC_dir/apl" "$BUILD_dir/apl-$build_name"
+test_one $build_name
+
+build_name="libapl"
+cd $ROOT_dir
+./configure --with-libapl 
+build_one $build_name
+ls "$SRC_dir/.libs/"
+cp "$SRC_dir/.libs/libapl.so" "$BUILD_dir/apl-lib.so"
+
+cat "$BUILD_dir/summary"
+

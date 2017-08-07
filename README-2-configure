@@ -1,10 +1,10 @@
-The APL interpreter can be configured by means of ./configure options (refer
-to file INSTALL in this directory). In addition to the standard options
-provided by ./configure (that are described in file INSTALL),
-the following GNU APL specific ./configure options are recognized.
-If no options are given then either the default value (for those options that
-have one) as given below is used, or else the described behavior will not
-occur.
+The GNU APL interpreter can be configured by means of ./configure options.
+The standard ./configure options are desctbed in file INSTALL in this directory.
+In addition to the standard options provided by ./configure the following GNU
+APL specific ./configure options are recognized. If an option is NOT given
+on the ./configure command line, then either the default value for the option
+is used (if the option has one), or else the behavior described below for
+the option will not occur.
 
 --with-android
    This option prevents the instantiation of CIN, COUT, and CERR. This may
@@ -144,19 +144,6 @@ DYNAMIC_LOG_WANTED=yes
    is static logging. Example:
 
     ./configure DYNAMIC_LOG_WANTED=yes
-
-MAKE_J
-    Set the -j command line option for make that shall be used when GNU APL
-    is being built. The default is 4 which causes make to be called
-    as make -j 4. In that case up to 4 files can be compiled in parallel which
-    is good when your build machine has 4 cores and sufficient memory. If the
-    machine has fewer cores, then -j 4 normally does no harm, except if the
-    machine is severly limited, like, for instance, a virtual machine with
-    little memory. In that case MAKE_J=1 is a better choice. On the other
-    side, if your machine has more cores then larger values for MAKE_J will
-    speed up the build process. Example:
-
-    ./configure MAKE_J=8
 
 CXX_WERROR=yes/no
     Do (not) add -Werror to the compiler flags. By default GNU APL is being

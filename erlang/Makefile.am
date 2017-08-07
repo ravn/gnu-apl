@@ -28,8 +28,7 @@ else
 
 .PHONY:	all
 all:
-	echo "nothing to be done because GNU APL was NOT \
-              configured --with-erlang"
+	echo "nothing to be done because GNU APL was NOT configured --with-erlang"
 
 endif
 
