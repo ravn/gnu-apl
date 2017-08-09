@@ -153,9 +153,7 @@ Token
 Bif_F12_RHO::eval_AB(Value_P A, Value_P B)
 {
 #ifdef PERFORMANCE_COUNTERS_WANTED
-#ifdef HAVE_RDTSC
 const uint64_t start_1 = cycle_counter();
-#endif
 #endif
 
 const Shape shape_Z(A, 0);
@@ -204,11 +202,9 @@ const ShapeItem len_Z = shape_Z.get_volume();
         B->set_shape(shape_Z);
 
 #ifdef PERFORMANCE_COUNTERS_WANTED
-#ifdef HAVE_RDTSC
 const uint64_t end_1 = cycle_counter();
    Performance::fs_F12_RHO_AB.add_sample(end_1 - start_1,
                                          B->nz_element_count());
-#endif
 #endif
 
         return Token(TOK_APL_VALUE1, B);
@@ -217,11 +213,9 @@ const uint64_t end_1 = cycle_counter();
 Token ret = do_reshape(shape_Z, *B);
 
 #ifdef PERFORMANCE_COUNTERS_WANTED
-#ifdef HAVE_RDTSC
 const uint64_t end_1 = cycle_counter();
    Performance::fs_F12_RHO_AB.add_sample(end_1 - start_1,
                                          shape_Z.get_volume());
-#endif
 #endif
 
    return ret;

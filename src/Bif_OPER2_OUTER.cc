@@ -142,9 +142,7 @@ void
 Bif_OPER2_OUTER::scalar_outer_product() const
 {
 #ifdef PERFORMANCE_COUNTERS_WANTED
-# ifdef HAVE_RDTSC
 const uint64_t start_1 = cycle_counter();
-# endif
 #endif
 
   // the empty cases have been handled already in eval_ALRB()
@@ -170,11 +168,9 @@ const uint64_t start_1 = cycle_counter();
       }
 
 #ifdef PERFORMANCE_COUNTERS_WANTED
-#ifdef HAVE_RDTSC
 const uint64_t end_1 = cycle_counter();
    Performance::fs_OPER2_OUTER_AB.add_sample(end_1 - start_1,
                                              job.ZAh * job.ZBl);
-#endif
 #endif
 }
 //-----------------------------------------------------------------------------

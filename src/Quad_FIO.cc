@@ -866,6 +866,13 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
              Probe::init_all();
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
+        case -3: // return the type of cycle_counter
+#if HAVE_RDTSC
+             return Token(TOK_APL_VALUE1, IntScalar(1, LOC));
+#else
+             return Token(TOK_APL_VALUE1, IntScalar(2, LOC));
+#endif
+
         case -2: // return CPU frequency
              {
                timeval tv = { 0, 100000 }; // 100 ms

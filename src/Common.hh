@@ -36,6 +36,7 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 // if someone (like curses on Solaris) has #defined erase() then
 // #undef it because vector would not be happy with it
@@ -124,8 +125,12 @@ uint32_t lo, hi;
 
 #else
 
-# define cycle_counter() (-1)
-
+inline uint64_t cycle_counter()
+{
+timeval tv;
+   gettimeofday(&tv, 0);
+   return tv.tv_sec * 1000000ULL + tv.tv_usec;
+}
 #endif
 
 //-----------------------------------------------------------------------------

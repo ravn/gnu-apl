@@ -27,7 +27,7 @@
 
 #include "../config.h"
 
-#if defined(PERFORMANCE_COUNTERS_WANTED) && defined(HAVE_RDTSC)
+#if defined(PERFORMANCE_COUNTERS_WANTED)
 
 # define PERFORMANCE_START(counter) const uint64_t counter = cycle_counter();
 # define PERFORMANCE_END(statistics, counter, len) \
