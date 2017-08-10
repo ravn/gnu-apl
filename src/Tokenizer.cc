@@ -739,17 +739,6 @@ enum { MAX_TOKENIZE_DIGITS_1 = 20,                       // incl. rounding digit
        MAX_TOKENIZE_DIGITS = MAX_TOKENIZE_DIGITS_1 - 1   // excl. rounding digit
      };
 
-#define dval(exp) { 0.0,     1E##exp, 2E##exp, 3E##exp, 4E##exp, \
-                    5E##exp, 6E##exp, 7E##exp, 8E##exp, 9E##exp }
-static const struct _digvals { long double d[10]; }
-digvals[MAX_TOKENIZE_DIGITS_1] =
-{
-  dval(0),  dval(1),  dval(2),  dval(3),  dval(4),
-  dval(5),  dval(6),  dval(7),  dval(8),  dval(9),
-  dval(10), dval(11), dval(12), dval(13), dval(14),
-  dval(15), dval(16), dval(17), dval(18), dval(19)
-};
-
 #define exp_0_9(x) x ## 0L, x ## 1L, x ## 2L, x ## 3L, x ## 4L,  \
                            x ## 5L, x ## 6L, x ## 7L, x ## 8L, x ## 9L, 
 
