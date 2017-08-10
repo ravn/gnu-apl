@@ -499,7 +499,7 @@ int count = 0;
               CERR << endl;
 
               CERR << " DynamicObject: " << obj << endl;
-              CERR << " Value:         " << reinterpret_cast<Value *>(obj)
+              CERR << " Value:         " << static_cast<Value *>(obj)
                    << endl;
               CERR << *static_cast<Value *>(obj) << endl;
             }
@@ -567,7 +567,7 @@ int count = 0;
               CERR << endl;
 
               CERR << " DynamicObject: " << obj << endl;
-              CERR << " Value:         " << reinterpret_cast<Value *>(obj)
+              CERR << " Value:         " << static_cast<Value *>(obj)
                    << endl;
               CERR << static_cast<Value *>(obj) << endl;
             }
