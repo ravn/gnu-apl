@@ -90,7 +90,6 @@ cd $ROOT_dir
    RATIONAL_NUMBERS_WANTED=yes
 build_one $build_name
 cp "$SRC_dir/apl" "$BUILD_dir/apl-$build_name"
-test_one $build_name
 
 # apl as library
 #

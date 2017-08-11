@@ -186,8 +186,19 @@ FloatCell::bif_reciprocal(Cell * Z) const
 #ifdef RATIONAL_NUMBERS_WANTED
    if (const APL_Integer denom = get_denominator())
       {
-        const APL_Integer numer = get_numerator();
-        return FloatCell::zv(Z, denom, numer);   // exchange numer and denom
+        if (uint64_t(denom) < 0x8000000000000000ULL)   // small enough for int32
+           {
+             const APL_Integer numer = get_numerator();
+             // simply exchange numerator and denominator, but make sure that
+             // the denominator is positive
+             //
+             if (numer == 1)    return IntCell::zv(Z,  denom);
+             if (numer == -1)   return IntCell::zv(Z, -denom);
+             if (numer < 0)     return FloatCell::zv(Z, -denom, -numer);
+             else               return FloatCell::zv(Z, denom, numer);
+           }
+
+        // at this point denom does not fit into numer. Fall through
       }
 #endif
 

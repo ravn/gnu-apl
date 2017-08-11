@@ -562,6 +562,12 @@ Quad_PS::assign(Value_P B, bool clone, const char * loc)
    if (B->get_rank() != 1)        RANK_ERROR;
    if (B->element_count() != 2)   LENGTH_ERROR;
 
+   if (!B->get_ravel(0).is_near_bool())
+      {
+        MORE_ERROR() << "Bad quot in ⎕PS←quot style: quot is not near bool";
+        DOMAIN_ERROR;
+      }
+
 const APL_Integer B_quot  = B->get_ravel(0).get_near_bool();
 const APL_Integer B_style = B->get_ravel(1).get_near_int();
 
@@ -579,7 +585,9 @@ const APL_Integer B_style = B->get_ravel(1).get_near_int();
         case 23: case  24: case  25:
         case 29: break;   // OK
 
-        default: DOMAIN_ERROR;
+        default: MORE_ERROR() << "Invalid style in ⎕PS←quot style: "
+                                 "style is not ± 0, 2-4, 7-9, 2-25, or 29";
+                  DOMAIN_ERROR;
       }
  
    // values in B are valid
