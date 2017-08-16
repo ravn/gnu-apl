@@ -569,7 +569,7 @@ UCS_string ufun_text = UserFunction_header::lambda_header(signature,lambda_num);
    ufun_text.append(lambda_text);
    ufun_text.append(UNI_ASCII_LF);
 
-Q(ufun_text)
+Q1(ufun_text)
 
 int error_line = -1;
 const char * error_loc = 0;

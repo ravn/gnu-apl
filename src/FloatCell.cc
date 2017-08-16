@@ -463,7 +463,6 @@ ErrorCode
 FloatCell::bif_multiply(Cell * Z, const Cell * A) const
 {
 #ifdef RATIONAL_NUMBERS_WANTED
-   if (A->is_float_cell())
    if (APL_Integer denom_B = get_denominator())
    if (APL_Integer denom_A = A->get_denominator())
       {

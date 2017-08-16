@@ -12,7 +12,7 @@ cd src          ; SRC_dir=`pwd`
 
 # remove old build results
 #
-rm "$BUILD_dir"/apl-*
+rm -f "$BUILD_dir"/apl-*
 echo "build summary:" > "$BUILD_dir/summary"
 
 # build one configuration
