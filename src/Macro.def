@@ -246,7 +246,7 @@ mac_def(Z__EXEC_EACH_B,
  " rho_Z←⍴B ◊ N←⎕IO ◊ N_max←N+⍴B←,B ◊ T←((⍴B), 3)⍴0\n"
  "LOOP: RC←↑T[N;]←⎕EC ⊃B[N] ◊ →(RC∈1 2 3)↓ERROR ◊ →(N_max>N←N+1)⍴LOOP\n"
  " →(∧/T[;⎕IO]=3)⍴0   ⍝ NO RESULT\n"
- " →(T[;⎕IO]=3)/MISMATCH ◊ Z←T[;⎕IO+2] ◊ →0\n"
+ " →(T[;⎕IO]=3)/MISMATCH ◊ Z←T[;⎕IO+2] ◊ Z←rho_Z⍴Z ◊ →0\n"
  "MISMATCH: 'VALUE ERROR in ⍎ macro:¨' ⎕ES 3 1\n"
  "ERROR: →(RC=0 4 5)/ RC0, RC4, RC5\n"
  " RC0: ((⊃T[N;⎕IO+2])[1;], ' in ⍎¨ macro:') ⎕ES ⊃T[N;⎕IO+1]\n"

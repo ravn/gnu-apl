@@ -54,6 +54,9 @@ NEG_ERR5[2]
       (vA MINUS ¨ vB) ≡ vA -¨ vB
 1
 
+      ⍎¨2 2⍴'1234'
+1 2
+3 4
 
       ⍝ OUTER PRODUCT
       ⍝
