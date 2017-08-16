@@ -172,18 +172,23 @@ UCS_string args_ucs(args);
                   args_ucs[a + 2] == '.')   many = true;
               continue;
          case '0' ... '9':
+         case '_':
          case 'A' ... 'Z':
          case 'a' ... 'z':
          case UNI_OVERBAR:
-         case '-': if (!in_param)   // start of a name or range
-                      {
-                        if (brackets)   ++opt_args;
-                        else            ++mandatory_args;
-                        in_param = true;
-                      }
-                   continue;
-         case ' ':                 in_param = false;   continue;
-         default: Q(args_ucs[a])   // should not happen
+         case '-':
+              if (!in_param)   // start of a name or range
+                 {
+                   if (brackets)   ++opt_args;
+                   else            ++mandatory_args;
+                   in_param = true;
+                 }
+              continue;
+
+         case ' ': in_param = false;
+              continue;
+
+         default: Q(args_ucs[a])   Q(int(args_ucs[a]))
        }
 
    if (argc < mandatory_args)   // too few parameters

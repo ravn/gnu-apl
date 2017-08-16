@@ -269,6 +269,8 @@ const bool nested = !value.is_simple();
                 PrintBuffer * item_row = item_matrix + y*cols;
                 col_info_x.consider(item_row[x].get_info());
               }
+           if (col_info_x.real_len<(col_info_x.int_len + col_info_x.denom_len))
+              col_info_x.real_len = col_info_x.int_len + col_info_x.denom_len;
 
           loop(y, rows)
               {
@@ -907,10 +909,11 @@ PrintBuffer::debug(ostream & out, const char * title) const
    out << UNI_LINE_UP_RIGHT;
    loop(w, get_width(0))   out << UNI_LINE_HORI;
    out << UNI_LINE_UP_LEFT
-       << "  flags=" << HEX(col_info.flags)
-       << "  ilen="  << col_info.int_len
-       << "  flen="   << col_info.fract_len
-       << "  rlen="   << col_info.real_len
+       << " flg=" << HEX(col_info.flags)
+       << " il="  << col_info.int_len
+       << " fl="   << col_info.fract_len
+       << " rl="   << col_info.real_len
+       << " ÷l="   << col_info.denom_len
        << endl << endl;
 
    return out;
@@ -1082,7 +1085,7 @@ void PrintBuffer::add_row(const PrintBuffer & pb)
 void
 PrintBuffer::align(ColInfo & cols)
 {
-   // this PrintBuffer is a (possibly nested) APL value.
+   // this PrintBuffer is one (possibly nested) APL value.
    // Align the buffer:
    //
    // to the J (in a column containing complex numbers), or
@@ -1103,59 +1106,89 @@ PrintBuffer::align(ColInfo & cols)
 void
 PrintBuffer::align_dot(ColInfo & COL_INFO)
 {
+   // align this PrintBuffer (one value) at the decimal dot of COL_INFO.
+   //
+   // COL_INFO is the desired ColInfo of the entire column while
+   // col_info (a member of this PrintBuffer) is the (smaller) item
+   // being aligned
+   //
    Log(LOG_printbuf_align)
       {
-        CERR << "before align_dot(), COL_INFO = " << COL_INFO.int_len
-             << ":" << COL_INFO.fract_len
-             << ":" << COL_INFO.real_len
-             << ", this col = " << col_info.int_len
-             << ":" << col_info.fract_len
-             << ":" << col_info.real_len << endl;
+        CERR << "before align_dot():" << endl
+             << "desired COL_INFO = "
+                "i-"  << COL_INFO.int_len
+             << " f-" << COL_INFO.fract_len
+             << " r-" << COL_INFO.real_len
+             << " ÷"  << COL_INFO.denom_len << endl
+             << "this row         = "
+                "i-"  << col_info.int_len
+             << " f-" << col_info.fract_len
+             << " r-" << col_info.real_len
+             << " ÷"  << col_info.denom_len << endl;
         debug(CERR, 0);
       }
 
    Assert(buffer.size() > 0);
 
-   Assert(COL_INFO.int_len   >= col_info.int_len);
-   Assert(COL_INFO.fract_len >= col_info.fract_len);
-   Assert(COL_INFO.real_len  >= col_info.real_len);
+   // make sure that consider() has worked.
+   //
+   Assert(COL_INFO.int_len    >= col_info.int_len);
+   Assert(COL_INFO.fract_len  >= col_info.fract_len);
+   Assert(COL_INFO.real_len   >= col_info.real_len);
+   Assert(COL_INFO.denom_len  >= col_info.denom_len);
 
    if (col_info.flags & CT_NUMERIC)
       {
-        // dot-align numeric items
+        // numeric items are aligned at the decimal dot. First pad the
+        // integer part with spaces to the left
+        //
         if (COL_INFO.int_len > col_info.int_len)
            {
              const size_t diff = COL_INFO.int_len - col_info.int_len;
              pad_l(UNI_iPAD_L3, diff);
              col_info.real_len += diff;
-             col_info.int_len = COL_INFO.int_len;
+             col_info.int_len  += diff;
            }
 
-        if (COL_INFO.fract_len > col_info.fract_len)
-           {
-             pad_fraction(COL_INFO.fract_len, COL_INFO.have_expo());
-           }
-
-        if (COL_INFO.real_len > col_info.real_len)
+        if (col_info.denom_len)   // quotient: maybe pad right with spaces
            {
              const size_t diff = COL_INFO.real_len - col_info.real_len;
-             if (col_info.have_expo())   // alrady have an expo field
+             if (diff)
                 {
                   pad_r(UNI_iPAD_L4, diff);
+                  col_info.real_len += diff;
                 }
-             else                        // no expo yet: create one
+           }
+        else
+           {
+             if (COL_INFO.fract_len > col_info.fract_len)
                 {
-                  Assert1(diff >= 2);
-                  pad_r(UNI_ASCII_E, 1);
-                  pad_r(UNI_ASCII_0, 1);
-                  pad_r(UNI_iPAD_L4, diff - 2);
+                  pad_fraction(COL_INFO.fract_len, COL_INFO.have_expo());
                 }
-             col_info.real_len = COL_INFO.real_len;
+
+             if (COL_INFO.real_len > col_info.real_len)
+                {
+                  const size_t diff = COL_INFO.real_len - col_info.real_len;
+                  if (!(COL_INFO.flags & (real_has_E | imag_has_E))
+                   || col_info.have_expo())       // or has one already 
+                     {
+                       pad_r(UNI_iPAD_L4, diff);
+                     }
+                  else                        // no expo yet: create one
+                     {
+                       Assert1(diff >= 2);
+                       pad_r(UNI_ASCII_E, 1);
+                       pad_r(UNI_ASCII_0, 1);
+                       pad_r(UNI_iPAD_L4, diff - 2);
+                     }
+                  col_info.real_len = COL_INFO.real_len;
+                }
            }
       }
    else
       {
-        // right-align char items
+        // char items are right aligned
+        //
         size_t LEN = COL_INFO.total_len();
         size_t len = col_info.total_len();
         if (LEN > len)
@@ -1174,6 +1207,9 @@ PrintBuffer::align_dot(ColInfo & COL_INFO)
 void
 PrintBuffer::align_j(ColInfo & COL_INFO)
 {
+   // align all items in this PrintBuffer (= one APL output column)
+   // at the complex J.
+   //
    Log(LOG_printbuf_align)
       {
         CERR << "before align_j(), COL_INFO = " << COL_INFO.int_len
@@ -1240,11 +1276,11 @@ UCS_string new_buf(buffer[0], 0, col_info.int_len);
       //
       loop(f, col_info.fract_len)
           new_buf.append(buffer[0][col_info.int_len + f]);
-      if (!want_expo)
+      if (!want_expo)                     // no exponent, e.g. 1,0
          {
            loop(d, diff)   new_buf.append(UNI_iPAD_L4);
          }
-      else if (col_info.fract_len == 0)   // no fractional part yet
+      else if (col_info.fract_len == 0)   // no fractional part (yet), e.g. 1E2
          {
            new_buf.append(UNI_ASCII_FULLSTOP);
            loop(d, diff - 1)   new_buf.append(UNI_ASCII_0);
@@ -1322,30 +1358,41 @@ PrintBuffer::is_rectangular() const
 }
 //-----------------------------------------------------------------------------
 void
-ColInfo::consider(ColInfo & other)
+ColInfo::consider(const ColInfo & item)
 {
-   flags |= other.flags;
-   if (other.imag_len)   flags |= has_j;
+   // this is the collective ColInfo of an entire column, and item
+   // is a new, not yet considered item in the columns.
+   //
+   flags |= item.flags;
+   if (item.imag_len)   flags |= has_j;
 
-const int expo_len = real_len - fract_len - int_len;
-const int expo_len1 = other.real_len - other.fract_len - other.int_len;
-
-   if (int_len   < other.int_len)
+   if (int_len < item.int_len)
       {
-        real_len += other.int_len - int_len;
-           int_len = other.int_len;
+        real_len += item.int_len - int_len;
+        int_len = item.int_len;
       }
 
-   if (fract_len < other.fract_len)
+   if (item.denom_len)
       {
-        real_len += other.fract_len - fract_len;
-        fract_len = other.fract_len;
+        if (denom_len < item.denom_len)   denom_len = item.denom_len;
+        if (real_len < int_len + denom_len)   real_len = int_len + denom_len;
+      }
+   else
+      {
+        const int EXPO_LEN = real_len - fract_len - int_len;
+        const int expo_len = item.real_len - item.fract_len - item.int_len;
+
+        if (fract_len < item.fract_len)
+           {
+             fract_len = item.fract_len;
+             if (fract_len + expo_len > denom_len)
+             real_len = int_len + fract_len + EXPO_LEN;
+           }
+
+        if (EXPO_LEN < expo_len)    real_len += expo_len - EXPO_LEN;
       }
 
-   real_len = int_len + fract_len + expo_len;
-   if (expo_len < expo_len1)    real_len += expo_len1 - expo_len;
-
-   if (imag_len  < other.imag_len)    imag_len  = other.imag_len;
+   if (imag_len  < item.imag_len)    imag_len  = item.imag_len;
 }
 //-----------------------------------------------------------------------------
 ostream &

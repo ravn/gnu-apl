@@ -44,16 +44,17 @@ public:
      int_len(0),
      fract_len(0),
      real_len(0),
-     imag_len(0)
+     imag_len(0),
+     denom_len(0)
    {}
 
    /// update the properties of \b this ColInfo according to
    /// the properties of \b other
-   void consider(ColInfo & other);
+   void consider(const ColInfo & other);
 
    /// true if \b this ColInfo has an exponent field
    bool have_expo() const
-      { return real_len > (int_len + fract_len); }
+      { return denom_len == 0 && real_len > (int_len + fract_len); }
 
    /// the total length
    int total_len() const
@@ -75,6 +76,9 @@ public:
 
    /// the length of the imaginary part (of complex numbers)
    int imag_len;
+
+   /// the length of the denominator (for rational numbers)
+   int denom_len;
 };
 //-----------------------------------------------------------------------------
 /** A two-dimensional Unicode character buffer used for converting APL values

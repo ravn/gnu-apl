@@ -716,8 +716,11 @@ FloatCell::character_representation(const PrintContext & pctx) const
                 }
              ucs.append(UCS_string::from_uint(numer));
              info.int_len = ucs.size();
+
              ucs.append(UNI_DIVIDE);
+
              ucs.append(UCS_string::from_uint(denom));
+             info.denom_len = ucs.size() - info.int_len;
              info.real_len = ucs.size();
              return PrintBuffer(ucs, info);
            }
