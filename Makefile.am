@@ -49,7 +49,7 @@ DEB:	DIST
            debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION).orig.tar.gz
 	cd debian_tmp ; tar xf $(PACKAGE)_$(PACKAGE_VERSION).orig.tar.gz
 	cp doc/apl.1 debian_tmp/$(distdir)/debian/manpage.1
-	cd debian_tmp/$(distdir) ; dpkg-buildpackage
+	cd debian_tmp/$(distdir) ; dpkg-buildpackage -j4
 	mkdir -p ftp-upload
 	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1_*.deb          ftp-upload/
 	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1.debian.tar.gz  ftp-upload/
