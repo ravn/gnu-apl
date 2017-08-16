@@ -400,7 +400,10 @@ IntCell::bif_reciprocal(Cell * Z) const
       }
 
 #ifdef RATIONAL_NUMBERS_WANTED
-   return FloatCell::zv(Z, 1, value.ival);
+   if (value.ival < 0)
+      return FloatCell::zv(Z, -1, -value.ival);
+   else
+      return FloatCell::zv(Z, 1, value.ival);
 #endif
 
    return FloatCell::zv(Z, 1.0/value.ival);
