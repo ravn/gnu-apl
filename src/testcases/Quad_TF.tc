@@ -155,17 +155,17 @@ SCORES
 
 ⍝ Inverse 1 ⎕TF, Chars  ----------------------------------
 
-      X←2 2 3⍴'ABC123abc@#$'
+      X←2 2 3⍴'ABC123abc#$%'
       X
 ABC
 123
 
 abc
-@#$
+#$%
 
       R←1 ⎕TF 'X'
       R
-CX 3 2 2 3 ABC123abc@#$
+CX 3 2 2 3 ABC123abc#$%
 
       ⎕NC 'X'
 2
@@ -182,7 +182,7 @@ ABC
 123
 
 abc
-@#$
+#$%
 
 ⍝ Inverse 1 ⎕TF, Function  ----------------------------------
 
@@ -255,17 +255,17 @@ SCORES
 
 ⍝ Inverse 2 ⎕TF, Chars  ----------------------------------
 
-      X←2 2 3⍴'ABC123abc@#$'
+      X←2 2 3⍴'ABC123abc#$%'
       X
 ABC
 123
 
 abc
-@#$
+#$%
 
       R←2 ⎕TF 'X'
       R
-X←(2 2 3⍴'ABC123abc@#$')
+X←(2 2 3⍴'ABC123abc#$%')
 
       ⎕NC 'X'
 2
@@ -282,7 +282,7 @@ ABC
 123
 
 abc
-@#$
+#$%
 
 ⍝ Inverse 2 ⎕TF, Function  ----------------------------------
 

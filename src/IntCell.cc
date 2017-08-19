@@ -484,18 +484,17 @@ IntCell::bif_nat_log(Cell * Z) const
 ErrorCode
 IntCell::bif_add(Cell * Z, const Cell * A) const
 {
-   if (A->is_integer_cell())
+   if (A->is_integer_cell())   // integer A + integer B
       {
         // both cells are integers.
         //
         const APL_Integer a = A->get_int_value();
         const APL_Integer b =    get_int_value();
-        const APL_Float sum = APL_Float(a) + APL_Float(b);
-
-        if (sum > LARGE_INT ||
-            sum < SMALL_INT)   new (Z) FloatCell(sum);
-        else                   new (Z) IntCell(a + b);
-        return E_NO_ERROR;
+        const APL_Integer z = a + b;
+        if (sum_overflow(z, a, b))
+           return FloatCell::zv(Z, APL_Float(a) + APL_Float(b));
+        else
+           return zv(Z,z);
       }
 
    // delegate to A
@@ -506,18 +505,18 @@ IntCell::bif_add(Cell * Z, const Cell * A) const
 ErrorCode
 IntCell::bif_subtract(Cell * Z, const Cell * A) const
 {
-   if (A->is_integer_cell())
+   if (A->is_integer_cell())   // integer A - integer B
       {
         // both cells are integers.
         //
         const APL_Integer a = A->get_int_value();
         const APL_Integer b =    get_int_value();
-        const APL_Float diff = a - APL_Float(b);
+        const APL_Integer z = a - b;
 
-        if (diff > LARGE_INT ||
-            diff < SMALL_INT)   new (Z) FloatCell(diff);
-        else                    new (Z) IntCell(a - b);
-        return E_NO_ERROR;
+        if (diff_overflow(z, a, b))
+           return FloatCell::zv(Z, APL_Float(a) + APL_Float(b));
+        else
+           return zv(Z,z);
       }
 
    // delegate to A

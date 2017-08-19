@@ -401,22 +401,18 @@ public:
    virtual APL_Integer get_denominator() const { FIXME }
 #endif
 
-   /// return \b true if adding a and b will (probably) overflow.
-   /// For some huge a or b the result may incorrectly return true.
-   static bool sum_overflow(int64_t a, int64_t b)
+   /// return \b true if z = a + b had an overflow.
+   static bool sum_overflow(APL_Integer z, APL_Integer a, APL_Integer b)
       {
-        const int64_t sum = (a >> 4) + (b >> 4);
-        return sum >=  0x0FFFFFFFFFFFFFFELL
-            || sum <= -0x0FFFFFFFFFFFFFFELL;
+        if (z < 0)   return ((a | b) & 0x8000000000000000) == 0;
+        else         return ((a & b) & 0x8000000000000000) != 0;
       }
 
-   /// return \b true if subtracting b from a will (probably) overflow.
-   /// For some huge a or b the result may incorrectly return true.
-   static bool diff_overflow(int64_t a, int64_t b)
+   /// return \b true if z = a - b had an overflow.
+   static bool diff_overflow(APL_Integer z, APL_Integer a, APL_Integer b)
       {
-        const int64_t sum = (a >> 4) - (b >> 4);
-        return sum >=  0x0FFFFFFFFFFFFFFELL
-            || sum <= -0x0FFFFFFFFFFFFFFELL;
+        if (z < 0)   return ((a | ~b) & 0x8000000000000000) == 0;
+        else         return ((a & ~b) & 0x8000000000000000) != 0;
       }
 
    /// return \b true if multiplying a and b will (probably) overflow.
@@ -424,9 +420,9 @@ public:
    /// a or b the result may incorrectly return true.
    static bool prod_overflow(int64_t a, int64_t b)
       {
-        const int64_t prod = (a >> 32) + (b >> 32);
-        return prod >=  0x100000000LL
-            || prod <= -0x100000000LL;
+        const int64_t prod = (a >> 4) * (b >> 4);
+        return prod >=  0x0FFFFFFFFFFFFFFELL
+            || prod <= -0x0FFFFFFFFFFFFFFELL;
       }
 
    /// placement new

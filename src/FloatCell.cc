@@ -381,6 +381,7 @@ FloatCell::bif_add(Cell * Z, const Cell * A) const
         const APL_Integer mult_A  = denom_A / gcd_AB;
         const APL_Integer mult_B  = denom_B / gcd_AB;
         const APL_Integer denom_AB = denom_A * mult_B;
+        if (Cell::prod_overflow(denom_AB, mult_B))                goto big;
 
         // compute numerators...
         const APL_Integer numer_A = A->get_numerator();
@@ -390,8 +391,8 @@ FloatCell::bif_add(Cell * Z, const Cell * A) const
         if (Cell::prod_overflow(numer_B, mult_A))                goto big;
         const APL_Integer numer_B1 = numer_B * mult_A;
 
-        if (Cell::sum_overflow(numer_A1, numer_B1))              goto big;
         const APL_Integer sum_AB = numer_A1 + numer_B1;
+        if (Cell::sum_overflow(sum_AB, numer_A1, numer_B1))      goto big;
         const APL_Integer sum_gcd = gcd(sum_AB, denom_AB);
         if (sum_gcd == denom_AB)   return IntCell::zv(Z, sum_AB / denom_AB);
         if (sum_gcd == 1)   return FloatCell::zv(Z, sum_AB, denom_AB);
@@ -436,8 +437,8 @@ FloatCell::bif_subtract(Cell * Z, const Cell * A) const
         if (Cell::prod_overflow(numer_B, mult_A))                goto big;
         const APL_Integer numer_B1 = numer_B * mult_A;
 
-        if (Cell::diff_overflow(numer_A1, numer_B1))              goto big;
         const APL_Integer diff_AB = numer_A1 - numer_B1;
+        if (Cell::diff_overflow(diff_AB, numer_A1, numer_B1))    goto big;
         const APL_Integer diff_gcd = gcd(diff_AB, denom_AB);
         if (diff_gcd == denom_AB)   return IntCell::zv(Z, diff_AB / denom_AB);
         if (diff_gcd == 1)   return FloatCell::zv(Z, diff_AB, denom_AB);
