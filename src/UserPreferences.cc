@@ -778,7 +778,7 @@ UserPreferences::show_version(ostream & out)
          out << *bt << endl;
        }
 
-   out << "   Archive SVN:    " << ARCHIVE_SVN << endl;
+   out << "    Archive SVN:   " << ARCHIVE_SVN << endl;
 
    Output::set_color_mode(Output::COLM_OUTPUT);
 }
