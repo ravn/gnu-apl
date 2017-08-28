@@ -35,6 +35,7 @@ Bif_OPER1_REDUCE.cc				Bif_OPER1_REDUCE.hh	\
 Bif_OPER1_SCAN.cc				Bif_OPER1_SCAN.hh	\
 CDR.cc						CDR.hh			\
 Cell.cc			Cell.icc		Cell.hh			\
+Doxy.cc						Doxy.hh			\
 CharCell.cc					CharCell.hh		\
 Command.cc		Command.def		Command.hh		\
 Common.cc					Common.hh		\

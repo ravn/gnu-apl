@@ -182,6 +182,7 @@ TabExpansion::expand_command_arg(UCS_string & user,
         case EH_oWSNAME:
         case EH_oLIB_WSNAME:
         case EH_oLIB_oPATH:
+        case EH_oPATH:
         case EH_FILENAME:
         case EH_DIR_OR_LIB:
         case EH_WSNAME:

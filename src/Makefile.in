@@ -154,8 +154,8 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh \
 	Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc \
 	Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc Cell.icc Cell.hh \
-	CharCell.cc CharCell.hh Command.cc Command.def Command.hh \
-	Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
+	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
 	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
 	DynamicObject.hh Error.cc Error.def Error.hh ErrorCode.hh \
 	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
@@ -223,8 +223,8 @@ am__objects_4 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
 	libapl_la-Bif_OPER2_POWER.lo libapl_la-Bif_OPER2_INNER.lo \
 	libapl_la-Bif_OPER2_OUTER.lo libapl_la-Bif_OPER2_RANK.lo \
 	libapl_la-Bif_OPER1_REDUCE.lo libapl_la-Bif_OPER1_SCAN.lo \
-	libapl_la-CDR.lo libapl_la-Cell.lo libapl_la-CharCell.lo \
-	libapl_la-Command.lo libapl_la-Common.lo \
+	libapl_la-CDR.lo libapl_la-Cell.lo libapl_la-Doxy.lo \
+	libapl_la-CharCell.lo libapl_la-Command.lo libapl_la-Common.lo \
 	libapl_la-ComplexCell.lo libapl_la-configure_args.lo \
 	libapl_la-DiffOut.lo libapl_la-DynamicObject.lo \
 	libapl_la-Error.lo libapl_la-Executable.lo \
@@ -283,8 +283,8 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh \
 	Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc \
 	Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc Cell.icc Cell.hh \
-	CharCell.cc CharCell.hh Command.cc Command.def Command.hh \
-	Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
+	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
 	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
 	DynamicObject.hh Error.cc Error.def Error.hh ErrorCode.hh \
 	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
@@ -351,7 +351,7 @@ am__objects_8 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-Bif_OPER2_INNER.$(OBJEXT) apl-Bif_OPER2_OUTER.$(OBJEXT) \
 	apl-Bif_OPER2_RANK.$(OBJEXT) apl-Bif_OPER1_REDUCE.$(OBJEXT) \
 	apl-Bif_OPER1_SCAN.$(OBJEXT) apl-CDR.$(OBJEXT) \
-	apl-Cell.$(OBJEXT) apl-CharCell.$(OBJEXT) \
+	apl-Cell.$(OBJEXT) apl-Doxy.$(OBJEXT) apl-CharCell.$(OBJEXT) \
 	apl-Command.$(OBJEXT) apl-Common.$(OBJEXT) \
 	apl-ComplexCell.$(OBJEXT) apl-configure_args.$(OBJEXT) \
 	apl-DiffOut.$(OBJEXT) apl-DynamicObject.$(OBJEXT) \
@@ -685,8 +685,8 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh \
 	Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc \
 	Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc Cell.icc Cell.hh \
-	CharCell.cc CharCell.hh Command.cc Command.def Command.hh \
-	Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
+	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
 	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
 	DynamicObject.hh Error.cc Error.def Error.hh ErrorCode.hh \
 	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
@@ -935,6 +935,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-ComplexCell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-DerivedFunction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-DiffOut.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Doxy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-DynamicObject.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Error.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Executable.Po@am__quote@
@@ -1026,6 +1027,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-ComplexCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-DerivedFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-DiffOut.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Doxy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-DynamicObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Executable.Plo@am__quote@
@@ -1253,6 +1255,13 @@ libapl_la-Cell.lo: Cell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cell.cc' object='libapl_la-Cell.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Cell.lo `test -f 'Cell.cc' || echo '$(srcdir)/'`Cell.cc
+
+libapl_la-Doxy.lo: Doxy.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Doxy.lo -MD -MP -MF $(DEPDIR)/libapl_la-Doxy.Tpo -c -o libapl_la-Doxy.lo `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Doxy.Tpo $(DEPDIR)/libapl_la-Doxy.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Doxy.cc' object='libapl_la-Doxy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Doxy.lo `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
 
 libapl_la-CharCell.lo: CharCell.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-CharCell.lo -MD -MP -MF $(DEPDIR)/libapl_la-CharCell.Tpo -c -o libapl_la-CharCell.lo `test -f 'CharCell.cc' || echo '$(srcdir)/'`CharCell.cc
@@ -2079,6 +2088,20 @@ apl-Cell.obj: Cell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cell.cc' object='apl-Cell.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Cell.obj `if test -f 'Cell.cc'; then $(CYGPATH_W) 'Cell.cc'; else $(CYGPATH_W) '$(srcdir)/Cell.cc'; fi`
+
+apl-Doxy.o: Doxy.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Doxy.o -MD -MP -MF $(DEPDIR)/apl-Doxy.Tpo -c -o apl-Doxy.o `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Doxy.Tpo $(DEPDIR)/apl-Doxy.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Doxy.cc' object='apl-Doxy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Doxy.o `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
+
+apl-Doxy.obj: Doxy.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Doxy.obj -MD -MP -MF $(DEPDIR)/apl-Doxy.Tpo -c -o apl-Doxy.obj `if test -f 'Doxy.cc'; then $(CYGPATH_W) 'Doxy.cc'; else $(CYGPATH_W) '$(srcdir)/Doxy.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Doxy.Tpo $(DEPDIR)/apl-Doxy.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Doxy.cc' object='apl-Doxy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Doxy.obj `if test -f 'Doxy.cc'; then $(CYGPATH_W) 'Doxy.cc'; else $(CYGPATH_W) '$(srcdir)/Doxy.cc'; fi`
 
 apl-CharCell.o: CharCell.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-CharCell.o -MD -MP -MF $(DEPDIR)/apl-CharCell.Tpo -c -o apl-CharCell.o `test -f 'CharCell.cc' || echo '$(srcdir)/'`CharCell.cc

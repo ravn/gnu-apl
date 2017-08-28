@@ -26,6 +26,7 @@
 #include "CharCell.hh"
 #include "ComplexCell.hh"
 #include "Command.hh"
+#include "Doxy.hh"
 #include "Executable.hh"
 #include "FloatCell.hh"
 #include "IndexExpr.hh"
@@ -690,6 +691,19 @@ const Unicode l = args[0][0];
 UCS_string wsname = args[0];
    args.erase(0);
    Workspace::copy_WS(out, libref, wsname, args, protection);
+}
+//-----------------------------------------------------------------------------
+void 
+Command::cmd_DOXY(ostream & out, UCS_string_vector & args)
+{
+UTF8_string root("/tmp");
+   if (args.size())   root = UTF8_string(args[0]);
+
+Doxy doxy(out, root);
+   doxy.gen();
+
+   out << endl
+       << "Sorry, this command is currently under construction." << endl;
 }
 //-----------------------------------------------------------------------------
 void 

@@ -120,6 +120,9 @@ protected:
    static void cmd_COPY(ostream & out, UCS_string_vector & args,
                         bool protection);
 
+   /// ]DOXY: create doxygen-like documentation of the current workspace
+   static void cmd_DOXY(ostream & out, UCS_string_vector & args);
+
    /// )DROP: delete a workspace file
    static void cmd_DROP(ostream & out, const UCS_string_vector & args);
 

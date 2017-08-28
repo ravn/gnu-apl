@@ -81,6 +81,10 @@ void
 init_1(const char * argv0, bool log_startup)
 {
 rlimit rl;
+
+#ifndef RLIMIT_AS // BSD
+#define RLIMIT_AS RLIMIT_DATA
+#endif
    getrlimit(RLIMIT_AS, &rl);
    total_memory = rl.rlim_cur;
 

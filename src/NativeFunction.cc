@@ -334,7 +334,6 @@ NativeFunction::cleanup()
 void
 NativeFunction::destroy()
 {
-   if (close_fun)   (*close_fun)(CAUSE_ERASED, this);
    if (close_fun && handle)
       {
         const bool do_dlclose = (*close_fun)(CAUSE_ERASED, this);
@@ -342,8 +341,15 @@ NativeFunction::destroy()
            {
              dlclose(handle);
              handle = 0;
+             close_fun = 0;
            }
       }
+   else if (handle)
+      {
+        dlclose(handle);
+        handle = 0;
+      }
+
    delete this;
 }
 //-----------------------------------------------------------------------------

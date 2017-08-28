@@ -82,7 +82,7 @@ EXPO:
 	tools/check_src
 	svn -m "auto-commit by make EXPO" commit
 	svn update
-	cd src; source buildtag
+	cd src; . buildtag
 	svn -m "auto-commit by make EXPO" commit
 	./configure --disable-maintainer-mode
 	make all
