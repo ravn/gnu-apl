@@ -96,9 +96,9 @@ Simple_string<const Symbol *, false> variables;
 
         bool is_function = false;
         bool is_variable = false;
-        loop(vs, sym->value_stack_size())
+        loop(si, sym->value_stack_size())
             {
-              switch((*sym)[vs].name_class)
+              switch((*sym)[si].name_class)
                  {
                    case NC_VARIABLE: is_variable = true;   break;
                    case NC_FUNCTION: is_function = true;   break;
@@ -133,25 +133,26 @@ ofstream index(index_filename.c_str());
 "    <TABLE class=funtab>"                                                 CRLF
 "     <TR>"                                                                CRLF
 "      <TH>Function"                                                       CRLF
+"      <TH>SI"                                                             CRLF
 "      <TH>Header"                                                         CRLF;
    loop(f, functions.size())
       {
         const Symbol & fun_sym = *functions[f];
-        loop(vs, fun_sym.value_stack_size())
+        loop(si, fun_sym.value_stack_size())
             {
-              if (fun_sym[vs].name_class == NC_FUNCTION ||
-                  fun_sym[vs].name_class == NC_OPERATOR)
+              if (fun_sym[si].name_class == NC_FUNCTION ||
+                  fun_sym[si].name_class == NC_OPERATOR)
                  {
-                   const Function * fp = fun_sym[vs].sym_val.function;
+                   const Function * fp = fun_sym[si].sym_val.function;
                    const UserFunction * ufun = fp->get_ufun1();
                    Assert(fp);
-                   const char * native = "";
-                   if (fp->is_native())   native = " (native)";
                    index << "  <tr>"                                       CRLF
-                            "   <td class=code>"
-                         << fun_sym.get_name() << native <<                CRLF
-                            "   <td class=code>";
+                            "   <TD class=code>"
+                         << fun_sym.get_name() <<                          CRLF
+                            "   <TD class=code>" << si <<                  CRLF 
+                            "   <TD class=code>";
                    if (ufun && !fp->is_native())   bold_name(index, ufun);
+                   else if (fp->is_native())       index << "(native)";
                    else                            index << "-";
                    index <<                                                CRLF;
                  }
@@ -164,26 +165,40 @@ ofstream index(index_filename.c_str());
 "    <TABLE class=vartab>"                                                 CRLF
 "     <TR>"                                                                CRLF
 "      <TH>Variable"                                                       CRLF
+"      <TH>SI"                                                             CRLF
 "      <TH>⍴⍴"                                                             CRLF
 "      <TH>⍴"                                                              CRLF
-"      <TH>≡"                                                              CRLF;
+"      <TH>≡"                                                              CRLF
+"      <TH>Type"                                                              CRLF;
    loop(v, variables.size())
       {
         const Symbol & var_sym = *variables[v];
-        loop(vs, var_sym.value_stack_size())
+        loop(si, var_sym.value_stack_size())
             {
-              if (var_sym[vs].name_class == NC_VARIABLE)
+              if (var_sym[si].name_class == NC_VARIABLE)
                  {
-                   Assert(!!var_sym[vs].apl_val);
-                   const Value * value = var_sym[vs].apl_val.get();
+                   Assert(!!var_sym[si].apl_val);
+                   const Value * value = var_sym[si].apl_val.get();
                    index << "  <tr>"                                       CRLF
                             "   <td class=code>" << var_sym.get_name() <<  CRLF
+                            "   <td class=code>" << si <<                  CRLF
                             "   <td class=code>" << value->get_rank() <<   CRLF
                             "   <td class=code>";
                    loop(r, value->get_rank())
                        index << " " << value->get_shape_item(r);
                    index << CRLF << "   <td class=code>"
                          << value->compute_depth()                      << CRLF;
+
+                   const CellType ct = value->deep_cell_types();
+                   if ((ct & CT_NUMERIC) && (ct & CT_CHAR))
+                      index <<   "   <td class=code>Mixed"                 CRLF;
+                   else if (ct & CT_NUMERIC)
+                      index <<   "   <td class=code>Numeric"               CRLF;
+                   else if (ct & CT_CHAR)
+                      index <<   "   <td class=code>Character"             CRLF;
+                   else
+                      index <<   "   <td class=code>? ? ?"                 CRLF;
+
                  }
             }
       }
