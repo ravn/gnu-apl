@@ -27,17 +27,23 @@
 
 using namespace std;
 
+class UserFunction;
+
 //-----------------------------------------------------------------------------
 class Doxy
 {
 public:
    Doxy(ostream & out, const UCS_string & root_dir);
 
-   void write_css();
-
    void gen();
 
 protected:
+   /// write a fixed CSS file
+   void write_css();
+
+   /// (HTML-)print header with name in bold to file of
+   void bold_name(ostream & of, const UserFunction * ufun);
+
    ostream & out;
 
    /// the name of the workspace (for HTML output)

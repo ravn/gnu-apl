@@ -228,7 +228,7 @@ public:
    UCS_string operator +(const UCS_string & other) const
       { UCS_string ret(*this);   ret.append(other);   return ret; }
 
-   /// assigne UCS_string \b other
+   /// assign UCS_string \b other
    const UCS_string & operator =(const UCS_string & other)
       {
         shrink(0);

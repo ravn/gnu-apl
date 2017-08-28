@@ -245,6 +245,9 @@ public:
    const Simple_string<Function_Line, false> & get_trace_lines() const
       { return trace_lines; }
 
+   const UserFunction_header & get_header() const
+      { return header; }
+
 protected:
    /// constructor for a normal (i.e. non-lambda) user defined function
    UserFunction(const UCS_string txt, const char * loc,
