@@ -1045,6 +1045,10 @@ Value_P Z(len, LOC);
                       data = reinterpret_cast<APL_Integer>
                            (reinterpret_cast<const LvalCell *>(&cB)
                               ->get_cell_owner());
+#ifdef RATIONAL_NUMBERS_WANTED
+                   else if (cB.get_cell_type() == CT_FLOAT)
+                      memcpy(&data, cB.get_u1(), sizeof(data));
+#endif
                  }
 
               new (cZ)   IntCell(data);

@@ -41,9 +41,13 @@ protected:
    /// write a fixed CSS file
    void write_css();
 
-   /// (HTML-)print header with name in bold to file of
+   /// (HTML-)print a function header with the name in bold to file of
    void bold_name(ostream & of, const UserFunction * ufun);
 
+   // write the page for one defined function
+   void function_page(const UserFunction * ufun);
+
+   /// the command output channel (COUR or CERR)
    ostream & out;
 
    /// the name of the workspace (for HTML output)

@@ -21,6 +21,7 @@
 
 #include "Doxy.hh"
 #include "Heapsort.hh"
+#include "NativeFunction.hh"
 #include "PrintOperator.hh"
 #include "UserFunction.hh"
 #include "UTF8_string.hh"
@@ -147,13 +148,28 @@ ofstream index(index_filename.c_str());
                    const UserFunction * ufun = fp->get_ufun1();
                    Assert(fp);
                    index << "  <tr>"                                       CRLF
-                            "   <TD class=code>"
-                         << fun_sym.get_name() <<                          CRLF
-                            "   <TD class=code>" << si <<                  CRLF 
                             "   <TD class=code>";
-                   if (ufun && !fp->is_native())   bold_name(index, ufun);
-                   else if (fp->is_native())       index << "(native)";
-                   else                            index << "-";
+
+                   if (ufun)
+                      {
+                        function_page(ufun);
+                        index << "<A href=f_" << fun_sym.get_name() <<".html>"
+                              << fun_sym.get_name() << "</A>"              CRLF;
+                      }
+                   else
+                      {
+                        index << fun_sym.get_name() <<                     CRLF;
+                      }
+                   index << "   <TD class=code>" << si <<                  CRLF 
+                            "   <TD class=code>";
+                   if (ufun && !fp->is_native())
+                      bold_name(index, ufun);
+                   else if (fp->is_native())
+                      index << "(native) "
+                            << reinterpret_cast<const NativeFunction *>
+                                               (fp)->get_so_path();
+                   else
+                      index << "-";
                    index <<                                                CRLF;
                  }
             }
@@ -169,7 +185,7 @@ ofstream index(index_filename.c_str());
 "      <TH>⍴⍴"                                                             CRLF
 "      <TH>⍴"                                                              CRLF
 "      <TH>≡"                                                              CRLF
-"      <TH>Type"                                                              CRLF;
+"      <TH>Type"                                                           CRLF;
    loop(v, variables.size())
       {
         const Symbol & var_sym = *variables[v];
@@ -209,6 +225,61 @@ ofstream index(index_filename.c_str());
    index.close();
 }
 //-----------------------------------------------------------------------------
+void
+Doxy::function_page(const UserFunction * ufun)
+{
+UTF8_string fun_filename(root_dir);
+   fun_filename.append_str("/f_");
+   fun_filename.append(UTF8_string(ufun->get_name()));
+   fun_filename.append_str(".html");
+   out << "Writing function HTML file " << fun_filename << endl;
+ofstream fun(fun_filename.c_str());
+   fun <<
+"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""                      CRLF
+"                      \"http://www.w3.org/TR/html4/strict.dtd\">"         CRLF
+"<HTML>"                                                                   CRLF
+"  <HEAD>"                                                                 CRLF
+"    <TITLE>Documentation of function" << ufun->get_name() << "</TITLE> "  CRLF
+"    <META http-equiv=\"content-type\" "                                   CRLF
+"          content=\"text/html; charset=UTF-8\">"                          CRLF
+"   <LINK rel='stylesheet' type='text/css' href='apl_doxy.css'>"           CRLF
+" </HEAD>"                                                                 CRLF
+" <BODY>"                                                                  CRLF
+"  <H1>Function " << ufun->get_name() << "</H1>"                           CRLF
+"  <H2><A href=index.html>→HOME</A></H2>"                                  CRLF;
+
+   fun << "<pre>" CRLF "    ∇ ";
+   loop(l, ufun->get_text_size())
+       {
+         const UCS_string & line(ufun->get_text(l));
+         if (l > 99)       fun << "[" << l << "]";
+         else if (l > 9)   fun << "[" << l << "] ";
+         else if (l > 0)   fun << "[" << l << "]  ";
+         loop(c, line.size())
+            {
+              const Unicode cc = line[c];
+            switch(cc)
+               {
+                 case '#':  fun << "&#35;";   break;
+                 case '%':  fun << "&#37;";   break;
+                 case '&':  fun << "&#38;";   break;
+                 case '<':  fun << "&lt;";    break;
+                 case '>':  fun << "&gt;";    break;
+                 default: fun << cc;
+               }
+            }
+         fun <<                                                            CRLF;
+       }
+   fun << "    ∇</pre>"                                                    CRLF;
+
+   fun <<
+" </BODY>"                                                                 CRLF
+" </HTML>"                                                                 CRLF;
+
+   fun.close();
+}
+//-----------------------------------------------------------------------------
+
 void
 Doxy::bold_name(ostream & of, const UserFunction * ufun)
 {

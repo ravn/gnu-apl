@@ -700,7 +700,7 @@ public:
       {
         switch(c & 0xFF)
            {
-              case '#':  out_file << "&#35;";    break;
+              case '#':  out_file << "&#35;";   break;
               case '%':  out_file << "&#37;";   break;
               case '&':  out_file << "&#38;";   break;
               case '<':  out_file << "&lt;";    break;
