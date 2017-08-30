@@ -345,6 +345,15 @@ public:
    /// dump \b this string to out (like U+nnn U+mmm ... )
    ostream & dump(ostream & out) const;
 
+   /// sort the characters in this string by their Unicode
+   UCS_string sort() const;
+
+   /// return the characters in this string (sorted and duplicates removed)
+   UCS_string unique() const;
+
+   /// retrun this string HTML-escaped, starting at offset
+   UCS_string to_HTML(int offset) const;
+
    /// helper function for Heapsort<Unicode>::sort()
    static bool greater_uni(const Unicode & u1, const Unicode & u2, const void *)
       { return u1 > u2; }
@@ -374,12 +383,6 @@ public:
    /// convert double \b value to an UCS_string with \b quad_pp significant
    /// digits in fixed point format
    static UCS_string from_double_fixed_pp(APL_Float value, int quad_pp);
-
-   /// sort the characters in this string by their Unicode
-   UCS_string sort() const;
-
-   /// return the characters in this string (sorted and duplicates removed)
-   UCS_string unique() const;
 
    /// return the total number of UCS_strings
    static ShapeItem get_total_count()

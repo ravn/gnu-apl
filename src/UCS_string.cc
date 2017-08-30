@@ -1148,3 +1148,24 @@ UCS_string ret;
    return ret;
 }
 //----------------------------------------------------------------------------
+UCS_string
+UCS_string::to_HTML(int offset) const
+{
+UCS_string ret;
+   for (;offset < size(); ++offset)
+      {
+        const Unicode uni = at(offset);
+        switch(uni)
+           {
+             case '#':  ret.append_ascii("&#35;");   break;
+             case '%':  ret.append_ascii("&#37;");   break;
+             case '&':  ret.append_ascii("&#38;");   break;
+             case '<':  ret.append_ascii("&lt;");    break;
+             case '>':  ret.append_ascii("&gt;");    break;
+             default:   ret.append(uni);
+           }
+      }
+   
+   return ret;
+}
+//----------------------------------------------------------------------------
