@@ -92,7 +92,8 @@ protected:
    int node_ID(const UserFunction * ufun);
 
    /// convert a .gv file to a .png file using program 'dot'
-   int gv_to_png(const char * gv_filename, const char * png_filename);
+   int gv_to_png(const char * gv_filename, const char * png_filename,
+                 bool cmapx);
 
    /// the command output channel (COUR or CERR)
    ostream & out;
