@@ -402,8 +402,9 @@ const Token_string & body = ufun->get_body();
       {
         const Token & tok = body[b];
         if (tok.get_Class() != TC_SYMBOL)   continue;
-        const Symbol & callee_sym = *tok.get_sym_ptr();
-        Assert(&callee_sym);
+        const Symbol * callee_ptr = tok.get_sym_ptr();
+        Assert(callee_ptr);
+        const Symbol & callee_sym = *callee_ptr;
         loop(si, callee_sym.value_stack_size())
             {
               if (callee_sym[si].name_class == NC_FUNCTION ||
