@@ -51,6 +51,9 @@ typedef int32_t Depth;
 /// The dimensions of an APL value.
 typedef int64_t ShapeItem;
 
+/// The SI level, 0 = global (oldest), caller at level N called function at N+1
+typedef int SI_level;
+
 /// One APL character value.
 typedef Unicode APL_Char;
 

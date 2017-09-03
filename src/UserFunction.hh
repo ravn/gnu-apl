@@ -98,7 +98,7 @@ public:
 
 
    /// return the idx'th local variable
-   const Symbol & get_local_var(ShapeItem idx) const
+   const Symbol * get_local_var(ShapeItem idx) const
       { return header.get_local_var(idx); }
 
 
@@ -143,8 +143,11 @@ public:
    /// Return a pounter to this newly created function (or 0 on error).
    static UserFunction * load(const char * workspace, const char * function);
 
-   /// Overloaded Function::destroy()
+   /// overloaded Function::destroy()
    virtual void destroy();
+
+   /// overloaded Executable::pushes_sym() const
+   virtual bool pushes_sym(const Symbol * sym) const;
 
    /// print help for this function on out (for the )HELP command)
    void help(ostream & out) const;

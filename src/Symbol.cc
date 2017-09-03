@@ -1169,7 +1169,7 @@ const ValueStackItem & vs = value_stack[0];
              //
              loop(l, ufun->local_var_count())
                  {
-                   out << ";" << ufun->get_local_var(l).get_name();
+                   out << ";" << ufun->get_local_var(l)->get_name();
                  }
              out << UNI_ASCII_R_CURLY << endl;
            }
@@ -1186,6 +1186,34 @@ const ValueStackItem & vs = value_stack[0];
              out << endl << endl;
            }
       }
+}
+//-----------------------------------------------------------------------------
+int
+Symbol::get_SI_level(const Function * fun) const
+{
+   loop(v, value_stack.size())
+       {
+         const ShapeItem from_tos = value_stack.size() - v - 1;
+         const ValueStackItem & item = value_stack[from_tos];
+         if (item.sym_val.function == fun)
+            return Workspace::SI_top()->nth_push(this, from_tos);
+       }
+
+   FIXME;
+}
+//-----------------------------------------------------------------------------
+int
+Symbol::get_SI_level(const Value * val) const
+{
+   loop(v, value_stack.size())
+       {
+         const ShapeItem from_tos = value_stack.size() - v - 1;
+         const ValueStackItem & item = value_stack[from_tos];
+         if (item.apl_val.get() == val)
+            return Workspace::SI_top()->nth_push(this, from_tos);
+       }
+
+   FIXME;
 }
 //-----------------------------------------------------------------------------
 void

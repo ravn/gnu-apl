@@ -84,6 +84,21 @@ Symbol * sym = new Symbol(sym_name, ID::USER_SYMBOL);
    return sym;
 }
 //-----------------------------------------------------------------------------
+UCS_string
+SymbolTable::find_lambda_name(const UserFunction * lambda)
+{
+   loop(s, SYMBOL_HASH_TABLE_SIZE)
+       {
+         for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
+             {
+               if (sym->is_erased())   continue;
+               if (sym->get_ufun_depth(lambda) != -1)   return sym->get_name();
+             }
+       }
+
+   return UCS_string();
+}
+//-----------------------------------------------------------------------------
 ostream &
 SymbolTable::list_symbol(ostream & out, const UCS_string & buf1) const
 {

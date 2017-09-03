@@ -93,11 +93,11 @@ public:
    ParseMode get_parse_mode() const
       { return executable->get_parse_mode(); }
 
-   /// evaluate a →N statement. Update pc return true iff context has changed
+   /// evaluate a →N statement. Update pc, return true iff context has changed
    Token jump(Value_P val);
 
    /// return the nesting level (oldest SI has level 0, next has level 1, ...)
-   int get_level() const   { return level; };
+   SI_level get_level() const   { return level; };
 
    /// return the current line number
    Function_Line get_line() const;
@@ -176,9 +176,16 @@ public:
    Prefix & get_prefix()
       { return current_stack; }
 
+   /// get the current prefix parser
+   const Prefix & get_prefix() const
+      { return current_stack; }
+
    /// return the SI that has called this one
    StateIndicator * get_parent() const
       { return parent; }
+
+   /// return the level at which sym is pushed for the nth. time
+   SI_level nth_push(const Symbol * sym, int from_tos) const;
 
    /// a small storage for DerivedFunction objects.
   DerivedFunctionCache fun_oper_cache;
@@ -191,7 +198,7 @@ protected:
    int safe_execution_count;
 
    /// The nesting level (of sub-executions)
-   const int level;
+   const SI_level level;
 
    /// details of the last error in this context.
    Error error;

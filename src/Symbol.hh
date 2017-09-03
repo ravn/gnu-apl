@@ -277,6 +277,12 @@ public:
    bool equal(const UCS_string & ucs) const
       { return (name.compare(ucs) == COMP_EQ); }
 
+   /// return the level of fun on the stack of \b this Symbol) on the SI stack
+   int get_SI_level(const Function * fun) const;
+
+   /// return the SI stack level of val on the stack of \b this Symbol)
+   int get_SI_level(const Value * val) const;
+
    /// The next Symbol with the same hash value as \b this \b Symbol
    Symbol * next;
 

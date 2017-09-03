@@ -115,11 +115,11 @@ public:
    Token * locate_R();
 
    /// return the current monadic function (if any)
-   const Function * get_dyadic_fun()
+   const Function * get_dyadic_fun() const
       { return at1().get_ValueType() == TV_FUN ? at1().get_function() : 0; }
 
    /// return the current dyadic function (if any)
-   const Function * get_monadic_fun()
+   const Function * get_monadic_fun() const
       { return at0().get_ValueType() == TV_FUN ? at0().get_function() : 0; }
 
    /// execute one context (user defined function or operator, execute,
@@ -141,6 +141,10 @@ public:
    /// return the leftmost token (e.g. A in A←B)
    Token & at0()
       { Assert1(size() > 0);   return content[put - 1].tok; }
+
+   /// return the second token from the left (e.g. ← in A←B)
+   const Token & at1() const
+      { Assert1(size() > 1);   return content[put - 2].tok; }
 
    /// return the second token from the left (e.g. ← in A←B)
    Token & at1()
@@ -222,6 +226,10 @@ public:
    Function_PC get_PC() const
       { return PC; }
 
+   /// return the PC that has caused an error
+   Function_PC get_error_PC() const
+      { return content[put - 1].pc; } 
+
    /// set action according to (result-) Token type
    void set_action(const Token & result)
       {
@@ -287,7 +295,7 @@ protected:
    /// put pointer (for the next token at PC)
    int put;
 
-   /// the lookahead token (read but not yet reduced)
+   /// the lookahead tokens (tokens that were read but not yet reduced)
    Token_loc content[MAX_CONTENT];
 
    /// the X token (leftmost token in MISC phrase, if any)

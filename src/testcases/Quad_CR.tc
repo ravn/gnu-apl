@@ -271,8 +271,8 @@ A ┌2─┐ 1 ┌2──┐ ┌3────────┐
       27 ⎕CR A
  65  65 66  1  1 2   1 2  3 4  
 
-      28 ⎕CR A
- 0  0 0  0  0 0   0 0  0 0  
+      28 ⎕CR A   ⍝ depends on ./configured rational number support
+ 0  0 0  ⁶  ⁶ ⁶   ⁶ ⁶  ⁶ ⁶  
 
       29 ⎕CR 3 2⍴1 2 'a' 'hello' '' (2 2 4⍴'ABC')
 ┏→━━━━━━━━━━┓

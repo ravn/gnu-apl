@@ -167,6 +167,15 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref)
               continue;
             }
 
+         if (r == UNI_PAD_U6)   // ⁶: match 28 ⎕CR 42
+            {
+#ifdef RATIONAL_NUMBERS_WANTED
+              if (a != '1')   return true;   // different
+#else
+              if (a != '0')   return true;   // different
+#endif
+              continue;
+            }
          if (r == UNI_PAD_Un)   // ⁿ: optional unit multiplier
             {
               // ⁿ shall match an optional  unit multiplier, ie.

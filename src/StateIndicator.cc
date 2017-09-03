@@ -489,6 +489,33 @@ Value_P * X = current_stack.locate_X();
    if (X)   *X = new_value;
 }
 //-----------------------------------------------------------------------------
+int
+StateIndicator::nth_push(const Symbol * sym, int from_tos) const
+{
+   if (from_tos == 0)   return 0;
+
+  // collect SI entries in reverse order...
+   //
+Simple_string<const StateIndicator *, false> stack;
+
+   for (const StateIndicator * si = Workspace::SI_top();
+        si; si = si->get_parent())
+      {
+        stack.append(si);
+      }
+
+   loop(d, stack.size())
+       {
+         const StateIndicator * si = stack[stack.size() - d - 1];
+         const Executable * exec = si->get_executable();
+         Assert(exec);
+         if (!exec->pushes_sym(sym))   continue;
+         if (0 == --from_tos)   return si->get_level();
+       }
+
+   FIXME;
+}
+//-----------------------------------------------------------------------------
 Function_Line
 StateIndicator::get_line() const
 {

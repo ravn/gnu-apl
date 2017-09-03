@@ -1149,7 +1149,7 @@ UCS_string ret;
 }
 //----------------------------------------------------------------------------
 UCS_string
-UCS_string::to_HTML(int offset) const
+UCS_string::to_HTML(int offset, bool preserve_ws) const
 {
 UCS_string ret;
    for (;offset < size(); ++offset)
@@ -1157,6 +1157,9 @@ UCS_string ret;
         const Unicode uni = at(offset);
         switch(uni)
            {
+             case ' ':  if (preserve_ws)   ret.append_ascii("&nbsp;");
+                        else               ret.append(uni);
+                        break;
              case '#':  ret.append_ascii("&#35;");   break;
              case '%':  ret.append_ascii("&#37;");   break;
              case '&':  ret.append_ascii("&#38;");   break;

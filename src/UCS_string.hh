@@ -351,8 +351,8 @@ public:
    /// return the characters in this string (sorted and duplicates removed)
    UCS_string unique() const;
 
-   /// retrun this string HTML-escaped, starting at offset
-   UCS_string to_HTML(int offset) const;
+   /// return this string HTML-escaped, starting at offset, maybe using &nbsp;
+   UCS_string to_HTML(int offset, bool preserve_ws) const;
 
    /// helper function for Heapsort<Unicode>::sort()
    static bool greater_uni(const Unicode & u1, const Unicode & u2, const void *)

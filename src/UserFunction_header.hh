@@ -139,8 +139,8 @@ public:
       { return local_vars.size(); }
 
    /// return the idx'th local variable
-   const Symbol & get_local_var(ShapeItem idx) const
-      { return *local_vars[idx]; }
+   const Symbol * get_local_var(ShapeItem idx) const
+      { return local_vars[idx]; }
 
 protected:
    /// remove \b sym from local_vars if it occurs at pos or above

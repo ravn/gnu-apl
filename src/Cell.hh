@@ -397,7 +397,10 @@ public:
       { return E_DOMAIN_ERROR; }
 
 #ifdef RATIONAL_NUMBERS_WANTED
+   /// return the numerator of a quotient
    virtual APL_Integer get_numerator() const   { FIXME }
+
+   /// return the denominator of a quotient, or 0 for non-quotients
    virtual APL_Integer get_denominator() const { FIXME }
 #endif
 

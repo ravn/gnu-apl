@@ -21,6 +21,7 @@
 #define __DOXY_HH_DEFINED__
 
 #include "UCS_string.hh"
+#include "UCS_string_vector.hh"
 #include "UTF8_string.hh"
 
 #include <ostream>
@@ -33,11 +34,34 @@ class UserFunction;
 /// one endge in a (directed) function call graph
 struct fcall_edge
 {
+   fcall_edge()
+   : caller(0),
+     caller_name(0),
+     callee(0),
+     callee_name(0),
+     value(0)
+   {}
+
+   fcall_edge(const UserFunction * cer, const UCS_string * cer_name,
+              const UserFunction * cee, const UCS_string * cee_name )
+   : caller(cer),
+     caller_name(cer_name),
+     callee(cee),
+     callee_name(cee_name),
+     value(0)
+   {}
+
    /// the calling function
    const UserFunction * caller;
 
+   /// the (Symbol-) name of the calling function
+   const UCS_string * caller_name;
+
    /// the called function
    const UserFunction * callee;
+
+   /// the (Symbol-) name of called function
+   const UCS_string * callee_name;
 
    /// some arbitrary int used in graph algorithms
    int      value;
@@ -55,6 +79,17 @@ public:
    /// generate the entire documentation
    void gen();
 
+   /// HTML-print a table with all functions to 'page'
+   void functions_table(const Simple_string<const Symbol *, false> & functions,
+                       ofstream & page);
+
+   /// HTML-print a table with all variables to 'page'
+   void variables_table(const Simple_string<const Symbol *, false> & variables,
+                       ofstream & page);
+
+   /// HTML-print a table with the SI stack to 'page'
+   void SI_table(ofstream & page);
+
    /// return the number of errors that have occurred
    int get_errors() const
       { return errors; }
@@ -67,10 +102,12 @@ protected:
    void write_css();
 
    /// (HTML-)print a function header with the name in bold to file of
-   void bold_name(ostream & of, const UserFunction * ufun);
+   void bold_name(ostream & of, const UserFunction * ufun) const;
 
-   /// write the page for one defined function
-   void function_page(const UserFunction * ufun);
+   /// write the page for one defined function. If the define function is a
+   /// named lambda, then lambda_owner is the Symbol to which the lambda was
+   /// assigned.
+   void function_page(const UserFunction * ufun, const UCS_string & alias);
 
    /// create the call graph
    void make_call_graph(const Simple_string<const Symbol *, false> & all_funs);
@@ -84,12 +121,17 @@ protected:
    void set_call_graph_root(const UserFunction * ufun);
 
    /// write the call graph (if caller == false), or else the caller graph
-   int write_call_graph(const UserFunction * ufun, bool caller);
+   int write_call_graph(const UserFunction * ufun, const UCS_string & alias,
+                        bool caller);
 
    /// swap callers and callees
    void swap_caller_calee();
 
+   /// return the index of \b ufun in \b nodes[] or -1 if not found
    int node_ID(const UserFunction * ufun);
+
+   /// return an HTML-anchor for function \b name (in the output files)
+   static UCS_string fun_anchor(const UCS_string & name);
 
    /// convert a .gv file to a .png file using program 'dot'
    int gv_to_png(const char * gv_filename, const char * png_filename,
@@ -106,6 +148,9 @@ protected:
 
    /// the nodes for the current root.
    Simple_string<const UserFunction *, false> nodes;
+
+   /// the real names for the current root.
+   UCS_string_vector aliases;
 
    /// a directed graph telling which function calles which
    CallGraph call_graph;

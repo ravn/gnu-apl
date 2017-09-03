@@ -915,6 +915,24 @@ UserFunction::destroy()
    else               delete this;
 }
 //-----------------------------------------------------------------------------
+bool
+UserFunction::pushes_sym(const Symbol * sym) const
+{
+   if (sym == header.Z())   return true;
+   if (sym == header.A())   return true;
+   if (sym == header.LO())   return true;
+   if (sym == header.X())   return true;
+   if (sym == header.RO())   return true;
+   if (sym == header.B())   return true;
+
+   loop(l, local_var_count())
+       {
+         if (sym == get_local_var(l))   return true;
+       }
+
+   return false;
+}
+//-----------------------------------------------------------------------------
 void 
 UserFunction::help(ostream & out) const
 {
@@ -926,7 +944,7 @@ UserFunction::help(ostream & out) const
          CERR << "Lambda: { " << body << " ";
          loop(v, local_var_count())
             {
-              const Symbol & sym = get_local_var(v);
+              const Symbol & sym = *get_local_var(v);
               CERR << ";" << sym.get_name();
             }
          CERR << " }" << endl;
@@ -996,6 +1014,11 @@ UCS_string
 UserFunction::get_name_and_line(Function_PC pc) const
 {
 UCS_string ret = header.get_name();
+   if (ret.size() && ret[0] == UNI_LAMBDA)
+      {
+        UCS_string name = Workspace::find_lambda_name(this);
+        if (name.size())   ret = name;
+      }
    ret.append(UNI_ASCII_L_BRACK);
 
    // pc may point to the next token already. If that is the case then

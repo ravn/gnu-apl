@@ -74,6 +74,9 @@ public:
         return 0;
       }
 
+   /// return the name to which \b lambda ia assigned (empty if not found)
+   UCS_string find_lambda_name(const UserFunction * lambda);
+
    /// add \b sym to the symbol table. The caller has checked
    /// that new_name does not yet exist in the symbol table
    void add_symbol(T * sym)
@@ -138,6 +141,9 @@ class SymbolTable : public SymbolTableBase<Symbol, SYMBOL_HASH_TABLE_SIZE>
 public:
    /// Return or create a \b Symbol with name \b ucs in \b this \b SymbolTable.
    Symbol * lookup_symbol(const UCS_string & ucs);
+
+   /// return the name to which \b lambda ia assigned (empty if not found)
+   UCS_string find_lambda_name(const UserFunction * lambda);
 
    /// List all symbols in \b this \b SymbolTable (for )VARS, )FNS etc.)
    void list(ostream & out, ListCategory which, UCS_string from_to) const;

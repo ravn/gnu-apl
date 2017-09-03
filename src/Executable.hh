@@ -70,7 +70,11 @@ public:
 
    /// return a UserFunction * (if \b this is one) or else 0.
    virtual const UserFunction * get_ufun() const
-   { return 0; }
+      { return 0; }
+
+   /// return true if this Executable localizes Symbol \b sym
+   virtual bool pushes_sym(const Symbol * sym) const
+      { return false; }
 
    /// return a UserFunction * (if \b this is one) or else 0.
    virtual UserFunction * get_ufun()

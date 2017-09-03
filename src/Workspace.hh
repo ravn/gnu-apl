@@ -208,6 +208,10 @@ public:
    /// lookup an existing symbol (user defined or ⎕xx).
    static Symbol * lookup_existing_symbol(const UCS_string & symbol_name);
 
+   /// return the name to which \b lambda ia assigned (empty if not found)
+   static UCS_string find_lambda_name(const UserFunction * lambda)
+      { return the_workspace.symbol_table.find_lambda_name(lambda); }
+
    /// save this workspace
    static void save_WS(ostream & out, LibRef lib, const UCS_string & wsname,
                        bool name_from_WSID);
