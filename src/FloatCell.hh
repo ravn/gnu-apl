@@ -79,6 +79,7 @@ public:
    static ErrorCode zv(Cell * Z, APL_Integer numer, APL_Integer denom)
       { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }
 
+   /// initialize Z with the value of \b this FloatCell
    ErrorCode zv(Cell * Z) const
       {
         if (const APL_Integer denom = get_denominator())

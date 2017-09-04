@@ -97,12 +97,16 @@
 #endif
 
 class APL_Float;
+
+/// the essential data of an APL_Float, so that it can be used in a union
 class APL_Float_Base
 {
 public:
+   /// return the value as double
    double _get() const
       { return dval; }
 
+   /// set the value from a double
    APL_Float_Base & _set(double d)
       { dval = d;    return *this; }
 
@@ -122,19 +126,26 @@ public:
       }
 
 protected:
+   /// the value
    double dval;
 };
 //------------------------------------------------------------------------------
+/// a non-rational APL floating point value
 class APL_Float : public APL_Float_Base
 {
 public:
+   /// default constructor
    APL_Float()                      { dval = 0.0; }
+
+   /// constructor from a \b double value \b d
    APL_Float(double d)              { dval = d; }
 
+   /// assingment from another APL_Float
    APL_Float & operator =(const APL_Float & other)
       { dval = other.dval; return *this; }
 };
 //------------------------------------------------------------------------------
+/// cast from APL_Float_Base to APL_Float
 APL_Float_Base::operator APL_Float() const
 {
    return APL_Float(dval);

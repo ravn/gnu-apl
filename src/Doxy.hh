@@ -34,6 +34,7 @@ class UserFunction;
 /// one endge in a (directed) function call graph
 struct fcall_edge
 {
+   /// default constructor
    fcall_edge()
    : caller(0),
      caller_name(0),
@@ -42,6 +43,7 @@ struct fcall_edge
      value(0)
    {}
 
+   /// constructor
    fcall_edge(const UserFunction * cer, const UCS_string * cer_name,
               const UserFunction * cee, const UCS_string * cee_name )
    : caller(cer),
@@ -94,6 +96,7 @@ public:
    int get_errors() const
       { return errors; }
 
+   /// return the directory into which all documenattion files will be written
    const UTF8_string & get_root_dir() const
       { return root_dir; }
 
@@ -155,6 +158,7 @@ protected:
    /// a directed graph telling which function calles which
    CallGraph call_graph;
 
+   /// the number of errors that have occurred
    int errors;
 };
 //-----------------------------------------------------------------------------

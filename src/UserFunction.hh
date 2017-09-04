@@ -248,6 +248,8 @@ public:
    const Simple_string<Function_Line, false> & get_trace_lines() const
       { return trace_lines; }
 
+   /// return the header object (return value name, argument names, local vars,
+   /// and function name) for this function
    const UserFunction_header & get_header() const
       { return header; }
 

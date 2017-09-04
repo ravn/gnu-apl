@@ -219,27 +219,31 @@ public:
    union SomeValue
       {
         Unicode        aval;        ///< a character
-        APL_Float_Base cval[2];
+        APL_Float_Base cval[2];     ///< a complex number
         ErrorCode      eval;        ///< an error code
         APL_Integer    ival;        ///< an integer
         struct _fval                ///< a floating point value
            {
+             /// either a floating point value, or the denominator of a quotient
              union _flt_num
                 {
                   APL_Float_Base flt;   ///< the non-rational value
 	          APL_Integer    num;   ///< the numerator of the quotient
-                } u1;
-	     APL_Integer denominator;       ///< the denominator of the quotient
-           }           fval;
+                } u1;                   ///< primary value, 27 ⎕CR
+
+             /// 0 for floating point value, or the denominator of a quotient
+	     APL_Integer denominator;
+           }           fval;        ///< a rational or floating point value
         void          *vptr;        ///< a void pointer
         Cell          *next;        ///< pointer to the next (unused) cell
         Cell          *lval;        ///< left value (for selective assignment)
+
+        /// pointer to, and owner of, a nested APL (sub-) value
         struct _pval
            {
              Value_P_Base valp;     ///< a pointer to a value
              Value       *owner;    ///< the value containing a PointerCell
-           }           pval;
-
+           }           pval;        ///< a nested value, and its owner
       };
 
    /// return the type of \b this cell
