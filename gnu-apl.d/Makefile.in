@@ -291,11 +291,6 @@ top_srcdir = @top_srcdir@
 dist_noinst_DATA = preferences.in keyboard1.txt parallel_thresholds
 dist_DATA = preferences keyboard1.txt parallel_thresholds
 distdir = ${sysconfdir}/gnu-apl.d
-
-# update preferences when eg. ./configure --prefix is executed.
-# See autoconf.pdf page 29
-#
-edit = sed -e 's|@prefix[@]|$(prefix)|g'
 all: all-am
 
 .SUFFIXES:
@@ -513,12 +508,6 @@ uninstall-am: uninstall-distDATA
 	mostlyclean-libtool pdf pdf-am ps ps-am tags-am uninstall \
 	uninstall-am uninstall-distDATA
 
-
-# build preferences after configure
-preferences: Makefile $(srcdir)/preferences.in
-	rm -f $@; srcdir=''; \
-	test -f ./$@.in || srcdir=$(srcdir)/; \
-	$(edit) $${srcdir}$@.in >$@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

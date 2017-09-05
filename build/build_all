@@ -4,23 +4,32 @@
 
 # figure and normalize some directory names
 #
-LOG_dir="/tmp"    # where to store build logs
+LOG_dir="/tmp"    # where to store longer build logs
 START_dir=`pwd`
-cd `dirname $0` ; BUILD_dir=`pwd`
-cd ..           ; ROOT_dir=`pwd`
-cd src          ; SRC_dir=`pwd`
+cd `dirname $0` 
+BUILD_dir=`pwd`
+ROOT_dir=`dirname $BUILD_dir`
+SRC_dir="$ROOT_dir/src"
 
-# remove old build results
+# remove old build results and start a fresh summary file
 #
 rm -f "$BUILD_dir"/apl-*
-echo "build summary:" > "$BUILD_dir/summary"
+echo "Build Summary:" > "$BUILD_dir/summary"
 
 # build one configuration
 #
 build_one()
 {
-   echo "building configuration \"$1\"..."
    local time_FROM=`date +%s`
+   cd $ROOT_dir
+   echo "configuring for configuration \"$1\"..."
+   {
+     set -o xtrace
+
+     ./configure $2
+     set +o xtrace
+   } > "/tmp/configure-$1" 2>&1
+   echo "building configuration \"$1\"..."
    cd $ROOT_dir
    {
      echo "building \"$1\"..."
@@ -29,15 +38,27 @@ build_one()
 ======== make clean done ======================================================
 "
      make -j4 all
-   } > "/tmp/build-$build_name.log"
+   } > "/tmp/build-$1"
    local make_result=$?
    local time_TO=`date +%s`
    local secs=$(( $time_TO - $time_FROM ))
+   local summ="$BUILD_dir/summary"
    if [ $make_result -eq 0 ] 
-      then echo "    build $build_name: OK ($secs seconds)"     \
-           >> "$BUILD_dir/summary"
-      else echo "*** build $build_name: FAILED ($secs seconds)" \
-           >> "$BUILD_dir/summary"
+   then
+       echo "    make OK" >> $summ
+       if [ -f "$SRC_dir/apl" ]
+       then
+           mv -f "$SRC_dir/apl" "$BUILD_dir/apl--$1"
+       elif [ -f "$SRC_dir/libapl.so" ]
+       then
+           mv -f "$SRC_dir/libapl.so" "$BUILD_dir/"
+       else
+           echo "**** no file $SRC_dir/apl" >> $summ
+       fi
+       echo "    build $1: OK ($secs seconds)" >> $summ
+   else
+       echo "make returned: $make_result" >> $summ
+       echo "*** build $1: FAILED ($secs seconds)" >> $summ
    fi
 }
 
@@ -47,73 +68,62 @@ test_one()
 {
    echo "testing configuration \"$1\"..."
    local time_FROM=`date +%s`
+   local summ="$BUILD_dir/summary"
    cd $SRC_dir
    make test > /dev/null 2>&1
    local make_result=$?
    local time_TO=`date +%s`
    local secs=$(( $time_TO - $time_FROM ))
    if [ $make_result -eq 0 ] 
-      then echo "    test $build_name: OK ($secs seconds)"     \
-           >> "$BUILD_dir/summary"
-      else echo "*** test $build_name: FAILED ($secs seconds)" \
-           >> "$BUILD_dir/summary"
+      then echo "    test $1: OK ($secs seconds)"     >> $summ
+      else echo "*** test $1: FAILED ($secs seconds)" >> $summ
    fi
 }
 
 cd $ROOT_dir
 autoreconf
 
+# shortcuts for various build options
+STD="--enable-maintainer-mode"
+LIB="--with-libapl"
+DEV="DEVELOP_WANTED=yes"
+RAT="RATIONAL_NUMBERS_WANTED=yes"
+
+PER="PERFORMANCE_COUNTERS_WANTED=yes"
+DYL="DYNAMIC_LOG_WANTED=yes"
+CC_3="CORE_COUNT_WANTED=-3"		# ⎕SYL controls the nubber fo cores
+noVC="VALUE_CHECK_WANTED=no"
+noVH="VALUE_HISTORY_WANTED=no"
+AL0="ASSERT_LEVEL_WANTED=0"             # no ASSERTions
+FAST="noVC noVH AL0"
+
 # the standard configuration
 #
-build_name="standard"
-cd $ROOT_dir
-./configure >/dev/null 2>&1
-build_one $build_name
-cp "$SRC_dir/apl" "$BUILD_dir/apl-$build_name"
-test_one $build_name
+build_one "standard" "$STD"
+test_one  "standard"
 
 # the developer configuration
 #
-build_name="develop"
-cd $ROOT_dir
-./configure --enable-maintainer-mode DEVELOP_WANTED=yes
-build_one $build_name
-cp "$SRC_dir/apl" "$BUILD_dir/apl-$build_name"
-test_one $build_name
+build_one "develop" "$STD $DEV"
+test_one "develop"
+
 
 # the developer configuration with rational number support
 #
-build_name="rational"
-cd $ROOT_dir
-./configure --enable-maintainer-mode \
-   DEVELOP_WANTED=yes \
-   RATIONAL_NUMBERS_WANTED=yes
-build_one $build_name
-cp "$SRC_dir/apl" "$BUILD_dir/apl-$build_name"
+build_one "rational" "$STD $DEV $RAT"
+
 
 # apl as library
 #
-build_name="libapl"
-cd $ROOT_dir
-./configure --with-libapl 
-build_one $build_name
-ls "$SRC_dir/.libs/"
-cp "$SRC_dir/.libs/libapl.so" "$BUILD_dir/apl-lib.so"
+build_one "libapl" "$STD $LIB"
+
 
 # parallel benchmarking
 #
-build_name="parallel_bench"
-cd $ROOT_dir
-./configure --enable-maintainer-mode                    \
-                    VALUE_CHECK_WANTED=no               \
-                    VALUE_HISTORY_WANTED=no             \
-                    PERFORMANCE_COUNTERS_WANTED=yes     \
-                    DYNAMIC_LOG_WANTED=yes              \
-                    ASSERT_LEVEL_WANTED=0               \
-                    CORE_COUNT_WANTED=-3
-build_one $build_name
-ls "$SRC_dir/.libs/"
-cp "$SRC_dir/apl" "$BUILD_dir/apl-parallel_bench"
+build_one "parallel_bench" "$STD $FAST $PER $DYL $CC_3"
+
 
 cat "$BUILD_dir/summary"
+
+cd $START_dir	# undo all cds in this script
 

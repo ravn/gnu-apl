@@ -254,7 +254,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
 
    if (count < 0)   count = 64;
 
-   loop(c, CORE_COUNT_WANTED)   all_CPUs.append((CPU_Number)c);
+   loop(c, CORE_COUNT_WANTED)   all_CPUs.append(static_cast<CPU_Number>(c));
 
    Log(LOG_Parallel || logit)
       {
