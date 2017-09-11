@@ -218,6 +218,6 @@ help_def(-4, "⍤",  "Rank",                    "Call GA F GB with each of the c
 help_def(-3, "⍣",  "Power Operator",          "repeat G times: B ← F B                       (numeric scalar G)\n",                              "")
 help_def(-3, "⍣",  "Power Operator",          "repeat: B ← F B until (F B) G B is true       (function G)\n",                                    "")
 help_def(-4, "⍣",  "Power Operator",          "repeat G times: B ← A F B                     (numeric scalar G)\n",                              "")
-help_def(-3, "⍣",  "Power Operator",          "repeat: B ← A F B until (A F B) G B is true   (function G)\n",                                    "")
+help_def(-4, "⍣",  "Power Operator",          "repeat: B ← A F B until (A F B) G B is true   (function G)\n",                                    "")
 #undef help_def
 
