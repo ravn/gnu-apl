@@ -115,11 +115,26 @@ ul.no-bullet {list-style: none}
     <li><a name="toc-Axis-argument-in-defined-functions" href="#Section-3_002e14">3.14 Axis argument in defined functions</a></li>
     <li><a name="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-3_002e15">3.15 ⎕SI - State Indicator</a></li>
     <li><a name="toc-_005b_003f_005dDLX-_002d-Knuth_0027s-Dancing-Links-Algorithm" href="#Section-3_002e16">3.16 ⎕DLX - Knuth&rsquo;s Dancing Links Algorithm</a></li>
-    <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e17">3.17 History and TAB completion</a></li>
-    <li><a name="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-3_002e18">3.18 ⎕SQL - SQL Database Interface</a></li>
-    <li><a name="toc-_005b_003f_005dPS-_002d-Print-Style" href="#Section-3_002e19">3.19 ⎕PS - Print Style</a></li>
-    <li><a name="toc-Rational-Numbers" href="#Section-3_002e20">3.20 Rational Numbers</a></li>
-    <li><a name="toc-Comparison-Rules" href="#Section-3_002e21">3.21 Comparison Rules</a></li>
+    <li><a name="toc-_005b_003f_005dRE_003a-Regular-Expressions" href="#Section-3_002e17">3.17 ⎕RE: Regular Expressions</a>
+    <ul class="no-bullet">
+      <li><a name="toc-Preconditions" href="#Preconditions">3.17.1 Preconditions</a></li>
+      <li><a name="toc-Syntax" href="#Syntax">3.17.2 Syntax</a></li>
+      <li><a name="toc-The-Regular-Expression-A" href="#The-Regular-Expression-A">3.17.3 The Regular Expression A</a></li>
+      <li><a name="toc-The-String_0028s_0029-B-Being-Matched" href="#The-String_0028s_0029-B-Being-Matched">3.17.4 The String(s) B Being Matched</a></li>
+      <li><a name="toc-The-Flags-X" href="#The-Flags-X">3.17.5 The Flags X</a>
+      <ul class="no-bullet">
+        <li><a name="toc-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x" href="#libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x">3.17.5.1 libpcre2 flags: i, m, s, and x</a></li>
+        <li><a name="toc-The-APL-output-format-flags-_007c_002c-_005b_003f_005d_002c-and-_002f" href="#The-APL-output-format-flags-_007c_002c-_005b_003f_005d_002c-and-_002f">3.17.5.2 The APL output format flags ↓, ⊂, and /</a></li>
+        <li><a name="toc-the-_005b_003f_005dRE-global-flag-g" href="#the-_005b_003f_005dRE-global-flag-g">3.17.5.3 the ⎕RE global flag g</a></li>
+        <li><a name="toc-the-_005b_003f_005dRE-error-flag-E" href="#the-_005b_003f_005dRE-error-flag-E">3.17.5.4 the ⎕RE error flag E</a></li>
+      </ul></li>
+      <li><a name="toc-Complex-Matches" href="#Complex-Matches">3.17.6 Complex Matches</a></li>
+    </ul></li>
+    <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e18">3.18 History and TAB completion</a></li>
+    <li><a name="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-3_002e19">3.19 ⎕SQL - SQL Database Interface</a></li>
+    <li><a name="toc-_005b_003f_005dPS-_002d-Print-Style" href="#Section-3_002e20">3.20 ⎕PS - Print Style</a></li>
+    <li><a name="toc-Rational-Numbers" href="#Section-3_002e21">3.21 Rational Numbers</a></li>
+    <li><a name="toc-Comparison-Rules" href="#Section-3_002e22">3.22 Comparison Rules</a></li>
   </ul></li>
   <li><a name="toc-Limitations-and-Missing-Features" href="#Chapter-4">4 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -809,15 +824,17 @@ Next: <a href="#Chapter-4" accesskey="n" rel="next">Chapter 4</a>, Previous: <a 
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e16">Section 3.16</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕DLX: Knuth&rsquo;s Dancing Links Algorithm
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e17">Section 3.17</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">History and TAB completion
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e17">Section 3.17</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕RE: Regular Expressions
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e18">Section 3.18</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SQL - SQL Database Interface
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e18">Section 3.18</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">History and TAB completion
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e19">Section 3.19</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕PS - Print Style
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e19">Section 3.19</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SQL - SQL Database Interface
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e20">Section 3.20</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Rational Numbers
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e20">Section 3.20</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕PS - Print Style
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e21">Section 3.21</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Comparison Rules
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e21">Section 3.21</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Rational Numbers
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e22">Section 3.22</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Comparison Rules
 </td></tr>
 </table>
 
@@ -1383,7 +1400,7 @@ Next: <a href="#Section-3_002e7" accesskey="n" rel="next">Section 3.7</a>, Previ
 <h3 class="section">3.6 ]DOXY Command</h3>
 
 <p>A particularly useful debug command is ]Doxy. It dumps the current workspace
-in browsable HTML format with listings of defined functions and hyperlinks
+in brows-able HTML format with listings of defined functions and hyperlinks
 between them.
 </p>
 <div class="smallexample">
@@ -1412,7 +1429,7 @@ command was executed.
 <p>One can (and should make it a habit to) insert special comments into defined
 function which are copied into proper places inside the documentation that is
 generated by the ]DOXY command. These &quot;Doxy&quot; comments begin with ⍝⍝ (as opposed
-to  &quot;normal&quot; APL comments that start with a single ⍝. Foxy cpmments are
+to  &quot;normal&quot; APL comments that start with a single ⍝. Doxy comments are
 typically one-liners that briefly explain what a function is supposed to do.
 </p>
 <p>For example:
@@ -2102,8 +2119,302 @@ a little more complicated, but the principle is the same.
 <p>
 Next: <a href="#Section-3_002e18" accesskey="n" rel="next">Section 3.18</a>, Previous: <a href="#Section-3_002e16" accesskey="p" rel="prev">Section 3.16</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
+<a name="g_t_005b_003f_005dRE_003a-Regular-Expressions"></a>
+<h3 class="section">3.17 ⎕RE: Regular Expressions</h3>
+
+<p>⎕RE is a function that provides access to a subset of libpcre2, which is a
+powerful regular expression matching library. &quot;pcre&quot; is an acronym for &quot;Perl
+compatible regular expressions&quot;. libpcre2 is Copyright (c) 1997-2017
+University of Cambridge, England.
+</p>
+<a name="Preconditions"></a>
+<h4 class="subsection">3.17.1 Preconditions</h4>
+
+<p>libpcre2 is NOT shipped with GNU APL but must be installed before the GNU APL
+./configure script is executed. The ./configure script tries to locate libpcre2
+and enables ⎕RE if the library (and its header files) are found.
+</p>
+<p>If ./configure does not find libpcre2, then ⎕RE will raise a SYNTAX ERROR when
+⎕RE is used in an APL program.
+</p>
+<a name="Syntax"></a>
+<h4 class="subsection">3.17.2 Syntax</h4>
+
+<p>⎕RE has two forms. The short form (without an axis argument) is intended to
+cover the most likely use cases of ⎕RE, while the long form gives more control
+over the format of the result produced by ⎕RE:
+</p>
+<pre class="verbatim">Z ← A ⎕RE B      (short form, no axis)
+Z ← A ⎕RE[X] B   (long form, with axis X)
+</pre>
+<p>The short form is equivalent to the long form with an empty axis:
+</p>
+<pre class="verbatim">    A ⎕RE B   ←→   A ⎕RE[''] B
+</pre>
+<p>It therefore suffices to explain the long form. The long form has 3 different
+arguments A, B, and X.
+</p>
+<a name="The-Regular-Expression-A"></a>
+<h4 class="subsection">3.17.3 The Regular Expression A</h4>
+
+<p>A is a simple character vector which is expected to be a regular expression
+as defined for the libpcre2 library. GNU passes A unmodified to libpcre2. The
+format of A ranges from very simple REs to very complex REs. In fact, regular
+expressions are a language of their own, and it is impossible to describe them
+here. The user of ⎕RE is referred to the description that comes with libpcre2.
+</p>
+<p>See in particular:
+</p>
+<p>man pcre2pattern
+</p>
+<a name="The-String_0028s_0029-B-Being-Matched"></a>
+<h4 class="subsection">3.17.4 The String(s) B Being Matched</h4>
+
+<p>B is either (1) a simple character vector (which is then also passed unmodified
+to libpcre2) or (2) a (nested) APL array containing only simple character
+vectors.
+</p>
+<p>In the case (2) the result of ⎕RE is conceptually the same as if the EACH
+operator had been applied to ⎕RE:
+</p>
+<pre class="verbatim">    A ⎕RE B   ←→   A ⎕RE ¨ B
+</pre>
+<p>The libpcre2 first compiles A into an internal representation that improves
+the matching (of B) speed. As a consequence, if several strings are matched
+with the same regular expression A, then it is (sometimes considerably) faster
+to call ⎕RE once with several nested Bs that multiple times than calling ⎕RE
+multiple times with the same A but different Bs. This is in particular the case when longer text files with many lines is being matched.
+</p>
+<p>If multiple (nested) strings B are used then A is compiled once and after that
+the different ⊃B[i] in B are passed unmodified to libpcre2. In that
+case the result is nested and (⍴B) ≡ (⍴A ⎕RE[X] B). We can therefore limit
+the description to the case where B is a simple character vector.
+</p>
+<p>Any string B that is passed to libpcre2 is called &quot;Subject&quot; in the
+libpcre2 documentation.
+</p>
+<a name="The-Flags-X"></a>
+<h4 class="subsection">3.17.5 The Flags X</h4>
+
+<p>Without any flags (or with an empty flag string X) ⎕RE returns the first
+match of the regular expression A in the string B. The flags will change
+this behavior in order to adapt various aspects of the matching to satisfy
+different requirements that the user of ⎕RE may have. The X argument of
+⎕RE is a character vector where each character is a flag. The different flag
+characters are either flags understood by (and then passed unmodified to)
+libpcre2 or flags understood by ⎕RE itself (and then not passed to libpcre2).
+</p>
+<a name="libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x"></a>
+<h4 class="subsubsection">3.17.5.1 libpcre2 flags: i, m, s, and x</h4>
+
+<p>The libpcre2 flags accepted by ⎕RE are: i, m, s, and x. They correspond to the
+following libpcre2 flags:
+</p>
+<ul>
+<li> i: PCRE2_CASELESS   (case insensitive matching)
+</li><li> m: PCRE2_MULTILINE  (matching across multiple lines)
+</li><li> s: PCRE2_DOTALL     (dot (.) also matches CR/LF)
+</li><li> x: PCRE2_EXTENDED   (see &rsquo;man pcre2pattern&rsquo;)
+</li></ul>
+
+<p>Please also consult the libpcre2 documentation for a description of these flags.
+</p>
+<a name="The-APL-output-format-flags-_007c_002c-_005b_003f_005d_002c-and-_002f"></a>
+<h4 class="subsubsection">3.17.5.2 The APL output format flags ↓, ⊂, and /</h4>
+
+<p>⎕RE provides different output formats, some of which are tailored to different
+APL functions. There are currently 4 different output formats:
+</p>
+<ul>
+<li> no flag: ⎕RE returns the matching sub-string of B
+
+</li><li> ↓ flag:  ⎕RE returns the position and the length of the matched sub-string of B,
+The result does not depend on ⎕IO and can be used by ↓ and ↑ to cut out the
+matched pieces.
+
+</li><li> ⊂ flag:  ⎕RE returns an integer vector suitable as the left argument of 
+   partition (⊂)
+
+</li><li> / flag:  ⎕RE returns an Boolean vector suitable as the left argument of 
+   compress (/)
+</li></ul>
+
+<p>The following examples may better explain the nature of the output flags:
+</p>
+<pre class="verbatim">      ⍝ return matched string
+      4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
+┏→━━┓
+┃foo┃
+┗━━━┛
+
+      ⍝ return possition and length
+      4 ⎕CR 'f..' ⎕RE['↓'] '__foo___fun____fox'
+┏→━━┓
+┃2 3┃
+┗━━━┛
+
+      ⍝ return left argument of ⊂
+      4 ⎕CR 'f..' ⎕RE['⊂'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ return left argument of /
+      4 ⎕CR 'f..' ⎕RE['/'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+</pre>
+<p>In the absence of a &rsquo;g&rsquo; flag (see below) the results of output formats
+⊂ and / are identical; if &rsquo;g&rsquo; is present, however, then they may differ.
+</p>
+<a name="the-_005b_003f_005dRE-global-flag-g"></a>
+<h4 class="subsubsection">3.17.5.3 the ⎕RE global flag g</h4>
+
+<p>The default behavior of ⎕RE is to return only the first match in B.
+The &rsquo;g&rsquo; flag causes ⎕RE to return all matches. For example:
+</p>
+<pre class="verbatim">      4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
+┏→━━┓
+┃foo┃
+┗━━━┛
+      4 ⎕CR 'f..' ⎕RE['g'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━┓ ┏→━━┓┃
+┃┃foo┃ ┃fun┃ ┃fox┃┃
+┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
+┗∊━━━━━━━━━━━━━━━━┛
+
+      4 ⎕CR 'f..' ⎕RE['↓'] '__foo___fun____fox'
+┏→━━┓
+┃2 3┃
+┗━━━┛
+      4 ⎕CR 'f..' ⎕RE['↓g'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━┓ ┏→━━━┓┃
+┃┃2 3┃ ┃8 3┃ ┃15 3┃┃
+┃┗━━━┛ ┗━━━┛ ┗━━━━┛┃
+┗∊━━━━━━━━━━━━━━━━━┛
+
+      4 ⎕CR 'f..' ⎕RE['⊂'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+      4 ⎕CR 'f..' ⎕RE['⊂g'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃0 0 1 1 1 0 0 0 2 2 2 0 0 0 0 3 3 3┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      4 ⎕CR 'f..' ⎕RE['/'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+      4 ⎕CR 'f..' ⎕RE['/g'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃0 0 1 1 1 0 0 0 1 1 1 0 0 0 0 1 1 1┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+</pre>
+<p>Please note that the &rsquo;g&rsquo; flag increments the depth of the result of the output
+formats string and position/length, but not of the result of output formats
+partition and compress.
+</p>
+<a name="the-_005b_003f_005dRE-error-flag-E"></a>
+<h4 class="subsubsection">3.17.5.4 the ⎕RE error flag E</h4>
+
+<p>The default behavior of ⎕RE is to return an empty result if no match of
+the regular expression A is found in B. It is sometimes more convenient to
+raise an error if no match is found. This can be achieved with the E flag:
+</p>
+<pre class="verbatim">       4 ⎕CR 'g..' ⎕RE[''] '__foo___fun____fox'
+┏⊖┓
+┃0┃
+┗━┛
+       'g..' ⎕RE['E'] '__foo___fun____fox'
+DOMAIN ERROR+
+      'g..' ⎕RE['E']'__foo___fun____fox'
+      ^            ^
+      )more
+No match
+</pre>
+<p>The &rsquo;E&rsquo; flag has no effect if the &rsquo;g&rsquo; flag is also given because in that case
+it is natural to check the length of the result:
+</p>
+<pre class="verbatim">       'g..' ⎕RE['Eg'] '__foo___fun____fox'
+
+</pre>
+<a name="Complex-Matches"></a>
+<h4 class="subsection">3.17.6 Complex Matches</h4>
+
+<p>The regular expressions considered so far were simple, which means that they
+did not have (regular) sub-expressions. In other words, the regular expression
+A did not contain non-literal (unquoted) parentheses. However, the libpcre2
+allows sub-expressions and ⎕RE follows suit to a certain extent. If A contains
+sub-expressions, then the result A ⎕RE becomes deeper, and the structure of
+the result is determined by the structure of the parentheses in A.
+</p>
+<p>The result of a general regular expression A is recursively constructed by ⎕RE
+as follows:
+</p>
+<p>1. If A contains no sub-expressions then the result is constructed as described
+   in the previous sections.
+</p>
+<p>2. If A contains sub-expressions, say A1, ... An, then the result is a (nested)
+   vector with N+1 elements where the first element is the entire match (which
+   contains the sub-matches) and the following elements are the next-level
+   sub-matches.
+</p>
+<p>Since the sub-matches are contained in their parent matches, it makes no sense
+to handle sub-matches in the partition and compress output formats. For the
+string and pos+len formats, the following examples may give an insight as to
+how the results look like.
+</p>
+<p>The regular expression A ← &rsquo;f(.)(.)&rsquo; used in the example below is a top-level
+regular expression which contains two 1-character sub-expressions (.).
+The result is therefore the top-level match plus two 1-character sub-matches:
+</p>
+<pre class="verbatim">      4 ⎕CR 'f(.)(.)' ⎕RE[''] '__foo___fun____fox'
+┏→━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→┓ ┏→┓┃
+┃┃foo┃ ┃o┃ ┃o┃┃
+┃┗━━━┛ ┗━┛ ┗━┛┃
+┗∊━━━━━━━━━━━━┛
+</pre>
+<p>Matching all instead of only the first then gives:
+</p>
+<pre class="verbatim">      4 ⎕CR 'f(.)(.)' ⎕RE['g'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━┓┃
+┃┃┏→━━┓ ┏→┓ ┏→┓┃ ┃┏→━━┓ ┏→┓ ┏→┓┃ ┃┏→━━┓ ┏→┓ ┏→┓┃┃
+┃┃┃foo┃ ┃o┃ ┃o┃┃ ┃┃fun┃ ┃u┃ ┃n┃┃ ┃┃fox┃ ┃o┃ ┃x┃┃┃
+┃┃┗━━━┛ ┗━┛ ┗━┛┃ ┃┗━━━┛ ┗━┛ ┗━┛┃ ┃┗━━━┛ ┗━┛ ┗━┛┃┃
+┃┗∊━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━┛┃
+┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+</pre>
+<p>The same for the pos+len output format:
+</p>
+<p>4 ⎕CR &rsquo;f(.)(.)&rsquo; ⎕RE[&rsquo;↓&rsquo;] &rsquo;__foo___fun____fox&rsquo;
+┏→━━━━━━━━━━━━━━┓
+┃2 3 ┏→━━┓ ┏→━━┓┃
+┃    ┃3 1┃ ┃4 1┃┃
+┃    ┗━━━┛ ┗━━━┛┃
+┗∊━━━━━━━━━━━━━━┛
+      4 ⎕CR &rsquo;f(.)(.)&rsquo; ⎕RE[&rsquo;↓g&rsquo;] &rsquo;__foo___fun____fox&rsquo;
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━━━┓┃
+┃┃2 3 ┏→━━┓ ┏→━━┓┃ ┃8 3 ┏→━━┓ ┏→━━━┓┃ ┃15 3 ┏→━━━┓ ┏→━━━┓┃┃
+┃┃    ┃3 1┃ ┃4 1┃┃ ┃    ┃9 1┃ ┃10 1┃┃ ┃     ┃16 1┃ ┃17 1┃┃┃
+┃┃    ┗━━━┛ ┗━━━┛┃ ┃    ┗━━━┛ ┗━━━━┛┃ ┃     ┗━━━━┛ ┗━━━━┛┃┃
+┃┗∊━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━━━┛┃
+┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+</p>
+<hr>
+<a name="Section-3_002e18"></a>
+<div class="header">
+<p>
+Next: <a href="#Section-3_002e19" accesskey="n" rel="next">Section 3.19</a>, Previous: <a href="#Section-3_002e17" accesskey="p" rel="prev">Section 3.17</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
 <a name="History-and-TAB-completion"></a>
-<h3 class="section">3.17 History and TAB completion</h3>
+<h3 class="section">3.18 History and TAB completion</h3>
 
 <p>Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user
 input. libreadline did provide two useful features: tab expansion (the tab
@@ -2145,13 +2456,13 @@ recalling function lines (and which are not fully supported in GNU APL).
 </p>
 
 <hr>
-<a name="Section-3_002e18"></a>
+<a name="Section-3_002e19"></a>
 <div class="header">
 <p>
-Next: <a href="#Section-3_002e19" accesskey="n" rel="next">Section 3.19</a>, Previous: <a href="#Section-3_002e17" accesskey="p" rel="prev">Section 3.17</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e20" accesskey="n" rel="next">Section 3.20</a>, Previous: <a href="#Section-3_002e18" accesskey="p" rel="prev">Section 3.18</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="g_t_005b_003f_005dSQL-_002d-SQL-Database-Interface"></a>
-<h3 class="section">3.18 ⎕SQL - SQL Database Interface</h3>
+<h3 class="section">3.19 ⎕SQL - SQL Database Interface</h3>
 
 <p>As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below.
@@ -2250,13 +2561,13 @@ given table. Currently, the column layout is as follows:
 release.
 </p>
 <hr>
-<a name="Section-3_002e19"></a>
+<a name="Section-3_002e20"></a>
 <div class="header">
 <p>
-Next: <a href="#Section-3_002e20" accesskey="n" rel="next">Section 3.20</a>, Previous: <a href="#Section-3_002e18" accesskey="p" rel="prev">Section 3.18</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e21" accesskey="n" rel="next">Section 3.21</a>, Previous: <a href="#Section-3_002e19" accesskey="p" rel="prev">Section 3.19</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="g_t_005b_003f_005dPS-_002d-Print-Style"></a>
-<h3 class="section">3.19 ⎕PS - Print Style</h3>
+<h3 class="section">3.20 ⎕PS - Print Style</h3>
 
 <p>⎕PS is an integer vector that currently (read: SVN 982) contains two integers
 which control some details of how APL values are being printed. The default
@@ -2275,13 +2586,13 @@ workspaces
 the same values.
 </p>
 <hr>
-<a name="Section-3_002e20"></a>
+<a name="Section-3_002e21"></a>
 <div class="header">
 <p>
-Next: <a href="#Section-3_002e21" accesskey="n" rel="next">Section 3.21</a>, Previous: <a href="#Section-3_002e19" accesskey="p" rel="prev">Section 3.19</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e22" accesskey="n" rel="next">Section 3.22</a>, Previous: <a href="#Section-3_002e20" accesskey="p" rel="prev">Section 3.20</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="Rational-Numbers"></a>
-<h3 class="section">3.20 Rational Numbers</h3>
+<h3 class="section">3.21 Rational Numbers</h3>
 
 <p>GNU APL has limited support for rational numbers. Instead of dividing integers
 (and possibly causing rounding errors), integer quotionts are kept undivided
@@ -2300,13 +2611,13 @@ in most cases it is slower.
 be enabled via ./configure (see README-2-configure).
 </p>
 <hr>
-<a name="Section-3_002e21"></a>
+<a name="Section-3_002e22"></a>
 <div class="header">
 <p>
-Previous: <a href="#Section-3_002e20" accesskey="p" rel="prev">Section 3.20</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Previous: <a href="#Section-3_002e21" accesskey="p" rel="prev">Section 3.21</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="Comparison-Rules"></a>
-<h3 class="section">3.21 Comparison Rules</h3>
+<h3 class="section">3.22 Comparison Rules</h3>
 
 <p>Both IBM APL2 and the ISO standard require that the arguments of &lt;, ≤, ≥, and
 &gt; (but not = or ≠) are integer or real numbers, and that the argument of monadic

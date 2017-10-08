@@ -67,6 +67,9 @@
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #define HAVE_LIBNSL 1
 
+/* Define to 1 if you have the `pcre2-32' library (-lpcre2-32). */
+#define HAVE_LIBPCRE2_32 1
+
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #define HAVE_LIBPTHREAD 1
 

@@ -86,6 +86,7 @@ Quad_CR.cc					Quad_CR.hh		\
 Quad_DLX.cc					Quad_DLX.hh		\
 Quad_FIO.cc					Quad_FIO.hh		\
 Quad_FX.cc					Quad_FX.hh		\
+Quad_RE.cc					Quad_RE.hh		\
 Quad_RL.cc					Quad_RL.hh		\
 Quad_SQL.cc					Quad_SQL.hh		\
 Quad_SVx.cc					Quad_SVx.hh		\
@@ -124,6 +125,11 @@ Value.cc		Value.icc		Value.hh		\
 ValueHistory.cc					ValueHistory.hh		\
 Workspace.cc					Workspace.hh            \
 static_Objects.cc                               static_Objects.hh
+
+if HAVE_LIBPCRE2_32
+common_SOURCES +=                                                       \
+Regexp.cc                                       Regexp.hh
+endif
 
 if SQLITE3
 common_CXXFLAGS += $(SQLITE3_CFLAGS)

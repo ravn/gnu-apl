@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "Assert.hh"
 #include "Backtrace.hh"
 #include "Common.hh"
 #include "Heapsort.hh"
@@ -105,6 +106,15 @@ public:
 #endif
       }
 
+   /// cast to an array of items with the same size as Unicode. This is for
+   /// interfacing to libraries that have typedef'ed Unicodes differently.
+   template<typename T>
+   const T * raw() const
+      {
+        Assert(sizeof(T) == sizeof(Unicode));
+        return reinterpret_cast<const T *>(&at(0));
+      }
+
    /// compute the length of an output row
    int compute_chunk_length(int quad_PW, int col) const;
 
@@ -182,7 +192,7 @@ public:
    /// return this string reversed (i.e. characters from back to front).
    UCS_string reverse() const;
 
-   /// return true if \b yhis string starts with # or ⍝ or x:
+   /// return true if \b this string starts with # or ⍝ or x:
    bool is_comment_or_label() const;
 
    /// return true if every character in \b this string is the digit '0'

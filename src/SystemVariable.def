@@ -73,6 +73,7 @@ rw_sv_def(OMEGA_U,   "",      "{ ... } right function arg"   )
   sf_def(Quad_NA,    "NA",    "Name Association"             )
   sf_def(Quad_NC,    "NC",    "Name Class"                   )
   sf_def(Quad_NL,    "NL",    "Name List"                    )
+  sf_def(Quad_RE,    "RE",    "Regular expression"           )
   sf_def(Quad_SI,    "SI",    "State Indicator"              )
   sf_def(Quad_SQL,   "SQL",   "SQL functions"                )
   sf_def(Quad_SVC,   "SVC",   "Shared Variable Control"      )
@@ -86,6 +87,3 @@ rw_sv_def(OMEGA_U,   "",      "{ ... } right function arg"   )
   sf_def(Quad_UCS,   "UCS",   "Universal Char Set (Unicode)" )
 # undef sf_def
 #endif
-
-
-
