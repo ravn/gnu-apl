@@ -77,7 +77,7 @@ int ofcnt = 0;
    if (ofcnt > 1)
       {
         MORE_ERROR() << "Multiple ⎕RE output flags: '" << flags_string
-                     << "'. Output flags are: ⊂⍳/";
+                     << "'. The ⎕RE output flags are: ⊂↓/";
         DOMAIN_ERROR;
       }
 }
@@ -202,7 +202,7 @@ Value_P
 Quad_RE::partition_result(const Regexp & A, const Flags & X,
                           const UCS_string & B)
 {
-const ShapeItem len = B.size();
+const PCRE2_SIZE len = B.size();
 Value_P Z(len, LOC);
    loop(z, len)   new (Z->next_ravel())   IntCell(0);
 

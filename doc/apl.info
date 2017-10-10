@@ -1927,11 +1927,11 @@ different arguments A, B, and X.
 -------------------------------
 
 A is a simple character vector which is expected to be a regular
-expression as defined for the libpcre2 library.  GNU passes A unmodified
-to libpcre2.  The format of A ranges from very simple REs to very
-complex REs.  In fact, regular expressions are a language of their own,
-and it is impossible to describe them here.  The user of ⎕RE is referred
-to the description that comes with libpcre2.
+expression as defined for the libpcre2 library.  ⎕RE passes its left
+argument A unmodified to libpcre2.  The format of A ranges from very
+simple REs to very complex REs.  In fact, regular expressions are a
+language of their own, and it is impossible to describe them here.  The
+user of ⎕RE is referred to the description that comes with libpcre2.
 
    See in particular:
 
@@ -1952,10 +1952,10 @@ EACH operator had been applied to ⎕RE:
    The libpcre2 first compiles A into an internal representation that
 improves the matching (of B) speed.  As a consequence, if several
 strings are matched with the same regular expression A, then it is
-(sometimes considerably) faster to call ⎕RE once with several nested Bs
-that multiple times than calling ⎕RE multiple times with the same A but
-different Bs.  This is in particular the case when longer text files
-with many lines is being matched.
+(sometimes considerably) faster to call ⎕RE once with several nested
+than to call calling ⎕RE multiple times with the same A but different
+Bs.  This is in particular the case when longer text files with many
+lines is being matched.
 
    If multiple (nested) strings B are used then A is compiled once and
 after that the different ⊃B[i] in B are passed unmodified to libpcre2.
@@ -2169,14 +2169,19 @@ two 1-character sub-matches:
 
    The same for the pos+len output format:
 
-   4 ⎕CR ’f(.)(.)’ ⎕RE[’↓’] ’__foo___fun____fox’ ┏→━━━━━━━━━━━━━━┓ ┃2 3
-┏→━━┓ ┏→━━┓┃ ┃ ┃3 1┃ ┃4 1┃┃ ┃ ┗━━━┛ ┗━━━┛┃ ┗∊━━━━━━━━━━━━━━┛ 4 ⎕CR
-’f(.)(.)’ ⎕RE[’↓g’] ’__foo___fun____fox’
+      4 ⎕CR 'f(.)(.)' ⎕RE['↓'] '__foo___fun____fox'
+┏→━━━━━━━━━━━━━━┓
+┃2 3 ┏→━━┓ ┏→━━┓┃
+┃    ┃3 1┃ ┃4 1┃┃
+┃    ┗━━━┛ ┗━━━┛┃
+┗∊━━━━━━━━━━━━━━┛
+      4 ⎕CR 'f(.)(.)' ⎕RE['↓g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃┏→━━━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━━━┓┃ ┃┃2 3 ┏→━━┓
-┏→━━┓┃ ┃8 3 ┏→━━┓ ┏→━━━┓┃ ┃15 3 ┏→━━━┓ ┏→━━━┓┃┃ ┃┃ ┃3 1┃ ┃4 1┃┃ ┃ ┃9 1┃
-┃10 1┃┃ ┃ ┃16 1┃ ┃17 1┃┃┃ ┃┃ ┗━━━┛ ┗━━━┛┃ ┃ ┗━━━┛ ┗━━━━┛┃ ┃ ┗━━━━┛
-┗━━━━┛┃┃ ┃┗∊━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━━━┛┃
+┃┏→━━━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━━━┓┃
+┃┃2 3 ┏→━━┓ ┏→━━┓┃ ┃8 3 ┏→━━┓ ┏→━━━┓┃ ┃15 3 ┏→━━━┓ ┏→━━━┓┃┃
+┃┃    ┃3 1┃ ┃4 1┃┃ ┃    ┃9 1┃ ┃10 1┃┃ ┃     ┃16 1┃ ┃17 1┃┃┃
+┃┃    ┗━━━┛ ┗━━━┛┃ ┃    ┗━━━┛ ┗━━━━┛┃ ┃     ┗━━━━┛ ┗━━━━┛┃┃
+┃┗∊━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━━━┛┃
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 
@@ -3783,19 +3788,19 @@ Node: Section 3.1456378
 Node: Section 3.1557142
 Node: Section 3.1659131
 Node: Section 3.1769043
-Node: Section 3.1882587
-Node: Section 3.1984372
-Node: Section 3.2087476
-Node: Section 3.2188238
-Node: Section 3.2289178
-Node: Chapter 491783
-Node: Chapter 593531
-Node: Chapter 694660
-Node: Section 6.195079
-Node: Section 6.295766
-Node: Chapter 796597
-Node: Section 7.197100
-Node: Section 7.2122409
+Node: Section 3.1882603
+Node: Section 3.1984388
+Node: Section 3.2087492
+Node: Section 3.2188254
+Node: Section 3.2289194
+Node: Chapter 491799
+Node: Chapter 593547
+Node: Chapter 694676
+Node: Section 6.195095
+Node: Section 6.295782
+Node: Chapter 796613
+Node: Section 7.197116
+Node: Section 7.2122425
 
 End Tag Table
 

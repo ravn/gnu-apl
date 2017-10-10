@@ -2000,10 +2000,11 @@ arguments A, B, and X.
 @subsection The Regular Expression A
 
 A is a simple character vector which is expected to be a regular expression
-as defined for the libpcre2 library. GNU passes A unmodified to libpcre2. The
-format of A ranges from very simple REs to very complex REs. In fact, regular
-expressions are a language of their own, and it is impossible to describe them
-here. The user of ⎕RE is referred to the description that comes with libpcre2.
+as defined for the libpcre2 library. ⎕RE passes its left argument A unmodified
+to libpcre2. The format of A ranges from very simple REs to very complex REs.
+In fact, regular expressions are a language of their own, and it is impossible
+to describe them here. The user of ⎕RE is referred to the description that
+comes with libpcre2.
 
 See in particular:
 
@@ -2025,8 +2026,9 @@ operator had been applied to ⎕RE:
 The libpcre2 first compiles A into an internal representation that improves
 the matching (of B) speed. As a consequence, if several strings are matched
 with the same regular expression A, then it is (sometimes considerably) faster
-to call ⎕RE once with several nested Bs that multiple times than calling ⎕RE
-multiple times with the same A but different Bs. This is in particular the case when longer text files with many lines is being matched.
+to call ⎕RE once with several nested than to call calling ⎕RE multiple times
+with the same A but different Bs. This is in particular the case when longer
+text files with many lines is being matched.
 
 If multiple (nested) strings B are used then A is compiled once and after that
 the different ⊃B[i] in B are passed unmodified to libpcre2. In that
@@ -2241,6 +2243,7 @@ Matching all instead of only the first then gives:
 
 The same for the pos+len output format:
 
+@verbatim
       4 ⎕CR 'f(.)(.)' ⎕RE['↓'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━┓
 ┃2 3 ┏→━━┓ ┏→━━┓┃
@@ -2255,6 +2258,7 @@ The same for the pos+len output format:
 ┃┃    ┗━━━┛ ┗━━━┛┃ ┃    ┗━━━┛ ┗━━━━┛┃ ┃     ┗━━━━┛ ┗━━━━┛┃┃
 ┃┗∊━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━┛ ┗∊━━━━━━━━━━━━━━━━━┛┃
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+@end verbatim
 
 @node    Section 3.18
 @section History and TAB completion

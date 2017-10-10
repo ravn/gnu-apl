@@ -100,7 +100,7 @@ int error_code = 0;
 PCRE2_SIZE error_offset = -1;
 
    code = pcre2_compile_32(pattern_ucs, pattern.size(),
-                           PCRE2_NO_UTF_CHECK | flags, &error_code,
+                           PCRE2_UTF | PCRE2_UCP | flags, &error_code,
                            &error_offset, 0);
    delete[] pattern_ucs;
 
