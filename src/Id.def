@@ -97,6 +97,7 @@ pp( FIRST_TIME    , ---       ,          )
 sf( F12_FORMAT    , "⍕"       ,          )
 qf( FX            , "⎕FX"     ,          )
 qf( FIO           , "⎕FIO"    ,          )
+qf( FFT           , "⎕FFT"    ,          )
 
 sf( F2_GREATER    , ">"       , = 0x4701 )
 

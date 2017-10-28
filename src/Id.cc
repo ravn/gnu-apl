@@ -36,6 +36,7 @@
 #include "PrintOperator.hh"
 #include "QuadFunction.hh"
 #include "Quad_DLX.hh"
+#include "Quad_FFT.hh"
 #include "Quad_FX.hh"
 #include "Quad_RE.hh"
 #include "Quad_SQL.hh"

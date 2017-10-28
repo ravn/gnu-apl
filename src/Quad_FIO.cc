@@ -294,12 +294,10 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
                           /* no break */
 
                      default:
-                        {
                           MORE_ERROR() << "invalid format character " << un1
                                        << " in function 22 (aka. printf())"
                                          " in module file_io:: ";
                           DOMAIN_ERROR;   // bad format char
-                        }
                   }
              }
          field_done: ;
@@ -761,12 +759,14 @@ Quad_FIO::list_functions(ostream & out)
 "   Ze ← Ai ⎕FIO[47] Bh    setsockopt(Bh, A_level, A_optname, A_optval)\n"
 "   Ze ← As ⎕FIO[48] Bh    fscanf(Bh, As)\n"
 "   Zs ←    ⎕FIO[49] Bs    return entire file Bs as nested lines\n"
+"   Zs ← LO ⎕FIO[49] Bs    ⎕FIO[49] Bs and pipe each line through LO."
 "   Zi ←    ⎕FIO[50] Bu    gettimeofday()\n"
 "   Zy4←    ⎕FIO[51] By67  mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zi ←    ⎕FIO[54] Bs    chdir(Bs)\n"
 "   Ze ← As ⎕FIO[55] Bh    sscanf(Bs, As) As is the format string\n"
+"   Zs ← As ⎕FIO[56] Bs    write nested lines As to file named Bs\n"
 
 "\n"
 "Benchmarking functions:\n"
@@ -950,7 +950,7 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
              }
-             
+
         default: break;
       }
 
@@ -962,11 +962,22 @@ Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B)
 {
    CHECK_SECURITY(disable_Quad_FIO);
 
-const APL_Integer function_number = X->get_ravel(0).get_int_value();
-   if (function_number != 49)   DOMAIN_ERROR;
+const ShapeItem function_number = X->get_ravel(0).get_int_value();
+   switch (function_number)
+      {
+        case 49:
+           {
+             Token lines_B = eval_XB(X, B);
+             return Bif_OPER1_EACH::fun->eval_LB(LO, lines_B.get_apl_val());
+           }
+      }
 
-Token lines_B = eval_XB(X, B);
-   return Bif_OPER1_EACH::fun->eval_LB(LO, lines_B.get_apl_val());
+   MORE_ERROR() <<
+"Bad function number (axis X) " << function_number << " in LO ⎕FIO[X] B.\n"
+"Chances are that you meant to use ⎕FIO[X] B and not LO ⎕FIO[X] B. In that\n"
+"case use (⎕FIO[X]) or H←⎕FIO[X]\n";
+                 DOMAIN_ERROR;
+
 }
 //-----------------------------------------------------------------------------
 Token
@@ -1592,7 +1603,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                     {
                       if (data[l] == '\n')   ++line_count;
                     }
-                if (data[len - 1] != '\n')   ++line_count;
+                if (len && data[len - 1] != '\n')   ++line_count;
 
                 Value_P Z(line_count, LOC);
                 Z->set_proto_Spc();
@@ -2171,6 +2182,51 @@ const int function_number = X->get_ravel(0).get_near_int();
                 const UCS_string data(*B.get());
                 File_or_String fos(&data);
                 return do_scanf(fos, format);
+              }
+
+         case 56:   // write nested lines As to file Bs
+              {
+                size_t items_written = 0;
+                UTF8_string path(*B.get());
+                if (A->get_rank() > 1)   RANK_ERROR;
+                const ShapeItem len_A = A->element_count();
+                loop(a, len_A)
+                    {
+                      const Cell & cA = A->get_ravel(a);
+                      if (!cA.is_pointer_cell())
+                         {
+                            MORE_ERROR() <<
+"The left argument of A ⎕FIO[56] B is not a nested vector of strings. The\n"
+"first non-nested element is A[⎕IO+" << a << "].";
+                            DOMAIN_ERROR;
+                         }
+
+                      Value_P Ai = A->get_ravel(a).get_pointer_value();
+                      if (!Ai->is_char_vector())
+                         {
+                            MORE_ERROR() <<
+"The left argument of A ⎕FIO[56] B is not a nested vector of strings. The\n"
+"first non-string element is A[⎕IO+" << a << "].";
+                            DOMAIN_ERROR;
+                         }
+                    }
+
+                // at this point As is OK. Write it to file Bs.
+                FILE * f = fopen(path.c_str(), "w");
+                if (f == 0)   goto out_errno;
+
+                loop(a, len_A)
+                    {
+                      Value_P Ai = A->get_ravel(a).get_pointer_value();
+                      UTF8_string line(Ai.getref());
+                      line.append(UNI_ASCII_LF);
+                      const size_t len = line.size();
+                      size_t written = fwrite(line.c_str(), 1, len, f);
+                      if (len != written)   goto out_errno;
+                      items_written += len;
+                    }
+                fclose(f);
+                return Token(TOK_APL_VALUE1, IntScalar(items_written, LOC));
               }
 
          case 202:   // set monadic parallel threshold

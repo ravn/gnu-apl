@@ -1234,6 +1234,10 @@ int file_profile = 0;   // the current profile in the preferences file
                  CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
                       << endl;
             }
+         else if (!strcasecmp(opt, "Multi-Line-Strings"))
+            {
+              multi_line_strings = yes;
+            }
          else if (!strcasecmp(opt, "WINCH-SETS-⎕PW"))
             {
               WINCH_sets_pw = yes;

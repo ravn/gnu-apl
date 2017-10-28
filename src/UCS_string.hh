@@ -196,10 +196,21 @@ public:
    bool is_comment_or_label() const;
 
    /// return true if every character in \b this string is the digit '0'
-   bool all_zeroes()
-      { loop(s, size())   if ((*this)[s] != UNI_ASCII_0)   return false;   
+   bool all_zeroes() const
+      { loop(s, size())   if ((*this)[s] != UNI_ASCII_0)   return false;
         return true;
       }
+
+   /// return the number of unescaped and un-commented " in this string
+   ShapeItem double_quote_count(bool in_quote2) const;
+
+   /// return the position of the first (leftmost) unescaped " in \b this
+   /// string (if any), or else -1
+   ShapeItem double_quote_first() const;
+
+   /// return the position of the last (rightmost) unescaped " in \b this
+   /// string (if any), or else -1
+   ShapeItem double_quote_last() const;
 
    /// return integer value for a string starting with optional whitespaces,
    /// followed by digits.
@@ -227,7 +238,7 @@ public:
    void prepend(Unicode uni)
       {
         if (size() == 0)   { append(uni);   return; }
-        
+
         extend(size() + 1);
         ++items_valid;
         memmove(&at(1), &at(0), size() * sizeof(Unicode));

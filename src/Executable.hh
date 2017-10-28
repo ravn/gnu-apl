@@ -109,6 +109,14 @@ public:
    const UCS_string & get_text(int l) const
       { return text[l]; }
 
+   /// clear the text of line n (0 = header line)
+   void clear_text(int l)
+      { text[l].shrink(0); }
+
+   /// set the text of line n (0 = header line)
+   void set_text(int l, const UCS_string & new_line)
+      { text[l] = new_line; }
+
    /// return the text of statement at \b pc
    UCS_string statement_text(Function_PC pc) const;
 

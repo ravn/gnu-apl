@@ -84,6 +84,7 @@ QuadFunction.cc					QuadFunction.hh		\
 ProcessorID.cc					ProcessorID.hh		\
 Quad_CR.cc					Quad_CR.hh		\
 Quad_DLX.cc					Quad_DLX.hh		\
+Quad_FFT.cc					Quad_FFT.hh		\
 Quad_FIO.cc					Quad_FIO.hh		\
 Quad_FX.cc					Quad_FX.hh		\
 Quad_RE.cc					Quad_RE.hh		\
@@ -184,7 +185,7 @@ endif
 update-svar_signals:
 	m4 -D protocol=Svar_signals tcp_signal.m4 > Svar_signals.hh
 
-apl_LDADD = $(LIBS)
+apl_LDADD = $(LIBS) $(FFT_LIBS)
 
 apl.lines: apl
 	objdump -j .text -l -d $< > $@

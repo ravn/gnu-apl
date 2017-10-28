@@ -666,6 +666,115 @@ UCS_string::is_comment_or_label() const
    return false;
 }
 //-----------------------------------------------------------------------------
+ShapeItem
+UCS_string::double_quote_count(bool in_quote2) const
+{
+ShapeItem count = 0;
+bool in_quote1 = false;
+   loop(s, size())
+       {
+        const Unicode uni = at(s);
+        switch(uni)
+           {
+             case UNI_SINGLE_QUOTE:
+                  if (!in_quote2)   in_quote1 = ! in_quote1;
+                  break;
+
+             case UNI_ASCII_DOUBLE_QUOTE:
+                  if (!in_quote1)
+                     {
+                       ++count;
+                       in_quote2 = ! in_quote2;
+                     }
+                  break;
+
+             case UNI_ASCII_BACKSLASH:
+                  if (in_quote2)    ++s;   // ignore next char inside ""
+                  break;
+
+             case UNI_ASCII_NUMBER_SIGN:
+             case UNI_COMMENT:
+                  if (!(in_quote1 || in_quote2))   return count;
+
+             default:                            ;
+           }
+       }
+
+   return count;
+}
+//-----------------------------------------------------------------------------
+ShapeItem
+UCS_string::double_quote_first() const
+{
+bool in_quote1 = false;
+bool in_quote2 = true;
+   loop(s, size())
+       {
+        const Unicode uni = at(s);
+        switch(uni)
+           {
+             case UNI_SINGLE_QUOTE:
+                  if (!in_quote2)   in_quote1 = ! in_quote1;
+                  break;
+
+             case UNI_ASCII_DOUBLE_QUOTE:
+                  if (!in_quote1)   return s;
+                  break;
+
+             case UNI_ASCII_BACKSLASH:
+                  if (in_quote2)    ++s;   // ignore next char inside ""
+                  break;
+
+             case UNI_ASCII_NUMBER_SIGN:
+             case UNI_COMMENT:
+                  if (in_quote1 || in_quote2)   ; // ignore # and ⍝ in atrings
+                  else                          s = size();
+                  break;
+
+             default:                            ;
+           }
+       }
+
+
+   return -1;   // no un-commented and un-escaped " found
+}
+//-----------------------------------------------------------------------------
+ShapeItem
+UCS_string::double_quote_last() const
+{
+ShapeItem ret = -1;
+bool in_quote1 = false;
+bool in_quote2 = false;
+   loop(s, size())
+       {
+        const Unicode uni = at(s);
+        switch(uni)
+           {
+             case UNI_SINGLE_QUOTE:
+                  if (!in_quote2)   in_quote1 = ! in_quote1;
+                  break;
+
+             case UNI_ASCII_DOUBLE_QUOTE:
+                  if (!in_quote1)   ret = s;
+                  break;
+
+             case UNI_ASCII_BACKSLASH:
+                  if (in_quote2)    ++s;   // ignotr next char inside ""
+                  break;
+
+             case UNI_ASCII_NUMBER_SIGN:
+             case UNI_COMMENT:
+                  if (in_quote1 || in_quote2)   ; // ignore # and ⍝ in atrings
+                  else                          s = size();
+                  break;
+
+             default:                            ;
+           }
+       }
+
+   return ret;
+}
+//-----------------------------------------------------------------------------
 void
 UCS_string::append_utf8(const UTF8 * str)
 {

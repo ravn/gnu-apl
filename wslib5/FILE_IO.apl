@@ -349,6 +349,14 @@
  Z←As ⎕FIO[55] Bs
 ∇
 
+∇Z ← As FIO∆write_lines Bs
+ ⍝⍝ write the strings in the (nested) As to file Bs. As is expected to be a
+ ⍝⍝ vector of lines. Every line A[n] is expected to be a simple character
+ ⍝⍝ vector. A newline (ASCII 10i aka. LF) is appended to every A[n] before it
+ ⍝⍝ is written to the file As
+ Z←As ⎕FIO[56] Bs
+∇
+
 ∇FIO∆clear_statistics Bi
  ⍝⍝ clear performance statistics with ID Bi
  Zn ← ⎕FIO[200] Bi
@@ -525,7 +533,7 @@ t←t⍪'INADDR_ANY' 0
  a←a, ('read'        41) ('write'      42) ('uwrite'     43) ('getsockname' 44)
  a←a, ('getpeername' 45) ('getsockopt' 46) ('setsockopt' 47) ('fscanf'      48)
  a←a, ('readlines'   49) ('gettimeofday' 50) ('mktime'   51) ('localtime'   52)
- a←a, ('gmtime'      53) ('chdir'      54) ('sscanf'     55)
+ a←a, ('gmtime'      53) ('chdir'      54) ('sscanf'     55) ('write_lines' 56)
  a←a, ('open'         3) ('close'       4) ⍝ And some handy aliases
  →(0=↑⍴x←,⊃((⊂X) ≡¨↑¨a)/a)/Nomatch
  X←¯1↑x

@@ -82,6 +82,7 @@ dist_noinst_DATA =				           \
         Member.tc                                          \
         Minimum.tc                                         \
         Multiply.tc                                        \
+        MultiLineStrings.tc                                \
         Nabla.tc                                           \
         NativeFunctions.tc                                 \
         NaturalLogarithm.tc                                \

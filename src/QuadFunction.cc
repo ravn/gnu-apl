@@ -36,6 +36,7 @@
 #include "PrintOperator.hh"
 #include "QuadFunction.hh"
 #include "Quad_FX.hh"
+#include "Quad_FFT.hh"
 #include "Quad_RE.hh"
 #include "Quad_SQL.hh"
 #include "Quad_TF.hh"
@@ -1299,7 +1300,9 @@ const ShapeItem ec = B->element_count();
    if (ec == 0)
       {
         if (B->get_ravel(0).is_character_cell())   // char to Unicode
-        new (&Z->get_ravel(0))   CharCell(UNI_ASCII_SPACE);
+           new (&Z->get_ravel(0))   IntCell(0);
+        else
+           new (&Z->get_ravel(0))   CharCell(UNI_ASCII_SPACE);
       }
 
    loop(v, ec)
@@ -1320,6 +1323,9 @@ const ShapeItem ec = B->element_count();
               continue;
             }
 
+         MORE_ERROR() << "⎕UCS got unexpected Cell type "
+                      << cell_B.get_classname()
+                      << ". Expecting int or character";
          DOMAIN_ERROR;
        }
 

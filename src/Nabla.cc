@@ -32,8 +32,6 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
-#define NABLA_ERROR throw_edit_error(LOC)
-
 //-----------------------------------------------------------------------------
 void
 Nabla::edit_function(const UCS_string & cmd)
@@ -185,7 +183,8 @@ UTF8_string creator_utf8(creator);
 
 UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
                                         LOC, creator_utf8, false);
-   if (ufun == 0)   NABLA_ERROR;
+
+   if (ufun == 0)   throw_edit_error(LOC);
 
    if (locked)
       {
@@ -820,9 +819,19 @@ Nabla::edit_body_line()
 const Parser parser(PM_FUNCTION, LOC, false);
 Token_string in;
 ErrorCode ec = parser.parse(current_text, in);
+   if (ec == E_NO_STRING_END && uprefs.multi_line_strings)
+      {
+        ec = E_NO_ERROR;
+        Workspace::more_error().shrink(0);
+      }
+
    if (ec)
       {
         CERR << "SYNTAX ERROR";
+        if (Workspace::more_error().size())
+           {
+             CERR << "+" << endl << Workspace::more_error();
+           }
         COUT << endl;
         return 0;
       }

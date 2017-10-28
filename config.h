@@ -43,6 +43,9 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
 
+/* Define to 1 if you have the <fftw3.h> header file. */
+#define HAVE_FFTW3_H 1
+
 /* Define to 1 if you have the `floor' function. */
 #define HAVE_FLOOR 1
 
@@ -60,6 +63,9 @@
 
 /* Define to 1 if you have the `execinfo' library (-lexecinfo). */
 /* #undef HAVE_LIBEXECINFO */
+
+/* Define to 1 if you have the `fftw3' library (-lfftw3). */
+#define HAVE_LIBFFTW3 1
 
 /* Define to 1 if you have the `m' library (-lm). */
 #define HAVE_LIBM 1

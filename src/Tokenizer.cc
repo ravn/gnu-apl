@@ -224,7 +224,7 @@ Source<Unicode> src(input);
                         new (&tos.last()) Token(TOK_OPER2_OUTER,
                                                 Bif_OPER2_OUTER::fun);
                       }
-                       
+
                    break;
 
               case TC_R_ARROW:

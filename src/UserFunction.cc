@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include "StateIndicator.hh"
 #include "Symbol.hh"
 #include "UserFunction.hh"
+#include "UserPreferences.hh"
 #include "Value.icc"
 #include "Workspace.hh"
 
@@ -582,6 +583,77 @@ Simple_string<bool, false> ts_lines;
    parse_body(LOC, false, false);
 }
 //-----------------------------------------------------------------------------
+ErrorCode
+UserFunction::transform_multi_line_strings()
+{
+UCS_string accu;   // including "
+int multi_start_line = -1;
+bool appending = false;
+   for (int l = 1; l < get_text_size(); ++l)
+       {
+         UCS_string line = get_text(l);
+         int quote_count = line.double_quote_count(appending);
+
+         if (appending)   // inside multi-line string
+            {
+              // discard leading \␣ (used for indentation)
+              if (line.size() >= 2               &&
+                  line[0] == UNI_ASCII_BACKSLASH &&
+                  line[1] == UNI_ASCII_SPACE)   line = line.drop(2);
+
+              if (quote_count == 0)   // append entire line
+                 {
+                   accu.append_utf8(" \"");
+                   accu.append(line);
+                   accu.append_utf8("\"");
+                   clear_text(l);
+                   continue;
+                 }
+
+              // partial line: append up to first "
+              //
+              const ShapeItem quote = line.double_quote_first();
+              Assert(quote >= 0);
+              const UCS_string prefix(line, 0, quote);
+              set_text(l, line.drop(quote + 1));   // drop prefix and "
+              accu.append_utf8(" \"");
+              accu.append(prefix);
+              accu.append_utf8("\")");   // close ""
+              set_text(multi_start_line, accu);
+              multi_start_line = -1;
+              accu.shrink(0);
+              --quote_count;
+              appending = false;
+            }
+
+         // not or no longer appending
+         //
+         if ((quote_count & 1) == 0)   continue;
+
+         // start of a new multi-line string
+         //
+         multi_start_line = l;
+         const ShapeItem quote = line.double_quote_last();
+         Assert(quote >= 0);
+         const UCS_string suffix(line, quote, line.size() - quote);
+         accu = UCS_string (line, 0, quote);
+         accu.append_utf8("(");
+         accu.append(suffix);   // close ""
+         accu.append_utf8("\"");   // close ""
+         appending = true;
+       }
+
+   if (appending)   // automatically close " at end of function text
+      {
+        set_text(multi_start_line, accu);
+        accu.append(UNI_ASCII_DOUBLE_QUOTE);
+      }
+
+   loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
+
+   return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
 void
 UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 {
@@ -589,6 +661,26 @@ UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
    line_starts.append(Function_PC_0);   // will be set later.
 
    clear_body();
+
+UCS_string_vector original_text;    // before possibly transforming multilines
+   if (uprefs.multi_line_strings)   // user allows milti-line strings
+      {
+        for (int l = 1; l < get_text_size(); ++l)
+            {
+              if (get_text(l).double_quote_count(false) & 1)
+                 {
+                   original_text = text;
+                   if (const ErrorCode ec = transform_multi_line_strings())
+                      {
+                        text = original_text;   // restore function text
+                        error_line = l;
+                        return;
+                      }
+
+                   break;
+                 }
+            }
+      }
 
    for (int l = 1; l < get_text_size(); ++l)
       {
@@ -657,6 +749,9 @@ UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 
    if (header.Z())   body.append(Token(TOK_RETURN_SYMBOL, header.Z()), LOC);
    else              body.append(Token(TOK_RETURN_VOID), LOC);
+
+   // restore the original text (before multi-line expansion)
+   if (original_text.size())   text = original_text;
 }
 //-----------------------------------------------------------------------------
 UserFunction *
@@ -764,23 +859,25 @@ UserFunction * ufun = new UserFunction(text, loc, creator, tolerant, false);
 const char * info = ufun->get_error_info();
    err_line = ufun->get_error_line();
 
-   if (info || err_line != -1)   // something went wrong
+const bool bad_function = info || err_line != -1;
+   if (bad_function)   // something went wrong
       {
         if (info)
            {
              Log(LOG_UserFunction__fix)   CERR << "Error: " << info << endl;
              MORE_ERROR() << info;
            }
+         else info = "Error";
 
          if (err_line == 0)
            {
-             MORE_ERROR() << " (function header)";
+             MORE_ERROR() << info << "in function header";
              Log(LOG_UserFunction__fix) CERR << "Bad header line" <<  endl;
            }
          else if (err_line > 0)
            {
-             MORE_ERROR() << " (function line [" << err_line << "] of:\n"
-                          << text;
+             MORE_ERROR() << info << " in function line ["
+                          << err_line << "] of:\n" << text;
              Log(LOG_UserFunction__fix)
                 CERR << "Bad function line: " << err_line << endl;
            }
@@ -806,7 +903,7 @@ Function * old_function = symbol->get_function();
         delete ufun;
         return 0;
       }
-     
+
    if (old_function)
       {
         const UserFunction * old_ufun = old_function->get_ufun1();
@@ -859,7 +956,7 @@ ShapeItem semi = -1;
 
               case UNI_ASCII_SEMICOLON: if (semi == -1)   semi = t - 1;
                                         continue;
-                                        
+
               case UNI_ASCII_LF:        break;   // header done
               default:                  continue;
             }
@@ -1118,18 +1215,12 @@ UserFunction::print_val_or_fun(ostream & out, Token & tok)
 }
 //-----------------------------------------------------------------------------
 UCS_string
-UserFunction::line_prefix(Function_Line l)
+UserFunction::line_prefix(Function_Line l) const
 {
-UCS_string ucs;
-   ucs.append(UNI_ASCII_L_BRACK);
-   if (l < Function_Line_10)   ucs.append(UNI_ASCII_SPACE);
-
 char cc[40];
-   snprintf(cc, sizeof(cc), "%d", l);
-   for (const char * s = cc; *s; ++s)   ucs.append(Unicode(*s));
-
-   ucs.append(UNI_ASCII_R_BRACK);
-   ucs.append(UNI_ASCII_SPACE);
-   return ucs;
+   if      (text.size() > 100)   snprintf(cc, sizeof(cc), "[%3d] ", l);
+   else if (text.size() > 10)    snprintf(cc, sizeof(cc), "[%2d] ", l);
+   else                          snprintf(cc, sizeof(cc), "[%d] ",  l);
+   return UCS_string(cc);
 }
 //-----------------------------------------------------------------------------

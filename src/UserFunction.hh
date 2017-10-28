@@ -237,6 +237,10 @@ public:
    /// set trace or stop vector
    void set_trace_stop(Simple_string<Function_Line, false> & lines, bool stop);
 
+   /// transform a function body containing multi-lines into a standard
+   /// function body
+   ErrorCode transform_multi_line_strings();
+
    /// recompile the body
    void parse_body(const char * loc, bool tolerant, bool macro);
 
@@ -279,7 +283,7 @@ protected:
    static ostream & print_val_or_fun(ostream & out, Token & tok);
 
    /// "[nn] " prefix
-   static UCS_string line_prefix(Function_Line l);
+   UCS_string line_prefix(Function_Line l) const;
 
    /// the header (line [0]) of the user-defined function
    UserFunction_header header;
