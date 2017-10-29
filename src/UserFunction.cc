@@ -649,7 +649,7 @@ bool appending = false;
         accu.append(UNI_ASCII_DOUBLE_QUOTE);
       }
 
-   loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
+// loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
 
    return E_NO_ERROR;
 }
