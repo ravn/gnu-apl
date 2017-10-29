@@ -2153,13 +2153,41 @@ Next: <a href="#Section-3_002e21" accesskey="n" rel="next">Section 3.21</a>, Pre
 </li><li> ¯1 ⎕FFT B returns the inverse FFT of the numeric array B.
 </li></ul>
 
+<p>Other <strong>negative</strong> arguments A of ⎕FFT <strong>ido not</strong> compute a FFT,
+but return the result of applying a window function to B:
+</p>
+<ul>
+<li> A=¯2: no FFT, return Hanning window of B
+</li><li> A=¯3: no FFT, return Hamming window of B
+</li><li> A=¯4: no FFT, return Blackman window of B
+</li><li> A=¯5: no FFT, return Blackman-Harris window of B
+</li><li> A=¯6: no FFT, return Blackman-Nuttal window of B
+</li><li> A=¯7: no FFT, return Flat-Top window of B
+</li></ul>
+
+<p>The corresponding <strong>positive</strong> arguments A of ⎕FFT <strong>do</strong> compute
+the forward FFT after applying a window function to B:
+</p>
+<ul>
+<li> A=1: FFT (without a window) of B
+</li><li> A=2: FFT (with Hanning window) of B
+</li><li> A=3: FFT (with Hamming window) of B
+</li><li> A=4: FFT (with Blackman window) of B
+</li><li> A=5: FFT (with Blackman-Harris window of B
+</li><li> A=6: FFT (with Blackman-Nuttal window) of B
+</li><li> A=7: FFT (with Flat-Top window) of B
+</li></ul>
+
 <p>⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The
 implementation of ⎕FFT uses libfftw3, aka. &quot;The fastest Fourier Transform in
-the West&quot;. GNU APL checks the presence of libfftw3 when it is compiled. If
-libfftw3 is present then ⎕FFT will hopefully return the expected result; if
-not a DOMAIN ERROR will be raised when ⎕FFT is being used.
+the West&quot;. GNU APL checks the presence of libfftw3 when it is ./condifure&rsquo;d.
+If libfftw3 is present then ⎕FFT will hopefully return the expected result;
+if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 </p>
-
+<p>⎕FFT honors the presence of /etc/fftw/wisdom (see man fftw-wisdom) to speed
+up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom will take a
+few hours, though, so that creating it will not pay off for most mortals.
+</p>
 <hr>
 <a name="Section-3_002e21"></a>
 <div class="header">

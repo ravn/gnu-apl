@@ -21,6 +21,8 @@
 #ifndef __Quad_FFT_DEFINED__
 #define __Quad_FFT_DEFINED__
 
+#include <math.h>
+
 #include "QuadFunction.hh"
 #include "Value.hh"
 #include "Simple_string.hh"
@@ -29,7 +31,9 @@ class Quad_FFT : public QuadFunction
 {
 public:
    /// Constructor.
-   Quad_FFT() : QuadFunction(TOK_Quad_FFT)
+   Quad_FFT()
+      : QuadFunction(TOK_Quad_FFT),
+        system_wisdom_loaded(false)
    {}
 
    static Quad_FFT * fun;          ///< Built-in function.
@@ -42,12 +46,51 @@ protected:
    /// overloaded Function::eval_B()
    Token eval_B(Value_P B);
 
-   // forward or backward FFT
-   Token do_fft(int dir, Value_P B);
+   /// window function for sample n of N with parameters a = a0, a1, ...
+   typedef double (*window_function)(ShapeItem n, ShapeItem N);
+
+   /// compute forward or backward FFT
+   Token do_fft(int dir, Value_P B, window_function win);
+
+   /// return the values of the window function \b win for length \b N
+   Token do_window(Value_P B, window_function win);
+
+   /// initialize \b in from B
+   static void init_in(void * in, Value_P B, window_function win);
+
+   static double hann_window(ShapeItem n, ShapeItem N)
+      { return 0.5 - 0.5*cos(2*n*M_PI / (N-1)); }
+
+   static double hamming_window(ShapeItem n, ShapeItem N)
+      { return 0.54 - 0.46*cos(2*n*M_PI / (N-1)); }
+
+   static double blackman_window(ShapeItem n, ShapeItem N)
+      { return 0.42 - 0.5*cos(2*n*M_PI / (N-1)) + 0.08*cos(4*M_PI*n / (N-1)); }
+
+   static double blackman_harris_window(ShapeItem n, ShapeItem N)
+      { return 0.35875
+             - 0.48829*cos(2*n*M_PI / (N-1))
+             + 0.14128*cos(4*n*M_PI / (N-1))
+             - 0.01168*cos(6*n*M_PI / (N-1)); }
+
+   static double blackman_nuttall_window(ShapeItem n, ShapeItem N)
+      { return 0.3635819
+             - 0.4891775*cos(2*n*M_PI / (N-1))
+             + 0.1365995*cos(4*n*M_PI / (N-1))
+             - 0.0106411*cos(6*n*M_PI / (N-1)); }
+
+   static double flat_top(ShapeItem n, ShapeItem N)
+      { return 1.0
+             - 1.93 *cos(2*n*M_PI / (N-1))
+             + 1.29 *cos(4*n*M_PI / (N-1))
+             - 0.388*cos(6*n*M_PI / (N-1))
+             + 0.028*cos(8*n*M_PI / (N-1)); }
 
 # ifdef HAVE_FFT
 
 # endif
+
+   bool system_wisdom_loaded;
 };
 
 #endif // __Quad_FFT_DEFINED__

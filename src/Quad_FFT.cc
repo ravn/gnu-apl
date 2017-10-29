@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "FloatCell.hh"
 #include "Quad_FFT.hh"
 #include "Workspace.hh"
 
@@ -33,15 +34,45 @@ Quad_FFT * Quad_FFT::fun = &Quad_FFT::_fun;
 Token
 Quad_FFT::eval_B(Value_P B)
 {
-   return do_fft(FFTW_FORWARD, B);
+   return do_fft(FFTW_FORWARD, B, 0);
+}
+//-----------------------------------------------------------------------------
+void
+Quad_FFT::init_in(void * _in, Value_P B, window_function win)
+{
+fftw_complex * in = reinterpret_cast<fftw_complex *>(_in);
+const APL_Integer N = B->element_count();
+   if (win)
+      {
+        loop(n, N)
+           {
+             const double w = win(n, N);
+             in[n][0] = w * B->get_ravel(n).get_real_value();
+             in[n][1] = w * B->get_ravel(n).get_imag_value();
+           }
+      }
+   else
+      {
+        loop(n, N)
+           {
+             in[n][0] = B->get_ravel(n).get_real_value();
+             in[n][1] = B->get_ravel(n).get_imag_value();
+           }
+      }
+
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FFT::do_fft(int dir, Value_P B)
+Quad_FFT::do_fft(int dir, Value_P B, window_function win)
 {
+   if (!system_wisdom_loaded)
+      {
+        fftw_import_system_wisdom();
+        system_wisdom_loaded = true;   // try only once
+      }
+
 const APL_Integer N = B->element_count();
    if (N == 0)   LENGTH_ERROR;
-const double norm = sqrt(N);
 
 const ShapeItem io_size = N * sizeof(fftw_complex);
 
@@ -53,12 +84,7 @@ fftw_complex * out =  reinterpret_cast<fftw_complex *>(fftw_malloc(io_size));
    enum { flags = FFTW_ESTIMATE | FFTW_DESTROY_INPUT };
 
    // fill in[] with B
-   loop(n, N)
-      {
-        in[n][0] = B->get_ravel(n).get_real_value();
-        in[n][1] = B->get_ravel(n).get_imag_value();
-      }
-
+   //
    if (B->get_rank() <= 1)   // one-dimensional FFT
       {
         fftw_plan plan = fftw_plan_dft_1d(N, in, out, dir, flags);
@@ -69,6 +95,7 @@ fftw_complex * out =  reinterpret_cast<fftw_complex *>(fftw_malloc(io_size));
              WS_FULL;
            }
 
+        init_in(in, B, win);   // do this after plan was created
         fftw_execute(plan);
         fftw_destroy_plan(plan);
       }
@@ -84,6 +111,7 @@ fftw_complex * out =  reinterpret_cast<fftw_complex *>(fftw_malloc(io_size));
              WS_FULL;
            }
 
+        init_in(in, B, win);   // do this after plan was created
         fftw_execute(plan);
         fftw_destroy_plan(plan);
       }
@@ -100,10 +128,11 @@ fftw_complex * out =  reinterpret_cast<fftw_complex *>(fftw_malloc(io_size));
              WS_FULL;
            }
 
+        init_in(in, B, win);   // do this after plan was created
         fftw_execute(plan);
         fftw_destroy_plan(plan);
       }
-   else
+   else                           // k-dimensional FFT
       {
         int ish[MAX_RANK];
         loop(r, B->get_rank())   ish[r] = B->get_shape_item(r);
@@ -116,16 +145,42 @@ fftw_complex * out =  reinterpret_cast<fftw_complex *>(fftw_malloc(io_size));
              WS_FULL;
            }
 
+        init_in(in, B, win);   // do this after plan was created
         fftw_execute(plan);
         fftw_destroy_plan(plan);
       }
 
 Value_P Z(B->get_shape(), LOC);
+const double norm = sqrt(N);
    loop(n, N)   new (Z->next_ravel())
                     ComplexCell(out[n][0]/norm, out[n][1]/norm);
 
    fftw_free(in);
    fftw_free(out);
+
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//-----------------------------------------------------------------------------
+Token
+Quad_FFT::do_window(Value_P B, window_function win)
+{
+   if (B->get_rank() != 1)   RANK_ERROR;
+
+const ShapeItem N = B->element_count();
+   if (N < 2)   LENGTH_ERROR;
+
+Value_P Z(N, LOC);
+   loop(n, N)
+      {
+        const double w = win ? win(n, N) : 1.0;
+        const Cell & cell_B = B->get_ravel(n);
+        if (cell_B.is_complex_cell())
+           new (Z->next_ravel())   ComplexCell(w * cell_B.get_real_value(),
+                                               w * cell_B.get_imag_value());
+        else
+           new (Z->next_ravel())   FloatCell(w * cell_B.get_real_value());
+      }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -140,14 +195,40 @@ Quad_FFT::eval_AB(Value_P A, Value_P B)
 const APL_Integer what = A->get_ravel(0).get_int_value();
    switch(what)
       {
-        case  0: return do_fft(FFTW_FORWARD,  B);
-        case -1: return do_fft(FFTW_BACKWARD, B);
+        case  7: return do_fft(FFTW_FORWARD, B, &flat_top);
+        case  6: return do_fft(FFTW_FORWARD, B, &blackman_nuttall_window);
+        case  5: return do_fft(FFTW_FORWARD, B, &blackman_harris_window);
+        case  4: return do_fft(FFTW_FORWARD, B, &blackman_window);
+        case  3: return do_fft(FFTW_FORWARD, B, &hamming_window);
+        case  2: return do_fft(FFTW_FORWARD, B, &hann_window);
+        case  1:
+        case  0: return do_fft(FFTW_FORWARD,  B, 0);
+        case -1: return do_fft(FFTW_BACKWARD, B, 0);
+        case -2: return do_window(B, &hann_window);
+        case -3: return do_window(B, &hamming_window);
+        case -4: return do_window(B, &blackman_window);
+        case -5: return do_window(B, &blackman_harris_window);
+        case -6: return do_window(B, &blackman_nuttall_window);
+        case -7: return do_window(B, &flat_top);
       }
 
-   MORE_ERROR() << "Invalid left argument (mode) " << what
-        << " of ⎕FFT. Valid left arguments are:\n"
-"     0: normal FFT\n"
-"    ¯1: inverse FFT\n";
+   MORE_ERROR() << "Invalid mode A (= " << what
+        << ") of A ⎕FFT B. Valid modes are:\n"
+"    A=¯7: no FFT, return Flat-Top window of B\n"
+"    A=¯6: no FFT, return Blackman-Nuttal window of B\n"
+"    A=¯5: no FFT, return Blackman-Harris window of B\n"
+"    A=¯4: no FFT, return Blackman window of B\n"
+"    A=¯3: no FFT, return Hamming window of B\n"
+"    A=¯2: no FFT, return Hanning window of B\n"
+"    A=¯1: inverse FFT\n"
+"    A=0: normal FFT (no window) of B\n"
+"    A=1: normal FFT (no window) of B\n"
+"    A=2: normal FFT (with Hanning window) of B\n"
+"    A=3: normal FFT (with Hamming window) of B\n"
+"    A=4: normal FFT (with Blackman window) of B\n"
+"    A=5: normal FFT (with Blackman-Harris window of B)\n"
+"    A=6: normal FFT (with Blackman-Nuttal window) of B\n"
+"    A=7: normal FFT (with Flat-Top window) of B\n";
 
    DOMAIN_ERROR;
 }

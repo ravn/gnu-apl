@@ -1895,12 +1895,38 @@ FFT:
      array B.
    • ¯1 ⎕FFT B returns the inverse FFT of the numeric array B.
 
+   Other *negative* arguments A of ⎕FFT *ido not* compute a FFT, but
+return the result of applying a window function to B:
+
+   • A=¯2: no FFT, return Hanning window of B
+   • A=¯3: no FFT, return Hamming window of B
+   • A=¯4: no FFT, return Blackman window of B
+   • A=¯5: no FFT, return Blackman-Harris window of B
+   • A=¯6: no FFT, return Blackman-Nuttal window of B
+   • A=¯7: no FFT, return Flat-Top window of B
+
+   The corresponding *positive* arguments A of ⎕FFT *do* compute the
+forward FFT after applying a window function to B:
+
+   • A=1: FFT (without a window) of B
+   • A=2: FFT (with Hanning window) of B
+   • A=3: FFT (with Hamming window) of B
+   • A=4: FFT (with Blackman window) of B
+   • A=5: FFT (with Blackman-Harris window of B
+   • A=6: FFT (with Blackman-Nuttal window) of B
+   • A=7: FFT (with Flat-Top window) of B
+
    ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more.
 The implementation of ⎕FFT uses libfftw3, aka.  "The fastest Fourier
 Transform in the West".  GNU APL checks the presence of libfftw3 when it
-is compiled.  If libfftw3 is present then ⎕FFT will hopefully return the
-expected result; if not a DOMAIN ERROR will be raised when ⎕FFT is being
-used.
+is ./condifure’d.  If libfftw3 is present then ⎕FFT will hopefully
+return the expected result; if not then a DOMAIN ERROR will be raised
+when ⎕FFT is being used.
+
+   ⎕FFT honors the presence of /etc/fftw/wisdom (see man fftw-wisdom) to
+speed up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom
+will take a few hours, though, so that creating it will not pay off for
+most mortals.
 
 
 File: apl.info,  Node: Section 3.21,  Next: Section 3.22,  Prev: Section 3.20,  Up: Chapter 3
@@ -3838,19 +3864,19 @@ Node: Section 3.1757930
 Node: Section 3.1867842
 Node: Section 3.1968115
 Node: Section 3.2068925
-Node: Section 3.2169862
-Node: Section 3.2283424
-Node: Section 3.2384186
-Node: Section 3.2487290
-Node: Section 3.2589279
-Node: Chapter 493657
-Node: Chapter 595405
-Node: Chapter 696534
-Node: Section 6.196953
-Node: Section 6.297640
-Node: Chapter 798471
-Node: Section 7.198974
-Node: Section 7.2124283
+Node: Section 3.2170987
+Node: Section 3.2284549
+Node: Section 3.2385311
+Node: Section 3.2488415
+Node: Section 3.2590404
+Node: Chapter 494782
+Node: Chapter 596530
+Node: Chapter 697659
+Node: Section 6.198078
+Node: Section 6.298765
+Node: Chapter 799596
+Node: Section 7.1100099
+Node: Section 7.2125408
 
 End Tag Table
 

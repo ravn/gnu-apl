@@ -1968,12 +1968,40 @@ The dyadic form A ⎕FFT B returns either the normal or the inverse FFT:
 @item ¯1 ⎕FFT B returns the inverse FFT of the numeric array B.
 @end itemize
 
+Other @strong{negative} arguments A of ⎕FFT @strong{ido not} compute a FFT,
+but return the result of applying a window function to B:
+
+@itemize
+@item A=¯2: no FFT, return Hanning window of B
+@item A=¯3: no FFT, return Hamming window of B
+@item A=¯4: no FFT, return Blackman window of B
+@item A=¯5: no FFT, return Blackman-Harris window of B
+@item A=¯6: no FFT, return Blackman-Nuttal window of B
+@item A=¯7: no FFT, return Flat-Top window of B
+@end itemize
+
+The corresponding @strong{positive} arguments A of ⎕FFT @strong{do} compute
+the forward FFT after applying a window function to B:
+
+@itemize
+@item A=1: FFT (without a window) of B
+@item A=2: FFT (with Hanning window) of B
+@item A=3: FFT (with Hamming window) of B
+@item A=4: FFT (with Blackman window) of B
+@item A=5: FFT (with Blackman-Harris window of B
+@item A=6: FFT (with Blackman-Nuttal window) of B
+@item A=7: FFT (with Flat-Top window) of B
+@end itemize
+
 ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The
 implementation of ⎕FFT uses libfftw3, aka. "The fastest Fourier Transform in
-the West". GNU APL checks the presence of libfftw3 when it is compiled. If
-libfftw3 is present then ⎕FFT will hopefully return the expected result; if
-not a DOMAIN ERROR will be raised when ⎕FFT is being used.
+the West". GNU APL checks the presence of libfftw3 when it is ./condifure'd.
+If libfftw3 is present then ⎕FFT will hopefully return the expected result;
+if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 
+⎕FFT honors the presence of /etc/fftw/wisdom (see man fftw-wisdom) to speed
+up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom will take a
+few hours, though, so that creating it will not pay off for most mortals.
 
 @node    Section 3.21
 @section ⎕RE - Regular Expressions
