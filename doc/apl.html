@@ -1278,7 +1278,7 @@ following order:
 <li> ranks of the values
 </li><li> shapes of the values
 </li><li> type (character vs. numeric) of the values,
-</li><li> unicodes of character values,
+</li><li> Unicodes of character values,
 </li><li> real parts of numeric values,
 </li><li> imaginary parts of numeric values,
 </li></ul>
@@ -1632,12 +1632,12 @@ Next: <a href="#Section-3_002e13" accesskey="n" rel="next">Section 3.13</a>, Pre
 <h3 class="section">3.12 Rational Numbers</h3>
 
 <p>GNU APL has limited support for rational numbers. Instead of dividing integers
-(and possibly causing rounding errors), integer quotionts are kept undivided
+(and possibly causing rounding errors), integer quotients are kept undivided
 internally until some function requires a conversion to a floating point
 (double) value.
 </p>
 <p>Currently only +, -, ×, and ÷ preserve rational numbers where possible, but
-this list may grow in the future. Monadic + (a noop for non-complex numbers)
+this list may grow in the future. Monadic + (a no-op for non-complex numbers)
 explicitly converts rational numbers to floating point numbers.
 </p>
 <p>A quotient is internally stored as a 64-bit numerator and a 64-bit denominator.
@@ -2094,7 +2094,7 @@ Next: <a href="#Section-3_002e19" accesskey="n" rel="next">Section 3.19</a>, Pre
 <a name="g_t_005b_003f_005dENV-_002d-Environment-Variables"></a>
 <h3 class="section">3.18 ⎕ENV - Environment Variables</h3>
 
-<p>⎕ENV contains the environmment variables of the process that is running
+<p>⎕ENV contains the environment variables of the process that is running
 GNU APL. See <a href="#Section-3_002e1">Section 3.1</a>.
 </p>
 
@@ -2144,43 +2144,49 @@ Next: <a href="#Section-3_002e21" accesskey="n" rel="next">Section 3.21</a>, Pre
 
 <p>For those interested in signal processing and the like, GNU APL provides ⎕FFT:
 </p>
-<p>The monadic form ⎕FFT B is a shortcvut for the dyadic form 0 ⎕FFT B.
+<p>The monadic form ⎕FFT B is a shortcut for the dyadic form 0 ⎕FFT B. It computes
+the FFT of complex or real B without applying a window function.
 </p>
-<p>The dyadic form A ⎕FFT B returns either the normal or the inverse FFT:
+<p>The dyadic form A ⎕FFT B provides more control over what ⎕FFT computes. A is
+an integer scalar which falls into one of three ranges.
+</p>
+<p>The first range from ¯15 to ¯10 does not compute an FFT, but returns the result
+of multiplying B with one of several window functions, that are frequently
+used in the context of FFTs. The result has same shape as B and can be used for
+analyzing or troubleshooting FFTs:
+</p>
+<ul>
+<li> A=¯10: no FFT, return the Hann window of B
+</li><li> A=¯11: no FFT, return the Hamming window of B
+</li><li> A=¯12: no FFT, return the Blackman window of B
+</li><li> A=¯13: no FFT, return the Blackman-Harris window of B
+</li><li> A=¯14: no FFT, return the Blackman-Nuttal window of B
+</li><li> A=¯15: no FFT, return the Flat-Top window of B
+</li></ul>
+
+<p>The second range around 0 contains the computation of the forward and inverse
+FFTs:
 </p>
 <ul>
 <li> 0 ⎕FFT B returns the &quot;normal&quot; (aka. forward) FFT of the numeric array B.
 </li><li> ¯1 ⎕FFT B returns the inverse FFT of the numeric array B.
 </li></ul>
 
-<p>Other <strong>negative</strong> arguments A of ⎕FFT <strong>ido not</strong> compute a FFT,
-but return the result of applying a window function to B:
+<p>The third range from 10 to 15 corresponds to the first range and first
+multiplies B with a window function and then computes the FFT:
 </p>
 <ul>
-<li> A=¯2: no FFT, return Hanning window of B
-</li><li> A=¯3: no FFT, return Hamming window of B
-</li><li> A=¯4: no FFT, return Blackman window of B
-</li><li> A=¯5: no FFT, return Blackman-Harris window of B
-</li><li> A=¯6: no FFT, return Blackman-Nuttal window of B
-</li><li> A=¯7: no FFT, return Flat-Top window of B
-</li></ul>
-
-<p>The corresponding <strong>positive</strong> arguments A of ⎕FFT <strong>do</strong> compute
-the forward FFT after applying a window function to B:
-</p>
-<ul>
-<li> A=1: FFT (without a window) of B
-</li><li> A=2: FFT (with Hanning window) of B
-</li><li> A=3: FFT (with Hamming window) of B
-</li><li> A=4: FFT (with Blackman window) of B
-</li><li> A=5: FFT (with Blackman-Harris window of B
-</li><li> A=6: FFT (with Blackman-Nuttal window) of B
-</li><li> A=7: FFT (with Flat-Top window) of B
+<li> A=2: FFT(B × Hann window)
+</li><li> A=3: FFT(B x Hamming window)
+</li><li> A=4: FFT(B x Blackman window)
+</li><li> A=5: FFT(B x Blackman-Harris window)
+</li><li> A=6: FFT(B x Blackman-Nuttal window)
+</li><li> A=7: FFT(B x Flat-Top window)
 </li></ul>
 
 <p>⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The
 implementation of ⎕FFT uses libfftw3, aka. &quot;The fastest Fourier Transform in
-the West&quot;. GNU APL checks the presence of libfftw3 when it is ./condifure&rsquo;d.
+the West&quot;. GNU APL checks the presence of libfftw3 when it is ./configured.
 If libfftw3 is present then ⎕FFT will hopefully return the expected result;
 if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 </p>
@@ -2502,7 +2508,7 @@ workspaces
 <p>⎕PS[1] = 0: print rational quotients normal floating point number
 ⎕PS[1] = 1: print rational quotients as A÷B
 </p>
-<p>⎕PS[1] has only an effect if rational numbers was ./configure&rsquo;d.
+<p>⎕PS[1] has only an effect if rational numbers was ./configured.
 </p>
 <p>⎕PS[2] = 0: no &quot;boxing&quot; of APL values
 ⎕PS[2] &gt; 0: &quot;boxing&quot; of APL values
@@ -2992,7 +2998,7 @@ of this license document, but changing it is not allowed.
 <p>The purpose of this License is to make a manual, textbook, or other
 functional and useful document <em>free</em> in the sense of freedom: to
 assure everyone the effective freedom to copy and redistribute it,
-with or without modifying it, either commercially or noncommercially.
+with or without modifying it, either commercially or non-commercially.
 Secondarily, this License preserves for the author and publisher a way
 to get credit for their work, while not being considered responsible
 for modifications made by others.

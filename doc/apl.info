@@ -1075,7 +1075,7 @@ values in the following order:
    • ranks of the values
    • shapes of the values
    • type (character vs.  numeric) of the values,
-   • unicodes of character values,
+   • Unicodes of character values,
    • real parts of numeric values,
    • imaginary parts of numeric values,
 
@@ -1400,12 +1400,12 @@ File: apl.info,  Node: Section 3.12,  Next: Section 3.13,  Prev: Section 3.11,  
 =====================
 
 GNU APL has limited support for rational numbers.  Instead of dividing
-integers (and possibly causing rounding errors), integer quotionts are
+integers (and possibly causing rounding errors), integer quotients are
 kept undivided internally until some function requires a conversion to a
 floating point (double) value.
 
    Currently only +, -, ×, and ÷ preserve rational numbers where
-possible, but this list may grow in the future.  Monadic + (a noop for
+possible, but this list may grow in the future.  Monadic + (a no-op for
 non-complex numbers) explicitly converts rational numbers to floating
 point numbers.
 
@@ -1849,7 +1849,7 @@ File: apl.info,  Node: Section 3.18,  Next: Section 3.19,  Prev: Section 3.17,  
 3.18 ⎕ENV - Environment Variables
 =================================
 
-⎕ENV contains the environmment variables of the process that is running
+⎕ENV contains the environment variables of the process that is running
 GNU APL. *Note Section 3.1::.
 
 
@@ -1886,42 +1886,48 @@ File: apl.info,  Node: Section 3.20,  Next: Section 3.21,  Prev: Section 3.19,  
 For those interested in signal processing and the like, GNU APL provides
 ⎕FFT:
 
-   The monadic form ⎕FFT B is a shortcvut for the dyadic form 0 ⎕FFT B.
+   The monadic form ⎕FFT B is a shortcut for the dyadic form 0 ⎕FFT B.
+It computes the FFT of complex or real B without applying a window
+function.
 
-   The dyadic form A ⎕FFT B returns either the normal or the inverse
-FFT:
+   The dyadic form A ⎕FFT B provides more control over what ⎕FFT
+computes.  A is an integer scalar which falls into one of three ranges.
+
+   The first range from ¯15 to ¯10 does not compute an FFT, but returns
+the result of multiplying B with one of several window functions, that
+are frequently used in the context of FFTs.  The result has same shape
+as B and can be used for analyzing or troubleshooting FFTs:
+
+   • A=¯10: no FFT, return the Hann window of B
+   • A=¯11: no FFT, return the Hamming window of B
+   • A=¯12: no FFT, return the Blackman window of B
+   • A=¯13: no FFT, return the Blackman-Harris window of B
+   • A=¯14: no FFT, return the Blackman-Nuttal window of B
+   • A=¯15: no FFT, return the Flat-Top window of B
+
+   The second range around 0 contains the computation of the forward and
+inverse FFTs:
 
    • 0 ⎕FFT B returns the "normal" (aka.  forward) FFT of the numeric
      array B.
    • ¯1 ⎕FFT B returns the inverse FFT of the numeric array B.
 
-   Other *negative* arguments A of ⎕FFT *ido not* compute a FFT, but
-return the result of applying a window function to B:
+   The third range from 10 to 15 corresponds to the first range and
+first multiplies B with a window function and then computes the FFT:
 
-   • A=¯2: no FFT, return Hanning window of B
-   • A=¯3: no FFT, return Hamming window of B
-   • A=¯4: no FFT, return Blackman window of B
-   • A=¯5: no FFT, return Blackman-Harris window of B
-   • A=¯6: no FFT, return Blackman-Nuttal window of B
-   • A=¯7: no FFT, return Flat-Top window of B
-
-   The corresponding *positive* arguments A of ⎕FFT *do* compute the
-forward FFT after applying a window function to B:
-
-   • A=1: FFT (without a window) of B
-   • A=2: FFT (with Hanning window) of B
-   • A=3: FFT (with Hamming window) of B
-   • A=4: FFT (with Blackman window) of B
-   • A=5: FFT (with Blackman-Harris window of B
-   • A=6: FFT (with Blackman-Nuttal window) of B
-   • A=7: FFT (with Flat-Top window) of B
+   • A=2: FFT(B × Hann window)
+   • A=3: FFT(B x Hamming window)
+   • A=4: FFT(B x Blackman window)
+   • A=5: FFT(B x Blackman-Harris window)
+   • A=6: FFT(B x Blackman-Nuttal window)
+   • A=7: FFT(B x Flat-Top window)
 
    ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more.
 The implementation of ⎕FFT uses libfftw3, aka.  "The fastest Fourier
 Transform in the West".  GNU APL checks the presence of libfftw3 when it
-is ./condifure’d.  If libfftw3 is present then ⎕FFT will hopefully
-return the expected result; if not then a DOMAIN ERROR will be raised
-when ⎕FFT is being used.
+is ./configured.  If libfftw3 is present then ⎕FFT will hopefully return
+the expected result; if not then a DOMAIN ERROR will be raised when ⎕FFT
+is being used.
 
    ⎕FFT honors the presence of /etc/fftw/wisdom (see man fftw-wisdom) to
 speed up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom
@@ -2242,7 +2248,7 @@ survives )LOADing of workspaces
    ⎕PS[1] = 0: print rational quotients normal floating point number
 ⎕PS[1] = 1: print rational quotients as A÷B
 
-   ⎕PS[1] has only an effect if rational numbers was ./configure’d.
+   ⎕PS[1] has only an effect if rational numbers was ./configured.
 
    ⎕PS[2] = 0: no "boxing" of APL values ⎕PS[2] > 0: "boxing" of APL
 values
@@ -2695,7 +2701,7 @@ File: apl.info,  Node: Section 7.1,  Next: Section 7.2,  Up: Chapter 7
      functional and useful document "free" in the sense of freedom: to
      assure everyone the effective freedom to copy and redistribute it,
      with or without modifying it, either commercially or
-     noncommercially.  Secondarily, this License preserves for the
+     non-commercially.  Secondarily, this License preserves for the
      author and publisher a way to get credit for their work, while not
      being considered responsible for modifications made by others.
 
@@ -3856,27 +3862,27 @@ Node: Section 3.944705
 Node: Section 3.1045302
 Node: Section 3.1147086
 Node: Section 3.1249026
-Node: Section 3.1349966
-Node: Section 3.1451362
-Node: Section 3.1554357
-Node: Section 3.1657639
-Node: Section 3.1757930
-Node: Section 3.1867842
+Node: Section 3.1349967
+Node: Section 3.1451363
+Node: Section 3.1554358
+Node: Section 3.1657640
+Node: Section 3.1757931
+Node: Section 3.1867843
 Node: Section 3.1968115
 Node: Section 3.2068925
-Node: Section 3.2170987
-Node: Section 3.2284549
-Node: Section 3.2385311
-Node: Section 3.2488415
-Node: Section 3.2590404
-Node: Chapter 494782
-Node: Chapter 596530
-Node: Chapter 697659
-Node: Section 6.198078
-Node: Section 6.298765
-Node: Chapter 799596
-Node: Section 7.1100099
-Node: Section 7.2125408
+Node: Section 3.2171323
+Node: Section 3.2284885
+Node: Section 3.2385644
+Node: Section 3.2488748
+Node: Section 3.2590737
+Node: Chapter 495115
+Node: Chapter 596863
+Node: Chapter 697992
+Node: Section 6.198411
+Node: Section 6.299098
+Node: Chapter 799929
+Node: Section 7.1100432
+Node: Section 7.2125742
 
 End Tag Table
 

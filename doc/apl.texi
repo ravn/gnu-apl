@@ -1163,7 +1163,7 @@ following order:
 @item ranks of the values
 @item shapes of the values
 @item type (character vs. numeric) of the values,
-@item unicodes of character values,
+@item Unicodes of character values,
 @item real parts of numeric values,
 @item imaginary parts of numeric values,
 @end itemize
@@ -1478,12 +1478,12 @@ toggles the state of logging facility N from OFF to ON and back.
 @section Rational Numbers
 
 GNU APL has limited support for rational numbers. Instead of dividing integers
-(and possibly causing rounding errors), integer quotionts are kept undivided
+(and possibly causing rounding errors), integer quotients are kept undivided
 internally until some function requires a conversion to a floating point
 (double) value.
 
 Currently only +, -, ×, and ÷ preserve rational numbers where possible, but
-this list may grow in the future. Monadic + (a noop for non-complex numbers)
+this list may grow in the future. Monadic + (a no-op for non-complex numbers)
 explicitly converts rational numbers to floating point numbers.
 
 A quotient is internally stored as a 64-bit numerator and a 64-bit denominator.
@@ -1921,7 +1921,7 @@ a little more complicated, but the principle is the same.
 @node    Section 3.18
 @section ⎕ENV - Environment Variables
 
-⎕ENV contains the environmment variables of the process that is running
+⎕ENV contains the environment variables of the process that is running
 GNU APL. @xref{Section 3.1}.
 
 
@@ -1959,43 +1959,49 @@ Z F¨Z←⎕FIO[49] 'filename'
 
 For those interested in signal processing and the like, GNU APL provides ⎕FFT:
 
-The monadic form ⎕FFT B is a shortcvut for the dyadic form 0 ⎕FFT B.
+The monadic form ⎕FFT B is a shortcut for the dyadic form 0 ⎕FFT B. It computes
+the FFT of complex or real B without applying a window function.
 
-The dyadic form A ⎕FFT B returns either the normal or the inverse FFT:
+The dyadic form A ⎕FFT B provides more control over what ⎕FFT computes. A is
+an integer scalar which falls into one of three ranges.
+
+The first range from ¯15 to ¯10 does not compute an FFT, but returns the result
+of multiplying B with one of several window functions, that are frequently
+used in the context of FFTs. The result has same shape as B and can be used for
+analyzing or troubleshooting FFTs:
+
+@itemize
+@item A=¯10: no FFT, return the Hann window of B
+@item A=¯11: no FFT, return the Hamming window of B
+@item A=¯12: no FFT, return the Blackman window of B
+@item A=¯13: no FFT, return the Blackman-Harris window of B
+@item A=¯14: no FFT, return the Blackman-Nuttal window of B
+@item A=¯15: no FFT, return the Flat-Top window of B
+@end itemize
+
+The second range around 0 contains the computation of the forward and inverse
+FFTs:
 
 @itemize
 @item  0 ⎕FFT B returns the "normal" (aka. forward) FFT of the numeric array B.
 @item ¯1 ⎕FFT B returns the inverse FFT of the numeric array B.
 @end itemize
 
-Other @strong{negative} arguments A of ⎕FFT @strong{ido not} compute a FFT,
-but return the result of applying a window function to B:
+The third range from 10 to 15 corresponds to the first range and first
+multiplies B with a window function and then computes the FFT:
 
 @itemize
-@item A=¯2: no FFT, return Hanning window of B
-@item A=¯3: no FFT, return Hamming window of B
-@item A=¯4: no FFT, return Blackman window of B
-@item A=¯5: no FFT, return Blackman-Harris window of B
-@item A=¯6: no FFT, return Blackman-Nuttal window of B
-@item A=¯7: no FFT, return Flat-Top window of B
-@end itemize
-
-The corresponding @strong{positive} arguments A of ⎕FFT @strong{do} compute
-the forward FFT after applying a window function to B:
-
-@itemize
-@item A=1: FFT (without a window) of B
-@item A=2: FFT (with Hanning window) of B
-@item A=3: FFT (with Hamming window) of B
-@item A=4: FFT (with Blackman window) of B
-@item A=5: FFT (with Blackman-Harris window of B
-@item A=6: FFT (with Blackman-Nuttal window) of B
-@item A=7: FFT (with Flat-Top window) of B
+@item A=2: FFT(B × Hann window)
+@item A=3: FFT(B x Hamming window)
+@item A=4: FFT(B x Blackman window)
+@item A=5: FFT(B x Blackman-Harris window)
+@item A=6: FFT(B x Blackman-Nuttal window)
+@item A=7: FFT(B x Flat-Top window)
 @end itemize
 
 ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The
 implementation of ⎕FFT uses libfftw3, aka. "The fastest Fourier Transform in
-the West". GNU APL checks the presence of libfftw3 when it is ./condifure'd.
+the West". GNU APL checks the presence of libfftw3 when it is ./configured.
 If libfftw3 is present then ⎕FFT will hopefully return the expected result;
 if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 
@@ -2315,7 +2321,7 @@ workspaces
 ⎕PS[1] = 0: print rational quotients normal floating point number
 ⎕PS[1] = 1: print rational quotients as A÷B
 
-⎕PS[1] has only an effect if rational numbers was ./configure'd.
+⎕PS[1] has only an effect if rational numbers was ./configured.
 
 ⎕PS[2] = 0: no "boxing" of APL values
 ⎕PS[2] > 0: "boxing" of APL values
@@ -2769,7 +2775,7 @@ PREAMBLE
 The purpose of this License is to make a manual, textbook, or other
 functional and useful document @dfn{free} in the sense of freedom: to
 assure everyone the effective freedom to copy and redistribute it,
-with or without modifying it, either commercially or noncommercially.
+with or without modifying it, either commercially or non-commercially.
 Secondarily, this License preserves for the author and publisher a way
 to get credit for their work, while not being considered responsible
 for modifications made by others.

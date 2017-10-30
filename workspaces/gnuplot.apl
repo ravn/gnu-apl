@@ -95,12 +95,12 @@ LOOP: Using←"using 1:",⍕REPL+1
 \   5 for FFT constant 1 with (Hann window)
 \   6 for FFT 3 sines of different frequencies"
 L←L1 L2 L3 L4 L5 L6 ◊ ⍞←'CHOOSE: ' ◊ →('123456'=↑8↓⍞)/L ◊ →¯1↑L
-L1: Z←2, ⊂10 SINES 32  ◊ →0        ⍝ 10 sines, 32 samples/sine, Hamm window
-L2: Z←1, ⊂40 PULSE 61  ◊ →0        ⍝ a pulse, no window
-L3: Z←2, ⊂40 PULSE 61  ◊ →0        ⍝ a pulse, Hamm window
-L4: Z←1, ⊂SQUARE  51   ◊ →0        ⍝ a square wave, no window
-L5: Z←2, ⊂CONST1 101   ◊ →0        ⍝ a constant, Hamm window
-L6: Z←1, ⊂2 SINES_N 5×3 4 5 ◊ →0   ⍝ 3 sines then symmetrized, no window
+L1: Z←10, ⊂10 SINES 32  ◊ →0        ⍝ 10 sines, 32 samples/sine, Hamm window
+L2: Z← 0, ⊂40 PULSE 61  ◊ →0        ⍝ a pulse, no window
+L3: Z←10, ⊂40 PULSE 61  ◊ →0        ⍝ a pulse, Hamm window
+L4: Z← 0, ⊂SQUARE  51   ◊ →0        ⍝ a square wave, no window
+L5: Z←10, ⊂CONST1 101   ◊ →0        ⍝ a constant, Hamm window
+L6: Z← 0, ⊂2 SINES_N 5×3 4 5 ◊ →0   ⍝ 3 sines then symmetrized, no window
 ∇
 
 (∆MODE ∆DATA)←choose_data

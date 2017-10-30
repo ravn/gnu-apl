@@ -195,40 +195,42 @@ Quad_FFT::eval_AB(Value_P A, Value_P B)
 const APL_Integer what = A->get_ravel(0).get_int_value();
    switch(what)
       {
-        case  7: return do_fft(FFTW_FORWARD, B, &flat_top);
-        case  6: return do_fft(FFTW_FORWARD, B, &blackman_nuttall_window);
-        case  5: return do_fft(FFTW_FORWARD, B, &blackman_harris_window);
-        case  4: return do_fft(FFTW_FORWARD, B, &blackman_window);
-        case  3: return do_fft(FFTW_FORWARD, B, &hamming_window);
-        case  2: return do_fft(FFTW_FORWARD, B, &hann_window);
-        case  1:
-        case  0: return do_fft(FFTW_FORWARD,  B, 0);
-        case -1: return do_fft(FFTW_BACKWARD, B, 0);
-        case -2: return do_window(B, &hann_window);
-        case -3: return do_window(B, &hamming_window);
-        case -4: return do_window(B, &blackman_window);
-        case -5: return do_window(B, &blackman_harris_window);
-        case -6: return do_window(B, &blackman_nuttall_window);
-        case -7: return do_window(B, &flat_top);
+        case  15: return do_fft(FFTW_FORWARD, B, &flat_top);
+        case  14: return do_fft(FFTW_FORWARD, B, &blackman_nuttall_window);
+        case  13: return do_fft(FFTW_FORWARD, B, &blackman_harris_window);
+        case  12: return do_fft(FFTW_FORWARD, B, &blackman_window);
+        case  11: return do_fft(FFTW_FORWARD, B, &hamming_window);
+        case  10: return do_fft(FFTW_FORWARD, B, &hann_window);
+
+        case   0: return do_fft(FFTW_FORWARD,  B, 0);
+        case  -1: return do_fft(FFTW_BACKWARD, B, 0);
+
+        case -10: return do_window(B, &hann_window);
+        case -11: return do_window(B, &hamming_window);
+        case -12: return do_window(B, &blackman_window);
+        case -13: return do_window(B, &blackman_harris_window);
+        case -14: return do_window(B, &blackman_nuttall_window);
+        case -15: return do_window(B, &flat_top);
       }
 
    MORE_ERROR() << "Invalid mode A (= " << what
         << ") of A ⎕FFT B. Valid modes are:\n"
-"    A=¯7: no FFT, return Flat-Top window of B\n"
-"    A=¯6: no FFT, return Blackman-Nuttal window of B\n"
-"    A=¯5: no FFT, return Blackman-Harris window of B\n"
-"    A=¯4: no FFT, return Blackman window of B\n"
-"    A=¯3: no FFT, return Hamming window of B\n"
-"    A=¯2: no FFT, return Hanning window of B\n"
+"    A=¯15: no FFT, return (B × Flat-Top window)\n"
+"    A=¯14: no FFT, return (B × Blackman-Nuttal window)\n"
+"    A=¯13: no FFT, return (B × Blackman-Harris window)\n"
+"    A=¯12: no FFT, return (B × Blackman window)\n"
+"    A=¯11: no FFT, return (B × Hamming window)\n"
+"    A=¯10: no FFT, return (B × Hann window)\n"
+"\n"
 "    A=¯1: inverse FFT\n"
-"    A=0: normal FFT (no window) of B\n"
-"    A=1: normal FFT (no window) of B\n"
-"    A=2: normal FFT (with Hanning window) of B\n"
-"    A=3: normal FFT (with Hamming window) of B\n"
-"    A=4: normal FFT (with Blackman window) of B\n"
-"    A=5: normal FFT (with Blackman-Harris window of B)\n"
-"    A=6: normal FFT (with Blackman-Nuttal window) of B\n"
-"    A=7: normal FFT (with Flat-Top window) of B\n";
+"    A=0:  forward FFT (no window) of B\n"
+"\n"
+"    A=10: forward FFT(B × Hann window)\n"
+"    A=11: forward FFT(B × Hamming window)\n"
+"    A=12: forward FFT(B × Blackman window)\n"
+"    A=13: forward FFT(B × Blackman-Harris window)\n"
+"    A=14: forward FFT(B × Blackman-Nuttal window)\n"
+"    A=15: forward FFT(B × Flat-Top window)\n";
 
    DOMAIN_ERROR;
 }
