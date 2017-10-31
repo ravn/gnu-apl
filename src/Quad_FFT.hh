@@ -58,27 +58,37 @@ protected:
    /// initialize \b in from B
    static void init_in(void * in, Value_P B, window_function win);
 
+   /// return the no window value for sample n of N
+   static double no_window(ShapeItem n, ShapeItem N)
+      { return 1.0; }
+
+   /// return the Hann window value for sample n of N
    static double hann_window(ShapeItem n, ShapeItem N)
       { return 0.5 - 0.5*cos(2*n*M_PI / (N-1)); }
 
+   /// return the Hamming window value for sample n of N
    static double hamming_window(ShapeItem n, ShapeItem N)
       { return 0.54 - 0.46*cos(2*n*M_PI / (N-1)); }
 
+   /// return the Hann window value for sample n of N
    static double blackman_window(ShapeItem n, ShapeItem N)
       { return 0.42 - 0.5*cos(2*n*M_PI / (N-1)) + 0.08*cos(4*M_PI*n / (N-1)); }
 
+   /// return the Blackman-Harris window value for sample n of N
    static double blackman_harris_window(ShapeItem n, ShapeItem N)
       { return 0.35875
              - 0.48829*cos(2*n*M_PI / (N-1))
              + 0.14128*cos(4*n*M_PI / (N-1))
              - 0.01168*cos(6*n*M_PI / (N-1)); }
 
+   /// return the Blackman-Nuttallwindow value for sample n of N
    static double blackman_nuttall_window(ShapeItem n, ShapeItem N)
       { return 0.3635819
              - 0.4891775*cos(2*n*M_PI / (N-1))
              + 0.1365995*cos(4*n*M_PI / (N-1))
              - 0.0106411*cos(6*n*M_PI / (N-1)); }
 
+   /// return the Flat-Top window value for sample n of N
    static double flat_top(ShapeItem n, ShapeItem N)
       { return 1.0
              - 1.93 *cos(2*n*M_PI / (N-1))
@@ -86,9 +96,10 @@ protected:
              - 0.388*cos(6*n*M_PI / (N-1))
              + 0.028*cos(8*n*M_PI / (N-1)); }
 
-# ifdef HAVE_FFT
-
-# endif
+   /// set up a multi-dimensional window for shape sh, using ithe window
+   // function \b win
+   static void fill_window(double * result, const Shape & shape,
+                           window_function win);
 
    bool system_wisdom_loaded;
 };

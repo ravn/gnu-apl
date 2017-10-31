@@ -42,7 +42,22 @@ Quad_FFT::init_in(void * _in, Value_P B, window_function win)
 {
 fftw_complex * in = reinterpret_cast<fftw_complex *>(_in);
 const APL_Integer N = B->element_count();
-   if (win)
+
+   if (N < 2)
+      {
+        in[0][0] = B->get_ravel(0).get_real_value();
+        in[0][1] = B->get_ravel(0).get_imag_value();
+      }
+
+   if (win == 0)
+      {
+        loop(n, N)
+           {
+             in[n][0] = B->get_ravel(n).get_real_value();
+             in[n][1] = B->get_ravel(n).get_imag_value();
+           }
+      }
+   else if (B->get_rank() == 1)
       {
         loop(n, N)
            {
@@ -53,13 +68,17 @@ const APL_Integer N = B->element_count();
       }
    else
       {
+        double * wp = new double[N];
+        if (wp == 0)   WS_FULL;
+        fill_window(wp, B->get_shape(), win);
         loop(n, N)
            {
-             in[n][0] = B->get_ravel(n).get_real_value();
-             in[n][1] = B->get_ravel(n).get_imag_value();
+             const double w = wp[n];
+             in[n][0] = w * B->get_ravel(n).get_real_value();
+             in[n][1] = w * B->get_ravel(n).get_imag_value();
            }
+        delete wp;
       }
-
 }
 //-----------------------------------------------------------------------------
 Token
@@ -165,21 +184,44 @@ const double norm = sqrt(N);
 Token
 Quad_FFT::do_window(Value_P B, window_function win)
 {
-   if (B->get_rank() != 1)   RANK_ERROR;
+   Assert(win);
+
+   if (B->get_rank() == 0)   return Token(TOK_APL_VALUE1, IntScalar(1, LOC));
 
 const ShapeItem N = B->element_count();
    if (N < 2)   LENGTH_ERROR;
 
-Value_P Z(N, LOC);
-   loop(n, N)
+Value_P Z(B->get_shape(), LOC);
+   if (B->get_rank() == 1)
       {
-        const double w = win ? win(n, N) : 1.0;
-        const Cell & cell_B = B->get_ravel(n);
-        if (cell_B.is_complex_cell())
-           new (Z->next_ravel())   ComplexCell(w * cell_B.get_real_value(),
-                                               w * cell_B.get_imag_value());
-        else
-           new (Z->next_ravel())   FloatCell(w * cell_B.get_real_value());
+        loop(n, N)
+           {
+             const double w = win(n, N);
+             const Cell & cell_B = B->get_ravel(n);
+             if (cell_B.is_complex_cell())
+                new (Z->next_ravel())   ComplexCell(w*cell_B.get_real_value(),
+                                                    w*cell_B.get_imag_value());
+             else
+                new (Z->next_ravel())   FloatCell(w * cell_B.get_real_value());
+           }
+      }
+   else
+      {
+        double * wp = new double[N];
+        if (wp == 0)   WS_FULL;
+        fill_window(wp, B->get_shape(), win);
+
+        loop(n, N)
+           {
+             const double w = wp[n];
+             const Cell & cell_B = B->get_ravel(n);
+             if (cell_B.is_complex_cell())
+                new (Z->next_ravel())   ComplexCell(w*cell_B.get_real_value(),
+                                                    w*cell_B.get_imag_value());
+             else
+                new (Z->next_ravel())   FloatCell(w*cell_B.get_real_value());
+           }
+        delete wp;
       }
 
    Z->check_value(LOC);
@@ -233,6 +275,30 @@ const APL_Integer what = A->get_ravel(0).get_int_value();
 "    A=15: forward FFT(B × Flat-Top window)\n";
 
    DOMAIN_ERROR;
+}
+//-----------------------------------------------------------------------------
+void
+Quad_FFT::fill_window(double * result, const Shape & shape, window_function win)
+{
+ShapeItem rlen = 1;
+   result[0] = 1.0;
+
+   for (Rank r = shape.get_rank() - 1; r >= 0; --r)
+       {
+         const ShapeItem axis_len = shape.get_shape_item(r);
+         double * e = result + rlen * axis_len;
+         for (ShapeItem a = axis_len - 1; a >= 0; --a)
+             {
+               const double wa = win(a, axis_len);
+               for (ShapeItem r = rlen - 1; r >= 0; --r)
+                   {
+                     *--e = wa * result[r];
+                   }
+             }
+
+         rlen *= axis_len;
+       }
+
 }
 
 #else // no libfftw3...

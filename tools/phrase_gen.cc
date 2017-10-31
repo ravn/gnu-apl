@@ -130,7 +130,8 @@ print_phrases(FILE * out)
                 "   *** phrase table ***/\n\n");
 }
 //-----------------------------------------------------------------------------
-int test_modu(int modu)
+int
+test_modu(int modu)
 {
 int * tab = new int[modu];
 
@@ -180,7 +181,7 @@ char nam[100];   snprintf(nam, sizeof(nam), "%s %s %s %s",
 char fun[100];   snprintf(fun, sizeof(fun), "%s_%s_%s_%s", 
                           e.rn1, e.names[1], e.names[2], e.names[3]);
 
-   fprintf(out, "  PH( %-12s ,  %5d,   %2d,   %d,  %d, %-12s )\n",
+   fprintf(out, "  PH( %-14s , 0x%5.5X,   %2d,   %d,  %d, %-12s )\n",
                 nam, e.hash, e.prio, e.misc, e.len, fun);
 }
 //-----------------------------------------------------------------------------
@@ -219,7 +220,7 @@ int MODU = TC_MAX_PHRASE;
 "   struct Phrase\n"
 "      {\n"
 "        const char *   phrase_name;     ///< phrase name\n"
-"        int            idx;             ///< phrase hash\n"
+"        int            phrase_hash;     ///< phrase hash\n"
 "        int            prio;            ///< phrase priority\n"
 "        int            misc;            ///< 1 if MISC phrase\n"
 "        int            phrase_len;      ///< phrase length\n"
@@ -234,8 +235,8 @@ int MODU = TC_MAX_PHRASE;
 "\n"
 "const Prefix::Phrase Prefix::hash_table[PHRASE_MODU] =\n"
 "{\n"
-"  //  phrase_name      hash  prio misc len  reduce_XXX()\n"
-"  //  --------------------------------------------------\n");
+"  //  phrase_name      hash     prio misc len  reduce_XXX()\n"
+"  //  -----------------------------------------------------\n");
 
    {
      const _phrase ** table = new const _phrase *[MODU];
@@ -286,7 +287,7 @@ check_phrases()
             {
               fprintf(stderr, "phrases %d and %d are the same\n", ph, ph1);
               assert(0);
-              
+
             }
        }
 

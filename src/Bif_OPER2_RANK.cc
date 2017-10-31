@@ -326,7 +326,7 @@ Bif_OPER2_RANK::split_y123_B(Value_P y123_B, Value_P & y123, Value_P & B)
    // 4a.  f ⍤ y123:B...     simple   any                y123       B...
    //
 
-   // y123_B shall be a skalar or vector
+   // y123_B shall be a scalar or vector
    //
    if (y123_B->get_rank() > 1)   RANK_ERROR;
 
@@ -359,8 +359,10 @@ const ShapeItem length = y123_B->element_count();
               B = Value_P(length - 1, LOC);
               loop(l, length - 1)
                   B->next_ravel()->init(y123_B->get_ravel(l + 1),
-                                                          B.getref(), LOC);
+                                        B.getref(), LOC);
             }
+         y123->check_value(LOC);
+         B->check_value(LOC);
          return;
       }
 
@@ -371,7 +373,8 @@ int y123_len = 0;
    loop(yy, 3)
       {
         if (yy >= length)   break;
-        if (y123_B->get_ravel(yy).is_near_int())   ++y123_len;
+        const Cell & cy = y123_B->get_ravel(yy);
+        if (cy.is_near_int())   ++y123_len;
         else                                          break;
       }
    if (y123_len == 0)   LENGTH_ERROR;   // at least y1 is needed
@@ -381,6 +384,10 @@ int y123_len = 0;
    if (length == y123_len)   // case 2: y123:⍬
       {
         y123 = y123_B;
+        //
+        // NOTE: B is NOT assigned so that Prefix::reduce_F_D_B_() can detect
+        // that y123_ was only y123 !
+        //
         return;
       }
 
@@ -391,6 +398,8 @@ int y123_len = 0;
         loop(yy, y123_len)
             y123->next_ravel()->init(y123_B->get_ravel(yy), y123.getref(), LOC);
         B = y123_B->get_ravel(y123_len).get_pointer_value();
+        y123->check_value(LOC);
+        B->check_value(LOC);
         return;
       }
 
@@ -400,8 +409,9 @@ int y123_len = 0;
    loop(yy, y123_len)
        y123->next_ravel()->init(y123_B->get_ravel(yy), y123.getref(), LOC);
 
-   B = Value_P(length - y123_len, LOC);
-   loop(bb, (length - y123_len))
+const ShapeItem B_len = length - y123_len;
+   B = Value_P(B_len, LOC);
+   loop(bb, B_len)
        B->next_ravel()->init(y123_B->get_ravel(bb + y123_len), B.getref(), LOC);
 }
 //-----------------------------------------------------------------------------

@@ -527,40 +527,40 @@ again:
    // search prefixes in phrase table...
    //
    {
-     const int idx_0 = at0().get_Class();
+     const int hash_0 = at0().get_Class();
 
      if (size() >= 3)
         {
-          const int idx_01  = idx_0  | at1().get_Class() <<  5;
-          const int idx_012 = idx_01 | at2().get_Class() << 10;
+          const int hash_01  = hash_0  | at1().get_Class() <<  5;
+          const int hash_012 = hash_01 | at2().get_Class() << 10;
 
           if (size() >= 4)
              {
-               const int idx_0123 = idx_012 | at3().get_Class() << 15;
-               best = hash_table + idx_0123 % PHRASE_MODU;
-               if (best->idx == idx_0123)   goto found_prefix;
+               const int hash_0123 = hash_012 | at3().get_Class() << 15;
+               best = hash_table + hash_0123 % PHRASE_MODU;
+               if (best->phrase_hash == hash_0123)   goto found_prefix;
              }
 
-          best = hash_table + idx_012 % PHRASE_MODU;
-          if (best->idx == idx_012)   goto found_prefix;
+          best = hash_table + hash_012 % PHRASE_MODU;
+          if (best->phrase_hash == hash_012)   goto found_prefix;
 
-          best = hash_table + idx_01 % PHRASE_MODU;
-          if (best->idx == idx_01)   goto found_prefix;
+          best = hash_table + hash_01 % PHRASE_MODU;
+          if (best->phrase_hash == hash_01)   goto found_prefix;
 
-          best = hash_table + idx_0 % PHRASE_MODU;
-          if (best->idx != idx_0)   goto grow;   // no matching phrase
+          best = hash_table + hash_0 % PHRASE_MODU;
+          if (best->phrase_hash != hash_0)   goto grow;   // no matching phrase
         }
      else   // 0 < size() < 3
         {
           if (size() >= 2)
              {
-               const int idx_01 = idx_0 | at1().get_Class() << 5;
-               best = hash_table + idx_01 % PHRASE_MODU;
-               if (best->idx == idx_01)   goto found_prefix;
+               const int hash_01 = hash_0 | at1().get_Class() << 5;
+               best = hash_table + hash_01 % PHRASE_MODU;
+               if (best->phrase_hash == hash_01)   goto found_prefix;
              }
 
-          best = hash_table + idx_0 % PHRASE_MODU;
-          if (best->idx != idx_0)   goto grow;
+          best = hash_table + hash_0 % PHRASE_MODU;
+          if (best->phrase_hash != hash_0)   goto grow;
         }
    }
 
@@ -1260,7 +1260,7 @@ Token result = Token(TOK_FUN2, derived);
         // save locations of ⍤ and B
         //
         Function_PC pc_D = at(1).pc;
-        Function_PC pc_B = at(3).pc;
+        Function_PC pc_B = at(2).pc;
 
         pop_and_discard();   // pop F
         pop_and_discard();   // pop C
@@ -1274,7 +1274,6 @@ Token result = Token(TOK_FUN2, derived);
       }
 
    action = RA_CONTINUE;
-
 }
 //-----------------------------------------------------------------------------
 void
