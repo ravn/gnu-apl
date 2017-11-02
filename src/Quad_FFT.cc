@@ -77,7 +77,7 @@ const APL_Integer N = B->element_count();
              in[n][0] = w * B->get_ravel(n).get_real_value();
              in[n][1] = w * B->get_ravel(n).get_imag_value();
            }
-        delete wp;
+        delete [] wp;
       }
 }
 //-----------------------------------------------------------------------------
@@ -221,7 +221,7 @@ Value_P Z(B->get_shape(), LOC);
              else
                 new (Z->next_ravel())   FloatCell(w*cell_B.get_real_value());
            }
-        delete wp;
+        delete [] wp;
       }
 
    Z->check_value(LOC);
