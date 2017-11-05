@@ -230,7 +230,7 @@ Value_P Z;
              else
                 {
                   LO_B = Value_P(LOC);
-   
+
                   LO_B->get_ravel(0).init(*cB, LO_B.getref(), LOC);
                   LO_B->set_complete();
                 }

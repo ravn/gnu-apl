@@ -505,12 +505,12 @@ const APL_Float ai = A->get_imag_value();
 
    // complex result
    //
-const double zar = ar * dfval();
-const double zai = ai * dfval();
-   if (!isfinite(zar))   return E_DOMAIN_ERROR;
-   if (!isfinite(zai))   return E_DOMAIN_ERROR;
-   return ComplexCell::zv(Z, ar, ai);
-}     
+const double zr = ar * dfval();
+const double zi = ai * dfval();
+   if (!isfinite(zr))   return E_DOMAIN_ERROR;
+   if (!isfinite(zi))   return E_DOMAIN_ERROR;
+   return ComplexCell::zv(Z, zr, zi);
+} 
 //-----------------------------------------------------------------------------
 ErrorCode
 FloatCell::bif_divide(Cell * Z, const Cell * A) const

@@ -384,13 +384,15 @@ Value_P Z2(2, LOC);
         case TOK_APL_VALUE3:
              new (Z->next_ravel()) IntCell(1);
              new (Z->next_ravel()) PointerCell(Z2, Z.getref());
-             new (Z->next_ravel()) PointerCell(result.get_apl_val(),Z.getref());
+             Z->next_ravel()->init_from_value(result.get_apl_val(),
+                                              Z.getref(), LOC);
              break;
 
         case TOK_APL_VALUE2:
              new (Z->next_ravel()) IntCell(2);
              new (Z->next_ravel()) PointerCell(Z2, Z.getref());
-             new (Z->next_ravel()) PointerCell(result.get_apl_val(),Z.getref());
+             Z->next_ravel()->init_from_value(result.get_apl_val(),
+                                              Z.getref(), LOC);
              break;
 
         case TOK_NO_VALUE:
