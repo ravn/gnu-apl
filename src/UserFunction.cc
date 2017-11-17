@@ -670,7 +670,8 @@ UCS_string_vector original_text;    // before possibly transforming multilines
               if (get_text(l).double_quote_count(false) & 1)
                  {
                    original_text = text;
-                   if (const ErrorCode ec = transform_multi_line_strings())
+                   const ErrorCode ec = transform_multi_line_strings();
+                   if (ec)
                       {
                         text = original_text;   // restore function text
                         error_line = l;
