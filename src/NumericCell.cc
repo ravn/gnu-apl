@@ -1361,9 +1361,9 @@ NumericCell::bif_binomial(Cell * Z, const Cell * A) const
         const APL_Float i_b   = get_imag_value();
         const APL_Float i_b_a = i_b - i_a;
 
-        const APL_Complex gam_1_a    = ComplexCell::gamma(r_1_a,    i_a);
-        const APL_Complex gam_1_b    = ComplexCell::gamma(r_1_b,    i_b);
-        const APL_Complex gam_1_b__a = ComplexCell::gamma(r_1_b__a, i_b_a);
+        const APL_Complex gam_1_a    = ComplexCell::gamma(r_1_a + 1.0,   i_a);
+        const APL_Complex gam_1_b    = ComplexCell::gamma(r_1_b + 1.0,   i_b);
+        const APL_Complex gam_1_b__a = ComplexCell::gamma(r_1_b__a + 1.0,i_b_a);
 
         new (Z) ComplexCell(gam_1_b / (gam_1_a * gam_1_b__a));
         return E_NO_ERROR;

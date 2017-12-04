@@ -117,7 +117,8 @@ ComplexCell::bif_factorial(Cell * Z) const
         return fc.bif_factorial(Z);
       }
 
-ErrorCode ret = ComplexCell::zv(Z, gamma(get_real_value(), get_imag_value()));
+ErrorCode ret = ComplexCell::zv(Z, gamma(get_real_value() + 1.0,
+                                         get_imag_value()));
    if (errno)   return E_DOMAIN_ERROR;
    return ret;
 }
@@ -673,7 +674,7 @@ ComplexCell::gamma(APL_Float x, const APL_Float & y)
 {
 const APL_Complex pi(M_PI, 0);
    if (x < 0.5)
-      return pi / sin(pi * APL_Complex(x, y)) * gamma(1.0 - x, -y);
+      return pi / (sin(pi * APL_Complex(x, y)) * gamma(1.0 - x, -y));
 
    // coefficients for lanczos approximation of the gamma function.
    //
@@ -687,8 +688,6 @@ const APL_Complex pi(M_PI, 0);
 
    errno = 0;
    feclearexcept(FE_ALL_EXCEPT);
-
-   x += 1.0;
 
 const APL_Complex z(x, y);
 const APL_Complex z1(x + 5.5, y);
@@ -813,7 +812,7 @@ ComplexCell::character_representation(const PrintContext & pctx) const
          //
          APL_Float ten_to_PP = 1.0;
          loop(p, pctx.get_PP())   ten_to_PP = ten_to_PP * 10.0;
-      
+
          // lrm p. 13: In J notation, the real or imaginary part is not
          // displayed if it is less than the other by more than ⎕PP orders
          // of magnitude (unless ⎕PP is at its maximum).

@@ -159,7 +159,7 @@ public:
    static ErrorCode zv(Cell * Z, APL_Complex v)
       { new (Z) ComplexCell(v.real(), v.imag());   return E_NO_ERROR; }
 
-   /// the lanczos approximation for gamma(1.0 + x + iy) for x >= 0.
+   /// the lanczos approximation for gamma(x + iy)
    static APL_Complex gamma(APL_Float x, const APL_Float & y);
 
    /// compute circle function \b fun
