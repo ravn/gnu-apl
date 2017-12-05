@@ -1102,7 +1102,7 @@ Makefile.dist:
 #
 # This is a trick to enable the building of make targets that do not need
 # ./configure (i.e. help, develop, develop_lib, parallel, and parallel1)
-# before ./configure is run. This avoids running ./configyre if not needed
+# before ./configure is run. This avoids running ./configure if not needed
 # or running ./configure twice (e.g. for make develop)
 #
 DIST:	dist Makefile.dist
