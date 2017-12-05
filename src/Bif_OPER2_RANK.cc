@@ -413,5 +413,6 @@ const ShapeItem B_len = length - y123_len;
    B = Value_P(B_len, LOC);
    loop(bb, B_len)
        B->next_ravel()->init(y123_B->get_ravel(bb + y123_len), B.getref(), LOC);
+   B->check_value(LOC);
 }
 //-----------------------------------------------------------------------------
