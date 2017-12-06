@@ -24,7 +24,7 @@ fi
 
 if [ -n "$SOURCE_DATE_EPOCH" ]
 then
-    BUILD_DATE=`date -u "+%F %R:%S %Z" --date=$SOURCE_DATE_EPOCH`
+    BUILD_DATE=`date -u "+%F %R:%S %Z" --date=@$SOURCE_DATE_EPOCH`
     BUILD_OS=""
 else
     BUILD_DATE=`date -u "+%F %R:%S %Z"`
