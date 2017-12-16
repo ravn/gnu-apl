@@ -197,7 +197,7 @@ help_def(2, "⊥", "Decode",                    "Z is the values of array B eval
 help_def(2, "⊤", "Encode",                    "Z is the representation of B in the number system whose radices are A",                           "")
 help_def(1, "⊢", "Identity",                  "Return B as non-committed value",                                                                 "")
 help_def(2, "⊢", "Right",                     "Return B.",                                                                                       "")
-help_def(1, "⊣", "Hide",                      "B as committed value.",                                                                           "")
+help_def(1, "⊣", "Hide",                      "Return committed 0 (as to prevent printing of B)",                                                                           "")
 help_def(2, "⊣", "Left",                      "Return A.",                                                                                       "")
 help_def(1, "⍪", "Table",                     "Return a matrix by ravelling the subarrays of B",                                                 "")
 help_def(2, "⍪", "Catenate",                  "Append A and B along first axis",                                                                 "")

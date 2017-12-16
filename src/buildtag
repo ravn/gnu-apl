@@ -9,7 +9,6 @@ SVNINFO=`svnversion`
 
 ARCHIVE_SVNINFO=`svn info Archive.cc | grep "Last Changed Rev" \
                                      | awk -F : '{print $2;}'`
-
 CONFIGURE_OPTS="unknown ./configure options (no config.status)"
 if [ -x ../config.status ]
 then

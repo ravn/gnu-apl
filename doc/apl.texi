@@ -703,18 +703,19 @@ between GNU APL and IBM APL2.
 * Section 3.11::  Logging Facilities
 * Section 3.12::  Rational Numbers
 * Section 3.13::  User-defined Commands
-* Section 3.14::  Dyadic ⎕CR
-* Section 3.15::  Dyadic ⎕FX (Native Functions)
-* Section 3.16::  ⎕ARG - Interpreter command line arguments
-* Section 3.17::  ⎕DLX - Knuth's Dancing Links Algorithm
-* Section 3.18::  ⎕ENV - Environment Variable
-* Section 3.19::  ⎕FIO - File I/O Functions
-* Section 3.20::  ⎕FFT - Fast Fourier Transform
-* Section 3.21::  ⎕RE  - Regular Expressions
-* Section 3.22::  ⎕PS  - Print Style
-* Section 3.23::  ⎕SQL - SQL Database Interface
-* Section 3.24::  ⎕SI  - State Indicator
-* Section 3.25::  ⎕SYL - System limits
+* Section 3.14::  Monadic ⊢ and ⊣
+* Section 3.15::  Dyadic ⎕CR
+* Section 3.16::  Dyadic ⎕FX (Native Functions)
+* Section 3.17::  ⎕ARG - Interpreter command line arguments
+* Section 3.18::  ⎕DLX - Knuth's Dancing Links Algorithm
+* Section 3.19::  ⎕ENV - Environment Variable
+* Section 3.20::  ⎕FIO - File I/O Functions
+* Section 3.21::  ⎕FFT - Fast Fourier Transform
+* Section 3.22::  ⎕RE  - Regular Expressions
+* Section 3.23::  ⎕PS  - Print Style
+* Section 3.24::  ⎕SQL - SQL Database Interface
+* Section 3.25::  ⎕SI  - State Indicator
+* Section 3.26::  ⎕SYL - System limits
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -1529,8 +1530,39 @@ be deleted like this:
       ]USERCMD REMOVE-ALL
 @end verbatim
 
-
 @node    Section 3.14
+@section Monadic ⊢ and ⊣
+
+Monadic ⊢ is the identity function. It returns its (committed or non-committed)
+right argument as a non-committed value.
+
+Conversely, monadic ⊣ (called @b{Hide} in GNU APL) discards its (committed or
+non-committed) right argument and returns a committed integer scalar 0. 
+
+For the most part there is no difference between a committed value (= a value
+that was assigned to a variable, including ⎕ and ⍞) and a non-committed value.
+The point where it does make a difference is when the value the final result
+of a statement (as opposed to an intermediate result inside a statement). In
+that situation (and only there) a non-committed value is being printed while
+a committed value is not.
+
+You can use ⊢ is a similar fashion as ⎕← at the left end of a statement,
+in order to print a value even though it was previously assigned to a
+variable.
+
+The main motivation for ⊣ is that, at least in GNU APL, lambdas always return
+a value. However, if a lambda is used only for the sake of its side effects, say
+to print something, then the value returned by the lambda is often of no
+interest and only messes up the APL output. In that situation ⊣ can be used
+to suppress the printing of undesired return values from lambdas.
+
+In earlier GNU APL versions, ⊣B and ⊢B would both return B; with ⊣ as committed
+value and with ⊢ as non-committed value. But since the only real-life purpose
+of ⊣ is to suppress the printing of B, the implementation of ⊣ was changed to
+returning an committed integer scalar 0 instead of committed B. That reduced
+the run-time of ⊣B from (O(,B) to O(1). Also, ⊢B is marginally faster than ⎕←B.
+
+@node    Section 3.15
 @section Dyadic ⎕CR
 
 The ⎕CR function has an optional left argument that selects one of several
@@ -1601,7 +1633,7 @@ then be used as input for e.g. byte vector → hex or byte vector → base64
 conversions.
 
 
-@node    Section 3.15
+@node    Section 3.16
 @section  Dyadic ⎕FX (Native Functions)
 
 A Native Function is a function that can be called in APL like a normal user
@@ -1677,14 +1709,14 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 )CLEAR workspace command will close all open files. 
 
 
-@node    Section 3.16
+@node    Section 3.17
 @section ⎕ARG - Interpreter command line arguments
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
 @xref{Section 3.1}.
 
 
-@node    Section 3.17
+@node    Section 3.18
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
@@ -1918,14 +1950,14 @@ Another application of ⎕DLX is solving sudokus. The constraints matrix is
 a little more complicated, but the principle is the same.
 
 
-@node    Section 3.18
+@node    Section 3.19
 @section ⎕ENV - Environment Variables
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. @xref{Section 3.1}.
 
 
-@node    Section 3.19
+@node    Section 3.20
 @section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -1954,7 +1986,7 @@ Z F¨Z←⎕FIO[49] 'filename'
 @end smallexample
 
 
-@node    Section 3.20
+@node    Section 3.21
 @section ⎕FFT - Fast Fourier Transform
 
 For those interested in signal processing and the like, GNU APL provides ⎕FFT:
@@ -2009,7 +2041,7 @@ if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom will take a
 few hours, though, so that creating it will not pay off for most mortals.
 
-@node    Section 3.21
+@node    Section 3.22
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -2310,7 +2342,7 @@ The same for the pos+len output format:
 @end verbatim
 
 
-@node    Section 3.22
+@node    Section 3.23
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: SVN 982) contains two integers
@@ -2330,7 +2362,7 @@ Setting ⎕PS[2] has the same effect as the debug command ]BOXING and uses
 the same values.
 
 
-@node    Section 3.23
+@node    Section 3.24
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -2450,7 +2482,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 3.24
+@node    Section 3.25
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -2514,7 +2546,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 3.25
+@node    Section 3.26
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:

@@ -642,18 +642,19 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.11::  Logging Facilities
 * Section 3.12::  Rational Numbers
 * Section 3.13::  User-defined Commands
-* Section 3.14::  Dyadic ⎕CR
-* Section 3.15::  Dyadic ⎕FX (Native Functions)
-* Section 3.16::  ⎕ARG - Interpreter command line arguments
-* Section 3.17::  ⎕DLX - Knuth’s Dancing Links Algorithm
-* Section 3.18::  ⎕ENV - Environment Variable
-* Section 3.19::  ⎕FIO - File I/O Functions
-* Section 3.20::  ⎕FFT - Fast Fourier Transform
-* Section 3.21::  ⎕RE  - Regular Expressions
-* Section 3.22::  ⎕PS  - Print Style
-* Section 3.23::  ⎕SQL - SQL Database Interface
-* Section 3.24::  ⎕SI  - State Indicator
-* Section 3.25::  ⎕SYL - System limits
+* Section 3.14::  Monadic ⊢ and ⊣
+* Section 3.15::  Dyadic ⎕CR
+* Section 3.16::  Dyadic ⎕FX (Native Functions)
+* Section 3.17::  ⎕ARG - Interpreter command line arguments
+* Section 3.18::  ⎕DLX - Knuth’s Dancing Links Algorithm
+* Section 3.19::  ⎕ENV - Environment Variable
+* Section 3.20::  ⎕FIO - File I/O Functions
+* Section 3.21::  ⎕FFT - Fast Fourier Transform
+* Section 3.22::  ⎕RE  - Regular Expressions
+* Section 3.23::  ⎕PS  - Print Style
+* Section 3.24::  ⎕SQL - SQL Database Interface
+* Section 3.25::  ⎕SI  - State Indicator
+* Section 3.26::  ⎕SYL - System limits
 
 There are a few possibly useful features in GNU APL:
 
@@ -1454,7 +1455,45 @@ be deleted like this:
 
 File: apl.info,  Node: Section 3.14,  Next: Section 3.15,  Prev: Section 3.13,  Up: Chapter 3
 
-3.14 Dyadic ⎕CR
+3.14 Monadic ⊢ and ⊣
+====================
+
+Monadic ⊢ is the identity function.  It returns its (committed or
+non-committed) right argument as a non-committed value.
+
+   Conversely, monadic ⊣ (called Hide in GNU APL) discards its
+(committed or non-committed) right argument and returns a committed
+integer scalar 0.
+
+   For the most part there is no difference between a committed value (=
+a value that was assigned to a variable, including ⎕ and ⍞) and a
+non-committed value.  The point where it does make a difference is when
+the value the final result of a statement (as opposed to an intermediate
+result inside a statement).  In that situation (and only there) a
+non-committed value is being printed while a committed value is not.
+
+   You can use ⊢ is a similar fashion as ⎕← at the left end of a
+statement, in order to print a value even though it was previously
+assigned to a variable.
+
+   The main motivation for ⊣ is that, at least in GNU APL, lambdas
+always return a value.  However, if a lambda is used only for the sake
+of its side effects, say to print something, then the value returned by
+the lambda is often of no interest and only messes up the APL output.
+In that situation ⊣ can be used to suppress the printing of undesired
+return values from lambdas.
+
+   In earlier GNU APL versions, ⊣B and ⊢B would both return B; with ⊣ as
+committed value and with ⊢ as non-committed value.  But since the only
+real-life purpose of ⊣ is to suppress the printing of B, the
+implementation of ⊣ was changed to returning an committed integer scalar
+0 instead of committed B. That reduced the run-time of ⊣B from (O(,B) to
+O(1).  Also, ⊢B is marginally faster than ⎕←B.
+
+
+File: apl.info,  Node: Section 3.15,  Next: Section 3.16,  Prev: Section 3.14,  Up: Chapter 3
+
+3.15 Dyadic ⎕CR
 ===============
 
 The ⎕CR function has an optional left argument that selects one of
@@ -1531,9 +1570,9 @@ be translated to bytes first and can then be used as input for e.g.
 byte vector → hex or byte vector → base64 conversions.
 
 
-File: apl.info,  Node: Section 3.15,  Next: Section 3.16,  Prev: Section 3.14,  Up: Chapter 3
+File: apl.info,  Node: Section 3.16,  Next: Section 3.17,  Prev: Section 3.15,  Up: Chapter 3
 
-3.15 Dyadic ⎕FX (Native Functions)
+3.16 Dyadic ⎕FX (Native Functions)
 ==================================
 
 A Native Function is a function that can be called in APL like a normal
@@ -1607,18 +1646,18 @@ into the system function ⎕FIO. The syntax of ⎕FIO is the same as for
 FILE_IO. The )CLEAR workspace command will close all open files.
 
 
-File: apl.info,  Node: Section 3.16,  Next: Section 3.17,  Prev: Section 3.15,  Up: Chapter 3
+File: apl.info,  Node: Section 3.17,  Next: Section 3.18,  Prev: Section 3.16,  Up: Chapter 3
 
-3.16 ⎕ARG - Interpreter command line arguments
+3.17 ⎕ARG - Interpreter command line arguments
 ==============================================
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
 *Note Section 3.1::.
 
 
-File: apl.info,  Node: Section 3.17,  Next: Section 3.18,  Prev: Section 3.16,  Up: Chapter 3
+File: apl.info,  Node: Section 3.18,  Next: Section 3.19,  Prev: Section 3.17,  Up: Chapter 3
 
-3.17 ⎕DLX - Knuth’s Dancing Links Algorithm
+3.18 ⎕DLX - Knuth’s Dancing Links Algorithm
 ===========================================
 
 ⎕DLX is an implementation of Donald Knuth’s Dancing Links Algorithm
@@ -1844,18 +1883,18 @@ problems that can be solved by ⎕DLX contain 3 steps:
 matrix is a little more complicated, but the principle is the same.
 
 
-File: apl.info,  Node: Section 3.18,  Next: Section 3.19,  Prev: Section 3.17,  Up: Chapter 3
+File: apl.info,  Node: Section 3.19,  Next: Section 3.20,  Prev: Section 3.18,  Up: Chapter 3
 
-3.18 ⎕ENV - Environment Variables
+3.19 ⎕ENV - Environment Variables
 =================================
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. *Note Section 3.1::.
 
 
-File: apl.info,  Node: Section 3.19,  Next: Section 3.20,  Prev: Section 3.18,  Up: Chapter 3
+File: apl.info,  Node: Section 3.20,  Next: Section 3.21,  Prev: Section 3.19,  Up: Chapter 3
 
-3.19 ⎕FIO - File I/O Functions
+3.20 ⎕FIO - File I/O Functions
 ==============================
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -1878,9 +1917,9 @@ and stored in F. In other words,
      Z F¨Z←⎕FIO[49] 'filename'
 
 
-File: apl.info,  Node: Section 3.20,  Next: Section 3.21,  Prev: Section 3.19,  Up: Chapter 3
+File: apl.info,  Node: Section 3.21,  Next: Section 3.22,  Prev: Section 3.20,  Up: Chapter 3
 
-3.20 ⎕FFT - Fast Fourier Transform
+3.21 ⎕FFT - Fast Fourier Transform
 ==================================
 
 For those interested in signal processing and the like, GNU APL provides
@@ -1935,9 +1974,9 @@ will take a few hours, though, so that creating it will not pay off for
 most mortals.
 
 
-File: apl.info,  Node: Section 3.21,  Next: Section 3.22,  Prev: Section 3.20,  Up: Chapter 3
+File: apl.info,  Node: Section 3.22,  Next: Section 3.23,  Prev: Section 3.21,  Up: Chapter 3
 
-3.21 ⎕RE - Regular Expressions
+3.22 ⎕RE - Regular Expressions
 ==============================
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is
@@ -1945,7 +1984,7 @@ a powerful regular expression matching library.  "pcre" is an acronym
 for "Perl compatible regular expressions".  libpcre2 is Copyright (c)
 1997-2017 University of Cambridge, England.
 
-3.21.1 Preconditions
+3.22.1 Preconditions
 --------------------
 
 libpcre2 is NOT shipped with GNU APL but must be installed before the
@@ -1956,7 +1995,7 @@ are found.
    If ./configure does not find libpcre2, then ⎕RE will raise a SYNTAX
 ERROR when ⎕RE is used in an APL program.
 
-3.21.2 Syntax
+3.22.2 Syntax
 -------------
 
 ⎕RE has two forms.  The short form (without an axis argument) is
@@ -1973,7 +2012,7 @@ Z ← A ⎕RE[X] B   (long form, with axis X)
    It therefore suffices to explain the long form.  The long form has 3
 different arguments A, B, and X.
 
-3.21.3 The Regular Expression A
+3.22.3 The Regular Expression A
 -------------------------------
 
 A is a simple character vector which is expected to be a regular
@@ -1987,7 +2026,7 @@ user of ⎕RE is referred to the description that comes with libpcre2.
 
    man pcre2pattern
 
-3.21.4 The String(s) B Being Matched
+3.22.4 The String(s) B Being Matched
 ------------------------------------
 
 B is either (1) a simple character vector (which is then also passed
@@ -2016,7 +2055,7 @@ character vector.
    Any string B that is passed to libpcre2 is called "Subject" in the
 libpcre2 documentation.
 
-3.21.5 The Flags X
+3.22.5 The Flags X
 ------------------
 
 Without any flags (or with an empty flag string X) ⎕RE returns the first
@@ -2028,7 +2067,7 @@ The different flag characters are either flags understood by (and then
 passed unmodified to) libpcre2 or flags understood by ⎕RE itself (and
 then not passed to libpcre2).
 
-3.21.5.1 libpcre2 flags: i, m, s, and x
+3.22.5.1 libpcre2 flags: i, m, s, and x
 .......................................
 
 The libpcre2 flags accepted by ⎕RE are: i, m, s, and x.  They correspond
@@ -2042,7 +2081,7 @@ to the following libpcre2 flags:
    Please also consult the libpcre2 documentation for a description of
 these flags.
 
-3.21.5.2 The APL output format flags ↓, ⊂, and /
+3.22.5.2 The APL output format flags ↓, ⊂, and /
 ................................................
 
 ⎕RE provides different output formats, some of which are tailored to
@@ -2092,7 +2131,7 @@ flags:
 formats ⊂ and / are identical; if ’g’ is present, however, then they may
 differ.
 
-3.21.5.3 the ⎕RE global flag g
+3.22.5.3 the ⎕RE global flag g
 ..............................
 
 The default behavior of ⎕RE is to return only the first match in B. The
@@ -2142,7 +2181,7 @@ The default behavior of ⎕RE is to return only the first match in B. The
 the output formats string and position/length, but not of the result of
 output formats partition and compress.
 
-3.21.5.4 the ⎕RE error flag E
+3.22.5.4 the ⎕RE error flag E
 .............................
 
 The default behavior of ⎕RE is to return an empty result if no match of
@@ -2167,7 +2206,7 @@ that case it is natural to check the length of the result:
        'g..' ⎕RE['Eg'] '__foo___fun____fox'
 
 
-3.21.6 Complex Matches
+3.22.6 Complex Matches
 ----------------------
 
 The regular expressions considered so far were simple, which means that
@@ -2235,9 +2274,9 @@ two 1-character sub-matches:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 
-File: apl.info,  Node: Section 3.22,  Next: Section 3.23,  Prev: Section 3.21,  Up: Chapter 3
+File: apl.info,  Node: Section 3.23,  Next: Section 3.24,  Prev: Section 3.22,  Up: Chapter 3
 
-3.22 ⎕PS - Print Style
+3.23 ⎕PS - Print Style
 ======================
 
 ⎕PS is an integer vector that currently (read: SVN 982) contains two
@@ -2257,9 +2296,9 @@ values
 uses the same values.
 
 
-File: apl.info,  Node: Section 3.23,  Next: Section 3.24,  Prev: Section 3.22,  Up: Chapter 3
+File: apl.info,  Node: Section 3.24,  Next: Section 3.25,  Prev: Section 3.23,  Up: Chapter 3
 
-3.23 ⎕SQL - SQL Database Interface
+3.24 ⎕SQL - SQL Database Interface
 ==================================
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -2356,9 +2395,9 @@ table.  Currently, the column layout is as follows:
 release.
 
 
-File: apl.info,  Node: Section 3.24,  Next: Section 3.25,  Prev: Section 3.23,  Up: Chapter 3
+File: apl.info,  Node: Section 3.25,  Next: Section 3.26,  Prev: Section 3.24,  Up: Chapter 3
 
-3.24 ⎕SI - State Indicator
+3.25 ⎕SI - State Indicator
 ==========================
 
 ⎕SI returns aspects of the current State Indicator, similar to the
@@ -2422,9 +2461,9 @@ while negative A count from the latest to the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 3.25,  Prev: Section 3.24,  Up: Chapter 3
+File: apl.info,  Node: Section 3.26,  Prev: Section 3.25,  Up: Chapter 3
 
-3.25 ⎕SYL - System limits
+3.26 ⎕SYL - System limits
 =========================
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -2462,7 +2501,7 @@ result in a SYNTAX ERROR. Indexed assignment to ⎕SYL will result in an
 INDEX ERROR unless the limit is writable.  Some read-only limits can be
 changed at compile-time via ./configure
 
-3.25.1 ⎕SYL[1 2 3 4 5 6;]
+3.26.1 ⎕SYL[1 2 3 4 5 6;]
 -------------------------
 
 The first three limits are writable; their purpose is to stop execution
@@ -2494,20 +2533,20 @@ bytes limits together.
    An attempt to set a too small limit, for example one that is close to
 the current value, is rejected with a DOMAIN ERROR.
 
-3.25.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
+3.26.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
 -------------------------------------------------------------
 
 These system limits are read-only.  Some of them can be changed at
 compile time via ./configure.  Most others can be changed in the source
 code of GNU APL, but doing so is not recommended.
 
-3.25.3 ⎕SYL[24 25 26;]
+3.26.3 ⎕SYL[24 25 26;]
 ----------------------
 
 These system limits have been added in preparation of multi-core GNU
 APL. They are currently not used.
 
-3.25.4 ⎕SYL[27;]
+3.26.4 ⎕SYL[27;]
 ----------------
 
 This is not a limit that raises a limit error.  Instead it limits the
@@ -3850,39 +3889,40 @@ Node: Top383
 Node: Chapter 11416
 Node: Chapter 217072
 Node: Chapter 321483
-Node: Section 3.122748
-Node: Section 3.233766
-Node: Section 3.334525
-Node: Section 3.435812
-Node: Section 3.538433
-Node: Section 3.638606
-Node: Section 3.739219
-Node: Section 3.843163
-Node: Section 3.944705
-Node: Section 3.1045302
-Node: Section 3.1147086
-Node: Section 3.1249026
-Node: Section 3.1349967
-Node: Section 3.1451363
-Node: Section 3.1554358
-Node: Section 3.1657640
-Node: Section 3.1757931
-Node: Section 3.1867843
-Node: Section 3.1968115
-Node: Section 3.2068925
-Node: Section 3.2171323
-Node: Section 3.2284885
-Node: Section 3.2385644
-Node: Section 3.2488748
-Node: Section 3.2590737
-Node: Chapter 495115
-Node: Chapter 596863
-Node: Chapter 697992
-Node: Section 6.198411
-Node: Section 6.299098
-Node: Chapter 799929
-Node: Section 7.1100432
-Node: Section 7.2125742
+Node: Section 3.122786
+Node: Section 3.233804
+Node: Section 3.334563
+Node: Section 3.435850
+Node: Section 3.538471
+Node: Section 3.638644
+Node: Section 3.739257
+Node: Section 3.843201
+Node: Section 3.944743
+Node: Section 3.1045340
+Node: Section 3.1147124
+Node: Section 3.1249064
+Node: Section 3.1350005
+Node: Section 3.1451401
+Node: Section 3.1553211
+Node: Section 3.1656206
+Node: Section 3.1759488
+Node: Section 3.1859779
+Node: Section 3.1969691
+Node: Section 3.2069963
+Node: Section 3.2170773
+Node: Section 3.2273171
+Node: Section 3.2386733
+Node: Section 3.2487492
+Node: Section 3.2590596
+Node: Section 3.2692585
+Node: Chapter 496963
+Node: Chapter 598711
+Node: Chapter 699840
+Node: Section 6.1100259
+Node: Section 6.2100946
+Node: Chapter 7101777
+Node: Section 7.1102280
+Node: Section 7.2127590
 
 End Tag Table
 

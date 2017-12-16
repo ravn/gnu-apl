@@ -1573,21 +1573,18 @@ Command::cmd_LOG(ostream & out, const UCS_string & arg)
 
 #else
 
-   out << "\n"
-<< "Command ]LOG is not available, since dynamic logging was not\n"
+   out <<
+"\n"
+"Command ]LOG is not available, since dynamic logging was not\n"
 "configured for this APL interpreter. To enable dynamic logging (which\n"
-"will decrease performance), recompile the interpreter as follows:"
-
-<< "\n\n"
-"   ./configure DYNAMIC_LOG_WANTED=yes (... "
-<< "other configure options"
-<< ")\n"
+"will slightly decrease performance), recompile the interpreter as follows:\n"
+"\n"
+"   ./configure DYNAMIC_LOG_WANTED=yes (... other configure options)\n"
 "   make\n"
 "   make install (or try: src/apl)\n"
 "\n"
-
-<< "above the src directory."
-<< "\n";
+"above the src directory."
+"\n";
 
 #endif
 }
