@@ -18,6 +18,34 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* the help_def() macro defines help texts used in different places.
+ *
+ * It is called with 5 arguments:
+ *
+ *    help_def(arity, prim, name, title, descr)
+ *
+ * the arguments are:
+ *
+ * arity: the arity of the primitive, encoded as follows:
+ *     0: niladic function
+ *     1: monadic function
+ *     2: dyadic function
+ *    -1: monadic operator taking one argument
+ *    -2: monadic operator taking one or two arguments
+ *    -3: dyadic operator taking two arguments
+ *    -4: dyadic operator taking two arguments
+ *    -5: quasi-dyadic operator (outer product)
+ *
+ * prim:  the APL symbol for the primitive
+ *
+ * name:  the official name of the primitive
+ *
+ * title: a short description of the primitive
+ *
+ * descr: a longer description what the primitive computes,
+ *        possibly including a short example
+ */
+
 // APL primitive functions...
 //
 help_def(0, "⍬", "Zilde",                     "Zilde is the empty numeric vector (aka. ⍳0)",
