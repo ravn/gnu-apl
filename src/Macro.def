@@ -242,16 +242,18 @@ mac_def(  Z__vA_LO_INNER_RO_vB,
 /// monadic EACH with ⍎
 //
 mac_def(Z__EXEC_EACH_B,
- "Z← Z__EXEC_EACH_B B;T;rho_Z;RC;N;N_max\n"
- " rho_Z←⍴B ◊ N←⎕IO ◊ N_max←N+⍴B←,B ◊ T←((⍴B), 3)⍴0\n"
- "LOOP: RC←↑T[N;]←⎕EC ⊃B[N] ◊ →(RC∈1 2 3)↓ERROR ◊ →(N_max>N←N+1)⍴LOOP\n"
- " →(∧/T[;⎕IO]=3)⍴0   ⍝ NO RESULT\n"
- " →(T[;⎕IO]=3)/MISMATCH ◊ Z←T[;⎕IO+2] ◊ Z←rho_Z⍴Z ◊ →0\n"
- "MISMATCH: 'VALUE ERROR in ⍎ macro:¨' ⎕ES 3 1\n"
- "ERROR: →(RC=0 4 5)/ RC0, RC4, RC5\n"
- " RC0: ((⊃T[N;⎕IO+2])[1;], ' in ⍎¨ macro:') ⎕ES ⊃T[N;⎕IO+1]\n"
- " RC4: 'SYNTAX ERROR: →N in ⍎¨ macro:' ⎕ES 2 2\n"
- " RC5: 'SYNTAX ERROR: → in ⍎¨ macro:' ⎕ES 2 2\n")
+ "Z← Z__EXEC_EACH_B B;⎕IO;T;rho_Z;RC;ET;ZZ;J;N;N3;V3;N_max\n"
+ " N←⎕IO←0 ◊ rho_Z←⍴B ◊ N_max←⍴B←,B ◊ T←N_max⍴0 ◊ V3←N3←0\n"
+ " J←RC0, RC12, RC12, RC3, RC4, RC5\n"
+ "LOOP: (RC ET ZZ)←⎕EC ⊃B[N] ◊ →J[RC]\n"
+ " RC0:  ((⊃ZZ)[0;], ' in macro ⍎¨') ⎕ES ⊃ET\n"
+ " RC12: T[N]←⊂ZZ ◊ N3←N3+1 ◊ →(N_max>N←N+1)⍴LOOP ◊ →DONE\n"
+ " RC3:             V3←V3+1 ◊ →(N_max>N←N+1)⍴LOOP ◊ →DONE\n"
+ " RC4: 'SYNTAX ERROR: →N in macro ⍎¨' ⎕ES 2 2\n"
+ " RC5: 'SYNTAX ERROR: → in macro ⍎¨'  ⎕ES 2 2\n"
+ " DONE: →(V3=N_max)⍴0                      ⍝ NO RESULT\n"
+ " →(N3≠N_max)/MISMATCH ◊ Z←rho_Z⍴T ◊ →0\n  ⍝ RESULT\n"
+ "MISMATCH: 'VALUE ERROR in macro ⍎¨' ⎕ES 3 1\n")
 
 /// unique for large values. Cannot fail
 mac_def(Z__UNIQUE_B,
