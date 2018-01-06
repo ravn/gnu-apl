@@ -542,7 +542,8 @@ const APL_Float ai = A->get_imag_value();
    if (ai == 0.0)   // real result
       {
         const APL_Float real = ar / dfval() ;
-        return FloatCell::zv(Z, real);
+        if (isfinite(real))   return FloatCell::zv(Z, real);
+        return E_DOMAIN_ERROR;
       }
 
    // complex result
@@ -620,8 +621,9 @@ const APL_Float b = dfval();
    // Note: In that case, the integer to which A ÷ B is close is either
    // floor(A ÷ B) or ceil(A ÷ B).
    //
-double qct = Workspace::get_CT();
+const double qct = Workspace::get_CT();
 const APL_Float quotient = b / a;
+   if (!isfinite(quotient))   return E_DOMAIN_ERROR;
 
    if ((qct != 0) && integral_within(quotient, qct))   return IntCell::z0(Z);
 

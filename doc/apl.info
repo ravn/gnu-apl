@@ -1487,7 +1487,7 @@ return values from lambdas.
 committed value and with ⊢ as non-committed value.  But since the only
 real-life purpose of ⊣ is to suppress the printing of B, the
 implementation of ⊣ was changed to returning an committed integer scalar
-0 instead of committed B. That reduced the run-time of ⊣B from (O(,B) to
+0 instead of committed B. That reduced the run-time of ⊣B from O(,B) to
 O(1).  Also, ⊢B is marginally faster than ⎕←B.
 
 
@@ -3903,26 +3903,26 @@ Node: Section 3.1147124
 Node: Section 3.1249064
 Node: Section 3.1350005
 Node: Section 3.1451401
-Node: Section 3.1553211
-Node: Section 3.1656206
-Node: Section 3.1759488
-Node: Section 3.1859779
-Node: Section 3.1969691
-Node: Section 3.2069963
-Node: Section 3.2170773
-Node: Section 3.2273171
-Node: Section 3.2386733
-Node: Section 3.2487492
-Node: Section 3.2590596
-Node: Section 3.2692585
-Node: Chapter 496963
-Node: Chapter 598711
-Node: Chapter 699840
-Node: Section 6.1100259
-Node: Section 6.2100946
-Node: Chapter 7101777
-Node: Section 7.1102280
-Node: Section 7.2127590
+Node: Section 3.1553210
+Node: Section 3.1656205
+Node: Section 3.1759487
+Node: Section 3.1859778
+Node: Section 3.1969690
+Node: Section 3.2069962
+Node: Section 3.2170772
+Node: Section 3.2273170
+Node: Section 3.2386732
+Node: Section 3.2487491
+Node: Section 3.2590595
+Node: Section 3.2692584
+Node: Chapter 496962
+Node: Chapter 598710
+Node: Chapter 699839
+Node: Section 6.1100258
+Node: Section 6.2100945
+Node: Chapter 7101776
+Node: Section 7.1102279
+Node: Section 7.2127589
 
 End Tag Table
 
