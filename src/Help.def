@@ -31,8 +31,8 @@
  *     1: monadic function
  *     2: dyadic function
  *    -1: monadic operator taking one argument
- *    -2: monadic operator taking one or two arguments
- *    -3: dyadic operator taking two arguments
+ *    -2: monadic operator taking two arguments
+ *    -3: dyadic operator taking one argument
  *    -4: dyadic operator taking two arguments
  *    -5: quasi-dyadic operator (outer product)
  *
