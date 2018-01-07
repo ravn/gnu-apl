@@ -168,7 +168,7 @@ public:
    /// return the pc of the first token in line l (valid line), or
    /// the pc of the last token in the function (invalid line)
    Function_PC pc_for_line(Function_Line line) const;
-   
+
    /// Overloaded Function::has_alpha()
    virtual bool has_alpha() const   { return true; }
 

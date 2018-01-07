@@ -1178,8 +1178,23 @@ const ValueStackItem & vs = value_stack[0];
              out << "∇";
              loop(u, text.size())
                 {
-                   out << text[u];
-                   if (text[u] == '\n' && u < text.size() - 1)   out << " ";
+                  const Unicode cc = text[u];
+                  if (cc != UNI_ASCII_SPACE)   out << cc;
+                  else   // blank: display unless trailing
+                     {
+                       for (int uu = u + 1; uu < text.size(); ++uu)
+                           {
+                             const Unicode cuu = text[uu];
+                              if (cuu == UNI_ASCII_SPACE)   continue;
+                              if (cuu != UNI_ASCII_LF)   out << cc;
+                              break;
+                           }
+                     }
+
+                   // indent the text lines with 1 blank so that the column
+                   // below ∇ is blank
+                   //
+                   if (cc == UNI_ASCII_LF && u < text.size() - 1)   out << " ";
                 }
              if (ufun->get_exec_properties()[0])   out << "⍫";
              else                                  out << "∇";
