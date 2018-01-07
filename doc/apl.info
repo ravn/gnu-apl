@@ -2284,16 +2284,22 @@ integers which control some details of how APL values are being printed.
 The default value of ⎕PS is 0 0.  ⎕PS is a session variable which
 survives )LOADing of workspaces
 
-   ⎕PS[1] = 0: print rational quotients normal floating point number
-⎕PS[1] = 1: print rational quotients as A÷B
+   ⎕PS[1] = 0: print rational quotients a normal floating point numbers
 
-   ⎕PS[1] has only an effect if rational numbers was ./configured.
+   ⎕PS[1] = 1: print rational quotients as A÷B
 
-   ⎕PS[2] = 0: no "boxing" of APL values ⎕PS[2] > 0: "boxing" of APL
-values
+   Note: ⎕PS[1] has only an effect if rational numbers were
+./configured.
+
+   ⎕PS[2] = 0: no "boxing" of APL values
+
+   ⎕PS[2] > 0: "boxing" of APL values according to ⎕PS[2].
 
    Setting ⎕PS[2] has the same effect as the debug command ]BOXING and
 uses the same values.
+
+   Note: For compatibility with older workspaces, Assigning a single
+value to ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
 File: apl.info,  Node: Section 3.24,  Next: Section 3.25,  Prev: Section 3.23,  Up: Chapter 3
@@ -3912,17 +3918,17 @@ Node: Section 3.2069962
 Node: Section 3.2170772
 Node: Section 3.2273170
 Node: Section 3.2386732
-Node: Section 3.2487491
-Node: Section 3.2590595
-Node: Section 3.2692584
-Node: Chapter 496962
-Node: Chapter 598710
-Node: Chapter 699839
-Node: Section 6.1100258
-Node: Section 6.2100945
-Node: Chapter 7101776
-Node: Section 7.1102279
-Node: Section 7.2127589
+Node: Section 3.2487672
+Node: Section 3.2590776
+Node: Section 3.2692765
+Node: Chapter 497143
+Node: Chapter 598891
+Node: Chapter 6100020
+Node: Section 6.1100439
+Node: Section 6.2101126
+Node: Chapter 7101957
+Node: Section 7.1102460
+Node: Section 7.2127770
 
 End Tag Table
 

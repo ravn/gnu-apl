@@ -2545,16 +2545,21 @@ which control some details of how APL values are being printed. The default
 value of ⎕PS is 0 0. ⎕PS is a session variable which survives )LOADing of
 workspaces
 </p>
-<p>⎕PS[1] = 0: print rational quotients normal floating point number
-⎕PS[1] = 1: print rational quotients as A÷B
+<p>⎕PS[1] = 0: print rational quotients a normal floating point numbers
 </p>
-<p>⎕PS[1] has only an effect if rational numbers was ./configured.
+<p>⎕PS[1] = 1: print rational quotients as A÷B
+</p>
+<p>Note: ⎕PS[1] has only an effect if rational numbers were ./configured.
 </p>
 <p>⎕PS[2] = 0: no &quot;boxing&quot; of APL values
-⎕PS[2] &gt; 0: &quot;boxing&quot; of APL values
+</p>
+<p>⎕PS[2] &gt; 0: &quot;boxing&quot; of APL values according to ⎕PS[2].
 </p>
 <p>Setting ⎕PS[2] has the same effect as the debug command ]BOXING and uses
 the same values.
+</p>
+<p>Note: For compatibility with older workspaces, Assigning a single value to
+⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 </p>
 
 <hr>

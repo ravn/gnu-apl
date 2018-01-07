@@ -559,8 +559,13 @@ Value_P val(2, LOC);
 void
 Quad_PS::assign(Value_P B, bool clone, const char * loc)
 {
-   if (B->get_rank() != 1)        RANK_ERROR;
-   if (B->element_count() != 2)   LENGTH_ERROR;
+APL_Integer B_quot  = 0;
+APL_Integer B_style = 0;
+
+   if (B->get_rank() > 1)        RANK_ERROR;
+
+   if (B->element_count() < 1)   LENGTH_ERROR;
+   if (B->element_count() > 2)   LENGTH_ERROR;
 
    if (!B->get_ravel(0).is_near_bool())
       {
@@ -568,8 +573,17 @@ Quad_PS::assign(Value_P B, bool clone, const char * loc)
         DOMAIN_ERROR;
       }
 
-const APL_Integer B_quot  = B->get_ravel(0).get_near_bool();
-const APL_Integer B_style = B->get_ravel(1).get_near_int();
+   if (B->element_count() == 1)
+      {
+        // for compatibility with old workspaces
+        //
+        B_style = B->get_ravel(0).get_near_int();
+      }
+   else
+      {
+        B_quot  = B->get_ravel(0).get_near_bool();
+        B_style = B->get_ravel(1).get_near_int();
+      }
 
    switch(B_style) // boxing format
       {
@@ -585,17 +599,24 @@ const APL_Integer B_style = B->get_ravel(1).get_near_int();
         case 23: case  24: case  25:
         case 29: break;   // OK
 
-        default: MORE_ERROR() << "Invalid style in ⎕PS←quot style: "
-                                 "style is not ± 0, 2-4, 7-9, 2-25, or 29";
+        default: MORE_ERROR() <<
+                 "Invalid style in ⎕PS←quot style or ⎕PS←style:\n"
+                 "style is not ± 0, 2-4, 7-9, 20-25, or 29";
                   DOMAIN_ERROR;
       }
- 
+
    // values in B are valid
    //
    Command::boxing_format = B_style;
    print_quotients = B_quot;
    style = B_style;
-   Symbol::assign(B, clone, LOC);
+
+Value_P B2(2, LOC);
+   new (B2->next_ravel())   IntCell(B_quot);
+   new (B2->next_ravel())   IntCell(B_style);
+   B2->check_value(LOC);
+
+   Symbol::assign(B2, false, LOC);
    return;
 }
 //-----------------------------------------------------------------------------
