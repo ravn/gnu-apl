@@ -612,7 +612,7 @@ const APL_Float a = A->get_real_value();
 const APL_Float b = dfval();
    if (a == 0.0)   return zv(Z, b);
 
-   // IBM: if B is zero , return B
+   // IBM: if B is zero , return B (== return 0)
    //
    if (b == 0.0)   return IntCell::z0(Z);
 
@@ -623,7 +623,19 @@ const APL_Float b = dfval();
    //
 const double qct = Workspace::get_CT();
 const APL_Float quotient = b / a;
-   if (!isfinite(quotient))   return E_DOMAIN_ERROR;
+   if (!isfinite(quotient))   // see ISO p. 89.
+      {
+        if (b > a)   return IntCell::z0(Z);   // exponent overflow
+
+        // exponent underflow
+        //
+        if (a < 0)
+           if (b < 0)   return   zv(Z, b);
+           else         return   IntCell::z0(Z);
+        else
+           if (b < 0)   return    IntCell::z0(Z);
+           else         return  zv(Z, b);
+      }
 
    if ((qct != 0) && integral_within(quotient, qct))   return IntCell::z0(Z);
 
