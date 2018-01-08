@@ -625,7 +625,7 @@ const double qct = Workspace::get_CT();
 const APL_Float quotient = b / a;
    if (!isfinite(quotient))   // see ISO p. 89.
       {
-        if (b > a)   return IntCell::z0(Z);   // exponent overflow
+        if (b > 0.1 || b < -0.1)   return IntCell::z0(Z);   // exponent overflow
 
         // exponent underflow
         //
