@@ -650,8 +650,9 @@ const APL_Float abs_prod       = prod < 0 ? -prod : prod;
 const APL_Float prod2          = P < 0 ? -abs_prod : abs_prod;
 const APL_Float r              = P - prod2;
 
-// return r;
+   return r;
 
+/*
 Q(P)
 Q(Q)
 Q(quotient)
@@ -668,6 +669,7 @@ Assert(isnormal(prod2)          || prod2          == 0.0);
 Assert(isnormal(r)              || r              == 0.0);
 
    return r;
+*/
 }
 //-----------------------------------------------------------------------------
 ErrorCode
