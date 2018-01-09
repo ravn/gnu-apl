@@ -595,6 +595,81 @@ const APL_Complex z = complex_power(a, dfval());
    return ComplexCell::zv(Z, z);
 }
 //-----------------------------------------------------------------------------
+inline double
+P_modulo_Q(double P, double Q)
+{
+  // return R ← P - (×P) ⌊ | Q × ⌊ | P ÷ Q as described in ISO p. 89
+  //            │   │    │ │ │   │ │ │
+  //            │   │    │ │ │   │ │ └──────── quotient
+  //            │   │    │ │ │   │ └────────── abs_quotient
+  //            │   │    │ │ │   └──────────── floor_quotient
+  //            │   │    │ │ └──────────────── floor_quotient
+  //            │   │    │ └────────────────── prod
+  //            │   │    └──────────────────── abs_prod
+  //            │   └───────────────────────── prod2
+  //            └───────────────────────────── r
+  //
+
+const APL_Float quotient = P / Q;   // quotient←b÷a and check overflows
+   if (!isfinite(quotient))   return 0.0;   // exponent overflow
+
+   if (!isfinite(Q / P))   // exponent underflow
+      return ((P < 0) == (Q < 0)) ? P : 0.0;
+
+   {
+     const double qct = Workspace::get_CT();
+     if ((qct != 0) && FloatCell::integral_within(quotient, qct))   return 0.0;
+   }
+
+const APL_Float abs_quotient   = quotient < 0 ? -quotient : quotient;
+   if (abs_quotient > 4.5E15)
+      {
+        // if "| P ÷ Q" is too large then 'abs_quotient' is not exact any more.
+        // In this case, for every R with 0 ≤ R < Q there ie an A such that
+        // A has the same floating point representation as 'abs_quotient' and
+        // (P - R) is an integer multiple of Q.
+        //
+        // Normally we would raise a DOMAIN ERROR to inform the user about the
+        // problem, but the ISO standard does not allow that. We therefore
+        // return 0 which is a valid remainder (although not the only one).
+        //
+        return 0.0;
+      }
+
+   if (abs_quotient < 1.0)
+      {
+        // P is smaller in magnitude than Q. If P and Q have the same sign then
+        // P mod Q is P, otherwise Q - P.
+        //
+        return (P < 0) == (Q < 0) ? P : Q + P;
+      }
+
+const APL_Float floor_quotient = floor(abs_quotient);
+const APL_Float prod           = Q * floor_quotient;
+const APL_Float abs_prod       = prod < 0 ? -prod : prod;
+const APL_Float prod2          = P < 0 ? -abs_prod : abs_prod;
+const APL_Float r              = P - prod2;
+
+// return r;
+
+Q(P)
+Q(Q)
+Q(quotient)
+Q(abs_quotient)
+Q(floor_quotient)
+Q(abs_prod)
+Q(prod2)
+Q(r)
+
+Assert(isnormal(abs_quotient)   || abs_quotient   == 0.0);
+Assert(isnormal(floor_quotient) || floor_quotient == 0.0);
+Assert(isnormal(abs_prod)       || abs_prod       == 0.0);
+Assert(isnormal(prod2)          || prod2          == 0.0);
+Assert(isnormal(r)              || r              == 0.0);
+
+   return r;
+}
+//-----------------------------------------------------------------------------
 ErrorCode
 FloatCell::bif_residue(Cell * Z, const Cell * A) const
 {
@@ -606,13 +681,14 @@ FloatCell::bif_residue(Cell * Z, const Cell * A) const
         return B.bif_residue(Z, A);
       }
 
-   // if A is zero , return B
-   //
 const APL_Float a = A->get_real_value();
 const APL_Float b = dfval();
+
+   // if A is zero, return B
+   //
    if (a == 0.0)   return zv(Z, b);
 
-   // IBM: if B is zero , return B (== return 0)
+   // IBM: if B is zero , return 0
    //
    if (b == 0.0)   return IntCell::z0(Z);
 
@@ -621,45 +697,19 @@ const APL_Float b = dfval();
    // Note: In that case, the integer to which A ÷ B is close is either
    // floor(A ÷ B) or ceil(A ÷ B).
    //
-const double qct = Workspace::get_CT();
-const APL_Float quotient = b / a;
-   if (!isfinite(quotient))   // see ISO p. 89.
-      {
-        if (b > 0.1 || b < -0.1)   return IntCell::z0(Z);   // exponent overflow
+const APL_Float z = P_modulo_Q(b, a);
+Assert(isnormal(z) || z == 0.0);
 
-        // exponent underflow
-        //
-        if (a < 0)
-           if (b < 0)   return   zv(Z, b);
-           else         return   IntCell::z0(Z);
-        else
-           if (b < 0)   return    IntCell::z0(Z);
-           else         return  zv(Z, b);
-      }
 
-   if ((qct != 0) && integral_within(quotient, qct))   return IntCell::z0(Z);
+APL_Float r2;
+   if      (z < 0 && a < 0)   r2 = z;           // (×R) = ×Q)
+   else if (z > 0 && a > 0)   r2 = z;           // (×R) = ×Q)
+   else                       r2 = z + a;       // (×R) ≠ ×Q)
+Assert(isnormal(r2) || r2 == 0.0);
 
-   // Otherwise return B mod A
-   //
-   // ISO: R←B-(×B)×|A×⌊|B÷A and return R if (×A)=×B or R+A otherwise
-   // IBM: if A > 0  then 0 ≤ Z < A
-   //                else 0 ≥ Z > A
-   //
-const APL_Float quot_int = floor(quotient);
-APL_Float z = b - a * quot_int;
-   if (a < 0.0)   // Z ≤ 0
-      {
-         while (z > 0.0)    z = z + a;
-         while (z <= a)     z = z - a;
-      }
-   else         // Z ≥ 0
-      {
-         while (z < 0.0)    z = z + a;
-         while (z >= a)     z = z - a;
-      }
-
-   Assert(z*a >= 0.0);
-   return zv(Z, z);
+   if (r2 == 0)   return IntCell::z0(Z);
+   if (r2 == a)   return IntCell::z0(Z);
+   else           return zv(Z, r2);
 }
 //-----------------------------------------------------------------------------
 ErrorCode

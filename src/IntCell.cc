@@ -736,6 +736,14 @@ IntCell::bif_residue(Cell * Z, const Cell * A) const
    //
 const APL_Float a = A->get_real_value();
    if (a == 0.0)   return zv(Z, value.ival);
+   if (a > (BIG_INT64_F - 1E10) || a < (1E10 - BIG_INT64_F))
+      {
+        // for large a compute a⍝b as for floats
+        //
+        const FloatCell cB(value.ival);
+        return cB.bif_residue(Z, A);
+      }
+
 
    // IBM: if B is zero , return B
    //
