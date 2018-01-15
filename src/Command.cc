@@ -920,6 +920,16 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
    if (descr)   out << descr << endl;
 }
 //-----------------------------------------------------------------------------
+
+/// return the lengt differece between a UCS_string and its UTF8 encoding
+static inline int
+len_diff(const char * txt)
+{
+int ret = 0;
+   while (const char cc = *txt++)   if ((cc & 0xC0) == 0x80)   ++ret;
+   return ret;
+}
+
 void 
 Command::cmd_HELP(ostream & out, const UCS_string & arg)
 {
@@ -1097,7 +1107,8 @@ bool left_col = true;
 #define ro_sv_def(x, _str, _txt)
 #define rw_sv_def(x, _str, _txt)
 #define sf_def(_q, str, txt)                                              \
-   if (left_col)   out << "      ⎕" << setw(7) << str << setw(30) << txt; \
+   if (left_col)   out << "      ⎕" << setw(7) << str << setw(30 +        \
+                                        len_diff(txt)) << txt;            \
    else            out << "⎕" << setw(7) << str << txt << endl;           \
    left_col = !left_col;
 #include "SystemVariable.def"
