@@ -759,7 +759,7 @@ Quad_FIO::list_functions(ostream & out)
 "   Ze ← Ai ⎕FIO[47] Bh    setsockopt(Bh, A_level, A_optname, A_optval)\n"
 "   Ze ← As ⎕FIO[48] Bh    fscanf(Bh, As)\n"
 "   Zs ←    ⎕FIO[49] Bs    return entire file Bs as nested lines\n"
-"   Zs ← LO ⎕FIO[49] Bs    ⎕FIO[49] Bs and pipe each line through LO."
+"   Zs ← LO ⎕FIO[49] Bs    ⎕FIO[49] Bs and pipe each line through LO.\n"
 "   Zi ←    ⎕FIO[50] Bu    gettimeofday()\n"
 "   Zy4←    ⎕FIO[51] By67  mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
