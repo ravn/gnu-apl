@@ -1961,7 +1961,122 @@ GNU APL. @xref{Section 3.1}.
 @section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
-system function ⎕FIO. See the FILE_IO section below for details.
+system function ⎕FIO. ⎕FIO normally takes a numeric axis argument which
+selects one of many different functions, most of which are contained in
+the standard C library. The arguments for these function are usually the same
+as the corresponding C function and the man page for each functions describes
+the meaning of the arguments.
+
+For example, ⎕FIO[3] corresponds to fopen() and 'man fopen' explains what fopen does (opening a file).
+
+Calling ⎕FIO monadically without an axis and with an empty right argument
+shows a list of all functions provided by ⎕FIO:
+
+@verbatim
+      ⎕FIO ''
+   Functions provided by ⎕FIO...
+
+   Legend: a - address family, IPv4 address, port (or errno)
+           d - table of dirent structs
+           e - error code (integer as per errno.h)
+           h - file handle (integer)
+           i - integer
+           n - names (nested vector of strings)
+           s - string
+           u - time divisor: 1       - second
+                             1000    - milli second
+                             1000000 - micro second
+           y4 - seconds, wday, yday, dst (
+           y67- year, mon, day, hour, minute, second, [dst]
+           y9 - year, mon, day, hour, minute, second, wday, yday, dst
+           A1, A2, ...  nested vector with elements A1, A2, ...
+
+           ⎕FIO     ''    print this text on stderr
+        '' ⎕FIO     ''    print this text on stdout
+           ⎕FIO[ 0] ''    print this text on stderr
+        '' ⎕FIO[ 0] ''    print this text on stdout
+
+   Zi ←    ⎕FIO[ 1] ''    errno (of last call)
+   Zs ←    ⎕FIO[ 2] Be    strerror(Be)
+   Zh ← As ⎕FIO[ 3] Bs    fopen(Bs, As) filename Bs mode As
+   Zh ←    ⎕FIO[ 3] Bs    fopen(Bs, "r") filename Bs
+
+File I/O functions:
+
+   Ze ←    ⎕FIO[ 4] Bh    fclose(Bh)
+   Ze ←    ⎕FIO[ 5] Bh    errno (of last call on Bh)
+   Zi ←    ⎕FIO[ 6] Bh    fread(Zi, 1, 5000, Bh) 1 byte per Zi
+   Zi ← Ai ⎕FIO[ 6] Bh    fread(Zi, 1, Ai, Bh) 1 byte per Zi
+   Zi ← Ai ⎕FIO[ 7] Bh    fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Ai
+   Zi ←    ⎕FIO[ 8] Bh    fgets(Zi, 5000, Bh) 1 byte per Zi
+   Zi ← Ai ⎕FIO[ 8] Bh    fgets(Zi, Ai, Bh) 1 byte per Zi
+   Zi ←    ⎕FIO[ 9] Bh    fgetc(Zi, Bh) 1 byte
+   Zi ←    ⎕FIO[10] Bh    feof(Bh)
+   Zi ←    ⎕FIO[11] Bh    ferror(Bh)
+   Zi ←    ⎕FIO[12] Bh    ftell(Bh)
+   Zi ← Ai ⎕FIO[13] Bh    fseek(Bh, Ai, SEEK_SET)
+   Zi ← Ai ⎕FIO[14] Bh    fseek(Bh, Ai, SEEK_CUR)
+   Zi ← Ai ⎕FIO[15] Bh    fseek(Bh, Ai, SEEK_END)
+   Zi ←    ⎕FIO[16] Bh    fflush(Bh)
+   Zi ←    ⎕FIO[17] Bh    fsync(Bh)
+   Zi ←    ⎕FIO[18] Bh    fstat(Bh)
+   Zi ←    ⎕FIO[19] Bh    unlink(Bc)
+   Zi ←    ⎕FIO[20] Bh    mkdir(Bc, 0777)
+   Zi ← Ai ⎕FIO[20] Bh    mkdir(Bc, AI)
+   Zi ←    ⎕FIO[21] Bh    rmdir(Bc)
+   Zi ← A  ⎕FIO[22] 1     printf(         A1, A2...) format A1
+   Zi ← A  ⎕FIO[22] 2     fprintf(stderr, A1, A2...) format A1
+   Zi ← A  ⎕FIO[22] Bh    fprintf(Bh,     A1, A2...) format A1
+   Zi ← Ac ⎕FIO[23] Bh    fwrite(Ac, 1, ⍴Ac, Bh) 1 Unicode per Ac, Output UTF8
+   Zh ← As ⎕FIO[24] Bs    popen(Bs, As) command Bs mode As
+   Zh ←    ⎕FIO[24] Bs    popen(Bs, "r") command Bs
+   Ze ←    ⎕FIO[25] Bh    pclose(Bh)
+   Zs ←    ⎕FIO[26] Bs    return entire file Bs as byte vector
+   Zs ← As ⎕FIO[27] Bs    rename file As to Bs
+   Zd ←    ⎕FIO[28] Bs    return content of directory Bs
+   Zn ←    ⎕FIO[29] Bs    return file names in directory Bs
+   Zs ←    ⎕FIO 30        getcwd()
+   Zn ← As ⎕FIO[31] Bs    access(As, Bs) As ∈ 'RWXF'
+   Zh ←    ⎕FIO[32] Bi    socket(Bi=AF_INET, SOCK_STREAM, 0)
+   Ze ← Aa ⎕FIO[33] Bh    bind(Bh, Aa)
+   Ze ←    ⎕FIO[34] Bh    listen(Bh, 10)
+   Ze ← Ai ⎕FIO[34] Bh    listen(Bh, Ai)
+   Za ←    ⎕FIO[35] Bh    accept(Bh)
+   Ze ← Aa ⎕FIO[36] Bh    connect(Bh, Aa)
+   Zi ←    ⎕FIO[37] Bh    recv(Bh, Zi, 5000, 0) 1 byte per Zi
+   Zi ← Ai ⎕FIO[37] Bh    recv(Bh, Zi, Ai, 0) 1 byte per Zi
+   Zi ← Ai ⎕FIO[38] Bh    send(Bh, Ai, ⍴Ai, 0) 1 byte per Ai
+   Zi ← Ac ⎕FIO[39] Bh    send(Bh, Ac, ⍴Ac, 0) 1 Unicode per Ac, Output UTF8
+   Zi ←    ⎕FIO[40] B     select(B_read, B_write, B_exception, B_timeout)
+   Zi ←    ⎕FIO[41] Bh    read(Bh, Zi, 5000) 1 byte per Zi
+   Zi ← Ai ⎕FIO[41] Bh    read(Bh, Zi, Ai) 1 byte per Zi
+   Zi ← Ai ⎕FIO[42] Bh    write(Bh, Ai, ⍴Ai) 1 byte per Ai
+   Zi ← Ac ⎕FIO[43] Bh    write(Bh, Ac, ⍴Ac) 1 Unicode per Ac, Output UTF8
+   Za ←    ⎕FIO[44] Bh    getsockname(Bh)
+   Za ←    ⎕FIO[45] Bh    getpeername(Bh)
+   Zi ← Ai ⎕FIO[46] Bh    getsockopt(Bh, A_level, A_optname, Zi)
+   Ze ← Ai ⎕FIO[47] Bh    setsockopt(Bh, A_level, A_optname, A_optval)
+   Ze ← As ⎕FIO[48] Bh    fscanf(Bh, As)
+   Zs ←    ⎕FIO[49] Bs    return entire file Bs as nested lines
+   Zs ← LO ⎕FIO[49] Bs    ⎕FIO[49] Bs and pipe each line through LO.   Zi ←    ⎕FIO[50] Bu    gettimeofday()
+   Zy4←    ⎕FIO[51] By67  mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...
+   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...
+   Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...
+   Zi ←    ⎕FIO[54] Bs    chdir(Bs)
+   Ze ← As ⎕FIO[55] Bh    sscanf(Bs, As) As is the format string
+   Zs ← As ⎕FIO[56] Bs    write nested lines As to file named Bs
+
+Benchmarking functions:
+
+           ⎕FIO[200] Bi    clear statistics with ID Bi
+   Zn ←    ⎕FIO[201] Bi    get statistics with ID Bi
+           ⎕FIO[202] Bs    get monadic parallel threshold for primitive Bs
+        Ai ⎕FIO[202] Bs    set monadic parallel threshold for primitive Bs
+           ⎕FIO[203] Bs    get dyadic parallel threshold for primitive Bs
+        Ai ⎕FIO[203] Bs    set dyadic parallel threshold for primitive Bs
+
+@end verbatim
+
 
 A new feature of ⎕FIO (which is not available with the native function FILE_IO)
 is ⎕FIO[49]. ⎕FIO[49] is a monadic operator which takes a monadic conversion
