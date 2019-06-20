@@ -376,12 +376,13 @@ AC_CONFIG_FILES([Makefile
                  src/workspaces/Makefile
                  support-files/Makefile
                  support-files/105-key-International-Keyboard/Makefile
+                 support-files/Dirk/Makefile
                  support-files/Dyalog-Keyboard/Makefile
+                 support-files/Jürgen-Mint-19/Makefile
+                 support-files/old-Keyboard/Makefile
                  support-files/OS-X-Keyboard/Makefile
                  support-files/Unicomp-Keyboard/Makefile
                  support-files/WASD-Keyboard/Makefile
-                 support-files/old-Keyboard/Makefile
-                 support-files/Dirk/Makefile
                  tools/Makefile
                  websock/Makefile
                  websock/client/Makefile
