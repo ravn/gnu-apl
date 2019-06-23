@@ -101,6 +101,7 @@ protected:
           fe_may_write(false)
         {}
 
+        /// assignment
         void operator =(const file_entry & other)
            {
              path = other.path;

@@ -376,6 +376,7 @@ const ssize_t bytes = read(device, buffer, len);
          return Z;
       }
 
+   MORE_ERROR() << "Invalid mode A in A ⎕FIO[60] B";
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
