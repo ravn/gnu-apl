@@ -1,0 +1,60 @@
+<map id="NativeFunction::NativeFunction" name="NativeFunction::NativeFunction">
+<area shape="rect" id="node2" href="$classSymbol.html#a72f886124dc96f52a165ba2a6933c227" title="return a reason why this symbol cant become a defined function " alt="" coords="269,814,438,840"/>
+<area shape="rect" id="node31" href="$classNativeFunction.html#a5c9e476c9e01c1109898d30980b58ab8" title="Overloaded Function::eval_() " alt="" coords="279,864,428,891"/>
+<area shape="rect" id="node32" href="$classNativeFunction.html#a32597c70cca8e5371156ed73a816adeb" title="Overloaded Function::eval_AB() " alt="" coords="502,940,669,967"/>
+<area shape="rect" id="node33" href="$classNativeFunction.html#a66ca8505044700ab894eff9485ef4275" title="Overloaded Function::eval_ALB() " alt="" coords="498,510,673,536"/>
+<area shape="rect" id="node36" href="$classNativeFunction.html#a1145278c60a5d05bc53a426a67cebce1" title="Overloaded Function::eval_ALRB() " alt="" coords="493,459,677,486"/>
+<area shape="rect" id="node37" href="$classNativeFunction.html#a794cf61b66644b9abe667fe9b55ffb07" title="Overloaded Function::eval_ALRXB() " alt="" coords="282,393,425,434"/>
+<area shape="rect" id="node38" href="$classNativeFunction.html#af49ca4035d43afbee169e625ea25ee47" title="Overloaded Function::eval_ALXB() " alt="" coords="262,560,445,587"/>
+<area shape="rect" id="node39" href="$classNativeFunction.html#a1d31e8bd385dc01cf1ff2924b47c3bfd" title="Overloaded Function::eval_AXB() " alt="" coords="265,966,441,992"/>
+<area shape="rect" id="node40" href="$classNativeFunction.html#a8e704e2889125d859aa9e144e35c009b" title="Overloaded Function::eval_B() " alt="" coords="506,1042,665,1068"/>
+<area shape="rect" id="node41" href="$classNativeFunction.html#aedd95c49a4a9581b91a1adaee0f7b906" title="Overloaded Function::eval_fill_AB() " alt="" coords="282,1118,425,1160"/>
+<area shape="rect" id="node42" href="$classNativeFunction.html#ac51189bec953ebdbd556e69fbbf27662" title="Overloaded Function::eval_fill_B() " alt="" coords="282,1184,425,1225"/>
+<area shape="rect" id="node43" href="$classNativeFunction.html#a1f69a91f42cc75968e05124e6af75008" title="Overloaded Function::eval_LB() " alt="" coords="503,712,668,739"/>
+<area shape="rect" id="node44" href="$classNativeFunction.html#aa5635bc6f9a33f99c2ef654b68c4eed6" title="Overloaded Function::eval_LRB() " alt="" coords="498,662,673,688"/>
+<area shape="rect" id="node45" href="$classNativeFunction.html#a679251dcb83e57b3d41d1c560eb4be9b" title="Overloaded Function::eval_LRXB() " alt="" coords="261,611,445,638"/>
+<area shape="rect" id="node46" href="$classNativeFunction.html#ae6398d1fed96aef3099d8ce27dadeb02" title="Overloaded Function::eval_LXB() " alt="" coords="266,763,441,790"/>
+<area shape="rect" id="node47" href="$classNativeFunction.html#a655c5408e6e86df0a0cea013ef67a6dc" title="Overloaded Function::eval_XB() " alt="" coords="270,1067,437,1094"/>
+<area shape="rect" id="node48" href="$classNativeFunction.html#abc8e9bfbb14b2fe89f87bdd5c209c46c" title="overloaded Function::is_operator() " alt="" coords="289,1249,417,1290"/>
+<area shape="rect" id="node49" href="$classWorkspace.html#ab0188eca4a9e7dd492e042f87ea69ba7" title="lookup an existing user defined symbol. If not found, create one (unless this would be a quad symbol)..." alt="" coords="262,207,445,234"/>
+<area shape="rect" id="node53" href="$classWorkspace.html#a5ebd29d8c860b589b9f1d8118a949514" title="return reference to more info about last error " alt="" coords="274,1315,433,1342"/>
+<area shape="rect" id="node54" href="$classNativeFunction.html#ad1a62a0e847dcd7a571b31c0a892c88d" title="open .so file in one of several directories. On success set handle and update so_path. " alt="" coords="512,338,659,380"/>
+<area shape="rect" id="node59" href="$classSymbol.html#acf6746d030a587da23fb32e898f23d36" title="Set current NameClass of this Symbol to nc. " alt="" coords="297,1366,410,1392"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a3b24e2d83089576235f2c43283259709" title="return true iff function funname is on the current call stack " alt="" coords="512,836,659,863"/>
+<area shape="rect" id="node4" href="$classWorkspace.html#ad59928bcb6527147b5c5ca3e34106fe3" title="lookup an existing symbol (user defined or ⎕xx). " alt="" coords="739,648,925,689"/>
+<area shape="rect" id="node14" href="$classNamedObject.html#a00dd1506b91748b88c3f6c2d2a2bb030" title="return the Id of this object (ID_USER_SYMBOL for user defined objects) " alt="" coords="1477,1034,1624,1060"/>
+<area shape="rect" id="node20" href="$classNamedObject.html#af04e50387e6c2c98d91f37b1f79a3f1b" title="Get current NameClass of this name. " alt="" coords="757,807,907,834"/>
+<area shape="rect" id="node27" href="$classSymbol.html#ae8323cb4a8eedf845477364e9631204d" title="Return the current function (or throw a VALUE_ERROR) " alt="" coords="759,858,905,884"/>
+<area shape="rect" id="node28" href="$classFunction.html#adbd055c988c2284dc98bdfacea3268aa" title="return a pointer to this UserFunction (if it is one) " alt="" coords="763,908,901,935"/>
+<area shape="rect" id="node29" href="$classWorkspace.html#a057e0d77702810d071560c7b72c2f8d6" title="the top of the SI stack (the SI pushed last) " alt="" coords="765,959,899,986"/>
+<area shape="rect" id="node30" href="$classStateIndicator.html#af4980db95c1e4a63fd7e6627a92d6ef2" title="return the SI that has called this one " alt="" coords="767,741,897,782"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a87168641a0381aae0e971844deb67062" title="overload basic_string::size() so that it returns a signed length " alt="" coords="1277,132,1400,159"/>
+<area shape="rect" id="node6" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯) " alt="" coords="1286,596,1391,623"/>
+<area shape="rect" id="node7" href="$classWorkspace.html#acb39e0420fcef7558220b9576b809e97" title="return a token for system function or variable ucs " alt="" coords="1019,807,1168,834"/>
+<area shape="rect" id="node10" href="$classSymbolTableBase.html#ab5f0eafde48f782a598fa846dcc30013" title="return a Symbol with name name in this SymbolTable. " alt="" coords="1251,648,1426,689"/>
+<area shape="rect" id="node17" href="$classToken.html#a61e87ed4d047f87903c187ea9f02a9c2" title="return the TokenClass of this token. " alt="" coords="1031,706,1156,732"/>
+<area shape="rect" id="node18" href="$classToken.html#aad7885060528a54f075e483d26eb4dda" title="return the Symbol * value of this token " alt="" coords="1024,554,1163,580"/>
+<area shape="rect" id="node8" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol. " alt="" coords="1263,714,1414,740"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="1269,402,1409,428"/>
+<area shape="rect" id="node11" href="$classSystemName.html#a91e2c07d54860c7dfc1ce8076438c9e6" title="return the variable (if any) that this name represents " alt="" coords="1249,764,1429,791"/>
+<area shape="rect" id="node12" href="$classSystemVariable.html#adfd61017d46f4b022af485637a768c76" title="return the TokenTag for this system variable " alt="" coords="1269,866,1409,908"/>
+<area shape="rect" id="node15" href="$classSystemName.html#a1e472d932bec255a5bf5d2c426a4c3c7" title="return the function (if any) that this name represents " alt="" coords="1248,932,1429,959"/>
+<area shape="rect" id="node16" href="$classFunction.html#a90afe275cefc1230fb019a4bf788a9c2" title="set tok to a Token for this function. " alt="" coords="1270,815,1407,842"/>
+<area shape="rect" id="node13" href="$classID.html#af829018611478bf22237c51c1491933b" title="return the TokenTag for id " alt="" coords="1487,874,1614,900"/>
+<area shape="rect" id="node19" href="$classToken.html#a62c80fbfd8987a5e4dcf1ebec3b40205" title="return the TokenValueType of this token. " alt="" coords="1262,499,1415,526"/>
+<area shape="rect" id="node21" href="$classNamedObject.html#a3b945c1398e679140c82f7e1d4ca6b1c" title="return the symbol for this user defined symbol (if any) or 0 if this Id refers to a system name ..." alt="" coords="1005,858,1182,884"/>
+<area shape="rect" id="node22" href="$classSymbol.html#a395888fd41e029d4b80e678e16ecd778" title="return the top&#45;most item on the value stack " alt="" coords="1019,908,1168,935"/>
+<area shape="rect" id="node23" href="$classNamedObject.html#a5c3b45deeece967728cafaa7a7b0c573" title="return the name of the named object " alt="" coords="1010,971,1177,998"/>
+<area shape="rect" id="node24" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string " alt="" coords="1270,983,1407,1010"/>
+<area shape="rect" id="node25" href="$classID.html#a1c80b7bfa291882045116dcec6d50098" title="return the printable name for id as UTF8 * " alt="" coords="1500,983,1601,1010"/>
+<area shape="rect" id="node26" href="$structId__name.html#a3202cdf13a9726257a4a3652a66285dd" title="compare key with item (for bsearch()) " alt="" coords="1672,983,1803,1010"/>
+<area shape="rect" id="node34" href="$classToken.html#a6e68866e29929b554cf2cc8421e019cc" title="return the Function * value of this token " alt="" coords="763,560,901,587"/>
+<area shape="rect" id="node35" href="$classToken.html#a5e7dfb7f42ba0602ea6ce4293eeccb4e" title="return true if this token is a function (or operator) " alt="" coords="1029,452,1158,479"/>
+<area shape="rect" id="node50" href="$classSymbolTable.html#a678844569da04a269614ef39a1057589" title="Return or create a Symbol with name ucs in this SymbolTable. " alt="" coords="513,110,657,152"/>
+<area shape="rect" id="node51" href="$classSymbolTableBase.html#ad231d005a78e9d44f0536aeb1caea62c" title="compute a 16&#45;bit hash for name " alt="" coords="987,52,1199,108"/>
+<area shape="rect" id="node52" href="$classSymbolTableBase.html#a8b6fdeffe7abdc7b3163d07befa9962a" title="add sym to the symbol table. The caller has checked that new_name does not yet exist in the symbol ta..." alt="" coords="726,103,938,159"/>
+<area shape="rect" id="node55" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string. " alt="" coords="1003,351,1183,378"/>
+<area shape="rect" id="node56" href="$classNativeFunction.html#a921982adc19e1056d5be819f206cc926" title="try to open one .so file " alt="" coords="765,234,899,276"/>
+<area shape="rect" id="node57" href="$classUTF8__string.html#aba107efc6a9fb0234cd9ae8d96b63987" title="return this string as a 0&#45;termionated C string " alt="" coords="767,452,897,479"/>
+<area shape="rect" id="node58" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix " alt="" coords="740,300,924,327"/>
+</map>

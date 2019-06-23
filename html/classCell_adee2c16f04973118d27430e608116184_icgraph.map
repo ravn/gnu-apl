@@ -1,0 +1,9 @@
+<map id="Cell::greater" name="Cell::greater">
+<area shape="rect" id="node2" href="$classBif__F2__INTER.html#a1b8227996771bfea3bab91a9dd5b9496" title="overloaded Function::eval_AB() " alt="" coords="151,5,316,32"/>
+<area shape="rect" id="node3" href="$classCell.html#a0ed39488d04d8e2dae0b6cb17d24300f" title="compare comp_len items ascendingly " alt="" coords="173,56,294,83"/>
+<area shape="rect" id="node7" href="$classBif__F12__WITHOUT.html#a2c021b4d40a1f616852c1b68f053e86f" title="eval_AB for large A and/or B " alt="" coords="147,107,320,149"/>
+<area shape="rect" id="node8" href="$classCell.html#a611277085a7f1a0a74c47c6d23abf676" title="compare comp_len items descendingly " alt="" coords="172,173,295,200"/>
+<area shape="rect" id="node4" href="$classBif__F12__SORT.html#a96a04ad4c64826d8a72c7a02fddebe3d" title="sort integer vector B " alt="" coords="368,115,509,141"/>
+<area shape="rect" id="node5" href="$classBif__F12__SORT__ASC.html#af86f5541d7c1a7900f74c31c05fec728" title="overloaded Function::eval_B() " alt="" coords="557,89,752,116"/>
+<area shape="rect" id="node6" href="$classBif__F12__SORT__DES.html#a237b76bfdb8b9204f0cf59b8a2b59c86" title="overloaded Function::eval_B() " alt="" coords="557,140,752,167"/>
+</map>

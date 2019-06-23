@@ -1,0 +1,11 @@
+<map id="Value_P_Base" name="Value_P_Base">
+<area shape="rect" id="node6" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="67,112,225,139"/>
+<area shape="rect" id="node2" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="219,429,273,456"/>
+<area shape="rect" id="node3" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="243,309,353,336"/>
+<area shape="rect" id="node4" href="$classCell.html" title="The base class for all Cells. " alt="" coords="173,309,219,336"/>
+<area shape="rect" id="node5" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="184,203,304,229"/>
+<area shape="rect" id="node7" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="250,112,405,139"/>
+<area shape="rect" id="node8" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="250,6,405,47"/>
+<area shape="rect" id="node9" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="493,309,603,336"/>
+<area shape="rect" id="node10" href="$classShape.html" title="the shape of an APL value " alt="" coords="680,309,737,336"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="Quad_WA" name="Quad_WA">
+<area shape="rect" id="node2" href="$classRO__SystemVariable.html" title="Base class for all read&#45;only APL system variables. " alt="" coords="27,405,167,432"/>
+<area shape="rect" id="node3" href="$classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized. " alt="" coords="28,328,167,355"/>
+<area shape="rect" id="node4" href="$classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="40,251,155,277"/>
+<area shape="rect" id="node5" href="$classSymbol.html" title="Base class for variables, defined functions, snd distinguished names. " alt="" coords="64,173,131,200"/>
+<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,83,107,109"/>
+<area shape="rect" id="node7" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="132,83,223,109"/>
+</map>

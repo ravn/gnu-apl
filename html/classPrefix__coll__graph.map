@@ -1,0 +1,29 @@
+<map id="Prefix" name="Prefix">
+<area shape="rect" id="node24" href="$classStateIndicator.html" title="One entry of the state indicator (SI) of the APL interpreter. " alt="" coords="378,741,480,768"/>
+<area shape="rect" id="node2" href="$classToken__string.html" title="A sequence of Token. " alt="" coords="511,533,608,560"/>
+<area shape="rect" id="node25" href="$classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. " alt="" coords="287,637,373,664"/>
+<area shape="rect" id="node4" href="$structToken__loc.html" title="A Token and its location information (position in a Token_string) " alt="" coords="404,533,485,560"/>
+<area shape="rect" id="node5" href="$classToken.html" title="One atom of an APL function or expression. " alt="" coords="205,429,263,456"/>
+<area shape="rect" id="node30" href="$classDerivedFunction.html" title="An APL operator bounf to its function argument(s) " alt="" coords="105,533,221,560"/>
+<area shape="rect" id="node6" href="$unionToken_1_1sval.html" title="the optional value of the token. " alt="" coords="231,325,321,352"/>
+<area shape="rect" id="node7" href="$classSymbol.html" title="Base class for variables, defined functions, snd distinguished names. " alt="" coords="116,235,183,261"/>
+<area shape="rect" id="node8" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,128,107,155"/>
+<area shape="rect" id="node11" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="20,235,92,261"/>
+<area shape="rect" id="node9" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="132,128,223,155"/>
+<area shape="rect" id="node12" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="598,13,705,40"/>
+<area shape="rect" id="node17" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="722,128,880,155"/>
+<area shape="rect" id="node23" href="$classValue__P.html" title="A Value smart * (constructors) " alt="" coords="261,128,331,155"/>
+<area shape="rect" id="node13" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="657,429,711,456"/>
+<area shape="rect" id="node14" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="355,128,465,155"/>
+<area shape="rect" id="node22" href="$classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="335,235,416,261"/>
+<area shape="rect" id="node15" href="$classCell.html" title="The base class for all Cells. " alt="" coords="819,325,864,352"/>
+<area shape="rect" id="node16" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="839,235,959,261"/>
+<area shape="rect" id="node18" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="905,128,1060,155"/>
+<area shape="rect" id="node19" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="905,6,1060,47"/>
+<area shape="rect" id="node20" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="345,325,455,352"/>
+<area shape="rect" id="node21" href="$classShape.html" title="the shape of an APL value " alt="" coords="532,325,589,352"/>
+<area shape="rect" id="node26" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="247,533,380,560"/>
+<area shape="rect" id="node28" href="$classError.html" title="An APL error and information related to it. " alt="" coords="404,637,455,664"/>
+<area shape="rect" id="node29" href="$classDerivedFunctionCache.html" title="a small cache for storing a few DerivedFunction objects " alt="" coords="107,637,260,664"/>
+<area shape="rect" id="node31" href="$structPrefix_1_1Phrase.html" title="one phrase in the phrase table " alt="" coords="633,533,737,560"/>
+</map>

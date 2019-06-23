@@ -1,0 +1,31 @@
+<map id="Workspace_0" name="Workspace_0">
+<area shape="rect" id="node2" href="$classSymbolTable.html" title="The table containing all user defined symbols. " alt="" coords="1819,359,1917,385"/>
+<area shape="rect" id="node3" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; Symbol,\l SYMBOL_HASH_TABLE_SIZE \&gt;" alt="" coords="1443,355,1667,397"/>
+<area shape="rect" id="node4" href="$classSymbol.html" title="Base class for variables, defined functions, snd distinguished names. " alt="" coords="1079,352,1145,379"/>
+<area shape="rect" id="node31" href="$classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="1304,313,1419,340"/>
+<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="509,219,611,245"/>
+<area shape="rect" id="node13" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="807,173,879,200"/>
+<area shape="rect" id="node6" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="797,284,888,311"/>
+<area shape="rect" id="node10" href="$classSystemName.html" title="a distinguished name (i.e. ⎕xx) " alt="" coords="1691,297,1794,324"/>
+<area shape="rect" id="node8" href="$classSystemSymTab.html" title="The table containing all system defined symbols (aka. distinguished names) " alt="" coords="2297,307,2413,333"/>
+<area shape="rect" id="node9" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; SystemName,\l 256&#45;1 \&gt;" alt="" coords="1941,293,2165,334"/>
+<area shape="rect" id="node11" href="$classQuadFunction.html" title="Base class for all system functions. " alt="" coords="1310,187,1413,213"/>
+<area shape="rect" id="node12" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="1051,112,1173,139"/>
+<area shape="rect" id="node14" href="$classCharCell.html" title="A Cell containing a single Unicode character. " alt="" coords="379,165,453,192"/>
+<area shape="rect" id="node15" href="$classCell.html" title="The base class for all Cells. " alt="" coords="39,336,84,363"/>
+<area shape="rect" id="node16" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="1052,428,1172,455"/>
+<area shape="rect" id="node18" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="279,507,334,533"/>
+<area shape="rect" id="node30" href="$classNumericCell.html" title="Base class for RealCell and ComplexCell. " alt="" coords="259,152,354,179"/>
+<area shape="rect" id="node17" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="763,467,922,493"/>
+<area shape="rect" id="node22" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="506,528,614,555"/>
+<area shape="rect" id="node19" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="5,469,117,496"/>
+<area shape="rect" id="node20" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="7,559,116,585"/>
+<area shape="rect" id="node21" href="$classShape.html" title="the shape of an APL value " alt="" coords="32,609,91,636"/>
+<area shape="rect" id="node23" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="765,552,921,579"/>
+<area shape="rect" id="node24" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="482,579,638,621"/>
+<area shape="rect" id="node25" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="767,112,918,139"/>
+<area shape="rect" id="node26" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="521,107,599,133"/>
+<area shape="rect" id="node27" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="500,157,620,184"/>
+<area shape="rect" id="node28" href="$classIntCell.html" title="A cell containing a single Integer value. " alt="" coords="813,5,873,32"/>
+<area shape="rect" id="node29" href="$classRealCell.html" title="Base class for IntCell and FloatCell. " alt="" coords="524,5,596,32"/>
+</map>

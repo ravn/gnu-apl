@@ -1,0 +1,38 @@
+var classIO__Files =
+[
+    [ "TestMode", "classIO__Files.html#a37b759b797b7663e97f750c7c1858620", [
+      [ "TM_EXIT_AFTER_LAST", "classIO__Files.html#a37b759b797b7663e97f750c7c1858620a44b5e2a1780ff7536e458a9797bad0c1", null ],
+      [ "TM_EXIT_AFTER_LAST_IF_OK", "classIO__Files.html#a37b759b797b7663e97f750c7c1858620a2d79f757c25615c5dcc736ae5579076f", null ],
+      [ "TM_STAY_AFTER_LAST", "classIO__Files.html#a37b759b797b7663e97f750c7c1858620a40aeb6d5fb4ad3ecadaac93c7bf0c75c", null ],
+      [ "TM_STOP_AFTER_ERROR", "classIO__Files.html#a37b759b797b7663e97f750c7c1858620a5527bb0d4509407f9dedd81791e784e6", null ],
+      [ "TM_EXIT_AFTER_ERROR", "classIO__Files.html#a37b759b797b7663e97f750c7c1858620ade582841f9f4a4b783ba9a7b037ead20", null ]
+    ] ],
+    [ "apl_error", "classIO__Files.html#ac7a14dfc38263d79ac39142ac269dfe0", null ],
+    [ "assert_error", "classIO__Files.html#a6101bf6358b96faf4025eca0462bf5b8", null ],
+    [ "diff_error", "classIO__Files.html#ab672c0a67bd7aa29dbd8d3c29bea86a2", null ],
+    [ "end_of_current_file", "classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e", null ],
+    [ "error_count", "classIO__Files.html#aa2c6031cd53afc14eb880778ec929238", null ],
+    [ "expect_apl_errors", "classIO__Files.html#ab4774669e92aa8fba8f5fb122bbd7dbf", null ],
+    [ "get_current_testreport", "classIO__Files.html#a43da0f07c2768c8ad4e2f42a9530f8b1", null ],
+    [ "get_file_line", "classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b", null ],
+    [ "next_file", "classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e", null ],
+    [ "open_next_file", "classIO__Files.html#aa29d2b92365b65b91d6db6288d55ae5d", null ],
+    [ "print_summary", "classIO__Files.html#a168f41b75e3b6ea0a6e5aa41f50c1872", null ],
+    [ "read_file_line", "classIO__Files.html#a9cd4e5d7e3467ff6ad303dc1063e5004", null ],
+    [ "reset_errors", "classIO__Files.html#ac9e3a19700b3d04e053494784e71e40d", null ],
+    [ "syntax_error", "classIO__Files.html#afe8b5bf7ac34aad3a974596cfcc0329d", null ],
+    [ "main", "classIO__Files.html#ac0f2228420376f4db7e1274f2b41667c", null ],
+    [ "UserPreferences", "classIO__Files.html#ae00770ffa95bbcc5a06e8d3066ae4fb8", null ],
+    [ "apl_errors", "classIO__Files.html#acc65076ffc0becf0b2a403f3d400b687", null ],
+    [ "assert_errors", "classIO__Files.html#ac520b210c43d33060548cc2653eca986", null ],
+    [ "current_testreport", "classIO__Files.html#abe458ef8e4d3b39e0924124f05fc6d82", null ],
+    [ "diff_errors", "classIO__Files.html#a9054ad01ef63f212a14b10ebca3f4fe7", null ],
+    [ "last_apl_error_line", "classIO__Files.html#a7a06f51722e57b8ed352fd6fa0bcbca4", null ],
+    [ "last_apl_error_loc", "classIO__Files.html#ad1612493689498433417a31ece2c4794", null ],
+    [ "need_total", "classIO__Files.html#a849d83631c68b6e80b9d97ac91c724e5", null ],
+    [ "parse_errors", "classIO__Files.html#a9c9cbb16371c4247b38d693301c3931f", null ],
+    [ "test_mode", "classIO__Files.html#a66620eeb77e462d0ff2ce5cf7e098de0", null ],
+    [ "testcase_count", "classIO__Files.html#ac00f72f2d9c089c5f0ed46ed6bc8c508", null ],
+    [ "testcases_done", "classIO__Files.html#a3ea2f4201d5fe224bc3b500bbd12b034", null ],
+    [ "total_errors", "classIO__Files.html#a32c1c334b7de4a2e7f76550ce26a16c5", null ]
+];

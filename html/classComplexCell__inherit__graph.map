@@ -1,0 +1,4 @@
+<map id="ComplexCell" name="ComplexCell">
+<area shape="rect" id="node2" href="$classNumericCell.html" title="Base class for RealCell and ComplexCell. " alt="" coords="6,80,100,107"/>
+<area shape="rect" id="node3" href="$classCell.html" title="The base class for all Cells. " alt="" coords="31,5,76,32"/>
+</map>

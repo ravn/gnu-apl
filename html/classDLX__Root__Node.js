@@ -1,0 +1,27 @@
+var classDLX__Root__Node =
+[
+    [ "DLX_Root_Node", "classDLX__Root__Node.html#a3553ce96f64de9e49e2e76d2034d73da", null ],
+    [ "cover", "classDLX__Root__Node.html#a2398a37e28c8fcfb9143d3a4dd1f61f9", null ],
+    [ "deep_check", "classDLX__Root__Node.html#a66b363e0b699bba9ff5f8d864f51adea", null ],
+    [ "display", "classDLX__Root__Node.html#a0b2721c3421097e8924ae3446f142f69", null ],
+    [ "get_cover_count", "classDLX__Root__Node.html#aa45217970171e3683d0bd73e0394bd14", null ],
+    [ "get_pick_count", "classDLX__Root__Node.html#a763dc2d3be878e1b6a375ab963d9dc3d", null ],
+    [ "get_solution_count", "classDLX__Root__Node.html#acd4e916bd1c26cc46973f859bc47b16c", null ],
+    [ "indent", "classDLX__Root__Node.html#a4ee02dea08e0d52a808f4e4532e23681", null ],
+    [ "preset", "classDLX__Root__Node.html#a361309d7f1cc268ab987fee4c2003558", null ],
+    [ "solve", "classDLX__Root__Node.html#a3c37a6cf9975dda2d0ddd30defdaf8c0", null ],
+    [ "uncover", "classDLX__Root__Node.html#a955017dab559c56d54c72e08af5ba1cb", null ],
+    [ "all_solutions", "classDLX__Root__Node.html#a430814184989b5630ca19df7a955ebae", null ],
+    [ "cols", "classDLX__Root__Node.html#a0ef82d19c8d4c886becae87455348a1d", null ],
+    [ "cover_count", "classDLX__Root__Node.html#a1df9935dc9fabe3793cb82d93cd81da9", null ],
+    [ "first_0", "classDLX__Root__Node.html#a61f1d84ebcc965e42c062024c98be5be", null ],
+    [ "headers", "classDLX__Root__Node.html#a75974671cc82801ba54c2e541da48ac5", null ],
+    [ "level", "classDLX__Root__Node.html#a6009d003acce255b818c42a3e4e7de63", null ],
+    [ "max_solutions", "classDLX__Root__Node.html#a8c393078506c6b89e4a8dccdf4c96c5d", null ],
+    [ "nodes", "classDLX__Root__Node.html#ac704a8912aafbb4554b85d2a8a6d40c2", null ],
+    [ "pick_count", "classDLX__Root__Node.html#ac99d21700ec82f8858cdcac7747433fa", null ],
+    [ "primary_count", "classDLX__Root__Node.html#a77446e595e71aace9d8eaec2a82887ed", null ],
+    [ "rows", "classDLX__Root__Node.html#ab34e74ca61e222915e98eed5cd668ef1", null ],
+    [ "secondary_count", "classDLX__Root__Node.html#af691a742edb3027ce913204eaf9d7e18", null ],
+    [ "solution_count", "classDLX__Root__Node.html#a9d9e33806c34f22182c1c8d505b190c1", null ]
+];

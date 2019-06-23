@@ -1,0 +1,12 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classCell.html" title="The base class for all Cells. " alt="" coords="5,81,51,108"/>
+<area shape="rect" id="node2" href="$classCharCell.html" title="A Cell containing a single Unicode character. " alt="" coords="110,5,183,32"/>
+<area shape="rect" id="node3" href="$classLvalCell.html" title="A cell pointing to another cell (which shall be updated) " alt="" coords="112,56,181,83"/>
+<area shape="rect" id="node5" href="$classNumericCell.html" title="Base class for RealCell and ComplexCell. " alt="" coords="99,107,194,133"/>
+<area shape="rect" id="node10" href="$classPointerCell.html" title="A cell pointing to a (nested) APL value. " alt="" coords="103,157,190,184"/>
+<area shape="rect" id="node4" href="$classLvalCell__picked.html" title="a compatibility Cell for fixing a bug in ⊃. Will be removed " alt="" coords="243,56,357,83"/>
+<area shape="rect" id="node6" href="$classComplexCell.html" title="A celkl containing one complex numbver. " alt="" coords="251,107,349,133"/>
+<area shape="rect" id="node7" href="$classRealCell.html" title="Base class for IntCell and FloatCell. " alt="" coords="264,157,336,184"/>
+<area shape="rect" id="node8" href="$classFloatCell.html" title="A Cell containing a single floating point (or rational) value. " alt="" coords="405,132,480,159"/>
+<area shape="rect" id="node9" href="$classIntCell.html" title="A cell containing a single Integer value. " alt="" coords="413,183,473,209"/>
+</map>

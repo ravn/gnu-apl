@@ -1,0 +1,27 @@
+var classDLX__Node =
+[
+    [ "Col_Type", "classDLX__Node.html#adecc3026ca5c24fb1657145fb1284411", [
+      [ "Col_INVALID", "classDLX__Node.html#adecc3026ca5c24fb1657145fb1284411a7a6ad9d07bac45a93c360ac060501bf6", null ],
+      [ "Col_NULL", "classDLX__Node.html#adecc3026ca5c24fb1657145fb1284411a6a27b0535c6b007816b264cb50001c77", null ],
+      [ "Col_PRIMARY", "classDLX__Node.html#adecc3026ca5c24fb1657145fb1284411aca3783736b2ac5db470593646d0d6ea5", null ],
+      [ "Col_SECONDARY", "classDLX__Node.html#adecc3026ca5c24fb1657145fb1284411a491cd514ac7e79b8271928805fe13c7c", null ],
+      [ "Col_UNKNOWN", "classDLX__Node.html#adecc3026ca5c24fb1657145fb1284411a325a73de2c0a1eb84c69ad38a57a9081", null ]
+    ] ],
+    [ "DLX_Node", "classDLX__Node.html#a36ba7f96f109f56a84c9eb9b6aaa9fe8", null ],
+    [ "DLX_Node", "classDLX__Node.html#a979ab77e093ce1a56d704973ae931729", null ],
+    [ "check", "classDLX__Node.html#ab93ddc153099357acf9a76558869467e", null ],
+    [ "get_col_type", "classDLX__Node.html#ace049ce44b5c35aec8b3bd682dee0336", null ],
+    [ "insert_lr", "classDLX__Node.html#ac8ca68f34075fd1f6c9403ea5151a989", null ],
+    [ "insert_ud", "classDLX__Node.html#a84aa1d52ac44b5aa278ee24e5962b655", null ],
+    [ "operator=", "classDLX__Node.html#a381c06571a596e1311554cfbeb295e32", null ],
+    [ "print", "classDLX__Node.html#ad112dbd9fd990c1d43414ca32288b74e", null ],
+    [ "print_RC", "classDLX__Node.html#a7d2416dffaee937f6b63b44e2a77262a", null ],
+    [ "remove_lr", "classDLX__Node.html#acd8abea5547ce468cb57e461fe886417", null ],
+    [ "remove_ud", "classDLX__Node.html#af863b7a6f3052af9c0b4df2987ec41c7", null ],
+    [ "col", "classDLX__Node.html#a03aec761d4c70aa3ebc53304c80d9fe3", null ],
+    [ "down", "classDLX__Node.html#a1189a051989fecab3f8488a444215ca9", null ],
+    [ "left", "classDLX__Node.html#a7e431d892b5281597eb7a0c0206bd2f1", null ],
+    [ "right", "classDLX__Node.html#ae3b464d6da93bdb1e09085b3799808ec", null ],
+    [ "row", "classDLX__Node.html#aa32ac066ced955a53fabcfb9b56d873b", null ],
+    [ "up", "classDLX__Node.html#a674c8223dbff415dae63db68572aa1cd", null ]
+];

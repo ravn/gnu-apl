@@ -1,0 +1,4 @@
+<map id="IndexIterator" name="IndexIterator">
+<area shape="rect" id="node2" href="$classElidedIndexIterator.html" title="Iterator for an elided index (= ⍳(⍴B)[N] for some N) " alt="" coords="4,80,133,107"/>
+<area shape="rect" id="node3" href="$classTrueIndexIterator.html" title="an IndexIterator for a true (i.e. non&#45;elided) index array " alt="" coords="159,80,280,107"/>
+</map>

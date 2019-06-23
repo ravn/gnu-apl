@@ -1,0 +1,10 @@
+<map id="NativeFunction::NativeFunction" name="NativeFunction::NativeFunction">
+<area shape="rect" id="node2" href="$classNativeFunction.html#a07ab61a74e4a64f38424a2bbd0c6b38b" title="⎕FX a native funtion from a shared library (dlopen) handle " alt="" coords="262,103,394,129"/>
+<area shape="rect" id="node3" href="$classQuad__FX.html#a550a9ac4f2bd7ed3d945994f31847012" title="⎕FX with native function and optional library reference " alt="" coords="443,103,608,129"/>
+<area shape="rect" id="node4" href="$classQuad__FX.html#a8cd0f99594d0c2559309d1b4f77605cd" title="overloaded Function::eval_AB(). " alt="" coords="661,77,795,104"/>
+<area shape="rect" id="node9" href="$classQuad__FX.html#a1441a80b40e7d08f8f5978f6b0a52040" title="overloaded Function::eval_AXB(). " alt="" coords="657,128,799,155"/>
+<area shape="rect" id="node5" href="$classQuad__TF.html#a29e0c815e17a256d7320bcb36e1ada43" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful " alt="" coords="848,77,971,104"/>
+<area shape="rect" id="node6" href="$structCommand_1_1transfer__context.html#a595bf601dcc01df3a79de2e60bf5351f" title="process a &#39;A&#39; (array in 2 ⎕TF format) item. " alt="" coords="1019,5,1203,46"/>
+<area shape="rect" id="node7" href="$structCommand_1_1transfer__context.html#ab86c640bd7427411b33bd1ea24d1e68f" title="process an &#39;F&#39; (function in 2 ⎕TF format) item. " alt="" coords="1019,70,1203,111"/>
+<area shape="rect" id="node8" href="$classQuad__TF.html#a0b9baf30e622ebe20e0afc21f32ec644" title="Overloaded Function::eval_AB(). " alt="" coords="1044,136,1177,163"/>
+</map>

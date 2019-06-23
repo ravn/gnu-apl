@@ -1,0 +1,6 @@
+<map id="ASSIGN_WSWS_VAR_c" name="ASSIGN_WSWS_VAR_c">
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="5,107,99,133"/>
+<area shape="rect" id="node3" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="123,99,271,141"/>
+<area shape="rect" id="node4" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="127,6,267,47"/>
+<area shape="rect" id="node5" href="$classSig__item__string.html" title="a string signal item of size bytes " alt="" coords="295,107,405,133"/>
+</map>

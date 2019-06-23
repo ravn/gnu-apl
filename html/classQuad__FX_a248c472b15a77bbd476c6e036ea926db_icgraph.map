@@ -1,0 +1,9 @@
+<map id="Quad_FX::do_quad_FX" name="Quad_FX::do_quad_FX">
+<area shape="rect" id="node2" href="$classQuad__FX.html#a8cd0f99594d0c2559309d1b4f77605cd" title="overloaded Function::eval_AB(). " alt="" coords="214,35,349,61"/>
+<area shape="rect" id="node3" href="$classQuad__TF.html#a29e0c815e17a256d7320bcb36e1ada43" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful " alt="" coords="397,77,520,104"/>
+<area shape="rect" id="node7" href="$classQuad__FX.html#a1bd3de48abc7e7f6171cd65bbc128783" title="overloaded Function::eval_B(). " alt="" coords="219,136,344,163"/>
+<area shape="rect" id="node4" href="$structCommand_1_1transfer__context.html#a595bf601dcc01df3a79de2e60bf5351f" title="process a &#39;A&#39; (array in 2 ⎕TF format) item. " alt="" coords="568,5,752,46"/>
+<area shape="rect" id="node5" href="$structCommand_1_1transfer__context.html#ab86c640bd7427411b33bd1ea24d1e68f" title="process an &#39;F&#39; (function in 2 ⎕TF format) item. " alt="" coords="568,70,752,111"/>
+<area shape="rect" id="node6" href="$classQuad__TF.html#a0b9baf30e622ebe20e0afc21f32ec644" title="Overloaded Function::eval_AB(). " alt="" coords="593,136,727,163"/>
+<area shape="rect" id="node8" href="$classQuad__TF.html#aa5afb1189a241875b5e94b71a3ebe79a" title="return inverse transfer format 1 (old APL format) for a variable " alt="" coords="397,136,520,163"/>
+</map>

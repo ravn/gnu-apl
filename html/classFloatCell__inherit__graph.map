@@ -1,0 +1,5 @@
+<map id="FloatCell" name="FloatCell">
+<area shape="rect" id="node2" href="$classRealCell.html" title="Base class for IntCell and FloatCell. " alt="" coords="16,155,88,181"/>
+<area shape="rect" id="node3" href="$classNumericCell.html" title="Base class for RealCell and ComplexCell. " alt="" coords="5,80,99,107"/>
+<area shape="rect" id="node4" href="$classCell.html" title="The base class for all Cells. " alt="" coords="29,5,75,32"/>
+</map>

@@ -1,0 +1,24 @@
+<map id="Bif_OPER2_OUTER" name="Bif_OPER2_OUTER">
+<area shape="rect" id="node2" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators. " alt="" coords="304,589,427,616"/>
+<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="180,512,303,539"/>
+<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="32,408,104,435"/>
+<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,283,107,309"/>
+<area shape="rect" id="node6" href="$classCharCell.html" title="A Cell containing a single Unicode character. " alt="" coords="234,224,307,251"/>
+<area shape="rect" id="node7" href="$classCell.html" title="The base class for all Cells. " alt="" coords="525,21,571,48"/>
+<area shape="rect" id="node8" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="707,512,827,539"/>
+<area shape="rect" id="node10" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="854,157,908,184"/>
+<area shape="rect" id="node22" href="$classNumericCell.html" title="Base class for RealCell and ComplexCell. " alt="" coords="267,157,361,184"/>
+<area shape="rect" id="node23" href="$structBif__OPER2__OUTER_1_1PJob__product.html" title="the context for an outer product " alt="" coords="451,342,633,383"/>
+<area shape="rect" id="node9" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="765,408,923,435"/>
+<area shape="rect" id="node14" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="787,283,895,309"/>
+<area shape="rect" id="node11" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="597,21,708,48"/>
+<area shape="rect" id="node12" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="848,21,957,48"/>
+<area shape="rect" id="node13" href="$classShape.html" title="the shape of an APL value " alt="" coords="1035,21,1092,48"/>
+<area shape="rect" id="node15" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="978,408,1133,435"/>
+<area shape="rect" id="node16" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="1009,275,1164,317"/>
+<area shape="rect" id="node17" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="279,408,429,435"/>
+<area shape="rect" id="node18" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="423,283,499,309"/>
+<area shape="rect" id="node19" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="279,283,399,309"/>
+<area shape="rect" id="node20" href="$classIntCell.html" title="A cell containing a single Integer value. " alt="" coords="142,408,201,435"/>
+<area shape="rect" id="node21" href="$classRealCell.html" title="Base class for IntCell and FloatCell. " alt="" coords="132,283,204,309"/>
+</map>

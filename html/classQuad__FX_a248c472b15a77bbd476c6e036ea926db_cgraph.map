@@ -1,0 +1,7 @@
+<map id="Quad_FX::do_quad_FX" name="Quad_FX::do_quad_FX">
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="221,5,361,32"/>
+<area shape="rect" id="node3" href="$classCell.html#a0b3c8510ef2eba85cd5e940915ec47b5" title="Return the character value of a cell. " alt="" coords="220,56,361,83"/>
+<area shape="rect" id="node4" href="$classCell.html#ae21e94a7e1a0c3d37f78aa97ff54ebc4" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="213,107,368,133"/>
+<area shape="rect" id="node5" href="$classCell.html#acf9c0a6b59978341602e8a12eb2b43a8" title="Return true iff this cell is a character cell. " alt="" coords="215,157,366,184"/>
+<area shape="rect" id="node6" href="$classCell.html#a3a8bc83f29a40d1fad6cf1dca58c6419" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="223,208,359,235"/>
+</map>
