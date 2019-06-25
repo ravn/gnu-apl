@@ -130,6 +130,7 @@ AC_CHECK_LIB(
 		LIBS="-lcurses $LIBS"])
 	])
 
+AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
 AC_CHECK_LIB([execinfo], [backtrace])
 AC_CHECK_LIB([m],        [acosh])
 AC_CHECK_LIB([pthread],  [sem_init])

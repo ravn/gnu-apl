@@ -185,6 +185,12 @@ GNU APL compiles under CYGWIN, (see
 provided that the necessary libraries are installed. A 32-bit <B>apl.exe</B>
 that may run under CYGWIN lives in the download area. Use at your own risk and
 see <B>README-5-WINDOWS</B> for further information.
+<BR>
+<BR>
+NOTE: GNU APL 1.7 will be the last version with WINDOWS support. I tryied to
+compile GNU APL 1.8, but the compilation failed. I suspect that my machine
+would need some sort of CYGWIN update. Unfortunately the Windows XP that I
+used for building GNU APL 1.7 is no longer supported by CYGWIN.
 
 <?apl HTML∆H4[''] 'Subversion (SVN) repository for GNU APL' ?>
 
