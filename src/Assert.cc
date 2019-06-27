@@ -38,32 +38,32 @@ const int loc_len = strlen(file) + 40;
 char * loc = new char[loc_len + 1];
 
    Log(LOG_delete)
-      CERR << "new    " << voidP(loc) << " at " LOC << endl;
+      get_CERR() << "new    " << voidP(loc) << " at " LOC << endl;
 
    snprintf(loc, loc_len, "%s:%d", file, line);
    loc[loc_len] = 0;
 
-   CERR << endl
+   get_CERR() << endl
         << "======================================="
            "=======================================" << endl;
 
 
    if (cond)       // normal assert()
       {
-        CERR << "Assertion failed: " << cond << endl
+        get_CERR() << "Assertion failed: " << cond << endl
              << "in Function:      " << fun  << endl
              << "in file:          " << loc  << endl << endl;
       }
    else if (fun)   // segfault etc.
       {
-        CERR << "\n\n================ " << fun <<  " ================\n";
+        get_CERR() << "\n\n================ " << fun <<  " ================\n";
       }
 
-   CERR << "Call stack:" << endl;
+   get_CERR() << "Call stack:" << endl;
 
    if (asserting)
       {
-        CERR << "*** do_Assert() called recursively ***" << endl;
+        get_CERR() << "*** do_Assert() called recursively ***" << endl;
       }
    else
       {
@@ -71,10 +71,10 @@ char * loc = new char[loc_len + 1];
 
         Backtrace::show(file, line);
 
-        CERR << endl << "SI stack:" << endl << endl;
-        Workspace::list_SI(CERR, SIM_SIS_dbg);
+        get_CERR() << endl << "SI stack:" << endl << endl;
+        Workspace::list_SI(get_CERR(), SIM_SIS_dbg);
       }
-   CERR << "======================================="
+   get_CERR() << "======================================="
            "=======================================" << endl;
 
    // count errors

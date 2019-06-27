@@ -149,7 +149,8 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 lib_gnu_apl_la_LIBADD =
-am__lib_gnu_apl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
+am__lib_gnu_apl_la_SOURCES_DIST = buildtag buildtag.hh \
+	static_Objects.cc static_Objects.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
 	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
 	Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
@@ -203,12 +204,11 @@ am__lib_gnu_apl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
 	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
 	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
-	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	Workspace.cc Workspace.hh Regexp.cc Regexp.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh python_apl.cc
@@ -225,7 +225,8 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresArgListBuilder.lo \
 @POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresConnection.lo \
 @POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresProvider.lo
-am__objects_5 = lib_gnu_apl_la-Archive.lo lib_gnu_apl_la-Assert.lo \
+am__objects_5 = lib_gnu_apl_la-static_Objects.lo \
+	lib_gnu_apl_la-Archive.lo lib_gnu_apl_la-Assert.lo \
 	lib_gnu_apl_la-Avec.lo lib_gnu_apl_la-Backtrace.lo \
 	lib_gnu_apl_la-Bif_F12_FORMAT.lo \
 	lib_gnu_apl_la-Bif_F12_SORT.lo \
@@ -282,8 +283,8 @@ am__objects_5 = lib_gnu_apl_la-Archive.lo lib_gnu_apl_la-Assert.lo \
 	lib_gnu_apl_la-UserPreferences.lo \
 	lib_gnu_apl_la-UTF8_string.lo lib_gnu_apl_la-Value.lo \
 	lib_gnu_apl_la-ValueHistory.lo lib_gnu_apl_la-Workspace.lo \
-	lib_gnu_apl_la-static_Objects.lo $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_4)
+	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
+	$(am__objects_4)
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS =  \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(am__objects_5) \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
@@ -299,35 +300,35 @@ lib_gnu_apl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_rpath = -rpath \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(pkglibdir)
 libapl_la_LIBADD =
-am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
-	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
-	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
-	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
-	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
-	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
-	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
-	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
-	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
-	Error.def Error.hh Error_macros.hh ErrorCode.hh Executable.cc \
-	Executable.hh FloatCell.cc FloatCell.hh Function.cc \
-	Function.hh DerivedFunction.cc DerivedFunction.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh \
-	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
-	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
-	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
-	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
-	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+am__libapl_la_SOURCES_DIST = buildtag buildtag.hh static_Objects.cc \
+	static_Objects.hh ../config.h APL_Float_as_class.hh \
+	APL_types.hh Archive.cc Archive.hh ArrayIterator.hh Assert.cc \
+	Assert.hh Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
+	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_SORT.cc \
+	Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh \
+	Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc \
+	Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh \
+	Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc \
+	Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh \
+	Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc \
+	Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc Cell.icc Cell.hh \
+	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
+	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
+	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parser.cc Parser.hh Prefix.cc Prefix.def \
+	Prefix.hh PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -353,12 +354,11 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
 	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
 	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
-	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	Workspace.cc Workspace.hh Regexp.cc Regexp.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
@@ -375,8 +375,8 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresArgListBuilder.lo \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresConnection.lo \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresProvider.lo
-am__objects_10 = libapl_la-Archive.lo libapl_la-Assert.lo \
-	libapl_la-Avec.lo libapl_la-Backtrace.lo \
+am__objects_10 = libapl_la-static_Objects.lo libapl_la-Archive.lo \
+	libapl_la-Assert.lo libapl_la-Avec.lo libapl_la-Backtrace.lo \
 	libapl_la-Bif_F12_FORMAT.lo libapl_la-Bif_F12_SORT.lo \
 	libapl_la-Bif_F12_TAKE_DROP.lo libapl_la-Bif_OPER1_COMMUTE.lo \
 	libapl_la-Bif_OPER1_EACH.lo libapl_la-Bif_OPER2_POWER.lo \
@@ -420,9 +420,8 @@ am__objects_10 = libapl_la-Archive.lo libapl_la-Assert.lo \
 	libapl_la-UserFunction.lo libapl_la-UserFunction_header.lo \
 	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
 	libapl_la-Value.lo libapl_la-ValueHistory.lo \
-	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_9)
+	libapl_la-Workspace.lo $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9)
 @WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_10) \
 @WANT_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
@@ -431,35 +430,35 @@ libapl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(libapl_la_LDFLAGS) $(LDFLAGS) -o $@
 @WANT_LIBAPL_TRUE@am_libapl_la_rpath = -rpath $(pkglibdir)
 PROGRAMS = $(bin_PROGRAMS)
-am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
-	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
-	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
-	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
-	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
-	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
-	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
-	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
-	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
-	Error.def Error.hh Error_macros.hh ErrorCode.hh Executable.cc \
-	Executable.hh FloatCell.cc FloatCell.hh Function.cc \
-	Function.hh DerivedFunction.cc DerivedFunction.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh \
-	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
-	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
-	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
-	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
-	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh static_Objects.cc \
+	static_Objects.hh ../config.h APL_Float_as_class.hh \
+	APL_types.hh Archive.cc Archive.hh ArrayIterator.hh Assert.cc \
+	Assert.hh Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
+	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_SORT.cc \
+	Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh \
+	Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc \
+	Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh \
+	Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc \
+	Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh \
+	Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc \
+	Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc Cell.icc Cell.hh \
+	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
+	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
+	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parser.cc Parser.hh Prefix.cc Prefix.def \
+	Prefix.hh PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -485,12 +484,11 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
 	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
 	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
-	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
-	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
-	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
-	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-	sql/SqliteProvider.hh sql/Connection.cc \
+	Workspace.cc Workspace.hh Regexp.cc Regexp.hh \
+	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
+	sql/SqliteConnection.cc sql/SqliteConnection.hh \
+	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
+	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
@@ -506,10 +504,10 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 @POSTGRES_TRUE@	sql/apl-PostgresArgListBuilder.$(OBJEXT) \
 @POSTGRES_TRUE@	sql/apl-PostgresConnection.$(OBJEXT) \
 @POSTGRES_TRUE@	sql/apl-PostgresProvider.$(OBJEXT)
-am__objects_15 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
-	apl-Avec.$(OBJEXT) apl-Backtrace.$(OBJEXT) \
-	apl-Bif_F12_FORMAT.$(OBJEXT) apl-Bif_F12_SORT.$(OBJEXT) \
-	apl-Bif_F12_TAKE_DROP.$(OBJEXT) \
+am__objects_15 = apl-static_Objects.$(OBJEXT) apl-Archive.$(OBJEXT) \
+	apl-Assert.$(OBJEXT) apl-Avec.$(OBJEXT) \
+	apl-Backtrace.$(OBJEXT) apl-Bif_F12_FORMAT.$(OBJEXT) \
+	apl-Bif_F12_SORT.$(OBJEXT) apl-Bif_F12_TAKE_DROP.$(OBJEXT) \
 	apl-Bif_OPER1_COMMUTE.$(OBJEXT) apl-Bif_OPER1_EACH.$(OBJEXT) \
 	apl-Bif_OPER2_POWER.$(OBJEXT) apl-Bif_OPER2_INNER.$(OBJEXT) \
 	apl-Bif_OPER2_OUTER.$(OBJEXT) apl-Bif_OPER2_RANK.$(OBJEXT) \
@@ -553,9 +551,8 @@ am__objects_15 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
 	apl-UserFunction.$(OBJEXT) apl-UserFunction_header.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
-	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
-	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
-	$(am__objects_14)
+	apl-Workspace.$(OBJEXT) $(am__objects_11) $(am__objects_12) \
+	$(am__objects_13) $(am__objects_14)
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@am_apl_OBJECTS =  \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	apl-main.$(OBJEXT) \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(am__objects_15)
@@ -855,35 +852,35 @@ distcleancheck_listfile = buildtag
 common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(am__append_4) \
 	$(am__append_8)
 common_LDFLAGS = $(am__append_5) $(am__append_9)
-common_SOURCES = buildtag buildtag.hh ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
-	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
-	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
-	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
-	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
-	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
-	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
-	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
-	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
-	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
-	Error.def Error.hh Error_macros.hh ErrorCode.hh Executable.cc \
-	Executable.hh FloatCell.cc FloatCell.hh Function.cc \
-	Function.hh DerivedFunction.cc DerivedFunction.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh \
-	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
-	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
-	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
-	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
-	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+common_SOURCES = buildtag buildtag.hh static_Objects.cc \
+	static_Objects.hh ../config.h APL_Float_as_class.hh \
+	APL_types.hh Archive.cc Archive.hh ArrayIterator.hh Assert.cc \
+	Assert.hh Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
+	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_SORT.cc \
+	Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh \
+	Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc \
+	Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh \
+	Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc \
+	Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh \
+	Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc \
+	Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc Cell.icc Cell.hh \
+	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
+	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
+	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parser.cc Parser.hh Prefix.cc Prefix.def \
+	Prefix.hh PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -909,9 +906,8 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
 	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
 	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
-	$(am__append_3) $(am__append_6) $(am__append_7) \
-	$(am__append_10)
+	Workspace.cc Workspace.hh $(am__append_3) $(am__append_6) \
+	$(am__append_7) $(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
@@ -1477,6 +1473,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+lib_gnu_apl_la-static_Objects.lo: static_Objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-static_Objects.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-static_Objects.Tpo -c -o lib_gnu_apl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-static_Objects.Tpo $(DEPDIR)/lib_gnu_apl_la-static_Objects.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='static_Objects.cc' object='lib_gnu_apl_la-static_Objects.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
 
 lib_gnu_apl_la-Archive.lo: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Archive.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Archive.Tpo -c -o lib_gnu_apl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
@@ -2143,13 +2146,6 @@ lib_gnu_apl_la-Workspace.lo: Workspace.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Workspace.lo `test -f 'Workspace.cc' || echo '$(srcdir)/'`Workspace.cc
 
-lib_gnu_apl_la-static_Objects.lo: static_Objects.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-static_Objects.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-static_Objects.Tpo -c -o lib_gnu_apl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-static_Objects.Tpo $(DEPDIR)/lib_gnu_apl_la-static_Objects.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='static_Objects.cc' object='lib_gnu_apl_la-static_Objects.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
-
 lib_gnu_apl_la-Regexp.lo: Regexp.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Regexp.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Regexp.Tpo -c -o lib_gnu_apl_la-Regexp.lo `test -f 'Regexp.cc' || echo '$(srcdir)/'`Regexp.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Regexp.Tpo $(DEPDIR)/lib_gnu_apl_la-Regexp.Plo
@@ -2219,6 +2215,13 @@ lib_gnu_apl_la-python_apl.lo: python_apl.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='python_apl.cc' object='lib_gnu_apl_la-python_apl.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-python_apl.lo `test -f 'python_apl.cc' || echo '$(srcdir)/'`python_apl.cc
+
+libapl_la-static_Objects.lo: static_Objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-static_Objects.lo -MD -MP -MF $(DEPDIR)/libapl_la-static_Objects.Tpo -c -o libapl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-static_Objects.Tpo $(DEPDIR)/libapl_la-static_Objects.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='static_Objects.cc' object='libapl_la-static_Objects.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
 
 libapl_la-Archive.lo: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Archive.lo -MD -MP -MF $(DEPDIR)/libapl_la-Archive.Tpo -c -o libapl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
@@ -2885,13 +2888,6 @@ libapl_la-Workspace.lo: Workspace.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Workspace.lo `test -f 'Workspace.cc' || echo '$(srcdir)/'`Workspace.cc
 
-libapl_la-static_Objects.lo: static_Objects.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-static_Objects.lo -MD -MP -MF $(DEPDIR)/libapl_la-static_Objects.Tpo -c -o libapl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-static_Objects.Tpo $(DEPDIR)/libapl_la-static_Objects.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='static_Objects.cc' object='libapl_la-static_Objects.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
-
 libapl_la-Regexp.lo: Regexp.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Regexp.lo -MD -MP -MF $(DEPDIR)/libapl_la-Regexp.Tpo -c -o libapl_la-Regexp.lo `test -f 'Regexp.cc' || echo '$(srcdir)/'`Regexp.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Regexp.Tpo $(DEPDIR)/libapl_la-Regexp.Plo
@@ -2975,6 +2971,20 @@ apl-main.obj: main.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cc' object='apl-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`
+
+apl-static_Objects.o: static_Objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-static_Objects.o -MD -MP -MF $(DEPDIR)/apl-static_Objects.Tpo -c -o apl-static_Objects.o `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-static_Objects.Tpo $(DEPDIR)/apl-static_Objects.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='static_Objects.cc' object='apl-static_Objects.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-static_Objects.o `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
+
+apl-static_Objects.obj: static_Objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-static_Objects.obj -MD -MP -MF $(DEPDIR)/apl-static_Objects.Tpo -c -o apl-static_Objects.obj `if test -f 'static_Objects.cc'; then $(CYGPATH_W) 'static_Objects.cc'; else $(CYGPATH_W) '$(srcdir)/static_Objects.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-static_Objects.Tpo $(DEPDIR)/apl-static_Objects.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='static_Objects.cc' object='apl-static_Objects.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-static_Objects.obj `if test -f 'static_Objects.cc'; then $(CYGPATH_W) 'static_Objects.cc'; else $(CYGPATH_W) '$(srcdir)/static_Objects.cc'; fi`
 
 apl-Archive.o: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Archive.o -MD -MP -MF $(DEPDIR)/apl-Archive.Tpo -c -o apl-Archive.o `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
@@ -4305,20 +4315,6 @@ apl-Workspace.obj: Workspace.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Workspace.cc' object='apl-Workspace.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Workspace.obj `if test -f 'Workspace.cc'; then $(CYGPATH_W) 'Workspace.cc'; else $(CYGPATH_W) '$(srcdir)/Workspace.cc'; fi`
-
-apl-static_Objects.o: static_Objects.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-static_Objects.o -MD -MP -MF $(DEPDIR)/apl-static_Objects.Tpo -c -o apl-static_Objects.o `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-static_Objects.Tpo $(DEPDIR)/apl-static_Objects.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='static_Objects.cc' object='apl-static_Objects.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-static_Objects.o `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
-
-apl-static_Objects.obj: static_Objects.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-static_Objects.obj -MD -MP -MF $(DEPDIR)/apl-static_Objects.Tpo -c -o apl-static_Objects.obj `if test -f 'static_Objects.cc'; then $(CYGPATH_W) 'static_Objects.cc'; else $(CYGPATH_W) '$(srcdir)/static_Objects.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-static_Objects.Tpo $(DEPDIR)/apl-static_Objects.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='static_Objects.cc' object='apl-static_Objects.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-static_Objects.obj `if test -f 'static_Objects.cc'; then $(CYGPATH_W) 'static_Objects.cc'; else $(CYGPATH_W) '$(srcdir)/static_Objects.cc'; fi`
 
 apl-Regexp.o: Regexp.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Regexp.o -MD -MP -MF $(DEPDIR)/apl-Regexp.Tpo -c -o apl-Regexp.o `test -f 'Regexp.cc' || echo '$(srcdir)/'`Regexp.cc

@@ -26,10 +26,6 @@
 #include "Symbol.hh"
 #include "Workspace.hh"
 
-Quad_CR    Quad_CR   ::_fun;
-
-Quad_CR    * Quad_CR   ::fun = &Quad_CR   ::_fun;
-
 //-----------------------------------------------------------------------------
 Token
 Quad_CR::list_functions(ostream & out)

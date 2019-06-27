@@ -132,7 +132,7 @@ UTF8_string.cc					UTF8_string.hh		\
 Value.cc		Value.icc		Value.hh		\
 			Value_P.icc		Value_P.hh		\
 ValueHistory.cc					ValueHistory.hh		\
-Workspace.cc					Workspace.hh            \
+Workspace.cc					Workspace.hh		\
 static_Objects.cc				static_Objects.hh
 
 if HAVE_LIBPCRE2_32

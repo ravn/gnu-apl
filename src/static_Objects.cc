@@ -32,9 +32,8 @@
    See 3.6.2 of "ISO standard Programming Languages — C++"
 */
 
-
 bool static_Objects::show_constructors = false;
-bool static_Objects::show_destructors = false;
+bool static_Objects::show_destructors  = false;
 
 //-----------------------------------------------------------------------------
 static_Objects::static_Objects(const char * l, const char * w)
@@ -68,9 +67,20 @@ Workspace Workspace::the_workspace;
 INFO(StateIndicator::top_level_error, __LINE__)
 Error StateIndicator::top_level_error(E_NO_ERROR, LOC);
 
+INFO(Quad_CR::fun, __LINE__)
+Quad_CR Quad_CR   ::_fun;
+Quad_CR * Quad_CR ::fun = &Quad_CR ::_fun;
+
+INFO(Quad_EC::fun, __LINE__)
+Quad_EC Quad_EC   ::_fun;
+Quad_EC * Quad_EC ::fun = &Quad_EC ::_fun;
+
+INFO(Quad_ES::fun, __LINE__)
+Quad_ES Quad_ES   ::_fun;
+Quad_ES * Quad_ES ::fun = &Quad_ES ::_fun;
+
 INFO(Parallel::all_CPUs, __LINE__)
 std::vector<CPU_Number>Parallel::all_CPUs;
-
 
 INFO(Macro::all_macros, __LINE__)
 #define mac_def(name, txt) Macro Macro::name(MAC_ ## name, txt);

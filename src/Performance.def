@@ -1,4 +1,14 @@
 
+// windows seems to #define _B and/or _AB. We therefore #undef it just in case
+//
+#ifdef _B
+# undef _B
+#endif
+
+#ifdef _AB
+# undef _AB
+#endif
+
 perfo_1(F12_PLUS       , _B,  "  + B",      8888888888888888888ULL)
 perfo_1(F12_MINUS      , _B,  "  - B",      8888888888888888888ULL)
 perfo_1(F12_TIMES      , _B,  "  × B",      8888888888888888888ULL)

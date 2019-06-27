@@ -354,6 +354,7 @@ if test "x$user_wants_python" = xyes ; then
    AC_DEFINE([WANT_PYTHON], [1], [Define if building lib_gnu_apl.so])
 fi
 AM_CONDITIONAL(WANT_PYTHON, test "x$user_wants_python" = xyes)
+AC_MSG_RESULT([$user_wants_python])
 
 AC_CONFIG_FILES([Makefile
                  build/Makefile

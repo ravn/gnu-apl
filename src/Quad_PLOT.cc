@@ -264,7 +264,7 @@ public:
 
    /// convert a string to a double
    static double double_from_str(const char * str, const char * & error)
-      { error = 0;   return strtold(str, 0); }
+      { error = 0;   return strtod(str, 0); }
 
    /// consvert a string like "#RGB" or "#RRGGB" to a color
    static Color Color_from_str(const char * str, const char * & error);

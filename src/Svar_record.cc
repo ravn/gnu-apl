@@ -37,6 +37,11 @@
 #include "Svar_record.hh"
 #include "Svar_signals.hh"
 
+// get_CERR() is used inside and outside APL (and may be defined differently
+// outside APL). Inside APL get_CERR() is declared in Common.hh, but 
+// this file (Svar_record.cc) is also used outside APL where Common.hh can
+// not be #included.
+
 extern ostream & get_CERR();
 
 //=============================================================================
