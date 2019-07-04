@@ -78,7 +78,7 @@ std::string TcpListener::start( void )
         DOMAIN_ERROR;        
     }
 
-    if( bind( server_socket, addr->ai_addr, addr->ai_addrlen ) == -1 ) {
+    if( ::bind( server_socket, addr->ai_addr, addr->ai_addrlen ) == -1 ) {
         stringstream errmsg;
         errmsg << "Unable to bind to port " << port << ": " << strerror( errno );
         close( server_socket );

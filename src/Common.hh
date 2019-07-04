@@ -23,9 +23,11 @@
 
 #include "../config.h"   // for xxx_WANTED and other macros from ./configure
 
+#include <string.h>
 #include <netinet/in.h>
-#include <sys/un.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/un.h>
 #include <sys/fcntl.h>
 
 #ifdef ENABLE_NLS

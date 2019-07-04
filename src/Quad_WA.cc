@@ -91,7 +91,7 @@ rlimit rl;
                      << " MB)" << endl;
            }
       }
-   else if (rl.rlim_cur > total_memory)
+   else if (uint64_t(rl.rlim_cur) > total_memory)
       {
         // the user has set a memory limit, but it is above the available
         // memory

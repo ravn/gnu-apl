@@ -181,12 +181,12 @@ bool
 Value::check_WS_FULL(const char * args, ShapeItem requested_cell_count,
                      const char * loc)
 {
-const uint64_t used_memory
+const int64_t used_memory
                = (total_ravel_count + requested_cell_count) * sizeof(Cell)
                + (value_count + 1) * sizeof(Value)
                + Workspace::SI_entry_count() * sizeof(StateIndicator);
 
-   if ((Quad_WA::total_memory*Quad_WA::WA_scale/100) >
+   if (int64_t((Quad_WA::total_memory*Quad_WA::WA_scale/100)) >
        (used_memory + Quad_WA::WA_margin))   return false;   // OK
 
    Log(LOG_Value_alloc) CERR
@@ -215,7 +215,7 @@ void
 Value::catch_exception(const exception & ex, const char * args,
                       const char * caller,  const char * loc)
 {
-const uint64_t used_memory
+const int64_t used_memory
                = total_ravel_count * sizeof(Cell)
                + value_count * sizeof(Value)
                + Workspace::SI_entry_count() * sizeof(StateIndicator);

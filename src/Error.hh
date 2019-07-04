@@ -25,6 +25,7 @@
 #include "Common.hh"
 #include "ErrorCode.hh"
 #include "UCS_string.hh"
+#include <cstring>
 
 #ifdef __GNUC__
     #define GNUC__noreturn __attribute__ ((noreturn))
