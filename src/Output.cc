@@ -89,8 +89,6 @@ int Output::color_UERR_background = 8;
 /// a filebuf for CERR
 ErrOut CERR_filebuf;
 
-bool ErrOut::used = false;
-
 DiffOut DOUT_filebuf(false);
 DiffOut UERR_filebuf(true);
 
