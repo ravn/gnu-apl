@@ -49,7 +49,7 @@
 #ifdef PARALLEL_ENABLED
 
 # define PRINT_LOCKED(x) \
-   { sem_wait(&Parallel::print_sema); x; sem_post(&Parallel::print_sema); }
+   { sem_wait(Parallel::print_sema); x; sem_post(Parallel::print_sema); }
 
 # define POOL_LOCK(l, x) \
      Parallel::acquire_lock(l); x; Parallel::release_lock(l);
