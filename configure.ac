@@ -175,9 +175,9 @@ fi
 PKG_CHECK_MODULES(XCBLIBS, [xcb >= 1.6], [HAVE_libxcb=yes], [HAVE_libxcb=no])
 AM_CONDITIONAL(HAVE_LIBXCB, test "$HAVE_libxcb" = yes)
 if test "$HAVE_libxcb" = yes; then
-   AC_DEFINE_UNQUOTED(HAVE_GTK3, [1], [libxcb is installed])
+   AC_DEFINE_UNQUOTED(HAVE_LIBXCB, [1], [libxcb is installed])
 else
-   AC_DEFINE_UNQUOTED(HAVE_GTK3, [0], [libxcb is NOT installed])
+   AC_DEFINE_UNQUOTED(HAVE_LIBXCB, [0], [libxcb is NOT installed])
 fi
 
 # check if libpcre is installed

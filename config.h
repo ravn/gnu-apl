@@ -88,7 +88,7 @@
 /* Define to 1 if you have the `socket' library (-lsocket). */
 /* #undef HAVE_LIBSOCKET */
 
-/* Define to 1 if you have the `xcb' library (-lxcb). */
+/* libxcb is NOT installed */
 #define HAVE_LIBXCB 1
 
 /* Define to 1 if you have the <memory.h> header file. */

@@ -18579,13 +18579,13 @@ fi
 if test "$HAVE_libxcb" = yes; then
 
 cat >>confdefs.h <<_ACEOF
-#define HAVE_GTK3 1
+#define HAVE_LIBXCB 1
 _ACEOF
 
 else
 
 cat >>confdefs.h <<_ACEOF
-#define HAVE_GTK3 0
+#define HAVE_LIBXCB 0
 _ACEOF
 
 fi
