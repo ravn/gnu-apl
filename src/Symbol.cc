@@ -485,9 +485,11 @@ const int sym_stack_size = value_stack_size();
 Value_P
 Symbol::get_value()
 {
-const ValueStackItem & vs = value_stack.back();
-
-   if (vs.name_class == NC_VARIABLE)   return vs.apl_val;
+   if (value_stack.size())
+      {
+        const ValueStackItem & vs = value_stack.back();
+        if (vs.name_class == NC_VARIABLE)   return vs.apl_val;
+      }
 
    return Value_P();
 }

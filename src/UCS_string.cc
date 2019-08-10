@@ -337,6 +337,7 @@ const Unicode last = digits.back();
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
 {
+Q(quad_PW)
    create(LOC);
 
    if (pb.get_height() == 0)   return;      // empty PrintBuffer

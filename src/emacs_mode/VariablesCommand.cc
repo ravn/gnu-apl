@@ -55,24 +55,27 @@ void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<s
     }
 
     std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
-    for( int i = 0 ; i < symbols.size() ; i++ ) {
-        const Symbol * symbol = symbols[i];
-        if ( !symbol->is_erased() )
-           {
-             const NameClass symbol_nc = symbol->top_of_stack()->name_class;
-             const bool symbol_is_var = symbol_nc == NC_VARIABLE;
-             const bool symbol_is_fun = symbol_nc == NC_FUNCTION ||
-                                        symbol_nc == NC_OPERATOR;
-             if ((cls == ALL && (symbol_is_var || symbol_is_fun)) ||
-                 (cls == VARIABLE && symbol_is_var)               ||
-                 (cls == FUNCTION && symbol_is_fun))
-                 {
-                   out << symbol->get_name();
-                   if(tagged)   out << " " << symbol_nc;
-                   out << endl;
-                 }
-           }
-    }
+    for (int i = 0 ; i < symbols.size() ; i++)
+        {
+          const Symbol * symbol = symbols[i];
+          if (symbol->is_erased())   continue;  // hide erased symbols
+
+          if (const ValueStackItem * tos = symbol->top_of_stack())
+             {
+               const NameClass symbol_nc = tos->name_class;
+               const bool symbol_is_var = symbol_nc == NC_VARIABLE;
+               const bool symbol_is_fun = symbol_nc == NC_FUNCTION ||
+                                          symbol_nc == NC_OPERATOR;
+               if ((cls == ALL && (symbol_is_var || symbol_is_fun)) ||
+                   (cls == VARIABLE && symbol_is_var)               ||
+                   (cls == FUNCTION && symbol_is_fun))
+                   {
+                     out << symbol->get_name();
+                     if(tagged)   out << " " << symbol_nc;
+                     out << endl;
+                   }
+             }
+        }
 
     out << END_TAG << "\n";
     conn.write_string_to_fd( out.str() );
