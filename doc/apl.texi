@@ -44,6 +44,8 @@ Copyright @copyright{} 2013 Free Software Foundation, Inc.
 @node Top
 @top GNU APL
 
+@today{}
+
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. "Programming Language APL, Extended".
 

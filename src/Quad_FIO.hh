@@ -67,7 +67,7 @@ public:
    void clear();
 
    /// fork(), execve(), and return a connection to fd 3 of forked process
-   int do_FIO_57(const UCS_string & B);
+   int do_FIO_57(const UCS_string & B, char * const * envp);
 
    /// close a file descriptor (and its FILE * if any)
    int close_handle(int handle);

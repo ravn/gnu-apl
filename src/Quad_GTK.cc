@@ -611,7 +611,24 @@ const char * path = 0;
         DOMAIN_ERROR;
       }
 
-const int fd = Quad_FIO::fun->do_FIO_57(path);
+const char * evars[] = { "DISPLAY", "XAUTHORITY", "XAUTHLOCALHOST" };
+enum { evar_count = sizeof(evars) / sizeof(*evars) };
+
+char * envp[evar_count + 1] = { 0 };
+int envp_idx = 0;
+   loop(c, evar_count)
+       {
+         const char * var = evars[c];
+         if (char * val = getenv(var))
+            {
+              char * env = new char[strlen(var) + 1 + strlen(val)];
+              sprintf(env, "%s=%s", var, val);
+              envp[envp_idx++] = env;
+              envp[envp_idx] = 0;
+            }
+       }
+const int fd = Quad_FIO::fun->do_FIO_57(path, envp);
+   loop(c, envp_idx)   delete evars[c];
 
    // write TLVs 1 and 3 or 1, 2, and 3 to Gtk_server...
    //

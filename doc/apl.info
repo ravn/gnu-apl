@@ -16,7 +16,9 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-This manual briefly documents GNU APL, an interpreter for APL as
+August 11, 2019
+
+   This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
 Extended".
 
@@ -4617,47 +4619,47 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11416
-Node: Chapter 219266
-Node: Chapter 323690
-Node: Section 3.125215
-Node: Section 3.241227
-Node: Section 3.341986
-Node: Section 3.443273
-Node: Section 3.545894
-Node: Section 3.646067
-Node: Section 3.746680
-Node: Section 3.850624
-Node: Section 3.952166
-Node: Section 3.1052763
-Node: Section 3.1154547
-Node: Section 3.1256487
-Node: Section 3.1357428
-Node: Section 3.1457680
-Node: Section 3.1559076
-Node: Section 3.1661588
-Node: Section 3.1768287
-Node: Section 3.1873322
-Node: Section 3.1976603
-Node: Section 3.2076894
-Node: Section 3.2186806
-Node: Section 3.2287078
-Node: Section 3.2393656
-Node: Section 3.2496107
-Node: Section 3.2596776
-Node: Section 3.26103412
-Node: Section 3.27104352
-Node: Section 3.28117914
-Node: Section 3.29121018
-Node: Section 3.30123007
-Node: Chapter 4127385
-Node: Chapter 5129133
-Node: Chapter 6130262
-Node: Section 6.1130681
-Node: Section 6.2131368
-Node: Chapter 7132199
-Node: Section 7.1132702
-Node: Section 7.2158012
+Node: Chapter 11436
+Node: Chapter 219286
+Node: Chapter 323710
+Node: Section 3.125235
+Node: Section 3.241247
+Node: Section 3.342006
+Node: Section 3.443293
+Node: Section 3.545914
+Node: Section 3.646087
+Node: Section 3.746700
+Node: Section 3.850644
+Node: Section 3.952186
+Node: Section 3.1052783
+Node: Section 3.1154567
+Node: Section 3.1256507
+Node: Section 3.1357448
+Node: Section 3.1457700
+Node: Section 3.1559096
+Node: Section 3.1661608
+Node: Section 3.1768307
+Node: Section 3.1873342
+Node: Section 3.1976623
+Node: Section 3.2076914
+Node: Section 3.2186826
+Node: Section 3.2287098
+Node: Section 3.2393676
+Node: Section 3.2496127
+Node: Section 3.2596796
+Node: Section 3.26103432
+Node: Section 3.27104372
+Node: Section 3.28117934
+Node: Section 3.29121038
+Node: Section 3.30123027
+Node: Chapter 4127405
+Node: Chapter 5129153
+Node: Chapter 6130282
+Node: Section 6.1130701
+Node: Section 6.2131388
+Node: Chapter 7132219
+Node: Section 7.1132722
+Node: Section 7.2158032
 
 End Tag Table
 

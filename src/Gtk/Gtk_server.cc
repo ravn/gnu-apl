@@ -629,7 +629,9 @@ const int flags = fcntl(3, F_GETFD);
 
 // cerr << "Flags = " << hex << flags << endl;
 
-  setenv("DISPLAY", ":0", true);
+   if (getenv("DISPLAY") == 0)   // DISPLAY not set
+      setenv("DISPLAY", ":0", true);
+
   gtk_init(&argc, &argv);
 
 enum { TLV_socket     = 3,

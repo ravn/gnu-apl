@@ -1831,7 +1831,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
 
          case 57:   // fork() + execve() in the child
               {
-                 const int fd = do_FIO_57(*B.get());
+                 const int fd = do_FIO_57(*B.get(), 0);
                  if (fd == -1)   goto out_errno;
                   return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
               }
@@ -1897,7 +1897,7 @@ out_errno:
 }
 //-----------------------------------------------------------------------------
 int
-Quad_FIO::do_FIO_57(const UCS_string & B)
+Quad_FIO::do_FIO_57(const UCS_string & B, char * const * envp)
 {
 int spair[2];
    if (socketpair(AF_UNIX, SOCK_DGRAM, 0, spair))
@@ -1961,7 +1961,6 @@ char * from = filename;
    if (*from)  argv[ai++] = from;
    argv[ai] = 0;
 
-   char * envp[] = { 0 };
    execve(filename, argv, envp);   // no return on success
 
    // execve() failed
