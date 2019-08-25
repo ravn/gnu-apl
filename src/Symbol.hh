@@ -86,7 +86,7 @@ public:
    NameClass name_class;
 };
 //-----------------------------------------------------------------------------
-/// Base class for variables, defined functions, snd distinguished names
+/// Base class for variables, defined functions, and distinguished names
 class Symbol : public NamedObject
 {
    friend class SymbolTable;

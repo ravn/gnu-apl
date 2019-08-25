@@ -395,9 +395,9 @@ UserFunction_header::remove_duplicate_local_variables()
    //
    remove_duplicate_local_var(sym_Z,   0);
    remove_duplicate_local_var(sym_A,   0);
-   remove_duplicate_local_var(sym_LO,  0);
-   remove_duplicate_local_var(sym_FUN, 0);
-   remove_duplicate_local_var(sym_RO,  0);
+
+   // sym_LO, sym_FUN, and sym_RO are not pushed, so they are never duplicates
+
    remove_duplicate_local_var(sym_X,   0);
    remove_duplicate_local_var(sym_B,   0);
 

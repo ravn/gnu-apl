@@ -48,7 +48,7 @@ NamedObject::get_nc() const
 
    // Distinguished name.
    //
-   Assert(Avec::is_quad(get_name()[0]));
+   Assert(Avec::is_quad(get_name()[0]) || get_name()[0] == UNI_QUOTE_Quad);
 
 int len;
 Token tok = Workspace::get_quad(get_name(), len);

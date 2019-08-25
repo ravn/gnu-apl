@@ -496,6 +496,18 @@ grow:
              {
                const bool left_sym = get_assign_state() == ASS_arrow_seen;
                bool resolved = false;
+               if (left_sym)
+                 {
+                    // assignment to only variable or undefined names
+                   const NameClass  nc = sym->get_nc();
+
+                   if (NC_VARIABLE         != nc &&
+                       NC_UNUSED_USER_NAME != nc &&
+                       NC_SHARED_VAR       != nc &&
+                       NC_INVALID          != nc)   // ⎕, ⍞, ⎕xx
+                      syntax_error(LOC);
+                 }
+
                if (size() > 0 && at(0).tok.get_Class() == TC_INDEX && 
                    tl.tok.get_tag() == TOK_SYMBOL)   // user defined variable
                   {
