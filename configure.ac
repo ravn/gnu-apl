@@ -186,17 +186,26 @@ m4_include([m4/ax_path_lib_pcre.m4])
 AM_CONDITIONAL(HAVE_LIBPCRE2_32,
                test "x$ac_cv_lib_pcre2_32_pcre2_compile_32" = xyes)
 
-# check for GTK+ version 3
+################################# GTK3 check #################################
 #
 AC_ARG_WITH([gtk3],
-             AS_HELP_STRING([--with-gtk3],
-             [enable ⎕GTK (interface to GTK+ version 3;
-              needs libgtk-3 and more)]))
-PKG_CHECK_MODULES([GTK],
-                  [gtk+-3.0],
-                  [HAVE_gtk3=yes],
-                  [HAVE_gtk3=no])
+    AS_HELP_STRING([--with-gtk3],
+    [enable ⎕GTK (interface to GTK+ version 3; needs libgtk-3 and more)]))
+
+if test "x$with_gtk3" = "xno"              # user explicitly disabled GTK
+then
+    AC_MSG_CHECKING([whether GTK version 3 is present and desired])
+    AC_MSG_RESULT([no (disabled by user)])
+    HAVE_gtk3=no
+else
+   PKG_CHECK_MODULES([GTK],
+                     [gtk+-3.0],
+                     [HAVE_gtk3=yes],
+                     [HAVE_gtk3=no])
+fi
+
 AM_CONDITIONAL(HAVE_GTK3, test "x$HAVE_gtk3" = xyes)
+
 if test "x$HAVE_gtk3" = xyes; then
    AC_DEFINE_UNQUOTED(HAVE_GTK3, [1], [GTK+ version 3 installed])
 else

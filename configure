@@ -18780,7 +18780,7 @@ else
 fi
 
 
-# check for GTK+ version 3
+################################# GTK3 check #################################
 #
 
 # Check whether --with-gtk3 was given.
@@ -18788,6 +18788,15 @@ if test "${with_gtk3+set}" = set; then :
   withval=$with_gtk3;
 fi
 
+
+if test "x$with_gtk3" = "xno"              # user explicitly disabled GTK
+then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether GTK version 3 is present and desired" >&5
+$as_echo_n "checking whether GTK version 3 is present and desired... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no (disabled by user)" >&5
+$as_echo "no (disabled by user)" >&6; }
+    HAVE_gtk3=no
+else
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GTK" >&5
@@ -18859,6 +18868,8 @@ else
 $as_echo "yes" >&6; }
 	HAVE_gtk3=yes
 fi
+fi
+
  if test "x$HAVE_gtk3" = xyes; then
   HAVE_GTK3_TRUE=
   HAVE_GTK3_FALSE='#'
@@ -18866,6 +18877,7 @@ else
   HAVE_GTK3_TRUE='#'
   HAVE_GTK3_FALSE=
 fi
+
 
 if test "x$HAVE_gtk3" = xyes; then
 
