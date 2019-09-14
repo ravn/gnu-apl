@@ -69,8 +69,9 @@ and texts about APL. We would like to refer the reader to the following:
 * Chapter 3::    Non-standard GNU APL Features
 * Chapter 4::    Limitations and Missing Features
 * Chapter 5::    Internationalization
-* Chapter 6::    Libraries Contributed by GNU APL Users
-* Chapter 7::    Licenses for GNU APL and this Manual
+* Chapter 6::    Project Structure
+* Chapter 7::    Libraries Contributed by GNU APL Users
+* Chapter 8::    Licenses for GNU APL and this Manual
 @end menu
 
 @c ============================================================================
@@ -1979,7 +1980,7 @@ shows a list of all functions provided by ⎕CR:
 
 Say a @b{byte vector} is an integer vector with numbers having a (signed or
 unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte
-vectors are frequenctly used arguments and results of ⎕FIO functions.
+vectors are frequently used arguments and results of ⎕FIO functions.
 
 Let Z←A ⎕CR B.
 
@@ -3473,6 +3474,154 @@ As far as xterm is concerned, the xterm command line options --u8, --lc, and
 
 @c ----------------------------------------------------------------------------
 @node Chapter 6
+@chapter Project Structure
+
+The top-level directory of the GNU APL project has a structure like this:
+
+@verbatim
+    apl-1.8/
+    ├── autom4te.cache
+    ├── build
+    ├── debian
+    ├── debian_tmp
+    ├── devel_doc
+    ├── doc
+    ├── erlang
+    ├── gnu-apl.d
+    ├── HOWTOs
+    ├── html
+    ├── m4
+    ├── rpm
+    ├── src
+    ├── support-files
+    ├── tools
+    ├── websock
+    ├── workspaces
+    ├── wslib2
+    ├── wslib3
+    ├── wslib4
+    └── wslib5
+@end verbatim
+
+Most of these directories are contained in the project tar file
+(e.g. apl-1.8.tar.gz) and some are created during the build of GNU APL. Only
+the directories in the top-level are shown above.
+
+The GNU APL project follows the standard layout for autoconf/automake projects.
+The top-level itself contains the files needed by autoconf/automake and a
+handful of README-XXX files that might be of interest when building GNU APL.
+
+The subdirectories are (in order of decreasing relevance):
+
+@menu
+* Section 6.1:: The subdirectory src
+* Section 6.2:: The subdirectory support-files
+* Section 6.3:: The subdirectory doc
+* Section 6.4:: The subdirectory HOWTOs
+* Section 6.5:: The subdirectories workspaces and wslib2 ... wslib5
+* Section 6.6:: The subdirectory m4
+* Section 6.7:: The subdirectories rpm, debian, and debian_tmp
+* Section 6.8:: The subdirectory tools
+@end menu
+
+@node Section 6.1
+@section The subdirectory src
+
+The subdirectory src contains all C++ source files that are needed to build
+either the GNU APL interpreter itself, or libapl (a library that contains the
+essential part of GNU APL, but without the interactive REPL loop of the
+interpreter). During the build, the object files produced by the compiler are
+also placed in this directory.
+
+The subdirectory src contains further subdirectories for components of GNU APL
+that are optional and typically require the installation of additional
+libraries on the build machine. The ./configure script in the top-level
+directory determines, which optional components shall be included on the build.
+
+@verbatim
+    apl-1.8/
+    ├── src
+        ├── APs                     ⎕SVO and friends
+        ├── emacs_mode              dito
+        ├── Gtk                     ⎕GTK
+        ├── native                  templates for native functions
+        ├── sql                     ⎕SQL
+        ├── testcaseses             dito
+@end verbatim
+
+GNU APL comes with an automated test suite, the testcases are
+contained in subdirectory src/testcases
+
+@node Section 6.2
+@section The subdirectory support-files
+
+The subdirectory support-file contains a number of configuration files that aim
+at making a standard keyboard produce APL characters. Details are explained in
+top-level file README-3-keyboard.
+
+@node Section 6.3
+@section The subdirectory doc
+
+The subdirectory doc is used to create @b{this} info file in different file
+formats (.info, .html).
+
+@node Section 6.4
+@section The subdirectory HOWTOs
+
+The subdirectory HOWTOs contains some documents that try to explain how some
+of the non-standard features of GNU APL are supposed to be used. These
+documents were written for two different audiences: APL programmers and
+GNU APL hackers. The documents for APL programmers are, by default, installed
+in directory /usr/local/share/doc/apl by @b{make install} while the documents
+for GNU APL hackers (i.e. C++ programmers or trouble-shooters) are not
+installed by @b{make install}, but rather remain in the source tree.
+
+@node Section 6.5
+@section The subdirectories workspaces and wslib2 ... wslib5
+
+These directories (and their content) are, by default, copied to
+/usr/local/lib/apl by @b{'make install}. Some subdirectories are empty while
+others contain small workspaces or libraries for various purposes (mostly
+demonstrating the use of some non-standard APL features).
+
+@node Section 6.6
+@section The subdirectory m4
+
+The subdirectory m4 contains macros used by autoconf and automake. In most
+cases the top-level ./configure script can be used as is. If a platform on
+which GNU APL shall be built differs to much from the platform on which the
+GNU APL project tar file (e.g. apl-1.8.tar.gz) was created, then it might
+be necessary to re-create the ./configure script on the platform.
+
+Re-creating the ./configure script requires:
+
+@node Section 6.7
+@section The subdirectories rpm, debian, and debian_tmp
+
+These subdirectories are templates for building (binary) RPM resp. Debian
+packages that contain GNU APL. Subdirectory debian_tmp is initially empty and
+acts as a scratch directory inside which the interpreter is being compiled
+when a Debian package is built.
+
+@itemize
+@item the installation of autoconf,
+@item the installation of automake,
+@item the installation of libtool,
+@item maybe running aclocal, libtoolize, and other scripts, and finally
+@item running autoreconf
+
+@end itemize
+
+@node Section 6.8
+@section The subdirectory tools
+
+GNU APL uses generated C++ code. The subdirectory tools contains the source
+code for the code generator (phrase_gen) and also some other small tools for
+various purposes. These tools are typically used by GNU APL hackers and are
+therefore not installed by @b{make install}.
+
+@c ----------------------------------------------------------------------------
+@node Chapter 7
 @chapter Libraries Contributed by GNU APL Users
 
 Since the first release of GNU APL, a number of libraries, but also other
@@ -3480,11 +3629,11 @@ developments, have been made by users of GNU APL. Below are links to these
 contributions.
 
 @menu
-* Section 6.1::  The GNU APL Community Webpage
-* Section 6.2::  Core Libraries
+* Section 7.1::  The GNU APL Community Webpage
+* Section 7.2::  Core Libraries
 @end menu
 
-@node Section 6.1
+@node Section 7.1
 @section The GNU APL Community Webpage
 
 The GNU APL project maintains a web page that lists contributions made by
@@ -3502,7 +3651,7 @@ more likely that it was overlooked. Just send an email to bug-apl@@gnu.org
 to fix that.
 
 
-@node Section 6.2
+@node Section 7.2
 @section Core Libraries
 
 There is a small number of libraries that are considered "core" APL because,
@@ -3526,7 +3675,7 @@ Component File System  (as required by ISO 13751)  by Blake McBride
 SQL
 
 @c ----------------------------------------------------------------------------
-@node Chapter 7
+@node Chapter 8
 @chapter Licenses for this GNU APL Manual and for GNU APL
 
 This manual for GNU APL is licensed under the GNU Free Documentation
@@ -3536,11 +3685,11 @@ GNU APL itself is licensed under the GNU Public License version 3 or later
 (aka GPLv3+), *Note Section 4.2:: below.
 
 @menu
-* Section 7.1::  The GNU Free Documentation License
-* Section 7.2::  The GNU General Public License
+* Section 8.1::  The GNU Free Documentation License
+* Section 8.2::  The GNU General Public License
 @end menu
 
-@node Section 7.1
+@node Section 8.1
 @section The GNU Free Documentation License
 
 @c The GNU Free Documentation License.
@@ -4042,7 +4191,7 @@ recommend releasing these examples in parallel under your choice of
 free software license, such as the GNU General Public License,
 to permit their use in free software.
 
-@node Section 7.2
+@node Section 8.2
 @section The GNU GENERAL PUBLIC LICENSE
 
                     GNU GENERAL PUBLIC LICENSE

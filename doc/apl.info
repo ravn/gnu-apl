@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-August 11, 2019
+September 14, 2019
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -42,8 +42,9 @@ ftp://rtfm.mit.edu/pub/usenet-by-group/comp.lang.apl/APL_language_FAQ
 * Chapter 3::    Non-standard GNU APL Features
 * Chapter 4::    Limitations and Missing Features
 * Chapter 5::    Internationalization
-* Chapter 6::    Libraries Contributed by GNU APL Users
-* Chapter 7::    Licenses for GNU APL and this Manual
+* Chapter 6::    Project Structure
+* Chapter 7::    Libraries Contributed by GNU APL Users
+* Chapter 8::    Licenses for GNU APL and this Manual
 
 
 File: apl.info,  Node: Chapter 1,  Next: Chapter 2,  Prev: Top,  Up: Top
@@ -1893,7 +1894,7 @@ argument shows a list of all functions provided by ⎕CR:
 
    Say a byte vector is an integer vector with numbers having a (signed
 or unsigned) 8-bit value (i.e.  a value from -128 to 255 inclusive).
-Such byte vectors are frequenctly used arguments and results of ⎕FIO
+Such byte vectors are frequently used arguments and results of ⎕FIO
 functions.
 
    Let Z←A ⎕CR B.
@@ -3378,7 +3379,179 @@ installed locales.
 
 File: apl.info,  Node: Chapter 6,  Next: Chapter 7,  Prev: Chapter 5,  Up: Top
 
-6 Libraries Contributed by GNU APL Users
+6 Project Structure
+*******************
+
+The top-level directory of the GNU APL project has a structure like
+this:
+
+    apl-1.8/
+    ├── autom4te.cache
+    ├── build
+    ├── debian
+    ├── debian_tmp
+    ├── devel_doc
+    ├── doc
+    ├── erlang
+    ├── gnu-apl.d
+    ├── HOWTOs
+    ├── html
+    ├── m4
+    ├── rpm
+    ├── src
+    ├── support-files
+    ├── tools
+    ├── websock
+    ├── workspaces
+    ├── wslib2
+    ├── wslib3
+    ├── wslib4
+    └── wslib5
+
+   Most of these directories are contained in the project tar file (e.g.
+apl-1.8.tar.gz) and some are created during the build of GNU APL. Only
+the directories in the top-level are shown above.
+
+   The GNU APL project follows the standard layout for autoconf/automake
+projects.  The top-level itself contains the files needed by
+autoconf/automake and a handful of README-XXX files that might be of
+interest when building GNU APL.
+
+   The subdirectories are (in order of decreasing relevance):
+
+* Menu:
+
+* Section 6.1:: The subdirectory src
+* Section 6.2:: The subdirectory support-files
+* Section 6.3:: The subdirectory doc
+* Section 6.4:: The subdirectory HOWTOs
+* Section 6.5:: The subdirectories workspaces and wslib2 ... wslib5
+* Section 6.6:: The subdirectory m4
+* Section 6.7:: The subdirectories rpm, debian, and debian_tmp
+* Section 6.8:: The subdirectory tools
+
+
+File: apl.info,  Node: Section 6.1,  Next: Section 6.2,  Up: Chapter 6
+
+6.1 The subdirectory src
+========================
+
+The subdirectory src contains all C++ source files that are needed to
+build either the GNU APL interpreter itself, or libapl (a library that
+contains the essential part of GNU APL, but without the interactive REPL
+loop of the interpreter).  During the build, the object files produced
+by the compiler are also placed in this directory.
+
+   The subdirectory src contains further subdirectories for components
+of GNU APL that are optional and typically require the installation of
+additional libraries on the build machine.  The ./configure script in
+the top-level directory determines, which optional components shall be
+included on the build.
+
+    apl-1.8/
+    ├── src
+        ├── APs                     ⎕SVO and friends
+        ├── emacs_mode              dito
+        ├── Gtk                     ⎕GTK
+        ├── native                  templates for native functions
+        ├── sql                     ⎕SQL
+        ├── testcaseses             dito
+
+   GNU APL comes with an automated test suite, the testcases are
+contained in subdirectory src/testcases
+
+
+File: apl.info,  Node: Section 6.2,  Next: Section 6.3,  Prev: Section 6.1,  Up: Chapter 6
+
+6.2 The subdirectory support-files
+==================================
+
+The subdirectory support-file contains a number of configuration files
+that aim at making a standard keyboard produce APL characters.  Details
+are explained in top-level file README-3-keyboard.
+
+
+File: apl.info,  Node: Section 6.3,  Next: Section 6.4,  Prev: Section 6.2,  Up: Chapter 6
+
+6.3 The subdirectory doc
+========================
+
+The subdirectory doc is used to create this info file in different file
+formats (.info, .html).
+
+
+File: apl.info,  Node: Section 6.4,  Next: Section 6.5,  Prev: Section 6.3,  Up: Chapter 6
+
+6.4 The subdirectory HOWTOs
+===========================
+
+The subdirectory HOWTOs contains some documents that try to explain how
+some of the non-standard features of GNU APL are supposed to be used.
+These documents were written for two different audiences: APL
+programmers and GNU APL hackers.  The documents for APL programmers are,
+by default, installed in directory /usr/local/share/doc/apl by make
+install while the documents for GNU APL hackers (i.e.  C++ programmers
+or trouble-shooters) are not installed by make install, but rather
+remain in the source tree.
+
+
+File: apl.info,  Node: Section 6.5,  Next: Section 6.6,  Prev: Section 6.4,  Up: Chapter 6
+
+6.5 The subdirectories workspaces and wslib2 ... wslib5
+=======================================================
+
+These directories (and their content) are, by default, copied to
+/usr/local/lib/apl by ’make install.  Some subdirectories are empty
+while others contain small workspaces or libraries for various purposes
+(mostly demonstrating the use of some non-standard APL features).
+
+
+File: apl.info,  Node: Section 6.6,  Next: Section 6.7,  Prev: Section 6.5,  Up: Chapter 6
+
+6.6 The subdirectory m4
+=======================
+
+The subdirectory m4 contains macros used by autoconf and automake.  In
+most cases the top-level ./configure script can be used as is.  If a
+platform on which GNU APL shall be built differs to much from the
+platform on which the GNU APL project tar file (e.g.  apl-1.8.tar.gz)
+was created, then it might be necessary to re-create the ./configure
+script on the platform.
+
+   Re-creating the ./configure script requires:
+
+
+File: apl.info,  Node: Section 6.7,  Next: Section 6.8,  Prev: Section 6.6,  Up: Chapter 6
+
+6.7 The subdirectories rpm, debian, and debian_tmp
+==================================================
+
+These subdirectories are templates for building (binary) RPM resp.
+Debian packages that contain GNU APL. Subdirectory debian_tmp is
+initially empty and acts as a scratch directory inside which the
+interpreter is being compiled when a Debian package is built.
+
+   • the installation of autoconf,
+   • the installation of automake,
+   • the installation of libtool,
+   • maybe running aclocal, libtoolize, and other scripts, and finally
+   • running autoreconf
+
+
+File: apl.info,  Node: Section 6.8,  Prev: Section 6.7,  Up: Chapter 6
+
+6.8 The subdirectory tools
+==========================
+
+GNU APL uses generated C++ code.  The subdirectory tools contains the
+source code for the code generator (phrase_gen) and also some other
+small tools for various purposes.  These tools are typically used by GNU
+APL hackers and are therefore not installed by make install.
+
+
+File: apl.info,  Node: Chapter 7,  Next: Chapter 8,  Prev: Chapter 6,  Up: Top
+
+7 Libraries Contributed by GNU APL Users
 ****************************************
 
 Since the first release of GNU APL, a number of libraries, but also
@@ -3387,13 +3560,13 @@ to these contributions.
 
 * Menu:
 
-* Section 6.1::  The GNU APL Community Webpage
-* Section 6.2::  Core Libraries
+* Section 7.1::  The GNU APL Community Webpage
+* Section 7.2::  Core Libraries
 
 
-File: apl.info,  Node: Section 6.1,  Next: Section 6.2,  Up: Chapter 6
+File: apl.info,  Node: Section 7.1,  Next: Section 7.2,  Up: Chapter 7
 
-6.1 The GNU APL Community Webpage
+7.1 The GNU APL Community Webpage
 =================================
 
 The GNU APL project maintains a web page that lists contributions made
@@ -3411,9 +3584,9 @@ listed but more likely that it was overlooked.  Just send an email to
 bug-apl@gnu.org to fix that.
 
 
-File: apl.info,  Node: Section 6.2,  Prev: Section 6.1,  Up: Chapter 6
+File: apl.info,  Node: Section 7.2,  Prev: Section 7.1,  Up: Chapter 7
 
-6.2 Core Libraries
+7.2 Core Libraries
 ==================
 
 There is a small number of libraries that are considered "core" APL
@@ -3437,9 +3610,9 @@ in the GNU APL packages that follows their contribution.
    SQL
 
 
-File: apl.info,  Node: Chapter 7,  Prev: Chapter 6,  Up: Top
+File: apl.info,  Node: Chapter 8,  Prev: Chapter 7,  Up: Top
 
-7 Licenses for this GNU APL Manual and for GNU APL
+8 Licenses for this GNU APL Manual and for GNU APL
 **************************************************
 
 This manual for GNU APL is licensed under the GNU Free Documentation
@@ -3450,13 +3623,13 @@ later (aka GPLv3+), *Note Section 4.2:: below.
 
 * Menu:
 
-* Section 7.1::  The GNU Free Documentation License
-* Section 7.2::  The GNU General Public License
+* Section 8.1::  The GNU Free Documentation License
+* Section 8.2::  The GNU General Public License
 
 
-File: apl.info,  Node: Section 7.1,  Next: Section 7.2,  Up: Chapter 7
+File: apl.info,  Node: Section 8.1,  Next: Section 8.2,  Up: Chapter 8
 
-7.1 The GNU Free Documentation License
+8.1 The GNU Free Documentation License
 ======================================
 
                      Version 1.3, 3 November 2008
@@ -3936,9 +4109,9 @@ software license, such as the GNU General Public License, to permit
 their use in free software.
 
 
-File: apl.info,  Node: Section 7.2,  Prev: Section 7.1,  Up: Chapter 7
+File: apl.info,  Node: Section 8.2,  Prev: Section 8.1,  Up: Chapter 8
 
-7.2 The GNU GENERAL PUBLIC LICENSE
+8.2 The GNU GENERAL PUBLIC LICENSE
 ==================================
 
 GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
@@ -4619,47 +4792,56 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11436
-Node: Chapter 219286
-Node: Chapter 323710
-Node: Section 3.125235
-Node: Section 3.241247
-Node: Section 3.342006
-Node: Section 3.443293
-Node: Section 3.545914
-Node: Section 3.646087
-Node: Section 3.746700
-Node: Section 3.850644
-Node: Section 3.952186
-Node: Section 3.1052783
-Node: Section 3.1154567
-Node: Section 3.1256507
-Node: Section 3.1357448
-Node: Section 3.1457700
-Node: Section 3.1559096
-Node: Section 3.1661608
-Node: Section 3.1768307
-Node: Section 3.1873342
-Node: Section 3.1976623
-Node: Section 3.2076914
-Node: Section 3.2186826
-Node: Section 3.2287098
-Node: Section 3.2393676
-Node: Section 3.2496127
-Node: Section 3.2596796
-Node: Section 3.26103432
-Node: Section 3.27104372
-Node: Section 3.28117934
-Node: Section 3.29121038
-Node: Section 3.30123027
-Node: Chapter 4127405
-Node: Chapter 5129153
-Node: Chapter 6130282
-Node: Section 6.1130701
-Node: Section 6.2131388
-Node: Chapter 7132219
-Node: Section 7.1132722
-Node: Section 7.2158032
+Node: Chapter 11474
+Node: Chapter 219324
+Node: Chapter 323748
+Node: Section 3.125273
+Node: Section 3.241285
+Node: Section 3.342044
+Node: Section 3.443331
+Node: Section 3.545952
+Node: Section 3.646125
+Node: Section 3.746738
+Node: Section 3.850682
+Node: Section 3.952224
+Node: Section 3.1052821
+Node: Section 3.1154605
+Node: Section 3.1256545
+Node: Section 3.1357486
+Node: Section 3.1457738
+Node: Section 3.1559134
+Node: Section 3.1661646
+Node: Section 3.1768345
+Node: Section 3.1873379
+Node: Section 3.1976660
+Node: Section 3.2076951
+Node: Section 3.2186863
+Node: Section 3.2287135
+Node: Section 3.2393713
+Node: Section 3.2496164
+Node: Section 3.2596833
+Node: Section 3.26103469
+Node: Section 3.27104409
+Node: Section 3.28117971
+Node: Section 3.29121075
+Node: Section 3.30123064
+Node: Chapter 4127442
+Node: Chapter 5129190
+Node: Chapter 6130319
+Node: Section 6.1131856
+Node: Section 6.2133101
+Node: Section 6.3133461
+Node: Section 6.4133703
+Node: Section 6.5134365
+Node: Section 6.6134846
+Node: Section 6.7135408
+Node: Section 6.8136075
+Node: Chapter 7136477
+Node: Section 7.1136896
+Node: Section 7.2137583
+Node: Chapter 8138414
+Node: Section 8.1138917
+Node: Section 8.2164227
 
 End Tag Table
 
