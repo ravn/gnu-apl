@@ -394,7 +394,7 @@ AC_CONFIG_FILES([Makefile
                  support-files/105-key-International-Keyboard/Makefile
                  support-files/Dirk/Makefile
                  support-files/Dyalog-Keyboard/Makefile
-                 support-files/Jürgen-Mint-19/Makefile
+                 support-files/Juergen-Mint-19/Makefile
                  support-files/old-Keyboard/Makefile
                  support-files/OS-X-Keyboard/Makefile
                  support-files/Unicomp-Keyboard/Makefile

@@ -204,7 +204,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>September 14, 2019
+<p>September 15, 2019
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -1275,7 +1275,7 @@ ABC
 <p>When entering a new-style multi-line strings then the prompt is prepended by
 → to indicate that a Multi-Line String is being entered.
 </p>
-<p>⎕INP and old-style strings will coexist for s while, but may disappear at some
+<p>⎕INP and old-style strings will coexist for a while, but may disappear at some
 point in time.
 </p>
 <a name="Script-Example"></a>
@@ -3836,7 +3836,7 @@ Next: <a href="#Section-6_002e6" accesskey="n" rel="next">Section 6.6</a>, Previ
 <h3 class="section">6.5 The subdirectories workspaces and wslib2 ... wslib5</h3>
 
 <p>These directories (and their content) are, by default, copied to
-/usr/local/lib/apl by <b>&rsquo;make install</b>. Some subdirectories are empty while
+/usr/local/lib/apl by <b>make install</b>. Some subdirectories are empty while
 others contain small workspaces or libraries for various purposes (mostly
 demonstrating the use of some non-standard APL features).
 </p>
@@ -3857,6 +3857,14 @@ be necessary to re-create the ./configure script on the platform.
 </p>
 <p>Re-creating the ./configure script requires:
 </p>
+<ul>
+<li> the installation of autoconf,
+</li><li> the installation of automake,
+</li><li> the installation of libtool,
+</li><li> maybe running aclocal, libtoolize, and other scripts, and finally
+</li><li> running autoreconf
+</li></ul>
+
 <hr>
 <a name="Section-6_002e7"></a>
 <div class="header">
@@ -3871,15 +3879,6 @@ packages that contain GNU APL. Subdirectory debian_tmp is initially empty and
 acts as a scratch directory inside which the interpreter is being compiled
 when a Debian package is built.
 </p>
-<ul>
-<li> the installation of autoconf,
-</li><li> the installation of automake,
-</li><li> the installation of libtool,
-</li><li> maybe running aclocal, libtoolize, and other scripts, and finally
-</li><li> running autoreconf
-
-</li></ul>
-
 <hr>
 <a name="Section-6_002e8"></a>
 <div class="header">

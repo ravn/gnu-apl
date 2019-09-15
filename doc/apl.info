@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-September 14, 2019
+September 15, 2019
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1049,7 +1049,7 @@ ABC
    When entering a new-style multi-line strings then the prompt is
 prepended by → to indicate that a Multi-Line String is being entered.
 
-   ⎕INP and old-style strings will coexist for s while, but may
+   ⎕INP and old-style strings will coexist for a while, but may
 disappear at some point in time.
 
 3.1.6 Script Example
@@ -3501,8 +3501,8 @@ File: apl.info,  Node: Section 6.5,  Next: Section 6.6,  Prev: Section 6.4,  Up:
 =======================================================
 
 These directories (and their content) are, by default, copied to
-/usr/local/lib/apl by ’make install.  Some subdirectories are empty
-while others contain small workspaces or libraries for various purposes
+/usr/local/lib/apl by make install.  Some subdirectories are empty while
+others contain small workspaces or libraries for various purposes
 (mostly demonstrating the use of some non-standard APL features).
 
 
@@ -3520,6 +3520,12 @@ script on the platform.
 
    Re-creating the ./configure script requires:
 
+   • the installation of autoconf,
+   • the installation of automake,
+   • the installation of libtool,
+   • maybe running aclocal, libtoolize, and other scripts, and finally
+   • running autoreconf
+
 
 File: apl.info,  Node: Section 6.7,  Next: Section 6.8,  Prev: Section 6.6,  Up: Chapter 6
 
@@ -3530,12 +3536,6 @@ These subdirectories are templates for building (binary) RPM resp.
 Debian packages that contain GNU APL. Subdirectory debian_tmp is
 initially empty and acts as a scratch directory inside which the
 interpreter is being compiled when a Debian package is built.
-
-   • the installation of autoconf,
-   • the installation of automake,
-   • the installation of libtool,
-   • maybe running aclocal, libtoolize, and other scripts, and finally
-   • running autoreconf
 
 
 File: apl.info,  Node: Section 6.8,  Prev: Section 6.7,  Up: Chapter 6
@@ -4833,15 +4833,15 @@ Node: Section 6.2133101
 Node: Section 6.3133461
 Node: Section 6.4133703
 Node: Section 6.5134365
-Node: Section 6.6134846
-Node: Section 6.7135408
-Node: Section 6.8136075
-Node: Chapter 7136477
-Node: Section 7.1136896
-Node: Section 7.2137583
-Node: Chapter 8138414
-Node: Section 8.1138917
-Node: Section 8.2164227
+Node: Section 6.6134843
+Node: Section 6.7135615
+Node: Section 6.8136072
+Node: Chapter 7136474
+Node: Section 7.1136893
+Node: Section 7.2137580
+Node: Chapter 8138411
+Node: Section 8.1138914
+Node: Section 8.2164224
 
 End Tag Table
 

@@ -1,7 +1,7 @@
 
 SUBDIRS =	Dyalog-Keyboard		\
 		Dirk			\
-		Jürgen-Mint-19		\
+		Juergen-Mint-19		\
 		old-Keyboard		\
 		OS-X-Keyboard		\
 		Unicomp-Keyboard	\

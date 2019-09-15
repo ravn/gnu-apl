@@ -1131,7 +1131,7 @@ ABC
 When entering a new-style multi-line strings then the prompt is prepended by
 → to indicate that a Multi-Line String is being entered.
 
-⎕INP and old-style strings will coexist for s while, but may disappear at some
+⎕INP and old-style strings will coexist for a while, but may disappear at some
 point in time.
 
 @subsection Script Example
@@ -3580,7 +3580,7 @@ installed by @b{make install}, but rather remain in the source tree.
 @section The subdirectories workspaces and wslib2 ... wslib5
 
 These directories (and their content) are, by default, copied to
-/usr/local/lib/apl by @b{'make install}. Some subdirectories are empty while
+/usr/local/lib/apl by @b{make install}. Some subdirectories are empty while
 others contain small workspaces or libraries for various purposes (mostly
 demonstrating the use of some non-standard APL features).
 
@@ -3595,6 +3595,14 @@ be necessary to re-create the ./configure script on the platform.
 
 Re-creating the ./configure script requires:
 
+@itemize
+@item the installation of autoconf,
+@item the installation of automake,
+@item the installation of libtool,
+@item maybe running aclocal, libtoolize, and other scripts, and finally
+@item running autoreconf
+@end itemize
+
 @node Section 6.7
 @section The subdirectories rpm, debian, and debian_tmp
 
@@ -3602,15 +3610,6 @@ These subdirectories are templates for building (binary) RPM resp. Debian
 packages that contain GNU APL. Subdirectory debian_tmp is initially empty and
 acts as a scratch directory inside which the interpreter is being compiled
 when a Debian package is built.
-
-@itemize
-@item the installation of autoconf,
-@item the installation of automake,
-@item the installation of libtool,
-@item maybe running aclocal, libtoolize, and other scripts, and finally
-@item running autoreconf
-
-@end itemize
 
 @node Section 6.8
 @section The subdirectory tools
