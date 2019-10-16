@@ -295,7 +295,7 @@ Parallel::unlock_pool(bool logit)
             {
               PRINT_LOCKED(CERR << "Parallel::unlock_pool() : " << endl; )
               Thread_context * tc = Thread_context::get_context(CoreNumber(a));
-              sem_post(tc->pool_sema);
+              sem_post(&tc->pool_sema);
               PRINT_LOCKED(
               CERR << "    pool_sema of thread #" << a << " incremented."
                    << endl;)
@@ -304,7 +304,7 @@ Parallel::unlock_pool(bool logit)
    else
      {
         for (int a = 1; a < Thread_context::get_active_core_count(); ++a)
-            sem_post(Thread_context::get_context(CoreNumber(a))->pool_sema);
+            sem_post(&Thread_context::get_context(CoreNumber(a))->pool_sema);
        }
 }
 //-----------------------------------------------------------------------------
@@ -325,7 +325,7 @@ Thread_context & tctx = *reinterpret_cast<Thread_context *>(arg);
    // start in state locked
    //
    tctx.blocked = true;
-   sem_wait(tctx.pool_sema);
+   sem_wait(&tctx.pool_sema);
    tctx.blocked = false;
 
    Log(LOG_Parallel)

@@ -88,6 +88,7 @@ xMAIL_APL_ARCHIVE←'http://lists.gnu.org/archive/html/bug-apl/'
 xMAIL_APL_SUBSCRIBE←'https://lists.gnu.org/mailman/listinfo/bug-apl'
 xTRY_GNU_APL←'http://juergen-sauermann.de/try-GNU-APL'
 xDocker_GNU_APL←'https://hub.docker.com/r/juergensauermann/gnu-apl'
+xDocker_GNU_APL_18←'https://hub.docker.com/r/juergensauermann/gnu-apl-1.8'
 xSVN_APL←'https://savannah.gnu.org/svn/?group=apl'
 
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
@@ -243,6 +244,8 @@ on your computer. See
 For those who live in the cloud there is a small Docker container with Alpine
 GNU/Linux, GNU APL, and the optional libraries (SQLite, Postgres, FFT). See
 <?apl HTML∆x2y xDocker_GNU_APL HTML∆A, "<B>", xDocker_GNU_APL, "</B>" ?>.
+A larger container with GNU APL 1.8 is:
+<?apl HTML∆x2y xDocker_GNU_APL_18 HTML∆A, "<B>", xDocker_GNU_APL_18, "</B>" ?>.
 
 </DIV>
 <DIV class="c4">
