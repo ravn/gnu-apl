@@ -23,21 +23,21 @@ xor
 MAX_UNSIGNED    qp1     qq  qq1     qq2     qq3     qq4     qr1     qr2     qr3
 
       ⎕CR 'quantum_dot_product'
- z←reg1 quantum_dot_product reg2;filtstate;s1;s2;siz1;nullpos;f1               
- siz1←(1⊃reg1)                                                                 
- →((⍴3⊃reg1)=⍬)/∆1                                                             
- ⊢filtstate←(3⊃reg1)(quantum_get_state⍤0 1)reg2 ⍝ contains positions in reg2   
- nullpos←filtstate⍳¯1                                                          
- ⍎(nullpos≠siz1)/'filtstate[nullpos]←¯1' ⍝ only positions in reg2 found in reg1
- s1←(2⊃reg1)                                                                   
- s2←(2⊃reg2)                                                                   
- f1←1+filtstate                                                                
- f1[(f1>1)/⍳⍴f1]←1                                                             
- z←+/(+(s1[f1/⍳siz1]))×s2[(filtstate>¯1)/filtstate]                            
- →0                                                                            
-∆1:filtstate←(⍳(1⊃reg1))(quantum_get_state⍤0 1)reg2                            
- filtstate←(filtstate>¯1)/filtstate                                            
- s1←(2⊃reg1)                                                                   
- s2←(2⊃reg2)                                                                   
- z←+/(+(s1[filtstate/⍳(1⊃reg1)]))×s2[filtstate]                                
+z←reg1 quantum_dot_product reg2;filtstate;s1;s2;siz1;nullpos;f1               
+siz1←(1⊃reg1)                                                                 
+→((⍴3⊃reg1)=⍬)/∆1                                                             
+⊢filtstate←(3⊃reg1)(quantum_get_state⍤0 1)reg2 ⍝ contains positions in reg2   
+nullpos←filtstate⍳¯1                                                          
+⍎(nullpos≠siz1)/'filtstate[nullpos]←¯1' ⍝ only positions in reg2 found in reg1
+s1←(2⊃reg1)                                                                   
+s2←(2⊃reg2)                                                                   
+f1←1+filtstate                                                                
+f1[(f1>1)/⍳⍴f1]←1                                                             
+z←+/(+(s1[f1/⍳siz1]))×s2[(filtstate>¯1)/filtstate]                            
+→0                                                                            
+∆1:filtstate←(⍳(1⊃reg1))(quantum_get_state⍤0 1)reg2                           
+filtstate←(filtstate>¯1)/filtstate                                            
+s1←(2⊃reg1)                                                                   
+s2←(2⊃reg2)                                                                   
+z←+/(+(s1[filtstate/⍳(1⊃reg1)]))×s2[filtstate]                                
 

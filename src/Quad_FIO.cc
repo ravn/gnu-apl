@@ -875,9 +875,27 @@ Quad_FIO::eval_B(Value_P B)
 const APL_Integer function_number = B->get_ravel(0).get_int_value();
    switch(function_number)
       {
-        // function_number < 0 are "hacker functions" that should not be
+        // function_numbers < 0 refer to "hacker functions" that should not be
         // used by normal mortals.
         //
+        case -15: // print performance IDs and names...
+             {
+               const ShapeItem count = PFS_MAX3;
+               Shape sh(count, 2);
+               Value_P Z(sh, LOC);
+#define perfo_4(id, b, name, thr) perfo_1(id, b, name, thr)
+#define perfo_3(id, b, name, thr) perfo_1(id, b, name, thr)
+#define perfo_2(id, b, name, thr) perfo_1(id, b, name, thr)
+#define perfo_1(id, ab, name, _thr)                     \
+   { new (Z->next_ravel())   IntCell(PFS_ ## id ## ab); \
+     UCS_string ucs(#id);                               \
+     Value_P uZ(ucs, LOC);                              \
+     new (Z->next_ravel())   PointerCell(uZ.get(), Z.getref()); }
+#include "Performance.def"
+               Z->check_value(LOC);
+               return Token(TOK_APL_VALUE1, Z);
+             }
+
         case -14: // print stacks. SI_top is the ⎕FIO call, so dont show it.
                   for (StateIndicator * si = Workspace::SI_top()->get_parent();
                        si; si = si->get_parent())

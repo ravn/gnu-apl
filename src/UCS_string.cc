@@ -85,10 +85,14 @@ UCS_string::UCS_string(const char * cstring)
    //
    create(LOC);
 
-   while (*cstring)
+   for (const char * str = cstring; *str; ++str)
       {
-        Assert((0x80 & *cstring) == 0);   // ASCII
-        *this += Unicode(*cstring++);
+        if (0x80 & *cstring)   // ASCII
+           {
+             CERR << "non-ASCII char in C-String '" << cstring << "'" << endl;
+             Assert(0 && "Bad C-string");
+           }
+        *this += Unicode(*str);
       }
 }
 //-----------------------------------------------------------------------------

@@ -127,7 +127,7 @@ UCS_string text;
 
    // ⎕FX accepts two kinds of B argments:
    //
-   // 1. A vector whose elements are the lines of the function, or
+   // 1. A vector whose elements are the (nested) lines of the function, or
    // 2. A character matrix whose rows are the lines of the function.
    //
    // we convert each format into text, which is a UCS string with
@@ -135,41 +135,55 @@ UCS_string text;
    //
    if (B->compute_depth() >= 2)   // case 1: vector of simple character vectors
       {
-        const ShapeItem ec = B->element_count();
-        loop(e, ec)
+        const ShapeItem rows = B->element_count();
+        loop(row, rows)
            {
-             const Cell & cell = B->get_ravel(e);
+             const Cell & cell = B->get_ravel(row);
              if (cell.is_character_cell())   /// a line with a single char.
                 {
-                  text.append(cell.get_char_value());
+                  const Unicode uni = cell.get_char_value();
+                  if (uni > UNI_ASCII_SPACE)   text.append(uni);
                   text.append(UNI_ASCII_LF);
                   continue;
                 }
 
-             if (!cell.is_pointer_cell())   DOMAIN_ERROR;
+             // row has more than 1 chatacter, so it must be nested
+             if (!cell.is_pointer_cell())
+                {
+                  MORE_ERROR() << "⎕FX: Function line " << row
+                               << " is not a string";
+                  DOMAIN_ERROR;
+                }
+
              Value_P line = cell.get_pointer_value();
              Assert(!!line);
 
              Log(LOG_quad_FX)
                 {
-                  CERR << "[" << setw(2) << e << "] " << *line << endl;
+                  CERR << "[" << setw(2) << row << "] " << *line << endl;
                 }
 
              if (line->is_char_vector())
                 {
-                  const uint64_t line_len = line->element_count();
+                  const ShapeItem line_len = line->element_count();
+                  bool skipping = false;
                   loop(l, line_len)
                      {
                        const Cell & c = line->get_ravel(l);
                        if (!c.is_character_cell())   DOMAIN_ERROR;
-                       text.append(c.get_char_value());
+
+                       const Unicode uni = c.get_char_value();
+                       if (l == 0 || skipping)
+                          skipping = (uni <= UNI_ASCII_SPACE);
+                       if (!skipping)   text.append(uni);
                      }
                 }
              else if (line->is_scalar())
                 {
                   const Cell & c1 = line->get_ravel(0);
                   if (!c1.is_character_cell())   DOMAIN_ERROR;
-                  text.append(c1.get_char_value());
+                  const Unicode uni = c1.get_char_value();
+                  if (uni > UNI_ASCII_SPACE)   text.append(uni);
                 }
              else
                 {
@@ -187,7 +201,14 @@ UCS_string text;
 
         loop(row, rows)
            {
-             loop(col, cols)   text.append(cB++->get_char_value());
+             bool skipping = false;
+             loop(col, cols)
+                 {
+                   const Unicode uni = cB++->get_char_value();
+                   if (col == 0 || skipping)
+                      skipping = (uni <= UNI_ASCII_SPACE);
+                   if (!skipping)   text.append(uni);
+                 }
              text.append(UNI_ASCII_LF);
            }
       }

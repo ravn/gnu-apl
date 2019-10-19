@@ -935,8 +935,13 @@ const APL_Integer qio = Workspace::get_IO();
            {
 #if PARALLEL_ENABLED
              if (Parallel::set_core_count(CoreCount(b), false))
-                DOMAIN_ERROR;
+                {
+                  MORE_ERROR() << "Bad core count " << b
+                               << " in ⎕SYL[" << x << "] ";
+                  DOMAIN_ERROR;
+                }
 #else
+             MORE_ERROR() << "PARALLEL_ENABLED not set in ⎕SYL[" << x << "] ";
              DOMAIN_ERROR;
 #endif
            }
@@ -958,6 +963,7 @@ const APL_Integer qio = Workspace::get_IO();
            }
         else
            {
+             MORE_ERROR() << "Bad ⎕SYL index " << x;
              INDEX_ERROR;
            }
       }

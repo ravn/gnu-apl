@@ -69,12 +69,22 @@ Thread_context::print_all(ostream & out)
 void
 Thread_context::print(ostream & out) const
 {
-const void * vpth = reinterpret_cast<const void *>(thread);
+const void * vthis = reinterpret_cast<const void *>(this);
 
-   out << "thread #"     << setw(2) << N << ":" << setw(16) << vpth
-       << (blocked ? " BLKD" : " RUN ")
-       << " job:"        << setw(4) << int(job_number)
-       << " " << job_name << endl;
+   if (vthis)
+      {
+        const void * vpth = reinterpret_cast<const void *>(thread);
+
+        out << "thread #"     << setw(2) << N << ":" << setw(16) << vpth
+            << (blocked ? " BLKD" : " RUN ")
+            << " job:"        << setw(4) << int(job_number)
+            << " " << job_name << endl;
+      }
+   else
+      {
+         CERR << "*** Thread_context::print() called with this == 0" << endl;
+         BACKTRACE;
+      }
 }
 //-----------------------------------------------------------------------------
 void
