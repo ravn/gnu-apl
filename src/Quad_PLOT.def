@@ -1,5 +1,7 @@
 #ifdef gdef
 gdef(String,   caption, "GNU APL PLOT", plot window caption)
+gdef(Pixel,    pw_pos_X,            50, plot window position X)
+gdef(Pixel,    pw_pos_Y,            50, plot window position Y)
 gdef(Pixel,    border_width,        10, width of the window border)
 gdef(Pixel,    pa_width,           600, plotarea width)
 gdef(Pixel,    pa_height,          400, plotarea height)

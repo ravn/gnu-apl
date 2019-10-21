@@ -137,6 +137,8 @@ AC_CHECK_LIB([pthread],  [sem_init])
 AC_CHECK_LIB([dl],       [dlopen])
 AC_CHECK_LIB([fftw3],    [fftw_plan_dft])
 AC_CHECK_LIB([xcb],      [xcb_connect])
+AC_CHECK_LIB([X11-xcb],  [XGetXCBConnection])
+AC_CHECK_LIB([X11],      [XOpenDisplay])
 
 # check if SQLite3 is wanted and installed
 m4_include([m4/ax_lib_sqlite3.m4])            AX_LIB_SQLITE3([])

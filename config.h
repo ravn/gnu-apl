@@ -88,6 +88,12 @@
 /* Define to 1 if you have the `socket' library (-lsocket). */
 /* #undef HAVE_LIBSOCKET */
 
+/* Define to 1 if you have the `X11' library (-lX11). */
+#define HAVE_LIBX11 1
+
+/* Define to 1 if you have the `X11-xcb' library (-lX11-xcb). */
+#define HAVE_LIBX11_XCB 1
+
 /* libxcb is NOT installed */
 #define HAVE_LIBXCB 1
 

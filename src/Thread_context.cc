@@ -70,6 +70,7 @@ void
 Thread_context::print(ostream & out) const
 {
 const void * vthis = reinterpret_cast<const void *>(this);
+Q(vthis)
 
    if (vthis)
       {

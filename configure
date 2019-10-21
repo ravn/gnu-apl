@@ -17944,6 +17944,96 @@ _ACEOF
 
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
+$as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
+if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lX11-xcb  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XGetXCBConnection ();
+int
+main ()
+{
+return XGetXCBConnection ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_X11_xcb_XGetXCBConnection=yes
+else
+  ac_cv_lib_X11_xcb_XGetXCBConnection=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_xcb_XGetXCBConnection" >&5
+$as_echo "$ac_cv_lib_X11_xcb_XGetXCBConnection" >&6; }
+if test "x$ac_cv_lib_X11_xcb_XGetXCBConnection" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBX11_XCB 1
+_ACEOF
+
+  LIBS="-lX11-xcb $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
+$as_echo_n "checking for XOpenDisplay in -lX11... " >&6; }
+if ${ac_cv_lib_X11_XOpenDisplay+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lX11  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XOpenDisplay ();
+int
+main ()
+{
+return XOpenDisplay ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_X11_XOpenDisplay=yes
+else
+  ac_cv_lib_X11_XOpenDisplay=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_XOpenDisplay" >&5
+$as_echo "$ac_cv_lib_X11_XOpenDisplay" >&6; }
+if test "x$ac_cv_lib_X11_XOpenDisplay" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBX11 1
+_ACEOF
+
+  LIBS="-lX11 $LIBS"
+
+fi
+
 
 # check if SQLite3 is wanted and installed
 # ===========================================================================

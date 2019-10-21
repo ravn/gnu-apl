@@ -386,15 +386,15 @@
 
 ∇FIO∆clear_statistics Bi
  ⍝⍝ clear performance statistics with ID Bi
- Zn ← ⎕FIO[200] Bi
+ ⊣ ⎕FIO[200] Bi
 ∇
 
 ∇Z ← FIO∆get_statistics Bi
  ⍝⍝ read performance statistics with ID Bi
  ⍝⍝ Z[1] statistics type
  ⍝⍝ Z[2] statistics name
- ⍝⍝ Z[3 4 5] first pass (or only statistics)
- ⍝⍝ Z[6 7 8] optional subsequent pass statistics
+ ⍝⍝ Z[3 4 5] first pass (or only statistics):     count/sum/sun2
+ ⍝⍝ Z[6 7 8] optional subsequent pass statistics: count/sum/sun2
  Z ← ⎕FIO[201] Bi
 ∇
 

@@ -39,6 +39,21 @@ std::vector<pthread_t> Quad_PLOT::plot_threads;
 #include "FloatCell.hh"
 #include "Workspace.hh"
 
+// UTF8 support for XCB windows needs additional libraries that may
+// not be present. You can disable that with: XCB_WINDOWS_WITH_UTF8_CAPTIONS 0
+// or maybe CXXFLAGS=-D XCB_WINDOWS_WITH_UTF8_CAPTIONS=0 ./configure...
+//
+#ifndef XCB_WINDOWS_WITH_UTF8_CAPTIONS
+#define XCB_WINDOWS_WITH_UTF8_CAPTIONS 1
+#endif
+
+#if XCB_WINDOWS_WITH_UTF8_CAPTIONS
+# define Depth Depth1
+# include <X11/Xutil.h>
+# include <X11/Xlib.h>
+# include <X11/Xlib-xcb.h>
+#endif
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -1216,6 +1231,7 @@ xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
    return reply.atom;
 }
 //-----------------------------------------------------------------------------
+
 void *
 plot_main(void * vp_props)
 {
@@ -1226,7 +1242,12 @@ const Plot_data & data = w_props.get_plot_data();
 
    // open a connection to the X server
    //
+#if XCB_WINDOWS_WITH_UTF8_CAPTIONS
+Display * dpy = XOpenDisplay(0);
+xcb_connection_t * conn = XGetXCBConnection(dpy);
+#else
 xcb_connection_t * conn = xcb_connect(0, 0);
+#endif
 
    // get the first screen
    //
@@ -1256,7 +1277,8 @@ xcb_drawable_t window = xcb_generate_id(conn);
                        XCB_COPY_FROM_PARENT,            // depth
                        window,                          // window Id
                        screen->root,                    // parent window
-                       50, 50,                          // position on screen
+                       w_props.get_pw_pos_X(),          // X position on screen
+                       w_props.get_pw_pos_Y(),          // Y position on screen
                        w_props.get_window_width(),
                        w_props.get_window_height(),
                        w_props.get_border_width(),
@@ -1264,10 +1286,29 @@ xcb_drawable_t window = xcb_generate_id(conn);
                        screen->root_visual,             // visual
                        mask, values);                   // mask and values
 
+#if XCB_WINDOWS_WITH_UTF8_CAPTIONS
+
+// size (and position) hints for the window manager
+XSizeHints size_hints;
+   memset(&size_hints, 0, sizeof(XSizeHints));
+   size_hints.flags       = USPosition | PPosition;
+   size_hints.x           = w_props.get_pw_pos_X();
+   size_hints.base_width  = w_props.get_pw_pos_X();
+   size_hints.y           = w_props.get_pw_pos_Y();
+   size_hints.base_height = w_props.get_pw_pos_Y();
+Xutf8SetWMProperties(dpy, window,
+                     strdup(w_props.get_caption().c_str()),
+                     "icon", 0, 0, &size_hints, 0, 0);
+
+#else
+
      xcb_change_property(conn, XCB_PROP_MODE_REPLACE, window,
                        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                        w_props.get_caption().size(),
                        w_props.get_caption().c_str());
+
+#endif
+
    }
 
    // tell the window manager that we will handle WM_DELETE_WINDOW events...
@@ -1492,7 +1533,7 @@ Quad_PLOT::eval_B(Value_P B)
                  found = true;
                  break;
                }
-         sem_post(plot_threads_sema);
+        sem_post(plot_threads_sema);
         return Token(TOK_APL_VALUE1, IntScalar(found ? u.B0 : 0, LOC));
       }
 

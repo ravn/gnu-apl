@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -888,7 +888,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 #define perfo_2(id, b, name, thr) perfo_1(id, b, name, thr)
 #define perfo_1(id, ab, name, _thr)                     \
    { new (Z->next_ravel())   IntCell(PFS_ ## id ## ab); \
-     UCS_string ucs(#id);                               \
+     UCS_string ucs(#id #ab);                           \
      Value_P uZ(ucs, LOC);                              \
      new (Z->next_ravel())   PointerCell(uZ.get(), Z.getref()); }
 #include "Performance.def"
@@ -1666,31 +1666,31 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                  Value_P Z1(stat_name, LOC);
                  if (t <= 2)   // cell function statistics
                     {
-                       const Statistics_record * r1 = stat->get_first_record();
-                       const Statistics_record * rN = stat->get_record();
-                       Value_P Z(8, LOC);
-                       new (Z->next_ravel())   IntCell(t);
-                       new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
-                       new (Z->next_ravel())   IntCell(r1->get_count());
-                       new (Z->next_ravel())   IntCell(r1->get_sum());
-                       new (Z->next_ravel())   FloatCell(r1->get_sum2());
-                       new (Z->next_ravel())   IntCell(rN->get_count());
-                       new (Z->next_ravel())   IntCell(rN->get_sum());
-                       new (Z->next_ravel())   FloatCell(rN->get_sum2());
-                       Z->check_value(LOC);
-                       return Token(TOK_APL_VALUE1, Z);
+                      const Statistics_record * r1 = stat->get_first_record();
+                      const Statistics_record * rN = stat->get_record();
+                      Value_P Z(8, LOC);
+                      new (Z->next_ravel())   IntCell(t);
+                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
+                      new (Z->next_ravel())   IntCell(r1->get_count());
+                      new (Z->next_ravel())   IntCell(r1->get_sum());
+                      new (Z->next_ravel())   FloatCell(r1->get_sum2());
+                      new (Z->next_ravel())   IntCell(rN->get_count());
+                      new (Z->next_ravel())   IntCell(rN->get_sum());
+                      new (Z->next_ravel())   FloatCell(rN->get_sum2());
+                      Z->check_value(LOC);
+                      return Token(TOK_APL_VALUE1, Z);
                     }
                  else           // function statistics
                     {
-                       const Statistics_record * r = stat->get_record();
-                       Value_P Z(5, LOC);
-                       new (Z->next_ravel())   IntCell(t);
-                       new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
-                       new (Z->next_ravel())   IntCell(r->get_count());
-                       new (Z->next_ravel())   IntCell(r->get_sum());
-                       new (Z->next_ravel())   FloatCell(r->get_sum2());
-                       Z->check_value(LOC);
-                       return Token(TOK_APL_VALUE1, Z);
+                      const Statistics_record * r = stat->get_record();
+                      Value_P Z(5, LOC);
+                      new (Z->next_ravel())   IntCell(t);
+                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
+                      new (Z->next_ravel())   IntCell(r->get_count());
+                      new (Z->next_ravel())   IntCell(r->get_sum());
+                      new (Z->next_ravel())   FloatCell(r->get_sum2());
+                      Z->check_value(LOC);
+                      return Token(TOK_APL_VALUE1, Z);
                     }
               }
 
