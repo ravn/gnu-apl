@@ -1916,6 +1916,84 @@ Token B = pop().tok;    // pop B
 }
 //-----------------------------------------------------------------------------
 void
+Prefix::reduce_END_A_GOTO_B()
+{
+   Assert1(prefix_len == 4);
+
+const Value * B = at3().get_apl_val().get();   // the condition
+   if (B->element_count() != 1)
+      {
+        if (B->get_rank() > 1)   RANK_ERROR;
+        else                     LENGTH_ERROR;
+      }
+
+const APL_Integer condition = B->get_ravel(0).get_near_bool();
+   if (!condition)
+      {
+        pop_and_discard();   // B
+        pop_and_discard();   // →
+        pop_and_discard();   // A
+        pop_and_discard();   // END
+        action = RA_PUSH_NEXT;
+        return;
+      }
+
+const Value * A = at1().get_apl_val().get();   // the condition
+const APL_Integer line_no = A->get_ravel(0).get_near_int();
+APL_Integer real_line_no = line_no;
+
+   if (const UserFunction * ufun = si.get_executable()->get_ufun())
+      {
+        if (line_no >= ufun->get_text_size())
+           {
+             MORE_ERROR() << "A → B past end of function";
+             DOMAIN_ERROR;
+           }
+        if (line_no <= 0)
+           {
+             real_line_no = ufun->get_line(PC) + line_no;
+             if (real_line_no < 1)
+                {
+                  MORE_ERROR() << "A → B past start of function";
+                  DOMAIN_ERROR;
+                }
+           }
+      }
+   else
+      {
+        MORE_ERROR() << "A → B can only be called inside a defined function";
+        DOMAIN_ERROR;
+      }
+
+
+const Token_loc tl_END = pop();
+const Token_loc tl_A = pop();
+const Token_loc tl_GOTO = pop();
+   pop_and_discard();   // B
+
+   // maybe adjust label
+   //
+   if (line_no == real_line_no)   // don't adjust
+      {
+        push(tl_A);
+      }
+   else                           // do adjust
+      {
+        Value_P A1 = IntScalar(real_line_no, LOC);
+        Token tA1(TOK_APL_VALUE1, A1);
+        Token_loc tl_A1(tA1, tl_A.pc);
+        push(tl_A1);
+      }
+
+
+
+   push(tl_GOTO);
+   push(tl_END);
+
+   reduce_END_GOTO_B_();
+}
+//-----------------------------------------------------------------------------
+void
 Prefix::reduce_END_GOTO_B_()
 {
    Assert1(prefix_len == 3);
@@ -2166,6 +2244,16 @@ Token B = at1();
    pop_args_push_result(B);
 
    action = RA_RETURN;
+}
+//-----------------------------------------------------------------------------
+// Note: reduce_RETC_GOTO_B__ happens only for context ⍎,
+//       since contexts ◊ and ∇ use reduce_END_GOTO_B__ instead.
+//
+void
+Prefix::reduce_RETC_A_GOTO_B()
+{
+   Assert1(prefix_len == 4);
+   syntax_error(LOC);
 }
 //-----------------------------------------------------------------------------
 // Note: reduce_RETC_GOTO_B__ happens only for context ⍎,

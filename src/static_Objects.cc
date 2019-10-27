@@ -83,8 +83,8 @@ INFO(Quad_ES::fun, __LINE__)
 Quad_ES Quad_ES   ::_fun;
 Quad_ES * Quad_ES ::fun = &Quad_ES ::_fun;
 
-INFO(Parallel::all_CPUs, __LINE__)
-std::vector<CPU_Number>Parallel::all_CPUs;
+INFO(CPU_pool::the_CPUs, __LINE__);
+std::vector<CPU_Number> CPU_pool::the_CPUs;
 
 INFO(Macro::all_macros, __LINE__)
 #define mac_def(name, txt) Macro Macro::name(MAC_ ## name, txt);

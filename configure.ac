@@ -1,5 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
+#
+# vim: et:ts=4:sw=4
 
 AC_PREREQ([2.65])
 AC_INIT([GNU APL], [1.8], [bug-apl@gnu.org])
@@ -54,41 +56,44 @@ AC_MSG_RESULT([$CAN_rdynamic])
 # check for ncurses.h first and for curses.h if ncurses.h was not found
 
 AC_CHECK_HEADER(
-	[ncurses.h],
-	[AC_DEFINE_UNQUOTED(	[HAVE_NCURSES_H], [1],
-				[Define to 1 iff <ncurses.h> is present])],
-	[AC_CHECK_HEADER(
-	[curses.h],
-	[AC_DEFINE_UNQUOTED(	[HAVE_CURSES_H], [1],
-				[Define to 1 iff <curses.h> is present])])
-	])
+    [ncurses.h],
+    [AC_DEFINE_UNQUOTED( [HAVE_NCURSES_H], [1],
+                         [Define to 1 iff <ncurses.h> is present])],
+    [AC_CHECK_HEADER(
+        [curses.h],
+        [AC_DEFINE_UNQUOTED( [HAVE_CURSES_H], [1],
+                             [Define to 1 iff <curses.h> is present])])
+    ])
 
 AC_CHECK_HEADER(
-	[term.h],
-	[AC_DEFINE_UNQUOTED(	[HAVE_TERM_H], [1],
-				[Define to 1 iff <term.h> is present])],
-	[],
-	[	[ # if HAVE_NCURSES_H   ]
-		[ # include <ncurses.h> ]
-		[ # elif HAVE_CURSES_H  ]
-		[ # include <curses.h>  ]
-		[ # endif ]
-	])
+    [term.h],
+    [AC_DEFINE_UNQUOTED( [HAVE_TERM_H], [1],
+                         [Define to 1 iff <term.h> is present])],
+    [],
+    [ [ # if HAVE_NCURSES_H   ]
+      [ # include <ncurses.h> ]
+      [ # elif HAVE_CURSES_H  ]
+      [ # include <curses.h>  ]
+      [ # endif ]
+    ])
 
-AC_CHECK_HEADERS([	\
-	execinfo.h	\
-	fcntl.h		\
-	fftw3.h		\
-	inttypes.h	\
-	stdint.h	\
-	stdlib.h	\
-	string.h	\
-	strings.h	\
-	unistd.h	\
-	sys/un.h	\
-	ext/atomicity.h	\
-	xcb/xcb.h	\
-	utmpx.h])
+AC_CHECK_HEADERS([  \
+    execinfo.h      \
+    fcntl.h         \
+    fftw3.h         \
+    inttypes.h      \
+    stdint.h        \
+    stdlib.h        \
+    string.h        \
+    strings.h       \
+    unistd.h        \
+    sys/un.h        \
+    ext/atomicity.h \
+    xcb/xcb.h       \
+    X11/Xlib.h      \
+    X11/Xlib-xcb.h  \
+    X11/Xutil.h     \
+    utmpx.h])
 
 # xcb/xproto.h needs xcb/xcb.h
 AC_CHECK_HEADER(xcb/xproto.h, [], [], [#include <xcb/xcb.h>])
@@ -117,28 +122,29 @@ AC_CHECK_LIB([nsl],       [yp_all])   # for Solaris
 
 # check for libncurses first and for libcurses if libncurses was not found
 #
-AC_CHECK_LIB(
-	[ncurses], [setupterm],
-	[	AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
-				   [Define to 1 iff lib(n)curses is available])
-	 	LIBS="-lncurses $LIBS"],
-	[
-    AC_CHECK_LIB(
-	[curses], [setupterm],
-	[	AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
-				   [Define to 1 iff lib(n)curses is available])
-		LIBS="-lcurses $LIBS"])
-	])
+AC_CHECK_LIB([ncurses],
+             [setupterm],
+             [AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
+                                 [Define to 1 iff lib(n)curses is available])
+              LIBS="-lncurses $LIBS"
+             ],
+             [ # no ncurses...
+               AC_CHECK_LIB([curses],
+                            [setupterm],
+                            [ AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
+                                  [Define to 1 iff lib(n)curses is available])
+               LIBS="-lcurses $LIBS"])
+             ])
 
 AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
-AC_CHECK_LIB([execinfo], [backtrace])
-AC_CHECK_LIB([m],        [acosh])
-AC_CHECK_LIB([pthread],  [sem_init])
-AC_CHECK_LIB([dl],       [dlopen])
-AC_CHECK_LIB([fftw3],    [fftw_plan_dft])
-AC_CHECK_LIB([xcb],      [xcb_connect])
-AC_CHECK_LIB([X11-xcb],  [XGetXCBConnection])
-AC_CHECK_LIB([X11],      [XOpenDisplay])
+AC_CHECK_LIB([execinfo],  [backtrace])
+AC_CHECK_LIB([m],         [acosh])
+AC_CHECK_LIB([pthread],   [sem_init])
+AC_CHECK_LIB([dl],        [dlopen])
+AC_CHECK_LIB([fftw3],     [fftw_plan_dft])
+AC_CHECK_LIB([xcb],       [xcb_connect])
+AC_CHECK_LIB([X11],       [XOpenDisplay])
+AC_CHECK_LIB([X11-xcb],   [XGetXCBConnection])
 
 # check if SQLite3 is wanted and installed
 m4_include([m4/ax_lib_sqlite3.m4])            AX_LIB_SQLITE3([])
@@ -157,14 +163,13 @@ fi
 
 # check if PostgreSQL is usable (if present)
 if test "x$found_postgresql" = "xyes" ; then
-	AC_MSG_CHECKING([for PostgreSQL usability])
-	saved_CPPFLAGS="$CPPFLAGS"
-	CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
-	AC_COMPILE_IFELSE(
-		[AC_LANG_PROGRAM([[@%:@include <libpq-fe.h>]],
-		[[PGconn *db = PQconnectdbParams( 0, 0, 1 );]])],
-		[USABLE_PostgreSQL=yes],
-		[USABLE_PostgreSQL=no])
+    AC_MSG_CHECKING([for PostgreSQL usability])
+    saved_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[@%:@include <libpq-fe.h>]],
+                      [[PGconn *db = PQconnectdbParams( 0, 0, 1 );]])],
+                      [USABLE_PostgreSQL=yes],
+                      [USABLE_PostgreSQL=no])
 
 CPPFLAGS="$saved_CPPFLAGS"
 AC_MSG_RESULT([$USABLE_PostgreSQL])
@@ -216,7 +221,8 @@ fi
 
 ################################# rdtsc check #################################
 # check if rdtsc (read CPU cycle counter is available.
-# This is expected only on Intel CPUs
+# This is expected to succeed only on Intel CPUs
+#
 AC_MSG_CHECKING([whether CPU has rdtsc (read CPU cycle counter) opcode])
 AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM([[]],

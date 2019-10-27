@@ -178,6 +178,15 @@
 /* Define to 1 if you have the <utmpx.h> header file. */
 #define HAVE_UTMPX_H 1
 
+/* Define to 1 if you have the <X11/Xlib.h> header file. */
+#define HAVE_X11_XLIB_H 1
+
+/* Define to 1 if you have the <X11/Xlib-xcb.h> header file. */
+#define HAVE_X11_XLIB_XCB_H 1
+
+/* Define to 1 if you have the <X11/Xutil.h> header file. */
+#define HAVE_X11_XUTIL_H 1
+
 /* Define to 1 if you have the <xcb/xcb.h> header file. */
 #define HAVE_XCB_XCB_H 1
 

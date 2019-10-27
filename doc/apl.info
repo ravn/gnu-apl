@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-September 15, 2019
+October 27, 2019
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -4792,56 +4792,56 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11474
-Node: Chapter 219324
-Node: Chapter 323748
-Node: Section 3.125273
-Node: Section 3.241285
-Node: Section 3.342044
-Node: Section 3.443331
-Node: Section 3.545952
-Node: Section 3.646125
-Node: Section 3.746738
-Node: Section 3.850682
-Node: Section 3.952224
-Node: Section 3.1052821
-Node: Section 3.1154605
-Node: Section 3.1256545
-Node: Section 3.1357486
-Node: Section 3.1457738
-Node: Section 3.1559134
-Node: Section 3.1661646
-Node: Section 3.1768345
-Node: Section 3.1873379
-Node: Section 3.1976660
-Node: Section 3.2076951
-Node: Section 3.2186863
-Node: Section 3.2287135
-Node: Section 3.2393713
-Node: Section 3.2496164
-Node: Section 3.2596833
-Node: Section 3.26103469
-Node: Section 3.27104409
-Node: Section 3.28117971
-Node: Section 3.29121075
-Node: Section 3.30123064
-Node: Chapter 4127442
-Node: Chapter 5129190
-Node: Chapter 6130319
-Node: Section 6.1131856
-Node: Section 6.2133101
-Node: Section 6.3133461
-Node: Section 6.4133703
-Node: Section 6.5134365
-Node: Section 6.6134843
-Node: Section 6.7135615
-Node: Section 6.8136072
-Node: Chapter 7136474
-Node: Section 7.1136893
-Node: Section 7.2137580
-Node: Chapter 8138411
-Node: Section 8.1138914
-Node: Section 8.2164224
+Node: Chapter 11472
+Node: Chapter 219322
+Node: Chapter 323746
+Node: Section 3.125271
+Node: Section 3.241283
+Node: Section 3.342042
+Node: Section 3.443329
+Node: Section 3.545950
+Node: Section 3.646123
+Node: Section 3.746736
+Node: Section 3.850680
+Node: Section 3.952222
+Node: Section 3.1052819
+Node: Section 3.1154603
+Node: Section 3.1256543
+Node: Section 3.1357484
+Node: Section 3.1457736
+Node: Section 3.1559132
+Node: Section 3.1661644
+Node: Section 3.1768343
+Node: Section 3.1873377
+Node: Section 3.1976658
+Node: Section 3.2076949
+Node: Section 3.2186861
+Node: Section 3.2287133
+Node: Section 3.2393711
+Node: Section 3.2496162
+Node: Section 3.2596831
+Node: Section 3.26103467
+Node: Section 3.27104407
+Node: Section 3.28117969
+Node: Section 3.29121073
+Node: Section 3.30123062
+Node: Chapter 4127440
+Node: Chapter 5129188
+Node: Chapter 6130317
+Node: Section 6.1131854
+Node: Section 6.2133099
+Node: Section 6.3133459
+Node: Section 6.4133701
+Node: Section 6.5134363
+Node: Section 6.6134841
+Node: Section 6.7135613
+Node: Section 6.8136070
+Node: Chapter 7136472
+Node: Section 7.1136891
+Node: Section 7.2137578
+Node: Chapter 8138409
+Node: Section 8.1138912
+Node: Section 8.2164222
 
 End Tag Table
 

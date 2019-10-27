@@ -91,6 +91,10 @@ public:
    static bool is_control(Unicode av)
       { return av >= 0 && av < ' '; }
 
+   /// return \b true iff \b av is a comment char (⍝ or #)
+   static bool is_comment(Unicode av)
+      { return av == UNI_ASCII_NUMBER_SIGN || av == UNI_COMMENT; }
+
    /// Return \b true iff \b av is a valid char in a user defined symbol
    static bool is_first_symbol_char(Unicode uni);
 

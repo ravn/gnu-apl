@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -799,13 +799,13 @@ public:
    static Bif_F12_MINUS  _fun;       ///< Built-in function.
 
 protected:
+   /// overloaded Function::eval_AB()
+   virtual Token eval_AB(Value_P A, Value_P B)
+      { return eval_scalar_AB(A, B, &Cell::bif_subtract); }
+
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B)
       { return eval_scalar_B(B, &Cell::bif_negative); }
-
-   /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B)
-      { return eval_scalar_AB(A, B, &Cell::bif_subtract); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const

@@ -2004,6 +2004,7 @@ Value_P
 Idx0(const char * loc)
 {
 Value_P Z(ShapeItem(0), loc);
+   // default proto is 0, so no need to set it here
    Z->check_value(LOC);
    return Z;
 }

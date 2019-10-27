@@ -63,13 +63,15 @@
    phrase 57:  SYM  )    ←    VAL       4
    phrase 58:  END  VOID                2
    phrase 59:  END  VAL                 2
-   phrase 60:  END  →    VAL            3
-   phrase 61:  END  →                   2
-   phrase 62:  RET                      1
-   phrase 63:  RET  VOID                2
-   phrase 64:  RET  VAL                 2
-   phrase 65:  RET  →                   2
-   phrase 66:  RET  →    VAL            3
+   phrase 60:  END  →                   2
+   phrase 61:  END  →    VAL            3
+   phrase 62:  END  VAL  →    VAL       4
+   phrase 63:  RET                      1
+   phrase 64:  RET  VOID                2
+   phrase 65:  RET  VAL                 2
+   phrase 66:  RET  →                   2
+   phrase 67:  RET  →    VAL            3
+   phrase 68:  RET  VAL  →    VAL       4
    ---------------------------------------------
 
    *** phrase table ***/
@@ -115,15 +117,17 @@
    void reduce_V_RPAR_ASS_B();       ///< reduce phrase V RPAR ASS B
    void reduce_END_VOID__();         ///< reduce phrase END VOID
    void reduce_END_B__();            ///< reduce phrase END B
-   void reduce_END_GOTO_B_();        ///< reduce phrase END GOTO B
    void reduce_END_GOTO__();         ///< reduce phrase END GOTO
+   void reduce_END_GOTO_B_();        ///< reduce phrase END GOTO B
+   void reduce_END_A_GOTO_B();       ///< reduce phrase END A GOTO B
    void reduce_RETC___();            ///< reduce phrase RETC
    void reduce_RETC_VOID__();        ///< reduce phrase RETC VOID
    void reduce_RETC_B__();           ///< reduce phrase RETC B
    void reduce_RETC_GOTO__();        ///< reduce phrase RETC GOTO
    void reduce_RETC_GOTO_B_();       ///< reduce phrase RETC GOTO B
+   void reduce_RETC_A_GOTO_B();      ///< reduce phrase RETC A GOTO B
 
-   enum { PHRASE_COUNT   = 67,      ///< number of phrases
+   enum { PHRASE_COUNT   = 69,      ///< number of phrases
           PHRASE_MODU    = 439,     ///< hash table size
           MAX_PHRASE_LEN = 4 };     ///< max. number of token in a phrase
 
@@ -326,7 +330,7 @@ const Prefix::Phrase Prefix::hash_table[PHRASE_MODU] =
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )
-  PH(                , 0x00000,    0,   0,  0, ___          )
+  PH( END A GOTO B   , 0x789E5,    4,   0,  4, END_A_GOTO_B )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )
@@ -334,7 +338,7 @@ const Prefix::Phrase Prefix::hash_table[PHRASE_MODU] =
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH( LBRA B I       , 0x041E3,    3,   0,  3, LBRA_B_I_    )
-  PH(                , 0x00000,    0,   0,  0, ___          )
+  PH( RETC A GOTO B  , 0x789ED,    4,   0,  4, RETC_A_GOTO_B )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH( V ASS D        , 0x0282E,   73,   0,  3, V_ASS_F_     )

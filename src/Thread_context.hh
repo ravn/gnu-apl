@@ -69,6 +69,9 @@ public:
    /// constructor
    Thread_context();
 
+   /// destructor
+   ~Thread_context();
+
    /// return the number of the core executing \b this context
    CoreNumber get_N() const
        { return N; }
@@ -152,8 +155,7 @@ public:
       { return active_core_count; }
 
    /// set the number of currently used cores
-   static void set_active_core_count(CoreCount new_count)
-      { active_core_count = new_count; }
+   static void set_active_core_count(CoreCount new_count);
 
 protected:
    /// thread number (0 = interpreter, 1... worker threads
@@ -191,8 +193,7 @@ public:
    Parallel_job_list<PJob_scalar_AB, false> joblist_AB;
 
    /// remove all thread contexts (when the APL interpreter exits)
-   static void cleanup()
-      { delete [] thread_contexts;   thread_contexts = 0; }
+   static void cleanup();
 
 protected:
    /// all thread contexts

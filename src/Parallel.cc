@@ -39,10 +39,17 @@ bool Parallel::run_parallel = false;
 bool Parallel::run_parallel = true;
 #endif
 
+bool Parallel::init_done = false;
+
 //=============================================================================
 void
 Parallel::init(bool logit)
 {
+   // supposedly called only once...
+   //
+   Assert(!init_done);
+   init_done = true;
+
 #if PARALLEL_ENABLED
 
    // init global semaphores
@@ -52,16 +59,16 @@ Parallel::init(bool logit)
 
    // compute number of cores available and set total_CPU_count accordingly
    //
-   init_all_CPUs(logit);
+   CPU_pool::init(logit);
 
    // initialize thread contexts
    //
-   Thread_context::init_parallel(get_max_core_count(), logit);
+   Thread_context::init_parallel(CPU_pool::get_count(), logit);
 
    // create threads...
    //
    Thread_context::get_context(CNUM_MASTER)->thread = pthread_self();
-   for (int w = CNUM_WORKER1; w < get_max_core_count(); ++w)
+   for (int w = CNUM_WORKER1; w < CPU_pool::get_count(); ++w)
        {
          Thread_context * tctx = Thread_context::get_context(CoreNumber(w));
          const int result = pthread_create(&(tctx->thread), /* attr */ 0,
@@ -80,24 +87,26 @@ Parallel::init(bool logit)
 
    // bind threads to cores
    //
-   loop(c, get_max_core_count())
-       Thread_context::get_context(CoreNumber(c))
-                       ->bind_to_cpu(all_CPUs[c], logit);
+   loop(c, CPU_pool::get_count())
+       {
+         const CPU_Number cpu = CPU_pool::get_CPU(c);
+         Thread_context::get_context(CoreNumber(c))->bind_to_cpu(cpu, logit);
+       }
 
    if (logit)   Thread_context::print_all(CERR);
 
    // the threads above start in state locked. Wake them up...
    //
 #if CORE_COUNT_WANTED == -3
-   set_core_count(CCNT_1, logit);
+   CPU_pool::change_core_count(CCNT_1, logit);
 #else
-   set_core_count(get_max_core_count(), logit);
+   CPU_pool::change_core_count(CPU_pool::get_count(), logit);
 #endif
 
 #else // not PARALLEL_ENABLED
 
    Thread_context::init_sequential(logit);
-   all_CPUs.push_back(CPU_0);
+   CPU_pool::add_CPU(CPU_0);
 
 #endif // PARALLEL_ENABLED
 }
@@ -109,33 +118,35 @@ sem_t * Parallel::pthread_create_sema = &__pthread_create_sema;
 
 //=============================================================================
 bool
-Parallel::set_core_count(CoreCount new_count, bool logit)
+CPU_pool::change_core_count(CoreCount new_count, bool logit)
 {
-   // this function is called from ⎕SYL[26]←
+   // this function is called from ⎕SYL[26]←new_countm but also from
+   // other places. It returns true on error.
    //
-   if (new_count < CCNT_0)                 return true;   // error
-   if (new_count > get_max_core_count())   return true;   // error
+   Log(LOG_Parallel || logit)
+      get_CERR() << "change_core_count(" << new_count << ")" << endl;
 
-   run_parallel = new_count != CCNT_0;
+   if (new_count < CCNT_0)                  return true;   // error
+   if (new_count > CPU_pool::get_count())   return true;   // error
+
+   Parallel::run_parallel = new_count != CCNT_0;
    if (new_count == CCNT_0)   new_count = CCNT_1;
 
-   if (new_count == Thread_context::get_active_core_count())
+const CoreCount current_count = Thread_context::get_active_core_count();
+   if (new_count == current_count)
       {
         Log(LOG_Parallel || logit)
            {
              CERR <<
-                "Parallel::set_core_count(): keeping current core count of "
+                "Parallel::change_core_count(): keeping current core count of "
                   << Thread_context::get_active_core_count() << endl;
              Thread_context::print_all(CERR);
            }
-
-         return false;
       }
-
-   if (new_count > Thread_context::get_active_core_count())
+   else if (new_count > current_count)
       {
         Log(LOG_Parallel || logit)
-           CERR << "Parallel::set_core_count(): increasing core count from "
+           CERR << "Parallel::change_core_count(): increasing core count from "
                 << Thread_context::get_active_core_count()
                 << " to " << new_count << endl;
 
@@ -148,10 +159,10 @@ Parallel::set_core_count(CoreCount new_count, bool logit)
 
         Log(LOG_Parallel || logit)   Thread_context::print_all(CERR);
       }
-   else
+   else   // new_count < current_count
       {
         Log(LOG_Parallel || logit)
-           CERR << "Parallel::set_core_count(): decreasing core count from "
+           CERR << "Parallel::change_core_count(): decreasing core count from "
                 << Thread_context::get_active_core_count()
                 << " to " << new_count << endl;
         lock_pool(logit);
@@ -165,44 +176,65 @@ Parallel::set_core_count(CoreCount new_count, bool logit)
 }
 //-----------------------------------------------------------------------------
 void
-Parallel::init_all_CPUs(bool logit)
+CPU_pool::init(bool logit)
 {
    // determine the max number of cores. We first handle the ./configure cases
    // that can live without pthread_getaffinity_np() and friends
    //
-int count = CORE_COUNT_WANTED;
+CoreCount count = CoreCount(CORE_COUNT_WANTED);
 
-#if CORE_COUNT_WANTED == 0
+#if CORE_COUNT_WANTED >= 1      // static parallel
 
-   run_parallel = false;
-   all_CPUs.push_back(CPU_0);
+   Parallel::run_parallel = true;
+   loop(c, CORE_COUNT_WANTED)   CPU_pool::add_CPU(CPU_Number(c));
    return;
 
-#elif CORE_COUNT_WANTED == 1
+#elif CORE_COUNT_WANTED == 0    // sequential
 
-   run_parallel = true;
-   all_CPUs.push_back(CPU_0);
+   Parallel::run_parallel = false;
+   CPU_pool::add_CPU(CPU_0);
    return;
+
+#elif CORE_COUNT_WANTED == -1   // handled below
+# if ! HAVE_AFFINITY_NP
+#  error "CORE_COUNT_WANTED == -1 cannot be used on platforms without pthread_getaffinity_np"
+# endif
 
 #elif CORE_COUNT_WANTED == -2   // --cc N
 
-#elif ! HAVE_AFFINITY_NP
+   Parallel::run_parallel = uprefs.requested_cc > 0;
+   loop(c, uprefs.requested_cc)   add_CPU(CPU_Number(c));
+   return;
 
-   if (uprefs.requested_cc < 1)   // serial or 1 core
-      {
-        run_parallel = uprefs.requested_cc > 0;
-        all_CPUs.push_back(CPU_0);
-        return;
-      }
-   else
-      {
-        count = uprefs.requested_cc;
-      }
+#elif CORE_COUNT_WANTED == -3   // handled below
+# if ! HAVE_AFFINITY_NP
+#  error "CORE_COUNT_WANTED == -3 cannot be used on platforms without pthread_getaffinity_np"
+# endif
+
+#else
+
+# error "Bad CORE_COUNT_WANTED value in ./configure"
+
 #endif
 
-   // at this point count is -1, -3, or > 1. Figure how many cores we have.
+   // at this point CORE_COUNT_WANTED is -1 (all cores) or -3 (⎕SYL)
+   // Figure how many cores we have.
    //
-#if HAVE_AFFINITY_NP
+#if ! HAVE_AFFINITY_NP
+
+   Log(LOG_Parallel || logit)
+      {
+        CERR <<
+        "The number of cores could not be detected because function\n"
+        "pthread_getaffinity_np() is not provided by your platform.\n"
+        "Assuming a maximum of 64 cores." << endl;
+      }
+
+   Parallel::run_parallel = true;
+   loop(c, 64)   add_CPU(CPU_Number(c));
+   return;
+
+#endif
 
 cpu_set_t CPUs;
    CPU_ZERO(&CPUs);
@@ -212,64 +244,61 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
       {
         CERR << "pthread_getaffinity_np() failed with error "
              << err << endl;
-        all_CPUs.push_back(CPU_0);
+        add_CPU(CPU_0);
         return;
       }
 
    {
-     const size_t CPU_count = CPU_COUNT(&CPUs);
-     loop(c, 8*sizeof(cpu_set_t))
+     const CoreCount CPU_count = CoreCount(CPU_COUNT(&CPUs));
+     // start with even CPUs followed by odd CPUs. This is to avoid that
+     // a secondart CPU thread is used before all primary threads have been
+     // exhausted.
+     //
+     for (size_t c = 0; c < 8*sizeof(cpu_set_t); c += 2)   //even
          {
            if (CPU_ISSET(c, &CPUs))
               {
-                all_CPUs.push_back(CPU_Number(c));
-                if (all_CPUs.size() == CPU_count)   break;   // all CPUs found
+                add_CPU(CPU_Number(c));
+                if (get_count() == CPU_count)   break;   // all CPUs found
+              }
+         }
+
+     for (size_t c = 1; c < 8*sizeof(cpu_set_t); c += 2)   //odd
+         {
+           if (CPU_ISSET(c, &CPUs))
+              {
+                add_CPU(CPU_Number(c));
+                if (get_count() == CPU_count)   break;   // all CPUs found
               }
          }
    }
 
-   if (all_CPUs.size() == 0)
+   if (get_count() == 0)
       {
         CERR << "*** no cores detected, assuming at least one! "
              << err << endl;
-        all_CPUs.push_back(CPU_0);
+        add_CPU(CPU_0);
         return;
       }
 
    // at this point we know the max. number of CPUs and can map cases
    // -1 and -3 to the max. number of CPUs.
    //
-   if (count < 0)   count = all_CPUs.size();
+   if (count < 0)   count = get_count();
 
    // if there are more CPUs than requested then limit all_CPUs accordingly
-   if (all_CPUs.size() > size_t(count))   all_CPUs.resize(count);
+   if (get_count() > count)   resize(count);
 
    Log(LOG_Parallel || logit)
       {
-        CERR << "detected " << all_CPUs.size() << " cores:";
-        loop(cc, all_CPUs.size())   CERR << " #" << all_CPUs[cc];
+        CERR << "detected " << get_count() << " cores:";
+        loop(cc, get_count())   CERR << " #" << get_CPU(cc);
         CERR << endl;
       }
-
-#else   // ! HAVE_AFFINITY_NP
-
-   if (count < 0)   count = 64;
-
-   loop(c, CORE_COUNT_WANTED)   all_CPUs.push_back(CPU_Number(c));
-
-   Log(LOG_Parallel || logit)
-      {
-        CERR <<
-"The precise number of cores could not be detected because function\n"
-"pthread_getaffinity_np() is not provided by your platform. Assuming a\n"
-" maximum of " << all_CPUs.size() << " cores." << endl;
-      }
-
-#endif // HAVE_AFFINITY_NP
 }
 //-----------------------------------------------------------------------------
 void
-Parallel::lock_pool(bool logit)
+CPU_pool::lock_pool(bool logit)
 {
    if (Thread_context::get_active_core_count() <= 1)   return;
 
@@ -285,7 +314,7 @@ Parallel::lock_pool(bool logit)
 }
 //-----------------------------------------------------------------------------
 void
-Parallel::unlock_pool(bool logit)
+CPU_pool::unlock_pool(bool logit)
 {
    if (Thread_context::get_active_core_count() <= 1)   return;
 

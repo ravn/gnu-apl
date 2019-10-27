@@ -899,6 +899,8 @@ Value_P X1 = IDX.extract_value(1);
 void
 Quad_SYL::assign_indexed(Value_P X, Value_P B)
 {
+   // try to assign ⎕SYL[X;2]
+   //
    if (!(X->is_int_scalar() || X->is_int_vector()))   INDEX_ERROR;
    if (!(B->is_int_scalar() || B->is_int_vector()))   DOMAIN_ERROR;
    if (X->element_count() != B->element_count())      LENGTH_ERROR;
@@ -934,7 +936,7 @@ const APL_Integer qio = Workspace::get_IO();
         else if (x == SYL_CURRENT_CORES)   // number of cores
            {
 #if PARALLEL_ENABLED
-             if (Parallel::set_core_count(CoreCount(b), false))
+             if (CPU_pool::change_core_count(CoreCount(b), false))
                 {
                   MORE_ERROR() << "Bad core count " << b
                                << " in ⎕SYL[" << x << "] ";

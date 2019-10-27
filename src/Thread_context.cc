@@ -41,9 +41,16 @@ Thread_context::Thread_context()
    : N(CNUM_INVALID),
      thread(0),
      job_number(0),
-     job_name("no-name"),
+     job_name("no-job-name"),
      blocked(false)
 {
+}
+//-----------------------------------------------------------------------------
+Thread_context::~Thread_context()
+{
+   // CERR << "\n*** DELETING Thread_context #" << N << endl;
+   if (thread)   pthread_kill(thread, SIGKILL);
+   thread = 0;
 }
 //-----------------------------------------------------------------------------
 void
@@ -55,37 +62,39 @@ Thread_context::init_sequential(bool logit)
 }
 //-----------------------------------------------------------------------------
 void
+Thread_context::cleanup()
+{
+   // CERR << "Thread_context::cleanup()" << endl;
+   thread_contexts_count = CCNT_0;
+
+//  delete [] thread_contexts;
+   thread_contexts = 0;
+}
+//-----------------------------------------------------------------------------
+void
 Thread_context::print_all(ostream & out)
 {
-   PRINT_LOCKED(
-      out << "thread_contexts_count: " << thread_contexts_count << endl
-          << "busy_worker_count:     " << busy_worker_count     << endl
-          << "active_core_count:     " << active_core_count     << endl;
+   if (thread_contexts_count)
+      {
+        PRINT_LOCKED(
+           out << "thread_contexts_count: " << thread_contexts_count << endl
+               << "busy_worker_count:     " << busy_worker_count     << endl
+               << "active_core_count:     " << active_core_count     << endl;
 
-      loop(e, thread_contexts_count)   thread_contexts[e].print(out);
-      out << endl)
+           loop(e, thread_contexts_count)   thread_contexts[e].print(out);
+           out << endl)
+      }
 }
 //-----------------------------------------------------------------------------
 void
 Thread_context::print(ostream & out) const
 {
-const void * vthis = reinterpret_cast<const void *>(this);
-Q(vthis)
+const void * vpth = reinterpret_cast<const void *>(thread);
 
-   if (vthis)
-      {
-        const void * vpth = reinterpret_cast<const void *>(thread);
-
-        out << "thread #"     << setw(2) << N << ":" << setw(16) << vpth
-            << (blocked ? " BLKD" : " RUN ")
-            << " job:"        << setw(4) << int(job_number)
-            << " " << job_name << endl;
-      }
-   else
-      {
-         CERR << "*** Thread_context::print() called with this == 0" << endl;
-         BACKTRACE;
-      }
+   out << "thread #"     << setw(2) << N << ":" << setw(16) << vpth
+       << (blocked ? " BLKD" : " RUN ")
+       << " job:"        << setw(5) << int(job_number)
+       << " " << job_name << endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -125,6 +134,15 @@ Thread_context::PF_lock_unlock_pool(Thread_context & tctx)
       }
 }
 
+//-----------------------------------------------------------------------------
+void Thread_context::set_active_core_count(CoreCount new_count)
+{
+   Log(LOG_Parallel)
+      get_CERR() << "Thread_context::set_active_core_count("
+                 << new_count << ")" << endl;
+
+   active_core_count = new_count;
+}
 //-----------------------------------------------------------------------------
 // functions and variables  that are only needed #if PARALLEL_ENABLED...
 
@@ -174,8 +192,8 @@ cpu_set_t cpus;
         // there is only one core in total (which is the master).
         // restore its affinity to all cores.
         //
-        loop(a, Parallel::get_max_core_count())
-            CPU_SET(Parallel::get_CPU(a), &cpus);
+        loop(a, CPU_pool::get_count())
+            CPU_SET(CPU_pool::get_CPU(a), &cpus);
       }
    else
       {

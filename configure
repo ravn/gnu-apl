@@ -16913,11 +16913,11 @@ fi
 
 
 
-ac_fn_cxx_check_header_compile "$LINENO" "term.h" "ac_cv_header_term_h" "	 # if HAVE_NCURSES_H
-		 # include <ncurses.h>
-		 # elif HAVE_CURSES_H
-		 # include <curses.h>
-		 # endif
+ac_fn_cxx_check_header_compile "$LINENO" "term.h" "ac_cv_header_term_h" "  # if HAVE_NCURSES_H
+       # include <ncurses.h>
+       # elif HAVE_CURSES_H
+       # include <curses.h>
+       # endif
 
 "
 if test "x$ac_cv_header_term_h" = xyes; then :
@@ -16930,20 +16930,23 @@ fi
 
 
 
-for ac_header in 	\
-	execinfo.h	\
-	fcntl.h		\
-	fftw3.h		\
-	inttypes.h	\
-	stdint.h	\
-	stdlib.h	\
-	string.h	\
-	strings.h	\
-	unistd.h	\
-	sys/un.h	\
-	ext/atomicity.h	\
-	xcb/xcb.h	\
-	utmpx.h
+for ac_header in   \
+    execinfo.h      \
+    fcntl.h         \
+    fftw3.h         \
+    inttypes.h      \
+    stdint.h        \
+    stdlib.h        \
+    string.h        \
+    strings.h       \
+    unistd.h        \
+    sys/un.h        \
+    ext/atomicity.h \
+    xcb/xcb.h       \
+    X11/Xlib.h      \
+    X11/Xlib-xcb.h  \
+    X11/Xutil.h     \
+    utmpx.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -17577,10 +17580,11 @@ cat >>confdefs.h <<_ACEOF
 #define HAVE_LIBCURSES 1
 _ACEOF
 
-	 	LIBS="-lncurses $LIBS"
-else
+              LIBS="-lncurses $LIBS"
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for setupterm in -lcurses" >&5
+else
+   # no ncurses...
+               { $as_echo "$as_me:${as_lineno-$LINENO}: checking for setupterm in -lcurses" >&5
 $as_echo_n "checking for setupterm in -lcurses... " >&6; }
 if ${ac_cv_lib_curses_setupterm+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -17622,7 +17626,7 @@ cat >>confdefs.h <<_ACEOF
 #define HAVE_LIBCURSES 1
 _ACEOF
 
-		LIBS="-lcurses $LIBS"
+               LIBS="-lcurses $LIBS"
 fi
 
 
@@ -17944,51 +17948,6 @@ _ACEOF
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
-$as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
-if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lX11-xcb  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char XGetXCBConnection ();
-int
-main ()
-{
-return XGetXCBConnection ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_X11_xcb_XGetXCBConnection=yes
-else
-  ac_cv_lib_X11_xcb_XGetXCBConnection=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_xcb_XGetXCBConnection" >&5
-$as_echo "$ac_cv_lib_X11_xcb_XGetXCBConnection" >&6; }
-if test "x$ac_cv_lib_X11_xcb_XGetXCBConnection" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBX11_XCB 1
-_ACEOF
-
-  LIBS="-lX11-xcb $LIBS"
-
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
 $as_echo_n "checking for XOpenDisplay in -lX11... " >&6; }
 if ${ac_cv_lib_X11_XOpenDisplay+:} false; then :
@@ -18031,6 +17990,51 @@ if test "x$ac_cv_lib_X11_XOpenDisplay" = xyes; then :
 _ACEOF
 
   LIBS="-lX11 $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
+$as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
+if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lX11-xcb  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XGetXCBConnection ();
+int
+main ()
+{
+return XGetXCBConnection ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_X11_xcb_XGetXCBConnection=yes
+else
+  ac_cv_lib_X11_xcb_XGetXCBConnection=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_xcb_XGetXCBConnection" >&5
+$as_echo "$ac_cv_lib_X11_xcb_XGetXCBConnection" >&6; }
+if test "x$ac_cv_lib_X11_xcb_XGetXCBConnection" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBX11_XCB 1
+_ACEOF
+
+  LIBS="-lX11-xcb $LIBS"
 
 fi
 
@@ -18436,11 +18440,11 @@ fi
 
 # check if PostgreSQL is usable (if present)
 if test "x$found_postgresql" = "xyes" ; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PostgreSQL usability" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for PostgreSQL usability" >&5
 $as_echo_n "checking for PostgreSQL usability... " >&6; }
-	saved_CPPFLAGS="$CPPFLAGS"
-	CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+    saved_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <libpq-fe.h>
 int
@@ -18985,7 +18989,8 @@ fi
 
 ################################# rdtsc check #################################
 # check if rdtsc (read CPU cycle counter is available.
-# This is expected only on Intel CPUs
+# This is expected to succeed only on Intel CPUs
+#
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether CPU has rdtsc (read CPU cycle counter) opcode" >&5
 $as_echo_n "checking whether CPU has rdtsc (read CPU cycle counter) opcode... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext

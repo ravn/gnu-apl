@@ -77,7 +77,7 @@ static struct sigaction new_SEGV_action;
 static void
 signal_SEGV_handler(int)
 {
-   CERR << "\n\n====================================================\n"
+   CERR << "\n\n===================================================\n"
            "SEGMENTATION FAULT" << endl;
 
 #if PARALLEL_ENABLED

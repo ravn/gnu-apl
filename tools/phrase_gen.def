@@ -102,8 +102,9 @@ phrase(BS_VAL_VAL + 2,   V    , RPAR , ASS  , B    , ""    )
 // end of statement
 phrase(BS_ANY + 2,       END  , VOID ,      ,      , ""    )
 phrase(BS_ANY + 2,       END  , B    ,      ,      , ""    )
-phrase(BS_ANY + 3,       END  , GOTO , B    ,      , ""    )
 phrase(BS_ANY + 2,       END  , GOTO ,      ,      , ""    )
+phrase(BS_ANY + 3,       END  , GOTO , B    ,      , ""    )
+phrase(BS_ANY + 4,       END  , A    , GOTO , B    , ""    )
 
 // end of user defined function, ⍎, or ◊ context
 phrase(BS_ANY + 1,       RETC ,      ,      ,      , ""    )
@@ -111,6 +112,7 @@ phrase(BS_ANY + 2,       RETC , VOID ,      ,      , ""    )
 phrase(BS_ANY + 2,       RETC , B    ,      ,      , ""    )
 phrase(BS_ANY + 2,       RETC , GOTO ,      ,      , ""    )
 phrase(BS_ANY + 3,       RETC , GOTO , B    ,      , ""    )
+phrase(BS_ANY + 4,       RETC , A    , GOTO , B    , ""    )
 
 #undef phrase
 

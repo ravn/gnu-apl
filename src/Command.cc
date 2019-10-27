@@ -104,7 +104,7 @@ void
 Command::process_line(UCS_string & line)
 {
    line.remove_leading_whitespaces();
-   if (line.size() == 0)   return;   // empty input line
+   if (line.size() == 0)           return;   // empty input line
 
    switch(line[0])
       {
@@ -126,7 +126,7 @@ Command::process_line(UCS_string & line)
          case UNI_COMMENT:             // e.g. ⍝ comment
               return;
 
-        default: ;
+        default: break;
       }
 
    ++APL_expression_count;

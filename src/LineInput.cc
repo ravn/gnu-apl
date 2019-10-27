@@ -736,7 +736,7 @@ const APL_time_us from = now();
    if (start_input)   (*start_input)();
 
 #if PARALLEL_ENABLED
-   Parallel::lock_pool(false);
+   CPU_pool::lock_pool(false);
 #endif
 
    for (int control_D_count = 0;;)
@@ -787,7 +787,7 @@ const APL_time_us from = now();
             }
       }
 #if PARALLEL_ENABLED
-   Parallel::unlock_pool(false);
+   CPU_pool::unlock_pool(false);
 #endif
 
    Log(LOG_get_line)   CERR << " '" << line << "'" << endl;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -169,8 +169,6 @@ inline void atomic_add(volatile _Atomic_word & counter, int increment)
 
 #include "Cell.hh"
 
-class Value;
-
 using namespace std;
 
 //=============================================================================
@@ -208,7 +206,50 @@ using namespace std;
 
  **/
 //=============================================================================
-/// a class coordinating the different cores working in prallel
+/**
+  The set of CPUs (= hyper-threads) over which the computational load is
+  being distrinuted.
+ **/
+class CPU_pool
+{
+public:
+   /// constructor
+   CPU_pool();
+
+   static void init(bool logit);
+
+   static void add_CPU(CPU_Number cpu)
+      { the_CPUs.push_back(cpu); }
+
+   /// get the idx;th CPU
+   static CPU_Number get_CPU(size_t idx)
+      { return the_CPUs[idx]; }
+
+   /// get the number of (active) CPUs
+   static CoreCount get_count()
+      { return CoreCount(the_CPUs.size()); }
+
+   static void resize(CoreCount new_size)
+      { the_CPUs.resize(new_size); }
+
+   /// set new active core count, return true on error
+   static bool change_core_count(CoreCount new_count, bool logit);
+
+   /// make all pool members lock on their pool_sema
+   static void lock_pool(bool logit);
+
+   /// unlock all pool members from their pool_sema
+   static void unlock_pool(bool logit);
+
+protected:
+   /// the CPU numbers that can be used
+   static std::vector<CPU_Number> the_CPUs;
+};
+//=============================================================================
+/**
+  a class coordinating the different cores working in parallel
+**/
+/// Parallel APL execution
 class Parallel
 {
 public:
@@ -247,21 +288,8 @@ public:
    /// true if parallel execution is enabled
    static bool run_parallel;
 
-   /// number of available cores
-   static CoreCount get_max_core_count()
-      { return CoreCount(all_CPUs.size()); }
-
-   /// make all pool members lock on their pool_sema
-   static void lock_pool(bool logit);
-
-   /// unlock all pool members from their pool_sema
-   static void unlock_pool(bool logit);
-
    /// initialize
    static void init(bool logit);
-
-   /// set new active core count, return true on error
-   static bool set_core_count(CoreCount new_count, bool logit);
 
    /// a semaphore to protect printing from different threads
    static sem_t * print_sema;
@@ -270,9 +298,6 @@ public:
    static sem_t * pthread_create_sema;
 
    /// return the core number for \b idx
-   static CPU_Number get_CPU(int idx)
-      { return all_CPUs[idx]; }
-
 protected:
    /// the main() function of the worker threads
    static void * worker_main(void *);
@@ -280,8 +305,8 @@ protected:
    /// initialize \b all_CPUs (which then determines the max. core count)
    static void init_all_CPUs(bool logit);
 
-   /// the CPU numbers that can be used
-   static std::vector<CPU_Number> all_CPUs;
+   /// true after init() has been called
+   static bool init_done;
 };
 //=============================================================================
 
