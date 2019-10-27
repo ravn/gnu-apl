@@ -15,7 +15,11 @@ dist_doc_DATA = \
     glade-1.png          \
     glade-2.png          \
     glade-3.png          \
-    glade-4.png
+    glade-4.png          \
+    APL1.png             \
+    APL2.png             \
+    APL3.png             \
+    APL4.png
 
 .asciidoc.html:
 	if [ -z `which asciidoc` ] ; then touch $@ ;       \
