@@ -797,12 +797,12 @@ this feature is rather limited.</td>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_controlling_the_core_count">Controlling the core count</h2>
+<h2 id="_controlling_the_core_count">Controlling the Core Count</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The number of cores that are used by the parallel APL execution can be
 controlled in several ways.</p></div>
 <div class="sect2">
-<h3 id="_configure_option_core_count_wanted">./configure option CORE_COUNT_WANTED</h3>
+<h3 id="_the_configure_option_core_count_wanted">The ./configure Option CORE_COUNT_WANTED</h3>
 <div class="paragraph"><p>The first way to control the (maximum) core count at the point time when the
 interpreter source code is being ./configure&#8217;d. The configure option
 CORE_COUNT_WANTED defines how the interpreter chooses the number of cores
@@ -867,7 +867,7 @@ the core count at run-time of an APL program (e.g. in a benchmarking workspace
 like <strong>Scalar2.apl</strong>).</p></div>
 </div>
 <div class="sect2">
-<h3 id="_changing_the_core_count_at_run_time">Changing the Core Count at run-time</h3>
+<h3 id="_changing_the_core_count_at_run_time">Changing the Core Count at Run-time</h3>
 <div class="paragraph"><p>If <strong>CORE_COUNT_WANTED=-3</strong> (the default) then the system variable <strong>⎕SYL</strong>, in
 particular <strong>⎕SYL[25 26 27;]</strong> control the number of cores being used:</p></div>
 <div class="listingblock">
@@ -915,7 +915,7 @@ computational load over several cores.</td>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_initialization_of_the_parallel_subsystem">Initialization of the Parallel Subsystem</h2>
+<h2 id="_the_initialization_of_the_parallel_subsystem">The Initialization of the Parallel Subsystem</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The parallel execution is initialized as follows.</p></div>
 <div class="ulist"><ul>
@@ -946,7 +946,7 @@ Then <strong>Parallel::init()</strong> creates a thread pool with
   <strong>Thread_context::init_parallel</strong>, with one thread for each CPU
   in <strong>CPU_pool::the_CPUs</strong>. If <strong>CORE_COUNT_WANTED = -3</strong> then only the first
   thread is activated (and the user needs to use ⎕SYL in order to activate
-  more cores. Otherwise all threads are activated (and ⎕SYL cannot be used).*
+  more cores. Otherwise all threads are activated (and ⎕SYL cannot be used).
   Finally <strong>Parallel::init()</strong> brings all threads into their initial state.
 </p>
 </li>
@@ -978,10 +978,12 @@ computing the current job.
 </li>
 </ul></div>
 <div class="paragraph"><p>The first thread in the pool, aka. the <strong>master</strong>, is always in state <strong>RUN</strong> and
-never busy-waiting (instead it executes the APL interpreter).</p></div>
+is never busy-waiting (instead it executes the APL interpreter).</p></div>
 <div class="paragraph"><p>The remaining threads, aka. the <strong>workers</strong>, are in state <strong>BLKD</strong> as long as
-their joblists (<strong>joblist_AB</strong> and <strong>joblist_B</strong>) are empty (i.e. there is no
-work to be done), and in state <strong>RUN</strong> otherwise.</p></div>
+they are inactive (this can only happen if ⎕SYL is being used and the worker
+is above the value set with ⎕SYL). Otherwise the worker is in state <strong>RUN</strong>. A
+worker in state <strong>RUN</strong> is not necessarily computing, e.g. if the joblists are
+empty and the worker is busy-waiting for more work.</p></div>
 <div class="paragraph"><p>When the interpreter (i.e. the master) needs to compute a primitive scalar
 function (or an inner or outer product of a primitive scalar function) with
 sufficiently large argument, then it unleashes the workers
@@ -995,7 +997,7 @@ for all workers to complete their share of the work
 </div>
 </div>
 <div class="sect1">
-<h2 id="_operation_of_the_parallel_subsystem">Operation of the Parallel Subsystem</h2>
+<h2 id="_the_operation_of_the_parallel_subsystem">The Operation of the Parallel Subsystem</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>After initialization, the parallel subsystem works (see <strong>Thread_context.cc/hh</strong>) as
 follows.</p></div>
@@ -1126,10 +1128,10 @@ thread after returning from <strong>M_fork()</strong> and before calling <strong
 </div>
 </div>
 <div class="sect1">
-<h2 id="_benchmarking_of_the_parallel_execution">Benchmarking of the parallel execution</h2>
+<h2 id="_benchmarking_of_the_parallel_execution">Benchmarking of the Parallel Execution</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_theory_8230">Theory &#8230;</h3>
+<h3 id="_the_theory_8230">The Theory &#8230;</h3>
 <div class="paragraph"><p>If a scalar APL function, is computed on a single core, then the time (most
 conveniently expressed in terms of CPU cycles) to compute it for an APL array
 with a ravel of length N is:</p></div>
@@ -1202,7 +1204,7 @@ The break-even length in this example is the intersection of the two plot
 lines at N=4.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_8230_and_practice">&#8230; and Practice</h3>
+<h3 id="_8230_and_the_practice">&#8230; and the Practice</h3>
 <div class="paragraph"><p>As <strong>Benjamin Brewster</strong> stated in 1882: <em>In theory there is no difference
 between theory and practice, while in practice there is</em>.</p></div>
 <div class="paragraph"><p>This statement is particularly true for benchmarking. Until about 1990, given
@@ -1284,7 +1286,7 @@ The speed-up of additional virtual cores (compared to physical ones) seems
 </ul></div>
 </div>
 <div class="sect2">
-<h3 id="_the_benchmark_workspace_scalar2_apl">The benchmark workspace Scalar2.apl</h3>
+<h3 id="_the_benchmark_workspace_scalar2_apl">The Benchmark Workspace Scalar2.apl</h3>
 <div class="paragraph"><p>The workspace <strong>workspaces/Scalar2.apl</strong> can be used to measure the execution
 times of scalar functions. GNU APL provides a number of internal performance
 counters. These counters need to be enabled with
@@ -1355,7 +1357,7 @@ with the given core count.</p></div>
 <h2 id="_recursive_parallelization">Recursive Parallelization</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The purpose of the joblist mentioned above is as follows. Consider the
-following APL expression, computed in parallel on 4 cores:</p></div>
+APL expression below, computed in parallel on 4 cores:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -1364,7 +1366,7 @@ following APL expression, computed in parallel on 4 cores:</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>The ravel elements of the left and right arguments of dyadic + are stored in
+<div class="paragraph"><p>The 4 ravel elements of the left and right arguments of dyadic + are stored in
 4 consecutive Cells, which are distributed in a round-robin fashion over the
 cores. That is:</p></div>
 <div class="listingblock">
@@ -1440,7 +1442,7 @@ inner and outer products of them).</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_setting_thresholds">Setting thresholds</h2>
+<h2 id="_setting_thresholds">Setting Thresholds</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>One purpose of the benchmarking is to find the break-even lengths for
 scalar functions. After that length was found, one can inform the APL
@@ -1476,7 +1478,7 @@ be set.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-10-27 17:08:32 CET
+Last updated 2019-10-27 17:30:25 CET
 </div>
 </div>
 </body>

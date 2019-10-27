@@ -28,16 +28,16 @@
 #include "UserPreferences.hh"
 
 #if !PARALLEL_ENABLED
-#define sem_init(x, y, z)   /* NO-OP */
+# define sem_init(x, y, z)   /* NO-OP */
 #endif // PARALLEL_ENABLED
 
 const char * Parallel_job_list_base::started_loc = 0;
 
 #if CORE_COUNT_WANTED == 0
 bool Parallel::run_parallel = false;
-#else
+#else   // CORE_COUNT_WANTED != 0
 bool Parallel::run_parallel = true;
-#endif
+#endif   // CORE_COUNT_WANTED == 0
 
 bool Parallel::init_done = false;
 
@@ -97,11 +97,11 @@ Parallel::init(bool logit)
 
    // the threads above start in state locked. Wake them up...
    //
-#if CORE_COUNT_WANTED == -3
+# if CORE_COUNT_WANTED == -3
    CPU_pool::change_core_count(CCNT_1, logit);
-#else
+# else
    CPU_pool::change_core_count(CPU_pool::get_count(), logit);
-#endif
+# endif
 
 #else // not PARALLEL_ENABLED
 
@@ -175,6 +175,7 @@ const CoreCount current_count = Thread_context::get_active_core_count();
    return false;   // no error
 }
 //-----------------------------------------------------------------------------
+#if PARALLEL_ENABLED
 void
 CPU_pool::init(bool logit)
 {
@@ -186,13 +187,13 @@ CoreCount count = CoreCount(CORE_COUNT_WANTED);
 #if CORE_COUNT_WANTED >= 1      // static parallel
 
    Parallel::run_parallel = true;
-   loop(c, CORE_COUNT_WANTED)   CPU_pool::add_CPU(CPU_Number(c));
+   loop(c, CORE_COUNT_WANTED)   add_CPU(CPU_Number(c));
    return;
 
 #elif CORE_COUNT_WANTED == 0    // sequential
 
    Parallel::run_parallel = false;
-   CPU_pool::add_CPU(CPU_0);
+   add_CPU(CPU_0);
    return;
 
 #elif CORE_COUNT_WANTED == -1   // handled below
@@ -211,11 +212,11 @@ CoreCount count = CoreCount(CORE_COUNT_WANTED);
 #  error "CORE_COUNT_WANTED == -3 cannot be used on platforms without pthread_getaffinity_np"
 # endif
 
-#else
+#else  // CORE_COUNT_WANTED == xxx
 
 # error "Bad CORE_COUNT_WANTED value in ./configure"
 
-#endif
+#endif // CORE_COUNT_WANTED == xxx
 
    // at this point CORE_COUNT_WANTED is -1 (all cores) or -3 (⎕SYL)
    // Figure how many cores we have.
@@ -296,6 +297,16 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
         CERR << endl;
       }
 }
+
+#else   // not PARALLEL_ENABLED
+void
+CPU_pool::init(bool logit)
+{
+   Parallel::run_parallel = false;
+   add_CPU(CPU_0);
+}
+#endif  // not PARALLEL_ENABLED
+
 //-----------------------------------------------------------------------------
 void
 CPU_pool::lock_pool(bool logit)
