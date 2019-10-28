@@ -830,6 +830,7 @@ HTML_streambuf hout_buf(outf);
 HTML_stream hout(&hout_buf);
 ostream * sout = &outf;
    if (html)   sout = &hout;
+
    // print header line, workspace name, time, and date to outf
    //
 const APL_time_us offset = get_v_Quad_TZ().get_offset();

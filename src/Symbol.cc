@@ -1173,27 +1173,16 @@ const ValueStackItem & vs = value_stack[0];
            }
         else
            {
+             UCS_string_vector lines;
+             text.to_vector(lines);
              out << "∇";
-             loop(u, text.size())
+             loop(l, lines.size())
                 {
-                  const Unicode cc = text[u];
-                  if (cc != UNI_ASCII_SPACE)   out << cc;
-                  else   // blank: display unless trailing
-                     {
-                       for (int uu = u + 1; uu < text.size(); ++uu)
-                           {
-                             const Unicode cuu = text[uu];
-                              if (cuu == UNI_ASCII_SPACE)   continue;
-                              if (cuu != UNI_ASCII_LF)   out << cc;
-                              break;
-                           }
-                     }
-
-                   // indent the text lines with 1 blank so that the column
-                   // below ∇ is blank
-                   //
-                   if (cc == UNI_ASCII_LF && u < text.size() - 1)   out << " ";
+                  UCS_string & line = lines[l];
+                  line.remove_leading_and_trailing_whitespaces();
+                  out << " " << line << endl;
                 }
+
              if (ufun->get_exec_properties()[0])   out << "⍫";
              else                                  out << "∇";
              out << endl << endl;
