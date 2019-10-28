@@ -1180,7 +1180,8 @@ const ValueStackItem & vs = value_stack[0];
                 {
                   UCS_string & line = lines[l];
                   line.remove_leading_and_trailing_whitespaces();
-                  out << " " << line << endl;
+                  if (l)   out << " ";
+                  out << line << endl;
                 }
 
              if (ufun->get_exec_properties()[0])   out << "⍫";
