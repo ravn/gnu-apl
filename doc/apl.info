@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-October 27, 2019
+November 1, 2019
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -2553,13 +2553,14 @@ window size, colors for lines and grids, etc.
 
    The general syntax of ⎕PLOT is:
 
-   ⎕PLOT ''      ⍝ show a list of attrinutes and their default values
+   ⎕PLOT ''      ⍝ show a list of attributes and their default values
    H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
    H←A ⎕PLOT B   ⍝ plot B with some of the default attributes overridden
    ⎕PLOT H       ⍝ close the plot window with handle H
    ⎕PLOT  0      ⍝ verbosity: OFF (do not print attribute values)
    ⎕PLOT ¯1      ⍝ verbosity: ON (print attribute values before plotting)
    ⎕PLOT ¯2      ⍝ verbosity: DEBUG (also print debug information)
+   ⎕PLOT ¯3      ⍝ close all plot windows
 
 3.25.1 The Plot Data B
 ----------------------
@@ -4820,28 +4821,28 @@ Node: Section 3.2287133
 Node: Section 3.2393711
 Node: Section 3.2496162
 Node: Section 3.2596831
-Node: Section 3.26103467
-Node: Section 3.27104407
-Node: Section 3.28117969
-Node: Section 3.29121073
-Node: Section 3.30123062
-Node: Chapter 4127440
-Node: Chapter 5129188
-Node: Chapter 6130317
-Node: Section 6.1131854
-Node: Section 6.2133099
-Node: Section 6.3133459
-Node: Section 6.4133701
-Node: Section 6.5134363
-Node: Section 6.6134841
-Node: Section 6.7135613
-Node: Section 6.8136070
-Node: Chapter 7136472
-Node: Section 7.1136891
-Node: Section 7.2137578
-Node: Chapter 8138409
-Node: Section 8.1138912
-Node: Section 8.2164222
+Node: Section 3.26103514
+Node: Section 3.27104454
+Node: Section 3.28118016
+Node: Section 3.29121120
+Node: Section 3.30123109
+Node: Chapter 4127487
+Node: Chapter 5129235
+Node: Chapter 6130364
+Node: Section 6.1131901
+Node: Section 6.2133146
+Node: Section 6.3133506
+Node: Section 6.4133748
+Node: Section 6.5134410
+Node: Section 6.6134888
+Node: Section 6.7135660
+Node: Section 6.8136117
+Node: Chapter 7136519
+Node: Section 7.1136938
+Node: Section 7.2137625
+Node: Chapter 8138456
+Node: Section 8.1138959
+Node: Section 8.2164269
 
 End Tag Table
 

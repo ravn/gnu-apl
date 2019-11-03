@@ -178,7 +178,7 @@ Parser::parse_statement(Token_string & tos)
         tos.print(CERR, true);
       }
 
-   // 5. replace bitwise functons ∧∧, ∨∨, ⍲⍲, and ⍱⍱ by their bitwise variant
+   // 5. replace bitwise functons ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
    //
    replace_bitwise_functions(tos);
    remove_void_token(tos);
@@ -487,6 +487,9 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
 void
 Parser::replace_bitwise_functions(Token_string & tos)
 {
+   // replace bitwise functions (⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤= or ⊤≠) by their
+   // own token
+   //
    loop(t, int(tos.size()) - 1)
        {
          if (tos[t].get_tag() != TOK_F12_ENCODE)   continue;

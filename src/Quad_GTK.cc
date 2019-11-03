@@ -65,18 +65,20 @@ int fd = -1;
 
         case 3: // increase verbosity
              if (!A->is_int_scalar())   goto bad_fd;
+             fd = A->get_ravel(0).get_int_value();
              if (write_TL0(fd, 7))
                 {
-                  CERR << "write( Tag 7) failed in Ah ⎕GTK 3";
+                  CERR << "write(Tag 7) failed in Ah ⎕GTK 3" << endl;
                   return Token(TOK_APL_VALUE1, IntScalar(-3, LOC));
                 }
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
         case 4: // decrease verbosity
              if (!A->is_int_scalar())   goto bad_fd;
+             fd = A->get_ravel(0).get_int_value();
              if (write_TL0(fd, 8))
                 {
-                  CERR << "write( Tag 8) failed in Ah ⎕GTK 3";
+                  CERR << "write(Tag 8) failed in Ah ⎕GTK 4" << endl;
                   return Token(TOK_APL_VALUE1, IntScalar(-4, LOC));
                 }
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
@@ -309,6 +311,7 @@ Quad_GTK::read_fd(int fd, int tag)
 
 char TLV[1000];
 
+   errno = 0;
 const ssize_t rx_len = read(fd, TLV, sizeof(TLV));
 
    if (rx_len < 8)
@@ -391,6 +394,7 @@ pollfd fds[count];
          fds[w].revents = 0;
        }
 
+   errno = 0;
 const int ready = poll(fds, count, 0);
    if (ready == 0)   return;
    if (ready > 0)
@@ -487,7 +491,7 @@ Quad_GTK::Fnum
 Quad_GTK::resolve_fun_name(UTF8_string & window_id, const Value * B)
 {
    // window_id is a class and an instance number, such as entry1
-   // Determine the length of the class prefixx
+   // Determine the length of the class prefix
    //
 int wid_len = window_id.size();
    while (wid_len &&
@@ -551,9 +555,13 @@ unsigned char TLV[8];
    TLV[2] = tag >> 8;
    TLV[3] = tag;
 
-    if (write(fd, TLV, 8) != 8)
+   errno = 0;
+const size_t tx_len = write(fd, TLV, 8);
+    if (tx_len != 8)
        {
-         CERR << "write(Tag = " << tag << ") failed in ⎕GTK::write_TL0()";
+         CERR << "write(Tag = " << tag << ") failed in ⎕GTK::write_TL0()"
+              << endl << "   tx_len = " << tx_len << endl
+              << "   errno says: " << strerror(errno) << endl;
          return -1;
        }
 
@@ -621,14 +629,13 @@ int envp_idx = 0;
          const char * var = evars[c];
          if (char * val = getenv(var))
             {
-              char * env = new char[strlen(var) + 1 + strlen(val)];
+              char * env = new char[strlen(var) + 2 + strlen(val)];
               sprintf(env, "%s=%s", var, val);
               envp[envp_idx++] = env;
               envp[envp_idx] = 0;
             }
        }
 const int fd = Quad_FIO::fun->do_FIO_57(path, envp);
-   loop(c, envp_idx)   delete evars[c];
 
    // write TLVs 1 and 3 or 1, 2, and 3 to Gtk_server...
    //

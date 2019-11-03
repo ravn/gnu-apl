@@ -1,31 +1,43 @@
 #ifdef gtk_fun_def
-/* a mapping from ⎕GTK function names (right string argument Bs in ⎕GTK Bs) to Gtk functions
+/* a mapping from ⎕GTK function names (right string argument Bs in ⎕GTK Bs) to Gtk functions.
 
-           ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-           ║                                               Macro Argument                                               ║
-╔══════════╬════════════╤══════════════╤═════════════╤════════╤═══╤══════════════════════════════════════════════════════╣
-║          ║            │              │             │  APL   │Typ│                                                      ║
-║ Used by  ║ glade_ID   │  gtk_class   │gtk_function │Variable│Z│A│                          help                        ║
-╠══════════╬════════════╪══════════════╪═════════════╪════════╪═╪═╪══════════════════════════════════════════════════════╣
-║ Quad_GTK ║     ✓      │              │             │        │ │✓│                                                      ║
-║Gtk_server║     ✓      │       ✓      │      ✓      │        │✓│✓│                                                      ║
-║ asciidoc ║     ✓      │       ✓      │      ✓      │   ✓    │✓│✓│                           ✓                          ║
-╚══════════╬════════════╪══════════════╪═════════════╪════════╪═╪═╪══════════════════════════════════════════════════════╣
- *///      ║            │              │             │        │ │ │                                                      ║
-gtk_fun_def(entry       ,GtkEntry      ,set_text     ,Text    ,V,S, set the text in e.g. a text entry                    )
-gtk_fun_def(entry       ,GtkEntry      ,get_text     ,Text    ,S,V, return the text in e.g. a text entry                 )
-gtk_fun_def(label       ,GtkLabel      ,set_label    ,Text    ,V,S, set the text of e.g. a label                         )
-gtk_fun_def(progress_bar,GtkProgressBar,set_fraction ,Fraction,V,F, set the progress shown by a progress bar             )
-gtk_fun_def(progress_bar,GtkProgressBar,get_fraction ,Fraction,F,V, return the progress shown by a progress bar          )
-gtk_fun_def(level_bar   ,GtkLevelBar   ,set_value    ,Level   ,V,F, set the level shown by a level bar                   )
-gtk_fun_def(level_bar   ,GtkLevelBar   ,get_value    ,Level   ,F,V, return the level  shown by level bar                 )
-gtk_fun_def(combo_box   ,GtkComboBox   ,set_active   ,Selected,V,I, set the selected item of a combo box (-1 for none)   )
-gtk_fun_def(combo_box   ,GtkComboBox   ,get_active   ,Selected,I,V, return the selected item of a combo box (-1 for none))
-gtk_fun_def(drawingarea ,GtkDrawingArea,draw_commands,DrawCmd ,V,S, set the commands needed to draw a drawing area       )
-gtk_fun_def(drawingarea ,GtkDrawingArea,set_area_size,SX_SY   ,V,I, set the area size to SX_SY >> 16 : SX_SY & 0xFFFF    )
-gtk_fun_def(drawingarea ,GtkDrawingArea,set_Y_origin ,Origin  ,V,I, set the Y-origin to the top (1) or to the bottom (0) )
-//         ║            │              │             │        │ │ │                                                      ║
-//         ╚════════════╧══════════════╧═════════════╧════════╧═╧═╧══════════════════════════════════════════════════════╝
+   Every Gtk widget has an #include file below, say, /usr/include/gtk-2.0/gtk/. The widget prefix is roughly the name
+   of the widget like per id= in the <object ...> tag of the XML file produced by glade. Often the id assigned by
+   glade is the same as in the include file. For example, glade assigns id="entry1" and the set_text function in file
+   gtkentry.h is declared as gtk_entry_set_text(). Sometimes, however, the names differ by underscores, like
+   glade assigns id="comboboxtext1" but the function is declard as gtk_combo_box_text_get_active_text(). In these
+   cases the XML file produced by glade needs to be adjusted to the C function name.
+
+   APL Variable, Z, and help are only used for automatically producing the documentation.
+
+           ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+           ║                                                    Macro Argument                                                 ║
+╔══════════╬══════════════╤═══════════════╤════════════════╤══════════╤═══╤════════════════════════════════════════════════════╣
+║          ║    widget    │               │                │    APL   │Typ│                                                    ║
+║ Used by  ║    prefix    │   gtk_class   │  gtk_function  │ Variable │Z│A│                          help                      ║
+╠══════════╬══════════════╪═══════════════╪════════════════╪══════════╪═╪═╪════════════════════════════════════════════════════╣
+║ Quad_GTK ║      ✓       │               │                │          │ │✓│                                                    ║
+║Gtk_server║      ✓       │       ✓       │       ✓        │          │✓│✓│                                                    ║
+║ asciidoc ║      ✓       │       ✓       │       ✓        │    ✓     │✓│✓│                           ✓                        ║
+╚══════════╬══════════════╪═══════════════╪════════════════╪══════════╪═╪═╪════════════════════════════════════════════════════╣
+ *///      ║              │               │                │          │ │ │                                                    ║
+gtk_fun_def(entry         ,GtkEntry       ,set_text        ,Text      ,V,S, set the text in e.g. a text entry                  )
+gtk_fun_def(entry         ,GtkEntry       ,get_text        ,Text      ,S,V, return the text in e.g. a text entry               )
+gtk_fun_def(label         ,GtkLabel       ,set_label       ,Text      ,V,S, set the text of e.g. a label                       )
+gtk_fun_def(progress_bar  ,GtkProgressBar ,set_fraction    ,Fraction  ,V,F, set the progress shown by a progress bar           )
+gtk_fun_def(progress_bar  ,GtkProgressBar ,get_fraction    ,Fraction  ,F,V, return the progress shown by a progress bar        )
+gtk_fun_def(level_bar     ,GtkLevelBar    ,set_value       ,Level     ,V,F, set the level shown by a level bar                 )
+gtk_fun_def(level_bar     ,GtkLevelBar    ,get_value       ,Level     ,F,V, return the level  shown by level bar               )
+gtk_fun_def(combo_box     ,GtkComboBox    ,set_active      ,Selected  ,V,I, set the selected item of a combo box (-1 for none) )
+gtk_fun_def(combo_box     ,GtkComboBox    ,get_active      ,Selected  ,I,V, return the selected item of a combo box (-1 = none))
+gtk_fun_def(drawingarea   ,GtkDrawingArea ,draw_commands   ,DrawCmd   ,V,S, set the commands needed to draw a drawing area     )
+gtk_fun_def(drawingarea   ,GtkDrawingArea ,set_area_size   ,SX_SY     ,V,I, set the area size to SX_SY >> 16 : SX_SY & 0xFFFF  )
+gtk_fun_def(drawingarea   ,GtkDrawingArea ,set_Y_origin    ,Origin  ,V,I, set the Y-origin to the top (1) or the bottom (0)  )
+gtk_fun_def(combo_box_text,GtkComboBoxText,get_active_text ,Selected,S,V, return the selected text in a combo box text       )
+gtk_fun_def(spin_button   ,GtkSpinButton  ,get_value       ,Selected,F,V, return the current value                           )
+gtk_fun_def(spin_button   ,GtkSpinButton  ,get_value_as_int,Selected,I,V, return the current value                           )
+//         ║              │               │                │        │ │ │                                                    ║
+//         ╚══════════════╧═══════════════╧════════════════╧════════╧═╧═╧════════════════════════════════════════════════════╝
 
 #undef gtk_fun_def
 #endif

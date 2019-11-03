@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2018  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,7 +73,11 @@ static struct _ID_DB
     xml_id(strdup(id)),
     widget_name(strdup(wn)),
     obj(0)
-    {}
+    {
+       if (verbosity > 2)
+          cerr << "Add class='" << cls << "' id='" << id
+                   << "' wname ='" << wn << "' to DB" << endl;
+    }
 
   /// the next _ID_DB entry
   _ID_DB * next;
@@ -145,6 +149,12 @@ static struct _draw_param
 } draw_param;
 
 //-----------------------------------------------------------------------------
+static void
+indent(int level)
+{
+   for (int l = 0; l < level; ++l)   cerr << "  ";
+}
+//-----------------------------------------------------------------------------
 static bool
 init_id_db(const char * filename)
 {
@@ -185,21 +195,31 @@ char line[200];
                                           << top_level_widget << endl;
                  }
 
-              verbosity > 1 && cerr <<
-                 "See class='" << cb << "' and id='"  << ib << "'" << endl;
+              if (verbosity > 1)
+                 {
+                   indent(level);
+                   cerr << "See class='" << cb << "' and id='"  << ib << "'"
+                         << endl;
+                 }
             }
          else if (1 == sscanf(line, " <property name=\"name\">%s", wb))
             {
               if (char * ob = strchr(wb, '<'))   *ob = 0;
 
-              verbosity > 1 && cerr << "See widget name='" << wb << endl;
+              if (verbosity > 1)
+                 {
+                   indent(level);
+                   cerr << "property name='" << wb << endl;
+                 }
             }
-         else if (strstr(line, "</object"))
+         else if (strstr(line, "</object>"))
             {
-              verbosity > 1 && cerr << "End of object class="
-                                    << class_buf << " id="
-                                    << id_buf << " widget-name="
-                                    << widget_name_buf << endl;
+              if (verbosity > 1)
+                 {
+                   indent(level);
+                   cerr << "End of object class=" << cb << " id="
+                        << ib << " widget-name=" << wb << endl;
+                 }
 
               if (*cb || *ib || *wb )
                  {
@@ -242,14 +262,14 @@ cmd_1_load_GUI(const char * filename)
    //
    for (_ID_DB * entry = id_db; entry; entry = entry->next)
        {
-          const GObject * obj =
-                G_OBJECT(gtk_builder_get_object(builder, id_db->xml_id));
-          if (obj)
+         if (!strncmp(entry->xml_id, "adjustment", 10))   continue;
+          if (const GObject * obj = G_OBJECT(gtk_builder_get_object(builder,
+                                                              entry->xml_id)))
              {
                verbosity > 0 && cerr <<
-                  "glade name '" << entry->xml_id << "' mapped to GObject "
+                  "map glade id= '" << entry->xml_id << "' to GObject "
                                  << reinterpret_cast<const void *>(obj) << endl;
-               id_db->obj = obj;
+               entry->obj = obj;
              }
            else cerr << "object '" << entry->xml_id << "' not found" << endl;
        }
@@ -257,21 +277,6 @@ cmd_1_load_GUI(const char * filename)
 
    gtk_builder_connect_signals(builder, NULL);
    verbosity > 0 && cerr << "GUI signals connected.\n";
-
-   if (verbosity > 2)
-      {
-        for (GSList * objects = gtk_builder_get_objects(builder);
-             objects; objects = objects->next)
-            {
-               GObject * obj = G_OBJECT(objects->data);
-               if (obj)
-                  {
-                    char * name = 0;
-                    g_object_get (obj, "name\0", &name, NULL);
-                    name && cerr << "NAME=" << name << endl;
-                  }
-            }
-      }
 }
 //-----------------------------------------------------------------------------
 void *
@@ -374,7 +379,7 @@ static cmd_3_show_GUI()
       window = gtk_builder_get_object(builder, "window1");
 
   assert(window);
-  gtk_widget_show_all(GTK_WIDGET(window));
+gtk_widget_show_all(GTK_WIDGET(window));
 
 pthread_t thread = 0;
    pthread_create(&thread, 0, reinterpret_cast<void *(*)(void *)>(gtk_main), 0);
@@ -649,6 +654,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
        {
           // expand buffer if needed
           {
+           errno = 0;
             const ssize_t len = recv(3, TLV, 8, MSG_PEEK);
             if (len != 8)
                {
@@ -771,14 +777,15 @@ generic_callback(GtkWidget * widget, const char * callback, const char * sig)
                              entry->xml_id, entry->xml_class);
               send_TLV(Event_widget_fun_id_class, data);
               verbosity > 0 &&
-                  cerr << "callback " << callback << "(1) done" << endl;
+                  cerr << "callback " << callback << "(new-style) done" << endl;
               return;
             }
        }
 
    // fallback: old-style
    //
-gchar * widget_name = 0;
+char none[] = { 0 };
+gchar * widget_name = none;
    g_object_get(widget, "name", &widget_name, NULL);
    verbosity > 0 && cerr << "    widget_name is: " << widget_name << endl
                          << "    callback is: " << callback << endl;
@@ -787,7 +794,8 @@ char data[strlen(callback) + strlen(widget_name) + 10];
    sprintf(data, "H%s:%s", widget_name, callback);
    send_TLV(Event_widget_fun, data);
 
-   verbosity > 0 && cerr << "callback " << callback << "(2) done" << endl;
+   if (verbosity > 0)
+      cerr << "callback " << callback << "(old-style) done" << endl;
 }
 //-----------------------------------------------------------------------------
 inline void
@@ -1249,7 +1257,7 @@ const unsigned int slen = snprintf(data, sizeof(data),
    if (slen >= sizeof(data))   data[sizeof(data) - 1] = 0;
 
    generic_callback(window, "destroy", __FUNCTION__);
-   // send_TLV(Event_widget_fun, data);
+   send_TLV(Event_widget_fun, data);
    close(3);
    exit(0);
    return false;   // propagate the event further

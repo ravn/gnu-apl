@@ -19,6 +19,7 @@
 */
 
 #include <iomanip>
+#include <signal.h>
 
 #include "Quad_PLOT.hh"
 
@@ -28,6 +29,12 @@ Quad_PLOT * Quad_PLOT::fun = &Quad_PLOT::_fun;
 sem_t __plot_threads_sema;
 sem_t * Quad_PLOT::plot_threads_sema = &__plot_threads_sema;
 
+/**
+   \b Quad_PLOT::plot_threads contains one thread per (open) plot window.
+   The thread handles the X main loop for the window. The thread also monitors
+   its presence in plot_threads so that removing a thread from \b plot_threads
+   causes the thread to close its plot window and then to exit.
+ **/
 std::vector<pthread_t> Quad_PLOT::plot_threads;
 
 #if defined(HAVE_XCB_XCB_H)
@@ -923,6 +930,56 @@ xcb_void_cookie_t textCookie = xcb_image_text_8_checked(conn, strlen(label),
    testCookie(textCookie, conn, "can't paste text");
 }
 //-----------------------------------------------------------------------------
+char *
+format_tick(double val)
+{
+static char cc[40];
+char * cp = cc;
+   if (val == 0)
+      {
+        *cp++ = '0';
+        *cp++ = 0;
+        return cc;
+      }
+
+   if (val < 0)
+      {
+        *cp++ = '-';
+        val = -val;
+      }
+
+const char * unit = 0;
+   if      (val >= 10e15)   ;
+   else if (val >= 10e12)   { unit = "T";   val /= 1000000000000; }
+   else if (val >= 10e9)    { unit = "G";   val /= 1000000000;    }
+   else if (val >= 10e6)    { unit = "M";   val /= 1000000;       }
+   else if (val >= 10e3)    { unit = "k";   val /= 1000;          }
+   else if (val >= 10e0)    { unit = "";                          }
+   else if (val >= 10e-3)   { unit = "m";   val *= 1000;          }
+   else if (val >= 10e-6)   { unit = "μ";   val *= 1000000;       }
+   else if (val >= 10e-9)   { unit = "n";   val *= 1000000000;    }
+   else if (val >= 10e-12)  { unit = "p";   val *= 1000000000000; }
+
+   if (unit == 0)   // very large or very small
+      {
+        snprintf(cp, sizeof(cc) - 1, "%.2E", val);
+        return cc;
+      }
+
+   // at this point: 1 ≤ val < 1000
+   //
+   if      (val < 10)    snprintf(cp, sizeof(cc) - 1, "%.2f%s", val, unit);
+   else if (val < 100)   snprintf(cp, sizeof(cc) - 1, "%.1f%s", val, unit);
+   else                  snprintf(cp, sizeof(cc) - 1, "%.0f%s", val, unit);
+   return cc;
+}
+//-----------------------------------------------------------------------------
+void
+draw_tick(xcb_connection_t * conn, xcb_gcontext_t text_gc,
+          xcb_window_t window, int16_t x, int16_t y, const char * label)
+{
+}
+//-----------------------------------------------------------------------------
 void
 draw_line(xcb_connection_t * conn, xcb_drawable_t window, xcb_gcontext_t gc,
            int16_t x0, int16_t y0, int16_t x1, int16_t y1)
@@ -1115,8 +1172,7 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
                 draw_line(conn, window, gc, px, py0 - 5, px, py0 + 5);
               }
 
-           char cc[40];
-           snprintf(cc, sizeof(cc), "%.1lf", v);
+           char * cc = format_tick(v);
            string_width_height wh(cc, conn, font);
            draw_text(conn, text_gc, window,
                      px - wh.width/2, py0 + wh.height + 3, cc);
@@ -1148,8 +1204,7 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
                 draw_line(conn, window, gc, px0 - 5, py, px0 + 5, py);
               }
 
-           char cc[40];
-           snprintf(cc, sizeof(cc), "%.1lf", v);
+           char * cc = format_tick(v);
            string_width_height wh(cc, conn, font);
            draw_text(conn, text_gc, window,
                      px0 - wh.width - 5, py + wh.height/2 - 1, cc);
@@ -1329,6 +1384,7 @@ const xcb_get_input_focus_reply_t * focusReply =
    xcb_flush(conn);
 
    // X main loop
+   //
    for (;;)
       {
         xcb_generic_event_t * event = xcb_poll_for_event(conn);
@@ -1506,7 +1562,7 @@ const APL_Integer qio = Workspace::get_IO();
 Token
 Quad_PLOT::eval_B(Value_P B)
 {
-   if (B->get_rank() == 0)   // create a zombie by removing it from plot_threads
+   if (B->get_rank() == 0)   // scalar argument
       {
         union
            {
@@ -1515,11 +1571,18 @@ Quad_PLOT::eval_B(Value_P B)
            } u;
 
         u.B0 = B->get_ravel(0).get_int_value();
-        if (u.B0 <= 0 && u.B0 >= -2)   // verbose mode
+        if (u.B0 <= 0 && u.B0 >= -2)   // change plot verbosity
            {
              verbosity = -u.B0;
              CERR << "⎕PLOT verbosity set to " << verbosity << endl;
              return Token(TOK_APL_VALUE1, Idx0(LOC));
+           }
+        if (u.B0 == -3)   // close all windows
+           {
+             while (plot_threads.size())
+                {
+                  plot_threads.pop_back();
+                }
            }
 
         bool found = false;
@@ -1537,14 +1600,15 @@ Quad_PLOT::eval_B(Value_P B)
         return Token(TOK_APL_VALUE1, IntScalar(found ? u.B0 : 0, LOC));
       }
 
-   if (B->get_rank() == 1 && B->element_count() == 0)
+   if (B->get_rank() == 1)   // vector argument
       {
+        if (B->element_count() > 0)   LENGTH_ERROR;
+
         help();
         return Token(TOK_APL_VALUE1, Idx0(LOC));
       }
 
-   if (B->get_rank() < 1 || B->get_rank() > 2)   RANK_ERROR;
-   if (B->element_count() < 2)                   LENGTH_ERROR;
+   if (B->get_rank() > 2)   RANK_ERROR;
 
    // plot window with default attributes
    //

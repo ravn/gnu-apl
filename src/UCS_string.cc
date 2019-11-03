@@ -1018,12 +1018,6 @@ UCS_string ret;
                   ret << "\\x0";
                   ret << Unicode(hex[uni]);
                 }
-             else if (uni <= 0xFF)   // other ASCII
-                {
-                  ret << "\\x";
-                  ret << Unicode(hex[uni >> 4 & 0x0F]);
-                  ret << Unicode(hex[uni      & 0x0F]);
-                }
              else
                 {
                   ret.append(uni);

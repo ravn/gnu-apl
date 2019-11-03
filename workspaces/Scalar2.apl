@@ -145,16 +145,17 @@ options:
 ∇
 
 ⍝ ====================================================================
-∇Z←ONE_PASS EXPR;JOB;OP;SID;TH1;TH2;STAT;JOBZ
+∇Z←ONE_PASS EXPR;A;JOB;OP;SID;TH1;TH2;STAT;JOBZ
   ⍝ Run one pass.  ⍝ return (VL CYCLES), CYCLES is CPU cycles for all VL items
   ⍝
-  ⍝ EXPR: A       OP  B          CAT SIDNAME    SID
-  ⍝  e.g. Mix_IRC "+" "Mix_IRC"  2   "F12_PLUS" 13
+  ⍝ EXPR: A         OP  B          CAT SIDNAME    SID
+  ⍝  e.g. "Mix_IRC" "+" "Mix_IRC"  2   "F12_PLUS" 13
   ⍝
   JOB←'JOBZ←',⊃,/EXPR[1 2 3]
+  A←⊃EXPR[1]      ⍝ "" for monadic
   OP←⊃EXPR[2]      ⍝ e.g. +
   SID←EXPR[6]
-  SID←42   ⍝ SCALAR_AB
+  SID←42 - A≡""   ⍝ SCALAR_AB / SCALAR_B
 
   ⍝ save current thresholds and set current thresholds to 1
   ⍝

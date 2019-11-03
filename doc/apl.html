@@ -204,7 +204,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>October 27, 2019
+<p>November 1, 2019
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -2853,13 +2853,14 @@ colors for lines and grids, etc.
 </p>
 <p>The general syntax of ⎕PLOT is:
 </p>
-<pre class="verbatim">   ⎕PLOT ''      ⍝ show a list of attrinutes and their default values
+<pre class="verbatim">   ⎕PLOT ''      ⍝ show a list of attributes and their default values
    H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
    H←A ⎕PLOT B   ⍝ plot B with some of the default attributes overridden
    ⎕PLOT H       ⍝ close the plot window with handle H
    ⎕PLOT  0      ⍝ verbosity: OFF (do not print attribute values)
    ⎕PLOT ¯1      ⍝ verbosity: ON (print attribute values before plotting)
    ⎕PLOT ¯2      ⍝ verbosity: DEBUG (also print debug information)
+   ⎕PLOT ¯3      ⍝ close all plot windows
 </pre>
 <a name="The-Plot-Data-B"></a>
 <h4 class="subsection">3.25.1 The Plot Data B</h4>

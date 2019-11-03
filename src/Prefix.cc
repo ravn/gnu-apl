@@ -1959,6 +1959,13 @@ APL_Integer real_line_no = line_no;
                 }
            }
       }
+   else if (line_no == 0)
+      {
+        // jump to same line (but outside a defined function)
+        set_PC(Function_PC_0);
+        action = RA_CONTINUE;
+        return;
+      }
    else
       {
         MORE_ERROR() << "A → B can only be called inside a defined function";
@@ -1990,6 +1997,7 @@ const Token_loc tl_GOTO = pop();
    push(tl_GOTO);
    push(tl_END);
 
+   prefix_len = 3;
    reduce_END_GOTO_B_();
 }
 //-----------------------------------------------------------------------------
