@@ -2681,7 +2681,7 @@ Example (plot a circle (actually: a regular 20-gon)):
 produces this plot window (only visible in the HTML version of this document;
 in text mode see file @b{doc/PLOT_circle.png}):
 
-@image {PLOT_circle}
+@image{PLOT_circle}
 
 @subsubsection Real Plot Data
 
@@ -2709,7 +2709,7 @@ Example:
 produces this plot window (only visible in the HTML version of this document;
 in text mode see file @b{doc/PLOT_zigzag.png}):
 
-@image {PLOT_zigzag}
+@image{PLOT_zigzag}
 
 @subsection The Plot Attributes A
 
