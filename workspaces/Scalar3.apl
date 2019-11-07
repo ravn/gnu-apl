@@ -145,9 +145,9 @@ CLICKED:   ⍝ the user clicked on the Measure ! button
 
 ⍝ -----------------------------------------------------------------------------
 ∇Z←STEP PLOT_LINES DATA;X;Q;Setup;Per_item;L1;L2
- ⍝⍝ for vector DATA, return (LIN, PLOT) where:
- ⍝  LIN  = setup, per-item
- ⍝  PLOT = plot lines for DATA and for its least-square linear solution
+ ⍝⍝ for vector DATA, return (setup, per-item, L1, L2) where:
+ ⍝  L1 = plot lines for DATA
+ ⍝  L2 = linearized DATA (least-square approximation)
  ⍝
  X←STEP×⍳⍴DATA
  Q←1,⍪X
@@ -155,11 +155,9 @@ CLICKED:   ⍝ the user clicked on the Measure ! button
  L1←X+0J1×DATA
  L2←X+0J1×Setup+Per_item×X
 
-  L1←(↑L1),L1         ⍝ double the first point (a plot no-op)
   L2←(0J1×Setup),L2   ⍝ Add X=0 plot point
 
- L1←(1,⍴X)⍴L1 ◊ L2←(1,⍴X)⍴L2 ◊ 
- Z←(Setup,Per_item) (L1⍪L2)
+ Z←Setup Per_item  L1 L2
 ∇
 ⍝ -----------------------------------------------------------------------------
 ∇GTK←SETUP_GTK;GUI_file;CSS_file
@@ -170,7 +168,7 @@ CLICKED:   ⍝ the user clicked on the Measure ! button
 ⍝ ⊣GTK ⎕GTK 3   ⍝ ++verbosity in Gtk_server
 ∇
 ⍝ -----------------------------------------------------------------------------
-∇MAIN;GTK;PARAMS;ATTS;EXPR;LEN;CORES;SID;SEQ;PAR;SEQ_linear;PAR_linear;L12;L34
+∇MAIN;GTK;PARAMS;SEQ;PAR;SEQ_sup;SEQ_pi;PAR_sup;PAR_pi;L1;L2;L3;L4
 
 GTK←SETUP_GTK
 LOOP: PARAMS←SETUP GTK ◊ DOIT → 0 < ⍴PARAMS
@@ -179,22 +177,20 @@ LOOP: PARAMS←SETUP GTK ◊ DOIT → 0 < ⍴PARAMS
    →0
 
 DOIT:
- (ATTS EXPR LEN CORES SID)←PARAMS
-
- ⎕SYL[26;2] ← 0     ◊ SEQ←BENCH SID   ⍝ sequential
- ⎕SYL[26;2] ← CORES ◊ PAR←BENCH SID   ⍝ parallel
+ ⎕SYL[26;2] ← 0         ◊ SEQ←BENCH PARAMS[5]   ⍝ sequential
+ ⎕SYL[26;2] ← PARAMS[4] ◊ PAR←BENCH PARAMS[5]   ⍝ parallel
  ⎕SYL[26;2] ← 0
 
- (SEQ_linear L12)←LEN PLOT_LINES SEQ
- 'Seq: setup'  SEQ_linear[1] 'per item:' SEQ_linear[2]
+ (SEQ_sup SEQ_pi  L1 L2)←PARAMS[3] PLOT_LINES SEQ
+ 'Seq: setup' SEQ_sup 'per item:' SEQ_pi
 
- (PAR_linear L34)←LEN PLOT_LINES PAR
- 'Par: setup'  PAR_linear[1] 'per item:' PAR_linear[2]
+ (PAR_sup PAR_pi L3 L4)←PARAMS[3] PLOT_LINES PAR
+ 'Par: setup' PAR_sup 'per item:' PAR_pi
 
- ⊣ATTS ⎕PLOT L12⍪L34
+ ⊣(⊃PARAMS[1]) ⎕PLOT L1 L2 L3 L4
 
- LOOP → PAR_linear[2] = 0
- 'Speedup:' (SEQ_linear[2]÷PAR_linear[2]) 'on' CORES 'cores for' EXPR
+ LOOP → PAR_pi = 0
+ 'Speedup:' (SEQ_pi÷PAR_pi) 'on' PARAMS[4] 'cores for' (⊃PARAMS[2])
  →LOOP
 ∇
 

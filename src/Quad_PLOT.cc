@@ -169,9 +169,8 @@ class Plot_data
 {
 public:
    /// constructor
-   Plot_data(uint32_t rows, uint32_t cols)
+   Plot_data(uint32_t rows)
    : row_count(rows),
-     col_count(cols),
      idx(0)
       {
         data_rows = new const Plot_data_row *[row_count];
@@ -187,10 +186,6 @@ public:
    /// return the number of plot lines
    uint32_t get_row_count() const
       { return row_count; }
-
-   /// return the number of data points
-   uint32_t get_col_count() const
-      { return col_count; }
 
    /// return the X and Y values of the data matrix row/col
    void get_XY(double & X, double & Y, uint32_t row, uint32_t col) const
@@ -280,6 +275,10 @@ public:
         return val;
       }
 
+   /// return the idx'th row
+   const Plot_data_row & operator[](ShapeItem idx) const
+      { Assert(idx < row_count);   return *data_rows[idx]; }
+
    /// convert a string to a Pixel
    static Pixel Pixel_from_str(const char * str, const char * & error)
       { error = 0;   return strtol(str, 0, 10); }
@@ -305,9 +304,6 @@ protected:
 
    /// the number of rows in the data matrix
    const uint32_t row_count;
-
-   /// the number of columns in the data matrix
-   const uint32_t col_count;
 
    /// the current number of columns in the data matrix
    uint32_t idx;
@@ -949,16 +945,23 @@ char * cp = cc;
       }
 
 const char * unit = 0;
-   if      (val >= 10e15)   ;
-   else if (val >= 10e12)   { unit = "T";   val /= 1000000000000; }
-   else if (val >= 10e9)    { unit = "G";   val /= 1000000000;    }
-   else if (val >= 10e6)    { unit = "M";   val /= 1000000;       }
-   else if (val >= 10e3)    { unit = "k";   val /= 1000;          }
-   else if (val >= 10e0)    { unit = "";                          }
-   else if (val >= 10e-3)   { unit = "m";   val *= 1000;          }
-   else if (val >= 10e-6)   { unit = "μ";   val *= 1000000;       }
-   else if (val >= 10e-9)   { unit = "n";   val *= 1000000000;    }
-   else if (val >= 10e-12)  { unit = "p";   val *= 1000000000000; }
+   if (val >= 1e3)
+      {
+        if      (val >= 1e15)   ;
+        else if (val >= 1e12)   { unit = "T";   val *= 1e-12; }
+        else if (val >= 1e9)    { unit = "G";   val *= 1e-9;  }
+        else if (val >= 1e6)    { unit = "M";   val *= 1e-6;  }
+        else                    { unit = "k";   val *= 1e-3;  }
+      }
+   else
+      {
+
+        if (val >= 1e0)    { unit = "";                  }
+        else if (val >= 1e-3)   { unit = "m";   val *= 1e3;   }
+        else if (val >= 1e-6)   { unit = "μ";   val *= 1e6;   }
+        else if (val >= 1e-9)   { unit = "n";   val *= 1e9;   }
+        else if (val >= 1e-12)  { unit = "p";   val *= 1e12;  }
+      }
 
    if (unit == 0)   // very large or very small
       {
@@ -1248,7 +1251,7 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
 
          int last_x = 0;
          int last_y = 0;
-         loop(n, data.get_col_count())
+         loop(n, data[l].get_N())
              {
                double vx, vy;   data.get_XY(vx, vy, l, n);
                const int px = w_props.valX2pixel(vx - w_props.get_min_X());
@@ -1259,7 +1262,7 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
              }
 
          xcb_change_gc(conn, gc, mask, gc_2);
-         loop(n, data.get_col_count())
+         loop(n, data[l].get_N())
              {
                double vx, vy;   data.get_XY(vx, vy, l, n);
                const Pixel px = w_props.valX2pixel(vx - w_props.get_min_X());
@@ -1502,8 +1505,8 @@ Quad_PLOT::~Quad_PLOT()
 Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B)
 {
-   if (B->get_rank() < 1 || B->get_rank() > 2)   RANK_ERROR;
-   if (B->element_count() < 2)                   LENGTH_ERROR;
+   if (B->get_rank() > 2)        RANK_ERROR;
+   if (B->element_count() < 2)   LENGTH_ERROR;
 
    // plot window with default attributes
    //
@@ -1562,8 +1565,10 @@ const APL_Integer qio = Workspace::get_IO();
 Token
 Quad_PLOT::eval_B(Value_P B)
 {
-   if (B->get_rank() == 0)   // scalar argument
+const bool nested = B->get_ravel(0).is_pointer_cell();
+   if (B->get_rank() == 0 && !nested)
       {
+        // scalar argument: plot window control
         union
            {
              int64_t B0;
@@ -1600,7 +1605,7 @@ Quad_PLOT::eval_B(Value_P B)
         return Token(TOK_APL_VALUE1, IntScalar(found ? u.B0 : 0, LOC));
       }
 
-   if (B->get_rank() == 1)   // vector argument
+   if (B->get_rank() == 1 && !nested)   // vector argument
       {
         if (B->element_count() > 0)   LENGTH_ERROR;
 
@@ -1628,44 +1633,114 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
 Plot_data *
 Quad_PLOT::setup_data(const Value * B)
 {
-const ShapeItem cols_B = B->get_cols();
-const ShapeItem rows_B = B->get_rows();
-const ShapeItem len_B = rows_B * cols_B;
-
-   // check data
+   // check data. We expect B to be either:
+   //  1a. a numeric vector (for a single plot line), or
+   //  1b. a numeric matrix (for one plot line for each row of the matrix), or
+   //  2a. a scalar of a nested numeric vector (for a single plot line), or
+   //  2b. a vector of nested numeric vectors (for one plot line per item)
    //
-   loop(b, len_B)   if (!B->get_ravel(b).is_numeric())   return 0;
+   if (B->is_scalar())   // 2a. → 1a.
+      {
+         if (!B->get_ravel(0).is_pointer_cell())   DOMAIN_ERROR;
+         B = B->get_ravel(0).get_pointer_value().get();
+      }
 
 const APL_Integer qio = Workspace::get_IO();
-
-double * X = new double[2*len_B];
-   if (!X)   WS_FULL;
-double * Y = X + len_B;
-
-   loop(b, len_B)
-       {
-         const Cell & cB = B->get_ravel(b);
-         if (cB.is_complex_cell())
+Plot_data * data = 0;
+   if (B->get_ravel(0).is_pointer_cell())   // 2b.
+      {
+        ShapeItem data_points = 0;
+        if (B->get_rank() > 1)   RANK_ERROR;
+        const ShapeItem rows = B->get_cols();
+        loop(r, rows)
             {
-              X[b] = cB.get_real_value();
-              Y[b] = cB.get_imag_value();
+              const Value * vrow = B->get_ravel(r).get_pointer_value().get();
+              if (vrow->get_rank() > 1)   RANK_ERROR;
+              const ShapeItem row_len = vrow->element_count();
+              data_points += row_len;
+              loop(rb, row_len)
+                  {
+                    if (!vrow->get_ravel(rb).is_numeric())   DOMAIN_ERROR;
+                  }
             }
-         else
+        double * X = new double[2*data_points];
+        double * Y = X + data_points;
+        if (!X)   WS_FULL;
+
+        ShapeItem idx = 0;
+        loop(r, rows)
             {
-              X[b] = qio + b % cols_B;
-              Y[b] = cB.get_real_value();
+              const Value * vrow = B->get_ravel(r).get_pointer_value().get();
+              loop(v, vrow->element_count())
+                  {
+                    const Cell & cB = vrow->get_ravel(v);
+                    if (cB.is_complex_cell())
+                       {
+                         X[idx]   = cB.get_real_value();
+                         Y[idx++] = cB.get_imag_value();
+                       }
+                    else
+                       {
+                         X[idx]   = qio + v;
+                         Y[idx++] = cB.get_real_value();
+                       }
+                  }
             }
-       }
+        data = new Plot_data(rows);
+        idx = 0;
+        loop(r, rows)
+            {
+              const double * pX = X + idx;
+              const double * pY = Y + idx;
+              const Value * vrow = B->get_ravel(r).get_pointer_value().get();
+              const ShapeItem row_len = vrow->element_count();
+              const Plot_data_row * pdr = new Plot_data_row(pX, pY, r, row_len);
+              data->add_row(pdr);
+              idx += row_len;
+            }
+      }
+   else
+      {
+        const ShapeItem cols_B = B->get_cols();
+        const ShapeItem rows_B = B->get_rows();
+        const ShapeItem len_B = rows_B * cols_B;
 
-Plot_data * data = new Plot_data(rows_B, cols_B);
-   loop(r, rows_B)
-       {
-         Plot_data_row * data_r = new Plot_data_row(X + r*cols_B,
-                                                    Y + r*cols_B, r, cols_B);
+        loop(b, len_B)
+            {
+              if (!B->get_ravel(b).is_numeric())   return 0;
+            }
 
-         data->add_row(data_r);
-       }
+        // split B into X=real B, Y=imag Y
 
+        double * X = new double[2*len_B];
+        double * Y = X + len_B;
+        if (!X)   WS_FULL;
+
+        loop(b, len_B)
+            {
+              const Cell & cB = B->get_ravel(b);
+              if (cB.is_complex_cell())
+                 {
+                   X[b] = cB.get_real_value();
+                   Y[b] = cB.get_imag_value();
+                 }
+              else
+                 {
+                   X[b] = qio + b % cols_B;
+                   Y[b] = cB.get_real_value();
+                 }
+            }
+
+        data = new Plot_data(rows_B);
+        loop(r, rows_B)
+            {
+              const double * pX = X + r*cols_B;
+              const double * pY = Y + r*cols_B;
+              const Plot_data_row * pdr = new Plot_data_row(pX, pY, r, cols_B);
+              data->add_row(pdr);
+            }
+
+      }
    return data;
 }
 //-----------------------------------------------------------------------------
