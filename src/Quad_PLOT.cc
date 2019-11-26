@@ -21,6 +21,17 @@
 #include <iomanip>
 #include <signal.h>
 
+#include "../config.h"
+#if ! defined(HAVE_LIBX11)
+# define WHY_NOT "libX11.so"
+#elif ! defined(HAVE_LIBXCB)
+# define WHY_NOT "libxcb.so"
+#elif ! defined(HAVE_LIBX11_XCB)
+# define WHY_NOT "libX11-xcb.so"
+#elif ! defined(HAVE_XCB_XCB_H)
+# define WHY_NOT "xcb/xcb.h"
+#endif
+
 #include "Quad_PLOT.hh"
 
 Quad_PLOT  Quad_PLOT::_fun;
@@ -37,40 +48,71 @@ sem_t * Quad_PLOT::plot_threads_sema = &__plot_threads_sema;
  **/
 std::vector<pthread_t> Quad_PLOT::plot_threads;
 
-#if defined(HAVE_XCB_XCB_H)
+#if defined(WHY_NOT)
+//-----------------------------------------------------------------------------
+Quad_PLOT::Quad_PLOT()
+  : QuadFunction(TOK_Quad_PLOT),
+    verbosity(0)
+{
+}
+//-----------------------------------------------------------------------------
+Quad_PLOT::~Quad_PLOT()
+{
+}
+//-----------------------------------------------------------------------------
+Token
+Quad_PLOT::eval_B(Value_P B)
+{
+    MORE_ERROR() <<
+"⎕PLOT is not available because one or more of its build prerequisites (in\n"
+"particular " WHY_NOT ") was missing, or because it was explicitly\n"
+" disabled in ./configure.";
 
-#include <xcb/xcb.h>
-#include <xcb/xproto.h>
+   SYNTAX_ERROR;
+   return Token();
+}
+//-----------------------------------------------------------------------------
+Token
+Quad_PLOT::eval_AB(Value_P A, Value_P B)
+{
+   eval_B(B);
+}
+//-----------------------------------------------------------------------------
 
-#include "ComplexCell.hh"
-#include "FloatCell.hh"
-#include "Workspace.hh"
+#else   // not defined(WHY_NOT)
+
+# include <xcb/xcb.h>
+# include <xcb/xproto.h>
+
+# include "ComplexCell.hh"
+# include "FloatCell.hh"
+# include "Workspace.hh"
 
 // UTF8 support for XCB windows needs additional libraries that may
 // not be present. You can disable that with: XCB_WINDOWS_WITH_UTF8_CAPTIONS 0
 // or maybe CXXFLAGS=-D XCB_WINDOWS_WITH_UTF8_CAPTIONS=0 ./configure...
 //
-#ifndef XCB_WINDOWS_WITH_UTF8_CAPTIONS
-#define XCB_WINDOWS_WITH_UTF8_CAPTIONS 1
-#endif
+# ifndef XCB_WINDOWS_WITH_UTF8_CAPTIONS
+#  define XCB_WINDOWS_WITH_UTF8_CAPTIONS 1
+# endif
 
-#if XCB_WINDOWS_WITH_UTF8_CAPTIONS
-# define Depth Depth1
-# include <X11/Xutil.h>
-# include <X11/Xlib.h>
-# include <X11/Xlib-xcb.h>
-#endif
+# if XCB_WINDOWS_WITH_UTF8_CAPTIONS
+#  define Depth Depth1
+#  include <X11/Xutil.h>
+#  include <X11/Xlib.h>
+#  include <X11/Xlib-xcb.h>
+# endif
 
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <xcb/xcb.h>
-#include <xcb/xproto.h>
+# include <stdio.h>
+# include <math.h>
+# include <stdlib.h>
+# include <string.h>
+# include <unistd.h>
+# include <xcb/xcb.h>
+# include <xcb/xproto.h>
 
-#include <iostream>
-#include <iomanip>
+# include <iostream>
+# include <iomanip>
 
 using namespace std;
 
@@ -355,8 +397,8 @@ class Plot_line_properties
 public:
    /// constructor
    Plot_line_properties(int lnum) :
-#define ldef(_ty,  na,  val, _descr) na(val),
-#include "Quad_PLOT.def"
+# define ldef(_ty,  na,  val, _descr) na(val),
+# include "Quad_PLOT.def"
    line_number(lnum)
    {
      snprintf(legend_name_buffer, sizeof(legend_name_buffer),
@@ -375,18 +417,18 @@ public:
    }
 
    // get_XXX() and set_XXX functions
-#define ldef(ty,  na,  _val, _descr)      \
+# define ldef(ty,  na,  _val, _descr)      \
    /** return the value of na **/         \
    ty get_ ## na() const   { return na; } \
    /** set the  value of na **/           \
    void set_ ## na(ty val)   { na = val; }
-#include "Quad_PLOT.def"
+# include "Quad_PLOT.def"
 
    /// print the properties
    int print(ostream & out) const;
 
-#define ldef(ty,  na,  _val, descr) /** descr **/ ty na;
-#include "Quad_PLOT.def"
+# define ldef(ty,  na,  _val, descr) /** descr **/ ty na;
+# include "Quad_PLOT.def"
 
   /// plot line number
   const int line_number;   // starting a 0 regardless of ⎕IO
@@ -399,11 +441,11 @@ int
 Plot_line_properties::print(ostream & out) const
 {
 char cc[40];
-#define ldef(ty,  na,  _val, _descr)                   \
+# define ldef(ty,  na,  _val, _descr)                   \
    snprintf(cc, sizeof(cc), #na "-%d:  ",              \
             int(line_number + Workspace::get_IO()));   \
    CERR << setw(20) << cc << Plot_data::ty ## _to_str(na) << endl;
-#include "Quad_PLOT.def"
+# include "Quad_PLOT.def"
 
    return 0;
 }
@@ -438,7 +480,7 @@ public:
    void set_window_size(int width, int height);
 
    // get_XXX() and set_XXX functions
-#define gdef(ty,  na,  _val, _descr)                                     \
+# define gdef(ty,  na,  _val, _descr)                                     \
   /** return the value of na **/                                         \
   ty get_ ## na() const   { return na; }                                 \
   /** set the value of na **/                                            \
@@ -453,7 +495,7 @@ public:
        else if (!strcmp(#na, "rangeY_max"))                              \
           rangeX_type = Plot_Range_type(rangeY_type | PLOT_RANGE_MAX);   \
      }
-#include "Quad_PLOT.def"
+# include "Quad_PLOT.def"
 
    /// return true iff a rangeX_min property was specified
    bool rangeX_min_valid() const
@@ -542,8 +584,8 @@ protected:
    /// the date to be plotted
    const Plot_data & plot_data;
 
-#define gdef(ty, na, _val, descr) /** descr **/ ty na;
-#include "Quad_PLOT.def"
+# define gdef(ty, na, _val, descr) /** descr **/ ty na;
+# include "Quad_PLOT.def"
 
    /// the width of the plot window
    Pixel window_width;
@@ -601,8 +643,8 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
                                                int verbosity) :
    line_count(data->get_row_count()),
    plot_data(*data),
-#define gdef(_ty,  na,  val, _descr) na(val),
-#include "Quad_PLOT.def"
+# define gdef(_ty,  na,  val, _descr) na(val),
+# include "Quad_PLOT.def"
    window_width(pa_border_L + pa_width  + pa_border_R),
    window_height(pa_border_T + pa_height + pa_border_B),
    min_X(data->get_min_X()),
@@ -736,9 +778,9 @@ const int max_Yi = ceil(max_Y / tile_Y);
 int
 Plot_window_properties::print(ostream & out) const
 {
-#define gdef(ty,  na,  _val, _descr) \
+# define gdef(ty,  na,  _val, _descr) \
    out << setw(20) << #na ":  " << Plot_data::ty ## _to_str(na) << endl;
-#include "Quad_PLOT.def"
+# include "Quad_PLOT.def"
 
    for (Plot_line_properties ** lp = line_properties; *lp; ++lp)
        {
@@ -771,24 +813,24 @@ const char * minus = strchr(att_and_val, '-');
         if (line < 0)             return 0;
         if (line >= line_count)   return 0;
 
-#define ldef(ty,  na,  val, _descr)                                       \
+# define ldef(ty,  na,  val, _descr)                                       \
          if (!strncmp(#na "-", att_and_val, minus - att_and_val))         \
             { const char * error = 0;                                     \
               line_properties[line]->set_ ## na(Plot_data::ty ##          \
                                                 _from_str(value, error)); \
               return error;                                               \
             }
-#include "Quad_PLOT.def"
+# include "Quad_PLOT.def"
       }
    else                          // window attribute
       {
-#define gdef(ty,  na,  _val, _descr) \
+# define gdef(ty,  na,  _val, _descr) \
          if (!strncmp(#na, att_and_val, colon - att_and_val))         \
             { const char * error = 0;                                 \
               set_ ## na(Plot_data::ty ## _from_str(value, error));   \
               return error;                                           \
             }
-#include "Quad_PLOT.def"
+# include "Quad_PLOT.def"
       }
 
    return "Unknown attribute";
@@ -991,7 +1033,7 @@ const xcb_segment_t segment = { x0, y0, x1, y1 };
    xcb_poly_segment(conn, window, gc, 1, &segment);
 }
 //-----------------------------------------------------------------------------
-#define ITEMS(x) sizeof(x)/sizeof(*x), x
+# define ITEMS(x) sizeof(x)/sizeof(*x), x
 void
 draw_point(xcb_connection_t * conn, xcb_drawable_t window, xcb_gcontext_t gc,
            int16_t x, int16_t y, Color canvas_color,
@@ -1300,12 +1342,20 @@ const Plot_data & data = w_props.get_plot_data();
 
    // open a connection to the X server
    //
-#if XCB_WINDOWS_WITH_UTF8_CAPTIONS
+# if XCB_WINDOWS_WITH_UTF8_CAPTIONS
 Display * dpy = XOpenDisplay(0);
 xcb_connection_t * conn = XGetXCBConnection(dpy);
-#else
+
+# else   // not XCB_WINDOWS_WITH_UTF8_CAPTIONS
 xcb_connection_t * conn = xcb_connect(0, 0);
-#endif
+# endif  // XCB_WINDOWS_WITH_UTF8_CAPTIONS
+
+   if (conn == 0 || xcb_connection_has_error(conn))
+      {
+        xcb_disconnect(conn);
+        MORE_ERROR() << "could not connect to the X-server ";
+        DOMAIN_ERROR;
+      }
 
    // get the first screen
    //
@@ -1344,7 +1394,7 @@ xcb_drawable_t window = xcb_generate_id(conn);
                        screen->root_visual,             // visual
                        mask, values);                   // mask and values
 
-#if XCB_WINDOWS_WITH_UTF8_CAPTIONS
+# if XCB_WINDOWS_WITH_UTF8_CAPTIONS
 
 // size (and position) hints for the window manager
 XSizeHints size_hints;
@@ -1358,14 +1408,14 @@ Xutf8SetWMProperties(dpy, window,
                      strdup(w_props.get_caption().c_str()),
                      "icon", 0, 0, &size_hints, 0, 0);
 
-#else
+# else   // not XCB_WINDOWS_WITH_UTF8_CAPTIONS
 
      xcb_change_property(conn, XCB_PROP_MODE_REPLACE, window,
                        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                        w_props.get_caption().size(),
                        w_props.get_caption().c_str());
 
-#endif
+# endif  // XCB_WINDOWS_WITH_UTF8_CAPTIONS
 
    }
 
@@ -1605,10 +1655,8 @@ const bool nested = B->get_ravel(0).is_pointer_cell();
         return Token(TOK_APL_VALUE1, IntScalar(found ? u.B0 : 0, LOC));
       }
 
-   if (B->get_rank() == 1 && !nested)   // vector argument
+   if (B->get_rank() == 1 && B->element_count() == 0 && !nested)
       {
-        if (B->element_count() > 0)   LENGTH_ERROR;
-
         help();
         return Token(TOK_APL_VALUE1, Idx0(LOC));
       }
@@ -1784,59 +1832,23 @@ Quad_PLOT::help() const
 
    CERR << left;
 
-#define gdef(ty,  na,  val, descr)           \
+# define gdef(ty,  na,  val, descr)           \
    CERR << setw(20) << #na ":  " << setw(14) \
         << Plot_data::ty ## _to_str(val) << " (" << #descr << ")" << endl;
-#include "Quad_PLOT.def"
+# include "Quad_PLOT.def"
 
    CERR <<
 "\n"
 "   2. Local (plot line N) Attributes:\n"
 "\n";
 
-#define ldef(ty,  na,  val, descr)             \
+# define ldef(ty,  na,  val, descr)             \
    CERR << setw(20) << #na "-N:  " << setw(14) \
         << Plot_data::ty ## _to_str(val) << " (" << #descr << ")" << endl;
-#include "Quad_PLOT.def"
+# include "Quad_PLOT.def"
 
    CERR << right;
 }
 //-----------------------------------------------------------------------------
-
-#else // no libxce...
-
-Quad_PLOT::Quad_PLOT()
-  : QuadFunction(TOK_Quad_PLOT),
-    verbosity(0)
-{
-}
-//-----------------------------------------------------------------------------
-Quad_PLOT::~Quad_PLOT()
-{
-}
-//-----------------------------------------------------------------------------
-Token
-Quad_PLOT::eval_B(Value_P B)
-{
-    MORE_ERROR() <<
-"⎕PLOT is not available because either no libxcb library was found on this\n"
-"system when GNU APL was compiled, or because it was disabled in ./configure.";
-
-   SYNTAX_ERROR;
-   return Token();
-}
-//-----------------------------------------------------------------------------
-Token
-Quad_PLOT::eval_AB(Value_P A, Value_P B)
-{
-    MORE_ERROR() <<
-"⎕PLOT is not available because either no libxcb library was found on this\n"
-"system when GNU APL was compiled, or because it was disabled in ./configure.";
-
-   SYNTAX_ERROR;
-   return Token();
-}
-//-----------------------------------------------------------------------------
-
-#endif // HAVE_PLOTW3_H
+#endif // defined(WHY_NOT)
 
