@@ -390,7 +390,11 @@ pollfd fds[count];
    loop(w, count)
        {
          fds[w].fd = open_windows[w].fd;
+#ifdef POLLRDHUP
          fds[w].events = POLLIN | POLLRDHUP;
+#else
+         fds[w].events = POLLIN;
+#endif
          fds[w].revents = 0;
        }
 
