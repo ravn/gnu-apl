@@ -75,7 +75,7 @@ Quad_PLOT::eval_B(Value_P B)
 Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B)
 {
-   eval_B(B);
+   return eval_B(B);
 }
 //-----------------------------------------------------------------------------
 
