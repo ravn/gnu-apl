@@ -63,7 +63,7 @@ protected:
    void help() const;
 
    /// plot the data (creating a new plot window in X)
-   Value_P plot_data(Plot_window_properties * w_props,
+   Value_P do_plot_data(Plot_window_properties * w_props,
                      const Plot_data * data);
 
    /// initialize the data to be plotted

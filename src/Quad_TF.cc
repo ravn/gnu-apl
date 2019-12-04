@@ -694,7 +694,7 @@ const ShapeItem ec = value->element_count();
         return  false;
       }
 
-const Depth depth = value->compute_depth();
+const APL_types::Depth depth = value->compute_depth();
 bool need_parenth = depth && level;
 
    // maybe print shape followed by ⍴

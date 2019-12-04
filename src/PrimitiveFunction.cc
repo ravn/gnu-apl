@@ -2507,7 +2507,7 @@ IndexExpr index_expr(ASS_none, LOC);
 Token
 Bif_F12_EQUIV::eval_B(Value_P B)
 {
-const Depth depth = B->compute_depth();
+const APL_types::Depth depth = B->compute_depth();
 
 Value_P Z(LOC);
    new (Z->next_ravel()) IntCell(depth);

@@ -977,14 +977,15 @@ const Cell * C = &get_ravel(0);
    return true;   // all items are scalars or vectors
 }
 //-----------------------------------------------------------------------------
-Depth
+APL_types::Depth
 Value::compute_depth() const
 {
    if (is_scalar())
       {
         if (get_ravel(0).is_pointer_cell())
            {
-             Depth d = get_ravel(0).get_pointer_value()->compute_depth();
+             APL_types::Depth d = get_ravel(0).get_pointer_value()
+                                     ->compute_depth();
              return 1 + d;
            }
 
@@ -993,10 +994,10 @@ Value::compute_depth() const
 
 const ShapeItem count = nz_element_count();
 
-Depth sub_depth = 0;
+APL_types::Depth sub_depth = 0;
    loop(c, count)
        {
-         Depth d = 0;
+         APL_types::Depth d = 0;
          if (get_ravel(c).is_pointer_cell())
             {
               d = get_ravel(c).get_pointer_value()->compute_depth();

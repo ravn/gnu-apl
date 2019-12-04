@@ -51,7 +51,7 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #endif
 
 // if someone (like curses on Solaris) has #defined erase() then
-// #undef it because vector would not be happy with it
+// #undef it because class vector<> would complain about it
 #ifdef erase
 #undef erase
 #endif
@@ -368,7 +368,7 @@ inline bool is_iPAD_char(Unicode uni)
 /// The location line l in file f.
 #define Loc(f, l) f ":" STR(l)
 
-extern ostream & get_CERR();
+extern std::ostream & get_CERR();
 
 /// print x and its source code location
 #define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;

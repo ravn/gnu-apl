@@ -49,8 +49,6 @@ typedef Rank Axis;
 typedef uint32_t uRank;
 typedef uRank uAxis;
 
-typedef int32_t Depth;
-
 /// The dimensions of an APL value.
 typedef int64_t ShapeItem;
 
@@ -596,5 +594,20 @@ struct _ftwc : public _twc
    ShapeItem from;
 };
 //-----------------------------------------------------------------------------
+
+//////////////////////////////////////////////////////////////
+// D. Namespace APL_types
+//////////////////////////////////////////////////////////////
+
+/*
+  instead of putting everything into a namespace (which makes the code
+  rather unreadable, we put only those types into a namesapce that were
+  observed to conflict with other libraries.
+ */
+
+namespace APL_types
+{
+  typedef int32_t Depth;
+}
 
 #endif // __APL_TYPES_HH_DEFINED__

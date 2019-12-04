@@ -138,9 +138,9 @@ operator << (ostream & out, const Token & token)
         else                                          out << "VALUE???";
         Value_P value = token.get_apl_val();
         Assert(!!value);
-        const Depth depth = value->compute_depth();
+        const APL_types::Depth depth = value->compute_depth();
         out << "«";
-        for (Depth d = 0; d < depth; ++d)   out << "≡";
+        for (APL_types::Depth d = 0; d < depth; ++d)   out << "≡";
 
         if (value->get_rank())   out << value->get_shape();
 

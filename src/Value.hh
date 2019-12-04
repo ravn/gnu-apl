@@ -268,7 +268,7 @@ public:
    ShapeItem get_enlist_count() const;
 
    /// compute the depth of this value.
-   Depth compute_depth() const;
+   APL_types::Depth compute_depth() const;
 
    /// store the scalars in this value into dest...
    void enlist(Cell * & dest, Value & dest_owner, bool left) const;

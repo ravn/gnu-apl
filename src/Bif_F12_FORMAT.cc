@@ -97,7 +97,7 @@ Value_P Z;
    // ρρZ ←→ ,1⌈⍴ρB     if B is simple
    // ρρZ ←→ ,1 or ,2   if B is nested
    //
-const Depth depth = B->compute_depth();
+const APL_types::Depth depth = B->compute_depth();
 Shape sZ;
    if (depth > 1)   // B is nested ⊢ ⍴⍴R is 1 or 2
       {

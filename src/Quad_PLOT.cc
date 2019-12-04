@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include <iomanip>
 #include <signal.h>
 
@@ -32,7 +33,10 @@
 # define WHY_NOT "xcb/xcb.h"
 #endif
 
+#include "Common.hh"
 #include "Quad_PLOT.hh"
+
+using namespace std;
 
 Quad_PLOT  Quad_PLOT::_fun;
 Quad_PLOT * Quad_PLOT::fun = &Quad_PLOT::_fun;
@@ -93,11 +97,10 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B)
 // or maybe CXXFLAGS=-D XCB_WINDOWS_WITH_UTF8_CAPTIONS=0 ./configure...
 //
 # ifndef XCB_WINDOWS_WITH_UTF8_CAPTIONS
-#  define XCB_WINDOWS_WITH_UTF8_CAPTIONS 1
+#  define XCB_WINDOWS_WITH_UTF8_CAPTIONS 0
 # endif
 
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
-#  define Depth Depth1
 #  include <X11/Xutil.h>
 #  include <X11/Xlib.h>
 #  include <X11/Xlib-xcb.h>
@@ -116,7 +119,20 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B)
 
 using namespace std;
 
-typedef uint16_t  Pixel;
+typedef uint16_t  Pixel_X;
+typedef uint16_t  Pixel_Y;
+typedef uint16_t  Pixel_Z;   // offset in the Z direction
+struct Pixel_XY
+{
+   Pixel_XY(Pixel_X px, Pixel_Y py)
+   : x(px),
+     y(py)
+   {}
+
+   const Pixel_X x; 
+   const Pixel_Y y;
+};
+
 typedef uint32_t Color;
 typedef std::string String;
 
@@ -126,12 +142,14 @@ class Plot_data_row
 {
 public:
    /// constructor
-   Plot_data_row(const double * pX, const double * pY, uint32_t idx,
-                 uint32_t len)
-   : X(pX), Y(pY), row_num(idx), N(len)
+   Plot_data_row(const double * pX, const double * pY, const double * pZ,
+                 uint32_t idx, uint32_t len)
+   : X(pX), Y(pY), Z(pZ), row_num(idx), N(len)
    {
      min_X = max_X = get_X(0);
      min_Y = max_Y = get_Y(0);
+     min_Z = max_Z = get_Z(0);
+
      for (unsigned int n = 1; n < N; ++n)
          {
             const double Xn = get_X(n);
@@ -141,6 +159,10 @@ public:
             const double Yn = get_Y(n);
             if (min_Y > Yn)   min_Y = Yn;
             if (max_Y < Yn)   max_Y = Yn;
+
+            const double Zn = get_Z(n);
+            if (min_Z > Zn)   min_Z = Zn;
+            if (max_Z < Zn)   max_Z = Zn;
          }
    }
 
@@ -164,6 +186,10 @@ public:
    double get_Y(uint32_t n) const
       { return Y[n]; }
 
+   /// return the n-th Z coordinate
+   double get_Z(uint32_t n) const
+      { return Z ? Z[n] : n; }
+
    /// return the smallest value in X
    double get_min_X() const
       { return min_X; }
@@ -176,16 +202,27 @@ public:
    double get_min_Y() const
       { return min_Y; }
 
-   /// return the largest value in X (if present) otherwise N-1
+   /// return the largest value in Y
    double get_max_Y() const
       { return max_Y; }
 
+   /// return the smallest value in Z
+   double get_min_Z() const
+      { return min_Z; }
+
+   /// return the largest value in Y
+   double get_max_Z() const
+      { return max_Z; }
+
 protected:
-   /// the X coordinates
+   /// the X coordinates (optional, 0 if none)
    const double * X;
 
    /// the Y coordinates
    const double * Y;
+
+   /// the Z coordinates (optional, 0 if none)
+   const double * Z;
 
    /// the row number
    const uint32_t row_num;
@@ -204,6 +241,12 @@ protected:
 
    /// the largest value in Y
    double max_Y;
+
+   /// the smallest value in Z
+   double min_Z;
+
+   /// the largest value in Z
+   double max_Z;
 };
 //=============================================================================
 /// data for all plot lines
@@ -212,7 +255,8 @@ class Plot_data
 public:
    /// constructor
    Plot_data(uint32_t rows)
-   : row_count(rows),
+   : surface(false),
+     row_count(rows),
      idx(0)
       {
         data_rows = new const Plot_data_row *[row_count];
@@ -253,6 +297,17 @@ public:
    double get_max_Y() const
       { return max_Y; }
 
+   /// return the smallest Z value in the data matrix
+   double get_min_Z() const
+      { return min_Z; }
+
+   /// return the largest Z value in the data matrix
+   double get_max_Z() const
+      { return max_Z; }
+
+   /// return true for surface plots
+   bool is_surface_plot() const       { return surface; }
+
    /// add a row to the data matrix
    void add_row(const Plot_data_row * row)
       {
@@ -264,6 +319,8 @@ public:
              max_X = row->get_max_X();
              min_Y = row->get_min_Y();
              max_Y = row->get_max_Y();
+             min_Z = row->get_min_Y();
+             max_Z = row->get_max_Y();
            }
         else
            {
@@ -271,6 +328,8 @@ public:
              if (max_X < row->get_max_X())   max_X = row->get_max_X();
              if (min_Y > row->get_min_Y())   min_Y = row->get_min_Y();
              if (max_Y < row->get_max_Y())   max_Y = row->get_max_Y();
+             if (min_Z > row->get_min_Z())   min_Z = row->get_min_Z();
+             if (max_Z < row->get_max_Z())   max_Z = row->get_max_Z();
            }
       }
 
@@ -283,8 +342,15 @@ public:
         return ret;
       }
 
-   /// convert a Pixel to a string
-   static const char * Pixel_to_str(Pixel val)
+   static const char * Pixel_X_to_str(Pixel_X val)
+      {
+        static char ret[40];
+        snprintf(ret, sizeof(ret), "%u pixel", val);
+        ret[sizeof(ret) - 1] = 0;
+        return ret;
+      }
+
+   static const char * Pixel_Y_to_str(Pixel_Y val)
       {
         static char ret[40];
         snprintf(ret, sizeof(ret), "%u pixel", val);
@@ -322,14 +388,18 @@ public:
       { Assert(idx < row_count);   return *data_rows[idx]; }
 
    /// convert a string to a Pixel
-   static Pixel Pixel_from_str(const char * str, const char * & error)
+   static Pixel_X Pixel_X_from_str(const char * str, const char * & error)
+      { error = 0;   return strtol(str, 0, 10); }
+
+   /// convert a string to a Pixel
+   static Pixel_Y Pixel_Y_from_str(const char * str, const char * & error)
       { error = 0;   return strtol(str, 0, 10); }
 
    /// convert a string to a double
    static double double_from_str(const char * str, const char * & error)
       { error = 0;   return strtod(str, 0); }
 
-   /// consvert a string like "#RGB" or "#RRGGB" to a color
+   /// convert a string like "#RGB" or "#RRGGB" to a color
    static Color Color_from_str(const char * str, const char * & error);
 
    /// convert a string to a uint32_t
@@ -339,6 +409,9 @@ public:
    /// convert a string to a String
    static String String_from_str(const char * str, const char * & error)
       { error = 0;   return str; }
+
+   /// true for surface plots
+   bool surface;
 
 protected:
    /// the rows of the data matrix (0-terminated)
@@ -361,6 +434,12 @@ protected:
 
    /// the largest value in Y
    double max_Y;
+
+   /// the smallest value in Z
+   double min_Z;
+
+   /// the largest value in Z
+   double max_Z;
 };
 //-----------------------------------------------------------------------------
 Color
@@ -395,7 +474,10 @@ uint32_t r, g, b;
 class Plot_line_properties
 {
 public:
-   /// constructor
+   /** constructor. Set all property values to the defaults that are
+       defined in Quad_PLOT.def, and then override those property that
+       have different defaults for different lines.
+   **/
    Plot_line_properties(int lnum) :
 # define ldef(_ty,  na,  val, _descr) na(val),
 # include "Quad_PLOT.def"
@@ -433,7 +515,7 @@ public:
   /// plot line number
   const int line_number;   // starting a 0 regardless of ⎕IO
 
-  /// a buffer for creating a legend name from a macto
+  /// a buffer for creating a legend name from a macro
   char legend_name_buffer[50];
 };
 //-----------------------------------------------------------------------------
@@ -477,7 +559,7 @@ public:
    bool update(int verbosity);
 
    /// handle window resize event
-   void set_window_size(int width, int height);
+   void set_window_size(Pixel_X width, Pixel_Y height);
 
    // get_XXX() and set_XXX functions
 # define gdef(ty,  na,  _val, _descr)                                     \
@@ -490,10 +572,14 @@ public:
           rangeX_type = Plot_Range_type(rangeX_type | PLOT_RANGE_MIN);   \
        else if (!strcmp(#na, "rangeX_max"))                              \
           rangeX_type = Plot_Range_type(rangeX_type | PLOT_RANGE_MAX);   \
-       if (!strcmp(#na, "rangeY_min"))                                   \
-          rangeX_type = Plot_Range_type(rangeY_type | PLOT_RANGE_MIN);   \
+       else if (!strcmp(#na, "rangeY_min"))                              \
+          rangeY_type = Plot_Range_type(rangeY_type | PLOT_RANGE_MIN);   \
        else if (!strcmp(#na, "rangeY_max"))                              \
-          rangeX_type = Plot_Range_type(rangeY_type | PLOT_RANGE_MAX);   \
+          rangeY_type = Plot_Range_type(rangeY_type | PLOT_RANGE_MAX);   \
+       else if (!strcmp(#na, "rangeZ_min"))                              \
+          rangeZ_type = Plot_Range_type(rangeZ_type | PLOT_RANGE_MIN);   \
+       else if (!strcmp(#na, "rangeY_max"))                              \
+          rangeZ_type = Plot_Range_type(rangeZ_type | PLOT_RANGE_MAX);   \
      }
 # include "Quad_PLOT.def"
 
@@ -513,17 +599,34 @@ public:
    bool rangeY_max_valid() const
       { return !!(rangeY_type & PLOT_RANGE_MAX); }
 
+   /// return true iff a rangeZ_min property was specified
+   bool rangeZ_min_valid() const
+      { return !!(rangeZ_type & PLOT_RANGE_MIN); }
+
+   /// return true iff a rangeZ_max property was specified
+   bool rangeZ_max_valid() const
+      { return !!(rangeZ_type & PLOT_RANGE_MAX); }
+
    /// an array of plot line properties
-   Plot_line_properties ** get_line_properties() const
+   Plot_line_properties * const * const get_line_properties() const
       { return line_properties; }
 
    /// convert \n val_X to the X coordinate of the pixel in the plot area
-   Pixel valX2pixel(double val_X) const
+   Pixel_X valX2pixel(double val_X) const
       { return pa_border_L + val_X * scale_X; }
 
    /// convert \n val_Y to the Y coordinate of the pixel in the plot area
-   Pixel valY2pixel(double val_Y) const
+   Pixel_Y valY2pixel(double val_Y) const
       { return pa_border_T + pa_height - val_Y * scale_Y; }
+
+   /// convert \n val_Z to the relative Z vector (q. quadrant)
+   Pixel_Z valZ2pixel(double val_Z) const
+
+      { return  val_Z * scale_Z; }
+
+   /// convert values \b val_X,  \b val_Y,  and \b val_Z, to the X and Y
+   /// coordinate of the pixel below the Z=0 plane of the plot area
+   Pixel_XY valXYZ2pixelXY(double val_X, double val_Y, double val_Z) const;
 
    /// print the properties (for sebugging purposes)
    int print(ostream & out) const;
@@ -533,10 +636,10 @@ public:
    const char * set_attribute(const char * att_and_val);
 
    /// return the width of the plot window
-   Pixel  get_window_width() const    { return window_width; }
+   Pixel_X  get_window_width() const    { return window_width; }
 
    /// return the height of the plot window
-   Pixel  get_window_height() const   { return window_height; }
+   Pixel_Y  get_window_height() const   { return window_height; }
 
    /// return the smallest X value
    double get_min_X() const           { return min_X; }
@@ -550,11 +653,20 @@ public:
    /// return the largest Y value
    double get_max_Y() const           { return max_Y; }
 
+   /// return the smallest Z value
+   double get_min_Z() const           { return min_Z; }
+
+   /// return the largest Z value
+   double get_max_Z() const           { return max_Z; }
+
    /// return the X value → X pixels scaling factor
    double get_scale_X() const         { return scale_X; }
 
    /// return the Y value → Y pixels scaling factor
    double get_scale_Y() const         { return scale_Y; }
+
+   /// return the Z value → Z pixels scaling factor
+   double get_scale_Z() const        { return scale_Z; }
 
    /// return the number of pixels between X grid lines
    double get_tile_X() const          { return tile_X; }
@@ -562,17 +674,23 @@ public:
    /// return the number of pixels between Y grid lines
    double get_tile_Y() const          { return tile_Y; }
 
+   /// return the number of pixels between Z grid lines
+   double get_tile_Z() const          { return tile_Z; }
+
    /// return the last index of the X grid
-   int    get_gridX_last() const      { return gridX_last; }
+   Pixel_X get_gridX_last() const      { return gridX_last; }
 
    /// return the last index of the Y grid
-   int    get_gridY_last() const      { return gridY_last; }
+   Pixel_Y get_gridY_last() const      { return gridY_last; }
+
+   /// return the last index of the Y grid
+   Pixel_Y get_gridZ_last() const      { return gridZ_last; }
 
    /// return the verbosity when plotting
-   int    get_verbosity() const       { return verbosity; }
+   int get_verbosity() const       { return verbosity; }
 
    /// set the verbosity when plotting
-   void  set_verbosity(int verb)      { verbosity = verb; }
+   void set_verbosity(int verb)      { verbosity = verb; }
 
    /// return the date to be plotted
    const Plot_data & get_plot_data() const   { return plot_data; }
@@ -588,10 +706,10 @@ protected:
 # include "Quad_PLOT.def"
 
    /// the width of the plot window
-   Pixel window_width;
+   Pixel_X window_width;
 
    /// the height of the plot window
-   Pixel window_height;
+   Pixel_Y window_height;
 
    /// the smallest X value
    double min_X;
@@ -605,11 +723,20 @@ protected:
    /// the largest Y value
    double max_Y;
 
+   /// the smallest Z value
+   double min_Z;
+
+   /// the largest Z value
+   double max_Z;
+
    /// the X value → X pixels scaling factor
    double scale_X;
 
    /// the Y value → Y pixels scaling factor
    double scale_Y;
+
+   /// the Z value → Z pixels scaling factor
+   double scale_Z;
 
    /// the number of pixels between X grid lines
    double tile_X;
@@ -617,11 +744,17 @@ protected:
    /// the number of pixels between Y grid lines
    double tile_Y;
 
+   /// the number of pixels between Z grid lines
+   double tile_Z;
+
    /// the last index of the X grid
    int gridX_last;
 
    /// the last index of the Y grid
    int gridY_last;
+
+   /// the last index of the Y grid
+   int gridZ_last;
 
    /// the verbosity when plotting
    int verbosity;
@@ -632,52 +765,71 @@ protected:
    /// the kind of Y range
    Plot_Range_type rangeY_type;
 
-   /// array contraining the data for rhe plot lines
-   Plot_line_properties ** line_properties;
+   /// the kind of Z range
+   Plot_Range_type rangeZ_type;
+
+   /// array containing the data for the plot lines
+   Plot_line_properties * * line_properties;
 
    /// round val up to the next higher 1/2/5×10^N
    static double round_up_125(double val);
 };
 //-----------------------------------------------------------------------------
 Plot_window_properties::Plot_window_properties(const Plot_data * data,
-                                               int verbosity) :
-   line_count(data->get_row_count()),
-   plot_data(*data),
+                                               int verbosity)
+   : line_count(data->get_row_count()),
+     plot_data(*data),
 # define gdef(_ty,  na,  val, _descr) na(val),
 # include "Quad_PLOT.def"
-   window_width(pa_border_L + pa_width  + pa_border_R),
-   window_height(pa_border_T + pa_height + pa_border_B),
-   min_X(data->get_min_X()),
-   max_X(data->get_max_X()),
-   min_Y(data->get_min_Y()),
-   max_Y(data->get_max_Y()),
-   scale_X(0),
-   scale_Y(0),
-   tile_X(0),
-   tile_Y(0),
-   verbosity(0),
-   rangeX_type(NO_RANGE),
-   rangeY_type(NO_RANGE)
+     window_width(pa_border_L  + origin_X + pa_width  + pa_border_R),
+     window_height(pa_border_T + origin_Y + pa_height + pa_border_B),
+     min_X(data->get_min_X()),
+     max_X(data->get_max_X()),
+     min_Y(data->get_min_Y()),
+     max_Y(data->get_max_Y()),
+     min_Z(data->get_min_Z()),
+     max_Z(data->get_max_Z()),
+     scale_X(0),
+     scale_Y(0),
+     scale_Z(0),
+     tile_X(0),
+     tile_Y(0),
+     tile_Z(0),
+     verbosity(0),
+     rangeX_type(NO_RANGE),
+     rangeY_type(NO_RANGE),
+     rangeZ_type(NO_RANGE)
 {
    (verbosity > 1) && CERR << setw(20) << "min_X: " << min_X << endl
                            << setw(20) << "max_X: " << max_X << endl
                            << setw(20) << "min_Y: " << min_Y << endl
-                           << setw(20) << "max_Y: " << max_Y << endl;
+                           << setw(20) << "max_Y: " << max_Y << endl
+                           << setw(20) << "min_Z: " << min_Z << endl
+                           << setw(20) << "max_Z: " << max_Z << endl;
 
    line_properties = new Plot_line_properties *[line_count + 1];
    loop (l, line_count)   line_properties[l] = new Plot_line_properties(l);
    line_properties[line_count] = 0;
+
+   // set the origin_X and origin_Y properties back to 0 so that they
+   // affect only surface plots.
+   if (!data->surface)
+      {
+         set_origin_X(0);
+         set_origin_Y(0);
+      }
+
    update(verbosity);
 }
 //-----------------------------------------------------------------------------
 void
-Plot_window_properties::set_window_size(int width, int height)
+Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
 {
    // window_width and window_height are, despite of their names, the
    // size of the plot area (without borders).
    //
-   pa_width  = width  - pa_border_L - pa_border_R;
-   pa_height = height - pa_border_T - pa_border_B;
+   pa_width  = width  - pa_border_L - origin_X - pa_border_R;
+   pa_height = height - pa_border_T - origin_Y - pa_border_B;
    update(0);
 }
 //-----------------------------------------------------------------------------
@@ -685,13 +837,27 @@ Plot_window_properties::set_window_size(int width, int height)
 bool
 Plot_window_properties::update(int verbosity)
 {
-   window_width  = pa_border_L + pa_width  + pa_border_R;
-   window_height = pa_border_T + pa_height + pa_border_B;
+   // this function is called for 2 reasons:
+   //
+   // 1. when constructor Plot_window_properties::Plot_window_properties()
+   //    is called in plot_main(), i.e. when the the plot window is created 
+   //    for the first time, and
+   //
+   // 2. when the user resizes the plot window.
+   //
+   // In both cases the caller has changed (at least) pa_width and pa_height,
+   // and this function recomputes all variables that depend on them.
+   //
+
+   window_width  = pa_border_L + origin_X + pa_width  + pa_border_R;
+   window_height = pa_border_T + origin_Y + pa_height + pa_border_B;
 
    min_X = plot_data.get_min_X();
    max_X = plot_data.get_max_X();
    min_Y = plot_data.get_min_Y();
    max_Y = plot_data.get_max_Y();
+   min_Z = plot_data.get_min_Z();
+   max_Z = plot_data.get_max_Z();
 
    // the user may override the range derived from the data
    //
@@ -699,6 +865,8 @@ Plot_window_properties::update(int verbosity)
    if (rangeX_max_valid())   max_X = rangeX_max;
    if (rangeY_min_valid())   min_Y = rangeY_min;
    if (rangeY_max_valid())   max_Y = rangeY_max;
+   if (rangeZ_min_valid())   min_Z = rangeZ_min;
+   if (rangeZ_max_valid())   max_Z = rangeZ_max;
 
    if (min_X >= max_X)
       {
@@ -712,65 +880,93 @@ Plot_window_properties::update(int verbosity)
         return true;
       }
 
+   if (min_Z >= max_Z)
+      {
+        MORE_ERROR() << "empty Z range in A ⎕PLOT B";
+        return true;
+      }
+
 double delta_X = max_X - min_X;
 double delta_Y = max_Y - min_Y;
+double delta_Z = max_Z - min_Z;
+const double orig_len = sqrt(origin_X*origin_X + origin_Y*origin_Y);
 
    // first approximation for value → pixel factor
    //
    scale_X = pa_width  / delta_X;   // pixels per X-value
    scale_Y = pa_height / delta_Y;   // pixels per Y-value
+   scale_Z = orig_len ? orig_len / delta_Z : 1.0;    // pixels per Z-value
 
    verbosity > 1 &&
       CERR << setw(20) << "delta_X (1): " << delta_X << " (Xmax-Xmin)" << endl
-           << setw(20) << "delta_Y (1): " << delta_Y << " Ymax-Ymin" << endl
+           << setw(20) << "delta_Y (1): " << delta_Y << " (Ymax-Ymin)" << endl
+           << setw(20) << "delta_Z (1): " << delta_Z << " (Zmax-Zmin)" << endl
            << setw(20) << "scale_X (1): " << scale_X << " pixels/X" << endl
-           << setw(20) << "scale_Y (1): " << scale_Y << " pixels/Y" << endl;
+           << setw(20) << "scale_Y (1): " << scale_Y << " pixels/Y" << endl
+           << setw(20) << "scale_Z (1): " << scale_Z << " pixels/Z" << endl;
 
 const double tile_X_raw = gridX_pixels / scale_X;
 const double tile_Y_raw = gridY_pixels / scale_Y;
+const double tile_Z_raw = gridZ_pixels / scale_Z;
 
    verbosity > 1 &&
       CERR << setw(20) << "tile_X_raw: " << tile_X_raw
                                          << "(∆X between grid lines)" << endl
            << setw(20) << "tile_Y_raw: " << tile_Y_raw
-                                         << "(∆Y between grid lines)" << endl;
+                                         << "(∆Y between grid lines)" << endl
+           << setw(20) << "tile_Z_raw: " << tile_Z_raw
+                                         << "(∆Z between grid lines)" << endl;
 
    tile_X = round_up_125(tile_X_raw);
    tile_Y = round_up_125(tile_Y_raw);
+   tile_Z = round_up_125(tile_Z_raw);
 
 const int min_Xi = floor(min_X / tile_X);
 const int min_Yi = floor(min_Y / tile_Y);
+const int min_Zi = floor(min_Z / tile_Z);
 const int max_Xi = ceil(max_X / tile_X);
 const int max_Yi = ceil(max_Y / tile_Y);
+const int max_Zi = ceil(max_Z / tile_Z);
    gridX_last = 0.5 + max_Xi - min_Xi;
    gridY_last = 0.5 + max_Yi - min_Yi;
+   gridZ_last = 0.5 + max_Zi - min_Zi;
 
    min_X = tile_X * floor(min_X / tile_X);
    min_Y = tile_Y * floor(min_Y / tile_Y);
+   min_Z = tile_Z * floor(min_Z / tile_Z);
    max_X = tile_X * ceil(max_X  / tile_X);
    max_Y = tile_Y * ceil(max_Y  / tile_Y);
+   max_Z = tile_Z * ceil(max_Z  / tile_Z);
 
    delta_X = max_X - min_X;
    delta_Y = max_Y - min_Y;
+   delta_Z = max_Z - min_Z;
 
    // final value → pixel factor
    //
-   scale_X = pa_width / delta_X;
+   scale_X = pa_width  / delta_X;
    scale_Y = pa_height / delta_Y;
+   scale_Z = orig_len ? orig_len  / delta_Z : 1.0;
 
    verbosity > 1 &&
       CERR << setw(20) << "min_X (2): " << min_X << endl
            << setw(20) << "max_X (2): " << max_X << endl
            << setw(20) << "min_Y (2): " << min_Y << endl
            << setw(20) << "max_Y (2): " << max_Y << endl
+           << setw(20) << "min_Z (2): " << min_Z << endl
+           << setw(20) << "max_Z (2): " << max_Z << endl
            << setw(20) << "delta_X (2): " << delta_X << " (Xmax-Xmin)" << endl
            << setw(20) << "delta_Y (2): " << delta_Y << " (Ymax-Ymin)" << endl
+           << setw(20) << "delta_Z (2): " << delta_Z << " (Zmax-Zmin)" << endl
            << setw(20) << "scale_X (2): " << scale_X << " pixels/X" << endl
            << setw(20) << "scale_Y (2): " << scale_Y << " pixels/Y" << endl
+           << setw(20) << "scale_Z (2): " << scale_Z << " pixels/Z" << endl
            << setw(20) << "tile_X  (2): " << tile_X
                                           << "(∆X between grid lines)" << endl
-           << setw(20) << "tile    (2): " << tile_Y
-                                          << "(∆Y between grid lines)" << endl;
+           << setw(20) << "tile_Y  (2): " << tile_Y
+                                          << "(∆Y between grid lines)" << endl
+           << setw(20) << "tile_Z  (2): " << tile_Z
+                                          << "(∆Z between grid lines)" << endl;
 
    return false;   // OK
 }
@@ -877,95 +1073,96 @@ xcb_generic_error_t * error = xcb_request_check(conn, cookie);
       }
 }
 //-----------------------------------------------------------------------------
-xcb_char2b_t *
-build_chars(const char * str, size_t length)
+/// Some xcb IDs (returned from the X server)
+struct Plot_context
 {
-xcb_char2b_t * ret = new xcb_char2b_t[length];
-   if (!ret)   return 0;
-
-   loop(l, length)
-       {
-         ret[l].byte1 = 0;
-         ret[l].byte2 = str[l];
-       }
-
-  return ret;
-}
+  xcb_connection_t * conn;
+  xcb_window_t       window;
+  xcb_screen_t       * screen;
+  xcb_gcontext_t     point;
+  xcb_gcontext_t     line;
+  xcb_gcontext_t     text;
+  xcb_font_t         font;
+};
 //-----------------------------------------------------------------------------
 /// the width and the height of a string (in pixels)
 struct string_width_height
 {
    /// constructor: ask X-server for the size (in pixels) of \b string
-   string_width_height(const char * string, xcb_connection_t * conn,
-                       xcb_font_t font);
+   string_width_height(const Plot_context & pctx, const char * string);
 
    /// the width of the string (pixels)
-   int width;
+   Pixel_X width;
 
    /// the height of the string (pixels)
-   int height;
+   Pixel_Y height;
 };
+//-----------------------------------------------------------------------------
 
-string_width_height::string_width_height(const char * string,
-                                         xcb_connection_t * conn,
-                                         xcb_font_t font)
+string_width_height::string_width_height(const Plot_context & pctx,
+                                         const char * string)
 {
-xcb_char2b_t * xcb_str = build_chars(string, strlen(string));
+const size_t string_length = strlen(string);
+xcb_char2b_t xcb_str[string_length + 10];
+
+   loop(s, string_length)
+       {
+         xcb_str[s].byte1 = 0;
+         xcb_str[s].byte2 = string[s];
+       }
 
 xcb_query_text_extents_cookie_t cookie =
-   xcb_query_text_extents(conn, font, strlen(string), xcb_str);
+   xcb_query_text_extents(pctx.conn, pctx.font, string_length, xcb_str);
 
 xcb_query_text_extents_reply_t * reply =
-   xcb_query_text_extents_reply(conn, cookie, 0);
+   xcb_query_text_extents_reply(pctx.conn, cookie, 0);
 
-  if (!reply) puts("STRING ERROR");
-
-  width  = reply->overall_width;
-  height = reply->font_ascent + reply->font_descent;
-  // origin = reply->font_ascent;
-
-  delete xcb_str;
-  free(reply);
+   if (reply)
+      {
+        width  = reply->overall_width;
+        height = reply->font_ascent + reply->font_descent;
+        // origin = reply->font_ascent;
+        free(reply);
+      }
+   else
+      {
+        puts("XCB ERROR: xcb_query_text_extents_reply() failed.");
+        width  = 24;
+        height = 13;
+      }
 }
 //-----------------------------------------------------------------------------
 xcb_gcontext_t
-getFontGC(xcb_connection_t * conn, xcb_screen_t * screen, xcb_window_t window,
-          const char * font_name, xcb_font_t font,
-          xcb_void_cookie_t & fontCookie)
+setup_font_gc(Plot_context & pctx, const char * font_name)
 {
    /* get font */
-   fontCookie = xcb_open_font_checked(conn, font, strlen (font_name),
-                                      font_name);
 
-   testCookie(fontCookie, conn, "can't open font");
+   testCookie(xcb_open_font_checked(pctx.conn, pctx.font, strlen(font_name),
+                                    font_name), pctx.conn, "can't open font");
 
-   /* create graphics context */
-xcb_gcontext_t gc = xcb_generate_id (conn);
+   // create graphics context
+xcb_gcontext_t gc = xcb_generate_id(pctx.conn);
 uint32_t mask     = XCB_GC_FOREGROUND | XCB_GC_BACKGROUND | XCB_GC_FONT;
-uint32_t values[3] = { screen->black_pixel,
-                           screen->white_pixel,
-                           font };
+uint32_t values[3] = { pctx.screen->black_pixel,
+                       pctx.screen->white_pixel,
+                       pctx.font };
 
-xcb_void_cookie_t gcCookie = xcb_create_gc_checked (conn,
-                                                    gc,
-                                                    window,
-                                                    mask,
-                                                    values);
-
-   testCookie(gcCookie, conn, "can't create gc");
+   testCookie(xcb_create_gc_checked(pctx.conn, gc, pctx.window, mask, values),
+              pctx.conn, "can't create font gc");
    return gc;
 }
 //-----------------------------------------------------------------------------
 void
-draw_text(xcb_connection_t * conn, xcb_gcontext_t text_gc,
-          xcb_window_t window, int16_t x, int16_t y, const char * label)
+draw_text(const Plot_context & pctx, Pixel_X x, Pixel_Y y, const char * label)
 {
 /* draw the text */
-xcb_void_cookie_t textCookie = xcb_image_text_8_checked(conn, strlen(label),
-                                                        window, text_gc, x, y,
-                                                        label);
+xcb_void_cookie_t textCookie = xcb_image_text_8_checked(pctx.conn,
+                                                        strlen(label),
+                                                        pctx.window, pctx.text,
+                                                        x, y, label);
 
-   testCookie(textCookie, conn, "can't paste text");
+   testCookie(textCookie, pctx.conn,
+              "xcb_image_text_8_checked() failed.");
 }
 //-----------------------------------------------------------------------------
 char *
@@ -1020,36 +1217,30 @@ const char * unit = 0;
 }
 //-----------------------------------------------------------------------------
 void
-draw_tick(xcb_connection_t * conn, xcb_gcontext_t text_gc,
-          xcb_window_t window, int16_t x, int16_t y, const char * label)
+draw_line(const Plot_context & pctx, Pixel_X x0, Pixel_Y y0,
+                                     Pixel_X x1, Pixel_Y y1)
 {
-}
-//-----------------------------------------------------------------------------
-void
-draw_line(xcb_connection_t * conn, xcb_drawable_t window, xcb_gcontext_t gc,
-           int16_t x0, int16_t y0, int16_t x1, int16_t y1)
-{
-const xcb_segment_t segment = { x0, y0, x1, y1 };
-   xcb_poly_segment(conn, window, gc, 1, &segment);
+const xcb_segment_t segment = { int16_t(x0), int16_t(y0),
+                                int16_t(x1), int16_t(y1) };
+   xcb_poly_segment(pctx.conn, pctx.window, pctx.line, 1, &segment);
 }
 //-----------------------------------------------------------------------------
 # define ITEMS(x) sizeof(x)/sizeof(*x), x
 void
-draw_point(xcb_connection_t * conn, xcb_drawable_t window, xcb_gcontext_t gc,
-           int16_t x, int16_t y, Color canvas_color,
+draw_point(const Plot_context & pctx, Pixel_X x, Pixel_Y y, Color canvas_color,
            const Plot_line_properties & l_props)
 {
-const Pixel point_size  = l_props.point_size;
-const Pixel point_size2  = l_props.point_size2;
-const int   point_style = l_props.get_point_style();
-const int16_t half = point_size >> 1;
+const Pixel_X point_size  = l_props.point_size;   // outer point diameter
+const Pixel_X point_size2 = l_props.point_size2;  // inner point diameter
+const int16_t half = point_size >> 1;             // outer point radius
+const int point_style = l_props.get_point_style();
 
    if (point_style == 1)   // circle
       {
         xcb_arc_t arc = { int16_t(x - half), int16_t(y - half),   // positions
                           point_size, point_size,                 // diameters
                           0, int16_t(360 << 6) };                 // angles
-        xcb_poly_fill_arc(conn, window, gc, 1, &arc);
+        xcb_poly_fill_arc(pctx.conn, pctx.window, pctx.point, 1, &arc);
 
         if (point_size2)   // hollow
            {
@@ -1058,9 +1249,9 @@ const int16_t half = point_size >> 1;
                                 point_size2, point_size2,             // dia
                                 0, int16_t(360 << 6) };               // ang
              enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(conn, gc, mask, &canvas_color);
-             xcb_poly_fill_arc(conn, window, gc, 1, &arc2);
-             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             xcb_poly_fill_arc(pctx.conn, pctx.window, pctx.point, 1, &arc2);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
            }
       }
    else if (point_style == 2)   // triangle ∆
@@ -1071,7 +1262,7 @@ const int16_t half = point_size >> 1;
               { int16_t(x), center_y  },
               { int16_t(half), hypo_y },
               { int16_t(-2*half), 0   } };
-        xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+        xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
@@ -1083,10 +1274,11 @@ const int16_t half = point_size >> 1;
                  { int16_t(half2), hypo2_y },
                  { int16_t(-2*half2), 0    } };
              enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(conn, gc, mask, &canvas_color);
-             xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
+                           XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
            }
       }
    else if (point_style == 3)   // triangle ∇
@@ -1097,7 +1289,7 @@ const int16_t half = point_size >> 1;
               { int16_t(x), center_y  },
               { int16_t(half), hypo_y },
               { int16_t(-2*half), 0   } };
-        xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+        xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
@@ -1109,10 +1301,10 @@ const int16_t half = point_size >> 1;
                  { int16_t(half2), hypo2_y },
                  { int16_t(-2*half2), 0    } };
              enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(conn, gc, mask, &canvas_color);
-             xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
            }
       }
    else if (point_style == 4)   // caro
@@ -1122,7 +1314,7 @@ const int16_t half = point_size >> 1;
               { int16_t(half), int16_t(half)  },
               { int16_t(-half), int16_t(half) },
               { int16_t(-half), int16_t(-half)} };
-        xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+        xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
@@ -1133,10 +1325,10 @@ const int16_t half = point_size >> 1;
                    { int16_t(-half2), int16_t(half2) },
                    { int16_t(-half2), int16_t(-half2)} };
              enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(conn, gc, mask, &canvas_color);
-             xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
            }
       }
    else if (point_style == 5)   // square
@@ -1146,7 +1338,7 @@ const int16_t half = point_size >> 1;
               { int16_t(point_size), 0  },
               { 0, int16_t(point_size)  },
               { int16_t(-point_size), 0 } };
-        xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+        xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
@@ -1157,169 +1349,314 @@ const int16_t half = point_size >> 1;
                    { 0, int16_t(point_size2)  },
                    { int16_t(-point_size2), 0 } };
              enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(conn, gc, mask, &canvas_color);
-             xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
            }
       }
 
    // otherwise: draw no point
 }
 //-----------------------------------------------------------------------------
+/// draw the legend
 void
-do_plot(xcb_connection_t * conn, xcb_screen_t * screen, xcb_drawable_t window,
-        xcb_gcontext_t gc, const Plot_window_properties & w_props,
-        const Plot_data & data)
+draw_legend(const Plot_context & pctx, const Plot_window_properties & w_props)
 {
-   // draw the background
-   //
+Plot_line_properties const * const * l_props = w_props.get_line_properties();
 const Color canvas_color = w_props.get_canvas_color();
-   {
-     enum { mask = XCB_GC_FOREGROUND };
-     xcb_change_gc(conn, gc, mask, &canvas_color);
-     xcb_rectangle_t rect = { 0, 0, w_props.get_window_width(),
-                                    w_props.get_window_height() };
-     xcb_poly_fill_rectangle(conn, window, gc, 1, &rect);
-   }
 
-Plot_line_properties ** l_props = w_props.get_line_properties();
-
-   // get graphics context...
-   //
-const xcb_font_t font = xcb_generate_id(conn);
-xcb_void_cookie_t fontCookie;
-xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
-                                   font, fontCookie);
-
-   // draw vertical (X-) grid lines...
-   //
-   {
-     enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-     const uint32_t values[] = { w_props.get_gridX_color(),
-                                 w_props.get_gridX_line_width() };
-     xcb_change_gc(conn, gc, mask, values);
-
-     const int py0 = w_props.valY2pixel(0);
-     const double dy = w_props.get_max_Y() - w_props.get_min_Y();
-     const int py1 = w_props.valY2pixel(dy);
-     for (int ix = 0; ix <= w_props.get_gridX_last(); ++ix)
-         {
-           const double v = w_props.get_min_X() + ix*w_props.get_tile_X();
-           const int px = w_props.valX2pixel(v - w_props.get_min_X());
-           if (ix == 0 || ix == w_props.get_gridX_last() ||
-               w_props.get_gridX_style() == 1)
-              {
-                draw_line(conn, window, gc, px, py0, px, py1);
-              }
-           else if (w_props.get_gridX_style() == 2)
-              {
-                draw_line(conn, window, gc, px, py0 - 5, px, py0 + 5);
-              }
-
-           char * cc = format_tick(v);
-           string_width_height wh(cc, conn, font);
-           draw_text(conn, text_gc, window,
-                     px - wh.width/2, py0 + wh.height + 3, cc);
-         }
-   }
-
-   // draw horizontal (Y-) grid lines...
-   //
-   {
-     enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH};
-     const uint32_t values[] = { w_props.get_gridY_color(),
-                                 w_props.get_gridY_line_width() };
-     xcb_change_gc(conn, gc, mask, values);
-
-     const int px0 = w_props.valX2pixel(0);
-     const double dx = w_props.get_max_X() - w_props.get_min_X();
-     const int px1 = w_props.valX2pixel(dx);
-     for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
-         {
-           const double v = w_props.get_min_Y() + iy*w_props.get_tile_Y();
-           const int py = w_props.valY2pixel(v - w_props.get_min_Y());
-           if (iy == 0 || iy == w_props.get_gridY_last() ||
-               w_props.get_gridY_style() == 1)
-              {
-                draw_line(conn, window, gc, px0, py, px1, py);
-              }
-           else if (w_props.get_gridY_style() == 2)
-              {
-                draw_line(conn, window, gc, px0 - 5, py, px0 + 5, py);
-              }
-
-           char * cc = format_tick(v);
-           string_width_height wh(cc, conn, font);
-           draw_text(conn, text_gc, window,
-                     px0 - wh.width - 5, py + wh.height/2 - 1, cc);
-         }
-}
-
-   // draw the legend
-   //
    for (int l = 0; l_props[l]; ++l)
        {
          const Plot_line_properties & lp = *l_props[l];
 
          enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-         const uint32_t gc_1[] = { lp.line_color, lp.line_width };
-         const uint32_t gc_2[] = { lp.point_color, lp.point_size };
+         const uint32_t gc_l[] = { lp.line_color, lp.line_width };
+         const uint32_t gc_p[] = { lp.point_color, lp.point_size };
 
          const int x0 = w_props.get_legend_X();
          const int x1 = x0 + (w_props.get_legend_X() >> 1);
          const int x2 = x1 + (w_props.get_legend_X() >> 1);
          const int xt = x2 + 10;
          const int y  = w_props.get_legend_Y() + l*w_props.get_legend_dY();
-         xcb_change_gc(conn, gc, mask, gc_1);
-         draw_line(conn, window, gc, x0, y, x2, y);
-         draw_text(conn, text_gc, window, xt, y + 5, lp.legend_name.c_str());
-         xcb_change_gc(conn, gc, mask, gc_2);
-         draw_point(conn, window, gc, x1, y, canvas_color, *l_props[l]);
+
+         xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
+         draw_line(pctx, x0, y, x2, y);
+         draw_text(pctx, xt, y + 5, lp.legend_name.c_str());
+         xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
+         draw_point(pctx, x1, y, canvas_color, *l_props[l]);
+       }
+}
+//-----------------------------------------------------------------------------
+/// draw the grid lines that start at the X axis
+void
+draw_X_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
+            bool surface)
+{
+enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
+const uint32_t values[] = { w_props.get_gridX_color(),
+                            w_props.get_gridX_line_width() };
+   xcb_change_gc(pctx.conn, pctx.line, mask, values);
+
+const Pixel_Y py0 = w_props.valY2pixel(0);
+const double dy = w_props.get_max_Y() - w_props.get_min_Y();
+const Pixel_Y py1 = w_props.valY2pixel(dy);
+   for (int ix = 0; ix <= w_props.get_gridX_last(); ++ix)
+       {
+         const double v = w_props.get_min_X() + ix*w_props.get_tile_X();
+         const int px0 = w_props.valX2pixel(v - w_props.get_min_X())
+                      + w_props.get_origin_X();
+         if (ix == 0 || ix == w_props.get_gridX_last() ||
+             w_props.get_gridX_style() == 1)
+            {
+              draw_line(pctx, px0, py0, px0, py1);
+            }
+         else if (w_props.get_gridX_style() == 2)
+            {
+              draw_line(pctx, px0, py0 - 5, px0, py0 + 5);
+            }
+
+         char * cc = format_tick(v);
+         string_width_height wh(pctx, cc);
+        if (surface)
+           {
+              const Pixel_X px2 = px0 - w_props.get_origin_X();
+              const Pixel_Y py2 = py0 + w_props.get_origin_Y();
+              draw_line(pctx, px0, py0, px2, py2);
+
+              draw_text(pctx, px0 - wh.width/2 - w_props.get_origin_X(),
+                              py0 + wh.height + 3+ w_props.get_origin_Y(), cc);
+           }
+        else
+           {
+             draw_text(pctx, px0 - wh.width/2, py0 + wh.height + 3, cc);
+           }
+       }
+}
+//-----------------------------------------------------------------------------
+/// draw the grid lines that start at the Y axis
+void
+draw_Y_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
+            bool surface)
+{
+enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH};
+const uint32_t values[] = { w_props.get_gridY_color(),
+                            w_props.get_gridY_line_width() };
+   xcb_change_gc(pctx.conn, pctx.line, mask, values);
+
+const Pixel_X px0 = w_props.valX2pixel(0) + w_props.get_origin_X();
+const double dx = w_props.get_max_X() - w_props.get_min_X();
+const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
+   for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
+       {
+         const double v = w_props.get_min_Y() + iy*w_props.get_tile_Y();
+         const Pixel_Y py0 = w_props.valY2pixel(v - w_props.get_min_Y());
+         if (iy == 0 || iy == w_props.get_gridY_last() ||
+               w_props.get_gridY_style() == 1)
+            {
+              draw_line(pctx, px0, py0, px1, py0);
+            }
+         else if (w_props.get_gridY_style() == 2)
+            {
+              draw_line(pctx, px0 - 5, py0, px0 + 5, py0);
+            }
+
+        char * cc = format_tick(v);
+        string_width_height wh(pctx, cc);
+        if (surface)
+           {
+              const Pixel_X px2 = px0 - w_props.get_origin_X();
+              const Pixel_Y py2 = py0 + w_props.get_origin_Y();
+              draw_line(pctx, px0, py0, px2, py2);
+
+             draw_text(pctx,
+                       px0 - wh.width - 5 - w_props.get_origin_X(),
+                       py0 + wh.height/2 - 1 + w_props.get_origin_Y(), cc);
+           }
+        else
+           {
+             draw_text(pctx, px0 - wh.width - 5, py0 + wh.height/2 - 1, cc);
+           }
        }
 
-   // draw the plot line(s)...
-   //
+   if (!surface)   return;
+}
+//-----------------------------------------------------------------------------
+/// draw the grid lines that start at the Z axis
+void
+draw_Z_grid(const Plot_context & pctx, const Plot_window_properties & w_props)
+{
+enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
+const uint32_t values[] = { w_props.get_gridZ_color(),
+                            w_props.get_gridZ_line_width() };
+   xcb_change_gc(pctx.conn, pctx.line, mask, values);
+
+const int iz_max = w_props.get_gridZ_last();
+const Pixel_X len_Zx = w_props.get_origin_X();
+const Pixel_Y len_Zy = w_props.get_origin_Y();
+const Pixel_XY orig = w_props.valXYZ2pixelXY(w_props.get_min_X(),
+                                             w_props.get_min_Y(),
+                                             w_props.get_min_Z());
+const Pixel_X len_X = w_props.valX2pixel(w_props.get_max_X())
+                    - w_props.valX2pixel(w_props.get_min_X());
+const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_max_Y())
+                    - w_props.valY2pixel(w_props.get_min_Y());
+   for (int iz = 1; iz <= iz_max; ++iz)
+       {
+         const double v = w_props.get_min_Z() + iz*w_props.get_tile_Z();
+         const Pixel_X px0 = orig.x - iz * len_Zx / iz_max;
+         const Pixel_Y py0 = orig.y + iz * len_Zy / iz_max;
+         const Pixel_X px1 = px0 + len_X;
+         draw_line(pctx, px0, py0, px1,  py0);
+         draw_line(pctx, px0, py0, px0,  py0 + len_Y);
+
+        char * cc = format_tick(v);
+        string_width_height wh(pctx, cc);
+
+        draw_text(pctx, px1 + 10, py0 + wh.height/2 - 1, cc);
+       }
+}
+//-----------------------------------------------------------------------------
+/// draw the plot lines
+void
+draw_plot_lines(const Plot_context & pctx,
+                const Plot_window_properties & w_props, const Plot_data & data)
+{
+const Color canvas_color = w_props.get_canvas_color();
+Plot_line_properties const * const * l_props = w_props.get_line_properties();
+
    loop(l, data.get_row_count())
        {
-         enum { mask = XCB_GC_FOREGROUND
-                     | XCB_GC_LINE_WIDTH
-              };
-         const uint32_t gc_1[] = { l_props[l]->line_color,
-                                     l_props[l]->line_width };
-         const uint32_t gc_2[] = { l_props[l]->point_color,
-                                   l_props[l]->point_size };
-         xcb_change_gc(conn, gc, mask, gc_1);
+         const Plot_line_properties & lp = *l_props[l];
 
-         int last_x = 0;
-         int last_y = 0;
+         enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
+         const uint32_t gc_l[] = { lp.line_color, lp.line_width };
+         xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
+
+         // draw lines between points
+         //
+         Pixel_X last_x = 0;
+         Pixel_Y last_y = 0;
          loop(n, data[l].get_N())
              {
                double vx, vy;   data.get_XY(vx, vy, l, n);
-               const int px = w_props.valX2pixel(vx - w_props.get_min_X());
-               const int py = w_props.valY2pixel(vy - w_props.get_min_Y());
-               if (n)   draw_line(conn, window, gc, last_x, last_y, px, py);
+               const Pixel_X px = w_props.valX2pixel(vx - w_props.get_min_X())
+                                + w_props.get_origin_X();
+               const Pixel_Y py = w_props.valY2pixel(vy - w_props.get_min_Y());
+               if (n)   draw_line(pctx, last_x, last_y, px, py);
                last_x = px;
                last_y = py;
              }
 
-         xcb_change_gc(conn, gc, mask, gc_2);
+         // draw points...
+         //
+         const uint32_t gc_p[] = { lp.point_color, lp.point_size };
+         xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
          loop(n, data[l].get_N())
              {
                double vx, vy;   data.get_XY(vx, vy, l, n);
-               const Pixel px = w_props.valX2pixel(vx - w_props.get_min_X());
-               const Pixel py = w_props.valY2pixel(vy - w_props.get_min_Y());
-               draw_point(conn, window, gc, px, py, canvas_color, *l_props[l]);
+               const Pixel_X px = w_props.valX2pixel(vx - w_props.get_min_X())
+                                + w_props.get_origin_X();
+               const Pixel_Y py = w_props.valY2pixel(vy - w_props.get_min_Y());
+               draw_point(pctx, px, py, canvas_color, *l_props[l]);
+             }
+       }
+}
+//-----------------------------------------------------------------------------
+Pixel_XY
+Plot_window_properties::valXYZ2pixelXY(double X, double Y, double Z) const
+{
+const double phi = atan2(get_origin_Y(), get_origin_X());
+const Pixel_Z pz = valZ2pixel(Z - get_min_Z());
+const Pixel_X px = valX2pixel(X - get_min_X()) + get_origin_X() - pz * cos(phi);
+const Pixel_X py = valY2pixel(Y - get_min_Y())                  + pz * sin(phi);
+
+   return Pixel_XY(px, py);
+}
+//-----------------------------------------------------------------------------
+/// draw the surface plot lines
+void
+draw_surface_lines(const Plot_context & pctx,
+                   const Plot_window_properties & w_props,
+                   const Plot_data & data)
+{
+const Color canvas_color = w_props.get_canvas_color();
+   Plot_line_properties const * const * l_props = w_props.get_line_properties();
+
+enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
+const uint32_t gc_l[] = { l_props[0]->line_color, l_props[0]->line_width };
+   xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
+
+const uint32_t gc_p[] = { l_props[0]->point_color, l_props[0]->point_size };
+   xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
+
+   loop(row, data.get_row_count())
+       {
+         loop(col, data[row].get_N())
+             {
+               const double X0 = data[row].get_X(col);
+               const double Y0 = data[row].get_Y(col);
+               const double Z0 = data[row].get_Z(col);
+               const Pixel_XY XY0 = w_props.valXYZ2pixelXY(X0, Y0, Z0);
+               if (w_props.get_verbosity() > 0)
+                  CERR << "data[" << row << "," << col << "]"
+                       << " X=" << X0 << " Y=" << Y0 << " Z=" << Z0 << endl;
+
+#if 0
+                // debug: plot points as vertical lines
+                //
+               const Pixel_XY xy0 = w_props.valXYZ2pixelXY(X0,
+                                                  w_props.get_min_Y(), Z0);
+               draw_line(pctx, xy0.x, xy0.y, XY0.x,  XY0.y);
+#else
+
+               if (col < (data[row].get_N() - 1))
+                  {
+                    const double X1 = data[row].get_X(col + 1);
+                    const double Y1 = data[row].get_Y(col + 1);
+                    const double Z1 = data[row].get_Z(col + 1);
+                    const Pixel_XY XY1 = w_props.valXYZ2pixelXY(X1, Y1, Z1);
+                    draw_line(pctx, XY0.x, XY0.y, XY1.x,  XY1.y);
+                  }
+               if (row < (data.get_row_count() - 1))
+                  {
+                    const double X2 = data[row + 1].get_X(col);
+                    const double Y2 = data[row + 1].get_Y(col);
+                    const double Z2 = data[row + 1].get_Z(col);
+                    const Pixel_XY XY2 = w_props.valXYZ2pixelXY(X2, Y2, Z2);
+                    draw_line(pctx, XY0.x, XY0.y, XY2.x,  XY2.y);
+                  }
+#endif
+/*
+*/
+               draw_point(pctx, XY0.x, XY0.y, canvas_color, *l_props[0]);
              }
        }
 
-   // free the text_gc
+}
+//-----------------------------------------------------------------------------
+void
+do_plot(const Plot_context & pctx,
+        const Plot_window_properties & w_props, const Plot_data & data)
+{
+   // draw the background
    //
-   testCookie(xcb_free_gc(conn, text_gc), conn, "can't free gc");
+const Color canvas_color = w_props.get_canvas_color();
+   {
+     enum { mask = XCB_GC_FOREGROUND };
+     xcb_change_gc(pctx.conn, pctx.line, mask, &canvas_color);
+     xcb_rectangle_t rect = { 0, 0, w_props.get_window_width(),
+                                    w_props.get_window_height() };
+     xcb_poly_fill_rectangle(pctx.conn, pctx.window, pctx.line, 1, &rect);
+   }
 
-   // close font
-   fontCookie = xcb_close_font_checked(conn, font);
-   testCookie(fontCookie, conn, "can't close font");
+const bool surface = data.is_surface_plot();
+   draw_Y_grid(pctx, w_props, surface);
+   draw_X_grid(pctx, w_props, surface);
+   if (surface)   draw_Z_grid(pctx, w_props);
+   draw_legend(pctx, w_props);
+   if  (surface)   draw_surface_lines(pctx, w_props, data);
+   else            draw_plot_lines(pctx, w_props, data);
 }
 //-----------------------------------------------------------------------------
 xcb_atom_t
@@ -1331,10 +1668,11 @@ xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
    return reply.atom;
 }
 //-----------------------------------------------------------------------------
-
 void *
 plot_main(void * vp_props)
 {
+Plot_context pctx;
+
 Plot_window_properties & w_props =
       *reinterpret_cast<Plot_window_properties *>(vp_props);
 
@@ -1344,55 +1682,62 @@ const Plot_data & data = w_props.get_plot_data();
    //
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
 Display * dpy = XOpenDisplay(0);
-xcb_connection_t * conn = XGetXCBConnection(dpy);
+   pctx.conn = XGetXCBConnection(dpy);
 
 # else   // not XCB_WINDOWS_WITH_UTF8_CAPTIONS
-xcb_connection_t * conn = xcb_connect(0, 0);
+   pctx.conn = xcb_connect(0, 0);
 # endif  // XCB_WINDOWS_WITH_UTF8_CAPTIONS
 
-   if (conn == 0 || xcb_connection_has_error(conn))
+   if (pctx.conn == 0 || xcb_connection_has_error(pctx.conn))
       {
-        xcb_disconnect(conn);
+        xcb_disconnect(pctx.conn);
         MORE_ERROR() << "could not connect to the X-server ";
         DOMAIN_ERROR;
       }
 
    // get the first screen
    //
-const xcb_setup_t * setup = xcb_get_setup(conn);
-xcb_screen_t * screen = xcb_setup_roots_iterator(setup).data;
-
-   // create a graphic context
-   //
-xcb_gcontext_t gc = xcb_generate_id(conn);
-   {
-     enum { mask = XCB_GC_GRAPHICS_EXPOSURES };
-//               | XCB_EVENT_MASK_STRUCTURE_NOTIFY };
-     const uint32_t value = 0;
-
-     xcb_create_gc(conn, gc, screen->root, mask, &value);
-   }
+const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
+   pctx.screen = xcb_setup_roots_iterator(setup).data;
 
    // create a window
    //
-xcb_drawable_t window = xcb_generate_id(conn);
-   {
-     enum { mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK};
-     const uint32_t values[] = { w_props.get_canvas_color(),
-                                 XCB_EVENT_MASK_EXPOSURE
-                               | XCB_EVENT_MASK_STRUCTURE_NOTIFY };
-     xcb_create_window(conn,                            // connection
+   pctx.window = xcb_generate_id(pctx.conn);
+   enum { mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK};
+   const uint32_t values[] = { w_props.get_canvas_color(),
+                               XCB_EVENT_MASK_EXPOSURE
+                             | XCB_EVENT_MASK_PROPERTY_CHANGE
+                             | XCB_EVENT_MASK_STRUCTURE_NOTIFY };
+     xcb_create_window(pctx.conn,                       // connection
                        XCB_COPY_FROM_PARENT,            // depth
-                       window,                          // window Id
-                       screen->root,                    // parent window
+                       pctx.window,                     // window Id
+                       pctx.screen->root,               // parent window
                        w_props.get_pw_pos_X(),          // X position on screen
                        w_props.get_pw_pos_Y(),          // Y position on screen
                        w_props.get_window_width(),
                        w_props.get_window_height(),
                        w_props.get_border_width(),
                        XCB_WINDOW_CLASS_INPUT_OUTPUT,   // class
-                       screen->root_visual,             // visual
+                       pctx.screen->root_visual,        // visual
                        mask, values);                   // mask and values
+
+   // create some graphic contexts
+   //
+   pctx.point = xcb_generate_id(pctx.conn);
+   pctx.line  = xcb_generate_id(pctx.conn);
+   pctx.font  = xcb_generate_id(pctx.conn);
+   pctx.text = setup_font_gc(pctx, "fixed");
+
+   {
+     enum { mask = XCB_GC_GRAPHICS_EXPOSURES };
+//               | XCB_EVENT_MASK_STRUCTURE_NOTIFY };
+     const uint32_t value = 0;
+
+     xcb_create_gc(pctx.conn, pctx.line,  pctx.screen->root, mask, &value);
+     xcb_create_gc(pctx.conn, pctx.point, pctx.screen->root, mask, &value);
+   }
+
+   {
 
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
 
@@ -1404,13 +1749,15 @@ XSizeHints size_hints;
    size_hints.base_width  = w_props.get_pw_pos_X();
    size_hints.y           = w_props.get_pw_pos_Y();
    size_hints.base_height = w_props.get_pw_pos_Y();
-Xutf8SetWMProperties(dpy, window,
-                     strdup(w_props.get_caption().c_str()),
+
+static char * caption = strdup(w_props.get_caption().c_str());
+Xutf8SetWMProperties(dpy, pctx.window, caption,
                      "icon", 0, 0, &size_hints, 0, 0);
+// free(caption);
 
 # else   // not XCB_WINDOWS_WITH_UTF8_CAPTIONS
 
-     xcb_change_property(conn, XCB_PROP_MODE_REPLACE, window,
+     xcb_change_property(pctx.conn, XCB_PROP_MODE_REPLACE, pctx.window,
                        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                        w_props.get_caption().size(),
                        w_props.get_caption().c_str());
@@ -1421,26 +1768,27 @@ Xutf8SetWMProperties(dpy, window,
 
    // tell the window manager that we will handle WM_DELETE_WINDOW events...
    //
-const xcb_atom_t window_deleted = get_atom_ID(conn, 0, "WM_DELETE_WINDOW");
-const xcb_atom_t WM_protocols   = get_atom_ID(conn, 1, "WM_PROTOCOLS");
-   xcb_change_property(conn, XCB_PROP_MODE_REPLACE, window, WM_protocols,
-                       XCB_ATOM_ATOM, /* bits */ 32, 1, &window_deleted);
+const xcb_atom_t window_deleted = get_atom_ID(pctx.conn, 0, "WM_DELETE_WINDOW");
+const xcb_atom_t WM_protocols   = get_atom_ID(pctx.conn, 1, "WM_PROTOCOLS");
+   xcb_change_property(pctx.conn, XCB_PROP_MODE_REPLACE, pctx.window,
+                        WM_protocols, XCB_ATOM_ATOM,
+                        /* bits */ 32, 1, &window_deleted);
 
    // remember who has the focus before mapping a new window
    //
 const xcb_get_input_focus_reply_t * focusReply =
-   xcb_get_input_focus_reply(conn, xcb_get_input_focus(conn), 0);
+   xcb_get_input_focus_reply(pctx.conn, xcb_get_input_focus(pctx.conn), 0);
 
    // map the window on the screen and flush
    //
-   xcb_map_window(conn, window);
-   xcb_flush(conn);
+   xcb_map_window(pctx.conn, pctx.window);
+   xcb_flush(pctx.conn);
 
    // X main loop
    //
    for (;;)
       {
-        xcb_generic_event_t * event = xcb_poll_for_event(conn);
+        xcb_generic_event_t * event = xcb_poll_for_event(pctx.conn);
         if (event == 0)   // nothing happened
            {
              pthread_t thread = pthread_self();
@@ -1457,7 +1805,7 @@ const xcb_get_input_focus_reply_t * focusReply =
              if (zombie)
                 {
                   free(event);
-                  xcb_disconnect(conn);
+                  xcb_disconnect(pctx.conn);
                   delete &w_props;
                   return 0;
                 }
@@ -1469,7 +1817,9 @@ const xcb_get_input_focus_reply_t * focusReply =
         switch(event->response_type & ~0x80)
            {
              case XCB_EXPOSE:             // 12
-                  do_plot(conn, screen, window, gc, w_props, data);
+                  if (w_props.get_verbosity() > 0)
+                     CERR << "\n*** XCB_EXPOSE " << endl;
+                  do_plot(pctx, w_props, data);
                   if (focusReply)
                      {
                        /* this is the first XCB_EXPOSE event. X has moved
@@ -1479,15 +1829,23 @@ const xcb_get_input_focus_reply_t * focusReply =
                           Return the focus to the window from which we have
                           stolen it.
                         */
-                       xcb_set_input_focus(conn, XCB_INPUT_FOCUS_PARENT,
+                       xcb_set_input_focus(pctx.conn, XCB_INPUT_FOCUS_PARENT,
                                            focusReply->focus, XCB_CURRENT_TIME);
                        focusReply = 0;
                     }
-                 xcb_flush(conn);
+                 xcb_flush(pctx.conn);
                  break;
 
              case XCB_UNMAP_NOTIFY:       // 18
+                  if (w_props.get_verbosity() > 0)
+                     CERR << "\n*** XCB_UNMAP_NOTIFY ***\n";
+                  break;
+
              case XCB_MAP_NOTIFY:         // 19
+                  if (w_props.get_verbosity() > 0)
+                     CERR << "\n*** XCB_MAP_NOTIFY ***\n";
+                  break;
+
              case XCB_REPARENT_NOTIFY:    // 21
                   break;
 
@@ -1502,13 +1860,25 @@ const xcb_get_input_focus_reply_t * focusReply =
                   }
              break;
 
+             case XCB_PROPERTY_NOTIFY:     // 28
+                  {
+                    const xcb_property_notify_event_t * notify =
+                          reinterpret_cast<const xcb_property_notify_event_t*>
+                          (event);
+                    if (w_props.get_verbosity() > 0)
+                       CERR << "\n*** XCB_PROPERTY_NOTIFY"
+                               " atom=" << int(notify->atom) <<
+                               ", state=" << int(notify->state) << " ***\n";
+                  }
+             break;
+
              case XCB_CLIENT_MESSAGE:     // 33
                   if (reinterpret_cast<xcb_client_message_event_t *>(event)
                            ->data.data32[0] == window_deleted)
                      {
                        // CERR << "Killed!" << endl;
                        free(event);
-                       xcb_disconnect(conn);
+                       xcb_disconnect(pctx.conn);
                        delete &w_props;
                        sem_wait(Quad_PLOT::plot_threads_sema);
                           const int count = Quad_PLOT::plot_threads.size();
@@ -1522,7 +1892,7 @@ const xcb_get_input_focus_reply_t * focusReply =
                                    break;
                                  }
                        sem_post(Quad_PLOT::plot_threads_sema);
-                       return 0;
+                       goto done;
                      }
                   break;
 
@@ -1536,7 +1906,17 @@ const xcb_get_input_focus_reply_t * focusReply =
         free(event);
       }
 
-   CERR << "plot_main() done!" << endl;
+done:
+   // free the text_gc
+   //
+   testCookie(xcb_free_gc(pctx.conn, pctx.text), pctx.conn, "can't free gc");
+
+   // close font
+   {
+     xcb_void_cookie_t cookie = xcb_close_font_checked(pctx.conn, pctx.font);
+     testCookie(cookie, pctx.conn, "can't close font");
+   }
+
    return 0;
 }
 //=============================================================================
@@ -1555,7 +1935,7 @@ Quad_PLOT::~Quad_PLOT()
 Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B)
 {
-   if (B->get_rank() > 2)        RANK_ERROR;
+   if (B->get_rank() > 3)        RANK_ERROR;
    if (B->element_count() < 2)   LENGTH_ERROR;
 
    // plot window with default attributes
@@ -1609,14 +1989,13 @@ const APL_Integer qio = Workspace::get_IO();
        }
 
    if (w_props->update(verbosity))   DOMAIN_ERROR;
-   return Token(TOK_APL_VALUE1, plot_data(w_props, data));
+   return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
 }
 //-----------------------------------------------------------------------------
 Token
 Quad_PLOT::eval_B(Value_P B)
 {
-const bool nested = B->get_ravel(0).is_pointer_cell();
-   if (B->get_rank() == 0 && !nested)
+   if (B->get_rank() == 0 && !B->get_ravel(0).is_pointer_cell())
       {
         // scalar argument: plot window control
         union
@@ -1655,13 +2034,13 @@ const bool nested = B->get_ravel(0).is_pointer_cell();
         return Token(TOK_APL_VALUE1, IntScalar(found ? u.B0 : 0, LOC));
       }
 
-   if (B->get_rank() == 1 && B->element_count() == 0 && !nested)
+   if (B->get_rank() == 1 && B->element_count() == 0)
       {
         help();
         return Token(TOK_APL_VALUE1, Idx0(LOC));
       }
 
-   if (B->get_rank() > 2)   RANK_ERROR;
+   if (B->get_rank() > 3)   RANK_ERROR;
 
    // plot window with default attributes
    //
@@ -1675,7 +2054,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
          WS_FULL;
       }
 
-   return Token(TOK_APL_VALUE1, plot_data(w_props, data));
+   return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
 }
 //-----------------------------------------------------------------------------
 Plot_data *
@@ -1686,6 +2065,7 @@ Quad_PLOT::setup_data(const Value * B)
    //  1b. a numeric matrix (for one plot line for each row of the matrix), or
    //  2a. a scalar of a nested numeric vector (for a single plot line), or
    //  2b. a vector of nested numeric vectors (for one plot line per item)
+   //  3.  a 3-dimensional real vector for surface plots
    //
    if (B->is_scalar())   // 2a. → 1a.
       {
@@ -1695,7 +2075,51 @@ Quad_PLOT::setup_data(const Value * B)
 
 const APL_Integer qio = Workspace::get_IO();
 Plot_data * data = 0;
-   if (B->get_ravel(0).is_pointer_cell())   // 2b.
+   if (B->get_rank() == 3)   // case 3.
+      {
+        const ShapeItem rows = B->get_shape_item(1);
+        const ShapeItem cols = B->get_shape_item(2);
+        if (B->get_shape_item(0) != 3)   LENGTH_ERROR;
+        if (rows < 1)                    LENGTH_ERROR;
+        if (cols < 1)                    LENGTH_ERROR;
+        const ShapeItem data_points = rows * cols;
+
+        double * X = new double[3*data_points];
+        double * Y = X + data_points;
+        double * Z = Y + data_points;
+        if (!X)   WS_FULL;
+
+        data = new Plot_data(rows);
+        loop(r, rows)
+            {
+              loop(c, cols)
+                  {
+                    const ShapeItem p = c + r*cols;
+                    const Cell & cX =B->get_ravel(p);
+                    const Cell & cY =B->get_ravel(p + data_points);
+                    const Cell & cZ =B->get_ravel(p + 2*data_points);
+
+                    if (!(cX.is_integer_cell() ||
+                          cX.is_real_cell()))   DOMAIN_ERROR;
+                    if (!(cY.is_integer_cell() ||
+                          cY.is_real_cell()))   DOMAIN_ERROR;
+                    if (!(cZ.is_integer_cell() ||
+                          cZ.is_real_cell()))   DOMAIN_ERROR;
+
+                    X[p] = cX.get_real_value();
+                    Y[p] = cY.get_real_value();
+                    Z[p] = cZ.get_real_value();
+                  }
+              const double * pX = X + r*cols;
+              const double * pY = Y + r*cols;
+              const double * pZ = Z + r*cols;
+              const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ,
+                                                            r, cols);
+              data->add_row(pdr);
+            }
+        data->surface = true;
+      }
+   else if (B->get_ravel(0).is_pointer_cell())   // 2b.
       {
         ShapeItem data_points = 0;
         if (B->get_rank() > 1)   RANK_ERROR;
@@ -1711,8 +2135,9 @@ Plot_data * data = 0;
                     if (!vrow->get_ravel(rb).is_numeric())   DOMAIN_ERROR;
                   }
             }
-        double * X = new double[2*data_points];
+        double * X = new double[3*data_points];
         double * Y = X + data_points;
+        double * Z = Y + data_points;
         if (!X)   WS_FULL;
 
         ShapeItem idx = 0;
@@ -1724,14 +2149,15 @@ Plot_data * data = 0;
                     const Cell & cB = vrow->get_ravel(v);
                     if (cB.is_complex_cell())
                        {
-                         X[idx]   = cB.get_real_value();
-                         Y[idx++] = cB.get_imag_value();
+                         X[idx] = cB.get_real_value();
+                         Z[idx] = Y[idx] = cB.get_imag_value();
                        }
                     else
                        {
-                         X[idx]   = qio + v;
-                         Y[idx++] = cB.get_real_value();
+                         X[idx] = qio + v;
+                         Z[idx] = Y[idx] = cB.get_real_value();
                        }
+                    ++idx;
                   }
             }
         data = new Plot_data(rows);
@@ -1740,9 +2166,11 @@ Plot_data * data = 0;
             {
               const double * pX = X + idx;
               const double * pY = Y + idx;
+              const double * pZ = Z + idx;
               const Value * vrow = B->get_ravel(r).get_pointer_value().get();
               const ShapeItem row_len = vrow->element_count();
-              const Plot_data_row * pdr = new Plot_data_row(pX, pY, r, row_len);
+              const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r,
+                                                            row_len);
               data->add_row(pdr);
               idx += row_len;
             }
@@ -1760,8 +2188,9 @@ Plot_data * data = 0;
 
         // split B into X=real B, Y=imag Y
 
-        double * X = new double[2*len_B];
+        double * X = new double[3*len_B];
         double * Y = X + len_B;
+        double * Z = Y + len_B;
         if (!X)   WS_FULL;
 
         loop(b, len_B)
@@ -1770,12 +2199,12 @@ Plot_data * data = 0;
               if (cB.is_complex_cell())
                  {
                    X[b] = cB.get_real_value();
-                   Y[b] = cB.get_imag_value();
+                   Z[b] = Y[b] = cB.get_imag_value();
                  }
               else
                  {
                    X[b] = qio + b % cols_B;
-                   Y[b] = cB.get_real_value();
+                   Z[b] = Y[b] = cB.get_real_value();
                  }
             }
 
@@ -1784,7 +2213,9 @@ Plot_data * data = 0;
             {
               const double * pX = X + r*cols_B;
               const double * pY = Y + r*cols_B;
-              const Plot_data_row * pdr = new Plot_data_row(pX, pY, r, cols_B);
+              const double * pZ = Z + r*cols_B;
+              const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ,
+                                                            r, cols_B);
               data->add_row(pdr);
             }
 
@@ -1793,8 +2224,8 @@ Plot_data * data = 0;
 }
 //-----------------------------------------------------------------------------
 Value_P
-Quad_PLOT::plot_data(Plot_window_properties * w_props,
-                     const Plot_data * data)
+Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
+                        const Plot_data * data)
 {
    w_props->set_verbosity(verbosity);
    verbosity > 0 && w_props->print(CERR);
