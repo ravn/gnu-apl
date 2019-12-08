@@ -160,18 +160,22 @@ const bool B_enclosed = B->get_rank() > 1;
         Value_P A_RO_B = T1.get_apl_val();
 
         Cell * cZ = Z->next_ravel();
-        new (cZ) PointerCell(A_RO_B.get(), Z.getref());
+        if (A_RO_B->is_simple_scalar())   // A_RO_B is A RO B
+           {
+             // A RO B has returned a scalar, so LO/A_RO_B is A_RO_B
+             //
+             cZ->init(A_RO_B->get_ravel(0), Z.getref(), LOC);
+           }
+        else
+           {
+             // A RO B has returned a vector, so compute LO/A_RO_B
+             //
+          //    new (cZ) PointerCell(A_RO_B.get(), Z.getref());
 
-        // at this point Z[z] is the result of a built-in function RO.
-        // Compute LO/Z[z].
-        //
-        Value_P ZZ = cZ->get_pointer_value();
-        const Token T2 = Bif_OPER1_REDUCE::fun->eval_LB(_LO, ZZ);
-        cZ->release(LOC);
-
-        if (T2.get_tag() == TOK_ERROR)   return T2;
-
-        cZ->init_from_value(T2.get_apl_val().get(), Z.getref(), LOC);
+            const Token T2 = Bif_OPER1_REDUCE::fun->eval_LB(_LO, A_RO_B);
+             if (T2.get_tag() == TOK_ERROR)   return T2;
+             cZ->init_from_value(T2.get_apl_val().get(), Z.getref(), LOC);
+           }
       }
 
    Z->set_default(*B.get(), LOC);

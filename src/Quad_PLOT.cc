@@ -22,6 +22,8 @@
 #include <iomanip>
 #include <signal.h>
 
+#include <vector>
+
 #include "../config.h"
 #if ! defined(HAVE_LIBX11)
 # define WHY_NOT "libX11.so"
@@ -33,10 +35,14 @@
 # define WHY_NOT "xcb/xcb.h"
 #endif
 
+#include "Avec.hh"
 #include "Common.hh"
 #include "Quad_PLOT.hh"
 
 using namespace std;
+
+#define I1616(x, y) int16_t(x), int16_t(y)
+# define ITEMS(x) sizeof(x)/sizeof(*x), x
 
 Quad_PLOT  Quad_PLOT::_fun;
 Quad_PLOT * Quad_PLOT::fun = &Quad_PLOT::_fun;
@@ -50,7 +56,7 @@ sem_t * Quad_PLOT::plot_threads_sema = &__plot_threads_sema;
    its presence in plot_threads so that removing a thread from \b plot_threads
    causes the thread to close its plot window and then to exit.
  **/
-std::vector<pthread_t> Quad_PLOT::plot_threads;
+vector<pthread_t> Quad_PLOT::plot_threads;
 
 #if defined(WHY_NOT)
 //-----------------------------------------------------------------------------
@@ -117,6 +123,12 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B)
 # include <iostream>
 # include <iomanip>
 
+enum
+{
+   SHOW_EVENTS = 1,   ///< show X events
+   SHOW_DATA   = 2,   ///< show APL data
+   SHOW_DRAW   = 4,   ///< show draw details
+};
 using namespace std;
 
 typedef uint16_t  Pixel_X;
@@ -129,8 +141,20 @@ struct Pixel_XY
      y(py)
    {}
 
-   const Pixel_X x; 
-   const Pixel_Y y;
+   /// the square of the distance between \b this and other
+   const double distance2(const Pixel_XY other) const
+      { const double dx = x - other.x;
+        const double dy = y - other.y;
+        return dx*dx + dy*dy;
+      }
+
+
+   /// the distance between \b this and other
+   const double distance(const Pixel_XY other) const
+      { return sqrt(distance2(other)); }
+
+   Pixel_X x; 
+   Pixel_Y y;
 };
 
 typedef uint32_t Color;
@@ -180,7 +204,7 @@ public:
 
    /// return the n-th X coordinate
    double get_X(uint32_t n) const
-      { return X ? X[n] : n; }
+      { return X ? X[n] : n + 1; }
 
    /// return the n-th Y coordinate
    double get_Y(uint32_t n) const
@@ -188,7 +212,7 @@ public:
 
    /// return the n-th Z coordinate
    double get_Z(uint32_t n) const
-      { return Z ? Z[n] : n; }
+      { return Z ? Z[n] : row_num + 1; }
 
    /// return the smallest value in X
    double get_min_X() const
@@ -250,6 +274,13 @@ protected:
 };
 //=============================================================================
 /// data for all plot lines
+
+struct level_color
+{
+   int      level;   ///< level 0-100
+   uint32_t rgb;     ///< color as RGB integer
+};
+
 class Plot_data
 {
 public:
@@ -304,6 +335,18 @@ public:
    /// return the largest Z value in the data matrix
    double get_max_Z() const
       { return max_Z; }
+
+   /// return the X coordinate at row and col
+   double get_X(uint32_t row, uint32_t col) const
+      { return data_rows[row]->get_X(col); }
+
+   /// return the Y coordinate at row and col
+   double get_Y(uint32_t row, uint32_t col) const
+      { return data_rows[row]->get_Y(col); }
+
+   /// return the Z coordinate at row and col
+   double get_Z(uint32_t row, uint32_t col) const
+      { return data_rows[row]->get_Z(col); }
 
    /// return true for surface plots
    bool is_surface_plot() const       { return surface; }
@@ -506,7 +549,7 @@ public:
    void set_ ## na(ty val)   { na = val; }
 # include "Quad_PLOT.def"
 
-   /// print the properties
+   /// print the line properties
    int print(ostream & out) const;
 
 # define ldef(ty,  na,  _val, descr) /** descr **/ ty na;
@@ -628,7 +671,7 @@ public:
    /// coordinate of the pixel below the Z=0 plane of the plot area
    Pixel_XY valXYZ2pixelXY(double val_X, double val_Y, double val_Z) const;
 
-   /// print the properties (for sebugging purposes)
+   /// print the properties (for debugging purposes)
    int print(ostream & out) const;
 
    /// for e.g. att_and_val = "pa_width: 600" set pa_width to 600.
@@ -694,6 +737,14 @@ public:
 
    /// return the date to be plotted
    const Plot_data & get_plot_data() const   { return plot_data; }
+
+   /// return the 3D color gradient
+   const vector<level_color> & get_gradient() const
+      { return gradient; }
+
+   /// for level 0.0 <= alpha <= 1.0: return the color for alpha according
+   /// to \b gradient
+   uint32_t get_color(double alpha) const;
 
 protected:
    /// the number of plot lines
@@ -771,6 +822,9 @@ protected:
    /// array containing the data for the plot lines
    Plot_line_properties * * line_properties;
 
+   /// some levels with colors (for surface plots)
+   vector<level_color> gradient;
+
    /// round val up to the next higher 1/2/5×10^N
    static double round_up_125(double val);
 };
@@ -800,12 +854,13 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
      rangeY_type(NO_RANGE),
      rangeZ_type(NO_RANGE)
 {
-   (verbosity > 1) && CERR << setw(20) << "min_X: " << min_X << endl
-                           << setw(20) << "max_X: " << max_X << endl
-                           << setw(20) << "min_Y: " << min_Y << endl
-                           << setw(20) << "max_Y: " << max_Y << endl
-                           << setw(20) << "min_Z: " << min_Z << endl
-                           << setw(20) << "max_Z: " << max_Z << endl;
+   if (verbosity & SHOW_DRAW)
+      CERR << setw(20) << "min_X: " << min_X << endl
+           << setw(20) << "max_X: " << max_X << endl
+           << setw(20) << "min_Y: " << min_Y << endl
+           << setw(20) << "max_Y: " << max_Y << endl
+           << setw(20) << "min_Z: " << min_Z << endl
+           << setw(20) << "max_Z: " << max_Z << endl;
 
    line_properties = new Plot_line_properties *[line_count + 1];
    loop (l, line_count)   line_properties[l] = new Plot_line_properties(l);
@@ -876,7 +931,8 @@ Plot_window_properties::update(int verbosity)
 
    if (min_Y >= max_Y)
       {
-        MORE_ERROR() << "empty Y range in A ⎕PLOT B";
+        MORE_ERROR() << "empty Y range " << min_Y << ":" << max_Y
+                     << " in A ⎕PLOT B";
         return true;
       }
 
@@ -897,7 +953,7 @@ const double orig_len = sqrt(origin_X*origin_X + origin_Y*origin_Y);
    scale_Y = pa_height / delta_Y;   // pixels per Y-value
    scale_Z = orig_len ? orig_len / delta_Z : 1.0;    // pixels per Z-value
 
-   verbosity > 1 &&
+   if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "delta_X (1): " << delta_X << " (Xmax-Xmin)" << endl
            << setw(20) << "delta_Y (1): " << delta_Y << " (Ymax-Ymin)" << endl
            << setw(20) << "delta_Z (1): " << delta_Z << " (Zmax-Zmin)" << endl
@@ -909,7 +965,7 @@ const double tile_X_raw = gridX_pixels / scale_X;
 const double tile_Y_raw = gridY_pixels / scale_Y;
 const double tile_Z_raw = gridZ_pixels / scale_Z;
 
-   verbosity > 1 &&
+   if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "tile_X_raw: " << tile_X_raw
                                          << "(∆X between grid lines)" << endl
            << setw(20) << "tile_Y_raw: " << tile_Y_raw
@@ -948,7 +1004,7 @@ const int max_Zi = ceil(max_Z / tile_Z);
    scale_Y = pa_height / delta_Y;
    scale_Z = orig_len ? orig_len  / delta_Z : 1.0;
 
-   verbosity > 1 &&
+   if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "min_X (2): " << min_X << endl
            << setw(20) << "max_X (2): " << max_X << endl
            << setw(20) << "min_Y (2): " << min_Y << endl
@@ -978,6 +1034,14 @@ Plot_window_properties::print(ostream & out) const
    out << setw(20) << #na ":  " << Plot_data::ty ## _to_str(na) << endl;
 # include "Quad_PLOT.def"
 
+   loop(g, gradient.size())
+       {
+         char cc[30];
+         snprintf(cc, sizeof(cc), "color_level-%u: ", gradient[g].level);
+         out << setw(20) << cc
+             << Plot_data::Color_to_str(gradient[g].rgb) << endl;
+       }
+
    for (Plot_line_properties ** lp = line_properties; *lp; ++lp)
        {
          out << endl;
@@ -990,24 +1054,76 @@ Plot_window_properties::print(ostream & out) const
 const char *
 Plot_window_properties::set_attribute(const char * att_and_val)
 {
-   while (*att_and_val && (*att_and_val <= ' '))   ++ att_and_val;
+   /*
+       called with leading whitespaces in att_and_val removed.
+
+       att_and_val is a string specifying one of:
+
+       a window attribute, like:   origin_X: 100                 , or
+       a line attribute, like:     point_color-1:  #000000       , or
+       a color gradient, like:     color_level-50: #00FF00
+
+       The value (right of ':') can be
+
+       an integer value, like:     100
+       a color, like:              #000000 or #000
+       a string, like:             "Window Title"
+
+       return 0 on success or else an appropriate error string.
+    */
+
+   // find demarcation between attribute name and attribute value
+   ///
 const char * colon = strchr(att_and_val, ':');
    if (colon == 0)   return "Expecting 'attribute: value' but no : found";
 
+   // skip leading whitespace before the attribute value
+   //
 const char * value = colon + 1;
    while (*value && (*value <= ' '))   ++value;
 
+   // check for line number resp. level
+   // 
 const char * minus = strchr(att_and_val, '-');
-   if (minus && minus < colon)   // line attribute
+   if (minus && minus < colon)   // line attribute or color gradient
       {
         // it is not unlikely that the user wants to use the same attributes
         // for different plots that may differ in the number of lines. We
         // therefore silently ignore such over-specified attribute rather
         // than returning an error string (which then raises a DOMAIN error).
         // 
+        if (!strncmp(att_and_val, "color_level-", 12))
+           {
+             const int level = strtol(minus + 1, 0, 10);
+             if (level < 0)     return "negative color level";
+             if (level > 100)   return "color level > 100%";
+
+              const char * error = 0;
+              const Color color = Plot_data::Color_from_str(value, error);
+              if (error)   return error;
+
+              level_color grad = { level, color };
+
+              // insert grad into gradient, but keeping it sorted by level
+              //
+              loop(g, gradient.size())
+                  {
+                    if (gradient[g].level == grad.level)
+                       return "duplicate gradient level";
+
+                    if (gradient[g].level > grad.level)
+                       {
+                         gradient.insert(gradient.begin() + g, grad);
+                         return 0;
+                       }
+                  }
+              gradient.push_back(grad);
+              return 0;   // OK
+           }
+
         const int line = strtol(minus + 1, 0, 10) - Workspace::get_IO();
-        if (line < 0)             return 0;
-        if (line >= line_count)   return 0;
+        if (line < 0)             return "line number ≤ ⎕IO";
+        if (line >= line_count)   return "line number too large";
 
 # define ldef(ty,  na,  val, _descr)                                       \
          if (!strncmp(#na "-", att_and_val, minus - att_and_val))         \
@@ -1017,6 +1133,10 @@ const char * minus = strchr(att_and_val, '-');
               return error;                                               \
             }
 # include "Quad_PLOT.def"
+
+        // nothing found
+        //
+        return "Bad or unknown line attribute";
       }
    else                          // window attribute
       {
@@ -1029,7 +1149,7 @@ const char * minus = strchr(att_and_val, '-');
 # include "Quad_PLOT.def"
       }
 
-   return "Unknown attribute";
+   return "Bad or unknown window attribute";
 }
 //-----------------------------------------------------------------------------
 double
@@ -1059,6 +1179,52 @@ int expo = 0;
         return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
       }
 }
+//-----------------------------------------------------------------------------
+uint32_t
+Plot_window_properties::get_color(double alpha) const
+{
+   Assert(alpha >= 0.0);
+   Assert(alpha <= 1.0);
+
+   if (gradient.size() == 0)   // no gradient specified: use gray-scale
+      return uint32_t(255*alpha) << 16
+           | uint32_t(255*alpha) << 8
+           | uint32_t(255*alpha);
+
+   if (gradient.size() == 1)   // only one gradient specified: use it
+      return gradient[0].rgb;
+
+   loop(g, gradient.size())
+       {
+         const double level_g = 0.01*gradient[g].level;
+         if (alpha == level_g)   return gradient[g].rgb;
+         if (alpha < level_g)   // level_g is the first level above alpha
+            {
+               if (g == 0)   return gradient[0].rgb;   // use first gradient
+
+               // interpolate
+               //
+               const double l0 = 0.01*gradient[g-1].level;   // previous level
+               const double beta1 = (alpha - l0) / (level_g - l0);
+               Assert(beta1 >= 0.0);
+               Assert(beta1 <= 1.0);
+               const double beta0 = 1.0 - beta1;
+               const uint32_t rgb0 = gradient[g-1].rgb;
+               const uint32_t rgb1 = gradient[g].rgb;
+               const uint32_t red = beta1*(rgb1 >> 16 & 0xFF)
+                                  + beta0*(rgb0 >> 16 & 0xFF);
+               const uint32_t grn = beta1*(rgb1 >>  8 & 0xFF)
+                                  + beta0*(rgb0 >>  8 & 0xFF);
+               const uint32_t blu = beta1*(rgb1       & 0xFF)
+                                  + beta0*(rgb0       & 0xFF);
+               return red << 16 | grn << 8 | blu;
+            }
+       }
+
+   // alpha is above last gradient: use last gradient
+   //
+   return gradient.back().rgb;
+}
 //=============================================================================
 void
 testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
@@ -1076,11 +1242,18 @@ xcb_generic_error_t * error = xcb_request_check(conn, cookie);
 /// Some xcb IDs (returned from the X server)
 struct Plot_context
 {
+  Plot_context(const Plot_window_properties & pwp)
+  : w_props(pwp)
+  {}
+
+  const Plot_window_properties & w_props;
+
   xcb_connection_t * conn;
   xcb_window_t       window;
   xcb_screen_t       * screen;
-  xcb_gcontext_t     point;
+  xcb_gcontext_t     fill;
   xcb_gcontext_t     line;
+  xcb_gcontext_t     point;
   xcb_gcontext_t     text;
   xcb_font_t         font;
 };
@@ -1153,13 +1326,13 @@ uint32_t values[3] = { pctx.screen->black_pixel,
 }
 //-----------------------------------------------------------------------------
 void
-draw_text(const Plot_context & pctx, Pixel_X x, Pixel_Y y, const char * label)
+draw_text(const Plot_context & pctx, const char * label, const Pixel_XY & xy)
 {
 /* draw the text */
 xcb_void_cookie_t textCookie = xcb_image_text_8_checked(pctx.conn,
                                                         strlen(label),
                                                         pctx.window, pctx.text,
-                                                        x, y, label);
+                                                        xy.x, xy.y, label);
 
    testCookie(textCookie, pctx.conn,
               "xcb_image_text_8_checked() failed.");
@@ -1217,17 +1390,101 @@ const char * unit = 0;
 }
 //-----------------------------------------------------------------------------
 void
-draw_line(const Plot_context & pctx, Pixel_X x0, Pixel_Y y0,
-                                     Pixel_X x1, Pixel_Y y1)
+draw_line(const Plot_context & pctx, xcb_gcontext_t gc,
+          const Pixel_XY & P0, const Pixel_XY & P1)
 {
-const xcb_segment_t segment = { int16_t(x0), int16_t(y0),
-                                int16_t(x1), int16_t(y1) };
-   xcb_poly_segment(pctx.conn, pctx.window, pctx.line, 1, &segment);
+const xcb_segment_t segment = { I1616(P0.x, P0.y), I1616(P1.x, P1.y) };
+   xcb_poly_segment(pctx.conn, pctx.window, gc, 1, &segment);
 }
 //-----------------------------------------------------------------------------
-# define ITEMS(x) sizeof(x)/sizeof(*x), x
+inline void
+pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
+{
+const double   Y = Y0;   Y0 = Y1;   Y1 = Y;
+const Pixel_XY P = P0;   P0 = P1;   P1 = P;
+}
+//-----------------------------------------------------------------------------
 void
-draw_point(const Plot_context & pctx, Pixel_X x, Pixel_Y y, Color canvas_color,
+draw_triangle(const Plot_context & pctx, int verbosity,
+              Pixel_XY P0, double H0, Pixel_XY P1, Pixel_XY P2, double H12)
+{
+   // draw a triangle with P1 and P2 at the same level H12
+   //
+   Assert(H0 >= 0.0);    Assert(H0 <= 1.0);
+   Assert(H12 >= 0.0);   Assert(H12 <= 1.0);
+
+   if (verbosity & SHOW_DRAW)
+      CERR <<   " ∆2: P0(" << P0.x << ":" << P0.y << ") @H0=" << H0
+           << "     P1(" << P1.x << ":" << P1.y << ") @H12=" << H12
+           << "     P2(" << P2.x << ":" << P2.y << ") @H12=" << H12 << endl;
+
+const double d1 = P0.distance2(P1);
+const double d2 = P0.distance2(P2);
+const int steps = sqrt(d1 > d2 ? d1 : d2);
+const double dH = (H12 - H0) / steps;
+   loop(s, steps)
+       {
+         const double alpha = H0 + s*dH;
+         const double beta  = 1.0 * s/ steps;
+         const uint32_t color = pctx.w_props.get_color(alpha);
+         xcb_change_gc(pctx.conn, pctx.fill, XCB_GC_FOREGROUND, &color);
+
+         const Pixel_XY P0_P1(P0.x + beta * (P1.x - P0.x),
+                              P0.y + beta * (P1.y - P0.y));
+         const Pixel_XY P0_P2(P0.x + beta * (P2.x - P0.x),
+                              P0.y + beta * (P2.y - P0.y));
+         draw_line(pctx, pctx.fill, P0_P1, P0_P2);
+       }
+}
+//-----------------------------------------------------------------------------
+void
+draw_triangle(const Plot_context & pctx, int verbosity, Pixel_XY P0, double H0,
+              Pixel_XY P1, double H1, Pixel_XY P2, double H2)
+{
+   // draw a triangle with P0, P1 and P2 at levels H0, H1, and H2
+
+   Assert(H0 >= 0);   Assert(H0 <= 1.0);
+   Assert(H1 >= 0);   Assert(H1 <= 1.0);
+   Assert(H2 >= 0);   Assert(H2 <= 1.0);
+
+   if (verbosity & SHOW_DRAW)
+      CERR << "\n∆1: P0(" << P0.x << ":" << P0.y << ")@H=" << H0
+           << "      P1(" << P1.x << ":" << P1.y << ")@H=" << H1
+           << "      P2(" << P2.x << ":" << P2.y << ")@H=" << H2 << endl;
+
+   if (H0 < H1)   pv_swap(P0, H0, P1, H1);   // then H0 >= H1
+   if (H0 < H2)   pv_swap(P0, H0, P2, H2);   // then H0 >= H2
+   if (H1 < H2)   pv_swap(P1, H1, P2, H2);   // then H1 >= H2
+
+   // here H0 >= H1 >= H2
+   //
+   Assert(H0 >= H1);
+   Assert(H1 >= H2);
+
+   if (H0 == H1)   // P0 and P1 have the same height
+      {
+        draw_triangle(pctx, verbosity, P2, H2, P0, P1, H0);
+      }
+   else if (H1 == H2)   // P1 and P2 have the same height
+      {
+        draw_triangle(pctx, verbosity, P0, H0, P1, P2, H1);
+      }
+   else            // P2 lies below P1
+      {
+        const double alpha = (H0 - H1) / (H0 - H2);   // alpha → 1 as P1 → P2
+        Assert(alpha >= 0.0);
+        Assert(alpha <= 1.0);
+
+        // compute the point P on P0-P2 that has the heigth H1 (of P1)
+        const Pixel_XY P(P0.x + alpha*(P2.x - P0.x),
+                         P0.y + alpha*(P2.y - P0.y));
+        draw_triangle(pctx, verbosity, P0, H0, P1, P, H1);
+        draw_triangle(pctx, verbosity, P2, H2, P1, P, H1);
+      }
+}
+//-----------------------------------------------------------------------------
+void
+draw_point(const Plot_context & pctx, const Pixel_XY & xy, Color canvas_color,
            const Plot_line_properties & l_props)
 {
 const Pixel_X point_size  = l_props.point_size;   // outer point diameter
@@ -1237,17 +1494,17 @@ const int point_style = l_props.get_point_style();
 
    if (point_style == 1)   // circle
       {
-        xcb_arc_t arc = { int16_t(x - half), int16_t(y - half),   // positions
-                          point_size, point_size,                 // diameters
-                          0, int16_t(360 << 6) };                 // angles
+        xcb_arc_t arc = { I1616(xy.x - half, xy.y - half),   // positions
+                          point_size, point_size,            // diameters
+                          0, 360 << 6 };                     // angles
         xcb_poly_fill_arc(pctx.conn, pctx.window, pctx.point, 1, &arc);
 
         if (point_size2)   // hollow
            {
              const int16_t half2 = point_size2 >> 1;
-             xcb_arc_t arc2 = { int16_t(x-half2), int16_t(y-half2),   // pos
-                                point_size2, point_size2,             // dia
-                                0, int16_t(360 << 6) };               // ang
+             xcb_arc_t arc2 = { I1616(xy.x - half2, xy.y - half2),   // pos
+                                point_size2, point_size2,            // dia
+                                0, int16_t(360 << 6) };              // ang
              enum { mask = XCB_GC_FOREGROUND };
              xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
              xcb_poly_fill_arc(pctx.conn, pctx.window, pctx.point, 1, &arc2);
@@ -1256,21 +1513,21 @@ const int point_style = l_props.get_point_style();
       }
    else if (point_style == 2)   // triangle ∆
       {
-        const int16_t center_y = y - 2*point_size/3;
+        const int16_t center_y = xy.y - 2*point_size/3;
         const int16_t hypo_y = half*1.732;
-        const xcb_point_t points[3]   = {
-              { int16_t(x), center_y  },
-              { int16_t(half), hypo_y },
-              { int16_t(-2*half), 0   } };
-        xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
+        const xcb_point_t points[3]   = { { int16_t(xy.x), center_y  },
+                                          { half, hypo_y },
+                                          { int16_t(-2*half), 0   } };
+        xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
+                      XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
              const int16_t half2 = point_size2 >> 1;
-             const int16_t center2_y = y - 2*point_size2/3;
+             const int16_t center2_y = xy.y - 2*point_size2/3;
              const int16_t hypo2_y = half2*1.732;
              const xcb_point_t points2[3]  = {
-                 { int16_t(x), center2_y   },
+                 { int16_t(xy.x), center2_y   },
                  { int16_t(half2), hypo2_y },
                  { int16_t(-2*half2), 0    } };
              enum { mask = XCB_GC_FOREGROUND };
@@ -1283,26 +1540,28 @@ const int point_style = l_props.get_point_style();
       }
    else if (point_style == 3)   // triangle ∇
       {
-        const int16_t center_y = y + 2*point_size/3;
+        const int16_t center_y = xy.y + 2*point_size/3;
         const int16_t hypo_y = - half*1.732;
         const xcb_point_t points[3]   = {
-              { int16_t(x), center_y  },
+              { int16_t(xy.x), center_y  },
               { int16_t(half), hypo_y },
               { int16_t(-2*half), 0   } };
-        xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
+        xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
+                      XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
              const int16_t half2 = point_size2 >> 1;
-             const int16_t center2_y = y + 2*point_size2/3;
+             const int16_t center2_y = xy.y + 2*point_size2/3;
              const int16_t hypo2_y = - half2*1.732;
              const xcb_point_t points2[3]  = {
-                 { int16_t(x), center2_y   },
+                 { int16_t(xy.x), center2_y   },
                  { int16_t(half2), hypo2_y },
                  { int16_t(-2*half2), 0    } };
              enum { mask = XCB_GC_FOREGROUND };
              xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
-             xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
+             xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
+                           XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
              xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
            }
@@ -1310,47 +1569,51 @@ const int point_style = l_props.get_point_style();
    else if (point_style == 4)   // caro
       {
         const xcb_point_t points[4] =           {
-              { int16_t(x), int16_t(y - half) },
-              { int16_t(half), int16_t(half)  },
-              { int16_t(-half), int16_t(half) },
-              { int16_t(-half), int16_t(-half)} };
+              { int16_t(xy.x), int16_t(xy.y - half) },
+              {  half,  half },
+              { int16_t(-half),  half },
+              { int16_t(-half), int16_t(-half) } };
         xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
              const int16_t half2 = point_size2 >> 1;
-             const xcb_point_t points2[4] =            {
-                   { int16_t(x), int16_t(y - half2)  },
-                   { int16_t(half2), int16_t(half2)  },
-                   { int16_t(-half2), int16_t(half2) },
-                   { int16_t(-half2), int16_t(-half2)} };
+             const xcb_point_t points2[4] =      {
+                   { I1616(xy.x, xy.y - half2) },
+                   { I1616( half2,  half2)     },
+                   { I1616(-half2,  half2)     },
+                   { I1616(-half2, -half2)     } };
              enum { mask = XCB_GC_FOREGROUND };
              xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
-             xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
-                           XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
+             xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
+                           XCB_POLY_SHAPE_CONVEX,
+                           XCB_COORD_MODE_PREVIOUS,
+                           ITEMS(points2));
              xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
            }
       }
    else if (point_style == 5)   // square
       {
-        const xcb_point_t points[4] =     {
-              { int16_t(x - half), int16_t(y - half) },
-              { int16_t(point_size), 0  },
-              { 0, int16_t(point_size)  },
-              { int16_t(-point_size), 0 } };
-        xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
+        const xcb_point_t points[4] =   {
+              { I1616(xy.x - half, xy.y - half) },
+              { I1616(point_size, 0)  },
+              { I1616(0, point_size)  },
+              { I1616(-point_size, 0) } };
+        xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
+                      XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
              const int16_t half2 = point_size2 >> 1;
              const xcb_point_t points2[4] =
-                 { { int16_t(x - half2), int16_t(y - half2) },
+                 { { int16_t(xy.x - half2), int16_t(xy.y - half2) },
                    { int16_t(point_size2), 0  },
                    { 0, int16_t(point_size2)  },
                    { int16_t(-point_size2), 0 } };
              enum { mask = XCB_GC_FOREGROUND };
              xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
-             xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
+             xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
+                           XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
              xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
            }
@@ -1381,10 +1644,10 @@ const Color canvas_color = w_props.get_canvas_color();
          const int y  = w_props.get_legend_Y() + l*w_props.get_legend_dY();
 
          xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
-         draw_line(pctx, x0, y, x2, y);
-         draw_text(pctx, xt, y + 5, lp.legend_name.c_str());
+         draw_line(pctx, pctx.line, Pixel_XY(x0, y), Pixel_XY(x2, y));
+         draw_text(pctx, lp.legend_name.c_str(), Pixel_XY(xt, y + 5));
          xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
-         draw_point(pctx, x1, y, canvas_color, *l_props[l]);
+         draw_point(pctx, Pixel_XY(x1, y), canvas_color, *l_props[l]);
        }
 }
 //-----------------------------------------------------------------------------
@@ -1409,11 +1672,11 @@ const Pixel_Y py1 = w_props.valY2pixel(dy);
          if (ix == 0 || ix == w_props.get_gridX_last() ||
              w_props.get_gridX_style() == 1)
             {
-              draw_line(pctx, px0, py0, px0, py1);
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px0, py1));
             }
          else if (w_props.get_gridX_style() == 2)
             {
-              draw_line(pctx, px0, py0 - 5, px0, py0 + 5);
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0 - 5), Pixel_XY(px0, py0 + 5));
             }
 
          char * cc = format_tick(v);
@@ -1422,14 +1685,16 @@ const Pixel_Y py1 = w_props.valY2pixel(dy);
            {
               const Pixel_X px2 = px0 - w_props.get_origin_X();
               const Pixel_Y py2 = py0 + w_props.get_origin_Y();
-              draw_line(pctx, px0, py0, px2, py2);
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px2, py2));
 
-              draw_text(pctx, px0 - wh.width/2 - w_props.get_origin_X(),
-                              py0 + wh.height + 3+ w_props.get_origin_Y(), cc);
+              draw_text(pctx, cc,
+                        Pixel_XY(px0 - wh.width/2 - w_props.get_origin_X(),
+                                 py0 + wh.height + 3+ w_props.get_origin_Y()));
            }
         else
            {
-             draw_text(pctx, px0 - wh.width/2, py0 + wh.height + 3, cc);
+             draw_text(pctx, cc,
+                       Pixel_XY(px0 - wh.width/2, py0 + wh.height + 3));
            }
        }
 }
@@ -1454,11 +1719,11 @@ const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
          if (iy == 0 || iy == w_props.get_gridY_last() ||
                w_props.get_gridY_style() == 1)
             {
-              draw_line(pctx, px0, py0, px1, py0);
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px1, py0));
             }
          else if (w_props.get_gridY_style() == 2)
             {
-              draw_line(pctx, px0 - 5, py0, px0 + 5, py0);
+              draw_line(pctx, pctx.line, Pixel_XY(px0 - 5, py0), Pixel_XY(px0 + 5, py0));
             }
 
         char * cc = format_tick(v);
@@ -1467,15 +1732,17 @@ const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
            {
               const Pixel_X px2 = px0 - w_props.get_origin_X();
               const Pixel_Y py2 = py0 + w_props.get_origin_Y();
-              draw_line(pctx, px0, py0, px2, py2);
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px2, py2));
 
-             draw_text(pctx,
-                       px0 - wh.width - 5 - w_props.get_origin_X(),
-                       py0 + wh.height/2 - 1 + w_props.get_origin_Y(), cc);
+             draw_text(pctx, cc,
+                       Pixel_XY(px0 - wh.width - 5 - w_props.get_origin_X(),
+                             py0 + wh.height/2 - 1 + w_props.get_origin_Y()));
            }
         else
            {
-             draw_text(pctx, px0 - wh.width - 5, py0 + wh.height/2 - 1, cc);
+             draw_text(pctx, cc,
+                       Pixel_XY(px0 - wh.width - 5,
+                                py0 + wh.height/2 - 1));
            }
        }
 
@@ -1507,13 +1774,14 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_max_Y())
          const Pixel_X px0 = orig.x - iz * len_Zx / iz_max;
          const Pixel_Y py0 = orig.y + iz * len_Zy / iz_max;
          const Pixel_X px1 = px0 + len_X;
-         draw_line(pctx, px0, py0, px1,  py0);
-         draw_line(pctx, px0, py0, px0,  py0 + len_Y);
+         draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px1,  py0));
+         draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px0,  py0 + len_Y));
 
         char * cc = format_tick(v);
         string_width_height wh(pctx, cc);
 
-        draw_text(pctx, px1 + 10, py0 + wh.height/2 - 1, cc);
+        draw_text(pctx, cc,
+                  Pixel_XY(px1 + 10, py0 + wh.height/2 - 1));
        }
 }
 //-----------------------------------------------------------------------------
@@ -1535,17 +1803,15 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
 
          // draw lines between points
          //
-         Pixel_X last_x = 0;
-         Pixel_Y last_y = 0;
+         Pixel_XY last(0, 0);
          loop(n, data[l].get_N())
              {
                double vx, vy;   data.get_XY(vx, vy, l, n);
-               const Pixel_X px = w_props.valX2pixel(vx - w_props.get_min_X())
-                                + w_props.get_origin_X();
-               const Pixel_Y py = w_props.valY2pixel(vy - w_props.get_min_Y());
-               if (n)   draw_line(pctx, last_x, last_y, px, py);
-               last_x = px;
-               last_y = py;
+               const Pixel_XY P(w_props.valX2pixel(vx - w_props.get_min_X())
+                                + w_props.get_origin_X(),
+                                w_props.valY2pixel(vy - w_props.get_min_Y()));
+               if (n)   draw_line(pctx, pctx.line, last, P);
+               last = P;
              }
 
          // draw points...
@@ -1558,7 +1824,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
                const Pixel_X px = w_props.valX2pixel(vx - w_props.get_min_X())
                                 + w_props.get_origin_X();
                const Pixel_Y py = w_props.valY2pixel(vy - w_props.get_min_Y());
-               draw_point(pctx, px, py, canvas_color, *l_props[l]);
+               draw_point(pctx, Pixel_XY(px, py), canvas_color, *l_props[l]);
              }
        }
 }
@@ -1581,58 +1847,136 @@ draw_surface_lines(const Plot_context & pctx,
                    const Plot_data & data)
 {
 const Color canvas_color = w_props.get_canvas_color();
-   Plot_line_properties const * const * l_props = w_props.get_line_properties();
+Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties & lp0 = *l_props[0];
 
 enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-const uint32_t gc_l[] = { l_props[0]->line_color, l_props[0]->line_width };
+const uint32_t gc_l[] = { lp0.line_color,        // XCB_GC_FOREGROUND
+                          lp0.line_width };      // XCB_GC_LINE_WIDTH
    xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
 
-const uint32_t gc_p[] = { l_props[0]->point_color, l_props[0]->point_size };
+const uint32_t gc_p[] = { lp0.point_color,       // XCB_GC_FOREGROUND
+                          lp0.point_size };      // XCB_GC_LINE_WIDTH
    xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
 
-   loop(row, data.get_row_count())
+   // draw areas between plot lines
+   //
+const double Hmin = w_props.get_min_Y();
+const double dH = w_props.get_max_Y() - Hmin;   // 100%
+const int verbosity = w_props.get_verbosity();
+
+   loop(row, data.get_row_count() - 1)
+   loop(col, data[row].get_N() - 1)
        {
-         loop(col, data[row].get_N())
-             {
-               const double X0 = data[row].get_X(col);
-               const double Y0 = data[row].get_Y(col);
-               const double Z0 = data[row].get_Z(col);
-               const Pixel_XY XY0 = w_props.valXYZ2pixelXY(X0, Y0, Z0);
-               if (w_props.get_verbosity() > 0)
-                  CERR << "data[" << row << "," << col << "]"
-                       << " X=" << X0 << " Y=" << Y0 << " Z=" << Z0 << endl;
+         if (verbosity & SHOW_DATA)
+            CERR << "B[" << row << ";" << col << "]"
+                 << " X=" << data.get_X(row, col)
+                 << " Y=" << data.get_Y(row, col)
+                 << " Z=" << data.get_Z(row, col) << endl;
 
-#if 0
-                // debug: plot points as vertical lines
-                //
-               const Pixel_XY xy0 = w_props.valXYZ2pixelXY(X0,
-                                                  w_props.get_min_Y(), Z0);
-               draw_line(pctx, xy0.x, xy0.y, XY0.x,  XY0.y);
-#else
+         const double X0 = data.get_X(row, col);
+         const double Y0 = data.get_Y(row, col);
+         const double Z0 = data.get_Z(row, col);
+         const double H0 = (Y0 - Hmin)/dH;
+         const Pixel_XY P0 = w_props.valXYZ2pixelXY(X0, Y0, Z0);
 
-               if (col < (data[row].get_N() - 1))
-                  {
-                    const double X1 = data[row].get_X(col + 1);
-                    const double Y1 = data[row].get_Y(col + 1);
-                    const double Z1 = data[row].get_Z(col + 1);
-                    const Pixel_XY XY1 = w_props.valXYZ2pixelXY(X1, Y1, Z1);
-                    draw_line(pctx, XY0.x, XY0.y, XY1.x,  XY1.y);
-                  }
-               if (row < (data.get_row_count() - 1))
-                  {
-                    const double X2 = data[row + 1].get_X(col);
-                    const double Y2 = data[row + 1].get_Y(col);
-                    const double Z2 = data[row + 1].get_Z(col);
-                    const Pixel_XY XY2 = w_props.valXYZ2pixelXY(X2, Y2, Z2);
-                    draw_line(pctx, XY0.x, XY0.y, XY2.x,  XY2.y);
-                  }
-#endif
-/*
-*/
-               draw_point(pctx, XY0.x, XY0.y, canvas_color, *l_props[0]);
-             }
+         const double X1 = data.get_X(row, col + 1);
+         const double Y1 = data.get_Y(row, col + 1);
+         const double Z1 = data.get_Z(row, col + 1);
+         const double H1 = (Y1 - Hmin)/dH;
+         const Pixel_XY P1 = w_props.valXYZ2pixelXY(X1, Y1, Z1);
+
+         const double X2 = data.get_X(row + 1, col);
+         const double Y2 = data.get_Y(row + 1, col);
+         const double Z2 = data.get_Z(row + 1, col);
+         const double H2 = (Y2 - Hmin)/dH;
+         const Pixel_XY P2 = w_props.valXYZ2pixelXY(X2, Y2, Z2);
+
+         const double X3 = data.get_X(row + 1, col + 1);
+         const double Y3 = data.get_Y(row + 1, col + 1);
+         const double Z3 = data.get_Z(row + 1, col + 1);
+         const double H3 = (Y3 - Hmin)/dH;
+         const Pixel_XY P3 = w_props.valXYZ2pixelXY(X3, Y3, Z3);
+
+//       if (row == 2 && col == 0)
+         if (w_props.get_gradient().size())   // show areas
+            {
+              // fold four-angle along its shorter edge
+              //
+              if (P0.distance2(P3) < P1.distance2(P2))   // P0-P3 is shorter
+                 {
+                   draw_triangle(pctx, verbosity, P1, H1, P0, H0, P3, H3);
+                   draw_triangle(pctx, verbosity, P2, H2, P0, H0, P3, H3);
+                 }
+              else                                       // P1-P2 is shorter
+                 {
+                   draw_triangle(pctx, verbosity, P0, H0, P1, H1, P2, H2);
+                   draw_triangle(pctx, verbosity, P3, H3, P1, H1, P2, H2);
+                 }
+            }
        }
 
+   // draw lines between plot points
+   //
+   loop(row, data.get_row_count() - 1)
+   loop(col, data[row].get_N() - 1)
+       {
+         if (verbosity & SHOW_DATA)
+            CERR << "data[" << row << "," << col << "]"
+                 << " X=" << data.get_X(row, col)
+                 << " Y=" << data.get_Y(row, col)
+                 << " Z=" << data.get_Z(row, col) << endl;
+
+         const double X0 = data.get_X(row, col);
+         const double Y0 = data.get_Y(row, col);
+         const double Z0 = data.get_Z(row, col);
+         const Pixel_XY P0 = w_props.valXYZ2pixelXY(X0, Y0, Z0);
+
+         const double X1 = data.get_X(row, col + 1);
+         const double Y1 = data.get_Y(row, col + 1);
+         const double Z1 = data.get_Z(row, col + 1);
+         const Pixel_XY P1 = w_props.valXYZ2pixelXY(X1, Y1, Z1);
+
+         const double X2 = data.get_X(row + 1, col);
+         const double Y2 = data.get_Y(row + 1, col);
+         const double Z2 = data.get_Z(row + 1, col);
+         const Pixel_XY P2 = w_props.valXYZ2pixelXY(X2, Y2, Z2);
+
+         const double X3 = data.get_X(row + 1, col + 1);
+         const double Y3 = data.get_Y(row + 1, col + 1);
+         const double Z3 = data.get_Z(row + 1, col + 1);
+         const Pixel_XY P3 = w_props.valXYZ2pixelXY(X3, Y3, Z3);
+
+#if 0
+         // debug: plot points as vertical lines
+         //
+         const Pixel_XY xy0 = w_props.valXYZ2pixelXY(data.get_X(row, col),
+                                                     w_props.get_min_Y(),
+                                                     data.get_Z(row, col));
+         draw_line(pctx, pctx.line, xy0, P0);
+         continue;
+#endif
+         draw_line(pctx, pctx.line, P0, P1);
+         if (row == (data.get_row_count() - 2))   // last row
+            draw_line(pctx, pctx.line, P2, P3);
+
+         draw_line(pctx, pctx.line, P0, P2);
+         if (col == (data[row].get_N() - 2))   // last column
+            draw_line(pctx, pctx.line, P1, P3);
+       }
+
+   // draw areas between plot lines
+   //
+   // draw plot points
+   //
+   loop(row, data.get_row_count())
+   loop(col, data[row].get_N())
+       {
+         const Pixel_XY P0 = w_props.valXYZ2pixelXY(data.get_X(row, col),
+                                                    data.get_Y(row, col),
+                                                    data.get_Z(row, col));
+         draw_point(pctx, P0, canvas_color, *l_props[0]);
+       }
 }
 //-----------------------------------------------------------------------------
 void
@@ -1671,10 +2015,10 @@ xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
 void *
 plot_main(void * vp_props)
 {
-Plot_context pctx;
-
 Plot_window_properties & w_props =
       *reinterpret_cast<Plot_window_properties *>(vp_props);
+
+Plot_context pctx(w_props);
 
 const Plot_data & data = w_props.get_plot_data();
 
@@ -1723,18 +2067,23 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
 
    // create some graphic contexts
    //
-   pctx.point = xcb_generate_id(pctx.conn);
+   pctx.fill  = xcb_generate_id(pctx.conn);
    pctx.line  = xcb_generate_id(pctx.conn);
+   pctx.point = xcb_generate_id(pctx.conn);
    pctx.font  = xcb_generate_id(pctx.conn);
    pctx.text = setup_font_gc(pctx, "fixed");
 
    {
-     enum { mask = XCB_GC_GRAPHICS_EXPOSURES };
-//               | XCB_EVENT_MASK_STRUCTURE_NOTIFY };
-     const uint32_t value = 0;
+     enum { mask = XCB_GC_GRAPHICS_EXPOSURES,
+            mask_fill = mask | XCB_GC_LINE_WIDTH
+          };
+     const uint32_t values[] = { 2,   // XCB_GC_LINE_WIDTH
+                                 0    // XCB_GC_GRAPHICS_EXPOSURES
+                               };
 
-     xcb_create_gc(pctx.conn, pctx.line,  pctx.screen->root, mask, &value);
-     xcb_create_gc(pctx.conn, pctx.point, pctx.screen->root, mask, &value);
+     xcb_create_gc(pctx.conn, pctx.fill, pctx.screen->root, mask_fill, values);
+     xcb_create_gc(pctx.conn, pctx.line,  pctx.screen->root, mask, values + 1);
+     xcb_create_gc(pctx.conn, pctx.point, pctx.screen->root, mask, values + 1);
    }
 
    {
@@ -1817,7 +2166,7 @@ const xcb_get_input_focus_reply_t * focusReply =
         switch(event->response_type & ~0x80)
            {
              case XCB_EXPOSE:             // 12
-                  if (w_props.get_verbosity() > 0)
+                  if (w_props.get_verbosity() & SHOW_EVENTS)
                      CERR << "\n*** XCB_EXPOSE " << endl;
                   do_plot(pctx, w_props, data);
                   if (focusReply)
@@ -1837,12 +2186,12 @@ const xcb_get_input_focus_reply_t * focusReply =
                  break;
 
              case XCB_UNMAP_NOTIFY:       // 18
-                  if (w_props.get_verbosity() > 0)
+                  if (w_props.get_verbosity() & SHOW_EVENTS)
                      CERR << "\n*** XCB_UNMAP_NOTIFY ***\n";
                   break;
 
              case XCB_MAP_NOTIFY:         // 19
-                  if (w_props.get_verbosity() > 0)
+                  if (w_props.get_verbosity() & SHOW_EVENTS)
                      CERR << "\n*** XCB_MAP_NOTIFY ***\n";
                   break;
 
@@ -1865,7 +2214,7 @@ const xcb_get_input_focus_reply_t * focusReply =
                     const xcb_property_notify_event_t * notify =
                           reinterpret_cast<const xcb_property_notify_event_t*>
                           (event);
-                    if (w_props.get_verbosity() > 0)
+                    if (w_props.get_verbosity() & SHOW_EVENTS)
                        CERR << "\n*** XCB_PROPERTY_NOTIFY"
                                " atom=" << int(notify->atom) <<
                                ", state=" << int(notify->state) << " ***\n";
@@ -1897,7 +2246,7 @@ const xcb_get_input_focus_reply_t * focusReply =
                   break;
 
              default:
-                w_props.get_verbosity() > 0 &&
+                if (w_props.get_verbosity() & SHOW_EVENTS)
                    CERR << "unexpected event type "
                         << int(event->response_type)
                          << " (ignored)" << endl;
@@ -1978,12 +2327,12 @@ const APL_Integer qio = Workspace::get_IO();
          UCS_string ucs = attr->get_UCS_ravel();
          ucs.remove_leading_and_trailing_whitespaces();
          if (ucs.size() == 0)         continue;
-         if (ucs[0] == UNI_COMMENT)   continue;
+         if (Avec::is_comment(ucs[0]))      continue;
          UTF8_string utf(ucs);
          const char * error = w_props->set_attribute(utf.c_str());
          if (error)
             {
-              MORE_ERROR() << error << " in string '" << ucs << "'";
+              MORE_ERROR() << error << " in ⎕PLOT attribute '" << ucs << "'";
               DOMAIN_ERROR;
             }
        }
@@ -2005,18 +2354,40 @@ Quad_PLOT::eval_B(Value_P B)
            } u;
 
         u.B0 = B->get_ravel(0).get_int_value();
-        if (u.B0 <= 0 && u.B0 >= -2)   // change plot verbosity
+        if (u.B0 == 0)                 // reset plot verbosity
            {
-             verbosity = -u.B0;
-             CERR << "⎕PLOT verbosity set to " << verbosity << endl;
+             verbosity = 0;
+             CERR << "⎕PLOT verbosity turned off" << endl;
              return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
+
+        if (u.B0 == -1)                // enable SHOW_EVENTS
+           {
+             verbosity |= SHOW_EVENTS;
+             CERR << "⎕PLOT will show X events " << endl;
+             return Token(TOK_APL_VALUE1, Idx0(LOC));
+           }
+
+        if (u.B0 == -2)                // enable SHOW_DATA
+           {
+             verbosity |= SHOW_DATA;
+             CERR << "⎕PLOT will  show APL data " << endl;
+             return Token(TOK_APL_VALUE1, Idx0(LOC));
+           }
+
         if (u.B0 == -3)   // close all windows
            {
              while (plot_threads.size())
                 {
                   plot_threads.pop_back();
                 }
+           }
+
+        if (u.B0 == -4)                // enable SHOW_DRAW
+           {
+             verbosity |= SHOW_DRAW;
+             CERR << "⎕PLOT will  show rendering details " << endl;
+             return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
 
         bool found = false;
@@ -2077,46 +2448,105 @@ const APL_Integer qio = Workspace::get_IO();
 Plot_data * data = 0;
    if (B->get_rank() == 3)   // case 3.
       {
+        const ShapeItem planes = B->get_shape_item(0);   // (X), Y, and (Z)
         const ShapeItem rows = B->get_shape_item(1);
         const ShapeItem cols = B->get_shape_item(2);
-        if (B->get_shape_item(0) != 3)   LENGTH_ERROR;
+        if (planes < 1 || planes > 3)    LENGTH_ERROR;
         if (rows < 1)                    LENGTH_ERROR;
         if (cols < 1)                    LENGTH_ERROR;
         const ShapeItem data_points = rows * cols;
 
-        double * X = new double[3*data_points];
-        double * Y = X + data_points;
-        double * Z = Y + data_points;
-        if (!X)   WS_FULL;
+        if (planes == 3)   // X, Y, and Z
+           {
+             double * X = new double[3*data_points];
+             double * Y = X + data_points;
+             double * Z = Y + data_points;
+             if (!X)   WS_FULL;
 
-        data = new Plot_data(rows);
-        loop(r, rows)
-            {
-              loop(c, cols)
-                  {
-                    const ShapeItem p = c + r*cols;
-                    const Cell & cX =B->get_ravel(p);
-                    const Cell & cY =B->get_ravel(p + data_points);
-                    const Cell & cZ =B->get_ravel(p + 2*data_points);
+             data = new Plot_data(rows);
+             loop(r, rows)
+                 {
+                   loop(c, cols)
+                       {
+                         const ShapeItem p = c + r*cols;
+                         const Cell & cX = B->get_ravel(p);
+                         const Cell & cY = B->get_ravel(p + data_points);
+                         const Cell & cZ = B->get_ravel(p + 2*data_points);
 
-                    if (!(cX.is_integer_cell() ||
-                          cX.is_real_cell()))   DOMAIN_ERROR;
-                    if (!(cY.is_integer_cell() ||
-                          cY.is_real_cell()))   DOMAIN_ERROR;
-                    if (!(cZ.is_integer_cell() ||
-                          cZ.is_real_cell()))   DOMAIN_ERROR;
+                         if (!(cX.is_integer_cell() ||
+                               cX.is_real_cell()))   DOMAIN_ERROR;
+                         if (!(cY.is_integer_cell() ||
+                               cY.is_real_cell()))   DOMAIN_ERROR;
+                         if (!(cZ.is_integer_cell() ||
+                               cZ.is_real_cell()))   DOMAIN_ERROR;
 
-                    X[p] = cX.get_real_value();
-                    Y[p] = cY.get_real_value();
-                    Z[p] = cZ.get_real_value();
-                  }
-              const double * pX = X + r*cols;
-              const double * pY = Y + r*cols;
-              const double * pZ = Z + r*cols;
-              const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ,
-                                                            r, cols);
-              data->add_row(pdr);
-            }
+                         X[p] = cX.get_real_value();
+                         Y[p] = cY.get_real_value();
+                         Z[p] = cZ.get_real_value();
+                       }
+                   const double * pX = X + r*cols;
+                   const double * pY = Y + r*cols;
+                   const double * pZ = Z + r*cols;
+                   const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ,
+                                                                 r, cols);
+                   data->add_row(pdr);
+                 }
+           }
+        else if (planes == 2)   // X and Y, but no Z
+           {
+             double * X = new double[2*data_points];
+             double * Y = X + data_points;
+             if (!X)   WS_FULL;
+
+             data = new Plot_data(rows);
+             loop(r, rows)
+                 {
+                   loop(c, cols)
+                       {
+                         const ShapeItem p = c + r*cols;
+                         const Cell & cX = B->get_ravel(p);
+                         const Cell & cY = B->get_ravel(p + data_points);
+
+                         if (!(cX.is_integer_cell() ||
+                               cX.is_real_cell()))   DOMAIN_ERROR;
+                         if (!(cY.is_integer_cell() ||
+                               cY.is_real_cell()))   DOMAIN_ERROR;
+
+                         X[p] = cX.get_real_value();
+                         Y[p] = cY.get_real_value();
+                       }
+                   const double * pX = X + r*cols;
+                   const double * pY = Y + r*cols;
+                   const Plot_data_row * pdr = new Plot_data_row(pX, pY, 0,
+                                                                 r, cols);
+                   data->add_row(pdr);
+                 }
+           }
+        else                    // Y, but no X or Z
+           {
+Q(LOC)
+             double * Y = new double[data_points];
+             if (!Y)   WS_FULL;
+
+             data = new Plot_data(rows);
+             loop(r, rows)
+                 {
+                   loop(c, cols)
+                       {
+                         const ShapeItem p = c + r*cols;
+                         const Cell & cY = B->get_ravel(p);
+
+                         if (!(cY.is_integer_cell() ||
+                               cY.is_real_cell()))   DOMAIN_ERROR;
+
+                         Y[p] = cY.get_real_value();
+                       }
+                   const double * pY = Y + r*cols;
+                   const Plot_data_row * pdr = new Plot_data_row(0, pY, 0,
+                                                                 r, cols);
+                   data->add_row(pdr);
+                 }
+           }
         data->surface = true;
       }
    else if (B->get_ravel(0).is_pointer_cell())   // 2b.
@@ -2251,12 +2681,13 @@ Quad_PLOT::help() const
 "   ⎕PLOT Usage:\n"
 "\n"
 "   ⎕PLOT B     plot B with default attribute values\n"
-"   A ⎕PLOT B   plot B with attributes A\n"
+"   A ⎕PLOT B   plot B with attributes specified by A\n"
 "\n"
 "   A is a nested vector of strings.\n"
-"   Each string has the form \"Attribute: Value\"\n"
+"   Each string in A has the form \"Attribute: Value\"\n"
 "   Colors are specified either as #RGB or as #RRGGBB or as RR GG BB)\n"
-"   The attributes understood and their defaults are:\n"
+"\n"
+"   The attributes understood by ⎕PLOT and their default values are:\n"
 "\n"
 "   1. Global (plot window) Attributes:\n"
 "\n";
@@ -2269,6 +2700,9 @@ Quad_PLOT::help() const
 # include "Quad_PLOT.def"
 
    CERR <<
+"\n"
+"color_level-P:      (none)         "
+                    "(color gradient at P% (surface plots only))\n"
 "\n"
 "   2. Local (plot line N) Attributes:\n"
 "\n";
