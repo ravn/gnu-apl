@@ -44,6 +44,7 @@ Bif_F12_FORMAT::eval_B(Value_P B)
       {
         Value_P Z(B->get_shape(), LOC);
         Z->set_proto_Spc();
+        Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 

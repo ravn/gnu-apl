@@ -1404,6 +1404,69 @@ const double   Y = Y0;   Y0 = Y1;   Y1 = Y;
 const Pixel_XY P = P0;   P0 = P1;   P1 = P;
 }
 //-----------------------------------------------------------------------------
+inline double
+intersection(double Ax, double Ay, double Bx, double By,
+             double Cx, double Cy, double Dx, double Dy)
+{
+   /** given 4 points A=(Ax, Ay), B=(Bx, By), C=(Cx, Cy), and D=(Dx, Dy)
+       in the plane, return the factor beta so that the intersection point
+       M=(Mx, My) of the lines A-C and B-D is given by
+
+       M = (Mx, My) == A + alpha*(D-A) == B + beta*(C - B). Note that:
+
+       A
+        \   B
+         \ /
+          M
+         / \
+        /   \
+       C     D
+    Ax     + alpha*(Dx-Ax) == Bx + beta*(Cx-Bx)
+    Ay     + alpha*(Dy-Ay) == By + beta*(Cy-By)
+
+   **/
+
+   /* first, translate A, B, and D by -C, so that C=(0, 0):
+
+       A
+        \   B
+         \ /
+          M
+         / \
+        /   \
+       0     D
+   */
+   Ax -= Cx;   Bx -= Cx;   Dx -= Cx;
+   Ay -= Cy;   By -= Cy;   Dy -= Cy;
+
+   /* Thus:
+
+   (Ax-Bx) + alpha*(Dx-Ax) == beta*(-Bx)
+   (Ay-By) + alpha*(Dy-Ay) == beta*(-By)
+
+   (Ax-Bx)*(Dy-Ay) + alpha*(Dx-Ax)*(Dy-Ay) == beta*(-Bx)*(Dy-Ay)
+   (Ay-By)*(Dx-Ax) + alpha*(Dy-Ay)*(Dx-Ax) == beta*(-By)*(Dx-Ax)
+   =======================================    ==================
+   (Ax-Bx)*(Dy-Ay) - (Ay-By)*(Dx-Ax) ==  beta*((-Bx)*(Dy-Ay) - (-By)*(Dx-Ax))
+   **/
+
+const double numer = (Ax-Bx)*(Dy-Ay) - (Ay-By)*(Dx-Ax);   // left side
+const double denom = ((-Bx)*(Dy-Ay) - (-By)*(Dx-Ax));     // right factor
+   if (denom == 0.0)
+      {
+        Ax += Cx;   Bx += Cx;   Dx += Cx;
+        Ay += Cy;   By += Cy;   Dy += Cy;
+        MORE_ERROR() << "⎕PLOT: one of the X-Z squares has bad coordinates:"
+                     << "P1=(" << Ax << ":" << Ay << "), "
+                        "P2=(" << Bx << ":" << By << "), "
+                        "P3=(" << Cx << ":" << Cy << ") "
+                        "P4=(" << Dx << ":" << Dy << ")";
+        DOMAIN_ERROR;
+      }
+
+   return /* beta == */ numer/denom;
+}
+//-----------------------------------------------------------------------------
 void
 draw_triangle(const Plot_context & pctx, int verbosity,
               Pixel_XY P0, double H0, Pixel_XY P1, Pixel_XY P2, double H12)
@@ -1850,6 +1913,8 @@ const Color canvas_color = w_props.get_canvas_color();
 Plot_line_properties const * const * l_props = w_props.get_line_properties();
 const Plot_line_properties & lp0 = *l_props[0];
 
+   // 1. setup graphic contexts
+   //
 enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
 const uint32_t gc_l[] = { lp0.line_color,        // XCB_GC_FOREGROUND
                           lp0.line_width };      // XCB_GC_LINE_WIDTH
@@ -1859,7 +1924,7 @@ const uint32_t gc_p[] = { lp0.point_color,       // XCB_GC_FOREGROUND
                           lp0.point_size };      // XCB_GC_LINE_WIDTH
    xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
 
-   // draw areas between plot lines
+   // 2. draw areas between plot lines...
    //
 const double Hmin = w_props.get_min_Y();
 const double dH = w_props.get_max_Y() - Hmin;   // 100%
@@ -1874,49 +1939,86 @@ const int verbosity = w_props.get_verbosity();
                  << " Y=" << data.get_Y(row, col)
                  << " Z=" << data.get_Z(row, col) << endl;
 
-         const double X0 = data.get_X(row, col);
-         const double Y0 = data.get_Y(row, col);
-         const double Z0 = data.get_Z(row, col);
-         const double H0 = (Y0 - Hmin)/dH;
+         if (!w_props.get_gradient().size())   continue; // no gradient
+//       if (row != 3)   continue;   // show only given row
+//       if (col != 0)   continue;   // show only given column
+
+         const double   X0 = data.get_X(row, col);
+         const double   Y0 = data.get_Y(row, col);
+         const double   Z0 = data.get_Z(row, col);
+         const double   H0 = (Y0 - Hmin)/dH;
          const Pixel_XY P0 = w_props.valXYZ2pixelXY(X0, Y0, Z0);
 
-         const double X1 = data.get_X(row, col + 1);
-         const double Y1 = data.get_Y(row, col + 1);
-         const double Z1 = data.get_Z(row, col + 1);
-         const double H1 = (Y1 - Hmin)/dH;
+         const double   X1 = data.get_X(row, col + 1);
+         const double   Y1 = data.get_Y(row, col + 1);
+         const double   Z1 = data.get_Z(row, col + 1);
+         const double   H1 = (Y1 - Hmin)/dH;
          const Pixel_XY P1 = w_props.valXYZ2pixelXY(X1, Y1, Z1);
 
-         const double X2 = data.get_X(row + 1, col);
-         const double Y2 = data.get_Y(row + 1, col);
-         const double Z2 = data.get_Z(row + 1, col);
-         const double H2 = (Y2 - Hmin)/dH;
+         const double   X2 = data.get_X(row + 1, col);
+         const double   Y2 = data.get_Y(row + 1, col);
+         const double   Z2 = data.get_Z(row + 1, col);
+         const double   H2 = (Y2 - Hmin)/dH;
          const Pixel_XY P2 = w_props.valXYZ2pixelXY(X2, Y2, Z2);
 
-         const double X3 = data.get_X(row + 1, col + 1);
-         const double Y3 = data.get_Y(row + 1, col + 1);
-         const double Z3 = data.get_Z(row + 1, col + 1);
-         const double H3 = (Y3 - Hmin)/dH;
+         const double   X3 = data.get_X(row + 1, col + 1);
+         const double   Y3 = data.get_Y(row + 1, col + 1);
+         const double   Z3 = data.get_Z(row + 1, col + 1);
+         const double   H3 = (Y3 - Hmin)/dH;
          const Pixel_XY P3 = w_props.valXYZ2pixelXY(X3, Y3, Z3);
 
-//       if (row == 2 && col == 0)
-         if (w_props.get_gradient().size())   // show areas
+
+         /* the surface has 4 points P0, P1, P2, and P3, but they are not
+            necessarily coplanar. We could draw the surface in 2 ways:
+
+            A. find the intersection PM of P0-P3 and P1-P2 on the bottom
+               plane Y=0, interpolate the respective heights, and draw
+               4 triangles from PM to each of the four edges of the square
+
+            B. fold the surface at its shorter edge into 2 triangles that
+               have the edge in common. (triangles are always coplanar).
+
+            Option B seems to look better.
+         */
+
+#if 0
+         /* Option A...
+
+            interpolate middle point PM with height HM and split the
+            square P0-P1-P2-P3 into 4 triangles with common point PM
+            and edges P0-P1, P1-P3, P3-P2, and P2-P0 respectively.
+         */
+         const double beta = intersection(X0,Z0, X1,Z1, X2,Z2, X3,Z3);
+         const double   XM = X1 + beta*(X2 - X1);
+         const double   YM = Y1 + beta*(Y2 - Y1);
+         const double   ZM = Z1 + beta*(Z2 - Z1);
+         const double   HM = (YM - Hmin)/dH;
+         const Pixel_XY PM = w_props.valXYZ2pixelXY(XM, YM, ZM);
+
+         draw_triangle(pctx, verbosity, PM, HM, P0, H0, P1, H1);
+         draw_triangle(pctx, verbosity, PM, HM, P1, H1, P3, H3);
+         draw_triangle(pctx, verbosity, PM, HM, P3, H3, P2, H2);
+         draw_triangle(pctx, verbosity, PM, HM, P2, H2, P0, H0);
+#else
+         /* Option B...
+
+            fold surface-square along its shorter edge
+         */
+
+         if (P0.distance2(P3) < P1.distance2(P2))   // P0-P3 is shorter
             {
-              // fold four-angle along its shorter edge
-              //
-              if (P0.distance2(P3) < P1.distance2(P2))   // P0-P3 is shorter
-                 {
-                   draw_triangle(pctx, verbosity, P1, H1, P0, H0, P3, H3);
-                   draw_triangle(pctx, verbosity, P2, H2, P0, H0, P3, H3);
-                 }
-              else                                       // P1-P2 is shorter
-                 {
-                   draw_triangle(pctx, verbosity, P0, H0, P1, H1, P2, H2);
-                   draw_triangle(pctx, verbosity, P3, H3, P1, H1, P2, H2);
-                 }
+              draw_triangle(pctx, verbosity, P1, H1, P0, H0, P3, H3);
+              draw_triangle(pctx, verbosity, P2, H2, P0, H0, P3, H3);
             }
+         else                                       // P1-P2 is shorter
+            {
+              draw_triangle(pctx, verbosity, P0, H0, P1, H1, P2, H2);
+              draw_triangle(pctx, verbosity, P3, H3, P1, H1, P2, H2);
+            }
+#endif
        }
 
-   // draw lines between plot points
+   // 3. draw lines between plot points
    //
    loop(row, data.get_row_count() - 1)
    loop(col, data[row].get_N() - 1)
@@ -1965,9 +2067,7 @@ const int verbosity = w_props.get_verbosity();
             draw_line(pctx, pctx.line, P1, P3);
        }
 
-   // draw areas between plot lines
-   //
-   // draw plot points
+   // 4. draw plot points
    //
    loop(row, data.get_row_count())
    loop(col, data[row].get_N())
