@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 /// common part of user-defined names and distinguished names
-template <typename T, int SYMBOL_COUNT>
+template <typename T, size_t SYMBOL_COUNT>
 class SymbolTableBase
 {
 public:
@@ -104,16 +104,7 @@ public:
    /// compute a 16-bit hash for \b name
    static uint32_t compute_hash(const UCS_string & name)
       {
-        // Parameters for the FNV-1 hash.
-        enum {
-               FNV_Offset_32 = 0x811C9DC5,
-               FNV_Prime_32  = 16777619
-             };
-
-        uint32_t hash = FNV_Offset_32;
-        for (int s = 0; s < name.size(); ++s)
-            hash = (hash * FNV_Prime_32) ^ name[s];
-
+        uint32_t hash = name.FNV_hash();
         hash = (((hash >> 16) ^ hash) & 0x0000FFFF) % SYMBOL_COUNT;
 
         Log(LOG_SYMBOL_lookup_symbol)

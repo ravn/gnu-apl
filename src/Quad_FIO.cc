@@ -59,6 +59,100 @@ Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
    // If the axis is missing, then a list of functions implemented by
    // ⎕FIO is displayed
 
+Quad_FIO::_sub_fun Quad_FIO::sub_functions[] =
+{
+   { 35, "accept"       },
+   { 31, "access"       },
+   { 33, "bind"         },
+   { 54, "chdir"        },
+   { 36, "connect"      },
+   { 29, "dir_files"    },
+   {  1, "errno"        },
+   {  5, "errno_B"      },
+   {  4, "fclose"       },
+   { 59, "fcntl"        },
+   { 10, "feof"         },
+   { 11, "ferror"       },
+   { 16, "fflush"       },
+   {  9, "fgetc"        },
+   {  8, "fgets"        },
+   {  3, "fopen"        },
+   { 57, "fork_daemon"  },
+   { 22, "fprintf"      },
+   {  6, "fread"        },
+   { 48, "fscanf"       },
+   { 14, "fseek_cur"    },
+   { 15, "fseek_end"    },
+   { 13, "fseek_set"    },
+   { 18, "fstat"        },
+   { 17, "fsync"        },
+   { 12, "ftell"        },
+   {  7, "fwrite"       },
+   { 23, "fwrite_UNI"   },
+   { 45, "getpeername"  },
+   { 44, "getsockname"  },
+   { 46, "getsockopt"   },
+   { 50, "gettimeofday" },
+   { 53, "gmtime"       },
+   {  0, "help"         },
+   { 34, "listen"       },
+   { 52, "localtime"    },
+   { 20, "mkdir"        },
+   { 51, "mktime"       },
+   { 25, "pclose"       },
+   { 24, "popen"        },
+   { 60, "random"       },
+   { 41, "read"         },
+   { 28, "read_dir"     },
+   { 26, "read_file"    },
+   { 49, "read_text"    },
+   { 37, "recv"         },
+   { 27, "rename"       },
+   { 21, "rmdir"        },
+   { 40, "select"       },
+   { 38, "send"         },
+   { 39, "send_UNI"     },
+   { 47, "setsockopt"   },
+   { 32, "socket"       },
+   { 58, "sprintf"      },
+   { 55, "sscanf"       },
+   {  2, "strerror"     },
+   { 19, "unlink"       },
+   { 42, "write"        },
+   { 43, "write_UNI"    },
+   { 56, "write_text"   },
+};
+//-----------------------------------------------------------------------------
+int
+Quad_FIO::axis_compare(const void * key, const void * sf)
+{
+   return strcasecmp(reinterpret_cast<const char *>(key),
+                     reinterpret_cast<const _sub_fun *>(sf)->key);
+}
+//-----------------------------------------------------------------------------
+int
+Quad_FIO::function_name_to_int(const char * function_name)
+{
+  enum { SF_SIZE = sizeof(_sub_fun),
+         SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
+
+#if 0
+   // check that sub_functions are sorted by function name...
+   //
+   loop(f, SF_COUNT - 1)
+       if (strcmp(sub_functions[f].key, sub_functions[f+1].key) >= 0)
+          {
+            // mismatch...
+            Q(sub_functions[f].key)
+            Q(sub_functions[f+1].key)
+          }
+#endif
+
+  if (const void * vp = bsearch(function_name, sub_functions,
+                                SF_COUNT, SF_SIZE, axis_compare))
+      return reinterpret_cast<const _sub_fun *>(vp)->val;
+  return -1;    // not found
+}
 //-----------------------------------------------------------------------------
 Quad_FIO::Quad_FIO()
    : QuadFunction(TOK_Quad_FIO)
@@ -746,9 +840,24 @@ Shape sh_Z(z);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::list_functions(ostream & out)
+Quad_FIO::list_functions(ostream & out, bool mapping)
 {
-   out <<
+   if (mapping)
+      {
+         out <<
+"      With a small performance penalty, ⎕FIO also accepts the following "
+"strings\n      instead of function numbers:\n\n";
+
+         loop(f, sizeof(sub_functions)/sizeof(_sub_fun))
+             out << "      ⎕FIO[" << setw(2) << sub_functions[f].val
+                 << "]  ←→  ⎕FIO['" << sub_functions[f].key << "']" << endl;
+
+         out << "\n      For a more detailed description of all functions:\n\n"
+                "      ⎕FIO ⍬" << endl;
+      }
+   else
+      {
+       out <<
 "   Functions provided by ⎕FIO...\n"
 "\n"
 "   Legend: a - address family, IPv4 address, port (or errno)\n"
@@ -768,9 +877,11 @@ Quad_FIO::list_functions(ostream & out)
 "           y9 - year, mon, day, hour, minute, second, wday, yday, dst\n"
 "           A1, A2, ...  nested vector with elements A1, A2, ...\n"
 "\n"
-"           ⎕FIO     ''    print this text on stderr\n"
-"           ⎕FIO     0     return a list of open file descriptors\n"
-"        '' ⎕FIO     ''    print this text on stdout\n"
+"           ⎕FIO      ⍬    print this text on stderr\n"
+"           ⎕FIO     ''    print function-number to -name mapping on stderr\n"
+"           ⎕FIO      0    return a list of open file descriptors\n"
+"        '' ⎕FIO      ⍬    print this text on stdout\n"
+"           ⎕FIO     ''    print function-number to -name mapping on stdout\n"
 "           ⎕FIO[ 0] ''    print this text on stderr\n"
 "        '' ⎕FIO[ 0] ''    print this text on stdout\n"
 "\n"
@@ -859,6 +970,7 @@ Quad_FIO::list_functions(ostream & out)
 "        Ai ⎕FIO[202] Bs    set monadic parallel threshold for primitive Bs\n"
 "           ⎕FIO[203] Bs    get dyadic parallel threshold for primitive Bs\n"
 "        Ai ⎕FIO[203] Bs    set dyadic parallel threshold for primitive Bs\n";
+      }
 
    return Token(TOK_APL_VALUE1, Str0(LOC));
 }
@@ -869,8 +981,15 @@ Quad_FIO::eval_B(Value_P B)
    CHECK_SECURITY(disable_Quad_FIO);
 
    if (B->get_rank() > 1)   RANK_ERROR;
+   if (B->get_rank() > 1)   RANK_ERROR;
 
-   if (!B->get_ravel(0).is_integer_cell())     return list_functions(COUT);
+   if (B->element_count() == 0)   // '' or ⍬
+      {
+        if (B->get_ravel(0).is_character_cell())
+           return list_functions(CERR, true);
+        if (B->get_ravel(0).is_integer_cell())
+           return list_functions(CERR, false);
+      }
 
 const APL_Integer function_number = B->get_ravel(0).get_int_value();
    switch(function_number)
@@ -1017,7 +1136,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
         default: break;
       }
 
-   return list_functions(COUT);
+   return list_functions(CERR, false);
 
 out_errno:
    MORE_ERROR() << "⎕FIO[" << function_number
@@ -1033,7 +1152,14 @@ Quad_FIO::eval_AB(Value_P A, Value_P B)
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
 
-   if (!B->get_ravel(0).is_integer_cell())     return list_functions(COUT);
+   if (B->element_count() == 0)   // '' or ⍬
+      {
+        if (B->get_ravel(0).is_character_cell())
+           return list_functions(CERR, true);
+        if (B->get_ravel(0).is_integer_cell())
+           return list_functions(CERR, false);
+      }
+
 
 const APL_Integer function_number = B->get_ravel(0).get_int_value();
    switch(function_number)
@@ -1066,7 +1192,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
         default: break;
       }
 
-   return list_functions(COUT);
+   return list_functions(COUT, false);
 }
 //-----------------------------------------------------------------------------
 Token
@@ -1114,12 +1240,28 @@ Quad_FIO::eval_XB(Value_P X, Value_P B)
    if (B->get_rank() > 1)   RANK_ERROR;
    if (X->get_rank() > 1)   RANK_ERROR;
 
-const APL_Integer function_number = X->get_ravel(0).get_near_int();
+int function_number = -1;
+   if (X->is_char_array())   // function name, e.g. "open"
+      {
+        UCS_string ucs_X(X.getref());
+        UTF8_string utf_X(ucs_X);
+        function_number = function_name_to_int(utf_X.c_str());
+        if (function_number == -1)
+           {
+             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
+                          << ucs_X << "')";
+             AXIS_ERROR;
+           }
+      }
+   else
+      {
+        function_number = X->get_ravel(0).get_near_int();
+      }
 
    switch(function_number)
       {
          case 0:   // list functions
-              return list_functions(CERR);
+              return list_functions(CERR, false);
 
          case 1:   // return (last) errno
               goto out_errno;
@@ -2000,12 +2142,28 @@ Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B)
    if (B->get_rank() > 1)   RANK_ERROR;
    if (X->get_rank() > 1)   RANK_ERROR;
 
-const int function_number = X->get_ravel(0).get_near_int();
+int function_number = -1;
+   if (X->is_char_array())   // function name, e.g. "open"
+      {
+        UCS_string ucs_X(X.getref());
+        UTF8_string utf_X(ucs_X);
+        function_number = function_name_to_int(utf_X.c_str());
+        if (function_number == -1)
+           {
+             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
+                          << ucs_X << "')";
+             AXIS_ERROR;
+           }
+      }
+   else
+      {
+        function_number = X->get_ravel(0).get_near_int();
+      }
 
    switch(function_number)
       {
          case 0:   // list functions
-              return list_functions(COUT);
+              return list_functions(COUT, false);
 
          case 3:   // fopen(Bs, As) filename Bs mode As
               {

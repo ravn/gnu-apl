@@ -129,6 +129,10 @@ World
       FIO∆strerror Error
 No such file or directory
 
+      ⎕FIO['strerror'] Error   ⍝ monadic with axis string
+No such file or directory
+
+
       ⍝ printf
       ⍝
       )ERASE FORMAT
@@ -262,7 +266,6 @@ World!
       FIO∆fclose Handle ⍝ close file
 0
 
-
       ⍝ sscanf
       ⍝
       ⍴DATA←'int 22 perc % doub 3.14 char C chars DEFGH qqq str st⍴ing'
@@ -271,6 +274,8 @@ World!
       FMT FIO∆sscanf DATA
  22 3.14 C DEFGH st⍴ing 57 
 
+      FMT ⎕FIO['sscanf'] DATA   ⍝ dyadic with axis string
+ 22 3.14 C DEFGH st⍴ing 57 
 
       ⍝ execve
       ⍝

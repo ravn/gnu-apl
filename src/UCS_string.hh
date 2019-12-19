@@ -107,40 +107,6 @@ public:
         return reinterpret_cast<const T *>(&at(0));
       }
 
-   /// compute the length of an output row
-   int compute_chunk_length(int quad_PW, int col) const;
-
-   /// remove trailing pad characters
-   void remove_trailing_padchars();
-
-   /// remove trailing blanks, tabs, etc
-   void remove_trailing_whitespaces();
-
-   /// remove leading blanks, tabs, etc
-   void remove_leading_whitespaces();
-
-   /// remove leading and trailing whitespaces
-   void remove_leading_and_trailing_whitespaces()
-      {
-        remove_trailing_whitespaces();
-        remove_leading_whitespaces();
-      }
-
-   /// skip leading whitespaces starting at idx, append the following
-   /// non-whitespaces (if any) to \b dest, and skip trailing whitespaces
-   void copy_black(UCS_string & dest, int & idx) const;
-
-   /// \b this is a command with optional args. Remove leading and trailing
-   /// whitespaces, append args to rest, and remove args from this.
-   void split_ws(UCS_string & rest);
-
-   /// return the number of LF characters in \b this string
-   ShapeItem LF_count() const;
-
-   /// return the start position of \b sub in \b this string or -1 if \b sub
-   /// is not contained in \b this string
-   ShapeItem substr_pos(const UCS_string & sub) const;
-
    /// return this string with the first \b drop_count characters removed
    UCS_string drop(int drop_count) const
       {
@@ -149,15 +115,39 @@ public:
         return UCS_string(*this, drop_count, size() - drop_count);
       }
 
+   /// return true if every character in \b this string is the digit '0'
+   bool all_zeroes() const
+      { loop(s, size())   if ((*this)[s] != UNI_ASCII_0)   return false;
+        return true;
+      }
+
    /// return the last character in \b this string
    Unicode back() const
     { return size() ? (*this)[size() - 1] : Invalid_Unicode; }
 
-   /// return the last character in \b this string
-   Unicode & back()
-    { Assert(size());   return at(size() - 1); }
+   /// compute the length of an output row
+   int compute_chunk_length(int quad_PW, int col) const;
 
-   /// return true if this string contains non-whitespace characters
+   /// skip leading whitespaces starting at idx, append the following
+   /// non-whitespaces (if any) to \b dest, and skip trailing whitespaces
+   void copy_black(UCS_string & dest, int & idx) const;
+
+   /// return the FNV (Fowler-Noll-Vo) hash of \b this_string
+   uint32_t FNV_hash() const
+      { enum { FNV_Offset_32 = 0x811C9DC5, FNV_Prime_32  = 16777619 };
+        uint32_t hash = FNV_Offset_32;
+        loop(s, size()) hash = (hash * FNV_Prime_32) ^ at(s);
+        return hash;
+      }
+
+   /// return the number of LF characters in \b this string
+   ShapeItem LF_count() const;
+
+   /// return the start position of \b sub in \b this string or -1 if \b sub
+   /// is not contained in \b this string
+   ShapeItem substr_pos(const UCS_string & sub) const;
+
+   /// return true if \b this string contains non-whitespace characters
    bool has_black() const;
 
    /// return true if \b this starts with prefix (ASCII, case matters).
@@ -178,27 +168,11 @@ public:
    /// return a string like this, but with pad chars mapped to spaces
    UCS_string no_pad() const;
 
-   /// replace pad chars in \b this string by spaces
-   void map_pad();
-
-   /// return a string like this, but with pad chars removed
-   UCS_string remove_pad() const;
-
-   /// remove the last character in \b this string
-   void pop_back()
-   { Assert(size() > 0);   resize(size() - 1); }
-
    /// return this string reversed (i.e. characters from back to front).
    UCS_string reverse() const;
 
    /// return true if \b this string starts with # or ⍝ or x:
    bool is_comment_or_label() const;
-
-   /// return true if every character in \b this string is the digit '0'
-   bool all_zeroes() const
-      { loop(s, size())   if ((*this)[s] != UNI_ASCII_0)   return false;
-        return true;
-      }
 
    /// return the number of unescaped and un-commented " in this string
    ShapeItem double_quote_count(bool in_quote2) const;
@@ -214,6 +188,66 @@ public:
    /// return integer value for a string starting with optional whitespaces,
    /// followed by digits.
    int atoi() const;
+
+   /// return a string like this, but with pad chars removed
+   UCS_string remove_pad() const;
+
+   /// split \b this multi-line string into individual lines,
+   /// removing the CR and NL chars in \b this string.
+   size_t to_vector(UCS_string_vector & result) const;
+
+   /// return \b this string with "escape sequences" replaced by their real
+   /// characters ('' → ' if single quoted and \\r, \\n, \\xNNN etc. otherwise.
+   UCS_string un_escape(bool double_quoted, bool keep_LF) const;
+
+   /// the inverse of \b un_escape().
+   UCS_string do_escape(bool double_quoted) const;
+
+   /// case-sensitive comparison: return true iff \b this comes before \b other
+   bool lexical_before(const UCS_string other) const;
+
+   /// dump \b this string to out (like U+nnn U+mmm ... )
+   ostream & dump(ostream & out) const;
+
+   /// sort the characters in this string by their Unicode
+   UCS_string sort() const;
+
+   /// return the characters in this string (sorted and duplicates removed)
+   UCS_string unique() const;
+
+   /// return this string HTML-escaped, starting at offset, maybe using &nbsp;
+   UCS_string to_HTML(int offset, bool preserve_ws) const;
+
+   /// remove trailing pad characters
+   void remove_trailing_padchars();
+
+   /// remove trailing blanks, tabs, etc
+   void remove_trailing_whitespaces();
+
+   /// remove leading blanks, tabs, etc
+   void remove_leading_whitespaces();
+
+   /// remove leading and trailing whitespaces
+   void remove_leading_and_trailing_whitespaces()
+      {
+        remove_trailing_whitespaces();
+        remove_leading_whitespaces();
+      }
+
+   /// \b this is a command with optional args. Remove leading and trailing
+   /// whitespaces, append args to rest, and remove args from this.
+   void split_ws(UCS_string & rest);
+
+   /// return the last character in \b this string
+   Unicode & back()
+    { Assert(size());   return at(size() - 1); }
+
+   /// replace pad chars in \b this string by spaces
+   void map_pad();
+
+   /// remove the last character in \b this string
+   void pop_back()
+   { Assert(size() > 0);   resize(size() - 1); }
 
    /// append UCS_string other to this string
    void append(const UCS_string & other)
@@ -290,17 +324,6 @@ public:
    /// append number (in ASCII encoding like %lf) to this string
    void append_float(APL_Float num);
 
-   /// split \b this multi-line string into individual lines,
-   /// removing the CR and NL chars in \b this string.
-   size_t to_vector(UCS_string_vector & result) const;
-
-   /// return \b this string with "escape sequences" replaced by their real
-   /// characters ('' → ' if single quoted and \\r, \\n, \\xNNN etc. otherwise.
-   UCS_string un_escape(bool double_quoted, bool keep_LF) const;
-
-   /// the inverse of \b un_escape().
-   UCS_string do_escape(bool double_quoted) const;
-
    /// overload basic_string::size() so that it returns a signed length
    ShapeItem size() const
       { return basic_string::size(); }
@@ -344,21 +367,6 @@ public:
 
    /// return true if \b this string contains \b uni
    bool contains(Unicode uni);
-
-   /// case-sensitive comparison: return true iff \b this comes before \b other
-   bool lexical_before(const UCS_string other) const;
-
-   /// dump \b this string to out (like U+nnn U+mmm ... )
-   ostream & dump(ostream & out) const;
-
-   /// sort the characters in this string by their Unicode
-   UCS_string sort() const;
-
-   /// return the characters in this string (sorted and duplicates removed)
-   UCS_string unique() const;
-
-   /// return this string HTML-escaped, starting at offset, maybe using &nbsp;
-   UCS_string to_HTML(int offset, bool preserve_ws) const;
 
    /// erase 1 (!) character at pos
    void erase(ShapeItem pos)

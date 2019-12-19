@@ -75,7 +75,7 @@ public:
    /// get one Unicode from file
    static Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
 
-   /// return one mor more random values
+   /// return one or more random values
    static Value_P get_random(APL_Integer mode, APL_Integer len);
 
    /// return the open FILE * for (APL integer) \b handle
@@ -83,6 +83,15 @@ public:
 
    static Quad_FIO * fun;   ///< Built-in function.
    static Quad_FIO  _fun;   ///< Built-in function.
+
+   struct _sub_fun
+      {
+        unsigned int val;
+        const char * key;
+      };
+
+   // a mapping between strings and axis iuntegers
+   static _sub_fun sub_functions[];
 
 protected:
    /// one file (openend with open(), fopen(), or fdopen()).
@@ -150,7 +159,7 @@ protected:
       }
 
    /// list all ⎕IO functions to \b out
-   Token list_functions(ostream & out);
+   Token list_functions(ostream & out, bool mapping);
 
    /// convert bits set in \b fds to an APL integer vector
    Value_P fds_to_val(fd_set * fds, int max_fd);
@@ -164,6 +173,12 @@ protected:
 
    /// perform an fscanf() from file
    Token do_scanf(File_or_String & input, const UCS_string & format);
+
+   /// compare two axis strings (function names)
+   static int axis_compare(const void * key, const void * sf);
+
+   /// find function number for function name, -1 if not found
+   static int function_name_to_int(const char * function_name);
 
    /// the open files
    std::vector<file_entry> open_files;
