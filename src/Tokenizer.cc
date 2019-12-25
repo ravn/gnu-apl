@@ -352,7 +352,15 @@ const Token tok = Avec::uni_to_token(uni, LOC);
 
    switch(tok.get_tag())
       {
-        sys(F0_ZILDE,      F0_ZILDE)
+        case TOK_F0_ZILDE:
+             // new ⍬ style: tokenize ⍬ as constant
+             //
+             return Token(TOK_APL_VALUE1, Idx0(LOC));
+
+             // old ⍬ style: tokenize ⍬ as niladic function
+             //
+             // return Token(tok.get_tag(), Bif_F0_ZILDE::fun);  break;
+
         sys(F1_EXECUTE,    F1_EXECUTE)
 
         sys(F2_AND,        F2_AND)
