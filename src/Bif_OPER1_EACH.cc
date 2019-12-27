@@ -140,8 +140,18 @@ ShapeItem len_Z = 0;
       {
         const Cell * cA = &A->get_ravel(dA * z);
         const Cell * cB = &B->get_ravel(dB * z);
+        const bool left_val = cB->is_lval_cell();
         Value_P LO_A = cA->to_value(LOC);     // left argument of LO
         Value_P LO_B = cB->to_value(LOC);     // right argument of LO;
+        if (left_val)
+           {
+             Cell * dest = cB->get_lval_value();
+             if (dest->is_pointer_cell())
+                {
+                  Value_P sub = dest->get_pointer_value();
+                  LO_B = sub->get_cellrefs(LOC);
+                }
+           }
 
         Token result = LO->eval_AB(LO_A, LO_B);
 
@@ -154,7 +164,7 @@ ShapeItem len_Z = 0;
              Value_P vZ = result.get_apl_val();
 
              Cell * cZ = Z->next_ravel();
-             if (vZ->is_simple_scalar())
+             if (vZ->is_simple_scalar() || (left_val && vZ->is_scalar()))
                 cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
              else
                 new (cZ)   PointerCell(vZ.get(), Z.getref());
@@ -249,19 +259,18 @@ Value_P Z;
            }
         else
            {
-             Value_P LO_B;         // right argument of LO;
              const Cell * cB = &B->get_ravel(z);
+             const bool left_val = cB->is_lval_cell();
+             Value_P LO_B = cB->to_value(LOC);      // right argument of LO
 
-             if (cB->is_pointer_cell())
+             if (left_val)
                 {
-                  LO_B = cB->get_pointer_value();
-                }
-             else
-                {
-                  LO_B = Value_P(LOC);
-
-                  LO_B->get_ravel(0).init(*cB, LO_B.getref(), LOC);
-                  LO_B->set_complete();
+                  Cell * dest = cB->get_lval_value();
+                  if (dest->is_pointer_cell())
+                     {
+                       Value_P sub = dest->get_pointer_value();
+                       LO_B = sub->get_cellrefs(LOC);
+                     }
                 }
 
              Token result = LO->eval_B(LO_B);
@@ -272,7 +281,8 @@ Value_P Z;
                   Cell * cZ = Z->next_ravel();
                   if (0)
                      cZ->init_from_value(vZ, Z.getref(), LOC);
-                  else if (vZ->is_simple_scalar())
+                  else if (vZ->is_simple_scalar() ||
+                           (left_val && vZ->is_scalar()))
                      cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
                   else
                      new (cZ)   PointerCell(vZ, Z.getref());

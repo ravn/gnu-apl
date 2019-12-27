@@ -2624,7 +2624,6 @@ Plot_data * data = 0;
            }
         else                    // Y, but no X or Z
            {
-Q(LOC)
              double * Y = new double[data_points];
              if (!Y)   WS_FULL;
 

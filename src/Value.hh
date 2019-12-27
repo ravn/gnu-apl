@@ -239,6 +239,7 @@ public:
    bool can_be_compared() const;
 
    /// return a value containing pointers to all ravel cells of this value.
+   /// the result is non-nested and has the same shape as \tb this
    Value_P get_cellrefs(const char * loc);
 
    /// assign \b val to the cell references in this value.

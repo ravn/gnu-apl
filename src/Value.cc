@@ -459,15 +459,34 @@ const int src_incr = new_value->is_scalar() ? 0 : 1;
 
    loop(d, dest_count)
       {
-        if (!C->is_lval_cell())   LEFT_SYNTAX_ERROR;
-
-        if (Cell * dest = C++->get_lval_value())   // dest can be 0!
+        if (C->is_pointer_cell())
            {
-             dest->release(LOC);   // free sub-values etc (if any)
+              Value_P sub = C++->get_pointer_value();
+              loop(s, sub->nz_element_count())
+                  {
+                    Cell * Csub = &sub->get_ravel(s);
+                    if (!Csub->is_lval_cell())   LEFT_SYNTAX_ERROR;
+                    if (Cell * dest = Csub->get_lval_value())  // dest can be 0!
+                       {
+                         dest->release(LOC);   // free sub-values etc (if any)
 
-             // erase the pointee when overriding a pointer-cell.
-             //
-             dest->init(*src, *cellowner, LOC);
+                         // erase the pointee when overriding a pointer-cell.
+                         //
+                         dest->init(*src, *cellowner, LOC);
+                       }
+                  }
+           }
+        else
+           {
+             if (!C->is_lval_cell())   LEFT_SYNTAX_ERROR;
+             if (Cell * dest = C++->get_lval_value())   // dest can be 0!
+                {
+                  dest->release(LOC);   // free sub-values etc (if any)
+
+                  // erase the pointee when overriding a pointer-cell.
+                  //
+                  dest->init(*src, *cellowner, LOC);
+                }
            }
         src += src_incr;
       }

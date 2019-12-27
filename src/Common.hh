@@ -373,8 +373,8 @@ extern std::ostream & get_CERR();
 /// print x and its source code location
 #define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
 
-/// same as Q1 (for printouts guarded by Log macros). Unlike Q() which should
-/// NOT remain in the code Q1 should remain in the code.
+/// same as Q1 (for printouts guarded by Log macros). Unlike Q() which MUST
+/// NOT REMAIN IN THE CODE, Q1 should remain in the code.
 #define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
 
 //-----------------------------------------------------------------------------

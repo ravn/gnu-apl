@@ -222,7 +222,7 @@ UCS_string args_ucs(args);
          case ' ': in_param = false;
               continue;
 
-         default: Q(args_ucs[a])   Q(int(args_ucs[a]))
+         default: Q1(args_ucs[a])   Q1(int(args_ucs[a]))
        }
 
    if (argc < mandatory_args)   // too few parameters

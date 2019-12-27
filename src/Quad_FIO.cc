@@ -143,8 +143,8 @@ Quad_FIO::function_name_to_int(const char * function_name)
        if (strcmp(sub_functions[f].key, sub_functions[f+1].key) >= 0)
           {
             // mismatch...
-            Q(sub_functions[f].key)
-            Q(sub_functions[f+1].key)
+            Q1(sub_functions[f].key)
+            Q1(sub_functions[f+1].key)
           }
 #endif
 
