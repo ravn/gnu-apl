@@ -706,10 +706,8 @@ const Token_string & body = ufun->get_body();
 
                     if (!have_call)
                        {
-                         UCS_string caller_name = caller_sym->get_name();
-                         UCS_string callee_name = callee_sym.get_name();
-                         const fcall_edge edge(ufun,   &caller_name,
-                                               callee, &callee_name);
+                         const fcall_edge edge(ufun,   caller_sym->get_name(),
+                                               callee, callee_sym.get_name());
 
                          call_graph.push_back(edge);
                          Log(LOG_command_DOXY)
@@ -793,12 +791,12 @@ bool progress = true;
           if (caller_is_new)
              {
                nodes.push_back(edge.caller);
-               aliases.push_back(*edge.caller_name);
+               aliases.push_back(edge.caller_name);
              }
           if (callee_is_new)
              {
                nodes.push_back(edge.callee);
-               aliases.push_back(*edge.callee_name);
+               aliases.push_back(edge.callee_name);
              }
        }
 

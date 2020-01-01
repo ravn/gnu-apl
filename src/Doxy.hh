@@ -45,8 +45,8 @@ struct fcall_edge
    {}
 
    /// constructor
-   fcall_edge(const UserFunction * cer, const UCS_string * cer_name,
-              const UserFunction * cee, const UCS_string * cee_name )
+   fcall_edge(const UserFunction * cer, const UCS_string & cer_name,
+              const UserFunction * cee, const UCS_string & cee_name )
    : caller(cer),
      caller_name(cer_name),
      callee(cee),
@@ -58,13 +58,13 @@ struct fcall_edge
    const UserFunction * caller;
 
    /// the (Symbol-) name of the calling function
-   const UCS_string * caller_name;
+   UCS_string caller_name;
 
    /// the called function
    const UserFunction * callee;
 
    /// the (Symbol-) name of called function
-   const UCS_string * callee_name;
+   UCS_string callee_name;
 
    /// some arbitrary int used in graph algorithms
    int      value;
