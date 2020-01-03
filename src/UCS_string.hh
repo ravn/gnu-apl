@@ -68,7 +68,8 @@ public:
    /// constructor: UCS_string from UTF8_string
    UCS_string(const UTF8_string & utf);
 
-   /// constructor: UCS_string from 0-terminated C string
+   /// constructor: UCS_string from 0-terminated C string. Do NOT use it
+   /// for non-ASCII strings.
    UCS_string(const char * cstring);
 
    /// constructor: UCS_string from print buffer

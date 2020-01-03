@@ -231,6 +231,12 @@ run in (new) Emacs mode with argument arg.
 
 
 @item
+@option{--eval line}
+
+evaluate one APL line and exit. This option can be given several times, in
+that case several lines are being executed before GNU apl exits.
+
+@item
 @option{-f file}
 
 read input from \fIfile\fP rather than from the keyboard. When the end of

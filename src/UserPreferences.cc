@@ -95,6 +95,7 @@ char cc[4000];
 "    --noCONT             do not )LOAD CONTINUE or SETUP workspace on startup\n"
 "    --emacs              run in (classical) emacs mode\n"
 "    --emacs_arg arg      run in emacs mode with argument arg\n"
+"    --eval expr          evaluate APL line expr and exit\n"
 "    --gpl                show license (GPL) and exit\n"
 "    -L wsname            )LOAD wsname (and not SETUP or CONTINUE) on startup\n"
 "    --LX expr            execute APL expression expr first\n"
@@ -302,6 +303,12 @@ UserPreferences::parse_argv_2(bool logit)
               break;
             }
 
+         if (!strcmp(opt, "-C"))
+            {
+              ++a;
+              continue;   // -C already handled in parse_argv_1()
+            }
+
 #if CORE_COUNT_WANTED == -2
          if (!strcmp(opt, "--cc"))
             {
@@ -319,12 +326,6 @@ UserPreferences::parse_argv_2(bool logit)
             {
               show_configure_options();
               exit(0);
-            }
-
-         if (!strcmp(opt, "-C"))
-            {
-              ++a;
-              continue;   // -C already handled in parse_argv_1()
             }
 
          if (!strcmp(opt, "--CPU_limit_secs"))
@@ -351,6 +352,14 @@ UserPreferences::parse_argv_2(bool logit)
               continue;
             }
 
+         if (!strcmp(opt, "--echoCIN"))
+            {
+              echo_CIN = true;
+              do_not_echo = true;
+              do_Color = false;
+              continue;
+            }
+
          if (!strcmp(opt, "--emacs"))
             {
               emacs_mode = true;
@@ -368,6 +377,19 @@ UserPreferences::parse_argv_2(bool logit)
 
               emacs_mode = true;
               emacs_arg = val;
+              continue;
+            }
+
+         if (!strcmp(opt, "--eval"))
+            {
+              ++a;
+              if (!val)
+                 {
+                   CERR << "--eval without APL line" << endl;
+                   exit(a);
+                 }
+              eval_exprs.push_back(val);
+              uprefs.silent = true;
               continue;
             }
 
@@ -412,26 +434,6 @@ UserPreferences::parse_argv_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-l"))
-            {
-              ++a;
-              if (val && atoi(val) == LID_startup)   logit = true;
-#ifdef DYNAMIC_LOG_WANTED
-              if (val)   Log_control(LogId(atoi(val)), true);
-              else
-                 {
-                   CERR << "-l without log facility" << endl;
-                   exit(a);
-                 }
-#else
-   if (val && atoi(val) == LID_startup)   ;
-   else  CERR << "the -l option was ignored (requires ./configure "
-                   "DYNAMIC_LOG_WANTED=yes)" << endl;
-#endif // DYNAMIC_LOG_WANTED
-
-              continue;
-            }
-
          if (!strcmp(opt, "-L"))
             {
               ++a;
@@ -458,11 +460,23 @@ UserPreferences::parse_argv_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--echoCIN"))
+         if (!strcmp(opt, "-l"))
             {
-              echo_CIN = true;
-              do_not_echo = true;
-              do_Color = false;
+              ++a;
+              if (val && atoi(val) == LID_startup)   logit = true;
+#ifdef DYNAMIC_LOG_WANTED
+              if (val)   Log_control(LogId(atoi(val)), true);
+              else
+                 {
+                   CERR << "-l without log facility" << endl;
+                   exit(a);
+                 }
+#else
+   if (val && atoi(val) == LID_startup)   ;
+   else  CERR << "the -l option was ignored (requires ./configure "
+                   "DYNAMIC_LOG_WANTED=yes)" << endl;
+#endif // DYNAMIC_LOG_WANTED
+
               continue;
             }
 
@@ -542,6 +556,13 @@ UserPreferences::parse_argv_2(bool logit)
               continue;
             }
 
+         if (!strcmp(opt, "--SV"))
+            {
+              user_do_svars = true;
+              system_do_svars = true;
+              continue;
+            }
+
          if (!strcmp(opt, "--safe"))
             {
               safe_mode = true;
@@ -598,22 +619,9 @@ UserPreferences::parse_argv_2(bool logit)
               exit(0);
             }
 
-         if (!strcmp(opt, "-q"))
+         if (!strcmp(opt, "--silent") || !strcmp(opt, "-q"))
             {
               silent = true;
-              continue;
-            }
-
-         if (!strcmp(opt, "--silent"))
-            {
-              silent = true;
-              continue;
-            }
-
-         if (!strcmp(opt, "--SV"))
-            {
-              user_do_svars = true;
-              system_do_svars = true;
               continue;
             }
 

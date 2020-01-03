@@ -484,8 +484,20 @@ const bool log_startup = uprefs.parse_argv_1();
 int
 main(int argc, const char *argv[])
 {
-const int ret = init_apl(argc, argv);
-   if (ret)   return ret;
+   if (const int ret = init_apl(argc, argv))   return ret;
+
+   if (uprefs.eval_exprs.size())
+      {
+         loop(e, uprefs.eval_exprs.size())
+            {
+              const char * expr = uprefs.eval_exprs[e];
+              const UTF8_string expr_utf(expr);
+              UCS_string expr_ucs(expr_utf);
+              Command::process_line(expr_ucs);
+            }
+        Command::cmd_OFF(0);
+        return 0;
+      }
 
    for (;;)
        {

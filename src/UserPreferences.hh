@@ -23,6 +23,7 @@
 
 #include <sys/time.h>
 #include <string>
+#include <vector>
 
 #include "Parallel.hh"
 #include "UTF8_string.hh"
@@ -36,39 +37,40 @@ class Function;
 struct UserPreferences
 {
    UserPreferences()
-   : silent(false),
-     emacs_mode(false),
-     emacs_arg(0),
-     do_not_echo(false),
-     echo_CIN(false),
-     safe_mode(false),
-     user_do_svars(true),
-     system_do_svars(true),
-     do_CONT(true),
-     do_Color(true),
-     requested_id(0),
-     requested_par(0),
-     requested_cc(CCNT_UNKNOWN),
-     daemon(false),
+   :
      append_summary(false),
-     wait_ms(0),
-     randomize_testfiles(false),
-     user_profile(0),
+     auto_OFF(false),
      backup_before_save(false),
-     script_argc(0),
-     line_history_path(".apl.history"),
-     line_history_len(500),
-     nabla_to_history(1),   // if function was modified
      control_Ds_to_exit(0),
-     raw_cin(false),
-     initial_pw(DEFAULT_Quad_PW),
+     CPU_limit_secs(0),
+     daemon(false),
 #define sec_def(X) X(false),
 #include "Security.def"
+     do_CONT(true),
+     do_Color(true),
+     do_not_echo(false),
+     echo_CIN(false),
+     emacs_arg(0),
+     emacs_mode(false),
+     initial_pw(DEFAULT_Quad_PW),
+     line_history_len(500),
+     line_history_path(".apl.history"),
      multi_line_strings(true),
      multi_line_strings_3(true),
-     WINCH_sets_pw(false),
-     auto_OFF(false),
-     CPU_limit_secs(0)
+     nabla_to_history(1),   // if function was modified
+     randomize_testfiles(false),
+     raw_cin(false),
+     requested_cc(CCNT_UNKNOWN),
+     requested_id(0),
+     requested_par(0),
+     safe_mode(false),
+     script_argc(0),
+     silent(false),
+     system_do_svars(true),
+     user_do_svars(true),
+     user_profile(0),
+     wait_ms(0),
+     WINCH_sets_pw(false)
    { gettimeofday(&session_start, 0); }
 
    /// read a \b preference file and update parameters set there
@@ -111,30 +113,27 @@ struct UserPreferences
    /// when apl was started
    timeval session_start;
 
-   /// true if no banner/Goodbye is wanted.
-   bool silent;
+   /// append test results to summary.log rather than overriding it
+   bool append_summary;
 
-   /// true if emacs mode is wanted
-   bool emacs_mode;
+   /// true if the interpreter shall )OFF on EOF of the last input file
+   bool auto_OFF;
 
-   /// an argument for emacs mode
-   const char * emacs_arg;
+   /// backup on )SAVE
+   bool backup_before_save;
 
-   /// true if no input echo is wanted.
-   bool do_not_echo;
+   /// number of control-Ds to exit (0 = never)
+   int control_Ds_to_exit;
 
-   /// true to echo input (after editing)
-   bool echo_CIN;
+   /// limit (seconds) on the CPU time
+   int CPU_limit_secs;
 
-   /// true if --safe command line option was given
-   bool safe_mode;
+   /// run as deamon
+   bool daemon;
 
-   /// true if shared variables are wanted by the user
-   bool user_do_svars;
-
-   /// true if shared variables are enabled by the system. This is initially
-   /// the same as user_do_svars, but can become false if something goes wrong
-   bool system_do_svars;
+#define sec_def(X) \
+   bool X;   ///< true if X is disabled dor security reasons
+#include "Security.def"
 
    /// load workspace CONTINUE on start-up
    bool do_CONT;
@@ -142,67 +141,35 @@ struct UserPreferences
   /// output coloring enabled
    bool do_Color;
 
-   /// desired --id (⎕AI[1] and shared variable functions)
-   int requested_id;
+   /// true if no input echo is wanted.
+   bool do_not_echo;
 
-   /// desired --par (⎕AI[1] and shared variable functions)
-   int requested_par;
+   /// true to echo input (after editing)
+   bool echo_CIN;
 
-   /// desired core count
-   CoreCount requested_cc;
+   /// an argument for emacs mode
+   const char * emacs_arg;
 
-   /// run as deamon
-   bool daemon;
+   /// true if emacs mode is wanted
+   bool emacs_mode;
 
-   /// append test results to summary.log rather than overriding it
-   bool append_summary;
-
-   /// wait at start-up
-   int wait_ms;
-
-   /// randomize the order of testfiles
-   bool randomize_testfiles;
-
-   /// the profile to be used (in the preferences file)
-   int user_profile;
-
-   /// something to be executed at startup (--LX)
-   UTF8_string latent_expression;
-
-   /// a workspace to be loaded at startup
-   UTF8_string initial_workspace;
-
-   /// backup on )SAVE
-   bool backup_before_save;
-
-   /// the argument number of the APL script name (if run from a script)
-   /// in expanded_argv, or 0 if apl is started directly.
-   size_t script_argc;
-
-   /// location of the input line history
-   UTF8_string line_history_path;
-
-   /// number of lines in the input line history
-   int line_history_len;
-
-   /// when function body shall go into the history
-   int nabla_to_history;
-
-   /// name of a user-provided keyboard layout file
-   UTF8_string keyboard_layout_file;
-
-   /// number of control-Ds to exit (0 = never)
-   int control_Ds_to_exit;
-
-   /// send no ESC sequences on stderr
-   bool raw_cin;
+   /// --eval expressions
+   std::vector<const char *> eval_exprs;
 
    /// initial value of ⎕PW
    int initial_pw;
 
-#define sec_def(X) \
-   bool X;   ///< true if X is disabled dor security reasons
-#include "Security.def"
+   /// a workspace to be loaded at startup
+   UTF8_string initial_workspace;
+
+   /// number of lines in the input line history
+   int line_history_len;
+
+   /// something to be executed at startup (--LX)
+   UTF8_string latent_expression;
+
+   /// location of the input line history
+   UTF8_string line_history_path;
 
    /// true if old-style multi-line strings are allowed (in ∇-defined functions)
    bool multi_line_strings;
@@ -210,15 +177,64 @@ struct UserPreferences
    /// true if new-style multi-line strings are allowed
    bool multi_line_strings_3;
 
+   /// when function body shall go into the history
+   int nabla_to_history;
+
+   /// randomize the order of testfiles
+   bool randomize_testfiles;
+
+   /// send no ESC sequences on stderr
+   bool raw_cin;
+
+   /// desired core count
+   CoreCount requested_cc;
+
+   /// desired --id (⎕AI[1] and shared variable functions)
+   int requested_id;
+
+   /// desired --par (⎕AI[1] and shared variable functions)
+   int requested_par;
+
+   /// true if --safe command line option was given
+   bool safe_mode;
+
+   /// the argument number of the APL script name (if run from a script)
+   /// in expanded_argv, or 0 if apl is started directly.
+   size_t script_argc;
+
+   /// true if no banner/Goodbye is wanted.
+   bool silent;
+
+   /// true if shared variables are enabled by the system. This is initially
+   /// the same as user_do_svars, but can become false if something goes wrong
+   bool system_do_svars;
+
+   /// true if shared variables are wanted by the user
+   bool user_do_svars;
+
+   /// the profile to be used (in the preferences file)
+   int user_profile;
+
+   /// wait at start-up
+   int wait_ms;
+
+   /// name of a user-provided keyboard layout file
+   UTF8_string keyboard_layout_file;
+
    /// true if the WINCH signal shall modify ⎕PW
    bool WINCH_sets_pw;
 
-   /// true if the interpreter shall )OFF on EOF of the last input file
-   bool auto_OFF;
-
-   /// limit (seconds) on the CPU time
-   int CPU_limit_secs;
 protected:
+   /// decode a byte in a preferences file. The byte can be given as ASCII name
+   /// (currently only ESC is understood), a single char (that stands for
+   /// itself), or 2 2-character hex value
+   /// 
+   static int decode_ASCII(const char * strg);
+
+   /// return true if file \b filename is an APL script (has execute permission
+   /// and starts with #!
+   static bool is_APL_script(const char * filename);
+
    /// open a user-supplied config file (in $HOME or gnu-apl.d)
    FILE * open_user_file(const char * fname, char * opened_filename,
                          bool sys, bool log_startup);
@@ -226,16 +242,6 @@ protected:
    /// set the parallel threshold of function \b fun to \b threshold
    static void set_threshold(Function * fun, int padic, int macn,
                              ShapeItem threshold);
-
-   /// return true if file \b filename is an APL script (has execute permission
-   /// and starts with #!
-   static bool is_APL_script(const char * filename);
-
-   /// decode a byte in a preferences file. The byte can be given as ASCII name
-   /// (currently only ESC is understood), a single char (that stands for
-   /// itself), or 2 2-character hex value
-   /// 
-   static int decode_ASCII(const char * strg);
 };
 
 extern UserPreferences uprefs;
