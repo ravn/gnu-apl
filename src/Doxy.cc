@@ -51,6 +51,15 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
    ws_name = Workspace::get_WS_name();
    if (ws_name.compare(UCS_string("CLEAR WS")) == 0)
       ws_name = UCS_string("CLEAR-WS");
+   else if (Avec::is_digit(ws_name[0]))
+      {
+         // workspace name starts with a library reference number. Skip the
+         // library reference number and whitespace directly after it
+         //
+         int pos = 1;   // first blank after the library reference number
+         while (pos < ws_name.size() && Avec::is_white(ws_name[pos]))   ++pos;
+         ws_name = UCS_string(ws_name, pos, ws_name.size() - pos);
+   }
 
    root_dir.append_ASCII("/");
    root_dir.append_UTF8(UTF8_string(ws_name));
@@ -61,8 +70,8 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
    errno = 0;
    if (mkdir(root_dir.c_str(), 0777))
       {
-        CERR << "creating destination directory " << root_dir << " failed: "
-             << strerror(errno) << endl;
+        CERR << "Cannot create fresh destination directory "
+             << root_dir << ": " << strerror(errno) << endl;
         ++errors;
         DOMAIN_ERROR;
       }
