@@ -753,7 +753,7 @@ UTF8_string root("/tmp");
          out << "Command ]DOXY finished successfully." << endl
              << "    The generated documentation was stored in directory "
              << doxy.get_root_dir() << endl
-             << "    You may want to browse it from file://"
+             << "    You may now browse it from file://"
              << doxy.get_root_dir()
              << "/index.html" << endl;
      }

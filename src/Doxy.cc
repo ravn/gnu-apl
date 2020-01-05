@@ -179,7 +179,7 @@ ofstream page(index_filename.c_str());
    SI_table(page);
 
    set_call_graph_root(0);
-const UCS_string alias = "all-functions";
+const UCS_string alias = "all_functions";
    if (write_call_graph(0, alias, false) == 0)
       {
         page <<
@@ -192,17 +192,24 @@ const UCS_string alias = "all-functions";
            cmapx_filename.append_ASCII("/cg_");
            cmapx_filename.append_UTF8(UTF8_string(alias));
            cmapx_filename.append_ASCII(".cmapx");
-           FILE * cmap = fopen(cmapx_filename.c_str(), "r");
-           Assert(cmap);
-           char buffer[400];
-           for (;;)
-               {
-                 const char * s = fgets(buffer, sizeof(buffer), cmap);
-                 if (s == 0)   break;
-                 buffer[sizeof(buffer) - 1] = 0;
-                 page << "    " << buffer;
-               }
-           fclose(cmap);
+           if (FILE * cmap = fopen(cmapx_filename.c_str(), "r"))
+              {
+                char buffer[400];
+                for (;;)
+                    {
+                      const char * s = fgets(buffer, sizeof(buffer), cmap);
+                      if (s == 0)   break;
+                      buffer[sizeof(buffer) - 1] = 0;
+                      page << "    " << buffer;
+                    }
+                fclose(cmap);
+              }
+           else
+              {
+                CERR << "*** Cannot open " << cmapx_filename
+                     << ": " << strerror(errno) << endl;
+              }
+
            Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
          }
       }
@@ -335,7 +342,7 @@ int total_lines = 0;
    // summary line
    //
    page <<
-"      <TR><TD><TD colspan=2 class=code center>Total<TD class=code center>"
+"      <TR><TD><TD colspan=2 class='code center'>Total<TD class='code center'>"
         << total_lines <<                                                  CRLF
 "   </TABLE>"                                                              CRLF;
 }
@@ -679,7 +686,7 @@ Doxy::add_fun_to_call_graph(const Symbol * caller_sym,
                             const UserFunction * ufun)
 {
    Log(LOG_command_DOXY)
-      out << "add (caller) Symbol " << caller_sym->get_name() << endl;
+      out << "   add (caller-) Symbol " << caller_sym->get_name() << endl;
 
 const Token_string & body = ufun->get_body();
    loop(b, body.size())
@@ -947,11 +954,12 @@ char buffer[1000];
          buffer[len] = 0;
          CERR << "dot says: " << buffer;
        }
-
    pclose(dot);
+
+   // if LOG_command_DOXY then do not remove temporary files
    Log(LOG_command_DOXY)
       {
-        out << "converted " << gv_filename << " to " << out_filename << endl;
+        out << "  converted " << gv_filename << " to " << out_filename << endl;
       }
    else
       {
