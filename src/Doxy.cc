@@ -120,7 +120,6 @@ Doxy::gen()
 const SymbolTable & symtab = Workspace::get_symbol_table();
 
 std::vector<const Symbol *> all_symbols = symtab.get_all_symbols();
-std::vector<const Symbol *> functions;
 std::vector<const Symbol *> variables;
 
    loop(a, all_symbols.size())
@@ -141,13 +140,17 @@ std::vector<const Symbol *> variables;
                    default: ;
                  }
             }
-        if (is_function)   functions.push_back(sym);
-        if (is_variable)   variables.push_back(sym);
+        if (is_function)
+           all_functions.push_back(sym);
+
+
+        if (is_variable)
+           variables.push_back(sym);
       }
 
-   if (functions.size() > 1)
+   if (all_functions.size() > 1)
       Heapsort<const Symbol *>::
-              sort(&functions[0], functions.size(), 0, symcomp);
+              sort(&all_functions[0], all_functions.size(), 0, symcomp);
 
    if (variables.size() > 1)
       Heapsort<const Symbol *>::
@@ -173,8 +176,8 @@ ofstream page(index_filename.c_str());
 " <BODY>"                                                                  CRLF
 "  <H1>Documentation of workspace " << ws_name << "</H1><HR>"              CRLF;
 
-   make_call_graph(functions);
-   functions_table(functions, page);
+   make_call_graph(all_functions);
+   functions_table(all_functions, page);
    variables_table(variables, page);
    SI_table(page);
 
@@ -743,6 +746,27 @@ const int MAX = 2 * call_graph.size();   // MAX means unreachable
 UCS_string root_name("all");
    if (ufun)   root_name = ufun->get_name();
 
+   if (call_graph.size() == 0)
+      {
+        // there are no calls (all functions are leafs). If the call graph
+        // root is the top-level (i.e. ufun == 0), then add all nodes
+        // to nodes.
+        //
+        if (ufun == 0)
+           {
+             nodes.clear();
+             aliases.clear();
+             loop(f, all_functions.size())
+                 {
+                   const Symbol * sym = all_functions[f];
+                   const Function * fun = sym->get_function();
+                   const UserFunction * ufun = fun->get_ufun1();
+                   nodes.push_back(ufun);
+                   aliases.push_back(ufun->get_name());
+                 }
+             return;
+           }
+      }
 
    // 1. set all edges starting at ufun to 0 and all others unreachable
    //
@@ -797,6 +821,7 @@ bool progress = true;
        {
          const fcall_edge & edge = call_graph[e];
          if (edge.value == MAX)   continue;   // not reachable
+
          bool caller_is_new = true;
          bool callee_is_new = true;
          loop(n, nodes.size())
@@ -821,7 +846,7 @@ bool progress = true;
       {
         loop(n, nodes.size())
         out << "Node: " << nodes[n]->get_name()
-            << " alias: " << aliases[n] <<endl;
+            << " alias: " << aliases[n] << endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -865,8 +890,12 @@ const char * node0_attributes = " shape=rect"
       {
         // create nodes
         //
-        loop(n, nodes.size())
+        loop(nrev, nodes.size())
             {
+              // graphviz allocates nodes in reverse order, so we write them
+              // in reverse order (as to display them ordered alphabetically).
+              //
+              const ShapeItem n = nodes.size() - nrev - 1;
               const UCS_string & alias = aliases[n];
               if (nodes[n] == ufun)   // the root
                  gv << "n" << n << " [label= " << alias

@@ -83,7 +83,7 @@ public:
    /// generate the entire documentation
    void gen();
 
-   /// HTML-print a table with all functions to 'page'
+   /// HTML-print a table containing all defined functions to \b page
    void functions_table(const std::vector<const Symbol *> & functions,
                        ofstream & page);
 
@@ -121,8 +121,8 @@ protected:
    /// UserFunctions at different SI levels.
    void add_fun_to_call_graph(const Symbol * sym, const UserFunction * ufun);
 
-   /// make the call graph start from root ufun and set nodes to nodes that are
-   /// reachable from the root
+   /// make the call graph start from function \b ufun and set \b nodes to
+   /// those nodes that are reachable from ufun
    void set_call_graph_root(const UserFunction * ufun);
 
    /// write the call graph (if caller == false), or else the caller graph
@@ -138,7 +138,7 @@ protected:
    /// return an HTML-anchor for function \b name (in the output files)
    static UCS_string fun_anchor(const UCS_string & name);
 
-   /// convert a .gv file to a .png file using program 'dot'
+   /// convert a graphviz .gv file to a .png file using program 'dot'
    int gv_to_png(const char * gv_filename, const char * png_filename,
                  bool cmapx);
 
@@ -153,6 +153,9 @@ protected:
 
    /// the nodes for the current root.
    std::vector<const UserFunction *> nodes;
+
+   /// the nodes for all function symbols (independent of the current root).
+   std::vector<const Symbol *> all_functions;
 
    /// the real names for the current root.
    UCS_string_vector aliases;
