@@ -327,7 +327,8 @@ int total_lines = 0;
                  {
                    loop(l, ufun->get_text_size())
                       {
-                        const UCS_string & line = ufun->get_text(l);
+                        UCS_string line = ufun->get_text(l);
+                        line.remove_leading_and_trailing_whitespaces();
                         if (line.size() >= 2 &&
                             line[0] == UNI_COMMENT &&
                             line[1] == UNI_COMMENT)

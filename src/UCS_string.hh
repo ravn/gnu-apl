@@ -216,7 +216,8 @@ public:
    /// return the characters in this string (sorted and duplicates removed)
    UCS_string unique() const;
 
-   /// return this string HTML-escaped, starting at offset, maybe using &nbsp;
+   /// return \b this string HTML-escaped, starting at offset, and using &nbsp;
+   /// for blanks
    UCS_string to_HTML(int offset, bool preserve_ws) const;
 
    /// remove trailing pad characters
