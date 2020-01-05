@@ -389,7 +389,8 @@ UserPreferences::parse_argv_2(bool logit)
                    exit(a);
                  }
               eval_exprs.push_back(val);
-              uprefs.silent = true;
+              uprefs.silent   = true;
+              uprefs.do_Color = false;
               continue;
             }
 

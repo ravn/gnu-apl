@@ -129,7 +129,7 @@ protected:
    int write_call_graph(const UserFunction * ufun, const UCS_string & alias,
                         bool caller);
 
-   /// swap callers and callees
+   /// swap callers and callees (reverse the direction of an edge)
    void swap_caller_calee();
 
    /// return the index of \b ufun in \b nodes[] or -1 if not found
