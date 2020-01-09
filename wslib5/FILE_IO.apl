@@ -4,13 +4,18 @@
 ⍝
 ⍝ ⎕FIO.apl 2014-07-29 15:40:42 (GMT+2)
 ⍝
- ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+⍝ Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+⍝ Copyright (C) 2017       Christian Robert
+⍝ Copyright (C) 2020       Bill Daly
 
-⍝ This library contains APL wrapper functions the system function ⎕FIO
+
+⍝ This library contains APL wrapper functions for the system function ⎕FIO
 ⍝
 ⍝ The purpose is to give functions for file I/O meaningful names instead
-⍝ of difficult-to-remember numbers. The function name is normally the name
-⍝ of the C-function that is called by the native function.
+⍝ of difficult-to-remember numbers. The function names and their parameters
+⍝ are is normally the name and the argument(s) of the C-function that ⎕FIO
+⍝ calls in order to implement the function.
 ⍝
 ⍝  Legend: d - table of dirent structs
 ⍝          e - error code
@@ -22,399 +27,420 @@
 
 
 ∇Zi ← FIO∆errno
- ⍝⍝ errno (of last call)
+⍝⍝ errno (of last call)
  Zi ← ⎕FIO[1] ''
 ∇
 
 ∇Zs ← FIO∆strerror Be
- ⍝⍝ strerror(Be)
+⍝⍝ strerror(Be)
  Zs ← ⎕FIO[2] Be
 ∇
 
 ∇Zh ← As FIO∆fopen Bs
- ⍝⍝ fopen(Bs, As) filename Bs
+⍝⍝ fopen(Bs, As) filename Bs
  Zh ← As ⎕FIO[3] Bs
 ∇
 
 ∇Zh ← FIO∆fopen_ro Bs
- ⍝⍝ fopen(Bs, "r") filename Bs
+⍝⍝ fopen(Bs, "r") filename Bs
  Zh ← ⎕FIO[3] Bs
 ∇
 
 ∇Ze ← FIO∆fclose Bh
- ⍝⍝ fclose(Bh)
+⍝⍝ fclose(Bh)
  Ze ← ⎕FIO[4] Bh
 ∇
 
 ∇Ze ← FIO∆file_errno Bh
- ⍝⍝ errno (of last call on Bh)
+⍝⍝ errno (of last call on Bh)
  Ze ← ⎕FIO[5] Bh
 ∇
 
 ∇Zi ← Ai FIO∆fread Bh
- ⍝⍝ fread(Zi, 1, Ai, Bh) 1 byte per Zi
- ⍝⍝ read (at most) 5000 items if Ai is not defined
+⍝⍝ fread(Zi, 1, Ai, Bh) 1 byte per Zi
+⍝⍝ read (at most) 5000 items if Ai is not defined
  →(0≠⎕NC 'Ai')/↑⎕LC+1 ◊ Ai←5000
  Zi ← Ai ⎕FIO[ 6] Bh
 ∇
 
 ∇Zi ← Ai FIO∆fwrite Bh
- ⍝⍝ fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Ai
+⍝⍝ fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Ai
  Zi ← Ai ⎕FIO[7] Bh
 ∇
 
 ∇Zi ← Ai FIO∆fgets Bh
- ⍝⍝ fgets(Zi, Ai, Bh) 1 byte per Zi
- ⍝⍝ read (at most) 5000 items unless Ai is defined
+⍝⍝ fgets(Zi, Ai, Bh) 1 byte per Zi
+⍝⍝ read (at most) 5000 items unless Ai is defined
  →(0≠⎕NC 'Ai')/↑⎕LC+1 ◊ Ai←5000
  Zi ← Ai ⎕FIO[8] Bh
 ∇
 
 ∇Zi ← FIO∆fgetc Bh
- ⍝⍝ fgetc(Zi, Bh) 1 byte per Zi
+⍝⍝ fgetc(Zi, Bh) 1 byte per Zi
  Zi ← ⎕FIO[9] Bh
 ∇
 
 ∇Zi ← FIO∆feof Bh
- ⍝⍝ feof(Bh)
+⍝⍝ feof(Bh)
  Zi ← ⎕FIO[10] Bh
 ∇
 
 ∇Zi ← FIO∆ferror Bh
- ⍝⍝ ferror(Bh)
+⍝⍝ ferror(Bh)
  Zi ← ⎕FIO[11] Bh
 ∇
 
 ∇Zi ← FIO∆ftell Bh
- ⍝⍝ ftell(Bh)
+⍝⍝ ftell(Bh)
  Zi ← ⎕FIO[12] Bh
 ∇
 
 ∇Zi ← Ai FIO∆fseek_cur Bh
- ⍝⍝ fseek(Bh, Ai, SEEK_SET)
+⍝⍝ fseek(Bh, Ai, SEEK_SET)
  Zi ← Ai ⎕FIO[13] Bh
 ∇
 
 ∇Zi ← Ai FIO∆fseek_set Bh
- ⍝⍝ fseek(Bh, Ai, SEEK_CUR)
+⍝⍝ fseek(Bh, Ai, SEEK_CUR)
  Zi ← Ai ⎕FIO[14] Bh
 ∇
 
 ∇Zi ← Ai FIO∆fseek_end Bh
- ⍝⍝ fseek(Bh, Ai, SEEK_END)
+⍝⍝ fseek(Bh, Ai, SEEK_END)
  Zi ← Ai ⎕FIO[15] Bh
 ∇
 
 ∇Zi ← FIO∆fflush Bh
- ⍝⍝ fflush(Bh)
+⍝⍝ fflush(Bh)
  Zi ← ⎕FIO[16] Bh
 ∇
 
 ∇Zi ← FIO∆fsync Bh
- ⍝⍝ fsync(Bh)
+⍝⍝ fsync(Bh)
  Zi ← ⎕FIO[17] Bh
 ∇
 
 ∇Zi ← FIO∆fstat Bh
- ⍝⍝ fstat(Bh)
+⍝⍝ fstat(Bh)
  Zi ← ⎕FIO[18] Bh
 ∇
 
 ∇Zi ← FIO∆unlink Bh
- ⍝⍝ unlink(Bc)
+⍝⍝ unlink(Bc)
  Zi ← ⎕FIO[19] Bh
 ∇
 
 ∇Zi ← FIO∆mkdir_777 Bh
- ⍝⍝ mkdir(Bc, 0777)
+⍝⍝ mkdir(Bc, 0777)
  Zi ← ⎕FIO[20] Bh
 ∇
 
 ∇Zi ← Ai FIO∆mkdir Bh
- ⍝⍝ mkdir(Bc, Ai)
+⍝⍝ mkdir(Bc, Ai)
  Zi ← Ai ⎕FIO[20] Bh
 ∇
 
 ∇Zi ← FIO∆rmdir Bh
- ⍝⍝ rmdir(Bc)
+⍝⍝ rmdir(Bc)
  Zi ← ⎕FIO[21] Bh
 ∇
 
 ∇Zi ← FIO∆printf B
- ⍝⍝ printf(B1, B2...) format B1
+⍝⍝ printf(B1, B2...) format B1
  Zi ← B ⎕FIO[22] 1
 ∇
 
 ∇Zi ← FIO∆fprintf_stderr B
- ⍝⍝ fprintf(stderr, B1, B2...) format B1
+⍝⍝ fprintf(stderr, B1, B2...) format B1
  Zi ← B  ⎕FIO[22] 2
 ∇
 
 ∇Zi ← Ah FIO∆fprintf B
- ⍝⍝ fprintf(Ah, Bf, B2...) format Bf
+⍝⍝ fprintf(Ah, Bf, B2...) format Bf
  Zi ← B ⎕FIO[22] Ah
 ∇
 
 ∇Zi ← Ac FIO∆fwrite_utf8 Bh
- ⍝⍝ fwrite(Ac, 1, ⍴Ac, Bh) Unicode Ac Output UTF-8
+⍝⍝ fwrite(Ac, 1, ⍴Ac, Bh) Unicode Ac Output UTF-8
  Zi ← Ac ⎕FIO[23] Bh
 ∇
 
 ∇Zh ← As FIO∆popen Bs
- ⍝⍝ popen(Bs, As) command Bs mode As
+⍝⍝ popen(Bs, As) command Bs mode As
  Zh ← As ⎕FIO[24] Bs
 ∇
 
 ∇Zh ← FIO∆popen_ro Bs
- ⍝⍝ popen(Bs, "r") command Bs
+⍝⍝ popen(Bs, "r") command Bs
  Zh ← ⎕FIO[24] Bs
 ∇
 
 ∇Ze ← FIO∆pclose Bh
- ⍝⍝ pclose(Bh)
+⍝⍝ pclose(Bh)
  Ze ← ⎕FIO[25] Bh
 ∇
 
+∇Ze←txt FIO∆pipeto cmd;ph
+⍝⍝ Function pipes txt to shell command cmd
+  ph←'w' FIO∆popen cmd
+  →(0≠Ze←txt ⎕fio[43] ph)/0	⍝return read error to caller
+  Ze←⎕fio[25] ph
+∇
+
+∇txt←FIO∆pipefrom cmd;ph;Ze
+⍝⍝ Function to pipe text from a shell command. Generally the function
+⍝⍝ returns the stdout of the command.  If error occur it returns an
+⍝⍝ integer FIO∆strerror will give a hint of what went wrong.
+  ph←'r' ⎕FIO[24] cmd
+  txt←⍬
+st: →(0=⍴sink←5000 ⎕fio[41] ph)/end
+  txt←txt,sink
+  →st
+end: txt←⎕ucs txt
+  Ze←⎕fio[25] ph
+  ⍎(0≠Ze)/'txt←Ze'
+∇
+
 ∇Zs ← FIO∆read_file Bs
- ⍝⍝ return entire file Bs as byte vector
+⍝⍝ return entire file Bs as byte vector
  Zs ← ⎕FIO[26] Bs
 ∇
 
 ∇Zs ← As FIO∆rename Bs
- ⍝⍝ rename file As to Bs
+⍝⍝ rename file As to Bs
  Zs ← As ⎕FIO[27] Bs
 ∇
 
 ∇Zd ← FIO∆read_directory Bs
- ⍝⍝ return content of directory Bs
+⍝⍝ return content of directory Bs
  Zd ← ⎕FIO[28] Bs
 ∇
 
 ∇Zn ← FIO∆files_in_directory Bs
- ⍝⍝ return file names in directory Bs
+⍝⍝ return file names in directory Bs
  Zn ← ⎕FIO[29] Bs
 ∇
 
 ∇Zs ← FIO∆getcwd
- ⍝⍝ getcwd()
+⍝⍝ getcwd()
  Zs ← ⎕FIO 30
 ∇
 
-∇Zn ← FIO∆access Bs
- ⍝⍝ access(As, Bs) As ∈ 'RWXF'
+∇Zn ← As FIO∆access Bs
+⍝⍝ access(As, Bs) As ∈ 'RWXF'
  Zn ← As ⎕FIO[31] Bs
 ∇
 
 ∇Zh ← FIO∆socket Bi
- ⍝⍝ socket(Bi). Bi is domain, type, protocol, e.g.
- ⍝⍝ Zh ← FIO∆socket 2 1 0  for an IPv4 TCP socket
+⍝⍝ socket(Bi). Bi is domain, type, protocol, e.g.
+⍝⍝ Zh ← FIO∆socket 2 1 0  for an IPv4 TCP socket
  Zh ← ⎕FIO[32] Bi
 ∇
 
 ∇Zi ← Ai FIO∆bind Bh
- ⍝⍝ bind(Bh, Ai). Ai is domain, local IPv4-address, local port, e.g.
- ⍝⍝ 2 (256⊥127 0 0 1) 80 bind Bh binds socket Bh to port 80 on
- ⍝⍝ localhost 127.0.0.1 (web server)
+⍝⍝ bind(Bh, Ai). Ai is domain, local IPv4-address, local port, e.g.
+⍝⍝ 2 (256⊥127 0 0 1) 80 bind Bh binds socket Bh to port 80 on
+⍝⍝ localhost 127.0.0.1 (web server)
  Zi ← Ai ⎕FIO[33] Bh
 ∇
 
 ∇Zi ← Ai FIO∆listen Bh
- ⍝⍝ listen(Bh, Ai).
+⍝⍝ listen(Bh, Ai).
  Zi ← Ai ⎕FIO[34] Bh
 ∇
 
 ∇Zh ← FIO∆accept Bh
- ⍝⍝ accept(Bh).
- ⍝⍝ Return errno or 4 integers: handle, domain, remote IPv4-address, remote port
+⍝⍝ accept(Bh).
+⍝⍝ Return errno or 4 integers: handle, domain, remote IPv4-address, remote port
  Zh ← ⎕FIO[35] Bh
 ∇
 
 ∇Zh ← Aa FIO∆connect Bh
- ⍝⍝ connect(Bh, Aa). Aa is domain, remote IPv4-address, remote port, e.g.
- ⍝⍝ 2 (256⊥127 0 0 1) 80 connects to port 80 on localhost 127.0.0.1 (web server)
+⍝⍝ connect(Bh, Aa). Aa is domain, remote IPv4-address, remote port, e.g.
+⍝⍝ 2 (256⊥127 0 0 1) 80 connects to port 80 on localhost 127.0.0.1 (web server)
  Zh ← Aa ⎕FIO[36] Bh
 ∇
 
 ∇Zi ← Ai FIO∆recv Bh
- ⍝⍝ return (at most) Ai bytes from socket Bh
+⍝⍝ return (at most) Ai bytes from socket Bh
  Zi←Ai ⎕FIO[37] Bh
 ∇
 
 ∇Zi ← Ai FIO∆send Bh
- ⍝⍝ send bytes Ai on socket Bh
+⍝⍝ send bytes Ai on socket Bh
  Zi←Ai ⎕FIO[38] Bh
 ∇
 
 ∇Zi ← Ai FIO∆send_utf8 Bh
- ⍝⍝ send Unicode characters Ai on socket Bh
+⍝⍝ send Unicode characters Ai on socket Bh
  Zi←Ai ⎕FIO[39] Bh
 ∇
 
 ∇Z ← FIO∆select B
- ⍝⍝ perform select() on handles in B
- ⍝⍝ B = Br [Bw [Be [Bt]]] is a (nested) vector of 1, 2, 3, or 4 items:
- ⍝⍝ Bt: timeout in milliseconds
- ⍝⍝ Be: handles with exceptions
- ⍝⍝ Bw: handles ready for writing
- ⍝⍝ Br: handles ready for reading
+⍝⍝ perform select() on handles in B
+⍝⍝ B = Br [Bw [Be [Bt]]] is a (nested) vector of 1, 2, 3, or 4 items:
+⍝⍝ Bt: timeout in milliseconds
+⍝⍝ Be: handles with exceptions
+⍝⍝ Bw: handles ready for writing
+⍝⍝ Br: handles ready for reading
  ⍝⍝
- ⍝⍝ Z = Zc Zr Zw Ze Zt is a (nested) 5-item vector:
- ⍝⍝ Zc: number of handles in Zr, Zw, and Ze, or -errno
- ⍝⍝ Zr, Zw, Ze: handles ready for reading, writing, and exceptions respectively
- ⍝⍝ Zt: timeout remaining
+⍝⍝ Z = Zc Zr Zw Ze Zt is a (nested) 5-item vector:
+⍝⍝ Zc: number of handles in Zr, Zw, and Ze, or -errno
+⍝⍝ Zr, Zw, Ze: handles ready for reading, writing, and exceptions respectively
+⍝⍝ Zt: timeout remaining
  Z←⎕FIO[40] B
 ∇
 
 ∇Zi ← Ai FIO∆read Bh
- ⍝⍝ read (at most) Ai bytes from file descriptor Bh
+⍝⍝ read (at most) Ai bytes from file descriptor Bh
  Zi←Ai ⎕FIO[41] Bh
 ∇
 
 ∇Zi ← Ai FIO∆write Bh
- ⍝⍝ write bytes Ai on file descriptor Bh
+⍝⍝ write bytes Ai on file descriptor Bh
  Zi←Ai ⎕FIO[42] Bh
 ∇
 
 ∇Zi ← Ai FIO∆write_utf8 Bh
- ⍝⍝ write Unicode characters Ai on file descriptor Bh
+⍝⍝ write Unicode characters Ai on file descriptor Bh
  Zi←Ai ⎕FIO[43] Bh
 ∇
 
 ∇Za ← FIO∆getsockname Bh
- ⍝⍝ get socket address (address family, ip address, port)
+⍝⍝ get socket address (address family, ip address, port)
  Zi←⎕FIO[44] Bh
 ∇
 
 ∇Za ← FIO∆getpeername Bh
- ⍝⍝ get socket address (address family, ip address, port) of peer
+⍝⍝ get socket address (address family, ip address, port) of peer
  Zi←⎕FIO[45] Bh
 ∇
 
 ∇Zi ← Ai FIO∆getsockopt Bh
- ⍝⍝ get socket option from socket Bh
- ⍝⍝ Ai is socket-level, option-name
+⍝⍝ get socket option from socket Bh
+⍝⍝ Ai is socket-level, option-name
  Zi←Ai ⎕FIO[46] Bh
 ∇
 
 ∇Zi ← Ai FIO∆setsockopt Bh
- ⍝⍝ set socket option from socket Bh
- ⍝⍝ Ai is socket-level, option-name, option-value
+⍝⍝ set socket option from socket Bh
+⍝⍝ Ai is socket-level, option-name, option-value
  Zi←Ai ⎕FIO[47] Bh
 ∇
 
 ∇Z ← As FIO∆fscanf Bh
- ⍝⍝ fscanf from a file Bh
- ⍝⍝ As is the format string
+⍝⍝ fscanf from a file Bh
+⍝⍝ As is the format string
  Z←As ⎕FIO[48] Bh
 ∇
 
 ∇Z← FIO∆read_lines Bs
- ⍝⍝ return Z with Z[i] ← line i of the file named Bs
+⍝⍝ return Z with Z[i] ← line i of the file named Bs
  Z←⎕FIO[49] Bs
 ∇
 
 ∇Z← (LO FIO∆transform_lines) Bs
- ⍝⍝ return Z with Z[i] ← LO (line i of the file named Bs)
+⍝⍝ return Z with Z[i] ← LO (line i of the file named Bs)
  Z←LO ⎕FIO[49] Bs
 ∇
 
 ∇Zi ← FIO∆gettimeofday Bu
- ⍝⍝ return time of day in unit Bu (1 = seconds, 1000 = ms, or 1000000 = μs)
+⍝⍝ return time of day in unit Bu (1 = seconds, 1000 = ms, or 1000000 = μs)
  Zi←⎕FIO[50] Bu
 ∇
  
 ∇Zy4 ← FIO∆mktime By67
- ⍝⍝ return seconds since Jan 1, 1970 for broken down calender time By67
+⍝⍝ return seconds since Jan 1, 1970 for broken down calender time By67
  Zy4←⎕FIO[51] By67
 ∇
  
 ∇Zy9 ← FIO∆localtime Bi
- ⍝⍝ return broken down calender time Zy9 for Bi seconds since Jan 1, 1970
+⍝⍝ return broken down calender time Zy9 for Bi seconds since Jan 1, 1970
  Zy9←⎕FIO[52] Bi
 ∇
  
 ∇Zy9 ← FIO∆gmtime Bi
- ⍝⍝ return broken down calender time Zy9 for Bi seconds since Jan 1, 1970
+⍝⍝ return broken down calender time Zy9 for Bi seconds since Jan 1, 1970
  Zy9←⎕FIO[53] Bi
 ∇
  
 ∇Z ← FIO∆chdir Bs
- ⍝⍝ chdir to string from Bs
+⍝⍝ chdir to string from Bs
  Z← ⎕FIO[54] Bs
 ∇
 
 ∇Z ← As FIO∆sscanf Bs
- ⍝⍝ sscanf from a string Bs
- ⍝⍝ As is the format string
+⍝⍝ sscanf from a string Bs
+⍝⍝ As is the format string
  Z←As ⎕FIO[55] Bs
 ∇
 
 ∇Z ← As FIO∆write_lines Bs
- ⍝⍝ write the strings in the (nested) As to file Bs. As is expected to be a
- ⍝⍝ vector of lines. Every line A[n] is expected to be a simple character
- ⍝⍝ vector. A newline (ASCII 10i aka. LF) is appended to every A[n] before it
- ⍝⍝ is written to the file As
+⍝⍝ write the strings in the (nested) As to file Bs. As is expected to be a
+⍝⍝ vector of lines. Every line A[n] is expected to be a simple character
+⍝⍝ vector. A newline (ASCII 10i aka. LF) is appended to every A[n] before it
+⍝⍝ is written to the file As
  Z←As ⎕FIO[56] Bs
 ∇
 
 ∇Z ← FIO∆execve Bs
- ⍝⍝ start program Bs with opening a connection between GNU APL and the new
- ⍝⍝ program. The return value of FIO∆execve Bs is a handle (a file descriptor)
- ⍝⍝ that can be used with FIO∆fread and FIO∆fwrite for receiving data from and
- ⍝⍝ for sending data to the new program. The other end of the communition link
- ⍝⍝ (in the new program) is file descriptor 3 (STERR + 1). The new program has
- ⍝⍝ stdin closed (so that the program cannot steal keyboard input) but stdout
- ⍝⍝ left open. It is possible (although asking for trouble) for the new program
- ⍝⍝ to write to its stdout or stderr.
+⍝⍝ start program Bs with opening a connection between GNU APL and the new
+⍝⍝ program. The return value of FIO∆execve Bs is a handle (a file descriptor)
+⍝⍝ that can be used with FIO∆fread and FIO∆fwrite for receiving data from and
+⍝⍝ for sending data to the new program. The other end of the communition link
+⍝⍝ (in the new program) is file descriptor 3 (STERR + 1). The new program has
+⍝⍝ stdin closed (so that the program cannot steal keyboard input) but stdout
+⍝⍝ left open. It is possible (although asking for trouble) for the new program
+⍝⍝ to write to its stdout or stderr.
  ⍝⍝
- ⍝⍝ FIO∆execve is quite similar to FIO∆popen. The difference is that FIO∆popen
- ⍝⍝ connects to either stdin or to stdout of the new program, but not both,
- ⍝⍝ while FIO∆execve uses only one file descriptor (3) and the communication
- ⍝⍝ over that file descriptor is bidirectional.
+⍝⍝ FIO∆execve is quite similar to FIO∆popen. The difference is that FIO∆popen
+⍝⍝ connects to either stdin or to stdout of the new program, but not both,
+⍝⍝ while FIO∆execve uses only one file descriptor (3) and the communication
+⍝⍝ over that file descriptor is bidirectional.
  ⍝⍝
- ⍝⍝ The GNU APL end of the connection is supposed to use FIO∆fread and
- ⍝⍝ and FIO∆fwrite, but not FIO∆read or FIO∆write (otherwise bad things will
- ⍝⍝ happen).
+⍝⍝ The GNU APL end of the connection is supposed to use FIO∆fread and
+⍝⍝ and FIO∆fwrite, but not FIO∆read or FIO∆write (otherwise bad things will
+⍝⍝ happen).
  ⍝⍝
  Z←⎕FIO[57] Bs
 ∇
 
 ∇Z ← Af FIO∆sprintf Bs
- ⍝⍝ sprintf( Af, B1...) format Af and data B1, ...
+⍝⍝ sprintf( Af, B1...) format Af and data B1, ...
  Z←Af ⎕FIO[58] Bs
 ∇
 
 ∇FIO∆clear_statistics Bi
- ⍝⍝ clear performance statistics with ID Bi
+⍝⍝ clear performance statistics with ID Bi
  ⊣ ⎕FIO[200] Bi
 ∇
 
 ∇Z ← FIO∆get_statistics Bi
- ⍝⍝ read performance statistics with ID Bi
- ⍝⍝ Z[1] statistics type
- ⍝⍝ Z[2] statistics name
- ⍝⍝ Z[3 4 5] first pass (or only statistics):     count/sum/sun2
- ⍝⍝ Z[6 7 8] optional subsequent pass statistics: count/sum/sun2
+⍝⍝ read performance statistics with ID Bi
+⍝⍝ Z[1] statistics type
+⍝⍝ Z[2] statistics name
+⍝⍝ Z[3 4 5] first pass (or only statistics):     count/sum/sun2
+⍝⍝ Z[6 7 8] optional subsequent pass statistics: count/sum/sun2
  Z ← ⎕FIO[201] Bi
 ∇
 
 ∇Z ← FIO∆get_monadic_threshold Bc
- ⍝⍝ read the monadic parallel execution threshold for primitive Bc
+⍝⍝ read the monadic parallel execution threshold for primitive Bc
  Z ← ⎕FIO[202] Bc
 ∇
 
 ∇Z ← Ai FIO∆set_monadic_threshold Bc
- ⍝⍝ set the monadic parallel execution threshold for primitive Bc
+⍝⍝ set the monadic parallel execution threshold for primitive Bc
  Z ← Ai ⎕FIO[202] Bc
 ∇
 
 ∇Z ← FIO∆get_dyadic_threshold Bc
- ⍝⍝ read the dyadic parallel execution threshold for primitive Bc
+⍝⍝ read the dyadic parallel execution threshold for primitive Bc
  Z ← ⎕FIO[203] Bc
 ∇
 
 ∇Z ← Ai FIO∆set_dyadic_threshold Bc
- ⍝⍝ set the dyadic parallel execution threshold for primitive Bc
+⍝⍝ set the dyadic parallel execution threshold for primitive Bc
  Z ← Ai ⎕FIO[203] Bc
 ∇
 
@@ -528,15 +554,15 @@ t←t⍪'INADDR_ANY' 0
 ⍝
 ∇Z←FIO⍙metadata
  Z←0 2⍴⍬
- Z←Z⍪'Author'      'Jürgen Sauermann'
+ Z←Z⍪'Author'      'Jürgen Sauermann, Christian Robert, Bill Daly'
  Z←Z⍪'BugEmail'    'bug-apl@gnu.org'
  Z←Z⍪'Documentation' ''
- Z←Z⍪'Download'      'http://svn.savannah.gnu.org/viewvc/trunk/wslib5/Makefile.in?root=apl'
+ Z←Z⍪'Download'      'http://svn.savannah.gnu.org/viewvc/trunk/wslib5/FILE_IO.apl.in?root=apl'
  Z←Z⍪'License'       'LGPL'
  Z←Z⍪'Portability'   'L3'
  Z←Z⍪'Provides'      'file-io'
  Z←Z⍪'Requires'      ''
- Z←Z⍪'Version'       '1.0'
+ Z←Z⍪'Version'       '1.1'
 ∇
 
 ⍝ A function that allows you to specify ⎕FIO functions as strings instead
