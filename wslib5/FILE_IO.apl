@@ -10,12 +10,11 @@
 ⍝ Copyright (C) 2020       Bill Daly
 
 
-⍝ This library contains APL wrapper functions for the system function ⎕FIO
+⍝ This library contains APL wrapper functions the system function ⎕FIO
 ⍝
 ⍝ The purpose is to give functions for file I/O meaningful names instead
-⍝ of difficult-to-remember numbers. The function names and their parameters
-⍝ are is normally the name and the argument(s) of the C-function that ⎕FIO
-⍝ calls in order to implement the function.
+⍝ of difficult-to-remember numbers. The function name is normally the name
+⍝ of the C-function that is called by the native function.
 ⍝
 ⍝  Legend: d - table of dirent structs
 ⍝          e - error code
@@ -183,7 +182,7 @@
 ∇Ze←txt FIO∆pipeto cmd;ph
 ⍝⍝ Function pipes txt to shell command cmd
   ph←'w' FIO∆popen cmd
-  →(0≠Ze←txt ⎕fio[43] ph)/0	⍝return read error to caller
+  Ze←txt ⎕fio[43] ph
   Ze←⎕fio[25] ph
 ∇
 
@@ -557,12 +556,12 @@ t←t⍪'INADDR_ANY' 0
  Z←Z⍪'Author'      'Jürgen Sauermann, Christian Robert, Bill Daly'
  Z←Z⍪'BugEmail'    'bug-apl@gnu.org'
  Z←Z⍪'Documentation' ''
- Z←Z⍪'Download'      'http://svn.savannah.gnu.org/viewvc/trunk/wslib5/FILE_IO.apl.in?root=apl'
+ Z←Z⍪'Download'      'http://svn.savannah.gnu.org/viewvc/trunk/wslib5/FILE_IO.apl?root=apl'
  Z←Z⍪'License'       'LGPL'
  Z←Z⍪'Portability'   'L3'
  Z←Z⍪'Provides'      'file-io'
  Z←Z⍪'Requires'      ''
- Z←Z⍪'Version'       '1.1'
+ Z←Z⍪'Version'       '1.2'
 ∇
 
 ⍝ A function that allows you to specify ⎕FIO functions as strings instead

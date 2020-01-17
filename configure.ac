@@ -178,15 +178,6 @@ if test "x$USABLE_PostgreSQL" = "xyes"; then
 fi
 fi
 
-# check if libxcb is installed
-PKG_CHECK_MODULES(XCBLIBS, [xcb >= 1.6], [HAVE_libxcb=yes], [HAVE_libxcb=no])
-AM_CONDITIONAL(HAVE_LIBXCB, test "$HAVE_libxcb" = yes)
-if test "$HAVE_libxcb" = yes; then
-   AC_DEFINE_UNQUOTED(HAVE_LIBXCB, [1], [libxcb is installed])
-else
-   AC_DEFINE_UNQUOTED(HAVE_LIBXCB, [0], [libxcb is NOT installed])
-fi
-
 # check if libpcre is installed
 m4_include([m4/ax_path_lib_pcre.m4])
    AX_PATH_LIB_PCRE([])
@@ -199,16 +190,21 @@ AC_ARG_WITH([gtk3],
     AS_HELP_STRING([--with-gtk3],
     [enable ⎕GTK (interface to GTK+ version 3; needs libgtk-3 and more)]))
 
-if test "x$with_gtk3" = "xno"              # user explicitly disabled GTK
+PKG_CHECK_MODULES([GTK],
+                  [gtk+-3.0],
+                  [HAVE_gtk3=yes],
+                  [HAVE_gtk3=no])
+
+if test "x$HAVE_gtk3" = "xyes"             # version 3 is installed
 then
-    AC_MSG_CHECKING([whether GTK version 3 is present and desired])
-    AC_MSG_RESULT([no (disabled by user)])
-    HAVE_gtk3=no
-else
-   PKG_CHECK_MODULES([GTK],
-                     [gtk+-3.0],
-                     [HAVE_gtk3=yes],
-                     [HAVE_gtk3=no])
+   AC_MSG_CHECKING([whether support for ⎕GTK (needs GTK version 3) is desired])
+   if test "x$with_gtk3" = "xno"              # user explicitly disabled GTK
+   then
+       AC_MSG_RESULT([no (explicitly disabled by user)])
+       HAVE_gtk3=no
+   else
+       AC_MSG_RESULT([yes])
+   fi
 fi
 
 AM_CONDITIONAL(HAVE_GTK3, test "x$HAVE_gtk3" = xyes)
@@ -589,7 +585,7 @@ AC_DEFINE_UNQUOTED([APSERVER_PORT], [$APSERVER_PORT],
 AC_MSG_RESULT([$APSERVER_PORT])
 
 # APL: APserver port name ?
-AC_MSG_CHECKING([which port name APserver shall use for unix ports])
+AC_MSG_CHECKING([which unix port name APserver shall use])
 AC_ARG_VAR(APSERVER_PATH,
    [ APserver transport (see README-2-configure) default: /tmp/GNU-APL/APserver) ])
 if test "x$APSERVER_PATH" = "x";   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi

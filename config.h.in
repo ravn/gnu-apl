@@ -93,7 +93,7 @@
 /* Define to 1 if you have the `X11-xcb' library (-lX11-xcb). */
 #undef HAVE_LIBX11_XCB
 
-/* libxcb is NOT installed */
+/* Define to 1 if you have the `xcb' library (-lxcb). */
 #undef HAVE_LIBXCB
 
 /* Define to 1 if you have the <memory.h> header file. */
