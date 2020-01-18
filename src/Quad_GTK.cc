@@ -694,14 +694,16 @@ window_entry we = { fd };
 Token
 Quad_GTK::eval_AB(Value_P A, Value_P B)
 {
-   MORE_ERROR() << "libgtk+ version 3 was not found at ./configure time";
+   MORE_ERROR() <<
+   "libgtk+ version 3 was not found (or disabled) at ./configure time";
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_B(Value_P B)
 {
-   MORE_ERROR() << "libgtk+ version 3 was not found at ./configure time";
+   MORE_ERROR() <<
+   "libgtk+ version 3 was not found (or disabled) at ./configure time";
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------

@@ -190,25 +190,43 @@ AC_ARG_WITH([gtk3],
     AS_HELP_STRING([--with-gtk3],
     [enable ⎕GTK (interface to GTK+ version 3; needs libgtk-3 and more)]))
 
-PKG_CHECK_MODULES([GTK],
-                  [gtk+-3.0],
-                  [HAVE_gtk3=yes],
-                  [HAVE_gtk3=no])
-
-if test "x$HAVE_gtk3" = "xyes"             # version 3 is installed
+HAVE_gtk3=no
+AC_SUBST(GTK_LIBS)
+AC_SUBST(GTK_CFLAGS)
+GTK_LIBS=
+GTK_CFLAGS=
+AC_MSG_CHECKING([whether support for ⎕GTK (needs GTK version 3) is desired])
+if test "x$with_gtk3" = "xno"       # user has explicitly disabled GTK
 then
-   AC_MSG_CHECKING([whether support for ⎕GTK (needs GTK version 3) is desired])
-   if test "x$with_gtk3" = "xno"              # user explicitly disabled GTK
-   then
-       AC_MSG_RESULT([no (explicitly disabled by user)])
-       HAVE_gtk3=no
-   else
-       AC_MSG_RESULT([yes])
-   fi
+    AC_MSG_RESULT([no - (user has explicitly disabled ⎕GTK)])
+else
+    # user wants ⎕GTK)
+    AC_MSG_RESULT([yes])
+    AC_MSG_CHECKING([if pkg-config is executable])
+    if test -x /usr/bin/pkg-config
+    then
+        AC_MSG_RESULT([yes])
+        AC_MSG_CHECKING([if package gtk+-3.0 is installed])
+        if pkg-config --exists gtk+-3.0
+        then
+            AC_MSG_RESULT([yes])
+            GTK_CFLAGS=`pkg-config --cflags gtk+-3.0`
+            GTK_LIBS=`pkg-config --libs gtk+-3.0`
+            HAVE_gtk3=yes
+        else
+            AC_MSG_RESULT([no])
+            HAVE_gtk3=no
+        fi
+    else
+        AC_MSG_RESULT([no (cannot use GTK without pkg-config)])
+        HAVE_gtk3=no
+    fi
 fi
 
+# make HAVE_GTK3 visible im Makefile.am
 AM_CONDITIONAL(HAVE_GTK3, test "x$HAVE_gtk3" = xyes)
 
+# make HAVE_GTK3 visible im config.h
 if test "x$HAVE_gtk3" = xyes; then
    AC_DEFINE_UNQUOTED(HAVE_GTK3, [1], [GTK+ version 3 installed])
 else
