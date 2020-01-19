@@ -57,26 +57,25 @@ UserPreferences uprefs;
 void
 UserPreferences::usage(const char * prog)
 {
-   {
-     const char * prog1 = strrchr(prog, '/');
-     if (prog1)   prog = prog1 + 1;
-   }
+   // skip directory components in prog
+   if (const char * prog1 = strrchr(prog, '/'))   prog = prog1 + 1;
 
-char cc[4000];
-   snprintf(cc, sizeof(cc),
-
-"usage: %s [options]\n"
+   CERR <<
+"usage: " << prog << " [options]\n"
 "    options: \n"
 "    -h, --help           print this help\n"
 "    -d                   run in the background (i.e. as daemon)\n"
 "    -f file              read APL input from file\n"
-"    --id proc            use processor ID proc (default: first unused > 1000)\n", prog);
-   CERR << cc;
+"    --id proc            use processor ID proc (default: first unused > 1000)\n"
+   ;
 
 #ifdef DYNAMIC_LOG_WANTED
-   snprintf(cc, sizeof(cc),
-"    -l num               turn log facility num (1-%d) ON\n", LID_MAX - 1);
-   CERR << cc;
+   CERR <<
+"    -l num               turn logging facility num ON;\n"
+"                         num is 1-" << (LID_MAX - 1) << "\n";
+#else
+   CERR <<
+"    -l 37                turn logging facility 37 (startup) ON\n";
 #endif
 
 #if CORE_COUNT_WANTED == -2
@@ -104,7 +103,7 @@ char cc[4000];
 "    --par proc           use processor parent ID proc (default: no parent)\n"
 "    --PW value           initial value of ⎕PW\n"
 "    -q, --silent         do not print the welcome banner\n"
-"    -s, --script         same as --silent --noCIN --noCONT --noColor\n"
+"    -s, --script         shortcut for --silent --noCIN --noCONT --noColor\n"
 "    --safe               safe mode (no shared vars, no native functions)\n"
 "    --show_bin_dir       show binary directory and exit\n"
 "    --show_doc_dir       show documentation directory and exit\n"
