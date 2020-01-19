@@ -84,7 +84,7 @@ char cc[4000];
 "    --cc count           use count cores (default: all)\n";
 #endif
 
-   snprintf(cc, sizeof(cc),
+   CERR <<
 "    -C new_root          do chroot(new_root) before starting APL (root only)\n"
 "    --cfg                show ./configure options used and exit\n"
 "    --noCIN              do not echo input (for scripting)\n"
@@ -125,8 +125,9 @@ char cc[4000];
 "    -u UID               run as user UID (root only)\n"
 "    -v, --version        show version information and exit\n"
 "    -w milli             wait milli milliseconds at startup\n"
-"    --                   end of options for %s\n", prog);
-   CERR << cc << endl;
+"    --                   end of options for " << prog << "\n"
+"\n"
+"Please report problems to: bug-apl@gnu.org\n" << endl;
 }
 //-----------------------------------------------------------------------------
 void
