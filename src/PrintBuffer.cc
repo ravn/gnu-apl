@@ -228,6 +228,11 @@ const bool nested = !value.is_simple();
                 if (scaling[x])   pctx1.set_scaled();
                 const Cell & cell = value.get_ravel(x + y*cols);
                 item = cell.character_representation(pctx1);
+                if (!item.get_height())
+                   {
+                     UCS_string empty;
+                     item.append_ucs(empty);
+                   }
 
                 if (cell.is_pointer_cell())
                    {
@@ -302,10 +307,13 @@ const bool nested = !value.is_simple();
             ShapeItem dest_height = 0;
             loop(y, rows)
                {
-                 dest_height += separator_rows(y, value, nested,
-                                               max_row_ranks[y],
-                                               y ? max_row_ranks[y - 1] : 0);
-                 dest_height += item_matrix[y*cols + x].get_height();
+                 const Rank Rk_y_1 = y ? max_row_ranks[y - 1] : 0;
+                 const ShapeItem srows = separator_rows(y, value, nested,
+                                                        max_row_ranks[y],
+                                                        Rk_y_1);
+                 const ShapeItem irows = item_matrix[y*cols + x].get_height();
+                 Assert(irows);
+                 dest_height += srows + irows;
                }
             dest.buffer.reserve(dest_height);
           }

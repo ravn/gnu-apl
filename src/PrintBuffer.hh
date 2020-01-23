@@ -166,7 +166,7 @@ public:
    /// append UCS_string \b ucs to \b this PrintBuffer
    void append_ucs(const UCS_string & ucs);
 
-   /// append ucs, aligne at char \b align.
+   /// append ucs, aligned at char \b align.
    void append_aligned(const UCS_string & ucs, Unicode align);
 
    /// add padding and a column \b pb to \b this PrintBuffer
@@ -213,7 +213,7 @@ protected:
    /// pad the fraction part to \b wanted_fract_len with '0'
    void pad_fraction(int wanted_fract_len, bool want_expo);
 
-   /// return the number of separator rows before row =b y in a value with
+   /// return the number of separator rows before row \b y in a value with
    /// shape \b shape
    static ShapeItem separator_rows(ShapeItem y, const Value & value,
                                    bool nested, Rank rk1, Rank rk2);
