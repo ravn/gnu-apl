@@ -18686,21 +18686,7 @@ $as_echo "no (cannot use GTK without pkg-config)" >&6; }
     fi
 fi
 
-if test "x$HAVE_gtk3" = "xyes"             # version 3 is installed
-then
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether support for ⎕GTK (needs GTK version 3) is desired" >&5
-$as_echo_n "checking whether support for ⎕GTK (needs GTK version 3) is desired... " >&6; }
-   if test "x$with_gtk3" = "xno"              # user explicitly disabled GTK
-   then
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no (explicitly disabled by user)" >&5
-$as_echo "no (explicitly disabled by user)" >&6; }
-       HAVE_gtk3=no
-   else
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-   fi
-fi
-
+# make HAVE_GTK3 visible im Makefile.am
  if test "x$HAVE_gtk3" = xyes; then
   HAVE_GTK3_TRUE=
   HAVE_GTK3_FALSE='#'
@@ -18710,6 +18696,7 @@ else
 fi
 
 
+# make HAVE_GTK3 visible im config.h
 if test "x$HAVE_gtk3" = xyes; then
 
 cat >>confdefs.h <<_ACEOF

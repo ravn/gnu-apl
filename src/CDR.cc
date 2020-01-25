@@ -230,7 +230,7 @@ const uint32_t nelm = val.element_count();
         //   | VALUE-nelm       |
         //   +------------------+
         //
-      
+
         uint32_t offset = 16 + 4*val.get_rank() + 4*nelm;
         while (offset & 0x0F)   ++offset;
         loop(e, nelm)
@@ -418,8 +418,10 @@ const uint8_t * ravel = data + 16 + 4*rank;
 
                    if (sub_vtype == 1)        // 4 byte int
                       {
-                        new (&ret->get_ravel(n)) IntCell(
-                               *reinterpret_cast<const uint32_t *>(sub_ravel));
+                        APL_Integer d = *reinterpret_cast<const uint32_t *>
+                                                         (sub_ravel);
+                        if (d & 0x80000000)   d |= 0xFFFFFFFF00000000ULL;
+                        new (&ret->get_ravel(n)) IntCell(d);
                         continue;   // next n
                       }
 
