@@ -111,8 +111,8 @@ bool
 IntCell::equal(const Cell & other, double qct) const
 {
    if (other.is_integer_cell())    return value.ival == other.get_int_value();
-   if (!other.is_numeric())        return false;
-   return other.equal(*this, qct);
+   if (other.is_numeric())         return other.equal(*this, qct);
+   return false;
 }
 //-----------------------------------------------------------------------------
 // monadic built-in functions...

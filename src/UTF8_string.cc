@@ -304,7 +304,7 @@ bool got_tag = false;
         const int rest = size() - src;
         if (rest > 5 && at(src + 1) == '#' && at(src + 4) == ';')
            {
-             const long val = strtol(charP(&at(src + 2)), 0, 10);
+             const long long val = strtoll(charP(&at(src + 2)), 0, 10);
              at(dest++) = val;
              src += 4;
            }

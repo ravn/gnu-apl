@@ -696,12 +696,8 @@ public:
 
 protected:
    /// return \b true iff \b cell is different from all \b others within \b qct
-   static bool is_unique(const Cell & cell,
-                         std::vector<const Cell *> & others, double qct)
-      { loop(z, others.size())
-            { if (others[z]->equal(cell, qct))  return false; }
-        return true;
-      }
+   static bool is_unique(const Cell & cell, vector<const Cell *> & others,
+                         double qct);
 };
 //-----------------------------------------------------------------------------
 /** System function ∩ (intersection) */

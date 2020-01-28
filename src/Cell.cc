@@ -110,7 +110,8 @@ bool
 Cell::greater(const Cell & other) const
 {
    MORE_ERROR() << "Cell::greater() : Objects of class " << get_classname()
-                << " cannot be compared";
+                << " cannot be compared with objects of class"
+                << other.get_classname();
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -118,17 +119,27 @@ bool
 Cell::equal(const Cell & other, double qct) const
 {
    MORE_ERROR() << "Cell::equal() : Objects of class " << get_classname()
-                << " cannot be compared";
+                << " cannot be compared with objects of class"
+                << other.get_classname();
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 bool
 Cell::compare_stable(const Cell * const & A, const Cell * const & B,
-                     const void *)
+                     const void * comp_arg)
 {
-const Comp_result cr = A->compare(*B);
-   if (cr == COMP_EQ)   return A < B;
-   return cr == COMP_GT;
+   if (comp_arg)   // ⎕CT
+      {
+        const double * qct = reinterpret_cast<const double *>(comp_arg);
+        if (A->equal(*B, *qct))   return A > B;
+        return A->greater(*B);
+      }
+   else
+      {
+        const Comp_result cr = A->compare(*B);
+        if (cr == COMP_EQ)   return A > B;
+        return cr == COMP_GT;
+      }
 }
 //-----------------------------------------------------------------------------
 bool

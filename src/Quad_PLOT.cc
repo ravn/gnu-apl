@@ -432,11 +432,11 @@ public:
 
    /// convert a string to a Pixel
    static Pixel_X Pixel_X_from_str(const char * str, const char * & error)
-      { error = 0;   return strtol(str, 0, 10); }
+      { error = 0;   return strtoll(str, 0, 10); }
 
    /// convert a string to a Pixel
    static Pixel_Y Pixel_Y_from_str(const char * str, const char * & error)
-      { error = 0;   return strtol(str, 0, 10); }
+      { error = 0;   return strtoll(str, 0, 10); }
 
    /// convert a string to a double
    static double double_from_str(const char * str, const char * & error)
@@ -447,7 +447,7 @@ public:
 
    /// convert a string to a uint32_t
    static uint32_t uint32_t_from_str(const char * str, const char * & error)
-      { error = 0;   return strtol(str, 0, 10); }
+      { error = 0;   return strtoll(str, 0, 10); }
 
    /// convert a string to a String
    static String String_from_str(const char * str, const char * & error)
@@ -498,14 +498,14 @@ uint32_t r, g, b;
       {
         if (strlen(h) == 4)   // #RGB
            {
-             const int v = strtol(str + 1, 0, 16);
+             const int v = strtoll(str + 1, 0, 16);
              return (0x11*(v >> 8 & 0x0F)) << 16
                   | (0x11*(v >> 4 & 0x0F)) << 8
                   | (0x11*(v      & 0x0F)  << 0);
            }
         else if (strlen(h) == 7)   // #RRGGBB
            {
-             return strtol(str + 1, 0, 16);
+             return strtoll(str + 1, 0, 16);
            }
       }
 
@@ -1094,7 +1094,7 @@ const char * minus = strchr(att_and_val, '-');
         // 
         if (!strncmp(att_and_val, "color_level-", 12))
            {
-             const int level = strtol(minus + 1, 0, 10);
+             const int level = strtoll(minus + 1, 0, 10);
              if (level < 0)     return "negative color level";
              if (level > 100)   return "color level > 100%";
 
@@ -1121,7 +1121,7 @@ const char * minus = strchr(att_and_val, '-');
               return 0;   // OK
            }
 
-        const int line = strtol(minus + 1, 0, 10) - Workspace::get_IO();
+        const int line = strtoll(minus + 1, 0, 10) - Workspace::get_IO();
         if (line < 0)             return "line number ≤ ⎕IO";
         if (line >= line_count)   return "line number too large";
 

@@ -566,12 +566,14 @@ public:
    const void * get_u1() const   { return &value.cval[1]; }
 
    /// a stable compare function to be used with Heapsort. Equal cells
-   /// are compared by their address
+   /// are compared by their address. Return true iff A > B or A = B
+   /// and &A > &B.
    static bool compare_stable(const Cell * const & A, const Cell * const & B,
                        const void * comp_arg);
 
    /// a stable compare function to be used with Heapsort. The cell content
-   /// is ignore and only the cell addresses are being compared
+   /// is ignored and only the cell addresses are being compared. Return
+   /// true iff &A > &B.
    static bool compare_ptr(const Cell * const & A, const Cell * const & B,
                        const void * comp_arg);
 

@@ -2693,7 +2693,7 @@ const ShapeItem len_B = B->element_count();
 
         loop(b, len_B)   cells_B[b] = &B->get_ravel(b);
 
-        Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
+        Heapsort<const Cell*>::sort(cells_B, len_B, &qct, Cell::compare_stable);
 
         ShapeItem idx_B = 0;
         ShapeItem len_Z = 0;
@@ -2734,6 +2734,18 @@ Value_P Z(items_Z.size(), LOC);
        Z->next_ravel()->init(*(items_Z[z]), Z.getref(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
+}
+//-----------------------------------------------------------------------------
+bool
+Bif_F12_UNION::is_unique(const Cell & cell, vector<const Cell *> & others,
+                         double qct)
+{
+   loop(z, others.size())
+       {
+         if (others[z]->equal(cell, qct))  return false;
+       }
+
+   return true;   // all items in other differ from cell
 }
 //-----------------------------------------------------------------------------
 Token
