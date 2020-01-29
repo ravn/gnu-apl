@@ -1,3 +1,3 @@
 #include "Common.hh"
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / 966", "2017-06-23 15:01:28 UTC", "Linux 3.13.0-96-generic i686", "unknown configure options"
-#define ARCHIVE_SVN " 896"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / 1219:1230M", "2020-01-29 18:29:37 UTC", "Linux 3.13.0-170-generic i686", "default ./configure options"
+#define ARCHIVE_SVN " 1161"
