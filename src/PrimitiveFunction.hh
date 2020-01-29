@@ -698,6 +698,12 @@ protected:
    /// return \b true iff \b cell is different from all \b others within \b qct
    static bool is_unique(const Cell & cell, vector<const Cell *> & others,
                          double qct);
+
+   /// find the unique(s) in cells_B[B_from] ... cells_B[B_to] and appendi
+   /// it/them to cells_Z. Return the number of uniquest appended.
+   /// 
+   static ShapeItem append_zone(const Cell ** cells_Z, const Cell ** cells_B,
+                                ShapeItem B_from, ShapeItem B_to, double qct);
 };
 //-----------------------------------------------------------------------------
 /** System function ∩ (intersection) */

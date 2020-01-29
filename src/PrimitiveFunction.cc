@@ -2678,6 +2678,85 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
+ShapeItem
+Bif_F12_UNION::append_zone(const Cell ** cells_Z, const Cell ** cells_B,
+               ShapeItem B_from, ShapeItem B_to, double qct)
+{
+   // Find the smallest pointer (i.e. smallest Cell address, not the smallest
+   // Cell value in the zone. This pointer will go into Z and it will kill
+   // all others in the middle zone.
+   //
+#if 0
+   // this fails when used with char cells !
+   Q(LOC)
+   fprintf(stderr, "%ld-element zone:\n", B_to - B_from);
+   for (ShapeItem j = B_from; j < B_to; ++j)
+       fprintf(stderr, "[%ld] value: %.12f\n", j, cells_B[j]->get_real_value());
+#endif
+
+   Assert(B_from < B_to);
+
+   // the most likely case is a 1-element zone
+   //
+   if (B_from == (B_to - 1))
+      {
+        *cells_Z++ = cells_B[B_from];   // ++ only for clarity
+        return 1;
+      }
+
+ShapeItem smallest = B_from;
+   for (ShapeItem bb = B_from + 1; bb < B_to; ++bb)
+       {
+         if (cells_B[smallest] > cells_B[bb])   smallest = bb;
+       }
+
+   //  See if the zone is transitive or not.
+   //
+   if (cells_B[smallest]->equal(*cells_B[B_to - 1], qct))
+      {
+        // the zone is transitive (i.e. all cells are equal within ⎕CT).
+        // The unique of the zone is then the smallest pointer (i.e.first,
+        // not the smallest Cell) in the zone.
+        //
+        *cells_Z++ = cells_B[smallest];
+        return 1;   // one item appended
+      }
+
+   // the zone is not transitive, i.e. cells_B[B_from] is NOT equal to
+   // cells_B[B_to]. Divide the zone into 3 (possibly empty) regions:
+   // cells < smallest, cells = smallest, and cells > smallest (cell values).
+   //
+   // Start with the middle region from1 ... to1 (excluding)
+   //
+ShapeItem ret = 1;   *cells_Z++ = cells_B[smallest];
+ShapeItem from1 = smallest;
+ShapeItem to1   = smallest;
+
+   // move from1 down as long as its cell is within ⎕CT of smallest.
+   //
+   while (from1 > B_from &&
+          cells_B[from1]->equal(*cells_B[smallest], qct))   --from1;
+   if (from1 > B_from)   // non-empty zone before smallest
+      {
+        const ShapeItem len = append_zone(cells_Z, cells_B, B_from, from1,qct);
+        cells_Z += len;
+        ret += len;
+      }
+
+   // move to1 up as long as its cell is within ⎕CT of smallest.
+   //
+   while (to1 < B_to &&
+          cells_B[to1]->equal(*cells_B[smallest], qct))   ++to1;
+   if (to1 < B_to)   // non-empty zone after smallest
+      {
+        const ShapeItem len = append_zone(cells_Z, cells_B, to1, B_to, qct);
+        cells_Z += len;
+        ret += len;
+      }
+
+   return ret;
+}
+//-----------------------------------------------------------------------------
 Token
 Bif_F12_UNION::eval_B(Value_P B)
 {
@@ -2686,52 +2765,50 @@ Bif_F12_UNION::eval_B(Value_P B)
 const double qct = Workspace::get_CT();
 const ShapeItem len_B = B->element_count();
    if (len_B <= 1)   return Token(TOK_APL_VALUE1, B->clone(LOC));
-   if (len_B >= 20)
-      {
-        const Cell ** cells_B = new const Cell *[2*len_B];
-        const Cell ** cells_Z = cells_B + len_B;
 
-        loop(b, len_B)   cells_B[b] = &B->get_ravel(b);
-
-        Heapsort<const Cell*>::sort(cells_B, len_B, &qct, Cell::compare_stable);
-
-        ShapeItem idx_B = 0;
-        ShapeItem len_Z = 0;
-        while(idx_B < len_B)
-            {
-              const Cell * ref = cells_B[idx_B++];
-              cells_Z[len_Z++] = ref;   // always take first
-              while (idx_B < len_B && ref->equal(*cells_B[idx_B], qct)) ++idx_B;
-            }
-
-        // sort cells_Z by position so that the original order in B is
-        // reconstructed
-        //
-        Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
-
-        Value_P Z(len_Z, LOC);
-        loop(z, len_Z)   Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
-        delete[] cells_B;
-        Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
-      }
-
-   // B is small, so an iterative search of unique elements is faster
+   // 1. construct a vector of Cell pointers and sort it so that the
+   //    cells beingh pointed to are sorted ascendingly.
    //
-std::vector<const Cell *> items_Z;
-   items_Z.reserve(len_B);
-
-   loop(b, len_B)
-      {
-        const Cell & cell = B->get_ravel(b);
-        if (is_unique(cell, items_Z, qct))   items_Z.push_back(&cell);
-      }
-
-   // build result value Z
+   // For efficiency We allocate both the Cell pointers for argument B and
+   // for the result Z. Sorting is done with ⎕CT←0; ⎕CT will be considered
+   // later on.
    //
-Value_P Z(items_Z.size(), LOC);
-   loop(z, items_Z.size())
-       Z->next_ravel()->init(*(items_Z[z]), Z.getref(), LOC);
+const Cell ** cells_B = new const Cell *[2*len_B];
+const Cell ** cells_Z = cells_B + len_B;
+ShapeItem idx_Z = 0;
+
+   loop(b, len_B)   cells_B[b] = &B->get_ravel(b);
+   Heapsort<const Cell*>::sort(cells_B, len_B, 0, Cell::A_greater_B);
+
+   // 2. divide the cells into zones. A zone is a sequence of cells
+   //    B[from] (including)  ... B[to] (excluding) so that the difference
+   //    between B[i] and B[i+1] is < ⎕CT.
+   //
+   // The unique element(s) of each zone are then appended to Z.
+   //
+ShapeItem from = 0;
+   for (ShapeItem b = 1; b < len_B; ++b)
+       {
+           if (cells_B[b]->equal(*cells_B[b-1], qct))
+              {
+                // cells_B[b] belongs to the zone
+                //
+                continue;
+              }
+
+           idx_Z += append_zone(cells_Z + idx_Z, cells_B, from, b, qct);
+           from = b;
+           continue;   // next b (and next zone)
+       }
+   idx_Z += append_zone(cells_Z + idx_Z, cells_B, from, len_B, qct);
+
+   // sort cells_Z by position so that the original order in B is
+   // reconstructed
+   //
+   Heapsort<const Cell *>::sort(cells_Z, idx_Z, 0, Cell::compare_ptr);
+Value_P Z(idx_Z, LOC);
+   loop(z, idx_Z)   Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
+   delete[] cells_B;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

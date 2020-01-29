@@ -1,4 +1,4 @@
-This is apl.info, produced by makeinfo version 5.2 from apl.texi.
+This is apl.info, produced by makeinfo version 6.5 from apl.texi.
 
 This is the manual for GNU APL, an implementation of ISO standard 13751
 "Programming Language APL, Extended"
@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 3, 2020
+January 17, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -801,13 +801,13 @@ can be retrieved with ⎕ARG.
 
 $ apl --silent -l 37 -- app1 app2
     ⊃⎕ARG
-apl
+apl     
 --silent
--l
-37
---
-app1
-app2
+-l      
+37      
+--      
+app1    
+app2    
 
    Example 2: APL started indirectly
 
@@ -838,10 +838,10 @@ options as seen by ⎕ARG, is produced:
 
    ⊃⎕ARG
 /usr/local/bin/apl
---script
-./SCRIPT.apl
-sarg1
-sarg2
+--script          
+./SCRIPT.apl      
+sarg1             
+sarg2 
 
    This tells us that the different names are constructed by execve() in
 the following order:
@@ -1092,7 +1092,7 @@ APL prompt of 6 blanks, while the output of the APL interpreter is not
 indented.
 
       #! /usr/local/bin/apl --script
-
+      
       ⎕ARG      ⍝ show command line options
       )OFF      ⍝ leave the interpreter
 
@@ -1105,7 +1105,7 @@ indented.
    Then we get:
 
 
- /usr/local/bin/apl --script ../workspaces/SCRIPT.apl
+ /usr/local/bin/apl --script ../workspaces/SCRIPT.apl 
 
 
    The ‘--script’ implies ‘--noCIN’ so that the
@@ -1126,7 +1126,7 @@ execve’).
    then it shows up at the end of ⎕ARG:
 
 
- /usr/local/bin/apl --script ../workspaces/SCRIPT.apl SCRIPTARG
+ /usr/local/bin/apl --script ../workspaces/SCRIPT.apl SCRIPTARG 
 
 
    A final note on scripting in GNU APL is that the ∇-editor works
@@ -1137,7 +1137,7 @@ with a full header gives a DEFN ERROR:
 
       ∇Z←FOO B
 [1] ∇
-
+      
             ∇Z←FOO B
 DEFN ERROR+
       ∇Z←FOO B
@@ -1324,7 +1324,7 @@ limited form.
 
 A statement of the form
 
-      FUN ← { body_statement }
+      FUN ← { body_statement } 
 
    creates a named lambda.  body_statement can contain variable names ⍺
 and ⍵ as well as function names ⍶ and ⍹ which are replaced by the actual
@@ -1359,7 +1359,7 @@ SUM
 
       ∇SUM[⎕]∇
 [0] λ←⍺ SUM ⍵
-[1] λ← ⍺ + ⍵
+[1] λ← ⍺ + ⍵ 
 
 
    The lambda_header is automatically deduced from the presence or
@@ -1378,8 +1378,8 @@ example one could add local variables C and D like this:
       SUM ← { ⍺ + ⍵ ;C;D }
 
       ⎕CR 'SUM'
-λ←⍺ λ1 ⍵;C;D
-λ← ⍺ + ⍵
+λ←⍺ λ1 ⍵;C;D 
+λ← ⍺ + ⍵     
 
 
    If a named lambda is created inside a function, then the name of the
@@ -1403,7 +1403,7 @@ example:
 
 
       { ⍴ , ⍵ } ¨ 'a' 'ab' 'abc'
- 1  2  3
+ 1  2  3 
 
 
    Unnamed lambdas are automatically local in scope (similar to labels).
@@ -2193,9 +2193,9 @@ time):
       Q8←⊃{(R⌽RC),(C⌽RC),((C-R)⌽D),((¯7-R+C)⌽D)⊣(R C)←-8 8⊤⍵-⎕IO} ¨ ⍳64
       Z←¯1 ⎕DLX Q8
       {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1 2 3 92] ⍝ solutions 1, 2, and 92
- A1 B6 C8 D3 E7 F4 G2 H5
- A1 C5 F4 H3 D8 G6 B7 E2
- A8 D6 H4 G7 C1 F5 B3 E2
+ A1 B6 C8 D3 E7 F4 G2 H5 
+ A1 C5 F4 H3 D8 G6 B7 E2 
+ A8 D6 H4 G7 C1 F5 B3 E2 
 
 
    Obviously Z contains solutions for the 8 Queens problem; the total
@@ -2218,69 +2218,69 @@ The resulting constraint matrix Q8 is this:
       Q8
 
 1       1              2                     2
-1        1              2                   2
-1         1              2                 2
-1          1              2               2
-1           1              2             2
-1            1              2           2
-1             1              2         2
-1              1              2       2
- 1      1             2                     2
- 1       1             2                   2
- 1        1             2                 2
- 1         1             2               2
- 1          1             2             2
- 1           1             2           2
- 1            1             2         2
- 1             1             2       2
-  1     1            2                     2
-  1      1            2                   2
-  1       1            2                 2
-  1        1            2               2
-  1         1            2             2
-  1          1            2           2
-  1           1            2         2
-  1            1            2       2
-   1    1           2                     2
-   1     1           2                   2
-   1      1           2                 2
-   1       1           2               2
-   1        1           2             2
-   1         1           2           2
-   1          1           2         2
-   1           1           2       2
-    1   1          2                     2
-    1    1          2                   2
-    1     1          2                 2
-    1      1          2               2
-    1       1          2             2
-    1        1          2           2
-    1         1          2         2
-    1          1          2       2
-     1  1         2                     2
-     1   1         2                   2
-     1    1         2                 2
-     1     1         2               2
-     1      1         2             2
-     1       1         2           2
-     1        1         2         2
-     1         1         2       2
-      1 1        2                     2
-      1  1        2                   2
-      1   1        2                 2
-      1    1        2               2
-      1     1        2             2
-      1      1        2           2
-      1       1        2         2
-      1        1        2       2
-       11       2                     2
-       1 1       2                   2
-       1  1       2                 2
-       1   1       2               2
-       1    1       2             2
-       1     1       2           2
-       1      1       2         2
-       1       1       2       2
+1        1              2                   2 
+1         1              2                 2  
+1          1              2               2   
+1           1              2             2    
+1            1              2           2     
+1             1              2         2      
+1              1              2       2       
+ 1      1             2                     2 
+ 1       1             2                   2  
+ 1        1             2                 2   
+ 1         1             2               2    
+ 1          1             2             2     
+ 1           1             2           2      
+ 1            1             2         2       
+ 1             1             2       2        
+  1     1            2                     2  
+  1      1            2                   2   
+  1       1            2                 2    
+  1        1            2               2     
+  1         1            2             2      
+  1          1            2           2       
+  1           1            2         2        
+  1            1            2       2         
+   1    1           2                     2   
+   1     1           2                   2    
+   1      1           2                 2     
+   1       1           2               2      
+   1        1           2             2       
+   1         1           2           2        
+   1          1           2         2         
+   1           1           2       2          
+    1   1          2                     2    
+    1    1          2                   2     
+    1     1          2                 2      
+    1      1          2               2       
+    1       1          2             2        
+    1        1          2           2         
+    1         1          2         2          
+    1          1          2       2           
+     1  1         2                     2     
+     1   1         2                   2      
+     1    1         2                 2       
+     1     1         2               2        
+     1      1         2             2         
+     1       1         2           2          
+     1        1         2         2           
+     1         1         2       2            
+      1 1        2                     2      
+      1  1        2                   2       
+      1   1        2                 2        
+      1    1        2               2         
+      1     1        2             2          
+      1      1        2           2           
+      1       1        2         2            
+      1        1        2       2             
+       11       2                     2       
+       1 1       2                   2        
+       1  1       2                 2         
+       1   1       2               2          
+       1    1       2             2           
+       1     1       2           2            
+       1      1       2         2             
+       1       1       2       2              
 
    To see how, for example, the first solution looks like and how it
 relates to the constraints matrix Q8:
@@ -2289,29 +2289,29 @@ relates to the constraints matrix Q8:
       ⍝ the rows in Q8 of the first solution
       ⍝
       Z[1]
- 1 14 24 27 39 44 50 61
+ 1 14 24 27 39 44 50 61 
 
       ⍝ the first solution translated back into the problem domain
       ⍝
       {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1]
- A1 B6 C8 D3 E7 F4 G2 H5
+ A1 B6 C8 D3 E7 F4 G2 H5 
 
       ⍝ the constraints of the rows of the first solution
       ⍝
       Q8[⊃Z[1];]
 1       1              2                     2
- 1           1             2           2
-  1            1            2       2
-   1      1           2                 2
-    1         1          2         2
-     1     1         2               2
-      1  1        2                   2
-       1    1       2             2
+ 1           1             2           2      
+  1            1            2       2         
+   1      1           2                 2     
+    1         1          2         2          
+     1     1         2               2        
+      1  1        2                   2       
+       1    1       2             2           
 
       ⍝ all primary contraints met?
       ⍝
-      +⌿ ' '≠ Q8[⊃Z[1];]
-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1
+      +⌿ ' '≠ Q8[⊃Z[1];] 
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1 
       1 0 0 0 0 1
 
 
@@ -3210,32 +3210,32 @@ File: apl.info,  Node: Section 3.30,  Prev: Section 3.29,  Up: Chapter 3
 System variable ⎕SYL shows a number of system limits when referenced:
 
       ⎕SYL
- SI depth limit          (0 = no limit)                    0
- number of values limit  (0 = no limit)                    0
- total ravel bytes limit (0 = no limit)                    0
- current SI depth                                          1
- current number of values                                 54
- current total ravel bytes                              9072
- max. rank for APL values                                  8
- min. ⎕PW                                                 30
- max. ⎕PW                                               1000
- min. ⎕PP                                                  1
- max. ⎕PP                                                 16
- max. input line length                                 2000
- hash table size (obsolete)                            65536
- max. shared variable name length                         64
- max. length of filenames (paths)                       4096
- max. # of shared variables (obsolete)                    64
- max. number of APs                                       16
- max. operators per statement                             16
- largest integer                         9000000000000000000
- smallest integer                       ¯9000000000000000000
- largest numeric exponent                                308
- max. shared variable size (bytes)                     65000
- max. cores (per ./configure)                              0
- max. cores (per max_cores())                              1
- current cores (per core_count())                          1
- print length limit (0 = no limit)                         0
+ SI depth limit          (0 = no limit)                    0 
+ number of values limit  (0 = no limit)                    0 
+ total ravel bytes limit (0 = no limit)                    0 
+ current SI depth                                          1 
+ current number of values                                 54 
+ current total ravel bytes                              9072 
+ max. rank for APL values                                  8 
+ min. ⎕PW                                                 30 
+ max. ⎕PW                                               1000 
+ min. ⎕PP                                                  1 
+ max. ⎕PP                                                 16 
+ max. input line length                                 2000 
+ hash table size (obsolete)                            65536 
+ max. shared variable name length                         64 
+ max. length of filenames (paths)                       4096 
+ max. # of shared variables (obsolete)                    64 
+ max. number of APs                                       16 
+ max. operators per statement                             16 
+ largest integer                         9000000000000000000 
+ smallest integer                       ¯9000000000000000000 
+ largest numeric exponent                                308 
+ max. shared variable size (bytes)                     65000 
+ max. cores (per ./configure)                              0 
+ max. cores (per max_cores())                              1 
+ current cores (per core_count())                          1 
+ print length limit (0 = no limit)                         0 
 
    Most system limits are read-only; attempting to assign ⎕SYL will
 result in a SYNTAX ERROR. Indexed assignment to ⎕SYL will result in an
@@ -3650,7 +3650,7 @@ File: apl.info,  Node: Section 8.1,  Next: Section 8.2,  Up: Chapter 8
   0. PREAMBLE
 
      The purpose of this License is to make a manual, textbook, or other
-     functional and useful document "free" in the sense of freedom: to
+     functional and useful document “free” in the sense of freedom: to
      assure everyone the effective freedom to copy and redistribute it,
      with or without modifying it, either commercially or
      non-commercially.  Secondarily, this License preserves for the
@@ -4100,7 +4100,7 @@ notices just after the title page:
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
-Texts, replace the “with…Texts.” line with this:
+Texts, replace the “with...Texts.” line with this:
 
          with the Invariant Sections being LIST THEIR TITLES, with
          the Front-Cover Texts being LIST, and with the Back-Cover Texts
@@ -4799,56 +4799,56 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11471
-Node: Chapter 219504
-Node: Chapter 323928
-Node: Section 3.125453
-Node: Section 3.241465
-Node: Section 3.342224
-Node: Section 3.443511
-Node: Section 3.546132
-Node: Section 3.646305
-Node: Section 3.746918
-Node: Section 3.850862
-Node: Section 3.952404
-Node: Section 3.1053001
-Node: Section 3.1154785
-Node: Section 3.1256725
-Node: Section 3.1357666
-Node: Section 3.1457918
-Node: Section 3.1559314
-Node: Section 3.1661826
-Node: Section 3.1768525
-Node: Section 3.1873559
-Node: Section 3.1976840
-Node: Section 3.2077131
-Node: Section 3.2187043
-Node: Section 3.2287315
-Node: Section 3.2393893
-Node: Section 3.2496344
-Node: Section 3.2597013
-Node: Section 3.26103696
-Node: Section 3.27104636
-Node: Section 3.28118198
-Node: Section 3.29121302
-Node: Section 3.30123291
-Node: Chapter 4127669
-Node: Chapter 5129417
-Node: Chapter 6130546
-Node: Section 6.1132083
-Node: Section 6.2133328
-Node: Section 6.3133688
-Node: Section 6.4133930
-Node: Section 6.5134592
-Node: Section 6.6135070
-Node: Section 6.7135842
-Node: Section 6.8136299
-Node: Chapter 7136701
-Node: Section 7.1137120
-Node: Section 7.2137807
-Node: Chapter 8138638
-Node: Section 8.1139141
-Node: Section 8.2164451
+Node: Chapter 11472
+Node: Chapter 219505
+Node: Chapter 323929
+Node: Section 3.125454
+Node: Section 3.241541
+Node: Section 3.342300
+Node: Section 3.443587
+Node: Section 3.546208
+Node: Section 3.646381
+Node: Section 3.746994
+Node: Section 3.850947
+Node: Section 3.952489
+Node: Section 3.1053086
+Node: Section 3.1154870
+Node: Section 3.1256810
+Node: Section 3.1357751
+Node: Section 3.1458003
+Node: Section 3.1559399
+Node: Section 3.1661911
+Node: Section 3.1768610
+Node: Section 3.1873644
+Node: Section 3.1976925
+Node: Section 3.2077216
+Node: Section 3.2187639
+Node: Section 3.2287911
+Node: Section 3.2394489
+Node: Section 3.2496940
+Node: Section 3.2597609
+Node: Section 3.26104292
+Node: Section 3.27105232
+Node: Section 3.28118794
+Node: Section 3.29121898
+Node: Section 3.30123887
+Node: Chapter 4128291
+Node: Chapter 5130039
+Node: Chapter 6131168
+Node: Section 6.1132705
+Node: Section 6.2133950
+Node: Section 6.3134310
+Node: Section 6.4134552
+Node: Section 6.5135214
+Node: Section 6.6135692
+Node: Section 6.7136464
+Node: Section 6.8136921
+Node: Chapter 7137323
+Node: Section 7.1137742
+Node: Section 7.2138429
+Node: Chapter 8139260
+Node: Section 8.1139763
+Node: Section 8.2165077
 
 End Tag Table
 

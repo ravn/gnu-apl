@@ -125,21 +125,19 @@ Cell::equal(const Cell & other, double qct) const
 }
 //-----------------------------------------------------------------------------
 bool
-Cell::compare_stable(const Cell * const & A, const Cell * const & B,
-                     const void * comp_arg)
+Cell::A_greater_B(const Cell * const & A, const Cell * const & B,
+                  const void * /* comp_arg not used */)
 {
-   if (comp_arg)   // ⎕CT
-      {
-        const double * qct = reinterpret_cast<const double *>(comp_arg);
-        if (A->equal(*B, *qct))   return A > B;
-        return A->greater(*B);
-      }
-   else
-      {
-        const Comp_result cr = A->compare(*B);
-        if (cr == COMP_EQ)   return A > B;
-        return cr == COMP_GT;
-      }
+   return A->greater(*B);
+}
+//-----------------------------------------------------------------------------
+bool
+Cell::compare_stable(const Cell * const & A, const Cell * const & B,
+                  const void * unused_comp_arg)
+{
+   const Comp_result cr = A->compare(*B);
+   if (cr == COMP_EQ)   return A > B;
+   return cr == COMP_GT;
 }
 //-----------------------------------------------------------------------------
 bool

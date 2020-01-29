@@ -77,6 +77,10 @@ public:
    /// 2c. PointerCells sorted by rank, then by shape, then by ravel
    virtual bool greater(const Cell & other) const;
 
+   /// like greater() but static
+   static bool A_greater_B(const Cell * const & A, const Cell * const & B,
+                           const void * unused_comp_arg);
+
    /// return \b true if \b this cell is equal to \b other
    virtual bool equal(const Cell & other, double qct) const;
 
