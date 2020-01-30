@@ -222,6 +222,9 @@ dist_noinst_DATA =				           \
         ZZ45_Regression.tc                                 \
         ZZ46_Regression.tc                                 \
         ZZ47_Regression.tc                                 \
+        ZZ48_Regression.tc                                 \
+        ZZ49_Regression.tc                                 \
+        ZZ50_Regression.tc                                 \
         ZZZ0_Standard_08x,tc                               \
         ZZZ0_Standard_09x.tc                               \
         ZZZ0_Standard_10x.tc                               \

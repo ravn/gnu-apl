@@ -182,8 +182,10 @@
 ∇Ze←txt FIO∆pipeto cmd;ph
 ⍝⍝ Function pipes txt to shell command cmd
   ph←'w' FIO∆popen cmd
-  Ze←txt ⎕fio[43] ph
-  Ze←⎕fio[25] ph
+  Z1←(⎕ucs txt) FIO∆fwrite ph
+  Ze←FIO∆pclose ph
+  →(Z1≥0)/0
+  Ze←Z1
 ∇
 
 ∇txt←FIO∆pipefrom cmd;ph;Ze
