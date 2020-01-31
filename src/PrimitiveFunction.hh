@@ -695,15 +695,34 @@ public:
    static Bif_F12_UNION  _fun;
 
 protected:
-   /// return \b true iff \b cell is different from all \b others within \b qct
-   static bool is_unique(const Cell & cell, vector<const Cell *> & others,
-                         double qct);
+   /// a range of indices (including \b from, excludinmg \b to)
+   struct Zone
+      {
+        /// constructor
+        Zone(ShapeItem f, ShapeItem t)
+        : from(f),
+          to(t)
+        {}
+
+        /// return the number of elements (indices) in \b this zone
+        ShapeItem count() const
+           { return to - from; }
+
+        /// the first index in the zone (including)
+        ShapeItem from;
+
+        /// the last index in the zone (excluding)
+        ShapeItem to;
+      };
+
+   /// a list of zones
+   typedef std::vector<Zone> Zone_list;
 
    /// find the unique(s) in cells_B[B_from] ... cells_B[B_to] and appendi
    /// it/them to cells_Z. Return the number of uniquest appended.
    /// 
    static ShapeItem append_zone(const Cell ** cells_Z, const Cell ** cells_B,
-                                ShapeItem B_from, ShapeItem B_to, double qct);
+                                Zone_list & B_from_to, double qct);
 };
 //-----------------------------------------------------------------------------
 /** System function ∩ (intersection) */
