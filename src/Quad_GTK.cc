@@ -422,7 +422,11 @@ again:
 
 pollfd pfd;
    pfd.fd = fd;
+#ifdef POLLRDHUP
    pfd.events = POLLIN | POLLRDHUP;
+#else
+   pfd.events = POLLIN;
+#endif
    pfd.revents = 0;
 
 const int ready = poll(&pfd, 1, 0);
