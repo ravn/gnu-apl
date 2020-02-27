@@ -62,20 +62,21 @@ public:
             }
       }
 
-   /// binary search of key in array)
+   /// binary search for \b key in \b array)
    template<typename K>
    static const T * search(const K & key, const T * array,
                            int64_t /* array size */ u,
-                           int (*compare)(const K & key, const T & item))
+                           int (*compare)(const K & key, const T & item,
+                                const void * comp_ctx), const void * ctx)
       {
         for (int64_t l = 0; l < u;)
            {
              const int64_t half = (l + u) / 2;
              const T * middle = &array[half];
-             const int comp = (*compare)(key, *middle);
-             if     (comp < 0)   u = half;
-            else if (comp > 0)   l = half + 1;
-             else                return middle;
+             const int comp = (*compare)(key, *middle, ctx);
+             if      (comp > 0)   l = half + 1;    // search in key upper half
+             else if (comp < 0)   u = half;        // search in key lower half
+             else                 return middle;   // key found
           }
 
         return 0;

@@ -135,14 +135,13 @@ bool
 Cell::compare_stable(const Cell * const & A, const Cell * const & B,
                   const void * unused_comp_arg)
 {
-   const Comp_result cr = A->compare(*B);
-   if (cr == COMP_EQ)   return A > B;
-   return cr == COMP_GT;
+   if (const Comp_result cr = A->compare(*B))   return cr == COMP_GT;
+   return A > B;
 }
 //-----------------------------------------------------------------------------
 bool
 Cell::compare_ptr(const Cell * const & A, const Cell * const & B,
-                  const void *)
+                  const void * unused_comp_arg)
 {
    return A > B;
 }
@@ -191,68 +190,56 @@ const APL_Float diff = value - result;
 }
 //-----------------------------------------------------------------------------
 bool
-Cell::greater_vec(const IntCell & Za, const IntCell & Zb, const void * comp_arg)
+Cell::greater_cp(const ShapeItem &  A, const ShapeItem & B, const void * ctx)
 {
-struct _ctx { const Cell * base;   ShapeItem comp_len; };
-const _ctx * ctx = reinterpret_cast<const _ctx *>(comp_arg);
-const Cell * ca = ctx->base + ctx->comp_len * Za.get_int_value();
-const Cell * cb = ctx->base + ctx->comp_len * Zb.get_int_value();
+const ravel_comp_len * rcl = reinterpret_cast<const ravel_comp_len *>(ctx);
+const Cell * cells = rcl->ravel;
+const ShapeItem comp_len = rcl->comp_len;
+const Cell * cell_A = cells + A * comp_len;
+const Cell * cell_B = cells + B * comp_len;
 
-const double qct = Workspace::get_CT();
+   loop(l, comp_len)
+       {
+         // compare() does not allow non-pointer vs, pointer (but allow
+         // vice versa). We therefore swap roles and negate the result.
+         //
+         if (cell_B->is_pointer_cell() && !cell_A->is_pointer_cell())
+            return false;
 
-   // most frequently comp_len is 1, so we optimize for this case.
-   //
-   if (ctx->comp_len == 1)
-      {
-        const bool equal = ca[0].equal(cb[0], qct);
-        if (equal)   return Za.get_int_value() > Zb.get_int_value();
-        const bool result = ca[0].greater(cb[0]);
-        return result;
-      }
-
-   loop(c, ctx->comp_len)
-      {
-        const bool equal = ca[c].equal(cb[c], qct);
-        if (equal)   continue;
-        const bool result = ca[c].greater(cb[c]);
-        return result;
-      }
-
-   return Za.get_int_value() > Zb.get_int_value();   // a and b are equal: sort by position
+         if (const Comp_result cr = cell_A++->compare(*cell_B++))
+            return cr == COMP_GT;
+       }
+   return A > B;
 }
 //-----------------------------------------------------------------------------
 bool
-Cell::smaller_vec(const IntCell & Za, const IntCell & Zb, const void * comp_arg)
+Cell::smaller_cp(const ShapeItem &  A, const ShapeItem & B,
+                 const void * ctx)
 {
-struct _ctx { const Cell * base;   ShapeItem comp_len; };
-const _ctx * ctx = reinterpret_cast<const _ctx *>(comp_arg);
-const Cell * ca = ctx->base + ctx->comp_len * Za.get_int_value();
-const Cell * cb = ctx->base + ctx->comp_len * Zb.get_int_value();
+const ravel_comp_len * rcl = reinterpret_cast<const ravel_comp_len *>(ctx);
+const Cell * cells = rcl->ravel;
+const ShapeItem comp_len = rcl->comp_len;
+const Cell * cell_A = cells + A * comp_len;
+const Cell * cell_B = cells + B * comp_len;
 
-const double qct = Workspace::get_CT();
+   loop(l, comp_len)
+       {
+         // compare() does not allow non-pointer vs, pointer (but allow
+         // vice versa). We therefore swap roles and negate the result.
+         //
+         if (cell_B->is_pointer_cell() && !cell_A->is_pointer_cell())
+            return true;
 
-   // most frequently comp_len is 1, so we optimize for this case.
+         if (const Comp_result cr = cell_A++->compare(*cell_B++))
+            return cr == COMP_LT;
+       }
+
+   // at this point all cells were equal
    //
-   if (ctx->comp_len == 1)
-      {
-        const bool equal = ca[0].equal(cb[0], qct);
-        if (equal)   return Za.get_int_value() > Zb.get_int_value();
-        const bool result = ca[0].greater(cb[0]);
-        return !result;
-      }
-
-   loop(c, ctx->comp_len)
-      {
-        const bool equal = ca[c].equal(cb[c], qct);
-        if (equal)   continue;
-        const bool result = ca[c].greater(cb[c]);
-        return !result;
-      }
-
-   return Za.get_int_value() > Zb.get_int_value();   // a and b are equal: sort by position
+   return A > B;
 }
 //-----------------------------------------------------------------------------
-ostream & 
+ostream &
 operator <<(ostream & out, const Cell & cell)
 {
 PrintBuffer pb = cell.character_representation(PR_BOXED_GRAPHIC);
@@ -302,5 +289,23 @@ ErrorCode
 Cell::bif_greater_eq(Cell * Z, const Cell * A) const
 {
    return IntCell::zv(Z, (A->compare(*this) != COMP_LT) ? 1 : 0);
+}
+//-----------------------------------------------------------------------------
+ShapeItem *
+Cell::sorted_indices(const Cell * ravel, ShapeItem length, Sort_order order,
+                     ShapeItem comp_len)
+{
+ShapeItem * indices = new ShapeItem[length];
+   if (indices == 0)   return indices;
+
+   // initialize indices with 0, 1, ... length-1
+   loop(l, length)   indices[l] = l;
+
+const ravel_comp_len ctx = { ravel, comp_len};
+   if (order == SORT_ASCENDING)
+      Heapsort<ShapeItem>::sort(indices, length, &ctx, &Cell::greater_cp);
+   else
+      Heapsort<ShapeItem>::sort(indices, length, &ctx, &Cell::smaller_cp);
+   return indices;
 }
 //-----------------------------------------------------------------------------

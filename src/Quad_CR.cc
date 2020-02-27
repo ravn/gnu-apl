@@ -678,7 +678,7 @@ const int level = shapes.size();
    result.append_UTF8("((⎕IO+");
    if (level == 2 && shapes[0].get_rank() > 1)   // need ⊂ for left ⊃ arg
       {
-         Shape sh = shapes[0].offset_to_index(indices[1]);
+         Shape sh = shapes[0].offset_to_index(indices[1], 0);
          result.append_UTF8("(⊂");
          result.append_shape(sh);
          result.append_UTF8(")");
@@ -688,7 +688,7 @@ const int level = shapes.size();
         loop(s, shapes.size() - 1)
            {
              if (s)   result.append_UTF8(" ");
-             Shape sh = shapes[s].offset_to_index(indices[s + 1]);
+             Shape sh = shapes[s].offset_to_index(indices[s + 1], 0);
              if (sh.get_rank() > 1)   result.append_UTF8("(");
              result.append_shape(sh);
              if (sh.get_rank() > 1)   result.append_UTF8(")");

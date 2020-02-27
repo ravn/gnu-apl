@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -552,16 +552,13 @@ public:
    /// return value if it is close to int, or else throw DOMAIN_ERROR
    static APL_Integer near_int(APL_Float value);
 
-   /// return \b ascending iff a > b
-   typedef bool (*greater_fun)(const Cell * a, const Cell * b,
-                               const void * comp_arg);
-   /// compare comp_len items ascendingly
-   static bool greater_vec(const IntCell & a, const IntCell & b,
-                           const void * arg);
+   /// compare cells[a] and cells[b] ascendingly
+   static bool greater_cp(const ShapeItem & a, const ShapeItem & b,
+                           const void * cells);
 
-   /// compare comp_len items descendingly
-   static bool smaller_vec(const IntCell & a, const IntCell & b,
-                           const void * arg);
+   /// compare cells[a] and cells[b] descendingly
+   static bool smaller_cp(const ShapeItem & a, const ShapeItem & b,
+                          const void * cells);
 
    /// raw pointer to the primary value (for 27 ⎕CR)
    const void * get_u0() const   { return &value.cval[0]; }
@@ -575,11 +572,17 @@ public:
    static bool compare_stable(const Cell * const & A, const Cell * const & B,
                        const void * comp_arg);
 
-   /// a stable compare function to be used with Heapsort. The cell content
-   /// is ignored and only the cell addresses are being compared. Return
+   /// a stable compare function to be used with Heapsort. The cell contents
+   /// are ignored and only the cell addresses are being compared. Return
    /// true iff &A > &B.
    static bool compare_ptr(const Cell * const & A, const Cell * const & B,
-                       const void * comp_arg);
+                          const void * comp_arg);
+
+   /// return \b length indices i1, i2, ... iN so that
+   /// ravel[i1] < ravel[i2] < ... < ravel[iN]. The indices are 0-based and
+   /// the caller must delete[] the result. Returns 0 on error (= WS FULL).
+   static ShapeItem * sorted_indices(const Cell * ravel, ShapeItem length,
+                                     Sort_order order, ShapeItem comp_len);
 
 protected:
    /// the primary value of \b this cell

@@ -2602,7 +2602,7 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 9     <strong>--or--</strong><br />
  Selected ← ⎕GTK[H_ID] "get_active"</p></td>
 <td align="center" valign="top"><p class="table">9</p></td>
-<td align="left" valign="top"><p class="table">return the selected item of a combo box (-1 for none)</p></td>
+<td align="left" valign="top"><p class="table">return the selected item of a combo box (-1 = none)</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">DrawCmd ⎕GTK[H_ID] 10     <strong>--or--</strong><br />
@@ -2620,13 +2620,25 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Origin ⎕GTK[H_ID] 12     <strong>--or--</strong><br />
  Origin ⎕GTK[H_ID] "set_Y_origin"</p></td>
 <td align="center" valign="top"><p class="table">12</p></td>
-<td align="left" valign="top"><p class="table">set the Y-origin to the top (1) or to the bottom (0)</p></td>
+<td align="left" valign="top"><p class="table">set the Y-origin to the top (1) or the bottom (0)</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 13     <strong>--or--</strong><br />
  Selected ← ⎕GTK[H_ID] "get_active_text"</p></td>
 <td align="center" valign="top"><p class="table">13</p></td>
 <td align="left" valign="top"><p class="table">return the selected text in a combo box text</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 14     <strong>--or--</strong><br />
+ Selected ← ⎕GTK[H_ID] "get_value"</p></td>
+<td align="center" valign="top"><p class="table">14</p></td>
+<td align="left" valign="top"><p class="table">return the current value</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 15     <strong>--or--</strong><br />
+ Selected ← ⎕GTK[H_ID] "get_value_as_int"</p></td>
+<td align="center" valign="top"><p class="table">15</p></td>
+<td align="left" valign="top"><p class="table">return the current value</p></td>
 </tr>
 </tbody>
 </table>
@@ -2825,7 +2837,7 @@ top-level group).</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-10-29 22:24:22 CET
+Last updated 2020-02-17 16:47:59 CET
 </div>
 </div>
 </body>

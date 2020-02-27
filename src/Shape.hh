@@ -210,7 +210,7 @@ public:
    ShapeItem ravel_pos(const Shape & idx) const;
 
    /// the inverse of \b ravel_pos()
-   Shape offset_to_index(ShapeItem offset) const;
+   Shape offset_to_index(ShapeItem offset, int quad_io) const;
 
 protected:
    /// the rank (number of valid shape items)

@@ -124,7 +124,7 @@ ShapeItem w = 1;
 }
 //-----------------------------------------------------------------------------
 Shape
-Shape::offset_to_index(ShapeItem offset) const
+Shape::offset_to_index(ShapeItem offset, int quad_io) const
 {
 Shape ret;
    ret.rho_rho = rho_rho;
@@ -138,7 +138,7 @@ Shape ret;
               continue;
             }
 
-         ret.rho[r] = offset % rho[r];
+         ret.rho[r] = quad_io + offset % rho[r];
          offset /= rho[r];
        }
 

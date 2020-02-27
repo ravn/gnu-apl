@@ -140,8 +140,8 @@ CollatingCache::find_entry(Unicode uni) const
 const CollatingCacheEntry * entries = &at(0);
 const CollatingCacheEntry * entry =
 
-   Heapsort<CollatingCacheEntry>:: search<Unicode>(uni, entries, size(),
-                                           CollatingCacheEntry::compare_chars);
+   Heapsort<CollatingCacheEntry>::search<Unicode>(uni, entries, size(),
+                                         CollatingCacheEntry::compare_chars, 0);
 
    if (entry)   return entry - entries;
    return size() - 1;   // the entry for characters not in A
@@ -155,29 +155,19 @@ Bif_F12_SORT::sort(Value_P B, Sort_order order)
 
 const ShapeItem len_BZ = B->get_shape_item(0);
    if (len_BZ == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));
-
 const ShapeItem comp_len = B->element_count()/len_BZ;
 
-   // first set Z←⍳len_BZ
-   //
-const int qio = Workspace::get_IO();
+const ShapeItem * indices = Cell::sorted_indices(&B->get_ravel(0),
+                                                 len_BZ, order, comp_len);
+   if (indices == 0)   WS_FULL;
+
 Value_P Z(len_BZ, LOC);
-   loop(l, len_BZ)   new (Z->next_ravel())   IntCell(l + qio);
+const int qio = Workspace::get_IO();
+
+   loop(a, len_BZ)   new (Z->next_ravel())   IntCell(indices[a] + qio);
+   delete[] indices;
+
    Z->check_value(LOC);
-   if (len_BZ == 1)   return Token(TOK_APL_VALUE1, Z);
-
-   // then sort Z (actually re-arrange Z so that B[Z] is sorted)
-   //
-const Cell * base = &B->get_ravel(0) - qio*comp_len;
-const struct { const Cell * base; ShapeItem comp_len; } ctx = { base, comp_len};
-
-   if (order == SORT_ASCENDING)
-      Heapsort<IntCell>::sort(&Z->get_ravel(0).vIntCell(),
-                              len_BZ, &ctx, &Cell::greater_vec);
-   else
-      Heapsort<IntCell>::sort(&Z->get_ravel(0).vIntCell(),
-                               len_BZ, &ctx, &Cell::smaller_vec);
-
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------

@@ -241,7 +241,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//=============================================================================
 Token
 Bif_F12_INDEX_OF::eval_B(Value_P B)
 {
@@ -303,47 +303,122 @@ Value_P Z(sh, LOC);
         Value_P ZZ(ec, LOC);
         loop(r, ec)   new (ZZ->next_ravel())   IntCell(0);
         ZZ->check_value(LOC);
-        new (&Z->get_ravel(0))   PointerCell(ZZ.get(), Z.getref());   // prototype
+        new (&Z->get_ravel(0))   PointerCell(ZZ.get(), Z.getref()); // prototype
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
+/// search elements of B in A. ⍴Z is ⍴B, and elements of Z are indices of A.
 Token
 Bif_F12_INDEX_OF::eval_AB(Value_P A, Value_P B)
 {
+   // A⍳B (aka. Index of)
+   //
+const bool simple_result = A->is_scalar_or_vector();
 const double qct = Workspace::get_CT();
 const APL_Integer qio = Workspace::get_IO();
 
-   // Index of
-   //
-   if (!A->is_scalar_or_vector())   RANK_ERROR;
-
-const uint64_t len_A  = A->element_count();
-const uint64_t len_BZ = B->element_count();
+const ShapeItem len_A  = A->element_count();
+const ShapeItem len_BZ = B->element_count();
 
 Value_P Z(B->get_shape(), LOC);
 
-   loop(bz, len_BZ)
-       {
-         const Cell & cell_B = B->get_ravel(bz);
-         APL_Integer z = len_A;   // assume cell_B is not in A
-         loop(a, len_A)
-             {
-               if (cell_B.equal(A->get_ravel(a), qct))
-                  {
-                    z = a;
-                    break;
-                  }
-             }
-         new (Z->next_ravel()) IntCell(qio + z);
-       }
+#if 1
+   // ⎕RL←42 ◊ D←?100 100⍴100 ◊ T←⎕FIO ¯1 ◊ ⊣(⍳100) ⍳ D ◊ -T-⎕FIO ¯1
+
+   if (len_A >= 64 && len_BZ > 5)
+      {
+        // array A is being searched len_BZ times. We therefore reduce the
+        // per-item search time from O(len_A) to O(log(len_A)). That costs us
+        // O(len_A × log(len_A)) for sorting A, but hopefully pays off if
+        // len_BZ > log(len_A).
+        //
+        // We don't do that for too small A though, as to compensate for the
+        // start-up cost of the sorting.
+        //
+        const ShapeItem * Idx_A = Cell::sorted_indices(&A->get_ravel(0), len_A,
+                                                       SORT_ASCENDING, 1);
+        loop(bz, len_BZ)
+            {
+              const APL_Integer z = find_B_in_sorted_A(&A->get_ravel(0),
+                                                       len_A, Idx_A,
+                                                       B->get_ravel(bz), qct);
+
+              if (simple_result)   new (Z->next_ravel()) IntCell(qio + z);
+              else if (z == len_A)   // not found: set result item to ⍬
+                 {
+                   Value_P zilde(ShapeItem(0), LOC);
+                   new (Z->next_ravel()) PointerCell(zilde.get(), Z.getref());
+                 }
+              else                   // element found (first at z (+⎕IO)
+                 {
+                   const Shape Sz = A->get_shape().offset_to_index(z, qio);
+                   Value_P Vz(LOC, &Sz);
+                   new (Z->next_ravel()) PointerCell(Vz.get(), Z.getref());
+                 }
+            }
+        delete[] Idx_A;
+      }
+   else
+#endif
+      {
+        loop(bz, len_BZ)
+            {
+              const APL_Integer z = find_B_in_A(&A->get_ravel(0), len_A,
+                                                B->get_ravel(bz), qct);
+
+              if (simple_result)   new (Z->next_ravel()) IntCell(qio + z);
+              else if (z == len_A)   // not found: set result item to ⍬
+                 {
+                   Value_P zilde(ShapeItem(0), LOC);
+                   new (Z->next_ravel()) PointerCell(zilde.get(), Z.getref());
+                 }
+              else                   // element found (first at z (+⎕IO)
+                 {
+                   const Shape Sz = A->get_shape().offset_to_index(z, qio);
+                   Value_P Vz(LOC, &Sz);
+                   new (Z->next_ravel()) PointerCell(Vz.get(), Z.getref());
+                 }
+            }
+      }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
+int
+Bif_F12_INDEX_OF::bs_cmp(const Cell & cell, const ShapeItem & A, const void * ctx)
+{
+const Cell * cells_A = reinterpret_cast<const Cell *>(ctx);
+const Cell & cell_A = cells_A[A];
+
+   if (cell_A.is_pointer_cell() && !cell.is_pointer_cell())   return COMP_LT;
+   return cell.compare(cell_A);
+}
+//-----------------------------------------------------------------------------
+ShapeItem
+Bif_F12_INDEX_OF::find_B_in_sorted_A(const Cell * A, ShapeItem len_A,
+                                     const ShapeItem * Idx_A,
+                                     const Cell & cell_B, double qct)
+{
+const ShapeItem * posp = Heapsort<ShapeItem>::search<const Cell &>(
+                                cell_B, Idx_A, len_A, &bs_cmp, A);
+   if (posp)
+      {
+        ShapeItem pos = Idx_A[*posp];   // A[pos] = cell_B within qct
+
+        // A[pos] = cell_B, but there could be predecessors of pos that also
+        // satisfy A[pos] = cell_B. Decrease pos as long as much as possible.
+        //
+        while (pos > 0 && cell_B.equal(A[pos - 1], qct))   --pos;
+        return pos;
+      }
+
+   return len_A;   // cell_B was not found in ravel A
+}
+//=============================================================================
 Token
 Bif_COMMA::ravel(const Shape & new_shape, Value_P B)
 {

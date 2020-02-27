@@ -75,7 +75,8 @@ struct CollatingCacheEntry
 
    /// compare \b key with \b entry (for Heapsort::search())
    static int compare_chars(const Unicode & key,
-                            const CollatingCacheEntry & entry)
+                            const CollatingCacheEntry & entry,
+                            const void * unused_ctx)
       { return key - entry.ce_char; }
 };
 //-----------------------------------------------------------------------------

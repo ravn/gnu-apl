@@ -82,7 +82,7 @@ Backtrace::open_lines_file()
 
 struct stat st;
    if (stat("apl2", &st))   return;   // stat apl2 failed
- 
+
 const time_t apl2_time = st.st_mtime;
 
 const int fd = open("apl2.lines", O_RDONLY);

@@ -99,6 +99,7 @@ typedef int64_t APL_time_us;
 
 class Symbol;
 class Value;
+class Cell;
 
 //////////////////////////////////////////////////////////////
 // B. enums            i                                    //
@@ -592,6 +593,17 @@ struct _ftwc : public _twc
    /// the start index (inclusive) for each axis. It can be < 0 for
    /// over-Take from the end.
    ShapeItem from;
+};
+//-----------------------------------------------------------------------------
+/// the ravel (of an APL value) and a comparison lenght (= number of
+/// consecutive cells to be compared)
+struct ravel_comp_len
+{
+   /// the ravel (first Cell of some Value)
+   const Cell * ravel;
+
+   /// the number of consecutive Cells to be compared
+   ShapeItem comp_len;
 };
 //-----------------------------------------------------------------------------
 
