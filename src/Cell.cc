@@ -200,21 +200,17 @@ const Cell * cell_B = cells + B * comp_len;
 
    loop(l, comp_len)
        {
-         // compare() does not allow non-pointer vs, pointer (but allow
-         // vice versa). We therefore swap roles and negate the result.
-         //
-         if (cell_B->is_pointer_cell() && !cell_A->is_pointer_cell())
-            return false;
-
          if (const Comp_result cr = cell_A++->compare(*cell_B++))
             return cr == COMP_GT;
        }
+
+   // at this point all cells were equal
+   //
    return A > B;
 }
 //-----------------------------------------------------------------------------
 bool
-Cell::smaller_cp(const ShapeItem &  A, const ShapeItem & B,
-                 const void * ctx)
+Cell::smaller_cp(const ShapeItem &  A, const ShapeItem & B, const void * ctx)
 {
 const ravel_comp_len * rcl = reinterpret_cast<const ravel_comp_len *>(ctx);
 const Cell * cells = rcl->ravel;
@@ -224,12 +220,6 @@ const Cell * cell_B = cells + B * comp_len;
 
    loop(l, comp_len)
        {
-         // compare() does not allow non-pointer vs, pointer (but allow
-         // vice versa). We therefore swap roles and negate the result.
-         //
-         if (cell_B->is_pointer_cell() && !cell_A->is_pointer_cell())
-            return true;
-
          if (const Comp_result cr = cell_A++->compare(*cell_B++))
             return cr == COMP_LT;
        }

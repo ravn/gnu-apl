@@ -38,6 +38,7 @@
 #endif
 
 #include "Backtrace.hh"
+#include "makefile.h"
 
 using namespace std;
 
@@ -47,27 +48,25 @@ Backtrace::_lines_status
 std::vector<Backtrace::PC_src> Backtrace::pc_2_src;
 
 //-----------------------------------------------------------------------------
+int
+Backtrace::pc_cmp(const int64_t & key, const PC_src & pc_src, const void *)
+{
+   return key - pc_src.pc;
+}
+//-----------------------------------------------------------------------------
 const char *
 Backtrace::find_src(int64_t pc)
 {
-int pos = 0;
-int len = pc_2_src.size();
+   if (pc == -1LL)   return 0;   // no pc
 
-   if (len == 0)          return 0;   // database not set up.
-   if (pc == -1LL)        return 0;   // no pc
-
-   while (len > 1)
+   if (pc_2_src.size())   // database was properly set up.
       {
-        const int low_len = len/2;
-        const int middle = pos + low_len;
-        const int64_t middle_pc = pc_2_src[middle].pc;
-
-        if      (pc < middle_pc)   {               len = low_len;  }
-        else if (pc > middle_pc)   { pos = middle; len -= low_len; }
-        else                       { pos = middle;   break;        }
+        if (const PC_src * posp = Heapsort<Backtrace::PC_src>
+                           ::search<const int64_t &>(pc, pc_2_src, &pc_cmp, 0))
+        return posp->src_loc;   // found
       }
 
-   return pc_2_src[pos].src_loc;
+   return 0;   // not found
 }
 //-----------------------------------------------------------------------------
 void
@@ -76,33 +75,37 @@ Backtrace::open_lines_file()
    if (lines_status != LINES_not_checked)   return;
 
    // we are here for the first time.
-   // Assume that apl2.lines is outdated until proven otherwise.
+   // Assume that apl.lines is outdated until proven otherwise.
    //
    lines_status = LINES_outdated;
 
 struct stat st;
-   if (stat("apl2", &st))   return;   // stat apl2 failed
+   if (stat("apl", &st))   return;   // stat apl failed
 
-const time_t apl2_time = st.st_mtime;
+const time_t apl_time = st.st_mtime;
 
-const int fd = open("apl2.lines", O_RDONLY);
+const int fd = open("apl.lines", O_RDONLY);
    if (fd == -1)   return;
 
-   if (fstat(fd, &st))   // stat apl2.lines failed
+   if (fstat(fd, &st))   // stat apl.lines failed
       {
         close(fd);
         return;
       }
 
-const time_t apl2_lines_time = st.st_mtime;
+const time_t apl_lines_time = st.st_mtime;
 
-   if (apl2_lines_time < apl2_time)
+   if (apl_lines_time < apl_time)
       {
+#ifndef Makefile__srcdir
+# define Makefile__srcdir "src"
+#endif
         close(fd);
-        cerr << endl
-             << "Cannot show line numbers, since apl2.lines is older "
-                "than apl2." << endl
-             << "Run 'make apl2.lines' to fix this" << endl;
+        get_CERR() << endl
+                   << "Cannot show line numbers, since apl.lines is older "
+                      "than apl." << endl
+                   << "Consider running 'make apl.lines' in directory " << endl
+                   << Makefile__srcdir " to fix this" << endl;
         return;
       }
 
@@ -144,7 +147,7 @@ int64_t prev_pc = -1LL;
                  {
                    if (pc < prev_pc)
                       {
-                         assert(0 && "apl2.lines not ordered by PC");
+                         assert(0 && "apl.lines not ordered by PC");
                          break;
                       }
 

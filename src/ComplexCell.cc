@@ -847,7 +847,8 @@ const Comp_result comp = compare(other);
 Comp_result
 ComplexCell::compare(const Cell & other) const
 {
-   if (other.is_character_cell())   return COMP_GT;
+   if (other.is_character_cell())   return COMP_GT;   // numeric > char
+   if (other.is_pointer_cell())     return COMP_LT;   // numeric < nested
    if (!other.is_numeric())   DOMAIN_ERROR;
 
 const double qct = Workspace::get_CT();

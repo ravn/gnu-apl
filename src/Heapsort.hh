@@ -23,6 +23,8 @@
 
 #include <stdint.h>
 
+#include <vector>
+
 /// heapsort an array of items of type \b T
 template<typename T>
 class Heapsort
@@ -62,7 +64,14 @@ public:
             }
       }
 
-   /// binary search for \b key in \b array)
+   /** binary search for \b key (of type K) in \b array of type T). The
+       key is typically a member of T. If K is, say, integer and T is
+       sorted ascendingly then compare() might be:
+
+      int compare(const int & key, const T & t, const void *)
+         { return key - t.key; }   // return > 0 if key is above t.
+    **/
+
    template<typename K>
    static const T * search(const K & key, const T * array,
                            int64_t /* array size */ u,
@@ -80,6 +89,16 @@ public:
           }
 
         return 0;
+      }
+
+   /// binary search for \b key (of type K) in vector \b vec of type T). The
+   /// key is typically a member of T.
+   template<typename K>
+   static const T * search(const K & key, std::vector<T> & vec,
+                           int (*compare)(const K & key, const T & item,
+                                const void * comp_ctx), const void * ctx)
+      {
+        return search<K>(key, &vec[0], vec.size(), compare, ctx);
       }
 
 protected:

@@ -104,16 +104,10 @@ PointerCell::greater(const Cell & other) const
 Comp_result
 PointerCell::compare(const Cell & other) const
 {
-   switch(other.get_cell_type())
-      {
-        case CT_CHAR:
-        case CT_INT:
-        case CT_FLOAT:
-        case CT_COMPLEX: return COMP_GT;
-        case CT_POINTER: break;   // continue below
-        case CT_CELLREF: DOMAIN_ERROR;
-        default:         Assert(0 && "Bad celltype");
-      }
+   if (other.get_cell_type() & CT_SIMPLE)   // nested > numeric > char
+      return COMP_GT;
+
+   if (other.get_cell_type() != CT_POINTER)   DOMAIN_ERROR;
 
    // at this point both cells are pointer cells.
    //
@@ -122,15 +116,17 @@ Value_P v2 = other.get_pointer_value();
 
    // compare ranks
    //
-   if (v1->get_rank() > v2->get_rank())   return COMP_GT;
-   if (v1->get_rank() < v2->get_rank())   return COMP_LT;
+   if (v1->get_rank() != v2->get_rank())   // ranks differ
+      return v1->get_rank() > v2->get_rank() ? COMP_GT : COMP_LT;
 
    // same rank, compare shapes
    //
    loop(r, v1->get_rank())
       {
-        if (v1->get_shape_item(r) > v2->get_shape_item(r))   return COMP_GT;
-        if (v1->get_shape_item(r) < v2->get_shape_item(r))   return COMP_LT;
+        const ShapeItem axis1 = v1->get_shape_item(r);
+        const ShapeItem axis2 = v2->get_shape_item(r);
+        if (axis1 != axis2)   // axis r differs
+           return axis1 > axis2 ? COMP_GT : COMP_LT;
       }
 
    // same rank and shape, compare ravel
@@ -139,9 +135,7 @@ const Cell * C1 = &v1->get_ravel(0);
 const Cell * C2 = &v2->get_ravel(0);
    loop(e, v1->nz_element_count())
       {
-        const Comp_result comp = C1++->compare(*C2++);
-        if (comp == COMP_GT)   return  COMP_GT;
-        if (comp == COMP_LT)   return  COMP_LT;
+        if (const Comp_result comp = C1++->compare(*C2++))   return  comp;
       }
 
    // everthing equal

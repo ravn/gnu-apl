@@ -91,8 +91,13 @@ CharCell::equal(const Cell & other, double qct) const
 Comp_result
 CharCell::compare(const Cell & other) const
 {
-   if (other.get_char_value() == value.aval)  return COMP_EQ;
-   return (value.aval < other.get_char_value()) ? COMP_LT : COMP_GT;
+   if (other.is_character_cell())
+      {
+        if (other.get_char_value() == value.aval)  return COMP_EQ;
+        return (value.aval < other.get_char_value()) ? COMP_LT : COMP_GT;
+      }
+
+   return COMP_LT;   // char < everything else
 }
 //-----------------------------------------------------------------------------
 bool

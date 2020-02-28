@@ -858,6 +858,8 @@ IntCell::compare(const Cell & other) const
         return Comp_result(-other.compare(*this));
       }
 
+   if (other.is_character_cell())   return COMP_GT;   // numeric > char
+   if (other.is_pointer_cell())     return COMP_LT;   // numeric < nested
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
