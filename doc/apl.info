@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-February 23, 2020
+March 1, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -713,12 +713,13 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.23::  ⎕FIO  - File I/O Functions
 * Section 3.24::  ⎕FFT  - Fast Fourier Transform
 * Section 3.25::  ⎕GTK  - GTK Interface
-* Section 3.26::  ⎕PLOT - Plot Data
-* Section 3.27::  ⎕PS   - Print Style
-* Section 3.28::  ⎕RE   - Regular Expressions
-* Section 3.29::  ⎕SQL  - SQL Database Interface
-* Section 3.30::  ⎕SI   - State Indicator
-* Section 3.31::  ⎕SYL  - System limits
+* Section 3.26::  ⎕MAP  - Map Value
+* Section 3.27::  ⎕PLOT - Plot Data
+* Section 3.28::  ⎕PS   - Print Style
+* Section 3.29::  ⎕RE   - Regular Expressions
+* Section 3.30::  ⎕SQL  - SQL Database Interface
+* Section 3.31::  ⎕SI   - State Indicator
+* Section 3.32::  ⎕SYL  - System limits
 
 There are a few possibly useful features in GNU APL:
 
@@ -2584,7 +2585,53 @@ HOWTOs/Quad-GTK.html.
 
 File: apl.info,  Node: Section 3.26,  Next: Section 3.27,  Prev: Section 3.25,  Up: Chapter 3
 
-3.26 ⎕PLOT - Plot Data
+3.26 ⎕MAP - Map Value
+=====================
+
+⎕MAP changes the ravel items of its right argument according to a
+mapping table provided as its left argument.  Let Z←A ⎕MAP B.
+
+   The left argument A of ⎕MAP must be a N×2 matrix.  Each 2-element row
+of A specifies a separate mapping.  That is, the elements of B which are
+found in B[;1] are replaced by the corresponding element in B[;2].  The
+shape of the result Z is the shape of the right argument B.
+
+   Example:
+
+      ⍝ the map A
+      ⊢A←5 2⍴'eEwWaAzZ92'
+eE    ⍝ map 'e' → 'E'
+wW    ⍝ map 'w' → 'W'
+aA    ⍝ map 'a' → 'A'
+zZ    ⍝ map 'z' → 'Z'
+92    ⍝ map '9' → '2'
+
+      ⍝ the value B being mapped
+      ⊢B←'Halloween'
+Halloween
+
+      ⍝ the result of A ⎕MAP B
+      A ⎕MAP B
+HAlloWEEn
+
+
+   NOTES:
+
+   • The keys of mapping A (i.e.  the elements in column A[;1]) must be
+     unique.  If they are not then the mapping is ambiguous and a DOMAIN
+     ERROR is raised.
+
+   • If a key is nested then it must match an equal nested item in B,
+     and the matched nested key is being replaced.  Likewise if the
+     result of a match is nested it replaces the matched item.
+     Depending of the depths of mappings in A ⎕MAP it is possible that
+     (≡Z) ≠ (≡B). That is, ⎕MAP conservres the shape but not the depth
+     of the mapped value.
+
+
+File: apl.info,  Node: Section 3.27,  Next: Section 3.28,  Prev: Section 3.26,  Up: Chapter 3
+
+3.27 ⎕PLOT - Plot Data
 ======================
 
 ⎕PLOT is a function for visualizing numerical APL values.  The values to
@@ -2603,7 +2650,7 @@ window size, colors for lines and grids, etc.
    ⎕PLOT ¯2      ⍝ verbosity: DEBUG (also print debug information)
    ⎕PLOT ¯3      ⍝ close all plot windows
 
-3.26.1 The Plot Data B
+3.27.1 The Plot Data B
 ----------------------
 
 The Plot Data B can be a vector (in that case a single plot line is
@@ -2616,7 +2663,7 @@ However, all colors used, all diameters of points, and all thicknesses
 of the lines can be controlled by overriding the default values (dyadic
 A ⎕PLOT B).
 
-3.26.1.1 Complex Plot Data
+3.27.1.1 Complex Plot Data
 ..........................
 
 If a data item B[N] or B[row;N] is complex, say B[N] = x + iy.  then it
@@ -2639,7 +2686,7 @@ document; in text mode see file doc/PLOT_circle.png):
 
  [image src="PLOT_circle.png" ]
 
-3.26.1.2 Real Plot Data
+3.27.1.2 Real Plot Data
 .......................
 
 On the other hand, if a data item B[N] or B[row;N] is real, then it is
@@ -2664,7 +2711,7 @@ document; in text mode see file doc/PLOT_zigzag.png):
 
  [image src="PLOT_zigzag.png" ]
 
-3.26.2 The Plot Attributes A
+3.27.2 The Plot Attributes A
 ----------------------------
 
 As can be displayed by ⎕PLOT "" there is quite a number of attributes
@@ -2730,7 +2777,7 @@ legend_name-1: Random Row 2
                     """
       Attributes ⎕PLOT Data
 
-3.26.3 Plot Window Handling
+3.27.3 Plot Window Handling
 ---------------------------
 
 Each call of ⎕PLOT with some plot data B opens a separate window in the
@@ -2744,9 +2791,9 @@ the top left of the window) and selecting the option named "Close", or *
 from APL by calling
 
 
-File: apl.info,  Node: Section 3.27,  Next: Section 3.28,  Prev: Section 3.26,  Up: Chapter 3
+File: apl.info,  Node: Section 3.28,  Next: Section 3.29,  Prev: Section 3.27,  Up: Chapter 3
 
-3.27 ⎕PS - Print Style
+3.28 ⎕PS - Print Style
 ======================
 
 ⎕PS is an integer vector that currently (read: SVN 982) contains two
@@ -2772,9 +2819,9 @@ uses the same values.
 value to ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-File: apl.info,  Node: Section 3.28,  Next: Section 3.29,  Prev: Section 3.27,  Up: Chapter 3
+File: apl.info,  Node: Section 3.29,  Next: Section 3.30,  Prev: Section 3.28,  Up: Chapter 3
 
-3.28 ⎕RE - Regular Expressions
+3.29 ⎕RE - Regular Expressions
 ==============================
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is
@@ -2782,7 +2829,7 @@ a powerful regular expression matching library.  "pcre" is an acronym
 for "Perl compatible regular expressions".  libpcre2 is Copyright (c)
 1997-2017 University of Cambridge, England.
 
-3.28.1 Preconditions
+3.29.1 Preconditions
 --------------------
 
 libpcre2 is NOT shipped with GNU APL but must be installed before the
@@ -2793,7 +2840,7 @@ are found.
    If ./configure does not find libpcre2, then ⎕RE will raise a SYNTAX
 ERROR when ⎕RE is used in an APL program.
 
-3.28.2 Syntax
+3.29.2 Syntax
 -------------
 
 ⎕RE has two forms.  The short form (without an axis argument) is
@@ -2810,7 +2857,7 @@ Z ← A ⎕RE[X] B   (long form, with axis X)
    It therefore suffices to explain the long form.  The long form has 3
 different arguments A, B, and X.
 
-3.28.3 The Regular Expression A
+3.29.3 The Regular Expression A
 -------------------------------
 
 A is a simple character vector which is expected to be a regular
@@ -2824,7 +2871,7 @@ user of ⎕RE is referred to the description that comes with libpcre2.
 
    man pcre2pattern
 
-3.28.4 The String(s) B Being Matched
+3.29.4 The String(s) B Being Matched
 ------------------------------------
 
 B is either (1) a simple character vector (which is then also passed
@@ -2853,7 +2900,7 @@ character vector.
    Any string B that is passed to libpcre2 is called "Subject" in the
 libpcre2 documentation.
 
-3.28.5 The Flags X
+3.29.5 The Flags X
 ------------------
 
 Without any flags (or with an empty flag string X) ⎕RE returns the first
@@ -2865,7 +2912,7 @@ The different flag characters are either flags understood by (and then
 passed unmodified to) libpcre2 or flags understood by ⎕RE itself (and
 then not passed to libpcre2).
 
-3.28.5.1 libpcre2 flags: i, m, s, and x
+3.29.5.1 libpcre2 flags: i, m, s, and x
 .......................................
 
 The libpcre2 flags accepted by ⎕RE are: i, m, s, and x.  They correspond
@@ -2879,7 +2926,7 @@ to the following libpcre2 flags:
    Please also consult the libpcre2 documentation for a description of
 these flags.
 
-3.28.5.2 The APL output format flags ↓, ⊂, and /
+3.29.5.2 The APL output format flags ↓, ⊂, and /
 ................................................
 
 ⎕RE provides different output formats, some of which are tailored to
@@ -2929,7 +2976,7 @@ flags:
 formats ⊂ and / are identical; if ’g’ is present, however, then they may
 differ.
 
-3.28.5.3 the ⎕RE global flag g
+3.29.5.3 the ⎕RE global flag g
 ..............................
 
 The default behavior of ⎕RE is to return only the first match in B. The
@@ -2979,7 +3026,7 @@ The default behavior of ⎕RE is to return only the first match in B. The
 the output formats string and position/length, but not of the result of
 output formats partition and compress.
 
-3.28.5.4 the ⎕RE error flag E
+3.29.5.4 the ⎕RE error flag E
 .............................
 
 The default behavior of ⎕RE is to return an empty result if no match of
@@ -3004,7 +3051,7 @@ that case it is natural to check the length of the result:
        'g..' ⎕RE['Eg'] '__foo___fun____fox'
 
 
-3.28.6 Complex Matches
+3.29.6 Complex Matches
 ----------------------
 
 The regular expressions considered so far were simple, which means that
@@ -3072,9 +3119,9 @@ two 1-character sub-matches:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 
-File: apl.info,  Node: Section 3.29,  Next: Section 3.30,  Prev: Section 3.28,  Up: Chapter 3
+File: apl.info,  Node: Section 3.30,  Next: Section 3.31,  Prev: Section 3.29,  Up: Chapter 3
 
-3.29 ⎕SQL - SQL Database Interface
+3.30 ⎕SQL - SQL Database Interface
 ==================================
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -3171,9 +3218,9 @@ table.  Currently, the column layout is as follows:
 release.
 
 
-File: apl.info,  Node: Section 3.30,  Next: Section 3.31,  Prev: Section 3.29,  Up: Chapter 3
+File: apl.info,  Node: Section 3.31,  Next: Section 3.32,  Prev: Section 3.30,  Up: Chapter 3
 
-3.30 ⎕SI - State Indicator
+3.31 ⎕SI - State Indicator
 ==========================
 
 ⎕SI returns aspects of the current State Indicator, similar to the
@@ -3237,9 +3284,9 @@ while negative A count from the latest to the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 3.31,  Prev: Section 3.30,  Up: Chapter 3
+File: apl.info,  Node: Section 3.32,  Prev: Section 3.31,  Up: Chapter 3
 
-3.31 ⎕SYL - System limits
+3.32 ⎕SYL - System limits
 =========================
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -3277,7 +3324,7 @@ result in a SYNTAX ERROR. Indexed assignment to ⎕SYL will result in an
 INDEX ERROR unless the limit is writable.  Some read-only limits can be
 changed at compile-time via ./configure
 
-3.31.1 ⎕SYL[1 2 3 4 5 6;]
+3.32.1 ⎕SYL[1 2 3 4 5 6;]
 -------------------------
 
 The first three limits are writable; their purpose is to stop execution
@@ -3309,20 +3356,20 @@ bytes limits together.
    An attempt to set a too small limit, for example one that is close to
 the current value, is rejected with a DOMAIN ERROR.
 
-3.31.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
+3.32.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
 -------------------------------------------------------------
 
 These system limits are read-only.  Some of them can be changed at
 compile time via ./configure.  Most others can be changed in the source
 code of GNU APL, but doing so is not recommended.
 
-3.31.3 ⎕SYL[24 25 26;]
+3.32.3 ⎕SYL[24 25 26;]
 ----------------------
 
 These system limits have been added in preparation of multi-core GNU
 APL. They are currently not used.
 
-3.31.4 ⎕SYL[27;]
+3.32.4 ⎕SYL[27;]
 ----------------
 
 This is not a limit that raises a limit error.  Instead it limits the
@@ -4834,57 +4881,58 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11473
-Node: Chapter 219506
-Node: Chapter 323930
-Node: Section 3.125489
-Node: Section 3.241501
-Node: Section 3.342260
-Node: Section 3.443547
-Node: Section 3.546168
-Node: Section 3.646341
-Node: Section 3.746954
-Node: Section 3.850898
-Node: Section 3.952440
-Node: Section 3.1053037
-Node: Section 3.1154821
-Node: Section 3.1256761
-Node: Section 3.1357702
-Node: Section 3.1457954
-Node: Section 3.1559350
-Node: Section 3.1661862
-Node: Section 3.1768561
-Node: Section 3.1869998
-Node: Section 3.1975032
-Node: Section 3.2078313
-Node: Section 3.2178604
-Node: Section 3.2288516
-Node: Section 3.2388788
-Node: Section 3.2495366
-Node: Section 3.2597817
-Node: Section 3.2698486
-Node: Section 3.27105169
-Node: Section 3.28106109
-Node: Section 3.29119671
-Node: Section 3.30122775
-Node: Section 3.31124764
-Node: Chapter 4129142
-Node: Chapter 5130890
-Node: Chapter 6132019
-Node: Section 6.1133556
-Node: Section 6.2134801
-Node: Section 6.3135161
-Node: Section 6.4135403
-Node: Section 6.5136065
-Node: Section 6.6136543
-Node: Section 6.7137315
-Node: Section 6.8137772
-Node: Chapter 7138174
-Node: Section 7.1138593
-Node: Section 7.2139280
-Node: Chapter 8140111
-Node: Section 8.1140614
-Node: Section 8.2165924
+Node: Chapter 11469
+Node: Chapter 219502
+Node: Chapter 323926
+Node: Section 3.125523
+Node: Section 3.241535
+Node: Section 3.342294
+Node: Section 3.443581
+Node: Section 3.546202
+Node: Section 3.646375
+Node: Section 3.746988
+Node: Section 3.850932
+Node: Section 3.952474
+Node: Section 3.1053071
+Node: Section 3.1154855
+Node: Section 3.1256795
+Node: Section 3.1357736
+Node: Section 3.1457988
+Node: Section 3.1559384
+Node: Section 3.1661896
+Node: Section 3.1768595
+Node: Section 3.1870032
+Node: Section 3.1975066
+Node: Section 3.2078347
+Node: Section 3.2178638
+Node: Section 3.2288550
+Node: Section 3.2388822
+Node: Section 3.2495400
+Node: Section 3.2597851
+Node: Section 3.2698520
+Node: Section 3.2799975
+Node: Section 3.28106658
+Node: Section 3.29107598
+Node: Section 3.30121160
+Node: Section 3.31124264
+Node: Section 3.32126253
+Node: Chapter 4130631
+Node: Chapter 5132379
+Node: Chapter 6133508
+Node: Section 6.1135045
+Node: Section 6.2136290
+Node: Section 6.3136650
+Node: Section 6.4136892
+Node: Section 6.5137554
+Node: Section 6.6138032
+Node: Section 6.7138804
+Node: Section 6.8139261
+Node: Chapter 7139663
+Node: Section 7.1140082
+Node: Section 7.2140769
+Node: Chapter 8141600
+Node: Section 8.1142103
+Node: Section 8.2167413
 
 End Tag Table
 

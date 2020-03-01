@@ -584,6 +584,8 @@ Nabla::open_existing_function()
       UERR << "opening existing function '" << fun_symbol->get_name()
            << "'" << endl;
 
+   if (const char * why = fun_symbol->cant_be_defined())   return why;
+
    // this function must only be called when editing functions interactively
    //
    if (InputFile::running_script())

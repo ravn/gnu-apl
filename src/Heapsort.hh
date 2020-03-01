@@ -73,10 +73,12 @@ public:
     **/
 
    template<typename K>
-   static const T * search(const K & key, const T * array,
+   static const T * search(const K & key,
+                           const T * array,
                            int64_t /* array size */ u,
                            int (*compare)(const K & key, const T & item,
-                                const void * comp_ctx), const void * ctx)
+                                                         const void * comp_ctx),
+                           const void * ctx)
       {
         for (int64_t l = 0; l < u;)
            {

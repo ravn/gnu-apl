@@ -777,12 +777,13 @@ between GNU APL and IBM APL2.
 * Section 3.23::  ⎕FIO  - File I/O Functions
 * Section 3.24::  ⎕FFT  - Fast Fourier Transform
 * Section 3.25::  ⎕GTK  - GTK Interface
-* Section 3.26::  ⎕PLOT - Plot Data
-* Section 3.27::  ⎕PS   - Print Style
-* Section 3.28::  ⎕RE   - Regular Expressions
-* Section 3.29::  ⎕SQL  - SQL Database Interface
-* Section 3.30::  ⎕SI   - State Indicator
-* Section 3.31::  ⎕SYL  - System limits
+* Section 3.26::  ⎕MAP  - Map Value
+* Section 3.27::  ⎕PLOT - Plot Data
+* Section 3.28::  ⎕PS   - Print Style
+* Section 3.29::  ⎕RE   - Regular Expressions
+* Section 3.30::  ⎕SQL  - SQL Database Interface
+* Section 3.31::  ⎕SI   - State Indicator
+* Section 3.32::  ⎕SYL  - System limits
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -2662,6 +2663,55 @@ and has therefore been put into a separate document.
 See: @b{HOWTOs/Quad-GTK.html}.
 
 @node    Section 3.26
+@section ⎕MAP  - Map Value
+
+⎕MAP changes the ravel items of its right argument according to a mapping
+table provided as its left argument. Let Z←A ⎕MAP B.
+
+The left argument A of ⎕MAP must be a N×2 matrix. Each 2-element row of
+A specifies a separate mapping. That is, the elements of B which are found
+in B[;1] are replaced by the corresponding element in B[;2]. The shape of
+the result Z is the shape of the right argument B.
+
+Example:
+
+@verbatim
+      ⍝ the map A
+      ⊢A←5 2⍴'eEwWaAzZ92'
+eE    ⍝ map 'e' → 'E'
+wW    ⍝ map 'w' → 'W'
+aA    ⍝ map 'a' → 'A'
+zZ    ⍝ map 'z' → 'Z'
+92    ⍝ map '9' → '2'
+
+      ⍝ the value B being mapped
+      ⊢B←'Halloween'
+Halloween
+
+      ⍝ the result of A ⎕MAP B
+      A ⎕MAP B
+HAlloWEEn
+
+@end verbatim
+
+NOTES:
+@itemize @bullet
+
+@item
+The keys of mapping A (i.e. the elements in column A[;1]) must be
+unique. If they are not then the mapping is ambiguous and a DOMAIN ERROR
+is raised.
+
+@item
+If a key is nested then it must match an equal nested item in B,
+and the matched nested key is being replaced. Likewise if the result of
+a match is nested it replaces the matched item. Depending of the depths
+of mappings in A ⎕MAP it is possible that (≡Z) ≠ (≡B). That is, ⎕MAP
+conservres the shape but not the depth of the mapped value.
+
+@end itemize
+
+@node    Section 3.27
 @section ⎕PLOT - Plot Data
 
 ⎕PLOT is a function for visualizing numerical APL values. The values to be
@@ -2827,7 +2877,7 @@ thread until it is being closed. A window can be closed in different ways:
   window) and selecting the option named "Close", or
 * from APL by calling 
 
-@node    Section 3.27
+@node    Section 3.28
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: SVN 982) contains two integers
@@ -2852,7 +2902,7 @@ Note: For compatibility with older workspaces, Assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-@node    Section 3.28
+@node    Section 3.29
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -3154,7 +3204,7 @@ The same for the pos+len output format:
 
 
 
-@node    Section 3.29
+@node    Section 3.30
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -3274,7 +3324,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 3.30
+@node    Section 3.31
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -3338,7 +3388,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 3.31
+@node    Section 3.32
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:

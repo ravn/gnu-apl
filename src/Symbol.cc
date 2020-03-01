@@ -498,7 +498,8 @@ const char *
 Symbol::cant_be_defined() const
 {
 // if (value_stack.size() > 1)         return "symbol was localized";
-   if (Workspace::is_called(name))   return "function is called";
+   if (Workspace::is_called(name))
+      return "function is called (used on the )SI stack). Try )SIC first.";
 
    if (value_stack.back().name_class == NC_UNUSED_USER_NAME)   return 0;   // OK
    if (value_stack.back().name_class == NC_FUNCTION)           return 0;   // OK

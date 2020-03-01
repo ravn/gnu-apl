@@ -103,13 +103,32 @@ StateIndicator::uses_function(const UserFunction * ufun) const
 {
 const Executable * uexec = ufun;
 
-   // case 1: ufun is the currently executing function
-   //
-   if (uexec == get_executable())   return true;
+   for (const StateIndicator * si = this; si; si = si->get_parent())
+       {
+         // case 1: ufun is the currently executing function
+         //
+         if (uexec == si->get_executable())   return true;
 
-   // case 2: ufun is used on the prefix parser stack
-   //
-   if (current_stack.uses_function(ufun))   return true;
+         // case 2: ufun is used on the prefix parser stack
+         //
+         if (si->current_stack.uses_function(ufun))   return true;
+
+         // case 3: ufun is in the body of si->get_executable(). This crashes
+         // )SAVE since the symbol is already resolved and points to the old
+         // function.
+         //
+         uexec = si->get_executable();
+         Assert(uexec);
+         const Token_string & body = uexec->get_body();
+         Assert(&body);
+         loop(b, body.size())
+             {
+               const Token & tok = body[b];
+               if (tok.get_tag() != TOK_SYMBOL)   continue;
+               if (ufun->get_name().compare(tok.get_sym_ptr()->get_name()))
+                  return true;
+             }
+       }
    return false;
 }
 //-----------------------------------------------------------------------------

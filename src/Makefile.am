@@ -95,6 +95,7 @@ Quad_FFT.cc					Quad_FFT.hh		\
 Quad_FIO.cc					Quad_FIO.hh		\
 Quad_FX.cc					Quad_FX.hh		\
 Quad_GTK.cc					Quad_GTK.hh		\
+Quad_MAP.cc					Quad_MAP.hh		\
 Quad_PLOT.cc		Quad_PLOT.def		Quad_PLOT.hh		\
 Quad_RE.cc					Quad_RE.hh		\
 Quad_RL.cc					Quad_RL.hh		\

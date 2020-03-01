@@ -137,6 +137,7 @@ st( LAMBDA        , "λ"       ,          )
 sf( F2_MEQ        , "≥"       , = 0x4D01 )
 sf( F12_MINUS     , "-"       ,          )
 st( MACRO         , "MACRO"   ,          )
+qf( MAP           , "⎕MAP"    ,          )
 
 qf( NA            , "⎕NA"     , = 0x4E01 )
 sf( F2_NAND       , "⍲"       ,          )

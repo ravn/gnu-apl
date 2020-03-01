@@ -124,6 +124,7 @@ dist_noinst_DATA =				           \
         Quad_LC.tc                                         \
         Quad_L.tc                                          \
         Quad_LX.tc                                         \
+        Quad_MAP.tc                                        \
         Quad_NC.tc                                         \
         Quad_NL.tc                                         \
         Quad_PP.tc                                         \
