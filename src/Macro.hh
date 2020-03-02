@@ -28,10 +28,10 @@
 class Macro : public UserFunction
 {
 public:
-   /// the unique number of a macros
+   /// the unique number of a macro
    enum Macro_num
       {
-#define mac_def(name, _txt) MAC_ ## name,
+#define mac_def(name, _txt) MAC_ ## name,   ///< a Macro_num
 #include "Macro.def"
         MAC_COUNT
       };

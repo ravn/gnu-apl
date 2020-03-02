@@ -71,6 +71,7 @@ protected:
    /// a mapping from PCs to source lines.
    static std::vector<PC_src> pc_2_src;
 
+   /// compare PCs (helper for binary search)
    static int pc_cmp(const int64_t & key, const Backtrace::PC_src & pc2, const void *);
 };
 

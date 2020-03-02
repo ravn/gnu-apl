@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// silence doxygen (it does not like our macros)
+/// \cond NOPE
+
 /* the help_def() macro defines help texts used in different places.
  *
  * It is called with 5 arguments:
@@ -254,4 +257,6 @@ help_def(-3, "⍣",  "Power Operator",          "repeat: B ← F B until (F B) G
 help_def(-4, "⍣",  "Power Operator",          "repeat G times: B ← A F B                     (numeric scalar G)\n",                              "")
 help_def(-4, "⍣",  "Power Operator",          "repeat: B ← A F B until (A F B) G B is true   (function G)\n",                                    "")
 #undef help_def
+
+/// \endcond
 

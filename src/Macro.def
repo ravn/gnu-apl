@@ -18,6 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/// \cond NOPE
+
 /// monadic EACH without result
 //
 mac_def(LO_EACH_B,
@@ -257,3 +259,4 @@ mac_def(Z__EXEC_EACH_B,
 
 #undef mac_def
 
+/// \endcond

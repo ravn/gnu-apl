@@ -84,13 +84,14 @@ public:
    static Quad_FIO * fun;   ///< Built-in function.
    static Quad_FIO  _fun;   ///< Built-in function.
 
+   /// a mapping between strings and axis integers
    struct _sub_fun
       {
-        unsigned int val;
-        const char * key;
+        unsigned int val;   ///< the axis number
+        const char * key;   ///< the name for it
       };
 
-   // a mapping between strings and axis iuntegers
+   /// a mapping between strings and axis integers
    static _sub_fun sub_functions[];
 
 protected:

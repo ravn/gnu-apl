@@ -134,8 +134,11 @@ using namespace std;
 typedef uint16_t  Pixel_X;
 typedef uint16_t  Pixel_Y;
 typedef uint16_t  Pixel_Z;   // offset in the Z direction
+
+/// a window coordinate in pixels
 struct Pixel_XY
 {
+   /// constructor
    Pixel_XY(Pixel_X px, Pixel_Y py)
    : x(px),
      y(py)
@@ -153,8 +156,8 @@ struct Pixel_XY
    const double distance(const Pixel_XY other) const
       { return sqrt(distance2(other)); }
 
-   Pixel_X x; 
-   Pixel_Y y;
+   Pixel_X x;   ///< horizontal pixels
+   Pixel_Y y;   ///< vertical pixels
 };
 
 typedef uint32_t Color;
@@ -281,6 +284,7 @@ struct level_color
    uint32_t rgb;     ///< color as RGB integer
 };
 
+/// the data to be plotted
 class Plot_data
 {
 public:
@@ -385,6 +389,7 @@ public:
         return ret;
       }
 
+   /// val as string with unit 'pixel'
    static const char * Pixel_X_to_str(Pixel_X val)
       {
         static char ret[40];
@@ -393,6 +398,7 @@ public:
         return ret;
       }
 
+   /// val as string with unit 'pixel'
    static const char * Pixel_Y_to_str(Pixel_Y val)
       {
         static char ret[40];
@@ -1242,20 +1248,22 @@ xcb_generic_error_t * error = xcb_request_check(conn, cookie);
 /// Some xcb IDs (returned from the X server)
 struct Plot_context
 {
-  Plot_context(const Plot_window_properties & pwp)
-  : w_props(pwp)
-  {}
+   /// constructor
+   Plot_context(const Plot_window_properties & pwp)
+   : w_props(pwp)
+   {}
 
-  const Plot_window_properties & w_props;
+   /// the window properties (as choosen by the user)
+   const Plot_window_properties & w_props;
 
-  xcb_connection_t * conn;
-  xcb_window_t       window;
-  xcb_screen_t       * screen;
-  xcb_gcontext_t     fill;
-  xcb_gcontext_t     line;
-  xcb_gcontext_t     point;
-  xcb_gcontext_t     text;
-  xcb_font_t         font;
+   xcb_connection_t * conn;       ///< the connection to the X server
+   xcb_window_t       window;     ///< the plot window
+   xcb_screen_t       * screen;   ///< the screen containing the window
+   xcb_gcontext_t     fill;       ///< the curren fill style
+   xcb_gcontext_t     line;       ///< the curren line style
+   xcb_gcontext_t     point;      ///< the curren point style
+   xcb_gcontext_t     text;       ///< the curren text style
+   xcb_font_t         font;       ///< the curren font
 };
 //-----------------------------------------------------------------------------
 /// the width and the height of a string (in pixels)

@@ -216,8 +216,10 @@ public:
    /// constructor
    CPU_pool();
 
+   /// initialize the pool
    static void init(bool logit);
 
+   /// add a CPU to the pool
    static void add_CPU(CPU_Number cpu)
       { the_CPUs.push_back(cpu); }
 
@@ -229,6 +231,7 @@ public:
    static CoreCount get_count()
       { return CoreCount(the_CPUs.size()); }
 
+   /// resize the pool
    static void resize(CoreCount new_size)
       { the_CPUs.resize(new_size); }
 

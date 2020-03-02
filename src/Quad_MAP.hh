@@ -4,6 +4,7 @@
 #include "QuadFunction.hh"
 
 //-----------------------------------------------------------------------------
+/// The implementation of ⎕MAP
 class Quad_MAP : public QuadFunction
 {
 public:
@@ -19,10 +20,11 @@ protected:
    /// overloaded Function::eval_AB()
    Token eval_AB(Value_P A, Value_P B);
 
-   // Heapsort helper
+   /// Heapsort helper
    static bool greater_map(const ShapeItem & a, const ShapeItem & b,
                            const void * cells);
 
+   /// compute ⎕MAP with (indices of) sorted A
    Value_P do_map(const Cell * ravel_A, ShapeItem len_A,
                   const ShapeItem * sorted_indices_A, const Value * B);
 };
