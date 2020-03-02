@@ -37,11 +37,13 @@ const double qct = Workspace::get_CT();
                MORE_ERROR() << "Duplicate keys (e.g. A["
                             << (qio + indices[m - 1]) << "] and A["
                             << (qio + indices[m]) << "]) in 'A ⎕MAP B'";
+               delete[] indices;
                DOMAIN_ERROR;
              }
        }
 
 Value_P Z = do_map(&A->get_ravel(0), map_len, indices, B.get());
+   delete[] indices;
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------

@@ -120,7 +120,6 @@ const Executable * uexec = ufun;
          uexec = si->get_executable();
          Assert(uexec);
          const Token_string & body = uexec->get_body();
-         Assert(&body);
          loop(b, body.size())
              {
                const Token & tok = body[b];
