@@ -518,7 +518,8 @@ PrintBuffer::pb_empty(const Value & value, PrintContext pctx,
 
              if (value.get_ravel(0).is_numeric())   // ⍬
                 {
-                  UCS_string ucs("⍬");
+                  UTF8_string utf("⍬");
+                  UCS_string ucs(utf);
                   ColInfo ci;
                   *this = PrintBuffer(ucs, ci);
                   add_outer_frame(outer_style);
