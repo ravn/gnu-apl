@@ -210,7 +210,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>March 1, 2020
+<p>March 7, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -2903,7 +2903,7 @@ table provided as its left argument. Let Z←A ⎕MAP B.
 </p>
 <p>The left argument A of ⎕MAP must be a N×2 matrix. Each 2-element row of
 A specifies a separate mapping. That is, the elements of B which are found
-in B[;1] are replaced by the corresponding element in B[;2]. The shape of
+in A[;1] are replaced by the corresponding element in A[;2]. The shape of
 the result Z is the shape of the right argument B.
 </p>
 <p>Example:
@@ -2927,18 +2927,50 @@ HAlloWEEn
 </pre>
 <p>NOTES:
 </p><ul>
-<li> The keys of mapping A (i.e. the elements in column A[;1]) must be
+<li> The keys of the mapping A (i.e. the elements in column A[;1]) must be
 unique. If they are not then the mapping is ambiguous and a DOMAIN ERROR
 is raised.
 
-</li><li> If a key is nested then it must match an equal nested item in B,
-and the matched nested key is being replaced. Likewise if the result of
-a match is nested it replaces the matched item. Depending of the depths
-of mappings in A ⎕MAP it is possible that (≡Z) ≠ (≡B). That is, ⎕MAP
-conservres the shape but not the depth of the mapped value.
+</li><li> Nested items in B: if an item of B is nested, then it is either equal to some
+(also nested) key, say A[N;1], (in that case it is being mapped to A[N;2] in
+the result), or it is different from all keys in A[;1] (and in that case the
+corresponding item in the result is the item in B.
 
-</li></ul>
+</li><li> Nested items in A: if a key, say A[N;1], is nested and matches an equal (hence
+also nested) item in B, then the corresponding item in the result will be
+A[N;2] (which may or may not be nested). If a (nested or not nested) key A[N;1]
+is equal to an item in B, then the corresponding item in the result will be
+nested iff A[N;2] is nested. If, for some N, the depths of A[N;1] and A[N;2]
+differ, then then depths of B and A ⎕MAP B may differ as well. That is, ⎕MAP
+conserves the shape of B, but not necessarily the depth of B.
 
+</li><li> By default the mapping of B is non-recursive, i.e. the top-level items of
+B are compared with the top-level keys A[;1], and nested keys and items of B
+are handled as described above.
+
+<p>Sometrimes, however, it is desirable to recursively descend into the nested
+sub-values of B (though never of A). This can be achieved by enclosing A as
+shown in the examples below.
+</p></li></ul>
+
+<pre class="verbatim">      A←5 2⍴'eEwWaAzZ92'
+      B←'Hal' 'low' 'een'   ⍝ nested B
+      4 ⎕CR A ⎕MAP B        ⍝ non-recursive (none of the keys in A[;1] matches)
+┏→━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━┓ ┏→━━┓┃
+┃┃Hal┃ ┃low┃ ┃een┃┃
+┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
+┗∊━━━━━━━━━━━━━━━━┛
+
+      4 ⎕CR (⊂A) ⎕MAP B   ⍝ recursive (some simple keys in A[;1] match)
+┏→━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━┓ ┏→━━┓┃
+┃┃HAl┃ ┃loW┃ ┃EEn┃┃
+┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
+┗∊━━━━━━━━━━━━━━━━┛
+
+
+</pre>
 <hr>
 <a name="Section-3_002e27"></a>
 <div class="header">

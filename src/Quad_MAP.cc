@@ -11,6 +11,16 @@ Quad_MAP * Quad_MAP::fun = &Quad_MAP::_fun;
 Token
 Quad_MAP::eval_AB(Value_P A, Value_P B)
 {
+bool recursive = false;
+
+   // a nested scalar A indicates recursive ⎕MAP
+   //
+   if (A->get_rank() == 0 && A->get_ravel(0).is_pointer_cell())
+      {
+         recursive = true;
+         A = A->get_ravel(0).get_pointer_value();
+      }
+
    if (A->get_rank() != 2)   RANK_ERROR;
    if (A->get_cols() != 2)   LENGTH_ERROR;
 const ShapeItem map_len = A->get_rows();
@@ -42,7 +52,7 @@ const double qct = Workspace::get_CT();
              }
        }
 
-Value_P Z = do_map(&A->get_ravel(0), map_len, indices, B.get());
+Value_P Z = do_map(&A->get_ravel(0), map_len, indices, B.get(), recursive);
    delete[] indices;
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -72,7 +82,8 @@ const Cell * cells_A = rcl->ravel;
 
 Value_P
 Quad_MAP::do_map(const Cell * ravel_A, ShapeItem len_A,
-                 const ShapeItem * sorted_indices_A, const Value * B)
+                 const ShapeItem * sorted_indices_A, const Value * B,
+                 bool recursive)
 {
 Value_P Z(B->get_shape(), LOC);
 const ravel_comp_len ctx = { ravel_A, 1};
@@ -98,7 +109,7 @@ const ShapeItem len_B = B->element_count();
         else
                  new (&cell_Z0) IntCell(0);
             }
-         else   // not mapped
+         else   // not mapped, simple
             {
               Z->get_ravel(0).init(cell_B, Z.getref(), LOC);
             }
@@ -117,9 +128,19 @@ const ShapeItem len_B = B->element_count();
             {
              Z->next_ravel()->init(ravel_A[*map*2 + 1], Z.getref(), LOC);
             }
-         else   // not mapped
+         else   // cell_B shall not be mapped
             {
-             Z->next_ravel()->init(cell_B, Z.getref(), LOC);
+              if (recursive && cell_B.is_pointer_cell())   // nested: recursive
+                 {
+                   Value_P sub_B = cell_B.get_pointer_value();
+                   Value_P sub_Z = do_map(ravel_A, len_A, sorted_indices_A,
+                                          sub_B.get(), true);
+                   new (Z->next_ravel())  PointerCell(sub_Z.get(), Z.getref());
+                 }
+              else   // not mapped, simple
+                 {
+                  Z->next_ravel()->init(cell_B, Z.getref(), LOC);
+                 }
             }
        }
 
