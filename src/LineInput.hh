@@ -77,6 +77,12 @@ public:
    /// move to next newer entry
    const UCS_string * down();
 
+   /// print relevant indices
+   ostream &  info(ostream & out) const
+      { return out << "   CUR=" << current_line
+                   << "/P=" << put
+                   << "/S=" << hist_lines.size() << endl; }
+
    /// add one line to \b this history
    void add_line(const UCS_string & line);
 

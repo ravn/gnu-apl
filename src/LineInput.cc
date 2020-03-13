@@ -265,7 +265,7 @@ LineHistory::replace_line(const UCS_string & line)
 const UCS_string *
 LineHistory::up()
 {
-   if (hist_lines.size() == 0)   return 0;
+   if (hist_lines.size() == 0)   return 0;   // no history
 
 int new_current_line = current_line - 1;
     if (new_current_line < 0)   new_current_line += hist_lines.size();   // wrap
@@ -277,15 +277,16 @@ int new_current_line = current_line - 1;
 const UCS_string *
 LineHistory::down()
 {
-   if (hist_lines.size() == 0)     return 0;
+   if (hist_lines.size() == 0)     return 0;   // no history
    if (current_line == put)   return 0;
 
 int new_current_line = current_line + 1;
    if (new_current_line >= int(hist_lines.size()))
       new_current_line = 0;   // wrap
-   if (new_current_line == put)   return 0;
+   current_line = new_current_line;
+   if (current_line == put)   return 0;
 
-   return &hist_lines[current_line = new_current_line];
+   return &hist_lines[current_line];
 }
 //=============================================================================
 LineEditContext::LineEditContext(LineInputMode mode, int rows, int cols,
@@ -537,9 +538,13 @@ const ExpandResult expand_result = tab_exp.expand_tab(line);
 void
 LineEditContext::cursor_UP()
 {
+   Log(LOG_get_line)   history.info(CERR << "cursor_UP()") << endl;
+
 const UCS_string * ucs = history.up();
    if (ucs == 0)   // no line above
       {
+        Log(LOG_get_line)   CERR << "hit top of history()" << endl;
+        Log(LOG_get_line)   history.info(CERR << "cursor_UP() done" << endl);
         return;
       }
 
@@ -555,14 +560,18 @@ const UCS_string * ucs = history.up();
    uidx = 0;
    refresh_from_cursor();
    move_idx(user_line.size());
+   Log(LOG_get_line)   history.info(CERR << "cursor_UP() done" << endl);
 }
 //-----------------------------------------------------------------------------
 void
 LineEditContext::cursor_DOWN()
 {
+   Log(LOG_get_line)   history.info(CERR << "cursor_DOWN()" << endl);
+
 const UCS_string * ucs = history.down();
    if (ucs == 0)   // no line below
       {
+        Log(LOG_get_line)   CERR << "hit bottom of history()" << endl;
         // if inside history: restore user_line
         //
         if (history_entered)   user_line = user_line_before_history;
@@ -583,6 +592,7 @@ refresh:
    uidx = 0;
    refresh_from_cursor();
    move_idx(user_line.size());
+   Log(LOG_get_line)   history.info(CERR << "cursor_DOWN() done" << endl);
 }
 //=============================================================================
 LineInput::LineInput(bool do_read_history)
