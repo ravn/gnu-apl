@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-March 7, 2020
+March 8, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -889,10 +889,11 @@ options; all such options are passed to the application via ⎕ARG.
 In order to be really useful for scripting, three more features have
 been added:
 
-   * ⎕ARG: access to the command line arguments given to the interpreter
-* ⎕ENV: access to the environment variables of the process running the
-interpreter, and * ⎕INP: Here-Document-alike function for creating large
-text variables
+   • ⎕ARG: access to the command line arguments given to the interpreter
+   • ⎕ENV: access to the environment variables of the process running
+     the interpreter, and
+   • ⎕INP: Here-Document-alike function for creating large text
+     variables
 
    The system variable ⎕ARG contains all command line arguments passed
 to the interpreter.  In the initial example above this would be a nested
@@ -912,7 +913,7 @@ N-by-2 matrix.  The first column is the name of the environment
 variable.  The second column is the value of the variable.  The number N
 of environment variables returned obviously depends on the number of
 environment variables whose name begins with the prefix given in B. B is
-case sensitive, but by convention the names of environment are
+case sensitive; by convention the names of environment are all
 uppercase.
 
    If you need to create a longer text, like the body of a web page,
@@ -1025,21 +1026,21 @@ alike in immediate execution mode, in scripts, and in defined functions.
 New-style strings are a little different and more restrictive than their
 old-style companions:
 
-   * the starting """ must be placed at the end of an APL code line,
-i.e.  no mixing of APL code and string content on the same line.  In
-old-style strings the APL line on which the string started became part
-of the string while in new-style strings the strings begins at the
-following line.
+   • the starting """ must be placed at the end of an APL code line,
+     i.e.  no mixing of APL code and string content on the same line.
+     In old-style strings the APL line on which the string started
+     became part of the string while in new-style strings the strings
+     begins at the following line.
 
-   * the ending """ must be placed at the end of a separate lines with
-only spaces allowed before the """ (to vertically align it with the
-leading """ if so desired).  In old-style strings the text up to the
-termination " is part of the string while in new-style strings it is
-not.
+   • the ending """ must be placed at the end of a separate lines with
+     only spaces allowed before the """ (to vertically align it with the
+     leading """ if so desired).  In old-style strings the text up to
+     the termination " is part of the string while in new-style strings
+     it is not.
 
-   * Neither the starting nor the ending line become nested strings of
-the result, and every line can be clearly identified as being either APL
-code or else string text.
+   • Neither the starting nor the ending line become nested strings of
+     the result, and every line can be clearly identified as being
+     either APL code or else string text.
 
    Example:
  4 ⎕CR """
@@ -1235,37 +1236,51 @@ general, rules.
 below that succeeds (i.e.  returns a result) is then the result of
 comparing A and B.
 
-   1.  If (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
+   1.  Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
 
-   2.  If (⍴A) < (⍴B) then A < B. And vice versa.
+   2.  Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa.
 
-   3.  Otherwise ⍴A and ⍴B are equal.  If all corresponding ravel
-elements of A and B are equal (i.e.  tolerantly equal within ⎕CT as
-defined in the ISO standard) then A = B. Otherwise let A1 and B1 the
-first corresponding ravel elements of A and B with A1≠B1.
+   3.  Comparison of ravel elements: otherwise ⍴A and ⍴B are equal.  If
+all corresponding ravel elements of A and B are equal (i.e.  tolerantly
+equal within ⎕CT as defined in the ISO standard) then A = B. Otherwise
+let A1 and B1 the first corresponding ravel elements of A and B with
+A1≠B1.  If A1 < B1 then A < B and vice versa.  The comparison A1 < B1 is
+made according tho the following rules.
 
-   4.  If A1 and B1 are both character values and (⎕UCS A1) < (⎕UCS B1)
-then A < B. And vice versa.
+   4.  Comparison by depth: if A1 is simple (a single character or
+number) and B1 is not (i.e.  B is nested) then A1 < B1 and vice versa.
+If cwA1 and B1 are both nested, then the above rules are applied
+recusively.  If both are simple then they are compared according to the
+rules below.
 
-   5.  If A1 is a character and B1 is numeric, then A < B. And vice
+   5.  Comparison by Unicode: if A1 and B1 are both character values and
+(⎕UCS A1) < (⎕UCS B1) then A < B. And vice versa.
+
+   6.  Comparison by type: If A1 is a character and B1 is numeric, then
+A < B. And vice versa.
+
+   7.  Comparison by numeric value: if A1 and B1 are both numeric values
+then:
+
+   7a.  Comparison by real part: if (9○A1) < (9○B1) then A < B. And vice
 versa.
 
-   6.  If A1 and B1 are both numeric values then:
-
-   6a.  If (9○A1) < (9○B1) then A < B. And vice versa.
-
-   6a.  Otherwise if (11○A1) < (11○B1) then A < B. And vice versa.
+   7a.  Comparison by imaginary part: otherwise if (11○A1) < (11○B1)
+then A < B. And vice versa.
 
    Another way of describing the rules above is that the comparison of
 two values is comprised of sub-comparisons of certain properties of the
 values in the following order:
 
-   • ranks of the values
-   • shapes of the values
-   • type (character vs.  numeric) of the values,
-   • Unicodes of character values,
-   • real parts of numeric values,
-   • imaginary parts of numeric values,
+   • the ranks of the values,
+   • the shapes of the values,
+   • the first differing ravel element (in row-major order) of the
+     values,
+   • the depths of the differing ravel elements,
+   • the types (character vs.  numeric) of the differing ravel elements,
+   • the Unicodes of the differing ravel elements
+   • the real parts of numeric values,
+   • the imaginary parts of numeric values,
 
    Note: Rules 1.  and 2.  above are only relevant for comparisons made
 in the context of sorting (i.e.  for ⍋ or ⍒).  This is because for =, ≠,
@@ -2359,7 +2374,10 @@ problems that can be solved by ⎕DLX contain 3 steps:
    • translate the result Z back into the problem domain.
 
    Another application of ⎕DLX is solving sudokus.  The constraints
-matrix is a little more complicated, but the principle is the same.
+matrix is a little more complicated, but the principle is the same.  GNU
+APL is shipped with two workspaces: sudoku.apl (which solves sudokus
+without using ⎕DLX) and sudoku_DLX.apl (which solves sudokus using
+⎕DLX).
 
 
 File: apl.info,  Node: Section 3.22,  Next: Section 3.23,  Prev: Section 3.21,  Up: Chapter 3
@@ -2732,23 +2750,27 @@ Xmax ← ⎕IO + ⌈/B   ⍝ largest real part of B
 Ymin ← ⌊/,B        ⍝ smallest value in B
 Ymax ← ⌈/,B        ⍝ largest value in B
 
-   In theory one can also mix real and complex values, even though doing
-so makes little sense.
-
    Example:
 
-      ⎕PLOT ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
+      ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
 
    produces this plot window (only visible in the HTML version of this
 document; in text mode see file doc/PLOT_zigzag.png):
 
  [image src="PLOT_zigzag.png" ]
 
+   NOTE: In theory one can also mix real and complex values, even though
+doing so makes little sense.  If at least one item of the plot data B is
+complex, then all real items in B are taken as complex with imaginary
+part 0.
+
 3.27.2 The Plot Attributes A
 ----------------------------
 
-As can be displayed by ⎕PLOT "" there is quite a number of attributes
-that control how the resulting plot looks like:
+As can be displayed with ⎕PLOT ” there are a number of attributes that
+control how the resulting plot will look like:
+
+   Example:
 
       ⎕PLOT ''
 
@@ -2818,10 +2840,11 @@ X server (which implies that ⎕PLOT requires X). That window runs in its
 own thread until it is being closed.  A window can be closed in
 different ways:
 
-   * By the user clicking on the close button (at the top-right) of the
-window, or * By the user opening the drop down menu of the window (at
-the top left of the window) and selecting the option named "Close", or *
-from APL by calling
+   • By the user clicking on the close button (at the top-right) of the
+     window, or
+   • By the user opening the drop down menu of the window (at the top
+     left of the window) and selecting the option named "Close", ori
+   • from APL by calling ⎕PLOT ¯3.
 
 
 File: apl.info,  Node: Section 3.28,  Next: Section 3.29,  Prev: Section 3.27,  Up: Chapter 3
@@ -2829,10 +2852,10 @@ File: apl.info,  Node: Section 3.28,  Next: Section 3.29,  Prev: Section 3.27,  
 3.28 ⎕PS - Print Style
 ======================
 
-⎕PS is an integer vector that currently (read: SVN 982) contains two
-integers which control some details of how APL values are being printed.
-The default value of ⎕PS is 0 0.  ⎕PS is a session variable which
-survives )LOADing of workspaces
+⎕PS is an integer vector that currently (read: as of SVN 982) contains
+two integers which control some details of how APL values are being
+printed.  The default value of ⎕PS is 0 0.  ⎕PS is a session variable
+which survives )LOADing of workspaces
 
    ⎕PS[1] = 0: print rational quotients a normal floating point numbers
 
@@ -2848,7 +2871,7 @@ survives )LOADing of workspaces
    Setting ⎕PS[2] has the same effect as the debug command ]BOXING and
 uses the same values.
 
-   Note: For compatibility with older workspaces, Assigning a single
+   Note: For compatibility with older workspaces, assigning a single
 value to ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
@@ -3487,10 +3510,9 @@ unavailable, even if your xmodmap is correct.  You can check your
 setting by executing the program ’locale’.  If it shows warnings like
 these:
 
-   locale: Cannot set LC_CTYPE to default locale: No such file or
-directory locale: Cannot set LC_MESSAGES to default locale: No such file
-or directory locale: Cannot set LC_ALL to default locale: No such file
-or directory
+locale: Cannot set LC_CTYPE to default locale: No such file or directory
+locale: Cannot set LC_MESSAGES to default locale: No such file or directory
+locale: Cannot set LC_ALL to default locale: No such file or directory
 
    then something is wrong and you should check your LANG setting and
 installed locales.
@@ -3572,9 +3594,9 @@ included on the build.
 
     apl-1.8/
     ├── src
-        ├── APs                     ⎕SVO and friends
+        ├── APs                     APs for ⎕SVO and friends
         ├── emacs_mode              dito
-        ├── Gtk                     ⎕GTK
+        ├── Gtk                     ⎕GTK (graphical user interface)
         ├── native                  templates for native functions
         ├── sql                     ⎕SQL
         ├── testcaseses             dito
@@ -4918,54 +4940,54 @@ Node: Chapter 11469
 Node: Chapter 219502
 Node: Chapter 323926
 Node: Section 3.125523
-Node: Section 3.241535
-Node: Section 3.342294
-Node: Section 3.443581
-Node: Section 3.546202
-Node: Section 3.646375
-Node: Section 3.746988
-Node: Section 3.850932
-Node: Section 3.952474
-Node: Section 3.1053071
-Node: Section 3.1154855
-Node: Section 3.1256795
-Node: Section 3.1357736
-Node: Section 3.1457988
-Node: Section 3.1559384
-Node: Section 3.1661896
-Node: Section 3.1768595
-Node: Section 3.1870032
-Node: Section 3.1975066
-Node: Section 3.2078347
-Node: Section 3.2178638
-Node: Section 3.2288550
-Node: Section 3.2388822
-Node: Section 3.2495400
-Node: Section 3.2597851
-Node: Section 3.2698520
-Node: Section 3.27101643
-Node: Section 3.28108326
-Node: Section 3.29109266
-Node: Section 3.30122828
-Node: Section 3.31125932
-Node: Section 3.32127921
-Node: Chapter 4132299
-Node: Chapter 5134047
-Node: Chapter 6135176
-Node: Section 6.1136713
-Node: Section 6.2137958
-Node: Section 6.3138318
-Node: Section 6.4138560
-Node: Section 6.5139222
-Node: Section 6.6139700
-Node: Section 6.7140472
-Node: Section 6.8140929
-Node: Chapter 7141331
-Node: Section 7.1141750
-Node: Section 7.2142437
-Node: Chapter 8143268
-Node: Section 8.1143771
-Node: Section 8.2169081
+Node: Section 3.241612
+Node: Section 3.342371
+Node: Section 3.443658
+Node: Section 3.547061
+Node: Section 3.647234
+Node: Section 3.747847
+Node: Section 3.851791
+Node: Section 3.953333
+Node: Section 3.1053930
+Node: Section 3.1155714
+Node: Section 3.1257654
+Node: Section 3.1358595
+Node: Section 3.1458847
+Node: Section 3.1560243
+Node: Section 3.1662755
+Node: Section 3.1769454
+Node: Section 3.1870891
+Node: Section 3.1975925
+Node: Section 3.2079206
+Node: Section 3.2179497
+Node: Section 3.2289561
+Node: Section 3.2389833
+Node: Section 3.2496411
+Node: Section 3.2598862
+Node: Section 3.2699531
+Node: Section 3.27102654
+Node: Section 3.28109508
+Node: Section 3.29110455
+Node: Section 3.30124017
+Node: Section 3.31127121
+Node: Section 3.32129110
+Node: Chapter 4133488
+Node: Chapter 5135236
+Node: Chapter 6136362
+Node: Section 6.1137899
+Node: Section 6.2139179
+Node: Section 6.3139539
+Node: Section 6.4139781
+Node: Section 6.5140443
+Node: Section 6.6140921
+Node: Section 6.7141693
+Node: Section 6.8142150
+Node: Chapter 7142552
+Node: Section 7.1142971
+Node: Section 7.2143658
+Node: Chapter 8144489
+Node: Section 8.1144992
+Node: Section 8.2170302
 
 End Tag Table
 

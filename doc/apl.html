@@ -210,7 +210,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>March 7, 2020
+<p>March 8, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -1123,11 +1123,13 @@ such options are passed to the application via ⎕ARG.
 
 <p>In order to be really useful for scripting, three more features have been added:
 </p>
-<p>* ⎕ARG: access to the command line arguments given to the interpreter
-* ⎕ENV: access to the environment variables of the process running the
+<ul>
+<li> ⎕ARG: access to the command line arguments given to the interpreter
+</li><li> ⎕ENV: access to the environment variables of the process running the
         interpreter, and
-* ⎕INP: Here-Document-alike function for creating large text variables
-</p>
+</li><li> ⎕INP: Here-Document-alike function for creating large text variables
+</li></ul>
+
 <p>The system variable ⎕ARG contains all command line arguments passed to the
 interpreter. In the initial example above this would be a nested 3-element
 vector:
@@ -1147,8 +1149,8 @@ The first column is the name of the environment variable.
 The second column is the value of the variable.
 The number N of environment variables returned obviously depends on
 the number of environment variables whose name begins with the prefix
-given in B. B is case sensitive, but by convention the names of environment
-are uppercase.
+given in B. B is case sensitive; by convention the names of environment
+are all uppercase.
 </p>
 <p>If you need to create a longer text, like the body of a web page, then you
 would normally construct it like this:
@@ -1168,7 +1170,7 @@ Third line
    ...
 END-OF-⎕INP
 </pre>
-<p>This works like &quot;Here documents&quot; in bash. The right argument of ⎕INP is
+<p>This works like &quot;Here documents&quot; in <b>bash</b>. The right argument of ⎕INP is
 the end of text marker, ⎕INP also has a dyadic form where the left argument
 specifies an escape sequence from text to apl and back to the text, similar
 to PHP scripts:
@@ -1260,20 +1262,22 @@ More importantly, new-style multi-line strings work alike in immediate
 execution mode, in scripts, and in defined functions. New-style strings are a
 little different and more restrictive than their old-style companions:
 </p>
-<p>* the starting &quot;&quot;&quot; must be placed at the end of an APL code line, i.e. no
-  mixing of APL code and string content on the same line. In old-style strings
-   the APL line on which the string started became part of the string while
-   in new-style strings the strings begins at the following line.
-</p>
-<p>* the ending &quot;&quot;&quot; must be placed at the end of a separate lines with only spaces
-  allowed before the &quot;&quot;&quot; (to vertically align it with the leading &quot;&quot;&quot; if so
-  desired). In old-style strings the text up to the termination &quot; is part of
-  the string while in new-style strings it is not.
-</p>
-<p>* Neither the starting nor the ending line become nested strings of the result,
-  and every line can be clearly identified as being either APL code or else
-  string text.
-</p>
+<ul>
+<li> the starting &quot;&quot;&quot; must be placed at the end of an APL code line, i.e. no
+mixing of APL code and string content on the same line. In old-style strings
+the APL line on which the string started became part of the string while
+in new-style strings the strings begins at the following line.
+
+</li><li> the ending &quot;&quot;&quot; must be placed at the end of a separate lines with only
+spaces allowed before the &quot;&quot;&quot; (to vertically align it with the leading &quot;&quot;&quot; if
+so  desired). In old-style strings the text up to the termination &quot; is part of
+the string while in new-style strings it is not.
+
+</li><li> Neither the starting nor the ending line become nested strings of the
+result, and every line can be clearly identified as being either APL code or
+else string text.
+</li></ul>
+
 <p>Example:
 </p><pre class="verbatim"> 4 ⎕CR &quot;&quot;&quot;
 ABC
@@ -1475,37 +1479,48 @@ according to the following, more general, rules.
 <p>Let A and B two APL values to be compared. The first comparison below that
 succeeds (i.e. returns a result) is then the result of comparing A and B.
 </p> 
-<p>1. If (⍴⍴A) &lt; (⍴⍴B) then A &lt; B. And vice versa.
+<p>1. Comparison by rank: if (⍴⍴A) &lt; (⍴⍴B) then A &lt; B. And vice versa.
 </p>
-<p>2. If (⍴A) &lt; (⍴B) then A &lt; B. And vice versa.
+<p>2. Comparison by shape: if (⍴A) &lt; (⍴B) then A &lt; B. And vice versa.
 </p>
-<p>3. Otherwise ⍴A and ⍴B are equal. If all corresponding ravel elements of A
-   and B are equal (i.e. tolerantly equal within ⎕CT as defined in the ISO
-   standard) then A = B. Otherwise let A1 and B1 the first corresponding
-   ravel elements of A and B with A1≠B1.
+<p>3. Comparison of ravel elements: otherwise ⍴A and ⍴B are equal. If all
+   corresponding ravel elements of A and B are equal (i.e. tolerantly equal
+   within ⎕CT as defined in the ISO standard) then A = B. Otherwise let A1
+   and B1 the first corresponding ravel elements of A and B with A1≠B1.
+   If A1 &lt; B1 then A &lt; B and vice versa. The comparison A1 &lt; B1 is made
+   according tho the following rules.
 </p>
-<p>4. If A1 and B1 are both character values and (⎕UCS A1) &lt; (⎕UCS B1) then
-   A &lt; B. And vice versa.
+<p>4. Comparison by depth: if A1 is simple (a single character or number) and
+   B1 is not (i.e. B is nested) then A1 &lt; B1 and vice versa. If cwA1 and B1 are
+   both nested, then the above rules are applied recusively. If both are simple
+   then they are compared according to the rules below.
 </p>
-<p>5. If A1 is a character and B1 is numeric, then A &lt; B. And vice versa.
+<p>5. Comparison by Unicode: if A1 and B1 are both character values and
+   (⎕UCS A1) &lt; (⎕UCS B1) then A &lt; B. And vice versa.
 </p>
-<p>6. If A1 and B1 are both numeric values then:
+<p>6. Comparison by type: If A1 is a character and B1 is numeric, then A &lt; B.
+   And vice versa.
 </p>
-<p>6a. If (9○A1) &lt; (9○B1) then A &lt; B. And vice versa.
+<p>7. Comparison by numeric value: if A1 and B1 are both numeric values then:
 </p>
-<p>6a. Otherwise if (11○A1) &lt; (11○B1) then A &lt; B. And vice versa.
+<p>7a. Comparison by real part: if (9○A1) &lt; (9○B1) then A &lt; B. And vice versa.
+</p>
+<p>7a. Comparison by imaginary part: otherwise if (11○A1) &lt; (11○B1) then A &lt; B.
+    And vice versa.
 </p>
 <p>Another way of describing the rules above is that the comparison of two values
 is comprised of sub-comparisons of certain properties of the values in the
 following order:
 </p>
 <ul>
-<li> ranks of the values
-</li><li> shapes of the values
-</li><li> type (character vs. numeric) of the values,
-</li><li> Unicodes of character values,
-</li><li> real parts of numeric values,
-</li><li> imaginary parts of numeric values,
+<li> the ranks of the values,
+</li><li> the shapes of the values,
+</li><li> the first differing ravel element (in row-major order) of the values,
+</li><li> the depths of the differing ravel elements,
+</li><li> the types (character vs. numeric) of the differing ravel elements,
+</li><li> the Unicodes of the differing ravel elements
+</li><li> the real parts of numeric values,
+</li><li> the imaginary parts of numeric values,
 </li></ul>
 
 <p>Note: Rules 1. and 2. above are only relevant for comparisons made in the
@@ -2644,9 +2659,10 @@ can be solved by ⎕DLX contain 3 steps:
 </li></ul>
 
 <p>Another application of ⎕DLX is solving sudokus. The constraints matrix is
-a little more complicated, but the principle is the same.
+a little more complicated, but the principle is the same. GNU APL is shipped
+with two workspaces: sudoku.apl (which solves sudokus without using ⎕DLX) and
+sudoku_DLX.apl (which solves sudokus using ⎕DLX).
 </p>
-
 <hr>
 <a name="Section-3_002e22"></a>
 <div class="header">
@@ -3044,23 +3060,26 @@ Xmax ← ⎕IO + ⌈/B   ⍝ largest real part of B
 Ymin ← ⌊/,B        ⍝ smallest value in B
 Ymax ← ⌈/,B        ⍝ largest value in B
 </pre>
-<p>In theory one can also mix real and complex values, even though doing so makes
-little sense.
-</p>
 <p>Example:
 </p>
-<pre class="verbatim">      ⎕PLOT ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
+<pre class="verbatim">      ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
 </pre>
 <p>produces this plot window (only visible in the HTML version of this document;
 in text mode see file <b>doc/PLOT_zigzag.png</b>):
 </p>
 <img src="PLOT_zigzag.png" alt="PLOT_zigzag">
 
+<p>NOTE: In theory one can also mix real and complex values, even though doing so
+makes little sense. If at least one item of the plot data B is complex, then
+all real items in B are taken as complex with imaginary part 0.
+</p>
 <a name="The-Plot-Attributes-A"></a>
 <h4 class="subsection">3.27.2 The Plot Attributes A</h4>
 
-<p>As can be displayed by ⎕PLOT &quot;&quot; there is quite a number of attributes that
-control how the resulting plot looks like:
+<p>As can be displayed with ⎕PLOT &rdquo; there are a number of attributes that
+control how the resulting plot will look like:
+</p>
+<p>Example:
 </p>
 <pre class="verbatim">      ⎕PLOT ''
 
@@ -3129,11 +3148,14 @@ legend_name-1: Random Row 2
 server (which implies that ⎕PLOT requires X). That window runs in its own
 thread until it is being closed. A window can be closed in different ways:
 </p>
-<p>* By the user clicking on the close button (at the top-right) of the window, or
-* By the user opening the drop down menu of the window (at the top left of the
-  window) and selecting the option named &quot;Close&quot;, or
-* from APL by calling 
-</p>
+<ul>
+<li> By the user clicking on the close button (at the top-right) of the
+window, or
+</li><li> By the user opening the drop down menu of the window (at the top left of
+the window) and selecting the option named &quot;Close&quot;, ori
+</li><li> from APL by calling ⎕PLOT ¯3.
+</li></ul>
+
 <hr>
 <a name="Section-3_002e28"></a>
 <div class="header">
@@ -3143,10 +3165,10 @@ Next: <a href="#Section-3_002e29" accesskey="n" rel="next">Section 3.29</a>, Pre
 <a name="g_t_005b_003f_005dPS-_002d-Print-Style"></a>
 <h3 class="section">3.28 ⎕PS - Print Style</h3>
 
-<p>⎕PS is an integer vector that currently (read: SVN 982) contains two integers
-which control some details of how APL values are being printed. The default
-value of ⎕PS is 0 0. ⎕PS is a session variable which survives )LOADing of
-workspaces
+<p>⎕PS is an integer vector that currently (read: as of SVN 982) contains
+two integers which control some details of how APL values are being printed.
+The default value of ⎕PS is 0 0. ⎕PS is a session variable which survives
+)LOADing of workspaces
 </p>
 <p>⎕PS[1] = 0: print rational quotients a normal floating point numbers
 </p>
@@ -3161,7 +3183,7 @@ workspaces
 <p>Setting ⎕PS[2] has the same effect as the debug command ]BOXING and uses
 the same values.
 </p>
-<p>Note: For compatibility with older workspaces, Assigning a single value to
+<p>Note: For compatibility with older workspaces, assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 </p>
 
@@ -3814,10 +3836,10 @@ variable is correctly set. For German, that would be &quot;de_DE.utf8&quot;, lik
 even if your xmodmap is correct. You can check your setting by executing the
 program &rsquo;locale&rsquo;.  If it  shows warnings like these:
 </p>
-<p>locale: Cannot set LC_CTYPE to default locale: No such file or directory
+<pre class="verbatim">locale: Cannot set LC_CTYPE to default locale: No such file or directory
 locale: Cannot set LC_MESSAGES to default locale: No such file or directory
 locale: Cannot set LC_ALL to default locale: No such file or directory
-</p>
+</pre>
 <p>then something is wrong and you should check your LANG setting and installed
 locales.
 </p>
@@ -3909,9 +3931,9 @@ directory determines, which optional components shall be included on the build.
 </p>
 <pre class="verbatim">    apl-1.8/
     ├── src
-        ├── APs                     ⎕SVO and friends
+        ├── APs                     APs for ⎕SVO and friends
         ├── emacs_mode              dito
-        ├── Gtk                     ⎕GTK
+        ├── Gtk                     ⎕GTK (graphical user interface)
         ├── native                  templates for native functions
         ├── sql                     ⎕SQL
         ├── testcaseses             dito

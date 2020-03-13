@@ -347,6 +347,7 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
 
    Log(LOG_prefix__location_info)
       {
+        Q1(body.size())
         Q1(pc_from_to.low)
         Q1(pc_from_to.high)
       }
@@ -673,6 +674,12 @@ int level = 0;
       {
         MORE_ERROR() <<
            "niladic lambda with axis. left argument, or function argument(s)";
+        DEFN_ERROR;
+      }
+
+   if ((signature & SIG_LO) && (signature & SIG_X))   // dyadic oper with axis
+      {
+        MORE_ERROR() << "invalid lambda operator (dyadic with axis)";
         DEFN_ERROR;
       }
 

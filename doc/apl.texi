@@ -961,10 +961,12 @@ such options are passed to the application via ⎕ARG.
 
 In order to be really useful for scripting, three more features have been added:
 
-* ⎕ARG: access to the command line arguments given to the interpreter
-* ⎕ENV: access to the environment variables of the process running the
+@itemize
+@item ⎕ARG: access to the command line arguments given to the interpreter
+@item ⎕ENV: access to the environment variables of the process running the
         interpreter, and
-* ⎕INP: Here-Document-alike function for creating large text variables
+@item ⎕INP: Here-Document-alike function for creating large text variables
+@end itemize
 
 The system variable ⎕ARG contains all command line arguments passed to the
 interpreter. In the initial example above this would be a nested 3-element
@@ -989,8 +991,8 @@ The first column is the name of the environment variable.
 The second column is the value of the variable.
 The number N of environment variables returned obviously depends on
 the number of environment variables whose name begins with the prefix
-given in B. B is case sensitive, but by convention the names of environment
-are uppercase.
+given in B. B is case sensitive; by convention the names of environment
+are all uppercase.
 
 If you need to create a longer text, like the body of a web page, then you
 would normally construct it like this:
@@ -1014,7 +1016,7 @@ Third line
 END-OF-⎕INP
 @end verbatim
 
-This works like "Here documents" in bash. The right argument of ⎕INP is
+This works like "Here documents" in @b{bash}. The right argument of ⎕INP is
 the end of text marker, ⎕INP also has a dyadic form where the left argument
 specifies an escape sequence from text to apl and back to the text, similar
 to PHP scripts:
@@ -1107,19 +1109,21 @@ More importantly, new-style multi-line strings work alike in immediate
 execution mode, in scripts, and in defined functions. New-style strings are a
 little different and more restrictive than their old-style companions:
 
-* the starting """ must be placed at the end of an APL code line, i.e. no
-  mixing of APL code and string content on the same line. In old-style strings
-   the APL line on which the string started became part of the string while
-   in new-style strings the strings begins at the following line.
+@itemize
+@item the starting """ must be placed at the end of an APL code line, i.e. no
+mixing of APL code and string content on the same line. In old-style strings
+the APL line on which the string started became part of the string while
+in new-style strings the strings begins at the following line.
 
-* the ending """ must be placed at the end of a separate lines with only spaces
-  allowed before the """ (to vertically align it with the leading """ if so
-  desired). In old-style strings the text up to the termination " is part of
-  the string while in new-style strings it is not.
+@item the ending """ must be placed at the end of a separate lines with only
+spaces allowed before the """ (to vertically align it with the leading """ if
+so  desired). In old-style strings the text up to the termination " is part of
+the string while in new-style strings it is not.
 
-* Neither the starting nor the ending line become nested strings of the result,
-  and every line can be clearly identified as being either APL code or else
-  string text.
+@item Neither the starting nor the ending line become nested strings of the
+result, and every line can be clearly identified as being either APL code or
+else string text.
+@end itemize
 
 Example:
 @verbatim
@@ -1323,37 +1327,48 @@ according to the following, more general, rules.
 Let A and B two APL values to be compared. The first comparison below that
 succeeds (i.e. returns a result) is then the result of comparing A and B.
  
-1. If (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
+1. Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
 
-2. If (⍴A) < (⍴B) then A < B. And vice versa.
+2. Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa.
 
-3. Otherwise ⍴A and ⍴B are equal. If all corresponding ravel elements of A
-   and B are equal (i.e. tolerantly equal within ⎕CT as defined in the ISO
-   standard) then A = B. Otherwise let A1 and B1 the first corresponding
-   ravel elements of A and B with A1≠B1.
+3. Comparison of ravel elements: otherwise ⍴A and ⍴B are equal. If all
+   corresponding ravel elements of A and B are equal (i.e. tolerantly equal
+   within ⎕CT as defined in the ISO standard) then A = B. Otherwise let A1
+   and B1 the first corresponding ravel elements of A and B with A1≠B1.
+   If A1 < B1 then A < B and vice versa. The comparison A1 < B1 is made
+   according tho the following rules.
 
-4. If A1 and B1 are both character values and (⎕UCS A1) < (⎕UCS B1) then
-   A < B. And vice versa.
+4. Comparison by depth: if A1 is simple (a single character or number) and
+   B1 is not (i.e. B is nested) then A1 < B1 and vice versa. If cwA1 and B1 are
+   both nested, then the above rules are applied recusively. If both are simple
+   then they are compared according to the rules below.
 
-5. If A1 is a character and B1 is numeric, then A < B. And vice versa.
+5. Comparison by Unicode: if A1 and B1 are both character values and
+   (⎕UCS A1) < (⎕UCS B1) then A < B. And vice versa.
 
-6. If A1 and B1 are both numeric values then:
+6. Comparison by type: If A1 is a character and B1 is numeric, then A < B.
+   And vice versa.
 
-6a. If (9○A1) < (9○B1) then A < B. And vice versa.
+7. Comparison by numeric value: if A1 and B1 are both numeric values then:
 
-6a. Otherwise if (11○A1) < (11○B1) then A < B. And vice versa.
+7a. Comparison by real part: if (9○A1) < (9○B1) then A < B. And vice versa.
+
+7a. Comparison by imaginary part: otherwise if (11○A1) < (11○B1) then A < B.
+    And vice versa.
 
 Another way of describing the rules above is that the comparison of two values
 is comprised of sub-comparisons of certain properties of the values in the
 following order:
 
 @itemize
-@item ranks of the values
-@item shapes of the values
-@item type (character vs. numeric) of the values,
-@item Unicodes of character values,
-@item real parts of numeric values,
-@item imaginary parts of numeric values,
+@item the ranks of the values,
+@item the shapes of the values,
+@item the first differing ravel element (in row-major order) of the values,
+@item the depths of the differing ravel elements,
+@item the types (character vs. numeric) of the differing ravel elements,
+@item the Unicodes of the differing ravel elements
+@item the real parts of numeric values,
+@item the imaginary parts of numeric values,
 @end itemize
 
 Note: Rules 1. and 2. above are only relevant for comparisons made in the
@@ -2439,8 +2454,9 @@ can be solved by ⎕DLX contain 3 steps:
 @end itemize
 
 Another application of ⎕DLX is solving sudokus. The constraints matrix is
-a little more complicated, but the principle is the same.
-
+a little more complicated, but the principle is the same. GNU APL is shipped
+with two workspaces: sudoku.apl (which solves sudokus without using ⎕DLX) and
+sudoku_DLX.apl (which solves sudokus using ⎕DLX).
 
 @node    Section 3.22
 @section ⎕ENV - Environment Variables
@@ -2818,13 +2834,10 @@ Ymin ← ⌊/,B        ⍝ smallest value in B
 Ymax ← ⌈/,B        ⍝ largest value in B
 @end verbatim
 
-In theory one can also mix real and complex values, even though doing so makes
-little sense.
-
 Example:
 
 @verbatim
-      ⎕PLOT ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
+      ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
 @end verbatim
 
 produces this plot window (only visible in the HTML version of this document;
@@ -2832,10 +2845,16 @@ in text mode see file @b{doc/PLOT_zigzag.png}):
 
 @image{PLOT_zigzag}
 
+NOTE: In theory one can also mix real and complex values, even though doing so
+makes little sense. If at least one item of the plot data B is complex, then
+all real items in B are taken as complex with imaginary part 0.
+
 @subsection The Plot Attributes A
 
-As can be displayed by ⎕PLOT "" there is quite a number of attributes that
-control how the resulting plot looks like:
+As can be displayed with ⎕PLOT '' there are a number of attributes that
+control how the resulting plot will look like:
+
+Example:
 
 @verbatim
       ⎕PLOT ''
@@ -2907,18 +2926,21 @@ Each call of ⎕PLOT with some plot data B opens a separate window in the X
 server (which implies that ⎕PLOT requires X). That window runs in its own
 thread until it is being closed. A window can be closed in different ways:
 
-* By the user clicking on the close button (at the top-right) of the window, or
-* By the user opening the drop down menu of the window (at the top left of the
-  window) and selecting the option named "Close", or
-* from APL by calling 
+@itemize
+@item By the user clicking on the close button (at the top-right) of the
+window, or
+@item By the user opening the drop down menu of the window (at the top left of
+the window) and selecting the option named "Close", ori
+@item from APL by calling ⎕PLOT ¯3.
+@end itemize
 
 @node    Section 3.28
 @section ⎕PS - Print Style
 
-⎕PS is an integer vector that currently (read: SVN 982) contains two integers
-which control some details of how APL values are being printed. The default
-value of ⎕PS is 0 0. ⎕PS is a session variable which survives )LOADing of
-workspaces
+⎕PS is an integer vector that currently (read: as of SVN 982) contains
+two integers which control some details of how APL values are being printed.
+The default value of ⎕PS is 0 0. ⎕PS is a session variable which survives
+)LOADing of workspaces
 
 ⎕PS[1] = 0: print rational quotients a normal floating point numbers
 
@@ -2933,7 +2955,7 @@ Note: ⎕PS[1] has only an effect if rational numbers were ./configured.
 Setting ⎕PS[2] has the same effect as the debug command ]BOXING and uses
 the same values.
 
-Note: For compatibility with older workspaces, Assigning a single value to
+Note: For compatibility with older workspaces, assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
@@ -3584,9 +3606,11 @@ A misspelling of the language can cause APL characters to become unavailable,
 even if your xmodmap is correct. You can check your setting by executing the
 program 'locale'.  If it  shows warnings like these:
 
+@verbatim
 locale: Cannot set LC_CTYPE to default locale: No such file or directory
 locale: Cannot set LC_MESSAGES to default locale: No such file or directory
 locale: Cannot set LC_ALL to default locale: No such file or directory
+@end verbatim
 
 then something is wrong and you should check your LANG setting and installed
 locales.
@@ -3663,9 +3687,9 @@ directory determines, which optional components shall be included on the build.
 @verbatim
     apl-1.8/
     ├── src
-        ├── APs                     ⎕SVO and friends
+        ├── APs                     APs for ⎕SVO and friends
         ├── emacs_mode              dito
-        ├── Gtk                     ⎕GTK
+        ├── Gtk                     ⎕GTK (graphical user interface)
         ├── native                  templates for native functions
         ├── sql                     ⎕SQL
         ├── testcaseses             dito

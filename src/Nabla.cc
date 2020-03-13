@@ -752,7 +752,7 @@ const int idx_from = find_line(LineLabel(edit_from));
    if (idx_from == -1)       return "Bad line number M in [M∆N] ";
    if (idx_from >= idx_to)   return "M ≥ N in [M∆N] ";
 
-   loop(j, idx_to - idx_from)   lines.erase(lines.begin() + idx_from);
+   loop(j, 1 + idx_to - idx_from)   lines.erase(lines.begin() + idx_from);
    current_line = lines.back().label;
    return 0;
 }
