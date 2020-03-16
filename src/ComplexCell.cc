@@ -760,7 +760,7 @@ const APL_Complex z1(x + 5.5, y);
 const APL_Complex z2(x + 0.5, y);
 
 const APL_Complex ret( (complex_sqrt(APL_Complex(2*M_PI)) / z)
-                      * (p0                            +
+                      * (p0                           +
                          p1 / APL_Complex(x + 1.0, y) +
                          p2 / APL_Complex(x + 2.0, y) +
                          p3 / APL_Complex(x + 3.0, y) +
@@ -771,8 +771,8 @@ const APL_Complex ret( (complex_sqrt(APL_Complex(2*M_PI)) / z)
                        * complex_exponent(-z1)
                      );
 
-   // errno may be set and is checked by the caller
-
+   if (!isfinite(ret.real()))   DOMAIN_ERROR;
+   if (!isfinite(ret.imag()))   DOMAIN_ERROR;
    return ret;
 
 #undef p0

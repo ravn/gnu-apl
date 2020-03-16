@@ -88,6 +88,9 @@ protected:
    static ErrorCode flt_gcd(APL_Float & z, APL_Float a, APL_Float b,
                             double qct);
 
+   /// N over K for positive integers N and K.
+   static ErrorCode integer_binomial(Cell * Z, APL_Integer N, APL_Integer K);
+
    /// return the greatest common divisor of complex a and b
    static ErrorCode cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b,
                               double qct);

@@ -168,7 +168,7 @@ Cell::is_near_int64_t(APL_Float value)
 
 const APL_Float result = nearbyint(value);
 const APL_Float diff = value - result;
-   if (diff >= INTEGER_TOLERANCE)    return false;
+   if (diff >=  INTEGER_TOLERANCE)   return false;
    if (diff <= -INTEGER_TOLERANCE)   return false;
 
    return true;

@@ -1357,22 +1357,46 @@ APL_Float z  = tgamma(N + 1);            // N!
 ErrorCode
 NumericCell::bif_binomial(Cell * Z, const Cell * A) const
 {
+   /*
+          compute N over K, i.e.
+
+              ⎛B⎞   ⎛N⎞      N!
+          Z ← ⎜ ⎟ = ⎜ ⎟ = ─────────   for integer K and N, K ≤ N, or
+              ⎝A⎠   ⎝K⎠   K!·(N-K)!
+
+          Z ← gamma(1+B) ÷ ( gamma(1+A) × gamma(1+B-A))  for non-integer K or N
+    */
+
    if (!A->is_numeric())              return E_DOMAIN_ERROR;
-   if (A->get_real_value() > 170.0)   return E_DOMAIN_ERROR;
 
-   if (!is_near_real() || !A->is_near_real())   // complex result
+   // so both A and B are numeric...
+   //
+const bool real_AB = is_near_real() && A->is_near_real();
+
+   // special case: non-negative real integers
+   //
+   if (real_AB && is_near_int() && A->is_near_int())
       {
-        const APL_Float r_1_a    = A->get_real_value();
-        const APL_Float r_1_b    = get_real_value();
-        const APL_Float r_1_b__a = r_1_b - A->get_real_value();
+        const APL_Integer K = A->get_checked_near_int();
+        const APL_Integer N =    get_checked_near_int();
+        if (K >= 0 && N >= 0)   return integer_binomial(Z, N, K);
 
-        const APL_Float i_a   = A->get_imag_value();
-        const APL_Float i_b   = get_imag_value();
-        const APL_Float i_b_a = i_b - i_a;
+        // K or N is negative: fall through
+      }
 
-        const APL_Complex gam_1_a    = ComplexCell::gamma(r_1_a + 1.0,   i_a);
-        const APL_Complex gam_1_b    = ComplexCell::gamma(r_1_b + 1.0,   i_b);
-        const APL_Complex gam_1_b__a = ComplexCell::gamma(r_1_b__a + 1.0,i_b_a);
+   if (!real_AB)   // complex A or B → complex result
+      {
+        const APL_Float r_A    = A->get_real_value();
+        const APL_Float r_B    = get_real_value();
+        const APL_Float r_B__A = r_B - r_A;
+
+        const APL_Float i_A    = A->get_imag_value();
+        const APL_Float i_B    = get_imag_value();
+        const APL_Float i_B__A = i_B - i_A;
+
+        const APL_Complex gam_1_a    = ComplexCell::gamma(r_A +    1.0, i_A);
+        const APL_Complex gam_1_b    = ComplexCell::gamma(r_B +    1.0, i_B);
+        const APL_Complex gam_1_b__a = ComplexCell::gamma(r_B__A + 1.0, i_B__A);
 
         new (Z) ComplexCell(gam_1_b / (gam_1_a * gam_1_b__a));
         return E_NO_ERROR;
@@ -1427,6 +1451,57 @@ int how = 0;
         case 6: do_binomial(Z, -(b + 1), -(a + 1), (b - a) & 1);   break;
         case 7: new (Z) IntCell(0);                                break;
       }
+
+   return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+NumericCell::integer_binomial(Cell * Z, APL_Integer N, APL_Integer K)
+{
+   // N over K is 0 for all K > N
+   //
+   if (K > N)
+      {
+        new (Z) IntCell(0);
+        return E_NO_ERROR;
+      }
+
+   // N over N is 1
+   if (K == N)
+      {
+        new (Z) IntCell(1);
+        return E_NO_ERROR;
+      }
+
+   // symmetry: N over K == N over (N-K). We want K to be as small
+   // as possible, therefore:
+   //
+   if (K > (N - K))   K = N - K;
+
+   /* at this point, K < N÷2 and Z is Pn ÷ (Pd × Pe) where:
+
+      Pn = 1 × 2 × 3 × ... × N      ⍝ all N factors of the numerator
+      Pd = 1 × 2 × 3 × ... × K      ⍝ the first K factors of the denominator
+      Pe = 1 × 2 × 3 × ... × N-K    ⍝ the last N-K factors of the denominator
+
+      Let Pf = N-K+1 × N-K+2 × ... × N.   ⍝ the last K factors of the numerator
+      Then:
+
+      Z = Pf ÷ Pd  (proof: by reducing Pn by the (identical) factors of Pe
+   */
+APL_Integer Pf = N;   // counting down to  N - K + 1
+APL_Integer Pd = 1;   // counting up to K
+APL_Float Q = 1.0;
+const APL_Float max_Q = 1E307 / N;
+
+   loop(k, K)
+       {
+          Q = (Q/Pd++) * Pf--;
+          if (Q > max_Q)   DOMAIN_ERROR;
+       }
+
+   if (is_near_int64_t(Q))   new (Z) IntCell(near_int(Q));
+   else                      new (Z) FloatCell(Q);
 
    return E_NO_ERROR;
 }
