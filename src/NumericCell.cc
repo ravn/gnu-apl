@@ -1367,27 +1367,14 @@ NumericCell::bif_binomial(Cell * Z, const Cell * A) const
           Z ← gamma(1+B) ÷ ( gamma(1+A) × gamma(1+B-A))  for non-integer K or N
     */
 
-   if (!A->is_numeric())              return E_DOMAIN_ERROR;
+   if (!A->is_numeric())   return E_DOMAIN_ERROR;
 
-   // so both A and B are numeric...
+   // at this point both A and B are numeric...
    //
-const bool real_AB = is_near_real() && A->is_near_real();
-
-   // special case: non-negative real integers
-   //
-   if (real_AB && is_near_int() && A->is_near_int())
+const APL_Float r_A = A->get_real_value();
+const APL_Float r_B =    get_real_value();
+   if (!(is_near_real() && A->is_near_real()))   // complex A or B → complex Z
       {
-        const APL_Integer K = A->get_checked_near_int();
-        const APL_Integer N =    get_checked_near_int();
-        if (K >= 0 && N >= 0)   return integer_binomial(Z, N, K);
-
-        // K or N is negative: fall through
-      }
-
-   if (!real_AB)   // complex A or B → complex result
-      {
-        const APL_Float r_A    = A->get_real_value();
-        const APL_Float r_B    = get_real_value();
         const APL_Float r_B__A = r_B - r_A;
 
         const APL_Float i_A    = A->get_imag_value();
@@ -1402,54 +1389,74 @@ const bool real_AB = is_near_real() && A->is_near_real();
         return E_NO_ERROR;
       }
 
-   if (!is_near_int() || !A->is_near_int())   // non-integer result
+   // at this point both A and B are real. Compute 'row' which is the
+   // row in the case table in chapter "7.2.10 Binomial" of
+   // ISO/IEC 13751 : 2000 (E) on page 90.
+   //
+const int row = (r_A < 0   ? 4 : 0)
+              | (r_B < 0   ? 2 : 0)
+              | (r_B < r_A ? 1 : 0);
+
+   // handle the 0 and the impossible (e.g. A≥0, B<0, but B-A≥0) cases.
+   // ISO wants DOMAIN ERROR for the impossible cases but they cannot occur
+   // anyway.
+   //
+const char * how = "-0?-0?-0";   // '?' means case cannot occur
+const char chow = how[row];
+   if (chow == '0')   return IntCell::z0(Z);
+   Assert(chow == '-');
+
+   // important special case: A and B are both non-negative integers.
+   // This case allows some simplifications.
+   //
+   if (is_near_int() && A->is_near_int())
       {
-        const APL_Float r_1_a    = 1.0 + A->get_real_value();
-        const APL_Float r_1_b    = 1.0 + get_real_value();
-        const APL_Float r_1_b__a = r_1_b - A->get_real_value();
+        const APL_Integer K = A->get_checked_near_int();
+        const APL_Integer N =    get_checked_near_int();
+        if (K >= 0 && N >= 0)   return integer_binomial(Z, N, K);
 
-        if (r_1_a < 0.0    && is_near_int(r_1_a))      return E_DOMAIN_ERROR;
-        if (r_1_b < 0.0    && is_near_int(r_1_b))      return E_DOMAIN_ERROR;
-        if (r_1_b__a < 0.0 && is_near_int(r_1_b__a))   return E_DOMAIN_ERROR;
-
-        const APL_Float rb = tgamma(r_1_b);
-        if (!isfinite(rb))   return E_DOMAIN_ERROR;
-
-        const APL_Float ra = tgamma(r_1_a);
-        if (!isfinite(ra))   return E_DOMAIN_ERROR;
-
-        const APL_Float r_b__a = tgamma(r_1_b__a);
-        if (!isfinite(r_b__a))   return E_DOMAIN_ERROR;
-
-        return FloatCell::zv(Z, (rb / ra) / r_b__a);
+        // otherwise K or N is negative: fall through
       }
 
-   if (!A->is_near_int())   return E_DOMAIN_ERROR;
-   if (!is_near_int())      return E_DOMAIN_ERROR;
+   if (!(is_near_int() && A->is_near_int()))   // non-integer result
+      {
+        const APL_Float r_1_A    = 1.0 + r_A;
+        const APL_Float r_1_B    = 1.0 + r_B;
+        const APL_Float r_1_B__A = r_1_B - r_A;
+
+        if (r_1_A    < 0.0 && is_near_int(r_1_A))      return E_DOMAIN_ERROR;
+        if (r_1_B    < 0.0 && is_near_int(r_1_B))      return E_DOMAIN_ERROR;
+        if (r_1_B__A < 0.0 && is_near_int(r_1_B__A))   return E_DOMAIN_ERROR;
+
+        const APL_Float gam_r_1_B = tgamma(r_1_B);
+        if (!isfinite(gam_r_1_B))   return E_DOMAIN_ERROR;
+
+        const APL_Float gam_r_1_A = tgamma(r_1_A);
+        if (!isfinite(gam_r_1_A))   return E_DOMAIN_ERROR;
+
+        const APL_Float gam_r_1_B__A = tgamma(r_1_B__A);
+        if (!isfinite(gam_r_1_B__A))   return E_DOMAIN_ERROR;
+
+        const APL_Float z = (gam_r_1_B / gam_r_1_A) / gam_r_1_B__A;
+        if (!isfinite(z))   return E_DOMAIN_ERROR;
+        return FloatCell::zv(Z, z);
+      }
+
    if (is_float_cell())
       {
-        if  (get_real_value() >  9223372036854775800.0)   return E_DOMAIN_ERROR;
-        if  (get_real_value() < -9223372036854775800.0)   return E_DOMAIN_ERROR;
+        if  (r_B >  9223372036854775800.0)   return E_DOMAIN_ERROR;
+        if  (r_B < -9223372036854775800.0)   return E_DOMAIN_ERROR;
       }
 
 const APL_Integer a = A->get_checked_near_int();
 const APL_Integer b = get_checked_near_int();
 
-int how = 0;
-   if (a < 0)    how |= 4;
-   if (b < 0)    how |= 2;
-   if (b < a)    how |= 1;
-
-   switch(how)
+   switch(row)
       {
-        case 0: do_binomial(Z, a, b, false);                       break;
-        case 1: new (Z) IntCell(0);                                break;
-        case 2: Assert(0 && "Impossible case 2");                  break;
-        case 3: do_binomial(Z, a, a - (b + 1), a & 1);             break;
-        case 4: new (Z) IntCell(0);                                break;
-        case 5: Assert(0 && "Impossible case 5");                  break;
-        case 6: do_binomial(Z, -(b + 1), -(a + 1), (b - a) & 1);   break;
-        case 7: new (Z) IntCell(0);                                break;
+        case 0:  do_binomial(Z, a,        b,           false);         break;
+        case 3:  do_binomial(Z, a,        a - (b + 1), a & 1);         break;
+        case 6:  do_binomial(Z, -(b + 1), -(a + 1),    (b - a) & 1);   break;
+        default: FIXME;
       }
 
    return E_NO_ERROR;
