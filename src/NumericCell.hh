@@ -58,7 +58,8 @@ protected:
    virtual ErrorCode bif_binomial(Cell * Z, const Cell * A) const;
 
    /// compute binomial funtion for integers a and b
-   static void do_binomial(Cell * Z, APL_Integer a, APL_Integer b, bool negate);
+   static ErrorCode K33_binomial(Cell * Z, APL_Integer N,
+                                 APL_Integer K, bool negate);
 
    /// overloaded Cell::bif_nand()
    virtual ErrorCode bif_nand(Cell * Z, const Cell * A) const;
@@ -81,6 +82,12 @@ protected:
    /// overloaded Cell::get_classname()
    virtual const char * get_classname() const   { return "NumericCell"; }
 
+   /// N over K for complex A and/or B
+   ErrorCode complex_binomial(Cell * Z, const Cell * A) const;
+
+   /// N over K for non-integer A and/or B
+   ErrorCode real_binomial(Cell * Z, const Cell * A) const;
+
    /// return the greatest common divisor of integers a and b
    static ErrorCode int_gcd(APL_Integer & z, APL_Integer a, APL_Integer b);
 
@@ -89,7 +96,8 @@ protected:
                             double qct);
 
    /// N over K for positive integers N and K.
-   static ErrorCode integer_binomial(Cell * Z, APL_Integer N, APL_Integer K);
+   static ErrorCode integer_binomial(Cell * Z, APL_Integer N, APL_Integer K,
+                                     bool negate);
 
    /// return the greatest common divisor of complex a and b
    static ErrorCode cpx_gcd(APL_Complex & z, APL_Complex a, APL_Complex b,
