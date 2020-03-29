@@ -306,7 +306,7 @@ use it for generating APL characters with your keyboard. In contrast to e,g.
 the xmodmap method, the mapping is on a per program basis so that other
 programs are not affected. Obtain a copy from:
 
-    https://github.com/TieDyedDevil/akt
+    https://github.com/blakemcbride/akt
 
 David's akt program is simple to use. In its most useful form the line is
 
