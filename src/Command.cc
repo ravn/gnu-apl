@@ -341,7 +341,19 @@ Command::finish_context()
          if (token.get_tag() == TOK_SI_PUSHED)   continue;
 
 check_EOC:
-         if (Workspace::SI_top()->is_safe_execution_start())
+         if (Quad_FIO::benchmark_cycles_from)
+            {
+               // ⎕FIO[-1] has started a cycle measurement. Read the CPU cycle
+               // counter, compute the cycle difference, stop the measurement
+               // and return the the cycle difference as int scalar.
+               //
+               const uint64_t to = cycle_counter();
+               const uint64_t diff = to - Quad_FIO::benchmark_cycles_from;
+               token = Token(TOK_APL_VALUE1, IntScalar(diff, LOC));
+               Quad_FIO::benchmark_cycles_from = 0;
+               Workspace::SI_top()->clear_safe_execution();
+            }
+         else if (Workspace::SI_top()->is_safe_execution_start())
             {
               Quad_EC::eoc(token);
             }
@@ -455,8 +467,16 @@ check_EOC:
               //
               if (Workspace::SI_top()->get_safe_execution())
                  {
-                  StateIndicator * si = Workspace::SI_top();
-                   while (si->get_parent() && si->get_safe_execution() ==
+                   // SI_top() is in save execution mode. Pop it and all
+                   // callers with the same get_safe_execution() level.
+                   //
+                   // after pop'ing the SI entries only the original SI
+                   // (which has set the save execution mode) shall remain
+                   // the SI stack.
+                   //
+                   StateIndicator * si = Workspace::SI_top();
+                   const int sex_level = si->get_safe_execution();
+                   while (si->get_parent() && sex_level ==
                           si->get_parent()->get_safe_execution())
                       {
                         si = si->get_parent();

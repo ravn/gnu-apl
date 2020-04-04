@@ -47,6 +47,7 @@
 #include "Workspace.hh"
 
 extern uint64_t top_of_memory();
+uint64_t Quad_FIO::benchmark_cycles_from = 0;
 
 Quad_FIO  Quad_FIO::_fun;
 Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
@@ -54,7 +55,7 @@ Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
 
    // CONVENTION: all functions must have an axis argument (like X
    // in A fun[X] B); the axis argument is a function number that selects
-   // one of several functions provided by this library...
+   // one of several functions provided by ⎕FIO...
    //
    // If the axis is missing, then a list of functions implemented by
    // ⎕FIO is displayed
@@ -1196,15 +1197,52 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 }
 //-----------------------------------------------------------------------------
 Token
+Quad_FIO::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
+{
+const ShapeItem function_number = X->get_ravel(0).get_int_value();
+   switch (function_number)
+      {
+        case -1:   // benchmark monadic LO with argument B
+           {
+#if ! HAVE_RDTSC
+             MORE_ERROR() << "Platform has no 'rtdsc' instruction.";
+             DOMAIN_ERROR;
+#endif
+
+             // doit...
+             //
+             Function * fun = LO.get_function();
+             Assert(fun);
+             const uint64_t from = cycle_counter();
+             Token result = fun->eval_AB(A, B);
+             const uint64_t to = cycle_counter();
+             if (result.get_tag() == TOK_SI_PUSHED)
+                {
+                  Workspace::SI_top()->set_safe_execution();
+                  benchmark_cycles_from = from;
+                  return result;
+                }
+
+             // LO is a primitive
+             //
+             return Token(TOK_APL_VALUE1, IntScalar(to - from, LOC));
+           }
+      }
+
+   MORE_ERROR() << "Bad function number (axis X) in operator A LO ⎕FIO[X] B";
+   DOMAIN_ERROR;
+}
+//-----------------------------------------------------------------------------
+Token
 Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B)
 {
    CHECK_SECURITY(disable_Quad_FIO);
 
    /* a common "mistake" is to suppress the printout of ⎕FIO by e.g.
 
-      ⊣⎕FIO[X} B
+      ⊣⎕FIO[X] B
 
-      which lands here instead of eval_XB. We "fix" that mistake...
+      which lands here instead of calling eval_XB(). We "fix" that mistake...
     */
    if (LO.get_tag() == TOK_F2_LEFT)
       {
@@ -1217,6 +1255,28 @@ Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B)
 const ShapeItem function_number = X->get_ravel(0).get_int_value();
    switch (function_number)
       {
+        case -1:   // benchmark monadic LO with argument B
+           {
+#if ! HAVE_RDTSC
+             MORE_ERROR() << "Platform has no 'rtdsc' instruction.";
+             DOMAIN_ERROR;
+#endif
+
+             // doit...
+             //
+             Function * fun = LO.get_function();
+             Assert(fun);
+             const uint64_t from = cycle_counter();
+             Token result = fun->eval_B(B);
+             if (result.get_tag() == TOK_SI_PUSHED)
+                {
+                  Workspace::SI_top()->set_safe_execution();
+                  benchmark_cycles_from = from;
+                  return result;
+                }
+             const uint64_t to = cycle_counter();
+             return Token(TOK_APL_VALUE1, IntScalar(to - from, LOC));
+           }
         case 49:
            {
              Token lines_B = eval_XB(X, B);

@@ -39,50 +39,65 @@ class File_or_String;
 class Quad_FIO : public QuadFunction
 {
 public:
-   /// overloaded Function::is_operator()
-   virtual bool is_operator() const   { return true; }
-
-   /// the default buffer size if the user does not provide one
-   enum { SMALL_BUF = 5000 };
-
    /// Constructor.
    Quad_FIO();
 
-   /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   /// the default buffer size if the user does not provide one
+   enum { SMALL_BUF = 5000 };
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B);
 
    /// overloaded Function::eval_AXB().
-   virtual Token eval_XB(Value_P X, Value_P B);
-
-   /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
 
    /// overloaded Function::eval_AXB().
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
+   virtual Token eval_XB(Value_P X, Value_P B);
 
-   /// close all open files
-   void clear();
-
-   /// fork(), execve(), and return a connection to fd 3 of forked process
-   int do_FIO_57(const UCS_string & B, char * const * envp);
+   /// overloaded Function::eval_B().
+   virtual Token eval_B(Value_P B);
 
    /// close a file descriptor (and its FILE * if any)
    int close_handle(int handle);
 
+   /// fork(), execve(), and return a connection to fd 3 of forked process
+   int do_FIO_57(const UCS_string & B, char * const * envp);
+
+   static Quad_FIO * fun;   ///< Built-in function.
+   static Quad_FIO  _fun;   ///< Built-in function.
+
    /// get one Unicode from file
    static Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
+
+   /// close all open files
+   void clear();
+
+   /// cycle counter at start of a benchmark (⎕FIO[-1])
+   static uint64_t benchmark_cycles_from;
+
+protected:
+   /// overloaded Function::is_operator()
+   virtual bool is_operator() const   { return true; }
+
+   /// overloaded Function::get_fun_valence()
+   virtual int get_fun_valence() const   { return 2; }
+
+   /// overloaded Function::get_oper_valence(). Most primitive operators are
+   /// monadic, so we return 1 and overload dyadic operators (i.e. inner/outer
+   /// product) to return 2
+   virtual int get_oper_valence() const   { return 1; }
+
+   /// overloaded Function::eval_ALXB().
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B);
+
+   /// overloaded Function::eval_LXB().
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
 
    /// return one or more random values
    static Value_P get_random(APL_Integer mode, APL_Integer len);
 
    /// return the open FILE * for (APL integer) \b handle
    FILE * get_FILE(int handle);
-
-   static Quad_FIO * fun;   ///< Built-in function.
-   static Quad_FIO  _fun;   ///< Built-in function.
 
    /// a mapping between strings and axis integers
    struct _sub_fun
@@ -94,7 +109,6 @@ public:
    /// a mapping between strings and axis integers
    static _sub_fun sub_functions[];
 
-protected:
    /// one file (openend with open(), fopen(), or fdopen()).
    /// : handle == fd, and FILE * may or may not exist for fd
    struct file_entry

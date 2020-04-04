@@ -480,39 +480,6 @@ protected:
                        double qct);
 };
 //-----------------------------------------------------------------------------
-/** primitive functions matrix divide and matrix invert */
-/// The class implementing ⌹
-class Bif_F12_DOMINO : public NonscalarFunction
-{
-public:
-   /// Constructor
-   Bif_F12_DOMINO()
-   : NonscalarFunction(TOK_F12_DOMINO)
-   {}
-
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
-
-   /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
-
-   static Bif_F12_DOMINO * fun;   ///< Built-in function
-   static Bif_F12_DOMINO  _fun;   ///< Built-in function
-
-   /// overloaded Function::eval_fill_B()
-   virtual Token eval_fill_B(Value_P B);
-
-   /// overloaded Function::eval_fill_AB()
-   virtual Token eval_fill_AB(Value_P A, Value_P B);
-
-protected:
-   /// Invert matrix B
-   Token matrix_inverse(Value_P B);
-
-   /// Divide matrix A by matrix B
-   Token matrix_divide(Value_P A, Value_P B);
-};
-//-----------------------------------------------------------------------------
 /** primitive functions rotate and reverse */
 /// Base class for implementing ⌽ and ⊖
 class Bif_ROTATE : public NonscalarFunction

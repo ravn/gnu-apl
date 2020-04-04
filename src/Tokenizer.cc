@@ -24,6 +24,7 @@
 #include "Bif_F12_SORT.hh"
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Bif_OPER1_COMMUTE.hh"
+#include "Bif_F12_DOMINO.hh"
 #include "Bif_OPER1_EACH.hh"
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER2_OUTER.hh"
