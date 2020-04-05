@@ -1986,10 +1986,10 @@ const ShapeItem llen = item_shape.get_volume();
             }
          else if (B_item.is_lval_cell())
             {
-              const Cell & pointee = *B_item.get_lval_value();
-               if (pointee.is_pointer_cell())   // pointer to nested
+              const Cell * pointee = B_item.get_lval_value();
+               if (pointee && pointee->is_pointer_cell())   // pointer to nested
                   {
-                    Value_P vB = pointee.get_pointer_value();
+                    Value_P vB = pointee->get_pointer_value();
                     Value_P ref_B = vB->get_cellrefs(LOC);
                     Bif_F12_TAKE::fill(item_shape, Z_from, Z.getref(), ref_B);
                   }
@@ -2165,9 +2165,10 @@ Shape ret;   // of the first non-scalar in B
               }
            else if (cB.is_lval_cell())
               {
-                const Cell & pointee = *cB.get_lval_value();
-                if (!pointee.is_pointer_cell())   continue;  // ptr to scalar
-                v = pointee.get_pointer_value();
+                const Cell * pointee = cB.get_lval_value();
+                if (!pointee)   continue;   // ⊃ NOOP element
+                if (!pointee->is_pointer_cell())   continue;  // ptr to scalar
+                v = pointee->get_pointer_value();
               }
            else
               {

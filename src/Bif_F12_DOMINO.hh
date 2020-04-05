@@ -38,6 +38,12 @@ public:
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B);
 
+   /// overloaded Function::eval_XB()
+   virtual Token eval_XB(Value_P X, Value_P B);
+
+   /// overloaded Function::eval_AXB()
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B);
 
@@ -51,11 +57,10 @@ public:
    virtual Token eval_fill_AB(Value_P A, Value_P B);
 
 protected:
-   /// Invert matrix B
-   Token matrix_inverse(Value_P B);
+   static void divide_matrix2(Cell * cZ, bool need_complex,
+                              ShapeItem rows, ShapeItem cols_A, const Cell * cA,
+                              ShapeItem cols_B, const Cell * cB, double EPS);
 
-   /// Divide matrix A by matrix B
-   Token matrix_divide(Value_P A, Value_P B);
 };
 //-----------------------------------------------------------------------------
 #endif // __BIF_F12_DOMINO_HH_DEFINED__
