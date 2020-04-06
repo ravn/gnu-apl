@@ -166,9 +166,9 @@ protected:
    void split_example_into_columns(const UCS_string & format,
                                    std::vector<UCS_string> & col_formats);
 
-   /// A character array with  a columns of B formatted by specification
-   PrintBuffer format_col_spec(int width, int precision, const Cell * cB,
-                               int cols, int rows);
+   /// A character array with one column of B formatted by specification
+   PrintBuffer format_one_col_by_spec(int width, int precision, const Cell * cB,
+                               ShapeItem cols, ShapeItem rows);
 
    /// add a row (consisting of \b data) to \b PrintBuffer \b ret
    void add_row(PrintBuffer & ret, int row, bool has_char, bool has_num,

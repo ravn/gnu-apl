@@ -938,7 +938,7 @@ PrintBuffer pb;
               precision = A->get_ravel(2*col + 1).get_near_int();
             }
 
-         PrintBuffer pb_col(format_col_spec(col_width, precision,
+         PrintBuffer pb_col(format_one_col_by_spec(col_width, precision,
                                          &B->get_ravel(col), cols_B, rows_B));
 
          if (col_width == 0)   pb_col.pad_l(UNI_ASCII_SPACE, 1);
@@ -961,19 +961,68 @@ Value_P Z(shape_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 PrintBuffer
-Bif_F12_FORMAT::format_col_spec(int width, int precision, const Cell * cB,
-                                int cols, int rows)
+Bif_F12_FORMAT::format_one_col_by_spec(int width, int precision,
+                                       const Cell * cB, ShapeItem cols,
+                                       ShapeItem rows)
 {
 PrintBuffer ret;
 
-bool has_char = false;
-bool has_num = false;
+bool has_char    = false;
+bool has_num     = false;
+bool has_complex = false;
 
    loop(r, rows)
       {
         const Cell & cell = cB[r*cols];
-        if (cell.is_numeric())   has_num = true;
-        else                     has_char = true;
+        if (cell.is_numeric())
+           {
+             has_num = true;
+             if (cell.is_complex_cell())   has_complex = true;
+           }
+        else has_char = true;
+      }
+
+   if (has_complex)
+      {
+         // split cB into real and imag parts...
+         Value_P real(rows, LOC);
+         Value_P imag(rows, LOC);
+         loop(r, rows)
+            {
+              const Cell & cell = cB[r*cols];
+              if (cell.is_complex_cell())
+                 {
+                   new (real->next_ravel()) FloatCell(cell.get_real_value());
+                   new (imag->next_ravel()) FloatCell(cell.get_imag_value());
+                 }
+              else
+                 {
+                   real->next_ravel()->init(cell, real.getref(), LOC);
+                   new (imag->next_ravel()) CharCell(UNI_ASCII_SPACE);
+                 }
+            }
+
+         PrintBuffer pb_real = format_one_col_by_spec(width, precision,
+                                                      &real->get_ravel(0), 1,
+                                                      rows);
+         PrintBuffer pb_imag = format_one_col_by_spec(width, precision,
+                                                      &imag->get_ravel(0), 1,
+                                                      rows);
+
+         PrintBuffer pb_real_imag;
+         loop(r,rows)
+             {
+               UCS_string real_imag = pb_real.get_line(r);
+               UCS_string imag = pb_imag.get_line(r);
+               imag.remove_leading_whitespaces();
+               if (imag.size())
+                  {
+                    real_imag += UNI_ASCII_J;
+                    real_imag.append(imag);
+                  }
+               pb_real_imag.append_ucs(real_imag);
+             }
+         return pb_real_imag;
       }
 
    loop(r, rows)

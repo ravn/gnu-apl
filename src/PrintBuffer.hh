@@ -116,11 +116,11 @@ public:
 
    /// return the first (and only) line
    UCS_string l1() const
-      { Assert (get_height() == 1);   return buffer[0]; }
+      { Assert(get_height() == 1);   return buffer[0]; }
 
    /// return line y
    UCS_string get_line(int y) const
-      { Assert (y < get_height());   return buffer[y]; }
+      { Assert(y < get_height());   return buffer[y]; }
 
    /// print this buffer, interruptible with ^C
    void print_interruptible(ostream & out, Rank rank, int quad_pw);
