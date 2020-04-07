@@ -92,6 +92,9 @@ public:
    : NonscalarFunction(TOK_F12_FORMAT)
    {}
 
+   /// A character array with B formatted by specification
+   Value_P format_by_specification(Value_P A, Value_P B);
+
    static Bif_F12_FORMAT * fun;   ///< Built-in function
    static Bif_F12_FORMAT  _fun;   ///< Built-in function
 
@@ -173,9 +176,6 @@ protected:
    /// add a row (consisting of \b data) to \b PrintBuffer \b ret
    void add_row(PrintBuffer & ret, int row, bool has_char, bool has_num,
                 Unicode align_char, UCS_string & data);
-
-   /// A character array with B formatted by specification
-   Value_P format_by_specification(Value_P A, Value_P B);
 
    /// format value with \b precision mantissa digits (floating format)
    static UCS_string format_spec_float(APL_Float value, int precision);

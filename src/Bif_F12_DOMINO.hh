@@ -21,6 +21,7 @@
 #ifndef __BIF_F12_DOMINO_HH_DEFINED__
 #define __BIF_F12_DOMINO_HH_DEFINED__
 
+#include "Assert.hh"
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 
@@ -73,10 +74,25 @@ protected:
        Also, the matrix does no memory allocation but operates on a double *
        provided in the constructor.
     **/
+
+    struct norm_result
+       {
+         double norm2_real;
+         double norm2_imag;
+         double norm_real;      // sqrt(norm)
+         double norm_imag;      // sqrt(norm)
+         double norm__2_real;   // 2÷norm
+         double norm__2_imag;   // 2÷norm
+       };
+
    template<bool cplx>
    class Matrix
      {
        enum { dpi = cplx ? 2 : 1 };   ///< doubles per item
+
+       /// check that cond is true
+//     void matrix_assert(bool cond) const {}
+#define matrix_assert(x) Assert(x)
 
        public:
 
@@ -87,63 +103,73 @@ protected:
          M(_M),
          N(_N),
          dX(dpi),
-         dY(dpi*N)
+         dY(dpi*_N)
        {}
 
-       /// check that cond is true
-       void matrix_assert(bool cond) const {}
+       // constructor: M×1 matrix from a matrix column
+       //
+       Matrix(double * _data, ShapeItem _M, ShapeItem _N, ShapeItem _dY)
+       : data(_data),
+         M(_M),
+         N(_N),
+         dX(dpi),
+         dY(dpi*_dY)
+       { matrix_assert(_N == 1); }
+
+       void resize(ShapeItem M, ShapeItem N)
+          { new (this)   Matrix<cplx>(data, M, N); }
 
        /// return the real part of A[x;y]
-       double & real(ShapeItem x, ShapeItem y)
+       double & real(ShapeItem y, ShapeItem x)
           {
              matrix_assert(x >= 0);
-             matrix_assert(x <  M);
+             matrix_assert(x <  N);
              matrix_assert(y >= 0);
-             matrix_assert(y <  N);
+             matrix_assert(y <  M);
              return data[x*dX + y*dY];
           }
 
        // initialize this matrix to the identity matrix
        inline void init_identity(ShapeItem rows);
-       inline void init_outer_product(double scale, const Matrix<cplx> & vector);
+       inline void imbed(const Matrix<cplx> & S);
+       inline void init_outer_product(const norm_result & scale,
+                                      const Matrix<cplx> & vect);
+       inline void operator =(const Matrix<cplx> & other);
+       inline void init_inner_product(const Matrix<cplx> & src_A,
+                                      const Matrix<cplx> & src_B);
 
        /// return the real part of A[x;y]
-       const double & real(ShapeItem x, ShapeItem y) const
+       const double & real(ShapeItem y, ShapeItem x) const
           {
              matrix_assert(x >= 0);
-             matrix_assert(x <  M);
+             matrix_assert(x <  N);
              matrix_assert(y >= 0);
-             matrix_assert(y <  N);
+             matrix_assert(y <  M);
              return data[x*dX + y*dY];
           }
 
        /// return the imaginary part of A[x;y]
-       double & imag(ShapeItem x, ShapeItem y)
+       double & imag(ShapeItem y, ShapeItem x)
           {
              matrix_assert(x >= 0);
-             matrix_assert(x <  M);
+             matrix_assert(x <  N);
              matrix_assert(y >= 0);
-             matrix_assert(y <  N);
+             matrix_assert(y <  M);
              return data[x*dX + y*dY + 1];
           }
 
        /// return the imaginary part of A[x;y]
-       const double & imag(ShapeItem x, ShapeItem y) const
+       const double & imag(ShapeItem y, ShapeItem x) const
           {
              matrix_assert(x >= 0);
-             matrix_assert(x <  M);
+             matrix_assert(x <  N);
              matrix_assert(y >= 0);
-             matrix_assert(y <  N);
+             matrix_assert(y <  M);
              return data[x*dX + y*dY + 1];
           }
 
        inline double abs2(ShapeItem y, ShapeItem x) const;
-       inline double col1_norm2() const
-          {
-            double ret = 0;
-            loop(y, M)   ret += abs2(y, 0);
-            return ret;
-          }
+       inline void col1_norm(norm_result & result) const;
 
        inline bool significant(double bmax, double eps) const
           {
@@ -160,10 +186,13 @@ protected:
             return false;   // all items below A[0;1] are (close to) 0
           }
 
+       void print(const char * name) const;
+
        protected:
        /// the matrix elements
        double * data;
 
+       public:
        /// the number of matrix rows
        const ShapeItem M;
 
@@ -178,6 +207,62 @@ protected:
      };
 };
 
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<false>::col1_norm(norm_result & result) const
+{
+double sum = 0;
+
+   loop(y, M)
+       {
+         const double r = real(y, 0);
+         sum += r*r;
+       }
+   result.norm2_real   = sum;
+   result.norm2_imag   = 0;
+   result.norm_real     = sqrt(sum);
+   result.norm_imag    = 0;
+
+   result.norm__2_real = 2.0 / result.norm2_real;
+   result.norm__2_imag = 0.0;
+}
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<true>::col1_norm(norm_result & result) const
+{
+double sum_real = 0;
+double sum_imag = 0;
+
+   loop(y, M)
+       {
+         const double r = real(y, 0);
+         const double i = imag(y, 0);
+         sum_real += r*r - i*i;
+         sum_imag += 2*r*i;
+       }
+
+const complex<double> sum(sum_real, sum_imag);
+   result.norm2_real = sum.real();
+   result.norm2_imag = sum.imag();
+const complex<double> root = sqrt(sum);
+   result.norm_real  = root.real();
+   result.norm_imag  = root.imag();
+
+const complex<double> _2__sum = 2.0 / sum;
+   result.norm__2_real = _2__sum.real();
+   result.norm__2_imag = _2__sum.imag();
+}
+//-----------------------------------------------------------------------------
+template<>
+inline double
+Bif_F12_DOMINO::Matrix<false>::abs2(ShapeItem y, ShapeItem x) const
+{
+const ShapeItem b = x*dX + y*dY;
+   return data[b]*data[b];
+}
+//-----------------------------------------------------------------------------
 template<>
 inline double
 Bif_F12_DOMINO::Matrix<true>::abs2(ShapeItem y, ShapeItem x) const
@@ -185,13 +270,13 @@ Bif_F12_DOMINO::Matrix<true>::abs2(ShapeItem y, ShapeItem x) const
 const ShapeItem b = x*dX + y*dY;
    return data[b]*data[b] + data[b+1]*data[b+1];
 }
-
+//-----------------------------------------------------------------------------
 template<>
-inline double
-Bif_F12_DOMINO::Matrix<false>::abs2(ShapeItem y, ShapeItem x) const
+inline void Bif_F12_DOMINO::Matrix<false>::init_identity(ShapeItem rows)
 {
-const ShapeItem b = x*dX + y*dY;
-   return data[b]*data[b];
+   matrix_assert(rows == M);
+   matrix_assert(rows == N);
+   loop(r, M) loop(c, N)   { real(r, c) = (r == c) ? 1.0 : 0.0; }
 }
 //-----------------------------------------------------------------------------
 template<>
@@ -204,32 +289,162 @@ inline void Bif_F12_DOMINO::Matrix<true>::init_identity(ShapeItem rows)
 }
 //-----------------------------------------------------------------------------
 template<>
-inline void Bif_F12_DOMINO::Matrix<true>::init_outer_product(double scale,
-                                                      const Matrix<true> & src)
+inline void Bif_F12_DOMINO::Matrix<false>::imbed(const Matrix<false>& S)
 {
-   loop(r, M) loop(c, N)
-       real(c, r) = scale * src.real(c, 1) * src.real(r, 1);
+   matrix_assert(  M ==   N);   // Qi is quadratic (N×N)
+   matrix_assert(S.M == S.N);   // S  is quadratic (M×M)
+   matrix_assert(S.M <=   M);   // S is smaller than Qi
+
+const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
+
+   loop(r, M)
+      {
+         if (r < IN)   // upper row: init from identity matrix
+            {
+              loop(c, N)   real(r, c) = 0.0;
+              real(r, r) = 1.0;   // diagonal
+            }
+         else          // lower row: maybe init from S
+            {
+              loop(c, N)
+                  {
+                    if (r < IN)   // left columns: init from identity matrix
+                       real(r, c) = 0.0;
+                    else          // right columns: init from S
+                       {
+                         real(r, c) = S.real(r - IN, c - IN);
+                       }
+                  }
+            }
+      }
 }
 //-----------------------------------------------------------------------------
 template<>
-inline void Bif_F12_DOMINO::Matrix<false>::init_outer_product(double scale,
-                                                     const Matrix<false> & src)
+inline void Bif_F12_DOMINO::Matrix<true>::imbed(const Matrix<true>& S)
 {
-   loop(r, M) loop(c, N)
+   matrix_assert(  M ==   N);   // Qi is quadratic (N×N)
+   matrix_assert(S.M == S.N);   // S  is quadratic (M×M)
+   matrix_assert(S.M <=   M);   // S is smaller than Qi
+
+const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
+
+   loop(r, M)
+      {
+         if (r < IN)   // upper row: init from identity matrix
+            {
+              loop(c, N)   real(r, c) = imag(r, c) = 0.0;
+              real(r, r) = 1.0;   // diagonal
+            }
+         else          // lower row: maybe init from S
+            {
+              loop(c, N)
+                  {
+                    if (r < IN)   // left columns: init from identity matrix
+                       real(r, c) = imag(r, c) = 0.0;
+                    else          // right columns: init from S
+                       {
+                         real(r, c) = S.real(r - IN, c - IN);
+                         imag(r, c) = S.imag(r - IN, c - IN);
+                       }
+                  }
+            }
+      }
+}
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<false>::init_outer_product(const norm_result & scale,
+                                                  const Matrix<false> & src)
+{
+   loop(y, M) loop(x, N)
+       real(y, x) = scale.norm__2_real * src.real(y, 0) * src.real(x, 0);
+}
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<true>::init_outer_product(const norm_result & scale,
+                                                 const Matrix<true> & src)
+{
+const complex<double> sc(scale.norm__2_real, scale.norm__2_imag);
+   loop(y, M) loop(x, N)
        {
-         real(c, r) = scale * (src.real(c, 1) * src.real(r, 1)
-                             - src.imag(c, 1) * src.imag(r, 1));
-         imag(c, r) = scale * (src.real(c, 1) * src.imag(r, 1)
-                             + src.imag(c, 1) * src.real(r, 1));
+         const complex<double> sx(src.real(x, 0), src.imag(x, 0));
+         const complex<double> sy(src.real(y, 0), src.imag(y, 0));
+         const complex<double> prod = sc*sx*sy;
+         real(y, x) = prod.real();
+         imag(y, x) = prod.imag();
        }
 }
 //-----------------------------------------------------------------------------
 template<>
-inline void Bif_F12_DOMINO::Matrix<false>::init_identity(ShapeItem rows)
+inline void
+Bif_F12_DOMINO::Matrix<false>::operator =(const Matrix<false> & src)
 {
-   matrix_assert(rows == M);
-   matrix_assert(rows == N);
-   loop(r, M) loop(c, N)   { real(r, c) = (r == c) ? 1.0 : 0.0; }
+   matrix_assert(M == src.M);
+   matrix_assert(N == src.N);
+   loop(y, src.M) loop(x, src.N)
+       {
+         real(y, x) = src.real(y, x);
+       }
+}
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<true>::operator =(const Matrix<true> & src)
+{
+   matrix_assert(M == src.M);
+   matrix_assert(N == src.N);
+   new(this)   Matrix<true>(data, src.M, src.N);
+   loop(y, src.M) loop(x, src.N)
+       {
+         real(y, x) = src.real(y, x);
+         imag(y, x) = src.imag(y, x);
+       }
+}
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<false>::init_inner_product(const Matrix<false> & src_A,
+                                                  const Matrix<false> & src_B)
+{
+const ShapeItem Z = src_A.N;
+   matrix_assert(M == src_A.M);
+   matrix_assert(N == src_B.N);
+   matrix_assert(Z == src_A.N);
+   matrix_assert(Z == src_B.M);
+
+   loop(y, src_A.M)   // for every row of src_A
+   loop(x, src_B.N)   // for every column of src_B
+       {
+         double sum = 0.0;
+         loop(z, Z)   sum += src_A.real(y, z) * src_B.real(z, x);
+         real(y, x) = sum;
+       }
+}
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<true>::init_inner_product(const Matrix<true> & src_A,
+                                                 const Matrix<true> & src_B)
+{
+const ShapeItem Z = src_A.N;
+   matrix_assert(Z == src_A.N);
+   matrix_assert(Z == src_B.M);
+   new (this) Matrix<true>(data, src_A.M, src_B.N);
+
+   loop(y, src_A.M)   // for every row y of src_A
+   loop(x, src_B.N)   // for every column x of src_B
+       {
+         complex<double> sum(0.0, 0.0);
+         loop(z, Z)
+             {
+               const complex<double> row_a(src_A.real(y, z), src_A.imag(y, z));
+               const complex<double> col_b(src_B.real(z, x), src_B.imag(z, x));
+                 sum += row_a * col_b;
+             }
+         real(y, x) = sum.real();
+         imag(y, x) = sum.imag();
+       }
 }
 //-----------------------------------------------------------------------------
 
