@@ -825,6 +825,12 @@ Nabla::edit_body_line()
 {
 const Parser parser(PM_FUNCTION, LOC, false);
 Token_string in;
+
+   if (InputFile::running_script() &&
+       current_text.size()         &&
+       current_text[0] == UNI_ASCII_SPACE)
+      current_text = current_text.drop(1);
+
 ErrorCode ec = parser.parse(current_text, in);
    if (ec == E_NO_STRING_END && uprefs.multi_line_strings)
       {
