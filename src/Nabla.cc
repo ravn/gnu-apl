@@ -879,10 +879,10 @@ Nabla::execute_escape()
 {
    lines.clear();
 
-   if (fun_symbol)   // existing function
+const Function * fun = fun_symbol ? fun_symbol->get_function() : 0;
+
+   if (fun)   // existing function
       {
-        const Function * fun = fun_symbol->get_function();
-        Assert(fun);
         const UserFunction * ufun = fun->get_ufun1();
         Assert(ufun);
         loop(l, ufun->get_text_size())
@@ -891,7 +891,7 @@ Nabla::execute_escape()
               lines.push_back(FunLine(l, fun_line));
             }
       }
-   else              // new function: only restore the header
+   else       // new function: only restore the header
       {
         lines.push_back(FunLine(0, fun_header));
       }
