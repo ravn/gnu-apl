@@ -486,13 +486,15 @@ mS .print("[11] S");
    mQ.init_inner_product(mR, mQi);
 mQ.print("[12] Q");
 
-   // [13]   B←1 1↓S+.×B ◊ Debug 'B'
+   // [13]   Debug 'B' ◊ Debug 'S' ◊ B←1 1↓S+.×B ◊ Debug 'B'
 
-mR.print("[13] B");
    mR.resize(mB.M, mB.N);   mR = mB;
+mR.print("[13] B");
 mS.print("[13] S");
    mB.resize(mS.M, mR.N);
    mB.init_inner_product(mS, mR);
+
+   mB.drop_1_1();   // 1 1↓B
 mB.print("[13] B");
 
    // [14]   →(0≠1↓⍴B)/SPRFLCTR

@@ -98,23 +98,23 @@ protected:
 
        // constructor: M×N matrix with the default item spacings dX and dY
        //
-       Matrix(double * _data, ShapeItem _M, ShapeItem _N)
-       : data(_data),
-         M(_M),
-         N(_N),
+       Matrix(double * pdata, ShapeItem uM, ShapeItem uN)
+       : data(pdata),
+         M(uM),
+         N(uN),
          dX(dpi),
-         dY(dpi*_N)
+         dY(dpi*uN)
        {}
 
        // constructor: M×1 matrix from a matrix column
        //
-       Matrix(double * _data, ShapeItem _M, ShapeItem _N, ShapeItem _dY)
-       : data(_data),
-         M(_M),
-         N(_N),
+       Matrix(double * pdata, ShapeItem uM, ShapeItem uN, ShapeItem udY)
+       : data(pdata),
+         M(uM),
+         N(uN),
          dX(dpi),
-         dY(dpi*_dY)
-       { matrix_assert(_N == 1); }
+         dY(dpi*udY)
+       { matrix_assert(uN == 1 || udY == (uN + 1)); }
 
        void resize(ShapeItem M, ShapeItem N)
           { new (this)   Matrix<cplx>(data, M, N); }
@@ -137,6 +137,9 @@ protected:
        inline void operator =(const Matrix<cplx> & other);
        inline void init_inner_product(const Matrix<cplx> & src_A,
                                       const Matrix<cplx> & src_B);
+
+       inline void drop_1_1()
+          { new (this)   Matrix<cplx>(data + dpi*(N + 1), M-1, N-1, N); }
 
        /// return the real part of A[x;y]
        const double & real(ShapeItem y, ShapeItem x) const
