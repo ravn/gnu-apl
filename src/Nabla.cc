@@ -878,7 +878,24 @@ const char *
 Nabla::execute_escape()
 {
    lines.clear();
-   lines.push_back(FunLine(0, fun_header));
+
+   if (fun_symbol)   // existing function
+      {
+        const Function * fun = fun_symbol->get_function();
+        Assert(fun);
+        const UserFunction * ufun = fun->get_ufun1();
+        Assert(ufun);
+        loop(l, ufun->get_text_size())
+            {
+              const UCS_string & fun_line = ufun->get_text(l);
+              lines.push_back(FunLine(l, fun_line));
+            }
+      }
+   else              // new function: only restore the header
+      {
+        lines.push_back(FunLine(0, fun_header));
+      }
+
    return 0;
 }
 //-----------------------------------------------------------------------------
