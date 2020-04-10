@@ -138,12 +138,12 @@ XML_Saving_Archive::save_UCS(const UCS_string & ucs)
 int space = do_indent();
    out << decr(space, "<UCS uni=\"");
    Assert(char_mode == false);
-   ++indent;
+   indent += 5;
    loop(u, ucs.size())   emit_unicode(ucs[u], space);
    leave_char_mode();
    out << "\"/>" << endl;
    space -= 2;
-   --indent;
+   indent -= 5;
 }
 //-----------------------------------------------------------------------------
 XML_Saving_Archive &
@@ -1610,6 +1610,11 @@ XML_Loading_Archive::read_chars(UCS_string & ucs, const UTF8 * & utf)
 {
    while (*utf <= ' ')   ++utf;   // skip leading whitespace
 
+   // char mode is controlled by delimiters:
+   // ² (UNI_PAD_U2 = start of char mode),
+   // ¹ (UNI_PAD_U1 = start of hex mode = implicit end of char mode), and
+   // ⁰ (UNI_PAD_U0 = end of char mode.
+   //
    for (bool char_mode = false;;)
        {
          if (*utf == '"')   break;   // end of attribute value

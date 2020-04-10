@@ -70,7 +70,8 @@ struct UserPreferences
      user_do_svars(true),
      user_profile(0),
      wait_ms(0),
-     WINCH_sets_pw(false)
+     WINCH_sets_pw(false),
+     discard_indentation(false)
    { gettimeofday(&session_start, 0); }
 
    /// read a \b preference file and update parameters set there
@@ -223,6 +224,9 @@ struct UserPreferences
 
    /// true if the WINCH signal shall modify ⎕PW
    bool WINCH_sets_pw;
+
+   /// true if leading spaces in the ∇-editor shall be dropped
+   bool discard_indentation;
 
 protected:
    /// decode a byte in a preferences file. The byte can be given as ASCII name

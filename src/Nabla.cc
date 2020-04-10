@@ -700,9 +700,11 @@ const LineLabel user_edit_to = edit_to;
       UERR << "Nabla::execute_oper(SHOW) from "
            << edit_from << " to " << edit_to << endl;
 
-   if (idx_from == 0)   COUT << "    ∇" << endl;               // if header line
+   if (idx_from == 0)                     // then print header line
+      COUT << "    ∇" << endl;
    for (int e = idx_from; e <= idx_to; ++e)   lines[e].print(COUT);
-   if (idx_to == int(lines.size() - 1))   COUT << "    ∇" << endl;  // if last line
+   if (idx_to == int(lines.size() - 1))   // then print last line
+      COUT << "    ∇" << endl;
 
    if (user_edit_to.valid())   // eg. [⎕42] or [2⎕42]
       {
@@ -724,8 +726,8 @@ const LineLabel user_edit_to = edit_to;
       }
 
    Log(LOG_nabla)
-      UERR << "Nabla::execute_oper(SHOW) done with current line "
-           << current_line << endl;
+      UERR << "Nabla::execute_oper(SHOW) done with current_line '"
+           << current_line << "'" << endl;
 
    return 0;
 }
@@ -826,10 +828,8 @@ Nabla::edit_body_line()
 const Parser parser(PM_FUNCTION, LOC, false);
 Token_string in;
 
-   if (InputFile::running_script() &&
-       current_text.size()         &&
-       current_text[0] == UNI_ASCII_SPACE)
-      current_text = current_text.drop(1);
+   if (uprefs.discard_indentation)
+      current_text.remove_leading_and_trailing_whitespaces();
 
 ErrorCode ec = parser.parse(current_text, in);
    if (ec == E_NO_STRING_END && uprefs.multi_line_strings)

@@ -407,6 +407,14 @@ CONTROL-Ds-TO-EXIT 0
 #
 # AUTO-OFF  Yes
 
+###############################################################################
+#
+# with the option below you force GNU APL to discard leading spaces in defined
+# functions (standard APL behaviour), or to leave them as they are. Discarding
+# primarily affects the behaviour of the ∇-editor.
+#
+# DISCARD-INDENTATION Yes
+
 # With the option below you can cause the WINCH signal to change ⎕PW. The
 ###############################################################################
 #

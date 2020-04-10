@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1377,6 +1377,10 @@ int file_profile = 0;   // the current profile in the preferences file
          else if (!strcasecmp(opt, "AUTO-OFF"))
             {
               auto_OFF = yes;
+            }
+         else if (!strcasecmp(opt, "DISCARD-INDENTATION"))
+            {
+              discard_indentation = yes;
             }
 
          // security facilities...
