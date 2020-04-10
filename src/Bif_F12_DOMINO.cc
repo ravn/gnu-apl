@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/// a macro to enable debug printouts
+#define DOMINO_DEBUG
+
 #include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_FORMAT.hh"
 #include "ComplexCell.hh"
@@ -30,6 +33,11 @@ extern void divide_matrix(Cell * cZ, bool need_complex,
 
 Bif_F12_DOMINO   Bif_F12_DOMINO   ::_fun;    // ⌹
 Bif_F12_DOMINO * Bif_F12_DOMINO::fun = &Bif_F12_DOMINO::_fun;
+
+#ifndef DOMINO_DEBUG
+# undef Q1
+# define Q1(x)
+#endif
 
 //-----------------------------------------------------------------------------
 Token
@@ -94,9 +102,9 @@ const ShapeItem cols = B->get_shape_item(1);
 const Shape shape_I(rows, rows);
 Value_P I(shape_I, LOC);
 
-   loop(r, rows)
-   loop(c, rows)
-       new (I->next_ravel()) FloatCell((c == r) ? 1.0 : 0.0);
+   loop(y, rows)
+   loop(x, rows)
+       new (I->next_ravel()) FloatCell((y == x) ? 1.0 : 0.0);
 
 Token result = eval_AB(I, B);
    return result;
@@ -212,8 +220,9 @@ Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 template<>
-void Bif_F12_DOMINO::Matrix<false>::print(const char * name) const
+void Bif_F12_DOMINO::Matrix<false>::debug(const char * name) const
 {
+#ifdef DOMINO_DEBUG
 const Shape shape_B(M, N);
 Value_P B(shape_B, LOC);
 
@@ -228,11 +237,13 @@ Value_P A(2, LOC);
 
 Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
    Z->print_boxed(CERR, name);
+#endif // DOMINO_DEBUG
 }
 //-----------------------------------------------------------------------------
 template<>
-void Bif_F12_DOMINO::Matrix<true>::print(const char * name) const
+void Bif_F12_DOMINO::Matrix<true>::debug(const char * name) const
 {
+#ifdef DOMINO_DEBUG
 const Shape shape_B(M, N);
 Value_P B(shape_B, LOC);
 
@@ -247,6 +258,7 @@ Value_P A(2, LOC);
 
 Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
    Z->print_boxed(CERR, name);
+#endif // DOMINO_DEBUG
 }
 //-----------------------------------------------------------------------------
 void
@@ -281,64 +293,56 @@ const ShapeItem end     = base_S  + CPLX*len_S  + 2;
 
 double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
    memset(data, 0, end*sizeof(double));
-   data[base_B - 1]  = len_B;   data[base_B  + CPLX*len_B]  = 1.0 / len_B;
-   data[base_Q - 1]  = len_Q;   data[base_Q  + CPLX*len_Q]  = 1.0 / len_Q;
-   data[base_Qi - 1] = len_Qi;  data[base_Qi + CPLX*len_Qi] = 1.0 / len_Qi;
-   data[base_R - 1]  = len_R;   data[base_R  + CPLX*len_R]  = 1.0 / len_R;
-   data[base_S - 1]  = len_S;   data[base_S  + CPLX*len_S]  = 1.0 / len_S;
+   data[base_B - 1]  = len_B;   data[base_B  + CPLX*len_B]  = 42.0 / len_B;
+   data[base_Q - 1]  = len_Q;   data[base_Q  + CPLX*len_Q]  = 42.0 / len_Q;
+   data[base_Qi - 1] = len_Qi;  data[base_Qi + CPLX*len_Qi] = 42.0 / len_Qi;
+   data[base_R - 1]  = len_R;   data[base_R  + CPLX*len_R]  = 42.0 / len_R;
+   data[base_S - 1]  = len_S;   data[base_S  + CPLX*len_S]  = 42.0 / len_S;
 
    if (need_complex)   // complex B
       {
-        const Cell * C = cB;
-        double * d = data + base_B;
-        loop(b, len_B)
-            {
-              const Cell & cell = *C++;
-              if (cell.is_float_cell())
-                 { *d++ = cell.get_real_value();   *d++ = 0.0; }
-              else if (cell.is_integer_cell())
-                 { *d++ = cell.get_real_value();   *d++ = 0.0; }
-              else if (cell.is_complex_cell())
-                 { *d++ = cell.get_real_value();
-                   *d++ = cell.get_imag_value(); }
-              else   DOMAIN_ERROR;
-            }
-
+        setup_complex_B(cB, data + base_B, len_B);
         householder<true>(data + base_B, rows, cols, data + base_Q,
                           data + base_Qi, data + base_R, data + base_S, EPS);
+
+        setup_complex_B(cB, data + base_B, len_B);   // restore B
+        const Matrix<true> mB(data + base_B, rows, cols);
+        Matrix<true> mQ(data + base_Q, rows, rows);
+        mQ.transpose(rows);
+        Matrix<true> mR(data + base_R, rows, cols);
+        mR.init_inner_product(mQ, mB);
+        mQ.debug("final Q");
+        mR.debug("final R");
       }
    else                // real B
       {
-        const Cell * C = cB;
-        double * d = data + base_B;
-        loop(b, len_B)
-            {
-              const Cell & cell = *C++;
-              if      (cell.is_float_cell())     *d++ = cell.get_real_value();
-              else if (cell.is_integer_cell())   *d++ = cell.get_real_value();
-              else if (cell.is_complex_cell())   FIXME    // need_complex ?
-              else                               DOMAIN_ERROR;
-            }
-
+        setup_real_B(cB, data + base_B, len_B);
         householder<false>(data + base_B, rows, cols, data + base_Q,
                            data + base_Qi, data + base_R, data + base_S, EPS);
+
+        setup_complex_B(cB, data + base_B, len_B);   // restore B
+        const Matrix<false> mB(data + base_B, rows, cols);
+        Matrix<false> mQ(data + base_Q, rows, rows);
+        mQ.transpose(rows);
+        Matrix<false> mR(data + base_R, rows, cols);
+        mR.init_inner_product(mQ, mB);
       }
 
+   // check that the memory areas were not overridden
    Assert(data[base_B - 1]  == len_B);
-   Assert(data[base_B + len_B]  = 1.0 / len_B);
+   Assert(data[base_B + CPLX*len_B]  == 42.0 / len_B);
    Assert(data[base_Q - 1]  == len_Q);
-   Assert(data[base_Q + len_Q]  = 1.0 / len_Q);
+   Assert(data[base_Q + CPLX*len_Q]  == 42.0 / len_Q);
    Assert(data[base_Qi - 1] == len_Qi);
-   Assert(data[base_Qi + len_Qi] = 1.0 / len_Qi);
+   Assert(data[base_Qi + CPLX*len_Qi] == 42.0 / len_Qi);
    Assert(data[base_R - 1]  == len_R);
-   Assert(data[base_R + len_R]  = 1.0 / len_R);
+   Assert(data[base_R + CPLX*len_R]  == 42.0 / len_R);
    Assert(data[base_S - 1]  == len_S);
-   Assert(data[base_S + len_S]  = 1.0 / len_S);
-
-const Shape shape_QR(rows, rows);
+   Assert(data[base_S + CPLX*len_S]  == 42.0 / len_S);
 
    {
-     Value_P vQ(shape_QR, LOC);
+     const Shape shape_Q(rows, rows);
+     Value_P vQ(shape_Q, LOC);
      if (need_complex)
         {
           loop(q, len_Q)
@@ -354,16 +358,17 @@ const Shape shape_QR(rows, rows);
      new (Z->next_ravel()) PointerCell(vQ.get(), Z.getref());
    }
    {
-     Value_P vR(shape_QR, LOC);
+     const Shape shape_R(rows, cols);
+     Value_P vR(shape_R, LOC);
      if (need_complex)
         {
-          loop(r, len_Q)
+          loop(r, rows*cols)
               new (vR->next_ravel()) ComplexCell(data[base_R + 2*r],
                                                  data[base_R + 2*r + 1]);
         }
      else
         {
-          loop(r, len_Q)
+          loop(r, rows*cols)
               new (vR->next_ravel()) FloatCell(data[base_R + r]);
         }
      vR->check_value(LOC);
@@ -371,6 +376,36 @@ const Shape shape_QR(rows, rows);
    }
 
    delete[] data;
+}
+//-----------------------------------------------------------------------------
+void
+Bif_F12_DOMINO::setup_complex_B(const Cell * cB, double * D, ShapeItem count)
+{
+   loop(b, count)
+      {
+        const Cell & cell = *cB++;
+        if (cell.is_float_cell())
+           { *D++ = cell.get_real_value();   *D++ = 0.0; }
+        else if (cell.is_integer_cell())
+           { *D++ = cell.get_real_value();   *D++ = 0.0; }
+        else if (cell.is_complex_cell())
+           { *D++ = cell.get_real_value(); *D++ = cell.get_imag_value(); }
+        else   DOMAIN_ERROR;
+      }
+}
+//-----------------------------------------------------------------------------
+void
+Bif_F12_DOMINO::setup_real_B(const Cell * cB, double * D, ShapeItem count)
+{
+   loop(b, count)
+      {
+        const Cell & cell = *cB++;
+        if (cell.is_float_cell())
+           { *D++ = cell.get_real_value();   *D++ = 0.0; }
+        else if (cell.is_integer_cell())
+           { *D++ = cell.get_real_value();   *D++ = 0.0; }
+        else   DOMAIN_ERROR;
+      }
 }
 //-----------------------------------------------------------------------------
 template<bool cplx>
@@ -381,18 +416,16 @@ Bif_F12_DOMINO::householder(double * pB, ShapeItem rows, ShapeItem cols,
 {
    // pB is the matrix to be factorized, pQ, pQi, amd pR were initialized to 0
    //
-Matrix<cplx> mB (pB,  rows, cols);
-Matrix<cplx> mQ (pQ,  rows, rows);
-Matrix<cplx> mQi(pQi, rows, rows);
-Matrix<cplx> mR (pR,  rows, rows);
-Matrix<cplx> mS (pS,  rows, rows);
-
-   mB.print("B:");
+Matrix<cplx> mB (pB,  rows, cols);   // shrinks
+Matrix<cplx> mQ (pQ,  rows, rows);   // keeps size
+Matrix<cplx> mQi(pQi, rows, rows);   // keeps size
+Matrix<cplx> mR (pR,  rows, rows);   // temporary storage
 
    // [0]  Q←HSHLDR2 B;N;BMAX;S;L2;QI;COL1
    // [1]  Q←ID N←↑⍴B
 
-   loop(r, rows)   mQ.real(r, r) = 1.0;
+   // mQ was cleared, so setting the diagonal suffices
+   loop(x, rows)   mQ.real(x, x) = 1.0;
 
    // [2]  →(0=(1↓⍴B),BMAX←⌈/∣,B)/0   ⍝ done if no or only near-0 columns
 
@@ -409,20 +442,21 @@ const double qct = Workspace::get_CT();
    if (BMAX < qct)   return;   // all B[x;y] = 0
 const double qct2 = qct*qct;
 
-   // [3]  SPRFLCTR: S←ID ↑⍴B ◊ Debug 'B'
-mB.print("[3] B");
+   for (;;)
+       {
 
-   do {
+   // [3]  SPRFLCTR: S←ID ↑⍴B ◊ Debug 'B'
+
+        Matrix<cplx> mS (pS,  rows, rows);
+mB.debug("[3] B");
 
    // [4]  L2←NORM2 COL1←B[;1] ◊ Debug 'COL1' ◊ Debug 'L2'
 
-        Matrix<cplx> mCOL1 (pB,  rows, 1, cols);   // COL1←B[;1]
-mCOL1.print("[4] COL1");
+        Matrix<cplx> mCOL1 (pB,  rows, 1, mB.dY);   // COL1←B[;1]
+mCOL1.debug("[4] COL1");
         norm_result L;   mB.col1_norm(L);
 Q(L.norm2_real)
 Q(L.norm2_imag)
-Q(L.norm_real)
-Q(L.norm_imag)
         const bool significant = mCOL1.significant(BMAX, EPS);
 
    // [5]  IMBED → L2=0
@@ -430,27 +464,27 @@ Q(L.norm_imag)
 
         if (significant || (L.norm2_real + L.norm2_imag) > qct2)
            {
+Q1("SIGNIFICANT")
    // [7]  B[1;1]←(↑B) + (L2⋆÷2)×(0≤↑B)-0>↑B
 
              double * B11_real = &mB.real(0, 0);
              double * B11_imag = B11_real + 1;
              if (*B11_real < 0)
                 {
-Q(*B11_real)
-Q(*B11_imag)
+Q1("SIGN ¯1")
+Q1(*B11_real)
+Q1(*B11_imag)
                   *B11_real -= L.norm_real;
                   *B11_imag -= L.norm_imag;
                 }
              else
                 {
-Q(*B11_real)
-Q(*B11_imag)
+Q1("SIGN 1")
+Q1(*B11_real)
+Q1(*B11_imag)
                   *B11_real += L.norm_real;
                   *B11_imag += L.norm_imag;
                 }
-
-Q(*B11_real)
-Q(*B11_imag)
 
    // [8]   COL1←B[;1] ◊ Debug 'COL1'
    // [9]   SCALE←2÷NORM2 COL1 ◊ Debug 'NORM2 COL1' ◊ Debug 'SCALE'·
@@ -462,12 +496,12 @@ Q(*B11_imag)
              // clause below. Therefore -S on the right does not work
              // here, but we can simply subtract 1.0 from the diagonal.
              //
-mCOL1.print("[8] COL1");
+mCOL1.debug("[8] COL1");
              norm_result scale;   mCOL1.col1_norm(scale);
              mS.init_outer_product(scale, mCOL1);
-Q(scale.norm__2_real)
-Q(scale.norm__2_imag)
-             loop(r, rows)   mS.real(r, r) -= 1.0;   // subtract 1.0
+Q1(scale.norm__2_real)
+Q1(scale.norm__2_imag)
+             loop(y, rows)   mS.real(y, y) -= 1.0;   // subtract 1.0
            }
         else   // →IMBED but do [3] here
            {
@@ -477,30 +511,35 @@ Q(scale.norm__2_imag)
    // [9] QI←ID N ◊ ((-2/↑⍴S)↑QI)←S ◊ Debug 'QI'
 
    mQi.imbed(mS);
-mQi.print("[11] QI");
-mS .print("[11] S");
+mQi.debug("[11] QI");
+mS .debug("[11] S");
 
    // [12]   Q←Q+.×QI ◊ Debug 'Q'
 
-                    mR = mQ;
+   mR.resize(mQ.M, mQ.N);   mR = mQ;
    mQ.init_inner_product(mR, mQi);
-mQ.print("[12] Q");
+mR.debug("[12] R");
+mQi.debug("[12] Qi");
+mQ.debug("[12] Q");
 
    // [13]   Debug 'B' ◊ Debug 'S' ◊ B←1 1↓S+.×B ◊ Debug 'B'
 
    mR.resize(mB.M, mB.N);   mR = mB;
-mR.print("[13] B");
-mS.print("[13] S");
+mR.debug("[13] B");
+mS.debug("[13] S");
    mB.resize(mS.M, mR.N);
    mB.init_inner_product(mS, mR);
 
-   mB.drop_1_1();   // 1 1↓B
-mB.print("[13] B");
+   pB = mB.drop_1_1();   // 1 1↓B
+mB.debug("[13] B");
 
    // [14]   →(0≠1↓⍴B)/SPRFLCTR
 
-DOMAIN_ERROR;   // for now
-      } while (cols);
+         if (0 == --cols)   break;
+         --rows;
+       }
+
+mQ.debug("[end] Q");
 }
 //-----------------------------------------------------------------------------
 

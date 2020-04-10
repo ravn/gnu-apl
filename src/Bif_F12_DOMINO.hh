@@ -58,13 +58,21 @@ public:
    virtual Token eval_fill_AB(Value_P A, Value_P B);
 
 protected:
+   /// compute the Q matrix of B = QR
    static void QR_factorization(Value_P Z, bool need_complex, ShapeItem rows,
                                 ShapeItem cols, const Cell * cB, double EPS);
 
+   /// compute the householder transformation Q of B = QR
    template<bool cplx>
    static void householder(double * B, ShapeItem rows, ShapeItem cols,
                            double * Q, double * Q1, double * R, double * S,
                            double EPS);
+
+   // initialize complex D with Cells cB
+   static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);
+
+   // initialize real D with Cells cB
+   static void setup_real_B(const Cell * cB, double * D, ShapeItem count);
 
    /** a real or complex matrix. Unlike "normal" matrices where the matrixc rows
        are adjacent, this matrix class separates the number of columns and the
@@ -88,21 +96,20 @@ protected:
    template<bool cplx>
    class Matrix
      {
+       public:
        enum { dpi = cplx ? 2 : 1 };   ///< doubles per item
 
        /// check that cond is true
 //     void matrix_assert(bool cond) const {}
 #define matrix_assert(x) Assert(x)
 
-       public:
 
-       // constructor: M×N matrix with the default item spacings dX and dY
+       // constructor: M×N matrix with the default vertical item spacings dY
        //
        Matrix(double * pdata, ShapeItem uM, ShapeItem uN)
        : data(pdata),
          M(uM),
          N(uN),
-         dX(dpi),
          dY(dpi*uN)
        {}
 
@@ -112,11 +119,10 @@ protected:
        : data(pdata),
          M(uM),
          N(uN),
-         dX(dpi),
-         dY(dpi*udY)
-       { matrix_assert(uN == 1 || udY == (uN + 1)); }
+         dY(udY)
+       {}
 
-       void resize(ShapeItem M, ShapeItem N)
+       inline void resize(ShapeItem M, ShapeItem N)
           { new (this)   Matrix<cplx>(data, M, N); }
 
        /// return the real part of A[x;y]
@@ -126,7 +132,7 @@ protected:
              matrix_assert(x <  N);
              matrix_assert(y >= 0);
              matrix_assert(y <  M);
-             return data[x*dX + y*dY];
+             return data[x*dpi + y*dY];
           }
 
        // initialize this matrix to the identity matrix
@@ -137,9 +143,11 @@ protected:
        inline void operator =(const Matrix<cplx> & other);
        inline void init_inner_product(const Matrix<cplx> & src_A,
                                       const Matrix<cplx> & src_B);
+       inline void transpose(ShapeItem M);
 
-       inline void drop_1_1()
-          { new (this)   Matrix<cplx>(data + dpi*(N + 1), M-1, N-1, N); }
+       inline double * drop_1_1()
+          { new (this)   Matrix<cplx>(data + dpi*(N + 1), M-1, N-1, dY);
+            return data; }
 
        /// return the real part of A[x;y]
        const double & real(ShapeItem y, ShapeItem x) const
@@ -148,7 +156,7 @@ protected:
              matrix_assert(x <  N);
              matrix_assert(y >= 0);
              matrix_assert(y <  M);
-             return data[x*dX + y*dY];
+             return data[x*dpi + y*dY];
           }
 
        /// return the imaginary part of A[x;y]
@@ -158,7 +166,7 @@ protected:
              matrix_assert(x <  N);
              matrix_assert(y >= 0);
              matrix_assert(y <  M);
-             return data[x*dX + y*dY + 1];
+             return data[x*dpi + y*dY + 1];
           }
 
        /// return the imaginary part of A[x;y]
@@ -168,7 +176,7 @@ protected:
              matrix_assert(x <  N);
              matrix_assert(y >= 0);
              matrix_assert(y <  M);
-             return data[x*dX + y*dY + 1];
+             return data[x*dpi + y*dY + 1];
           }
 
        inline double abs2(ShapeItem y, ShapeItem x) const;
@@ -189,7 +197,8 @@ protected:
             return false;   // all items below A[0;1] are (close to) 0
           }
 
-       void print(const char * name) const;
+       /// print this matrix boxed with name
+       void debug(const char * name) const;
 
        protected:
        /// the matrix elements
@@ -201,9 +210,6 @@ protected:
 
        /// the number of matrix columns
        const ShapeItem N;
-
-       /// the distance (in doubles) between  A[i;j] and A[i+1;j]
-       const ShapeItem dX;
 
        /// the distance (in doubles) between  A[i;j] and A[i;j+1]
        const ShapeItem dY;
@@ -262,7 +268,7 @@ template<>
 inline double
 Bif_F12_DOMINO::Matrix<false>::abs2(ShapeItem y, ShapeItem x) const
 {
-const ShapeItem b = x*dX + y*dY;
+const ShapeItem b = x*dpi + y*dY;
    return data[b]*data[b];
 }
 //-----------------------------------------------------------------------------
@@ -270,7 +276,7 @@ template<>
 inline double
 Bif_F12_DOMINO::Matrix<true>::abs2(ShapeItem y, ShapeItem x) const
 {
-const ShapeItem b = x*dX + y*dY;
+const ShapeItem b = x*dpi + y*dY;
    return data[b]*data[b] + data[b+1]*data[b+1];
 }
 //-----------------------------------------------------------------------------
@@ -300,22 +306,22 @@ inline void Bif_F12_DOMINO::Matrix<false>::imbed(const Matrix<false>& S)
 
 const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
 
-   loop(r, M)
+   loop(y, M)
       {
-         if (r < IN)   // upper row: init from identity matrix
+         if (y < IN)   // upper row: init from identity matrix
             {
-              loop(c, N)   real(r, c) = 0.0;
-              real(r, r) = 1.0;   // diagonal
+              loop(x, N)   real(y, x) = 0.0;
+              real(y, y) = 1.0;   // diagonal
             }
          else          // lower row: maybe init from S
             {
-              loop(c, N)
+              loop(x, N)
                   {
-                    if (r < IN)   // left columns: init from identity matrix
-                       real(r, c) = 0.0;
+                    if (x < IN)   // left columns: init from identity matrix
+                       real(y, x) = 0.0;
                     else          // right columns: init from S
                        {
-                         real(r, c) = S.real(r - IN, c - IN);
+                         real(y, x) = S.real(y - IN, x - IN);
                        }
                   }
             }
@@ -331,23 +337,23 @@ inline void Bif_F12_DOMINO::Matrix<true>::imbed(const Matrix<true>& S)
 
 const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
 
-   loop(r, M)
+   loop(y, M)
       {
-         if (r < IN)   // upper row: init from identity matrix
+         if (y < IN)   // upper row: init from identity matrix
             {
-              loop(c, N)   real(r, c) = imag(r, c) = 0.0;
-              real(r, r) = 1.0;   // diagonal
+              loop(x, N)   real(y, x) = imag(y, x) = 0.0;
+              real(y, y) = 1.0;   // diagonal
             }
          else          // lower row: maybe init from S
             {
-              loop(c, N)
+              loop(x, N)
                   {
-                    if (r < IN)   // left columns: init from identity matrix
-                       real(r, c) = imag(r, c) = 0.0;
+                    if (x < IN)   // left columns: init from identity matrix
+                       real(y, x) = imag(y, x) = 0.0;
                     else          // right columns: init from S
                        {
-                         real(r, c) = S.real(r - IN, c - IN);
-                         imag(r, c) = S.imag(r - IN, c - IN);
+                         real(y, x) = S.real(y - IN, x - IN);
+                         imag(y, x) = S.imag(y - IN, x - IN);
                        }
                   }
             }
@@ -431,6 +437,8 @@ Bif_F12_DOMINO::Matrix<true>::init_inner_product(const Matrix<true> & src_A,
                                                  const Matrix<true> & src_B)
 {
 const ShapeItem Z = src_A.N;
+   matrix_assert(M == src_A.M);
+   matrix_assert(N == src_B.N);
    matrix_assert(Z == src_A.N);
    matrix_assert(Z == src_B.M);
    new (this) Matrix<true>(data, src_A.M, src_B.N);
@@ -448,6 +456,29 @@ const ShapeItem Z = src_A.N;
          real(y, x) = sum.real();
          imag(y, x) = sum.imag();
        }
+}
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<false>::transpose(ShapeItem M)
+{
+   for (ShapeItem y = 1; y < M; ++y)   // for every row below the first
+   loop(x, y)                          // for every column left of the diagonal
+      {
+        double r = real(y, x); real(y, x) = real(x, y); real(x, y) = r;
+      }
+}
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<true>::transpose(ShapeItem M)
+{
+   for (ShapeItem y = 1; y < M; ++y)   // for every row below the first
+   loop(x, y)                          // for every column left of the diagonal
+      {
+        double t = real(y, x);   real(y, x) = real(x, y);   real(x, y) = t;
+               t = imag(y, x);   imag(y, x) = imag(x, y);   imag(x, y) = t;
+      }
 }
 //-----------------------------------------------------------------------------
 
