@@ -86,6 +86,16 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
         return;
       }
 
+   if (uprefs.discard_indentation)   // really ?
+      {
+        loop(l, get_text_size())
+            {
+              UCS_string line = get_text(l);
+              line.remove_leading_and_trailing_whitespaces();
+              set_text(l, line);
+            }
+      }
+
    error_line = -1;   // no error
    error_info = 0;
 }

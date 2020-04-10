@@ -64,6 +64,9 @@ protected:
    /// list all ⎕CR functions
    static Token list_functions(ostream & out);
 
+   // do eval_B() with extra spaces removed
+   static Token do_eval_B(const Value & B, bool remove_extra_spaces);
+
    /// compute \b 5 ⎕CR \b B or \b 6 ⎕CR \b B
    static Value_P do_CR5_6(const char * alpha, const Value & B);
 
@@ -120,6 +123,10 @@ protected:
 
    /// compute \b 36 ⎕CR \b B
    static Value_P do_CR36(const Value & B);
+
+   /// compute \b 37 ⎕CR \b B
+   static Value_P do_CR37(const Value & B)
+      { return do_eval_B(B, false).get_apl_val(); }
 
    /// the left argument of Pick (⊃) which selects a sub-item of a variable
    /// being constructed

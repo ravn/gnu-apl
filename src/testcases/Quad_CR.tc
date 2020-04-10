@@ -366,13 +366,34 @@ A ⎕CR B with invalid A < 0
 Hello
 World
 
+)erase foo
+∇foo
+1
+ 2
+  3
+∇
+
+      ⎕CR 'foo'
+foo
+1  
+2  
+3  
+
+      37 ⎕CR 'foo'
+foo
+1  
+ 2 
+  3
+
+
+      )erase foo
 
       ⍝ trigger a domain error if new left arguments are implemented
       ⍝ without adding a testcase
       ⍝
-      37 ⎕CR A
+      38 ⎕CR A
 DOMAIN ERROR+
-      37 ⎕CR A
+      38 ⎕CR A
       ^      ^
 
       )MORE

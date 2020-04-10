@@ -80,6 +80,7 @@ Quad_CR::list_functions(ostream & out)
 "   Zv ← 34 ⎕CR Bb    TLV Bb to Tag ↑Z and Value 1↓Z\n"
 "   Zn ← 35 ⎕CR Bl    string of lines Bl → nested vector of lines Zn\n"
 "   Zl ← 36 ⎕CR Bn    nested vector of lines Bn → string of lines Bl\n"
+"   Zl ← 37 ⎕CR Bn    ⎕CR B without removing indentation\n"
 "\n"
 "   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
 
@@ -89,11 +90,18 @@ Quad_CR::list_functions(ostream & out)
 Token
 Quad_CR::eval_B(Value_P B)
 {
-UCS_string symbol_name(*B.get());
-   if (symbol_name.size() == 0)   // ⎕CR '' : print help
+   if (B->element_count() == 0)   // ⎕CR '' : print help
       {
         return list_functions(COUT);
       }
+
+   return do_eval_B(B.getref(), true);
+}
+//-----------------------------------------------------------------------------
+Token
+Quad_CR::do_eval_B(const Value & B, bool remove_extra_spaces)
+{
+UCS_string symbol_name(B);
 
    // remove trailing whitespaces in B
    //
@@ -142,7 +150,9 @@ UCS_string_vector tlines;
 int max_len = 0;
    loop(row, tlines.size())
       {
-        tlines[row].remove_leading_and_trailing_whitespaces();
+        if (remove_extra_spaces)
+           tlines[row].remove_leading_and_trailing_whitespaces();
+
         if (max_len < tlines[row].size())   max_len = tlines[row].size();
       }
 
@@ -257,6 +267,7 @@ bool extra_frame = false;
         case 34: return do_CR34(*B);             // TLV byte vector to TV
         case 35: return do_CR35(*B);             // lines to nested strings
         case 36: return do_CR36(*B);             // nested strings to lines
+        case 37: return do_CR37(*B);             // ⎕CR B with extra spaces kept
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A";
                  DOMAIN_ERROR;
