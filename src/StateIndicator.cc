@@ -124,8 +124,9 @@ const Executable * uexec = ufun;
              {
                const Token & tok = body[b];
                if (tok.get_tag() != TOK_SYMBOL)   continue;
-               if (ufun->get_name().compare(tok.get_sym_ptr()->get_name()))
-                  return true;
+
+               if (ufun->get_name().compare(tok.get_sym_ptr()->get_name())
+                   == COMP_EQ)   return true;
              }
        }
    return false;

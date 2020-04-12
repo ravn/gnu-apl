@@ -1039,6 +1039,7 @@ UserFunction::fix(const UCS_string & text, int & err_line,
       }
 
 UserFunction * ufun = new UserFunction(text, loc, creator, tolerant, false);
+Q(ufun)
 const char * info = ufun->get_error_info();
    err_line = ufun->get_error_line();
 
@@ -1076,6 +1077,12 @@ Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
 Function * old_function = symbol->get_function();
    if (old_function && keep_existing)
       {
+        Log(LOG_UserFunction__fix)
+           {
+             CERR << "not fixing '" << ufun->header.get_name()
+                  << "' (function already exists, and keep_existing set)"
+                  << endl;
+           }
         err_line = 0;
         delete ufun;
         return 0;
@@ -1083,15 +1090,20 @@ Function * old_function = symbol->get_function();
 
    // check that the function can be defined (e.g. is not on the )SI stack)
    //
-   if (old_function && symbol->cant_be_defined())
-      {
-        err_line = 0;
-        delete ufun;
-        return 0;
-      }
-
    if (old_function)
       {
+        if (const char * reason = symbol->cant_be_defined())
+           {
+             Log(LOG_UserFunction__fix)
+                {
+                  CERR << "not fixing '" << ufun->header.get_name()
+                       << "' (function already exists, and " << reason << endl;
+                }
+             err_line = 0;
+             delete ufun;
+             return 0;
+           }
+
         const UserFunction * old_ufun = old_function->get_ufun1();
         Assert(old_ufun);
         delete old_ufun;
@@ -1106,6 +1118,7 @@ Function * old_function = symbol->get_function();
       {
         CERR << " addr " << voidP(ufun) << endl;
         ufun->print(CERR);
+        CERR <<  "------------------- UserFunction::fix() OK --" << endl;
       }
 
    return ufun;

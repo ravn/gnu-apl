@@ -1951,7 +1951,9 @@ APL_Integer real_line_no = line_no;
            }
         if (line_no <= 0)
            {
-             real_line_no = ufun->get_line(PC) + line_no;
+             // PC points past the jump, so we need to go back a little
+             // in order to get the current line.
+             real_line_no = ufun->get_line(PC - 3) + line_no;
              if (real_line_no < 1)
                 {
                   MORE_ERROR() << "A → B past start of function";

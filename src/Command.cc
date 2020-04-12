@@ -341,21 +341,45 @@ Command::finish_context()
          if (token.get_tag() == TOK_SI_PUSHED)   continue;
 
 check_EOC:
-         if (Quad_FIO::benchmark_cycles_from)
+         if (Quad_FIO::benchmark_cycles_from)   // a benchmark is ongoing
             {
-               // ⎕FIO[-1] has started a cycle measurement. Read the CPU cycle
-               // counter, compute the cycle difference, stop the measurement
-               // and return the the cycle difference as int scalar.
-               //
-               const uint64_t to = cycle_counter();
-               const uint64_t diff = to - Quad_FIO::benchmark_cycles_from;
-               token = Token(TOK_APL_VALUE1, IntScalar(diff, LOC));
-               Quad_FIO::benchmark_cycles_from = 0;
-               Workspace::SI_top()->clear_safe_execution();
+              if (StateIndicator * si = Workspace::SI_top()->get_parent())
+                 {
+                   if (si->is_safe_execution_start())
+                      {
+                        // at this point token is the result of a defined
+                        // function which is being benchmarked. Replace the
+                        // result by the number of CPU cycles executed since
+                        // the start of the benchmark.
+                        //
+                        const uint64_t to = cycle_counter();
+                        const uint64_t from = Quad_FIO::benchmark_cycles_from;
+                        const uint64_t diff = to - from;
+                        Value_P val = IntScalar(diff, LOC);
+                        token.~Token();   // free the value (if any)
+                        new (&token) Token(TOK_APL_VALUE1, val);
+                        si->clear_safe_execution();
+                      }
+                 }
             }
          else if (Workspace::SI_top()->is_safe_execution_start())
             {
-              Quad_EC::eoc(token);
+              if (Quad_FIO::benchmark_cycles_from)
+                 {
+                   // ⎕FIO[-1] has started a cycle measurement. Read the CPU
+                   // cycle counter, compute the cycle difference, stop the
+                   // measurement, and return the the cycle difference as int
+                   // scalar...
+                   //
+                   const uint64_t to = cycle_counter();
+                   const uint64_t diff = to - Quad_FIO::benchmark_cycles_from;
+                   token = Token(TOK_APL_VALUE1, IntScalar(diff, LOC));
+                   Quad_FIO::benchmark_cycles_from = 0;
+                 }
+              else
+                 {
+                   Quad_EC::eoc(token);
+                 }
             }
 
          // the far most frequent cases are TC_VALUE and TOK_VOID

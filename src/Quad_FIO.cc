@@ -1267,14 +1267,15 @@ const ShapeItem function_number = X->get_ravel(0).get_int_value();
              Function * fun = LO.get_function();
              Assert(fun);
              const uint64_t from = cycle_counter();
+             Workspace::SI_top()->set_safe_execution();
              Token result = fun->eval_B(B);
              if (result.get_tag() == TOK_SI_PUSHED)
                 {
-                  Workspace::SI_top()->set_safe_execution();
-                  benchmark_cycles_from = from;
+                  benchmark_cycles_from = from | 1;
                   return result;
                 }
              const uint64_t to = cycle_counter();
+             Workspace::SI_top()->clear_safe_execution();
              return Token(TOK_APL_VALUE1, IntScalar(to - from, LOC));
            }
         case 49:

@@ -794,8 +794,22 @@ ScalarFunction::eval_scalar_AXB(Value_P A, Value_P X, Value_P B, prim_f2 fun)
 {
 PERFORMANCE_START(start_1)
 
-   if (!X || A->is_scalar_extensible() || B->is_scalar_extensible())
-      return eval_scalar_AB(A, B, fun);
+   {
+     int sec = 0;
+     if (A->is_scalar_extensible())   ++sec;
+     if (B->is_scalar_extensible())   ++sec;
+
+     /* avoid a conflict between scalar extension and axis of 1-element
+        values with different ranks, e.g.
+
+        (1 1⍴'A') = [1] (1⍴'B')
+
+         which could lead to the wrong (smaller rank) shape of the result
+      */
+     if (!X || sec == 1 ||
+         (sec == 2 && A->same_rank(*B))   // ← conflict if ranks differ
+        ) return eval_scalar_AB(A, B, fun);
+   }
 
    if (X->get_rank() > 1)   AXIS_ERROR;
 

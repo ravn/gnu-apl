@@ -64,7 +64,7 @@ protected:
 
    /// compute the householder transformation Q of B = QR
    template<bool cplx>
-   static void householder(double * B, ShapeItem rows, ShapeItem cols,
+   static double * householder(double * B, ShapeItem rows, ShapeItem cols,
                            double * Q, double * Q1, double * R, double * S,
                            double EPS);
 
@@ -93,6 +93,8 @@ protected:
          double norm__2_imag;   // 2÷norm
        };
 
+   /// Matrix is a helper class that makes a plain double * look like
+   /// a real (cplx = false) or complex (cplx = true) matrix.
    template<bool cplx>
    class Matrix
      {
@@ -179,9 +181,6 @@ protected:
              return data[x*dpi + y*dY + 1];
           }
 
-       inline double abs2(ShapeItem y, ShapeItem x) const;
-       inline void col1_norm(norm_result & result) const;
-
        inline bool significant(double bmax, double eps) const
           {
             const double bmax_eps = bmax + eps;
@@ -197,6 +196,17 @@ protected:
             return false;   // all items below A[0;1] are (close to) 0
           }
 
+       /// return the square of the length of the item at row x column y
+       inline double abs2(ShapeItem y, ShapeItem x) const;
+
+       /// add or subtract val to/from a so that the result has the largest
+       /// length.
+       static inline void add_sub(double * item, const double * val);
+
+       /// return lengts of the first column in different forms
+       inline void col1_norm(norm_result & result) const;
+
+
        /// print this matrix boxed with name
        void debug(const char * name) const;
 
@@ -211,7 +221,7 @@ protected:
        /// the number of matrix columns
        const ShapeItem N;
 
-       /// the distance (in doubles) between  A[i;j] and A[i;j+1]
+       /// the distance (in doubles) between  A[i;j] and A[i+1;j]
        const ShapeItem dY;
      };
 };
@@ -281,11 +291,40 @@ const ShapeItem b = x*dpi + y*dY;
 }
 //-----------------------------------------------------------------------------
 template<>
+inline void
+Bif_F12_DOMINO::Matrix<false>::add_sub(double * item, const double * val)
+{
+double v = *val;
+   if (v < 0.0)   v = -v;   // make v positive
+   if (*item < 0)   *item -= v;
+   else             *item += v;
+}
+//-----------------------------------------------------------------------------
+template<>
+inline void
+Bif_F12_DOMINO::Matrix<true>::add_sub(double * item, const double * val)
+{
+bool add = false;
+   if      (item[0] >= 0 && val[0] >= 0)   add = true;
+   else if (item[0] < 0  && val[0] < 0)    add = true;
+
+   if (add)   { item[0] += val[0];   item[1] += val[1]; }
+   else       { item[0] -= val[0];   item[1] -= val[1]; }
+}
+//-----------------------------------------------------------------------------
+template<>
 inline void Bif_F12_DOMINO::Matrix<false>::init_identity(ShapeItem rows)
 {
    matrix_assert(rows == M);
    matrix_assert(rows == N);
-   loop(r, M) loop(c, N)   { real(r, c) = (r == c) ? 1.0 : 0.0; }
+
+   // off-diagonal elements...
+   //
+   loop(y, rows) loop(x, y)   real(x, y) = real(y, x) = 0.0;
+
+   // diagonal elements...
+   //
+   loop(y, rows)              real(y, y) = 1.0;
 }
 //-----------------------------------------------------------------------------
 template<>
@@ -293,8 +332,15 @@ inline void Bif_F12_DOMINO::Matrix<true>::init_identity(ShapeItem rows)
 {
    matrix_assert(rows == M);
    matrix_assert(rows == N);
-   loop(r, M) loop(c, N)
-      { real(r, c) = (r == c) ? 1.0 : 0.0;   imag(r, c) = 0.0; }
+
+   // off-diagonal elements...
+   //
+   loop(y, rows) loop(x, y)
+       real(x, y) = real(y, x) = imag(x, y) = imag(y, x) = 0.0;
+
+   // diagonal elements...
+   //
+   loop(y, rows)   real(y, y) = 1.0;
 }
 //-----------------------------------------------------------------------------
 template<>
@@ -307,25 +353,17 @@ inline void Bif_F12_DOMINO::Matrix<false>::imbed(const Matrix<false>& S)
 const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
 
    loop(y, M)
+   loop(x, N)
       {
-         if (y < IN)   // upper row: init from identity matrix
-            {
-              loop(x, N)   real(y, x) = 0.0;
-              real(y, y) = 1.0;   // diagonal
-            }
-         else          // lower row: maybe init from S
-            {
-              loop(x, N)
-                  {
-                    if (x < IN)   // left columns: init from identity matrix
-                       real(y, x) = 0.0;
-                    else          // right columns: init from S
-                       {
-                         real(y, x) = S.real(y - IN, x - IN);
-                       }
-                  }
-            }
+         if (y < IN || x < IN)         // upper row or left col: init from ID N
+            real(x, y) = real(y, x) = 0.0;
+         else                          // lower row and right col: init from S
+            real(y, x) = S.real(y - IN, x - IN);
       }
+
+   // upper diagonal
+   //
+   loop(y, IN)   real(y,y) = 1.0;
 }
 //-----------------------------------------------------------------------------
 template<>
@@ -365,8 +403,23 @@ inline void
 Bif_F12_DOMINO::Matrix<false>::init_outer_product(const norm_result & scale,
                                                   const Matrix<false> & src)
 {
-   loop(y, M) loop(x, N)
-       real(y, x) = scale.norm__2_real * src.real(y, 0) * src.real(x, 0);
+   // the resulting matrix is symmetric, so we can take advantage of that
+   // by computing every value only once,
+   //
+   matrix_assert(M == N);
+
+   // off-diagonal elements...
+   //
+   for (ShapeItem y = 1; y < M; ++y)   // for every row below the first
+   loop(x, y)                          // for every column left of the diagonal
+       real(x, y) = real(y, x)
+                  = scale.norm__2_real * src.real(y, 0) * src.real(x, 0);
+
+   // diagonal elements...
+   //
+   loop(y, M)
+       real(y, y) = scale.norm__2_real * src.real(y, 0) * src.real(y, 0);
+
 }
 //-----------------------------------------------------------------------------
 template<>
@@ -374,14 +427,33 @@ inline void
 Bif_F12_DOMINO::Matrix<true>::init_outer_product(const norm_result & scale,
                                                  const Matrix<true> & src)
 {
+   // the resulting matrix is symmetric, so we can take advantage of that
+   // by computing every value only once,
+   //
+   matrix_assert(M == N);
+
 const complex<double> sc(scale.norm__2_real, scale.norm__2_imag);
-   loop(y, M) loop(x, N)
+
+   // off-diagonal elements...
+   //
+   for (ShapeItem y = 1; y < M; ++y)   // for every row below the first
+   loop(x, y)                          // for every column left of the diagonal
        {
          const complex<double> sx(src.real(x, 0), src.imag(x, 0));
          const complex<double> sy(src.real(y, 0), src.imag(y, 0));
          const complex<double> prod = sc*sx*sy;
-         real(y, x) = prod.real();
-         imag(y, x) = prod.imag();
+         real(x, y) = real(y, x) = prod.real();
+         imag(x, y) = imag(y, x) = prod.imag();
+       }
+
+   // diagonal elements...
+   //
+   loop(y, M)
+       {
+         const complex<double> sd(src.real(y, 0), src.imag(y, 0));
+         const complex<double> prod = sc*sd*sd;
+         real(y, y) = prod.real();
+         imag(y, y) = prod.imag();
        }
 }
 //-----------------------------------------------------------------------------
