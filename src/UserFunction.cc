@@ -1039,7 +1039,6 @@ UserFunction::fix(const UCS_string & text, int & err_line,
       }
 
 UserFunction * ufun = new UserFunction(text, loc, creator, tolerant, false);
-Q(ufun)
 const char * info = ufun->get_error_info();
    err_line = ufun->get_error_line();
 
