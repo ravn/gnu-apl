@@ -760,7 +760,7 @@ between GNU APL and IBM APL2.
 * Section 3.6::   Debug Commands
 * Section 3.7::   Direct Functions (Lambdas)
 * Section 3.8::   ]DOXY Command
-* Section 3.9::   )DUMP Command
+* Section 3.9::   )DUMP and DUMP-HTML Commands
 * Section 3.10::  History and TAB completion
 * Section 3.11::  Logging Facilities
 * Section 3.12::  Rational Numbers
@@ -1576,7 +1576,9 @@ For example:
 
 
 @node    Section 3.9
-@section )DUMP Command
+@section )DUMP and DUMP-HTML Commands
+
+@subsection )DUMP Command
 
 GNU APL has a command )DUMP that saves a workspace to disk, similar to command
  )OUT.  The difference to command )OUT is the file format being produced.
@@ -1586,6 +1588,21 @@ APL statements). Files written with )DUMP can be edited with normal text
 editors (vi, Emacs), read back with "apl -f", or made executable (see
 scripting).
 
+@subsection )DUMP-HTML Command
+
+The )DUMP-HTML command is similar to the )DUMP command. The output format
+is similar to the )DUMP command, the difference is that those characters\
+that need HTML-escaping (e.g. '<' becomes &lt;, '>' becomes '&gt;) are being
+HTML-escaped. The output of the )DUMP-HTML command can therefore be directly
+used by a web server to display workspace listings (in order to share the
+code).
+
+The files written with command )DUMP-HTML have the extension @b{.html}.
+
+In addition to the APL code, the .html files produced have a short HTML
+<head> section template. The user should replace the fields marked
+with @b{??????} with proper values (for the author, the copyright owner,
+and a short description) before publishing the page.
 
 @node    Section 3.10
 @section History and TAB completion
@@ -2008,7 +2025,7 @@ case.
 The standard function @b{Index Of} (A⍳B) requires its left argument A to be a
 scalar or a length 1 vector. The items of the result are the (first) positions
 (= indices) of the corresponding items in B in A (for the items found in A) or
-else ⎕IO+⍴B (which is an invalid index of A) for the items of B that are not
+else ⎕IO+⍴A (which is an invalid index of A) for the items of B that are not
 found in A.
 
 Generalized dyadic ⍳ extends this concept to find the (first) indices of the
@@ -2024,20 +2041,23 @@ Z←⌹[X] B computes a QR factorization of the real or complex matrix B. The ax
 argument X is used to clear near-0 matrix items to exactly 0.0 during the
 computation. Set X←⎕CT if unsure.
 
-The result Z is a pair (QT R)←Z with the following properties. Let ⍴B=(M, N).
+The result Z is a triple (QT R Ri)←Z with the following properties.
+Let ⍴B=(M, N).
 
-* QT is an orthogonal M×M matrix, i.e Q@sup{-1} = Q@sup{T}, resp. QT +.× ⍉ QT
- is the M×M identity matrix,
+* QT is an orthogonal M×M matrix, i.e QT@sup{-1} = QT@sup{T}, resp. QT +.× ⍉QT
+ is the M×M identity matrix I@sub{M} (with I@sub{M}←∘.=⍨⍳M).
 
 * R is an upper triangular M×N matrix, i.e. R[m;n] = 0 for n < m, and
 
+* Ri is the inverse of R, i.e. Ri +.× R is the identity matrix I@sub{N}.
+
 * (⍉QT) +.× R = B.
 
-Note that, unlike in standard QR Factorizations, the matrix QT returned by ⌹[X]
-is already inverted (i.e. transposed since QT is orthogonal). The reason is that
-the algorithm used can transpose Q with no extra cost and usually the first
-step after a QR factorization is to transpose the returned Q matrix. This
-first transpose step is therefore not needed.
+Note that, unlike in standard QR factorizations, the matrix QT returned by
+⌹[X] is already inverted (i.e. transposed since QT is orthogonal). The
+reason is that the algorithm used can transpose Q with no extra cost and
+usually the first step after a QR factorization is to transpose the
+returned Q matrix. This first transpose step is therefore not needed.
 
 Example 1 (real B)
 @verbatim
@@ -2047,7 +2067,7 @@ Example 1 (real B)
 2 4 2
 4 8 7
 
-      (QT R)←⌹[⎕CT]B
+      (QT R Ri)←⌹[⎕CT]B
       Q←⍉QT   ⍝ recover the non-transposed Q
 
       4 ⎕CR 0 4⍕ Q
@@ -2065,7 +2085,7 @@ Example 1 (real B)
 ┃  .0000  .0000 1.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-      ⍝ verify that R is upper triangle...
+      ⍝ verify that R is upper triangle
       4 ⎕CR 0 4⍕ R
 ┏→━━━━━━━━━━━━━━━━━━━━┓
 ↓ 4.5826 8.9469 7.6376┃
@@ -2073,11 +2093,19 @@ Example 1 (real B)
 ┃ ¯.0000 ¯.0000 1.3416┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-       ⍝ verify that B is (⍉Q) +.× R
+       ⍝ verify that B is Q +.× R   i.e. B is (⍉Q) +.× R
        Q +.× R
 1 1 3
 2 4 2
 4 8 7
+
+      ⍝ verify that Ri is the inverse of R
+      4 ⎕CR 0 4⍕ Ri +.×R
+┏→━━━━━━━━━━━━━━━━━━━━┓
+↓ 1.0000 ¯.0000  .0000┃
+┃  .0000 1.0000  .0000┃
+┃  .0000  .0000 1.0000┃
+┗━━━━━━━━━━━━━━━━━━━━━┛
 
 @end verbatim
 
@@ -2119,7 +2147,7 @@ Example 2 (complex overdetermined B)
 ┃  .0000J.0000     .0000J.0000     .0000J.0000    ¯.0000J.0000  ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-       ⍝ verify that B is (⍉Q) +.× R
+       ⍝ verify that B is Q +.× R   i.e. B is (⍉Q) +.× R
        Q +.× R
 4J6  6J3 5J10  3J2
 8J10 3J4 5J10  5J8
@@ -2128,6 +2156,9 @@ Example 2 (complex overdetermined B)
 2J10 7J6 9J8  10J10
 
 @end verbatim
+
+Please note as well that QR factorization is currently experimental. So
+please double-check its results before using it in production code.
 
 @node    Section 3.19
 @section Dyadic ⎕CR

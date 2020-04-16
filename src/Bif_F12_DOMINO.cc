@@ -128,7 +128,7 @@ const ShapeItem cols_B = B->get_cols();
 
 
 const bool need_complex = B->is_complex(true);
-Value_P Z(2, LOC);
+Value_P Z(3, LOC);
    QR_factorization(Z, need_complex, rows_B, cols_B, &B->get_ravel(0), EPS);
 
    Z->set_default(*B.get(), LOC);   // not needed
@@ -261,6 +261,160 @@ Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
 #endif // DOMINO_DEBUG
 }
 //-----------------------------------------------------------------------------
+template<>
+Value_P Bif_F12_DOMINO::invert_upper_triangle_matrix<false>(const ShapeItem M,
+                                                            const ShapeItem N,
+                                                            double * utm,
+                                                            double * tmp)
+{
+   // ignore rows ≥ N; they are 0 and then cols ≥ N of the result as well.
+   // the 0s will be filled in at the end.
+
+matrix_assert(M >= N);
+Matrix<false> UTM(utm, N, N);   // the matrix to be inverted
+Matrix<false> AUG(tmp, N, N);   // the augmented matrix for the result
+
+   AUG.init_identity(N);   // start with the identity matrix
+
+UTM.debug("UTM orig");
+AUG.debug("AUG orig");
+
+   // divide every row by its diagonal element, so that the diagonal
+   // elements of UTM become 1.0.
+   //
+   loop(y, N)   // for every row y
+       {
+         const double diag_y = UTM.real(y, y);
+         if (diag_y == 0.0)   DOMAIN_ERROR;
+
+         // divide off-diagonal UTM | AUG[y;] by diag_y
+         for (ShapeItem x = y + 1; x < N; ++x)   UTM.real(y, x) /= diag_y;
+
+         // divide diagonal of UTM | AUG by diag_y
+         UTM.real(y, y) = 1.0;
+         AUG.real(y, y) /= diag_y;
+       }
+
+UTM.debug("UTM unity " LOC);
+AUG.debug("AUG unity " LOC);
+
+   // subtract a multiple of the diagonal element from the items above it
+   // so that the item becomes 0.0
+   //
+   loop(y, N)       // for every row y
+   loop (y1, y)     // for every row y1 above y
+       {
+Q1(y) Q1(y1)
+         const double factor = UTM.real(y1, y);
+         if (factor == 0)   continue;   // already 0.0
+Q1(factor)
+         for (ShapeItem x1 = y1; x1 < N; ++x1)
+             {
+               // make UTM[y1;x1] zero by subtracting UTM[y;x] × UTM[y;]
+               UTM.real(y1, x1) -= UTM.real(y, x1) * factor;
+               AUG.real(y1, x1) -= AUG.real(y, x1) * factor;
+             }
+UTM.debug("UTM at " LOC);
+AUG.debug("AUG at " LOC);
+       }
+
+AUG.debug("AUG at " LOC);
+
+   // create the result value
+const Shape shape_INV(N, M);
+Value_P INV(shape_INV, LOC);
+   loop(y, N)   // for every row y
+       {
+         loop(x, M)   // for every column y
+             {
+               const double flt = (x < N) ? AUG.real(y, x) : 0.0;
+               new (INV->next_ravel())   FloatCell(flt);
+             }
+       }
+
+   INV->check_value(LOC);
+   return INV;
+}
+//-----------------------------------------------------------------------------
+template<>
+Value_P Bif_F12_DOMINO::invert_upper_triangle_matrix<true>(ShapeItem M,
+                                                           ShapeItem N,
+                                                           double * utm,
+                                                           double * tmp)
+{
+   // ignore rows ≥ N; they are 0 and then cols ≥ N of the result as well.
+   // the 0s will be filled in at the end.
+
+matrix_assert(M >= N);
+Matrix<true> UTM(utm, N, N);   // the matrix to be inverted
+Matrix<true> AUG(tmp, N, N);   // the augmented matrix for the result
+
+   AUG.init_identity(N);   // start with the identity matrix
+
+UTM.debug("UTM orig");
+AUG.debug("AUG orig");
+
+   // divide every row by its diagonal element, so that the diagonal
+   // elements of UTM become 1.0.
+   //
+   loop(y, N)   // for every row y
+       {
+         const complex<double> diag_y = UTM.get_Z(y, y);
+         if (diag_y.real() == 0.0 && diag_y.imag())   DOMAIN_ERROR;
+
+         // divide off-diagonal UTM | AUG[y;] by diag_y
+         for (ShapeItem x = y + 1; x < N; ++x)
+             UTM.div_Z(y, x, diag_y);
+
+         // divide diagonal of UTM | AUG by diag_y
+         UTM.set_Z(y, y, complex<double>(1.0, 0.0));
+         AUG.div_Z(y, y, diag_y);
+       }
+
+UTM.debug("UTM unity " LOC);
+AUG.debug("AUG unity " LOC);
+
+   // subtract a multiple of the diagonal element from the items above it
+   // so that the item becomes 0.0
+   //
+   loop(y, N)       // for every row y
+   loop (y1, y)     // for every row y1 above y
+       {
+Q1(y) Q1(y1)
+         const complex<double> factor = UTM.get_Z(y1, y);
+         if (factor.real() == 0 && factor.imag() == 0)   continue;
+Q1(factor)
+         for (ShapeItem x1 = y1; x1 < N; ++x1)
+             {
+               // make UTM[y1;x1] zero by subtracting UTM[y;x] × UTM[y;]
+               UTM.sub_Z(y1, x1, UTM.get_Z(y, x1) * factor);
+               AUG.sub_Z(y1, x1, AUG.get_Z(y, x1) * factor);
+             }
+UTM.debug("UTM at " LOC);
+AUG.debug("AUG at " LOC);
+       }
+
+AUG.debug("AUG at " LOC);
+
+   // create the result value
+const Shape shape_INV(N, M);
+Value_P INV(shape_INV, LOC);
+   loop(y, N)   // for every row y
+       {
+         loop(x, M)   // for every column y
+             {
+               if (x < N)
+                  new (INV->next_ravel())   ComplexCell(AUG.real(y, x),
+                                                        AUG.imag(y, x));
+               else
+                  new (INV->next_ravel())   ComplexCell(0.0, 0.0);
+             }
+       }
+
+   INV->check_value(LOC);
+   return INV;
+}
+//-----------------------------------------------------------------------------
 void
 Bif_F12_DOMINO::QR_factorization(Value_P Z, bool need_complex, ShapeItem rows,
                                  ShapeItem cols, const Cell * cB, double EPS)
@@ -273,7 +427,9 @@ Bif_F12_DOMINO::QR_factorization(Value_P Z, bool need_complex, ShapeItem rows,
       Complex numbers are stored as real followed by imag part.
 
       The variables are B, Q, and R with B = Q +.× R, with Q real orthogonal
-      and R real or complex upper triangular.
+      and R real or complex upper triangular. Since being R is computed after
+      Q, it can be used as a temporary variable in the computation of Q (i,e,
+      in function householder()).
    */
 
    // start with the base addresses of the variables. All variables are
@@ -314,9 +470,9 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
       }
    else                // real B
       {
-   Assert(data[base_B + CPLX*len]  == 43.0);
+   Assert(data[base_B + CPLX*len_B]  == 43.0);
         setup_real_B(cB, data + base_B, len_B);
-   Assert(data[base_B + CPLX*len]  == 43.0);
+   Assert(data[base_B + CPLX*len_B]  == 43.0);
         double * Q = householder<false>(data + base_B, rows,cols, data + base_Q,
                            data + base_Qi, data + base_R, data + base_S, EPS);
 
@@ -326,7 +482,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
         mQ.transpose(rows);
         Matrix<false> mR(data + base_R, rows, cols);
         mR.init_inner_product(mQ, mB);
-   Assert(data[base_B + CPLX*len]  == 43.0);
+   Assert(data[base_B + CPLX*len_B]  == 43.0);
       }
 
    // check that the memory areas were not overridden
@@ -374,6 +530,21 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
         }
      vR->check_value(LOC);
      new (Z->next_ravel()) PointerCell(vR.get(), Z.getref());
+
+      if (need_complex)
+         {
+           Value_P INV = invert_upper_triangle_matrix<true>(rows, cols,
+                                                            data + base_R,
+                                                            data + base_Q);
+           new (Z->next_ravel()) PointerCell(INV.get(), Z.getref());
+         }
+      else
+         {
+           Value_P INV = invert_upper_triangle_matrix<false>(rows, cols,
+                                                             data + base_R,
+                                                             data + base_Q);
+           new (Z->next_ravel()) PointerCell(INV.get(), Z.getref());
+         }
    }
 
    delete[] data;
@@ -415,6 +586,10 @@ Bif_F12_DOMINO::householder(double * pB, ShapeItem rows, ShapeItem cols,
 {
    // pB is the matrix to be factorized, pQ, pQi, and pT were initialized to 0
    //
+   // the algorithm is essentially the one described in Garry Helzer's paper
+   // "THE HOUSEHOLDER ALGORITHM AND APPLICATIONS" but using complex numbers
+   // when needed.
+
 const double qct = Workspace::get_CT();
 const double qct2 = qct*qct;
 double BMAX = 0.0;

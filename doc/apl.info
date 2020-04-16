@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-April 12, 2020
+April 16, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -696,7 +696,7 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.6::   Debug Commands
 * Section 3.7::   Direct Functions (Lambdas)
 * Section 3.8::   ]DOXY Command
-* Section 3.9::   )DUMP Command
+* Section 3.9::   )DUMP and DUMP-HTML Commands
 * Section 3.10::  History and TAB completion
 * Section 3.11::  Logging Facilities
 * Section 3.12::  Rational Numbers
@@ -1486,8 +1486,11 @@ explain what a function is supposed to do.
 
 File: apl.info,  Node: Section 3.9,  Next: Section 3.10,  Prev: Section 3.8,  Up: Chapter 3
 
-3.9 )DUMP Command
-=================
+3.9 )DUMP and DUMP-HTML Commands
+================================
+
+3.9.1 )DUMP Command
+-------------------
 
 GNU APL has a command )DUMP that saves a workspace to disk, similar to
 command )OUT. The difference to command )OUT is the file format being
@@ -1496,6 +1499,23 @@ format (aka.  an .atf file), )DUMP produces a file in GNU APL’s script
 format (i.e.  readable APL statements).  Files written with )DUMP can be
 edited with normal text editors (vi, Emacs), read back with "apl -f", or
 made executable (see scripting).
+
+3.9.2 )DUMP-HTML Command
+------------------------
+
+The )DUMP-HTML command is similar to the )DUMP command.  The output
+format is similar to the )DUMP command, the difference is that those
+characters\ that need HTML-escaping (e.g.  ’<’ becomes &lt;, ’>’ becomes
+’&gt;) are being HTML-escaped.  The output of the )DUMP-HTML command can
+therefore be directly used by a web server to display workspace listings
+(in order to share the code).
+
+   The files written with command )DUMP-HTML have the extension .html.
+
+   In addition to the APL code, the .html files produced have a short
+HTML <head> section template.  The user should replace the fields marked
+with ??????  with proper values (for the author, the copyright owner,
+and a short description) before publishing the page.
 
 
 File: apl.info,  Node: Section 3.10,  Next: Section 3.11,  Prev: Section 3.9,  Up: Chapter 3
@@ -1926,7 +1946,7 @@ scalars in the standard case.
 The standard function Index Of (A⍳B) requires its left argument A to be
 a scalar or a length 1 vector.  The items of the result are the (first)
 positions (= indices) of the corresponding items in B in A (for the
-items found in A) or else ⎕IO+⍴B (which is an invalid index of A) for
+items found in A) or else ⎕IO+⍴A (which is an invalid index of A) for
 the items of B that are not found in A.
 
    Generalized dyadic ⍳ extends this concept to find the (first) indices
@@ -1945,18 +1965,21 @@ Z←⌹[X] B computes a QR factorization of the real or complex matrix B.
 The axis argument X is used to clear near-0 matrix items to exactly 0.0
 during the computation.  Set X←⎕CT if unsure.
 
-   The result Z is a pair (QT R)←Z with the following properties.  Let
-⍴B=(M, N).
+   The result Z is a triple (QT R Ri)←Z with the following properties.
+Let ⍴B=(M, N).
 
-   * QT is an orthogonal M×M matrix, i.e Q^{-1} = Q^{T}, resp.  QT +.× ⍉
-QT is the M×M identity matrix,
+   * QT is an orthogonal M×M matrix, i.e QT^{-1} = QT^{T}, resp.  QT +.×
+⍉QT is the M×M identity matrix I_{M} (with I_{M}←∘.=⍨⍳M).
 
    * R is an upper triangular M×N matrix, i.e.  R[m;n] = 0 for n < m,
 and
 
+   * Ri is the inverse of R, i.e.  Ri +.× R is the identity matrix
+I_{N}.
+
    * (⍉QT) +.× R = B.
 
-   Note that, unlike in standard QR Factorizations, the matrix QT
+   Note that, unlike in standard QR factorizations, the matrix QT
 returned by ⌹[X] is already inverted (i.e.  transposed since QT is
 orthogonal).  The reason is that the algorithm used can transpose Q with
 no extra cost and usually the first step after a QR factorization is to
@@ -1970,7 +1993,7 @@ not needed.
 2 4 2
 4 8 7
 
-      (QT R)←⌹[⎕CT]B
+      (QT R Ri)←⌹[⎕CT]B
       Q←⍉QT   ⍝ recover the non-transposed Q
 
       4 ⎕CR 0 4⍕ Q
@@ -1988,7 +2011,7 @@ not needed.
 ┃  .0000  .0000 1.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-      ⍝ verify that R is upper triangle...
+      ⍝ verify that R is upper triangle
       4 ⎕CR 0 4⍕ R
 ┏→━━━━━━━━━━━━━━━━━━━━┓
 ↓ 4.5826 8.9469 7.6376┃
@@ -1996,11 +2019,19 @@ not needed.
 ┃ ¯.0000 ¯.0000 1.3416┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-       ⍝ verify that B is (⍉Q) +.× R
+       ⍝ verify that B is Q +.× R   i.e. B is (⍉Q) +.× R
        Q +.× R
 1 1 3
 2 4 2
 4 8 7
+
+      ⍝ verify that Ri is the inverse of R
+      4 ⎕CR 0 4⍕ Ri +.×R
+┏→━━━━━━━━━━━━━━━━━━━━┓
+↓ 1.0000 ¯.0000  .0000┃
+┃  .0000 1.0000  .0000┃
+┃  .0000  .0000 1.0000┃
+┗━━━━━━━━━━━━━━━━━━━━━┛
 
 
    Example 2 (complex overdetermined B)
@@ -2040,7 +2071,7 @@ not needed.
 ┃  .0000J.0000     .0000J.0000     .0000J.0000    ¯.0000J.0000  ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-       ⍝ verify that B is (⍉Q) +.× R
+       ⍝ verify that B is Q +.× R   i.e. B is (⍉Q) +.× R
        Q +.× R
 4J6  6J3 5J10  3J2
 8J10 3J4 5J10  5J8
@@ -2048,6 +2079,9 @@ not needed.
 1J4  9J9 9J6   2J7
 2J10 7J6 9J8  10J10
 
+
+   Please note as well that QR factorization is currently experimental.
+So please double-check its results before using it in production code.
 
 
 File: apl.info,  Node: Section 3.19,  Next: Section 3.20,  Prev: Section 3.18,  Up: Chapter 3
@@ -5054,56 +5088,56 @@ Node: Top383
 Node: Chapter 11470
 Node: Chapter 219503
 Node: Chapter 323927
-Node: Section 3.125568
-Node: Section 3.241732
-Node: Section 3.342491
-Node: Section 3.443778
-Node: Section 3.547181
-Node: Section 3.647354
-Node: Section 3.747967
-Node: Section 3.851920
-Node: Section 3.953462
-Node: Section 3.1054059
-Node: Section 3.1155843
-Node: Section 3.1257783
-Node: Section 3.1358724
-Node: Section 3.1458976
-Node: Section 3.1560372
-Node: Section 3.1662884
-Node: Section 3.1769583
-Node: Section 3.1871020
-Node: Section 3.1976078
-Node: Section 3.2081112
-Node: Section 3.2184393
-Node: Section 3.2284684
-Node: Section 3.2395259
-Node: Section 3.2495531
-Node: Section 3.25102109
-Node: Section 3.26104560
-Node: Section 3.27105229
-Node: Section 3.28108352
-Node: Section 3.29115206
-Node: Section 3.30116153
-Node: Section 3.31129715
-Node: Section 3.32132819
-Node: Section 3.33134808
-Node: Chapter 4139212
-Node: Chapter 5140960
-Node: Chapter 6142086
-Node: Section 6.1143623
-Node: Section 6.2144903
-Node: Section 6.3145263
-Node: Section 6.4145505
-Node: Section 6.5146167
-Node: Section 6.6146645
-Node: Section 6.7147417
-Node: Section 6.8147874
-Node: Chapter 7148276
-Node: Section 7.1148695
-Node: Section 7.2149382
-Node: Chapter 8150213
-Node: Section 8.1150716
-Node: Section 8.2176030
+Node: Section 3.125583
+Node: Section 3.241747
+Node: Section 3.342506
+Node: Section 3.443793
+Node: Section 3.547196
+Node: Section 3.647369
+Node: Section 3.747982
+Node: Section 3.851935
+Node: Section 3.953477
+Node: Section 3.1054932
+Node: Section 3.1156716
+Node: Section 3.1258656
+Node: Section 3.1359597
+Node: Section 3.1459849
+Node: Section 3.1561245
+Node: Section 3.1663757
+Node: Section 3.1770456
+Node: Section 3.1871893
+Node: Section 3.1977553
+Node: Section 3.2082587
+Node: Section 3.2185868
+Node: Section 3.2286159
+Node: Section 3.2396734
+Node: Section 3.2497006
+Node: Section 3.25103584
+Node: Section 3.26106035
+Node: Section 3.27106704
+Node: Section 3.28109827
+Node: Section 3.29116681
+Node: Section 3.30117628
+Node: Section 3.31131190
+Node: Section 3.32134294
+Node: Section 3.33136283
+Node: Chapter 4140687
+Node: Chapter 5142435
+Node: Chapter 6143561
+Node: Section 6.1145098
+Node: Section 6.2146378
+Node: Section 6.3146738
+Node: Section 6.4146980
+Node: Section 6.5147642
+Node: Section 6.6148120
+Node: Section 6.7148892
+Node: Section 6.8149349
+Node: Chapter 7149751
+Node: Section 7.1150170
+Node: Section 7.2150857
+Node: Chapter 8151688
+Node: Section 8.1152191
+Node: Section 8.2177505
 
 End Tag Table
 

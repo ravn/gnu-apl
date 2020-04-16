@@ -68,6 +68,11 @@ protected:
                            double * Q, double * Q1, double * R, double * S,
                            double EPS);
 
+   /// compute the inverse of \b utm (utm will be destroyed in the process).
+   template<bool cplx>
+   static Value_P invert_upper_triangle_matrix(ShapeItem M, ShapeItem N,
+                                               double * utm, double * tmp);
+
    // initialize complex D with Cells cB
    static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);
 
@@ -115,7 +120,7 @@ protected:
          dY(dpi*uN)
        {}
 
-       // constructor: M×1 matrix from a matrix column
+       // constructor: M×1 matrix (aka. column vector) from a matrix column
        //
        Matrix(double * pdata, ShapeItem uM, ShapeItem uN, ShapeItem udY)
        : data(pdata),
@@ -124,6 +129,7 @@ protected:
          dY(udY)
        {}
 
+       /// resize a (nulti-purpose) matrix to size M×N
        inline void resize(ShapeItem M, ShapeItem N)
           { new (this)   Matrix<cplx>(data, M, N); }
 
@@ -154,31 +160,64 @@ protected:
        /// return the real part of A[x;y]
        const double & real(ShapeItem y, ShapeItem x) const
           {
-             matrix_assert(x >= 0);
-             matrix_assert(x <  N);
-             matrix_assert(y >= 0);
-             matrix_assert(y <  M);
+             matrix_assert(x >= 0);   matrix_assert(x <  N);
+             matrix_assert(y >= 0);   matrix_assert(y <  M);
              return data[x*dpi + y*dY];
           }
 
        /// return the imaginary part of A[x;y]
        double & imag(ShapeItem y, ShapeItem x)
           {
-             matrix_assert(x >= 0);
-             matrix_assert(x <  N);
-             matrix_assert(y >= 0);
-             matrix_assert(y <  M);
+             matrix_assert(x >= 0);   matrix_assert(x <  N);
+             matrix_assert(y >= 0);   matrix_assert(y <  M);
              return data[x*dpi + y*dY + 1];
           }
 
        /// return the imaginary part of A[x;y]
        const double & imag(ShapeItem y, ShapeItem x) const
           {
-             matrix_assert(x >= 0);
-             matrix_assert(x <  N);
-             matrix_assert(y >= 0);
-             matrix_assert(y <  M);
+             matrix_assert(x >= 0);   matrix_assert(x <  N);
+             matrix_assert(y >= 0);   matrix_assert(y <  M);
              return data[x*dpi + y*dY + 1];
+          }
+
+       inline complex<double> get_Z(ShapeItem y, ShapeItem x) const
+          {
+             matrix_assert(x >= 0);   matrix_assert(x <  N);
+             matrix_assert(y >= 0);   matrix_assert(y <  M);
+             const ShapeItem offset = x*dpi + y*dY;
+             return complex<double>(data[offset], data[offset + 1]);
+          }
+
+       inline void set_Z(ShapeItem y, ShapeItem x, complex<double> val)
+          {
+             matrix_assert(x >= 0);   matrix_assert(x <  N);
+             matrix_assert(y >= 0);   matrix_assert(y <  M);
+             const ShapeItem offset = x*dpi + y*dY;
+             data[offset]     = val.real();
+             data[offset + 1] = val.imag();
+          }
+
+       // subtract val from the matrix element at row y, col x.
+       inline void sub_Z(ShapeItem y, ShapeItem x, complex<double> val)
+          {
+             matrix_assert(x >= 0);   matrix_assert(x <  N);
+             matrix_assert(y >= 0);   matrix_assert(y <  M);
+             const ShapeItem offset = x*dpi + y*dY;
+             data[offset]     -= val.real();
+             data[offset + 1] -= val.imag();
+          }
+
+       // divide the matrix element at row y, col x by val.
+       inline void div_Z(ShapeItem y, ShapeItem x, complex<double> val)
+          {
+             matrix_assert(x >= 0);   matrix_assert(x <  N);
+             matrix_assert(y >= 0);   matrix_assert(y <  M);
+             const ShapeItem offset = x*dpi + y*dY;
+             const complex<double> quot =
+                         complex<double>(data[offset], data[offset + 1]) / val;
+             data[offset]     = quot.real();
+             data[offset + 1] = quot.imag();
           }
 
        inline bool significant(double bmax, double eps) const
@@ -201,7 +240,7 @@ protected:
 
        /// add or subtract val to/from a so that the result has the largest
        /// length.
-       static inline void add_sub(double * item, const double * val);
+       static inline void add_sub(double * V11, const double * W11);
 
        /// return lengts of the first column in different forms
        inline void col1_norm(norm_result & result) const;
@@ -292,24 +331,24 @@ const ShapeItem b = x*dpi + y*dY;
 //-----------------------------------------------------------------------------
 template<>
 inline void
-Bif_F12_DOMINO::Matrix<false>::add_sub(double * item, const double * val)
+Bif_F12_DOMINO::Matrix<false>::add_sub(double * V11, const double * W11)
 {
-double v = *val;
-   if (v < 0.0)   v = -v;   // make v positive
-   if (*item < 0)   *item -= v;
-   else             *item += v;
+double w11 = *W11;
+   if (w11 < 0.0)   w11 = -w11;   // make w11 positive
+   if (*V11 < 0)      *V11 -= w11;
+   else               *V11 += w11;
 }
 //-----------------------------------------------------------------------------
 template<>
 inline void
-Bif_F12_DOMINO::Matrix<true>::add_sub(double * item, const double * val)
+Bif_F12_DOMINO::Matrix<true>::add_sub(double * V11, const double * W11)
 {
 bool add = false;
-   if      (item[0] >= 0 && val[0] >= 0)   add = true;
-   else if (item[0] < 0  && val[0] < 0)    add = true;
+   if      (V11[0] >= 0 && W11[0] >= 0)   add = true;
+   else if (V11[0] < 0  && W11[0] < 0)    add = true;
 
-   if (add)   { item[0] += val[0];   item[1] += val[1]; }
-   else       { item[0] -= val[0];   item[1] -= val[1]; }
+   if (add)   { V11[0] += W11[0];   V11[1] += W11[1]; }
+   else       { V11[0] -= W11[0];   V11[1] -= W11[1]; }
 }
 //-----------------------------------------------------------------------------
 template<>
@@ -340,7 +379,7 @@ inline void Bif_F12_DOMINO::Matrix<true>::init_identity(ShapeItem rows)
 
    // diagonal elements...
    //
-   loop(y, rows)   real(y, y) = 1.0;
+   loop(y, rows)   { real(y, y) = 1.0;   imag(y, y) = 0.0; }
 }
 //-----------------------------------------------------------------------------
 template<>

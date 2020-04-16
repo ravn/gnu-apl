@@ -91,7 +91,11 @@ ul.no-bullet {list-style: none}
       <li><a id="toc-Limitations-of-Lambdas" href="#Limitations-of-Lambdas">3.7.3 Limitations of Lambdas</a></li>
     </ul></li>
     <li><a id="toc-_005dDOXY-Command" href="#Section-3_002e8">3.8 ]DOXY Command</a></li>
-    <li><a id="toc-_0029DUMP-Command" href="#Section-3_002e9">3.9 )DUMP Command</a></li>
+    <li><a id="toc-_0029DUMP-and-DUMP_002dHTML-Commands" href="#Section-3_002e9">3.9 )DUMP and DUMP-HTML Commands</a>
+    <ul class="no-bullet">
+      <li><a id="toc-_0029DUMP-Command" href="#g_t_0029DUMP-Command">3.9.1 )DUMP Command</a></li>
+      <li><a id="toc-_0029DUMP_002dHTML-Command" href="#g_t_0029DUMP_002dHTML-Command">3.9.2 )DUMP-HTML Command</a></li>
+    </ul></li>
     <li><a id="toc-History-and-TAB-completion" href="#Section-3_002e10">3.10 History and TAB completion</a></li>
     <li><a id="toc-Logging-Facilities" href="#Section-3_002e11">3.11 Logging Facilities</a>
     <ul class="no-bullet">
@@ -198,7 +202,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a> &nbsp; [<a hre
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>April 12, 2020
+<p>April 16, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -882,7 +886,7 @@ Next: <a href="#Chapter-4" accesskey="n" rel="next">Chapter 4</a>, Previous: <a 
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e8" accesskey="8">Section 3.8</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">]DOXY Command
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e9" accesskey="9">Section 3.9</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">)DUMP Command
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e9" accesskey="9">Section 3.9</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">)DUMP and DUMP-HTML Commands
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e10">Section 3.10</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">History and TAB completion
 </td></tr>
@@ -1695,7 +1699,9 @@ typically one-liners that briefly explain what a function is supposed to do.
 <p>
 Next: <a href="#Section-3_002e10" accesskey="n" rel="next">Section 3.10</a>, Previous: <a href="#Section-3_002e8" accesskey="p" rel="prev">Section 3.8</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="g_t_0029DUMP-Command"></span><h3 class="section">3.9 )DUMP Command</h3>
+<span id="g_t_0029DUMP-and-DUMP_002dHTML-Commands"></span><h3 class="section">3.9 )DUMP and DUMP-HTML Commands</h3>
+
+<span id="g_t_0029DUMP-Command"></span><h4 class="subsection">3.9.1 )DUMP Command</h4>
 
 <p>GNU APL has a command )DUMP that saves a workspace to disk, similar to command
  )OUT.  The difference to command )OUT is the file format being produced.
@@ -1705,7 +1711,22 @@ APL statements). Files written with )DUMP can be edited with normal text
 editors (vi, Emacs), read back with &quot;apl -f&quot;, or made executable (see
 scripting).
 </p>
+<span id="g_t_0029DUMP_002dHTML-Command"></span><h4 class="subsection">3.9.2 )DUMP-HTML Command</h4>
 
+<p>The )DUMP-HTML command is similar to the )DUMP command. The output format
+is similar to the )DUMP command, the difference is that those characters\
+that need HTML-escaping (e.g. &rsquo;&lt;&rsquo; becomes &amp;lt;, &rsquo;&gt;&rsquo; becomes &rsquo;&amp;gt;) are being
+HTML-escaped. The output of the )DUMP-HTML command can therefore be directly
+used by a web server to display workspace listings (in order to share the
+code).
+</p>
+<p>The files written with command )DUMP-HTML have the extension <b>.html</b>.
+</p>
+<p>In addition to the APL code, the .html files produced have a short HTML
+&lt;head&gt; section template. The user should replace the fields marked
+with <b>??????</b> with proper values (for the author, the copyright owner,
+and a short description) before publishing the page.
+</p>
 <hr>
 <span id="Section-3_002e10"></span><div class="header">
 <p>
@@ -2132,7 +2153,7 @@ case.
 <p>The standard function <b>Index Of</b> (A⍳B) requires its left argument A to be a
 scalar or a length 1 vector. The items of the result are the (first) positions
 (= indices) of the corresponding items in B in A (for the items found in A) or
-else ⎕IO+⍴B (which is an invalid index of A) for the items of B that are not
+else ⎕IO+⍴A (which is an invalid index of A) for the items of B that are not
 found in A.
 </p>
 <p>Generalized dyadic ⍳ extends this concept to find the (first) indices of the
@@ -2152,20 +2173,23 @@ Next: <a href="#Section-3_002e19" accesskey="n" rel="next">Section 3.19</a>, Pre
 argument X is used to clear near-0 matrix items to exactly 0.0 during the
 computation. Set X←⎕CT if unsure.
 </p>
-<p>The result Z is a pair (QT R)←Z with the following properties. Let ⍴B=(M, N).
+<p>The result Z is a triple (QT R Ri)←Z with the following properties.
+Let ⍴B=(M, N).
 </p>
-<p>* QT is an orthogonal M×M matrix, i.e Q<sup>-1</sup> = Q<sup>T</sup>, resp. QT +.× ⍉ QT
- is the M×M identity matrix,
+<p>* QT is an orthogonal M×M matrix, i.e QT<sup>-1</sup> = QT<sup>T</sup>, resp. QT +.× ⍉QT
+ is the M×M identity matrix I<sub>M</sub> (with I<sub>M</sub>←∘.=⍨⍳M).
 </p>
 <p>* R is an upper triangular M×N matrix, i.e. R[m;n] = 0 for n &lt; m, and
 </p>
+<p>* Ri is the inverse of R, i.e. Ri +.× R is the identity matrix I<sub>N</sub>.
+</p>
 <p>* (⍉QT) +.× R = B.
 </p>
-<p>Note that, unlike in standard QR Factorizations, the matrix QT returned by ⌹[X]
-is already inverted (i.e. transposed since QT is orthogonal). The reason is that
-the algorithm used can transpose Q with no extra cost and usually the first
-step after a QR factorization is to transpose the returned Q matrix. This
-first transpose step is therefore not needed.
+<p>Note that, unlike in standard QR factorizations, the matrix QT returned by
+⌹[X] is already inverted (i.e. transposed since QT is orthogonal). The
+reason is that the algorithm used can transpose Q with no extra cost and
+usually the first step after a QR factorization is to transpose the
+returned Q matrix. This first transpose step is therefore not needed.
 </p>
 <p>Example 1 (real B)
 </p><pre class="verbatim">
@@ -2174,7 +2198,7 @@ first transpose step is therefore not needed.
 2 4 2
 4 8 7
 
-      (QT R)←⌹[⎕CT]B
+      (QT R Ri)←⌹[⎕CT]B
       Q←⍉QT   ⍝ recover the non-transposed Q
 
       4 ⎕CR 0 4⍕ Q
@@ -2192,7 +2216,7 @@ first transpose step is therefore not needed.
 ┃  .0000  .0000 1.0000┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-      ⍝ verify that R is upper triangle...
+      ⍝ verify that R is upper triangle
       4 ⎕CR 0 4⍕ R
 ┏→━━━━━━━━━━━━━━━━━━━━┓
 ↓ 4.5826 8.9469 7.6376┃
@@ -2200,11 +2224,19 @@ first transpose step is therefore not needed.
 ┃ ¯.0000 ¯.0000 1.3416┃
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
-       ⍝ verify that B is (⍉Q) +.× R
+       ⍝ verify that B is Q +.× R   i.e. B is (⍉Q) +.× R
        Q +.× R
 1 1 3
 2 4 2
 4 8 7
+
+      ⍝ verify that Ri is the inverse of R
+      4 ⎕CR 0 4⍕ Ri +.×R
+┏→━━━━━━━━━━━━━━━━━━━━┓
+↓ 1.0000 ¯.0000  .0000┃
+┃  .0000 1.0000  .0000┃
+┃  .0000  .0000 1.0000┃
+┗━━━━━━━━━━━━━━━━━━━━━┛
 
 </pre>
 <p>Example 2 (complex overdetermined B)
@@ -2244,7 +2276,7 @@ first transpose step is therefore not needed.
 ┃  .0000J.0000     .0000J.0000     .0000J.0000    ¯.0000J.0000  ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-       ⍝ verify that B is (⍉Q) +.× R
+       ⍝ verify that B is Q +.× R   i.e. B is (⍉Q) +.× R
        Q +.× R
 4J6  6J3 5J10  3J2
 8J10 3J4 5J10  5J8
@@ -2253,6 +2285,9 @@ first transpose step is therefore not needed.
 2J10 7J6 9J8  10J10
 
 </pre>
+<p>Please note as well that QR factorization is currently experimental. So
+please double-check its results before using it in production code.
+</p>
 <hr>
 <span id="Section-3_002e19"></span><div class="header">
 <p>

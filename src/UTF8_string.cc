@@ -282,7 +282,7 @@ bool got_tag = false;
    loop(src, size())
       {
         const char cc = at(src);
-        if (in_HTML == 2)   // in HTML header, i.e. < seen
+        if (in_HTML == 2)   // inside HTML tag, i.e. < seen
            {
              if (cc == '>')   in_HTML = 1;   // in HTML but not in HTML tag
              continue;
@@ -290,7 +290,7 @@ bool got_tag = false;
 
         if (cc == '<')   // start of HTML tag
            {
-             in_HTML = 2;   // in HTML tag
+             in_HTML = 2;   // now inside HTML tag
              got_tag = true;
              continue;
            }
@@ -301,26 +301,33 @@ bool got_tag = false;
              continue;
            }
 
+        // at this point cc == '&' which is the start of an HTML-escaped
+        // character. This can be:
+        //
+        // &#XX;  with 2 hexadecimal digits XX, or (incomplete list)
+        // &gt;   for >, or
+        // &lt;   for <
+        //
         const int rest = size() - src;
-        if (rest > 5 && at(src + 1) == '#' && at(src + 4) == ';')
+        if (rest > 4 && at(src + 1) == '#' && at(src + 4) == ';')
            {
-             const long long val = strtoll(charP(&at(src + 2)), 0, 10);
+             const long long val = strtoll(charP(&at(src + 2)), 0, 16);
              at(dest++) = val;
-             src += 4;
+             src += 4;   // skip "#XX;"
            }
-        else if (rest > 4 && at(src + 1) == 'g' &&
+        else if (rest > 3 && at(src + 1) == 'g' &&
                              at(src + 2) == 't' &&
                              at(src + 3) == ';')
            {
              at(dest++) = '>';
-             src += 3;   // skip gt;
+             src += 3;   // skip "gt;"
            }
-        else if (rest > 4 && at(src + 1) == 'l' &&
+        else if (rest > 3 && at(src + 1) == 'l' &&
                              at(src + 2) == 't' &&
                              at(src + 3) == ';')
            {
              at(dest++) = '<';
-             src += 3;   // skip gt;
+             src += 3;   // skip "lt;"
            }
         else
            {
