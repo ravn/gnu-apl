@@ -311,7 +311,7 @@ bool got_tag = false;
         const int rest = size() - src;
         if (rest > 4 && at(src + 1) == '#' && at(src + 4) == ';')
            {
-             const long long val = strtoll(charP(&at(src + 2)), 0, 16);
+             const long long val = strtoll(charP(&at(src + 2)), 0, 10);
              at(dest++) = val;
              src += 4;   // skip "#XX;"
            }
