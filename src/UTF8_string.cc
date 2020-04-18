@@ -304,16 +304,33 @@ bool got_tag = false;
         // at this point cc == '&' which is the start of an HTML-escaped
         // character. This can be:
         //
-        // &#XX;  with 2 hexadecimal digits XX, or (incomplete list)
-        // &gt;   for >, or
+        // &NN;  with decimal digits NN...,        or
+        // &#XX;  with hexadecimal digits XX...,   or (incomplete list)
+        // &gt;   for >,                           or
         // &lt;   for <
         //
+        // There exist more HTML escapes, but the function producing them
+        // (i.e. UCS_string::to_HTML()) does not emit them.
+        //
         const int rest = size() - src;
-        if (rest > 4 && at(src + 1) == '#' && at(src + 4) == ';')
+        if (rest > 3 && at(src + 1) == '#' &&
+            strchr("0123456789", at(src + 2)))
            {
-             const long long val = strtoll(charP(&at(src + 2)), 0, 10);
+             src += 2;   // skip "&#"
+             int val = 0;
+             char * end = 0;
+             if (at(src) == 'x')   // hex value
+                {
+                  ++src;   // skip "x"
+                  val = strtoll(c_str() + src, &end, 16);
+                }
+             else                 // decimal
+                {
+                  val = strtoll(c_str() + src, &end, 10);
+                }
              at(dest++) = val;
-             src += 4;   // skip "#XX;"
+             src = end - c_str();   // skip hex or decimal digits
+             // ";" skipped by loop()
            }
         else if (rest > 3 && at(src + 1) == 'g' &&
                              at(src + 2) == 't' &&
@@ -328,6 +345,15 @@ bool got_tag = false;
            {
              at(dest++) = '<';
              src += 3;   // skip "lt;"
+           }
+        else if (rest > 4 && at(src + 1) == 'n' &&
+                             at(src + 2) == 'b' &&
+                             at(src + 3) == 's' &&
+                             at(src + 4) == 'p' &&
+                             at(src + 5) == ';')
+           {
+             at(dest++) = ' ';
+             src += 5;   // skip "nbsp;"
            }
         else
            {
