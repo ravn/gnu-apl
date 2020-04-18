@@ -1,6 +1,12 @@
 
 # HTML files generated from ASCIIDOC sources
 #
+ASCIIDOC = \
+    APL-Communication-Cookbook.asciidoc \
+    Parallel-APL.asciidoc               \
+    Quad-GTK.asciidoc                   \
+    GNU-APL-Memory-Management.asciidoc
+
 HTML = \
     APL-Communication-Cookbook.html \
     Parallel-APL.html               \
@@ -9,6 +15,7 @@ HTML = \
 
 dist_doc_DATA = \
     $(HTML)              \
+    $(ASCIIDOC)          \
     APL-on-Macintosh.pdf \
     Parallel-APL.pdf     \
     glade-0.png          \
