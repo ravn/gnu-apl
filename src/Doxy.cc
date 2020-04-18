@@ -70,8 +70,13 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
    errno = 0;
    if (mkdir(root_dir.c_str(), 0777))
       {
+        const char * why = strerror(errno);
+
+        // EEXIST says "File exists" which is a little misleading
+        if (errno == EEXIST)   why = "Directory already exists";
+
         CERR << "Cannot create fresh destination directory "
-             << root_dir << ": " << strerror(errno) << endl;
+             << root_dir << ": " << why << endl;
         ++errors;
         DOMAIN_ERROR;
       }
@@ -693,12 +698,24 @@ Doxy::add_fun_to_call_graph(const Symbol * caller_sym,
       out << "   add (caller-) Symbol " << caller_sym->get_name() << endl;
 
 const Token_string & body = ufun->get_body();
+
+   // scan the body of ufun for symbol Token and filter those that are
+   // functions. This is rather heuriostic and therefore not reliable.
+   //
+   // It can fail if the same name is used for both functions and variables.
+   //
    loop(b, body.size())
       {
         const Token & tok = body[b];
         if (tok.get_Class() != TC_SYMBOL)   continue;
+
         const Symbol * callee_ptr = tok.get_sym_ptr();
         Assert(callee_ptr);
+
+        // assume (maybe incorrectly) that local symbol of ufun are variables.
+        //
+        if (ufun->localizes(callee_ptr))   continue;
+
         const Symbol & callee_sym = *callee_ptr;
         loop(si, callee_sym.value_stack_size())
             {

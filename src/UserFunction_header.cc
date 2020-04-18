@@ -447,6 +447,22 @@ UCS_string u;
    return u;
 }
 //-----------------------------------------------------------------------------
+bool
+UserFunction_header::localizes(const Symbol * sym) const
+{
+   if (sym == sym_Z)   return true;
+   if (sym == sym_A)   return true;
+   if (sym == sym_LO)  return true;
+   if (sym == sym_RO)  return true;
+   if (sym == sym_X)   return true;
+   if (sym == sym_B)   return true;
+
+   loop(l, local_vars.size())     if (sym == local_vars[l])         return true;
+   loop(l, label_values.size())   if (sym == label_values[l].sym)   return true;
+
+   return false;
+}
+//-----------------------------------------------------------------------------
 void
 UserFunction_header::print_properties(ostream & out, int indent) const
 {

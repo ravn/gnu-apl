@@ -102,6 +102,9 @@ public:
    /// return error if header was not parsed successfully
    ErrorCode get_error() const   { return error; }
 
+   /// return \b true if this function localizes \b sym
+   bool localizes(const Symbol * sym) const;
+
    /// print local vars etc.
    void print_properties(ostream & out, int indent) const;
 

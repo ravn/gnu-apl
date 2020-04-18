@@ -83,6 +83,10 @@ public:
    virtual bool has_axis() const
       { return header.has_axis(); }
 
+   /// return \b true if this function localizes \b sym
+   bool localizes(const Symbol * sym) const
+      { return header.localizes(sym); }
+
    /// pop all
    void pop_local_vars() const
       { header.pop_local_vars(); }
@@ -95,11 +99,9 @@ public:
    ShapeItem local_var_count() const
       { return header.local_var_count(); }
 
-
    /// return the idx'th local variable
    const Symbol * get_local_var(ShapeItem idx) const
       { return header.get_local_var(idx); }
-
 
    /// Overloaded \b Function::is_operator.
    virtual bool is_operator() const

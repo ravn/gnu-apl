@@ -804,10 +804,11 @@ a GNU APL program can use them.</p></div>
 <div class="paragraph"><p>The following table gives an overview of the communication mechanisms that are
 implemented in GNU APL. Most communication mechanisms are accessed from an APL
 program via system variables. Some system variables need certain libraries and
-if these libraries are not present at the time when GNU APL was ./configure&#8217;d,
-then these system variables will not exist (raising a SYNTAX ERROR) or raise
-a DOMAIN ERROR. The fact that GNU APL is in one role, for example as server,
-does not preclude it from being a client in a different communication.</p></div>
+if these libraries are not present at the time when GNU APL was
+<strong>./configure&#8217;d</strong>, then these system variables will not exist
+(raising a SYNTAX ERROR) or raise a DOMAIN ERROR. The fact that GNU APL is
+in one role, for example as server, does not preclude it from being a client
+in a different communication.</p></div>
 <div class="tableblock">
 <table rules="all"
 width="100%"
@@ -907,13 +908,14 @@ plus possibly code needed for the communication partner).</p></div>
 some more detail.</p></div>
 <div class="sect2">
 <h3 id="_libapl">libapl</h3>
-<div class="paragraph"><p>Normally GNU APL initializes itself end then enters a <strong>REPL</strong> loop until
+<div class="paragraph"><p>Normally GNU APL initializes itself and then enters a <strong>REPL</strong> loop until
 the )OFF command is given (interactive mode) or the input stream ends (script
 mode). <strong>REPL</strong> stands for *R*ead-*E*valuate-*P*rint-*L*oop and that describes
-the top-=level operation of an APL interpreter in interactive mode.</p></div>
+the top-level operation of an APL interpreter in interactive mode.</p></div>
 <div class="paragraph"><p>If GNU APL is <strong>./configure&#8217;d</strong> with option <strong>--with-libapl</strong>, then GNU APL does not
 build a normal executable that can be started from a script or from a shell,
-but it builds a library <strong>libapl</strong>. That library can then be linked with another program that either implements its own REPL loop (thus providing some
+but it builds a library <strong>libapl</strong>. That library can then be linked with another
+program that either implements its own <strong>REPL</strong> loop (thus providing some
 interactive mode, but with a different user interface), or only call GNU APL
 facilities from time to time.</p></div>
 <div class="paragraph"><p>The following is an example C program that demonstrates the use of libapl:</p></div>
@@ -957,17 +959,17 @@ GNU APL), the following command should create an executable file test_libapl:</p
 </div>
 <div class="sect2">
 <h3 id="_shared_variables">Shared Variables</h3>
-<div class="paragraph"><p>Share variables is a communication mechanism that reaches back to the early
-days of APL. In essence, a Share variable is an APL variable that represents
+<div class="paragraph"><p>Shared variables is a communication mechanism that reaches back to the early
+days of APL. In essence, a shared variable is an APL variable that represents
 a communication channel to a peer. If one side assigns a value to a shared
 variable, then the other side gets that value when referencing the variable
 (and vice versa). The communication channel is established, maintained,
-and closed by a set of system variables named ⎕SVC (shared variable
-create) ⎕SVO (shared variable offer) ⎕SVQ (shared variable query), ⎕SVR
-(shared variable retract), and ⎕SVS (shared variable status). The details
+and closed by a set of system variables named <strong>⎕SVC</strong> (shared variable
+create) <strong>⎕SVO</strong> (shared variable offer) <strong>⎕SVQ</strong> (shared variable query), <strong>⎕SVR</strong>
+(shared variable retract), and <strong>⎕SVS</strong> (shared variable status). The details
 of how these system variables are used will not be explained here, because
 shared variables exist in GNU APL only for compatibility with IBM APL2. For
-new APL programs, the socket functions in ⎕FIO are much easier to use than
+new APL programs, the socket functions in <strong>⎕FIO</strong> are much easier to use than
 shared variables and have less restrictions.</p></div>
 <div class="paragraph"><p>Shared variables come in 2 varieties:</p></div>
 <div class="ulist"><ul>
@@ -1003,13 +1005,13 @@ of which are sub-functions of ⎕FIO) that are easier to use that shared
 variables.</p></div>
 <div class="paragraph"><p>For workspace-to-workspace shared variables, the APserver stores
 the shared variables themselves, so that no data is lost if one of the
-connected workspaces exits or ⎕SVRs a shared variable. APserver also maps the
+connected workspaces exits or *⎕SVR*s a shared variable. APserver also maps the
 peer-to-peer connection between two workspaces onto two client/server
 connections from each workspace (as client) to APserver (as server). APserver
 is started automatically when an APL workspace uses shared variables for the
 first time.</p></div>
 <div class="paragraph"><p>Since shared variables are considered obsolete, the effort put into their
-implementing them was kept at a minimum. As a consequence, the implementation
+implementation was kept at a minimum. As a consequence, the implementation
 is rather crude and not optimized for performance.</p></div>
 </div>
 <div class="sect2">
@@ -1382,7 +1384,7 @@ while its inverse function <strong>¯33 ⎕CR</strong>  converts a TLV back to
 <code>      5 ⎕CR  33 ⎕CR 42,"Hello"
 0000002A0000000548656C6C6F
  │ │ │ │ │ │ │ │ │ │ │ │ │
- │ │ │ │ │ │ │ │ └─┴─┴─┴─┴───── "Hello:
+ │ │ │ │ │ │ │ │ └─┴─┴─┴─┴───── "Hello"
  │ │ │ │ └─┴─┴─┴─────────────── 5 (lenght)
  └─┴─┴─┴─────────────────────── 42 (tag)
 
@@ -1422,7 +1424,7 @@ done with <strong>35 ⎕CR</strong>. The terminating line-feeds are removed in t
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-09-04 20:08:54 CEST
+Last updated 2020-04-18 14:48:57 CEST
 </div>
 </div>
 </body>
