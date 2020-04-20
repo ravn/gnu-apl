@@ -5,7 +5,7 @@
 == Abstract
 
 This document describes how memory is being managed in GNU APL and what
-the consequences for an GNU APL programmer are.
+the consequences for a GNU APL programmer are.
 
 == Fundamentals
 
@@ -32,7 +32,7 @@ The sizes of the binaries mentioned (at the time of this writing) are:
 * After the interpreter has started it requests additional memory from the
   operating system on behalf of APL commands and APL code executed. That
   memory is allocated by malloc(), either directly or indirectly (via C++
-  new()). When the memory is no longer needed the it is returned to the
+  new()). When the memory is no longer needed, it is returned to the
   malloc() memory management (for later re-use). The memory kept in the 
   malloc() memory management is only returned to the operating system when the
   GNU APL interpreter exits.
@@ -50,10 +50,10 @@ The sizes of the binaries mentioned (at the time of this writing) are:
 In the following the sizes of these objects are given. The sizes differ
 slightly between 32-bit and 64-bit systems because 32-bit systems use 4-byte
 pointers and 64-bit systems use 8 byte pointers. In addition to the indicated
-sizes there is a (very) small overhead in the malloc() library for every object.
+sizes, there is a (very) small overhead in the malloc() library for every object.
 Each of the objects is far bigger than its malloc overhead and therefore the
 overhead can normally be ignored. A typical APL program is assumed to have
-less than 1000 APL symbols (i.e. variables or defined functions) and an )SI
+fewer than 1000 APL symbols (i.e. variables or defined functions) and an )SI
 stack depth of less than 100. A typical computer on which GNU APL runs is
 assumed to have 4 GB of memory available to the interpreter and it should
 definitely have at least 1 GB.
@@ -74,20 +74,20 @@ definitely have at least 1 GB.
 |===============
 
 In the table above, the term + X means that the object is a structure that
-contains other objects. For example the size of a defined function depends
+contains other objects. For example, the size of a defined function depends
 on the number of function lines and their lengths. Likewise, the size of an
 APL value depends primarily on the number of its ravel elements. The term X
 for the different objects is explained in the following.
 
 === X for a Unicode string (aka. UCS string)
 
-X is 4 byte per Unicode character. For performance reasons at least 16
+X is 4 bytes per Unicode character. For performance reasons at least 16
 characters are being allocated so that X ≥ 64.
 
 === X for an APL Symbol
 
 An APL symbol has two variable parts: an UCS string containing the name of the
-symbol (e.g. a variable name or a the name of a defined function) and value
+symbol (e.g. a variable name or the name of a defined function) and value
 stack. The value stack of a function is initially empty, but is increased
 when a defined function is called and the symbol is a local variable or a
 label in the defined function and decreased if that function returns. The
@@ -96,20 +96,20 @@ amount of memory by which the stack is increased is the size of a
 
 === X for a Defined Function
 
-When a defined functions is created, then its textual representation (i.e.
+When a defined function is created, then its textual representation (i.e.
 the argument for ⎕FX or the result produced by the ∇-editor). This textual
 representation is stored in the function object for the purpose of displaying
 error information in case the execution of the function fails.
 
 The textual representation is then converted into an internal representation
-of fixed-sized Token with one token for each lexical unit. A Lexical unit is:
+of fixed-sized Token with one token for each lexical unit. A lexical unit is:
 
 * one user-defined name, or
 * one distinguished name, or
 * one primitive function, or
 * a special symbol (◊ [ ] etc.)
 
-Finally a jump table to the different function lines is added to the
+Finally, a jump table to the different function lines is added to the
 function. The X for the function is therefore Utx + N×To + L×Jt, where
 
 * Utx is the size of UCS_string containing the function text,
@@ -129,12 +129,12 @@ The rationale for distinguishing short and long values is performance. A short
 value can be allocated in a single new() call while a long value needs two
 new() calls: one for the value header (which contains the shape of the value),
 and one for the ravel cells of the value. Looking at the details of malloc()
-one can see that the allocation or de-allocation of smaller memory areas is more
-efficient than the allocation or de-allocation of larger areas, Finally,
-short APL values occur more frequent in APL programs than long values, and they
+one can see that the allocation or deallocation of smaller memory areas is more
+efficient than the allocation or deallocation of larger areas, Finally,
+short APL values occur more frequently in APL programs than long values, and they
 are also more frequently overridden as a whole (which allocates a new value
 and discards the old) as opposed to being updated via indexed assignment
-(which changes an existing value but does does not create a newly allocated
+(which changes an existing value but does not create a newly allocated
 value (unless nesting is involved)).
 
 * If a value is short then X = 0
@@ -150,7 +150,7 @@ frequently. Many APL primitive functions (with the noteworthy exception of
 scalar functions) need to perform multiple computations of V[n] for one
 of their arguments V.
 
-In ISO 13751 the concept of mixed values was introduced, In a mixed value
+In ISO 13751 the concept of mixed values was introduced. In a mixed value,
 different ravel elements can have different types, so that the type becomes a
 property of each ravel element of a value instead of a property of the value
 itself. The implementer of ISO 13751 then had different alternatives (and
@@ -162,7 +162,7 @@ possibly combinations of them) to deal with mixed values:
   that code base to ISO 13751.
 
 * Make the ravel elements pointers to a different location that contains the
-  real ravel elements. Since all pointers have the same size, the constant time
+  real ravel elements. Since all pointers have the same size, the constant-time
   access to arbitrary ravel elements would remain. The performance cost
   would be somewhat higher due to:
 ** the additional indirection via the pointers, and
@@ -174,17 +174,16 @@ possibly combinations of them) to deal with mixed values:
 * Make the ravel elements virtual objects that all have the same size. That
   means instead of primitive functions working with pointers to ravel
   elements, the ravel elements would point to the functions that are
-  appropriate for their type. On one hand this approach wastes quite some
-  memory because the largest possible type (i.e. complex numbers) determines
-  the size of all ravel cells including those that would fit in far fewer
-  bytes. On the other hand there are quite a few advantages:
-** The the same size of all elements causes V[n] to take constant time,
+  appropriate for their type. On one hand, this approach wastes quite some
+  memory because the largest possible type (i.e. complex numbers) determines the size of all ravel cells including those that would fit in far fewer
+bytes. On the other hand, there are quite a few advantages:
+** The same size of all elements causes V[n] to take constant time,
 ** The indexed assignment of e.g. a single element (of a different type) to a
    non-mixed array would also take (constant time (in option 1 above the entire
    array would have needed to be converted from non-mixed to mixed)).
 ** The number of different array types would be reduced to 1 instead of being
    increased from 5 to 6 (bit, byte, integer, float, complex, and mixed). This
-   in turn makes a huge number of type-checks in the dyadic APL primitives
+   in turn makes a huge number of type checks in the dyadic APL primitives
    obsolete. Since a virtual cell knows its own type, it only needs to check
    the type of the other cell(s) in a dyadic operation.
 ** The "wasted" space could be used for other features at no extra cost such as:
@@ -225,7 +224,7 @@ pool was essentially empty) and the interpreter would keep track of the memory
 that it allocated after that, say *memory-used*. So printing ⎕WA at any time
 would essentially show *initial-⎕WA - memory-used*. And that was it.
 
-=== Present memory management
+=== Present Memory Management
 
 Since then a number of things have changed. The changes are in general
 advantageous, but also cause trouble in very specific situations. The main
@@ -245,13 +244,13 @@ differences, as seen by an application like GNU APL are:
 
 * Over-commitment: Modern operating systems return far more virtual memory to
   applications than they really have in terms of physical memory. The idea is
-  that not all applications reach their maximum need for memory a the same
+  that not all applications reach their maximum need for memory at the same
   time, so that the same piece of physical memory can be used by different
   applications (or by the kernel for that matter) at different times.
 
-*Corollary 1:* In the old days, the memory that an applications has obtained
-from the kernel was a *guarantee*. These day it is merely a *promise* which
-*normally* kept but may fail with a small though non-zero probability.
+*Corollary 1:* In the old days, the memory that an application has obtained
+from the kernel was a *guarantee*. These days it is merely a *promise* which
+is *normally* kept but may fail with a small though non-zero probability.
 
 *Corollary 2:* As far as GNU APL is concerned, GNU APL does not (and actually
 cannot) guarantee proper operation if the kernel reaches the limit of its
@@ -259,8 +258,8 @@ physical memory. Some error handling mechanisms, in particular WS FULL errors,
 may fail in a non-graceful fashion - including immediate termination of the
 GNU APL process without any warnings.
 
-Although a crash of GNU APL cannot be prevented in general. one can decrease
-the probability of such crashes by taking counter-measures beforehand. Most GNU
+Although a crash of GNU APL cannot be prevented in general, one can decrease
+the probability of such crashes by taking countermeasures beforehand. Most GNU
 APL users will not need this (see *normal* above), but those facing problems
 with improper WS FULL handling should read on.
 
@@ -271,7 +270,7 @@ with improper WS FULL handling should read on.
 One enemy of GNU APL is the kernel's OOM (out-of-memory) handler. The OOM
 handler is invoked when the kernel needs (physical) memory and has none. It
 then kills one or more running processes in order to claim their memory back.
-The processes that are killed (un-gracefully) may or may not be the process(es)
+The processes that are killed (ungracefully) may or may not be the process(es)
 that have caused the shortage of memory. That is:
 
 * GNU APL may be killed by some other (unrelated) process or interrupt that
@@ -284,7 +283,7 @@ It should be clear that the first two cases are very difficult to reproduce.
 The third case is much easier by creating a very large APL value. It is also
 the case that has been observed in reality.
 
-In GNU/Linux one can protect individual processes from being killed by the
+In GNU/Linux, one can protect individual processes from being killed by the
 OOM handler with the following command (as root; <PID> is the process ID of
 the process to be protected:
 
@@ -312,11 +311,11 @@ a process running on that system.
 === Using System Limits
 
 Instead of disabling the OOM handler, one should use methods that prevent GNU
-APL from requesting too much memory. so that the OOM handler is not invoked
+APL from requesting too much memory, so that the OOM handler is not invoked
 in the first place (at least not from GNU APL). There are several ⎕SYL (aka.
 system limit) entries that can be set by an APL program in order to prevent
 GNU APL from requesting too much memory. Some of them have to be combined
-with other to achieve full protection.
+with others to achieve full protection.
 
 * ⎕SYL[1;] limits the depth of the )SI stack and therefore the amount of
   memory spent for function calls. Referring to Table 2 above, *⎕SYL[1;2]←1000*
@@ -363,7 +362,7 @@ Cached:            54732 kB
 
 In that case *MemAvailable:* is the value on which the system limits settings
 should be based. On older GNU/Linux machines *MemAvailable:* may not be
-displayed. In that case *MemFree: + Cached:* can be used as a work-around.
+displayed. In that case *MemFree: + Cached:* can be used as a workaround.
 
 The actual implementation of *MemAvailable:* by the kernel is quite complex
 (more than simply adding *MemFree:* and *Cached:*). For that reason, even if
@@ -403,7 +402,7 @@ The ⎕WA-margin currently has a default value of 0, but can be changed via
 ==== Setting a memory limit
 
 If stability of a system is a concern, then setting memory limits for
-processes is normally a good idea. The command for doing that is differs
+processes is normally a good idea. The command for doing that differs
 between shells; in *bash* you can start GNU APL with a virtual memory limit
 of like this:
 ----
@@ -425,15 +424,15 @@ helps a procxss in predicting when the limit will be reached.
 
 === 32-bit GNU/Linux
 
-On 32-bit machines there is a per process memory limit of about 3 GByte. If
-the memory of a machines is, say, 8 GB or more then one can have several
+On 32-bit machines, there is a per process memory limit of about 3 GByte. If
+the memory of a machine is, say, 8 GB or more, then one can have several
 processes with each process allocating up to 3 GByte as long as the memory
 shown in */proc/meminfo* is not exceeded.
 
 If GNU APL sees a *total_memory* of more than 3 GB in the analysis of
 */proc/meminfo*, then it reduces *total_memory* to about 3 GB. if it is
 running on a 32-bit kernel. 64-bit machines have a similar limit, but the
-limit is so high that is is not relevant in practice.
+limit is so high that it is not relevant in practice.
 
 The safety margin *(total_memory_1* - *total_memory)* that results from
 *⎕SYL[31 32;2]* remains in effect so that the total memory that an APL program
@@ -472,10 +471,10 @@ it creates two different challenges for the kernel. One is a big allocation
 when the process is already near starvation and one is a small allocation
 that fails.
 
-in both cases the WS FULL is caused by *N ⍴ A*. Because A is a scalar (due to
+In both cases the WS FULL is caused by *N ⍴ A*. Because A is a scalar (due to
 ⊂), all ravel elements of the result are nested values. Therefore  the
 computation of *N ⍴ A* creates exactly 1+N values: a big value for the result
-itself and N small nested values the the ravel of the result.
+itself and N small nested values the ravel of the result.
 
 Referring to Table 2, the variable *A* (and therefore each nested value of the
 result needs *372 + 16*20 = 692* bytes. The top-level of the result requires
@@ -494,13 +493,13 @@ amount of free memory at the point in time where the allocation failed:
 
 1. if the first (big) allocation fails, then the free memory is still F,
 
-2. if one of the subsequent (small) allocations fail then (since the previous
-   allocations have succeeded) the free memory is now less that the requested
-   size, regardless how large F was initially. In our example F would be less
-   than 692 bytes (in theory) or less than about 1024 (in practice because
+2. if one of the subsequent (small) allocations fails then (since the previous
+   allocations have succeeded) the free memory is now less than the requested
+ size, regardless how large F was initially. In our example F would be less
+  than 692 bytes (in theory) or less than about 1024 (in practice because
    malloc allocates the next power of 2).
 
-Exception handling with only 1024 bytes left can fail as can be demonstrate on a
+Exception handling with only 1024 bytes left can fail as can be demonstrated on a
 32-bit machine quite easily. The following examples show both cases (with
 safety margin disabled in order to allow near-memory-starvation.
 
@@ -627,7 +626,7 @@ new Value(const Shape & shape, const char * loc) failed (std::bad_alloc)
   FULL occurs. In this time the interpreter creates a large number of
   sub-values until the memory is exhausted.
 * The stack dumps differ. The pretty-printing of C++ function names requires
-  extra memory, In example 2 that extra memory is not available so that
+  extra memory, in example 2 that extra memory is not available so that
   backtrace_symbols() fails (and the interpreter then uses a function that
 needs less memory):
 ----
@@ -671,7 +670,7 @@ on bug-apl please consider the following.
 ** ulimit to protect processes from each other,
 ** ⎕SYL[1 2 3;2] to limit what the GNU APL interpreter may try allocate, and
 ** ⎕SYL[31 32;2] to avoid near-memory-starvation situations in the WS FULL
-   exception handling
+   exception handling.
 
 Thanks for using GNU APL.
 

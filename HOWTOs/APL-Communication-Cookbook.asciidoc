@@ -16,7 +16,7 @@ A *server* is a program or process that is being controlled by one or more
 other programs or processes. A *client* is a program or process that controls
 another program or process. A *peer* is a program or process that communicates
 with GNU APL, but is not a client or a server with respect to that
-communication. In a client/server communication it is the client that
+communication. In a client/server communication, it is the client that
 establishes the communication link between the two partners.
 
 In general the communication between a client and a server is somewhat simpler
@@ -178,12 +178,12 @@ a communication channel to a peer. If one side assigns a value to a shared
 variable, then the other side gets that value when referencing the variable
 (and vice versa). The communication channel is established, maintained,
 and closed by a set of system variables named *⎕SVC* (shared variable
-create) *⎕SVO* (shared variable offer) *⎕SVQ* (shared variable query), *⎕SVR*
+control), *⎕SVO* (shared variable offer), *⎕SVQ* (shared variable query), *⎕SVR*
 (shared variable retract), and *⎕SVS* (shared variable status). The details
 of how these system variables are used will not be explained here, because
 shared variables exist in GNU APL only for compatibility with IBM APL2. For
 new APL programs, the socket functions in *⎕FIO* are much easier to use than
-shared variables and have less restrictions.
+shared variables and have fewer restrictions.
 
 Shared variables come in 2 varieties:
 
@@ -199,9 +199,9 @@ Shared variables come in 2 varieties:
   already available on the operating system.
 
 Those interested in the style of shared variables programming may have a
-look at testcases *AP100.tc* for AP100, *AP210.tc* for AP210, and *APnnn.tc*
+look at test cases *AP100.tc* for AP100, *AP210.tc* for AP210, and *APnnn.tc*
 for workspace-to-workspace shared variables in the directory
-*src/testcases/* of GNU APL.
+*src/test cases/* of GNU APL.
 
 The GNU APL implementation of shared variables is a separate process running
 the program *APserver* (which comes with GNU APL). APserver currently
@@ -215,7 +215,7 @@ For workspace-to-workspace shared variables, the APserver stores
 the shared variables themselves, so that no data is lost if one of the
 connected workspaces exits or *⎕SVR*s a shared variable. APserver also maps the
 peer-to-peer connection between two workspaces onto two client/server
-connections from each workspace (as client) to APserver (as server). APserver
+connections from each workspace (as clients) to APserver (as server). APserver
 is started automatically when an APL workspace uses shared variables for the
 first time.
 
@@ -225,7 +225,7 @@ is rather crude and not optimized for performance.
 
 === SQL Interface
 
-The System function ⎕SQL provides a direct interface to a SQL database.
+The system function ⎕SQL provides a direct interface to an SQL database.
 Currently PostgreSQL and SQLite databases are supported. ⎕SQL is a
 container for a number of sub-functions that can be displayed with:
 
@@ -415,14 +415,14 @@ The use of these functions requires some experience with socket programming.
 can do ⎕FIO "" to obtain a list of ⎕FIO sub-function, in particular the names
 of the corresponding functions in the libstdc library.
 
-That function name can then used with with *man* command which explains the
+That function name can then used with *man* command which explains the
 expected function arguments. By and large ⎕FIO takes the same arguments as
 the corresponding libc functions, but some of the function arguments (in
 particular those taking pointer arguments) were mapped to APL byte arrays.
 
-The testcase file *src/testcases/Quad_FIO.tc* contains APL code for a short
+The test case file *src/test cases/Quad_FIO.tc* contains APL code for a short
 client/server communication between two TCP sockets on Port 22222 (around
-line 170 of the testcase file).
+line 170 of the test case file).
 
 === Native functions
 
@@ -434,7 +434,7 @@ C++).
 
 Writing native functions is a little more complicated than using communication
 facilities already present in APL like the mechanisms explained so far. The
-design and use of a native functions consists of the following steps:
+design and use of a native function consists of the following steps:
 
 First of all, preparation of a dynamic library that contains implementations
 for those function signatures that the native function shall support. For
@@ -459,7 +459,7 @@ same signatures).
 
 *Note:* Native functions were not primarily intended for communication purposes.
 But since they import the full power of C/C++ into GNU APL they are a last
-resort if all methods above can not be used.
+resort if all methods above cannot be used.
 
 The directory *src/native* contains C++ code templates for different APL
 function signatures. You can use these templates as a starting point for your
@@ -474,7 +474,7 @@ be ⎕FXed later on.
 The majority of the communication mechanisms above use - explicitly or
 implicitly - some sort of data framing between the communication partners.
 This data framing divides the entire communication between the partners into
-several transactions, where one transaction is, depending on the machanism:
+several transactions, where one transaction is, depending on the mechanism:
 
 * one libapl function call, or
 * one shared variable assignment, or
@@ -508,11 +508,11 @@ a byte stream.
 
 === Tag/Length/Value aka. TLV
 
-TLV is a frequantly used format for sending byte vectors over a stream. The
+TLV is a frequently used format for sending byte vectors over a stream. The
 byte vector is prepended by a tag field and a length field indicating the
 length of the byte vector. The tag and length fields have a fixed size
 (typically 1, 2, or 4 bytes) while the length of the byte vector can vary.
-Decoding of the TLV is very simple and efficient. The de-framing as such onlt
+Decoding of the TLV is very simple and efficient. The de-framing as such only
 requires the length field, but the tag is often required to distinguish
 different data types sent over the same stream.
 
@@ -524,8 +524,8 @@ while its inverse function *¯33 ⎕CR*  converts a TLV back to
       5 ⎕CR  33 ⎕CR 42,"Hello"
 0000002A0000000548656C6C6F
  │ │ │ │ │ │ │ │ │ │ │ │ │
- │ │ │ │ │ │ │ │ └─┴─┴─┴─┴───── "Hello:
- │ │ │ │ └─┴─┴─┴─────────────── 5 (lenght)
+ │ │ │ │ │ │ │ │ └─┴─┴─┴─┴───── "Hello"
+ │ │ │ │ └─┴─┴─┴─────────────── 5 (length)
  └─┴─┴─┴─────────────────────── 42 (tag)
 
      ¯33 ⎕CR 33 ⎕CR 42,"Hello"
@@ -533,15 +533,15 @@ while its inverse function *¯33 ⎕CR*  converts a TLV back to
 
 ----
 
-=== Lines terminated by line-feeds
+=== Lines terminated by line feeds
 
 Many programs, in particular operating system commands, write their output
 line-by-line to their *stdout*. If these programs are started from APL with 
 *Handle←24 ⎕FIO[24] Bs* (aka. popen(Bs, "r") then the handle returned to APL
-is a stream of lines that are termnated by line-feeds (ASCII 10 or *\n*).
-The first step in the processing of such a streams in APL is usually to split
+is a stream of lines that are terminated by line feeds (ASCII 10 or *\n*).
+The first step in the processing of such a stream in APL is usually to split
 the stream into a (nested) vector of lines. This can be easily and efficiently
-done with *35 ⎕CR*. The terminating line-feeds are removed in this conversion.
+done with *35 ⎕CR*. The terminating line feeds are removed in this conversion.
 
 Example:
 
