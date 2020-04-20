@@ -47,6 +47,6 @@ enum
 #define INTEGER_TOLERANCE (1.0e-10)   // system tolerance, lrm p. 59
 
 #define BIG_INT64_F 9223372036854775807.0
-#define BIG_FLOAT   1.79769313486231470e308
+#define BIG_FLOAT   1.7976e308
 
 #endif // __SYSTEM_LIMITS_HH_DEFINED__

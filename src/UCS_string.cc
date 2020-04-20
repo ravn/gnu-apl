@@ -181,11 +181,18 @@ int expo = 0;
 
    if (value >= 10.0)   // large number, positive exponent
       {
-        if (value > 1e307)
+        if (value > BIG_FLOAT || !isnormal(value))   // something odd
            {
-             if (negative)   append_UTF8("¯∞");
-             else            append_UTF8("∞");
-             FloatCell::map_FC(*this);
+            if (isnormal(value) || isinf(value))   // rather large
+               {
+                 if (negative)   append_UTF8("¯∞");
+                 else            append_UTF8("∞");
+                 FloatCell::map_FC(*this);
+               }
+           else
+               {
+                 append_UTF8("-nan-");
+               }
              return;
            }
 

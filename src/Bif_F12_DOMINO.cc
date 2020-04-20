@@ -328,6 +328,7 @@ Value_P INV(shape_INV, LOC);
          loop(x, M)   // for every column y
              {
                const double flt = (x < N) ? AUG.real(y, x) : 0.0;
+               if (!isfinite(flt))   DOMAIN_ERROR;
                new (INV->next_ravel())   FloatCell(flt);
              }
        }
@@ -403,11 +404,17 @@ Value_P INV(shape_INV, LOC);
        {
          loop(x, M)   // for every column y
              {
-               if (x < N)
-                  new (INV->next_ravel())   ComplexCell(AUG.real(y, x),
-                                                        AUG.imag(y, x));
-               else
-                  new (INV->next_ravel())   ComplexCell(0.0, 0.0);
+               if (x < N)   // diagonal or above
+                  {
+                    const double re = AUG.real(y, x);
+                    const double im = AUG.imag(y, x);
+                    if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
+                    new (INV->next_ravel())   ComplexCell(re, im);
+                  }
+               else   // below diagonal
+                  {
+                    new (INV->next_ravel())   ComplexCell(0.0, 0.0);
+                  }
              }
        }
 
@@ -503,13 +510,21 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
      if (need_complex)
         {
           loop(q, len)
-              new (vQ->next_ravel()) ComplexCell(data[base_Q + 2*q],
-                                                 data[base_Q + 2*q + 1]);
+              {
+                const double re = data[base_Q + 2*q];
+                const double im = data[base_Q + 2*q + 1];
+                if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
+                new (vQ->next_ravel()) ComplexCell(re, im);
+              }
         }
      else
         {
           loop(q, len)
-              new (vQ->next_ravel()) FloatCell(data[base_Q + q]);
+              {
+                const double re = data[base_Q + q];
+                if (!isfinite(re))   DOMAIN_ERROR;
+                new (vQ->next_ravel()) FloatCell(re);
+              }
         }
      vQ->check_value(LOC);
      new (Z->next_ravel()) PointerCell(vQ.get(), Z.getref());
@@ -520,13 +535,21 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
      if (need_complex)
         {
           loop(r, rows*cols)
-              new (vR->next_ravel()) ComplexCell(data[base_R + 2*r],
-                                                 data[base_R + 2*r + 1]);
+              {
+                const double re = data[base_R + 2*r];
+                const double im = data[base_R + 2*r + 1];
+                if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
+                new (vR->next_ravel()) ComplexCell(re, im);
+              }
         }
      else
         {
           loop(r, rows*cols)
-              new (vR->next_ravel()) FloatCell(data[base_R + r]);
+              {
+                const double re = data[base_R + r];
+                if (!isfinite(re))   DOMAIN_ERROR;
+                new (vR->next_ravel()) FloatCell(re);
+              }
         }
      vR->check_value(LOC);
      new (Z->next_ravel()) PointerCell(vR.get(), Z.getref());
