@@ -29,6 +29,13 @@
 class Quad_TF : public QuadFunction
 {
 public:
+   enum VState
+      {
+        VSt_OPEN     = 0,   // N⍴M
+        VSt_CLOSED   = 1,   // (N⍴M) or (I J ...) but not (''⍴M)
+        VSt_ENCLOSED = 2,   // '' 'abc' (0 ⍴0)
+      };
+
    /// Constructor.
    Quad_TF() : QuadFunction(TOK_Quad_TF) {}
 
@@ -54,12 +61,10 @@ public:
    /// a left parenthesis) was emitted, e.g. (, or (A⍴
    static bool tf2_shape(UCS_string & ucs, const Shape & shape);
 
-   /// append ravel of \b value in tf2_format to \b ucs. Return true if
-   /// the value is closed (e.g. 'abc' or (...))
-   static bool tf2_value(int level, UCS_string & ucs, Value_P value);
-
-   /// try inverse ⎕TF2 of ucs, set \b new_var_or_fun if successful
-   static UCS_string tf2_inv(const UCS_string & ravel);
+   /// append ravel of \b value in tf2_format to \b ucs.
+   /// Return true iff the value should be enclosed in parentheses when grouped.
+   static VState tf2_value(int level, UCS_string & ucs,
+                                    const Value & value);
 
    /// store B in transfer format 2 (new APL format) into \b ucs
    static void tf2_fun_ucs(UCS_string & ucs, const UCS_string & fun_name,
@@ -72,7 +77,22 @@ public:
    /// undo ⎕UCS() created by tf2_char_vec
    static UCS_string no_UCS(const UCS_string & ucs);
 
+   /// try inverse ⎕TF2 of ucs, set \b new_var_or_fun if successful
+   static UCS_string tf2_inv(const UCS_string & ravel);
+
 protected:
+   /// append to \b ucs a string EXPR so that ⍎EXPR produces \b value
+   /// and EXPR can be an element of a strand list. \b value is empty.
+   /// Return true iff the value should be enclosed in parentheses when grouped.
+   static VState tf2_strand_item(int level, UCS_string & ucs,
+                                 const Value & value);
+
+   /// Return true iff the value should be enclosed in parentheses when grouped.
+   static VState tf2_all_chars(int level, UCS_string & ucs, const Value & value);
+
+   /// append to \b ucs a string EXPR so that ⍎EXPR produces the empty \b value
+   static VState tf2_empty(int level, UCS_string & ucs, const Value & value);
+
    /// return B in transfer format 1 (old APL format) for a variable
    static Value_P tf1(const UCS_string & var_name, Value_P val);
 

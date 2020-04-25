@@ -486,15 +486,7 @@ Quad_TF::tf2_var(const UCS_string & var_name, Value_P value)
 UCS_string ucs(var_name);
    ucs.append(UNI_LEFT_ARROW);
 
-   tf2_value(0, ucs, value);   // value not closed
-
-   // return '' for invalid values.
-   //
-   if (ucs.size() == 0)
-      {
-        Log(LOG_Quad_TF)   CERR << "error in tf2_var()" << endl;
-        return Token(TOK_APL_VALUE1, Str0(LOC));
-      }
+   tf2_value(0, ucs, value.getref());
 
    Log(LOG_Quad_TF)   CERR << "success in tf2_var(): " << ucs << endl;
 Value_P Z(ucs, LOC);
@@ -622,15 +614,13 @@ Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape)
       {
         if (shape.get_volume() == 1)
            {
-             ucs.append(UNI_ASCII_L_PARENT);
              ucs.append(UNI_ASCII_COMMA);
-             return true;   // UNI_ASCII_L_PARENT appended
+             return true;   // () needed
            }
 
-        if (shape.get_volume() != 0)   return false;
+        if (shape.get_volume() != 0)   return true;
       }
 
-   ucs.append(UNI_ASCII_L_PARENT);
    loop(r, shape.get_rank())
       {
         if (r)   ucs.append(UNI_ASCII_SPACE);
@@ -638,143 +628,79 @@ Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape)
       }
 
    ucs.append(UNI_RHO);
-   return true;   // UNI_ASCII_L_PARENT appended
+   return true;   // () needed
 }
 //-----------------------------------------------------------------------------
-bool
-Quad_TF::tf2_value(int level, UCS_string & ucs, Value_P value)
+Quad_TF::VState
+Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value)
 {
    Log(LOG_Quad_TF)
       {
-        value->print_boxed(CERR, "tf2_value() initial");
+        char cc[100];
+        snprintf(cc, sizeof(cc), "tf2_value() initial level %u\n", level);
+        CERR << "tf2_value(): ucs before at level " << level << ": "
+             << ucs << endl;
+        value.print_boxed(CERR, cc);
       }
 
-const ShapeItem ec = value->element_count();
+const ShapeItem ec = value.element_count();
 
    // special case: empty vector (including '' and ⍳0)
    //
-   if (ec == 0)
-      {
-        if (value->get_ravel(0).is_character_cell())   // ''
-           {
-              ucs.append(UNI_SINGLE_QUOTE);
-              ucs.append(UNI_SINGLE_QUOTE);
-              return  true;   // closed
-           }
-
-        if (value->get_ravel(0).is_numeric())          // ⍳0
-           {
-              ucs.append(UNI_ASCII_L_PARENT);
-              ucs.append(UNI_ASCII_0);
-              ucs.append(UNI_RHO);
-              ucs.append(UNI_ASCII_0);
-              ucs.append(UNI_ASCII_R_PARENT);
-              return  true;   // closed
-           }
-
-        // other empty values: print ( shape ⍴ prototype )
-
-        const bool rho_used = tf2_shape(ucs, value->get_shape());
-        Assert(rho_used);
-
-        Value_P proto = value->prototype(LOC);
-        tf2_value(level + 1, ucs, proto);
-        ucs.append(UNI_ASCII_R_PARENT);
-        return  true;   // closed
-      }
+   if (ec == 0)   return tf2_empty(level, ucs, value);
 
    // special case: char-only ravel.
    //
-   if (!value->NOTCHAR())
-      {
-        const bool rho_used = tf2_shape(ucs, value->get_shape());
+   if (!value.NOTCHAR())   return tf2_all_chars(level, ucs, value);
 
-        // check if ⎕UCS is needed. 
-        //
-        // ⎕UCS is needed if the string contains a character that is:
-        //
-        // 1. not in our ⎕AV, or
-        // 2. not in IBM's ⎕AV
-        //
-        bool use_UCS = false;
-        loop(e, ec)
-           {
-             const Unicode uni = value->get_ravel(e).get_char_value();
-             if (Avec::need_UCS(uni))   { use_UCS = true;   break; }
-           }
-
-        if (use_UCS)
-           {
-             if (level)   ucs.append(UNI_ASCII_L_PARENT);
-             ucs.append(UNI_Quad_Quad);
-             ucs.append(UNI_ASCII_U);
-             ucs.append(UNI_ASCII_C);
-             ucs.append(UNI_ASCII_S);
-             loop(e, ec)
-                {
-                  ucs.append(UNI_ASCII_SPACE);
-                  const Unicode uni = value->get_ravel(e).get_char_value();
-                  ucs.append_number(uni);
-                }
-             if (level)   ucs.append(UNI_ASCII_R_PARENT);
-           }
-        else
-           {
-             ucs.append(UNI_SINGLE_QUOTE);
-             loop(e, ec)
-                {
-                  const Unicode uni = value->get_ravel(e).get_char_value();
-                  ucs.append(uni);
-                  if (uni == UNI_SINGLE_QUOTE)   ucs.append(UNI_SINGLE_QUOTE);
-                }
-             ucs.append(UNI_SINGLE_QUOTE);
-           }
-
-        if (rho_used) ucs.append(UNI_ASCII_R_PARENT);
-        return  true;   // closed
-      }
-
-const APL_types::Depth depth = value->compute_depth();
-bool need_parenth = depth && level;
-
-   // maybe print A⍴
+   // maybe emit (A⍴ or (,
    //
-const bool rho_used = tf2_shape(ucs, value->get_shape());
-bool have_parenth = rho_used;
-
-   if (need_parenth && !have_parenth)
-      {
-        have_parenth = true;
-        ucs.append(UNI_ASCII_L_PARENT);
-      }
+const bool ret = tf2_shape(ucs, value.get_shape());
 
    loop(e, ec)
       {
         if (e)   ucs.append(UNI_ASCII_SPACE);
-        const Cell & cell = value->get_ravel(e);
+        const Cell & cell = value.get_ravel(e);
 
         if (cell.is_pointer_cell())
            {
              Value_P sub_val = cell.get_pointer_value();
-             UCS_string sub_UCS;
-             const bool sub_closed = tf2_value(level + 1, sub_UCS, sub_val);
-             Log(LOG_Quad_TF)
+             UCS_string sub;
+             VState sub_vs = tf2_strand_item(level + 1, sub, sub_val.getref());
+             const ShapeItem sub_ec = sub_val->element_count();
+             switch(sub_vs)
                 {
-                  CERR << "sub_UCS: " << sub_UCS << endl;
-                  CERR << "sub_closed: " << sub_closed << endl;
-                }
+                  case VSt_OPEN:
+                       if (sub_ec > 1)   // strand
+                          {
+                            ucs.append(UNI_ASCII_L_PARENT);
+                            ucs.append(sub);
+                            ucs.append(UNI_ASCII_R_PARENT);
+                          }
+                       else   // sub_ec ≤ 1
+                          {
+                            if (level)   ucs.append(UNI_ASCII_L_PARENT);
+                            ucs.append(UNI_SUBSET);
+                            ucs.append(sub);
+                            if (level)   ucs.append(UNI_ASCII_R_PARENT);
+                          }
+                       break;
 
-             if (sub_closed)
-                {
-                  ucs.append(sub_UCS);
-                  continue;
-                }
+                  case VSt_CLOSED:
+                       ucs.append(UNI_ASCII_L_PARENT);
+                       ucs.append(UNI_SUBSET);
+                       ucs.append(sub);
+                       ucs.append(UNI_ASCII_R_PARENT);
+                       break;
 
-FIXME;
+                  case VSt_ENCLOSED:
+                       ucs.append(sub);
+                       break;
+                }
            }
         else if (cell.is_lval_cell())
            {
-             return true;
+             DOMAIN_ERROR;
            }
         else if (cell.is_complex_cell())
            {
@@ -802,9 +728,148 @@ FIXME;
            }
       }
 
-   if (have_parenth)   ucs.append(UNI_ASCII_R_PARENT);
+   Log(LOG_Quad_TF)
+      {
+        CERR << "tf2_value(): ucs after at level " << level
+             << ": " << ucs << endl;
+      }
+   return ret ? VSt_OPEN : VSt_CLOSED;
+}
+//-----------------------------------------------------------------------------
+Quad_TF::VState
+Quad_TF::tf2_strand_item(int level, UCS_string & ucs, const Value & value)
+{
+   // append EXPR with ⍎EXPR == value to UCS. EXPR must be such that it can be
+   // used as an item in a strand expression. The caller is responsible for
+   // closing open items.
 
-   return have_parenth;
+   // since enclosing a simple (!) scalar has no effect, it cannot happen here.
+   //
+   Assert(!value.is_simple_scalar());
+
+   Log(LOG_Quad_TF)
+      {
+        char cc[100];
+        snprintf(cc, sizeof(cc), "tf2_value() initial level %u\n", level);
+        CERR << "tf2_strand_item(): ucs before at level " << level
+             << ": " << ucs << endl;
+        value.print_boxed(CERR, cc);
+      }
+
+   if (value.element_count() == 0)
+      {
+        return tf2_empty(level, ucs, value);
+      }
+
+   // special case: char-only ravel.
+   //
+   if (!value.NOTCHAR())
+      {
+        return tf2_all_chars(level, ucs, value);
+      }
+
+   if (value.is_scalar())
+      {
+        // since value cannot be a simple scalar it must be a nested scalar.
+        //
+        ucs.append(UNI_SUBSET);
+        tf2_value(level, ucs, value);
+        return VSt_OPEN;
+      }
+   else if (value.is_vector())
+      {
+        return tf2_value(level, ucs, value);
+      }
+   else
+      {
+        return tf2_value(level, ucs, value);
+      }
+
+   Log(LOG_Quad_TF)
+      {
+        CERR << "tf2_value(): ucs after at level " << level
+             << ": " << ucs << endl;
+      }
+   FIXME;
+}
+//-----------------------------------------------------------------------------
+Quad_TF::VState
+Quad_TF::tf2_empty(int level, UCS_string & ucs, const Value & value)
+{
+   if (value.get_ravel(0).is_character_cell())   // ''
+      {
+        ucs.append(UNI_SINGLE_QUOTE);
+        ucs.append(UNI_SINGLE_QUOTE);
+        return VSt_ENCLOSED;
+      }
+
+   if (value.get_ravel(0).is_numeric())          // ⍳0
+      {
+        ucs.append(UNI_ASCII_L_PARENT);
+        ucs.append(UNI_ASCII_0);
+        ucs.append(UNI_RHO);
+        ucs.append(UNI_ASCII_0);
+        ucs.append(UNI_ASCII_R_PARENT);
+        return VSt_ENCLOSED;
+      }
+
+   // other empty values: emit shape ⍴ prototype
+   //
+const bool ret = tf2_shape(ucs, value.get_shape());
+   Assert(ret);
+
+Value_P proto = value.prototype(LOC);
+   tf2_value(level + 1, ucs, proto.getref());
+   return VSt_OPEN;   // need ()
+}
+//-----------------------------------------------------------------------------
+Quad_TF::VState
+Quad_TF::tf2_all_chars(int level, UCS_string & ucs, const Value & value)
+{
+const ShapeItem ec = value.element_count();
+
+   tf2_shape(ucs, value.get_shape());
+
+   // check if ⎕UCS is needed. 
+   //
+   // ⎕UCS is needed if the string contains a character that is:
+   //
+   // 1. not in our ⎕AV, or
+   // 2. not in IBM's ⎕AV
+   //
+   bool use_UCS = false;
+   loop(e, ec)
+       {
+         const Unicode uni = value.get_ravel(e).get_char_value();
+         if (Avec::need_UCS(uni))   { use_UCS = true;   break; }
+       }
+
+   if (use_UCS)
+      {
+        ucs.append(UNI_Quad_Quad);
+        ucs.append(UNI_ASCII_U);
+        ucs.append(UNI_ASCII_C);
+        ucs.append(UNI_ASCII_S);
+        loop(e, ec)
+            {
+              ucs.append(UNI_ASCII_SPACE);
+              const Unicode uni = value.get_ravel(e).get_char_value();
+              ucs.append_number(uni);
+            }
+        return VSt_OPEN;
+      }
+   else
+      {
+        ucs.append(UNI_SINGLE_QUOTE);
+        loop(e, ec)
+            {
+              const Unicode uni = value.get_ravel(e).get_char_value();
+              ucs.append(uni);
+              if (uni == UNI_SINGLE_QUOTE)   ucs.append(UNI_SINGLE_QUOTE);
+            }
+        ucs.append(UNI_SINGLE_QUOTE);
+        return VSt_ENCLOSED;
+      }
 }
 //-----------------------------------------------------------------------------
 void
@@ -1130,25 +1195,23 @@ Quad_TF::tf2_remove_ENCLOSE(Token_string & tos, int & progress)
 {
 ShapeItem skipped = 0;
 
-   // replace  ( ⊂ B )  by an enclosed B
+   // replace  ⊂ B  by an enclosed B
    //
    loop(s, tos.size())
       {
-        if ((s + 3) >= ShapeItem(tos.size())            ||
-            tos[s    ].get_tag()   != TOK_L_PARENT      ||   // not (
-            tos[s + 1].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
-            tos[s + 2].get_Class() != TC_VALUE          ||   // not B
-            tos[s + 3].get_tag()   != TOK_R_PARENT)          // not )
+        if ((s + 1) >= ShapeItem(tos.size())            ||
+            tos[s    ].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
+            tos[s + 1].get_Class() != TC_VALUE)              // not B
            {
              if (skipped)   // dont copy to itself
                 tos[s - skipped].move_1(tos[s], LOC);
              continue;
            }
 
-        Value_P B = tos[s + 2].get_apl_val();
-        if (B->is_scalar())
+        Value_P B = tos[s + 1].get_apl_val();
+        if (B->is_simple_scalar())
            {
-             tos[s - skipped].move_1(tos[s + 2], LOC);
+             tos[s - skipped].move_1(tos[s + 1], LOC);
            }
         else
            {
@@ -1157,9 +1220,9 @@ ShapeItem skipped = 0;
              enc_B->check_value(LOC);
              Token tok(TOK_APL_VALUE1, enc_B);
              tos[s - skipped].move_2(tok, LOC);
-             tos[s + 2].clear(LOC);   // B
+             tos[s + 1].clear(LOC);   // B
            }
-        s += 3;   skipped += 3;
+        s += 1;   skipped += 1;
       }
 
    if (skipped)
