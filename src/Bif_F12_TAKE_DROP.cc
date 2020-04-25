@@ -157,18 +157,19 @@ Shape ravel_A(A.get(), /* ⎕IO */ 0);
 
    if (B->is_scalar())
       {
-        // if B is a scalar then the result rank shall be the length of A->
-        // the result may be empty (shape 0 0 ... 0) if we drop something
-        // or non-empty (shape 1 1 ... 1) if we drop nothing.
-        //
-        const ShapeItem len_Z = ravel_A.get_volume() ? 0 : 1;
-
         Shape shape_Z;
-        loop(r, ravel_A.get_rank())   shape_Z.add_shape_item(len_Z);
+        loop(r, ravel_A.get_rank())
+            {
+               // the r'th shape item is either 0 (if anything is dropped)
+               // or 1 if not.
+               if (ravel_A.get_shape_item(r))   shape_Z.add_shape_item(0);
+               else                             shape_Z.add_shape_item(1);
+            }
 
         Value_P Z(shape_Z, LOC);
 
         Z->get_ravel(0).init(B->get_ravel(0), Z.getref(), LOC);
+        if (shape_Z.get_volume() == 0)   Z->to_proto();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }

@@ -170,7 +170,11 @@ UCS_string text;
                   loop(l, line_len)
                      {
                        const Cell & c = line->get_ravel(l);
-                       if (!c.is_character_cell())   DOMAIN_ERROR;
+                       if (!c.is_character_cell())
+                          {
+                            MORE_ERROR() << "non-char in line at " LOC;
+                            DOMAIN_ERROR;
+                          }
 
                        const Unicode uni = c.get_char_value();
                        if (l == 0 || skipping)
@@ -181,12 +185,18 @@ UCS_string text;
              else if (line->is_scalar())
                 {
                   const Cell & c1 = line->get_ravel(0);
-                  if (!c1.is_character_cell())   DOMAIN_ERROR;
+                  if (!c1.is_character_cell())
+                     {
+                       MORE_ERROR() << "non-char in line at " LOC;
+                       DOMAIN_ERROR;
+                     }
                   const Unicode uni = c1.get_char_value();
                   if (uni > UNI_ASCII_SPACE)   text.append(uni);
                 }
              else
                 {
+line->print_boxed(CERR);
+                  MORE_ERROR() << "bad line at " LOC;
                   DOMAIN_ERROR;
                 }
 

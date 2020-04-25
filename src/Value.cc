@@ -1329,15 +1329,16 @@ Value::glue_closed_strand(Token & result, Value_P A, Value_P B,
 {
    // glue a new item A to the strand B
    //
+const ShapeItem len_A = A->element_count();
+const ShapeItem len_B = B->element_count();
    Log(LOG_glue)
       {
-        CERR << "gluing non-strand " << endl << *A
-             << " to strand " << endl << *B << endl;
+        CERR << "gluing non-strand[" << len_A << "] " << endl << *A
+             << " to strand[" << len_B << "] " << endl << *B << endl;
       }
 
    Assert(B->is_scalar_or_vector());
 
-const ShapeItem len_B = B->element_count();
 Value_P Z(len_B + 1, LOC);
 
    if (A->is_simple_scalar())

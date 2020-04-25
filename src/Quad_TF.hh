@@ -50,10 +50,12 @@ public:
    /// return B in transfer format 3 (APL2 CDR format)
    static Value_P tf3(const UCS_string & symbol_name);
 
-   /// append \b shape in tf2_format to \b ucs. Return true if (A⍴ was appended
+   /// append \b shape in tf2_format to \b ucs. Return true if
+   /// a left parenthesis) was emitted, e.g. (, or (A⍴
    static bool tf2_shape(UCS_string & ucs, const Shape & shape);
 
-   /// append ravel of \b value in tf2_format to \b ucs. Return true on error
+   /// append ravel of \b value in tf2_format to \b ucs. Return true if
+   /// the value is closed (e.g. 'abc' or (...))
    static bool tf2_value(int level, UCS_string & ucs, Value_P value);
 
    /// try inverse ⎕TF2 of ucs, set \b new_var_or_fun if successful
@@ -95,14 +97,14 @@ protected:
    /// replace , B by a reshaped B
    static void tf2_remove_COMMA(Token_string & tos, int & progress);
 
-   /// replace ⍴ ⊂ B  by  ⍴ enclosed B
-   static void tf2_remove_ENCLOSE1(Token_string & tos, int & progress);
+   /// replace ⊂ ⊂ B by ⊂ B
+   static void tf2_remove_ENCLOSE_ENCLOSE(Token_string & tos, int & progress);
 
    /// replace ( ⊂ B ) by an enclosed B
    static void tf2_remove_ENCLOSE(Token_string & tos, int & progress);
 
-   /// replace ⊂ ⊂ B by ⊂ B
-   static void tf2_remove_ENCLOSE_ENCLOSE(Token_string & tos, int & progress);
+   /// replace ⍴ ⊂ B  by  ⍴ enclosed B
+   static void tf2_remove_ENCLOSE1(Token_string & tos, int & progress);
 
    /// replace N - ⎕IO - ⍳ K  by  N N+1 ... N+K-1
    static void tf2_remove_sequence(Token_string & tos, int & progress);

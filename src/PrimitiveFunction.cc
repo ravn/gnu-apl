@@ -1694,7 +1694,7 @@ Value_P Z(A->get_shape(), LOC);
                 }
          new (Z->next_ravel())   IntCell(same);
        }
-   
+
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

@@ -971,6 +971,7 @@ bool has_char    = false;
 bool has_num     = false;
 bool has_complex = false;
 
+   // determine the data types (character/numbers/complex) in B
    loop(r, rows)
       {
         const Cell & cell = cB[r*cols];
@@ -1025,6 +1026,9 @@ bool has_complex = false;
          return pb_real_imag;
       }
 
+   // real B. (if B was initially complex then we arrive here twice: once
+   // for the real parts and once for the imag parts).
+   //
    loop(r, rows)
       {
         const Cell & cell = cB[r*cols];
@@ -1054,9 +1058,17 @@ bool has_complex = false;
 
         if (!cell.is_real_cell())   DOMAIN_ERROR;
 
-        const APL_Float value = cB[r*cols].get_real_value();
+        APL_Float value = cB[r*cols].get_real_value();
+
         if (precision >= 0)   // floating format
-           {
+          {
+            // fix values close to 0 as 0 so that, for example, we never
+            // see ¯.0000 in the formatted output.
+            //
+            double minval = 0.01;
+            loop(p,  precision)   minval /= 10;
+            if (value < minval && value > -minval)   value = 0.0;
+
              UCS_string data = format_spec_float(value, precision);
              if (width && data.size() > width)   // overflow
                 {
