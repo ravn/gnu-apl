@@ -29,7 +29,8 @@ Shape::Shape(const Value * A, int qio_A)
    // check that A is a shape value, like the left argument of A⍴B
    //
    if (A->get_rank() > 1)               RANK_ERROR;
-   if (A->element_count() > MAX_RANK)   LIMIT_ERROR_RANK;   // of A
+const ShapeItem Alen = A->element_count();
+   if (Alen > MAX_RANK)   LIMIT_ERROR_RANK;   // of A
 
    loop(r, A->element_count())
       {

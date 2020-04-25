@@ -174,7 +174,11 @@ Shape ravel_A(A.get(), /* ⎕IO */ 0);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   if (ravel_A.get_rank() == 0)   ravel_A.add_shape_item(1);   // A = ,A
+   if (ravel_A.get_rank() == 0)   // ''↓B
+      {
+        if (!B->is_scalar())   LENGTH_ERROR;
+        ravel_A.add_shape_item(1);   // A = ,A
+      }
 
    if (ravel_A.get_rank() != B->get_rank())   LENGTH_ERROR;
 
