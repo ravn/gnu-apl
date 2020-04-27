@@ -29,13 +29,6 @@
 class Quad_TF : public QuadFunction
 {
 public:
-   enum VState
-      {
-        VSt_OPEN     = 0,   // N⍴M
-        VSt_CLOSED   = 1,   // (N⍴M) or (I J ...) but not (''⍴M)
-        VSt_ENCLOSED = 2,   // '' 'abc' (0 ⍴0)
-      };
-
    /// Constructor.
    Quad_TF() : QuadFunction(TOK_Quad_TF) {}
 
@@ -57,14 +50,10 @@ public:
    /// return B in transfer format 3 (APL2 CDR format)
    static Value_P tf3(const UCS_string & symbol_name);
 
-   /// append \b shape in tf2_format to \b ucs. Return true if
-   /// a left parenthesis) was emitted, e.g. (, or (A⍴
-   static bool tf2_shape(UCS_string & ucs, const Shape & shape);
-
    /// append ravel of \b value in tf2_format to \b ucs.
    /// Return true iff the value should be enclosed in parentheses when grouped.
-   static VState tf2_value(int level, UCS_string & ucs,
-                                    const Value & value);
+   static void tf2_value(int level, UCS_string & ucs,
+                                    const Value & value, ShapeItem nesting);
 
    /// store B in transfer format 2 (new APL format) into \b ucs
    static void tf2_fun_ucs(UCS_string & ucs, const UCS_string & fun_name,
@@ -78,68 +67,73 @@ public:
    static UCS_string no_UCS(const UCS_string & ucs);
 
    /// try inverse ⎕TF2 of ucs, set \b new_var_or_fun if successful
-   static UCS_string tf2_inv(const UCS_string & ravel);
-
-protected:
-   /// append to \b ucs a string EXPR so that ⍎EXPR produces \b value
-   /// and EXPR can be an element of a strand list. \b value is empty.
-   /// Return true iff the value should be enclosed in parentheses when grouped.
-   static VState tf2_strand_item(int level, UCS_string & ucs,
-                                 const Value & value);
-
-   /// Return true iff the value should be enclosed in parentheses when grouped.
-   static VState tf2_all_chars(int level, UCS_string & ucs, const Value & value);
-
-   /// append to \b ucs a string EXPR so that ⍎EXPR produces the empty \b value
-   static VState tf2_empty(int level, UCS_string & ucs, const Value & value);
-
-   /// return B in transfer format 1 (old APL format) for a variable
-   static Value_P tf1(const UCS_string & var_name, Value_P val);
-
-   /// return B in transfer format 1 (old APL format) for a function
-   static Value_P tf1(const UCS_string & fun_name, const Function & fun);
-
-   /// return inverse  transfer format 1 (old APL format) for a variable
-   static Value_P tf1_inv(const UCS_string &  ravel);
+   static UCS_string tf2_inverse(const UCS_string & ravel);
 
    /// return B in transfer format 2 (new APL format) for a variable
    static Token tf2_var(const UCS_string & var_name, Value_P val);
 
+protected:
+   /// append \b shape in tf2_format to \b ucs. Return true if
+   /// a left parenthesis) was emitted, e.g. (, or (A⍴
+   static void tf2_shape(UCS_string & ucs, const Shape & shape,
+                         ShapeItem nesting );
+   static void tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
+                           const Cell * cells);
+
+   /// append the ravel of a simple character array (of any rank)
+   static void tf2_all_char_ravel(int level, UCS_string & ucs,
+                                  const Value & value);
+
+   /// return B in transfer format 1 (old APL format) for variable B
+   static Value_P tf1(const UCS_string & var_name, Value_P B);
+
+   /// return B in transfer format 1 (old APL format) for function B
+   static Value_P tf1(const UCS_string & fun_name, const Function & B);
+
+   /// return inverse transfer format 1 (old APL format) for a variable
+   static Value_P tf1_inv(const UCS_string &  ravel);
+
    /// simplify tos by removing UCS nnn etc.
-   static void tf2_simplify(Token_string & tos);
+   static void tf2_reduce(Token_string & tos);
 
-   /// replace ⎕UCS n... by the corresponding Unicodes,
-   static void tf2_remove_UCS(Token_string & tos);
+   /// replace ⎕UCS n... with the corresponding Unicodes,
+   static void tf2_reduce_UCS(Token_string & tos);
 
-   /// replace A ⍴ B by a reshaped B
-   static void tf2_remove_RHO(Token_string & tos, int & progress);
+   /// replace pattern A ⍴ B in \b tos with the single token (A⍴B);
+   /// return true iff done so.
+   static bool tf2_reduce_RHO(Token_string & tos);
 
-   /// replace , B by a reshaped B
-   static void tf2_remove_COMMA(Token_string & tos, int & progress);
+   /// replace pattern ⊂ B  in \b tos with the single token (⊂B);
+   /// return true iff done so.
+   static bool tf2_reduce_ENCLOSE(Token_string & tos);
 
-   /// replace ⊂ ⊂ B by ⊂ B
-   static void tf2_remove_ENCLOSE_ENCLOSE(Token_string & tos, int & progress);
+   /// replace pattern N - ⎕IO - ⍳ K  in \b tos with N N+1 ... N+K-1;
+   /// return true iff done so.
+   static bool tf2_reduce_sequence(Token_string & tos);
 
-   /// replace ( ⊂ B ) by an enclosed B
-   static void tf2_remove_ENCLOSE(Token_string & tos, int & progress);
+   /// replace pattern N - M × ⎕IO - ⍳ K  in \b tos with M × (N N+1 ... N+K-1);
+   /// return true iff done so.
+   static bool tf2_reduce_sequence1(Token_string & tos);
 
-   /// replace ⍴ ⊂ B  by  ⍴ enclosed B
-   static void tf2_remove_ENCLOSE1(Token_string & tos, int & progress);
+   /// replace pattern ( B ) in tos with B; return true iff done so.
+   static bool tf2_reduce_parentheses(Token_string & tos);
 
-   /// replace N - ⎕IO - ⍳ K  by  N N+1 ... N+K-1
-   static void tf2_remove_sequence(Token_string & tos, int & progress);
+   /// replace pattern value1 value2... in tos with the single token
+   //  (value1 value2...); return true iff done so.
+   static bool tf2_glue(Token_string & tos);
 
-   /// replace N - M × ⎕IO - ⍳ K  by  M × (N N+1 ... N+K-1)
-   static void tf2_remove_sequence1(Token_string & tos, int & progress);
-
-   /// replace ( value ) by value
-   static void tf2_remove_parentheses(Token_string & tos, int & progress);
-
-   /// replace value1 value2 by value
-   static void tf2_glue(Token_string & tos, int & progress);
+   /// replace pattern , B in tos with single token (,B);
+   /// return true iff done so.
+   static bool tf2_reduce_COMMA(Token_string & tos);
 
    /// return B in transfer format 2 (new APL format) for a function
    static UCS_string tf2_fun(const UCS_string & fun_name, const Function & fun);
+
+   /// replace pattern ⊂ ⊂ B in tos with the single token (⊂⊂B)
+   static bool tf2_reduce_ENCLOSE_ENCLOSE(Token_string & tos);
+
+   /// replace pattern ⊂ B in tos with the single token (⊂B)
+   static bool tf2_reduce_ENCLOSE1(Token_string & tos);
 };
 //-----------------------------------------------------------------------------
 #endif // __QUAD_TF_HH_DEFINED__

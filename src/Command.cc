@@ -2367,7 +2367,7 @@ UCS_string var_or_fun;
         if (!objects.contains(var_name))   return;
       }
 
-   var_or_fun = Quad_TF::tf2_inv(data1);
+   var_or_fun = Quad_TF::tf2_inverse(data1);
 
    if (var_or_fun.size() == 0)
       {
@@ -2392,8 +2392,8 @@ UCS_string statement;
    while (idx < data.size())   statement.append(data[idx++]);
    statement.append(UNI_ASCII_LF);
 
-UCS_string fun_name1 = Quad_TF::tf2_inv(statement);
-   if (fun_name1.size() == 0)   // tf2_inv() failed
+UCS_string fun_name1 = Quad_TF::tf2_inverse(statement);
+   if (fun_name1.size() == 0)   // tf2_inverse() failed
       {
         CERR << "inverse 2 ⎕TF failed for the following APL statement: "
              << endl << "    " << statement << endl;

@@ -948,9 +948,7 @@ UCS_string data;
         case NC_VARIABLE:
              {
                data.append(UNI_ASCII_A);
-               data.append(get_name());
-               data.append(UNI_LEFT_ARROW);
-               Quad_TF::tf2_value(0, data, value_stack[0].apl_val.getref());
+               Quad_TF::tf2_var(get_name(), value_stack[0].apl_val);
              }
              break;
 
