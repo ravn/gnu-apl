@@ -87,7 +87,7 @@ public:
    /// prevent basic_string::erase() with its dangerous default value for
    /// the number of erased character.
    void erase(size_t pos)
-      { basic_string::erase(pos, 1); }
+      { basic_string<UTF8>::erase(pos, 1); }
 
    /// return the last byte in this string
    UTF8 back() const

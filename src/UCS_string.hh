@@ -253,7 +253,7 @@ public:
 
    /// append UCS_string other to this string
    void append(const UCS_string & other)
-      { basic_string::append(other); }
+      {  basic_string<Unicode>::append(other); }
 
    /// append 0-terminated ASCII string \b str to this string. str is NOT
    /// interpreted as UTF8 string (use append_UTF8() if such interpretation        /// is desired)
@@ -277,7 +277,7 @@ public:
 
    /// more intuitive insert() function
    void insert(ShapeItem pos, Unicode uni)
-      { basic_string::insert(pos, 1, uni); }
+      {  basic_string<Unicode>::insert(pos, 1, uni); }
 
    /// prepend character \b uni
    void prepend(Unicode uni)
@@ -301,7 +301,7 @@ public:
 
    /// append UCS_string \b other
    UCS_string & operator <<(const UCS_string & other)
-      { basic_string::append(other);   return *this; }
+      {  basic_string<Unicode>::append(other);   return *this; }
 
    /// compare \b this with UCS_string \b other
    Comp_result compare(const UCS_string & other) const
@@ -328,7 +328,7 @@ public:
 
    /// overload basic_string::size() so that it returns a signed length
    ShapeItem size() const
-      { return basic_string::size(); }
+      { return  basic_string<Unicode>::size(); }
 
    /// an iterator for UCS_strings
    class iterator
@@ -372,7 +372,7 @@ public:
 
    /// erase 1 (!) character at pos
    void erase(ShapeItem pos)
-      { basic_string::erase(pos, 1); }
+      {  basic_string<Unicode>::erase(pos, 1); }
 
    /// helper function for Heapsort<Unicode>::sort()
    static bool greater_uni(const Unicode & u1, const Unicode & u2, const void *)
@@ -435,7 +435,7 @@ private:
 private:
    /// prevent accidental usage of the rather dangerous default len parameter
    /// in basic_strng::erase(pos, len = npos)
-   basic_string & erase(size_type pos, size_type len);
+    basic_string<Unicode> & erase(size_type pos, size_type len);
 };
 //-----------------------------------------------------------------------------
 inline void
