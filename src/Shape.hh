@@ -63,9 +63,9 @@ public:
 
    /// constructor: shape of another shape
    Shape(const Shape & other)
+   : rho_rho(other.rho_rho)
    {
-     rho_rho = other.rho_rho;
-     loop(r, MAX_RANK)   rho[r] = other.rho[r];
+     loop(r, rho_rho)   rho[r] = other.rho[r];
      volume = other.volume;
    }
 
