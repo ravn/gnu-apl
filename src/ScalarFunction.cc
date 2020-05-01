@@ -1124,6 +1124,15 @@ Bif_F12_WITHOUT::large_eval_AB(const Value * A, const Value * B)
 {
 const ShapeItem len_A = A->element_count();
 const ShapeItem len_B = B->element_count();
+
+   /* pack pointers to the cells of the arguments A and B and of the
+      result Z into one big array:
+
+        len_A    len_A      len_B
+     ┌─────────┬─────────┬─────────┐
+     │ cells_A │ cells_Z │ cells_B │
+     └─────────┴─────────┴─────────┘
+    */
 const Cell ** cells_A = new const Cell *[2*len_A + len_B];
 const Cell ** cells_Z = cells_A + len_A;
 const Cell ** cells_B = cells_A + 2*len_A;
@@ -1131,35 +1140,32 @@ const Cell ** cells_B = cells_A + 2*len_A;
    loop(a, len_A)   cells_A[a] = &A->get_ravel(a);
    loop(b, len_B)   cells_B[b] = &B->get_ravel(b);
 
+   // sort the A-cells and the B-cells ascendingly
+   //
    Heapsort<const Cell *>::sort(cells_A, len_A, 0, Cell::compare_stable);
    Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
 
-   // set pointers in A to 0 if they are also in B. Count remaining entries
-   // in A in len_Z.
+   // store those cells_A pointers that are not in cells_B into cells_Z. Use
+   // the fact that cells_A and cells_B are sorted.
 ShapeItem len_Z = 0;
-ShapeItem idx_B = 0;
-const double qct = Workspace::get_CT();
+   {
+     ShapeItem idx_A = 0;
+     ShapeItem idx_B = 0;
+     const double qct = Workspace::get_CT();
 
-   loop(idx_A, len_A)
-       {
-         const Cell * ref = cells_A[idx_A];
-         while (idx_B < len_B)
-               {
-                 if (ref->equal(*cells_B[idx_B], qct))
-                    {
-                         break;   // for idx_B → next idx_A
-                    }
+     while (idx_A < len_A && idx_B < len_B)
+           {
+             const Cell & ref_A = *cells_A[idx_A];
+             const Cell & ref_B = *cells_B[idx_B];
+             if (ref_A.equal(ref_B, qct))     ++idx_A;   // A is in B → not in Z
+             else if (ref_A.greater(ref_B))   ++idx_B;
+            else cells_Z[len_Z++] = cells_A[idx_A++];    // A is in Z
+           }
 
-                 // B is much (by ⎕CT) smaller or greater than A
-                 //
-                 if (ref->greater(*cells_B[idx_B]))    ++idx_B;
-                 else   // B > A, so A is in A∼B
-                    {
-                      cells_Z[len_Z++] = ref;   // A is in B
-                      break;
-                    }
-               }
-       }
+     // the rest of A is in Z
+     //
+     while (idx_A < len_A)   cells_Z[len_Z++] = cells_A[idx_A++];
+   }
 
    // sort cells_Z by position so that the original order in A is reconstructed
    //

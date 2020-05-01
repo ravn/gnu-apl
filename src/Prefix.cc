@@ -456,6 +456,7 @@ grow:
                         }
                    }
               }
+          Log(LOG_prefix_parser)   print_stack(CERR, LOC);
           syntax_error(LOC);   // no more token
         }
 

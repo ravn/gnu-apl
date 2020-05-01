@@ -197,6 +197,7 @@ sf( F12_RND_UP    , "⌈"       ,          )
 sf( F12_ROLL      , "?"       ,          )
 sf( F12_ROTATE    , "⌽"       ,          )
 sf( F12_ROTATE1   , "⊖"       ,          )
+qf( RVAL          , "⎕RVAL"   ,          )
 
 sf( OPER1_SCAN    , "\\"      , = 0x5301 )
 sf( OPER1_SCAN1   , "⍀"       ,          )

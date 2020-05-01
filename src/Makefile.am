@@ -100,6 +100,7 @@ Quad_MAP.cc					Quad_MAP.hh		\
 Quad_PLOT.cc		Quad_PLOT.def		Quad_PLOT.hh		\
 Quad_RE.cc					Quad_RE.hh		\
 Quad_RL.cc					Quad_RL.hh		\
+Quad_RVAL.cc					Quad_RVAL.hh		\
 Quad_SQL.cc					Quad_SQL.hh		\
 Quad_SVx.cc					Quad_SVx.hh		\
 Quad_TF.cc					Quad_TF.hh		\

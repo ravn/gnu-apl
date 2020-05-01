@@ -61,6 +61,9 @@
 /* Define to 1 if you have the `atomicity' library (-latomicity). */
 /* #undef HAVE_LIBATOMICITY */
 
+/* Define to 1 if you have the `c' library (-lc). */
+#define HAVE_LIBC 1
+
 /* Define to 1 iff lib(n)curses is available */
 #define HAVE_LIBCURSES 1
 

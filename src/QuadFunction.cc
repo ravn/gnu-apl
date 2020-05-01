@@ -41,6 +41,7 @@
 #include "Quad_MAP.hh"
 #include "Quad_PLOT.hh"
 #include "Quad_RE.hh"
+#include "Quad_RVAL.hh"
 #include "Quad_SQL.hh"
 #include "Quad_TF.hh"
 #include "Tokenizer.hh"
