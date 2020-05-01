@@ -41,7 +41,14 @@ protected:
    virtual Token eval_AB(Value_P A, Value_P B);
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B)
+      { return Token(TOK_APL_VALUE1, do_eval_B(B.getref())); }
+
+   /// do eval_AB(A, B);
+   Value_P do_eval_AB(int A, const Value & B);
+
+   /// do eval_B(B);
+   Value_P do_eval_B(const Value & B);
 
    /// set or return the state of the random generator
    Value_P generator_state(const Value & B);
@@ -71,7 +78,7 @@ protected:
    void random_complex(Cell * cell);
 
    /// initialize \b cell with a random nested value
-   void random_nested(Cell * cell);
+   void random_nested(Cell * cell, Value & cell_owner, const Value & B);
 
    /// the number of bytes in the state of the random number generator
    size_t N;
@@ -89,7 +96,7 @@ protected:
    char state[256];
 
    /// the state of the random number generator
-   struct random_data  buf[256];
+   struct random_data buf[256];
 };
 
 #endif // __Quad_RVAL_DEFINED__

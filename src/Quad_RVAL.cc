@@ -45,11 +45,40 @@ Quad_RVAL::Quad_RVAL()
    desired_types.push_back(1);
 }
 //-----------------------------------------------------------------------------
-Token
-Quad_RVAL::eval_B(Value_P B)
+Value_P
+Quad_RVAL::do_eval_B(const Value & B)
 {
+   if (B.get_rank() != 1)   RANK_ERROR;
+const ShapeItem ec_B = B.element_count();
+   if (ec_B > 3)   LENGTH_ERROR;
+
+   // save properties values so that we can restore them
+   //
+vector<int> old_desired_ranks = desired_ranks;
+Shape old_desired_shape = desired_shape;
+vector<int> old_desired_types = desired_types;
+bool need_restore = false;
+
+   try {
+         need_restore = true;   // something was cahnged
+         if (ec_B >= 1)
+            do_eval_AB(1, B.get_ravel(1).get_pointer_value().getref());
+         if (ec_B >= 2)
+            do_eval_AB(2, B.get_ravel(2).get_pointer_value().getref());
+         if (ec_B >= 3)
+            do_eval_AB(3, B.get_ravel(3).get_pointer_value().getref());
+       }
+    catch (...)
+      {
+        desired_ranks = old_desired_ranks;
+        desired_shape = old_desired_shape;
+        desired_types = old_desired_types;
+        throw;
+      }
+
 const Rank rank = choose_integer(desired_ranks);
 Shape shape;
+
 
    for (Rank r = MAX_RANK - rank; r < MAX_RANK; ++r)
        {
@@ -68,41 +97,53 @@ const ShapeItem ec = Z->element_count();
          Cell * cZ = Z->next_ravel();
          switch(type_z)
             {
-               case 0:   random_character(cZ);   continue;
-               case 1:   random_integer(cZ);     continue;
-               case 2:   random_float(cZ);       continue;
-               case 3:   random_complex(cZ);     continue;
-               case 4:   random_nested(cZ);      continue;
+               case 0:   random_character(cZ);               continue;
+               case 1:   random_integer(cZ);                 continue;
+               case 2:   random_float(cZ);                   continue;
+               case 3:   random_complex(cZ);                 continue;
+               case 4:   random_nested(cZ, Z.getref(), B);   continue;
                default:  FIXME;
             }
+      }
+
+   if (need_restore)
+      {
+        desired_ranks = old_desired_ranks;
+        desired_shape = old_desired_shape;
+        desired_types = old_desired_types;
       }
 
    if (ec == 0)   new (&Z->get_ravel(0))   IntCell(0);
 
    Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   return Z;
 }
 //-----------------------------------------------------------------------------
 Token
 Quad_RVAL::eval_AB(Value_P A, Value_P B)
 {
-   if (!A->is_scalar())   RANK_ERROR;
+   if (!A->is_scalar())       RANK_ERROR;
+   if (!A->is_int_scalar())   DOMAIN_ERROR;
 
-const int function = A->get_ravel(0).get_int_value();
+Value_P Z = do_eval_AB(A->get_ravel(0).get_int_value(), B.getref());
+   return Token(TOK_APL_VALUE1, Z);
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_RVAL::do_eval_AB(int A, const Value & B)
+{
+const int function = A;
 
-Value_P Z;
    switch(function)
       {
-        case 0: Z = generator_state(B.getref());   break;
-        case 1: Z = result_rank(B.getref());       break;
-        case 2: Z = result_shape(B.getref());      break;
-        case 3: Z = result_type(B.getref());       break;
-
-        default: MORE_ERROR() << "Bad function number A in A ⎕RVAL B";
-                 DOMAIN_ERROR;
+        case 0: return generator_state(B);
+        case 1: return result_rank(B);
+        case 2: return result_shape(B);
+        case 3: return result_type(B);
       }
 
-   return Token(TOK_APL_VALUE1, Z);
+   MORE_ERROR() << "Bad function number A in A ⎕RVAL B";
+   DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 Value_P
@@ -342,9 +383,10 @@ union { int64_t i; double f; } u1, u2;
 }
 //-----------------------------------------------------------------------------
 void
-Quad_RVAL::random_nested(Cell * cell)
+Quad_RVAL::random_nested(Cell * cell, Value & cell_owner, const Value & B)
 {
-   TODO;
+Value_P Zsub = do_eval_B(B);
+   new (cell) PointerCell(Zsub.get(), cell_owner);
 }
 //-----------------------------------------------------------------------------
 
@@ -357,15 +399,15 @@ Quad_RVAL::Quad_RVAL()
 {
 }
 //-----------------------------------------------------------------------------
-Token
-Quad_RVAL::eval_B(Value_P B)
+Value_P
+Quad_RVAL::do_eval_B(const Value & B)
 {
     MORE_ERROR() <<
 "⎕RVAL is only available on platforms that have glibc.\n"
 "Your platform is lacking initstate_r() (and probably others).";
 
    SYNTAX_ERROR;
-   return Token();
+   return Value_P();
 }
 //-----------------------------------------------------------------------------
 Token
