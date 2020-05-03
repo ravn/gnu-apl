@@ -368,7 +368,7 @@ Value_P Z(desired_types.size(), LOC);
 Value_P
 Quad_RVAL::result_maxdepth(const Value & B)
 {
-   if (!B.get_rank() > 1)            RANK_ERROR;
+   if (B.get_rank() > 1)             RANK_ERROR;
    if (B.element_count() > 1)        LENGTH_ERROR;
 
    if (B.element_count())   // set the desired maxdepth
