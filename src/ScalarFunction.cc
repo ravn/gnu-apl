@@ -704,7 +704,8 @@ ScalarFunction::eval_fill_AB(Value_P A, Value_P B)
 
    // both A and B are empty
    //
-   Assert(A->same_shape(*B));   // has been checked already
+   if (A->get_rank() != A->get_rank())   RANK_ERROR;
+   if (!A->same_shape(*B))               LENGTH_ERROR;
 
    // Value::prototype() does not work here, so we clone() and to_proto()
    //

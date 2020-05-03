@@ -22,6 +22,7 @@
 #include "../config.h"   // for HAVE_LIBC
 #include "ComplexCell.hh"
 #include "Quad_RVAL.hh"
+#include "Value.hh"
 
 Quad_RVAL  Quad_RVAL::_fun;
 Quad_RVAL * Quad_RVAL::fun = &Quad_RVAL::_fun;
@@ -33,7 +34,8 @@ Quad_RVAL * Quad_RVAL::fun = &Quad_RVAL::_fun;
 //-----------------------------------------------------------------------------
 Quad_RVAL::Quad_RVAL()
    : QuadFunction(TOK_Quad_RVAL),
-     N(8)
+     N(8),
+   desired_maxdepth(4)
 {
    memset(state, 0, sizeof(state));
    initstate_r(1, state, N, buf);
@@ -46,7 +48,7 @@ Quad_RVAL::Quad_RVAL()
 }
 //-----------------------------------------------------------------------------
 Value_P
-Quad_RVAL::do_eval_B(const Value & B)
+Quad_RVAL::do_eval_B(const Value & B, int depth)
 {
    if (B.get_rank() != 1)   RANK_ERROR;
 const ShapeItem ec_B = B.element_count();
@@ -57,22 +59,52 @@ const ShapeItem ec_B = B.element_count();
 vector<int> old_desired_ranks = desired_ranks;
 Shape old_desired_shape = desired_shape;
 vector<int> old_desired_types = desired_types;
+int old_desired_maxdepth = desired_maxdepth;
 bool need_restore = false;
 
    try {
-         need_restore = true;   // something was cahnged
-         if (ec_B >= 1)
-            do_eval_AB(1, B.get_ravel(1).get_pointer_value().getref());
-         if (ec_B >= 2)
-            do_eval_AB(2, B.get_ravel(2).get_pointer_value().getref());
-         if (ec_B >= 3)
-            do_eval_AB(3, B.get_ravel(3).get_pointer_value().getref());
+         need_restore = true;   // since something was changed
+
+         if (ec_B >= 1)   // rank: scalar or enclosed vector (distribution)
+            {
+              const Cell & cell = B.get_ravel(0);
+              if (cell.is_pointer_cell())
+                 {
+                   do_eval_AB(1, cell.get_pointer_value().getref());
+                 }
+              else   // rank as scalar
+                 {
+                   Value_P rank = IntScalar(cell.get_int_value(), LOC);
+                   do_eval_AB(1, rank.getref());
+                 }
+            }
+
+         if (ec_B >= 2)   // shape: always enclosed vector
+            do_eval_AB(2, B.get_ravel(1).get_pointer_value().getref());
+
+         if (ec_B >= 3)   // type: always enclosed vector (distribution)
+            do_eval_AB(3, B.get_ravel(2).get_pointer_value().getref());
+
+         if (ec_B >= 4)   // maxdepth: scalar or 1-element vector
+            {
+              const Cell & cell = B.get_ravel(3);
+              if (cell.is_pointer_cell())   // maxdepth as 1-element vector
+                 {
+                   do_eval_AB(4, cell.get_pointer_value().getref());
+                 }
+              else   // maxdepth as scalar
+                 {
+                   Value_P rank = IntScalar(cell.get_int_value(), LOC);
+                   do_eval_AB(4, rank.getref());
+                 }
+            }
        }
     catch (...)
       {
         desired_ranks = old_desired_ranks;
         desired_shape = old_desired_shape;
         desired_types = old_desired_types;
+        desired_maxdepth = old_desired_maxdepth;
         throw;
       }
 
@@ -93,24 +125,26 @@ const ShapeItem ec = Z->element_count();
 
    loop(z, ec)
       {
-         const int type_z = choose_integer(desired_types);
+         int type_z;  do    { type_z = choose_integer(desired_types); }
+                      while (depth == desired_maxdepth && type_z == 4);
          Cell * cZ = Z->next_ravel();
          switch(type_z)
             {
-               case 0:   random_character(cZ);               continue;
-               case 1:   random_integer(cZ);                 continue;
-               case 2:   random_float(cZ);                   continue;
-               case 3:   random_complex(cZ);                 continue;
-               case 4:   random_nested(cZ, Z.getref(), B);   continue;
+               case 0:   random_character(cZ);                     continue;
+               case 1:   random_integer(cZ);                       continue;
+               case 2:   random_float(cZ);                         continue;
+               case 3:   random_complex(cZ);                        continue;
+               case 4:   random_nested(cZ, Z.getref(), B, depth);   continue;
                default:  FIXME;
             }
       }
 
    if (need_restore)
       {
-        desired_ranks = old_desired_ranks;
-        desired_shape = old_desired_shape;
-        desired_types = old_desired_types;
+        desired_ranks    = old_desired_ranks;
+        desired_shape    = old_desired_shape;
+        desired_types    = old_desired_types;
+        desired_maxdepth = old_desired_maxdepth;
       }
 
    if (ec == 0)   new (&Z->get_ravel(0))   IntCell(0);
@@ -140,6 +174,7 @@ const int function = A;
         case 1: return result_rank(B);
         case 2: return result_shape(B);
         case 3: return result_type(B);
+        case 4: return result_maxdepth(B);
       }
 
    MORE_ERROR() << "Bad function number A in A ⎕RVAL B";
@@ -174,8 +209,11 @@ const int new_N = B.element_count();
         loop(b, N)
             {
                state[b] = B.get_ravel(b).get_int_value();
+Q(int(state[b]));
             }
          setstate_r(state, buf);
+        loop(b, N)
+Q(int(state[b]));
       }
 
    // always return the current state
@@ -272,12 +310,25 @@ Quad_RVAL::result_type(const Value & B)
    // B is a distribution of cell types char (0), int (1), real (2),
    // complex (3), // or nested (4).
 
-   if (!B.is_vector())          RANK_ERROR;
-   if (B.element_count() > 5)   LENGTH_ERROR;
+   if (!B.is_vector())
+      {
+        MORE_ERROR() << "the right argument B of 3 ⎕RVAL B "
+        "should be a vector of up to 5 integers (the\nrelative "
+        "probabilities for types CHAR INT REAL COMPLEX or NESTED respectively)";
+          RANK_ERROR;
+      }
+   if (B.element_count() > 5)
+      {
+        MORE_ERROR() << "the right argument B of 3 ⎕RVAL B "
+        "should be a vector of up to 5 integers (the\nrelative "
+        "probabilities for types CHAR INT REAL COMPLEX or NESTED respectively)";
+          LENGTH_ERROR;
+      }
 
    if (B.element_count())   // distribution of depths
       {
         vector<int>new_types;
+        bool B_has_simple = false;
         loop(b, B.element_count())
             {
               const int type_b = B.get_ravel(b).get_int_value();
@@ -287,8 +338,19 @@ Quad_RVAL::result_type(const Value & B)
                    "should be a distribution (vector of integers ≥ 0)";
                    DOMAIN_ERROR;
                  }
+              if (type_b && b < 4)   B_has_simple = true;
               new_types.push_back(type_b);
             }
+
+        // if all simple types had a probability of 0 then random_nested()
+        // would loop forever, attempting to choose one. Do not allow that.
+        //
+        if (!B_has_simple)
+           {
+             MORE_ERROR() << "the right argument B of 3 ⎕RVAL B should contain "
+                   "at least one simple type with a non-zero probability";
+             DOMAIN_ERROR;
+           }
 
         while (new_types.size() < 5)    new_types.push_back(0);   // make 5=⍴Z
         desired_types = new_types;
@@ -303,6 +365,22 @@ Value_P Z(desired_types.size(), LOC);
    return Z;
 }
 //-----------------------------------------------------------------------------
+Value_P
+Quad_RVAL::result_maxdepth(const Value & B)
+{
+   if (!B.get_rank() > 1)            RANK_ERROR;
+   if (B.element_count() > 1)        LENGTH_ERROR;
+
+   if (B.element_count())   // set the desired maxdepth
+      {
+        const APL_Integer mxd = B.get_ravel(0).get_int_value();
+        if (mxd < 1)   DOMAIN_ERROR;
+        desired_maxdepth = mxd;
+      }
+
+   return IntScalar(desired_maxdepth, LOC);
+}
+//-----------------------------------------------------------------------------
 int
 Quad_RVAL::choose_integer(const vector<int> & dist)
 {
@@ -313,9 +391,7 @@ const int n = dist.size();
       {
         const int desired = dist[0];
         if (desired >= 0)   return desired;   // fixed value
-        int rand = 0;
-        const int err = random_r(buf, &rand);
-        Assert(err == 0);
+        const int rand = rand17();
         return rand % (1 - desired);   // = 0... desired
       }
 
@@ -323,12 +399,7 @@ const int n = dist.size();
    //
 int sum = 0;
    for (size_t d = 0; d < dist.size(); ++d)   sum += dist[d];
-
-        int rand = 0;
-        const int err = random_r(buf, &rand);
-        Assert(err == 0);
-        rand %= sum;
-
+   const int rand = (rand17() & 0xFFFF) % sum;
    sum = 0;
    for (size_t d = 0; d < dist.size(); ++d)
        {
@@ -342,51 +413,68 @@ int sum = 0;
 void
 Quad_RVAL::random_character(Cell * cell)
 {
-int32_t rnd = 0;
-const int err = random_r(buf, &rnd);
-   Assert(err == 0);
+int32_t rnd = rand17();
    new (cell) CharCell(Unicode(rnd & 0x3FFF));
 }
 //-----------------------------------------------------------------------------
 void
 Quad_RVAL::random_integer(Cell * cell)
 {
-int32_t rnd1= 0;   if (random_r(buf, &rnd1))   FIXME;
-int32_t rnd2= 0;   if (random_r(buf, &rnd2))   FIXME;
-const int64_t rnd = uint32_t(rnd1) | uint64_t(uint32_t(rnd2)) << 32;
+const int64_t rnd = rand17()
+                  ^ (rand17() << 16)
+                  ^ (rand17() << 32)
+                  ^ (rand17() << 48);
    new (cell) IntCell(rnd);
 }
 //-----------------------------------------------------------------------------
 void
 Quad_RVAL::random_float(Cell * cell)
 {
-int32_t rnd1= 0;   if (random_r(buf, &rnd1))   FIXME;
-int32_t rnd2= 0;   if (random_r(buf, &rnd2))   FIXME;
+union { uint64_t i; double f; } u;
+   do {
+        u.i = rand17() | rand17() << 17 | rand17() << 34;
+        u.i &= 0x000FFFFFFFFFFFFFULL;
+        u.i |= 0x3FE0000000000000ULL;
+      } while (!isnormal(u.f));
 
-union { int64_t i; double f; } u;
-   u.i = uint32_t(rnd1) | uint64_t(uint32_t(rnd2)) << 32;
    new (cell) FloatCell(u.f);
 }
 //-----------------------------------------------------------------------------
 void
 Quad_RVAL::random_complex(Cell * cell)
 {
-int32_t rnd1= 0;   if (random_r(buf, &rnd1))   FIXME;
-int32_t rnd2= 0;   if (random_r(buf, &rnd2))   FIXME;
-int32_t rnd3= 0;   if (random_r(buf, &rnd3))   FIXME;
-int32_t rnd4= 0;   if (random_r(buf, &rnd4))   FIXME;
-
 union { int64_t i; double f; } u1, u2;
-   u1.i = uint32_t(rnd1) | uint64_t(uint32_t(rnd2)) << 32;
-   u2.i = uint32_t(rnd3) | uint64_t(uint32_t(rnd4)) << 32;
-   new (cell) ComplexCell(u1.f, u2.f);
+   do {
+        u1.i = rand17() | rand17() << 17 | rand17() << 34;
+        u1.i &= 0x000FFFFFFFFFFFFFULL;
+        u1.i |= 0x3FE0000000000000ULL;
+      } while (!isnormal(u1.f));
+
+   do {
+        u2.i = rand17() | rand17() << 17 | rand17() << 34;
+        u2.i &= 0x000FFFFFFFFFFFFFULL;
+        u2.i |= 0x3FE0000000000000ULL;
+      } while (!isnormal(u2.f));
+   new (cell) ComplexCell(u1.f - 1.0, u2.f - 1.0);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_RVAL::random_nested(Cell * cell, Value & cell_owner, const Value & B)
+Quad_RVAL::random_nested(Cell * cell, Value & cell_owner,
+                         const Value & B, int depth)
 {
-Value_P Zsub = do_eval_B(B);
+Value_P Zsub = do_eval_B(B, depth + 1);
    new (cell) PointerCell(Zsub.get(), cell_owner);
+}
+//-----------------------------------------------------------------------------
+uint64_t
+Quad_RVAL::rand17()
+{
+int32_t rnd;
+   if (random_r(buf, &rnd))   FIXME;
+
+   // the lower bits are less random, so we xor the upper 16 bits into
+   // the lower 16 bits and return them.
+   return (rnd ^ (rnd >> 16)) & 0x1FFFF;
 }
 //-----------------------------------------------------------------------------
 
@@ -400,7 +488,7 @@ Quad_RVAL::Quad_RVAL()
 }
 //-----------------------------------------------------------------------------
 Value_P
-Quad_RVAL::do_eval_B(const Value & B)
+Quad_RVAL::do_eval_B(const Value & B, int depth)
 {
     MORE_ERROR() <<
 "⎕RVAL is only available on platforms that have glibc.\n"

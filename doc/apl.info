@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-April 16, 2020
+May 3, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -718,9 +718,10 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.28::  ⎕PLOT - Plot Data
 * Section 3.29::  ⎕PS   - Print Style
 * Section 3.30::  ⎕RE   - Regular Expressions
-* Section 3.31::  ⎕SQL  - SQL Database Interface
-* Section 3.32::  ⎕SI   - State Indicator
-* Section 3.33::  ⎕SYL  - System limits
+* Section 3.31::  ⎕RVAL - Random APL value
+* Section 3.32::  ⎕SQL  - SQL Database Interface
+* Section 3.33::  ⎕SI   - State Indicator
+* Section 3.34::  ⎕SYL  - System limits
 
 There are a few possibly useful features in GNU APL:
 
@@ -3326,7 +3327,86 @@ two 1-character sub-matches:
 
 File: apl.info,  Node: Section 3.31,  Next: Section 3.32,  Prev: Section 3.30,  Up: Chapter 3
 
-3.31 ⎕SQL - SQL Database Interface
+3.31 ⎕RVAL - Random APL value
+=============================
+
+The standard way to produce random numbers is the primitive function ?
+aka.  *Roll*.  Roll returns a simple random array whose ravel elements
+are positive integers choosen in a random fashion.  While this is
+sufficient for many applications, one sometimes needs APL values whose
+randomness not only affects the ravel elements themselves, but also
+other aspects like:
+
+   * the rank of the value, * the shape of the value, * the data type of
+the ravel elements, and * the depth (nesting) of the values.
+
+   Such values can be produced with system function ⎕RVAL. The main use
+case for ⎕RVAL is the production of test data for the interpreter, but
+⎕RVAL might be useful for other purposes as well.
+
+3.31.1 General
+--------------
+
+In general, monadic ⎕RVAL, i.e.  Z←RVAL B returns a single random APL
+value Z, while dyadic ⎕RVAL, i.e.  A RVAL B is used to control the
+properties of subsequent random APL values.
+
+3.31.2 Dyadic ⎕RVAL
+-------------------
+
+The left argument A of A ⎕RVAL B determines which aspect of the
+subsequent random APL values shall be controlled.  A is an integer
+scalar from 0 to 4 (including):
+
+   * A=0 controls the state of the underlying random number generator, *
+A=1 controls the ranks of the subsequent random APL values, * A=2
+controls the shapes of the subsequent random APL values, * A=3 controls
+the data types in the ravels of the subsequent random APL values, and *
+A=4 controls a maximum depth of the subsequent random APL values.
+
+3.31.2.1 0 ⎕RVAL B: Control of the underlying random number generator
+.....................................................................
+
+⎕RVAL uses the standard C function random_r().  For this reason ⎕RVAL is
+only available on platforms which use glibc, for example all GNU/Linux
+system.
+
+   Every random number generator has a state (similar to ⎕RL for ’?’).
+While the primitive ?  keeps its state in ⎕RL, i.e.  in the workspace,
+⎕RVAL has no associated system variable like ⎕RL which keeps its state.
+Instead, the user needs to store the state of ⎕RVAL in a workspace
+variable if the workspace shall be stored and continued at a later
+point.  This rarely happens, therefore no effort was spent for
+implementing another system variable.
+
+   The current state of ⎕RVAL’s random number generator can be retrieved
+with:
+
+      STATE ← 0 ⎕RVAL ''
+
+   The state changes with every call of monadic ⎕RVAL. The random number
+generator can later be restored to the same state like this:
+
+      0 ⎕RVAL STATE
+
+   STATE←0 LRVAL
+
+3.31.2.2 1 ⎕RVAL B: Control of the ranks
+........................................
+
+3.31.2.3 2 ⎕RVAL B: Control of the shapes
+.........................................
+
+3.31.2.4 3 ⎕RVAL B: Control of the data types
+.............................................
+
+3.31.2.5 4 ⎕RVAL B: Control of a maximum depth
+..............................................
+
+
+File: apl.info,  Node: Section 3.32,  Next: Section 3.33,  Prev: Section 3.31,  Up: Chapter 3
+
+3.32 ⎕SQL - SQL Database Interface
 ==================================
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -3423,9 +3503,9 @@ table.  Currently, the column layout is as follows:
 release.
 
 
-File: apl.info,  Node: Section 3.32,  Next: Section 3.33,  Prev: Section 3.31,  Up: Chapter 3
+File: apl.info,  Node: Section 3.33,  Next: Section 3.34,  Prev: Section 3.32,  Up: Chapter 3
 
-3.32 ⎕SI - State Indicator
+3.33 ⎕SI - State Indicator
 ==========================
 
 ⎕SI returns aspects of the current State Indicator, similar to the
@@ -3489,9 +3569,9 @@ while negative A count from the latest to the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 3.33,  Prev: Section 3.32,  Up: Chapter 3
+File: apl.info,  Node: Section 3.34,  Prev: Section 3.33,  Up: Chapter 3
 
-3.33 ⎕SYL - System limits
+3.34 ⎕SYL - System limits
 =========================
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -3529,7 +3609,7 @@ result in a SYNTAX ERROR. Indexed assignment to ⎕SYL will result in an
 INDEX ERROR unless the limit is writable.  Some read-only limits can be
 changed at compile-time via ./configure
 
-3.33.1 ⎕SYL[1 2 3 4 5 6;]
+3.34.1 ⎕SYL[1 2 3 4 5 6;]
 -------------------------
 
 The first three limits are writable; their purpose is to stop execution
@@ -3561,20 +3641,20 @@ bytes limits together.
    An attempt to set a too small limit, for example one that is close to
 the current value, is rejected with a DOMAIN ERROR.
 
-3.33.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
+3.34.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
 -------------------------------------------------------------
 
 These system limits are read-only.  Some of them can be changed at
 compile time via ./configure.  Most others can be changed in the source
 code of GNU APL, but doing so is not recommended.
 
-3.33.3 ⎕SYL[24 25 26;]
+3.34.3 ⎕SYL[24 25 26;]
 ----------------------
 
 These system limits have been added in preparation of multi-core GNU
 APL. They are currently not used.
 
-3.33.4 ⎕SYL[27;]
+3.34.4 ⎕SYL[27;]
 ----------------
 
 This is not a limit that raises a limit error.  Instead it limits the
@@ -5085,59 +5165,60 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11470
-Node: Chapter 219503
-Node: Chapter 323927
-Node: Section 3.125583
-Node: Section 3.241747
-Node: Section 3.342506
-Node: Section 3.443793
-Node: Section 3.547196
-Node: Section 3.647369
-Node: Section 3.747982
-Node: Section 3.851935
-Node: Section 3.953477
-Node: Section 3.1054932
-Node: Section 3.1156716
-Node: Section 3.1258656
-Node: Section 3.1359597
-Node: Section 3.1459849
-Node: Section 3.1561245
-Node: Section 3.1663757
-Node: Section 3.1770456
-Node: Section 3.1871893
-Node: Section 3.1977553
-Node: Section 3.2082587
-Node: Section 3.2185868
-Node: Section 3.2286159
-Node: Section 3.2396734
-Node: Section 3.2497006
-Node: Section 3.25103584
-Node: Section 3.26106035
-Node: Section 3.27106704
-Node: Section 3.28109827
-Node: Section 3.29116681
-Node: Section 3.30117628
-Node: Section 3.31131190
-Node: Section 3.32134294
-Node: Section 3.33136283
-Node: Chapter 4140687
-Node: Chapter 5142435
-Node: Chapter 6143561
-Node: Section 6.1145098
-Node: Section 6.2146378
-Node: Section 6.3146738
-Node: Section 6.4146980
-Node: Section 6.5147642
-Node: Section 6.6148120
-Node: Section 6.7148892
-Node: Section 6.8149349
-Node: Chapter 7149751
-Node: Section 7.1150170
-Node: Section 7.2150857
-Node: Chapter 8151688
-Node: Section 8.1152191
-Node: Section 8.2177505
+Node: Chapter 11467
+Node: Chapter 219500
+Node: Chapter 323924
+Node: Section 3.125625
+Node: Section 3.241789
+Node: Section 3.342548
+Node: Section 3.443835
+Node: Section 3.547238
+Node: Section 3.647411
+Node: Section 3.748024
+Node: Section 3.851977
+Node: Section 3.953519
+Node: Section 3.1054974
+Node: Section 3.1156758
+Node: Section 3.1258698
+Node: Section 3.1359639
+Node: Section 3.1459891
+Node: Section 3.1561287
+Node: Section 3.1663799
+Node: Section 3.1770498
+Node: Section 3.1871935
+Node: Section 3.1977595
+Node: Section 3.2082629
+Node: Section 3.2185910
+Node: Section 3.2286201
+Node: Section 3.2396776
+Node: Section 3.2497048
+Node: Section 3.25103626
+Node: Section 3.26106077
+Node: Section 3.27106746
+Node: Section 3.28109869
+Node: Section 3.29116723
+Node: Section 3.30117670
+Node: Section 3.31131232
+Node: Section 3.32134295
+Node: Section 3.33137399
+Node: Section 3.34139388
+Node: Chapter 4143792
+Node: Chapter 5145540
+Node: Chapter 6146666
+Node: Section 6.1148203
+Node: Section 6.2149483
+Node: Section 6.3149843
+Node: Section 6.4150085
+Node: Section 6.5150747
+Node: Section 6.6151225
+Node: Section 6.7151997
+Node: Section 6.8152454
+Node: Chapter 7152856
+Node: Section 7.1153275
+Node: Section 7.2153962
+Node: Chapter 8154793
+Node: Section 8.1155296
+Node: Section 8.2180610
 
 End Tag Table
 

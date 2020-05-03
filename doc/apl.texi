@@ -782,9 +782,10 @@ between GNU APL and IBM APL2.
 * Section 3.28::  ⎕PLOT - Plot Data
 * Section 3.29::  ⎕PS   - Print Style
 * Section 3.30::  ⎕RE   - Regular Expressions
-* Section 3.31::  ⎕SQL  - SQL Database Interface
-* Section 3.32::  ⎕SI   - State Indicator
-* Section 3.33::  ⎕SYL  - System limits
+* Section 3.31::  ⎕RVAL - Random APL value
+* Section 3.32::  ⎕SQL  - SQL Database Interface
+* Section 3.33::  ⎕SI   - State Indicator
+* Section 3.34::  ⎕SYL  - System limits
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -3403,15 +3404,87 @@ The same for the pos+len output format:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 @end verbatim
 
-
-
 @node    Section 3.31
+@section ⎕RVAL - Random APL value
+
+The standard way to produce random numbers is the primitive function ?
+aka. *Roll*. Roll returns a simple random array whose ravel elements are
+positive integers choosen in a random fashion. While this is sufficient
+for many applications, one sometimes needs APL values whose randomness not
+only affects the ravel elements themselves, but also other aspects like:
+
+* the rank of the value,
+* the shape of the value,
+* the data type of the ravel elements, and
+* the depth (nesting) of the values.
+
+Such values can be produced with system function ⎕RVAL. The main use case for
+⎕RVAL is the production of test data for the interpreter, but ⎕RVAL might be
+useful for other purposes as well.
+
+@subsection General
+
+In general, monadic ⎕RVAL, i.e. Z←RVAL B returns a single random APL value Z,
+while dyadic ⎕RVAL, i.e. A RVAL B is used to control the properties of
+subsequent random APL values.
+
+@subsection Dyadic ⎕RVAL
+
+The left argument A of A ⎕RVAL B determines which aspect of the
+subsequent random APL values shall be controlled. A is an integer scalar
+from 0 to 4 (including):
+
+* A=0 controls the state of the underlying random number generator,
+* A=1 controls the ranks of the subsequent random APL values,
+* A=2 controls the shapes of the subsequent random APL values,
+* A=3 controls the data types in the ravels of the subsequent random APL values, and
+* A=4 controls a maximum depth of the subsequent random APL values.
+
+@subsubsection 0 ⎕RVAL B: Control of the underlying random number generator
+
+⎕RVAL uses the standard C function random_r(). For this reason ⎕RVAL is
+only available on platforms which use glibc, for example all GNU/Linux
+system.
+
+Every random number generator has a state (similar to ⎕RL for '?'). While
+the primitive ? keeps its state in ⎕RL, i.e. in the workspace, ⎕RVAL has
+no associated system variable like ⎕RL which keeps its state. Instead,
+the user needs to store the state of ⎕RVAL in a workspace variable if the
+workspace shall be stored and continued at a later point. This rarely happens,
+therefore no effort was spent for implementing another system variable.
+
+The current state of ⎕RVAL's random number generator can be retrieved
+with:
+
+@verbatim
+      STATE ← 0 ⎕RVAL ''
+@end verbatim
+
+The state changes with every call of monadic ⎕RVAL. The random number generator
+can later be restored to the same state like this:
+
+@verbatim
+      0 ⎕RVAL STATE
+@end verbatim
+
+
+STATE←0 LRVAL
+
+@subsubsection 1 ⎕RVAL B: Control of the ranks
+
+@subsubsection 2 ⎕RVAL B: Control of the shapes
+
+@subsubsection 3 ⎕RVAL B: Control of the data types
+
+@subsubsection 4 ⎕RVAL B: Control of a maximum depth
+
+@node    Section 3.32
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below.
 
-@verbatim 
+@verbatim
       ⎕SQL[0]''
 Available function numbers:
 type  ⎕SQL[1] file      - open a database file, return reference ID for it
@@ -3525,7 +3598,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 3.32
+@node    Section 3.33
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -3589,7 +3662,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 3.33
+@node    Section 3.34
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:

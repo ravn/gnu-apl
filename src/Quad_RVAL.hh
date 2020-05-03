@@ -42,13 +42,13 @@ protected:
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B)
-      { return Token(TOK_APL_VALUE1, do_eval_B(B.getref())); }
+      { return Token(TOK_APL_VALUE1, do_eval_B(B.getref(), 0)); }
 
    /// do eval_AB(A, B);
    Value_P do_eval_AB(int A, const Value & B);
 
    /// do eval_B(B);
-   Value_P do_eval_B(const Value & B);
+   Value_P do_eval_B(const Value & B, int depth);
 
    /// set or return the state of the random generator
    Value_P generator_state(const Value & B);
@@ -59,8 +59,11 @@ protected:
    /// set or return the desired ranks of random numbers
    Value_P result_shape(const Value & B);
 
-   /// set or return the desired depths of random numbers
+   /// set or return the desired types of random numbers
    Value_P result_type(const Value & B);
+
+   /// set or return the desired max. depth of random numbers
+   Value_P result_maxdepth(const Value & B);
 
    /// choose an integer value at random according to distribution \b dist
    int choose_integer(const vector<int> & dist);
@@ -78,7 +81,12 @@ protected:
    void random_complex(Cell * cell);
 
    /// initialize \b cell with a random nested value
-   void random_nested(Cell * cell, Value & cell_owner, const Value & B);
+   void random_nested(Cell * cell, Value & cell_owner,
+                      const Value & B, int depth);
+
+   /// return a 17-bit random number
+   // of random_r()
+   uint64_t rand17();
 
    /// the number of bytes in the state of the random number generator
    size_t N;
@@ -89,8 +97,11 @@ protected:
    /// the desired rank of random values
    Shape desired_shape;
 
-   /// the desired depth (or a distribution of depths) of random values
+   /// the desired types (or a distribution of types) of random values
    vector<int> desired_types;
+
+   /// the desiredlimit on the depths of the random values
+   int desired_maxdepth;
 
    /// the state buffer of the random number generator
    char state[256];

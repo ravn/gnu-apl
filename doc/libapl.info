@@ -1,4 +1,4 @@
-This is libapl.info, produced by makeinfo version 5.2 from libapl.texi.
+This is libapl.info, produced by makeinfo version 6.7 from libapl.texi.
 
 INFO-DIR-SECTION GNU programming tools
 START-INFO-DIR-ENTRY
@@ -339,7 +339,7 @@ static int save_to_workspace(const APL_value apl,int committed) {
 result_callback res_callback = always_print_it;
 ...
 /* A later assignment statement may be anywhere */
-res_callback = save_to_workspace;
+res_callback = save_to_workspace;  
 ...
 res_callback = NULL;      /* disables callback feature */
 
@@ -428,14 +428,14 @@ Node: Write access to cells12901
 Ref: #write-access-to-cells13099
 Node: Interface to APL interpreter13431
 Ref: #interface-to-apl-interpreter13641
-Node: Destructor function15011
-Ref: #destructor-function15195
-Node: Print support15334
-Ref: #print-support15469
-Node: Programming notes15867
-Ref: #programming-notes15994
-Node: The loc parameter and LOC macro16318
-Ref: #the-loc-parameter-and-loc-macro16492
+Node: Destructor function15013
+Ref: #destructor-function15197
+Node: Print support15336
+Ref: #print-support15471
+Node: Programming notes15869
+Ref: #programming-notes15996
+Node: The loc parameter and LOC macro16320
+Ref: #the-loc-parameter-and-loc-macro16494
 
 End Tag Table
 
