@@ -48,7 +48,8 @@ VH_entry::VH_entry(const Value * _val, VH_event _ev, int _iarg,
 void
 VH_entry::init()
 {
-   memset(history, 0, sizeof(history));
+void * h = history;
+   memset(h, 0, sizeof(history));
 }
 //----------------------------------------------------------------------------
 void
