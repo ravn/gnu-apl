@@ -36,6 +36,7 @@ public:
    static Quad_RVAL * fun;          ///< Built-in function.
    static Quad_RVAL  _fun;          ///< Built-in function.
 
+#if HAVE_LIBC
 protected:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B);
@@ -107,7 +108,8 @@ protected:
    char state[256];
 
    /// the state of the random number generator
-   struct random_data buf[256];
+   struct random_data rdata;
+#endif
 };
 
 #endif // __Quad_RVAL_DEFINED__

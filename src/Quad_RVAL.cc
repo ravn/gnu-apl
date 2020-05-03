@@ -38,7 +38,7 @@ Quad_RVAL::Quad_RVAL()
    desired_maxdepth(4)
 {
    memset(state, 0, sizeof(state));
-   initstate_r(1, state, N, buf);
+   initstate_r(1, state, N, &rdata);
 
    while (desired_shape.get_rank() < MAX_RANK)
          desired_shape.add_shape_item(1);
@@ -209,11 +209,8 @@ const int new_N = B.element_count();
         loop(b, N)
             {
                state[b] = B.get_ravel(b).get_int_value();
-Q(int(state[b]));
             }
-         setstate_r(state, buf);
-        loop(b, N)
-Q(int(state[b]));
+         setstate_r(state, &rdata);
       }
 
    // always return the current state
@@ -470,7 +467,7 @@ uint64_t
 Quad_RVAL::rand17()
 {
 int32_t rnd;
-   if (random_r(buf, &rnd))   FIXME;
+   if (random_r(&rdata, &rnd))   FIXME;
 
    // the lower bits are less random, so we xor the upper 16 bits into
    // the lower 16 bits and return them.
