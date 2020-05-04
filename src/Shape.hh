@@ -65,7 +65,7 @@ public:
    Shape(const Shape & other)
    : rho_rho(other.rho_rho)
    {
-     loop(r, rho_rho)   rho[r] = other.rho[r];
+     loop(r, MAX_RANK)   rho[r] = other.rho[r];
      volume = other.volume;
    }
 
