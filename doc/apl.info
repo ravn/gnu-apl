@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-May 3, 2020
+May 4, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3332,13 +3332,18 @@ File: apl.info,  Node: Section 3.31,  Next: Section 3.32,  Prev: Section 3.30,  
 
 The standard way to produce random numbers is the primitive function ?
 aka.  *Roll*.  Roll returns a simple random array whose ravel elements
-are positive integers choosen in a random fashion.  While this is
+are positive integers chosen in a random fashion.  While this is
 sufficient for many applications, one sometimes needs APL values whose
 randomness not only affects the ravel elements themselves, but also
 other aspects like:
 
-   * the rank of the value, * the shape of the value, * the data type of
-the ravel elements, and * the depth (nesting) of the values.
+   * the rank of the value,
+
+   * the shape of the value,
+
+   * the data type of the ravel elements, and
+
+   * the depth (nesting) of the values.
 
    Such values can be produced with system function ⎕RVAL. The main use
 case for ⎕RVAL is the production of test data for the interpreter, but
@@ -3349,20 +3354,26 @@ case for ⎕RVAL is the production of test data for the interpreter, but
 
 In general, monadic ⎕RVAL, i.e.  Z←RVAL B returns a single random APL
 value Z, while dyadic ⎕RVAL, i.e.  A RVAL B is used to control the
-properties of subsequent random APL values.
+properties of subsequently generated random APL values returned by
+monadic ⎕RVAL.
 
 3.31.2 Dyadic ⎕RVAL
 -------------------
 
 The left argument A of A ⎕RVAL B determines which aspect of the
 subsequent random APL values shall be controlled.  A is an integer
-scalar from 0 to 4 (including):
+scalar:
 
-   * A=0 controls the state of the underlying random number generator, *
-A=1 controls the ranks of the subsequent random APL values, * A=2
-controls the shapes of the subsequent random APL values, * A=3 controls
-the data types in the ravels of the subsequent random APL values, and *
-A=4 controls a maximum depth of the subsequent random APL values.
+   • A=0 controls the state of the underlying random number generator,
+
+   • A=1 controls the ranks of the subsequent random APL values,
+
+   • A=2 controls the shapes of the subsequent random APL values,
+
+   • A=3 controls the data types in the ravels of the subsequent random
+     APL values, and
+
+   • A=4 controls a maximum depth of the subsequent random APL values.
 
 3.31.2.1 0 ⎕RVAL B: Control of the underlying random number generator
 .....................................................................
@@ -3377,7 +3388,8 @@ While the primitive ?  keeps its state in ⎕RL, i.e.  in the workspace,
 Instead, the user needs to store the state of ⎕RVAL in a workspace
 variable if the workspace shall be stored and continued at a later
 point.  This rarely happens, therefore no effort was spent for
-implementing another system variable.
+implementing another system variable.  For the same reason, the state of
+⎕RVAL survives )CLEAR.
 
    The current state of ⎕RVAL’s random number generator can be retrieved
 with:
@@ -3389,19 +3401,186 @@ generator can later be restored to the same state like this:
 
       0 ⎕RVAL STATE
 
-   STATE←0 LRVAL
+   Restoring the state is needed when the same sequence of random value
+shall be generated again.  The random number generators of ?  and ⎕RVAL
+are indepentent; generating a random number or random value with one
+does not change the state of the other.
 
 3.31.2.2 1 ⎕RVAL B: Control of the ranks
 ........................................
 
+The rank of subsequently generated random values can be controlled with
+1 ⎕RVAL B as follows.
+
+   • If B is a scalar 0 ≤ B < MAX_RANK (MAX_RANK is ./configurable with
+     a default of 8) then subsequently generated random values will have
+     the fixed rank B.
+
+   • If B is a scalar 0 > B > -MAX_RANK then the ranks of subsequently
+     generated random values will be chosen at random between 0 and -B
+     (including).  All possible ranks 0, ...  MAX_RANK have the same
+     probability P = 100÷1-B %.
+
+   • Otherwise B must be a vector of positive integers.  The integers
+     are the relative frequencies of the ranks 0, 1, ...  MAX_RANK
+     respectively.  Too many integers will give raise LENGTH ERROR while
+     fewer (than MAX_RANK) are set to 0.
+
+   1 ⎕RVAL always returns its previous setting (i.e.  before applying
+B). An empty B, e.g.  1 ⎕RVAL ⍬ will not change anything and can be used
+to query the current setting for 1 ⎕RVAL.
+
+   Examples:
+
+   • 1 ⎕RVAL 2 will produce only matrices,
+
+   • 1 ⎕RVAL ¯2 will produce scalars, vectors or matrices, each with a
+     probability of 100÷3 %, and
+
+   • 1 ⎕RVAL 50 30 20 will produce a scalars with probability 50%,
+     vectors with probability 30%, and a matrices with probability 20%.
+     The numbers need not add up to 100, but will be scaled accordingly.
+
 3.31.2.3 2 ⎕RVAL B: Control of the shapes
 .........................................
+
+The shapes of subsequently generated random values can be controlled
+with 2 ⎕RVAL B as follows.
+
+   B must be a vector of positive or negative integers.  Vectors longer
+than MAX_RANK + 1 will give a LENGTH ERROR while vectors shorter than
+MAX_RANK + 1 will be filled with 1 until the length of B becomes
+MAX_RANK + 1.
+
+   If an element B_{i} of the resulting shape B = B_{1} ...  B_{MAXRANK}
+is ≥ 0 then the corresponding axis i will have a fixed length of B_{i}.
+If B_{i} < 0 then the length of that axis will be chosen at random with
+a probability of 1÷B_{i}.  Note that the same B can still produce
+different shapes even if all B_{i} are ≥ 0 (i.e.  if the rank is also
+chosen at random).
+
+   2 ⎕RVAL always returns its previous setting (i.e.  before applying
+B). An empty B, e.g.  2 ⎕RVAL ⍬, will not change anything and can be
+used to query the current setting for 2 ⎕RVAL.
+
+   Example:
+
+1 ⎕RVAL 2        ⍝ produce matrices
+2 ⎕RVAL 3 ¯10    ⍝ the first axis of every matrix will have length 3, and
+                 ⍝ the last axis of every matrix will vary between 0 and 10
+
+   This will produce scalars, vectors with a fixed length of 3 and
+matrices with 3 rows and between 0 and 10 columns.
 
 3.31.2.4 3 ⎕RVAL B: Control of the data types
 .............................................
 
+The types (i.e.  CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of
+subsequently generated random values can be controlled with 3 ⎕RVAL B as
+follows.
+
+   B must be a vector with up to 5 positive numbers, corresponding to
+the types.  Shorter vectors are filled with 0 (the corresponding types
+will not occur) and longer vectors will raise a LENGTH error.
+
+   Once the type was chosen, th ravel item will be:
+
+   • for type CHARACTER: a random character with ⎕UCS between 0 and
+     $3000 (excluding).  Larger Unicodes typically cause display
+     problems.  If you need larget Unicodes, use ⎕UCS with random
+     integers.
+
+   • for type INTEGER: a random integer with ⎕UCS between -$80000000 and
+     $7FFFFFFF.
+
+   • for type REAL: a floating point number between 0.0 and 1.0
+     (excluding)
+
+   • for type COMPLEX: a complex point number with real and imaginaty
+     part between 0.0 and 1.0 (excluding), and
+
+   • for type NESTED: a nested APL value with the same properties (rank,
+     shape, and type) as their parent.
+
+   3 ⎕RVAL always returns its previous setting (i.e.  before applying
+B). An empty B, e.g.  3 ⎕RVAL ⍬ will not change anything and can be used
+to query the current setting for 3 ⎕RVAL.
+
+   Example:
+
+      1 ⎕RVAL 2         ⍝ produce matrices
+      2 ⎕RVAL 3 3       ⍝ produce 3×3 matrices
+      3 ⎕RVAL 0 50 50   ⍝ produce a mix of integer and real values
+      ⎕RVAL ''
+¯975954163190248487                   0.5892132425
+7677327503669503253 2152001972871424768
+
 3.31.2.5 4 ⎕RVAL B: Control of a maximum depth
 ..............................................
+
+If the probability of generating a nested value is > 0 then the depth of
+random values can become arbitrarily large and could therefore exceed
+the system limit for the depth of the random value being produced.  This
+can be prevented by setting a maximum depth for every value generated.
+⎕RVAL sets the probability of the deepest allowed depth to 0.
+
+   4 ⎕CR B expects B to be a positive integer which is deepest allowed
+depth;
+
+   An empty B, e.g.  4 ⎕RVAL ⍬, will not change anything and can be used
+to query the current setting for 4 ⎕RVAL.
+
+3.31.2.6 monadic ⎕RVAL B: Return a new random value
+...................................................
+
+Calling ⎕RVAL monadically produces one new random APL value.
+
+   The properties of that next value can be controlled by the dyadic
+calls of ⎕RVAL as described above.  If no prior dyadic call of ⎕RVAL was
+made then the properties have the following defaults:
+
+      1 ⎕RVAL ⍬    ⍝ rank (scalar)
+0
+
+      2 ⎕RVAL ⍬    ⍝ shape (not used since rank = 0)
+1 1 1 1 1 1 1 1
+
+      3 ⎕RVAL ⍬    ⍝ types (integer)
+0 1 0 0 0
+
+      4 ⎕RVAL ⍬    ⍝ max. depth (not used since probasbility of NESTED = 0)
+4
+
+   That is, by default ⎕RVAL ⍬ produces random integer scalars.
+
+   It is sometimes convenient to be able to change the properties of the
+next random value without modifying (and later restoring) the properties
+with dyadic ⎕RVAL. This can be achieved with monadic ⎕RVAL with
+non-empty B.
+
+   Let 4=⍴B. Then
+
+   Z←⎕RVAL B does essentially:
+
+   B[1]←1 ⎕RVAL B[1]
+   B[2]←2 ⎕RVAL B[2]
+   B[3]←3 ⎕RVAL B[3]
+   B[4]←4 ⎕RVAL B[4]
+
+   Z←⎕RVAL ''
+
+   B[1]←1 ⎕RVAL B[1]
+   B[2]←2 ⎕RVAL B[2]
+   B[3]←3 ⎕RVAL B[3]
+   B[4]←4 ⎕RVAL B[4]
+
+   If 4>⍴B then the missing properties are not changed.
+
+   Examples:
+
+⎕RVAL 1 (,¯4) (0 1)    ⍝ return a random 0-4 element integer vector
+⎕RVAL 2 (2 2) (1 0)    ⍝ return a random 2×2 character array
+
 
 
 File: apl.info,  Node: Section 3.32,  Next: Section 3.33,  Prev: Section 3.31,  Up: Chapter 3
@@ -5199,26 +5378,26 @@ Node: Section 3.28109869
 Node: Section 3.29116723
 Node: Section 3.30117670
 Node: Section 3.31131232
-Node: Section 3.32134295
-Node: Section 3.33137399
-Node: Section 3.34139388
-Node: Chapter 4143792
-Node: Chapter 5145540
-Node: Chapter 6146666
-Node: Section 6.1148203
-Node: Section 6.2149483
-Node: Section 6.3149843
-Node: Section 6.4150085
-Node: Section 6.5150747
-Node: Section 6.6151225
-Node: Section 6.7151997
-Node: Section 6.8152454
-Node: Chapter 7152856
-Node: Section 7.1153275
-Node: Section 7.2153962
-Node: Chapter 8154793
-Node: Section 8.1155296
-Node: Section 8.2180610
+Node: Section 3.32140732
+Node: Section 3.33143836
+Node: Section 3.34145825
+Node: Chapter 4150229
+Node: Chapter 5151977
+Node: Chapter 6153103
+Node: Section 6.1154640
+Node: Section 6.2155920
+Node: Section 6.3156280
+Node: Section 6.4156522
+Node: Section 6.5157184
+Node: Section 6.6157662
+Node: Section 6.7158434
+Node: Section 6.8158891
+Node: Chapter 7159293
+Node: Section 7.1159712
+Node: Section 7.2160399
+Node: Chapter 8161230
+Node: Section 8.1161733
+Node: Section 8.2187047
 
 End Tag Table
 

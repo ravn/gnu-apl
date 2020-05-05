@@ -3408,14 +3408,17 @@ The same for the pos+len output format:
 @section ⎕RVAL - Random APL value
 
 The standard way to produce random numbers is the primitive function ?
-aka. *Roll*. Roll returns a simple random array whose ravel elements are
-positive integers choosen in a random fashion. While this is sufficient
+aka. @strong{Roll}. Roll returns a simple random array whose ravel elements are
+positive integers chosen in a random fashion. While this is sufficient
 for many applications, one sometimes needs APL values whose randomness not
 only affects the ravel elements themselves, but also other aspects like:
 
 * the rank of the value,
+
 * the shape of the value,
+
 * the data type of the ravel elements, and
+
 * the depth (nesting) of the values.
 
 Such values can be produced with system function ⎕RVAL. The main use case for
@@ -3426,19 +3429,30 @@ useful for other purposes as well.
 
 In general, monadic ⎕RVAL, i.e. Z←RVAL B returns a single random APL value Z,
 while dyadic ⎕RVAL, i.e. A RVAL B is used to control the properties of
-subsequent random APL values.
+subsequently generated random APL values returned by monadic ⎕RVAL.
 
 @subsection Dyadic ⎕RVAL
 
 The left argument A of A ⎕RVAL B determines which aspect of the
-subsequent random APL values shall be controlled. A is an integer scalar
-from 0 to 4 (including):
+subsequent random APL values shall be controlled. A is an integer scalar:
 
-* A=0 controls the state of the underlying random number generator,
-* A=1 controls the ranks of the subsequent random APL values,
-* A=2 controls the shapes of the subsequent random APL values,
-* A=3 controls the data types in the ravels of the subsequent random APL values, and
-* A=4 controls a maximum depth of the subsequent random APL values.
+@itemize
+@item
+A=0 controls the state of the underlying random number generator,
+
+@item
+A=1 controls the ranks of the subsequent random APL values,
+
+@item
+A=2 controls the shapes of the subsequent random APL values,
+
+@item
+A=3 controls the data types in the ravels of the subsequent random APL values, and
+
+@item
+A=4 controls a maximum depth of the subsequent random APL values.
+
+@end itemize
 
 @subsubsection 0 ⎕RVAL B: Control of the underlying random number generator
 
@@ -3451,7 +3465,8 @@ the primitive ? keeps its state in ⎕RL, i.e. in the workspace, ⎕RVAL has
 no associated system variable like ⎕RL which keeps its state. Instead,
 the user needs to store the state of ⎕RVAL in a workspace variable if the
 workspace shall be stored and continued at a later point. This rarely happens,
-therefore no effort was spent for implementing another system variable.
+therefore no effort was spent for implementing another system variable. For the
+same reason, the state of ⎕RVAL survives )CLEAR.
 
 The current state of ⎕RVAL's random number generator can be retrieved
 with:
@@ -3467,16 +3482,202 @@ can later be restored to the same state like this:
       0 ⎕RVAL STATE
 @end verbatim
 
-
-STATE←0 LRVAL
+Restoring the state is needed when the same sequence of random value shall
+be generated again. The random number generators of ? and ⎕RVAL are
+indepentent; generating a random number or random value with one does not
+change the state of the other.
 
 @subsubsection 1 ⎕RVAL B: Control of the ranks
 
+The rank of subsequently generated random values can be controlled with
+1 ⎕RVAL B as follows.
+
+@itemize
+@item
+If B is a scalar 0 ≤ B < MAX_RANK (MAX_RANK is ./configurable with a
+default of 8) then subsequently generated random values will have
+the fixed rank B.
+
+@item
+If B is a scalar 0 > B > -MAX_RANK then the ranks of subsequently generated
+random values will be chosen at random between 0 and -B (including). All
+possible ranks 0, ... MAX_RANK have the same probability P = 100÷1-B %.
+
+@item
+Otherwise B must be a vector of positive integers. The integers are the
+relative frequencies of the ranks 0, 1, ... MAX_RANK respectively. Too many
+integers will give raise LENGTH ERROR while fewer (than MAX_RANK) are
+set to 0.
+@end itemize
+
+1 ⎕RVAL always returns its previous setting (i.e. before applying B).
+An empty B, e.g. 1 ⎕RVAL ⍬ will not change anything and can be used to
+query the current setting for 1 ⎕RVAL.
+
+Examples:
+
+@itemize
+@item
+1 ⎕RVAL 2 will produce only matrices,
+
+@item
+1 ⎕RVAL ¯2 will produce scalars, vectors or matrices, each with a
+probability of 100÷3 %, and
+
+@item
+1 ⎕RVAL 50 30 20 will produce a scalars with probability 50%, vectors
+with probability 30%, and a matrices with probability 20%. The numbers
+need not add up to 100, but will be scaled accordingly.
+@end itemize
+
 @subsubsection 2 ⎕RVAL B: Control of the shapes
+
+The shapes of subsequently generated random values can be controlled with
+2 ⎕RVAL B as follows.
+
+B must be a vector of positive or negative integers. Vectors longer than
+MAX_RANK + 1 will give a LENGTH ERROR while vectors shorter than MAX_RANK + 1
+will be filled with 1 until the length of B becomes MAX_RANK + 1.
+
+If an element B@sub{i} of the resulting shape B = B@sub{1} ... B@sub{MAXRANK}
+is ≥ 0 then the corresponding axis i will have a fixed length of B@sub{i}.
+If  B@sub{i} < 0 then the length of that axis will be chosen at random with
+a probability of 1÷B@sub{i}. Note that the same B can still produce different
+shapes even if all  B@sub{i} are ≥ 0 (i.e. if the rank is also chosen at
+random).
+
+2 ⎕RVAL always returns its previous setting (i.e. before applying B).
+An empty B, e.g. 2 ⎕RVAL ⍬, will not change anything and can be used to
+query the current setting for 2 ⎕RVAL.
+
+Example:
+
+@verbatim
+1 ⎕RVAL 2        ⍝ produce matrices
+2 ⎕RVAL 3 ¯10    ⍝ the first axis of every matrix will have length 3, and
+                 ⍝ the last axis of every matrix will vary between 0 and 10
+@end verbatim
+
+This will produce scalars, vectors with a fixed length of 3 and matrices
+with 3 rows and between 0 and 10 columns.
 
 @subsubsection 3 ⎕RVAL B: Control of the data types
 
+The types (i.e. CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of subsequently
+generated random values can be controlled with 3 ⎕RVAL B as follows.
+
+B must be a vector with up to 5 positive numbers, corresponding to the types.
+Shorter vectors are filled with 0 (the corresponding types will not occur) and
+longer vectors will raise a LENGTH error.
+
+Once the type was chosen, th  ravel item will be:
+
+@itemize
+@item
+for type CHARACTER: a random character with ⎕UCS between 0 and $3000
+(excluding). Larger Unicodes typically cause display problems. If you need
+larget Unicodes, use ⎕UCS with random integers.
+
+@item
+for type INTEGER: a random integer with ⎕UCS between -$80000000 and
+$7FFFFFFF.
+
+@item
+for type REAL: a floating point number between 0.0 and 1.0 (excluding)
+
+@item
+for type COMPLEX: a complex point number with real and imaginaty part
+between 0.0 and 1.0 (excluding), and
+
+@item
+for type NESTED: a nested APL value with the same properties (rank, shape,
+and type) as their parent.
+@end itemize
+
+3 ⎕RVAL always returns its previous setting (i.e. before applying B).
+An empty B, e.g. 3 ⎕RVAL ⍬ will not change anything and can be used to
+query the current setting for 3 ⎕RVAL.
+
+Example:
+
+@verbatim
+      1 ⎕RVAL 2         ⍝ produce matrices
+      2 ⎕RVAL 3 3       ⍝ produce 3×3 matrices
+      3 ⎕RVAL 0 50 50   ⍝ produce a mix of integer and real values
+      ⎕RVAL ''
+¯975954163190248487                   0.5892132425
+7677327503669503253 2152001972871424768
+@end verbatim
+
 @subsubsection 4 ⎕RVAL B: Control of a maximum depth
+
+If the probability of generating a nested value is > 0 then the depth of
+random values can become arbitrarily large and could therefore exceed the
+system limit for the depth of the random value being produced. This can be
+prevented by setting a maximum depth for every value generated. ⎕RVAL sets
+the probability of the deepest allowed depth to 0.
+
+4 ⎕CR B expects B to be a positive integer which is deepest allowed depth;
+
+An empty B, e.g. 4 ⎕RVAL ⍬, will not change anything and can be used to
+query the current setting for 4 ⎕RVAL.
+
+@subsubsection monadic ⎕RVAL B: Return a new random value
+
+Calling ⎕RVAL monadically produces one new random APL value.
+
+The properties of that next value can be controlled by the dyadic calls
+of ⎕RVAL as described above. If no prior dyadic call of ⎕RVAL was made then
+the properties have the following defaults:
+
+@verbatim
+      1 ⎕RVAL ⍬    ⍝ rank (scalar)
+0
+
+      2 ⎕RVAL ⍬    ⍝ shape (not used since rank = 0)
+1 1 1 1 1 1 1 1
+
+      3 ⎕RVAL ⍬    ⍝ types (integer)
+0 1 0 0 0
+
+      4 ⎕RVAL ⍬    ⍝ max. depth (not used since probasbility of NESTED = 0)
+4
+@end verbatim
+
+That is, by default ⎕RVAL ⍬ produces random integer scalars.
+
+It is sometimes convenient to be able to change the properties of the next
+random value without modifying (and later restoring) the properties with
+dyadic ⎕RVAL. This can be achieved with monadic ⎕RVAL with non-empty B.
+
+Let 4=⍴B. Then
+
+@verbatim
+   Z←⎕RVAL B does essentially:
+
+   B[1]←1 ⎕RVAL B[1]
+   B[2]←2 ⎕RVAL B[2]
+   B[3]←3 ⎕RVAL B[3]
+   B[4]←4 ⎕RVAL B[4]
+
+   Z←⎕RVAL ''
+
+   B[1]←1 ⎕RVAL B[1]
+   B[2]←2 ⎕RVAL B[2]
+   B[3]←3 ⎕RVAL B[3]
+   B[4]←4 ⎕RVAL B[4]
+@end verbatim
+
+If 4>⍴B then the missing properties are not changed.
+
+Examples:
+
+@verbatim
+⎕RVAL 1 (,¯4) (0 1)    ⍝ return a random 0-4 element integer vector
+⎕RVAL 2 (2 2) (1 0)    ⍝ return a random 2×2 character array
+
+@end verbatim
+
 
 @node    Section 3.32
 @section ⎕SQL - SQL Database Interface
