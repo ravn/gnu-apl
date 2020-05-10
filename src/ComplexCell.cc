@@ -615,14 +615,10 @@ const APL_Complex one(1.0, 0.0);
 
         case -10: return zv(Z, b.real(), -b.imag());
 
-        case  -9: return zv(Z,             b   );
-        case  -8: { const APL_Complex par = -(b*b + one);     // (¯1 - R⋆2)
-                    const APL_Complex sq = complex_sqrt(par); // (¯1 + R⋆2)⋆0.5
-                    if ((b.real()  > 0.0 && b.imag() > 0.0) ||
-                        (b.real() == 0.0 && b.imag() > 1.0) ||
-                        (b.real()  < 0.0 && b.imag() >= 0.0)) return zv(Z,  sq);
-                    else                                      return zv(Z, -sq);
-                  }
+        case  -9: return zv(Z, b);
+        case  -8: // ¯8○Z ←→ -8○Z
+                  do_bif_circle_fun(Z, 8, b);
+                  return zv(Z, -Z->get_complex_value());
 
         case  -7: // arctanh(z) = 0.5 (ln(1.0 + z) - ln(1.0 - z))
                   {
@@ -699,29 +695,42 @@ const APL_Complex one(1.0, 0.0);
 
         case   0: return zv(Z, complex_sqrt(one - b*b));
 
-        case   1: return zv(Z, sin       (b));
+        case   1: return zv(Z, sin(b));
 
-        case   2: return zv(Z, cos       (b));
+        case   2: return zv(Z, cos(b));
 
-        case   3: return zv(Z, tan       (b));
+        case   3: return zv(Z, tan(b));
 
         case   4: return zv(Z, complex_sqrt(one + b*b));
 
-        case   5: return zv(Z, sinh      (b));
+        case   5: return zv(Z, sinh(b));
 
-        case   6: return zv(Z, cosh      (b));
+        case   6: return zv(Z, cosh(b));
 
-        case   7: return zv(Z, tanh      (b));
+        case   7: return zv(Z, tanh(b));
 
-        case   8: { const APL_Complex par = -(b*b + one);      // (¯1 - R⋆2)
-                    const APL_Complex sq = complex_sqrt(par);  // (¯1 + R⋆2)⋆0.5
-                    if ((b.real()  > 0.0 && b.imag() > 0.0) ||
-                        (b.real() == 0.0 && b.imag() > 1.0) ||
-                        (b.real()  < 0.0 && b.imag() >= 0.0)) return zv(Z, -sq);
-                    else                                      return zv(Z,  sq);
+        case   8: { const APL_Complex b2 = b*b;
+                    const APL_Complex square =                    // (¯1 - R⋆2)
+                                      APL_Complex(-1, 0) - b2;
+                    const APL_Complex root = complex_sqrt(square);
+                    if (b.real()  > 0.0)
+                       {
+                         if (b.imag() > 0.0)    return zv(Z,  root);
+                         else                   return zv(Z, -root);
+                       }
+                   else if (b.real() == 0.0)
+                       {
+                         if (b.imag() > 1.0)    return zv(Z,  root);
+                         else                   return zv(Z, -root);
+                       }
+                   else   // b.real() < 0,0;
+                       {
+                         if (b.imag() >= 0.0)   return zv(Z,  root);
+                         else                   return zv(Z, -root);
+                       }
                   }
 
-        case   9: return FloatCell::zv(Z,      b.real());
+        case   9: return FloatCell::zv(Z, b.real());
 
         case  10: return FloatCell::zv(Z, sqrt(mag2(b)));
 
@@ -905,7 +914,7 @@ ComplexCell::character_representation(const PrintContext & pctx) const
                    PrintBuffer ret = imag_cell.character_representation(pctx);
                    ret.pad_l(UNI_ASCII_J, 1);
                    ret.pad_l(UNI_ASCII_0, 1);
-                   
+
                    ret.get_info().flags |= CT_COMPLEX;
                    ret.get_info().imag_len = 1 + ret.get_info().real_len;
                    ret.get_info().int_len = 1;

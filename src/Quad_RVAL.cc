@@ -89,8 +89,19 @@ bool need_restore = false;
                  }
             }
 
-         if (ec_B >= 2)   // shape: always enclosed vector
-            do_eval_AB(2, B.get_ravel(1).get_pointer_value().getref());
+         if (ec_B >= 2)   // shape: scalar or enclosed vector
+            {
+              const Cell & cell = B.get_ravel(1);
+              if (cell.is_pointer_cell())
+                 {
+                   do_eval_AB(2, cell.get_pointer_value().getref());
+                 }
+              else   // rank as scalar
+                 {
+                   Value_P rank = IntScalar(cell.get_int_value(), LOC);
+                   do_eval_AB(2, rank.getref());
+                 }
+            }
 
          if (ec_B >= 3)   // type: always enclosed vector (distribution)
             do_eval_AB(3, B.get_ravel(2).get_pointer_value().getref());
@@ -284,7 +295,7 @@ Value_P Z(desired_ranks.size(), LOC);
 Value_P
 Quad_RVAL::result_shape(const Value & B)
 {
-   if (!B.is_vector())   RANK_ERROR;
+   if (B.get_rank() > 1)   RANK_ERROR;
 
 const ShapeItem len_B = B.element_count();
    if (len_B > MAX_RANK)   LENGTH_ERROR;   // to many shape items
@@ -300,13 +311,21 @@ Value_P Z(MAX_RANK, LOC);
       {
         Shape new_shape;
 
-        // fill leading dimensions with 1
-        while (new_shape.get_rank() < MAX_RANK - len_B)
-              new_shape.add_shape_item(1);
+        if (B.is_scalar())   // scalar-extend B
+           {
+              const APL_Integer len = B.get_ravel(0).get_int_value();
+              loop(b, MAX_RANK)   new_shape.add_shape_item(len);
+           }
+        else                 // vector B: prepend 1s as needed
+           {
+             // fill leading dimensions with 1
+             while (new_shape.get_rank() < MAX_RANK - len_B)
+                   new_shape.add_shape_item(1);
 
-        // fill lower dimensions with B
-         loop(b, len_B)
-             new_shape.add_shape_item(B.get_ravel(b).get_int_value());
+             // fill lower dimensions with B
+              loop(b, len_B)
+                  new_shape.add_shape_item(B.get_ravel(b).get_int_value());
+           }
 
         desired_shape = new_shape;
       }

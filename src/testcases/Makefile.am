@@ -179,6 +179,7 @@ dist_noinst_DATA =				           \
         UserCommand.tc                                     \
         Without.tc                                         \
         Zilde.tc                                           \
+        ZZ01_Invariants.tc                                 \
         ZZ03_Regression.tc                                 \
         ZZ04_Regression.tc                                 \
         ZZ05_Regression.tc                                 \
