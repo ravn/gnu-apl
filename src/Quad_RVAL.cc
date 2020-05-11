@@ -494,7 +494,11 @@ void
 Quad_RVAL::random_nested(Cell * cell, Value & cell_owner,
                          const Value & B, int depth)
 {
-Value_P Zsub = do_eval_B(B, depth + 1);
+Value_P Zsub;
+
+   do Zsub = do_eval_B(B, depth + 1);
+   while (Zsub->is_simple_scalar());
+
    new (cell) PointerCell(Zsub.get(), cell_owner);
 }
 //-----------------------------------------------------------------------------
