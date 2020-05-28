@@ -35,11 +35,15 @@ Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B)
 {
    // dyadic EACH: call _LO for corresponding items of A and B
 
-   if (!(A->is_scalar() || B->is_scalar() || A->same_shape(*B)))
+bool scalar_extension = false;
+   if (A->get_rank() != B->get_rank())
       {
-        if (A->same_rank(*B))   LENGTH_ERROR;
-        else                    RANK_ERROR;
+         if      (A->is_scalar_or_len1_vector())   scalar_extension = true;
+         else if (B->is_scalar_or_len1_vector())   scalar_extension = true;
+         else                                      RANK_ERROR;
       }
+
+   if (!(scalar_extension || A->same_shape(*B)))    LENGTH_ERROR;
 
 Function * LO = _LO.get_function();
    Assert1(LO);
@@ -64,10 +68,11 @@ Function * LO = _LO.get_function();
         else if (!B->is_scalar())   DOMAIN_ERROR;
 
         Value_P Z1 = LO->eval_fill_AB(Fill_A, Fill_B).get_apl_val();
-        if (Z1->is_simple_scalar())   return Token(TOK_APL_VALUE1, Z1);
-
         Value_P Z(shape_Z, LOC);
-        new (&Z->get_ravel(0)) PointerCell(Z1.get(), Z.getref());
+        if (Z1->is_simple_scalar())
+           Z->get_ravel(0).init(Z1->get_ravel(0), Z.getref(), LOC);
+        else
+           new (&Z->get_ravel(0))   PointerCell(Z1.get(), Z.getref());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
