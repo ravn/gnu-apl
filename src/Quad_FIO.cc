@@ -1953,7 +1953,7 @@ int function_number = -1;
                       from = data + l + 1;
                     }
 
-                if (data[len - 1] != '\n')   // incomplete final line
+                if (len && data[len - 1] != '\n')   // incomplete final line
                    {
                       uint8_t * end = data + len;
                       if (end[-1] == '\r')   --end;   // discard trailing CR
