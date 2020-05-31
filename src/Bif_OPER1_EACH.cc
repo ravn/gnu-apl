@@ -35,7 +35,6 @@ Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B)
 {
    // dyadic EACH: call _LO for corresponding items of A and B
 
-ShapeItem N = B->element_count();   // often the same for A and B
    if (!A->same_shape(*B))
       {
         // if the shapes differ then either A or B must be a scalar or
@@ -43,7 +42,7 @@ ShapeItem N = B->element_count();   // often the same for A and B
         //
         if (A->get_rank() != B->get_rank())
            {
-             if      (A->is_scalar_or_len1_vector())    N = A->element_count();
+             if      (A->is_scalar_or_len1_vector())    ;   // OK
              else if (B->is_scalar_or_len1_vector())    ;   // OK
              else if (A->get_rank() != B->get_rank())   RANK_ERROR;
              else                                       LENGTH_ERROR;
@@ -105,10 +104,9 @@ Function * LO = _LO.get_function();
             }
          else   // LO has no result, so we can ignore the shape of the result
             {
-              if (N == 1)
+              if (scalar_A && scalar_B)
                  {
-                   LO->eval_ALB(A, _LO, B);
-                   return Token(TOK_VOID);
+                   macro = Macro::get_macro(Macro::MAC_sA_LO_EACH_sB);
                  }
 
               if (scalar_B)

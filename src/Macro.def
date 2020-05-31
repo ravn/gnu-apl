@@ -27,6 +27,12 @@ mac_def(LO_EACH_B,
       "N←⎕IO ◊ N_max←N+⍴B←,B\n"
       "LOOP: LO N⊃B ◊ →(N_max>N←N+1)⍴LOOP\n")
 
+/// dyadic EACH without result, scalar A, scalar B
+//
+mac_def(sA_LO_EACH_sB,
+ "A (LO sa_LO_EACH_sB) B\n"
+ "A LO B\n")
+
 /// dyadic EACH without result, scalar A, vector B
 //
 mac_def(sA_LO_EACH_vB,
