@@ -35,15 +35,20 @@ Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B)
 {
    // dyadic EACH: call _LO for corresponding items of A and B
 
-bool scalar_extension = false;
-   if (A->get_rank() != B->get_rank())
+ShapeItem N = B->element_count();   // often the same for A and B
+   if (!A->same_shape(*B))
       {
-         if      (A->is_scalar_or_len1_vector())   scalar_extension = true;
-         else if (B->is_scalar_or_len1_vector())   scalar_extension = true;
-         else                                      RANK_ERROR;
+        // if the shapes differ then either A or B must be a scalar or
+        // 1-element vector.
+        //
+        if (A->get_rank() != B->get_rank())
+           {
+             if      (A->is_scalar_or_len1_vector())    N = A->element_count();
+             else if (B->is_scalar_or_len1_vector())    ;   // OK
+             else if (A->get_rank() != B->get_rank())   RANK_ERROR;
+             else                                       LENGTH_ERROR;
+           }
       }
-
-   if (!(scalar_extension || A->same_shape(*B)))    LENGTH_ERROR;
 
 Function * LO = _LO.get_function();
    Assert1(LO);
@@ -57,8 +62,8 @@ Function * LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P Fill_A = Bif_F12_TAKE::first(A);
-        Value_P Fill_B = Bif_F12_TAKE::first(B);
+        Value_P First_A = Bif_F12_TAKE::first(A);
+        Value_P First_B = Bif_F12_TAKE::first(B);
         Shape shape_Z;
 
         if (A->is_empty())          shape_Z = A->get_shape();
@@ -67,7 +72,7 @@ Function * LO = _LO.get_function();
         if (B->is_empty())          shape_Z = B->get_shape();
         else if (!B->is_scalar())   DOMAIN_ERROR;
 
-        Value_P Z1 = LO->eval_fill_AB(Fill_A, Fill_B).get_apl_val();
+        Value_P Z1 = LO->eval_fill_AB(First_A, First_B).get_apl_val();
         Value_P Z(shape_Z, LOC);
         if (Z1->is_simple_scalar())
            Z->get_ravel(0).init(Z1->get_ravel(0), Z.getref(), LOC);
@@ -79,41 +84,46 @@ Function * LO = _LO.get_function();
 
    if (LO->may_push_SI())   // user defined LO
       {
-         // remember scalarity of A and B BEFORE disclosing them
-         //
          const bool scalar_A = A->is_scalar();
          const bool scalar_B = B->is_scalar();
 
-        // we will call a macro, so disclose nested scalars (if any) here...
-        //
-        if (scalar_A && A->get_ravel(0).is_pointer_cell())
-           A = A->get_ravel(0).get_pointer_value();
+         Macro * macro = 0;
+         if (LO->has_result())
+            {
+              if (scalar_A)
+                 {
+                   macro = Macro::get_macro(scalar_B
+                                            ? Macro::MAC_Z__sA_LO_EACH_sB
+                                            : Macro::MAC_Z__sA_LO_EACH_vB);
+                }
+             else
+                {
+                  macro = Macro::get_macro(scalar_B
+                                           ? Macro::MAC_Z__vA_LO_EACH_sB
+                                           : Macro::MAC_Z__vA_LO_EACH_vB);
+                }
+            }
+         else   // LO has no result, so we can ignore the shape of the result
+            {
+              if (N == 1)
+                 {
+                   LO->eval_ALB(A, _LO, B);
+                   return Token(TOK_VOID);
+                 }
 
-        if (scalar_B && B->get_ravel(0).is_pointer_cell())
-           B = B->get_ravel(0).get_pointer_value();
-
-        Macro * macro = 0;
-        if (LO->has_result())
-           if (scalar_A)
-              if (scalar_B)   macro = Macro::get_macro(
-                                      Macro::MAC_Z__sA_LO_EACH_sB);
-              else            macro = Macro::get_macro(
-                                      Macro::MAC_Z__sA_LO_EACH_vB);
-           else
-              if (scalar_B)   macro = Macro::get_macro(
-                                      Macro::MAC_Z__vA_LO_EACH_sB);
-              else            macro = Macro::get_macro(
-                                      Macro::MAC_Z__vA_LO_EACH_vB);
-        else
-           if (scalar_A)
-              if (scalar_B)   LO->eval_ALB(A, _LO, B);
-              else                  macro = Macro::get_macro(
-                                            Macro::MAC_sA_LO_EACH_vB);
-           else
-              if (scalar_B)   macro = Macro::get_macro(
-                                      Macro::MAC_vA_LO_EACH_sB);
-              else            macro = Macro::get_macro(
-                                      Macro::MAC_vA_LO_EACH_vB);
+              if (scalar_B)
+                 {
+                   macro = Macro::get_macro(Macro::MAC_vA_LO_EACH_sB);
+                 }
+              else if (scalar_A)
+                 {
+                   macro = Macro::get_macro(Macro::MAC_sA_LO_EACH_vB);
+                 }
+               else
+                 {
+                   macro = Macro::get_macro(Macro::MAC_vA_LO_EACH_vB);
+                 }
+            }
 
         return macro->eval_ALB(A, _LO, B);
       }
@@ -203,8 +213,8 @@ Function * LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P Fill_B = Bif_F12_TAKE::first(B);
-        Token tZ = LO->eval_fill_B(Fill_B);
+        Value_P First_B = Bif_F12_TAKE::first(B);
+        Token tZ = LO->eval_fill_B(First_B);
         Value_P Z1 = tZ.get_apl_val();
 
         if (Z1->is_simple_scalar())

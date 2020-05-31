@@ -25,35 +25,35 @@
 mac_def(LO_EACH_B,
       "(LO LO_EACH_B) B;N;N_max\n"
       "N←⎕IO ◊ N_max←N+⍴B←,B\n"
-      "LOOP: LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n")
+      "LOOP: LO N⊃B ◊ →(N_max>N←N+1)⍴LOOP\n")
 
 /// dyadic EACH without result, scalar A, vector B
 //
 mac_def(sA_LO_EACH_vB,
  "A (LO sa_LO_EACH_vB) B;N;N_max\n"
  "N←⎕IO ◊ N_max←N+⍴B←,B\n"
- "LOOP: A LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n")
+ "LOOP: A LO N⊃B ◊ →(N_max>N←N+1)⍴LOOP\n")
 
 /// dyadic EACH without result, vector A, scalar B
 //
 mac_def(vA_LO_EACH_sB,
  "A (LO vA_LO_EACH_sB) B;N;N_max\n"
  "N←⎕IO ◊ N_max←N+⍴A←,A\n"
- "LOOP: (⊃A[N]) LO B ◊ →(N_max>N←N+1)⍴LOOP\n")
+ "LOOP: (N⊃A) LO B ◊ →(N_max>N←N+1)⍴LOOP\n")
 
 /// dyadic EACH without result, vector A, vector B
 //
 mac_def(vA_LO_EACH_vB,
  "A (LO vA_LO_EACH_vB) B;N;N_max\n"
  "N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B\n"
- "LOOP: (⊃A[N]) LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n")
+ "LOOP: (N⊃A) LO N⊃B ◊ →(N_max>N←N+1)⍴LOOP\n")
 
 /// monadic EACH with result
 //
 mac_def(Z__LO_EACH_B, 
  "Z←(LO Z__LO_EACH_B) B;rho_Z;N;N_max\n"
  "rho_Z←⍴B ◊ N←⎕IO ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
- "LOOP: Z[N]←⊂LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n"
+ "LOOP: (N⊃Z)←LO N⊃B ◊ →(N_max>N←N+1)⍴LOOP\n"
  "Z←rho_Z⍴Z\n")
 
 
@@ -68,7 +68,7 @@ mac_def(Z__sA_LO_EACH_sB,
 mac_def(  Z__sA_LO_EACH_vB, 
  "Z←A (LO Z__sA_LO_EACH_vB) B;rho_Z;N;N_max\n"
  "rho_Z←⍴B ◊ N←⎕IO ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
- "LOOP: Z[N]←⊂A LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n"
+ "LOOP: (N⊃Z)←A LO N⊃B ◊ →(N_max>N←N+1)⍴LOOP\n"
  "Z←rho_Z⍴Z\n")
 
 /// dyadic EACH with result, vector A, scalar B
@@ -76,7 +76,7 @@ mac_def(  Z__sA_LO_EACH_vB,
 mac_def(  Z__vA_LO_EACH_sB, 
  "Z←A (LO Z__vA_LO_EACH_sB) B;rho_Z;N;N_max\n"
  "rho_Z←⍴A ◊ N←⎕IO ◊ N_max←N+⍴A←,A ◊ Z←N_max⍴0\n"
- "LOOP: Z[N]←⊂(⊃A[N]) LO B ◊ →(N_max>N←N+1)⍴LOOP\n"
+ "LOOP: (N⊃Z)←(N⊃A) LO B ◊ →(N_max>N←N+1)⍴LOOP\n"
  "Z←rho_Z⍴Z\n")
 
 /// dyadic EACH with result, vector A, vector B
@@ -84,7 +84,7 @@ mac_def(  Z__vA_LO_EACH_sB,
 mac_def(  Z__vA_LO_EACH_vB, 
  "Z←A (LO Z__vA_LO_EACH_vB) B;rho_Z;N;N_max\n"
  "rho_Z←⍴B ◊ N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
- "LOOP: Z[N]←⊂(⊃A[N]) LO ⊃B[N] ◊ →(N_max>N←N+1)⍴LOOP\n"
+ "LOOP: (N⊃Z)←(N⊃A) LO N⊃B ◊ →(N_max>N←N+1)⍴LOOP\n"
  "Z←rho_Z⍴Z\n")
 
 /// outer product
