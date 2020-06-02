@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "Bif_F12_PARTITION_PICK.hh"
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER1_REDUCE.hh"
 #include "Macro.hh"
@@ -135,7 +136,7 @@ const bool B_enclosed = B->get_rank() > 1;
         const Shape last_axis(A->get_rank() - 1);
         A = Bif_F12_PARTITION::enclose_with_axes(last_axis, A);
       }
-   
+
    // enclose first axis of B if necessary
    //
    if (B_enclosed)
@@ -143,7 +144,7 @@ const bool B_enclosed = B->get_rank() > 1;
         const Shape first_axis(0);
         B = Bif_F12_PARTITION::enclose_with_axes(first_axis, B);
       }
-   
+
    loop (a, items_A)
    loop (b, items_B)
       {

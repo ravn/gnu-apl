@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "Bif_F12_PARTITION_PICK.hh"
 #include "Bif_OPER1_EACH.hh"
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Workspace.hh"
