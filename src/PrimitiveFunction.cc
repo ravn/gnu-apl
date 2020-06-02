@@ -90,9 +90,6 @@ Bif_F12_UNION     * Bif_F12_UNION    ::fun = &Bif_F12_UNION    ::_fun;
 Bif_F2_LEFT       * Bif_F2_LEFT      ::fun = &Bif_F2_LEFT      ::_fun;
 Bif_F2_RIGHT      * Bif_F2_RIGHT     ::fun = &Bif_F2_RIGHT     ::_fun;
 
-const CharCell PrimitiveFunction::c_filler(UNI_ASCII_SPACE);
-const IntCell  PrimitiveFunction::n_filler(0);
-
 int Bif_F1_EXECUTE::copy_pending = 0;
 
 //-----------------------------------------------------------------------------
@@ -711,8 +708,8 @@ const Cell * cB = &B->get_ravel(0);
       {
         if (B->is_scalar())
            {
-              Z->next_ravel()->init(*cA, Z.getref(), LOC);
-              Z->next_ravel()->init(*cB, Z.getref(), LOC);
+             Z->next_ravel()->init(*cA, Z.getref(), LOC);
+             Z->next_ravel()->init(*cB, Z.getref(), LOC);
            }
         else
            {

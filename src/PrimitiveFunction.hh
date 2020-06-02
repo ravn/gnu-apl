@@ -83,12 +83,6 @@ protected:
 
    /// performance statistics for dyadic calls
    CellFunctionStatistics * statistics_B;
-
-   /// a cell containing ' '
-   static const CharCell c_filler;
-
-   /// a cell containing 0
-   static const IntCell n_filler;
 };
 //-----------------------------------------------------------------------------
 /// Base class for all internal non-scalar functions of the interpreter

@@ -355,13 +355,13 @@ const ShapeItem llen = item_shape.get_volume();
             {
               Z_from->init(B_item, Z.getref(), LOC);
               for (ShapeItem c = 1; c < llen; ++c)
-                  (Z_from + c)->init(c_filler, Z.getref(), LOC);
+                  new (Z_from + c)   CharCell(UNI_ASCII_SPACE);
             }
          else                                   // simple numeric scalar
             {
               Z->get_ravel(h*llen).init(B_item, Z.getref(), LOC);
               for (ShapeItem c = 1; c < llen; ++c)
-                  (Z_from + c)->init(n_filler, Z.getref(), LOC);
+                  new (Z_from + c) IntCell(0);
             }
        }
 
@@ -446,24 +446,23 @@ PermutedArrayIterator it_Z(shape_Z, perm);
    for (ArrayIterator it_B(B->get_shape()); it_B.more(); ++it_B)
       {
         const Cell & B_item = B->get_ravel(it_B());
-        const Cell * src = 0;
         if (B_item.is_pointer_cell())
            {
              Value_P vB = B_item.get_pointer_value();
              ArrayIterator vB_it(vB->get_shape());
              for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
+                   Cell * dest = &Z->get_ravel(it_Z());
                    if (vB->get_shape().contains(it_it.get_offsets()))
                       {
-                        src = &vB->get_ravel(vB_it());
+                        dest->init(vB->get_ravel(vB_it()), Z.getref(), LOC);
                         ++vB_it;
                       }
                    else if (vB->get_ravel(0).is_character_cell())  // char
-                        src = &c_filler;
+                      new (dest) CharCell(UNI_ASCII_SPACE);
                    else                                   // simple numeric
-                        src = &n_filler;
+                      new (dest) IntCell(0);
 
-                   Z->get_ravel(it_Z()).init(*src, Z.getref(), LOC);
                    ++it_Z;
                  }
            }
@@ -471,20 +470,13 @@ PermutedArrayIterator it_Z(shape_Z, perm);
            {
              for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
+                   Cell * dest = &Z->get_ravel(it_Z());
                    if (it_it() == 0)   // first element: use B_item
-                      {
-                        src = &B_item;
-                      }
+                      dest->init(B_item, Z.getref(), LOC);
                    else if (B_item.is_character_cell())   // simple char scalar
-                      {
-                        src = &c_filler;
-                      }
+                      new (dest) CharCell(UNI_ASCII_SPACE);
                    else                                // simple numeric scalar
-                      {
-                        src = &n_filler;
-                      }
-
-                   Z->get_ravel(it_Z()).init(*src, Z.getref(), LOC);
+                      new (dest) IntCell(0);
                    ++it_Z;
                  }
             }
