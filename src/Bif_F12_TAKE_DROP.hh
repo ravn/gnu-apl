@@ -104,8 +104,11 @@ public:
         ShapeItem _weight = 1;
         loop(r, sh_A.get_rank())
             {
-              const ShapeItem sA = sh_A.get_transposed_shape_item(r);
-              const ShapeItem sB = sh_B.get_transposed_shape_item(r);
+              const ShapeItem sA = sh_A.get_rank() == 0
+                                 ? 1 : sh_A.get_transposed_shape_item(r);
+              const ShapeItem sB = sh_B.get_rank() == 0
+                                 ? 1 : sh_B.get_transposed_shape_item(r);
+
               ShapeItem _from, _to;
               if (take)   // sh_A ↑ B
                  {

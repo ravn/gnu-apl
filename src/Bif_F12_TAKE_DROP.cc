@@ -142,11 +142,11 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Cell * cZ, Value & Z_owner,
                    Value_P B)
 {
    for (TakeDropIterator i(true, shape_Zi, B->get_shape()); i.more(); ++i)
-      {
-        const ShapeItem offset = i();
-        if (offset == -1)   cZ++->init_type(B->get_ravel(0), Z_owner, LOC);
-        else                cZ++->init(B->get_ravel(offset), Z_owner, LOC);
-      }
+       {
+         const ShapeItem offset = i();
+         if (offset == -1)   cZ++->init_type(B->get_ravel(0), Z_owner, LOC);
+         else                cZ++->init(B->get_ravel(offset), Z_owner, LOC);
+       }
 }
 //=============================================================================
 Token
