@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-May 4, 2020
+June 4, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1745,13 +1745,14 @@ O(1).  Also, ⊢B is marginally faster than ⎕←B.
 
       A←2 3⍴'abcdef'
       B←2 3⍴⍳6
-      X←2 3⍴0 1 0 1 0
+      X←2 3⍴0 1 0 1 0 1
       A ⊢[X] B
 a 2 c
 4 e 6
 
    A ⊢[X] '*'
 a*c
+*e*
 
   '*' ⊢[X] B
 * 2 *
@@ -5344,60 +5345,60 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11467
-Node: Chapter 219500
-Node: Chapter 323924
-Node: Section 3.125625
-Node: Section 3.241789
-Node: Section 3.342548
-Node: Section 3.443835
-Node: Section 3.547238
-Node: Section 3.647411
-Node: Section 3.748024
-Node: Section 3.851977
-Node: Section 3.953519
-Node: Section 3.1054974
-Node: Section 3.1156758
-Node: Section 3.1258698
-Node: Section 3.1359639
-Node: Section 3.1459891
-Node: Section 3.1561287
-Node: Section 3.1663799
-Node: Section 3.1770498
-Node: Section 3.1871935
-Node: Section 3.1977595
-Node: Section 3.2082629
-Node: Section 3.2185910
-Node: Section 3.2286201
-Node: Section 3.2396776
-Node: Section 3.2497048
-Node: Section 3.25103626
-Node: Section 3.26106077
-Node: Section 3.27106746
-Node: Section 3.28109869
-Node: Section 3.29116723
-Node: Section 3.30117670
-Node: Section 3.31131232
-Node: Section 3.32140732
-Node: Section 3.33143836
-Node: Section 3.34145825
-Node: Chapter 4150229
-Node: Chapter 5151977
-Node: Chapter 6153103
-Node: Section 6.1154640
-Node: Section 6.2155920
-Node: Section 6.3156280
-Node: Section 6.4156522
-Node: Section 6.5157184
-Node: Section 6.6157662
-Node: Section 6.7158434
-Node: Section 6.8158891
-Node: Chapter 7159293
-Node: Section 7.1159712
-Node: Section 7.2160399
-Node: Chapter 8161230
-Node: Section 8.1161733
-Node: Section 8.2187047
+Node: Chapter 11468
+Node: Chapter 219501
+Node: Chapter 323925
+Node: Section 3.125626
+Node: Section 3.241790
+Node: Section 3.342549
+Node: Section 3.443836
+Node: Section 3.547239
+Node: Section 3.647412
+Node: Section 3.748025
+Node: Section 3.851978
+Node: Section 3.953520
+Node: Section 3.1054975
+Node: Section 3.1156759
+Node: Section 3.1258699
+Node: Section 3.1359640
+Node: Section 3.1459892
+Node: Section 3.1561288
+Node: Section 3.1663806
+Node: Section 3.1770505
+Node: Section 3.1871942
+Node: Section 3.1977602
+Node: Section 3.2082636
+Node: Section 3.2185917
+Node: Section 3.2286208
+Node: Section 3.2396783
+Node: Section 3.2497055
+Node: Section 3.25103633
+Node: Section 3.26106084
+Node: Section 3.27106753
+Node: Section 3.28109876
+Node: Section 3.29116730
+Node: Section 3.30117677
+Node: Section 3.31131239
+Node: Section 3.32140739
+Node: Section 3.33143843
+Node: Section 3.34145832
+Node: Chapter 4150236
+Node: Chapter 5151984
+Node: Chapter 6153110
+Node: Section 6.1154647
+Node: Section 6.2155927
+Node: Section 6.3156287
+Node: Section 6.4156529
+Node: Section 6.5157191
+Node: Section 6.6157669
+Node: Section 6.7158441
+Node: Section 6.8158898
+Node: Chapter 7159300
+Node: Section 7.1159719
+Node: Section 7.2160406
+Node: Chapter 8161237
+Node: Section 8.1161740
+Node: Section 8.2187054
 
 End Tag Table
 

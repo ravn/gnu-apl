@@ -215,7 +215,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a> &nbsp; [<a hre
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>May 4, 2020
+<p>June 4, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -1970,13 +1970,14 @@ the run-time of ⊣B from O(,B) to O(1). Also, ⊢B is marginally faster than �
 </p><pre class="verbatim">
       A←2 3⍴'abcdef'
       B←2 3⍴⍳6
-      X←2 3⍴0 1 0 1 0
+      X←2 3⍴0 1 0 1 0 1
       A ⊢[X] B
 a 2 c
 4 e 6
 
    A ⊢[X] '*'
 a*c
+*e*
 
   '*' ⊢[X] B
 * 2 *
