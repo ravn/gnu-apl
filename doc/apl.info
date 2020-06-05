@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-June 4, 2020
+June 5, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1954,7 +1954,7 @@ the items of B that are not found in A.
    Generalized dyadic ⍳ extends this concept to find the (first) indices
 of the corresponding items of B in A (in ravel order) where the rank of
 A is > 1.  Each item of the result Z is then either a nested integer
-vector (if the item was found) or - different from the monadic case (!)
+vector (if the item was found) or - different from the standard case (!)
 - the empty vector ⍬ if the item was not found).
 
 
@@ -2994,7 +2994,7 @@ different ways:
    • By the user clicking on the close button (at the top-right) of the
      window, or
    • By the user opening the drop down menu of the window (at the top
-     left of the window) and selecting the option named "Close", ori
+     left of the window) and selecting the option named "Close", or
    • from APL by calling ⎕PLOT ¯3.
 
 
@@ -5365,17 +5365,17 @@ Node: Section 3.1459892
 Node: Section 3.1561288
 Node: Section 3.1663806
 Node: Section 3.1770505
-Node: Section 3.1871942
-Node: Section 3.1977602
-Node: Section 3.2082636
-Node: Section 3.2185917
-Node: Section 3.2286208
-Node: Section 3.2396783
-Node: Section 3.2497055
-Node: Section 3.25103633
-Node: Section 3.26106084
-Node: Section 3.27106753
-Node: Section 3.28109876
+Node: Section 3.1871943
+Node: Section 3.1977603
+Node: Section 3.2082637
+Node: Section 3.2185918
+Node: Section 3.2286209
+Node: Section 3.2396784
+Node: Section 3.2497056
+Node: Section 3.25103634
+Node: Section 3.26106085
+Node: Section 3.27106754
+Node: Section 3.28109877
 Node: Section 3.29116730
 Node: Section 3.30117677
 Node: Section 3.31131239
