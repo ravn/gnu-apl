@@ -56,19 +56,18 @@ Cell::init_from_value(Value * value, Value & cell_owner, const char * loc)
 Value_P
 Cell::to_value(const char * loc) const
 {
-Value_P ret;
    if (is_pointer_cell())
       {
-        ret = get_pointer_value(); // ->clone(LOC);
+        Value_P ret = get_pointer_value();//->clone(LOC);
+        return ret;
       }
    else
       {
-        ret = Value_P(loc);
+        Value_P ret(loc);
         init_other(&ret->get_ravel(0), ret.getref(), loc);
         ret->check_value(LOC);
+        return ret;
       }
-
-   return ret;
 }
 //-----------------------------------------------------------------------------
 void

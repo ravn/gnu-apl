@@ -127,27 +127,33 @@ Function * LO = _LO.get_function();
       }
 
 Value_P Z;
-int dA = 1;
-int dB = 1;
+int dA = 1;   // assume A is non-scalar
+int dB = 1;   // assume B is non-scalar
 ShapeItem len_Z = 0;
 
-   if (A->is_scalar())
+   if (A->is_scalar())          // scalar-extend A
       {
         len_Z = B->element_count();
         dA = 0;
         if (LO->has_result())   Z = Value_P(B->get_shape(), LOC);
       }
-   else if (B->is_scalar())
+   else if (B->is_scalar())     // scalar-extend B
       {
         dB = 0;
         len_Z = A->element_count();
         if (LO->has_result())   Z = Value_P(A->get_shape(), LOC);
       }
-   else
+   else if (A->same_shape(*B))  // A and B are non-scalars with identical shapes
       {
         len_Z = B->element_count();
-        if (LO->has_result())   Z = Value_P(A->get_shape(), LOC);
+        if (LO->has_result())   Z = Value_P(B->get_shape(), LOC);
       }
+   else                         // the shapes of A and B differ
+      {
+        if (A->get_rank() != B->get_rank())   RANK_ERROR;
+        else                                  LENGTH_ERROR;
+      }
+
 
    loop(z, len_Z)
       {
