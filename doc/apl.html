@@ -215,7 +215,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a> &nbsp; [<a hre
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>June 5, 2020
+<p>June 6, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -1334,8 +1334,7 @@ is not indented.
 
 </pre>
 <p>The <samp>--script</samp> implies <samp>--noCIN</samp> so that the
-</p>
-<p>input lines for the interpreter are no longer echoed to the output.
+input lines for the interpreter are no longer echoed to the output.
 That is most likely what you want when writing a script.
 </p>
 <p>Also, the first line of the script is no longer ignored as a comment,
@@ -1472,8 +1471,8 @@ succeeds (i.e. returns a result) is then the result of comparing A and B.
    according tho the following rules.
 </p>
 <p>4. Comparison by depth: if A1 is simple (a single character or number) and
-   B1 is not (i.e. B is nested) then A1 &lt; B1 and vice versa. If cwA1 and B1 are
-   both nested, then the above rules are applied recusively. If both are simple
+   B1 is not (i.e. B is nested) then A1 &lt; B1 and vice versa. If A1 and B1 are
+   both nested, then the above rules are applied recursively. If both are simple
    then they are compared according to the rules below.
 </p>
 <p>5. Comparison by Unicode: if A1 and B1 are both character values and
@@ -2166,11 +2165,11 @@ case.
 </p>
 <span id="Generalized-dyadic-_005b_003f_005d"></span><h4 class="subsection">3.17.2 Generalized dyadic ⍳</h4>
 
-<p>The standard function <b>Index Of</b> (A⍳B) requires its left argument A to be a
-scalar or a length 1 vector. The items of the result are the (first) positions
-(= indices) of the corresponding items in B in A (for the items found in A) or
-else ⎕IO+⍴A (which is an invalid index of A) for the items of B that are not
-found in A.
+<p>The standard function <b>Index Of</b> (Z←A⍳B) requires its left argument A to be
+a scalar or a vector of rank 1. The items of the result Z are the (first)
+positions (= indices) of the corresponding items of B in A (for the items found
+in A) or else ⎕IO+⍴A (which is an invalid index of A) for the items of B that
+are not found in A.
 </p>
 <p>Generalized dyadic ⍳ extends this concept to find the (first) indices of the
 corresponding items of B in A (in ravel order) where the rank of A is &gt; 1.
@@ -2255,7 +2254,7 @@ returned Q matrix. This first transpose step is therefore not needed.
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
 </pre>
-<p>Example 2 (complex overdetermined B)
+<p>Example 2 (complex over-determined B)
 </p>
 <pre class="verbatim">
 ⎕←B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10

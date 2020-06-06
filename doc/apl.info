@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-June 5, 2020
+June 6, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1113,10 +1113,9 @@ indented.
  /usr/local/bin/apl --script ../workspaces/SCRIPT.apl 
 
 
-   The ‘--script’ implies ‘--noCIN’ so that the
-
-   input lines for the interpreter are no longer echoed to the output.
-That is most likely what you want when writing a script.
+   The ‘--script’ implies ‘--noCIN’ so that the input lines for the
+interpreter are no longer echoed to the output.  That is most likely
+what you want when writing a script.
 
    Also, the first line of the script is no longer ignored as a comment,
 but controls the command line argument (and thus ⎕ARG) of the
@@ -1251,8 +1250,8 @@ made according tho the following rules.
 
    4.  Comparison by depth: if A1 is simple (a single character or
 number) and B1 is not (i.e.  B is nested) then A1 < B1 and vice versa.
-If cwA1 and B1 are both nested, then the above rules are applied
-recusively.  If both are simple then they are compared according to the
+If A1 and B1 are both nested, then the above rules are applied
+recursively.  If both are simple then they are compared according to the
 rules below.
 
    5.  Comparison by Unicode: if A1 and B1 are both character values and
@@ -1945,11 +1944,11 @@ scalars in the standard case.
 3.17.2 Generalized dyadic ⍳
 ---------------------------
 
-The standard function Index Of (A⍳B) requires its left argument A to be
-a scalar or a length 1 vector.  The items of the result are the (first)
-positions (= indices) of the corresponding items in B in A (for the
-items found in A) or else ⎕IO+⍴A (which is an invalid index of A) for
-the items of B that are not found in A.
+The standard function Index Of (Z←A⍳B) requires its left argument A to
+be a scalar or a vector of rank 1.  The items of the result Z are the
+(first) positions (= indices) of the corresponding items of B in A (for
+the items found in A) or else ⎕IO+⍴A (which is an invalid index of A)
+for the items of B that are not found in A.
 
    Generalized dyadic ⍳ extends this concept to find the (first) indices
 of the corresponding items of B in A (in ravel order) where the rank of
@@ -2036,7 +2035,7 @@ not needed.
 ┗━━━━━━━━━━━━━━━━━━━━━┛
 
 
-   Example 2 (complex overdetermined B)
+   Example 2 (complex over-determined B)
 
 
 ⎕←B←5 4⍴4J6 6J3 5J10 3J2 8J10 3J4 5J10 5J8 3J1 2J3 4J5 1J3 1J4 9J9 9J6 2J7 2J10 7J6 9J8 10J10
@@ -5349,56 +5348,56 @@ Node: Chapter 11468
 Node: Chapter 219501
 Node: Chapter 323925
 Node: Section 3.125626
-Node: Section 3.241790
-Node: Section 3.342549
-Node: Section 3.443836
-Node: Section 3.547239
-Node: Section 3.647412
-Node: Section 3.748025
-Node: Section 3.851978
-Node: Section 3.953520
-Node: Section 3.1054975
-Node: Section 3.1156759
-Node: Section 3.1258699
-Node: Section 3.1359640
-Node: Section 3.1459892
-Node: Section 3.1561288
-Node: Section 3.1663806
-Node: Section 3.1770505
-Node: Section 3.1871943
-Node: Section 3.1977603
-Node: Section 3.2082637
-Node: Section 3.2185918
-Node: Section 3.2286209
-Node: Section 3.2396784
-Node: Section 3.2497056
-Node: Section 3.25103634
-Node: Section 3.26106085
-Node: Section 3.27106754
-Node: Section 3.28109877
-Node: Section 3.29116730
-Node: Section 3.30117677
-Node: Section 3.31131239
-Node: Section 3.32140739
-Node: Section 3.33143843
-Node: Section 3.34145832
-Node: Chapter 4150236
-Node: Chapter 5151984
-Node: Chapter 6153110
-Node: Section 6.1154647
-Node: Section 6.2155927
-Node: Section 6.3156287
-Node: Section 6.4156529
-Node: Section 6.5157191
-Node: Section 6.6157669
-Node: Section 6.7158441
-Node: Section 6.8158898
-Node: Chapter 7159300
-Node: Section 7.1159719
-Node: Section 7.2160406
-Node: Chapter 8161237
-Node: Section 8.1161740
-Node: Section 8.2187054
+Node: Section 3.241787
+Node: Section 3.342546
+Node: Section 3.443833
+Node: Section 3.547235
+Node: Section 3.647408
+Node: Section 3.748021
+Node: Section 3.851974
+Node: Section 3.953516
+Node: Section 3.1054971
+Node: Section 3.1156755
+Node: Section 3.1258695
+Node: Section 3.1359636
+Node: Section 3.1459888
+Node: Section 3.1561284
+Node: Section 3.1663802
+Node: Section 3.1770501
+Node: Section 3.1871946
+Node: Section 3.1977607
+Node: Section 3.2082641
+Node: Section 3.2185922
+Node: Section 3.2286213
+Node: Section 3.2396788
+Node: Section 3.2497060
+Node: Section 3.25103638
+Node: Section 3.26106089
+Node: Section 3.27106758
+Node: Section 3.28109881
+Node: Section 3.29116734
+Node: Section 3.30117681
+Node: Section 3.31131243
+Node: Section 3.32140743
+Node: Section 3.33143847
+Node: Section 3.34145836
+Node: Chapter 4150240
+Node: Chapter 5151988
+Node: Chapter 6153114
+Node: Section 6.1154651
+Node: Section 6.2155931
+Node: Section 6.3156291
+Node: Section 6.4156533
+Node: Section 6.5157195
+Node: Section 6.6157673
+Node: Section 6.7158445
+Node: Section 6.8158902
+Node: Chapter 7159304
+Node: Section 7.1159723
+Node: Section 7.2160410
+Node: Chapter 8161241
+Node: Section 8.1161744
+Node: Section 8.2187058
 
 End Tag Table
 

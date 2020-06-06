@@ -1207,7 +1207,6 @@ Then we get:
 @end verbatim
 
 The @option{--script} implies @option{--noCIN} so that the
-
 input lines for the interpreter are no longer echoed to the output.
 That is most likely what you want when writing a script.
 
@@ -1341,8 +1340,8 @@ succeeds (i.e. returns a result) is then the result of comparing A and B.
    according tho the following rules.
 
 4. Comparison by depth: if A1 is simple (a single character or number) and
-   B1 is not (i.e. B is nested) then A1 < B1 and vice versa. If cwA1 and B1 are
-   both nested, then the above rules are applied recusively. If both are simple
+   B1 is not (i.e. B is nested) then A1 < B1 and vice versa. If A1 and B1 are
+   both nested, then the above rules are applied recursively. If both are simple
    then they are compared according to the rules below.
 
 5. Comparison by Unicode: if A1 and B1 are both character values and
@@ -2024,11 +2023,11 @@ case.
 
 @subsection Generalized dyadic ⍳
 
-The standard function @b{Index Of} (A⍳B) requires its left argument A to be a
-scalar or a length 1 vector. The items of the result are the (first) positions
-(= indices) of the corresponding items in B in A (for the items found in A) or
-else ⎕IO+⍴A (which is an invalid index of A) for the items of B that are not
-found in A.
+The standard function @b{Index Of} (Z←A⍳B) requires its left argument A to be
+a scalar or a vector of rank 1. The items of the result Z are the (first)
+positions (= indices) of the corresponding items of B in A (for the items found
+in A) or else ⎕IO+⍴A (which is an invalid index of A) for the items of B that
+are not found in A.
 
 Generalized dyadic ⍳ extends this concept to find the (first) indices of the
 corresponding items of B in A (in ravel order) where the rank of A is > 1.
@@ -2111,7 +2110,7 @@ Example 1 (real B)
 
 @end verbatim
 
-Example 2 (complex overdetermined B)
+Example 2 (complex over-determined B)
 
 @verbatim
 
