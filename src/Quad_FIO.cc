@@ -1109,6 +1109,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 
         case 0:   // list of open file descriptors
              {
+               errno = 0;
                Value_P Z(open_files.size(), LOC);
                loop(z, open_files.size())
                    {
@@ -1121,6 +1122,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 
         case 30:   // getcwd()
              {
+               errno = 0;
                char buffer[APL_PATH_MAX + 1];
                char * success = getcwd(buffer, APL_PATH_MAX);
                if (!success)   goto out_errno;
@@ -1479,6 +1481,7 @@ int function_number = -1;
 
          case 19:   // unlink(Bc)
               {
+                errno = 0;
                 UTF8_string path(*B.get());
                 unlink(path.c_str());
               }
@@ -1486,6 +1489,7 @@ int function_number = -1;
 
          case 20:   // mkdir(Bc)
               {
+                errno = 0;
                 UTF8_string path(*B.get());
                 mkdir(path.c_str(), 0777);
               }
@@ -1493,6 +1497,7 @@ int function_number = -1;
 
          case 21:   // rmdir(Bc)
               {
+                errno = 0;
                 UTF8_string path(*B.get());
                 rmdir(path.c_str());
               }
@@ -1689,9 +1694,9 @@ int function_number = -1;
                 open_files.push_back(nfe);
 
                 Value_P Z(4, LOC);
-                new (Z->next_ravel())   IntCell(nfe.fe_fd);
-                new (Z->next_ravel())   IntCell(addr.inet.sin_family);
-                new (Z->next_ravel())   IntCell(ntohl(addr.inet.sin_addr.s_addr));
+                new (Z->next_ravel()) IntCell(nfe.fe_fd);
+                new (Z->next_ravel()) IntCell(addr.inet.sin_family);
+                new (Z->next_ravel()) IntCell(ntohl(addr.inet.sin_addr.s_addr));
                 new (Z->next_ravel())   IntCell(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -1842,59 +1847,11 @@ int function_number = -1;
                 if (ret == -1)   goto out_errno;
 
                 Value_P Z(3, LOC);
-                new (Z->next_ravel())   IntCell(addr.inet.sin_family);
-                new (Z->next_ravel())   IntCell(ntohl(addr.inet.sin_addr.s_addr));
-                new (Z->next_ravel())   IntCell(ntohs(addr.inet.sin_port));
+                new (Z->next_ravel()) IntCell(addr.inet.sin_family);
+                new (Z->next_ravel()) IntCell(ntohl(addr.inet.sin_addr.s_addr));
+                new (Z->next_ravel()) IntCell(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
-              }
-
-         case 200:   // clear statistics Bi
-         case 201:   // get statistics Bi
-              {
-                const Pfstat_ID b = Pfstat_ID(B->get_ravel(0).get_int_value());
-                Statistics * stat = Performance::get_statistics(b);
-                if (stat == 0)   DOMAIN_ERROR;   // bad statistics ID
-
-                if (function_number == 200)   // reset statistics
-                   {
-                     stat->reset();
-                     return Token(TOK_APL_VALUE1, IntScalar(b, LOC));
-                   }
-
-                // get statistics
-                //
-                 const int t = Performance::get_statistics_type(b);
-                 UCS_string stat_name(stat->get_name());
-                 Value_P Z1(stat_name, LOC);
-                 if (t <= 2)   // cell function statistics
-                    {
-                      const Statistics_record * r1 = stat->get_first_record();
-                      const Statistics_record * rN = stat->get_record();
-                      Value_P Z(8, LOC);
-                      new (Z->next_ravel())   IntCell(t);
-                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
-                      new (Z->next_ravel())   IntCell(r1->get_count());
-                      new (Z->next_ravel())   IntCell(r1->get_sum());
-                      new (Z->next_ravel())   FloatCell(r1->get_sum2());
-                      new (Z->next_ravel())   IntCell(rN->get_count());
-                      new (Z->next_ravel())   IntCell(rN->get_sum());
-                      new (Z->next_ravel())   FloatCell(rN->get_sum2());
-                      Z->check_value(LOC);
-                      return Token(TOK_APL_VALUE1, Z);
-                    }
-                 else           // function statistics
-                    {
-                      const Statistics_record * r = stat->get_record();
-                      Value_P Z(5, LOC);
-                      new (Z->next_ravel())   IntCell(t);
-                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
-                      new (Z->next_ravel())   IntCell(r->get_count());
-                      new (Z->next_ravel())   IntCell(r->get_sum());
-                      new (Z->next_ravel())   FloatCell(r->get_sum2());
-                      Z->check_value(LOC);
-                      return Token(TOK_APL_VALUE1, Z);
-                    }
               }
 
          case 49:   // read entire file as nested lines
@@ -2052,9 +2009,10 @@ int function_number = -1;
 
          case 57:   // fork() + execve() in the child
               {
-                 const int fd = do_FIO_57(*B.get(), 0);
-                 if (fd == -1)   goto out_errno;
-                  return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
+                errno = 0;
+                const int fd = do_FIO_57(*B.get(), 0);
+                if (fd == -1)   goto out_errno;
+                return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
               }
 
          case 60:   // random value
@@ -2065,6 +2023,54 @@ int function_number = -1;
                  if (len > 8)   LENGTH_ERROR;
                  Value_P Z = get_random(0, len);
                  return Token(TOK_APL_VALUE1, Z);
+              }
+
+         case 200:   // clear statistics Bi
+         case 201:   // get statistics Bi
+              {
+                const Pfstat_ID b = Pfstat_ID(B->get_ravel(0).get_int_value());
+                Statistics * stat = Performance::get_statistics(b);
+                if (stat == 0)   DOMAIN_ERROR;   // bad statistics ID
+
+                if (function_number == 200)   // reset statistics
+                   {
+                     stat->reset();
+                     return Token(TOK_APL_VALUE1, IntScalar(b, LOC));
+                   }
+
+                // get statistics
+                //
+                 const int t = Performance::get_statistics_type(b);
+                 UCS_string stat_name(stat->get_name());
+                 Value_P Z1(stat_name, LOC);
+                 if (t <= 2)   // cell function statistics
+                    {
+                      const Statistics_record * r1 = stat->get_first_record();
+                      const Statistics_record * rN = stat->get_record();
+                      Value_P Z(8, LOC);
+                      new (Z->next_ravel())   IntCell(t);
+                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
+                      new (Z->next_ravel())   IntCell(r1->get_count());
+                      new (Z->next_ravel())   IntCell(r1->get_sum());
+                      new (Z->next_ravel())   FloatCell(r1->get_sum2());
+                      new (Z->next_ravel())   IntCell(rN->get_count());
+                      new (Z->next_ravel())   IntCell(rN->get_sum());
+                      new (Z->next_ravel())   FloatCell(rN->get_sum2());
+                      Z->check_value(LOC);
+                      return Token(TOK_APL_VALUE1, Z);
+                    }
+                 else           // function statistics
+                    {
+                      const Statistics_record * r = stat->get_record();
+                      Value_P Z(5, LOC);
+                      new (Z->next_ravel())   IntCell(t);
+                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
+                      new (Z->next_ravel())   IntCell(r->get_count());
+                      new (Z->next_ravel())   IntCell(r->get_sum());
+                      new (Z->next_ravel())   FloatCell(r->get_sum2());
+                      Z->check_value(LOC);
+                      return Token(TOK_APL_VALUE1, Z);
+                    }
               }
 
          case 202:   // get monadic parallel threshold
@@ -2348,6 +2354,7 @@ int function_number = -1;
 
          case 20:   // mkdir(Bc, Ai)
               {
+                errno = 0;
                 const int mask = A->get_ravel(0).get_near_int();
                 UTF8_string path(*B.get());
                 mkdir(path.c_str(), mask);
@@ -2441,9 +2448,10 @@ int function_number = -1;
                 const int fd = get_fd(*B.get());
                 SockAddr addr;
                 memset(&addr, 0, sizeof(addr.inet));
-                addr.inet.sin_family      =       A->get_ravel(0).get_int_value();
-                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1).get_int_value());
-                addr.inet.sin_port        = htons(A->get_ravel(2).get_int_value());
+                addr.inet.sin_family = A->get_ravel(0).get_int_value();
+                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1)
+                                                    .get_int_value());
+                addr.inet.sin_port = htons(A->get_ravel(2).get_int_value());
                 errno = 0;
                 bind(fd, &addr.addr, sizeof(addr.inet));
                 goto out_errno;
@@ -2467,9 +2475,10 @@ int function_number = -1;
                 errno = 0;
                 SockAddr addr;
                 memset(&addr, 0, sizeof(addr.inet));
-                addr.inet.sin_family      =       A->get_ravel(0).get_int_value();
-                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1).get_int_value());
-                addr.inet.sin_port        = htons(A->get_ravel(2).get_int_value());
+                addr.inet.sin_family = A->get_ravel(0).get_int_value();
+                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1)
+                                                    .get_int_value());
+                addr.inet.sin_port = htons(A->get_ravel(2).get_int_value());
                 errno = 0;
                 connect(fd, &addr.addr, sizeof(addr));
                 goto out_errno;
@@ -2479,7 +2488,6 @@ int function_number = -1;
               {
                 const size_t bytes = A->get_ravel(0).get_near_int();
                 const int fd = get_fd(*B.get());
-                errno = 0;
 
                 char small_buffer[SMALL_BUF];
                 char * buffer = small_buffer;
@@ -2487,6 +2495,7 @@ int function_number = -1;
                 if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
+                errno = 0;
                 const ssize_t len = recv(fd, buffer, bytes, 0);
                 if (len < 0)   goto out_errno;
 
@@ -2613,6 +2622,7 @@ int function_number = -1;
                 FILE * file = get_FILE(*B.get());
                 const UCS_string format(*A.get());
                 File_or_String fos(file);
+                errno = 0;
                 return do_scanf(fos, format);
               }
 
@@ -2621,11 +2631,13 @@ int function_number = -1;
                 const UCS_string format(*A.get());
                 const UCS_string data(*B.get());
                 File_or_String fos(&data);
+                errno = 0;
                 return do_scanf(fos, format);
               }
 
          case 56:   // write nested lines As to file Bs
               {
+                errno = 0;
                 size_t items_written = 0;
                 UTF8_string path(*B.get());
                 if (A->get_rank() > 1)   RANK_ERROR;
@@ -2702,14 +2714,15 @@ int function_number = -1;
 
          case 60:   // random value(s)
               {
-                 if (!A->is_scalar())   RANK_ERROR;
-                 if (!B->is_scalar())   RANK_ERROR;
-                 const APL_Integer mode = A->get_ravel(0).get_int_value();
-                 const APL_Integer len  = B->get_ravel(0).get_int_value();
-                 if (len < 1)    LENGTH_ERROR;
-                 if (len > 32)   LENGTH_ERROR;
-                 Value_P Z = get_random(mode, len);
-                 return Token(TOK_APL_VALUE1, Z);
+                errno = 0;
+                if (!A->is_scalar())   RANK_ERROR;
+                if (!B->is_scalar())   RANK_ERROR;
+                const APL_Integer mode = A->get_ravel(0).get_int_value();
+                const APL_Integer len  = B->get_ravel(0).get_int_value();
+                if (len < 1)    LENGTH_ERROR;
+                if (len > 32)   LENGTH_ERROR;
+                Value_P Z = get_random(mode, len);
+                return Token(TOK_APL_VALUE1, Z);
               }
 
          case 202:   // set monadic parallel threshold
