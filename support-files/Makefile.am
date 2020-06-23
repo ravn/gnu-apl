@@ -1,5 +1,6 @@
 
-SUBDIRS =	Dyalog-Keyboard		\
+SUBDIRS =	Bill_Daly_Ubuntu	\
+		Dyalog-Keyboard		\
 		Dirk			\
 		Juergen-Mint-19		\
 		old-Keyboard		\

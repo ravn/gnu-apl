@@ -415,6 +415,7 @@ AC_CONFIG_FILES([Makefile
                  src/workspaces/Makefile
                  support-files/Makefile
                  support-files/105-key-International-Keyboard/Makefile
+                 support-files/Bill_Daly_Ubuntu/Makefile
                  support-files/Dirk/Makefile
                  support-files/Dyalog-Keyboard/Makefile
                  support-files/Juergen-Mint-19/Makefile
