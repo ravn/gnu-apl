@@ -540,9 +540,7 @@ const bool A_zero = A->is_near_zero();
         return E_DOMAIN_ERROR;
       }
 
-   if (A_zero)   return IntCell::z0(Z);
-
-   // at this point both A and B are non-zero
+   // at this point B is non-zero
    //
    if (A->is_integer_cell())
       {
