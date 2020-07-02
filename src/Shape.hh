@@ -24,7 +24,9 @@
 #include "Common.hh"
 #include "Error_macros.hh"
 
-#include <string.h>
+#include <string.h>   // memset()
+
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 
 // ----------------------------------------------------------------------------
 /// the shape of an APL value
