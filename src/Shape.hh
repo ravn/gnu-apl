@@ -26,8 +26,6 @@
 
 #include <string.h>   // memset()
 
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-
 // ----------------------------------------------------------------------------
 /// the shape of an APL value
 class Shape
@@ -65,10 +63,20 @@ public:
 
    /// constructor: shape of another shape
    Shape(const Shape & other)
-   : rho_rho(other.rho_rho)
+   : rho_rho(other.rho_rho),
+     volume(other.volume)
    {
+     // we purposefully initialize parts of rho (more precisely:
+     // rho[j] with j ≥ rho_rho) with uninitialized parts of other.rho.
+     // This causes gcc to complain but has shown to make some APL programs
+     // 3 times faster.
+     //
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+
      loop(r, MAX_RANK)   rho[r] = other.rho[r];
-     volume = other.volume;
+
+#pragma GCC diagnostic pop
    }
 
    /// constructor: shape defined by the ravel of an APL value \b val

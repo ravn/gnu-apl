@@ -47,8 +47,10 @@ public:
 
    /// append a value.
    void add(Value_P val)
-      { Assert(rank < MAX_RANK);
-        values[rank++] = val; }
+      {
+       if (rank < MAX_RANK)   values[rank++] = val;
+       else                   RANK_ERROR;
+      }
 
    /// return the number of values (= number of semicolons + 1)
    uRank value_count() const   { return rank; }
