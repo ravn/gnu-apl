@@ -66,17 +66,15 @@ public:
    : rho_rho(other.rho_rho),
      volume(other.volume)
    {
-     // we purposefully initialize parts of rho (more precisely:
-     // rho[j] with j ≥ rho_rho) with uninitialized parts of other.rho.
-     // This causes gcc to complain but has shown to make some APL programs
-     // 3 times faster.
-     //
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+     /* this may trigger a somewhat bogus -Wmaybe-uninitialized warning but
+        makes some workspaces 3 times faster. The slower code with no warning
+        would be:
 
+        loop(r, rhorho)   rho[r] = other.rho[r];
+
+        but that prevents loop-unrolling.
+     */
      loop(r, MAX_RANK)   rho[r] = other.rho[r];
-
-#pragma GCC diagnostic pop
    }
 
    /// constructor: shape defined by the ravel of an APL value \b val
