@@ -145,13 +145,17 @@ DYNAMIC_LOG_WANTED=yes
     ./configure DYNAMIC_LOG_WANTED=yes
 
 CXX_WERROR=yes/no
-    Do (not) add -Werror to the compiler flags. By default GNU APL is being
-    compiled with -Werror, which turns compiler warnings into compiler errors
-    so that the  build fails if the compiler issues warnings. However, some
-    older compilers produce lots of bogus warnings that cannot be fixed in a
-    reasonable way. In such cases you can, for example:
+    Do (not) add -Werror to the C++ compiler flags. By default GNU APL is being
+    compiled without -Werror, which turns compiler warnings into compiler errors
+    so that the build succeeds if the compiler issues warnings. Up to SVN
+    version 1304 the default was CXX_WERROR=yes, but a recent inflation of
+    bogus compiler warnings has triggered a change of the default value.
 
-    ./configure CXX_WERROR=no
+    The old behavior can be reestablished by, for example:
+
+    ./configure CXX_WERROR=yes
+
+    Note that `make develop' also sets CXX_WERROR=yes.
 
 DEVELOP_WANTED
     This option enables a number of internal checks in the GNU APL interpreter

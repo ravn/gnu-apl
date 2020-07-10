@@ -437,9 +437,9 @@ AC_CONFIG_FILES([Makefile
 
 # AM_CXXFLAGS: do/dont -Werror ?
 AC_ARG_VAR(CXX_WERROR,
-   [ turn warnings into errors (compiler flag -Werror) default: yes) ])
-if test "x$CXX_WERROR" = "xno"; then CXX_WERROR="";
-                                else CXX_WERROR="-Werror"; fi
+   [ turn all warnings into errors (compiler flag -Werror) default: no) ])
+if test "x$CXX_WERROR" = "xyes"; then CXX_WERROR="-Werror";
+                                 else CXX_WERROR=""; fi
 
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden

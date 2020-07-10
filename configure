@@ -1536,7 +1536,8 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
-  CXX_WERROR  turn warnings into errors (compiler flag -Werror) default: yes)
+  CXX_WERROR  turn all warnings into errors (compiler flag -Werror) default:
+              no)
   DEVELOP_WANTED
               set development options (see README-2-configure) default: no
   MAX_RANK_WANTED
@@ -19083,8 +19084,8 @@ ac_config_files="$ac_config_files Makefile build/Makefile debian/Makefile debian
 
 # AM_CXXFLAGS: do/dont -Werror ?
 
-if test "x$CXX_WERROR" = "xno"; then CXX_WERROR="";
-                                else CXX_WERROR="-Werror"; fi
+if test "x$CXX_WERROR" = "xyes"; then CXX_WERROR="-Werror";
+                                 else CXX_WERROR=""; fi
 
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden

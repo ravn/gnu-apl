@@ -92,14 +92,15 @@ Value_P vsh_Z(shape_Z.get_rank(), LOC);
    vsh_Z->check_value(LOC);
 
 Value_P X5(5, LOC);
-   if (!X)   new (X5->next_ravel())   IntCell(-1);                // no X
+   if (!X)   new (X5->next_ravel())   IntCell(-1);                   // no X
    else      new (X5->next_ravel())   PointerCell(X.get(), X5.getref());   // X
 
-   new (X5->next_ravel())   IntCell(shape_B.get_volume());        // LB
-   new (X5->next_ravel())   PointerCell(vsh_B.get(), X5.getref());      // rho_B
-   new (X5->next_ravel())   IntCell(shape_Z.get_volume());        // N_max
-   new (X5->next_ravel())   PointerCell(vsh_Z.get(), X5.getref());      // rho_Z
+   new (X5->next_ravel())   IntCell(shape_B.get_volume());           // LB
+   new (X5->next_ravel())   PointerCell(vsh_B.get(), X5.getref());   // rho_B
+   new (X5->next_ravel())   IntCell(shape_Z.get_volume());           // N_max
+   new (X5->next_ravel())   PointerCell(vsh_Z.get(), X5.getref());   // rho_Z
    X5->check_value(LOC);
+
    return Macro::get_macro(Macro::MAC_Z__LO_RANK_X5_B)->eval_LXB(_LO, X5, B);
 }
 //-----------------------------------------------------------------------------

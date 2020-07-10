@@ -1144,11 +1144,14 @@ Quad_CR::do_CR30(const Value & B)
    //
 const ShapeItem len = B.element_count();
    if (len == 0)   return B.clone(LOC);
+/*
    if (len == 1)
       {
+        return B.clone(LOC);
         if (!B.get_ravel(0).is_pointer_cell())   return B.clone(LOC);
         return B.get_ravel(0).get_pointer_value()->clone(LOC);
       }
+*/
 
 ShapeItem max_shape[MAX_RANK];   // in reverse order
    loop(r, MAX_RANK)   max_shape[r] = 0;
