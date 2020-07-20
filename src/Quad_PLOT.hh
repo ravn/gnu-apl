@@ -48,6 +48,9 @@ public:
    /// a semaphore protecting plot_threads
    static sem_t * plot_threads_sema;
 
+   /// a semaphore waiting until the plot window has been EXPOSED
+   static sem_t * plot_window_sema;
+
    /// an array of threads (one per plot window) handling X events from the
    /// window
    static std::vector<pthread_t> plot_threads;

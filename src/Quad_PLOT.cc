@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2018-2019  Dr. Jürgen Sauermann
+    Copyright (C) 2018-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <errno.h>
+#include <signal.h>
+
 #include <iostream>
 #include <iomanip>
-#include <signal.h>
 
 #include <vector>
 
@@ -38,6 +40,8 @@
 #include "Avec.hh"
 #include "Common.hh"
 #include "Quad_PLOT.hh"
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 using namespace std;
 
@@ -49,6 +53,9 @@ Quad_PLOT * Quad_PLOT::fun = &Quad_PLOT::_fun;
 
 sem_t __plot_threads_sema;
 sem_t * Quad_PLOT::plot_threads_sema = &__plot_threads_sema;
+
+sem_t __plot_window_sema;
+sem_t * Quad_PLOT::plot_window_sema = &__plot_window_sema;
 
 /**
    \b Quad_PLOT::plot_threads contains one thread per (open) plot window.
@@ -2120,6 +2127,154 @@ xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
    return reply.atom;
 }
 //-----------------------------------------------------------------------------
+void
+save_file(const char * outfile, Display * dpy, int window,
+          const Plot_context & pctx)
+{
+   // figure position and size...
+   //
+int x, y;   // position of the plot window in its parent
+   {
+     Window child;
+     XTranslateCoordinates(dpy, window, pctx.screen->root,
+                           0, 0, &x, &y, &child );
+
+     /*
+     XWindowAttributes xwa;
+     XGetWindowAttributes(dpy, window, &xwa);
+       CERR << "POS: " <<  (x - xwa.x) << ":" << (y - xwa.y) << endl;
+     */
+   }
+
+Window geo_root;
+int geo_x, geo_y;
+unsigned int geo_w, geo_h;
+unsigned int geo_border_w, geo_depth;
+   if (XGetGeometry(dpy, window, &geo_root, &geo_x, &geo_y, &geo_w, &geo_h,
+                    &geo_border_w, &geo_depth))   // success
+      {
+        /*
+        CERR <<                                             endl
+             << "  POS:    "    << geo_x << ":" << geo_y << endl
+             << "  SIZE: "      << geo_w << "x" << geo_h << endl
+             << "  bw:   "      << geo_border_w          << endl
+             << "  bits/pixel=" << geo_depth             << endl;
+         */
+      }
+   else   // error
+      {
+        CERR << "  XGetGeometry() failed" << endl;
+        MORE_ERROR() << "XGetGeometry() failed in save_file()";
+        DOMAIN_ERROR;
+      }
+
+const unsigned int width  = geo_w + geo_x;
+const unsigned int height = geo_h + geo_y;
+const unsigned long plane_mask = AllPlanes;
+const int format = XYPixmap;
+const int screen = XDefaultScreen(dpy);
+XImage * image = XGetImage(dpy, XRootWindow(dpy, screen),
+                            x - geo_x, y - geo_y,
+                            width, height, plane_mask, format);
+
+   if (image == 0)
+      {
+        MORE_ERROR() << "XGetImage() failed in save_file()";
+        DOMAIN_ERROR;
+      }
+
+   // write .bmp file...
+   //
+UTF8_string outfile_utf8(outfile);
+   if (!outfile_utf8.ends_with(".bmp"))   outfile_utf8.append_ASCII(".bmp");
+
+   errno = 0;
+FILE * bmp = fopen(outfile_utf8.c_str(), "w");
+   if (bmp == 0)
+      {
+        CERR << "open " << outfile << ": " << strerror(errno) << endl;
+        MORE_ERROR() << "save_file() failed: cannot open output file "
+                     << outfile;
+        DOMAIN_ERROR;
+      }
+
+   // compute some .bmp related sizes...
+   //
+const int pixel_count = width * height;
+
+   enum
+      {
+        file_header_size = 14,
+        dib_header_size  = 40,
+        pixel_offset     = file_header_size + dib_header_size
+      };
+
+const int part_DWORD = (width*3) & 3;        // bytes in final scanline DWORD
+const int pad_DWORD  = 3 & (4-part_DWORD);   // pad bytes per scanline
+const int pad_bytes = height*pad_DWORD;
+const int file_size = file_header_size
+                    + dib_header_size
+                    + 3*pixel_count
+                    + pad_bytes;
+
+/// 2 byte little endian
+#define LE2(x) uint8_t((x)), uint8_t((x) >> 8)
+
+/// 4 byte little endian
+#define LE4(x) LE2((x)), LE2((x >> 16))
+
+int file_bytes = 0;
+   {
+     const uint8_t file_header[file_header_size] =
+        {
+          uint8_t('B'),
+          uint8_t('M'),
+          LE4(file_size),
+          LE4(0),              // reserved
+          LE4(pixel_offset),   // offset
+       };
+     file_bytes += fwrite(file_header, 1, sizeof(file_header), bmp);
+   };
+
+   {
+     const uint8_t dib_header[dib_header_size] =
+        {
+          LE4(dib_header_size),
+          LE4(width),
+          LE4(height),
+          LE2(1),    // number of planes
+          LE2(24),   // bits per pixel
+          LE4(0),    // no compression
+          LE4(0),    // image size (0 if no compression)
+          LE4(0),    // Xpixels per meter
+          LE4(0),    // Ypixels per meter
+          LE4(0),    // colors used
+          LE4(0),    // importantcolors
+        };
+     file_bytes += fwrite(dib_header, 1, sizeof(dib_header), bmp);
+   }
+
+const Colormap cmap = XDefaultColormap(dpy, screen);
+   for (int y = height - 1; y >= 0; --y)
+       {
+         uint8_t scanline[3*width + 10];
+         uint8_t * s = scanline;
+         for (unsigned int x = 0; x < width; ++x)
+             {
+               XColor c;   c.pixel = XGetPixel(image, x, y);
+               XQueryColor(dpy, cmap, &c);
+               *s++ = uint8_t(c.blue /256);
+               *s++ = uint8_t(c.green/256);
+               *s++ = uint8_t(c.red  /256);
+             }
+          while ((s - scanline) & 3)   *s++ = 0;   // scanline padding
+          file_bytes += fwrite(scanline, 1, s - scanline, bmp);
+       }
+
+   XFree(image);
+   fclose(bmp);
+}
+//-----------------------------------------------------------------------------
 void *
 plot_main(void * vp_props)
 {
@@ -2132,8 +2287,8 @@ const Plot_data & data = w_props.get_plot_data();
 
    // open a connection to the X server
    //
-# if XCB_WINDOWS_WITH_UTF8_CAPTIONS
 Display * dpy = XOpenDisplay(0);
+# if XCB_WINDOWS_WITH_UTF8_CAPTIONS
    pctx.conn = XGetXCBConnection(dpy);
 
 # else   // not XCB_WINDOWS_WITH_UTF8_CAPTIONS
@@ -2243,6 +2398,7 @@ const xcb_get_input_focus_reply_t * focusReply =
 
    // X main loop
    //
+bool file_saved = false;
    for (;;)
       {
         xcb_generic_event_t * event = xcb_poll_for_event(pctx.conn);
@@ -2277,11 +2433,23 @@ const xcb_get_input_focus_reply_t * focusReply =
                   if (w_props.get_verbosity() & SHOW_EVENTS)
                      CERR << "\n*** XCB_EXPOSE " << endl;
                   do_plot(pctx, w_props, data);
+                  xcb_flush(pctx.conn);
+
+                  if (const char * outfile = w_props.get_filename().c_str())
+                     {
+                       if (*outfile && !file_saved)
+                          {
+                            save_file(outfile, dpy, pctx.window, pctx);
+                            file_saved = true;
+                          }
+                     }
+
                   if (focusReply)
                      {
                        /* this is the first XCB_EXPOSE event. X has moved
-                          the focus way from our caller to the newly
-                          created focus window (which is somehat annoying).
+                          the focus away from our caller (the window that is
+                          running the apl interpreter) to the newly
+                          created window (which is somehat annoying).
 
                           Return the focus to the window from which we have
                           stolen it.
@@ -2291,6 +2459,7 @@ const xcb_get_input_focus_reply_t * focusReply =
                        focusReply = 0;
                     }
                  xcb_flush(pctx.conn);
+                 sem_post(Quad_PLOT::plot_window_sema);
                  break;
 
              case XCB_UNMAP_NOTIFY:       // 18
@@ -2309,6 +2478,7 @@ const xcb_get_input_focus_reply_t * focusReply =
              case XCB_CONFIGURE_NOTIFY:   // 22
                   if (focusReply)   break;   // not yet exposed
 
+                  // XCB_EXPOSE has occurred.
                   {
                     const xcb_configure_notify_event_t * notify =
                           reinterpret_cast<const xcb_configure_notify_event_t *>
@@ -2335,6 +2505,19 @@ const xcb_get_input_focus_reply_t * focusReply =
                      {
                        // CERR << "Killed!" << endl;
                        free(event);
+
+                       // free the text_gc
+                       //
+                       testCookie(xcb_free_gc(pctx.conn, pctx.text),
+                                  pctx.conn, "can't free gc");
+
+                       // close font
+                       {
+                         xcb_void_cookie_t cookie =
+                                  xcb_close_font_checked(pctx.conn, pctx.font);
+                         testCookie(cookie, pctx.conn, "can't close font");
+                       }
+
                        xcb_disconnect(pctx.conn);
                        delete &w_props;
                        sem_wait(Quad_PLOT::plot_threads_sema);
@@ -2349,7 +2532,7 @@ const xcb_get_input_focus_reply_t * focusReply =
                                    break;
                                  }
                        sem_post(Quad_PLOT::plot_threads_sema);
-                       goto done;
+                       return 0;
                      }
                   break;
 
@@ -2363,7 +2546,6 @@ const xcb_get_input_focus_reply_t * focusReply =
         free(event);
       }
 
-done:
    // free the text_gc
    //
    testCookie(xcb_free_gc(pctx.conn, pctx.text), pctx.conn, "can't free gc");
@@ -2382,6 +2564,7 @@ Quad_PLOT::Quad_PLOT()
     verbosity(0)
 {
     __sem_init(plot_threads_sema, 0, 1);
+    __sem_init(plot_window_sema, 1, 0);
 }
 //-----------------------------------------------------------------------------
 Quad_PLOT::~Quad_PLOT()
@@ -2774,9 +2957,11 @@ union
 } u;
    u.ret = 0;
    pthread_create(&u.thread, 0, plot_main, w_props);
-   sem_wait(Quad_PLOT::plot_threads_sema);
+   sem_wait(plot_threads_sema);
       plot_threads.push_back(u.thread);
-   sem_post(Quad_PLOT::plot_threads_sema);
+   sem_post(plot_threads_sema);
+
+   sem_wait(plot_window_sema);   // blocks until XCB_EXPOSE
    return IntScalar(u.ret, LOC);
 }
 //-----------------------------------------------------------------------------

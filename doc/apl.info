@@ -1,4 +1,4 @@
-This is apl.info, produced by makeinfo version 6.7 from apl.texi.
+This is apl.info, produced by makeinfo version 6.5 from apl.texi.
 
 This is the manual for GNU APL, an implementation of ISO standard 13751
 "Programming Language APL, Extended"
@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-June 6, 2020
+July 20, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -2937,6 +2937,7 @@ control how the resulting plot will look like:
    1. Global (plot window) Attributes:
 
 caption:            GNU APL PLOT   (plot window caption)
+filename:                          (output file name)
 pa_width:           600 pixel      (plotarea width)
 pa_height:          400 pixel      (plotarea height)
 pa_border_L:        30 pixel       (pixels left of the plotarea)
@@ -2981,6 +2982,22 @@ legend_name-0: Random Row 1
 legend_name-1: Random Row 2
                     """
       Attributes ⎕PLOT Data
+
+   If the global attribute "filename" is given, then the plot is not
+only being displayed in an X window on the screen but also written to a
+file with the name provided as attribute value.  The file format is
+bitmap (typical file extension: .bmp) which can then eaily converted to
+the formats like .png or .jpg with tools like ’convert’ from package
+imagemagick.
+
+   For example:
+
+      ⊣ ( ⊂ "filename: /tmp/bitmap.bmp" ) ⎕PLOT 1 3 1 4 2
+
+   writes the plot of a a zigzag curve to file /tmp/bitmap.bmp (note:
+⎕PLOT with attribute filename overrides existing files without a
+warning.  Lack of permissions to write the file raises a DOMAIN ERROR
+with )MORE providing details.
 
 3.28.3 Plot Window Handling
 ---------------------------
@@ -5344,60 +5361,60 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11468
-Node: Chapter 219501
-Node: Chapter 323925
-Node: Section 3.125626
-Node: Section 3.241787
-Node: Section 3.342546
-Node: Section 3.443833
-Node: Section 3.547235
-Node: Section 3.647408
-Node: Section 3.748021
-Node: Section 3.851974
-Node: Section 3.953516
-Node: Section 3.1054971
-Node: Section 3.1156755
-Node: Section 3.1258695
-Node: Section 3.1359636
-Node: Section 3.1459888
-Node: Section 3.1561284
-Node: Section 3.1663802
-Node: Section 3.1770501
-Node: Section 3.1871946
-Node: Section 3.1977607
-Node: Section 3.2082641
-Node: Section 3.2185922
-Node: Section 3.2286213
-Node: Section 3.2396788
-Node: Section 3.2497060
-Node: Section 3.25103638
-Node: Section 3.26106089
-Node: Section 3.27106758
-Node: Section 3.28109881
-Node: Section 3.29116734
-Node: Section 3.30117681
-Node: Section 3.31131243
-Node: Section 3.32140743
-Node: Section 3.33143847
-Node: Section 3.34145836
-Node: Chapter 4150240
-Node: Chapter 5151988
-Node: Chapter 6153114
-Node: Section 6.1154651
-Node: Section 6.2155931
-Node: Section 6.3156291
-Node: Section 6.4156533
-Node: Section 6.5157195
-Node: Section 6.6157673
-Node: Section 6.7158445
-Node: Section 6.8158902
-Node: Chapter 7159304
-Node: Section 7.1159723
-Node: Section 7.2160410
-Node: Chapter 8161241
-Node: Section 8.1161744
-Node: Section 8.2187058
+Node: Chapter 11469
+Node: Chapter 219502
+Node: Chapter 323926
+Node: Section 3.125627
+Node: Section 3.241788
+Node: Section 3.342547
+Node: Section 3.443834
+Node: Section 3.547236
+Node: Section 3.647409
+Node: Section 3.748022
+Node: Section 3.851975
+Node: Section 3.953517
+Node: Section 3.1054972
+Node: Section 3.1156756
+Node: Section 3.1258696
+Node: Section 3.1359637
+Node: Section 3.1459889
+Node: Section 3.1561285
+Node: Section 3.1663803
+Node: Section 3.1770502
+Node: Section 3.1871947
+Node: Section 3.1977608
+Node: Section 3.2082642
+Node: Section 3.2185923
+Node: Section 3.2286214
+Node: Section 3.2396789
+Node: Section 3.2497061
+Node: Section 3.25103639
+Node: Section 3.26106090
+Node: Section 3.27106759
+Node: Section 3.28109882
+Node: Section 3.29117477
+Node: Section 3.30118424
+Node: Section 3.31131986
+Node: Section 3.32141486
+Node: Section 3.33144590
+Node: Section 3.34146579
+Node: Chapter 4150983
+Node: Chapter 5152731
+Node: Chapter 6153857
+Node: Section 6.1155394
+Node: Section 6.2156674
+Node: Section 6.3157034
+Node: Section 6.4157276
+Node: Section 6.5157938
+Node: Section 6.6158416
+Node: Section 6.7159188
+Node: Section 6.8159645
+Node: Chapter 7160047
+Node: Section 7.1160466
+Node: Section 7.2161153
+Node: Chapter 8161984
+Node: Section 8.1162487
+Node: Section 8.2187801
 
 End Tag Table
 
