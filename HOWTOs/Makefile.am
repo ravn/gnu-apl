@@ -36,3 +36,9 @@ dist_doc_DATA = \
 
 .PRECIOUS: $(HTML) glade-1.png glade-2.png glade-3.png glade-4.png
 
+# convert all .bmp files in /tmp to png files in current directory
+.PHONY: PNGs
+PNGs:
+	for b in /tmp/*.bmp; do p=`basename "$$b" .bmp`; \
+		convert "$$b" "./$$p.png"; done
+

@@ -2282,6 +2282,7 @@ const Colormap cmap = XDefaultColormap(dpy, screen);
 
    XFree(image);
    fclose(bmp);
+   CERR << "output file " << outfile_utf8 << " written" << endl;
 }
 //-----------------------------------------------------------------------------
 void *
@@ -2289,6 +2290,7 @@ plot_main(void * vp_props)
 {
 Plot_window_properties & w_props =
       *reinterpret_cast<Plot_window_properties *>(vp_props);
+const char * outfile = strdup(w_props.get_output_filename().c_str());
 
 Plot_context pctx(w_props);
 
@@ -2408,7 +2410,7 @@ const xcb_get_input_focus_reply_t * focusReply =
    // X main loop
    //
 bool file_saved = false;
-   for (;;)
+   for (bool goon = true; goon;)
       {
         xcb_generic_event_t * event = xcb_poll_for_event(pctx.conn);
         if (event == 0)   // nothing happened
@@ -2420,16 +2422,15 @@ bool file_saved = false;
                     if (Quad_PLOT::plot_threads[pt] == thread)
                        {
                          zombie = false;
-                         break;
+                         break;   // loop(pt)
                        }
              sem_post(Quad_PLOT::plot_threads_sema);
 
              if (zombie)
                 {
                   free(event);
-                  xcb_disconnect(pctx.conn);
-                  delete &w_props;
-                  return 0;
+                  goon = false;   // break the outer for ()
+                  continue;       // for ()
                 }
 
              usleep(200000);
@@ -2444,12 +2445,16 @@ bool file_saved = false;
                   do_plot(pctx, w_props, data);
                   xcb_flush(pctx.conn);
 
-                  if (const char * outfile = w_props.get_filename().c_str())
+                  if (*outfile && !file_saved)
                      {
-                       if (*outfile && !file_saved)
+                       save_file(strdup(outfile), dpy, pctx.window, pctx);
+                       file_saved = true;
+                       if (w_props.get_auto_close())
                           {
-                            save_file(outfile, dpy, pctx.window, pctx);
-                            file_saved = true;
+                            // wake-up the interpreter
+                            sem_post(Quad_PLOT::plot_window_sema);
+                            goon = false;
+                            continue;
                           }
                      }
 
@@ -2515,20 +2520,8 @@ bool file_saved = false;
                        // CERR << "Killed!" << endl;
                        free(event);
 
-                       // free the text_gc
+                       // make this thread a zombie
                        //
-                       testCookie(xcb_free_gc(pctx.conn, pctx.text),
-                                  pctx.conn, "can't free gc");
-
-                       // close font
-                       {
-                         xcb_void_cookie_t cookie =
-                                  xcb_close_font_checked(pctx.conn, pctx.font);
-                         testCookie(cookie, pctx.conn, "can't close font");
-                       }
-
-                       xcb_disconnect(pctx.conn);
-                       delete &w_props;
                        sem_wait(Quad_PLOT::plot_threads_sema);
                           const int count = Quad_PLOT::plot_threads.size();
                           const pthread_t thread = pthread_self();
@@ -2541,9 +2534,11 @@ bool file_saved = false;
                                    break;
                                  }
                        sem_post(Quad_PLOT::plot_threads_sema);
-                       return 0;
+
+                       goon = false;   // break the outer for ()
+                       continue;   // for ()
                      }
-                  break;
+                  break;   // switch()
 
              default:
                 if (w_props.get_verbosity() & SHOW_EVENTS)
@@ -2555,6 +2550,8 @@ bool file_saved = false;
         free(event);
       }
 
+   // at this point the plot window was closed
+
    // free the text_gc
    //
    testCookie(xcb_free_gc(pctx.conn, pctx.text), pctx.conn, "can't free gc");
@@ -2565,6 +2562,8 @@ bool file_saved = false;
      testCookie(cookie, pctx.conn, "can't close font");
    }
 
+   xcb_disconnect(pctx.conn);
+   delete &w_props;
    return 0;
 }
 //=============================================================================

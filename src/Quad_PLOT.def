@@ -1,6 +1,7 @@
 #ifdef gdef
 gdef(String,   caption, "GNU APL PLOT", plot window caption)
-gdef(String,   filename,            "", output file name)
+gdef(String,   output_filename,     "", output file name)
+gdef(uint32_t, auto_close,           0, close X window with output file)
 gdef(Pixel_X,  pw_pos_X,            50, plot window position X)
 gdef(Pixel_Y,  pw_pos_Y,            50, plot window position Y)
 gdef(Pixel_X,  border_width,        10, width of the window border)
