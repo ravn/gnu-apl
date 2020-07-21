@@ -2140,8 +2140,8 @@ int x, y;   // position of the plot window in its parent
                            0, 0, &x, &y, &child );
 
      /*
-     XWindowAttributes xwa;
-     XGetWindowAttributes(dpy, window, &xwa);
+       XWindowAttributes xwa;
+       XGetWindowAttributes(dpy, window, &xwa);
        CERR << "POS: " <<  (x - xwa.x) << ":" << (y - xwa.y) << endl;
      */
    }
@@ -2168,8 +2168,17 @@ unsigned int geo_border_w, geo_depth;
         DOMAIN_ERROR;
       }
 
-const unsigned int width  = geo_w + geo_x;
-const unsigned int height = geo_h + geo_y;
+   // Note: the point geo_x:geo_y seems to be the top-left corner of the
+   // plotarea.
+   // Therefore we assume that the window border has a thickness of geo_x
+   // left, right, and below the plotarea and a thickness of geo_y above
+   // (caused by the window caption etc.).
+   //
+   // To save the window including its borders we have to start at point
+   // (x - geo_x):(y - geo_y) and add the borders to width:height.
+   //
+const unsigned int width  = geo_x + geo_w + geo_x;
+const unsigned int height = geo_y + geo_h + geo_x;
 const unsigned long plane_mask = AllPlanes;
 const int format = XYPixmap;
 const int screen = XDefaultScreen(dpy);

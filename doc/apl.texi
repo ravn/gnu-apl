@@ -3070,8 +3070,8 @@ legend_name-1: Random Row 2
 If the global attribute "filename" is given, then the plot is not only being
 displayed in an X window on the screen but also written to a file with the
 name provided as attribute value. The file format is bitmap (typical file
-extension: .bmp) which can then eaily converted to the formats like .png or
-.jpg with tools like 'convert' from package imagemagick.
+extension: .bmp) which can then eaily converted to other graphic formats
+such as .png or .jpg with tools like 'convert' from package imagemagick.
 
 For example:
 

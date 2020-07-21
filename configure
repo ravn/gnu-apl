@@ -681,7 +681,7 @@ HAVE_RDTSC_TRUE
 HAVE_GTK3_FALSE
 HAVE_GTK3_TRUE
 GTK_CFLAGS
-GTK_LIBS
+GTK_LDFLAGS
 HAVE_LIBPCRE2_32_FALSE
 HAVE_LIBPCRE2_32_TRUE
 PCRE_CFLAGS
@@ -18693,7 +18693,7 @@ fi
 HAVE_gtk3=no
 
 
-GTK_LIBS=
+GTK_LDFLAGS=
 GTK_CFLAGS=
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether support for ⎕GTK (needs GTK version 3) is desired" >&5
 $as_echo_n "checking whether support for ⎕GTK (needs GTK version 3) is desired... " >&6; }
@@ -18718,7 +18718,7 @@ $as_echo_n "checking if package gtk+-3.0 is installed... " >&6; }
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
             GTK_CFLAGS=`pkg-config --cflags gtk+-3.0`
-            GTK_LIBS=`pkg-config --libs gtk+-3.0`
+            GTK_LDFLAGS=`pkg-config --libs gtk+-3.0`
             HAVE_gtk3=yes
         else
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5

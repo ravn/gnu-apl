@@ -338,7 +338,7 @@ cmd_2_load_CSS(const char * filename)
 {
    verbosity > 0 && cerr << "Loading CSS: " << filename << endl;
 
-GtkCssProvider * css_provider = gtk_css_provider_get_default();
+GtkCssProvider * css_provider = gtk_css_provider_new();
    assert(css_provider);
 
 GError * err = 0;

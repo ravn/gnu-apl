@@ -192,9 +192,9 @@ AC_ARG_WITH([gtk3],
     [enable ⎕GTK (interface to GTK+ version 3; needs libgtk-3 and more)]))
 
 HAVE_gtk3=no
-AC_SUBST(GTK_LIBS)
+AC_SUBST(GTK_LDFLAGS)
 AC_SUBST(GTK_CFLAGS)
-GTK_LIBS=
+GTK_LDFLAGS=
 GTK_CFLAGS=
 AC_MSG_CHECKING([whether support for ⎕GTK (needs GTK version 3) is desired])
 if test "x$with_gtk3" = "xno"       # user has explicitly disabled GTK
@@ -212,7 +212,7 @@ else
         then
             AC_MSG_RESULT([yes])
             GTK_CFLAGS=`pkg-config --cflags gtk+-3.0`
-            GTK_LIBS=`pkg-config --libs gtk+-3.0`
+            GTK_LDFLAGS=`pkg-config --libs gtk+-3.0`
             HAVE_gtk3=yes
         else
             AC_MSG_RESULT([no])

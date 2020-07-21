@@ -1,4 +1,4 @@
-This is apl.info, produced by makeinfo version 6.5 from apl.texi.
+This is apl.info, produced by makeinfo version 6.7 from apl.texi.
 
 This is the manual for GNU APL, an implementation of ISO standard 13751
 "Programming Language APL, Extended"
@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-July 20, 2020
+July 21, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -2987,8 +2987,8 @@ legend_name-1: Random Row 2
 only being displayed in an X window on the screen but also written to a
 file with the name provided as attribute value.  The file format is
 bitmap (typical file extension: .bmp) which can then eaily converted to
-the formats like .png or .jpg with tools like ’convert’ from package
-imagemagick.
+other graphic formats such as .png or .jpg with tools like ’convert’
+from package imagemagick.
 
    For example:
 
@@ -5392,29 +5392,29 @@ Node: Section 3.25103639
 Node: Section 3.26106090
 Node: Section 3.27106759
 Node: Section 3.28109882
-Node: Section 3.29117477
-Node: Section 3.30118424
-Node: Section 3.31131986
-Node: Section 3.32141486
-Node: Section 3.33144590
-Node: Section 3.34146579
-Node: Chapter 4150983
-Node: Chapter 5152731
-Node: Chapter 6153857
-Node: Section 6.1155394
-Node: Section 6.2156674
-Node: Section 6.3157034
-Node: Section 6.4157276
-Node: Section 6.5157938
-Node: Section 6.6158416
-Node: Section 6.7159188
-Node: Section 6.8159645
-Node: Chapter 7160047
-Node: Section 7.1160466
-Node: Section 7.2161153
-Node: Chapter 8161984
-Node: Section 8.1162487
-Node: Section 8.2187801
+Node: Section 3.29117490
+Node: Section 3.30118437
+Node: Section 3.31131999
+Node: Section 3.32141499
+Node: Section 3.33144603
+Node: Section 3.34146592
+Node: Chapter 4150996
+Node: Chapter 5152744
+Node: Chapter 6153870
+Node: Section 6.1155407
+Node: Section 6.2156687
+Node: Section 6.3157047
+Node: Section 6.4157289
+Node: Section 6.5157951
+Node: Section 6.6158429
+Node: Section 6.7159201
+Node: Section 6.8159658
+Node: Chapter 7160060
+Node: Section 7.1160479
+Node: Section 7.2161166
+Node: Chapter 8161997
+Node: Section 8.1162500
+Node: Section 8.2187814
 
 End Tag Table
 
