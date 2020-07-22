@@ -186,7 +186,7 @@ bool auto_started = false;
 
    prog = argv[0];
 char bin_path[FILENAME_MAX];
-   strncpy(bin_path, prog, sizeof(bin_path));
+   strncpy(bin_path, prog, sizeof(bin_path) - 1);
 
 char * slash = strrchr(bin_path, '/');
    if (slash)

@@ -1093,7 +1093,7 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
 
    if (auto_start && fork())   return 0;         // parent returns (daemonize)
 
-   memset(&db, 0, sizeof(db));
+   memset(reinterpret_cast<void *>(&db), 0, sizeof(db));
 
    (verbosity > 0) && cerr << prog << ": entering main loop..." << endl;
    for (;;)

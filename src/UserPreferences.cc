@@ -1127,7 +1127,17 @@ int file_profile = 0;   // the current profile in the preferences file
 
          // some args could be non-numeric
          //
-         Assert(sargs_idx >= count);
+         if (0 && sargs_idx < count)   // bogus assertion (disable it)
+            {
+               CERR << "sargs_idx: "          << sargs_idx << endl
+                    << "count: "              << count << endl
+                    << "file_profile: "       << file_profile << endl
+                    << "sargs[" << (sargs_idx-1)
+                                << "]: " << sargs[sargs_idx-1] << endl
+                    ;
+
+               Assert(0);
+            }
          sargs[sargs_idx] = "NUL";              // terminating 0
 
          if (!strcasecmp(opt, "Color"))

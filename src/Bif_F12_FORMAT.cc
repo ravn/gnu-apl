@@ -431,10 +431,9 @@ UCS_string ucs;
 
    if (exponent.size())
       {
-        UCS_string data(1, exponent_char);
+        UCS_string data(1, exponent_char);   // the 'E'
 
         const Unicode pad_char = exponent.pad_char(Workspace::get_FC(2));
-
         if (exponent.no_float())              // floating disabled.
            {
              data.append(expo_deco.format);
@@ -672,7 +671,7 @@ const int data_buf_len = int_part.out_len + 1        // 123.
 char data_buf[101];
 char * fract_end = 0;
 
-   if (exponent.size())
+   if (exponent.size())   // E in format string
       {
         // create a format like %.5E (if fract_part has 5 digits)
         //
@@ -686,8 +685,9 @@ char * fract_end = 0;
         char * ep = strchr(&data_buf[0], 'E');
         Assert(ep);
         fract_end = ep++;
-        if      (*ep == '+')   ++ep;
-        else if (*ep == '-')   { expo_negative = true;   ++ep; }
+        if      (*ep == '+')   ++ep;                               // skip +
+        else if (*ep == '-')   { expo_negative = true;   ++ep; }   // skip -
+        if (*ep == '0' && ep[1])   ++ep;          // skip leading 0 in exponent
 
         int elen = strlen(ep);
 
@@ -730,8 +730,8 @@ char * int_end = strchr(&data_buf[0], '.');
       }
    else
       {
-        char * fract_digits = int_end + 1;
         Assert(int_end);
+        char * fract_digits = int_end + 1;
 
         int flen = fract_end - fract_digits;
 
