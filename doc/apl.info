@@ -2715,12 +2715,12 @@ inverse FFTs:
    The third range from 10 to 15 corresponds to the first range and
 first multiplies B with a window function and then computes the FFT:
 
-   • A=2: FFT(B × Hann window)
-   • A=3: FFT(B × Hamming window)
-   • A=4: FFT(B × Blackman window)
-   • A=5: FFT(B × Blackman-Harris window)
-   • A=6: FFT(B × Blackman-Nuttal window)
-   • A=7: FFT(B × Flat-Top window)
+   • A=10: FFT(B × Hann window)
+   • A=11: FFT(B × Hamming window)
+   • A=12: FFT(B × Blackman window)
+   • A=13: FFT(B × Blackman-Harris window)
+   • A=14: FFT(B × Blackman-Nuttal window)
+   • A=15: FFT(B × Flat-Top window)
 
    ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more.
 The implementation of ⎕FFT uses libfftw3, aka.  "The fastest Fourier
@@ -5389,32 +5389,32 @@ Node: Section 3.2286214
 Node: Section 3.2396789
 Node: Section 3.2497061
 Node: Section 3.25103639
-Node: Section 3.26106090
-Node: Section 3.27106759
-Node: Section 3.28109882
-Node: Section 3.29117490
-Node: Section 3.30118437
-Node: Section 3.31131999
-Node: Section 3.32141499
-Node: Section 3.33144603
-Node: Section 3.34146592
-Node: Chapter 4150996
-Node: Chapter 5152744
-Node: Chapter 6153870
-Node: Section 6.1155407
-Node: Section 6.2156687
-Node: Section 6.3157047
-Node: Section 6.4157289
-Node: Section 6.5157951
-Node: Section 6.6158429
-Node: Section 6.7159201
-Node: Section 6.8159658
-Node: Chapter 7160060
-Node: Section 7.1160479
-Node: Section 7.2161166
-Node: Chapter 8161997
-Node: Section 8.1162500
-Node: Section 8.2187814
+Node: Section 3.26106096
+Node: Section 3.27106765
+Node: Section 3.28109888
+Node: Section 3.29117496
+Node: Section 3.30118443
+Node: Section 3.31132005
+Node: Section 3.32141505
+Node: Section 3.33144609
+Node: Section 3.34146598
+Node: Chapter 4151002
+Node: Chapter 5152750
+Node: Chapter 6153876
+Node: Section 6.1155413
+Node: Section 6.2156693
+Node: Section 6.3157053
+Node: Section 6.4157295
+Node: Section 6.5157957
+Node: Section 6.6158435
+Node: Section 6.7159207
+Node: Section 6.8159664
+Node: Chapter 7160066
+Node: Section 7.1160485
+Node: Section 7.2161172
+Node: Chapter 8162003
+Node: Section 8.1162506
+Node: Section 8.2187820
 
 End Tag Table
 

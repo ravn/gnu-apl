@@ -2792,12 +2792,12 @@ The third range from 10 to 15 corresponds to the first range and first
 multiplies B with a window function and then computes the FFT:
 
 @itemize
-@item A=2: FFT(B × Hann window)
-@item A=3: FFT(B × Hamming window)
-@item A=4: FFT(B × Blackman window)
-@item A=5: FFT(B × Blackman-Harris window)
-@item A=6: FFT(B × Blackman-Nuttal window)
-@item A=7: FFT(B × Flat-Top window)
+@item A=10: FFT(B × Hann window)
+@item A=11: FFT(B × Hamming window)
+@item A=12: FFT(B × Blackman window)
+@item A=13: FFT(B × Blackman-Harris window)
+@item A=14: FFT(B × Blackman-Nuttal window)
+@item A=15: FFT(B × Flat-Top window)
 @end itemize
 
 ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The

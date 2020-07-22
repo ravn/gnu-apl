@@ -40,8 +40,6 @@
 #include "Avec.hh"
 #include "Common.hh"
 #include "Quad_PLOT.hh"
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
 
 using namespace std;
 
@@ -98,6 +96,8 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B)
 
 #else   // not defined(WHY_NOT)
 
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 # include <xcb/xcb.h>
 # include <xcb/xproto.h>
 
