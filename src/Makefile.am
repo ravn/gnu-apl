@@ -241,16 +241,17 @@ perf: apl
 
 
 makefile.h:
-	@echo "// some strings exported from Makefile"           > $@
-	@echo "//"                                              >> $@
-	@echo "#define Makefile__bindir     \"${bindir}\""      >> $@
-	@echo "#define Makefile__docdir     \"${docdir}\""      >> $@
-	@echo "#define Makefile__sysconfdir \"${sysconfdir}\""  >> $@
-	@echo "#define Makefile__pkglibdir  \"${pkglibdir}\""   >> $@
-	@echo "#define Makefile__localedir  \"${localedir}\""   >> $@
-	@echo "#define Makefile__srcdir     \"${abs_srcdir}\""  >> $@
-	@echo "#define Makefile__host_os    \"${host_os}\""     >> $@
-	@echo                                                   >> $@
+	@echo "// some strings exported from Makefile"            > $@
+	@echo "//"                                               >> $@
+	@echo "#define xSTR(x) #x"                               >> $@
+	@echo "#define Makefile__bindir     xSTR(${bindir})"     >> $@
+	@echo "#define Makefile__docdir     xSTR(${docdir})"     >> $@
+	@echo "#define Makefile__sysconfdir xSTR(${sysconfdir})" >> $@
+	@echo "#define Makefile__pkglibdir  xSTR(${pkglibdir})"  >> $@
+	@echo "#define Makefile__localedir  xSTR(${localedir})"  >> $@
+	@echo "#define Makefile__srcdir     xSTR(${abs_srcdir})" >> $@
+	@echo "#define Makefile__host_os    xSTR(${host_os})"    >> $@
+	@echo ""                                                 >> $@
 
 .PHONY:	patch
 patch:

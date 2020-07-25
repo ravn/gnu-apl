@@ -56,7 +56,7 @@ DEB:	DIST
 	cd debian_tmp/$(distdir) ; dpkg-buildpackage -j4
 	mkdir -p ftp-upload
 	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1_*.deb          ftp-upload/
-	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1.debian.tar.gz  ftp-upload/
+	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1.debian.tar.xz  ftp-upload/
 
 # update from SVN repository and ./configure
 #

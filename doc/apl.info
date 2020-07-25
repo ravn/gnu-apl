@@ -1,4 +1,4 @@
-This is apl.info, produced by makeinfo version 6.7 from apl.texi.
+This is apl.info, produced by makeinfo version 6.5 from apl.texi.
 
 This is the manual for GNU APL, an implementation of ISO standard 13751
 "Programming Language APL, Extended"
@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-July 21, 2020
+July 25, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,

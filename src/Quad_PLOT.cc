@@ -554,8 +554,10 @@ public:
         }
    }
 
-   // get_XXX() and set_XXX functions
-# define ldef(ty,  na,  _val, _descr)      \
+   // define the get_XXX() and set_XXX functions for every attributes XXX
+   // defined in Quad_PLOT.def...
+   //
+# define ldef(ty,  na,  _val, _descr)     \
    /** return the value of na **/         \
    ty get_ ## na() const   { return na; } \
    /** set the  value of na **/           \
@@ -758,6 +760,10 @@ public:
    /// for level 0.0 <= alpha <= 1.0: return the color for alpha according
    /// to \b gradient
    uint32_t get_color(double alpha) const;
+
+   /// return the number of plot lines
+   uint32_t get_line_count() const
+      { return line_count; }
 
 protected:
    /// the number of plot lines
@@ -1264,6 +1270,7 @@ struct Plot_context
    const Plot_window_properties & w_props;
 
    xcb_connection_t * conn;       ///< the connection to the X server
+   Display *          display;    ///< the open display
    xcb_window_t       window;     ///< the plot window
    xcb_screen_t       * screen;   ///< the screen containing the window
    xcb_gcontext_t     fill;       ///< the curren fill style
@@ -1273,7 +1280,7 @@ struct Plot_context
    xcb_font_t         font;       ///< the curren font
 };
 //-----------------------------------------------------------------------------
-/// the width and the height of a string (in pixels)
+/// the supposed width and the height of a string (in pixels)
 struct string_width_height
 {
    /// constructor: ask X-server for the size (in pixels) of \b string
@@ -1340,10 +1347,65 @@ uint32_t values[3] = { pctx.screen->black_pixel,
    return gc;
 }
 //-----------------------------------------------------------------------------
+#define XFT   0
+#define PANGO 0
+#if XFT
+#include <X11/Xft/Xft.h>
+#endif
+
 void
 draw_text(const Plot_context & pctx, const char * label, const Pixel_XY & xy)
 {
-/* draw the text */
+#if XFT
+
+const int x = xy.x;
+const int y = xy.y;
+
+const Colormap colormap = XDefaultColormap(pctx.display, /*screen*/ 0);
+Visual * visual = DefaultVisual(pctx.display, /*screen*/ 0);
+XftDraw * xftd = XftDrawCreate(pctx.display, pctx.window, visual, colormap);
+
+static XftFont * font = 0;
+static XftColor black, white, red;
+   if (font == 0)   // first time through
+      {
+      //const char * font_name = "Arial-10";
+        const char * font_name = "Courier-10";
+
+        // alpha = 0 is fully transparent, 0xFFFF is fully opaque
+        //                                  red   green    blue   alpha
+        const XRenderColor rgb_black = {      0,      0,      0, 0xFFFF };
+        const XRenderColor rgb_white = { 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF };
+        const XRenderColor rgb_red   = { 0xFFFF, 0x8000, 0x8000, 0xFFFF };
+
+        XftColorAllocValue(pctx.display, visual, colormap, &rgb_white, &white);
+        XftColorAllocValue(pctx.display, visual, colormap, &rgb_black, &black);
+        XftColorAllocValue(pctx.display, visual, colormap, &rgb_red,   &red);
+
+        font = XftFontOpenName(pctx.display, /*screen*/ 0, font_name);
+      }
+
+   Assert(font);
+
+   XftDrawRect(xftd, &red, x, y - 10, 40, 20);
+
+// XGlyphInfo extents;
+//    XftTextExtentsUtf8(pctx.display, font,
+//                      (const FcChar8 *)label, strlen(label), &extents);
+   XftDrawStringUtf8(xftd, &black, font,
+                     x, y,
+             //      x + (cellwidth - extents.xOff) / 2, y + font->ascent,
+                     (const FcChar8 *)label, strlen(label));
+
+   xcb_flush(pctx.conn);
+
+#elif PANGO
+
+cairo_surface_t * surface = 
+cairo_t cr = cairo_create(surface);
+#else
+   // draw the text
+   //
 xcb_void_cookie_t textCookie = xcb_image_text_8_checked(pctx.conn,
                                                         strlen(label),
                                                         pctx.window, pctx.text,
@@ -1351,6 +1413,7 @@ xcb_void_cookie_t textCookie = xcb_image_text_8_checked(pctx.conn,
 
    testCookie(textCookie, pctx.conn,
               "xcb_image_text_8_checked() failed.");
+#endif
 }
 //-----------------------------------------------------------------------------
 char *
@@ -1651,7 +1714,8 @@ const int point_style = l_props.get_point_style();
               {  half,  half },
               { int16_t(-half),  half },
               { int16_t(-half), int16_t(-half) } };
-        xcb_fill_poly(pctx.conn, pctx.window, pctx.point, XCB_POLY_SHAPE_CONVEX,
+        xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
+                      XCB_POLY_SHAPE_CONVEX,
                       XCB_COORD_MODE_PREVIOUS, ITEMS(points));
         if (point_size2)   // hollow
            {
@@ -1705,28 +1769,62 @@ void
 draw_legend(const Plot_context & pctx, const Plot_window_properties & w_props)
 {
 Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const int line_count = w_props.get_line_count();
+
+   // estimate the box size from the length of the longest legend string
+   //
+const char * longest_legend = "";
+   for (int l = 0; l < line_count; ++l)
+       {
+         const char * lstr = l_props[l]->get_legend_name().c_str();
+         if (strlen(longest_legend) < strlen(lstr))   longest_legend = lstr;
+       }
+
+string_width_height longest_size(pctx, longest_legend);
+
 const Color canvas_color = w_props.get_canvas_color();
+
+   // every legend looks like:   ---o---  legend_name
+   //                            |  |  |  |
+   //                           x0 x1 x2 xt
+   //
+const int x0 = w_props.get_legend_X();               // left of    --o--
+const int x1 = x0 + 30;                              // point o in --o--
+const int x2 = x1 + 30;                              // end of     --o--
+const int xt = x2 + 10;                              // text after --o--
+
+const int y0 = w_props.get_legend_Y();               // y of first legends
+const int dy = w_props.get_legend_dY();
+
+   // draw legend background
+   {
+     enum { mask = XCB_GC_FOREGROUND };
+     xcb_change_gc(pctx.conn, pctx.fill, mask, &canvas_color);
+     xcb_rectangle_t rect = { int16_t(x0 - 10),
+                              int16_t(y0 -  8),
+                              uint16_t(20 + xt + longest_size.width - x0),
+                              uint16_t(dy*line_count) };
+     xcb_poly_fill_rectangle(pctx.conn, pctx.window, pctx.fill, 1, &rect);
+     xcb_flush(pctx.conn);
+   }
 
    for (int l = 0; l_props[l]; ++l)
        {
          const Plot_line_properties & lp = *l_props[l];
 
          enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-         const uint32_t gc_l[] = { lp.line_color, lp.line_width };
+         const uint32_t gc_l[] = { lp.line_color,  lp.line_width };
          const uint32_t gc_p[] = { lp.point_color, lp.point_size };
 
-         const int x0 = w_props.get_legend_X();
-         const int x1 = x0 + (w_props.get_legend_X() >> 1);
-         const int x2 = x1 + (w_props.get_legend_X() >> 1);
-         const int xt = x2 + 10;
-         const int y  = w_props.get_legend_Y() + l*w_props.get_legend_dY();
+         const Pixel_Y y1 = y0 + l*dy;
 
          xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
-         draw_line(pctx, pctx.line, Pixel_XY(x0, y), Pixel_XY(x2, y));
-         draw_text(pctx, lp.legend_name.c_str(), Pixel_XY(xt, y + 5));
+         draw_line(pctx, pctx.line, Pixel_XY(x0, y1), Pixel_XY(x2, y1));
+         draw_text(pctx, lp.legend_name.c_str(), Pixel_XY(xt, y1 + 5));
          xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
-         draw_point(pctx, Pixel_XY(x1, y), canvas_color, *l_props[l]);
+         draw_point(pctx, Pixel_XY(x1, y1), canvas_color, *l_props[l]);
        }
+     xcb_flush(pctx.conn);
 }
 //-----------------------------------------------------------------------------
 /// draw the grid lines that start at the X axis
@@ -2098,7 +2196,7 @@ void
 do_plot(const Plot_context & pctx,
         const Plot_window_properties & w_props, const Plot_data & data)
 {
-   // draw the background
+   // draw the canvas background
    //
 const Color canvas_color = w_props.get_canvas_color();
    {
@@ -2109,13 +2207,22 @@ const Color canvas_color = w_props.get_canvas_color();
      xcb_poly_fill_rectangle(pctx.conn, pctx.window, pctx.line, 1, &rect);
    }
 
-const bool surface = data.is_surface_plot();
+const bool surface = data.is_surface_plot();   // 2D or 3D plot ?
+
+   // draw grid lines...
+   //
    draw_Y_grid(pctx, w_props, surface);
    draw_X_grid(pctx, w_props, surface);
    if (surface)   draw_Z_grid(pctx, w_props);
-   draw_legend(pctx, w_props);
+
+   // draw plot lines...
+   //
    if  (surface)   draw_surface_lines(pctx, w_props, data);
    else            draw_plot_lines(pctx, w_props, data);
+
+   // draw legend...
+   //
+   draw_legend(pctx, w_props);
 }
 //-----------------------------------------------------------------------------
 xcb_atom_t
@@ -2299,6 +2406,7 @@ const Plot_data & data = w_props.get_plot_data();
    // open a connection to the X server
    //
 Display * dpy = XOpenDisplay(0);
+   pctx.display = dpy;
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
    pctx.conn = XGetXCBConnection(dpy);
 
@@ -2472,9 +2580,9 @@ bool file_saved = false;
                                            focusReply->focus, XCB_CURRENT_TIME);
                        focusReply = 0;
                     }
-                 xcb_flush(pctx.conn);
-                 sem_post(Quad_PLOT::plot_window_sema);
-                 break;
+                  xcb_flush(pctx.conn);
+                  sem_post(Quad_PLOT::plot_window_sema);
+                  break;
 
              case XCB_UNMAP_NOTIFY:       // 18
                   if (w_props.get_verbosity() & SHOW_EVENTS)
@@ -2495,7 +2603,7 @@ bool file_saved = false;
                   // XCB_EXPOSE has occurred.
                   {
                     const xcb_configure_notify_event_t * notify =
-                          reinterpret_cast<const xcb_configure_notify_event_t *>
+                          reinterpret_cast<const xcb_configure_notify_event_t*>
                              (event);
                     w_props.set_window_size(notify->width, notify->height);
                   }
