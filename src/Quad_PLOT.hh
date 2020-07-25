@@ -32,6 +32,14 @@
 class Plot_window_properties;
 class Plot_data;
 
+/// ⎕PLOT vervosity
+enum
+{
+   SHOW_EVENTS = 1,   ///< show X events
+   SHOW_DATA   = 2,   ///< show APL data
+   SHOW_DRAW   = 4,   ///< show draw details
+};
+
 /// The class implementing ⎕PLOT
 class Quad_PLOT : public QuadFunction
 {

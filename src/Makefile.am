@@ -82,8 +82,12 @@ NumericCell.cc					NumericCell.hh		\
 Output.cc					Output.hh		\
 						PJob.hh		\
 Parser.cc					Parser.hh		\
-Prefix.cc		Prefix.def		Prefix.hh		\
 PointerCell.cc					PointerCell.hh		\
+Prefix.cc		Prefix.def		Prefix.hh		\
+Plot_line_properties.cc				Plot_line_properties.hh	\
+Plot_data.cc					Plot_data.hh	\
+Plot_xcb.cc					Plot_xcb.hh	\
+Plot_window_properties.cc			Plot_window_properties.hh\
 PrimitiveFunction.cc				PrimitiveFunction.hh	\
 PrimitiveOperator.cc				PrimitiveOperator.hh	\
 PrintBuffer.cc					PrintBuffer.hh		\

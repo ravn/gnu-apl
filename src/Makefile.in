@@ -190,8 +190,11 @@ am__lib_gnu_apl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
 	NativeFunction.cc NativeFunction.hh Native_interface.hh \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_xcb.cc \
+	Plot_xcb.hh Plot_window_properties.cc \
+	Plot_window_properties.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -271,8 +274,11 @@ am__objects_5 = lib_gnu_apl_la-Archive.lo lib_gnu_apl_la-Assert.lo \
 	lib_gnu_apl_la-Nabla.lo lib_gnu_apl_la-Macro.lo \
 	lib_gnu_apl_la-NamedObject.lo lib_gnu_apl_la-NativeFunction.lo \
 	lib_gnu_apl_la-NumericCell.lo lib_gnu_apl_la-Output.lo \
-	lib_gnu_apl_la-Parser.lo lib_gnu_apl_la-Prefix.lo \
-	lib_gnu_apl_la-PointerCell.lo \
+	lib_gnu_apl_la-Parser.lo lib_gnu_apl_la-PointerCell.lo \
+	lib_gnu_apl_la-Prefix.lo \
+	lib_gnu_apl_la-Plot_line_properties.lo \
+	lib_gnu_apl_la-Plot_data.lo lib_gnu_apl_la-Plot_xcb.lo \
+	lib_gnu_apl_la-Plot_window_properties.lo \
 	lib_gnu_apl_la-PrimitiveFunction.lo \
 	lib_gnu_apl_la-PrimitiveOperator.lo \
 	lib_gnu_apl_la-PrintBuffer.lo lib_gnu_apl_la-QuadFunction.lo \
@@ -345,8 +351,11 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
 	NativeFunction.cc NativeFunction.hh Native_interface.hh \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_xcb.cc \
+	Plot_xcb.hh Plot_window_properties.cc \
+	Plot_window_properties.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -418,20 +427,22 @@ am__objects_10 = libapl_la-Archive.lo libapl_la-Assert.lo \
 	libapl_la-Malloc_hooks.lo libapl_la-Nabla.lo \
 	libapl_la-Macro.lo libapl_la-NamedObject.lo \
 	libapl_la-NativeFunction.lo libapl_la-NumericCell.lo \
-	libapl_la-Output.lo libapl_la-Parser.lo libapl_la-Prefix.lo \
-	libapl_la-PointerCell.lo libapl_la-PrimitiveFunction.lo \
-	libapl_la-PrimitiveOperator.lo libapl_la-PrintBuffer.lo \
-	libapl_la-QuadFunction.lo libapl_la-ProcessorID.lo \
-	libapl_la-Quad_CR.lo libapl_la-Quad_DLX.lo \
-	libapl_la-Quad_FFT.lo libapl_la-Quad_FIO.lo \
-	libapl_la-Quad_FX.lo libapl_la-Quad_GTK.lo \
-	libapl_la-Quad_MAP.lo libapl_la-Quad_PLOT.lo \
-	libapl_la-Quad_RE.lo libapl_la-Quad_RL.lo \
-	libapl_la-Quad_RVAL.lo libapl_la-Quad_SQL.lo \
-	libapl_la-Quad_SVx.lo libapl_la-Quad_TF.lo \
-	libapl_la-Quad_WA.lo libapl_la-Parallel.lo \
-	libapl_la-Performance.lo libapl_la-RealCell.lo \
-	libapl_la-sbrk.lo libapl_la-Shape.lo \
+	libapl_la-Output.lo libapl_la-Parser.lo \
+	libapl_la-PointerCell.lo libapl_la-Prefix.lo \
+	libapl_la-Plot_line_properties.lo libapl_la-Plot_data.lo \
+	libapl_la-Plot_xcb.lo libapl_la-Plot_window_properties.lo \
+	libapl_la-PrimitiveFunction.lo libapl_la-PrimitiveOperator.lo \
+	libapl_la-PrintBuffer.lo libapl_la-QuadFunction.lo \
+	libapl_la-ProcessorID.lo libapl_la-Quad_CR.lo \
+	libapl_la-Quad_DLX.lo libapl_la-Quad_FFT.lo \
+	libapl_la-Quad_FIO.lo libapl_la-Quad_FX.lo \
+	libapl_la-Quad_GTK.lo libapl_la-Quad_MAP.lo \
+	libapl_la-Quad_PLOT.lo libapl_la-Quad_RE.lo \
+	libapl_la-Quad_RL.lo libapl_la-Quad_RVAL.lo \
+	libapl_la-Quad_SQL.lo libapl_la-Quad_SVx.lo \
+	libapl_la-Quad_TF.lo libapl_la-Quad_WA.lo \
+	libapl_la-Parallel.lo libapl_la-Performance.lo \
+	libapl_la-RealCell.lo libapl_la-sbrk.lo libapl_la-Shape.lo \
 	libapl_la-ScalarFunction.lo libapl_la-Security.lo \
 	libapl_la-StateIndicator.lo libapl_la-Svar_DB.lo \
 	libapl_la-Svar_record.lo libapl_la-Symbol.lo \
@@ -481,8 +492,11 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
 	NativeFunction.cc NativeFunction.hh Native_interface.hh \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_xcb.cc \
+	Plot_xcb.hh Plot_window_properties.cc \
+	Plot_window_properties.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -555,8 +569,11 @@ am__objects_15 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
 	apl-Nabla.$(OBJEXT) apl-Macro.$(OBJEXT) \
 	apl-NamedObject.$(OBJEXT) apl-NativeFunction.$(OBJEXT) \
 	apl-NumericCell.$(OBJEXT) apl-Output.$(OBJEXT) \
-	apl-Parser.$(OBJEXT) apl-Prefix.$(OBJEXT) \
-	apl-PointerCell.$(OBJEXT) apl-PrimitiveFunction.$(OBJEXT) \
+	apl-Parser.$(OBJEXT) apl-PointerCell.$(OBJEXT) \
+	apl-Prefix.$(OBJEXT) apl-Plot_line_properties.$(OBJEXT) \
+	apl-Plot_data.$(OBJEXT) apl-Plot_xcb.$(OBJEXT) \
+	apl-Plot_window_properties.$(OBJEXT) \
+	apl-PrimitiveFunction.$(OBJEXT) \
 	apl-PrimitiveOperator.$(OBJEXT) apl-PrintBuffer.$(OBJEXT) \
 	apl-QuadFunction.$(OBJEXT) apl-ProcessorID.$(OBJEXT) \
 	apl-Quad_CR.$(OBJEXT) apl-Quad_DLX.$(OBJEXT) \
@@ -907,8 +924,11 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
 	NativeFunction.cc NativeFunction.hh Native_interface.hh \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_xcb.cc \
+	Plot_xcb.hh Plot_window_properties.cc \
+	Plot_window_properties.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -1212,6 +1232,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Parallel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Performance.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_data.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_line_properties.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_window_properties.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_xcb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PointerCell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Prefix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PrimitiveFunction.Po@am__quote@
@@ -1314,6 +1338,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Parallel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Performance.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo@am__quote@
@@ -1416,6 +1444,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Parallel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Performance.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_line_properties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_window_properties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_xcb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PointerCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Prefix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo@am__quote@
@@ -1872,6 +1904,13 @@ lib_gnu_apl_la-Parser.lo: Parser.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Parser.lo `test -f 'Parser.cc' || echo '$(srcdir)/'`Parser.cc
 
+lib_gnu_apl_la-PointerCell.lo: PointerCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-PointerCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-PointerCell.Tpo -c -o lib_gnu_apl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-PointerCell.Tpo $(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PointerCell.cc' object='lib_gnu_apl_la-PointerCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+
 lib_gnu_apl_la-Prefix.lo: Prefix.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Prefix.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Prefix.Tpo -c -o lib_gnu_apl_la-Prefix.lo `test -f 'Prefix.cc' || echo '$(srcdir)/'`Prefix.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Prefix.Tpo $(DEPDIR)/lib_gnu_apl_la-Prefix.Plo
@@ -1879,12 +1918,33 @@ lib_gnu_apl_la-Prefix.lo: Prefix.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Prefix.lo `test -f 'Prefix.cc' || echo '$(srcdir)/'`Prefix.cc
 
-lib_gnu_apl_la-PointerCell.lo: PointerCell.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-PointerCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-PointerCell.Tpo -c -o lib_gnu_apl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-PointerCell.Tpo $(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PointerCell.cc' object='lib_gnu_apl_la-PointerCell.lo' libtool=yes @AMDEPBACKSLASH@
+lib_gnu_apl_la-Plot_line_properties.lo: Plot_line_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_line_properties.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Tpo -c -o lib_gnu_apl_la-Plot_line_properties.lo `test -f 'Plot_line_properties.cc' || echo '$(srcdir)/'`Plot_line_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_line_properties.cc' object='lib_gnu_apl_la-Plot_line_properties.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_line_properties.lo `test -f 'Plot_line_properties.cc' || echo '$(srcdir)/'`Plot_line_properties.cc
+
+lib_gnu_apl_la-Plot_data.lo: Plot_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_data.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_data.Tpo -c -o lib_gnu_apl_la-Plot_data.lo `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_data.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_data.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_data.cc' object='lib_gnu_apl_la-Plot_data.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_data.lo `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
+
+lib_gnu_apl_la-Plot_xcb.lo: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='lib_gnu_apl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+
+lib_gnu_apl_la-Plot_window_properties.lo: Plot_window_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_window_properties.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Tpo -c -o lib_gnu_apl_la-Plot_window_properties.lo `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_window_properties.cc' object='lib_gnu_apl_la-Plot_window_properties.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_window_properties.lo `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
 
 lib_gnu_apl_la-PrimitiveFunction.lo: PrimitiveFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-PrimitiveFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Tpo -c -o lib_gnu_apl_la-PrimitiveFunction.lo `test -f 'PrimitiveFunction.cc' || echo '$(srcdir)/'`PrimitiveFunction.cc
@@ -2642,6 +2702,13 @@ libapl_la-Parser.lo: Parser.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Parser.lo `test -f 'Parser.cc' || echo '$(srcdir)/'`Parser.cc
 
+libapl_la-PointerCell.lo: PointerCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-PointerCell.lo -MD -MP -MF $(DEPDIR)/libapl_la-PointerCell.Tpo -c -o libapl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-PointerCell.Tpo $(DEPDIR)/libapl_la-PointerCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PointerCell.cc' object='libapl_la-PointerCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+
 libapl_la-Prefix.lo: Prefix.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Prefix.lo -MD -MP -MF $(DEPDIR)/libapl_la-Prefix.Tpo -c -o libapl_la-Prefix.lo `test -f 'Prefix.cc' || echo '$(srcdir)/'`Prefix.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Prefix.Tpo $(DEPDIR)/libapl_la-Prefix.Plo
@@ -2649,12 +2716,33 @@ libapl_la-Prefix.lo: Prefix.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Prefix.lo `test -f 'Prefix.cc' || echo '$(srcdir)/'`Prefix.cc
 
-libapl_la-PointerCell.lo: PointerCell.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-PointerCell.lo -MD -MP -MF $(DEPDIR)/libapl_la-PointerCell.Tpo -c -o libapl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-PointerCell.Tpo $(DEPDIR)/libapl_la-PointerCell.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PointerCell.cc' object='libapl_la-PointerCell.lo' libtool=yes @AMDEPBACKSLASH@
+libapl_la-Plot_line_properties.lo: Plot_line_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_line_properties.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_line_properties.Tpo -c -o libapl_la-Plot_line_properties.lo `test -f 'Plot_line_properties.cc' || echo '$(srcdir)/'`Plot_line_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_line_properties.Tpo $(DEPDIR)/libapl_la-Plot_line_properties.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_line_properties.cc' object='libapl_la-Plot_line_properties.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_line_properties.lo `test -f 'Plot_line_properties.cc' || echo '$(srcdir)/'`Plot_line_properties.cc
+
+libapl_la-Plot_data.lo: Plot_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_data.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_data.Tpo -c -o libapl_la-Plot_data.lo `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_data.Tpo $(DEPDIR)/libapl_la-Plot_data.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_data.cc' object='libapl_la-Plot_data.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_data.lo `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
+
+libapl_la-Plot_xcb.lo: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_xcb.Tpo -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_xcb.Tpo $(DEPDIR)/libapl_la-Plot_xcb.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='libapl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+
+libapl_la-Plot_window_properties.lo: Plot_window_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_window_properties.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_window_properties.Tpo -c -o libapl_la-Plot_window_properties.lo `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_window_properties.Tpo $(DEPDIR)/libapl_la-Plot_window_properties.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_window_properties.cc' object='libapl_la-Plot_window_properties.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_window_properties.lo `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
 
 libapl_la-PrimitiveFunction.lo: PrimitiveFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-PrimitiveFunction.lo -MD -MP -MF $(DEPDIR)/libapl_la-PrimitiveFunction.Tpo -c -o libapl_la-PrimitiveFunction.lo `test -f 'PrimitiveFunction.cc' || echo '$(srcdir)/'`PrimitiveFunction.cc
@@ -3783,6 +3871,20 @@ apl-Parser.obj: Parser.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Parser.obj `if test -f 'Parser.cc'; then $(CYGPATH_W) 'Parser.cc'; else $(CYGPATH_W) '$(srcdir)/Parser.cc'; fi`
 
+apl-PointerCell.o: PointerCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-PointerCell.o -MD -MP -MF $(DEPDIR)/apl-PointerCell.Tpo -c -o apl-PointerCell.o `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-PointerCell.Tpo $(DEPDIR)/apl-PointerCell.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PointerCell.cc' object='apl-PointerCell.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-PointerCell.o `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+
+apl-PointerCell.obj: PointerCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-PointerCell.obj -MD -MP -MF $(DEPDIR)/apl-PointerCell.Tpo -c -o apl-PointerCell.obj `if test -f 'PointerCell.cc'; then $(CYGPATH_W) 'PointerCell.cc'; else $(CYGPATH_W) '$(srcdir)/PointerCell.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-PointerCell.Tpo $(DEPDIR)/apl-PointerCell.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PointerCell.cc' object='apl-PointerCell.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-PointerCell.obj `if test -f 'PointerCell.cc'; then $(CYGPATH_W) 'PointerCell.cc'; else $(CYGPATH_W) '$(srcdir)/PointerCell.cc'; fi`
+
 apl-Prefix.o: Prefix.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Prefix.o -MD -MP -MF $(DEPDIR)/apl-Prefix.Tpo -c -o apl-Prefix.o `test -f 'Prefix.cc' || echo '$(srcdir)/'`Prefix.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Prefix.Tpo $(DEPDIR)/apl-Prefix.Po
@@ -3797,19 +3899,61 @@ apl-Prefix.obj: Prefix.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Prefix.obj `if test -f 'Prefix.cc'; then $(CYGPATH_W) 'Prefix.cc'; else $(CYGPATH_W) '$(srcdir)/Prefix.cc'; fi`
 
-apl-PointerCell.o: PointerCell.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-PointerCell.o -MD -MP -MF $(DEPDIR)/apl-PointerCell.Tpo -c -o apl-PointerCell.o `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-PointerCell.Tpo $(DEPDIR)/apl-PointerCell.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PointerCell.cc' object='apl-PointerCell.o' libtool=no @AMDEPBACKSLASH@
+apl-Plot_line_properties.o: Plot_line_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_line_properties.o -MD -MP -MF $(DEPDIR)/apl-Plot_line_properties.Tpo -c -o apl-Plot_line_properties.o `test -f 'Plot_line_properties.cc' || echo '$(srcdir)/'`Plot_line_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_line_properties.Tpo $(DEPDIR)/apl-Plot_line_properties.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_line_properties.cc' object='apl-Plot_line_properties.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-PointerCell.o `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_line_properties.o `test -f 'Plot_line_properties.cc' || echo '$(srcdir)/'`Plot_line_properties.cc
 
-apl-PointerCell.obj: PointerCell.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-PointerCell.obj -MD -MP -MF $(DEPDIR)/apl-PointerCell.Tpo -c -o apl-PointerCell.obj `if test -f 'PointerCell.cc'; then $(CYGPATH_W) 'PointerCell.cc'; else $(CYGPATH_W) '$(srcdir)/PointerCell.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-PointerCell.Tpo $(DEPDIR)/apl-PointerCell.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PointerCell.cc' object='apl-PointerCell.obj' libtool=no @AMDEPBACKSLASH@
+apl-Plot_line_properties.obj: Plot_line_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_line_properties.obj -MD -MP -MF $(DEPDIR)/apl-Plot_line_properties.Tpo -c -o apl-Plot_line_properties.obj `if test -f 'Plot_line_properties.cc'; then $(CYGPATH_W) 'Plot_line_properties.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_line_properties.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_line_properties.Tpo $(DEPDIR)/apl-Plot_line_properties.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_line_properties.cc' object='apl-Plot_line_properties.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-PointerCell.obj `if test -f 'PointerCell.cc'; then $(CYGPATH_W) 'PointerCell.cc'; else $(CYGPATH_W) '$(srcdir)/PointerCell.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_line_properties.obj `if test -f 'Plot_line_properties.cc'; then $(CYGPATH_W) 'Plot_line_properties.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_line_properties.cc'; fi`
+
+apl-Plot_data.o: Plot_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_data.o -MD -MP -MF $(DEPDIR)/apl-Plot_data.Tpo -c -o apl-Plot_data.o `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_data.Tpo $(DEPDIR)/apl-Plot_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_data.cc' object='apl-Plot_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_data.o `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
+
+apl-Plot_data.obj: Plot_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_data.obj -MD -MP -MF $(DEPDIR)/apl-Plot_data.Tpo -c -o apl-Plot_data.obj `if test -f 'Plot_data.cc'; then $(CYGPATH_W) 'Plot_data.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_data.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_data.Tpo $(DEPDIR)/apl-Plot_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_data.cc' object='apl-Plot_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_data.obj `if test -f 'Plot_data.cc'; then $(CYGPATH_W) 'Plot_data.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_data.cc'; fi`
+
+apl-Plot_xcb.o: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.o -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+
+apl-Plot_xcb.obj: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.obj -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
+
+apl-Plot_window_properties.o: Plot_window_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_window_properties.o -MD -MP -MF $(DEPDIR)/apl-Plot_window_properties.Tpo -c -o apl-Plot_window_properties.o `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_window_properties.Tpo $(DEPDIR)/apl-Plot_window_properties.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_window_properties.cc' object='apl-Plot_window_properties.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_window_properties.o `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
+
+apl-Plot_window_properties.obj: Plot_window_properties.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_window_properties.obj -MD -MP -MF $(DEPDIR)/apl-Plot_window_properties.Tpo -c -o apl-Plot_window_properties.obj `if test -f 'Plot_window_properties.cc'; then $(CYGPATH_W) 'Plot_window_properties.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_window_properties.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_window_properties.Tpo $(DEPDIR)/apl-Plot_window_properties.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_window_properties.cc' object='apl-Plot_window_properties.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_window_properties.obj `if test -f 'Plot_window_properties.cc'; then $(CYGPATH_W) 'Plot_window_properties.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_window_properties.cc'; fi`
 
 apl-PrimitiveFunction.o: PrimitiveFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-PrimitiveFunction.o -MD -MP -MF $(DEPDIR)/apl-PrimitiveFunction.Tpo -c -o apl-PrimitiveFunction.o `test -f 'PrimitiveFunction.cc' || echo '$(srcdir)/'`PrimitiveFunction.cc
