@@ -1485,27 +1485,5 @@ bool file_saved = false;
 }
 // ===========================================================================
 
-#else // one or more libs are missing. Tell which one(s)
-
-# if !HAVE_LIBX11
-#  error "MISSING: HAVE_LIBX11"
-# endif
-
-# if !HAVE_LIBXCB
-#  error "MISSING: HAVE_LIBXCB"
-# endif
-
-# if !HAVE_LIBX11_XCB
-#  error "MISSING: HAVE_LIBX11_XCB"
-# endif
-
-# if !HAVE_X11_XLIB_XCB_H
-#  error "MISSING: HAVE_X11_XLIB_XCB_H"
-# endif
-
-# error "MISSING X LIBRARIES"
-
-// ===========================================================================
-
 #endif // HAVE_LIBX11 && HAVE_LIBXCB && HAVE_LIBX11_XCB && HAVE_X11_XLIB_XCB_H
 
