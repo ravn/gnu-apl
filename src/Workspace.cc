@@ -652,8 +652,11 @@ ofstream outf(filename.c_str(), ofstream::out);
 
    the_workspace.WS_name = wsname;
 
+   Log(LOG_archive)   CERR << "constructing XML_Saving_Archive." << endl;
 XML_Saving_Archive ar(outf);
+   Log(LOG_archive)   CERR << "saving XML_Saving_Archive..." << endl;
    ar.save();
+   Log(LOG_archive)   CERR << "done XML_Saving_Archive." << endl;
 
    // print time and date to COUT
    get_v_Quad_TZ().print_timestamp(out, now());

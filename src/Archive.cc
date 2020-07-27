@@ -169,6 +169,8 @@ const Vid parent_vid = values[vid]._par;
 XML_Saving_Archive &
 XML_Saving_Archive::save_Ravel(Vid vid)
 {
+   Log(LOG_archive)   CERR << "save_Ravel(Vid " << vid << ")" << endl;
+
 const Value & v = *values[vid]._val;
 
 int space = do_indent();
@@ -353,6 +355,8 @@ XML_Saving_Archive::save_Parser(const Prefix & prefix)
 void
 XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
 {
+   Log(LOG_archive)   CERR << "save_symtab()" << endl;
+
 std::vector<const Symbol *> symbols = symtab.get_all_symbols();
 
    // remove erased symbols
@@ -401,6 +405,8 @@ std::vector<const Symbol *> symbols = symtab.get_all_symbols();
 void
 XML_Saving_Archive::save_SI_entry(const StateIndicator & si)
 {
+   Log(LOG_archive)   CERR << "save_SI_entry()" << endl;
+
 const Executable & exec = *si.get_executable();
 
    do_indent();
@@ -474,6 +480,8 @@ const Executable & exec = *si.get_executable();
 void
 XML_Saving_Archive::save_Symbol(const Symbol & sym)
 {
+   Log(LOG_archive)   CERR << "save_Symbol(Vid " << sym.get_name() << ")" << endl;
+
    do_indent();
    out << "<Symbol name=\"" << sym.get_name() << "\" stack-size=\""
        << sym.value_stack_size() << "\">" << endl;
@@ -490,6 +498,7 @@ void
 XML_Saving_Archive::save_user_commands(
                const std::vector<Command::user_command> & cmds)
 {
+   Log(LOG_archive)   CERR << "save_user_commands()" << endl;
    if (cmds.size() == 0)   return;
 
    do_indent();
@@ -602,6 +611,7 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
 void
 XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 {
+   Log(LOG_archive)   CERR << "save_vstack_item()" << endl;
    switch(vsi.name_class)
       {
         case NC_UNUSED_USER_NAME:
@@ -652,6 +662,8 @@ const void * Bv = (reinterpret_cast<const _val_par *>(B))->_val;
 XML_Saving_Archive &
 XML_Saving_Archive::save()
 {
+   Log(LOG_archive)   CERR << "save()" << endl;
+
 tm * t;
    {
      timeval now;
@@ -793,7 +805,10 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
    // collect all values to be saved. We mark the values to avoid
    // saving of stale values and unmark the used values
    //
+   Log(LOG_archive)   CERR << "save() marks values..." << endl;
    Value::mark_all_dynamic_values();
+
+   Log(LOG_archive)   CERR << "save() unmarks values..." << endl;
    Workspace::unmark_all_values();
 
    for (const DynamicObject * dob = DynamicObject::get_all_values()->get_next();
@@ -807,7 +822,26 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
          ++value_count;
        }
 
-   values = new _val_par[value_count];
+   Log(LOG_archive)
+      CERR << "save() allocates values[" << value_count << "]..." << endl;
+
+   try
+      {
+        values = new _val_par[value_count];
+      }
+   catch(...)
+      {
+        MORE_ERROR() << 
+           "XML_Saving_Archive::save() could not allocate values["
+               << value_count << "]: (lack of memory).\n"
+            "Your workspace may be corrupt (possibly due "
+               "to a previous WS FULL ?).\n"
+            "You should not )SAVE it. Maybe )DUMP the workspace instead?."
+           ;
+         WS_FULL;
+      }
+   Log(LOG_archive)   CERR << "save() done allocating values[]..." << endl;
+
 ShapeItem idx = 0;
 
    for (const DynamicObject * dob = DynamicObject::get_all_values()->get_next();

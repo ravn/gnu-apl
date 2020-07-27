@@ -75,8 +75,7 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
 void
 Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
 {
-   // window_width and window_height are, despite of their names, the
-   // size of the plot area (without borders).
+   // pa_width and pa_height are the size of the plot area (without borders).
    //
    pa_width  = width  - pa_border_L - origin_X - pa_border_R;
    pa_height = height - pa_border_T - origin_Y - pa_border_B;

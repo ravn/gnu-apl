@@ -658,7 +658,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
             const ssize_t len = recv(3, TLV, 8, MSG_PEEK);
             if (len != 8)
                {
-                 cerr << "TLV socked closed (1): " << strerror(errno) << endl;
+                 cerr << "TLV socket closed (1): " << strerror(errno) << endl;
                  close(3);
                  __sem_destroy(drawarea_sema);
                  return 0;
@@ -682,7 +682,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
           const ssize_t rx_len = read(3, TLV, TLV_buflen);
           if (rx_len < 8)
              {
-               cerr << "TLV socked closed (2): " << strerror(errno) << endl;
+               cerr << "TLV socket closed (2): " << strerror(errno) << endl;
                close(3);
                __sem_destroy(drawarea_sema);
                return 0;
@@ -700,7 +700,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 
           if (rx_len != V_len + 8)
              {
-               cerr << "TLV socked closed (3): "
+               cerr << "TLV socket closed (3): "
                     << strerror(errno) << ": V_len=" << V_len
                                        << " rx_len=" << rx_len << endl;
                close(3);

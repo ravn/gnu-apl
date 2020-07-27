@@ -135,7 +135,9 @@ using namespace std;
 #include "Plot_data.hh"
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
-#include "Plot_xcb.hh"
+
+// the pthread that handles one plot window.
+extern void * plot_main(void * vp_props);
 
 //=============================================================================
 Quad_PLOT::Quad_PLOT()

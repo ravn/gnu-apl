@@ -192,32 +192,32 @@ am__lib_gnu_apl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
 	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_xcb.cc \
-	Plot_xcb.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
-	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
-	Security.cc Security.def Security.hh StateIndicator.cc \
-	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
-	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
-	SystemLimits.def SystemLimits.hh SystemVariable.cc \
-	SystemVariable.def SystemVariable.hh TabExpansion.cc \
-	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
-	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_gtk.cc \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh \
+	Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_GTK.cc \
+	Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Parallel.cc Parallel.hh Performance.cc Performance.def \
+	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
+	Shape.hh ScalarFunction.cc ScalarFunction.hh Security.cc \
+	Security.def Security.hh StateIndicator.cc StateIndicator.hh \
+	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
+	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
+	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
+	SystemLimits.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
+	Thread_context.cc Thread_context.hh Token.cc Token.def \
+	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
+	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
+	Unicode.hh UserFunction.cc UserFunction.hh \
+	UserFunction_header.cc UserFunction_header.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
 	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
@@ -277,7 +277,7 @@ am__objects_5 = lib_gnu_apl_la-Archive.lo lib_gnu_apl_la-Assert.lo \
 	lib_gnu_apl_la-Parser.lo lib_gnu_apl_la-PointerCell.lo \
 	lib_gnu_apl_la-Prefix.lo \
 	lib_gnu_apl_la-Plot_line_properties.lo \
-	lib_gnu_apl_la-Plot_data.lo lib_gnu_apl_la-Plot_xcb.lo \
+	lib_gnu_apl_la-Plot_data.lo lib_gnu_apl_la-Plot_gtk.lo \
 	lib_gnu_apl_la-Plot_window_properties.lo \
 	lib_gnu_apl_la-PrimitiveFunction.lo \
 	lib_gnu_apl_la-PrimitiveOperator.lo \
@@ -353,32 +353,32 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
 	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_xcb.cc \
-	Plot_xcb.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
-	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
-	Security.cc Security.def Security.hh StateIndicator.cc \
-	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
-	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
-	SystemLimits.def SystemLimits.hh SystemVariable.cc \
-	SystemVariable.def SystemVariable.hh TabExpansion.cc \
-	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
-	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_gtk.cc \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh \
+	Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_GTK.cc \
+	Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Parallel.cc Parallel.hh Performance.cc Performance.def \
+	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
+	Shape.hh ScalarFunction.cc ScalarFunction.hh Security.cc \
+	Security.def Security.hh StateIndicator.cc StateIndicator.hh \
+	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
+	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
+	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
+	SystemLimits.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
+	Thread_context.cc Thread_context.hh Token.cc Token.def \
+	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
+	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
+	Unicode.hh UserFunction.cc UserFunction.hh \
+	UserFunction_header.cc UserFunction_header.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
 	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
@@ -430,7 +430,7 @@ am__objects_10 = libapl_la-Archive.lo libapl_la-Assert.lo \
 	libapl_la-Output.lo libapl_la-Parser.lo \
 	libapl_la-PointerCell.lo libapl_la-Prefix.lo \
 	libapl_la-Plot_line_properties.lo libapl_la-Plot_data.lo \
-	libapl_la-Plot_xcb.lo libapl_la-Plot_window_properties.lo \
+	libapl_la-Plot_gtk.lo libapl_la-Plot_window_properties.lo \
 	libapl_la-PrimitiveFunction.lo libapl_la-PrimitiveOperator.lo \
 	libapl_la-PrintBuffer.lo libapl_la-QuadFunction.lo \
 	libapl_la-ProcessorID.lo libapl_la-Quad_CR.lo \
@@ -494,32 +494,32 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
 	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_xcb.cc \
-	Plot_xcb.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
-	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
-	Security.cc Security.def Security.hh StateIndicator.cc \
-	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
-	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
-	SystemLimits.def SystemLimits.hh SystemVariable.cc \
-	SystemVariable.def SystemVariable.hh TabExpansion.cc \
-	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
-	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_gtk.cc \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh \
+	Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_GTK.cc \
+	Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Parallel.cc Parallel.hh Performance.cc Performance.def \
+	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
+	Shape.hh ScalarFunction.cc ScalarFunction.hh Security.cc \
+	Security.def Security.hh StateIndicator.cc StateIndicator.hh \
+	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
+	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
+	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
+	SystemLimits.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
+	Thread_context.cc Thread_context.hh Token.cc Token.def \
+	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
+	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
+	Unicode.hh UserFunction.cc UserFunction.hh \
+	UserFunction_header.cc UserFunction_header.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
 	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
@@ -571,7 +571,7 @@ am__objects_15 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
 	apl-NumericCell.$(OBJEXT) apl-Output.$(OBJEXT) \
 	apl-Parser.$(OBJEXT) apl-PointerCell.$(OBJEXT) \
 	apl-Prefix.$(OBJEXT) apl-Plot_line_properties.$(OBJEXT) \
-	apl-Plot_data.$(OBJEXT) apl-Plot_xcb.$(OBJEXT) \
+	apl-Plot_data.$(OBJEXT) apl-Plot_gtk.$(OBJEXT) \
 	apl-Plot_window_properties.$(OBJEXT) \
 	apl-PrimitiveFunction.$(OBJEXT) \
 	apl-PrimitiveOperator.$(OBJEXT) apl-PrintBuffer.$(OBJEXT) \
@@ -893,9 +893,9 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(am__append_4) \
-	$(am__append_8)
-common_LDFLAGS = $(am__append_5) $(am__append_9)
+common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) -rdynamic $(GTK_CFLAGS) \
+	$(GTK_LIBS) $(am__append_4) $(am__append_8)
+common_LDFLAGS = $(GTK_LDFLAGS) -lX11 $(am__append_5) $(am__append_9)
 common_SOURCES = buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
 	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
@@ -926,32 +926,32 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
 	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_xcb.cc \
-	Plot_xcb.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
-	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
-	Security.cc Security.def Security.hh StateIndicator.cc \
-	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
-	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
-	SystemLimits.def SystemLimits.hh SystemVariable.cc \
-	SystemVariable.def SystemVariable.hh TabExpansion.cc \
-	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
-	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_gtk.cc \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh \
+	Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_GTK.cc \
+	Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Parallel.cc Parallel.hh Performance.cc Performance.def \
+	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
+	Shape.hh ScalarFunction.cc ScalarFunction.hh Security.cc \
+	Security.def Security.hh StateIndicator.cc StateIndicator.hh \
+	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
+	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
+	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
+	SystemLimits.hh SystemVariable.cc SystemVariable.def \
+	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
+	Thread_context.cc Thread_context.hh Token.cc Token.def \
+	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
+	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
+	Unicode.hh UserFunction.cc UserFunction.hh \
+	UserFunction_header.cc UserFunction_header.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
 	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
@@ -1233,9 +1233,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Performance.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_data.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_gtk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_line_properties.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_window_properties.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_xcb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PointerCell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Prefix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PrimitiveFunction.Po@am__quote@
@@ -1339,9 +1339,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Performance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo@am__quote@
@@ -1445,9 +1445,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Performance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_gtk.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_line_properties.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_window_properties.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_xcb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PointerCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Prefix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo@am__quote@
@@ -1932,12 +1932,12 @@ lib_gnu_apl_la-Plot_data.lo: Plot_data.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_data.lo `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
 
-lib_gnu_apl_la-Plot_xcb.lo: Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='lib_gnu_apl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+lib_gnu_apl_la-Plot_gtk.lo: Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_gtk.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Tpo -c -o lib_gnu_apl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='lib_gnu_apl_la-Plot_gtk.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
 
 lib_gnu_apl_la-Plot_window_properties.lo: Plot_window_properties.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_window_properties.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Tpo -c -o lib_gnu_apl_la-Plot_window_properties.lo `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
@@ -2730,12 +2730,12 @@ libapl_la-Plot_data.lo: Plot_data.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_data.lo `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
 
-libapl_la-Plot_xcb.lo: Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_xcb.Tpo -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_xcb.Tpo $(DEPDIR)/libapl_la-Plot_xcb.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='libapl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+libapl_la-Plot_gtk.lo: Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_gtk.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_gtk.Tpo -c -o libapl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_gtk.Tpo $(DEPDIR)/libapl_la-Plot_gtk.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='libapl_la-Plot_gtk.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
 
 libapl_la-Plot_window_properties.lo: Plot_window_properties.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_window_properties.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_window_properties.Tpo -c -o libapl_la-Plot_window_properties.lo `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
@@ -3927,19 +3927,19 @@ apl-Plot_data.obj: Plot_data.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_data.obj `if test -f 'Plot_data.cc'; then $(CYGPATH_W) 'Plot_data.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_data.cc'; fi`
 
-apl-Plot_xcb.o: Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.o -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.o' libtool=no @AMDEPBACKSLASH@
+apl-Plot_gtk.o: Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_gtk.o -MD -MP -MF $(DEPDIR)/apl-Plot_gtk.Tpo -c -o apl-Plot_gtk.o `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_gtk.Tpo $(DEPDIR)/apl-Plot_gtk.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='apl-Plot_gtk.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_gtk.o `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
 
-apl-Plot_xcb.obj: Plot_xcb.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.obj -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.obj' libtool=no @AMDEPBACKSLASH@
+apl-Plot_gtk.obj: Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_gtk.obj -MD -MP -MF $(DEPDIR)/apl-Plot_gtk.Tpo -c -o apl-Plot_gtk.obj `if test -f 'Plot_gtk.cc'; then $(CYGPATH_W) 'Plot_gtk.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_gtk.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_gtk.Tpo $(DEPDIR)/apl-Plot_gtk.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='apl-Plot_gtk.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_gtk.obj `if test -f 'Plot_gtk.cc'; then $(CYGPATH_W) 'Plot_gtk.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_gtk.cc'; fi`
 
 apl-Plot_window_properties.o: Plot_window_properties.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_window_properties.o -MD -MP -MF $(DEPDIR)/apl-Plot_window_properties.Tpo -c -o apl-Plot_window_properties.o `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc

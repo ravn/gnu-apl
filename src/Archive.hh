@@ -57,6 +57,7 @@ public:
    XML_Saving_Archive(ofstream & of)
    : indent(0),
      out(of),
+     values(0),
      value_count(0),
      char_mode(false)
    {}

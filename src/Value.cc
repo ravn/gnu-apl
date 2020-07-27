@@ -227,7 +227,7 @@ const int64_t used_memory
         << " current sbrk(): 0x" << top_of_memory() << endl
         << " alloc_size:     0x" << alloc_size << dec << " ("
                                  << alloc_size << ")" << endl
-        << "  used memory:   0x" << hex  << used_memory << dec
+        << " used memory:    0x" << hex  << used_memory << dec
                                  << " (" << used_memory << ")" << endl;
 
    MORE_ERROR() << "new Value(" << args << ") failed (" << ex.what() << ")";
@@ -1445,7 +1445,7 @@ const ShapeItem ec = nz_element_count();
         print(CERR) << endl
            << "************************************************"
            << endl;
-        Assert(0 && "corrupt ravel");
+        Assert(0 && "corrupt ravel ");
       }
 #endif
 
@@ -1873,9 +1873,16 @@ bool goon = true;
 
    // then print more info...
    //
+int count = 0;
    loop(s, incomplete.size())
       {
         incomplete[s]->print_stale_info(out, incomplete[s]);
+        if (++count > 20)   // its getting boring
+           {
+             CERR << endl << " ... ( " << (incomplete.size() - count) 
+                  << " more incomplete values)..." << endl;
+             break;
+           }
       }
 
    return incomplete.size();
@@ -1917,7 +1924,12 @@ int count = 0;
         const DynamicObject * dob = stale_dobs[s];
         const Value * val = stale_vals[s];
         val->print_stale_info(out, dob);
-        ++count;
+        if (++count > 20)   // its getting boring
+           {
+             CERR << endl << " ... ( " << (stale_vals.size() - count) 
+                  << " more stale values)..." << endl;
+             break;
+           }
        }
 
    // mark all dynamic values, and then unmark those known in the workspace
@@ -1948,8 +1960,10 @@ int count = 0;
 
          if (val->is_marked())
             {
-              val->print_stale_info(out, dob);
               ++count;
+              if (count < 20)   val->print_stale_info(out, dob);
+              else if (count == 20)
+              CERR << endl << " ... (more stale values)..." << endl;
               val->unmark();
             }
        }
@@ -1973,7 +1987,7 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob) const
         Z->print(out);
         out << endl;
       }
-   catch (...)   { out << " *** corrupt ***"; }
+   catch (...)   { out << " *** corrupt stale ***"; }
 
    out << endl;
 }
