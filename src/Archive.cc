@@ -611,7 +611,9 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
 void
 XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 {
-   Log(LOG_archive)   CERR << "save_vstack_item()" << endl;
+   Log(LOG_archive)   CERR << "    save_vstack_item(name_class "
+                           << vsi.name_class << ")" << endl;
+
    switch(vsi.name_class)
       {
         case NC_UNUSED_USER_NAME:
