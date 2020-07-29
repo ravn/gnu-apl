@@ -472,6 +472,7 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            else
                               {
                                  Value_P Z1(A1->get_shape(), LOC);
+                                 if (!Z1)   WS_FULL;
                                  new (&cell_Z)
                                      PointerCell(Z1.get(),*job_AB->value_Z,
                                                  0x6B616769);
