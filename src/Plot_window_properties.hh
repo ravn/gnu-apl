@@ -42,10 +42,7 @@ public:
    Plot_window_properties(const Plot_data * data, int verbosity);
 
    /// destructor
-   ~Plot_window_properties()
-      {
-        delete &plot_data;
-      }
+   ~Plot_window_properties();
 
    /// update derived properties after changing primary ones, return \b true
    /// on error
@@ -114,7 +111,6 @@ public:
 
    /// convert \n val_Z to the relative Z vector (q. quadrant)
    Pixel_Z valZ2pixel(double val_Z) const
-
       { return  val_Z * scale_Z; }
 
    /// convert values \b val_X,  \b val_Y,  and \b val_Z, to the X and Y
@@ -191,6 +187,7 @@ public:
    /// return the 3D color gradient
    const vector<level_color> & get_gradient() const
       { return gradient; }
+
    /// for level 0.0 <= alpha <= 1.0: return the color for alpha according
    /// to \b gradient
    uint32_t get_color(double alpha) const;

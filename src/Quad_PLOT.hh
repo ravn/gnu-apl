@@ -32,7 +32,7 @@
 class Plot_window_properties;
 class Plot_data;
 
-/// ⎕PLOT vervosity
+/// ⎕PLOT verbosity
 enum
 {
    SHOW_EVENTS = 1,   ///< show X events

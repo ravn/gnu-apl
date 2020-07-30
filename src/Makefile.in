@@ -91,6 +91,10 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @WANT_ANDROID_FALSE@am__append_1 = APs emacs_mode sql workspaces
+
+# depending on HAVE_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc, but
+# keep both in the tar file (hence EXTRA_apl_SOURCES).
+#
 @HAVE_GTK3_TRUE@am__append_2 = Gtk
 @HAVE_LIBPCRE2_32_TRUE@am__append_3 = \
 @HAVE_LIBPCRE2_32_TRUE@Regexp.cc                                       Regexp.hh
@@ -162,11 +166,12 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 lib_gnu_apl_la_LIBADD =
-am__lib_gnu_apl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh \
-	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
+am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
+	buildtag.hh ../config.h APL_Float_as_class.hh APL_types.hh \
+	Archive.cc Archive.hh ArrayIterator.hh Assert.cc Assert.hh \
+	Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
+	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_FORMAT.cc \
+	Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
 	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
 	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
 	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
@@ -192,7 +197,7 @@ am__lib_gnu_apl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
 	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_gtk.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
 	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
@@ -230,22 +235,24 @@ am__lib_gnu_apl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh python_apl.cc
-@HAVE_LIBPCRE2_32_TRUE@am__objects_1 = lib_gnu_apl_la-Regexp.lo
+@HAVE_GTK3_FALSE@am__objects_1 = lib_gnu_apl_la-Plot_xcb.lo
+@HAVE_GTK3_TRUE@am__objects_1 = lib_gnu_apl_la-Plot_gtk.lo
+@HAVE_LIBPCRE2_32_TRUE@am__objects_2 = lib_gnu_apl_la-Regexp.lo
 am__dirstamp = $(am__leading_dot)dirstamp
-@SQLITE3_TRUE@am__objects_2 =  \
+@SQLITE3_TRUE@am__objects_3 =  \
 @SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteArgListBuilder.lo \
 @SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteConnection.lo \
 @SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteResultValue.lo \
 @SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteProvider.lo \
 @SQLITE3_TRUE@	sql/lib_gnu_apl_la-Connection.lo
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_3 = sql/lib_gnu_apl_la-Connection.lo
-@POSTGRES_TRUE@am__objects_4 =  \
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_4 = sql/lib_gnu_apl_la-Connection.lo
+@POSTGRES_TRUE@am__objects_5 =  \
 @POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresArgListBuilder.lo \
 @POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresConnection.lo \
 @POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresProvider.lo
-am__objects_5 = lib_gnu_apl_la-Archive.lo lib_gnu_apl_la-Assert.lo \
-	lib_gnu_apl_la-Avec.lo lib_gnu_apl_la-Backtrace.lo \
-	lib_gnu_apl_la-Bif_F12_DOMINO.lo \
+am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
+	lib_gnu_apl_la-Assert.lo lib_gnu_apl_la-Avec.lo \
+	lib_gnu_apl_la-Backtrace.lo lib_gnu_apl_la-Bif_F12_DOMINO.lo \
 	lib_gnu_apl_la-Bif_F12_FORMAT.lo \
 	lib_gnu_apl_la-Bif_F12_PARTITION_PICK.lo \
 	lib_gnu_apl_la-Bif_F12_SORT.lo \
@@ -277,7 +284,7 @@ am__objects_5 = lib_gnu_apl_la-Archive.lo lib_gnu_apl_la-Assert.lo \
 	lib_gnu_apl_la-Parser.lo lib_gnu_apl_la-PointerCell.lo \
 	lib_gnu_apl_la-Prefix.lo \
 	lib_gnu_apl_la-Plot_line_properties.lo \
-	lib_gnu_apl_la-Plot_data.lo lib_gnu_apl_la-Plot_gtk.lo \
+	lib_gnu_apl_la-Plot_data.lo \
 	lib_gnu_apl_la-Plot_window_properties.lo \
 	lib_gnu_apl_la-PrimitiveFunction.lo \
 	lib_gnu_apl_la-PrimitiveOperator.lo \
@@ -306,10 +313,10 @@ am__objects_5 = lib_gnu_apl_la-Archive.lo lib_gnu_apl_la-Assert.lo \
 	lib_gnu_apl_la-UserPreferences.lo \
 	lib_gnu_apl_la-UTF8_string.lo lib_gnu_apl_la-Value.lo \
 	lib_gnu_apl_la-ValueHistory.lo lib_gnu_apl_la-Workspace.lo \
-	lib_gnu_apl_la-static_Objects.lo $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_4)
+	lib_gnu_apl_la-static_Objects.lo $(am__objects_2) \
+	$(am__objects_3) $(am__objects_4) $(am__objects_5)
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(am__objects_5) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(am__objects_6) \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
 lib_gnu_apl_la_OBJECTS = $(am_lib_gnu_apl_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -323,11 +330,12 @@ lib_gnu_apl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_rpath = -rpath \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(pkglibdir)
 libapl_la_LIBADD =
-am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh \
-	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
+am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
+	buildtag.hh ../config.h APL_Float_as_class.hh APL_types.hh \
+	Archive.cc Archive.hh ArrayIterator.hh Assert.cc Assert.hh \
+	Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
+	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_FORMAT.cc \
+	Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
 	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
 	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
 	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
@@ -353,7 +361,7 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
 	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_gtk.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
 	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
@@ -392,20 +400,22 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
 	libapl.cc
-@HAVE_LIBPCRE2_32_TRUE@am__objects_6 = libapl_la-Regexp.lo
-@SQLITE3_TRUE@am__objects_7 = sql/libapl_la-SqliteArgListBuilder.lo \
+@HAVE_GTK3_FALSE@am__objects_7 = libapl_la-Plot_xcb.lo
+@HAVE_GTK3_TRUE@am__objects_7 = libapl_la-Plot_gtk.lo
+@HAVE_LIBPCRE2_32_TRUE@am__objects_8 = libapl_la-Regexp.lo
+@SQLITE3_TRUE@am__objects_9 = sql/libapl_la-SqliteArgListBuilder.lo \
 @SQLITE3_TRUE@	sql/libapl_la-SqliteConnection.lo \
 @SQLITE3_TRUE@	sql/libapl_la-SqliteResultValue.lo \
 @SQLITE3_TRUE@	sql/libapl_la-SqliteProvider.lo \
 @SQLITE3_TRUE@	sql/libapl_la-Connection.lo
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_8 =  \
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_10 =  \
 @POSTGRES_TRUE@@SQLITE3_FALSE@	sql/libapl_la-Connection.lo
-@POSTGRES_TRUE@am__objects_9 =  \
+@POSTGRES_TRUE@am__objects_11 =  \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresArgListBuilder.lo \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresConnection.lo \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresProvider.lo
-am__objects_10 = libapl_la-Archive.lo libapl_la-Assert.lo \
-	libapl_la-Avec.lo libapl_la-Backtrace.lo \
+am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
+	libapl_la-Assert.lo libapl_la-Avec.lo libapl_la-Backtrace.lo \
 	libapl_la-Bif_F12_DOMINO.lo libapl_la-Bif_F12_FORMAT.lo \
 	libapl_la-Bif_F12_PARTITION_PICK.lo libapl_la-Bif_F12_SORT.lo \
 	libapl_la-Bif_F12_TAKE_DROP.lo libapl_la-Bif_OPER1_COMMUTE.lo \
@@ -430,7 +440,7 @@ am__objects_10 = libapl_la-Archive.lo libapl_la-Assert.lo \
 	libapl_la-Output.lo libapl_la-Parser.lo \
 	libapl_la-PointerCell.lo libapl_la-Prefix.lo \
 	libapl_la-Plot_line_properties.lo libapl_la-Plot_data.lo \
-	libapl_la-Plot_gtk.lo libapl_la-Plot_window_properties.lo \
+	libapl_la-Plot_window_properties.lo \
 	libapl_la-PrimitiveFunction.lo libapl_la-PrimitiveOperator.lo \
 	libapl_la-PrintBuffer.lo libapl_la-QuadFunction.lo \
 	libapl_la-ProcessorID.lo libapl_la-Quad_CR.lo \
@@ -454,9 +464,9 @@ am__objects_10 = libapl_la-Archive.lo libapl_la-Assert.lo \
 	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
 	libapl_la-Value.lo libapl_la-ValueHistory.lo \
 	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_9)
-@WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_10) \
+	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
+	$(am__objects_11)
+@WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_12) \
 @WANT_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
 libapl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -464,11 +474,12 @@ libapl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(libapl_la_LDFLAGS) $(LDFLAGS) -o $@
 @WANT_LIBAPL_TRUE@am_libapl_la_rpath = -rpath $(pkglibdir)
 PROGRAMS = $(bin_PROGRAMS)
-am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
-	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
-	Backtrace.cc Backtrace.hh Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh \
-	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
+am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc buildtag \
+	buildtag.hh ../config.h APL_Float_as_class.hh APL_types.hh \
+	Archive.cc Archive.hh ArrayIterator.hh Assert.cc Assert.hh \
+	Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
+	Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh Bif_F12_FORMAT.cc \
+	Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
 	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
 	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
 	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
@@ -494,7 +505,7 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
 	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_gtk.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
 	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
@@ -532,21 +543,24 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
-@HAVE_LIBPCRE2_32_TRUE@am__objects_11 = apl-Regexp.$(OBJEXT)
-@SQLITE3_TRUE@am__objects_12 = sql/apl-SqliteArgListBuilder.$(OBJEXT) \
+@HAVE_GTK3_FALSE@am__objects_13 = apl-Plot_xcb.$(OBJEXT)
+@HAVE_GTK3_TRUE@am__objects_13 = apl-Plot_gtk.$(OBJEXT)
+@HAVE_LIBPCRE2_32_TRUE@am__objects_14 = apl-Regexp.$(OBJEXT)
+@SQLITE3_TRUE@am__objects_15 = sql/apl-SqliteArgListBuilder.$(OBJEXT) \
 @SQLITE3_TRUE@	sql/apl-SqliteConnection.$(OBJEXT) \
 @SQLITE3_TRUE@	sql/apl-SqliteResultValue.$(OBJEXT) \
 @SQLITE3_TRUE@	sql/apl-SqliteProvider.$(OBJEXT) \
 @SQLITE3_TRUE@	sql/apl-Connection.$(OBJEXT)
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_13 =  \
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_16 =  \
 @POSTGRES_TRUE@@SQLITE3_FALSE@	sql/apl-Connection.$(OBJEXT)
-@POSTGRES_TRUE@am__objects_14 =  \
+@POSTGRES_TRUE@am__objects_17 =  \
 @POSTGRES_TRUE@	sql/apl-PostgresArgListBuilder.$(OBJEXT) \
 @POSTGRES_TRUE@	sql/apl-PostgresConnection.$(OBJEXT) \
 @POSTGRES_TRUE@	sql/apl-PostgresProvider.$(OBJEXT)
-am__objects_15 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
-	apl-Avec.$(OBJEXT) apl-Backtrace.$(OBJEXT) \
-	apl-Bif_F12_DOMINO.$(OBJEXT) apl-Bif_F12_FORMAT.$(OBJEXT) \
+am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
+	apl-Assert.$(OBJEXT) apl-Avec.$(OBJEXT) \
+	apl-Backtrace.$(OBJEXT) apl-Bif_F12_DOMINO.$(OBJEXT) \
+	apl-Bif_F12_FORMAT.$(OBJEXT) \
 	apl-Bif_F12_PARTITION_PICK.$(OBJEXT) \
 	apl-Bif_F12_SORT.$(OBJEXT) apl-Bif_F12_TAKE_DROP.$(OBJEXT) \
 	apl-Bif_OPER1_COMMUTE.$(OBJEXT) apl-Bif_OPER1_EACH.$(OBJEXT) \
@@ -571,8 +585,7 @@ am__objects_15 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
 	apl-NumericCell.$(OBJEXT) apl-Output.$(OBJEXT) \
 	apl-Parser.$(OBJEXT) apl-PointerCell.$(OBJEXT) \
 	apl-Prefix.$(OBJEXT) apl-Plot_line_properties.$(OBJEXT) \
-	apl-Plot_data.$(OBJEXT) apl-Plot_gtk.$(OBJEXT) \
-	apl-Plot_window_properties.$(OBJEXT) \
+	apl-Plot_data.$(OBJEXT) apl-Plot_window_properties.$(OBJEXT) \
 	apl-PrimitiveFunction.$(OBJEXT) \
 	apl-PrimitiveOperator.$(OBJEXT) apl-PrintBuffer.$(OBJEXT) \
 	apl-QuadFunction.$(OBJEXT) apl-ProcessorID.$(OBJEXT) \
@@ -597,11 +610,12 @@ am__objects_15 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
-	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
-	$(am__objects_14)
+	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
+	$(am__objects_17)
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@am_apl_OBJECTS =  \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	apl-main.$(OBJEXT) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(am__objects_15)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(am__objects_18)
+am__EXTRA_apl_SOURCES_DIST = Plot_gtk.cc Plot_xcb.cc
 apl_OBJECTS = $(am_apl_OBJECTS)
 am__DEPENDENCIES_1 =
 apl_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -661,9 +675,10 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(lib_gnu_apl_la_SOURCES) $(libapl_la_SOURCES) \
-	$(apl_SOURCES)
+	$(apl_SOURCES) $(EXTRA_apl_SOURCES)
 DIST_SOURCES = $(am__lib_gnu_apl_la_SOURCES_DIST) \
-	$(am__libapl_la_SOURCES_DIST) $(am__apl_SOURCES_DIST)
+	$(am__libapl_la_SOURCES_DIST) $(am__apl_SOURCES_DIST) \
+	$(am__EXTRA_apl_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -888,6 +903,10 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIRS = $(am__append_1)
 SUBDIRS = native $(EXTRA_DIRS) $(am__append_2)
+@HAVE_GTK3_FALSE@plot_SOURCES = Plot_xcb.cc
+@HAVE_GTK3_TRUE@plot_SOURCES = Plot_gtk.cc
+@HAVE_GTK3_FALSE@EXTRA_apl_SOURCES = Plot_gtk.cc
+@HAVE_GTK3_TRUE@EXTRA_apl_SOURCES = Plot_xcb.cc
 DIST_SUBDIRS = $(SUBDIRS) testcases
 distcleancheck_listfile = buildtag
 
@@ -896,7 +915,7 @@ distcleancheck_listfile = buildtag
 common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) -rdynamic $(GTK_CFLAGS) \
 	$(GTK_LIBS) $(am__append_4) $(am__append_8)
 common_LDFLAGS = $(GTK_LDFLAGS) -lX11 $(am__append_5) $(am__append_9)
-common_SOURCES = buildtag buildtag.hh ../config.h \
+common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
 	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
 	Backtrace.cc Backtrace.hh Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh \
@@ -926,7 +945,7 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
 	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh Plot_gtk.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
 	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
@@ -1236,6 +1255,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_gtk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_line_properties.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_window_properties.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Plot_xcb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PointerCell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Prefix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-PrimitiveFunction.Po@am__quote@
@@ -1342,6 +1362,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_line_properties.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo@am__quote@
@@ -1448,6 +1469,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_gtk.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_line_properties.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_window_properties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Plot_xcb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PointerCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Prefix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-PrimitiveFunction.Plo@am__quote@
@@ -1546,6 +1568,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+lib_gnu_apl_la-Plot_xcb.lo: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_xcb.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='lib_gnu_apl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+
+lib_gnu_apl_la-Plot_gtk.lo: Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_gtk.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Tpo -c -o lib_gnu_apl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='lib_gnu_apl_la-Plot_gtk.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
 
 lib_gnu_apl_la-Archive.lo: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Archive.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Archive.Tpo -c -o lib_gnu_apl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
@@ -1931,13 +1967,6 @@ lib_gnu_apl_la-Plot_data.lo: Plot_data.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_data.cc' object='lib_gnu_apl_la-Plot_data.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_data.lo `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
-
-lib_gnu_apl_la-Plot_gtk.lo: Plot_gtk.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_gtk.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Tpo -c -o lib_gnu_apl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Tpo $(DEPDIR)/lib_gnu_apl_la-Plot_gtk.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='lib_gnu_apl_la-Plot_gtk.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
 
 lib_gnu_apl_la-Plot_window_properties.lo: Plot_window_properties.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Plot_window_properties.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Plot_window_properties.Tpo -c -o lib_gnu_apl_la-Plot_window_properties.lo `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
@@ -2345,6 +2374,20 @@ lib_gnu_apl_la-python_apl.lo: python_apl.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-python_apl.lo `test -f 'python_apl.cc' || echo '$(srcdir)/'`python_apl.cc
 
+libapl_la-Plot_xcb.lo: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_xcb.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_xcb.Tpo -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_xcb.Tpo $(DEPDIR)/libapl_la-Plot_xcb.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='libapl_la-Plot_xcb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_xcb.lo `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+
+libapl_la-Plot_gtk.lo: Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_gtk.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_gtk.Tpo -c -o libapl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_gtk.Tpo $(DEPDIR)/libapl_la-Plot_gtk.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='libapl_la-Plot_gtk.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+
 libapl_la-Archive.lo: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Archive.lo -MD -MP -MF $(DEPDIR)/libapl_la-Archive.Tpo -c -o libapl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Archive.Tpo $(DEPDIR)/libapl_la-Archive.Plo
@@ -2729,13 +2772,6 @@ libapl_la-Plot_data.lo: Plot_data.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_data.cc' object='libapl_la-Plot_data.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_data.lo `test -f 'Plot_data.cc' || echo '$(srcdir)/'`Plot_data.cc
-
-libapl_la-Plot_gtk.lo: Plot_gtk.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_gtk.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_gtk.Tpo -c -o libapl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Plot_gtk.Tpo $(DEPDIR)/libapl_la-Plot_gtk.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='libapl_la-Plot_gtk.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Plot_gtk.lo `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
 
 libapl_la-Plot_window_properties.lo: Plot_window_properties.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Plot_window_properties.lo -MD -MP -MF $(DEPDIR)/libapl_la-Plot_window_properties.Tpo -c -o libapl_la-Plot_window_properties.lo `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc
@@ -3156,6 +3192,34 @@ apl-main.obj: main.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cc' object='apl-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`
+
+apl-Plot_xcb.o: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.o -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.o `test -f 'Plot_xcb.cc' || echo '$(srcdir)/'`Plot_xcb.cc
+
+apl-Plot_xcb.obj: Plot_xcb.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_xcb.obj -MD -MP -MF $(DEPDIR)/apl-Plot_xcb.Tpo -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_xcb.Tpo $(DEPDIR)/apl-Plot_xcb.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_xcb.cc' object='apl-Plot_xcb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_xcb.obj `if test -f 'Plot_xcb.cc'; then $(CYGPATH_W) 'Plot_xcb.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_xcb.cc'; fi`
+
+apl-Plot_gtk.o: Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_gtk.o -MD -MP -MF $(DEPDIR)/apl-Plot_gtk.Tpo -c -o apl-Plot_gtk.o `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_gtk.Tpo $(DEPDIR)/apl-Plot_gtk.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='apl-Plot_gtk.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_gtk.o `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
+
+apl-Plot_gtk.obj: Plot_gtk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_gtk.obj -MD -MP -MF $(DEPDIR)/apl-Plot_gtk.Tpo -c -o apl-Plot_gtk.obj `if test -f 'Plot_gtk.cc'; then $(CYGPATH_W) 'Plot_gtk.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_gtk.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_gtk.Tpo $(DEPDIR)/apl-Plot_gtk.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='apl-Plot_gtk.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_gtk.obj `if test -f 'Plot_gtk.cc'; then $(CYGPATH_W) 'Plot_gtk.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_gtk.cc'; fi`
 
 apl-Archive.o: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Archive.o -MD -MP -MF $(DEPDIR)/apl-Archive.Tpo -c -o apl-Archive.o `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
@@ -3926,20 +3990,6 @@ apl-Plot_data.obj: Plot_data.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_data.cc' object='apl-Plot_data.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_data.obj `if test -f 'Plot_data.cc'; then $(CYGPATH_W) 'Plot_data.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_data.cc'; fi`
-
-apl-Plot_gtk.o: Plot_gtk.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_gtk.o -MD -MP -MF $(DEPDIR)/apl-Plot_gtk.Tpo -c -o apl-Plot_gtk.o `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_gtk.Tpo $(DEPDIR)/apl-Plot_gtk.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='apl-Plot_gtk.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_gtk.o `test -f 'Plot_gtk.cc' || echo '$(srcdir)/'`Plot_gtk.cc
-
-apl-Plot_gtk.obj: Plot_gtk.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_gtk.obj -MD -MP -MF $(DEPDIR)/apl-Plot_gtk.Tpo -c -o apl-Plot_gtk.obj `if test -f 'Plot_gtk.cc'; then $(CYGPATH_W) 'Plot_gtk.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_gtk.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Plot_gtk.Tpo $(DEPDIR)/apl-Plot_gtk.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Plot_gtk.cc' object='apl-Plot_gtk.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Plot_gtk.obj `if test -f 'Plot_gtk.cc'; then $(CYGPATH_W) 'Plot_gtk.cc'; else $(CYGPATH_W) '$(srcdir)/Plot_gtk.cc'; fi`
 
 apl-Plot_window_properties.o: Plot_window_properties.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Plot_window_properties.o -MD -MP -MF $(DEPDIR)/apl-Plot_window_properties.Tpo -c -o apl-Plot_window_properties.o `test -f 'Plot_window_properties.cc' || echo '$(srcdir)/'`Plot_window_properties.cc

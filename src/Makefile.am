@@ -3,8 +3,17 @@ if ! WANT_ANDROID
 EXTRA_DIRS += APs emacs_mode sql workspaces
 endif
 SUBDIRS = native $(EXTRA_DIRS)
+
+# depending on HAVE_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc compiled,
+# but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
+#
 if HAVE_GTK3
 SUBDIRS += Gtk
+   plot_SOURCES      = Plot_gtk.cc
+   EXTRA_apl_SOURCES = Plot_xcb.cc
+else
+   plot_SOURCES      = Plot_xcb.cc
+   EXTRA_apl_SOURCES = Plot_gtk.cc
 endif
 
 DIST_SUBDIRS = $(SUBDIRS) testcases
@@ -17,9 +26,10 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Wall -I sql $(CXX_WERROR)
-common_LDFLAGS =
-common_SOURCES =        buildtag		buildtag.hh		\
+common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) -rdynamic $(GTK_CFLAGS) $(GTK_LIBS)
+common_LDFLAGS  = $(GTK_LDFLAGS) -lX11
+common_SOURCES  = $(plot_SOURCES) 					\
+			buildtag		buildtag.hh		\
 						../config.h		\
 						APL_Float_as_class.hh	\
 						APL_types.hh		\
@@ -85,8 +95,7 @@ Parser.cc					Parser.hh		\
 PointerCell.cc					PointerCell.hh		\
 Prefix.cc		Prefix.def		Prefix.hh		\
 Plot_line_properties.cc				Plot_line_properties.hh	\
-Plot_data.cc					Plot_data.hh	\
-Plot_xcb.cc					Plot_xcb.hh	\
+Plot_data.cc					Plot_data.hh		\
 Plot_window_properties.cc			Plot_window_properties.hh\
 PrimitiveFunction.cc				PrimitiveFunction.hh	\
 PrimitiveOperator.cc				PrimitiveOperator.hh	\

@@ -60,7 +60,9 @@ using namespace std;
 # include "Plot_data.hh"
 # include "Plot_line_properties.hh"
 # include "Plot_window_properties.hh"
-# include "Plot_xcb.hh"
+
+/// the pthread that handles one plot window.
+extern void * plot_main(void * vp_props);
 
 #define I1616(x, y) int16_t(x), int16_t(y)
 #define ITEMS(x) sizeof(x)/sizeof(*x), x
@@ -221,7 +223,6 @@ static XftColor black, white, red;
 cairo_surface_t * surface =·
 cairo_t cr = cairo_create(surface);
 
-   ...
 #else   // works reliably
 
    // draw the text

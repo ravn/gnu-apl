@@ -480,7 +480,8 @@ const Executable & exec = *si.get_executable();
 void
 XML_Saving_Archive::save_Symbol(const Symbol & sym)
 {
-   Log(LOG_archive)   CERR << "save_Symbol(Vid " << sym.get_name() << ")" << endl;
+   Log(LOG_archive)   CERR << "save_Symbol(Vid "
+                           << sym.get_name() << ")" << endl;
 
    do_indent();
    out << "<Symbol name=\"" << sym.get_name() << "\" stack-size=\""
@@ -613,7 +614,6 @@ XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 {
    Log(LOG_archive)   CERR << "    save_vstack_item(name_class "
                            << vsi.name_class << ")" << endl;
-
    switch(vsi.name_class)
       {
         case NC_UNUSED_USER_NAME:

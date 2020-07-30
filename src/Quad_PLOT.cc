@@ -171,10 +171,16 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
          WS_FULL;
       }
 
-   if (A->get_rank() > 1)   RANK_ERROR;
+   Log(LOG_Quad_PLOT)
+     CERR << "wprops = " << w_props << " created." << endl;
+
+   // from here on 'data' is owned by 'w_props' (whose destructor
+   // will delete it).
+   //
+   if (A->get_rank() > 1)   { delete w_props;   RANK_ERROR; }
 
 const ShapeItem len_A = A->element_count();
-   if (len_A < 1)   LENGTH_ERROR;
+   if (len_A < 1)   { delete w_props;   LENGTH_ERROR; }
 
 const APL_Integer qio = Workspace::get_IO();
 
@@ -185,6 +191,7 @@ const APL_Integer qio = Workspace::get_IO();
             {
                MORE_ERROR() << "A[" << (a + qio)
                             << "] is not a string in A ⎕PLOT B";
+               delete w_props;
                DOMAIN_ERROR;
             }
 
@@ -193,6 +200,7 @@ const APL_Integer qio = Workspace::get_IO();
             {
                MORE_ERROR() << "A[" << (a + qio)
                             << "] is not a string in A ⎕PLOT B";
+               delete w_props;
                DOMAIN_ERROR;
             }
 
@@ -205,11 +213,14 @@ const APL_Integer qio = Workspace::get_IO();
          if (error)
             {
               MORE_ERROR() << error << " in ⎕PLOT attribute '" << ucs << "'";
+              delete w_props;
               DOMAIN_ERROR;
             }
        }
 
-   if (w_props->update(verbosity))   DOMAIN_ERROR;
+   if (w_props->update(verbosity))   { delete w_props;   DOMAIN_ERROR; }
+
+   // do_plot_data will delete w_props
    return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
 }
 //-----------------------------------------------------------------------------
@@ -569,7 +580,7 @@ Quad_PLOT::help() const
 
 # define gdef(ty,  na,  val, descr)           \
    CERR << setw(20) << #na ":  " << setw(14) \
-        << Plot_data::ty ## _to_str(val) << " (" << #descr << ")" << endl;
+        << Plot_data::ty ## _to_str(val) << " (" << descr << ")" << endl;
 # include "Quad_PLOT.def"
 
    CERR <<
@@ -582,7 +593,7 @@ Quad_PLOT::help() const
 
 # define ldef(ty,  na,  val, descr)             \
    CERR << setw(20) << #na "-N:  " << setw(14) \
-        << Plot_data::ty ## _to_str(val) << " (" << #descr << ")" << endl;
+        << Plot_data::ty ## _to_str(val) << " (" << descr << ")" << endl;
 # include "Quad_PLOT.def"
 
    CERR << right;

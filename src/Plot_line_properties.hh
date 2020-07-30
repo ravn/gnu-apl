@@ -35,7 +35,7 @@ public:
        defined in Quad_PLOT.def, and then override those property that
        have different defaults for different lines.
    **/
-   Plot_line_properties(int lnum) : 
+   Plot_line_properties(int lnum) :
 # define ldef(_ty,  na,  val, _descr) na(val),
 # include "Quad_PLOT.def"
    line_number(lnum)
@@ -55,12 +55,18 @@ public:
         }
    }
 
-   // define the get_XXX() and set_XXX functions for every attributes XXX
+   // define the get_XXX() function for every attribute XXX that is
    // defined in Quad_PLOT.def...
    //
 # define ldef(ty,  na,  _val, _descr)     \
    /** return the value of na **/         \
-   ty get_ ## na() const   { return na; } \
+   ty get_ ## na() const   { return na; }
+# include "Quad_PLOT.def"
+
+   // define the set_XXX functions for every attribute XXX that is
+   // defined in Quad_PLOT.def...
+   //
+# define ldef(ty,  na,  _val, _descr)     \
    /** set the  value of na **/           \
    void set_ ## na(ty val)   { na = val; }
 # include "Quad_PLOT.def"
@@ -68,14 +74,14 @@ public:
    /// print the line properties
    int print(std::ostream & out) const;
 
+protected:
 # define ldef(ty,  na,  _val, descr) /** descr **/ ty na;
 # include "Quad_PLOT.def"
 
   /// plot line number
   const int line_number;   // starting a 0 regardless of ⎕IO
 
-
-  /// a buffer for creating a legend name from a macro
+  /// a buffer for creating a (default) legend name from a macro
   char legend_name_buffer[50];
 };
 //============================================================================

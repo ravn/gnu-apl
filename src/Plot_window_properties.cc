@@ -72,6 +72,15 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
    update(verbosity);
 }
 //-----------------------------------------------------------------------------
+Plot_window_properties::~Plot_window_properties()
+
+{
+   Log(LOG_Quad_PLOT)
+      CERR << "~Plot_window_properties(): deleting plot_data" << endl;
+
+   delete &plot_data;
+}
+//-----------------------------------------------------------------------------
 void
 Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
 {

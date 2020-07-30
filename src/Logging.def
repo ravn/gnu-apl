@@ -64,6 +64,7 @@ log_def(0, Quad_DLX                    , "⎕DLX details                        
 log_def(0, command_DOXY                , "command ]DOXY                       ")
 log_def(0, Value_alloc                 , "details of Value allocation         ")
 log_def(0, Quad_TF                     , "⎕TF details                         ")
+log_def(0, Quad_PLOT                   , "⎕PLOT details                       ")
 
 #undef log_def
 
