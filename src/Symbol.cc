@@ -122,6 +122,7 @@ Symbol::print_verbose(ostream & out) const
 void
 Symbol::assign(Value_P new_value, bool clone, const char * loc)
 {
+   Assert(!!new_value);
    Assert(value_stack.size());
 
    if (!new_value->is_complete())
