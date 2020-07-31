@@ -50,7 +50,7 @@ const char * gui =
 "  <requires lib=\"gtk+\" version=\"3.20\"/>\n"
 "  <object class=\"GtkWindow\" id=\"top-level-window\">\n"
 "    <property name=\"can_focus\">False</property>\n"
-"    <signal name=\"destroy\" handler=\"plot_destroyed\" swapped=\"no\"/>\n"
+// "    <signal name=\"destroy\" handler=\"plot_destroyed\" swapped=\"no\"/>\n"
 "    <child>\n"
 "      <placeholder/>\n"
 "    </child>\n"
@@ -58,7 +58,7 @@ const char * gui =
 "      <object class=\"GtkDrawingArea\" id=\"canvas\">\n"
 "        <property name=\"visible\">True</property>\n"
 "        <property name=\"can_focus\">False</property>\n"
-"        <signal name=\"draw\" handler=\"draw_callback\" swapped=\"no\"/>\n"
+// "        <signal name=\"draw\" handler=\"draw_callback\" swapped=\"no\"/>\n"
 "      </object>\n"
 "    </child>\n"
 "  </object>\n"
@@ -125,6 +125,7 @@ struct Plot_context
 
 /// all Plot_contexts (= all open windows)
 static vector<Plot_context *> all_plot_contexts;
+static int plot_window_count = 0;
 
 //-----------------------------------------------------------------------------
 inline void
@@ -139,7 +140,7 @@ void
 draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
 {
    cairo_set_RGB_source(cr, color);
-   cairo_arc(cr, P0.x, P0.y, 1.0*size, 0.0, 2*M_PI);
+   cairo_arc(cr, P0.x, P0.y, 0.5*size, 0.0, 2*M_PI);
    cairo_fill(cr);
 }
 //-----------------------------------------------------------------------------
@@ -239,7 +240,7 @@ draw_line(cairo_t * cr, const Plot_context & pctx, Color color,
 {
    cairo_set_RGB_source(cr, color);
 
-   cairo_set_line_width(cr, 2.0*line_width);   // 1 pixel = 2 cairo
+   cairo_set_line_width(cr, 1.0*line_width);   // 1 pixel = 2 cairo
    cairo_move_to(cr, P0.x, P0.y);
    cairo_line_to(cr, P1.x, P1.y);
    cairo_stroke(cr);
@@ -703,17 +704,16 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
 
          // draw points...
          //
-         const Color canvas_color = w_props.get_canvas_color();
-         const int point_style  = lp.get_point_style();
          loop(n, data[l].get_N())
              {
                double vx, vy;   data.get_XY(vx, vy, l, n);
                const Pixel_X px = w_props.valX2pixel(vx - w_props.get_min_X())
                                 + w_props.get_origin_X();
                const Pixel_Y py = w_props.valY2pixel(vy - w_props.get_min_Y());
-               draw_point(cr, pctx, Pixel_XY(px, py), point_style,
-                                             lp.get_point_color(),
-                          lp.get_point_size(), canvas_color, lp.get_point_size2());
+               draw_point(cr, pctx, Pixel_XY(px, py),
+                              lp.get_point_style(), lp.get_point_color(),
+                              lp.get_point_size(), w_props.get_canvas_color(),
+                              lp.get_point_size2());
              }
        }
 }
@@ -916,6 +916,43 @@ const bool surface_plot = pctx.w_props.get_plot_data().is_surface_plot();
 }
 //-------------------------------------------------------------------------------
 extern "C" gboolean
+window_event(GtkWidget * top_level);
+
+gboolean
+window_event(GtkWidget * top_level)
+{
+   // find the Plot_context for this event...
+Plot_context * pctx = 0;
+   for (size_t th = 0; th < all_plot_contexts.size(); ++th)
+       {
+           if (all_plot_contexts[th]->window == G_OBJECT(top_level))
+              {
+                pctx = all_plot_contexts[th];
+                break;
+              }
+       }
+
+   if (pctx == 0)
+      {
+        CERR << "*** Could not find thread handling window "
+             << reinterpret_cast<void *>(top_level) << endl;
+        return FALSE;
+      }
+
+GtkWindow * window = GTK_WINDOW(top_level);
+gint width, height;
+   gtk_window_get_size(window, &width, &height);
+
+static int num = 0;
+  0 && CERR << "RESIZE-EVENT " << num++ << ":"
+       << "  width=" << width
+       << "  height=" << height
+       << endl;
+
+  return FALSE;   // event not handled by this handler
+}
+//-------------------------------------------------------------------------------
+extern "C" gboolean
 plot_destroyed(GtkWidget * top_level);
 
 gboolean
@@ -962,9 +999,8 @@ draw_callback(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
    if (verbosity & SHOW_EVENTS)
       CERR << "draw_callback(drawing_area = " << drawing_area << ")" << endl;
 
-   // find the Plot_context for this thread...
+   // find the Plot_context for this event...
    //
-
 Plot_context * pctx = 0;
    for (size_t th = 0; th < all_plot_contexts.size(); ++th)
        {
@@ -1009,7 +1045,7 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
    if (verbosity & SHOW_EVENTS)   CERR << "draw_callback() done." << endl;
    return TRUE;   // event handled by this handler
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void *
 gtk_main_wrapper(void * w_props)
 {
@@ -1017,21 +1053,18 @@ gtk_main_wrapper(void * w_props)
 
    if (verbosity & SHOW_EVENTS)   CERR << "gtk_main() thread done" << endl;
 
-   delete reinterpret_cast<char *>(w_props);
-
    if (verbosity & SHOW_EVENTS)
       CERR << "wprops " << w_props << " deleted." << endl;
 
-   // remove this plot context
-   for (size_t th = 0; th < all_plot_contexts.size(); ++th)
-       {
-         if (w_props == &all_plot_contexts[th]->w_props)
-            {
-              all_plot_contexts[th] = all_plot_contexts.back();
-              usleep(1000);   // let others find back()
-              all_plot_contexts.pop_back();
-            }
-       }
+   if (--plot_window_count == 0)   // last window closed
+      {
+        while (all_plot_contexts.size())
+           {
+             Plot_context * p = all_plot_contexts.back();
+             delete &p->w_props;
+             all_plot_contexts.pop_back();
+           }
+      }
 
    return 0;
 }
@@ -1063,6 +1096,7 @@ Plot_window_properties & w_props =
 Plot_context * pctx = new Plot_context(w_props);
    Assert(pctx);
    all_plot_contexts.push_back(pctx);
+   ++plot_window_count;
 
    pctx->builder = gtk_builder_new_from_string(gui, strlen(gui));
    Assert(pctx->builder);
@@ -1107,8 +1141,10 @@ c++: warning: argument unused during compilation: '-rdynamic' [-Wunused-command-
 
       We therefore connect our signals manually using g_signal_connect_object().
     */
-   g_signal_connect_object(pctx->window, "destroy", G_CALLBACK(plot_destroyed),
-                           0, G_CONNECT_AFTER);
+   g_signal_connect_object(pctx->window, "destroy",
+                           G_CALLBACK(plot_destroyed), 0, G_CONNECT_AFTER);
+   g_signal_connect_object(pctx->window, "event",
+                           G_CALLBACK(window_event), 0, G_CONNECT_AFTER);
    g_signal_connect_object(pctx->canvas, "draw", G_CALLBACK(draw_callback),
                            0, G_CONNECT_AFTER);
 

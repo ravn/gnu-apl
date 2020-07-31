@@ -43,16 +43,6 @@ public:
      snprintf(legend_name_buffer, sizeof(legend_name_buffer),
               "Line-%d", int(lnum + Workspace::get_IO()));
      legend_name = legend_name_buffer;
-     switch(lnum)
-        {
-           default: line_color = point_color = 0x000000;   break;
-           case 0:  line_color = point_color = 0x00E000;   break;
-           case 1:  line_color = point_color = 0xFF0000;   break;
-           case 2:  line_color = point_color = 0x0000FF;   break;
-           case 3:  line_color = point_color = 0xFF00FF;   break;
-           case 4:  line_color = point_color = 0x00FFFF;   break;
-           case 5:  line_color = point_color = 0xFFFF00;   break;
-        }
    }
 
    // define the get_XXX() function for every attribute XXX that is
