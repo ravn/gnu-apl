@@ -250,10 +250,13 @@ const int left_pad = (80 - len)/2;
    for (const char ** l = lines; *l; ++l)
        {
          const char * cl = *l;
-         const int clen = strlen(cl);
-         const int pad = left_pad + (len - clen)/2;
-         loop(p, pad)   out << " ";
-         out << cl << endl;
+         if (const int clen = strlen(cl))   // unless empty line
+            {
+              const int pad = left_pad + (len - clen)/2;
+              loop(p, pad)   out << " ";
+              out << cl;
+            }
+         out<< endl;
        }
 }
 //-----------------------------------------------------------------------------

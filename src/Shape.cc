@@ -84,27 +84,24 @@ Shape::insert_axis(Axis axis, ShapeItem len) const
 {
    if (get_rank() >= MAX_RANK)   LIMIT_ERROR_RANK;
 
+Shape ret;
+
    if (axis <= 0)   // insert before first axis
       {
-        const Shape ret(len);
-        return ret + *this;
+        ret.add_shape_item(len);
+        loop(a, get_rank())          ret.add_shape_item(get_shape_item(a));
       }
-
-   if (uAxis(axis) >= get_rank())   // insert after last axis
+   else if (uAxis(axis) >= get_rank())   // insert after last axis
       {
-        const Shape ret(len);
-        return *this + ret;
+        loop(a, get_rank())          ret.add_shape_item(get_shape_item(a));
+        ret.add_shape_item(len);
       }
-
-   // insert after (including) axis
-   //
-Shape ret;
-   loop(r, axis)
-       ret.add_shape_item(get_shape_item(r));
-
-   ret.add_shape_item(len);
-   loop(r, get_rank() - axis)
-       ret.add_shape_item(get_shape_item(r + axis));
+   else
+      {
+        loop(a, axis)                ret.add_shape_item(get_shape_item(a));
+        ret.add_shape_item(len);
+        loop(a, get_rank() - axis)   ret.add_shape_item(get_shape_item(a + axis));
+      }
 
    return ret;
 }

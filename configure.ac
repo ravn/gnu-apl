@@ -35,20 +35,6 @@ AC_PROG_CC
 
 AC_GNU_SOURCE
 
-# check if the compiler knows -rdynamic
-#
-AC_MSG_CHECKING([whether $CXX accepts -rdynamic])
-apl_save_CXXFLAGS=$CXXFLAGS
-CXXFLAGS="-rdynamic -Werror -Wall"
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], 
- [CAN_rdynamic=yes], [CAN_rdynamic=no])
-CXXFLAGS=$apl_save_CXXFLAGS
-if test "x$CAN_rdynamic" = "xyes"; then
-   AC_SUBST([CXX_RDYNAMIC], ["-rdynamic"])
-fi
-AC_MSG_RESULT([$CAN_rdynamic])
-
-
 ##############################################################################
 # Checks for header files.
 #

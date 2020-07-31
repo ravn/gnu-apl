@@ -19,8 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using namespace std;
-
 /// the pthread that handles one plot window.
 extern void * plot_main(void * vp_props);
 
@@ -81,6 +79,7 @@ struct Plot_context
      builder(0),
      css_provider(0),
      window(0),
+     canvas(0),
      drawing_area(0)
    {}
 
@@ -116,6 +115,9 @@ struct Plot_context
 
    /// the window of this Plot_context
    GObject * window;
+
+   /// the drawing area of this Plot_context (in GUI)
+   GObject * canvas;
 
    /// the drawing area in the window of this Plot_context
    GtkWidget * drawing_area;
@@ -346,9 +348,10 @@ double ly = FONT_SIZE;
 double longest_len = 0.0;
    for (int l = 0; l < line_count; ++l)
        {
-         const char * lstr = l_props[l]->get_legend_name().c_str();
          double lx = 0.0;
-         cairo_string_size(lx, ly, cr, lstr, FONT_NAME, FONT_SIZE);
+         cairo_string_size(lx, ly, cr,
+                           l_props[l]->get_legend_name().c_str(),
+                           FONT_NAME, FONT_SIZE);
          if (longest_len < lx)   longest_len = lx;
        }
 
@@ -1070,6 +1073,8 @@ GError * error = 0;
    Assert(error == 0);
    pctx->window = gtk_builder_get_object(pctx->builder, "top-level-window");
    Assert(pctx->window);
+   pctx->canvas = gtk_builder_get_object(pctx->builder, "canvas");
+   Assert(pctx->canvas);
 
    // drawing_area is the same GObject * as the first argument of draw_callback()
    //
@@ -1085,7 +1090,27 @@ GError * error = 0;
 
    gtk_widget_show_all(GTK_WIDGET(pctx->window));
 
-   gtk_builder_connect_signals(pctx->builder, 0);
+   /*
+      NOTE: supposedly we should connect our signals like this:
+
+      gtk_builder_connect_signals(pctx->builder, 0);
+
+      However, gtk_builder_connect_signals() then complains about -rdynamic not
+      being used, for example
+
+      (⎕PLOT:6029): Gtk-WARNING **: 14:35:25.772: Could not find signal handler 'draw_callback'.  Did you compile with -rdynamic?
+
+      If we fix that by compiling with -rdynamic, then everything works fine
+      with gcc, but clang complains about -rdynamic being used:
+
+c++: warning: argument unused during compilation: '-rdynamic' [-Wunused-command-line-argument]
+
+      We therefore connect our signals manually using g_signal_connect_object().
+    */
+   g_signal_connect_object(pctx->window, "destroy", G_CALLBACK(plot_destroyed),
+                           0, G_CONNECT_AFTER);
+   g_signal_connect_object(pctx->canvas, "draw", G_CALLBACK(draw_callback),
+                           0, G_CONNECT_AFTER);
 
    // fork a handler for Gtk window events.
    //

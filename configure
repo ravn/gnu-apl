@@ -694,7 +694,6 @@ SQLITE3_VERSION
 SQLITE3_LDFLAGS
 SQLITE3_CFLAGS
 LIBOBJS
-CXX_RDYNAMIC
 CXXCPP
 LT_SYS_LIBRARY_PATH
 OTOOL64
@@ -17464,38 +17463,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
-
-
-# check if the compiler knows -rdynamic
-#
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CXX accepts -rdynamic" >&5
-$as_echo_n "checking whether $CXX accepts -rdynamic... " >&6; }
-apl_save_CXXFLAGS=$CXXFLAGS
-CXXFLAGS="-rdynamic -Werror -Wall"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  CAN_rdynamic=yes
-else
-  CAN_rdynamic=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-CXXFLAGS=$apl_save_CXXFLAGS
-if test "x$CAN_rdynamic" = "xyes"; then
-   CXX_RDYNAMIC="-rdynamic"
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $CAN_rdynamic" >&5
-$as_echo "$CAN_rdynamic" >&6; }
 
 
 ##############################################################################

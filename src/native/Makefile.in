@@ -280,7 +280,6 @@ CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
-CXX_RDYNAMIC = @CXX_RDYNAMIC@
 CXX_WERROR = @CXX_WERROR@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -424,10 +423,9 @@ pkglib_LTLIBRARIES = lib_file_io.la		\
 # not to like one of the -module, -shared, or -export-dynamic options when
 # asked to build dylibs.
 #
-common_LDFLAGS = -avoid-version
 # common_LDFLAGS += -module
 # common_LDFLAGS += -shared
-# common_LDFLAGS += -export-dynamic
+common_LDFLAGS = -avoid-version -export-dynamic
 lib_file_io_la_SOURCES = file_io.cc
 lib_file_io_la_CXXFLAGS = $(AM_CXXFLAGS)
 lib_file_io_la_LDFLAGS = $(common_LDFLAGS)

@@ -148,7 +148,6 @@ CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
-CXX_RDYNAMIC = @CXX_RDYNAMIC@
 CXX_WERROR = @CXX_WERROR@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -490,7 +489,7 @@ uninstall-am:
 @WANT_ERLANG_TRUE@	erlc $<
 
 @WANT_ERLANG_TRUE@erlang_APL_nif.so: erlang_APL_nif.c
-@WANT_ERLANG_TRUE@	gcc -o $@ -Wall $(WERROR) -fpic -shared -rdynamic -pthread \
+@WANT_ERLANG_TRUE@	gcc -o $@ -Wall $(WERROR) -fpic -shared -Wl,-E -pthread \
 @WANT_ERLANG_TRUE@ erlang_APL_nif.c -L/usr/local/lib/apl -lapl
 
 @WANT_ERLANG_TRUE@install: erlang_APL_nif.so apl.erl apl_example.erl
