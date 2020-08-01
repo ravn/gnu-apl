@@ -74,7 +74,7 @@ const char * css =
 struct Plot_context
 {
    /// constructor
-   Plot_context(const Plot_window_properties & pwp)
+   Plot_context(Plot_window_properties & pwp)
    : w_props(pwp),
      builder(0),
      css_provider(0),
@@ -102,7 +102,7 @@ struct Plot_context
        }
 
    /// the window properties (as choosen by the user)
-   const Plot_window_properties & w_props;
+   Plot_window_properties & w_props;
 
    /// the GtkBuilder that contains the gui
    GtkBuilder * builder;
@@ -914,44 +914,7 @@ const bool surface_plot = pctx.w_props.get_plot_data().is_surface_plot();
   //
   draw_legend(cr, pctx, surface_plot);
 }
-//-------------------------------------------------------------------------------
-extern "C" gboolean
-window_event(GtkWidget * top_level);
-
-gboolean
-window_event(GtkWidget * top_level)
-{
-   // find the Plot_context for this event...
-Plot_context * pctx = 0;
-   for (size_t th = 0; th < all_plot_contexts.size(); ++th)
-       {
-           if (all_plot_contexts[th]->window == G_OBJECT(top_level))
-              {
-                pctx = all_plot_contexts[th];
-                break;
-              }
-       }
-
-   if (pctx == 0)
-      {
-        CERR << "*** Could not find thread handling window "
-             << reinterpret_cast<void *>(top_level) << endl;
-        return FALSE;
-      }
-
-GtkWindow * window = GTK_WINDOW(top_level);
-gint width, height;
-   gtk_window_get_size(window, &width, &height);
-
-static int num = 0;
-  0 && CERR << "RESIZE-EVENT " << num++ << ":"
-       << "  width=" << width
-       << "  height=" << height
-       << endl;
-
-  return FALSE;   // event not handled by this handler
-}
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 extern "C" gboolean
 plot_destroyed(GtkWidget * top_level);
 
@@ -962,7 +925,7 @@ plot_destroyed(GtkWidget * top_level)
   gtk_main_quit();
   return TRUE;   // event handled by this handler
 }
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 static void
 save_file(Plot_context & pctx, cairo_surface_t * surface)
 {
@@ -996,8 +959,12 @@ draw_callback(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
 {
    // callback from GTK.
 
+const int new_width  = gtk_widget_get_allocated_width(drawing_area);
+const int new_height = gtk_widget_get_allocated_height(drawing_area);
    if (verbosity & SHOW_EVENTS)
-      CERR << "draw_callback(drawing_area = " << drawing_area << ")" << endl;
+      CERR << "draw_callback(drawing_area = " << drawing_area << ")  " 
+
+   << "width: " << new_width << ", height: " << new_height << endl;
 
    // find the Plot_context for this event...
    //
@@ -1018,13 +985,10 @@ Plot_context * pctx = 0;
         return false;
       }
 
-
-GtkWidget * widget = GTK_WIDGET(drawing_area);
+   pctx->w_props.set_window_size(new_width, new_height);
 cairo_surface_t * surface = gdk_window_create_similar_surface(
                                 gtk_widget_get_window(drawing_area),
-                                CAIRO_CONTENT_COLOR,
-                                gtk_widget_get_allocated_width(widget),
-                                gtk_widget_get_allocated_height(widget));
+                                CAIRO_CONTENT_COLOR, new_width, new_height);
 
    {
      cairo_t * cr1 = cairo_create(surface);
@@ -1143,8 +1107,6 @@ c++: warning: argument unused during compilation: '-rdynamic' [-Wunused-command-
     */
    g_signal_connect_object(pctx->window, "destroy",
                            G_CALLBACK(plot_destroyed), 0, G_CONNECT_AFTER);
-   g_signal_connect_object(pctx->window, "event",
-                           G_CALLBACK(window_event), 0, G_CONNECT_AFTER);
    g_signal_connect_object(pctx->canvas, "draw", G_CALLBACK(draw_callback),
                            0, G_CONNECT_AFTER);
 

@@ -27,15 +27,63 @@
 #include <vector>
 
 #include "../config.h"
-#if ! defined(HAVE_LIBX11)
-# define WHY_NOT "libX11.so"
-#elif ! defined(HAVE_LIBXCB)
-# define WHY_NOT "libxcb.so"
-#elif ! defined(HAVE_LIBX11_XCB)
-# define WHY_NOT "libX11-xcb.so"
-#elif ! defined(HAVE_XCB_XCB_H)
-# define WHY_NOT "xcb/xcb.h"
-#endif
+
+// always require libX11
+//
+# if defined( HAVE_LIBX11 )
+#  define MISSING1 ""
+# else
+#  define MISSING_LIBS 1
+#  define MISSING1 " libX11.so"
+#endif       // HAVE_LIBX11
+
+#if HAVE_GTK3                            // ======== GTK based ⎕PLOT ========
+
+# if defined( HAVE_LIBGTK_3 )
+#  define MISSING2 ""
+# else
+#  define MISSING_LIBS 1
+#  define MISSING2 " libgtk-3.so"
+#endif       // HAVE_LIBGTK_3_0
+
+# if defined( HAVE_LIBGDK_3 )
+#  define MISSING3 ""
+# else
+#  define MISSING_LIBS 1
+#  define MISSING3 " libgdk-3.so"
+#endif       // HAVE_LIBGTK_3_0
+
+# if defined( HAVE_LIBCAIRO )
+#  define MISSING4 ""
+# else
+#  define MISSING_LIBS 1
+#  define MISSING4 " libcairo.so"
+#endif       // HAVE_LIBGTK_3_0
+
+#else    // don't HAVE_GTK3:             // ======== XCB based ⎕PLOT ========
+
+# if defined( HAVE_LIBXCB )
+#  define MISSING2 ""
+# else
+#  define MISSING_LIBS 1
+#  define MISSING2 " libxcb.so"
+#endif       // HAVE_LIBXCB
+
+# if defined( HAVE_LIBX11_XCB )
+#  define MISSING3 ""
+# else
+#  define MISSING_LIBS 1
+#  define MISSING3 " libX11-xcb.so"
+#endif       // HAVE_LIBX11_XCB
+
+# if ! defined( HAVE_XCB_XCB_H )
+#  define MISSING_LIBS 1
+#  define MISSING4 " xcb/xcb.h"
+# else
+#  define MISSING4 ""
+# endif      // HAVE_XCB_XCB_H
+
+#endif   // HAVE_GTK3                    // ======== GTK vs. XCB ========
 
 #include "Avec.hh"
 #include "Common.hh"
@@ -63,7 +111,7 @@ sem_t * Quad_PLOT::plot_window_sema = &__plot_window_sema;
  **/
 vector<pthread_t> Quad_PLOT::plot_threads;
 
-#if defined(WHY_NOT)
+#if defined(MISSING_LIBS)
 //-----------------------------------------------------------------------------
 Quad_PLOT::Quad_PLOT()
   : QuadFunction(TOK_Quad_PLOT),
@@ -79,9 +127,9 @@ Token
 Quad_PLOT::eval_B(Value_P B)
 {
     MORE_ERROR() <<
-"⎕PLOT is not available because one or more of its build prerequisites (in\n"
-"particular " WHY_NOT ") was missing, or because it was explicitly\n"
-" disabled in ./configure.";
+"⎕PLOT is not available because some of its build prerequisites (in particular\n"
+MISSING1 MISSING2 MISSING3 MISSING4 ") were either missing,\n"
+" or were explicitly disabled in ./configure.";
 
    SYNTAX_ERROR;
    return Token();
@@ -220,7 +268,8 @@ const APL_Integer qio = Workspace::get_IO();
 
    if (w_props->update(verbosity))   { delete w_props;   DOMAIN_ERROR; }
 
-   // do_plot_data will delete w_props
+   // do_plot_data takes ownership of w_props and will delete w_props
+   //
    return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
 }
 //-----------------------------------------------------------------------------

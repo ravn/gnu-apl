@@ -132,6 +132,9 @@ AC_CHECK_LIB([c],         [initstate_r])
 AC_CHECK_LIB([xcb],       [xcb_connect])
 AC_CHECK_LIB([X11],       [XOpenDisplay])
 AC_CHECK_LIB([X11-xcb],   [XGetXCBConnection])
+AC_CHECK_LIB([gtk-3],     [gtk_init])
+AC_CHECK_LIB([gdk-3],     [gdk_init])
+AC_CHECK_LIB([cairo],     [cairo_fill])
 
 # check if SQLite3 is wanted and installed
 m4_include([m4/ax_lib_sqlite3.m4])            AX_LIB_SQLITE3([])

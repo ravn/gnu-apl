@@ -63,6 +63,9 @@
 /* Define to 1 if you have the `c' library (-lc). */
 #undef HAVE_LIBC
 
+/* Define to 1 if you have the `cairo' library (-lcairo). */
+#undef HAVE_LIBCAIRO
+
 /* Define to 1 iff lib(n)curses is available */
 #undef HAVE_LIBCURSES
 
@@ -74,6 +77,12 @@
 
 /* Define to 1 if you have the `fftw3' library (-lfftw3). */
 #undef HAVE_LIBFFTW3
+
+/* Define to 1 if you have the `gdk-3' library (-lgdk-3). */
+#undef HAVE_LIBGDK_3
+
+/* Define to 1 if you have the `gtk-3' library (-lgtk-3). */
+#undef HAVE_LIBGTK_3
 
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM

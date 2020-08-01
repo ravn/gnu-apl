@@ -166,16 +166,16 @@ uint32_t values[3] = { pctx.screen->black_pixel,
    return gc;
 }
 //-----------------------------------------------------------------------------
-#define XFT   0   /* draw text with Xdt */
-#define PANGO 0   /* draw text with pango */
-#if XFT
-# include <X11/Xft/Xft.h>
-#endif
+# define XFT   0   /* draw text with Xdt */
+# define PANGO 0   /* draw text with pango */
+# if XFT
+#  include <X11/Xft/Xft.h>
+# endif
 
 void
 draw_text(const Plot_context & pctx, const char * label, const Pixel_XY & xy)
 {
-#if XFT
+# if XFT
 
 const int x = xy.x;
 const int y = xy.y;
@@ -218,12 +218,12 @@ static XftColor black, white, red;
 
    xcb_flush(pctx.conn);
 
-#elif PANGO
+# elif PANGO
 
 cairo_surface_t * surface =·
 cairo_t cr = cairo_create(surface);
 
-#else   // works reliably
+# else   // works reliably
 
    // draw the text
    //
@@ -234,7 +234,7 @@ xcb_void_cookie_t textCookie = xcb_image_text_8_checked(pctx.conn,
 
    testCookie(textCookie, pctx.conn,
               "xcb_image_text_8_checked() failed.");
-#endif
+# endif
 }
 //-----------------------------------------------------------------------------
 char *
@@ -449,10 +449,11 @@ void
 draw_point(const Plot_context & pctx, const Pixel_XY & xy, Color canvas_color,
            const Plot_line_properties & l_props)
 {
-const Pixel_X point_size  = l_props.point_size;   // outer point diameter
-const Pixel_X point_size2 = l_props.point_size2;  // inner point diameter
-const int16_t half = point_size >> 1;             // outer point radius
+const Pixel_X point_size  = l_props.get_point_size();   // outer point diameter
+const Pixel_X point_size2 = l_props.get_point_size();   // inner point diameter
+const int16_t half = point_size >> 1;                   // outer point radius
 const int point_style = l_props.get_point_style();
+const Color point_color = l_props.get_point_color();
 
    if (point_style == 1)   // circle
       {
@@ -470,7 +471,7 @@ const int point_style = l_props.get_point_style();
              enum { mask = XCB_GC_FOREGROUND };
              xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
              xcb_poly_fill_arc(pctx.conn, pctx.window, pctx.point, 1, &arc2);
-             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
            }
       }
    else if (point_style == 2)   // triangle ∆
@@ -497,7 +498,7 @@ const int point_style = l_props.get_point_style();
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
            }
       }
    else if (point_style == 3)   // triangle ∇
@@ -525,7 +526,7 @@ const int point_style = l_props.get_point_style();
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
            }
       }
    else if (point_style == 4)   // caro
@@ -552,7 +553,7 @@ const int point_style = l_props.get_point_style();
                            XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS,
                            ITEMS(points2));
-             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
            }
       }
    else if (point_style == 5)   // square
@@ -578,7 +579,7 @@ const int point_style = l_props.get_point_style();
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(pctx.conn, pctx.point, mask, &l_props.point_color);
+             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
            }
       }
 
@@ -634,14 +635,14 @@ const int dy = w_props.get_legend_dY();
          const Plot_line_properties & lp = *l_props[l];
 
          enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-         const uint32_t gc_l[] = { lp.line_color,  lp.line_width };
-         const uint32_t gc_p[] = { lp.point_color, lp.point_size };
+         const uint32_t gc_l[] = { lp.get_line_color(),  lp.get_line_width() };
+         const uint32_t gc_p[] = { lp.get_point_color(), lp.get_point_size() };
 
          const Pixel_Y y1 = y0 + l*dy;
 
          xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
          draw_line(pctx, pctx.line, Pixel_XY(x0, y1), Pixel_XY(x2, y1));
-         draw_text(pctx, lp.legend_name.c_str(), Pixel_XY(xt, y1 + 5));
+         draw_text(pctx, lp.get_legend_name().c_str(), Pixel_XY(xt, y1 + 5));
          xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
          draw_point(pctx, Pixel_XY(x1, y1), canvas_color, *l_props[l]);
        }
@@ -795,7 +796,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
          const Plot_line_properties & lp = *l_props[l];
 
          enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-         const uint32_t gc_l[] = { lp.line_color, lp.line_width };
+         const uint32_t gc_l[] = { lp.get_line_color(), lp.get_line_width() };
          xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
 
          // draw lines between points
@@ -813,7 +814,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
 
          // draw points...
          //
-         const uint32_t gc_p[] = { lp.point_color, lp.point_size };
+         const uint32_t gc_p[] = { lp.get_point_color(), lp.get_point_size() };
          xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
          loop(n, data[l].get_N())
              {
@@ -839,12 +840,12 @@ const Plot_line_properties & lp0 = *l_props[0];
    // 1. setup graphic contexts
    //
 enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-const uint32_t gc_l[] = { lp0.line_color,        // XCB_GC_FOREGROUND
-                          lp0.line_width };      // XCB_GC_LINE_WIDTH
+const uint32_t gc_l[] = { lp0.get_line_color(),        // XCB_GC_FOREGROUND
+                          lp0.get_line_width() };      // XCB_GC_LINE_WIDTH
    xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
 
-const uint32_t gc_p[] = { lp0.point_color,       // XCB_GC_FOREGROUND
-                          lp0.point_size };      // XCB_GC_LINE_WIDTH
+const uint32_t gc_p[] = { lp0.get_point_color(),       // XCB_GC_FOREGROUND
+                          lp0.get_point_size() };      // XCB_GC_LINE_WIDTH
    xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
 
    // 2. draw areas between plot lines...
