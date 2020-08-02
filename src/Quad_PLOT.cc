@@ -606,6 +606,15 @@ union
    return IntScalar(u.ret, LOC);
 }
 //-----------------------------------------------------------------------------
+static UCS_string
+fill14(const std::string & name)
+{
+UTF8_string name_utf(name.c_str());
+UCS_string ret(name_utf);
+   while (ret.size() < 14)   ret += UNI_ASCII_SPACE;
+   return ret;
+}
+
 void
 Quad_PLOT::help() const
 {
@@ -627,9 +636,9 @@ Quad_PLOT::help() const
 
    CERR << left;
 
-# define gdef(ty,  na,  val, descr)           \
-   CERR << setw(20) << #na ":  " << setw(14) \
-        << Plot_data::ty ## _to_str(val) << " (" << descr << ")" << endl;
+# define gdef(ty,  na,  val, descr)                           \
+   CERR << setw(20) << #na ":  " << fill14(Plot_data::ty ## _to_str(val)) \
+        << " (" << descr << ")" << endl;
 # include "Quad_PLOT.def"
 
    CERR <<

@@ -926,6 +926,51 @@ plot_destroyed(GtkWidget * top_level)
   return TRUE;   // event handled by this handler
 }
 //-----------------------------------------------------------------------------
+/// return a new surface with window borders, or 0 on failure
+cairo_surface_t *
+add_border(Plot_context & pctx, cairo_surface_t * old_surface)
+{
+   // gtk_win is the window including borders
+   //
+GtkWindow * gtk_win = GTK_WINDOW(pctx.window);   // the plot window (GTK)
+   Assert(gtk_win);
+int gtk_x, gtk_y, gtk_w, gtk_h;
+   gtk_window_get_position(gtk_win, &gtk_x, &gtk_y);
+   gtk_window_get_size(gtk_win, &gtk_w, &gtk_h);
+
+   // gtd is the window excluding borders (with slightly larger x, y and the
+   // same size
+   //
+GdkWindow * gdk_win = gtk_widget_get_window(GTK_WIDGET(gtk_win));   // dito (GDK)
+   Assert(gdk_win);
+
+int gdk_x, gdk_y;
+   gdk_window_get_position(gdk_win, &gdk_x, &gdk_y);
+
+const int N_border   = gdk_y - gtk_y;   // north border (window caption)
+const int ESW_border = gdk_x - gtk_x;   // east, south, or west border
+
+GdkWindow * root = gdk_get_default_root_window();
+GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(root, gtk_x, gtk_y,
+                                                gtk_w + 2*ESW_border,
+                                                gtk_h + N_border + ESW_border);
+
+cairo_surface_t * ret = gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
+
+   // at this point the window manager has already displayed the window borders,
+   // but not yet the content (since we haven't returned yet). We fix that by
+   // copyingg the new content (which is contained in old_surface) into ret.
+   //
+cairo_t * cr2 = cairo_create(ret);
+   cairo_new_path(cr2);
+   cairo_set_source_surface(cr2, old_surface, ESW_border, N_border);
+   cairo_rectangle(cr2, ESW_border, N_border, gtk_w, gtk_h);
+   cairo_fill(cr2);
+   cairo_destroy(cr2);
+
+   return ret;
+}
+//-----------------------------------------------------------------------------
 static void
 save_file(Plot_context & pctx, cairo_surface_t * surface)
 {
@@ -937,7 +982,18 @@ string fname = w_props.get_output_filename();
    if (fname.size() < 4 || strcmp(".png", fname.c_str() + fname.size() - 4))
       fname += ".png";
 
-const cairo_status_t stat = cairo_surface_write_to_png(surface, fname.c_str());
+cairo_status_t stat;
+
+   if (cairo_surface_t * file_surface = add_border(pctx, surface))
+      {
+        stat = cairo_surface_write_to_png(file_surface, fname.c_str());
+        cairo_surface_destroy(file_surface);
+      }
+   else   // adding window boarder failed (or not desired)
+      {
+        stat = cairo_surface_write_to_png(surface, fname.c_str());
+      }
+
    if (stat == CAIRO_STATUS_SUCCESS)
       {
         CERR << "wrote output file: " << fname << endl;
@@ -1000,7 +1056,6 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
    //
    cairo_set_source_surface(cr, surface, 0, 0);
    cairo_paint(cr);
-
 
    save_file(*pctx, surface);
 
