@@ -43,43 +43,12 @@ const char * FONT_NAME = "sans-serif";
 enum {  FONT_SIZE = 10 };
 
 // ===========================================================================
-const char * gui =
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-"<!-- Generated with glade 3.22.1 -->\n"
-"<interface>\n"
-"  <requires lib=\"gtk+\" version=\"3.20\"/>\n"
-"  <object class=\"GtkWindow\" id=\"top-level-window\">\n"
-"    <property name=\"can_focus\">False</property>\n"
-// "    <signal name=\"destroy\" handler=\"plot_destroyed\" swapped=\"no\"/>\n"
-"    <child>\n"
-"      <placeholder/>\n"
-"    </child>\n"
-"    <child>\n"
-"      <object class=\"GtkDrawingArea\" id=\"canvas\">\n"
-"        <property name=\"visible\">True</property>\n"
-"        <property name=\"can_focus\">False</property>\n"
-// "        <signal name=\"draw\" handler=\"draw_callback\" swapped=\"no\"/>\n"
-"      </object>\n"
-"    </child>\n"
-"  </object>\n"
-"</interface>\n"
-;
-
-// plot window CSS (none yet)
-
-const char * css =
-"\n"
-;
-//-------------------------------------------------------------------------------
 struct Plot_context
 {
    /// constructor
    Plot_context(Plot_window_properties & pwp)
    : w_props(pwp),
-     builder(0),
-     css_provider(0),
      window(0),
-     canvas(0),
      drawing_area(0)
    {}
 
@@ -104,20 +73,11 @@ struct Plot_context
    /// the window properties (as choosen by the user)
    Plot_window_properties & w_props;
 
-   /// the GtkBuilder that contains the gui
-   GtkBuilder * builder;
-
-   /// the GtkCssProvider that contains the CSS for the gui
-   GtkCssProvider * css_provider;
-
    /// the pthread_t that handles this Plot_context
    pthread_t thread;
 
    /// the window of this Plot_context
-   GObject * window;
-
-   /// the drawing area of this Plot_context (in GUI)
-   GObject * canvas;
+   GtkWidget * window;
 
    /// the drawing area in the window of this Plot_context
    GtkWidget * drawing_area;
@@ -131,6 +91,8 @@ static int plot_window_count = 0;
 inline void
 cairo_set_RGB_source(cairo_t * cr, Color color)
 {
+   // cairo-RGB runs from 0.0 to 1.0
+   //
    cairo_set_source_rgba(cr, (color >> 16 & 0xFF) / 255.0,
                              (color >>  8 & 0xFF) / 255.0,
                              (color       & 0xFF) / 255.0, 1.0);   // opaque
@@ -153,14 +115,14 @@ const double s = 0.5*l;           // ∆ base middle to left/right vertex
 
    cairo_set_RGB_source(cr, color);
 
-   if (up)   // ∆
+   if (up)   // ▲
       {
         cairo_move_to(cr, P0.x,     P0.y + l);   // top vertex
         cairo_line_to(cr, P0.x + m, P0.y - s);   // right vertex
         cairo_line_to(cr, P0.x - m, P0.y - s);   // left vertex
         cairo_close_path(cr);                    // back to top
       }
-   else      // ∇
+   else      // ▼
       {
         cairo_move_to(cr, P0.x,     P0.y - l);   // bottom vertex
         cairo_line_to(cr, P0.x + m, P0.y + s);   // right vertex
@@ -176,7 +138,7 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
 {
    cairo_set_RGB_source(cr, color);
 
-   if (caro)   // ◊
+   if (caro)   // ◆
       {
         const double dlta = 2.0 * size;
         cairo_move_to(cr, P0.x,        P0.y + dlta);   // top vertex
@@ -185,7 +147,7 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
         cairo_line_to(cr, P0.x - dlta, P0.y);          // left vertex
         cairo_close_path(cr);                          // back to top
       }
-   else        // □
+   else        // ■
       {
         const double dlta = 1.414213562 * size;
         cairo_move_to(cr, P0.x - dlta,  P0.y + dlta);   // top left vertex
@@ -203,34 +165,23 @@ draw_point(cairo_t * cr, const Plot_context & pctx, Pixel_XY P0, int point_style
            const Color outer_color, int outer_dia,
            const Color inner_color, int inner_dia)
 {
-   if (point_style == 1)        // circle
+   switch(point_style)
       {
-        draw_circle(cr, P0, outer_color, outer_dia);
-        if (inner_dia)   draw_circle(cr, P0, inner_color, inner_dia);
+        case 1: draw_circle(cr, P0,       outer_color, outer_dia);   break; // ●
+        case 2: draw_delta(cr, P0, true,  outer_color, outer_dia);   break; // ▲
+        case 3: draw_delta(cr, P0, false, outer_color, outer_dia);   break; // ▼
+        case 4: draw_quad(cr, P0, true,   outer_color, outer_dia);   break; // ◆
+        case 5: draw_quad(cr, P0, false,  outer_color, outer_dia);   break; // ■
+        default: CERR << "Invalid point style " << point_style;     return;
       }
-   else if (point_style == 2)   // triangle ∆
+
+   if (inner_dia)   switch(point_style)
       {
-        draw_delta(cr, P0, true, outer_color, outer_dia);
-        if (inner_dia)   draw_delta(cr, P0, true, inner_color, inner_dia);
-      }
-   else if (point_style == 3)   // triangle ∇
-      {
-        draw_delta(cr, P0, false, outer_color, outer_dia);
-        if (inner_dia)   draw_delta(cr, P0, false, inner_color, inner_dia);
-      }
-   else if (point_style == 4)   // caro ◊
-      {
-        draw_quad(cr, P0, true, outer_color, outer_dia);
-        if (inner_dia)   draw_quad(cr, P0, true, inner_color, inner_dia);
-      }
-   else if (point_style == 5)   // square □
-      {
-        draw_quad(cr, P0, false, outer_color, outer_dia);
-        if (inner_dia)   draw_quad(cr, P0, false, inner_color, inner_dia);
-      }
-   else
-      {
-        CERR << "Invalid point style " << point_style;
+        case 1: draw_circle(cr, P0,       inner_color, inner_dia);   return; // ●
+        case 2: draw_delta(cr, P0, true,  inner_color, inner_dia);   return; // ▲
+        case 3: draw_delta(cr, P0, false, inner_color, inner_dia);   return; // ▼
+        case 4: draw_quad(cr, P0, true,   inner_color, inner_dia);   return; // ◆
+        case 5: draw_quad(cr, P0, false,  inner_color, inner_dia);   return; // ■
       }
 }
 //-----------------------------------------------------------------------------
@@ -1094,45 +1045,33 @@ plot_main(void * vp_props)
    if (getenv("DISPLAY") == 0)   // DISPLAY not set
       setenv("DISPLAY", ":0", true);
 
-char * name = strdup("⎕PLOT");
-char * argv2[2] = { name, 0 };
-char ** argv = argv2;
+Plot_window_properties & w_props =
+      *reinterpret_cast<Plot_window_properties *>(vp_props);
+   verbosity = w_props.get_verbosity();
 
    XInitThreads();
 
 static bool gtk_init_done = false;
    if (!gtk_init_done)
       {
-        int argc = sizeof(argv2) / sizeof(*argv2) - 1;
-        gtk_init(&argc, &argv);
+        int argc = 0;
+        gtk_init(&argc, NULL);
         gtk_init_done = true;
       }
-
-Plot_window_properties & w_props =
-      *reinterpret_cast<Plot_window_properties *>(vp_props);
-   verbosity = w_props.get_verbosity();
 
 Plot_context * pctx = new Plot_context(w_props);
    Assert(pctx);
    all_plot_contexts.push_back(pctx);
    ++plot_window_count;
 
-   pctx->builder = gtk_builder_new_from_string(gui, strlen(gui));
-   Assert(pctx->builder);
-   pctx->css_provider = gtk_css_provider_new();
-   Assert(pctx->css_provider);
-GError * error = 0;
-   gtk_css_provider_load_from_data(pctx->css_provider, css, strlen(css), &error);
-   Assert(error == 0);
-   pctx->window = gtk_builder_get_object(pctx->builder, "top-level-window");
+   pctx->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    Assert(pctx->window);
-   pctx->canvas = gtk_builder_get_object(pctx->builder, "canvas");
-   Assert(pctx->canvas);
+   gtk_window_set_title(GTK_WINDOW(pctx->window),
+                          w_props.get_caption().c_str());
+   gtk_window_set_resizable(GTK_WINDOW(pctx->window), true);
 
-   // drawing_area is the same GObject * as the first argument of draw_callback()
-   //
-   if (GObject * canvas = gtk_builder_get_object(pctx->builder, "canvas"))
-      { pctx-> drawing_area = GTK_WIDGET(canvas); }
+   pctx->drawing_area = gtk_drawing_area_new();
+   gtk_container_add(GTK_CONTAINER(pctx->window), pctx->drawing_area);
 
    // resize the drawing_area before showing it so that draw_callback() won't be
    // called twice.
@@ -1141,35 +1080,22 @@ GError * error = 0;
                                           pctx->get_total_width(),
                                           pctx->get_total_height());
 
+   gtk_window_move(GTK_WINDOW(pctx->window), w_props.get_pw_pos_X(),
+                                             w_props.get_pw_pos_Y());
+
    gtk_widget_show_all(GTK_WIDGET(pctx->window));
 
-   /*
-      NOTE: supposedly we should connect our signals like this:
-
-      gtk_builder_connect_signals(pctx->builder, 0);
-
-      However, gtk_builder_connect_signals() then complains about -rdynamic not
-      being used, for example
-
-      (⎕PLOT:6029): Gtk-WARNING **: 14:35:25.772: Could not find signal handler 'draw_callback'.  Did you compile with -rdynamic?
-
-      If we fix that by compiling with -rdynamic, then everything works fine
-      with gcc, but clang complains about -rdynamic being used:
-
-c++: warning: argument unused during compilation: '-rdynamic' [-Wunused-command-line-argument]
-
-      We therefore connect our signals manually using g_signal_connect_object().
-    */
    g_signal_connect_object(pctx->window, "destroy",
                            G_CALLBACK(plot_destroyed), 0, G_CONNECT_AFTER);
-   g_signal_connect_object(pctx->canvas, "draw", G_CALLBACK(draw_callback),
-                           0, G_CONNECT_AFTER);
+
+   g_signal_connect_object(pctx->drawing_area, "draw",
+                           G_CALLBACK(draw_callback), 0, G_CONNECT_AFTER);
 
    // fork a handler for Gtk window events.
    //
    pthread_create(&pctx->thread, 0, gtk_main_wrapper, &w_props);
 
-   sem_post(Quad_PLOT::plot_window_sema);   // unleash the APL intrpreter
+   sem_post(Quad_PLOT::plot_window_sema);   // unleash the APL interpreter
    return 0;
 }
 //-----------------------------------------------------------------------------
