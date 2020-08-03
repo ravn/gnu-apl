@@ -96,45 +96,51 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 
-# Checks for library functions.
+#################################################################################
+#
+# Various checks for library functions. We use inverse alphabetic order although
+# the order should be least-dependent to most-dependent (or vice versa?). The
+# checks that come earlier in this file come later on the linker command line.
+#
+# That is, if e.g. lib_A requires lib_B, then the linker command line should be
+# ... lib_A ... lib_B   and the test for lib_B should come before the test for
+# lib_A in this file.
+#
+#################################################################################
+
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 AC_CHECK_FUNCS([floor memset munmap pow sqrt strchr strerror])
 
-# Checks for libraries, less relevant first (to be last on linker command)
-#
-AC_CHECK_LIB([socket],    [socket])   # for Solaris
-AC_CHECK_LIB([nsl],       [yp_all])   # for Solaris
-
 # check for libncurses first and for libcurses if libncurses was not found
 #
-AC_CHECK_LIB([ncurses],
-             [setupterm],
+AC_CHECK_LIB([ncurses], [setupterm],
              [AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
                                  [Define to 1 iff lib(n)curses is available])
               LIBS="-lncurses $LIBS"
              ],
              [ # no ncurses...
-               AC_CHECK_LIB([curses],
-                            [setupterm],
+               AC_CHECK_LIB([curses], [setupterm],
                             [ AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
                                   [Define to 1 iff lib(n)curses is available])
                LIBS="-lcurses $LIBS"])
              ])
 
-AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
-AC_CHECK_LIB([execinfo],  [backtrace])
-AC_CHECK_LIB([m],         [acosh])
-AC_CHECK_LIB([pthread],   [sem_init])
-AC_CHECK_LIB([dl],        [dlopen])
-AC_CHECK_LIB([fftw3],     [fftw_plan_dft])
-AC_CHECK_LIB([c],         [initstate_r])
-AC_CHECK_LIB([xcb],       [xcb_connect])
-AC_CHECK_LIB([X11],       [XOpenDisplay], [HAVE_libx11=yes])
 AC_CHECK_LIB([X11-xcb],   [XGetXCBConnection])
+AC_CHECK_LIB([X11],       [XOpenDisplay])
+AC_CHECK_LIB([xcb],       [xcb_connect])
+AC_CHECK_LIB([socket],    [socket])   # for Solaris
+AC_CHECK_LIB([pthread],   [sem_init])
+AC_CHECK_LIB([nsl],       [yp_all])   # for Solaris
+AC_CHECK_LIB([m],         [acosh])
 AC_CHECK_LIB([gtk-3],     [gtk_init])
 AC_CHECK_LIB([gdk-3],     [gdk_init])
+AC_CHECK_LIB([fftw3],     [fftw_plan_dft])
+AC_CHECK_LIB([execinfo],  [backtrace])
+AC_CHECK_LIB([dl],        [dlopen])
 AC_CHECK_LIB([cairo],     [cairo_fill])
+AC_CHECK_LIB([c],         [initstate_r])
+AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
 
 # check if SQLite3 is wanted and installed
 m4_include([m4/ax_lib_sqlite3.m4])            AX_LIB_SQLITE3([])
@@ -161,11 +167,11 @@ if test "x$found_postgresql" = "xyes" ; then
                       [USABLE_PostgreSQL=yes],
                       [USABLE_PostgreSQL=no])
 
-CPPFLAGS="$saved_CPPFLAGS"
-AC_MSG_RESULT([$USABLE_PostgreSQL])
-if test "x$USABLE_PostgreSQL" = "xyes"; then
-   AC_DEFINE_UNQUOTED([USABLE_PostgreSQL], [1], [PostgreSQL code compiles])
-fi
+    CPPFLAGS="$saved_CPPFLAGS"
+    AC_MSG_RESULT([$USABLE_PostgreSQL])
+    if test "x$USABLE_PostgreSQL" = "xyes"; then
+        AC_DEFINE_UNQUOTED([USABLE_PostgreSQL], [1], [PostgreSQL code compiles])
+    fi
 fi
 
 # check if libpcre is installed
@@ -222,9 +228,6 @@ if test "x$HAVE_gtk3" = xyes; then
 else
    AC_DEFINE_UNQUOTED(HAVE_GTK3, [0], [GTK+ version 3 NOT installed])
 fi
-
-# make HAVE_X11 visible im Makefile.am
-AM_CONDITIONAL(HAVE_X11, test "x$HAVE_libx11" = xyes)
 
 ################################# rdtsc check #################################
 # check if rdtsc (read CPU cycle counter is available.
@@ -287,6 +290,23 @@ AC_COMPILE_IFELSE(
     [HAVE_AFFINITY_NP=no])
 AM_CONDITIONAL(HAVE_AFFINITY_NP, test "x$HAVE_AFFINITY_NP" = xyes)
 AC_MSG_RESULT([$HAVE_AFFINITY_NP])
+
+######################## pthread_setname_np() check #######################
+# see if pthread_setname_np is available
+#
+AC_MSG_CHECKING([whether pthread_setname_np is available])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([ [#include <pthread.h>]
+                     ],
+                     [ [pthread_t thread = 0;]
+                       [pthread_setname_np(thread, "thread_name");]
+                     ])],
+    [HAVE_PTHREAD_SETNAME_NP=yes
+     AC_DEFINE_UNQUOTED([HAVE_PTHREAD_SETNAME_NP], [1],
+                        [Define to 1 iff pthread_setname_np() is available])
+    ],
+    [HAVE_PTHREAD_SETNAME_NP=no])
+AC_MSG_RESULT([$HAVE_PTHREAD_SETNAME_NP])
 
 ############################### atomicity checks ##############################
 # check for alternatives for ext/atomicity.h on OS/X 

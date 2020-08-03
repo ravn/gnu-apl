@@ -678,8 +678,6 @@ HAVE_SEM_INIT_FALSE
 HAVE_SEM_INIT_TRUE
 HAVE_RDTSC_FALSE
 HAVE_RDTSC_TRUE
-HAVE_X11_FALSE
-HAVE_X11_TRUE
 HAVE_GTK3_FALSE
 HAVE_GTK3_TRUE
 GTK_CFLAGS
@@ -17777,7 +17775,18 @@ _ACEOF
   esac
 
 
-# Checks for library functions.
+#################################################################################
+#
+# Various checks for library functions. We use inverse alphabetic order although
+# the order should be least-dependent to most-dependent (or vice versa?). The
+# checks that come earlier in this file come later on the linker command line.
+#
+# That is, if e.g. lib_A requires lib_B, then the linker command line should be
+# ... lib_A ... lib_B   and the test for lib_B should come before the test for
+# lib_A in this file.
+#
+#################################################################################
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for error_at_line" >&5
 $as_echo_n "checking for error_at_line... " >&6; }
 if ${ac_cv_lib_error_at_line+:} false; then :
@@ -18029,99 +18038,6 @@ fi
 done
 
 
-# Checks for libraries, less relevant first (to be last on linker command)
-#
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for socket in -lsocket" >&5
-$as_echo_n "checking for socket in -lsocket... " >&6; }
-if ${ac_cv_lib_socket_socket+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsocket  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char socket ();
-int
-main ()
-{
-return socket ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_socket_socket=yes
-else
-  ac_cv_lib_socket_socket=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_socket_socket" >&5
-$as_echo "$ac_cv_lib_socket_socket" >&6; }
-if test "x$ac_cv_lib_socket_socket" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBSOCKET 1
-_ACEOF
-
-  LIBS="-lsocket $LIBS"
-
-fi
-   # for Solaris
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for yp_all in -lnsl" >&5
-$as_echo_n "checking for yp_all in -lnsl... " >&6; }
-if ${ac_cv_lib_nsl_yp_all+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lnsl  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char yp_all ();
-int
-main ()
-{
-return yp_all ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_nsl_yp_all=yes
-else
-  ac_cv_lib_nsl_yp_all=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_nsl_yp_all" >&5
-$as_echo "$ac_cv_lib_nsl_yp_all" >&6; }
-if test "x$ac_cv_lib_nsl_yp_all" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBNSL 1
-_ACEOF
-
-  LIBS="-lnsl $LIBS"
-
-fi
-   # for Solaris
-
 # check for libncurses first and for libcurses if libncurses was not found
 #
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for setupterm in -lncurses" >&5
@@ -18219,13 +18135,13 @@ fi
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for __atomic_fetch_add_4 in -latomicity" >&5
-$as_echo_n "checking for __atomic_fetch_add_4 in -latomicity... " >&6; }
-if ${ac_cv_lib_atomicity___atomic_fetch_add_4+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
+$as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
+if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-latomicity  $LIBS"
+LIBS="-lX11-xcb  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -18235,42 +18151,42 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char __atomic_fetch_add_4 ();
+char XGetXCBConnection ();
 int
 main ()
 {
-return __atomic_fetch_add_4 ();
+return XGetXCBConnection ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_atomicity___atomic_fetch_add_4=yes
+  ac_cv_lib_X11_xcb_XGetXCBConnection=yes
 else
-  ac_cv_lib_atomicity___atomic_fetch_add_4=no
+  ac_cv_lib_X11_xcb_XGetXCBConnection=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_atomicity___atomic_fetch_add_4" >&5
-$as_echo "$ac_cv_lib_atomicity___atomic_fetch_add_4" >&6; }
-if test "x$ac_cv_lib_atomicity___atomic_fetch_add_4" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_xcb_XGetXCBConnection" >&5
+$as_echo "$ac_cv_lib_X11_xcb_XGetXCBConnection" >&6; }
+if test "x$ac_cv_lib_X11_xcb_XGetXCBConnection" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBATOMICITY 1
+#define HAVE_LIBX11_XCB 1
 _ACEOF
 
-  LIBS="-latomicity $LIBS"
+  LIBS="-lX11-xcb $LIBS"
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for backtrace in -lexecinfo" >&5
-$as_echo_n "checking for backtrace in -lexecinfo... " >&6; }
-if ${ac_cv_lib_execinfo_backtrace+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
+$as_echo_n "checking for XOpenDisplay in -lX11... " >&6; }
+if ${ac_cv_lib_X11_XOpenDisplay+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lexecinfo  $LIBS"
+LIBS="-lX11  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -18280,257 +18196,32 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char backtrace ();
+char XOpenDisplay ();
 int
 main ()
 {
-return backtrace ();
+return XOpenDisplay ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_execinfo_backtrace=yes
+  ac_cv_lib_X11_XOpenDisplay=yes
 else
-  ac_cv_lib_execinfo_backtrace=no
+  ac_cv_lib_X11_XOpenDisplay=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_execinfo_backtrace" >&5
-$as_echo "$ac_cv_lib_execinfo_backtrace" >&6; }
-if test "x$ac_cv_lib_execinfo_backtrace" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_XOpenDisplay" >&5
+$as_echo "$ac_cv_lib_X11_XOpenDisplay" >&6; }
+if test "x$ac_cv_lib_X11_XOpenDisplay" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBEXECINFO 1
+#define HAVE_LIBX11 1
 _ACEOF
 
-  LIBS="-lexecinfo $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for acosh in -lm" >&5
-$as_echo_n "checking for acosh in -lm... " >&6; }
-if ${ac_cv_lib_m_acosh+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lm  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char acosh ();
-int
-main ()
-{
-return acosh ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_m_acosh=yes
-else
-  ac_cv_lib_m_acosh=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_acosh" >&5
-$as_echo "$ac_cv_lib_m_acosh" >&6; }
-if test "x$ac_cv_lib_m_acosh" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBM 1
-_ACEOF
-
-  LIBS="-lm $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sem_init in -lpthread" >&5
-$as_echo_n "checking for sem_init in -lpthread... " >&6; }
-if ${ac_cv_lib_pthread_sem_init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpthread  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char sem_init ();
-int
-main ()
-{
-return sem_init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_pthread_sem_init=yes
-else
-  ac_cv_lib_pthread_sem_init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pthread_sem_init" >&5
-$as_echo "$ac_cv_lib_pthread_sem_init" >&6; }
-if test "x$ac_cv_lib_pthread_sem_init" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPTHREAD 1
-_ACEOF
-
-  LIBS="-lpthread $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
-$as_echo_n "checking for dlopen in -ldl... " >&6; }
-if ${ac_cv_lib_dl_dlopen+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-ldl  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char dlopen ();
-int
-main ()
-{
-return dlopen ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_dl_dlopen=yes
-else
-  ac_cv_lib_dl_dlopen=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_dl_dlopen" >&5
-$as_echo "$ac_cv_lib_dl_dlopen" >&6; }
-if test "x$ac_cv_lib_dl_dlopen" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBDL 1
-_ACEOF
-
-  LIBS="-ldl $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw_plan_dft in -lfftw3" >&5
-$as_echo_n "checking for fftw_plan_dft in -lfftw3... " >&6; }
-if ${ac_cv_lib_fftw3_fftw_plan_dft+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lfftw3  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char fftw_plan_dft ();
-int
-main ()
-{
-return fftw_plan_dft ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_fftw3_fftw_plan_dft=yes
-else
-  ac_cv_lib_fftw3_fftw_plan_dft=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_fftw_plan_dft" >&5
-$as_echo "$ac_cv_lib_fftw3_fftw_plan_dft" >&6; }
-if test "x$ac_cv_lib_fftw3_fftw_plan_dft" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBFFTW3 1
-_ACEOF
-
-  LIBS="-lfftw3 $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for initstate_r in -lc" >&5
-$as_echo_n "checking for initstate_r in -lc... " >&6; }
-if ${ac_cv_lib_c_initstate_r+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lc  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char initstate_r ();
-int
-main ()
-{
-return initstate_r ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_c_initstate_r=yes
-else
-  ac_cv_lib_c_initstate_r=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_c_initstate_r" >&5
-$as_echo "$ac_cv_lib_c_initstate_r" >&6; }
-if test "x$ac_cv_lib_c_initstate_r" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBC 1
-_ACEOF
-
-  LIBS="-lc $LIBS"
+  LIBS="-lX11 $LIBS"
 
 fi
 
@@ -18579,13 +18270,13 @@ _ACEOF
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
-$as_echo_n "checking for XOpenDisplay in -lX11... " >&6; }
-if ${ac_cv_lib_X11_XOpenDisplay+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for socket in -lsocket" >&5
+$as_echo_n "checking for socket in -lsocket... " >&6; }
+if ${ac_cv_lib_socket_socket+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lX11  $LIBS"
+LIBS="-lsocket  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -18595,72 +18286,167 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char XOpenDisplay ();
+char socket ();
 int
 main ()
 {
-return XOpenDisplay ();
+return socket ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_X11_XOpenDisplay=yes
+  ac_cv_lib_socket_socket=yes
 else
-  ac_cv_lib_X11_XOpenDisplay=no
+  ac_cv_lib_socket_socket=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_XOpenDisplay" >&5
-$as_echo "$ac_cv_lib_X11_XOpenDisplay" >&6; }
-if test "x$ac_cv_lib_X11_XOpenDisplay" = xyes; then :
-  HAVE_libx11=yes
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
-$as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
-if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lX11-xcb  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char XGetXCBConnection ();
-int
-main ()
-{
-return XGetXCBConnection ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_X11_xcb_XGetXCBConnection=yes
-else
-  ac_cv_lib_X11_xcb_XGetXCBConnection=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_xcb_XGetXCBConnection" >&5
-$as_echo "$ac_cv_lib_X11_xcb_XGetXCBConnection" >&6; }
-if test "x$ac_cv_lib_X11_xcb_XGetXCBConnection" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_socket_socket" >&5
+$as_echo "$ac_cv_lib_socket_socket" >&6; }
+if test "x$ac_cv_lib_socket_socket" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBX11_XCB 1
+#define HAVE_LIBSOCKET 1
 _ACEOF
 
-  LIBS="-lX11-xcb $LIBS"
+  LIBS="-lsocket $LIBS"
+
+fi
+   # for Solaris
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sem_init in -lpthread" >&5
+$as_echo_n "checking for sem_init in -lpthread... " >&6; }
+if ${ac_cv_lib_pthread_sem_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpthread  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sem_init ();
+int
+main ()
+{
+return sem_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_pthread_sem_init=yes
+else
+  ac_cv_lib_pthread_sem_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pthread_sem_init" >&5
+$as_echo "$ac_cv_lib_pthread_sem_init" >&6; }
+if test "x$ac_cv_lib_pthread_sem_init" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBPTHREAD 1
+_ACEOF
+
+  LIBS="-lpthread $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for yp_all in -lnsl" >&5
+$as_echo_n "checking for yp_all in -lnsl... " >&6; }
+if ${ac_cv_lib_nsl_yp_all+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lnsl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char yp_all ();
+int
+main ()
+{
+return yp_all ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_nsl_yp_all=yes
+else
+  ac_cv_lib_nsl_yp_all=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_nsl_yp_all" >&5
+$as_echo "$ac_cv_lib_nsl_yp_all" >&6; }
+if test "x$ac_cv_lib_nsl_yp_all" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBNSL 1
+_ACEOF
+
+  LIBS="-lnsl $LIBS"
+
+fi
+   # for Solaris
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for acosh in -lm" >&5
+$as_echo_n "checking for acosh in -lm... " >&6; }
+if ${ac_cv_lib_m_acosh+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lm  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char acosh ();
+int
+main ()
+{
+return acosh ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_m_acosh=yes
+else
+  ac_cv_lib_m_acosh=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_acosh" >&5
+$as_echo "$ac_cv_lib_m_acosh" >&6; }
+if test "x$ac_cv_lib_m_acosh" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBM 1
+_ACEOF
+
+  LIBS="-lm $LIBS"
 
 fi
 
@@ -18754,6 +18540,141 @@ _ACEOF
 
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw_plan_dft in -lfftw3" >&5
+$as_echo_n "checking for fftw_plan_dft in -lfftw3... " >&6; }
+if ${ac_cv_lib_fftw3_fftw_plan_dft+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lfftw3  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char fftw_plan_dft ();
+int
+main ()
+{
+return fftw_plan_dft ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_fftw3_fftw_plan_dft=yes
+else
+  ac_cv_lib_fftw3_fftw_plan_dft=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_fftw_plan_dft" >&5
+$as_echo "$ac_cv_lib_fftw3_fftw_plan_dft" >&6; }
+if test "x$ac_cv_lib_fftw3_fftw_plan_dft" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBFFTW3 1
+_ACEOF
+
+  LIBS="-lfftw3 $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for backtrace in -lexecinfo" >&5
+$as_echo_n "checking for backtrace in -lexecinfo... " >&6; }
+if ${ac_cv_lib_execinfo_backtrace+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lexecinfo  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char backtrace ();
+int
+main ()
+{
+return backtrace ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_execinfo_backtrace=yes
+else
+  ac_cv_lib_execinfo_backtrace=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_execinfo_backtrace" >&5
+$as_echo "$ac_cv_lib_execinfo_backtrace" >&6; }
+if test "x$ac_cv_lib_execinfo_backtrace" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBEXECINFO 1
+_ACEOF
+
+  LIBS="-lexecinfo $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
+$as_echo_n "checking for dlopen in -ldl... " >&6; }
+if ${ac_cv_lib_dl_dlopen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ldl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlopen ();
+int
+main ()
+{
+return dlopen ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_dl_dlopen=yes
+else
+  ac_cv_lib_dl_dlopen=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_dl_dlopen" >&5
+$as_echo "$ac_cv_lib_dl_dlopen" >&6; }
+if test "x$ac_cv_lib_dl_dlopen" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBDL 1
+_ACEOF
+
+  LIBS="-ldl $LIBS"
+
+fi
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for cairo_fill in -lcairo" >&5
 $as_echo_n "checking for cairo_fill in -lcairo... " >&6; }
 if ${ac_cv_lib_cairo_cairo_fill+:} false; then :
@@ -18796,6 +18717,96 @@ if test "x$ac_cv_lib_cairo_cairo_fill" = xyes; then :
 _ACEOF
 
   LIBS="-lcairo $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for initstate_r in -lc" >&5
+$as_echo_n "checking for initstate_r in -lc... " >&6; }
+if ${ac_cv_lib_c_initstate_r+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char initstate_r ();
+int
+main ()
+{
+return initstate_r ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_c_initstate_r=yes
+else
+  ac_cv_lib_c_initstate_r=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_c_initstate_r" >&5
+$as_echo "$ac_cv_lib_c_initstate_r" >&6; }
+if test "x$ac_cv_lib_c_initstate_r" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBC 1
+_ACEOF
+
+  LIBS="-lc $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for __atomic_fetch_add_4 in -latomicity" >&5
+$as_echo_n "checking for __atomic_fetch_add_4 in -latomicity... " >&6; }
+if ${ac_cv_lib_atomicity___atomic_fetch_add_4+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-latomicity  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char __atomic_fetch_add_4 ();
+int
+main ()
+{
+return __atomic_fetch_add_4 ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_atomicity___atomic_fetch_add_4=yes
+else
+  ac_cv_lib_atomicity___atomic_fetch_add_4=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_atomicity___atomic_fetch_add_4" >&5
+$as_echo "$ac_cv_lib_atomicity___atomic_fetch_add_4" >&6; }
+if test "x$ac_cv_lib_atomicity___atomic_fetch_add_4" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBATOMICITY 1
+_ACEOF
+
+  LIBS="-latomicity $LIBS"
 
 fi
 
@@ -19223,16 +19234,16 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-CPPFLAGS="$saved_CPPFLAGS"
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $USABLE_PostgreSQL" >&5
+    CPPFLAGS="$saved_CPPFLAGS"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USABLE_PostgreSQL" >&5
 $as_echo "$USABLE_PostgreSQL" >&6; }
-if test "x$USABLE_PostgreSQL" = "xyes"; then
+    if test "x$USABLE_PostgreSQL" = "xyes"; then
 
 cat >>confdefs.h <<_ACEOF
 #define USABLE_PostgreSQL 1
 _ACEOF
 
-fi
+    fi
 fi
 
 # check if libpcre is installed
@@ -19497,16 +19508,6 @@ _ACEOF
 
 fi
 
-# make HAVE_X11 visible im Makefile.am
- if test "x$HAVE_libx11" = xyes; then
-  HAVE_X11_TRUE=
-  HAVE_X11_FALSE='#'
-else
-  HAVE_X11_TRUE='#'
-  HAVE_X11_FALSE=
-fi
-
-
 ################################# rdtsc check #################################
 # check if rdtsc (read CPU cycle counter is available.
 # This is expected to succeed only on Intel CPUs
@@ -19645,6 +19646,40 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_AFFINITY_NP" >&5
 $as_echo "$HAVE_AFFINITY_NP" >&6; }
+
+######################## pthread_setname_np() check #######################
+# see if pthread_setname_np is available
+#
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pthread_setname_np is available" >&5
+$as_echo_n "checking whether pthread_setname_np is available... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+ #include <pthread.h>
+
+int
+main ()
+{
+ pthread_t thread = 0;
+                       pthread_setname_np(thread, "thread_name");
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  HAVE_PTHREAD_SETNAME_NP=yes
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_PTHREAD_SETNAME_NP 1
+_ACEOF
+
+
+else
+  HAVE_PTHREAD_SETNAME_NP=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_PTHREAD_SETNAME_NP" >&5
+$as_echo "$HAVE_PTHREAD_SETNAME_NP" >&6; }
 
 ############################### atomicity checks ##############################
 # check for alternatives for ext/atomicity.h on OS/X
@@ -20303,10 +20338,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_GTK3_TRUE}" && test -z "${HAVE_GTK3_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_GTK3\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_X11_TRUE}" && test -z "${HAVE_X11_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_X11\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_RDTSC_TRUE}" && test -z "${HAVE_RDTSC_FALSE}"; then

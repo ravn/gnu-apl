@@ -99,6 +99,9 @@
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
 
+/* Define to 1 if you have the `X11' library (-lX11). */
+#undef HAVE_LIBX11
+
 /* Define to 1 if you have the `X11-xcb' library (-lX11-xcb). */
 #undef HAVE_LIBX11_XCB
 
@@ -128,6 +131,9 @@
 
 /* Define to 1 if you have the `pow' function. */
 #undef HAVE_POW
+
+/* Define to 1 iff pthread_setname_np() is available */
+#undef HAVE_PTHREAD_SETNAME_NP
 
 /* Define to 1 iff the CPU has rdtsc opcode */
 #undef HAVE_RDTSC

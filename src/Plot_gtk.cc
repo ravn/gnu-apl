@@ -1085,6 +1085,9 @@ static bool gtk_init_done = false;
         gtk_init(&argc, NULL);
         pthread_t thread = 0;
         pthread_create(&thread, 0, gtk_main_wrapper, &w_props);
+#if HAVE_PTHREAD_SETNAME_NP
+         pthread_setname_np(thread, "apl/⎕PLOT");
+#endif
         gtk_init_done = true;
       }
 

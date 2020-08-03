@@ -502,6 +502,10 @@ main(int argc, const char *argv[])
         return 0;
       }
 
+#if HAVE_PTHREAD_SETNAME_NP
+         pthread_setname_np(pthread_self(), "apl/main");
+#endif
+
    for (;;)
        {
          Token t = Workspace::immediate_execution(
