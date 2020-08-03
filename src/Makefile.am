@@ -28,6 +28,10 @@ distcleancheck_listfile = buildtag
 #
 common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS)
 common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS) -lX11
+if HAVE_X11
+common_LDFLAGS  += -lX11
+
+endif
 common_SOURCES  = $(plot_SOURCES) 					\
 			buildtag		buildtag.hh		\
 						../config.h		\

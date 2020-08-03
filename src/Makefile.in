@@ -96,26 +96,27 @@ host_triplet = @host@
 # but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
 #
 @HAVE_GTK3_TRUE@am__append_2 = Gtk
-@HAVE_LIBPCRE2_32_TRUE@am__append_3 = \
+@HAVE_X11_TRUE@am__append_3 = -lX11
+@HAVE_LIBPCRE2_32_TRUE@am__append_4 = \
 @HAVE_LIBPCRE2_32_TRUE@Regexp.cc                                       Regexp.hh
 
-@SQLITE3_TRUE@am__append_4 = $(SQLITE3_CFLAGS)
-@SQLITE3_TRUE@am__append_5 = $(SQLITE3_LDFLAGS)
-@SQLITE3_TRUE@am__append_6 = sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh  \
+@SQLITE3_TRUE@am__append_5 = $(SQLITE3_CFLAGS)
+@SQLITE3_TRUE@am__append_6 = $(SQLITE3_LDFLAGS)
+@SQLITE3_TRUE@am__append_7 = sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh  \
 @SQLITE3_TRUE@                  sql/SqliteConnection.cc     sql/SqliteConnection.hh      \
 @SQLITE3_TRUE@                  sql/SqliteResultValue.cc    sql/SqliteResultValue.hh     \
 @SQLITE3_TRUE@                  sql/SqliteProvider.cc       sql/SqliteProvider.hh        \
 @SQLITE3_TRUE@                  sql/Connection.cc
 
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__append_7 = sql/Connection.cc
-@POSTGRES_TRUE@am__append_8 = $(POSTGRESQL_CFLAGS)
-@POSTGRES_TRUE@am__append_9 = $(POSTGRESQL_LDFLAGS)
-@POSTGRES_TRUE@am__append_10 = sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__append_8 = sql/Connection.cc
+@POSTGRES_TRUE@am__append_9 = $(POSTGRESQL_CFLAGS)
+@POSTGRES_TRUE@am__append_10 = $(POSTGRESQL_LDFLAGS)
+@POSTGRES_TRUE@am__append_11 = sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 @POSTGRES_TRUE@                  sql/PostgresConnection.cc     sql/PostgresConnection.hh \
 @POSTGRES_TRUE@                  sql/PostgresProvider.cc       sql/PostgresProvider.hh
 
-@WANT_LIBAPL_TRUE@am__append_11 = libapl.la
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
+@WANT_LIBAPL_TRUE@am__append_12 = libapl.la
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am__append_13 = lib_gnu_apl.la
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -912,9 +913,9 @@ distcleancheck_listfile = buildtag
 # common means common to the apl and libapl builds
 #
 common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS) \
-	$(am__append_4) $(am__append_8)
-common_LDFLAGS = -export-dynamic $(GTK_LDFLAGS) -lX11 $(am__append_5) \
-	$(am__append_9)
+	$(am__append_5) $(am__append_9)
+common_LDFLAGS = -export-dynamic $(GTK_LDFLAGS) -lX11 $(am__append_3) \
+	$(am__append_6) $(am__append_10)
 common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
 	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
@@ -975,9 +976,9 @@ common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
 	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
 	Workspace.hh static_Objects.cc static_Objects.hh \
-	$(am__append_3) $(am__append_6) $(am__append_7) \
-	$(am__append_10)
-pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
+	$(am__append_4) $(am__append_7) $(am__append_8) \
+	$(am__append_11)
+pkglib_LTLIBRARIES = $(am__append_12) $(am__append_13)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 @WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version

@@ -678,6 +678,8 @@ HAVE_SEM_INIT_FALSE
 HAVE_SEM_INIT_TRUE
 HAVE_RDTSC_FALSE
 HAVE_RDTSC_TRUE
+HAVE_X11_FALSE
+HAVE_X11_TRUE
 HAVE_GTK3_FALSE
 HAVE_GTK3_TRUE
 GTK_CFLAGS
@@ -18614,12 +18616,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_XOpenDisplay" >&5
 $as_echo "$ac_cv_lib_X11_XOpenDisplay" >&6; }
 if test "x$ac_cv_lib_X11_XOpenDisplay" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBX11 1
-_ACEOF
-
-  LIBS="-lX11 $LIBS"
-
+  HAVE_libx11=yes
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
@@ -19500,6 +19497,16 @@ _ACEOF
 
 fi
 
+# make HAVE_X11 visible im Makefile.am
+ if test "x$HAVE_libx11" = xyes; then
+  HAVE_X11_TRUE=
+  HAVE_X11_FALSE='#'
+else
+  HAVE_X11_TRUE='#'
+  HAVE_X11_FALSE=
+fi
+
+
 ################################# rdtsc check #################################
 # check if rdtsc (read CPU cycle counter is available.
 # This is expected to succeed only on Intel CPUs
@@ -20296,6 +20303,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_GTK3_TRUE}" && test -z "${HAVE_GTK3_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_GTK3\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_X11_TRUE}" && test -z "${HAVE_X11_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_X11\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_RDTSC_TRUE}" && test -z "${HAVE_RDTSC_FALSE}"; then

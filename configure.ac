@@ -130,7 +130,7 @@ AC_CHECK_LIB([dl],        [dlopen])
 AC_CHECK_LIB([fftw3],     [fftw_plan_dft])
 AC_CHECK_LIB([c],         [initstate_r])
 AC_CHECK_LIB([xcb],       [xcb_connect])
-AC_CHECK_LIB([X11],       [XOpenDisplay])
+AC_CHECK_LIB([X11],       [XOpenDisplay], [HAVE_libx11=yes])
 AC_CHECK_LIB([X11-xcb],   [XGetXCBConnection])
 AC_CHECK_LIB([gtk-3],     [gtk_init])
 AC_CHECK_LIB([gdk-3],     [gdk_init])
@@ -222,6 +222,9 @@ if test "x$HAVE_gtk3" = xyes; then
 else
    AC_DEFINE_UNQUOTED(HAVE_GTK3, [0], [GTK+ version 3 NOT installed])
 fi
+
+# make HAVE_X11 visible im Makefile.am
+AM_CONDITIONAL(HAVE_X11, test "x$HAVE_libx11" = xyes)
 
 ################################# rdtsc check #################################
 # check if rdtsc (read CPU cycle counter is available.
