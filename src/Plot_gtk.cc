@@ -19,9 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/// the pthread that handles one plot window.
-extern void * plot_main(void * vp_props);
-
 static int verbosity;
 
 #include "../config.h"
@@ -33,6 +30,10 @@ static int verbosity;
 # include "Plot_data.hh"
 # include "Plot_line_properties.hh"
 # include "Plot_window_properties.hh"
+
+extern void * plot_main(void * vp_props);
+extern const Plot_window_properties *
+             plot_stop(const Plot_window_properties * vp_props);
 
 # include "ComplexCell.hh"
 # include "FloatCell.hh"
@@ -84,7 +85,7 @@ struct Plot_context
 };
 
 /// all Plot_contexts (= all open windows)
-static vector<Plot_context *> all_plot_contexts;
+static vector<const Plot_context *> all_plot_contexts;
 static int plot_window_count = 0;
 
 //-----------------------------------------------------------------------------
@@ -283,7 +284,7 @@ draw_text(cairo_t * cr, const Plot_context & pctx,
 }
 //-------------------------------------------------------------------------------
 void
-draw_legend(cairo_t * cr, Plot_context & pctx, bool surface_plot)
+draw_legend(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 Plot_line_properties const * const * l_props = w_props.get_line_properties();
@@ -467,7 +468,7 @@ const vector<level_color> & color_steps = w_props.get_gradient();
 }
 //-------------------------------------------------------------------------------
 void
-draw_X_grid(cairo_t * cr, Plot_context & pctx, bool surface_plot)
+draw_X_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int line_width = w_props.get_gridX_line_width();
@@ -509,7 +510,7 @@ const Pixel_Y py1 = w_props.valY2pixel(dy);
 }
 //-------------------------------------------------------------------------------
 void
-draw_Y_grid(cairo_t * cr, Plot_context & pctx, bool surface_plot)
+draw_Y_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int line_width = w_props.get_gridY_line_width();
@@ -549,7 +550,7 @@ const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
 }
 //-------------------------------------------------------------------------------
 void
-draw_Z_grid(cairo_t * cr, Plot_context & pctx)
+draw_Z_grid(cairo_t * cr, const Plot_context & pctx)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int line_width = w_props.get_gridZ_line_width();
@@ -735,7 +736,7 @@ const int verbosity = w_props.get_verbosity();
                4 triangles from PM to each of the four edges of the square
 
             B. fold the surface at its shorter edge into 2 triangles that
-               have the edge in common. (triangles are always coplanar).
+               have the shorter edge in common. (triangles are always coplanar).
 
             Option B seems to look better.
          */
@@ -839,7 +840,7 @@ const int point_style  = lp0.get_point_style();
 }
 //-------------------------------------------------------------------------------
 static void
-do_plot(GtkWidget * drawing_area, Plot_context & pctx, cairo_t * cr)
+do_plot(GtkWidget * drawing_area, const Plot_context & pctx, cairo_t * cr)
 {
   cairo_set_source_rgb(cr, 1.0,  1.0,  1.0);
   cairo_rectangle(cr, 0, 0, pctx.get_total_width(), pctx.get_total_height());
@@ -873,13 +874,13 @@ gboolean
 plot_destroyed(GtkWidget * top_level)
 {
    if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
-  gtk_main_quit();
+  // gtk_main_quit();
   return TRUE;   // event handled by this handler
 }
 //-----------------------------------------------------------------------------
 /// return a new surface with window borders, or 0 on failure
 cairo_surface_t *
-add_border(Plot_context & pctx, cairo_surface_t * old_surface)
+add_border(const Plot_context & pctx, cairo_surface_t * old_surface)
 {
    // gtk_win is the window including borders
    //
@@ -923,7 +924,7 @@ cairo_t * cr2 = cairo_create(ret);
 }
 //-----------------------------------------------------------------------------
 static void
-save_file(Plot_context & pctx, cairo_surface_t * surface)
+save_file(const Plot_context & pctx, cairo_surface_t * surface)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 
@@ -948,13 +949,13 @@ cairo_status_t stat;
    if (stat == CAIRO_STATUS_SUCCESS)
       {
         CERR << "wrote output file: " << fname << endl;
-        if (w_props.get_auto_close() == 1)   gtk_main_quit();
+  //    if (w_props.get_auto_close() == 1)   gtk_main_quit();
       }
 
    else
       {
         CERR << "*** writing output fil: " << fname << " failed." << endl;
-        if (w_props.get_auto_close() == 2)   gtk_main_quit();
+  //    if (w_props.get_auto_close() == 2)   gtk_main_quit();
       }
 }
 //-------------------------------------------------------------------------------
@@ -975,7 +976,7 @@ const int new_height = gtk_widget_get_allocated_height(drawing_area);
 
    // find the Plot_context for this event...
    //
-Plot_context * pctx = 0;
+const Plot_context * pctx = 0;
    for (size_t th = 0; th < all_plot_contexts.size(); ++th)
        {
            if (all_plot_contexts[th]->drawing_area == drawing_area)
@@ -1030,7 +1031,7 @@ gtk_main_wrapper(void * w_props)
       {
         while (all_plot_contexts.size())
            {
-             Plot_context * p = all_plot_contexts.back();
+             const Plot_context * p = all_plot_contexts.back();
              delete &p->w_props;
              all_plot_contexts.pop_back();
            }
@@ -1039,9 +1040,35 @@ gtk_main_wrapper(void * w_props)
    return 0;
 }
 //-------------------------------------------------------------------------------
+const Plot_window_properties *
+plot_stop(const Plot_window_properties * props)
+{
+// CERR << "plot_stop(" << vp_props << ")" << endl;
+
+   // find the Plot_context for this event...
+   //
+   for (size_t th = 0; th < all_plot_contexts.size(); ++th)
+       {
+         const Plot_context * pctx = all_plot_contexts[th];
+         const Plot_window_properties * w_props = &pctx->w_props;
+         if (w_props == props)
+            {
+              gtk_window_close(GTK_WINDOW(pctx->window));
+              all_plot_contexts[th] = all_plot_contexts.back();
+              all_plot_contexts.pop_back();
+              return props;
+            }
+       }
+
+   CERR << "*** Could not find w_props " << props
+        << " in plot_stop() ***" << endl;
+   return 0;
+}
+//-------------------------------------------------------------------------------
 void *
 plot_main(void * vp_props)
 {
+CERR << "plot_main(" << vp_props << ")" << endl;
    if (getenv("DISPLAY") == 0)   // DISPLAY not set
       setenv("DISPLAY", ":0", true);
 
@@ -1056,6 +1083,8 @@ static bool gtk_init_done = false;
       {
         int argc = 0;
         gtk_init(&argc, NULL);
+        pthread_t thread = 0;
+        pthread_create(&thread, 0, gtk_main_wrapper, &w_props);
         gtk_init_done = true;
       }
 
@@ -1090,10 +1119,6 @@ Plot_context * pctx = new Plot_context(w_props);
 
    g_signal_connect_object(pctx->drawing_area, "draw",
                            G_CALLBACK(draw_callback), 0, G_CONNECT_AFTER);
-
-   // fork a handler for Gtk window events.
-   //
-   pthread_create(&pctx->thread, 0, gtk_main_wrapper, &w_props);
 
    sem_post(Quad_PLOT::plot_window_sema);   // unleash the APL interpreter
    return 0;

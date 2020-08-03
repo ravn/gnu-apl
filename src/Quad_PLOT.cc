@@ -186,6 +186,8 @@ using namespace std;
 
 // the pthread that handles one plot window.
 extern void * plot_main(void * vp_props);
+extern const Plot_window_properties *
+             plot_stop(const Plot_window_properties * vp_props);
 
 //=============================================================================
 Quad_PLOT::Quad_PLOT()
@@ -281,8 +283,10 @@ Quad_PLOT::eval_B(Value_P B)
         // scalar argument: plot window control
         union
            {
-             int64_t B0;
-             pthread_t thread;
+             int64_t B0;                               // APL
+             const Plot_window_properties * w_props;   // gtk
+             const void * vp;                          // plot_stop() result
+             pthread_t thread;                         // xcb
            } u;
 
         u.B0 = B->get_ravel(0).get_int_value();
@@ -322,6 +326,13 @@ Quad_PLOT::eval_B(Value_P B)
              return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
 
+#if HAVE_GTK3
+
+        u.vp = plot_stop(u.w_props);
+        return Token(TOK_APL_VALUE1, IntScalar(u.B0, LOC));
+
+#else   // XCB
+
         bool found = false;
         sem_wait(plot_threads_sema);
            loop(pt, Quad_PLOT::plot_threads.size())
@@ -335,6 +346,8 @@ Quad_PLOT::eval_B(Value_P B)
                }
         sem_post(plot_threads_sema);
         return Token(TOK_APL_VALUE1, IntScalar(found ? u.B0 : 0, LOC));
+
+#endif   // GTK vs. XCB
       }
 
    if (B->get_rank() == 1 && B->element_count() == 0)
@@ -575,8 +588,7 @@ Plot_data * data = 0;
               const double * pX = X + r*cols_B;
               const double * pY = Y + r*cols_B;
               const double * pZ = Z + r*cols_B;
-              const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ,
-                                                            r, cols_B);
+              const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r, cols_B);
               data->add_row(pdr);
             }
 
@@ -593,21 +605,29 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
 
 union
 {
-   pthread_t thread;
-   int64_t   ret;
+   pthread_t                      thread;    // xcb
+   const Plot_window_properties * w_props;   // gtk
+   int64_t                        ret;       // APL
 } u;
    u.ret = 0;
+
+#if HAVE_GTK3   // GTK
+   u.w_props = w_props;
+   plot_main(w_props);
+#else          // XCB
    pthread_create(&u.thread, 0, plot_main, w_props);
+#endif
+
    sem_wait(plot_threads_sema);
       plot_threads.push_back(u.thread);
    sem_post(plot_threads_sema);
 
-   sem_wait(plot_window_sema);   // blocks until XCB_EXPOSE
+   sem_wait(plot_window_sema);   // blocks until window shown
    return IntScalar(u.ret, LOC);
 }
 //-----------------------------------------------------------------------------
 static UCS_string
-fill14(const std::string & name)
+fill_14(const std::string & name)
 {
 UTF8_string name_utf(name.c_str());
 UCS_string ret(name_utf);
@@ -636,8 +656,8 @@ Quad_PLOT::help() const
 
    CERR << left;
 
-# define gdef(ty,  na,  val, descr)                           \
-   CERR << setw(20) << #na ":  " << fill14(Plot_data::ty ## _to_str(val)) \
+# define gdef(ty,  na,  val, descr)                                        \
+   CERR << setw(20) << #na ":  " << fill_14(Plot_data::ty ## _to_str(val)) \
         << " (" << descr << ")" << endl;
 # include "Quad_PLOT.def"
 
