@@ -15,15 +15,17 @@ gdef(Pixel_X,  pa_border_L,         30, "pixels left of the plotarea")
 gdef(Pixel_X,  pa_border_R,         20, "pixels right of the plotarea")
 gdef(Pixel_Y,  pa_border_T,         25, "pixels above the plotarea")
 gdef(Pixel_Y,  pa_border_B,         25, "pixels below the plotarea")
-gdef(uint32_t, gridX_style,          1, "X grid style (1-2)")
+gdef(uint32_t, gridX_style,          1, "X grid style = ──────── )\n"
+"                   (2)             (             = ╴╴╴╴╴╴╴╴ )\n"
+"                   (3)             (             = ─╴─╴─╴─╴ ")
 gdef(Pixel_X,  gridX_pixels,        44, "pixels between X grid lines")
 gdef(Pixel_Y,  gridX_line_width,     1, "thickness of the X-grid lines")
 gdef(Color,    gridX_color,   0x000000, "color of the X-grid lines")
-gdef(uint32_t, gridY_style,          1, "Y grid style (1-2)")
+gdef(uint32_t, gridY_style,          1, "Y grid style, see gridX_style above")
 gdef(Pixel_Y,  gridY_pixels,        33, "pixels between Y grid lines")
 gdef(Pixel_X,  gridY_line_width,     1, "thickness of the Y-grid lines")
 gdef(Color,    gridY_color,   0x000000, "color of the Y-grid lines")
-gdef(uint32_t, gridZ_style,          1, "Z grid style (1-2)")
+gdef(uint32_t, gridZ_style,          1, "Z grid style, see gridX_style above")
 gdef(Pixel_Y,  gridZ_pixels,        33, "pixels between Z grid lines")
 gdef(Pixel_X,  gridZ_line_width,     1, "thickness of the Z-grid lines")
 gdef(Color,    gridZ_color,   0x000000, "color of the Z-grid lines")
@@ -44,13 +46,16 @@ gdef(Pixel_Y,  origin_Y,           100, "Y position offset of the origin")
 
 #ifdef ldef
 ldef(Color,    line_color,    0x00FF00, "the color of plot line N")
+ldef(uint32_t, line_style,           1, "line style, see gridX_style above")
 ldef(Pixel_Y,  line_width,           3, "the thickness of plot line N")
 ldef(Color,    point_color,   0x000000, "the color of the plot points")
 ldef(uint32_t, point_style,          1, "= plot_points: ● )\n"
 "                   (2)             (= plot_points: ▲ )\n"
 "                   (3)             (= plot_points: ▼ )\n"
 "                   (4)             (= plot_points: ◆ )\n"
-"                   (5)             (= plot_points: ■ ")
+"                   (5)             (= plot_points: ■ )\n"
+"                   (6)             (= plot_points: 🞤   (GTK only)\n"
+"                   (7)             (= plot_points: 🞫   (GTK only")
 ldef(Pixel_X,  point_size,           8, "the outer diameter of the plot points")
 ldef(Pixel_X,  point_size2,          0, "the inner diameter of the plot points")
 ldef(String,   legend_name,         "", "the name of plot line N in the legend")

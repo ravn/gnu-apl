@@ -89,7 +89,9 @@ static vector<const Plot_context *> all_plot_contexts;
 static int plot_window_count = 0;
 
 //-----------------------------------------------------------------------------
-inline void
+/// same as standard cairo_set_RGB_source() but with Color instead of double
+/// red, green, and cblue values.
+static inline void
 cairo_set_RGB_source(cairo_t * cr, Color color)
 {
    // cairo-RGB runs from 0.0 to 1.0
@@ -99,7 +101,35 @@ cairo_set_RGB_source(cairo_t * cr, Color color)
                              (color       & 0xFF) / 255.0, 1.0);   // opaque
 }
 //-----------------------------------------------------------------------------
-void
+static void
+draw_line(cairo_t * cr, const Plot_context & pctx, Color line_color,
+          int line_style, int line_width, const Pixel_XY & P0, const Pixel_XY & P1)
+{
+double dashes_1[] = {  };              // ────────
+double dashes_2[] = {  5.0 };          // ╴╴╴╴╴╴╴╴
+double dashes_3[] = { 10.0, 5.0 };     // ─╴─╴─╴─╴
+
+   enum
+      {
+        num_dashes_1 = sizeof(dashes_1) / sizeof(double),
+        num_dashes_2 = sizeof(dashes_2) / sizeof(double),
+        num_dashes_3 = sizeof(dashes_3) / sizeof(double),
+      };
+
+   cairo_set_RGB_source(cr, line_color);
+   if      (line_style == 3)   cairo_set_dash(cr, dashes_3, num_dashes_3, 0);
+   else if (line_style == 2)   cairo_set_dash(cr, dashes_2, num_dashes_2, 0);
+   else                        cairo_set_dash(cr, dashes_1, num_dashes_1, 0);
+
+   cairo_set_line_width(cr, 1.0*line_width);   // 1 pixel = 2 cairo
+   cairo_move_to(cr, P0.x, P0.y);
+   cairo_line_to(cr, P1.x, P1.y);
+   cairo_stroke(cr);
+
+   if (line_style != 1)   cairo_set_dash(cr, dashes_1, num_dashes_1, 0);
+}
+//-----------------------------------------------------------------------------
+static void
 draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
 {
    cairo_set_RGB_source(cr, color);
@@ -107,7 +137,7 @@ draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
    cairo_fill(cr);
 }
 //-----------------------------------------------------------------------------
-void
+static void
 draw_delta(cairo_t * cr, Pixel_XY P0, bool up, Color color, int size)
 {
 const double l = 1.0*size;        // ∆ center to top vertex
@@ -134,7 +164,7 @@ const double s = 0.5*l;           // ∆ base middle to left/right vertex
    cairo_fill(cr);
 }
 //-----------------------------------------------------------------------------
-void
+static void
 draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
 {
    cairo_set_RGB_source(cr, color);
@@ -151,29 +181,58 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
    else        // ■
       {
         const double dlta = 1.414213562 * size;
-        cairo_move_to(cr, P0.x - dlta,  P0.y + dlta);   // top left vertex
-        cairo_line_to(cr, P0.x + dlta,  P0.y + dlta);   // top right vertex
-        cairo_line_to(cr, P0.x + dlta,  P0.y - dlta);   // bottom right vertex
-        cairo_line_to(cr, P0.x - dlta,  P0.y - dlta);   // bottom left vertex
-        cairo_close_path(cr);                           // back to top
+        cairo_rectangle(cr, P0.x - dlta,  P0.y + dlta, 2*dlta, 2*dlta);
       }
 
    cairo_fill(cr);
 }
 //-----------------------------------------------------------------------------
-void
+static void
+draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
+           double size, int size2)
+{
+   size *= 2.5;
+   cairo_set_RGB_source(cr, color);
+
+const double half = 0.5*size;
+   if (size2 == 0)   size2 = 2;   // default line thickness
+   cairo_set_line_width(cr, 1.0*size2);   // 1 pixel = 2 cairo
+   if (plus)   // 🞤
+      {
+        cairo_move_to(cr, P0.x - half, P0.y);
+        cairo_line_to(cr, P0.x + half, P0.y);
+        cairo_move_to(cr, P0.x, P0.y + half);
+        cairo_line_to(cr, P0.x, P0.y - half);
+      }
+   else        // 🞫
+      {
+        const double dlta = 0.707106781*half;
+        cairo_move_to(cr, P0.x - dlta, P0.y + dlta);
+        cairo_line_to(cr, P0.x + dlta, P0.y - dlta);
+        cairo_move_to(cr, P0.x + dlta, P0.y + dlta);
+        cairo_line_to(cr, P0.x - dlta, P0.y - dlta);
+      }
+
+   cairo_stroke(cr);
+}
+//-----------------------------------------------------------------------------
+static void
 draw_point(cairo_t * cr, const Plot_context & pctx, Pixel_XY P0, int point_style,
            const Color outer_color, int outer_dia,
            const Color inner_color, int inner_dia)
 {
    switch(point_style)
       {
-        case 1: draw_circle(cr, P0,       outer_color, outer_dia);   break; // ●
-        case 2: draw_delta(cr, P0, true,  outer_color, outer_dia);   break; // ▲
-        case 3: draw_delta(cr, P0, false, outer_color, outer_dia);   break; // ▼
-        case 4: draw_quad(cr, P0, true,   outer_color, outer_dia);   break; // ◆
-        case 5: draw_quad(cr, P0, false,  outer_color, outer_dia);   break; // ■
-        default: CERR << "Invalid point style " << point_style;     return;
+        case 1: draw_circle(cr, P0,       outer_color, outer_dia);   break;   // ●
+        case 2: draw_delta(cr, P0, true,  outer_color, outer_dia);   break;   // ▲
+        case 3: draw_delta(cr, P0, false, outer_color, outer_dia);   break;   // ▼
+        case 4: draw_quad( cr, P0, true,  outer_color, outer_dia);   break;   // ◆
+        case 5: draw_quad( cr, P0, false, outer_color, outer_dia);   break;   // ■
+        case 6: draw_cross(cr, P0, true,  outer_color, outer_dia,
+                                                       inner_dia);   return;  // 🞤
+        case 7: draw_cross(cr, P0, false, outer_color, outer_dia,
+                                                       inner_dia);   return;  // 🞫
+        default: CERR << "Invalid point style " << point_style;      return;
       }
 
    if (inner_dia)   switch(point_style)
@@ -184,18 +243,6 @@ draw_point(cairo_t * cr, const Plot_context & pctx, Pixel_XY P0, int point_style
         case 4: draw_quad(cr, P0, true,   inner_color, inner_dia);   return; // ◆
         case 5: draw_quad(cr, P0, false,  inner_color, inner_dia);   return; // ■
       }
-}
-//-----------------------------------------------------------------------------
-void
-draw_line(cairo_t * cr, const Plot_context & pctx, Color color,
-          int line_width, const Pixel_XY & P0, const Pixel_XY & P1)
-{
-   cairo_set_RGB_source(cr, color);
-
-   cairo_set_line_width(cr, 1.0*line_width);   // 1 pixel = 2 cairo
-   cairo_move_to(cr, P0.x, P0.y);
-   cairo_line_to(cr, P1.x, P1.y);
-   cairo_stroke(cr);
 }
 //-----------------------------------------------------------------------------
 const char *
@@ -214,6 +261,16 @@ char * cp = cc;
       {
         *cp++ = '-';
         val = -val;
+      }
+
+   // at this point,. val > 0
+   //
+   if (val < 1 && val >= 0.1)  // 100-999 milli
+      {
+        snprintf(cc, sizeof(cc), "0.%03d", int(val*1000));
+        size_t cc_len = strlen(cc);
+        if (cc[--cc_len] == '0')   cc[cc_len] = 0;   // skip trailing 0
+        return cc;
       }
 
 const char * unit = 0;
@@ -350,18 +407,23 @@ const int dy = w_props.get_legend_dY();
      cairo_close_path(cr);
      cairo_fill(cr);
    }
-
    for (int l = 0; l < line_count; ++l)
        {
          const Plot_line_properties & lp = *l_props[l];
+         const Color line_color  = lp.get_line_color();
+         const int line_style    = lp.get_line_style();
+         const int line_width    = lp.get_line_width();
+         const int point_style   = lp.get_point_style();
+         const Color point_color = lp.get_point_color();
+         const int point_size    = lp.get_point_size();
+         const int point_size2   = lp.get_point_size2();
 
          const Pixel_Y y1 = y0 + l*dy;
 
-         draw_line(cr, pctx, lp.get_line_color(), lp.get_line_width(),
+         draw_line(cr, pctx, line_color, line_style, line_width,
                    Pixel_XY(x0, y1), Pixel_XY(x2, y1));
-         draw_point(cr, pctx, Pixel_XY(x1, y1), lp.get_point_style(),
-                    lp.get_point_color(), lp.get_point_size(),
-                    canvas_color, lp.get_point_size2());
+         draw_point(cr, pctx, Pixel_XY(x1, y1), point_style, point_color,
+                    point_size, canvas_color, point_size2);
          draw_text(cr, pctx, lp.get_legend_name().c_str(), Pixel_XY(xt, y1 + 5));
        }
 }
@@ -405,7 +467,7 @@ const double dH = (H12 - H0) / steps;
                               P0.y + beta * (P1.y - P0.y));
          const Pixel_XY P0_P2(P0.x + beta * (P2.x - P0.x),
                               P0.y + beta * (P2.y - P0.y));
-         draw_line(cr, pctx, line_color, 1, P0_P1, P0_P2);
+         draw_line(cr, pctx, line_color, 1, 1, P0_P1, P0_P2);
        }
 }
 //-------------------------------------------------------------------------------
@@ -477,20 +539,21 @@ const Color line_color = w_props.get_gridX_color();
 const Pixel_Y py0 = w_props.valY2pixel(0);
 const double dy = w_props.get_max_Y() - w_props.get_min_Y();
 const Pixel_Y py1 = w_props.valY2pixel(dy);
+const int line_style = w_props.get_gridX_style();
    for (int ix = 0; ix <= w_props.get_gridX_last(); ++ix)
        {
          const double v = w_props.get_min_X() + ix*w_props.get_tile_X();
          const int px0 = w_props.valX2pixel(v - w_props.get_min_X())
-                      + w_props.get_origin_X();
-         if (ix == 0 || ix == w_props.get_gridX_last() ||
-             w_props.get_gridX_style() == 1)
+                       + w_props.get_origin_X();
+
+         if (ix == 0 || ix == w_props.get_gridX_last())
             {
-              draw_line(cr, pctx, line_color, line_width,
+              draw_line(cr, pctx, line_color, 1, line_width,
                         Pixel_XY(px0, py0), Pixel_XY(px0, py1));
             }
          else if (w_props.get_gridX_style() == 2)
             {
-              draw_line(cr, pctx, line_color, line_width,
+              draw_line(cr, pctx, line_color, line_style, line_width,
                         Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1 - 5));
             }
 
@@ -519,20 +582,20 @@ const Color line_color = w_props.get_gridY_color();
 const Pixel_X px0 = w_props.valX2pixel(0) + w_props.get_origin_X();
 const double dx = w_props.get_max_X() - w_props.get_min_X();
 const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
+const int line_style = w_props.get_gridY_style();
    for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
        {
          const double v = w_props.get_min_Y() + iy*w_props.get_tile_Y();
          const Pixel_Y py0 = w_props.valY2pixel(v - w_props.get_min_Y());
-         if (iy == 0 || iy == w_props.get_gridY_last() ||
-               w_props.get_gridY_style() == 1)
+         if (iy == 0 || iy == w_props.get_gridY_last())
             {
-              draw_line(cr, pctx, line_color, line_width,
+              draw_line(cr, pctx, line_color, 1, line_width,
                         Pixel_XY(px0, py0), Pixel_XY(px1, py0));
             }
-         else if (w_props.get_gridY_style() == 2)
+         else
             {
 
-              draw_line(cr, pctx, line_color, line_width,
+              draw_line(cr, pctx, line_color, line_style, line_width,
                         Pixel_XY(px0 - 5, py0), Pixel_XY(px1 + 5, py0));
             }
          const char * cc = format_tick(v);
@@ -577,6 +640,7 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_min_Y())
 
    // lines starting on the Z-axis...
    //
+int line_style = w_props.get_gridZ_style();
    for (int iz = 1; iz <= iz_max; ++iz)
        {
          const Pixel_X px0 = orig.x - iz * len_Zx / iz_max;
@@ -586,8 +650,17 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_min_Y())
          const  Pixel_XY PZ(px0, py0);   // point on the Z axis
          const  Pixel_XY PX(px1, py0);   // along the X axis
          const  Pixel_XY PY(px0, py1);   // along the Y axis
-         draw_line(cr, pctx, line_color, line_width, PZ, PX);
-         draw_line(cr, pctx, line_color, line_width, PZ, PY);
+
+         if (iz == iz_max)   // full line
+            {
+              draw_line(cr, pctx, line_color, 1, line_width, PZ, PX);
+              draw_line(cr, pctx, line_color, 1, line_width, PZ, PY);
+            }
+         else
+            {
+              draw_line(cr, pctx, line_color, line_style, line_width, PZ, PX);
+              draw_line(cr, pctx, line_color, line_style, line_width, PZ, PY);
+            }
 
          const double v = w_props.get_min_Z() + iz*w_props.get_tile_Z();
          const char * cc = format_tick(v);
@@ -599,6 +672,7 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_min_Y())
 
    // lines starting on the X-axis...
    //
+line_style = w_props.get_gridX_style();
    for (int ix = 0; ix <= ix_max; ++ix)
        {
          const Pixel_X px0 = orig.x + ix * len_X / ix_max;
@@ -608,11 +682,15 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_min_Y())
          const  Pixel_XY P0(px0, py0);   // point on the X axis
          const  Pixel_XY P1(px1, py1);   // point along the Z axis
 
-         draw_line(cr, pctx, line_color, line_width, P0, P1);
+         if (ix == 0 || ix == ix_max)   // full line
+            draw_line(cr, pctx, line_color, 1, line_width, P0, P1);
+         else
+            draw_line(cr, pctx, line_color, line_style, line_width, P0, P1);
        }
 
    // lines starting on the Y-axis...
    //
+line_style = w_props.get_gridY_style();
    for (int iy = 1; iy <= iy_max; ++iy)
        {
          const Pixel_X px0 = orig.x;
@@ -622,7 +700,10 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_min_Y())
          const  Pixel_XY P0(px0, py0);   // point on the Y axis
          const  Pixel_XY P1(px1, py1);   // point along the Z axis
 
-         draw_line(cr, pctx, line_color, line_width, P0, P1);
+         if (iy == iy_max)   // full line
+            draw_line(cr, pctx, line_color, 1, line_width, P0, P1);
+         else
+            draw_line(cr, pctx, line_color, line_style, line_width, P0, P1);
        }
 }
 //-----------------------------------------------------------------------------
@@ -638,7 +719,8 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
        {
          const Plot_line_properties & lp = *l_props[l];
          const Color line_color = lp.get_line_color();
-         const int line_width = lp.get_line_width();
+         const int line_style   = lp.get_line_style();
+         const int line_width   = lp.get_line_width();
 
          // draw lines between points
          //
@@ -650,7 +732,8 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
                const Pixel_XY P(w_props.valX2pixel(vx - w_props.get_min_X())
                                 + w_props.get_origin_X(),
                                 w_props.valY2pixel(vy - w_props.get_min_Y()));
-               if (n)   draw_line(cr, pctx, line_color, line_width, last, P);
+               if (n)   draw_line(cr, pctx, line_color, line_style,
+                                            line_width, last, P);
                last = P;
              }
 
@@ -816,13 +899,13 @@ const int verbosity = w_props.get_verbosity();
          draw_line(pctx, pctx.line, xy0, P0);
          continue;
 #endif
-         draw_line(cr, pctx, line_color, line_width, P0, P1);
+         draw_line(cr, pctx, line_color, 1, line_width, P0, P1);
          if (row == (data.get_row_count() - 2))   // last row
-            draw_line(cr, pctx, line_color, line_width, P2, P3);
+            draw_line(cr, pctx, line_color, 1, line_width, P2, P3);
 
-         draw_line(cr, pctx, line_color, line_width, P0, P2);
+         draw_line(cr, pctx, line_color, 1, line_width, P0, P2);
          if (col == (data[row].get_N() - 2))   // last column
-            draw_line(cr, pctx, line_color, line_width, P1, P3);
+            draw_line(cr, pctx, line_color, 1, line_width, P1, P3);
        }
 
   // 3. draw plot points
@@ -1068,7 +1151,8 @@ plot_stop(const Plot_window_properties * props)
 void *
 plot_main(void * vp_props)
 {
-CERR << "plot_main(" << vp_props << ")" << endl;
+// CERR << "plot_main(" << vp_props << ")" << endl;
+
    if (getenv("DISPLAY") == 0)   // DISPLAY not set
       setenv("DISPLAY", ":0", true);
 
@@ -1115,6 +1199,7 @@ Plot_context * pctx = new Plot_context(w_props);
    gtk_window_move(GTK_WINDOW(pctx->window), w_props.get_pw_pos_X(),
                                              w_props.get_pw_pos_Y());
 
+   gtk_window_set_focus_on_map(GTK_WINDOW(pctx->window), true);
    gtk_widget_show_all(GTK_WIDGET(pctx->window));
 
    g_signal_connect_object(pctx->window, "destroy",
