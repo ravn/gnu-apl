@@ -27,7 +27,7 @@ distcleancheck_listfile = buildtag
 # common means common to the apl and libapl builds
 #
 common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS)
-common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS) -lX11
+common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS)
 common_SOURCES  = $(plot_SOURCES) 					\
 			buildtag		buildtag.hh		\
 						../config.h		\
