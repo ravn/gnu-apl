@@ -913,7 +913,7 @@ distcleancheck_listfile = buildtag
 #
 common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS) \
 	$(am__append_4) $(am__append_8)
-common_LDFLAGS = -export-dynamic $(GTK_LDFLAGS) -lX11 $(am__append_5) \
+common_LDFLAGS = -export-dynamic $(GTK_LDFLAGS) $(am__append_5) \
 	$(am__append_9)
 common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
