@@ -102,8 +102,8 @@ cairo_set_RGB_source(cairo_t * cr, Color color)
 }
 //-----------------------------------------------------------------------------
 static void
-draw_line(cairo_t * cr, const Plot_context & pctx, Color line_color,
-          int line_style, int line_width, const Pixel_XY & P0, const Pixel_XY & P1)
+draw_line(cairo_t * cr, Color line_color, int line_style, int line_width,
+          const Pixel_XY & P0, const Pixel_XY & P1)
 {
 double dashes_1[] = {  };              // ────────
 double dashes_2[] = {  5.0 };          // ╴╴╴╴╴╴╴╴
@@ -217,7 +217,7 @@ const double half = 0.5*size;
 }
 //-----------------------------------------------------------------------------
 static void
-draw_point(cairo_t * cr, const Plot_context & pctx, Pixel_XY P0, int point_style,
+draw_point(cairo_t * cr, Pixel_XY P0, int point_style,
            const Color outer_color, int outer_dia,
            const Color inner_color, int inner_dia)
 {
@@ -243,6 +243,49 @@ draw_point(cairo_t * cr, const Plot_context & pctx, Pixel_XY P0, int point_style
         case 4: draw_quad(cr, P0, true,   inner_color, inner_dia);   return; // ◆
         case 5: draw_quad(cr, P0, false,  inner_color, inner_dia);   return; // ■
       }
+}
+//-----------------------------------------------------------------------------
+inline void
+draw_marker(cairo_t * cr, Pixel_XY P)
+{
+   draw_point(cr, P, 1, 0xFF0000, 10, 0, 0);
+}
+//-----------------------------------------------------------------------------
+static void
+draw_arrow(cairo_t * cr, Pixel_XY O, Pixel_XY A, const Color color)
+{
+   // draw an arrow for an axis that starts at origin O and ends at
+   // A (where the arrow starts).
+
+   // 1. create a unit vector U of length 1 parallel to the axis O-A
+   //
+const int dx = A.x - O.x;
+const int dy = A.y - O.y;
+const double len = sqrt(dx*dx + dy*dy);
+const double Ux = dx/len;
+const double Uy = dy/len;
+
+   // arrow dimensions (pixel)
+   //
+   enum { SHAFT = 20, WING  = 5, TIP = 15 };
+
+   // draw the shaft
+   //
+const Pixel_XY S(A.x + SHAFT*Ux, A.y + SHAFT*Uy);
+   cairo_move_to(cr, A.x, A.y);
+   cairo_line_to(cr, S.x, S.y);
+   cairo_stroke(cr);
+
+const Pixel_XY W(S.x - WING*Ux, S.y - WING*Uy);
+const Pixel_XY W1(W.x - WING*Uy, W.y + WING*Ux);
+const Pixel_XY W2(W.x + WING*Uy, W.y - WING*Ux);
+const Pixel_XY T(S.x + TIP*Ux, S.y + TIP*Uy);
+   cairo_move_to(cr, S.x, S.y);
+   cairo_line_to(cr, W1.x, W1.y);
+   cairo_line_to(cr, T.x, T.y);
+   cairo_line_to(cr, W2.x, W2.y);
+   cairo_close_path(cr);
+   cairo_fill(cr);
 }
 //-----------------------------------------------------------------------------
 const char *
@@ -325,8 +368,7 @@ cairo_string_size(double & lx, double & ly, cairo_t * cr, const char * label,
 }
 //-----------------------------------------------------------------------------
 void
-draw_text(cairo_t * cr, const Plot_context & pctx,
-          const char * label, const Pixel_XY & xy)
+draw_text(cairo_t * cr, const char * label, const Pixel_XY & xy)
 {
   cairo_move_to(cr, xy.x, xy.y);
   cairo_select_font_face(cr, FONT_NAME,
@@ -366,7 +408,6 @@ double longest_len = 0.0;
        }
 
 const Color canvas_color = w_props.get_canvas_color();
-// const Color canvas_color = 0xB0B0B0;
 
   /*
                              ┌────────────────────────┐
@@ -376,15 +417,15 @@ const Color canvas_color = w_props.get_canvas_color();
                                x0 x1 x2 xt
   */
 
-int x0 = w_props.get_legend_X();               // left of    --o--
-   if (surface_plot)   x0 += w_props.get_origin_X();
+const Pixel_XY origin = w_props.get_origin(surface_plot);
+const int x0 = origin.x + w_props.get_legend_X();
+const int y0 = origin.y - w_props.get_pa_height() + w_props.get_legend_Y();
 
 const int x1 = x0 + 30;                              // point o in --o--
 const int x2 = x1 + 30;                              // end of     --o--
 const int xt = x2 + 10;                              // text after --o--
 const int xe = xt + longest_len;                     // end of legend_name
 
-const int y0 = w_props.get_legend_Y();               // y of first legends
 const int dy = w_props.get_legend_dY();
 
    // draw legend background
@@ -400,12 +441,12 @@ const int dy = w_props.get_legend_dY();
      const double Y1 = y0 + ly2 + dy*(line_count - 1) + BORDER;
 
      cairo_set_RGB_source(cr, canvas_color);
-     cairo_move_to(cr, X0, Y0);
-     cairo_line_to(cr, X1, Y0);
-     cairo_line_to(cr, X1, Y1);
-     cairo_line_to(cr, X0, Y1);
-     cairo_close_path(cr);
+     cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
      cairo_fill(cr);
+     cairo_set_RGB_source(cr, 0x000000);
+     cairo_set_line_width(cr, 2);
+     cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
+     cairo_stroke(cr);
    }
    for (int l = 0; l < line_count; ++l)
        {
@@ -420,11 +461,11 @@ const int dy = w_props.get_legend_dY();
 
          const Pixel_Y y1 = y0 + l*dy;
 
-         draw_line(cr, pctx, line_color, line_style, line_width,
+         draw_line(cr, line_color, line_style, line_width,
                    Pixel_XY(x0, y1), Pixel_XY(x2, y1));
-         draw_point(cr, pctx, Pixel_XY(x1, y1), point_style, point_color,
+         draw_point(cr, Pixel_XY(x1, y1), point_style, point_color,
                     point_size, canvas_color, point_size2);
-         draw_text(cr, pctx, lp.get_legend_name().c_str(), Pixel_XY(xt, y1 + 5));
+         draw_text(cr, lp.get_legend_name().c_str(), Pixel_XY(xt, y1 + 5));
        }
 }
 //-------------------------------------------------------------------------------
@@ -467,7 +508,7 @@ const double dH = (H12 - H0) / steps;
                               P0.y + beta * (P1.y - P0.y));
          const Pixel_XY P0_P2(P0.x + beta * (P2.x - P0.x),
                               P0.y + beta * (P2.y - P0.y));
-         draw_line(cr, pctx, line_color, 1, 1, P0_P1, P0_P2);
+         draw_line(cr, line_color, 1, 1, P0_P1, P0_P2);
        }
 }
 //-------------------------------------------------------------------------------
@@ -534,29 +575,28 @@ draw_X_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int line_width = w_props.get_gridX_line_width();
-const Color line_color = w_props.get_gridX_color();
+const Color grid_color = w_props.get_gridX_color();
 
 const Pixel_Y py0 = w_props.valY2pixel(0);
-const double dy = w_props.get_max_Y() - w_props.get_min_Y();
-const Pixel_Y py1 = w_props.valY2pixel(dy);
-const int line_style = w_props.get_gridX_style();
+const double dv = w_props.get_max_Y() - w_props.get_min_Y();
+const Pixel_Y py1 = w_props.valY2pixel(dv);
+const int grid_style = w_props.get_gridX_style();
    for (int ix = 0; ix <= w_props.get_gridX_last(); ++ix)
        {
-         const double v = w_props.get_min_X() + ix*w_props.get_tile_X();
+         const double v = w_props.get_min_X() + ix*w_props.get_value_per_tile_X();
          const int px0 = w_props.valX2pixel(v - w_props.get_min_X())
                        + w_props.get_origin_X();
 
          if (ix == 0 || ix == w_props.get_gridX_last())
             {
-              draw_line(cr, pctx, line_color, 1, line_width,
+              draw_line(cr, grid_color, 1, line_width,
                         Pixel_XY(px0, py0), Pixel_XY(px0, py1));
             }
-         else if (w_props.get_gridX_style() == 2)
+         else
             {
-              draw_line(cr, pctx, line_color, line_style, line_width,
+              draw_line(cr, grid_color, grid_style, line_width,
                         Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1 - 5));
             }
-
 
          const char * cc = format_tick(v);
          double cc_width, cc_height;
@@ -568,8 +608,15 @@ const int line_style = w_props.get_gridX_style();
               cc_pos.x -= w_props.get_origin_X();
               cc_pos.y += w_props.get_origin_Y();
             }
-         draw_text(cr, pctx, cc, cc_pos);
+         draw_text(cr, cc, cc_pos);
        }
+
+   if (w_props.get_axisX_arrow())
+      {
+        const Pixel_XY origin = w_props.get_origin(surface_plot);
+        const Pixel_X px = w_props.valX2pixel(dv) + w_props.get_origin_X();
+        draw_arrow(cr, origin, Pixel_XY(px, origin.y), grid_color);
+      }
 }
 //-------------------------------------------------------------------------------
 void
@@ -577,25 +624,25 @@ draw_Y_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int line_width = w_props.get_gridY_line_width();
-const Color line_color = w_props.get_gridY_color();
+const Color grid_color = w_props.get_gridY_color();
 
 const Pixel_X px0 = w_props.valX2pixel(0) + w_props.get_origin_X();
-const double dx = w_props.get_max_X() - w_props.get_min_X();
-const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
-const int line_style = w_props.get_gridY_style();
+const double dv = w_props.get_max_X() - w_props.get_min_X();
+const Pixel_X px1 = w_props.valX2pixel(dv) + w_props.get_origin_X();
+const int grid_style = w_props.get_gridY_style();
    for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
        {
-         const double v = w_props.get_min_Y() + iy*w_props.get_tile_Y();
+         const double v = w_props.get_min_Y() + iy*w_props.get_value_per_tile_Y();
          const Pixel_Y py0 = w_props.valY2pixel(v - w_props.get_min_Y());
          if (iy == 0 || iy == w_props.get_gridY_last())
             {
-              draw_line(cr, pctx, line_color, 1, line_width,
+              draw_line(cr, grid_color, 1, line_width,
                         Pixel_XY(px0, py0), Pixel_XY(px1, py0));
             }
          else
             {
 
-              draw_line(cr, pctx, line_color, line_style, line_width,
+              draw_line(cr, grid_color, grid_style, line_width,
                         Pixel_XY(px0 - 5, py0), Pixel_XY(px1 + 5, py0));
             }
          const char * cc = format_tick(v);
@@ -608,8 +655,26 @@ const int line_style = w_props.get_gridY_style();
               cc_pos.x -= w_props.get_origin_X();
               cc_pos.y += w_props.get_origin_Y();
             }
-           draw_text(cr, pctx, cc, cc_pos);
+           draw_text(cr, cc, cc_pos);
        }
+
+   if (w_props.get_axisY_arrow())
+      {
+        const Pixel_XY origin = w_props.get_origin(surface_plot);
+        Pixel_Y Ay;
+        if (surface_plot)
+           {
+            Ay = w_props.valXYZ2pixelXY(w_props.get_min_X(),
+                                        w_props.get_max_Y(),
+                                        w_props.get_min_Z()).y;
+           }
+        else
+           {
+            Ay = w_props.valY2pixel(dv);
+           }
+
+        draw_arrow(cr, origin, Pixel_XY(origin.x, Ay), grid_color);
+      }
 }
 //-------------------------------------------------------------------------------
 void
@@ -617,7 +682,7 @@ draw_Z_grid(cairo_t * cr, const Plot_context & pctx)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int line_width = w_props.get_gridZ_line_width();
-const Color line_color = w_props.get_gridZ_color();
+const Color grid_color = w_props.get_gridZ_color();
 
 const int ix_max = w_props.get_gridX_last();
 const int iy_max = w_props.get_gridY_last();
@@ -640,7 +705,7 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_min_Y())
 
    // lines starting on the Z-axis...
    //
-int line_style = w_props.get_gridZ_style();
+int grid_style = w_props.get_gridZ_style();
    for (int iz = 1; iz <= iz_max; ++iz)
        {
          const Pixel_X px0 = orig.x - iz * len_Zx / iz_max;
@@ -653,26 +718,26 @@ int line_style = w_props.get_gridZ_style();
 
          if (iz == iz_max)   // full line
             {
-              draw_line(cr, pctx, line_color, 1, line_width, PZ, PX);
-              draw_line(cr, pctx, line_color, 1, line_width, PZ, PY);
+              draw_line(cr, grid_color, 1, line_width, PZ, PX);
+              draw_line(cr, grid_color, 1, line_width, PZ, PY);
             }
          else
             {
-              draw_line(cr, pctx, line_color, line_style, line_width, PZ, PX);
-              draw_line(cr, pctx, line_color, line_style, line_width, PZ, PY);
+              draw_line(cr, grid_color, grid_style, line_width, PZ, PX);
+              draw_line(cr, grid_color, grid_style, line_width, PZ, PY);
             }
 
-         const double v = w_props.get_min_Z() + iz*w_props.get_tile_Z();
+         const double v = w_props.get_min_Z() + iz*w_props.get_value_per_tile_Z();
          const char * cc = format_tick(v);
          double cc_width, cc_height;
          cairo_string_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
          const Pixel_XY cc_pos(px1 + 10, py0 + 0.5*cc_height - 1);
-         draw_text(cr, pctx, cc, cc_pos);
+         draw_text(cr, cc, cc_pos);
        }
 
    // lines starting on the X-axis...
    //
-line_style = w_props.get_gridX_style();
+   grid_style = w_props.get_gridX_style();
    for (int ix = 0; ix <= ix_max; ++ix)
        {
          const Pixel_X px0 = orig.x + ix * len_X / ix_max;
@@ -683,14 +748,14 @@ line_style = w_props.get_gridX_style();
          const  Pixel_XY P1(px1, py1);   // point along the Z axis
 
          if (ix == 0 || ix == ix_max)   // full line
-            draw_line(cr, pctx, line_color, 1, line_width, P0, P1);
+            draw_line(cr, grid_color, 1, line_width, P0, P1);
          else
-            draw_line(cr, pctx, line_color, line_style, line_width, P0, P1);
+            draw_line(cr, grid_color, grid_style, line_width, P0, P1);
        }
 
    // lines starting on the Y-axis...
    //
-line_style = w_props.get_gridY_style();
+   grid_style = w_props.get_gridY_style();
    for (int iy = 1; iy <= iy_max; ++iy)
        {
          const Pixel_X px0 = orig.x;
@@ -701,10 +766,17 @@ line_style = w_props.get_gridY_style();
          const  Pixel_XY P1(px1, py1);   // point along the Z axis
 
          if (iy == iy_max)   // full line
-            draw_line(cr, pctx, line_color, 1, line_width, P0, P1);
+            draw_line(cr, grid_color, 1, line_width, P0, P1);
          else
-            draw_line(cr, pctx, line_color, line_style, line_width, P0, P1);
+            draw_line(cr, grid_color, grid_style, line_width, P0, P1);
        }
+
+   if (w_props.get_axisZ_arrow())
+      {
+        const Pixel_XY origin = w_props.get_origin(true);
+        const Pixel_XY P(orig.x - len_Zx, orig.y + len_Zy);
+        draw_arrow(cr, origin, P, grid_color);
+      }
 }
 //-----------------------------------------------------------------------------
 /// draw normal (2D) data lines
@@ -732,8 +804,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
                const Pixel_XY P(w_props.valX2pixel(vx - w_props.get_min_X())
                                 + w_props.get_origin_X(),
                                 w_props.valY2pixel(vy - w_props.get_min_Y()));
-               if (n)   draw_line(cr, pctx, line_color, line_style,
-                                            line_width, last, P);
+               if (n)   draw_line(cr, line_color, line_style, line_width, last, P);
                last = P;
              }
 
@@ -745,7 +816,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
                const Pixel_X px = w_props.valX2pixel(vx - w_props.get_min_X())
                                 + w_props.get_origin_X();
                const Pixel_Y py = w_props.valY2pixel(vy - w_props.get_min_Y());
-               draw_point(cr, pctx, Pixel_XY(px, py),
+               draw_point(cr, Pixel_XY(px, py),
                               lp.get_point_style(), lp.get_point_color(),
                               lp.get_point_size(), w_props.get_canvas_color(),
                               lp.get_point_size2());
@@ -899,13 +970,13 @@ const int verbosity = w_props.get_verbosity();
          draw_line(pctx, pctx.line, xy0, P0);
          continue;
 #endif
-         draw_line(cr, pctx, line_color, 1, line_width, P0, P1);
+         draw_line(cr, line_color, 1, line_width, P0, P1);
          if (row == (data.get_row_count() - 2))   // last row
-            draw_line(cr, pctx, line_color, 1, line_width, P2, P3);
+            draw_line(cr, line_color, 1, line_width, P2, P3);
 
-         draw_line(cr, pctx, line_color, 1, line_width, P0, P2);
+         draw_line(cr, line_color, 1, line_width, P0, P2);
          if (col == (data[row].get_N() - 2))   // last column
-            draw_line(cr, pctx, line_color, 1, line_width, P1, P3);
+            draw_line(cr, line_color, 1, line_width, P1, P3);
        }
 
   // 3. draw plot points
@@ -918,7 +989,7 @@ const int point_style  = lp0.get_point_style();
         const Pixel_XY P0 = w_props.valXYZ2pixelXY(data.get_X(row, col),
                                                    data.get_Y(row, col),
                                                    data.get_Z(row, col));
-        draw_point(cr, pctx, P0, point_style, point_color, 2, canvas_color, 0);
+        draw_point(cr, P0, point_style, point_color, 2, canvas_color, 0);
       }
 }
 //-------------------------------------------------------------------------------
@@ -1199,8 +1270,7 @@ Plot_context * pctx = new Plot_context(w_props);
    gtk_window_move(GTK_WINDOW(pctx->window), w_props.get_pw_pos_X(),
                                              w_props.get_pw_pos_Y());
 
-   gtk_window_set_focus_on_map(GTK_WINDOW(pctx->window), true);
-   gtk_widget_show_all(GTK_WIDGET(pctx->window));
+   gtk_widget_show_all(pctx->window);
 
    g_signal_connect_object(pctx->window, "destroy",
                            G_CALLBACK(plot_destroyed), 0, G_CONNECT_AFTER);

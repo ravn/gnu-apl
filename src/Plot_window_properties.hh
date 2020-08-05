@@ -117,6 +117,16 @@ public:
    /// coordinate of the pixel below the Z=0 plane of the plot area
    Pixel_XY valXYZ2pixelXY(double val_X, double val_Y, double val_Z) const;
 
+   /// return the pixel position of the point where the X, Y, and possibly
+   /// Z-axis cross.
+   Pixel_XY get_origin(bool surface) const
+      {
+        if (surface)   return valXYZ2pixelXY(get_min_X(),
+                                             get_min_Y(),
+                                             get_min_Z());
+        return Pixel_XY(valX2pixel(0), valY2pixel(0));   // 2D
+      }
+
    /// print the properties (for debugging purposes)
    int print(ostream & out) const;
 
@@ -157,14 +167,14 @@ public:
    /// return the Z value → Z pixels scaling factor
    double get_scale_Z() const        { return scale_Z; }
 
-   /// return the number of pixels between X grid lines
-   double get_tile_X() const          { return tile_X; }
+   /// return the X-value difference for one tile (= between two X grid lines)
+   double get_value_per_tile_X() const          { return tile_X; }
 
-   /// return the number of pixels between Y grid lines
-   double get_tile_Y() const          { return tile_Y; }
+   /// return the Y-value difference for one tile (= between two Y grid lines)
+   double get_value_per_tile_Y() const          { return tile_Y; }
 
-   /// return the number of pixels between Z grid lines
-   double get_tile_Z() const          { return tile_Z; }
+   /// return the Z-value difference for one tile (= between two Z grid lines)
+   double get_value_per_tile_Z() const          { return tile_Z; }
 
    /// return the last index of the X grid
    Pixel_X get_gridX_last() const      { return gridX_last; }

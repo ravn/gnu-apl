@@ -18,6 +18,12 @@ gdef(Pixel_Y,  pa_border_B,         25, "pixels below the plotarea")
 gdef(uint32_t, gridX_style,          1, "X grid style = ──────── )\n"
 "                   (2)             (             = ╴╴╴╴╴╴╴╴ )\n"
 "                   (3)             (             = ─╴─╴─╴─╴ ")
+gdef(uint32_t, axisX_arrow,          0, "X-axis arrow")
+gdef(String,   axisX_label,        "X", "X-axis label")
+gdef(uint32_t, axisY_arrow,          0, "Yaxis arrow")
+gdef(String,   axisY_label,        "Y", "Y-axislabel")
+gdef(uint32_t, axisZ_arrow,          0, "Z-axis arrow")
+gdef(String,   axisZ_label,        "Z", "Z-axis label")
 gdef(Pixel_X,  gridX_pixels,        44, "pixels between X grid lines")
 gdef(Pixel_Y,  gridX_line_width,     1, "thickness of the X-grid lines")
 gdef(Color,    gridX_color,   0x000000, "color of the X-grid lines")

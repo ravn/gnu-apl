@@ -283,7 +283,7 @@ Quad_PLOT::eval_B(Value_P B)
         // scalar argument: plot window control
         union
            {
-             int64_t B0;                               // APL
+             APL_Integer B0;                           // APL
              const Plot_window_properties * w_props;   // gtk
              const void * vp;                          // plot_stop() result
              pthread_t thread;                         // xcb
@@ -607,7 +607,7 @@ union
 {
    pthread_t                      thread;    // xcb
    const Plot_window_properties * w_props;   // gtk
-   int64_t                        ret;       // APL
+   APL_Integer                    ret;       // APL
 } u;
    u.ret = 0;
 
