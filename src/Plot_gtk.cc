@@ -44,6 +44,11 @@ const char * FONT_NAME = "sans-serif";
 enum {  FONT_SIZE = 10 };
 
 // ===========================================================================
+/** a structure that aggregates:
+
+     plot data and plot attributes (Plot_window_properties) and
+     GTK widgets (window, drawing_area).
+ **/
 struct Plot_context
 {
    /// constructor
@@ -74,9 +79,6 @@ struct Plot_context
    /// the window properties (as choosen by the user)
    Plot_window_properties & w_props;
 
-   /// the pthread_t that handles this Plot_context
-   pthread_t thread;
-
    /// the window of this Plot_context
    GtkWidget * window;
 
@@ -90,7 +92,7 @@ static int plot_window_count = 0;
 
 //-----------------------------------------------------------------------------
 /// same as standard cairo_set_RGB_source() but with Color instead of double
-/// red, green, and cblue values.
+/// red, green, and blue values.
 static inline void
 cairo_set_RGB_source(cairo_t * cr, Color color)
 {
@@ -442,10 +444,9 @@ const int dy = w_props.get_legend_dY();
 
      cairo_set_RGB_source(cr, canvas_color);
      cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
-     cairo_fill(cr);
+     cairo_fill_preserve(cr);
      cairo_set_RGB_source(cr, 0x000000);
      cairo_set_line_width(cr, 2);
-     cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
      cairo_stroke(cr);
    }
    for (int l = 0; l < line_count; ++l)
@@ -615,7 +616,15 @@ const int grid_style = w_props.get_gridX_style();
       {
         const Pixel_XY origin = w_props.get_origin(surface_plot);
         const Pixel_X px = w_props.valX2pixel(dv) + w_props.get_origin_X();
-        draw_arrow(cr, origin, Pixel_XY(px, origin.y), grid_color);
+
+        Pixel_XY P(px, origin.y);
+        draw_arrow(cr, origin, P, grid_color);
+
+        const string arrow_label = w_props.get_axisX_label();
+        if (arrow_label.size())
+           {
+             draw_text(cr, arrow_label.c_str(), Pixel_XY(P.x + 40, P.y + 5));
+           }
       }
 }
 //-------------------------------------------------------------------------------
@@ -673,7 +682,18 @@ const int grid_style = w_props.get_gridY_style();
             Ay = w_props.valY2pixel(dv);
            }
 
-        draw_arrow(cr, origin, Pixel_XY(origin.x, Ay), grid_color);
+        Pixel_XY P(origin.x, Ay);
+        draw_arrow(cr, origin, P, grid_color);
+
+        const string arrow_label = w_props.get_axisY_label();
+        if (arrow_label.size())
+           {
+             double cc_width, cc_height;
+             cairo_string_size(cc_width, cc_height, cr, arrow_label.c_str(),
+                               FONT_NAME, FONT_SIZE);
+             draw_text(cr, arrow_label.c_str(),
+                       Pixel_XY(P.x - 0.5*cc_width, P.y - 40));
+           }
       }
 }
 //-------------------------------------------------------------------------------
@@ -776,6 +796,16 @@ int grid_style = w_props.get_gridZ_style();
         const Pixel_XY origin = w_props.get_origin(true);
         const Pixel_XY P(orig.x - len_Zx, orig.y + len_Zy);
         draw_arrow(cr, origin, P, grid_color);
+
+        const string arrow_label = w_props.get_axisZ_label();
+        if (arrow_label.size())
+           {
+             double cc_width, cc_height;
+             cairo_string_size(cc_width, cc_height, cr, arrow_label.c_str(),
+                               FONT_NAME, FONT_SIZE);
+             draw_text(cr, arrow_label.c_str(),
+                       Pixel_XY(P.x - 30 - 0.5*cc_width, P.y + 35));
+           }
       }
 }
 //-----------------------------------------------------------------------------
