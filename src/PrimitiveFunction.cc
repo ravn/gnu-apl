@@ -337,7 +337,7 @@ Value_P Z(B->get_shape(), LOC);
                                                        len_A, Idx_A,
                                                        B->get_ravel(bz), qct);
 
-              if (simple_result)   new (Z->next_ravel()) IntCell(qio + z);
+              if (simple_result)   new (Z->next_ravel()) IntCell(qio + Idx_A[z]);
               else if (z == len_A)   // not found: set result item to ⍬
                  {
                    Value_P zilde(ShapeItem(0), LOC);
@@ -345,7 +345,7 @@ Value_P Z(B->get_shape(), LOC);
                  }
               else                   // element found (first at z (+⎕IO)
                  {
-                   const Shape Sz = A->get_shape().offset_to_index(z, qio);
+                   const Shape Sz = A->get_shape().offset_to_index(Idx_A[z], qio);
                    Value_P Vz(LOC, &Sz);
                    new (Z->next_ravel()) PointerCell(Vz.get(), Z.getref());
                  }
