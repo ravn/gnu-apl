@@ -392,24 +392,38 @@ const int ret = cell.compare(cell_A);
 }
 //-----------------------------------------------------------------------------
 ShapeItem
-Bif_F12_INDEX_OF::find_B_in_sorted_A(const Cell * A, ShapeItem len_A,
+Bif_F12_INDEX_OF::find_B_in_sorted_A(const Cell * ravel_A, ShapeItem len_A,
                                      const ShapeItem * Idx_A,
                                      const Cell & cell_B, double qct)
 {
-const ShapeItem * posp = Heapsort<ShapeItem>::search<const Cell &>(
-                                cell_B, Idx_A, len_A, &bs_cmp, A);
-   if (posp)   // found cell_B in A
-      {
-        ShapeItem pos = Idx_A[posp - Idx_A];   // A[pos] = cell_B within qct
+const ShapeItem * const posp = Heapsort<ShapeItem>::search<const Cell &>(
+                                      cell_B, Idx_A, len_A, &bs_cmp, ravel_A);
+   if (!posp)   return len_A;   // cell_B was not found in ravel A
 
-        // A[pos] = cell_B, but there could be predecessors of pos that also
-        // satisfy A[pos] = cell_B. Decrease pos as long as much as possible.
-        //
-        while (pos > 0 && cell_B.equal(A[pos - 1], qct))   --pos;
-        return pos;
-      }
+ShapeItem pos = Idx_A[posp - Idx_A];   // A[pos] = cell_B within qct
+   Assert(cell_B.equal(ravel_A[pos], qct));
 
-   return len_A;   // cell_B was not found in ravel A
+   // A[pos] = cell_B, but there could be predecessors of pos that also
+   // satisfy A[pos] = cell_B. Search neighbor with smallest index in A.
+   //
+ShapeItem ret = pos;
+   for (const ShapeItem * posp1 = posp - 1; posp1 >= Idx_A; --posp1)
+       {
+         ShapeItem pos1 = Idx_A[posp1 - Idx_A];
+         const Cell & C1 = ravel_A[pos1];
+         if (!cell_B.equal(C1, qct))    break;
+         if (ret > pos1)   ret = pos1;
+       }
+
+   for (const ShapeItem * posp2 = posp + 1; posp2 < (Idx_A + len_A); ++posp2)
+       {
+         ShapeItem pos2 = Idx_A[posp2 - Idx_A];
+         const Cell & C2 = ravel_A[pos2];
+         if (!cell_B.equal(C2, qct))    break;
+         if (ret > pos2)   ret = pos2;
+       }
+
+   return ret;
 }
 //=============================================================================
 Token
