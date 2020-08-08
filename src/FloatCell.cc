@@ -698,14 +698,14 @@ const APL_Float r              = P - prod2;
    return r;
 
 /*
-// Q(P)
-// Q(Q)
-// Q(quotient)
-// Q(abs_quotient)
-// Q(floor_quotient)
-// Q(abs_prod)
-// Q(prod2)
-// Q(r)
+// Q1(P)
+// Q1(Q)
+// Q1(quotient)
+// Q1(abs_quotient)
+// Q1(floor_quotient)
+// Q1(abs_prod)
+// Q1(prod2)
+// Q1(r)
 
 Assert(isnormal(abs_quotient)   || abs_quotient   == 0.0);
 Assert(isnormal(floor_quotient) || floor_quotient == 0.0);

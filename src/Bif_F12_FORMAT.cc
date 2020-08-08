@@ -209,7 +209,7 @@ Bif_F12_FORMAT::format_by_example(Value_P A, Value_P B)
 {
    if (A->get_rank() != 1)   RANK_ERROR;
 
-   // convert the ravel of char vector A into an UCS_string.
+   // convert the ravel of char vector A into UCS_string 'format'.
    //
 UCS_string format = A->get_UCS_ravel();
    if (format.size() == 0)   LENGTH_ERROR;
@@ -217,7 +217,7 @@ UCS_string format = A->get_UCS_ravel();
 const ShapeItem cols = B->get_cols();
 const ShapeItem rows = B->get_rows();
 
-   // split format into format fields, one per column.
+   // split string format into format fields, one per column.
    // If there is only one format field, then repeat it cols times.
    //
 vector<UCS_string> col_formats;
@@ -249,15 +249,19 @@ vector<Format_LIFER> col_items;
 
         loop(c, col_items.size())
             {
-              Q1(col_formats[c])
-
-              Q1(col_items[c].left_deco)
-              Q1(col_items[c].int_part)
-              Q1(col_items[c].fract_part)
-              Q1(col_items[c].expo_deco)
-              Q1(col_items[c].exponent)
-              Q1(col_items[c].expo_negative)
-              Q1(col_items[c].right_deco)
+              CERR << "At " LOC " in format_by_example()" << endl
+                   << "    col_items[c].left_deco:     '"
+                   << col_items[c].left_deco << "'"      << endl
+                   << "    col_items[c].int_part:      '"
+                   << col_items[c].int_part << "'"       << endl
+                   << "    col_items[c].fract_part:    '"
+                   << col_items[c].fract_part << "'"     << endl
+                   << "    col_items[c].expo_deco:     '"
+                   << col_items[c].expo_deco << "'"      << endl
+                   << "    col_items[c].expo_negative: "
+                   << col_items[c].expo_negative         << endl
+                   << "    col_items[c].right_deco:    '"
+                   << col_items[c].right_deco << "'"     << endl;
             }
       }
 
@@ -483,10 +487,11 @@ Bif_F12_FORMAT::Format_LIFER::Format_LIFER(const UCS_string format)
    : exponent_char(UNI_ASCII_E),
      expo_negative(false)
 {
-   // we split format into our format chunks...
+   // split one column format into sub-format chunks...
    //
 int f = 0;
 bool exponent_pending = false;
+bool have_decimal_point = false;
 
 // left_decorator:
    while (f < format.size())
@@ -501,7 +506,11 @@ integral_part:
       {
         const Unicode cc = format[f++];
 
-        if (cc == UNI_ASCII_FULLSTOP)   goto fractional_part;
+        if (cc == UNI_ASCII_FULLSTOP)
+           {
+             have_decimal_point = true;
+             goto fractional_part;
+           }
         if (cc == UNI_ASCII_E)          goto exponent_part;
         if (is_control_char(cc))
            {
@@ -533,7 +542,7 @@ fractional_part:
              goto exponent_decorator;
            }
       }
-   goto fields_done;
+   goto right_decorator;
 
 exponent_decorator:
    if (!exponent_pending)   { --f;   goto right_decorator; }
@@ -571,11 +580,24 @@ exponent_part:
       }
 
 right_decorator:   /// the right decorator
+
+   if (have_decimal_point &&
+       exponent.format.size() == 0 &&
+       fract_part.format.size() == 0)   // quirk!
+      {
+        // this is ambiguous as to whether the decimal point belongs to
+        // the number or to the right decorator. lrm says all non-digits
+        // are decorators but that seems to be wrong anyhow. (e.g. ',').
+        //
+        // we put a trailing decimat point into the right decorator.
+        //
+        right_deco.format.append(UNI_ASCII_FULLSTOP);
+      }
+
    while (f < format.size())
       right_deco.format.append(format[f++]);
 
 fields_done:
-
 int sum = 0;
    sum += left_deco.out_len = left_deco .format.size();
 
@@ -650,8 +672,8 @@ int flt_cnt = 0;
 ostream &
 Format_sub::print(ostream & out) const
 {
-   out << "format '" << format << "'"
-          " min " << min_len << ", out_len " << out_len << ", flags: ";
+   out << "format: '" << format << "',"
+          " min: " << min_len << ", out_len " << out_len << ", flags: ";
    loop(d, 32)   if (flt_mask & (1 << d))   out << char('0' + d);
    return out;
 }
@@ -706,14 +728,18 @@ char * fract_end = 0;
         const int dlen = snprintf(&data_buf[0], data_buf_len, format, value);
         data_buf[data_buf_len - 1] = 0;
 
-        // the int part could be longer than allowed by the exaple string.
+        // the int part could be longer than allowed by the example string.
         //
         const char * dot = strchr(data_buf, '.');
         const int ilen = dot ? (dot - data_buf)
                              : strlen(data_buf);
         if (ilen > int_part.out_len)
            {
-             if (Workspace::get_FC(3) == UNI_ASCII_0)   DOMAIN_ERROR;
+             if (Workspace::get_FC(3) == UNI_ASCII_0)
+                {
+                  MORE_ERROR() << "Overflow in integer part";
+                  DOMAIN_ERROR;
+                }
              overflow = true;
              return ;
            }
@@ -760,11 +786,12 @@ const int ilen = int_end - &data_buf[0];
 
    Log(LOG_Bif_F12_FORMAT)
       {
-        Q1(format)
-        Q1(value)
-        Q1(data_int)
-        Q1(data_fract)
-        Q1(data_expo)
+        CERR << "At " LOC " in Format_LIFER::fill_data_fields()" << endl
+             << "    format:     '" << format << "'"     << endl
+             << "    value:      "  << value             << endl
+             << "    data_int:   '" << data_int << "'"   << endl
+             << "    data_fract: '" << data_fract << "'" << endl
+             << "    data_expo:  '" << data_expo << "'"  << endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -774,6 +801,9 @@ Format_sub::insert_int_commas(const UCS_string & data, bool & overflow) const
 size_t fill_pos = -1;
 Unicode fill_char = UNI_ASCII_SPACE;
 
+   // BIT_0: pad with 0
+   // BIT_8: fille with ⎕FC[3] (* by default)
+   // BIT_9: pad with 0
    if (flt_mask & (BIT_0 | BIT_8 | BIT_9))   // format has a '0', '8', or '9'
       {
         loop(f, format.size())
@@ -813,7 +843,7 @@ size_t d = data.size();
             {
               // Workspace::get_FC(1) is ⎕FC[2] when ⎕IO is 1
               //
-              if (d)   ucs.append(Workspace::get_FC(1));
+              if (d)                    ucs.append(Workspace::get_FC(1));
               else if (f >= fill_pos)   ucs.append(fill_char);
               else                      break;
             }

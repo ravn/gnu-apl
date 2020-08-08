@@ -467,13 +467,13 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
                           data + base_Qi, data + base_R, data + base_S, EPS);
 
         setup_complex_B(cB, data + base_B, len_B);   // restore B
-        const Matrix<true> mB(data + base_B, rows, cols);
-        Matrix<true> mQ(Q, rows, rows);
-        mQ.transpose(rows);
-        Matrix<true> mR(data + base_R, rows, cols);
-        mR.init_inner_product(mQ, mB);
-        mQ.debug("final Q");
-        mR.debug("final R");
+        const Matrix<true> Bm(data + base_B, rows, cols);
+        Matrix<true> Qm(Q, rows, rows);
+        Qm.transpose(rows);
+        Matrix<true> Rm(data + base_R, rows, cols);
+        Rm.init_inner_product(Qm, Bm);
+        Qm.debug("final Q");
+        Rm.debug("final R");
       }
    else                // real B
       {
@@ -484,11 +484,11 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
                            data + base_Qi, data + base_R, data + base_S, EPS);
 
         setup_real_B(cB, data + base_B, len_B);   // restore B
-        const Matrix<false> mB(data + base_B, rows, cols);
-        Matrix<false> mQ(Q, rows, rows);
-        mQ.transpose(rows);
-        Matrix<false> mR(data + base_R, rows, cols);
-        mR.init_inner_product(mQ, mB);
+        const Matrix<false> Bm(data + base_B, rows, cols);
+        Matrix<false> Qm(Q, rows, rows);
+        Qm.transpose(rows);
+        Matrix<false> Rm(data + base_R, rows, cols);
+        Rm.init_inner_product(Qm, Bm);
    Assert(data[base_B + CPLX*len_B]  == 43.0);
       }
 
@@ -505,8 +505,8 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
    Assert(data[base_S + CPLX*len]   == 51.0);
 
    {
-     const Shape shape_Q(rows, rows);
-     Value_P vQ(shape_Q, LOC);
+     const Shape Q_shape(rows, rows);
+     Value_P Qv(Q_shape, LOC);
      if (need_complex)
         {
           loop(q, len)
@@ -514,7 +514,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
                 const double re = data[base_Q + 2*q];
                 const double im = data[base_Q + 2*q + 1];
                 if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
-                new (vQ->next_ravel()) ComplexCell(re, im);
+                new (Qv->next_ravel()) ComplexCell(re, im);
               }
         }
      else
@@ -523,11 +523,11 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
               {
                 const double re = data[base_Q + q];
                 if (!isfinite(re))   DOMAIN_ERROR;
-                new (vQ->next_ravel()) FloatCell(re);
+                new (Qv->next_ravel()) FloatCell(re);
               }
         }
-     vQ->check_value(LOC);
-     new (Z->next_ravel()) PointerCell(vQ.get(), Z.getref());
+     Qv->check_value(LOC);
+     new (Z->next_ravel()) PointerCell(Qv.get(), Z.getref());
    }
    {
      const Shape shape_R(rows, cols);

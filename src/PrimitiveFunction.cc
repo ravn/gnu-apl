@@ -337,7 +337,7 @@ Value_P Z(B->get_shape(), LOC);
                                                        len_A, Idx_A,
                                                        B->get_ravel(bz), qct);
 
-              if (simple_result)   new (Z->next_ravel()) IntCell(qio + Idx_A[z]);
+              if (simple_result)   new (Z->next_ravel()) IntCell(qio + z);
               else if (z == len_A)   // not found: set result item to ⍬
                  {
                    Value_P zilde(ShapeItem(0), LOC);
@@ -345,7 +345,7 @@ Value_P Z(B->get_shape(), LOC);
                  }
               else                   // element found (first at z (+⎕IO)
                  {
-                   const Shape Sz = A->get_shape().offset_to_index(Idx_A[z], qio);
+                   const Shape Sz = A->get_shape().offset_to_index(z, qio);
                    Value_P Vz(LOC, &Sz);
                    new (Z->next_ravel()) PointerCell(Vz.get(), Z.getref());
                  }
@@ -386,7 +386,9 @@ const Cell * cells_A = reinterpret_cast<const Cell *>(ctx);
 const Cell & cell_A = cells_A[A];
 
    if (cell_A.is_pointer_cell() && !cell.is_pointer_cell())   return COMP_LT;
-   return cell.compare(cell_A);
+
+const int ret = cell.compare(cell_A);
+   return ret;
 }
 //-----------------------------------------------------------------------------
 ShapeItem
@@ -396,9 +398,9 @@ Bif_F12_INDEX_OF::find_B_in_sorted_A(const Cell * A, ShapeItem len_A,
 {
 const ShapeItem * posp = Heapsort<ShapeItem>::search<const Cell &>(
                                 cell_B, Idx_A, len_A, &bs_cmp, A);
-   if (posp)
+   if (posp)   // found cell_B in A
       {
-        ShapeItem pos = Idx_A[*posp];   // A[pos] = cell_B within qct
+        ShapeItem pos = Idx_A[posp - Idx_A];   // A[pos] = cell_B within qct
 
         // A[pos] = cell_B, but there could be predecessors of pos that also
         // satisfy A[pos] = cell_B. Decrease pos as long as much as possible.
@@ -1997,7 +1999,7 @@ const Cell ** Z0 = cells_Z;
 #if 0
         // this fails when used with char cells but is quite handy for
         // testing the algorithm!
-        Q(LOC)
+        Q1(LOC)
         fprintf(stderr, "%ld-element zone:\n", B_to - B_from);
         for (ShapeItem j = B_from; j < B_to; ++j)
             fprintf(stderr, "[%ld] value: %.12f\n", j,

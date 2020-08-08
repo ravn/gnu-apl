@@ -650,7 +650,7 @@ found_prefix:
              }
         }
 
-//   Q(next) Q(at0())
+//   Q1(next) Q1(at0())
 
      // we could reduce, but we could also shift. Compute more, which is true
      // if we should shift.

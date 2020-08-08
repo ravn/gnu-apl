@@ -334,7 +334,7 @@ Command::finish_context()
          //
          Token token = Workspace::SI_top()->get_executable()->execute_body();
 
-// Q(token)
+// Q1(token)
 
          // start over if execution has pushed a new SI entry
          //
