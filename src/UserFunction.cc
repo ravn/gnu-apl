@@ -129,7 +129,7 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
    else                    tag = TOK_FUN0;
 
    while (lambda_body.size() > 2 &&
-          lambda_body.back().get_tag() == TOK_SYMBOL &&
+          lambda_body.back().get_Class() == TC_SYMBOL &&
           lambda_body[lambda_body.size() - 2].get_tag() == TOK_SEMICOL)
       {
         header.add_local_var(lambda_body.back().get_sym_ptr());

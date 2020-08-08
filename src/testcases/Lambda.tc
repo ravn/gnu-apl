@@ -44,3 +44,15 @@
 
       )ERASE a b cmp
 
+      )CLEAR
+CLEAR WS
+
+SUM ← { ⍺ + ⍵⊣C←0 ;C;⎕io}
+      ⎕CR 'SUM'
+λ←⍺ λ1 ⍵;C;⎕io
+λ← ⍺ + ⍵⊣C←0  
+
+      7 SUM 7
+14
+
+      )ERASE SUM
