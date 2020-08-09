@@ -167,92 +167,6 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** Comma related functions (catenate, laminate, and ravel.) */
-/// Base class for , and ⍪
-class Bif_COMMA : public NonscalarFunction
-{
-public:
-   /// Constructor
-   Bif_COMMA(TokenTag tag)
-   : NonscalarFunction(tag)
-   {}
-
-   /// ravel along axis, with axis being the first (⍪( or last (,) axis of B
-   Token ravel_axis(Value_P X, Value_P B, uAxis axis);
-
-   /// Return the ravel of B as APL value
-   static Token ravel(const Shape & new_shape, Value_P B);
-
-   /// Catenate A and B
-   static Token catenate(Value_P A, Axis axis, Value_P B);
-
-   /// Laminate A and B
-   static Token laminate(Value_P A, Axis axis, Value_P B);
-
-   /// Prepend scalar cell_A to B along axis
-   static Value_P prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B);
-
-   /// Prepend scalar cell_B to A along axis
-   static Value_P append_scalar(Value_P A, uAxis axis, const Cell & cell_B);
-};
-//-----------------------------------------------------------------------------
-/** primitive functions catenate, laminate, and ravel along last axis */
-/// The class implementing ,
-class Bif_F12_COMMA : public Bif_COMMA
-{
-public:
-   /// Constructor
-   Bif_F12_COMMA()
-   : Bif_COMMA(TOK_F12_COMMA)
-   {}
-
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
-
-   /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
-
-   /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B)
-      { return ravel_axis(X, B, B->get_rank()); }
-
-   /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
-
-   static Bif_F12_COMMA * fun;   ///< Built-in function
-   static Bif_F12_COMMA  _fun;   ///< Built-in function
-
-protected:
-};
-//-----------------------------------------------------------------------------
-/** primitive functions catenate and laminate along first axis, table */
-/// The class implementing ⍪
-class Bif_F12_COMMA1 : public Bif_COMMA
-{
-public:
-   /// Constructor
-   Bif_F12_COMMA1()
-   : Bif_COMMA(TOK_F12_COMMA1)
-   {}
-
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
-
-   /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
-
-   /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B)
-      { return ravel_axis(X, B, 0); }
-
-   /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
-
-   static Bif_F12_COMMA1 * fun;   ///< Built-in function
-   static Bif_F12_COMMA1  _fun;   ///< Built-in function
-protected:
-};
-//-----------------------------------------------------------------------------
 /** primitive functions member and enlist */
 /// The class implementing ∈
 class Bif_F12_ELEMENT : public NonscalarFunction
@@ -489,45 +403,6 @@ protected:
 
    /// return true iff sh is a permutation
    static bool is_permutation(const Shape & sh);
-};
-//-----------------------------------------------------------------------------
-/** System function index of (⍳) */
-/// The class implementing ⍳
-class Bif_F12_INDEX_OF : public NonscalarFunction
-{
-public:
-   /// Constructor
-   Bif_F12_INDEX_OF()
-   : NonscalarFunction(TOK_F12_INDEX_OF)
-   {}
-
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
-
-   /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
-
-   static Bif_F12_INDEX_OF * fun;   ///< Built-in function
-   static Bif_F12_INDEX_OF  _fun;   ///< Built-in function
-
-protected:
-   /// find Cell B in the ravel A (of length len_A). Return the position
-   /// (< len_A) if found, or len_A if not.
-   ShapeItem find_B_in_A(const Cell * A, ShapeItem len_A,
-                         const Cell & cell_B, double qct)
-      {
-        loop(a, len_A)   if (cell_B.equal(A[a], qct))   return a;   // found
-        return len_A;                                               // not found
-      }
-
-   /// find Cell B in the ravel A (of length len_A). Return the position
-   /// (< len_A) if found, or len_A if not. Idx_A is ⍋A ⊣ ⎕IO←0.
-   ShapeItem find_B_in_sorted_A(const Cell * A, ShapeItem len_A,
-                         const ShapeItem * Idx_A,  const Cell & cell_B,
-                         double qct);
-
-   /// compare function for Heapsort<ShapeItem>::search<const Cell &>
-   static int bs_cmp(const Cell & cell, const ShapeItem & A, const void * ctx);
 };
 //-----------------------------------------------------------------------------
 /** primitive functions reshape and shape */

@@ -226,8 +226,13 @@ public:
    /// return \b true iff \b this value and its ravel items have rank < 2
    bool is_one_dimensional() const;
 
-   /// return \b true iff \b this value is a simple integer vector.
-   bool is_int_vector() const;
+   /// return \b true iff \b this value is a (simple) integer array, allowing
+   /// near-int values (but NOT necessatily values within ⎕CT of an integers).
+   bool is_int_array() const;
+
+   /// return \b true iff \b this value is a (simple) integer vector.
+   bool is_int_vector() const
+      { return (get_rank() == 1) && is_int_array(); }
 
    /// return true, if this value has complex cells, false iff it has only
    /// real cells. Throw domain error for other cells (char, nested etc.)

@@ -219,6 +219,7 @@ Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B)
    TODO;
 }
 //-----------------------------------------------------------------------------
+/// print debug infos for \b this real matrix
 template<>
 void Bif_F12_DOMINO::Matrix<false>::debug(const char * name) const
 {
@@ -240,6 +241,7 @@ Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
 #endif // DOMINO_DEBUG
 }
 //-----------------------------------------------------------------------------
+/// print debug infos for \b this complex matrix
 template<>
 void Bif_F12_DOMINO::Matrix<true>::debug(const char * name) const
 {
@@ -260,7 +262,8 @@ Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
    Z->print_boxed(CERR, name);
 #endif // DOMINO_DEBUG
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+/// inver a real upper-triangle matrix
 template<>
 Value_P Bif_F12_DOMINO::invert_upper_triangle_matrix<false>(const ShapeItem M,
                                                             const ShapeItem N,
@@ -337,6 +340,7 @@ Value_P INV(shape_INV, LOC);
    return INV;
 }
 //-----------------------------------------------------------------------------
+/// inver a complex upper-triangle matrix
 template<>
 Value_P Bif_F12_DOMINO::invert_upper_triangle_matrix<true>(ShapeItem M,
                                                            ShapeItem N,

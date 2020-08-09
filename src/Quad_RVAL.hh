@@ -27,6 +27,7 @@ using namespace std;
 
 #include "QuadFunction.hh"
 
+/// a random APL value
 class Quad_RVAL : public QuadFunction
 {
 public:

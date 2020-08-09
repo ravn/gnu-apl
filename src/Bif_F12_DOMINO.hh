@@ -73,13 +73,13 @@ protected:
    static Value_P invert_upper_triangle_matrix(ShapeItem M, ShapeItem N,
                                                double * utm, double * tmp);
 
-   // initialize complex D with Cells cB
+   /// initialize complex D with Cells cB
    static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);
 
-   // initialize real D with Cells cB
+   /// initialize real D with Cells cB
    static void setup_real_B(const Cell * cB, double * D, ShapeItem count);
 
-   /** a real or complex matrix. Unlike "normal" matrices where the matrixc rows
+   /** a real or complex matrix. Unlike "normal" matrices where the matrix rows
        are adjacent, this matrix class separates the number of columns and the
        distance between column elements in order to avoid unnecessary copies of
        sub matrices (which are frequent in householder transformations).
@@ -88,14 +88,15 @@ protected:
        provided in the constructor.
     **/
 
+    /// different norm varieties
     struct norm_result
        {
-         double norm2_real;
-         double norm2_imag;
-         double norm_real;      // sqrt(norm)
-         double norm_imag;      // sqrt(norm)
-         double norm__2_real;   // 2÷norm
-         double norm__2_imag;   // 2÷norm
+         double norm2_real;     ///< sum of the squares of the real parts
+         double norm2_imag;     ///< sum of the squares of the imag parts
+         double norm_real;      ///< sqrt(this->norm2_real)
+         double norm_imag;      ///< sqrt(this->norm2_imag)
+         double norm__2_real;   ///< 2.0 ÷ this->norm_real
+         double norm__2_imag;   ///< 2.0 ÷ this->norm_imag
        };
 
    /// Matrix is a helper class that makes a plain double * look like
@@ -111,7 +112,7 @@ protected:
 #define matrix_assert(x) Assert(x)
 
 
-       // constructor: M×N matrix with the default vertical item spacings dY
+       /// constructor: M×N matrix with the default vertical item spacings dY
        //
        Matrix(double * pdata, ShapeItem uM, ShapeItem uN)
        : data(pdata),
@@ -120,7 +121,7 @@ protected:
          dY(dpi*uN)
        {}
 
-       // constructor: M×1 matrix (aka. column vector) from a matrix column
+       /// constructor: M×1 matrix (aka. column vector) from a matrix column
        //
        Matrix(double * pdata, ShapeItem uM, ShapeItem uN, ShapeItem udY)
        : data(pdata),
@@ -143,16 +144,28 @@ protected:
              return data[x*dpi + y*dY];
           }
 
-       // initialize this matrix to the identity matrix
+       /// initialize this matrix to the identity matrix
        inline void init_identity(ShapeItem rows);
+
+       /// imbed matrix S into this matrix
        inline void imbed(const Matrix<cplx> & S);
+
+       /// initialize this matrix to be the outer product of the first
+       /// column of src with itself
        inline void init_outer_product(const norm_result & scale,
-                                      const Matrix<cplx> & vect);
+                                      const Matrix<cplx> & src);
+
+       /// assign matrix other to this matrix
        inline void operator =(const Matrix<cplx> & other);
+
+       /// set this matrix to A +.× B
        inline void init_inner_product(const Matrix<cplx> & src_A,
                                       const Matrix<cplx> & src_B);
+
+       /// transpose the upper left M×M submatrix of this matrix
        inline void transpose(ShapeItem M);
 
+       /// return the elements of matrix 1 1↓this
        inline double * drop_1_1()
           { new (this)   Matrix<cplx>(data + dpi*(N + 1), M-1, N-1, dY);
             return data; }
@@ -181,6 +194,7 @@ protected:
              return data[x*dpi + y*dY + 1];
           }
 
+       /// return the complex number at row y, column x of this matrix
        inline complex<double> get_Z(ShapeItem y, ShapeItem x) const
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -189,6 +203,7 @@ protected:
              return complex<double>(data[offset], data[offset + 1]);
           }
 
+       /// set the complex number at row y, column x of this matrix
        inline void set_Z(ShapeItem y, ShapeItem x, complex<double> val)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -198,7 +213,7 @@ protected:
              data[offset + 1] = val.imag();
           }
 
-       // subtract val from the matrix element at row y, col x.
+       /// subtract val from the matrix element at row y, column x.
        inline void sub_Z(ShapeItem y, ShapeItem x, complex<double> val)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -208,7 +223,7 @@ protected:
              data[offset + 1] -= val.imag();
           }
 
-       // divide the matrix element at row y, col x by val.
+       /// divide the matrix element at row y, col x by val.
        inline void div_Z(ShapeItem y, ShapeItem x, complex<double> val)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -220,6 +235,7 @@ protected:
              data[offset + 1] = quot.imag();
           }
 
+       /// true if this matrix is significant with respect to bmax and eps
        inline bool significant(double bmax, double eps) const
           {
             const double bmax_eps = bmax + eps;
@@ -242,9 +258,8 @@ protected:
        /// length.
        static inline void add_sub(double * V11, const double * W11);
 
-       /// return lengts of the first column in different forms
+       /// return the lengts of the first column(-vector) in different forms
        inline void col1_norm(norm_result & result) const;
-
 
        /// print this matrix boxed with name
        void debug(const char * name) const;
@@ -266,6 +281,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+/// compute norm variants of column 1 of \b this real marix
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<false>::col1_norm(norm_result & result) const
@@ -286,6 +302,7 @@ double sum = 0;
    result.norm__2_imag = 0.0;
 }
 //-----------------------------------------------------------------------------
+/// compute norm variants of column 1 of \b this complex marix
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<true>::col1_norm(norm_result & result) const
@@ -313,6 +330,7 @@ const complex<double> _2__sum = 2.0 / sum;
    result.norm__2_imag = _2__sum.imag();
 }
 //-----------------------------------------------------------------------------
+/// compute the square of the real item at row y, columns x
 template<>
 inline double
 Bif_F12_DOMINO::Matrix<false>::abs2(ShapeItem y, ShapeItem x) const
@@ -321,6 +339,7 @@ const ShapeItem b = x*dpi + y*dY;
    return data[b]*data[b];
 }
 //-----------------------------------------------------------------------------
+/// compute the square of the complex item at row y, columns x
 template<>
 inline double
 Bif_F12_DOMINO::Matrix<true>::abs2(ShapeItem y, ShapeItem x) const
@@ -329,6 +348,7 @@ const ShapeItem b = x*dpi + y*dY;
    return data[b]*data[b] + data[b+1]*data[b+1];
 }
 //-----------------------------------------------------------------------------
+/// increase real *W11 by +/- real *V11
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<false>::add_sub(double * V11, const double * W11)
@@ -339,6 +359,7 @@ double w11 = *W11;
    else               *V11 += w11;
 }
 //-----------------------------------------------------------------------------
+/// increase complex *W11 by +/- complex *V11
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<true>::add_sub(double * V11, const double * W11)
@@ -351,6 +372,7 @@ bool add = false;
    else       { V11[0] -= W11[0];   V11[1] -= W11[1]; }
 }
 //-----------------------------------------------------------------------------
+/// increase complex *W11 by +/- *V11
 template<>
 inline void Bif_F12_DOMINO::Matrix<false>::init_identity(ShapeItem rows)
 {
@@ -366,6 +388,7 @@ inline void Bif_F12_DOMINO::Matrix<false>::init_identity(ShapeItem rows)
    loop(y, rows)              real(y, y) = 1.0;
 }
 //-----------------------------------------------------------------------------
+/// initialize \b this complex matrix to the unit matrix
 template<>
 inline void Bif_F12_DOMINO::Matrix<true>::init_identity(ShapeItem rows)
 {
@@ -382,6 +405,7 @@ inline void Bif_F12_DOMINO::Matrix<true>::init_identity(ShapeItem rows)
    loop(y, rows)   { real(y, y) = 1.0;   imag(y, y) = 0.0; }
 }
 //-----------------------------------------------------------------------------
+/// insert S into \b this real matrix
 template<>
 inline void Bif_F12_DOMINO::Matrix<false>::imbed(const Matrix<false>& S)
 {
@@ -405,6 +429,7 @@ const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
    loop(y, IN)   real(y,y) = 1.0;
 }
 //-----------------------------------------------------------------------------
+/// insert S into \b this complex matrix
 template<>
 inline void Bif_F12_DOMINO::Matrix<true>::imbed(const Matrix<true>& S)
 {
@@ -437,6 +462,8 @@ const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
       }
 }
 //-----------------------------------------------------------------------------
+/// initialize this real matrix to be the outer product of the first
+/// column of the real matrix \b src with itself
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<false>::init_outer_product(const norm_result & scale,
@@ -461,6 +488,8 @@ Bif_F12_DOMINO::Matrix<false>::init_outer_product(const norm_result & scale,
 
 }
 //-----------------------------------------------------------------------------
+/// initialize this complex matrix to be the outer product of the first
+/// column of the complex matrix \b src with itself
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<true>::init_outer_product(const norm_result & scale,
@@ -496,6 +525,7 @@ const complex<double> sc(scale.norm__2_real, scale.norm__2_imag);
        }
 }
 //-----------------------------------------------------------------------------
+/// assign real matrix src to this real matrix
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<false>::operator =(const Matrix<false> & src)
@@ -508,6 +538,7 @@ Bif_F12_DOMINO::Matrix<false>::operator =(const Matrix<false> & src)
        }
 }
 //-----------------------------------------------------------------------------
+/// assign complex matrix src to this complex matrix
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<true>::operator =(const Matrix<true> & src)
@@ -522,6 +553,7 @@ Bif_F12_DOMINO::Matrix<true>::operator =(const Matrix<true> & src)
        }
 }
 //-----------------------------------------------------------------------------
+/// set this matrix to A +.× B
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<false>::init_inner_product(const Matrix<false> & src_A,
@@ -542,6 +574,7 @@ const ShapeItem Z = src_A.N;
        }
 }
 //-----------------------------------------------------------------------------
+/// set this matrix to A +.× B
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<true>::init_inner_product(const Matrix<true> & src_A,
@@ -569,6 +602,7 @@ const ShapeItem Z = src_A.N;
        }
 }
 //-----------------------------------------------------------------------------
+/// transpose the upper left M×M submatrix of this real matrix
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<false>::transpose(ShapeItem M)
@@ -580,6 +614,7 @@ Bif_F12_DOMINO::Matrix<false>::transpose(ShapeItem M)
       }
 }
 //-----------------------------------------------------------------------------
+/// transpose the upper left M×M submatrix of this complex matrix
 template<>
 inline void
 Bif_F12_DOMINO::Matrix<true>::transpose(ShapeItem M)

@@ -19,8 +19,10 @@
 */
 
 #include "Avec.hh"
+#include "Bif_F12_COMMA.hh"
 #include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_FORMAT.hh"
+#include "Bif_F12_INDEX_OF.hh"
 #include "Bif_F12_PARTITION_PICK.hh"
 #include "Bif_F12_SORT.hh"
 #include "Bif_F12_TAKE_DROP.hh"

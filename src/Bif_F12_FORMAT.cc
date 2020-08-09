@@ -110,7 +110,7 @@ Shape sZ;
         //
         // "Nested Arrays: When R is a nested array, Z is a vector if all"
         // items of R at any depth are scalars or vectors."
-        // 
+        //
         // lrm also contradicts the ISO standard regarding the rank of Z.
         //
         // We try our best...
@@ -152,14 +152,12 @@ Bif_F12_FORMAT::eval_AB(Value_P A, Value_P B)
 {
 Value_P Z;
 
-   if (A->is_char_vector() || A->is_char_scalar())
-      {
-        Z = format_by_example(A, B);
-      }
-   else if (A->is_int_vector() || A->is_int_scalar())
-      {
-        Z = format_by_specification(A, B);
-      }
+   // any A should be a scalar or a vcector
+   //
+   if (A->get_rank() > 1)   RANK_ERROR;
+
+   if      (A->is_char_array())   Z = format_by_example(A, B);
+   else if (A->is_int_array())    Z = format_by_specification(A, B);
    else
       {
         MORE_ERROR() = "Bad left argument of ⍕";
@@ -207,28 +205,26 @@ Value_P Z;
 Value_P
 Bif_F12_FORMAT::format_by_example(Value_P A, Value_P B)
 {
-   if (A->get_rank() != 1)   RANK_ERROR;
-
    // convert the ravel of char vector A into UCS_string 'format'.
    //
-UCS_string format = A->get_UCS_ravel();
-   if (format.size() == 0)   LENGTH_ERROR;
+UCS_string all_formats = A->get_UCS_ravel();
+   if (all_formats.size() == 0)   LENGTH_ERROR;
 
 const ShapeItem cols = B->get_cols();
 const ShapeItem rows = B->get_rows();
 
-   // split string format into format fields, one per column.
+   // split string all_formats into individual format fields, one per column.
    // If there is only one format field, then repeat it cols times.
    //
 vector<UCS_string> col_formats;
-   split_example_into_columns(format, col_formats);
+   split_example_into_columns(all_formats, col_formats);
    if (col_formats. size() == 1)
       {
-        const UCS_string f = format;
+        const UCS_string f = all_formats;
         const UCS_string col0 = col_formats[0];   // keep it out of loop!
         loop(c, cols - 1)
            {
-             format.append(f);
+             all_formats.append(f);
              col_formats.push_back(col0);
            }
       }
@@ -243,8 +239,8 @@ vector<Format_LIFER> col_items;
 
    Log(LOG_Bif_F12_FORMAT)
       {
-        Q1(format)
-        Q1(format.size())
+        Q1(all_formats)
+        Q1(all_formats.size())
         Q1(col_formats.size())
 
         loop(c, col_items.size())
@@ -267,7 +263,7 @@ vector<Format_LIFER> col_items;
 
 Shape shape_Z(B->get_shape());
    if (B->is_scalar())   shape_Z.add_shape_item(1);
-   shape_Z.set_last_shape_item(format.size());
+   shape_Z.set_last_shape_item(all_formats.size());
 
 Value_P Z(shape_Z, LOC);
 
@@ -288,11 +284,11 @@ Value_P Z(shape_Z, LOC);
                   row.append(item);
                 }
 
-             Log(LOG_Bif_F12_FORMAT)   { Q1(row) Q1(format) }
+             Log(LOG_Bif_F12_FORMAT)   { Q1(row) Q1(all_formats) }
 
-             Assert(row.size() == format.size());
+             Assert(row.size() == all_formats.size());
              loop(c, row.size())
-                new (&Z->get_ravel(r*format.size() + c))  CharCell(row[c]);
+                new (&Z->get_ravel(r*all_formats.size() + c)) CharCell(row[c]);
            }
       }
    catch (Error err)
@@ -307,46 +303,50 @@ Value_P Z(shape_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Bif_F12_FORMAT::split_example_into_columns(const UCS_string & format,
+Bif_F12_FORMAT::split_example_into_columns(const UCS_string & all_formats,
                                    vector<UCS_string> & col_formats)
 {
-bool fmt_seen = false;
-UCS_string fmt;
-   loop(f, format.size())
+   // split string 'all_formats' into fields, where:
+   //
+   // 1.   a field contains at least one digit and is delimited by either
+   // 1a.  a space (which belongs to the next field),  or
+   // 1b.  digit '6' (which belongs to the field).
+   //
+bool digit_seen = false;
+UCS_string current_format;
+   loop(f, all_formats.size())
        {
-         const Unicode cc = format[f];
-         fmt.append(cc);
+         const Unicode cc = all_formats[f];
+         current_format.append(cc);
 
-         const bool is_fmt_char = is_control_char(cc);
-         if (is_fmt_char)   fmt_seen = true;
+         if (Avec::is_digit(cc))   digit_seen = true;
 
-         if ((cc == UNI_ASCII_SPACE) && fmt_seen)   // end of field
+         if ((cc == UNI_ASCII_SPACE) && digit_seen)   // end of field, case 1a.
             {
-              col_formats.push_back(fmt);
-              fmt.clear();    // start a new field;
-              fmt_seen = false;
-              continue;   // next char
+              col_formats.push_back(current_format);
+              current_format.clear();    // start a new field;
+              digit_seen = false;
             }
-
-         if (cc == UNI_ASCII_6)   // end of field after next char
+         else if (cc == UNI_ASCII_6)                  // end of field, case 1b.
             {
               ++f;   // next char is right decorator (and end of field)
-              if (f < format.size())   fmt.append(format[f]);
+              if (f < all_formats.size())
+                 current_format.append(all_formats[f]);
 
-              col_formats.push_back(fmt);
-              fmt.clear();    // start a new field;
-              fmt_seen = false;
+              col_formats.push_back(current_format);
+              current_format.clear();    // start a new field;
+              digit_seen = false;
               continue;   // next char
             }
        }
 
-   if ((!fmt_seen) && (col_formats.size() > 0))
+   if (col_formats.size() && !digit_seen)
       {
-        col_formats.back().append(fmt);
+        col_formats.back().append(current_format);
       }
    else
       {
-        col_formats.push_back(fmt);
+        col_formats.push_back(current_format);
       }
 }
 //-----------------------------------------------------------------------------
@@ -429,7 +429,7 @@ UCS_string ucs;
 
         // print nothing instead of .
         if (data.size() == 0)   ++pad_count;
-        else                    ucs.append(Workspace::get_FC(0)); 
+        else                    ucs.append(Workspace::get_FC(0));
         ucs.append(data);
       }
 
@@ -639,15 +639,15 @@ int flt_cnt = 0;
       {
         switch(format[f])
            {
-             case UNI_ASCII_0:              flt_mask |= BIT_0;   break; 
-             case UNI_ASCII_1: ++flt_cnt;   flt_mask |= BIT_1;   break; 
-             case UNI_ASCII_2: ++flt_cnt;   flt_mask |= BIT_2;   break; 
-             case UNI_ASCII_3: ++flt_cnt;   flt_mask |= BIT_3;   break; 
-             case UNI_ASCII_4: ++flt_cnt;   flt_mask |= BIT_4;   break; 
-             case UNI_ASCII_5:              flt_mask |= BIT_5;   break; 
-             case UNI_ASCII_6:              flt_mask |= BIT_6;   break; 
-             case UNI_ASCII_7:              flt_mask |= BIT_7;   break; 
-             case UNI_ASCII_8:              flt_mask |= BIT_8;   break; 
+             case UNI_ASCII_0:              flt_mask |= BIT_0;   break;
+             case UNI_ASCII_1: ++flt_cnt;   flt_mask |= BIT_1;   break;
+             case UNI_ASCII_2: ++flt_cnt;   flt_mask |= BIT_2;   break;
+             case UNI_ASCII_3: ++flt_cnt;   flt_mask |= BIT_3;   break;
+             case UNI_ASCII_4: ++flt_cnt;   flt_mask |= BIT_4;   break;
+             case UNI_ASCII_5:              flt_mask |= BIT_5;   break;
+             case UNI_ASCII_6:              flt_mask |= BIT_6;   break;
+             case UNI_ASCII_7:              flt_mask |= BIT_7;   break;
+             case UNI_ASCII_8:              flt_mask |= BIT_8;   break;
              case UNI_ASCII_9:              flt_mask |= BIT_9;   break;
              default:                                            break;
            }
@@ -913,17 +913,17 @@ Bif_F12_FORMAT::is_control_char(Unicode uni)
 Value_P
 Bif_F12_FORMAT::format_by_specification(Value_P A, Value_P B)
 {
+   // A is a near-int scalar or vector.
+
 const Shape shape_1(1);
 const Shape & shape_B = B->get_rank() ? B->get_shape() : shape_1;
 
 const ShapeItem rows_B = shape_B.get_rows();
 const ShapeItem cols_B = shape_B.get_cols();
 
-   if (A->get_rank() > 1)   RANK_ERROR;
-const ShapeItem len_A = A->is_scalar() ? 1 : A->get_shape_item(0);
+const ShapeItem len_A = A->element_count();
 
-   if (len_A != 1 && len_A != 2 && len_A != 2*cols_B)
-      LENGTH_ERROR;
+   if (len_A != 1 && len_A != 2 && len_A != 2*cols_B)   LENGTH_ERROR;
 
    if (shape_B.get_volume() == 0)   // empty B
       {
@@ -1175,7 +1175,7 @@ UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
              ret.erase(0);
            }
       }
-   else if (ret.size() == 2       && 
+   else if (ret.size() == 2       &&
             ret[0] == UNI_OVERBAR &&
             ret[1] == UNI_ASCII_0)               // ¯0 → 0
            {
@@ -1186,7 +1186,7 @@ UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
 }
 //-----------------------------------------------------------------------------
 ostream &
-operator<<(ostream & out, const Format_sub & fmt)
+operator <<(ostream & out, const Format_sub & fmt)
 {
    return fmt.print(out);
 }

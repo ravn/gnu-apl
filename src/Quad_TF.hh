@@ -73,10 +73,11 @@ public:
    static Token tf2_var(const UCS_string & var_name, Value_P val);
 
 protected:
-   /// append \b shape in tf2_format to \b ucs. Return true if
-   /// a left parenthesis) was emitted, e.g. (, or (A⍴
+   /// append \b shape in tf2_format to \b ucs.
    static void tf2_shape(UCS_string & ucs, const Shape & shape,
-                         ShapeItem nesting );
+                         ShapeItem nesting);
+
+   /// append ravel \b cells in tf2_format to \b ucs.
    static void tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
                            const Cell * cells);
 

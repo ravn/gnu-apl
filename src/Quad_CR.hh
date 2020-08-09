@@ -64,7 +64,7 @@ protected:
    /// list all ⎕CR functions
    static Token list_functions(ostream & out);
 
-   // do eval_B() with extra spaces removed
+   /// do eval_B() with extra spaces removed
    static Token do_eval_B(const Value & B, bool remove_extra_spaces);
 
    /// compute \b 5 ⎕CR \b B or \b 6 ⎕CR \b B

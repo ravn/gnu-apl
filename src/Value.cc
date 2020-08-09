@@ -905,17 +905,15 @@ int error_count = 0;
 }
 //-----------------------------------------------------------------------------
 bool
-Value::is_int_vector() const
+Value::is_int_array() const
 {
-   if (get_rank() != 1)   return false;
-
-   loop(c, get_shape_item(0))
+const ShapeItem ec = nz_element_count();
+   loop(c, ec)
        {
-         const Cell & cell = get_ravel(c);
-         if (!cell.is_near_int())   return false;
+         if (!get_ravel(c).is_near_int())   return false;
        }
 
-   return true;
+   return true;   // all ravel items are near-int
 }
 //-----------------------------------------------------------------------------
 bool
