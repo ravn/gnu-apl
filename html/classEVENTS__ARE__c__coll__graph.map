@@ -1,6 +1,6 @@
 <map id="EVENTS_ARE_c" name="EVENTS_ARE_c">
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="5,107,99,133"/>
-<area shape="rect" id="node3" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint32\l_t, 4 \&gt;" alt="" coords="123,99,263,141"/>
-<area shape="rect" id="node4" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="287,99,435,141"/>
-<area shape="rect" id="node5" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="291,6,431,47"/>
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="5,103,99,130"/>
+<area shape="rect" id="node3" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint32\l_t, 4 \&gt;" alt="" coords="123,96,264,137"/>
+<area shape="rect" id="node4" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="289,96,437,137"/>
+<area shape="rect" id="node5" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="292,5,433,47"/>
 </map>

@@ -39,7 +39,7 @@ var classQuad__SYL =
     [ "assign", "classQuad__SYL.html#a8db4fdb88c99c60f2f513e8f1a889b92", null ],
     [ "assign_indexed", "classQuad__SYL.html#a178bd2a6d795880398b2a48ce8d036ff", null ],
     [ "assign_indexed", "classQuad__SYL.html#adc31fcfbd6c5b25df2f703c58ed60a56", null ],
-    [ "get_apl_value", "classQuad__SYL.html#aaf0d12aec203d501fae26a0fa25ef619", null ],
+    [ "get_apl_value", "classQuad__SYL.html#ae467defe27bbd3e540aec5ea769b6bfc", null ],
     [ "print_length_limit", "classQuad__SYL.html#a2c1c059576608061f1c3bc6b36f319e0", null ],
     [ "ravel_count_limit", "classQuad__SYL.html#aa14bf658fbea75a78175f75812b442f4", null ],
     [ "si_depth_limit", "classQuad__SYL.html#a4eef8497b63b526b00eb9638d4611805", null ],

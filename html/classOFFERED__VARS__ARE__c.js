@@ -2,10 +2,10 @@ var classOFFERED__VARS__ARE__c =
 [
     [ "OFFERED_VARS_ARE_c", "classOFFERED__VARS__ARE__c.html#a2c3ef613f4972e819fe5114b471c49c9", null ],
     [ "OFFERED_VARS_ARE_c", "classOFFERED__VARS__ARE__c.html#a116e8ab050e0da8356dd4022145193de", null ],
-    [ "get__OFFERED_VARS_ARE__offered_vars", "classOFFERED__VARS__ARE__c.html#a3d5611d7012d48390b5cd1004c66cfec", null ],
-    [ "get_sigID", "classOFFERED__VARS__ARE__c.html#ad5f41871c27d3ec9990acd1656fff2e5", null ],
-    [ "get_sigName", "classOFFERED__VARS__ARE__c.html#a3752b250ffea2bb57870938e99311643", null ],
-    [ "print", "classOFFERED__VARS__ARE__c.html#a361c1b75f95cedb915248c38093e56d6", null ],
-    [ "store", "classOFFERED__VARS__ARE__c.html#a4ce5b23f925f32c7c52ca066ca667f56", null ],
+    [ "get__OFFERED_VARS_ARE__offered_vars", "classOFFERED__VARS__ARE__c.html#a178d72e4006d750469804d3b23f37093", null ],
+    [ "get_sigID", "classOFFERED__VARS__ARE__c.html#a7439cde61c2318c043b72665d66c54fe", null ],
+    [ "get_sigName", "classOFFERED__VARS__ARE__c.html#a35af1e3fb670b7f872aa9fdb833a8804", null ],
+    [ "print", "classOFFERED__VARS__ARE__c.html#a75aadc393e9764c9e04e706ed002afcd", null ],
+    [ "store", "classOFFERED__VARS__ARE__c.html#a1b3987d4e503fa8d0947ea2d2c8ff6dc", null ],
     [ "offered_vars", "classOFFERED__VARS__ARE__c.html#a51086d982c28a944822999755e0400c3", null ]
 ];

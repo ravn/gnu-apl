@@ -1,7 +1,7 @@
 var structESCmap =
 [
-    [ "has_prefix", "structESCmap.html#a8f2dfcfbe7cc352cf8b6820850ab5f17", null ],
-    [ "is_equal", "structESCmap.html#a6f4b973f8d22af4024a57560f526b4ca", null ],
+    [ "has_prefix", "structESCmap.html#af6cbce2074f2cc32f20d8d7fb48db905", null ],
+    [ "is_equal", "structESCmap.html#a0d9c20b8301dd599fdd784e65e2f76d4", null ],
     [ "need_more", "structESCmap.html#a5b67213606c610861670a344d469cc3c", null ],
     [ "refresh_lengths", "structESCmap.html#aa63872c4389e5f21347eedeb9290792b", null ],
     [ "len", "structESCmap.html#af1dd36314cc1fc9dbfb951ec1f22e457", null ],

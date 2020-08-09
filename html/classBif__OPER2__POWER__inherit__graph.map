@@ -1,6 +1,6 @@
 <map id="Bif_OPER2_POWER" name="Bif_OPER2_POWER">
-<area shape="rect" id="node2" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators. " alt="" coords="17,229,140,256"/>
-<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="17,155,140,181"/>
+<area shape="rect" id="node2" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators. " alt="" coords="18,229,141,256"/>
+<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="18,155,141,181"/>
 <area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="43,80,115,107"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="27,5,129,32"/>
+<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="28,5,131,32"/>
 </map>

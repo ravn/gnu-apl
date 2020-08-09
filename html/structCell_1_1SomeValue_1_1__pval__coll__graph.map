@@ -1,11 +1,11 @@
 <map id="Cell::SomeValue::_pval" name="Cell::SomeValue::_pval">
-<area shape="rect" id="node5" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="273,203,393,229"/>
-<area shape="rect" id="node2" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="427,429,481,456"/>
-<area shape="rect" id="node10" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="531,520,639,547"/>
-<area shape="rect" id="node3" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="4,309,115,336"/>
-<area shape="rect" id="node4" href="$classCell.html" title="The base class for all Cells. " alt="" coords="255,309,300,336"/>
-<area shape="rect" id="node6" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="255,112,411,139"/>
-<area shape="rect" id="node7" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="255,6,411,47"/>
-<area shape="rect" id="node8" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="324,309,433,336"/>
-<area shape="rect" id="node9" href="$classShape.html" title="the shape of an APL value " alt="" coords="511,309,568,336"/>
+<area shape="rect" id="node5" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="275,199,395,225"/>
+<area shape="rect" id="node2" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="431,424,486,451"/>
+<area shape="rect" id="node10" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="490,513,598,540"/>
+<area shape="rect" id="node3" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="5,304,117,331"/>
+<area shape="rect" id="node4" href="$classCell.html" title="The base class for all Cells. " alt="" coords="256,304,301,331"/>
+<area shape="rect" id="node6" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="257,109,413,136"/>
+<area shape="rect" id="node7" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="257,5,413,47"/>
+<area shape="rect" id="node8" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="325,304,435,331"/>
+<area shape="rect" id="node9" href="$classShape.html" title="the shape of an APL value " alt="" coords="512,304,571,331"/>
 </map>

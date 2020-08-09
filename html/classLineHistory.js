@@ -5,6 +5,7 @@ var classLineHistory =
     [ "add_line", "classLineHistory.html#a870ae7c7f0a0abcc27623195bca68b20", null ],
     [ "clear_history", "classLineHistory.html#ae97a45176203e977a0ca11e2a2ad6197", null ],
     [ "down", "classLineHistory.html#a4c22c3a61eaa31f95b5c9a1db12cf23d", null ],
+    [ "info", "classLineHistory.html#af918cad5b18471c0e34453a55e796d41", null ],
     [ "next", "classLineHistory.html#a65f9dbc23912fc543e4433659ffc81ed", null ],
     [ "print_history", "classLineHistory.html#aec8670ab9fb094f57871d8b73575f5ac", null ],
     [ "read_history", "classLineHistory.html#a1c4bc5b3af8fd0d38b425b2aeefcf9a6", null ],

@@ -20,7 +20,10 @@ var classQuad__GTK =
       [ "FNUM_GtkComboBox_get_active", "classQuad__GTK.html#a9fe8e835d646eb866ea30c88e6c5be53a71e9ff8e08369d777f70b7d17c5feabc", null ],
       [ "FNUM_GtkDrawingArea_draw_commands", "classQuad__GTK.html#a9fe8e835d646eb866ea30c88e6c5be53ab393a17f22dfb3e9971c75b5f15e1b8c", null ],
       [ "FNUM_GtkDrawingArea_set_area_size", "classQuad__GTK.html#a9fe8e835d646eb866ea30c88e6c5be53a398d24dbc59cddbd1da9e17451f46e86", null ],
-      [ "FNUM_GtkDrawingArea_set_Y_origin", "classQuad__GTK.html#a9fe8e835d646eb866ea30c88e6c5be53a9fbf74cdd9fb7d7e15865a3057e8118d", null ]
+      [ "FNUM_GtkDrawingArea_set_Y_origin", "classQuad__GTK.html#a9fe8e835d646eb866ea30c88e6c5be53a9fbf74cdd9fb7d7e15865a3057e8118d", null ],
+      [ "FNUM_GtkComboBoxText_get_active_text", "classQuad__GTK.html#a9fe8e835d646eb866ea30c88e6c5be53a98ba93e8f27608e86fd3845dcffb5a89", null ],
+      [ "FNUM_GtkSpinButton_get_value", "classQuad__GTK.html#a9fe8e835d646eb866ea30c88e6c5be53ab6db8a63c10fe8bd76fdc3c0c9ab83f7", null ],
+      [ "FNUM_GtkSpinButton_get_value_as_int", "classQuad__GTK.html#a9fe8e835d646eb866ea30c88e6c5be53a52493faaa43b2a2b9defd4398261c729", null ]
     ] ],
     [ "Gtk_Command_Tag", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603", [
       [ "Command_0", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603a09e3af6bd8347f825229ab5d9f3bfe71", null ],
@@ -35,7 +38,10 @@ var classQuad__GTK =
       [ "Command_GtkComboBox_get_active", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603af1515a2c0ee64591c5372401d1076cd2", null ],
       [ "Command_GtkDrawingArea_draw_commands", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603a53ad5b6efea5df6c0aa809afe4ac3cfd", null ],
       [ "Command_GtkDrawingArea_set_area_size", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603a173fb274a67a7fdd262e0b54cc1201b6", null ],
-      [ "Command_GtkDrawingArea_set_Y_origin", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603a74de3d272ae538aa702939ebf22568b6", null ]
+      [ "Command_GtkDrawingArea_set_Y_origin", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603a74de3d272ae538aa702939ebf22568b6", null ],
+      [ "Command_GtkComboBoxText_get_active_text", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603a86e9b3ffff0a0e824cf04bba961bf922", null ],
+      [ "Command_GtkSpinButton_get_value", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603a3b2e448e4c4bb116af89841f65d1e0d2", null ],
+      [ "Command_GtkSpinButton_get_value_as_int", "classQuad__GTK.html#a0987cae671cd7f6b09f3e69aa80c7603a82e6ee407523c7552568921adb92c29d", null ]
     ] ],
     [ "Gtk_Response_Tag", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867", [
       [ "Response_0", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867a3cd53a2538259f552c02887d1aacd1d6", null ],
@@ -50,7 +56,10 @@ var classQuad__GTK =
       [ "Response_GtkComboBox_get_active", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867a83da106c61cb68d60244359e8de5eeb3", null ],
       [ "Response_GtkDrawingArea_draw_commands", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867a972f06d9d7860a9307aee3376d6a1e85", null ],
       [ "Response_GtkDrawingArea_set_area_size", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867a47a16eeb8175df052b56c81cbee5de46", null ],
-      [ "Response_GtkDrawingArea_set_Y_origin", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867a7e23d6affa7d8577197e5e380c2c36fc", null ]
+      [ "Response_GtkDrawingArea_set_Y_origin", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867a7e23d6affa7d8577197e5e380c2c36fc", null ],
+      [ "Response_GtkComboBoxText_get_active_text", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867a4f63a9c7264cf031bb5037b84801c295", null ],
+      [ "Response_GtkSpinButton_get_value", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867a79eb1930a3630eb0afa5c5516001f862", null ],
+      [ "Response_GtkSpinButton_get_value_as_int", "classQuad__GTK.html#ac857041514085f38fb3406e69027c867aba72c14c2b214519f2e60592d952fc6e", null ]
     ] ],
     [ "Gtype", "classQuad__GTK.html#a67e545a2f18826af12644955f7efbf80", [
       [ "gtype_V", "classQuad__GTK.html#a67e545a2f18826af12644955f7efbf80a1b16bd53993ba0950435c1ca8c08da29", null ],
@@ -71,7 +80,7 @@ var classQuad__GTK =
     [ "read_fd", "classQuad__GTK.html#a70ad8230ade1a543dffdf62400c326bb", null ],
     [ "resolve_fun_name", "classQuad__GTK.html#a92e46505ab59bbb58e6cf7d6e82303d1", null ],
     [ "resolve_window", "classQuad__GTK.html#aad419e2b42c9496579506c92e298be5e", null ],
-    [ "window_list", "classQuad__GTK.html#a72de288ea5b83132abee8ea8813bfa6d", null ],
+    [ "window_list", "classQuad__GTK.html#a6f1d31f22ac3906f4966d50e31a068ae", null ],
     [ "write_TL0", "classQuad__GTK.html#a89a221039ea3e73ecb7b1826564dd9e6", null ],
     [ "write_TLV", "classQuad__GTK.html#a70d303da66e582ecdd494f9f0a738eb8", null ],
     [ "_fun", "classQuad__GTK.html#a6ef45606812dc4f5f0fd1952df550fca", null ],

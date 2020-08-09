@@ -10,6 +10,7 @@ var classBacktrace =
     [ "demangle_line", "classBacktrace.html#a60b9a2f5cd0bd6f76c07875b5a9562e8", null ],
     [ "find_src", "classBacktrace.html#a07bdcf0cb769b764a3c6fc9b0ab74894", null ],
     [ "open_lines_file", "classBacktrace.html#aec4c7866f70a4cd3c4c0883b6729c507", null ],
+    [ "pc_cmp", "classBacktrace.html#a76c5fe0d5b88ac892b378660f6ff4feb", null ],
     [ "show", "classBacktrace.html#aeacff0c96a9f9cb8f92088e549e44bb5", null ],
     [ "show_item", "classBacktrace.html#a5c94ed510dd515e043325a0a034d9c00", null ],
     [ "lines_status", "classBacktrace.html#a28cf85a0690c51224bb8294e3596cc31", null ],

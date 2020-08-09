@@ -1,8 +1,8 @@
 var classTakeDropIterator =
 [
     [ "TakeDropIterator", "classTakeDropIterator.html#ab9190b8aac1da33fa850947eb5713104", null ],
-    [ "more", "classTakeDropIterator.html#a0bc3c74339661ea9d182a2916f5d7189", null ],
-    [ "operator()", "classTakeDropIterator.html#a14e99181d16b36151c1d5fb02268e5e6", null ],
+    [ "more", "classTakeDropIterator.html#a04a20c2d8441cc3ac5496fbadcafd2dc", null ],
+    [ "operator()", "classTakeDropIterator.html#a4492253761860b1796aa3d652ec06385", null ],
     [ "operator++", "classTakeDropIterator.html#a07d14e17b316b1a4916d671de8445307", null ],
     [ "current_offset", "classTakeDropIterator.html#a7b6cbecd9895252ce927e10173193780", null ],
     [ "done", "classTakeDropIterator.html#a259b2fe6da8de3c113253eba801cfb0e", null ],

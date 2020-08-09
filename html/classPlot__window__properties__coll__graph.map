@@ -1,5 +1,5 @@
 <map id="Plot_window_properties" name="Plot_window_properties">
-<area shape="rect" id="node2" href="$classPlot__data.html" title="data for all plot lines " alt="" coords="19,96,95,123"/>
-<area shape="rect" id="node3" href="$classPlot__data__row.html" title="data for one plot line " alt="" coords="5,5,109,32"/>
-<area shape="rect" id="node4" href="$classPlot__line__properties.html" title="properties of a single plot line " alt="" coords="120,96,255,123"/>
+<area shape="rect" id="node2" href="$classPlot__data.html" title="the data to be plotted " alt="" coords="19,95,97,121"/>
+<area shape="rect" id="node3" href="$classPlot__data__row.html" title="data for one plot line " alt="" coords="5,5,111,32"/>
+<area shape="rect" id="node4" href="$classPlot__line__properties.html" title="properties of a single plot line " alt="" coords="121,95,257,121"/>
 </map>

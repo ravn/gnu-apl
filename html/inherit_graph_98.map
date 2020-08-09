@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$unionSockAddr.html" title="A union holding a sockaddr and a sockaddr_in as to avoid casting between sockaddr and a sockaddr_in..." alt="" coords="6,5,85,32"/>
+<area shape="rect" id="node1" href="$classShape.html" title="the shape of an APL value " alt="" coords="5,5,64,32"/>
+<area shape="rect" id="node2" href="$classShape3.html" title="a shape of rank 3 " alt="" coords="112,5,179,32"/>
 </map>

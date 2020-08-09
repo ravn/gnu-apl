@@ -1,9 +1,9 @@
 var classRealCell =
 [
-    [ "bif_circle_fun", "classRealCell.html#ad5630a6f6ef3f710662136fbf5292b7b", null ],
-    [ "bif_circle_fun_inverse", "classRealCell.html#a1e92439c0317eb23769d0ee918033630", null ],
-    [ "bif_logarithm", "classRealCell.html#a6bb5e571df5c117d6030e9fdbf689579", null ],
-    [ "do_bif_circle_fun", "classRealCell.html#ad716392879c5a376b2066bd7eec6f9d6", null ],
-    [ "get_classname", "classRealCell.html#ac6e37c5c5b26bd89fa6ea2f6bd691fa5", null ],
-    [ "is_real_cell", "classRealCell.html#ade3a78e7f0b137a873f51663335c0e89", null ]
+    [ "bif_circle_fun", "classRealCell.html#aed27521634af9fed4dd213807f93a2c8", null ],
+    [ "bif_circle_fun_inverse", "classRealCell.html#aa5cb568d949ab777e9ce4eba530b2121", null ],
+    [ "bif_logarithm", "classRealCell.html#a4d54d91ae4cacf6d1ccaf726158e1dba", null ],
+    [ "do_bif_circle_fun", "classRealCell.html#af52c6c260e11975f8334f583872985c6", null ],
+    [ "get_classname", "classRealCell.html#a3bb8ff309a70f0516c26fd7be4f26db3", null ],
+    [ "is_real_cell", "classRealCell.html#ac30508908bf8e8cb7234f756e04be692", null ]
 ];

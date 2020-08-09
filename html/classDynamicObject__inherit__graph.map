@@ -1,4 +1,4 @@
 <map id="DynamicObject" name="DynamicObject">
-<area shape="rect" id="node2" href="$classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="5,80,85,107"/>
-<area shape="rect" id="node3" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="110,80,164,107"/>
+<area shape="rect" id="node2" href="$classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="5,80,87,107"/>
+<area shape="rect" id="node3" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="111,80,165,107"/>
 </map>

@@ -1,8 +1,8 @@
 <map id="UCS_string::UCS_string" name="UCS_string::UCS_string">
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="226,5,366,32"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors " alt="" coords="229,56,363,83"/>
-<area shape="rect" id="node4" href="$classValue.html#a3716f034c6dee29c17cba94f8e53a781" title="return the number of elements (the product of the shapes). " alt="" coords="222,107,370,133"/>
-<area shape="rect" id="node5" href="$classCell.html#a0b3c8510ef2eba85cd5e940915ec47b5" title="Return the character value of a cell. " alt="" coords="225,157,367,184"/>
-<area shape="rect" id="node6" href="$classValue.html#a6838fe626aa18cbd1dc0a72576c8301a" title="return the rank of this value " alt="" coords="239,208,353,235"/>
-<area shape="rect" id="node7" href="$classValue.html#a89120a742c078918d1a5d84ec742e69c" title="return the idx&#39;th element of the ravel. " alt="" coords="238,259,354,285"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="224,5,364,32"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors " alt="" coords="227,56,361,83"/>
+<area shape="rect" id="node4" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes). " alt="" coords="220,107,368,133"/>
+<area shape="rect" id="node5" href="$classCell.html#ab940e21b6212fbd1bfa8de9f99d090ea" title="Return the character value of a cell. " alt="" coords="223,157,365,184"/>
+<area shape="rect" id="node6" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value " alt="" coords="237,208,351,235"/>
+<area shape="rect" id="node7" href="$classValue.html#a89120a742c078918d1a5d84ec742e69c" title="return the idx&#39;th element of the ravel. " alt="" coords="236,259,352,285"/>
 </map>

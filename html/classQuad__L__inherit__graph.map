@@ -1,6 +1,6 @@
 <map id="Quad_L" name="Quad_L">
 <area shape="rect" id="node2" href="$classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized. " alt="" coords="5,229,144,256"/>
 <area shape="rect" id="node3" href="$classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="17,155,132,181"/>
-<area shape="rect" id="node4" href="$classSymbol.html" title="Base class for variables, defined functions, snd distinguished names. " alt="" coords="41,80,108,107"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="23,5,125,32"/>
+<area shape="rect" id="node4" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="41,80,108,107"/>
+<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="23,5,126,32"/>
 </map>

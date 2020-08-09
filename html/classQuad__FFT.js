@@ -1,6 +1,6 @@
 var classQuad__FFT =
 [
-    [ "window_function", "classQuad__FFT.html#ae2c7e9d09cfa196af4648849fbe7d1aa", null ],
+    [ "window_function", "classQuad__FFT.html#a8fe0ed7f28c19d996257930fc4354560", null ],
     [ "Quad_FFT", "classQuad__FFT.html#a32516d8d84ae10595481dca4a17a4b9e", null ],
     [ "blackman_harris_window", "classQuad__FFT.html#a9926610e55253b1936787331d2478b3c", null ],
     [ "blackman_nuttall_window", "classQuad__FFT.html#a2b398321ae8bcbb3aba02bbec1238c83", null ],

@@ -9,6 +9,7 @@ var classAvec =
     [ "get_av_pos", "classAvec.html#a01fc79211fc2962b985fbde59438a08a", null ],
     [ "IBM_quad_AV", "classAvec.html#a15bfa417923b425ec3c2baf973d2a5f9", null ],
     [ "init", "classAvec.html#a9188425612180914156bba6bbcf881fe", null ],
+    [ "is_comment", "classAvec.html#aabdbe6d3bd194f16c3d6bd1fe1f1117e", null ],
     [ "is_control", "classAvec.html#ac1a3f05db620e46d7ecdc6d65a7c25d5", null ],
     [ "is_diamond", "classAvec.html#a3a2dcac522444cd99f9ec4c3fdd6db8c", null ],
     [ "is_digit", "classAvec.html#af6b90a707281ad128da1764d92d85cd7", null ],

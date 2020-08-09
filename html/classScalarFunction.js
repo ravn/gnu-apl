@@ -12,7 +12,7 @@ var classScalarFunction =
     [ "eval_scalar_identity_fun", "classScalarFunction.html#a99c717844b6c855c221ba5ae8ada62fd", null ],
     [ "expand_pointers", "classScalarFunction.html#a6708ab16b41f917f0f821ed7b8e3b0c9", null ],
     [ "get_scalar_f2", "classScalarFunction.html#a64754e3340246d2eb4e0757fab13b0df", null ],
-    [ "has_result", "classScalarFunction.html#abc8a8d02f8c894338f564f39ada7b822", null ],
+    [ "has_result", "classScalarFunction.html#a2c2d61847435fbf524c6ef06e5309270", null ],
     [ "PF_scalar_AB", "classScalarFunction.html#a555d0680dcb4197630d565690dc60502", null ],
     [ "PF_scalar_B", "classScalarFunction.html#a08a98a0be7135164c7b1ecb6947999be", null ]
 ];

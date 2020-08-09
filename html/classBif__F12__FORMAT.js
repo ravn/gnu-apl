@@ -7,7 +7,7 @@ var classBif__F12__FORMAT =
     [ "eval_B", "classBif__F12__FORMAT.html#ad53df43e5b29c2d03a7500cc5d622b6b", null ],
     [ "format_by_example", "classBif__F12__FORMAT.html#a9a2278ed7ab90821a0eb131339f6eebb", null ],
     [ "format_by_specification", "classBif__F12__FORMAT.html#ad945541c06e489c1079ae401f4d1db28", null ],
-    [ "format_col_spec", "classBif__F12__FORMAT.html#a826ed831029f9acec1a678e9092fda42", null ],
+    [ "format_one_col_by_spec", "classBif__F12__FORMAT.html#ad7f677afc847fa6df13f16decdecd992", null ],
     [ "format_spec_float", "classBif__F12__FORMAT.html#a3ee8b8a6f38d77c6234470d08cfb3799", null ],
     [ "is_control_char", "classBif__F12__FORMAT.html#a9cf835b32359329b0ad06d68de670a7d", null ],
     [ "monadic_format", "classBif__F12__FORMAT.html#a6a22a403a9c962b8a60abf27b31383ce", null ],

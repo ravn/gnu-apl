@@ -1,7 +1,7 @@
 var classQuad__WA =
 [
     [ "Quad_WA", "classQuad__WA.html#a7e032e65b4a750308066279b2633484a", null ],
-    [ "get_apl_value", "classQuad__WA.html#aa227b99c2584a419cc2a4090e6c08497", null ],
+    [ "get_apl_value", "classQuad__WA.html#a18d887b6e9f15369d9660c873ab562c4", null ],
     [ "get_free_memory", "classQuad__WA.html#ab79e01d2d0778bd0c877511367cdeb34", null ],
     [ "init", "classQuad__WA.html#ae1eca3f457520df1e217512ddd73ed53", null ],
     [ "initial_rlimit", "classQuad__WA.html#af6d9143e603553fdbb6ac5040d498cc3", null ],
