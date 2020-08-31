@@ -151,6 +151,7 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B)
 
 # include "ComplexCell.hh"
 # include "FloatCell.hh"
+# include "Security.hh"
 # include "Workspace.hh"
 
 // UTF8 support for XCB windows needs additional libraries that may
@@ -206,6 +207,8 @@ Quad_PLOT::~Quad_PLOT()
 Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_PLOT);
+
    if (B->get_rank() > 3)        RANK_ERROR;
    if (B->element_count() < 2)   LENGTH_ERROR;
 
@@ -278,6 +281,8 @@ const APL_Integer qio = Workspace::get_IO();
 Token
 Quad_PLOT::eval_B(Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_PLOT);
+
    if (B->get_rank() == 0 && !B->get_ravel(0).is_pointer_cell())
       {
         // scalar argument: plot window control

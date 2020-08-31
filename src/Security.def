@@ -26,6 +26,8 @@
 sec_def( disable_Quad_SQL )           ///< disable ⎕SQL
 sec_def( disable_Quad_FIO )           ///< disable ⎕FIO
 sec_def( disable_native_functions )   ///< disable dyadic ⎕FX
+sec_def( disable_Quad_PLOT )          ///< disable ⎕PLOT
+sec_def( disable_Quad_GTK  )          ///< disable ⎕GTK
 
 #undef sec_def
 

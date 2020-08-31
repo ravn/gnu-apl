@@ -27,6 +27,7 @@
 #include "LibPaths.hh"
 #include "PointerCell.hh"
 #include "Quad_GTK.hh"
+#include "Security.hh"
 #include "Workspace.hh"
 
 Quad_GTK  Quad_GTK::_fun;
@@ -37,6 +38,8 @@ Quad_GTK * Quad_GTK::fun = &Quad_GTK::_fun;
 Token
 Quad_GTK::eval_AB(Value_P A, Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_GTK);
+
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
    if (A->is_char_array() && B->is_char_array())
@@ -100,6 +103,8 @@ bad_fd:
 Token
 Quad_GTK::eval_B(Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_GTK);
+
    if (B->get_rank() > 1)   RANK_ERROR;
    if (B->is_char_array())
       {
@@ -187,6 +192,8 @@ const int function = B->get_ravel(0).get_int_value();
 Token
 Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_GTK);
+
    if (B->get_rank() > 1)   RANK_ERROR;
 
 UTF8_string window_id;                // e.g. "entry1"
@@ -266,6 +273,8 @@ UTF8_string utf_A(ucs_A);
 Token
 Quad_GTK::eval_XB(Value_P X, Value_P B)
 {
+   CHECK_SECURITY(disable_Quad_GTK);
+
    if (B->get_rank() > 1)   RANK_ERROR;
 
 UTF8_string window_id;                // e.g. "entry1"

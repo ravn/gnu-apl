@@ -142,7 +142,7 @@ draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
 static void
 draw_delta(cairo_t * cr, Pixel_XY P0, bool up, Color color, int size)
 {
-const double l = 1.0*size;        // ∆ center to top vertex
+const double l = 0.51*size;       // ∆ center to top vertex
 const double m = 0.866025404*l;   // ∆ center to base
 const double s = 0.5*l;           // ∆ base middle to left/right vertex
 
@@ -173,7 +173,7 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
 
    if (caro)   // ◆
       {
-        const double dlta = 2.0 * size;
+        const double dlta = 0.5 * size;
         cairo_move_to(cr, P0.x,        P0.y + dlta);   // top vertex
         cairo_line_to(cr, P0.x + dlta, P0.y);          // left vertex
         cairo_line_to(cr, P0.x,        P0.y - dlta);   // top vertex
@@ -182,8 +182,8 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
       }
    else        // ■
       {
-        const double dlta = 1.414213562 * size;
-        cairo_rectangle(cr, P0.x - dlta,  P0.y + dlta, 2*dlta, 2*dlta);
+        const double dlta = 0.35*size;
+        cairo_rectangle(cr, P0.x - dlta,  P0.y - dlta, 2*dlta, 2*dlta);
       }
 
    cairo_fill(cr);
@@ -193,7 +193,7 @@ static void
 draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
            double size, int size2)
 {
-   size *= 2.5;
+   size *= 0.98;
    cairo_set_RGB_source(cr, color);
 
 const double half = 0.5*size;
@@ -219,31 +219,35 @@ const double half = 0.5*size;
 }
 //-----------------------------------------------------------------------------
 static void
-draw_point(cairo_t * cr, Pixel_XY P0, int point_style,
+draw_point(cairo_t * cr, Pixel_XY P, int point_style,
            const Color outer_color, int outer_dia,
            const Color inner_color, int inner_dia)
 {
+const bool es = ! (point_style & 1);   // even style
    switch(point_style)
       {
-        case 1: draw_circle(cr, P0,       outer_color, outer_dia);   break;   // ●
-        case 2: draw_delta(cr, P0, true,  outer_color, outer_dia);   break;   // ▲
-        case 3: draw_delta(cr, P0, false, outer_color, outer_dia);   break;   // ▼
-        case 4: draw_quad( cr, P0, true,  outer_color, outer_dia);   break;   // ◆
-        case 5: draw_quad( cr, P0, false, outer_color, outer_dia);   break;   // ■
-        case 6: draw_cross(cr, P0, true,  outer_color, outer_dia,
-                                                       inner_dia);   return;  // 🞤
-        case 7: draw_cross(cr, P0, false, outer_color, outer_dia,
-                                                       inner_dia);   return;  // 🞫
-        default: CERR << "Invalid point style " << point_style;      return;
+        case 0:                                                   return;
+        case 1: draw_circle(cr, P,     outer_color, outer_dia);   break;  // ●
+        case 2:                                                           // ▲
+        case 3: draw_delta( cr, P, es, outer_color, outer_dia);   break;  // ▼
+        case 4:                                                           // ◆
+        case 5: draw_quad(  cr, P, es, outer_color, outer_dia);   break;  // ■
+        case 6:                                                           // 🞤
+        case 7: draw_cross( cr, P, es, outer_color, outer_dia,
+                                                    inner_dia);   return; // 🞫
+        default: MORE_ERROR() << "Invalid point style: "
+                              << point_style;                     return;
       }
 
+   // at this point, point_style understands (though may not have) inner_dia.
+   //
    if (inner_dia)   switch(point_style)
       {
-        case 1: draw_circle(cr, P0,       inner_color, inner_dia);   return; // ●
-        case 2: draw_delta(cr, P0, true,  inner_color, inner_dia);   return; // ▲
-        case 3: draw_delta(cr, P0, false, inner_color, inner_dia);   return; // ▼
-        case 4: draw_quad(cr, P0, true,   inner_color, inner_dia);   return; // ◆
-        case 5: draw_quad(cr, P0, false,  inner_color, inner_dia);   return; // ■
+        case 1: draw_circle(cr, P,     inner_color, inner_dia);   return; // ●
+        case 2:                                                           // ▲
+        case 3: draw_delta( cr, P, es, inner_color, inner_dia);   return; // ▼
+        case 4:                                                           // ◆
+        case 5: draw_quad(  cr, P, es, inner_color, inner_dia);   return; // ■
       }
 }
 //-----------------------------------------------------------------------------
@@ -388,6 +392,9 @@ void
 draw_legend(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
+const int lx = w_props.get_legend_lX();
+   if (lx <= 0)   return;   // no legend
+
 Plot_line_properties const * const * l_props = w_props.get_line_properties();
 
 const int line_count = surface_plot ? 1 : w_props.get_line_count();
