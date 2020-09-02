@@ -112,23 +112,10 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 AC_CHECK_FUNCS([floor memset munmap pow sqrt strchr strerror])
 
-# check for libncurses first and for libcurses if libncurses was not found
-#
-AC_CHECK_LIB([ncurses], [setupterm],
-             [AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
-                                 [Define to 1 iff lib(n)curses is available])
-              LIBS="-lncurses $LIBS"
-             ],
-             [ # no ncurses...
-               AC_CHECK_LIB([curses], [setupterm],
-                            [ AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
-                                  [Define to 1 iff lib(n)curses is available])
-               LIBS="-lcurses $LIBS"])
-             ])
-
 AC_CHECK_LIB([X11-xcb],   [XGetXCBConnection])
 AC_CHECK_LIB([X11],       [XOpenDisplay])
 AC_CHECK_LIB([xcb],       [xcb_connect])
+AC_CHECK_LIB([tinfo],     [tparm])
 AC_CHECK_LIB([socket],    [socket])   # for Solaris
 AC_CHECK_LIB([pthread],   [sem_init])
 AC_CHECK_LIB([nsl],       [yp_all])   # for Solaris

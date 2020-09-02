@@ -67,9 +67,6 @@
 /* Define to 1 if you have the `cairo' library (-lcairo). */
 #define HAVE_LIBCAIRO 1
 
-/* Define to 1 iff lib(n)curses is available */
-#define HAVE_LIBCURSES 1
-
 /* Define to 1 if you have the `dl' library (-ldl). */
 #define HAVE_LIBDL 1
 
@@ -99,6 +96,9 @@
 
 /* Define to 1 if you have the `socket' library (-lsocket). */
 /* #undef HAVE_LIBSOCKET */
+
+/* Define to 1 if you have the `tinfo' library (-ltinfo). */
+#define HAVE_LIBTINFO 1
 
 /* Define to 1 if you have the `X11' library (-lX11). */
 #define HAVE_LIBX11 1

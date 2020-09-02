@@ -18,6 +18,8 @@ Summary:      An APL interpreter
 Name:         @PACKAGE@
 Version:      @VERSION@
 Release:      0
+Provides:     apl
+Recommends:   libtinfo
 Group:        Applications/Interpreters
 Source:       file://@abs_top_srcdir@/@PACKAGE@-@VERSION@.tar.gz
 Distribution: Ubuntu

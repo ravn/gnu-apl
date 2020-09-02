@@ -51,8 +51,14 @@
 # undef CURSES_USABLE
 #endif
 
+// on some MAC OS versions, libcurses may be present but libtinfo missing
+//
+#if not HAVE_LIBTINFO
+# undef CURSES_USABLE
+#endif
+
 // curses on Solaris #defines erase() and tab() which conflicts with e.g.
-// vector::erase() and others
+// vector::erase() and possibly others
 //
 #ifdef erase
 # undef erase

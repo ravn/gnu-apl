@@ -18038,103 +18038,6 @@ fi
 done
 
 
-# check for libncurses first and for libcurses if libncurses was not found
-#
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for setupterm in -lncurses" >&5
-$as_echo_n "checking for setupterm in -lncurses... " >&6; }
-if ${ac_cv_lib_ncurses_setupterm+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lncurses  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char setupterm ();
-int
-main ()
-{
-return setupterm ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_ncurses_setupterm=yes
-else
-  ac_cv_lib_ncurses_setupterm=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ncurses_setupterm" >&5
-$as_echo "$ac_cv_lib_ncurses_setupterm" >&6; }
-if test "x$ac_cv_lib_ncurses_setupterm" = xyes; then :
-
-cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBCURSES 1
-_ACEOF
-
-              LIBS="-lncurses $LIBS"
-
-else
-   # no ncurses...
-               { $as_echo "$as_me:${as_lineno-$LINENO}: checking for setupterm in -lcurses" >&5
-$as_echo_n "checking for setupterm in -lcurses... " >&6; }
-if ${ac_cv_lib_curses_setupterm+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcurses  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char setupterm ();
-int
-main ()
-{
-return setupterm ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_curses_setupterm=yes
-else
-  ac_cv_lib_curses_setupterm=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_curses_setupterm" >&5
-$as_echo "$ac_cv_lib_curses_setupterm" >&6; }
-if test "x$ac_cv_lib_curses_setupterm" = xyes; then :
-
-cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBCURSES 1
-_ACEOF
-
-               LIBS="-lcurses $LIBS"
-fi
-
-
-fi
-
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
 $as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
 if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
@@ -18267,6 +18170,51 @@ if test "x$ac_cv_lib_xcb_xcb_connect" = xyes; then :
 _ACEOF
 
   LIBS="-lxcb $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for tparm in -ltinfo" >&5
+$as_echo_n "checking for tparm in -ltinfo... " >&6; }
+if ${ac_cv_lib_tinfo_tparm+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltinfo  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char tparm ();
+int
+main ()
+{
+return tparm ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_tinfo_tparm=yes
+else
+  ac_cv_lib_tinfo_tparm=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tinfo_tparm" >&5
+$as_echo "$ac_cv_lib_tinfo_tparm" >&6; }
+if test "x$ac_cv_lib_tinfo_tparm" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBTINFO 1
+_ACEOF
+
+  LIBS="-ltinfo $LIBS"
 
 fi
 

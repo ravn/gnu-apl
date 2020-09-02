@@ -1145,6 +1145,7 @@ int file_profile = 0;   // the current profile in the preferences file
               if (yes_no)   // user said "Yes" or "No"
                  {
                    // if the user said "No" then use_curses is not touched.
+                   //
                    // if the user said "Yes" (which is an obsolete setting)
                    // then use_curses is cleared because at the time when
                    // "Yes" was valid, curses was not yet implemented.
@@ -1152,6 +1153,7 @@ int file_profile = 0;   // the current profile in the preferences file
                    do_Color = yes;
                    if (yes)   Output::use_curses = false;
                  }
+
               if (!strcasecmp(arg, "ANSI"))
                  {
                    do_Color = true;
@@ -1160,7 +1162,9 @@ int file_profile = 0;   // the current profile in the preferences file
               else if (!strcasecmp(arg, "CURSES"))
                  {
                    do_Color = true;
+#ifdef HAVE_LIBTINFO
                    Output::use_curses = true;
+#endif
                  }
             }
          else if (!strcasecmp(opt, "Keyboard"))

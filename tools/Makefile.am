@@ -5,7 +5,8 @@ noinst_PROGRAMS =	APL_keyboard		\
 			apl2html		\
 			phrase_gen		\
 			sockconst		\
-			TLV_server
+			TLV_server		\
+			ncurses_emul
 
 if HAVE_RDTSC
 if HAVE_AFFINITY_NP
@@ -18,12 +19,13 @@ endif
 
 dist_noinst_SCRIPTS = check_src
 
-LIBS =
+LIBS = -ltinfo
 APL_keyboard_SOURCES       = APL_keyboard.cc        APL_keyboard.def
 APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def
 APL_keyboard_show_SOURCES  = APL_keyboard_show.cc
 apl2html_SOURCES           = apl2html.cc
 TLV_server_SOURCES         = TLV_server.c
+ncurses_emul_SOURCES       = ncurses_emul.cc
 
 phrase_gen_SOURCES = phrase_gen.cc phrase_gen.def
 
