@@ -67,6 +67,9 @@
 /* Define to 1 if you have the `cairo' library (-lcairo). */
 #define HAVE_LIBCAIRO 1
 
+/* Define to 1 if you have the `curses' library (-lcurses). */
+#define HAVE_LIBCURSES 1
+
 /* Define to 1 if you have the `dl' library (-ldl). */
 #define HAVE_LIBDL 1
 
@@ -84,6 +87,9 @@
 
 /* Define to 1 if you have the `m' library (-lm). */
 #define HAVE_LIBM 1
+
+/* Define to 1 if you have the `ncurses' library (-lncurses). */
+#define HAVE_LIBNCURSES 1
 
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #define HAVE_LIBNSL 1

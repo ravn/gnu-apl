@@ -18353,6 +18353,96 @@ _ACEOF
 
 fi
    # for Solaris
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for setupterm in -lcurses" >&5
+$as_echo_n "checking for setupterm in -lcurses... " >&6; }
+if ${ac_cv_lib_curses_setupterm+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcurses  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char setupterm ();
+int
+main ()
+{
+return setupterm ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_curses_setupterm=yes
+else
+  ac_cv_lib_curses_setupterm=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_curses_setupterm" >&5
+$as_echo "$ac_cv_lib_curses_setupterm" >&6; }
+if test "x$ac_cv_lib_curses_setupterm" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBCURSES 1
+_ACEOF
+
+  LIBS="-lcurses $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for setupterm in -lncurses" >&5
+$as_echo_n "checking for setupterm in -lncurses... " >&6; }
+if ${ac_cv_lib_ncurses_setupterm+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lncurses  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char setupterm ();
+int
+main ()
+{
+return setupterm ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_ncurses_setupterm=yes
+else
+  ac_cv_lib_ncurses_setupterm=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ncurses_setupterm" >&5
+$as_echo "$ac_cv_lib_ncurses_setupterm" >&6; }
+if test "x$ac_cv_lib_ncurses_setupterm" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBNCURSES 1
+_ACEOF
+
+  LIBS="-lncurses $LIBS"
+
+fi
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for acosh in -lm" >&5
 $as_echo_n "checking for acosh in -lm... " >&6; }
 if ${ac_cv_lib_m_acosh+:} false; then :
@@ -19697,6 +19787,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 $as_echo "$HAVE_SOLARIS_ATOMIC" >&6; }
 
 
+echo
+echo "   *** decisions made by the user ... ***"
+echo
+
 # check if the user compiles for ANDROID
 #
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if we are compiling for Android" >&5
@@ -20089,7 +20183,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $VISIBLE_MARKERS_WANTED" >&5
 $as_echo "$VISIBLE_MARKERS_WANTED" >&6; }
 
-# check if we are on i686 (to fix a strange rpmbuild problem
+# check if we are on i686 (to fix a strange rpmbuild problem)
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we compile for an i686 CPU" >&5
 $as_echo_n "checking whether we compile for an i686 CPU... " >&6; }
  if test `uname -m` = i686; then

@@ -119,6 +119,8 @@ AC_CHECK_LIB([tinfo],     [tparm])
 AC_CHECK_LIB([socket],    [socket])   # for Solaris
 AC_CHECK_LIB([pthread],   [sem_init])
 AC_CHECK_LIB([nsl],       [yp_all])   # for Solaris
+AC_CHECK_LIB([curses],    [setupterm])
+AC_CHECK_LIB([ncurses],   [setupterm])
 AC_CHECK_LIB([m],         [acosh])
 AC_CHECK_LIB([gtk-3],     [gtk_init])
 AC_CHECK_LIB([gdk-3],     [gdk_init])
@@ -328,6 +330,10 @@ AC_COMPILE_IFELSE(
     [HAVE_SOLARIS_ATOMIC=no])
 AC_MSG_RESULT([$HAVE_SOLARIS_ATOMIC])
 
+
+echo
+echo "   *** decisions made by the user ... ***"
+echo
 
 # check if the user compiles for ANDROID
 #
@@ -644,7 +650,7 @@ else RATIONAL_NUMBERS_WANTED="no"
 fi
 AC_MSG_RESULT([$VISIBLE_MARKERS_WANTED])
 
-# check if we are on i686 (to fix a strange rpmbuild problem
+# check if we are on i686 (to fix a strange rpmbuild problem)
 AC_MSG_CHECKING([whether we compile for an i686 CPU])
 AM_CONDITIONAL([ON_i686], [test `uname -m` = i686])
 if test `uname -m` = "i686" ; then

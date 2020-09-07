@@ -380,8 +380,6 @@ const bool log_startup = uprefs.parse_argv_1();
 
              // no clear_EOL
              Output::clear_EOL[0] = 0;
-
-             Output::use_curses = false;
            }
       }
 

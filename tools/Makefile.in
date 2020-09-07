@@ -287,7 +287,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
-LIBS = -ltinfo
+LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -399,6 +399,7 @@ APL_keyboard_show_SOURCES = APL_keyboard_show.cc
 apl2html_SOURCES = apl2html.cc
 TLV_server_SOURCES = TLV_server.c
 ncurses_emul_SOURCES = ncurses_emul.cc
+ncurses_emul_LIBS = -lncurses -ltinfo
 phrase_gen_SOURCES = phrase_gen.cc phrase_gen.def
 all: all-am
 

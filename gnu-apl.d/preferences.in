@@ -212,13 +212,6 @@
 # cursor-down, cursor-left, cursor-right, Home, End, Ins, and Del keys of
 # your keyboard.
 #
-# The sequences can be set explicitly (in the following) or via CURSES
-# The latter (CURSES) may fail work because the sequences reported by
-# CURSES may be different from the sequences sent by the keyboard.
-#
-  Keyboard      NOCURSES (default)
-# Keyboard      CURSES
-#
 # KEY-CURSOR-UP          1b 5b 41
 # KEY-CURSOR-DOWN        1b 5b 42
 # KEY-CURSOR-RIGHT       1b 5b 43

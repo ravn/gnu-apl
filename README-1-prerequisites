@@ -15,12 +15,6 @@ For Fedora:
 
 For Centos replace dnf by yum 
 
-On Linux Mint 16 (and possibly some other GNU/Linux distributions) you may
-need to install package ncurses-dev in order to uses curses functions,
-for example:
-
-    apt-get install libncurses-dev
-
 On Linux Mint 14.1, GNU APL compiled out-of--the-box.
 On Fedora 25, GNU APL compiled out-of-the-box.
 

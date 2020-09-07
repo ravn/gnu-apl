@@ -319,10 +319,7 @@ LineEditContext::~LineEditContext()
 {
    // restore block cursor
    //
-   if (!Output::use_curses)
-      {
-        if (!ins_mode)   CIN << "\x1B[1 q" << flush;
-      }
+   if (!ins_mode)   CIN << "\x1B[1 q" << flush;
 }
 //-----------------------------------------------------------------------------
 void
@@ -495,11 +492,8 @@ LineEditContext::toggle_ins_mode()
    // CSI [5 q       : blinking bar (doesn't work) 
    // CSI [6 q       : steady   bar (doesn't work) 
 
-   if (!Output::use_curses)
-      {
-        if (ins_mode)   CIN << "\x1B[0 q" << flush;
-        else            CIN << "\x1B[3 q" << flush;
-      }
+   if (ins_mode)   CIN << "\x1B[0 q" << flush;
+   else            CIN << "\x1B[3 q" << flush;
 }
 //-----------------------------------------------------------------------------
 void

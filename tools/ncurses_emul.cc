@@ -30,6 +30,9 @@
    g++ -o ncurses_emul ncurses_emul.cc -ltinfo
  */
 
+#include <../config.h>   // for HAVE_XXX macros
+#if HAVE_LIBTINFO && HAVE_NCURSES_H && HAVE_TERM_H
+
 #include <string.h>
 #include <ncurses.h>
 #include <term.h>
@@ -199,8 +202,36 @@ int errors = 0;
    READ_Seq(color_UERR, 1, set_background, color_UERR_background, PREF);
    cout << endl;
 
+   READ_Seq(ESC_CursorUp,    0, key_up,    0, KEY-CURSOR-UP);
+   cout << endl;
+   READ_Seq(ESC_CursorDown,  0, key_down,  0, KEY-CURSOR-DOWN);
+   cout << endl;
+   READ_Seq(ESC_CursorLeft,  0, key_left,  0, KEY-CURSOR-LEFT);
+   cout << endl;
+   READ_Seq(ESC_CursorRight, 0, key_right, 0, KEY-CURSOR-RIGHT);
+   cout << endl;
+   READ_Seq(ESC_CursorEnd,   0, key_end,   0, KEY-CURSOR-END);
+   cout << endl;
+   READ_Seq(ESC_CursorHome,  0, key_home,  0, KEY-CURSOR-HOME);
+   cout << endl;
+   READ_Seq(ESC_InsertMode,  0, key_ic,    0, KEY-INSMODE);
+   cout << endl;
+   READ_Seq(ESC_Delete,      0, key_dc,    0, KEY-DELETE);
+   cout << endl;
+
+
   return errors;
 }
+
+#else // NOT HAVE_LIBTINFO && HAVE_NCURSES_H && HAVE_TERM_H
+
+#include <stdio.h>
+int
+doit()
+{
+   return fprintf(sdterr, "*** LIBCURSES etc. missing\n");
+}
+#endif
 //----------------------------------------------------------------------------
 int
 main(int, char *[])
