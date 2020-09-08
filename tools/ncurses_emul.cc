@@ -229,7 +229,7 @@ int errors = 0;
 int
 doit()
 {
-   return fprintf(sdterr, "*** LIBCURSES etc. missing\n");
+   return fprintf(stderr, "*** LIBCURSES etc. missing\n");
 }
 #endif
 //----------------------------------------------------------------------------
