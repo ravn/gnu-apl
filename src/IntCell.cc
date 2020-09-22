@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -333,19 +333,16 @@ const APL_Integer iv = value.ival;
    // 64-bit signed integer for N <= 20
    // 64-bit float for N <= 170
    //
-   
    if (iv < 0)     return E_DOMAIN_ERROR;
 
    if (iv < int_fact_max)   // integer result that fits into a 64-bit int
       {
-        new (Z) IntCell(int_factorials[iv]);
-        return E_NO_ERROR;
+        return IntCell::zv(Z, int_factorials[iv]);
       }
 
    if (iv < float_fact_max)   // float result that fits into a 64 bit double
       {
-        new (Z) FloatCell(float_factorials[iv]);
-        return E_NO_ERROR;
+        return FloatCell::zv(Z, float_factorials[iv]);
       }
 
    return E_DOMAIN_ERROR;
@@ -354,27 +351,24 @@ const APL_Integer iv = value.ival;
 ErrorCode
 IntCell::bif_conjugate(Cell * Z) const
 {
-   new (Z) IntCell(value.ival);
-   return E_NO_ERROR;
+   return IntCell::zv(Z, value.ival);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_negative(Cell * Z) const
 {
    if (uint64_t(value.ival) == 0x8000000000000000LL)   // integer overflow
-      new (Z) FloatCell(- value.ival);
-   else
-      new (Z) IntCell(- value.ival);
-   return E_NO_ERROR;
+      return FloatCell::zv(Z, - value.ival);
+   return  IntCell::zv(Z, - value.ival);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_direction(Cell * Z) const
 {
-   if      (value.ival > 0)   new (Z) IntCell( 1);
-   else if (value.ival < 0)   new (Z) IntCell(-1);
-   else                       new (Z) IntCell( 0);
-   return E_NO_ERROR;
+APL_Integer result = 0;
+   if      (value.ival > 0)   result =  1;
+   else if (value.ival < 0)   result = -1;
+   return IntCell::zv(Z, result);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -613,14 +607,13 @@ const bool invert_Z = b < 0;
 
    // at this point, b ≥ 0
    //
-   if (b <= 1)   // special cases A⋆1, A⋆0, and A⋆¯1
+   if (b <= 1)   // special cases: A⋆1, A⋆0, and A⋆¯1
       {
         if (b == 0)   return z1(Z);  // A⋆0 is 1
 
         if (invert_Z)               return A->bif_reciprocal(Z);
         if (A->is_real_cell())      return A->bif_conjugate(Z);
-        new (Z) ComplexCell(A->get_complex_value());
-        return E_NO_ERROR;
+        return ComplexCell::zv(Z, A->get_complex_value());
       }
 
    if (A->is_integer_cell())
@@ -708,6 +701,8 @@ const bool invert_Z = b < 0;
         if (af < 0.0)   af = -af;
 
         APL_Float z = pow(af, bf);
+        if (!isfinite(z))   return E_DOMAIN_ERROR;
+
         if (negate_Z)   z = - z;
         if (invert_Z)
            {

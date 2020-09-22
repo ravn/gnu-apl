@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -620,16 +620,21 @@ const APL_Float ai = A->get_imag_value();
 
    // 2. real A > 0   (real result)
    //
-   if (ai == 0.0)
+   if (ai == 0.0)   // real A
       {
         if (ar  == 1.0)   return IntCell::z1(Z);   // 1⋆b = 1
-        const APL_Float z = pow(ar, dfval());
-        if (isfinite(z)) return zv(Z, z);
 
-        /* fall through */
+        if (ar >= 0)
+           {
+             const APL_Float z = pow(ar, dfval());
+             if (isfinite(z))   return zv(Z, z);
+             return E_DOMAIN_ERROR;
+           }
+
+        // ar < 0: fall through
       }
 
-   // 3. complex result
+   // 3. complex or negative A → complex result
    //
 const APL_Complex a(ar, ai);
 const APL_Complex z = complex_power(a, dfval());
