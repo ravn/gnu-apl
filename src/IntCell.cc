@@ -689,8 +689,7 @@ const bool invert_Z = b < 0;
 
         if (negate_Z)   z = - z;
         if (invert_Z)   z = 1.0 / z;
-        new (Z) FloatCell(z);
-        return E_NO_ERROR;
+        return FloatCell::zv(Z, z);
       }
 
    if (A->is_float_cell())
@@ -719,6 +718,9 @@ const bool invert_Z = b < 0;
      APL_Complex cb(APL_Float(b), 0.0);
 
      APL_Complex z = complex_power(ca, cb);
+     if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
+     if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+
      const APL_Float denom = ComplexCell::mag2(z);
      if (!invert_Z)   return ComplexCell::zv(Z, z);
 
