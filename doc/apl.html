@@ -227,7 +227,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>July 25, 2020
+<p>September 28, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -375,9 +375,10 @@ particular a shell, and possibly libraries needed by the shell. Consult
 
 </li><li> GNU APL processes the -C option (i.e. it calls chroot(&quot;new_root&quot;)) before
 all other command line options. As a consequence, file names in other command
-line options pf GNU APL are also affected by -C. That means that the file names
-are interpreted relative to new_root and not relative to the root of the
-process that is starting GNU APL.
+line options of GNU APL are also affected by -C. That means that the file
+names in command line options arr being interpreted relative to new_root
+and <strong>not</strong> relative to the curret directory of the process that had
+started GNU APL.
 
 </li><li> GNU APL may automatically start other processes such as APserver and friends
 after processing the -C option. These processes (and the libraries that they
@@ -415,8 +416,11 @@ via the -f option.
 
 </li><li> <samp>--eval line</samp>
 
-<p>evaluate one APL line and exit. This option can be given several times, in
-that case several lines are being executed before GNU apl exits.
+<p>evaluate one APL line and exit. This option can be given several times; in
+that case several lines are being executed before GNU apl exits. Keep in
+mind that command line options are nrmally processed by your shell before
+being passed to apl. Therefore sometimes quoting the argument of &ndash;eval may
+be needed and common wisdom has it to always quote the argument of &ndash;eval.
 </p>
 </li><li> <samp>-f file</samp>
 

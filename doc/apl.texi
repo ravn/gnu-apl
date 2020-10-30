@@ -185,9 +185,10 @@ particular a shell, and possibly libraries needed by the shell. Consult
 @item
 GNU APL processes the -C option (i.e. it calls chroot("new_root")) before
 all other command line options. As a consequence, file names in other command
-line options pf GNU APL are also affected by -C. That means that the file names
-are interpreted relative to new_root and not relative to the root of the
-process that is starting GNU APL.
+line options of GNU APL are also affected by -C. That means that the file
+names in command line options arr being interpreted relative to new_root
+and @strong{not} relative to the curret directory of the process that had
+started GNU APL.
 
 @item
 GNU APL may automatically start other processes such as APserver and friends
@@ -233,8 +234,11 @@ run in (new) Emacs mode with argument arg.
 @item
 @option{--eval line}
 
-evaluate one APL line and exit. This option can be given several times, in
-that case several lines are being executed before GNU apl exits.
+evaluate one APL line and exit. This option can be given several times; in
+that case several lines are being executed before GNU apl exits. Keep in
+mind that command line options are nrmally processed by your shell before
+being passed to apl. Therefore sometimes quoting the argument of --eval may
+be needed and common wisdom has it to always quote the argument of --eval.
 
 @item
 @option{-f file}

@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-July 25, 2020
+September 28, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -151,10 +151,11 @@ GNU APL understands the following command line options:
 
         • GNU APL processes the -C option (i.e.  it calls
           chroot("new_root")) before all other command line options.  As
-          a consequence, file names in other command line options pf GNU
-          APL are also affected by -C. That means that the file names
-          are interpreted relative to new_root and not relative to the
-          root of the process that is starting GNU APL.
+          a consequence, file names in other command line options of GNU
+          APL are also affected by -C. That means that the file names in
+          command line options arr being interpreted relative to
+          new_root and *not* relative to the curret directory of the
+          process that had started GNU APL.
 
         • GNU APL may automatically start other processes such as
           APserver and friends after processing the -C option.  These
@@ -195,8 +196,11 @@ GNU APL understands the following command line options:
    • ‘--eval line’
 
      evaluate one APL line and exit.  This option can be given several
-     times, in that case several lines are being executed before GNU apl
-     exits.
+     times; in that case several lines are being executed before GNU apl
+     exits.  Keep in mind that command line options are nrmally
+     processed by your shell before being passed to apl.  Therefore
+     sometimes quoting the argument of –eval may be needed and common
+     wisdom has it to always quote the argument of –eval.
 
    • ‘-f file’
 
@@ -5361,60 +5365,60 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11469
-Node: Chapter 219502
-Node: Chapter 323926
-Node: Section 3.125627
-Node: Section 3.241788
-Node: Section 3.342547
-Node: Section 3.443834
-Node: Section 3.547236
-Node: Section 3.647409
-Node: Section 3.748022
-Node: Section 3.851975
-Node: Section 3.953517
-Node: Section 3.1054972
-Node: Section 3.1156756
-Node: Section 3.1258696
-Node: Section 3.1359637
-Node: Section 3.1459889
-Node: Section 3.1561285
-Node: Section 3.1663803
-Node: Section 3.1770502
-Node: Section 3.1871947
-Node: Section 3.1977608
-Node: Section 3.2082642
-Node: Section 3.2185923
-Node: Section 3.2286214
-Node: Section 3.2396789
-Node: Section 3.2497061
-Node: Section 3.25103639
-Node: Section 3.26106096
-Node: Section 3.27106765
-Node: Section 3.28109888
-Node: Section 3.29117496
-Node: Section 3.30118443
-Node: Section 3.31132005
-Node: Section 3.32141505
-Node: Section 3.33144609
-Node: Section 3.34146598
-Node: Chapter 4151002
-Node: Chapter 5152750
-Node: Chapter 6153876
-Node: Section 6.1155413
-Node: Section 6.2156693
-Node: Section 6.3157053
-Node: Section 6.4157295
-Node: Section 6.5157957
-Node: Section 6.6158435
-Node: Section 6.7159207
-Node: Section 6.8159664
-Node: Chapter 7160066
-Node: Section 7.1160485
-Node: Section 7.2161172
-Node: Chapter 8162003
-Node: Section 8.1162506
-Node: Section 8.2187820
+Node: Chapter 11474
+Node: Chapter 219813
+Node: Chapter 324237
+Node: Section 3.125938
+Node: Section 3.242099
+Node: Section 3.342858
+Node: Section 3.444145
+Node: Section 3.547547
+Node: Section 3.647720
+Node: Section 3.748333
+Node: Section 3.852286
+Node: Section 3.953828
+Node: Section 3.1055283
+Node: Section 3.1157067
+Node: Section 3.1259007
+Node: Section 3.1359948
+Node: Section 3.1460200
+Node: Section 3.1561596
+Node: Section 3.1664114
+Node: Section 3.1770813
+Node: Section 3.1872258
+Node: Section 3.1977919
+Node: Section 3.2082953
+Node: Section 3.2186234
+Node: Section 3.2286525
+Node: Section 3.2397100
+Node: Section 3.2497372
+Node: Section 3.25103950
+Node: Section 3.26106407
+Node: Section 3.27107076
+Node: Section 3.28110199
+Node: Section 3.29117807
+Node: Section 3.30118754
+Node: Section 3.31132316
+Node: Section 3.32141816
+Node: Section 3.33144920
+Node: Section 3.34146909
+Node: Chapter 4151313
+Node: Chapter 5153061
+Node: Chapter 6154187
+Node: Section 6.1155724
+Node: Section 6.2157004
+Node: Section 6.3157364
+Node: Section 6.4157606
+Node: Section 6.5158268
+Node: Section 6.6158746
+Node: Section 6.7159518
+Node: Section 6.8159975
+Node: Chapter 7160377
+Node: Section 7.1160796
+Node: Section 7.2161483
+Node: Chapter 8162314
+Node: Section 8.1162817
+Node: Section 8.2188131
 
 End Tag Table
 

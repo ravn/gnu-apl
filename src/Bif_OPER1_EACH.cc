@@ -83,37 +83,37 @@ Function * LO = _LO.get_function();
 
    if (LO->may_push_SI())   // user defined LO
       {
-         const bool scalar_A = A->is_scalar();
-         const bool scalar_B = B->is_scalar();
+         const bool extend_A = A->is_scalar_or_len1_vector() && !B->is_scalar();
+         const bool extend_B = B->is_scalar_or_len1_vector();
 
          Macro * macro = 0;
          if (LO->has_result())
             {
-              if (scalar_A)
+              if (extend_A)
                  {
-                   macro = Macro::get_macro(scalar_B
-                                            ? Macro::MAC_Z__sA_LO_EACH_sB
-                                            : Macro::MAC_Z__sA_LO_EACH_vB);
+                   macro = Macro::get_macro(extend_B
+                                          ? Macro::MAC_Z__sA_LO_EACH_sB
+                                          : Macro::MAC_Z__sA_LO_EACH_vB);
                 }
              else
                 {
-                  macro = Macro::get_macro(scalar_B
-                                           ? Macro::MAC_Z__vA_LO_EACH_sB
-                                           : Macro::MAC_Z__vA_LO_EACH_vB);
+                  macro = Macro::get_macro(extend_B
+                                         ? Macro::MAC_Z__vA_LO_EACH_sB
+                                         : Macro::MAC_Z__vA_LO_EACH_vB);
                 }
             }
          else   // LO has no result, so we can ignore the shape of the result
             {
-              if (scalar_A && scalar_B)
+              if (extend_A && extend_B)
                  {
                    macro = Macro::get_macro(Macro::MAC_sA_LO_EACH_sB);
                  }
 
-              if (scalar_B)
+              if (extend_B)
                  {
                    macro = Macro::get_macro(Macro::MAC_vA_LO_EACH_sB);
                  }
-              else if (scalar_A)
+              else if (extend_A)
                  {
                    macro = Macro::get_macro(Macro::MAC_sA_LO_EACH_vB);
                  }
@@ -123,7 +123,33 @@ Function * LO = _LO.get_function();
                  }
             }
 
-        return macro->eval_ALB(A, _LO, B);
+        if (extend_A && !A->is_scalar())        // 1-element non-scalar A
+           {
+             if (extend_B && !B->is_scalar())   // 1-element non-scalar B
+                {
+                  Value_P A1(LOC);
+                  Value_P B1(LOC);
+                  A1->get_ravel(0).init(A->get_ravel(0), A1.getref(), LOC);
+                  B1->get_ravel(0).init(B->get_ravel(0), B1.getref(), LOC);
+                  return macro->eval_ALB(A1, _LO, B1);
+                }
+             else
+                {
+                  Value_P A1(LOC);
+                  A1->get_ravel(0).init(A->get_ravel(0), A1.getref(), LOC);
+                  return macro->eval_ALB(A1, _LO, B);
+                }
+           }
+        else if (extend_B && !B->is_scalar())   // 1-element non-scalar B
+           {
+             Value_P B1(LOC);
+             B1->get_ravel(0).init(B->get_ravel(0), B1.getref(), LOC);
+             return macro->eval_ALB(A, _LO, B1);
+           }
+        else
+           {
+             return macro->eval_ALB(A, _LO, B);
+           }
       }
 
 Value_P Z;
@@ -131,13 +157,13 @@ int dA = 1;   // assume A is non-scalar
 int dB = 1;   // assume B is non-scalar
 ShapeItem len_Z = 0;
 
-   if (A->is_scalar())          // scalar-extend A
+   if (A->is_scalar_or_len1_vector())          // scalar-extend A
       {
         len_Z = B->element_count();
         dA = 0;
         if (LO->has_result())   Z = Value_P(B->get_shape(), LOC);
       }
-   else if (B->is_scalar())     // scalar-extend B
+   else if (B->is_scalar_or_len1_vector())     // scalar-extend B
       {
         dB = 0;
         len_Z = A->element_count();
