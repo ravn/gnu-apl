@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ public:
 
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
-      { return true; }
+      { return false; }
 
    /// eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)
    Token eval_form_1(Value_P A, Token & LO, Value_P N, Value_P B);
