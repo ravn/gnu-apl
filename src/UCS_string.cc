@@ -103,8 +103,12 @@ UCS_string::UCS_string(const UTF8_string & utf)
    Log(LOG_char_conversion)
       CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
 
+size_t from = 0;
+
    for (size_t i = 0; i < utf.size();)
       {
+start_of_sequence:
+
         const uint32_t b0 = utf[i++];
         uint32_t bx = b0;
         uint32_t more;
@@ -114,12 +118,21 @@ UCS_string::UCS_string(const UTF8_string & utf)
         else if ((b0 & 0xF8) == 0xF0)   { more = 3; bx &= 0x0E; }
         else if ((b0 & 0xFC) == 0xF8)   { more = 4; bx &= 0x07; }
         else if ((b0 & 0xFE) == 0xFC)   { more = 5; bx &= 0x03; }
-        else
+        else   // invalid UTF start byte
            {
-             utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
-                               << " at " << LOC <<  endl;
-             Backtrace::show(__FILE__, __LINE__);
-             return;
+             Log(LOG_char_conversion)
+                {
+                 utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
+                                   << " at " << LOC <<  endl;
+                 Backtrace::show(__FILE__, __LINE__);
+                }
+
+             // map this string to the "supplementary private use area B" so
+             // that its hex code becomes (sort of) visible
+             //
+             append(Unicode(utf[from] | 0x100000));
+             i = ++from;   // retry, starting at next char
+             goto start_of_sequence;
            }
 
         uint32_t uni = 0;
@@ -127,30 +140,44 @@ UCS_string::UCS_string(const UTF8_string & utf)
             {
               if (i >= utf.size())
                  {
-                   utf.dump_hex(CERR << "Truncated UTF8 string: ", 40)
-                      << " len " << utf.size() << " at " << LOC <<  endl;
-                   if (utf.size() >= 40)
+                   Log(LOG_char_conversion)
                       {
-                         const UTF8_string end(&utf[utf.size() - 10], 10);
-                         end.dump_hex(CERR << endl << "(ending with : ", 20)
-                                           << ")" << endl;
+                        utf.dump_hex(CERR << "Truncated UTF8 string: ", 40)
+                                          << " len " << utf.size()
+                                          << " at " << LOC << endl;
+                        if (utf.size() >= 40)
+                           {
+                             const UTF8_string end(&utf[utf.size() - 10], 10);
+                             end.dump_hex(CERR << endl << "(ending with : ", 20)
+                                               << ")" << endl;
+                           }
                       }
-                   return;
+
+                   append(Unicode(utf[from] | 0x100000));
+                   i = ++from;   // retry, starting at next char
+                   goto start_of_sequence;
                  }
 
               const UTF8 subc = utf[i++];
-              if ((subc & 0xC0) != 0x80)
+              if ((subc & 0xC0) != 0x80)   // invalid UTF continuation byte
                  {
-                   utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
-                      << " len " << utf.size() << " at " << LOC <<  endl;
-                   if (utf.size() >= 40)
+                   Log(LOG_char_conversion)
                       {
-                         const UTF8_string end(&utf[utf.size() - 10], 10);
-                         end.dump_hex(CERR << endl << "(ending with : ", 20)
-                                           << ")" << endl;
+                        utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
+                                          << " len " << utf.size()
+                                          << " at " << LOC <<  endl;
+                        if (utf.size() >= 40)
+                           {
+                             const UTF8_string end(&utf[utf.size() - 10], 10);
+                             end.dump_hex(CERR << endl << "(ending with : ", 20)
+                                               << ")" << endl;
+                           }
+                        Backtrace::show(__FILE__, __LINE__);
                       }
-                   Backtrace::show(__FILE__, __LINE__);
-                   return;
+
+                   append(Unicode(utf[from] | 0x100000));
+                   i = ++from;   // retry, starting at next char
+                   goto start_of_sequence;
                  }
 
               bx  <<= 6;
@@ -159,6 +186,7 @@ UCS_string::UCS_string(const UTF8_string & utf)
             }
 
          append(Unicode(bx | uni));
+         from = i;
       }
 
    Log(LOG_char_conversion)
