@@ -220,15 +220,16 @@ const int64_t used_memory
                + value_count * sizeof(Value)
                + Workspace::SI_entry_count() * sizeof(StateIndicator);
 
-   CERR << "Value_P::Value_P(" << args << ") failed at " << loc
-        << " (caller: "        << caller << ")" << endl
-        << " what: "           << ex.what() << endl
-        << " initial sbrk(): 0x" << hex << Quad_WA::initial_sbrk << endl
-        << " current sbrk(): 0x" << top_of_memory() << endl
-        << " alloc_size:     0x" << alloc_size << dec << " ("
-                                 << alloc_size << ")" << endl
-        << " used memory:    0x" << hex  << used_memory << dec
-                                 << " (" << used_memory << ")" << endl;
+   Log(LOG_Value_alloc)
+      CERR << "Value_P::Value_P(" << args << ") failed at " << loc
+           << " (caller: "        << caller << ")" << endl
+           << " what: "           << ex.what() << endl
+           << " initial sbrk(): 0x" << hex << Quad_WA::initial_sbrk << endl
+           << " current sbrk(): 0x" << top_of_memory() << endl
+           << " alloc_size:     0x" << alloc_size << dec << " ("
+                                    << alloc_size << ")" << endl
+           << " used memory:    0x" << hex  << used_memory << dec
+                                    << " (" << used_memory << ")" << endl;
 
    MORE_ERROR() << "new Value(" << args << ") failed (" << ex.what() << ")";
    WS_FULL;
