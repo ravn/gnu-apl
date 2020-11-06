@@ -143,7 +143,8 @@ public:
       { return Id(tag >> 16); }
 
    /// return the tag of this token
-   const TokenTag get_tag() const   { return tag; }
+   const TokenTag get_tag() const
+      { return tag; }
 
    /// return the Unicode value of this token
    Unicode get_char_val() const

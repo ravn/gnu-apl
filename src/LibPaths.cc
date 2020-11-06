@@ -260,7 +260,7 @@ UTF8_string filename_ext2 = name;
         << "WARNING: filename " << name << endl
         << "    is ambiguous because another file" << endl << "    "
         << filename_ext2 << endl
-        << "    exists as well. Using the first." << endl << endl;
+        << "    exists as well. Using the first (.xml) file." << endl << endl;
 }
 //-----------------------------------------------------------------------------
 UTF8_string

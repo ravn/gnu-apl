@@ -78,6 +78,9 @@ public:
    /// return \b true iff \b this function is a macro
    virtual bool is_macro() const   { return false; }
 
+   /// return \b true iff \b this function is defined (= has an APL body)
+   virtual bool is_defined() const   { return false; }
+
    /// return \b true iff \b this function is a derived function
    virtual bool is_derived() const
       { return false; }
@@ -159,8 +162,11 @@ public:
    virtual assoc_f2 get_assoc() const
       { return 0; }
 
-   /// set \b tok to a \b Token for \b this function.
-   Token get_token()   { return Token(tag, this); }
+   /// return a \b Token for \b this function.
+   Token get_token() { return Token(tag, this); }
+
+   /// return the \b Token Tag for \b this function.
+   TokenTag get_tag() const { return tag; }
 
    /// plain function, 0 arguments
    virtual Token eval_();

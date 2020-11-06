@@ -43,9 +43,13 @@ public:
    /// Destructor.
    ~UserFunction();
 
-   /// return true if this function is a lambda
+   /// overloaded Function::is_lambda()
    virtual bool is_lambda() const
       { return header.get_name()[0] == UNI_LAMBDA; }
+
+   /// overloaded Function::is_defined()
+   virtual bool is_defined() const
+      { return true; }
 
    /// return the macro number (if this function is one) or -1
    virtual int get_macnum() const
@@ -53,7 +57,7 @@ public:
 
    /// overloaded Executable::get_ufun()
    virtual const UserFunction * get_ufun() const
-   { return this; }
+      { return this; }
 
    /// overloaded Function::get_ufun1()
    virtual UserFunction * get_ufun1()

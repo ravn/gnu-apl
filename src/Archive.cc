@@ -273,24 +273,55 @@ char cc[80];
 void
 XML_Saving_Archive::save_Function(const Function & fun)
 {
-const int * eprops = fun.get_exec_properties();
-const APL_time_us creation_time = fun.get_creation_time();
-   do_indent();
-   out << "<Function creation-time=\"" << creation_time
-       << "\" exec-properties=\""
-       << eprops[0] << "," << eprops[1] << ","
-       << eprops[2] << "," << eprops[3] << "\"";
+   if (fun.is_macro())
+      {
+        const UserFunction * ufun = fun.get_ufun1();
+        Assert(ufun);
 
-   if (fun.is_native())   out << " native=\"1\"";
+        do_indent();
+        out << "<Function macro=\"" << ufun->get_macnum() << "\"/>" << endl;
+      }
+   else if (fun.is_derived())
+      {
+        CERR << endl <<
+"WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
+"         such a state is currently not supported and WILL cause problems\n"
+"         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
+"         )SAVE this workspace again.\n"
+"\n"
+"         As an alternative (and to be on the safe side), you should also\n"
+"         consider to )DUMP this workspace.\n"
+             << endl;
+      }
+   else if (fun.is_defined())   // defined APL function
+      {
+        const int * eprops = fun.get_exec_properties();
+        const APL_time_us creation_time = fun.get_creation_time();
 
-   out << ">" << endl;
-   ++indent;
+        do_indent();
+        out << "<Function creation-time=\"" << creation_time
+            << "\" exec-properties=\""
+            << eprops[0] << "," << eprops[1] << ","
+            << eprops[2] << "," << eprops[3] << "\"";
 
-   save_UCS(fun.canonical(false));
+        if (fun.is_native())   out << " native=\"1\"";
 
-   --indent;
-   do_indent();
-   out << "</Function>" << endl;
+        out << ">" << endl;
+        ++indent;
+
+        save_UCS(fun.canonical(false));
+
+        --indent;
+        do_indent();
+        out << "</Function>" << endl;
+      }
+   else // primitive APL function
+      {
+        do_indent();
+        out << "<Function tag=\"" << fun.get_tag()
+            << "\"/>   <!-- primitive: " << ID::get_name_UCS(fun.get_Id())
+            << " -->" << endl;
+      }
 }
 //-----------------------------------------------------------------------------
 int
@@ -305,7 +336,11 @@ XML_Saving_Archive::save_Function_name(const char * ufun_prefix,
 "WARNING: The )SI stack contains a derived function. )SAVEing a workspace in\n"
 "         such a state is currently not supported and WILL cause problems\n"
 "         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
-"         )SAVE this workspace again." << endl;
+"         )SAVE this workspace again.\n"
+"\n"
+"         As an alternative (and to be on the safe side), you should also\n"
+"         consider to )DUMP this workspace.\n"
+             << endl;
       }
 
 const UserFunction * ufun = fun.get_ufun1();
@@ -726,6 +761,8 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "                <!ELEMENT Function (UCS)>\n"
 "                <!ATTLIST Function creation-time   CDATA #IMPLIED>\n"
 "                <!ATTLIST Function exec-properties CDATA #IMPLIED>\n"
+"                <!ATTLIST Function macro           CDATA #IMPLIED>\n"
+"                <!ATTLIST Function tag             CDATA #IMPLIED>\n"
 "\n"
 "                <!ELEMENT Label (#PCDATA)>\n"
 "                <!ATTLIST Label value CDATA #REQUIRED>\n"
@@ -1813,11 +1850,30 @@ const int value = find_int_attr("value", false, 10);
 void
 XML_Loading_Archive::read_Function(int d, Symbol & symbol)
 {
-const int native = find_int_attr("native", true, 10);
+const Macro::Macro_num macnum =
+                       Macro::Macro_num(find_int_attr("macro", true, 10));
+   if (macnum != -1)   // function is a macro
+      {
+        Macro * fmacro = Macro::get_macro(macnum);
+        Assert(fmacro);
+        symbol.push_function(fmacro);
+        return;
+      }
+
+const TokenTag primitive_tag = TokenTag(find_int_attr("tag", true, 16));
+   if (primitive_tag != -1)   // function is an APL primitive
+      {
+        Function * pfun = ID::get_system_function(Id(primitive_tag >> 16));
+        Assert(pfun);
+        symbol.push_function(pfun);
+        return;
+      }
+
+const int native                = find_int_attr("native", true, 10);
 const APL_time_us creation_time = find_int_attr("creation-time", true, 10);
 int eprops[4] = { 0, 0, 0, 0 };
-const UTF8 * ep = find_attr("exec-properties", true);
-   if (ep)
+
+   if (const UTF8 * ep = find_attr("exec-properties", true))
       {
         sscanf(charP(ep), "%d,%d,%d,%d",
                eprops, eprops + 1, eprops + 2, eprops+ 3);
@@ -2255,7 +2311,7 @@ Symbol * symbol = Workspace::lookup_symbol(name_UCS);
    Assert(level >= 0);
    Assert(level < symbol->value_stack_size());
 ValueStackItem & vsi = (*symbol)[level];
-   Assert(vsi.name_class == NC_FUNCTION);
+   Assert(vsi.name_class == NC_FUNCTION || vsi.name_class == NC_OPERATOR);
 Function * fun = vsi.sym_val.function;
    Assert(fun);
 UserFunction * ufun = fun->get_ufun1();

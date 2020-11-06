@@ -471,7 +471,8 @@ const int sym_stack_size = value_stack_size();
    loop(s, sym_stack_size)
       {
         const ValueStackItem & vsi = value_stack[s];
-        if (vsi.name_class != NC_FUNCTION)   continue;
+        if (vsi.name_class != NC_FUNCTION &&
+            vsi.name_class != NC_OPERATOR)   continue;
         if (fun != vsi.sym_val.function)     continue;
 
        // found at level s
