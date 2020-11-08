@@ -258,7 +258,7 @@ ShapeItem end_z = z + slice_len;
                   job.ec = (col_B->*job.RO)(&product, row_A);
                   if (job.ec != E_NO_ERROR)   return;
 
-                  job.ec = (product.*job.LO)(sum, sum);
+                  job.ec = (sum->*job.LO)(sum, &product);
                   if (job.ec != E_NO_ERROR)   return;
                 }
            }

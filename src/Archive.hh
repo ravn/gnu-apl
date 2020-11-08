@@ -73,11 +73,13 @@ public:
 
    /// write either the name and SI-level of user-defined function or the
    /// id of a system function. Return number of attribute= items written
-   int save_Function_name(const char * ufun_prefix, const char * level_prefix,
-                          const char * id_prefix, const Function & fun);
+   int save_Function_name(const Function & fun);
 
-   /// write Prefix \b pfp
-   void save_Parser(const Prefix & pfp);
+   /// write the Prefix parser of \b si (and its derived functions)
+   void save_Parser(const StateIndicator & si);
+
+   /// write derived functions cache
+   void save_Derived(const DerivedFunctionCache & fns);
 
    /// write Symbol \b sym
    void save_Symbol(const Symbol & sym);
@@ -304,8 +306,7 @@ protected:
 
    /// read a system function with attribute id_prefix-id or a user defined
    /// functions with attributes 'ufun_prefix-ufun' and 'level_prefix-prefix'
-   Function * read_Function_name(const char * ufun_name, const char * si_level,
-                                 const char * sysfun_id);
+   Function * read_Function_name();
 
    /// find a lambda in the current SI entry
    Function * find_lambda(const UCS_string & lambda);

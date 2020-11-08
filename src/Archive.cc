@@ -289,9 +289,14 @@ XML_Saving_Archive::save_Function(const Function & fun)
 "         when )LOADing the workspace. Please perform )SIC (or →) and then\n"
 "         )SAVE this workspace again.\n"
 "\n"
-"         As an alternative (and to be on the safe side), you should also\n"
-"         consider to )DUMP this workspace.\n"
+"         As a precaution for loosing data or function definitions, please\n"
+"         also )DUMP this workspace (before )SIC or →).\n"
              << endl;
+
+        do_indent();
+        out << "<Function fid=\"" << HEX(&fun)
+            << "\" derived=\"yes\"/>" << endl;
+
       }
    else if (fun.is_defined())   // defined APL function
       {
@@ -299,12 +304,13 @@ XML_Saving_Archive::save_Function(const Function & fun)
         const APL_time_us creation_time = fun.get_creation_time();
 
         do_indent();
-        out << "<Function creation-time=\"" << creation_time
-            << "\" exec-properties=\""
+        out << "<Function creation-time=\"" << creation_time << "\"" << endl
+            << "                exec-properties=\""
             << eprops[0] << "," << eprops[1] << ","
             << eprops[2] << "," << eprops[3] << "\"";
 
         if (fun.is_native())   out << " native=\"1\"";
+        out << " fid=\"" << HEX(&fun) << "\"";
 
         out << ">" << endl;
         ++indent;
@@ -325,10 +331,7 @@ XML_Saving_Archive::save_Function(const Function & fun)
 }
 //-----------------------------------------------------------------------------
 int
-XML_Saving_Archive::save_Function_name(const char * ufun_prefix,
-                                       const char * level_prefix,
-                                       const char * id_prefix,
-                                       const Function & fun)
+XML_Saving_Archive::save_Function_name(const Function & fun)
 {
    if (fun.is_derived())
       {
@@ -350,20 +353,22 @@ const UserFunction * ufun = fun.get_ufun1();
         Symbol * sym = Workspace::lookup_symbol(fname);
         Assert(sym);
         const int sym_depth = sym->get_ufun_depth(ufun);
-        out << " " << ufun_prefix << "-name=\""  << fname     << "\""
-            << " " << level_prefix << "-level=\"" << sym_depth << "\"";
+        out << " ufun-name=\""  << fname     << "\""
+            << " symbol-level=\"" << sym_depth << "\"";
         return 2;   // two attributes
       }
    else        // primitive or quad function
       {
-        out << " " << id_prefix << "-id=\"" << HEX(fun.get_Id());
+        out << " fun-id=\"" << HEX(fun.get_Id());
         return 1;   // one attribute
       }
 }
 //-----------------------------------------------------------------------------
 void
-XML_Saving_Archive::save_Parser(const Prefix & prefix)
+XML_Saving_Archive::save_Parser(const StateIndicator & si)
 {
+const Prefix & prefix = si.current_stack;
+
    do_indent();
     out << "<Parser size=\""      << prefix.size()
         << "\" assign-pending=\"" << prefix.get_assign_state()
@@ -379,12 +384,25 @@ XML_Saving_Archive::save_Parser(const Prefix & prefix)
         const Token_loc & tloc = prefix.at(prefix.size() - s - 1);
         save_token_loc(tloc);
       }
-   save_token_loc(prefix.saved_lookahead);
-   --indent;
 
+   save_token_loc(prefix.saved_lookahead);
+
+   // print the derived functions stack...
+   save_Derived(si.fun_oper_cache);
+   --indent;
 
    do_indent();
    out << "</Parser>" << endl;
+}
+//-----------------------------------------------------------------------------
+void
+XML_Saving_Archive::save_Derived(const DerivedFunctionCache & fns)
+{
+   loop(f, fns.size())
+      {
+        const DerivedFunction & derived = fns[f];
+        save_Function(derived);
+      }
 }
 //-----------------------------------------------------------------------------
 void
@@ -504,7 +522,7 @@ const Executable & exec = *si.get_executable();
 
    // print the parser states...
    //
-   save_Parser(si.current_stack);
+   save_Parser(si);
 
    --indent;
 
@@ -634,7 +652,7 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
 
                          Function * fun = tok.get_function();
                          Assert1(fun);
-                         save_Function_name("ufun", "symbol", "fun", *fun);
+                         save_Function_name(*fun);
                        }
                        out << "\"";
                        break;
@@ -1883,6 +1901,12 @@ int eprops[4] = { 0, 0, 0, 0 };
       CERR << "      [" << d << "] read_Function(" << symbol.get_name()
            << ") native=" << native << endl;
 
+   if (find_attr("derived", true))
+      {
+        symbol.push();   // placeholder (for now)
+        return;
+      }
+
    next_tag(LOC);
    expect_tag("UCS", LOC);
 const UTF8 * uni = find_attr("uni", false);
@@ -2366,12 +2390,20 @@ Prefix & parser = si.current_stack;
 
    for (;;)
        {
-         Token_loc tl;
-         const bool success = read_Token(tl);
-         if (!success)   break;
+         next_tag(LOC);
+         if (is_tag("/Parser"))   break;
 
-         if (parser.size() < stack_size)   parser.push(tl);
-         else                              parser.saved_lookahead.copy(tl, LOC);
+         if (is_tag("Token"))
+            {
+              Token_loc tl;
+              read_Token(tl);
+
+              if (parser.size() < stack_size)   parser.push(tl);
+              else                    parser.saved_lookahead.copy(tl, LOC);
+            }
+         else if (is_tag("Function"))   // derived function
+            {
+            }
        }
 
    Log(LOG_archive)
@@ -2386,8 +2418,6 @@ Prefix & parser = si.current_stack;
 bool
 XML_Loading_Archive::read_Token(Token_loc & tloc)
 {
-   next_tag(LOC);
-   if (is_tag("/Parser"))   return false;
    expect_tag("Token", LOC);
 
    tloc.pc  = Function_PC(find_int_attr("pc", false, 10));
@@ -2489,9 +2519,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 
         case TV_FUN:
              {
-               Function * fun = read_Function_name("ufun-name",
-                                                   "symbol-level",
-                                                   "fun-id");
+               Function * fun = read_Function_name();
                Assert(fun);
                new (&tloc.tok) Token(tag, fun);
              }
@@ -2504,15 +2532,13 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 }
 //-----------------------------------------------------------------------------
 Function *
-XML_Loading_Archive::read_Function_name(const char * name_attr,
-                                        const char * level_attr,
-                                        const char * id_attr)
+XML_Loading_Archive::read_Function_name()
 {
-const UTF8 * fun_name = find_attr(name_attr, true);
+const UTF8 * fun_name = find_attr("ufun-name", true);
 
    if (fun_name)   // user defined function
       {
-        const int level = find_int_attr(level_attr, false, 10);
+        const int level = find_int_attr("symbol-level", false, 10);
         const UTF8 * end = fun_name;
         while (*end != '"')   ++end;
         UTF8_string name_UTF(fun_name, end - fun_name);
@@ -2534,7 +2560,7 @@ const UTF8 * fun_name = find_attr(name_attr, true);
         return fun;
       }
 
-const int fun_id = find_int_attr(id_attr, true, 16);
+const int fun_id = find_int_attr("fun-id", true, 16);
    if (fun_id != -1)
       {
         Function * sysfun = ID::get_system_function(Id(fun_id));

@@ -114,10 +114,18 @@ public:
    /// destructor
    ~DerivedFunctionCache();
 
+   const DerivedFunction & operator [](size_t i) const
+      { Assert(i < idx);    return cache[i]; }
+
+   /// return the number of items in the cache
+   size_t size() const
+      { return idx; }
+
    /// reset (clear) the cache
    void reset();
 
-   /// get a cache entry
+   /// return the last cache entry and increment \b idx. To be used with
+   /// placement new.
    DerivedFunction * get(const char * loc);
 
 protected:
@@ -125,7 +133,7 @@ protected:
    DerivedFunction cache[MAX_FUN_OPER];
 
    /// the number of elements in \b cache
-   int idx;
+   size_t idx;
 };
 //-----------------------------------------------------------------------------
 #endif // __DERIVED_FUNCTION__DEFINED__
