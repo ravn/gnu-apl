@@ -39,10 +39,12 @@ public:
    virtual bool has_alpha() const   { return true; }
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B) { VALENCE_ERROR; }
+   virtual Token eval_B(Value_P B)
+      { VALENCE_ERROR; }
 
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B) { VALENCE_ERROR; }
+   virtual Token eval_AB(Value_P A, Value_P B)
+      { VALENCE_ERROR; }
 
    /// overloaded Function::has_result()
    virtual bool has_result() const   { return true; }
@@ -309,10 +311,12 @@ public:
 
 protected:
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B)   { TODO; }
+   virtual Token eval_AB(Value_P A, Value_P B)
+      { TODO; }
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B)   { TODO; }
+   virtual Token eval_B(Value_P B)
+      { TODO; }
 };
 //-----------------------------------------------------------------------------
 /**

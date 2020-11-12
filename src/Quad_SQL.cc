@@ -374,7 +374,7 @@ Quad_SQL::eval_B(Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_SQL::eval_AB( Value_P A, Value_P B )
+Quad_SQL::eval_AB(Value_P A, Value_P B)
 {
    CHECK_SECURITY(disable_Quad_SQL);
    return list_functions(COUT);

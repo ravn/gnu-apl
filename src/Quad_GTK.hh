@@ -62,13 +62,13 @@ protected:
       };
 
    /// overloaded Function::eval_AB()
-   Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B);
 
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
 
    /// overloaded Function::eval_B()
-   Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B);
 
    /// overloaded Function::eval_XB()
    virtual Token eval_XB(Value_P X, Value_P B);

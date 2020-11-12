@@ -73,6 +73,7 @@ DerivedFunction.cc				DerivedFunction.hh	\
 			Help.def					\
 						Heapsort.hh		\
 Id.cc			Id.def			Id.hh			\
+						IdEnums.hh		\
 IndexExpr.cc					IndexExpr.hh		\
 IndexIterator.cc				IndexIterator.hh	\
 InputFile.cc					InputFile.hh		\

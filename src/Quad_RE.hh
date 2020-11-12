@@ -48,18 +48,18 @@ protected:
       } result_type;    ///< the type of result
 
    /// overloaded Function::eval_AB().
-   Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B)
       { return eval_AXB(A, Str0(LOC), B); }
 
    /// overloaded Function::eval_AXB().
-   Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
 
    /// overloaded Function::eval_B().
-   Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B)
       { VALENCE_ERROR; }
 
    /// overloaded Function::eval_XB().
-   Token eval_XB(Value_P X, Value_P B)
+   virtual Token eval_XB(Value_P X, Value_P B)
       { VALENCE_ERROR; }
 
 #ifdef HAVE_LIBPCRE2_32

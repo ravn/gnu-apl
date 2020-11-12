@@ -42,7 +42,7 @@ public:
 
    /// return the TokenTag for this system variable
    Token get_token()
-      { return Token(TokenTag(ID::get_token_tag(get_Id())), this); }
+      { return Token(ID::get_token_tag(get_Id()), this); }
 
    /// overloaded Symbol::print().
    virtual ostream & print(ostream & out) const;

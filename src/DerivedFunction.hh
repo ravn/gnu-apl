@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,6 +63,20 @@ public:
    virtual bool has_result() const
      { if (left_fun.get_tag() == TOK_VOID)   return oper->has_result();
        return left_fun.is_function() && left_fun.get_function()->has_result(); }
+
+  const Function * get_LO() const
+      { return left_fun.get_function(); }
+
+   const Function * get_OPER() const
+      { return oper; }
+
+   const Function * get_RO() const
+      {   if (right_fun.get_tag() == TOK_VOID)   return 0;
+          return right_fun.get_function();
+      }
+
+   const Value * get_AXIS() const
+      { return axis.get(); }
 
 protected:
    /// Overloaded Function::print_properties()

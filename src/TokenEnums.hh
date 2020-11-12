@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,13 +18,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ID_HH_DEFINED__
-# error This file shall NOT be #included directly, but by #including Id.hh
-#endif
-
 #ifndef __TOKENENUMS_HH_DEFINED__
 #define __TOKENENUMS_HH_DEFINED__
 
+#include "IdEnums.hh"
 /**
     The class tag of a token. Token classes < TC_MAX_PERM are permanent
     (e.g. used in user defined functions) while higher classes are

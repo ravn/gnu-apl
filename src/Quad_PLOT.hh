@@ -65,10 +65,10 @@ public:
 
 protected:
    /// overloaded Function::eval_AB()
-   Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B);
 
    /// overloaded Function::eval_B()
-   Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B);
 
    /// print attribute help text
    void help() const;

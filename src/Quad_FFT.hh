@@ -41,10 +41,10 @@ public:
 
 protected:
    /// overloaded Function::eval_AB()
-   Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B);
 
    /// overloaded Function::eval_B()
-   Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B);
 
    /// window function for sample n of N with parameters a = a0, a1, ...
    typedef double (*window_function)(ShapeItem n, ShapeItem N);

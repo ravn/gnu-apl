@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -83,6 +83,9 @@ public:
 
    /// write Symbol \b sym
    void save_Symbol(const Symbol & sym);
+
+   /// write all function
+   void save_functions();
 
    /// write all user defined commands
    void save_user_commands(const std::vector<Command::user_command> & cmds);
@@ -195,6 +198,12 @@ protected:
 
    /// true iff ² is pending
    bool char_mode;
+
+   /// functions saved so far
+   vector<const Function *> saved_Functions;
+
+   /// return true iff (the definition of) \b fun was already saved.
+   bool is_saved(const Function * fun) const;
 };
 //-----------------------------------------------------------------------------
 inline void Hswap(XML_Saving_Archive::_val_par & vp1,
@@ -233,11 +242,17 @@ public:
    /// read vids of top-level variables
    void read_vids();
 
-protected:
    /// move to next tag, return true if EOF
    bool next_tag(const char * loc);
 
-   /// read next Value element, return true on success
+protected:
+   /// a value ID in a )SAVEd workspace
+   enum Vid { NO_VID = int(-1) };   ///< no (invalid) value ID
+
+   /// the address of a function in a )SAVEd workspace
+   enum Fid { NO_FID = int(-1) };   ///< no (invalid) function ID
+
+   /// read next Value element
    void read_Value();
 
    /// read cell(s) starting at \b cell from string starting at \b first
@@ -257,7 +272,13 @@ protected:
    void read_Variable(int d, Symbol & symbol);
 
    /// read next Function element
+   void read_Function();
+
+   /// read next Function element
    void read_Function(int d, Symbol & symbol);
+
+   /// read next derived function
+   void read_Derived(StateIndicator & si, int lev);
 
    /// read next Label element
    void read_Label(int d, Symbol & symbol);
@@ -338,6 +359,14 @@ protected:
    /// return integer value of attribute \b att_name
    int64_t find_int_attr(const char * att_name, bool optional, int base);
 
+   /// return Fid value of attribute \b att_name
+   Fid find_Fid_attr(const char * att_name, bool optional, int base)
+      { return Fid(find_int_attr(att_name, optional, base)); }
+
+   /// return Fid value of attribute \b att_name
+   Vid find_Vid_attr(const char * att_name, bool optional, int base)
+      { return Vid(find_int_attr(att_name, optional, base)); }
+
    /// return floating point value of attribute \b att_name
    APL_Float find_float_attr(const char * att_name);
 
@@ -390,7 +419,7 @@ protected:
    bool reading_vids;
 
    /// the vids to be copied (empty if all)
-   std::vector<int> vids_COPY;
+   std::vector<Vid> vids_COPY;
 
    /// the names of objects (empty if all)
    UCS_string_vector allowed_objects;
@@ -401,18 +430,57 @@ protected:
    /// a value ID and the ID of its parent
    struct _vid_pvid
      {
-       int vid;    ///< value ID
-       int pvid;   ///< parent's value ID
+       Vid vid;    ///< value ID
+       Vid pvid;   ///< parent's value ID
      };
 
-   /// parents[vid] os the parent of vid, or -1 if vid is a top-level value
-   std::vector<int> parents;
+   /// parents[vid] is the parent of vid, or NO_VID if vid is a top-level value
+   std::vector<Vid> parents;
 
    /// the file name from which this archive was read
    const char * filename;
 
    /// true if file contains a <\/Workspace> tag at the end
    bool file_is_complete;
+
+   /// one mapping from an fid in the old (SAVEed) workspace to the function
+   /// address in the new (LOADing) workspace
+   struct fun_map
+      {
+        Fid old_fid;          ///< the fid in the )SAVEed workspace
+        Function * new_fun;   ///< address in the )LOADing workspace
+        const char * loc;     ///< where allocated
+      };
+
+   /// all mappings from fids to functions
+   std::vector<fun_map> fid_to_function;
+
+   /// return fun_map for fid, or 0 if not found.
+   fun_map * find_fun_map(Fid fid);
+
+   /// return function for fid, or 0 if not found.
+   Function * find_function(Fid fid);
+
+   /// add fid and function to find_fun_map. Either fid must be new, or else
+   /// an existing fid must have its new_fun == 0 (forward declaration).
+   void add_fid_function(Fid fid, Function * new_fun, const char * loc);
+
+   struct _derived_todo
+      {
+        Function * cache;     ///< the new ()-address of the function
+        Function ** symptr;   ///< the address of a function * to be set
+        Fid fid;              ///< the address of \b this derived function
+        Fid LO_fid;           ///< the address of \b LO of this function
+        Fid OPER_fid;         ///< the address of \b OPER of this function
+        Fid RO_fid;           ///< the address of \b RO of this function
+        Vid AXIS_vid;         ///< the AXIS of \b this function
+        const char * loc;     ///< where \b this was initialized
+      };
+
+      vector<_derived_todo> derived_todos;
+
+   /// instantiate the derived functions in \b derived_todos
+   void instantiate_derived_functions(bool allocate);
 };
 //-----------------------------------------------------------------------------
 

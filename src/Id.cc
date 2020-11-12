@@ -170,7 +170,7 @@ ID::get_system_variable(Id id)
    return 0;
 }
 //-----------------------------------------------------------------------------
-int
+TokenTag
 ID::get_token_tag(Id id)
 {
    switch(id)
@@ -186,6 +186,6 @@ ID::get_token_tag(Id id)
         default: break;
       }
 
-   return 0;
+   return TOK_INVALID;
 }
 //-----------------------------------------------------------------------------

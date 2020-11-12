@@ -45,11 +45,11 @@ DerivedFunction::DerivedFunction(Token & lfun, Function * dyop, Token & rfun,
 }
 //-----------------------------------------------------------------------------
 DerivedFunction::DerivedFunction(Token & lfun, Function * dyop, Value_P X,
-                                 Token & rval, const char * loc)
+                                 Token & rfun, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_fun(lfun),
      oper(dyop),
-     right_fun(rval),
+     right_fun(rfun),
      axis(X)
 {
 }

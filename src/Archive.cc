@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,21 @@
 
 #include "Archive.hh"
 #include "buildtag.hh"   // for ARCHIVE_SVN
+#include "Bif_F12_COMMA.hh"
+#include "Bif_F12_DOMINO.hh"
+#include "Bif_F12_FORMAT.hh"
+#include "Bif_F12_INDEX_OF.hh"
+#include "Bif_F12_PARTITION_PICK.hh"
+#include "Bif_F12_SORT.hh"
+#include "Bif_F12_TAKE_DROP.hh"
+#include "Bif_OPER1_COMMUTE.hh"
+#include "Bif_OPER1_EACH.hh"
+#include "Bif_OPER1_REDUCE.hh"
+#include "Bif_OPER1_SCAN.hh"
+#include "Bif_OPER2_INNER.hh"
+#include "Bif_OPER2_OUTER.hh"
+#include "Bif_OPER2_POWER.hh"
+#include "Bif_OPER2_RANK.hh"
 #include "Common.hh"
 #include "Command.hh"
 #include "CharCell.hh"
@@ -44,6 +59,15 @@
 #include "Output.hh"
 #include "PointerCell.hh"
 #include "PrintOperator.hh"
+#include "PrimitiveFunction.hh"
+#include "Quad_FFT.hh"
+#include "Quad_FX.hh"
+#include "Quad_GTK.hh"
+#include "Quad_MAP.hh"
+#include "Quad_PLOT.hh"
+#include "Quad_RVAL.hh"
+#include "Quad_SQL.hh"
+#include "Quad_TF.hh"
 #include "Symbol.hh"
 #include "Token.hh"
 #include "UCS_string.hh"
@@ -271,15 +295,35 @@ char cc[80];
 }
 //-----------------------------------------------------------------------------
 void
+XML_Saving_Archive::save_functions()
+{
+   // save build-in functions
+   //
+   do_indent();
+   out << "<!-- system functions and primitives... -->" << endl;
+#define sf_def(x, _str, _txt)   save_Function(x::_fun);
+#define pf_def(x, _str, _txt)   save_Function(x::_fun);
+#include "SystemVariable.def"
+
+   out << endl;
+}
+//-----------------------------------------------------------------------------
+void
 XML_Saving_Archive::save_Function(const Function & fun)
 {
-   if (fun.is_macro())
+   do_indent();
+   out << "<Function fid=\"" << HEX(&fun) << "\"";
+
+   if (is_saved(&fun))
+      {
+         out << " ref=\"true\"/>"    << endl;
+      }
+   else if (fun.is_macro())
       {
         const UserFunction * ufun = fun.get_ufun1();
         Assert(ufun);
 
-        do_indent();
-        out << "<Function macro=\"" << ufun->get_macnum() << "\"/>" << endl;
+        out << " macro=\"" << ufun->get_macnum() << "\"/>" << endl;
       }
    else if (fun.is_derived())
       {
@@ -293,25 +337,34 @@ XML_Saving_Archive::save_Function(const Function & fun)
 "         also )DUMP this workspace (before )SIC or →).\n"
              << endl;
 
-        do_indent();
-        out << "<Function fid=\"" << HEX(&fun)
-            << "\" derived=\"yes\"/>" << endl;
+        const DerivedFunction & dfn = static_cast<const DerivedFunction &>(fun);
+        out << " LO-fid=\"" << HEX(dfn.get_LO())     << "\""
+               " OPER-fid=\"" << HEX(dfn.get_OPER()) << "\"";
 
+        const Function * ro = dfn.get_RO();
+        const Value * axis = dfn.get_AXIS();
+        if (ro || axis)
+           {
+             out << endl;
+             do_indent();
+             out << "        ";
+           }
+        if (ro)     out << " RO-fid=\""   << HEX(ro) << "\"";
+        if (axis)   out << " AXIS-vid=\"" << HEX(find_vid(axis)) << "\"";
+
+        out << "/>" << endl;
       }
    else if (fun.is_defined())   // defined APL function
       {
         const int * eprops = fun.get_exec_properties();
         const APL_time_us creation_time = fun.get_creation_time();
 
-        do_indent();
-        out << "<Function creation-time=\"" << creation_time << "\"" << endl
+        out << " creation-time=\"" << creation_time << "\"" << endl
             << "                exec-properties=\""
             << eprops[0] << "," << eprops[1] << ","
             << eprops[2] << "," << eprops[3] << "\"";
 
         if (fun.is_native())   out << " native=\"1\"";
-        out << " fid=\"" << HEX(&fun) << "\"";
-
         out << ">" << endl;
         ++indent;
 
@@ -320,14 +373,23 @@ XML_Saving_Archive::save_Function(const Function & fun)
         --indent;
         do_indent();
         out << "</Function>" << endl;
+        saved_Functions.push_back(&fun);
       }
    else // primitive APL function
       {
-        do_indent();
-        out << "<Function tag=\"" << fun.get_tag()
-            << "\"/>   <!-- primitive: " << ID::get_name_UCS(fun.get_Id())
+        out << " tag=\"" << fun.get_tag()  << "\""
+               "/>   <!-- primitive: " << ID::get_name_UCS(fun.get_Id())
             << " -->" << endl;
       }
+}
+//-----------------------------------------------------------------------------
+bool
+XML_Saving_Archive::is_saved(const Function * fun) const
+{
+   loop(f, saved_Functions.size())
+       if (fun == saved_Functions[f])   return true;
+
+   return false;
 }
 //-----------------------------------------------------------------------------
 int
@@ -363,6 +425,7 @@ const UserFunction * ufun = fun.get_ufun1();
         return 1;   // one attribute
       }
 }
+
 //-----------------------------------------------------------------------------
 void
 XML_Saving_Archive::save_Parser(const StateIndicator & si)
@@ -376,19 +439,24 @@ const Prefix & prefix = si.current_stack;
         << "\" lookahead-high=\"" << prefix.get_lookahead_high()
         << "\">" << endl;
 
+   ++indent;
+
+   // write the derived functions cache...
+   //
+   save_Derived(si.fun_oper_cache);
+
    // write the lookahead token, starting at the fifo's get position
    //
-   ++indent;
    loop(s, prefix.size())
       {
         const Token_loc & tloc = prefix.at(prefix.size() - s - 1);
         save_token_loc(tloc);
       }
 
+   // write the remaining token
+   //
    save_token_loc(prefix.saved_lookahead);
 
-   // print the derived functions stack...
-   save_Derived(si.fun_oper_cache);
    --indent;
 
    do_indent();
@@ -427,6 +495,9 @@ std::vector<const Symbol *> symbols = symtab.get_all_symbols();
         ++s;
       }
 
+   out << endl;
+   do_indent();
+   out << "<!-- Symbol Table -->" << endl;
    do_indent();
    out << "<SymbolTable size=\"" << symbols.size() << "\">" << endl;
 
@@ -735,7 +806,8 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "\n"
 "<!DOCTYPE Workspace\n"
 "[\n"
-"    <!ELEMENT Workspace (Value*,Ravel*,SymbolTable,Symbol*,Commands,StateIndicator)>\n"
+"    <!ELEMENT Workspace (Function*,Value*,Ravel*,SymbolTable,\n"
+"                         Symbol*,Commands?,StateIndicator)>\n"
 "    <!ATTLIST Workspace  wsid       CDATA #REQUIRED>\n"
 "    <!ATTLIST Workspace  year       CDATA #REQUIRED>\n"
 "    <!ATTLIST Workspace  month      CDATA #REQUIRED>\n"
@@ -767,7 +839,8 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "        <!ELEMENT SymbolTable (Symbol*)>\n"
 "        <!ATTLIST SymbolTable size CDATA #REQUIRED>\n"
 "\n"
-"            <!ELEMENT Symbol (unused-name|Variable|Function|Label|Shared-Variable)*>\n"
+"            <!ELEMENT Symbol (unused-name|Variable|Function|\n"
+"                              Label|Shared-Variable)*>\n"
 "            <!ATTLIST Symbol name       CDATA #REQUIRED>\n"
 "            <!ATTLIST Symbol stack-size CDATA #REQUIRED>\n"
 "\n"
@@ -776,8 +849,13 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "                <!ELEMENT Variable (#PCDATA)>\n"
 "                <!ATTLIST Variable vid CDATA #REQUIRED>\n"
 "\n"
-"                <!ELEMENT Function (UCS)>\n"
+"                <!ELEMENT Function (UCS*)>\n"
+"                <!ATTLIST Function fid             CDATA #REQUIRED>\n"
 "                <!ATTLIST Function creation-time   CDATA #IMPLIED>\n"
+"                <!ATTLIST Function LO-fid          CDATA #IMPLIED>\n"
+"                <!ATTLIST Function OPER-fid        CDATA #IMPLIED>\n"
+"                <!ATTLIST Function RO-fid          CDATA #IMPLIED>\n"
+"                <!ATTLIST Function AXIS-vid        CDATA #IMPLIED>\n"
 "                <!ATTLIST Function exec-properties CDATA #IMPLIED>\n"
 "                <!ATTLIST Function macro           CDATA #IMPLIED>\n"
 "                <!ATTLIST Function tag             CDATA #IMPLIED>\n"
@@ -817,7 +895,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "                <!ATTLIST UserFunction lambda-name     CDATA #IMPLIED>\n"
 "                <!ATTLIST UserFunction symbol-level    CDATA #IMPLIED>\n"
 "\n"
-"                <!ELEMENT Parser (Token*)>\n"
+"                <!ELEMENT Parser (Token*,Function*)>\n"
 "                <!ATTLIST Parser size           CDATA #REQUIRED>\n"
 "                <!ATTLIST Parser assign-pending CDATA #REQUIRED>\n"
 "                <!ATTLIST Parser lookahead-high CDATA #REQUIRED>\n"
@@ -842,10 +920,10 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "\n"
 "]>\n"
 "\n"
-"\n"
 "    <!-- hour/minute/second is )SAVE time in UTC (aka. GMT).\n"
 "         timezone is offset to UTC in seconds.\n"
 "         local time is UTC + offset -->\n"
+"\n"
 "<Workspace wsid=\""     << Workspace::get_WS_name()
      << "\" year=\""     << (t->tm_year + 1900)
      << "\" month=\""    << (t->tm_mon  + 1)
@@ -858,6 +936,9 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
      << "\">\n" << endl;
 
    ++indent;
+
+   Log(LOG_archive)   CERR << "save() saves function..." << endl;
+   save_functions();
 
    // collect all values to be saved. We mark the values to avoid
    // saving of stale values and unmark the used values
@@ -888,7 +969,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
       }
    catch(...)
       {
-        MORE_ERROR() << 
+        MORE_ERROR() <<
            "XML_Saving_Archive::save() could not allocate values["
                << value_count << "]: (lack of memory).\n"
             "Your workspace may be corrupt (possibly due "
@@ -955,7 +1036,6 @@ ShapeItem idx = 0;
                         CERR << endl << " Running )CHECK..." << endl;
                         Command::cmd_CHECK(CERR);
                         CERR << endl;
-                        
 
 #if VALUE_HISTORY_WANTED
 print_history(CERR, sub, 0);
@@ -982,10 +1062,15 @@ print_history(CERR, values[p]._val, 0);
 
    // save all values (without their ravel)
    //
+   do_indent();
+   out << "<!-- APL values... -->" << endl;
    loop(vid, value_count)   save_shape(Vid(vid));
 
    // save ravels of all values
    //
+   out << endl;
+   do_indent();
+   out << "<!-- Ravels of APL values... -->" << endl;
    loop(vid, value_count)   save_Ravel(Vid(vid));
 
    // save user defined symbols
@@ -994,6 +1079,9 @@ print_history(CERR, values[p]._val, 0);
 
    // save certain system variables
    //
+   do_indent();
+   out << "<!-- APL system variables... -->" << endl;
+
 #define rw_sv_def(x, _str, _txt) save_Symbol(Workspace::get_v_ ## x());
 #define ro_sv_def(x, _str, _txt) save_Symbol(Workspace::get_v_ ## x());
 #include "SystemVariable.def"
@@ -1005,6 +1093,9 @@ print_history(CERR, values[p]._val, 0);
    // save state indicator
    //
    {
+     out << endl;
+     do_indent();
+     out << "<!-- State Indicator -->" << endl;
      const int levels = Workspace::SI_entry_count();
      do_indent();
      out << "<StateIndicator levels=\"" << levels << "\">" << endl;
@@ -1233,8 +1324,10 @@ const int att_len = strlen(att_name);
    //
    if (!optional)
       {
-         CERR << "Attribute name '" << att_name << "' not found in:" << endl;
-         where_att(CERR);
+         const int offset = attributes - line_start;
+         MORE_ERROR() << "mandatory Attribute '" << att_name
+              << "' is missing in line " << line_no << ":" << offset
+              << " of file " << filename;
          DOMAIN_ERROR;
       }
    return 0;   // not found
@@ -1261,24 +1354,42 @@ const APL_Float val = strtod(charP(value), 0);
 bool
 XML_Loading_Archive::next_tag(const char * loc)
 {
+   /* loc points into a read-only string. Set the variables:
+
+      tag_name:    char after next '<'
+      attributes:  char after tag_name + blank
+      end_attr:    next >
+    */
+
 again:
 
    // read chars up to (including) '<'
    //
    while (current_char != '<')
       {
-         if (get_uni())   return true;
+         if (get_uni())   return true;   // EOF
       }
 
    tag_name = data;
 
    // read char after <
    //
-   if (get_uni())   return true;
+   if (get_uni())   return true;   // EOF
 
    if (current_char == '?')   goto again;   // processing instruction
-   if (current_char == '!')   goto again;   // comment
-   if (current_char == '/')   get_uni();    // / at start of name
+   if (current_char == '!')                 // comment
+      {
+        const char * ctag_name = reinterpret_cast<const char *>(tag_name);
+        const char * comment_end = strstr(ctag_name, "-->");
+        Assert(comment_end);
+        comment_end += 3;
+        while (data < reinterpret_cast<const UTF8 *>(comment_end))
+           {
+             if (get_uni())   return true;   // EOF
+           }
+        goto again;
+      }
+   if (current_char == '/')   get_uni();    // / start of end tag
 
    // read chars before attributes (if any)
    //
@@ -1287,7 +1398,7 @@ again:
          if (current_char == ' ')   break;
          if (current_char == '/')   break;
          if (current_char == '>')   break; 
-         if (get_uni())   return true;
+         if (get_uni())   return true;   // EOF
        }
 
    attributes = data;
@@ -1296,14 +1407,14 @@ again:
    //
    while (current_char != '>')
       {
-         if (get_uni())   return true;
+         if (get_uni())   return true;   // EOF
       }
 
    end_attr = data;
 
 /*
    CERR << "See tag ";
-   for (const UTF8 * t = tag_name; t < attributes; ++t)   CERR << (char)*t;
+   for (const UTF8 * t = tag_name; t < attributes; ++t)   CERR << char(*t);
    CERR << " at " << loc << " line " << line_no << endl;
 */
 
@@ -1432,6 +1543,7 @@ bool prev_month = false;
    //
 const char * tag_order[] =
 {
+  "Function",
   "Value",
   "Ravel",
   "SymbolTable",
@@ -1454,13 +1566,20 @@ const char ** tag_pos = tag_order;
               tag_pos++;
               for (;;)
                   {
-                     if (*tag_pos == 0)      DOMAIN_ERROR;   // end of list
+                     if (*tag_pos == 0)
+                        {
+                          MORE_ERROR() << "Unexpected Tag "
+                                       << UTF8_string(tag_name,
+                                                      attributes - tag_name);
+                          DOMAIN_ERROR;   // end of list
+                        }
                      if (is_tag(*tag_pos))   break;          // found
                      ++tag_pos;
                   }
             }
 
-         if      (is_tag("Value"))            read_Value();
+         if      (is_tag("Function"))         read_Function();
+         else if (is_tag("Value"))            read_Value();
          else if (is_tag("Ravel"))            read_Ravel();
          else if (is_tag("SymbolTable"))      read_SymbolTable();
          else if (is_tag("Symbol"))           read_Symbol();
@@ -1511,8 +1630,8 @@ XML_Loading_Archive::read_Value()
 {
    expect_tag("Value", LOC);
 
-const int  vid = find_int_attr("vid", false, 10);
-const int  parent = find_int_attr("parent", true, 10);
+const Vid  vid = find_Vid_attr("vid", false, 10);
+const Vid  parent = find_Vid_attr("parent", true, 10);
 const int  rk  = find_int_attr("rk",  false, 10);
 
    Log(LOG_archive)   CERR << "  read_Value() vid=" << vid << endl;
@@ -1866,24 +1985,62 @@ const int value = find_int_attr("value", false, 10);
 }
 //-----------------------------------------------------------------------------
 void
+XML_Loading_Archive::read_Function()
+{
+const Fid fid = find_Fid_attr("fid", false, 16);
+const TokenTag primitive_tag = TokenTag(find_int_attr("tag", true, 16));
+   Assert(primitive_tag != -1);
+   Function * pfun = ID::get_system_function(primitive_tag);
+   Assert(pfun);
+   add_fid_function(fid, pfun, LOC);
+}
+//-----------------------------------------------------------------------------
+void
 XML_Loading_Archive::read_Function(int d, Symbol & symbol)
 {
+const Fid fid = find_Fid_attr("fid", false, 16);
 const Macro::Macro_num macnum =
                        Macro::Macro_num(find_int_attr("macro", true, 10));
    if (macnum != -1)   // function is a macro
       {
-        Macro * fmacro = Macro::get_macro(macnum);
-        Assert(fmacro);
-        symbol.push_function(fmacro);
+        Macro * macro = Macro::get_macro(macnum);
+        Assert(macro);
+        symbol.push_function(macro);
+        add_fid_function(fid, macro, LOC);
         return;
       }
 
 const TokenTag primitive_tag = TokenTag(find_int_attr("tag", true, 16));
    if (primitive_tag != -1)   // function is an APL primitive
       {
-        Function * pfun = ID::get_system_function(Id(primitive_tag >> 16));
-        Assert(pfun);
-        symbol.push_function(pfun);
+        Function * prim = ID::get_system_function(Id(primitive_tag >> 16));
+        Assert(prim);
+        symbol.push_function(prim);
+        add_fid_function(fid, prim, LOC);
+        return;
+      }
+
+const Fid LO_fid = find_Fid_attr("LO-fid", true, 16);
+   if (LO_fid != -1)   // derived function
+      {
+        const Fid OPER_fid = find_Fid_attr("OPER-fid", false, 16);
+        const Fid RO_fid = find_Fid_attr("RO-fid", true, 16);
+        const Vid AXIS_vid = find_Vid_attr("AXIS-vid", true, 16);
+
+        symbol.push();   // placeholder (for now)
+        add_fid_function(fid, 0, LOC);
+
+        _derived_todo td = { 0, &symbol.top_of_stack()->sym_val.function,
+                             fid, LO_fid, OPER_fid, RO_fid, AXIS_vid, LOC };
+        derived_todos.push_back(td);
+        return;
+      }
+
+   if (find_attr("ref", true))   // function pointer
+      {
+        Function * fun = find_function(fid);
+        Assert(fun);
+        symbol.push_function(fun);
         return;
       }
 
@@ -1900,12 +2057,6 @@ int eprops[4] = { 0, 0, 0, 0 };
    Log(LOG_archive)
       CERR << "      [" << d << "] read_Function(" << symbol.get_name()
            << ") native=" << native << endl;
-
-   if (find_attr("derived", true))
-      {
-        symbol.push();   // placeholder (for now)
-        return;
-      }
 
    next_tag(LOC);
    expect_tag("UCS", LOC);
@@ -1924,6 +2075,7 @@ UCS_string text;
              nfun->set_creation_time(creation_time);
              if (d == 0)   symbol.pop();
              symbol.push_function(nfun);
+             add_fid_function(fid, nfun, LOC);
            }
         else        // fix failed
            {
@@ -1945,7 +2097,7 @@ UCS_string text;
         if (text[0] == UNI_LAMBDA)
            {
              ufun = UserFunction::fix_lambda(symbol, text);
-             ufun->increment_refcount(LOC);   // since we push it below
+             ufun->increment_refcount(LOC);   // since we pushed it below
            }
         else
            {
@@ -1957,6 +2109,7 @@ UCS_string text;
            {
              ufun->set_creation_time(creation_time);
              symbol.push_function(ufun);
+             add_fid_function(fid, ufun, LOC);
              ufun->set_exec_properties(eprops);
            }
         else
@@ -1964,8 +2117,33 @@ UCS_string text;
              CERR << "    ⎕FX " << symbol.get_name() << " failed: "
                   << Workspace::more_error() << endl;
              symbol.push();
+             add_fid_function(fid, 0, LOC);
            }
       }
+}
+//-----------------------------------------------------------------------------
+void
+XML_Loading_Archive::read_Derived(StateIndicator & si, int lev)
+{
+   Log(LOG_archive)   CERR << "  read_Derived()" << endl;
+
+const Fid fid = find_Fid_attr("fid", false, 16);   // fid in the )SAVEing WS
+const Fid LO_fid   = find_Fid_attr("LO-fid",   false, 16);
+const Fid OPER_fid = find_Fid_attr("OPER-fid", false, 16);
+const Fid RO_fid   = find_Fid_attr("RO-fid",   true,  16);
+const Vid AXIS_vid = find_Vid_attr("AXIS-vid", true,  10);
+Function * derived = si.fun_oper_cache.get(LOC);
+
+   if (LO_fid == NO_FID)
+      {
+        CERR << "got non-derived function when expecting a derived one" << endl;
+        return;
+      }
+
+_derived_todo td = { derived, 0, fid, LO_fid, OPER_fid, RO_fid,
+                     AXIS_vid, LOC };
+   add_fid_function(fid, derived, LOC);
+   derived_todos.push_back(td);
 }
 //-----------------------------------------------------------------------------
 void
@@ -2076,7 +2254,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
         next_tag(LOC);
         if (is_tag("Variable"))
            {
-             const int vid = find_int_attr("vid", false, 10);
+             const Vid vid = find_Vid_attr("vid", false, 10);
              vids_COPY.push_back(vid);
            }
         skip_to_tag("/Symbol");
@@ -2242,6 +2420,9 @@ const int levels = find_int_attr("levels", false, 10);
         // the parsers loop eats the terminating /SI-entry
       }
 
+   instantiate_derived_functions(true);
+   instantiate_derived_functions(false);
+
    next_tag(LOC);
    expect_tag("/StateIndicator", LOC);
 }
@@ -2388,6 +2569,19 @@ Prefix & parser = si.current_stack;
    parser.action = R_action(action);
    parser.lookahead_high = Function_PC(lah_high);
 
+   // read derived functions cache
+   //
+   for (;;)
+       {
+         next_tag(LOC);
+         if (is_tag("/Parser"))   break;
+         if (is_tag("Token"))     break;
+
+          read_Derived(si, lev);
+       }
+
+   // read parser token
+   //
    for (;;)
        {
          next_tag(LOC);
@@ -2400,9 +2594,6 @@ Prefix & parser = si.current_stack;
 
               if (parser.size() < stack_size)   parser.push(tl);
               else                    parser.saved_lookahead.copy(tl, LOC);
-            }
-         else if (is_tag("Function"))   // derived function
-            {
             }
        }
 
@@ -2571,6 +2762,123 @@ const int fun_id = find_int_attr("fun-id", true, 16);
    // not found. This can happen when the function is optional.
    //
    return 0;
+}
+//-----------------------------------------------------------------------------
+XML_Loading_Archive::fun_map *
+XML_Loading_Archive::find_fun_map(Fid fid)
+{
+   loop(f, fid_to_function.size())
+       {
+         if (fid_to_function[f].old_fid == fid)   return &fid_to_function[f];
+       }
+
+   return 0;
+}
+//-----------------------------------------------------------------------------
+Function *
+XML_Loading_Archive::find_function(Fid fid)
+{
+   if (fun_map * map = find_fun_map(fid))   return map->new_fun;
+   return 0;
+}
+//-----------------------------------------------------------------------------
+void
+XML_Loading_Archive::add_fid_function(Fid fid, Function * new_fun,
+                                      const char * loc)
+{
+   if (fun_map * map = find_fun_map(fid))   // fid exists
+      {
+        if (map->new_fun)   // function also exists.
+           {
+             // function already exists. Setting it multiple times is OK
+             // as long as the pointers are the same (e.g. pointer to
+             // primitive APL functions).
+             //
+             if (new_fun == map->new_fun)   return;
+
+             CERR << "*** OVERRIDING fid " << HEX(fid)
+                  << " (from " << map->loc << ") at " << loc << "***" << endl;
+           }
+        else
+           {
+             map->new_fun = new_fun;
+             map->loc = loc;
+           }
+
+        return;
+      }
+
+   // new fid/function
+   //
+const fun_map fm =  { fid, new_fun, loc };
+   fid_to_function.push_back(fm);
+}
+//-----------------------------------------------------------------------------
+void
+XML_Loading_Archive::instantiate_derived_functions(bool allocate)
+{
+   /* derived functions are allocated i 2 phases:
+
+      phase 1: allocate=true and todo.cache set: create the function
+      phase 2: allocate=false and todo.symptr set: store pointer
+    */
+
+   loop(d, derived_todos.size())
+      {
+        _derived_todo & todo = derived_todos[d];
+        Assert(todo.fid != -1);
+
+        Function * fun = find_function(todo.fid);
+        Assert(fun);
+
+        if (!allocate)
+           {
+             if (todo.symptr)   *todo.symptr = fun;
+             continue;
+           }
+
+        if (!todo.cache)   continue;
+
+        Assert(todo.LO_fid   != -1);
+        Function * LO = find_function(todo.LO_fid);
+        Assert(LO);
+
+        Assert(todo.OPER_fid != -1);
+        Function * OPER = find_function(todo.OPER_fid);
+        Assert(OPER);
+        Token tok_LO(TOK_FUN2, LO);
+
+        if (todo.RO_fid   != -1)   // dyadic operator
+           {
+             Assert(todo.RO_fid != -1);
+             Function * RO = find_function(todo.RO_fid);
+             Assert(RO);
+             Token tok_RO(TOK_FUN2, RO);
+
+             if (todo.AXIS_vid == -1)   // dyadic operator without axis
+                {
+                  new (todo.cache) DerivedFunction(tok_LO, OPER, tok_RO, LOC);
+                }
+             else                       // dyadic operator with axis
+                {
+                  Value_P val_X = values[todo.AXIS_vid];
+                  new (todo.cache) DerivedFunction(tok_LO, OPER, val_X,
+                                                   tok_RO, LOC);
+                }
+           }
+        else                       // monadic operator
+           {
+             if (todo.AXIS_vid == -1)   // monadic operator without axis
+                {
+                  new (todo.cache) DerivedFunction(tok_LO, OPER, LOC);
+                }
+             else                       // monadic operator with axis
+                {
+                  Value_P val_X = values[todo.AXIS_vid];
+                  new (todo.cache) DerivedFunction(tok_LO, OPER, val_X, LOC);
+                }
+           }
+      }
 }
 //-----------------------------------------------------------------------------
 Function *

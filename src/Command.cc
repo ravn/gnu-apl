@@ -1185,12 +1185,17 @@ bool left_col = true;
        << "⍞       Character Input/Output"
        << "⎕       Evaluated Input/Output" << endl;
    left_col = true;
+
 #define ro_sv_def(x, _str, txt)                                            \
    { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
      if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
      else            out << setw(8) << ucs << txt << endl;                 \
         left_col = !left_col; }
-#define rw_sv_def(x, str, txt) ro_sv_def(x, str, txt)
+#define rw_sv_def(x, _str, txt)                                            \
+   { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
+     if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
+     else            out << setw(8) << ucs << txt << endl;                 \
+        left_col = !left_col; }
 #include "SystemVariable.def"
 
    out << endl << "System functions:" << endl;

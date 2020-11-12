@@ -56,7 +56,9 @@ Workspace::Workspace()
    if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
    distinguished_names.add_variable(q, ID_ ## x, &v_ ## x); }
 
-#define rw_sv_def ro_sv_def
+#define rw_sv_def(x, str, _txt)                                   \
+   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
+   distinguished_names.add_variable(q, ID_ ## x, &v_ ## x); }
 
 #define sf_def(x, str, _txt)                                      \
    if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
@@ -1006,7 +1008,7 @@ XML_Loading_Archive in(filename.c_str(), dump_fd);
         the_workspace.clear_WS(out, true);
         Log_control(LID_archive, logit);
 #else
-        the_workspace.clear_WS(out, LOG_archive);
+        the_workspace.clear_WS(out, !LOG_archive);
 #endif
 
         in.read_Workspace(silent);
