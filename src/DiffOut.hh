@@ -54,8 +54,9 @@ protected:
    /// overloaded filebuf::overflow()
    virtual int overflow(int c);
 
-   /// return true iff 0-terminated strings apl and ref are different
-   bool different(const UTF8 * apl, const UTF8 * ref);
+   /// return true iff 0-terminated strings apl and ref differ
+   /// at \b pos
+   bool different(const UTF8 * apl, const UTF8 * ref, size_t & pos);
 
    /// a buffer for one line of APL output
    UTF8_string aplout;

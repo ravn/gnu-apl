@@ -61,16 +61,20 @@ ofstream & rep = IO_Files::get_current_testreport();
 const char * apl = aplout.c_str();
 UTF8_string ref;
 bool eof = false;
+size_t diff_pos = 0;
    IO_Files::read_file_line(ref, eof);
    if (eof)   // nothing in current_testfile
       {
         rep << "extra: " << apl << endl;
       }
-   else if (different(utf8P(apl), utf8P(ref.c_str())))
+   else if (different(utf8P(apl), utf8P(ref.c_str()), diff_pos))
       {
         IO_Files::diff_error();
         rep << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl
-            << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << endl;
+            << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << endl
+            << " ∆ : ⋅⋅⋅";
+        loop(p, diff_pos)   rep << " ";
+        rep << "^" << endl;
       }
    else                    // same
       {
@@ -83,11 +87,12 @@ bool eof = false;
 }
 //-----------------------------------------------------------------------------
 bool
-DiffOut::different(const UTF8 * apl, const UTF8 * ref)
+DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
 {
-   for (;;)
+   for (pos = 0;; ++pos)   // compare position in ref
        {
-         int len_apl, len_ref;
+         int len_apl;   // length of the UTF8 encoding
+         int len_ref;   // length of the UTF8 encoding
 
          const Unicode a = UTF8_string::toUni(apl, len_apl, true);
          const Unicode r = UTF8_string::toUni(ref, len_ref, true);

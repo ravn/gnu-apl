@@ -29,9 +29,9 @@
 
 //-----------------------------------------------------------------------------
 /**
-    A user-defined function.
+    A defined function written in C++.
  */
-/// A user-defined function written in C++.
+/// A defined function written in C++.
 class NativeFunction : public Function
 {
 public:
@@ -75,6 +75,9 @@ protected:
 
    /// try to open one .so file
    static void * try_one_file(const char * filename, UCS_string & t4);
+
+   /// overloaded Function::is_defined()
+   virtual bool is_defined() const   { return true; }
 
    /// overloaded Function::is_native()
    virtual bool is_native() const   { return true; }

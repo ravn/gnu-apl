@@ -15,7 +15,7 @@ SYNTAX ERROR
       )SAVE save_load_SI
 20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰)
 
-      )LOAD save_load_SI
+      )LOAD save_load_SI.xml
 SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 
       )SI
@@ -53,6 +53,28 @@ SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
       ⎕CR 'cmp_b'
 λ←⍺ λ0 ⍵                 
 λ←{⍵[⍋⍵]} (∨⌿ ⍺∘.= ⍵) / ⍵
+
+
+      )CLEAR
+CLEAR WS
+
+      )DROP test.xml
+³
+
+      )WSID test
+WAS CLEAR WS
+
+      'lib_template_F0' ⎕FX 'TEST0'
+TEST0
+
+      )SAVE
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) test
+
+      )LOAD test.xml
+SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+
+      )DROP test.xml
+³
 
 ⍝ ==================================
 
