@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public:
    /// the possible values of a symbol
    union _sym_val
       {
-        Function *    function;   ///< if \b Symbol is a function
+        Function_P    function;   ///< if \b Symbol is a function
         Function_Line label;      ///< if \b Symbol is a label
         SV_key        sv_key;     ///< if \b Symbol is a shared variable
       };
@@ -137,7 +137,7 @@ public:
    void clear_vs();
 
    /// Set current NameClass of this Symbol to \b nc and function fun
-   void set_nc(NameClass nc, Function * fun);
+   void set_nc(NameClass nc, Function_P fun);
 
    /// Compare name of \b this value with \b other
    int compare(const Symbol & other) const
@@ -160,7 +160,7 @@ public:
    virtual void assign_indexed(Value_P index, Value_P value);
 
    /// assign lambda, eg. V←{ ... }
-   virtual bool assign_named_lambda(Function * lambda, const char * loc);
+   virtual bool assign_named_lambda(Function_P lambda, const char * loc);
 
    /// Print \b this \b Symbol to \b out
    virtual ostream & print(ostream & out) const;
@@ -178,7 +178,7 @@ public:
    virtual void push_label(Function_Line label);
 
    /// push a function onto the stack of \b this \b Symbol
-   virtual void push_function(Function * function);
+   virtual void push_function(Function_P function);
 
    /// Push an APL value onto the stack of \b this \b Symbol
    virtual void push_value(Value_P value);
@@ -214,7 +214,7 @@ public:
    virtual UCS_string get_name() const   { return name; }
 
    /// overloaded NamedObject::get_function()
-   virtual Function * get_function();
+   virtual Function_P get_function();
 
    /// overloaded NamedObject::get_value()
    virtual Value_P get_value();

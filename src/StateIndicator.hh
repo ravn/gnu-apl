@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ class StateIndicator
 
 public:
    /// constructor
-   StateIndicator(Executable * exec, StateIndicator * _par);
+   StateIndicator(const Executable * exec, StateIndicator * _par);
 
    /// destructor
    ~StateIndicator();
@@ -71,10 +71,6 @@ public:
 
    /// print spaces according to level
    ostream & indent(ostream & out) const;
-
-   /// return pointer to the current user function, statements, or execute
-   Executable * get_executable()
-      { return executable; }
 
    /// return pointer to the current user function, statements, or execute
    const Executable * get_executable() const
@@ -196,7 +192,7 @@ public:
 
 protected:
    /// the user function that is being executed
-   Executable * executable;
+   const Executable * executable;
 
    /// the number of pending ⎕EC calles
    int safe_execution_count;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ Bif_OPER2_POWER * Bif_OPER2_POWER::fun = &Bif_OPER2_POWER::_fun;
 
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
+Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
    if (RO.get_ValueType() == TV_VAL)   // integer count
       return eval_form_1(A, LO, RO.get_apl_val(), B);
@@ -37,7 +37,7 @@ Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B)
+Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
    if (RO.get_ValueType() == TV_VAL)   // integer count
       return eval_form_1(Value_P(), LO, RO.get_apl_val(), B);
@@ -50,8 +50,8 @@ Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B)
 Token
 Bif_OPER2_POWER::eval_form_2(Value_P A, Token & _LO, Token & _RO, Value_P B)
 {
-Function * LO = _LO.get_function();   Assert(LO);
-Function * RO = _RO.get_function();   Assert(RO);
+Function_P LO = _LO.get_function();   Assert(LO);
+Function_P RO = _RO.get_function();   Assert(RO);
 
    if (!LO->has_result())   DOMAIN_ERROR;
    if (!RO->has_result())   DOMAIN_ERROR;
@@ -101,7 +101,7 @@ Function * RO = _RO.get_function();   Assert(RO);
 Token
 Bif_OPER2_POWER::eval_form_1(Value_P A, Token & _LO, Value_P N, Value_P B)
 {
-Function * LO = _LO.get_function();
+Function_P LO = _LO.get_function();
    Assert(LO);
 
    Assert(!!N);
@@ -124,7 +124,7 @@ ShapeItem repeat_cnt = N->get_ravel(0).get_checked_near_int();
 
    if (repeat_cnt < 0)   // inverse
       {
-        Function * inverse = LO->get_dyadic_inverse();
+        Function_P inverse = LO->get_dyadic_inverse();
         if (inverse == 0)   DOMAIN_ERROR;   // no inverse for LO
 
         LO = inverse;

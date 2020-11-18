@@ -137,7 +137,7 @@ enum TokenValueType
    TV_LIN           = 0x0600,   // Function_Line      .fun_line;
    TV_VAL           = 0x0700,   // Value_P            .apl_val;
    TV_INDEX         = 0x0800,   // IndexExpr *        .index_val;
-   TV_FUN           = 0x0900,   // Function *         .function;
+   TV_FUN           = 0x0900,   // Function_P         .function;
 };
 
 /**

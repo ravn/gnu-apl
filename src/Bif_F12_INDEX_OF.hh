@@ -35,10 +35,10 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    static Bif_F12_INDEX_OF * fun;   ///< Built-in function
    static Bif_F12_INDEX_OF  _fun;   ///< Built-in function
@@ -46,7 +46,7 @@ public:
 protected:
    /// find Cell B in the ravel A (of length len_A). Return the position
    /// (< len_A) if found, or len_A if not.
-   ShapeItem find_B_in_A(const Cell * A, ShapeItem len_A,
+   static ShapeItem find_B_in_A(const Cell * A, ShapeItem len_A,
                          const Cell & cell_B, double qct)
       {
         loop(a, len_A)   if (cell_B.equal(A[a], qct))   return a;   // found
@@ -55,9 +55,9 @@ protected:
 
    /// find Cell B in the ravel A (of length len_A). Return the position
    /// (< len_A) if found, or len_A if not. Idx_A is ⍋A ⊣ ⎕IO←0.
-   ShapeItem find_B_in_sorted_A(const Cell * A, ShapeItem len_A,
-                         const ShapeItem * Idx_A,  const Cell & cell_B,
-                         double qct);
+   static ShapeItem find_B_in_sorted_A(const Cell * A, ShapeItem len_A,
+                                       const ShapeItem * Idx_A,
+                                       const Cell & cell_B, double qct);
 
    /// compare function for Heapsort<ShapeItem>::search<const Cell &>
    static int bs_cmp(const Cell & cell, const ShapeItem & A, const void * ctx);

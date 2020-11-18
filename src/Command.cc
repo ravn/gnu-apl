@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1078,7 +1078,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
 
              case NC_FUNCTION:
                   {
-                    Function * fun = sym->get_function();
+                    Function_P fun = sym->get_function();
                     Assert(fun);
                     if (fun->is_native())
                        {
@@ -1105,7 +1105,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
 
              case NC_OPERATOR:
                   {
-                    Function * fun = sym->get_function();
+                    Function_P fun = sym->get_function();
                     Assert(fun);
                     CERR << "is a ";
                     if      (fun->get_oper_valence() == 2)   CERR << "dyadic";
@@ -2407,9 +2407,11 @@ UCS_string fun_name1 = Quad_TF::tf2_inverse(statement);
 
 Symbol * sym1 = Workspace::lookup_existing_symbol(fun_name1);
    Assert(sym1);
-Function * fun1 = sym1->get_function();
-   Assert(fun1);
-   fun1->set_creation_time(timestamp);
+   {
+     Function * fun1 = const_cast<Function *>(sym1->get_function());
+     Assert(fun1);
+     fun1->set_creation_time(timestamp);
+   }
 
    Log(LOG_command_IN)
       {

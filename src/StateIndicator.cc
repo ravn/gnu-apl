@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
-StateIndicator::StateIndicator(Executable * exec, StateIndicator * _par)
+StateIndicator::StateIndicator(const Executable * exec, StateIndicator * _par)
    : executable(exec),
      safe_execution_count(_par ? _par->safe_execution_count : 0),
      level(_par ? 1 + _par->get_level() : 0),
@@ -414,8 +414,8 @@ Token * tok_R = current_stack.locate_R();
 Value_P
 StateIndicator::get_X()
 {
-Value_P * X = current_stack.locate_X();
-   if (X)   return *X;
+   if (const Value_P * X = current_stack.locate_X())
+      return *const_cast<Value_P *>(X);
    return Value_P();
 }
 //-----------------------------------------------------------------------------
@@ -442,8 +442,8 @@ Value_P old_value = tok_R->get_apl_val();   // so that
 void
 StateIndicator::set_X(Value_P new_value)
 {
-Value_P * X = current_stack.locate_X();
-   if (X)   *X = new_value;
+const Value_P * X = current_stack.locate_X();
+   if (X)   *const_cast<Value_P *>(X) = new_value;
 }
 //-----------------------------------------------------------------------------
 int

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ public:
    : tag(tg) { Assert(get_ValueType() == TV_NONE);   value.int_vals[0] = 0; }
 
    /// Construct a token for a \b Function.
-   Token(TokenTag tg, Function * fun)
+   Token(TokenTag tg, Function_P fun)
    : tag(tg) { Assert(get_ValueType() == TV_FUN);   value.function = fun; }
 
    /// Construct a token for a \b line number
@@ -237,8 +237,8 @@ public:
    bool is_function() const
       { return (get_ValueType() == TV_FUN); }
 
-   /// return the Function * value of this token
-   Function * get_function() const
+   /// return the Function_P value of this token
+   Function_P get_function() const
       { if (!is_function())   SYNTAX_ERROR;   return value.function; }
 
    /// return value usage counter
@@ -290,7 +290,7 @@ public:
         Symbol        * sym_ptr;         ///< the symbol for TV_SYM
         Function_Line   fun_line;        ///< the function line for TV_LIN
         IndexExpr     * index_val;       ///< the index for TV_INDEX
-        Function      * function;        ///< the function for TV_FUN
+        Function_P      function;        ///< the function for TV_FUN
         Value_P_Base    apl_val;         ///< the APL value for TV_VAL
 
         /// a shortcut for accessing apl_val

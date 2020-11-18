@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -722,7 +722,7 @@ ShapeItem c = 0;   // the column in the reduced matrix
 }
 //=============================================================================
 Token
-Quad_DLX::eval_AB(Value_P A, Value_P B)
+Quad_DLX::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
    if (A->element_count() < 1)   LENGTH_ERROR;
@@ -745,7 +745,7 @@ const APL_Integer a0 = A->get_ravel(0).get_int_value();
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_DLX::eval_B(Value_P B)
+Quad_DLX::eval_B(Value_P B) const
 {
    if (B->get_rank() != 2)   RANK_ERROR;
    return do_DLX(0, B.getref());

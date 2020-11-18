@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,10 +56,10 @@ public:
 
 protected:
    /// Overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_AB().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 };
 //-----------------------------------------------------------------------------
 /**
@@ -98,14 +98,14 @@ public:
 
 protected:
    /// Overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_AB().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// share one variable
-   SV_key share_one_variable(AP_num proc, const uint32_t * vname,
-                             SV_Coupling & coupling);
+   static SV_key share_one_variable(AP_num proc, const uint32_t * vname,
+                                    SV_Coupling & coupling);
 };
 //-----------------------------------------------------------------------------
 /**
@@ -123,13 +123,13 @@ public:
 
 protected:
    /// Overloaded Function::eval_AB().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// return processors with matching offers
-   Value_P get_processors();
+   static Value_P get_processors();
 
    /// return variables offered by processor proc
-   Value_P get_variables(AP_num proc);
+   static Value_P get_variables(AP_num proc);
 };
 //-----------------------------------------------------------------------------
 /**
@@ -147,7 +147,7 @@ public:
 
 protected:
    /// Overloaded Function::eval_AB().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 };
 //=============================================================================
 /**
@@ -165,7 +165,7 @@ public:
 
 protected:
    /// Overloaded Function::eval_AB().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 };
 //-----------------------------------------------------------------------------
 

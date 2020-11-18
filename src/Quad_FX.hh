@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,13 +38,13 @@ public:
    static Quad_FX  _fun;   ///< Built-in function.
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// do ⎕FX with execution properties \b exec_props
    static Token do_quad_FX(const int * exec_props, Value_P B,

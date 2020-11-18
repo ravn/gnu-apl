@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ Value * v1_owner = v1->get_lval_cellowner();
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_TAKE::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F12_TAKE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    if (X->element_count() == 0)   // no axes
       {
@@ -106,7 +106,7 @@ Token result = Bif_F12_PICK::fun->eval_XB(X, cT.get_apl_val());
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_TAKE::eval_AB(Value_P A, Value_P B)
+Bif_F12_TAKE::eval_AB(Value_P A, Value_P B) const
 {
 Shape ravel_A1(A.get(), /* ⎕IO */ 0);   // checks that 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RANK
 
@@ -151,7 +151,7 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Cell * cZ, Value & Z_owner,
 }
 //=============================================================================
 Token
-Bif_F12_DROP::eval_AB(Value_P A, Value_P B)
+Bif_F12_DROP::eval_AB(Value_P A, Value_P B) const
 {
 Shape ravel_A(A.get(), /* ⎕IO */ 0);
    if (A->get_rank() > 1)   RANK_ERROR;
@@ -213,7 +213,7 @@ Value_P Z(sh_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_DROP::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F12_DROP::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    if (X->element_count() == 0)   // no axes
       {

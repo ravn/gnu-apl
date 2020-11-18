@@ -34,16 +34,16 @@ public:
    Bif_OPER1_COMMUTE() : PrimitiveOperator(TOK_OPER1_COMMUTE) {}
 
    /// Overloaded Function::eval_LB().
-   virtual Token eval_LB(Token & LO, Value_P B);
+   virtual Token eval_LB(Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_LXB().
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALB().
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B);
+   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_ALXB().
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B);
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
    static Bif_OPER1_COMMUTE * fun;      ///< Built-in function.
    static Bif_OPER1_COMMUTE  _fun;      ///< Built-in function.

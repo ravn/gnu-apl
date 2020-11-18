@@ -9,7 +9,7 @@ Quad_MAP * Quad_MAP::fun = &Quad_MAP::_fun;
     ⊢A←5 2⍴'eEwWaAzZ92' ◊ ⊢B←'Halloween' ◊ A ⎕MAP B
  */
 Token
-Quad_MAP::eval_AB(Value_P A, Value_P B)
+Quad_MAP::eval_AB(Value_P A, Value_P B) const
 {
 bool recursive = false;
 

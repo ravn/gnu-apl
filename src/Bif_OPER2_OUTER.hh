@@ -57,7 +57,7 @@ public:
    Bif_OPER2_OUTER() : PrimitiveOperator(TOK_OPER2_OUTER) {}
 
    /// Overloaded Function::eval_ALRB().
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B);
+   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    static Bif_OPER2_OUTER * fun;   ///< Built-in function.
    static Bif_OPER2_OUTER  _fun;   ///< Built-in function.

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ UserFunction::~UserFunction()
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_()
+UserFunction::eval_() const
 {
    Log(LOG_UserFunction__enter_leave)
       CERR << "Function " << get_name() << " calls eval_()" << endl;
@@ -172,7 +172,7 @@ UserFunction::eval_()
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_B(Value_P B)
+UserFunction::eval_B(Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -195,7 +195,7 @@ UserFunction::eval_B(Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_XB(Value_P X, Value_P B)
+UserFunction::eval_XB(Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -219,7 +219,7 @@ UserFunction::eval_XB(Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_AB(Value_P A, Value_P B)
+UserFunction::eval_AB(Value_P A, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -244,7 +244,7 @@ UserFunction::eval_AB(Value_P A, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
+UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -270,7 +270,7 @@ UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_LB(Token & LO, Value_P B)
+UserFunction::eval_LB(Token & LO, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -296,7 +296,7 @@ UserFunction::eval_LB(Token & LO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B)
+UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -324,7 +324,7 @@ UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B)
+UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -353,7 +353,7 @@ UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
+UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -383,7 +383,7 @@ UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B)
+UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -413,7 +413,7 @@ UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
+UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -444,7 +444,7 @@ UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
+UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -476,8 +476,7 @@ UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
-                         Value_P X, Value_P B)
+UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -510,14 +509,14 @@ UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_fill_B(Value_P B)
+UserFunction::eval_fill_B(Value_P B) const
 {
 Value_P Z = B->clone(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
 Token
-UserFunction::eval_fill_AB(Value_P A, Value_P B)
+UserFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
 Value_P Z = B->clone(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -1073,7 +1072,7 @@ const bool bad_function = info || err_line != -1;
       }
 
 Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
-Function * old_function = symbol->get_function();
+Function_P old_function = symbol->get_function();
    if (old_function && keep_existing)
       {
         Log(LOG_UserFunction__fix)

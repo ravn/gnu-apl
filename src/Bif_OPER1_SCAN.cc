@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ ShapeItem inc_2 = 0;              // increment after result m*l items
 Token
 Bif_SCAN::scan(Token & _LO, Value_P B, uAxis axis)
 {
-Function * LO = _LO.get_function();
+Function_P LO = _LO.get_function();
    Assert(LO);
 
    if (!LO->has_result())   DOMAIN_ERROR;
@@ -211,29 +211,28 @@ const Shape3 Z3(B->get_shape(), axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_SCAN::eval_AXB(Value_P A,
-                             Value_P X, Value_P B)
+Bif_OPER1_SCAN::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return expand(A, B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_SCAN::eval_LXB(Token & LO, Value_P X, Value_P B)
+Bif_OPER1_SCAN::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return scan(LO, B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_SCAN1::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_OPER1_SCAN1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return expand(A, B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_SCAN1::eval_LXB(Token & LO, Value_P X, Value_P B)
+Bif_OPER1_SCAN1::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return scan(LO, B, axis);

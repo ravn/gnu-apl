@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -480,7 +480,7 @@ const int error =
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_()
+NativeFunction::eval_() const
 {
    if (f_eval_)   return (*f_eval_)(this);
 
@@ -488,7 +488,7 @@ NativeFunction::eval_()
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_B(Value_P B)
+NativeFunction::eval_B(Value_P B) const
 {
    if (f_eval_B)   return (*f_eval_B)(B, this);
 
@@ -496,7 +496,7 @@ NativeFunction::eval_B(Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_AB(Value_P A, Value_P B)
+NativeFunction::eval_AB(Value_P A, Value_P B) const
 {
    if (f_eval_AB)   return (*f_eval_AB)(A, B, this);
 
@@ -504,7 +504,7 @@ NativeFunction::eval_AB(Value_P A, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_LB(Token & LO, Value_P B)
+NativeFunction::eval_LB(Token & LO, Value_P B) const
 {
    if (f_eval_LB)   return (*f_eval_LB)(*LO.get_function(), B, this);
 
@@ -512,7 +512,7 @@ NativeFunction::eval_LB(Token & LO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_ALB(Value_P A, Token & LO, Value_P B)
+NativeFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
    if (f_eval_ALB)   return (*f_eval_ALB)(A, *LO.get_function(), B, this);
 
@@ -520,7 +520,7 @@ NativeFunction::eval_ALB(Value_P A, Token & LO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_LRB(Token & LO, Token & RO, Value_P B)
+NativeFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
    if (f_eval_LRB)   return (*f_eval_LRB)(*LO.get_function(),
                                           *RO.get_function(), B, this);
@@ -529,7 +529,7 @@ NativeFunction::eval_LRB(Token & LO, Token & RO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
+NativeFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
    if (f_eval_ALRB)   return (*f_eval_ALRB)(A, *LO.get_function(),
                                                *RO.get_function(), B, this);
@@ -538,7 +538,7 @@ NativeFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_XB(Value_P X, Value_P B)
+NativeFunction::eval_XB(Value_P X, Value_P B) const
 {
    // call axis variant if present, or else the non-axis variant.
    //
@@ -547,7 +547,7 @@ NativeFunction::eval_XB(Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
+NativeFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    // call axis variant if present, or else the non-axis variant.
    //
@@ -556,7 +556,7 @@ NativeFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_LXB(Token & LO, Value_P X, Value_P B)
+NativeFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
    // call axis variant if present, or else the non-axis variant.
    //
@@ -565,7 +565,7 @@ NativeFunction::eval_LXB(Token & LO, Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
+NativeFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
    // call axis variant if present, or else the non-axis variant.
    //
@@ -574,7 +574,7 @@ NativeFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
+NativeFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
 {
    // call axis variant if present, or else the non-axis variant.
    //
@@ -584,7 +584,7 @@ NativeFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B)
+NativeFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const
 {
    // call axis variant if present, or else the non-axis variant.
    //
@@ -594,7 +594,7 @@ NativeFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_fill_B(Value_P B)
+NativeFunction::eval_fill_B(Value_P B) const
 {
    if (f_eval_fill_B)   return (*f_eval_fill_B)(B, this);
 
@@ -602,7 +602,7 @@ NativeFunction::eval_fill_B(Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_fill_AB(Value_P A, Value_P B)
+NativeFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
    if (f_eval_fill_AB)   return (*f_eval_fill_AB)(A, B, this);
 
@@ -610,7 +610,7 @@ NativeFunction::eval_fill_AB(Value_P A, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-NativeFunction::eval_identity_fun(Value_P B, Axis axis)
+NativeFunction::eval_identity_fun(Value_P B, Axis axis) const
 {
    if (f_eval_ident_Bx)   return (*f_eval_ident_Bx)(B, axis, this);
 

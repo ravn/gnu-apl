@@ -41,7 +41,9 @@ using namespace std;
 
 bool debug_log = false;;
 
-        enum { ALL_RW = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH };
+static int var_count_210 = 0;
+
+enum { ALL_RW = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH };
 
 struct SVAR_context
 {
@@ -285,9 +287,9 @@ const int nelm = cdr.header().get_nelm();
 
         // return to command mode
         ctx.var_C.context = ctx.var_D.context = 0;
-        delete &ctx;
-
         set_ACK(ctx.var_C, 0);
+
+        delete &ctx;
         return;
       }
 
@@ -618,11 +620,15 @@ const uint32_t * varname = Svar_DB::get_svar_name(var.key);
    if (*varname == 'C')
       {
         Svar_DB::set_control(var.key, USE_BY_1);
+        ++var_count_210;
       }
    else if (*varname == 'D')
       {
       }
-   else                             return true;  // error
+   else
+      {
+        return true;  // error
+      }
    return false;   // OK
 }
 //-----------------------------------------------------------------------------
@@ -740,6 +746,9 @@ SVAR_context * ctx = var.context;
 
         ctx->var_C.context = ctx->var_D.context = 0;
         delete ctx;
+        --var_count_210;
+        if (var_count_210 == 0)   exit(0);
       }
+
 }
 //-----------------------------------------------------------------------------

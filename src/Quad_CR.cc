@@ -88,7 +88,7 @@ Quad_CR::list_functions(ostream & out)
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_CR::eval_B(Value_P B)
+Quad_CR::eval_B(Value_P B) const
 {
    if (B->element_count() == 0)   // ⎕CR '' : print help
       {
@@ -133,7 +133,7 @@ const Function * function = 0;
       }
    else   // maybe user defined function
       {
-        NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
+        const NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
         if (obj && obj->is_user_defined())
            {
              function = obj->get_function();
@@ -176,7 +176,7 @@ Value_P Z(shape_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_CR::eval_AB(Value_P A, Value_P B)
+Quad_CR::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)                    RANK_ERROR;
    if (!A->is_scalar_or_len1_vector())       LENGTH_ERROR;

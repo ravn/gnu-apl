@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,11 +56,11 @@ public:
 
    /// If \b id is the ID of primitive function, primitive operator, or
    /// quad function, then return a pointer to it. Otherwise return 0.
-   static Function * get_system_function(Id id);
+   static Function_P get_system_function(Id id);
 
    /// If \b tag is the tag of primitive function, primitive operator, or
    /// quad function, then return a pointer to it. Otherwise return 0.
-   static Function * get_system_function(TokenTag tag)
+   static Function_P get_system_function(TokenTag tag)
       { return get_system_function(Id(tag >> 16)); }
 
    /// If \b id is the ID of a quad variable, then return a pointer to its

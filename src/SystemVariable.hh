@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ protected:
    virtual void push_label(Function_Line label) {}
 
    /// overloaded Symbol::push_function()
-   virtual void push_function(Function * function) {}
+   virtual void push_function(Function_P function) {}
 
    /// overloaded Symbol::push_value()
    virtual void push_value(Value_P value) {}

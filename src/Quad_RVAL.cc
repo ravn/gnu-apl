@@ -24,6 +24,18 @@
 #include "Quad_RVAL.hh"
 #include "Value.hh"
 
+size_t N;
+vector<int> Quad_RVAL::desired_ranks;
+Shape       Quad_RVAL::desired_shape;
+vector<int> Quad_RVAL::desired_types;
+int         Quad_RVAL::desired_maxdepth;
+char        Quad_RVAL::state[256];
+size_t      Quad_RVAL::N;
+
+#if HAVE_LIBC
+random_data Quad_RVAL::rdata;
+#endif
+
 Quad_RVAL  Quad_RVAL::_fun;
 Quad_RVAL * Quad_RVAL::fun = &Quad_RVAL::_fun;
 
@@ -33,10 +45,10 @@ Quad_RVAL * Quad_RVAL::fun = &Quad_RVAL::_fun;
 
 //-----------------------------------------------------------------------------
 Quad_RVAL::Quad_RVAL()
-   : QuadFunction(TOK_Quad_RVAL),
-     N(8),
-   desired_maxdepth(4)
+   : QuadFunction(TOK_Quad_RVAL)
 {
+   N = 8;
+   desired_maxdepth = 4;
    memset(state, 0, sizeof(state));
    initstate_r(1, state, N, &rdata);
 
@@ -175,7 +187,7 @@ const ShapeItem ec = Z->element_count();
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_RVAL::eval_AB(Value_P A, Value_P B)
+Quad_RVAL::eval_AB(Value_P A, Value_P B) const
 {
    if (!A->is_scalar())       RANK_ERROR;
    if (!A->is_int_scalar())   DOMAIN_ERROR;
@@ -535,7 +547,7 @@ Quad_RVAL::do_eval_B(const Value & B, int depth)
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_RVAL::eval_AB(Value_P A, Value_P B)
+Quad_RVAL::eval_AB(Value_P A, Value_P B) const
 {
     MORE_ERROR() <<
 "⎕RVAL is only available on platforms that have glibc.\n"

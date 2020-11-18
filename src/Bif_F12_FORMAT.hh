@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ public:
    {}
 
    /// A character array with B formatted by specification
-   Value_P format_by_specification(Value_P A, Value_P B);
+   static Value_P format_by_specification(Value_P A, Value_P B);
 
    static Bif_F12_FORMAT * fun;   ///< Built-in function
    static Bif_F12_FORMAT  _fun;   ///< Built-in function
@@ -157,24 +157,24 @@ public:
 
 protected:
    /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// A character array with B formatted by example
-   Value_P format_by_example(Value_P A, Value_P B);
+   static Value_P format_by_example(Value_P A, Value_P B);
 
    /// split entire format string string into \b column format strings
-   void split_example_into_columns(const UCS_string & format,
+   static void split_example_into_columns(const UCS_string & format,
                                    std::vector<UCS_string> & col_formats);
 
    /// A character array with one column of B formatted by specification
-   PrintBuffer format_one_col_by_spec(int width, int precision, const Cell * cB,
+   static PrintBuffer format_one_col_by_spec(int width, int precision, const Cell * cB,
                                ShapeItem cols, ShapeItem rows);
 
    /// add a row (consisting of \b data) to \b PrintBuffer \b ret
-   void add_row(PrintBuffer & ret, int row, bool has_char, bool has_num,
+   static void add_row(PrintBuffer & ret, int row, bool has_char, bool has_num,
                 Unicode align_char, UCS_string & data);
 
    /// format value with \b precision mantissa digits (floating format)

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2018  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,10 +33,13 @@
 Quad_GTK  Quad_GTK::_fun;
 Quad_GTK * Quad_GTK::fun = &Quad_GTK::_fun;
 
+std::vector<Quad_GTK::window_entry> Quad_GTK::open_windows;
+UCS_string_vector Quad_GTK::event_queue;
+
 #if HAVE_GTK3
 //-----------------------------------------------------------------------------
 Token
-Quad_GTK::eval_AB(Value_P A, Value_P B)
+Quad_GTK::eval_AB(Value_P A, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_GTK);
 
@@ -101,7 +104,7 @@ bad_fd:
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_GTK::eval_B(Value_P B)
+Quad_GTK::eval_B(Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_GTK);
 
@@ -190,7 +193,7 @@ const int function = B->get_ravel(0).get_int_value();
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B)
+Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_GTK);
 
@@ -271,7 +274,7 @@ UTF8_string utf_A(ucs_A);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_GTK::eval_XB(Value_P X, Value_P B)
+Quad_GTK::eval_XB(Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_GTK);
 
@@ -457,7 +460,7 @@ const int ready = poll(&pfd, 1, 0);
 }
 //-----------------------------------------------------------------------------
 Value_P
-Quad_GTK::window_list() const
+Quad_GTK::window_list()
 {
 Value_P Z(open_windows.size(), LOC);
    loop(w, open_windows.size())
@@ -705,7 +708,7 @@ window_entry we = { fd };
 
 //-----------------------------------------------------------------------------
 Token
-Quad_GTK::eval_AB(Value_P A, Value_P B)
+Quad_GTK::eval_AB(Value_P A, Value_P B) const
 {
    MORE_ERROR() <<
    "libgtk+ version 3 was not found (or disabled) at ./configure time";
@@ -713,7 +716,7 @@ Quad_GTK::eval_AB(Value_P A, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_GTK::eval_B(Value_P B)
+Quad_GTK::eval_B(Value_P B) const
 {
    MORE_ERROR() <<
    "libgtk+ version 3 was not found (or disabled) at ./configure time";
@@ -721,14 +724,14 @@ Quad_GTK::eval_B(Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B)
+Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    MORE_ERROR() << "libgtk+ version 3 was not found at ./configure time";
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_GTK::eval_XB(Value_P X, Value_P B)
+Quad_GTK::eval_XB(Value_P X, Value_P B) const
 {
    MORE_ERROR() << "libgtk+ version 3 was not found at ./configure time";
    DOMAIN_ERROR;

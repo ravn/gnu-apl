@@ -32,7 +32,7 @@ Bif_F12_PICK      * Bif_F12_PICK     ::fun = &Bif_F12_PICK     ::_fun;
 
 //=============================================================================
 Token
-Bif_F12_PARTITION::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F12_PARTITION::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return partition(A, B, axis);
@@ -144,7 +144,7 @@ Value_P Z(shape_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis)
+Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis) const
 {
    if (A->get_rank() > 1)    RANK_ERROR;
    if (B->get_rank() == 0)   RANK_ERROR;
@@ -157,7 +157,7 @@ Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis)
              return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
 
-        return eval_B(B);
+        return Token(TOK_APL_VALUE1, do_eval_B(B));
       }
 
    if (A->get_shape_item(0) != B->get_shape_item(axis))   LENGTH_ERROR;
@@ -267,7 +267,7 @@ Cell * vv = &V->get_ravel(0);
 }
 //=============================================================================
 Token
-Bif_F12_PICK::eval_AB(Value_P A, Value_P B)
+Bif_F12_PICK::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)    RANK_ERROR;
 

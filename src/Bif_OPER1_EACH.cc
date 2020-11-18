@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ Bif_OPER1_EACH * Bif_OPER1_EACH::fun = &Bif_OPER1_EACH::_fun;
 
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B)
+Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B) const
 {
    // dyadic EACH: call _LO for corresponding items of A and B
 
@@ -49,7 +49,7 @@ Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B)
            }
       }
 
-Function * LO = _LO.get_function();
+Function_P LO = _LO.get_function();
    Assert1(LO);
 
    // for the ambiguous operators /. ⌿, \, and ⍀ is_operator() returns true,
@@ -230,11 +230,11 @@ ShapeItem len_Z = 0;
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_EACH::eval_LB(Token & _LO, Value_P B)
+Bif_OPER1_EACH::eval_LB(Token & _LO, Value_P B) const
 {
    // monadic EACH: call _LO for every item of B
 
-Function * LO = _LO.get_function();
+Function_P LO = _LO.get_function();
    Assert1(LO);
    if (LO->is_operator())                SYNTAX_ERROR;
    if (!(LO->get_signature() & SIG_B))   VALENCE_ERROR;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1027,7 +1027,7 @@ UCS_string symbol;
         while (src.rest() && *src <= UNI_ASCII_SPACE)   src.get();   // spaces
         UCS_string symbol1(symbol, 2, symbol.size() - 2);   // without S∆/T∆
         Value_P AB(symbol1, LOC);
-        Function * ST = 0;
+        Function_P ST = 0;
         if (symbol[0] == UNI_ASCII_S) ST = Quad_STOP::fun;
         else                          ST = Quad_TRACE::fun;
 

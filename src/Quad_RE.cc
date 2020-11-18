@@ -31,7 +31,7 @@ Quad_RE * Quad_RE::fun = &Quad_RE::_fun;
 
 //-----------------------------------------------------------------------------
 Token
-Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B)
+Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
   MORE_ERROR() <<
 "⎕RE is not available because either no libpcre2 library was found on this\n"
@@ -346,7 +346,7 @@ int ccount[ovector_count];
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B)
+Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
    if (X->get_rank() > 1)   RANK_ERROR;

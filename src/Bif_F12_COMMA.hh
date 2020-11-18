@@ -35,7 +35,7 @@ public:
    {}
 
    /// ravel along axis, with axis being the first (⍪( or last (,) axis of B
-   Token ravel_axis(Value_P X, Value_P B, uAxis axis);
+   static Token ravel_axis(Value_P X, Value_P B, uAxis axis);
 
    /// Return the ravel of B as APL value
    static Token ravel(const Shape & new_shape, Value_P B);
@@ -63,17 +63,17 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B)
+   virtual Token eval_XB(Value_P X, Value_P B) const
       { return ravel_axis(X, B, B->get_rank()); }
 
    /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    static Bif_F12_COMMA * fun;   ///< Built-in function
    static Bif_F12_COMMA  _fun;   ///< Built-in function
@@ -92,17 +92,17 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B)
+   virtual Token eval_XB(Value_P X, Value_P B) const
       { return ravel_axis(X, B, 0); }
 
   /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    static Bif_F12_COMMA1 * fun;   ///< Built-in function
    static Bif_F12_COMMA1  _fun;   ///< Built-in function

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -121,9 +121,10 @@ Executable::clear_body()
 
         if (body[b].is_function())
            {
-             Function * fun = body[b].get_function();
-             UserFunction * ufun = fun->get_ufun1();
-             if (ufun && ufun->is_lambda())   ufun->decrement_refcount(LOC);
+             Function_P fun = body[b].get_function();
+             const UserFunction * ufun = fun->get_ufun1();
+             if (ufun && ufun->is_lambda())
+                const_cast<UserFunction *>(ufun)->decrement_refcount(LOC);
              new (&body[b]) Token();
            }
       }
@@ -477,8 +478,8 @@ Executable::unmark_all_values() const
 
         if (tok.get_ValueType() == TV_FUN)
            {
-             Function * fun = tok.get_function();
-             UserFunction * ufun = fun->get_ufun1();
+             Function_P fun = tok.get_function();
+             const UserFunction * ufun = fun->get_ufun1();
              if (ufun && ufun->is_lambda())
                 {
                   ufun->unmark_all_values();

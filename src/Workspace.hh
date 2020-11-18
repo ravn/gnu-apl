@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -175,7 +175,7 @@ public:
       {  return the_workspace.user_commands; }
 
    /// Create a new SI-entry on the SI stack.
-   static void push_SI(Executable * fun, const char * loc);
+   static void push_SI(const Executable * fun, const char * loc);
 
    /// Remove the current SI-entry from the SI stack.
    static void pop_SI(const char * loc);
@@ -208,7 +208,7 @@ public:
 
    /// lookup an existing name (user defined or ⎕xx, var or function).
    /// return 0 if not found.
-   static NamedObject * lookup_existing_name(const UCS_string & name);
+   static const NamedObject * lookup_existing_name(const UCS_string & name);
 
    /// lookup an existing symbol (user defined or ⎕xx).
    static Symbol * lookup_existing_symbol(const UCS_string & symbol_name);

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -184,44 +184,43 @@ public:
    Function_Line get_line(Function_PC pc) const;
 
    /// Overloaded Function::eval_()
-   virtual Token eval_();
+   virtual Token eval_() const;
 
    /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// Overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B);
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LB.
-   virtual Token eval_LB(Token & LO, Value_P B);
+   virtual Token eval_LB(Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_LXB()
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALB.
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B);
+   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    /// Overloaded Function::eval_ALXB()
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B);
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LRB()
-   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B);
+   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_LRXB()
-   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B);
+   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALRB()
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B);
+   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
-                            Value_P X, Value_P B);
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// Quad_CR of this function
    virtual UCS_string canonical(bool with_lines) const;
@@ -275,10 +274,10 @@ protected:
    virtual bool may_push_SI() const   { return true; }
 
    /// Overloaded Function::eval_fill_B()
-   virtual Token eval_fill_B(Value_P B);
+   virtual Token eval_fill_B(Value_P B) const;
 
    /// Overloaded Function::eval_fill_AB()
-   virtual Token eval_fill_AB(Value_P A, Value_P B);
+   virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
    /// return the line number where an error has occurred (-1 if none)
    int get_error_line() const

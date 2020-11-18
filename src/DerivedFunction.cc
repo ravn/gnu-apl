@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include "Workspace.hh"
 
 //=============================================================================
-DerivedFunction::DerivedFunction(Token & lfun, Function * dyop, Token & rfun,
+DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Token & rfun,
                                  const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_fun(lfun),
@@ -44,7 +44,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function * dyop, Token & rfun,
      }
 }
 //-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & lfun, Function * dyop, Value_P X,
+DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Value_P X,
                                  Token & rfun, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_fun(lfun),
@@ -54,7 +54,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function * dyop, Value_P X,
 {
 }
 //-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & lfun, Function * monop,
+DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
                                  const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_fun(lfun),
@@ -71,7 +71,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function * monop,
      }
 }
 //-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & lfun, Function * monop,
+DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
                                  Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_fun(lfun),
@@ -88,7 +88,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function * monop,
      }
 }
 //-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Function * fun, Value_P X, const char * loc)
+DerivedFunction::DerivedFunction(Function_P fun, Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_fun(TOK_VOID),
      oper(fun),
@@ -105,7 +105,7 @@ DerivedFunction::DerivedFunction(Function * fun, Value_P X, const char * loc)
 }
 //-----------------------------------------------------------------------------
 Token
-DerivedFunction::eval_B(Value_P B)
+DerivedFunction::eval_B(Value_P B) const
 {
    Log(LOG_FunOperX)
       {
@@ -121,17 +121,20 @@ DerivedFunction::eval_B(Value_P B)
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        return oper->eval_LRB(left_fun, right_fun, B);
+        Token & left  = const_cast<Token &>(left_fun);
+        Token & right = const_cast<Token &>(right_fun);
+        return oper->eval_LRB(left, right, B);
       }
    else                                   // monadic operator
       {
-        if (!!axis)   return oper->eval_LXB(left_fun, axis, B);
-        else          return oper->eval_LB(left_fun, B);
+        Token & left  = const_cast<Token &>(left_fun);
+        if (!!axis)   return oper->eval_LXB(left, axis, B);
+        else          return oper->eval_LB(left, B);
       }
 }
 //-----------------------------------------------------------------------------
 Token
-DerivedFunction::eval_XB(Value_P X, Value_P B)
+DerivedFunction::eval_XB(Value_P X, Value_P B) const
 {
    Log(LOG_FunOperX)
       {
@@ -142,16 +145,19 @@ DerivedFunction::eval_XB(Value_P X, Value_P B)
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        return oper->eval_LRXB(left_fun, right_fun, X, B);
+        Token & left  = const_cast<Token &>(left_fun);
+        Token & right = const_cast<Token &>(right_fun);
+        return oper->eval_LRXB(left, right, X, B);
       }
    else                                   // monadic operator
       {
-        return oper->eval_LXB(left_fun, X, B);
+        Token & left  = const_cast<Token &>(left_fun);
+        return oper->eval_LXB(left, X, B);
       }
 }
 //-----------------------------------------------------------------------------
 Token
-DerivedFunction::eval_AB(Value_P A, Value_P B)
+DerivedFunction::eval_AB(Value_P A, Value_P B) const
 {
    Log(LOG_FunOperX)
       {
@@ -166,18 +172,21 @@ DerivedFunction::eval_AB(Value_P A, Value_P B)
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        if (!axis)   return oper->eval_ALRB(A, left_fun, right_fun, B);
-        else         return oper->eval_ALRXB(A, left_fun, right_fun, axis, B);
+        Token & left  = const_cast<Token &>(left_fun);
+        Token & right = const_cast<Token &>(right_fun);
+        if (!axis)   return oper->eval_ALRB(A, left, right, B);
+        else         return oper->eval_ALRXB(A, left, right, axis, B);
       }
    else                                   // monadic operator
       {
-        if (!axis)   return oper->eval_ALB(A, left_fun, B);
-        else         return oper->eval_ALXB(A, left_fun, axis, B);
+        Token & left  = const_cast<Token &>(left_fun);
+        if (!axis)   return oper->eval_ALB(A, left, B);
+        else         return oper->eval_ALXB(A, left, axis, B);
       }
 }
 //-----------------------------------------------------------------------------
 Token
-DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
+DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    Log(LOG_FunOperX)
       {
@@ -187,11 +196,14 @@ DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B)
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        return oper->eval_ALRXB(A, left_fun, right_fun, X, B);
+        Token & left  = const_cast<Token &>(left_fun);
+        Token & right = const_cast<Token &>(right_fun);
+        return oper->eval_ALRXB(A, left, right, X, B);
       }
    else                                   // monadic operator
       {
-        return oper->eval_ALXB(A, left_fun, X, B);
+        Token & left  = const_cast<Token &>(left_fun);
+        return oper->eval_ALXB(A, left, X, B);
       }
 }
 //-----------------------------------------------------------------------------

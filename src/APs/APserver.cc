@@ -728,7 +728,7 @@ AP3_fd * ap_fd = 0;
              return;
 
         case sid_ASSIGN_VALUE:     // Svar←X for APs
-	     {
+             {
                const SV_key key = request->get__ASSIGN_VALUE__key();
                const TCP_socket ap_sock = get_peer_fd2(key, fd);
                if (ap_sock == NO_TCP_SOCKET)
@@ -811,8 +811,9 @@ AP3_fd * ap_fd = 0;
 
                char * del = 0;
                char buffer[2*MAX_SIGNAL_CLASS_SIZE + 40000];
+               const char * loc = 0;
                Signal_base * response = Signal_base::recv_TCP(ap_sock, buffer,
-                                                  sizeof(buffer), del, debug);
+                                    sizeof(buffer), del, debug, &loc);
                VALUE_IS_c vis(fd, response->get__VALUE_IS__key(),
                                   response->get__VALUE_IS__error(),
                                   response->get__VALUE_IS__error_loc(),
@@ -858,12 +859,17 @@ connection_readable(TCP_socket fd)
 char buffer[50000];
 char * del = 0;
 ostream * debug = verbosity ? &cerr : 0;
+const char * loc = 0;
 Signal_base * request = Signal_base::recv_TCP(fd, buffer, sizeof(buffer),
-                                              del, debug);
+                                              del, debug, &loc);
    if (request == 0)
       {
-         (verbosity > 0) && cerr << prog << ": connection[" << fd
-                                 << "] closed by peer" << endl;
+        if (verbosity > 0)
+           {
+             cerr << prog << ": connection[" << fd
+                  << "] closed by peer: errno=" << errno
+                  << ", loc=" << loc << endl;
+           }
          close_fd(fd);
          return;
       }
@@ -1010,10 +1016,10 @@ bool auto_start = false;
 
 #if APSERVER_TRANSPORT == 0   // TCP
               cerr << "APSERVER_PORT is: " << APSERVER_PORT << endl;
-               got_port = true;
+              got_port = true;
 #else                         // AF_UNIX
               cerr << "APSERVER_PATH is: " << APSERVER_PATH << endl;
-               got_path = true;
+              got_path = true;
 #endif
               ++verbosity;
               debug = &cerr;
@@ -1227,7 +1233,7 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
                   ::recv(jfd, 0, 0, MSG_DONTWAIT);
                   cerr << "janitor got " << errno << " on fd " << jfd << endl;
                 }
-             
+
              continue;
            }
 #endif

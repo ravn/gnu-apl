@@ -27,7 +27,7 @@ Bif_F12_INDEX_OF * Bif_F12_INDEX_OF ::fun = &Bif_F12_INDEX_OF ::_fun;
 
 //=============================================================================
 Token
-Bif_F12_INDEX_OF::eval_B(Value_P B)
+Bif_F12_INDEX_OF::eval_B(Value_P B) const
 {
    if (B->get_rank() > 1)   RANK_ERROR;
 
@@ -96,7 +96,7 @@ Value_P Z(sh, LOC);
 //-----------------------------------------------------------------------------
 /// search elements of B in A. ⍴Z is ⍴B, and elements of Z are indices of A.
 Token
-Bif_F12_INDEX_OF::eval_AB(Value_P A, Value_P B)
+Bif_F12_INDEX_OF::eval_AB(Value_P A, Value_P B) const
 {
    // A⍳B (aka. Index of)
    //
@@ -173,7 +173,8 @@ Value_P Z(B->get_shape(), LOC);
 }
 //-----------------------------------------------------------------------------
 int
-Bif_F12_INDEX_OF::bs_cmp(const Cell & cell, const ShapeItem & A, const void * ctx)
+Bif_F12_INDEX_OF::bs_cmp(const Cell & cell, const ShapeItem & A,
+                         const void * ctx)
 {
 const Cell * cells_A = reinterpret_cast<const Cell *>(ctx);
 const Cell & cell_A = cells_A[A];

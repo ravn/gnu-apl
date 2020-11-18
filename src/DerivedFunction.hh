@@ -37,20 +37,20 @@ public:
    DerivedFunction() : Function(TOK_FUN0)   {}
 
    /// Constructor (dyadic operator)
-   DerivedFunction(Token & lf, Function * dyop, Token & rf, const char * loc);
+   DerivedFunction(Token & lf, Function_P dyop, Token & rf, const char * loc);
 
    /// Constructor (dyadic operator with axis: fun ⍤[] rval)
-   DerivedFunction(Token & lf, Function * dyop, Value_P X, Token & rval,
+   DerivedFunction(Token & lf, Function_P dyop, Value_P X, Token & rval,
                    const char * loc);
 
    /// Constructor (monadic operator, no axis)
-   DerivedFunction(Token & lfun, Function * monop, const char * loc);
+   DerivedFunction(Token & lfun, Function_P monop, const char * loc);
 
    /// Constructor (monadic operator, with axis)
-   DerivedFunction(Token & lf, Function * monop, Value_P X, const char * loc);
+   DerivedFunction(Token & lf, Function_P monop, Value_P X, const char * loc);
 
    /// Constructor (function with axis)
-   DerivedFunction(Function * func, Value_P X, const char * loc);
+   DerivedFunction(Function_P func, Value_P X, const char * loc);
 
    /// overloaded Function::print();
    virtual ostream & print(ostream & out) const;
@@ -83,16 +83,16 @@ protected:
    virtual void print_properties(ostream & out, int indent) const;
 
    /// overloaded Function::eval_B();
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_XB();
-   virtual Token eval_XB(Value_P X, Value_P B);
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// overloaded Function::eval_AB();
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
@@ -102,14 +102,14 @@ protected:
       }
 
    /// overloaded Function::locate_X()
-   virtual Value_P * locate_X()
+   virtual const Value_P * locate_X() const
       { return (!axis) ? 0 : &axis; }
 
    /// the function (to the left of the operator)
    Token left_fun;
 
    /// the monadic operator (to the right of the function)
-   Function * oper;
+   Function_P oper;
 
    /// the function on the right of the (dyadic) operator (if any)
    Token right_fun;

@@ -35,13 +35,13 @@ public:
  
 protected:
    /// Expand B according to A.
-   Token expand(Value_P A, Value_P B, uAxis axis);
+   static Token expand(Value_P A, Value_P B, uAxis axis);
 
    /// Compute the LO-scan of B.
-   Token scan(Token & _LO, Value_P B, uAxis axis);
+   static Token scan(Token & _LO, Value_P B, uAxis axis);
 
    /// Compute one scan item and store result in Z.
-   static void scan_item(Cell * Z, Function * LO, const Cell * B,
+   static void scan_item(Cell * Z, Function_P LO, const Cell * B,
                          uint32_t m_len, uint32_t l_len);
 };
 //-----------------------------------------------------------------------------
@@ -55,18 +55,18 @@ public:
    Bif_OPER1_SCAN() : Bif_SCAN(TOK_OPER1_SCAN) {}
 
    /// Overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { return expand(A, B, B->get_rank() - 1); }
 
    /// Overloaded Function::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LB().
-   virtual Token eval_LB(Token & LO, Value_P B)
+   virtual Token eval_LB(Token & LO, Value_P B) const
       { return scan(LO, B, B->get_rank() - 1); }
 
    /// Overloaded Function::eval_LXB().
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    static Bif_OPER1_SCAN * fun;      ///< Built-in function.
    static Bif_OPER1_SCAN  _fun;      ///< Built-in function.
@@ -88,18 +88,18 @@ public:
    Bif_OPER1_SCAN1() : Bif_SCAN(TOK_OPER1_SCAN1) {}
 
    /// Overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { return expand(A, B, 0); }
 
    /// Overloaded Function::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALB().
-   virtual Token eval_LB(Token & LO, Value_P B)
+   virtual Token eval_LB(Token & LO, Value_P B) const
       { return scan(LO, B, 0); }
 
    /// Overloaded Function::eval_ALXB().
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    static Bif_OPER1_SCAN1 * fun;     ///< Built-in function.
    static Bif_OPER1_SCAN1  _fun;     ///< Built-in function.

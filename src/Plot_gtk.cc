@@ -90,7 +90,7 @@ struct Plot_context
 static vector<const Plot_context *> all_plot_contexts;
 static int plot_window_count = 0;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// same as standard cairo_set_RGB_source() but with Color instead of double
 /// red, green, and blue values.
 static inline void
@@ -102,7 +102,7 @@ cairo_set_RGB_source(cairo_t * cr, Color color)
                              (color >>  8 & 0xFF) / 255.0,
                              (color       & 0xFF) / 255.0, 1.0);   // opaque
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void
 draw_line(cairo_t * cr, Color line_color, int line_style, int line_width,
           const Pixel_XY & P0, const Pixel_XY & P1)
@@ -130,7 +130,7 @@ double dashes_3[] = { 10.0, 5.0 };     // ─╴─╴─╴─╴
 
    if (line_style != 1)   cairo_set_dash(cr, dashes_1, num_dashes_1, 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void
 draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
 {
@@ -138,7 +138,7 @@ draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
    cairo_arc(cr, P0.x, P0.y, 0.5*size, 0.0, 2*M_PI);
    cairo_fill(cr);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void
 draw_delta(cairo_t * cr, Pixel_XY P0, bool up, Color color, int size)
 {
@@ -165,7 +165,7 @@ const double s = 0.5*l;           // ∆ base middle to left/right vertex
 
    cairo_fill(cr);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void
 draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
 {
@@ -188,7 +188,7 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
 
    cairo_fill(cr);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void
 draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
            double size, int size2)
@@ -217,7 +217,7 @@ const double half = 0.5*size;
 
    cairo_stroke(cr);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void
 draw_point(cairo_t * cr, Pixel_XY P, int point_style,
            const Color outer_color, int outer_dia,
@@ -250,13 +250,13 @@ const bool es = ! (point_style & 1);   // even style
         case 5: draw_quad(  cr, P, es, inner_color, inner_dia);   return; // ■
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 draw_marker(cairo_t * cr, Pixel_XY P)
 {
    draw_point(cr, P, 1, 0xFF0000, 10, 0, 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void
 draw_arrow(cairo_t * cr, Pixel_XY O, Pixel_XY A, const Color color)
 {
@@ -293,7 +293,7 @@ const Pixel_XY T(S.x + TIP*Ux, S.y + TIP*Uy);
    cairo_close_path(cr);
    cairo_fill(cr);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 format_tick(double val)
 {
@@ -354,7 +354,7 @@ const char * unit = 0;
    else                  snprintf(cp, sizeof(cc) - 1, "%.0f%s", val, unit);
    return cc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 cairo_string_size(double & lx, double & ly, cairo_t * cr, const char * label,
                   const char * font_name, double font_size)
@@ -372,7 +372,7 @@ cairo_string_size(double & lx, double & ly, cairo_t * cr, const char * label,
   if (ly == 0.0)   ly = font_size;   // cairo bug
   cairo_new_path(cr);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 draw_text(cairo_t * cr, const char * label, const Pixel_XY & xy)
 {
@@ -387,7 +387,7 @@ draw_text(cairo_t * cr, const char * label, const Pixel_XY & xy)
   cairo_text_path(cr, label);
   cairo_fill(cr);
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 draw_legend(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
@@ -476,14 +476,14 @@ const int dy = w_props.get_legend_dY();
          draw_text(cr, lp.get_legend_name().c_str(), Pixel_XY(xt, y1 + 5));
        }
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static inline void
 pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
 {
 const double   Y = Y0;   Y0 = Y1;   Y1 = Y;
 const Pixel_XY P = P0;   P0 = P1;   P1 = P;
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // draw a 3D triangle where one point P0 is at visual height H0 and the
 // other two points P1 and P2 are the same at visual height H12.
 void
@@ -519,7 +519,7 @@ const double dH = (H12 - H0) / steps;
          draw_line(cr, line_color, 1, 1, P0_P1, P0_P2);
        }
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // draw a 3D triangle where the points P0, P1, and P2 are at visual
 // heights H0, H1, and H2 respectively. This is done by splitting the
 // triangle into two triangles that each have 2 points at the same height.
@@ -577,7 +577,7 @@ const vector<level_color> & color_steps = w_props.get_gradient();
         draw_triangle(cr, pctx, verbosity, P2, H2, P1, P, H1);
       }
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 draw_X_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
@@ -634,7 +634,7 @@ const int grid_style = w_props.get_gridX_style();
            }
       }
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 draw_Y_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
@@ -703,7 +703,7 @@ const int grid_style = w_props.get_gridY_style();
            }
       }
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 draw_Z_grid(cairo_t * cr, const Plot_context & pctx)
 {
@@ -815,7 +815,7 @@ int grid_style = w_props.get_gridZ_style();
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// draw normal (2D) data lines
 void
 draw_plot_lines(cairo_t * cr, const Plot_context & pctx)
@@ -860,7 +860,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// draw surface (3D) data lines
 void
 draw_surface_lines(cairo_t * cr, const Plot_context & pctx)
@@ -1029,7 +1029,7 @@ const int point_style  = lp0.get_point_style();
         draw_point(cr, P0, point_style, point_color, 2, canvas_color, 0);
       }
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void
 do_plot(GtkWidget * drawing_area, const Plot_context & pctx, cairo_t * cr)
 {
@@ -1057,7 +1057,7 @@ const bool surface_plot = pctx.w_props.get_plot_data().is_surface_plot();
   //
   draw_legend(cr, pctx, surface_plot);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 extern "C" gboolean
 plot_destroyed(GtkWidget * top_level);
 
@@ -1068,7 +1068,7 @@ plot_destroyed(GtkWidget * top_level)
   // gtk_main_quit();
   return TRUE;   // event handled by this handler
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// return a new surface with window borders, or 0 on failure
 cairo_surface_t *
 add_border(const Plot_context & pctx, cairo_surface_t * old_surface)
@@ -1113,7 +1113,7 @@ cairo_t * cr2 = cairo_create(ret);
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void
 save_file(const Plot_context & pctx, cairo_surface_t * surface)
 {
@@ -1149,7 +1149,7 @@ cairo_status_t stat;
   //    if (w_props.get_auto_close() == 2)   gtk_main_quit();
       }
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 extern "C" gboolean
 draw_callback(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data);
 
@@ -1230,7 +1230,7 @@ gtk_main_wrapper(void * w_props)
 
    return 0;
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const Plot_window_properties *
 plot_stop(const Plot_window_properties * props)
 {
@@ -1255,7 +1255,7 @@ plot_stop(const Plot_window_properties * props)
         << " in plot_stop() ***" << endl;
    return 0;
 }
-//-------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void *
 plot_main(void * vp_props)
 {
@@ -1318,5 +1318,5 @@ Plot_context * pctx = new Plot_context(w_props);
    sem_post(Quad_PLOT::plot_window_sema);   // unleash the APL interpreter
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // HAVE_GTK3

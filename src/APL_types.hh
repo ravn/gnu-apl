@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,6 +67,9 @@ typedef long long long_long;
 /// unsigned long for sprintf() and friends
 typedef unsigned long unsigned_long;
 
+class Function;
+typedef const Function * Function_P;
+
 inline void
 Hswap(APL_Integer & i1, APL_Integer & i2)
 { const APL_Integer tmp = i1;   i1 = i2;   i2 = tmp; }
@@ -90,10 +93,10 @@ typedef APL_Float_Base APL_Float;
 
 #endif // APL_Float is class vs. POD
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /// One APL complex value.
 typedef complex<APL_Float> APL_Complex;
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /// APL time = microseconds since Jan. 1. 1970 00:00:00 UTC
 typedef int64_t APL_time_us;
 

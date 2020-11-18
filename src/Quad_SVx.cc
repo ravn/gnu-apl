@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ FILE * fp = popen(filename, "r");
 }
 //=============================================================================
 Token
-Quad_SVC::eval_AB(Value_P A, Value_P B)
+Quad_SVC::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 2)   RANK_ERROR;
    if (B->get_rank() > 2)   RANK_ERROR;
@@ -217,7 +217,7 @@ Value_P Z(sh_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_SVC::eval_B(Value_P B)
+Quad_SVC::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
@@ -316,7 +316,7 @@ Value_P Z(LOC);
  ** Offer variables in B to corresponding processors in A
  **/
 Token
-Quad_SVO::eval_AB(Value_P A, Value_P B)
+Quad_SVO::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 2)   RANK_ERROR;
@@ -326,7 +326,6 @@ const ShapeItem var_count = B->get_rows();
 
 const UCS_string_vector apl_vars(B.getref(), false);
 const UCS_string_vector surrogates(B.getref(), true);
-
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -433,7 +432,7 @@ const SV_key key = Svar_DB::match_or_make(vname, to_proc, from);
         // APs always return SV_OFFERED
         //
         if (auto_started)   coupling = SV_OFFERED;
-        
+
         return key;
       }
 
@@ -455,7 +454,7 @@ const SV_key key = Svar_DB::match_or_make(vname, to_proc, from);
  ** Return degree of coupling for variables in B
  **/
 Token
-Quad_SVO::eval_B(Value_P B)
+Quad_SVO::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
@@ -493,7 +492,7 @@ Value_P Z(sh_Z, LOC);
 }
 //=============================================================================
 Token
-Quad_SVQ::eval_B(Value_P B)
+Quad_SVQ::eval_B(Value_P B) const
 {
    if (B->get_rank() > 1)        RANK_ERROR;
    if (B->element_count() > 1)   LENGTH_ERROR;
@@ -675,7 +674,7 @@ int v = 0;
 }
 //=============================================================================
 Token
-Quad_SVR::eval_B(Value_P B)
+Quad_SVR::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
@@ -705,7 +704,7 @@ Value_P Z(sh_Z, LOC);
 }
 //=============================================================================
 Token
-Quad_SVS::eval_B(Value_P B)
+Quad_SVS::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 

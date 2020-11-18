@@ -31,7 +31,7 @@ void FnCommand::run_command( NetworkConnection &conn, const std::vector<std::str
     std::stringstream out;
 
     UCS_string ucs_name = ucs_string_from_string( name );
-    NamedObject *obj = Workspace::lookup_existing_name( ucs_name );
+    const NamedObject * obj = Workspace::lookup_existing_name(ucs_name);
     if( obj == NULL ) {
         out << "undefined\n";
     }

@@ -721,7 +721,7 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
                          Log(LOG_archive)
                             CERR << "Saving TV_FUN Token" << endl;
 
-                         Function * fun = tok.get_function();
+                         Function_P fun = tok.get_function();
                          Assert1(fun);
                          save_Function_name(*fun);
                        }
@@ -1990,7 +1990,7 @@ XML_Loading_Archive::read_Function()
 const Fid fid = find_Fid_attr("fid", false, 16);
 const TokenTag primitive_tag = TokenTag(find_int_attr("tag", true, 16));
    Assert(primitive_tag != -1);
-   Function * pfun = ID::get_system_function(primitive_tag);
+   Function_P pfun = ID::get_system_function(primitive_tag);
    Assert(pfun);
    add_fid_function(fid, pfun, LOC);
 }
@@ -2013,7 +2013,7 @@ const Macro::Macro_num macnum =
 const TokenTag primitive_tag = TokenTag(find_int_attr("tag", true, 16));
    if (primitive_tag != -1)   // function is an APL primitive
       {
-        Function * prim = ID::get_system_function(Id(primitive_tag >> 16));
+        Function_P prim = ID::get_system_function(Id(primitive_tag >> 16));
         Assert(prim);
         symbol.push_function(prim);
         add_fid_function(fid, prim, LOC);
@@ -2038,7 +2038,7 @@ const Fid LO_fid = find_Fid_attr("LO-fid", true, 16);
 
    if (find_attr("ref", true))   // function pointer
       {
-        Function * fun = find_function(fid);
+        Function_P fun = find_function(fid);
         Assert(fun);
         symbol.push_function(fun);
         return;
@@ -2435,7 +2435,7 @@ const int pc = find_int_attr("pc", false, 10);
 
    Log(LOG_archive)   CERR << "    read_SI_entry() level=" << level << endl;
 
-Executable * exec = 0;
+const Executable * exec = 0;
    next_tag(LOC);
    if      (is_tag("Execute"))        exec = read_Execute();
    else if (is_tag("Statements"))     exec = read_Statement();
@@ -2460,7 +2460,7 @@ StateIndicator * si = Workspace::SI_top();
        }
 }
 //-----------------------------------------------------------------------------
-Executable *
+const Executable *
 XML_Loading_Archive::read_Execute()
 {
    next_tag(LOC);
@@ -2477,7 +2477,7 @@ ExecuteList * exec = ExecuteList::fix(text, LOC);
    return exec;
 }
 //-----------------------------------------------------------------------------
-Executable *
+const Executable *
 XML_Loading_Archive::read_Statement()
 {
    next_tag(LOC);
@@ -2494,7 +2494,7 @@ StatementList * exec = StatementList::fix(text, LOC);
    return exec;
 }
 //-----------------------------------------------------------------------------
-Executable *
+const Executable *
 XML_Loading_Archive::read_UserFunction()
 {
 const int macro_num = find_int_attr("macro-num", true, 10);
@@ -2517,9 +2517,9 @@ Symbol * symbol = Workspace::lookup_symbol(name_UCS);
    Assert(level < symbol->value_stack_size());
 ValueStackItem & vsi = (*symbol)[level];
    Assert(vsi.name_class == NC_FUNCTION || vsi.name_class == NC_OPERATOR);
-Function * fun = vsi.sym_val.function;
+Function_P fun = vsi.sym_val.function;
    Assert(fun);
-UserFunction * ufun = fun->get_ufun1();
+const UserFunction * ufun = fun->get_ufun1();
    Assert(fun == ufun);
 
    return ufun;
@@ -2710,7 +2710,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 
         case TV_FUN:
              {
-               Function * fun = read_Function_name();
+               Function_P fun = read_Function_name();
                Assert(fun);
                new (&tloc.tok) Token(tag, fun);
              }
@@ -2722,7 +2722,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
    return true;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 XML_Loading_Archive::read_Function_name()
 {
 const UTF8 * fun_name = find_attr("ufun-name", true);
@@ -2746,7 +2746,7 @@ const UTF8 * fun_name = find_attr("ufun-name", true);
         Assert(level < symbol.value_stack_size());
         const ValueStackItem & vsi = symbol[level];
         Assert(vsi.name_class == NC_FUNCTION);
-        Function * fun = vsi.sym_val.function;
+        Function_P fun = vsi.sym_val.function;
         Assert(fun);
         return fun;
       }
@@ -2754,7 +2754,7 @@ const UTF8 * fun_name = find_attr("ufun-name", true);
 const int fun_id = find_int_attr("fun-id", true, 16);
    if (fun_id != -1)
       {
-        Function * sysfun = ID::get_system_function(Id(fun_id));
+        Function_P sysfun = ID::get_system_function(Id(fun_id));
         Assert(sysfun);
         return sysfun;
       }
@@ -2775,7 +2775,7 @@ XML_Loading_Archive::find_fun_map(Fid fid)
    return 0;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 XML_Loading_Archive::find_function(Fid fid)
 {
    if (fun_map * map = find_fun_map(fid))   return map->new_fun;
@@ -2783,7 +2783,7 @@ XML_Loading_Archive::find_function(Fid fid)
 }
 //-----------------------------------------------------------------------------
 void
-XML_Loading_Archive::add_fid_function(Fid fid, Function * new_fun,
+XML_Loading_Archive::add_fid_function(Fid fid, Function_P new_fun,
                                       const char * loc)
 {
    if (fun_map * map = find_fun_map(fid))   // fid exists
@@ -2828,7 +2828,7 @@ XML_Loading_Archive::instantiate_derived_functions(bool allocate)
         _derived_todo & todo = derived_todos[d];
         Assert(todo.fid != -1);
 
-        Function * fun = find_function(todo.fid);
+        Function_P fun = find_function(todo.fid);
         Assert(fun);
 
         if (!allocate)
@@ -2840,18 +2840,18 @@ XML_Loading_Archive::instantiate_derived_functions(bool allocate)
         if (!todo.cache)   continue;
 
         Assert(todo.LO_fid   != -1);
-        Function * LO = find_function(todo.LO_fid);
+        Function_P LO = find_function(todo.LO_fid);
         Assert(LO);
 
         Assert(todo.OPER_fid != -1);
-        Function * OPER = find_function(todo.OPER_fid);
+        Function_P OPER = find_function(todo.OPER_fid);
         Assert(OPER);
         Token tok_LO(TOK_FUN2, LO);
 
         if (todo.RO_fid   != -1)   // dyadic operator
            {
              Assert(todo.RO_fid != -1);
-             Function * RO = find_function(todo.RO_fid);
+             Function_P RO = find_function(todo.RO_fid);
              Assert(RO);
              Token tok_RO(TOK_FUN2, RO);
 
@@ -2881,7 +2881,7 @@ XML_Loading_Archive::instantiate_derived_functions(bool allocate)
       }
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 XML_Loading_Archive::find_lambda(const UCS_string & lambda)
 {
 const StateIndicator & si = *Workspace::SI_top();
@@ -2911,7 +2911,7 @@ const Token_string & body = exec.get_body();
            }
         else if (tok.get_ValueType() != TV_FUN)   continue;
 
-        Function * fun = tok.get_function();
+        Function_P fun = tok.get_function();
         Assert1(fun);
         const UserFunction * ufun = fun->get_ufun1();
         if (!ufun)   continue;   // not a user defined function

@@ -32,8 +32,8 @@ void FnTagCommand::run_command( NetworkConnection &conn, const std::vector<std::
 
     std::stringstream out;
 
-    UCS_string ucs_name = ucs_string_from_string( name );
-    NamedObject *obj = Workspace::lookup_existing_name( ucs_name );
+    UCS_string ucs_name = ucs_string_from_string(name);
+    const NamedObject * obj = Workspace::lookup_existing_name(ucs_name);
     if( obj == NULL ) {
         out << "undefined\n";
     }

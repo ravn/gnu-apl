@@ -23,16 +23,12 @@
 #include <fstream>
 #include <string.h>
 #include <vector>
-#include <vector>
-
-#include <vector>
 
 #include "SystemLimits.hh"
 #include "UCS_string.hh"
 #include "UTF8_string.hh"
-#include "Workspace.hh"
-
 #include "Value.hh"
+#include "Workspace.hh"
 
 class Cell;
 class Function;
@@ -308,13 +304,13 @@ protected:
    void read_Parser(StateIndicator & si, int lev);
 
    /// read ⍎ Executable
-   Executable * read_Execute();
+   const Executable * read_Execute();
 
    /// read ◊ Executable
-   Executable * read_Statement();
+   const Executable * read_Statement();
 
    /// read a user defined Executable
-   Executable * read_UserFunction();
+   const Executable * read_UserFunction();
 
    /// read a lambda
    Executable * read_lambda(const UTF8 * lambda_name);
@@ -327,10 +323,10 @@ protected:
 
    /// read a system function with attribute id_prefix-id or a user defined
    /// functions with attributes 'ufun_prefix-ufun' and 'level_prefix-prefix'
-   Function * read_Function_name();
+   Function_P read_Function_name();
 
    /// find a lambda in the current SI entry
-   Function * find_lambda(const UCS_string & lambda);
+   Function_P find_lambda(const UCS_string & lambda);
 
    /// return true iff there is more data in the file
    bool more() const   { return data < file_end; }
@@ -448,7 +444,7 @@ protected:
    struct fun_map
       {
         Fid old_fid;          ///< the fid in the )SAVEed workspace
-        Function * new_fun;   ///< address in the )LOADing workspace
+        Function_P new_fun;   ///< address in the )LOADing workspace
         const char * loc;     ///< where allocated
       };
 
@@ -459,16 +455,16 @@ protected:
    fun_map * find_fun_map(Fid fid);
 
    /// return function for fid, or 0 if not found.
-   Function * find_function(Fid fid);
+   Function_P find_function(Fid fid);
 
    /// add fid and function to find_fun_map. Either fid must be new, or else
    /// an existing fid must have its new_fun == 0 (forward declaration).
-   void add_fid_function(Fid fid, Function * new_fun, const char * loc);
+   void add_fid_function(Fid fid, Function_P new_fun, const char * loc);
 
    struct _derived_todo
       {
         Function * cache;     ///< the new ()-address of the function
-        Function ** symptr;   ///< the address of a function * to be set
+        Function_P* symptr;   ///< the address of a function * to be set
         Fid fid;              ///< the address of \b this derived function
         Fid LO_fid;           ///< the address of \b LO of this function
         Fid OPER_fid;         ///< the address of \b OPER of this function

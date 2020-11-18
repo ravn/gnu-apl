@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -186,7 +186,8 @@ char peer[100];
 
         if (::bind(sock, &local.addr, sizeof(sockaddr_in)))
            {
-             get_CERR() << "bind(127.0.0.1) failed:" << strerror(errno) << endl;
+             get_CERR() << "bind(127.0.0.1) failed: "
+                        << strerror(errno) << endl;
              ::close(sock);
              return NO_TCP_SOCKET;
            }
@@ -289,11 +290,12 @@ Svar_DB::DB_tcp_error(const char * op, int got, int expected)
    //
    if (op)
       {
-        get_CERR() << "⋆⋆⋆ " << op << " failed: got " << got << " when expecting "
-                   << expected << " (" << strerror(errno) << ")" << endl;
+        get_CERR() << "⋆⋆⋆ " << op << " failed: got " << got
+                   << " when expecting " << expected
+                   << " (" << strerror(errno) << ")" << endl;
       }
 
-   shutdown(DB_tcp, SHUT_RDWR);
+   ::close(DB_tcp);
 }
 //=============================================================================
 
@@ -310,8 +312,9 @@ const int sock = Svar_DB::get_DB_tcp();
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + sizeof(Svar_record)];
 ostream * log = (LOG_startup != 0 || LOG_Svar_DB_signals != 0) ? & cerr : 0;
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
-                                               del, log);
+                                               del, log, &err_loc);
    if (response)
       {
         memcpy(static_cast<void *>(&cache),
@@ -367,8 +370,9 @@ MATCH_OR_MAKE_c request(tcp, vname,
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {
@@ -394,8 +398,9 @@ GET_EVENTS_c request(tcp, id.proc, id.parent, id.grand);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
 Signal_base * response =
-                    Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0);
+       Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0, &err_loc);
 
    if (response)
       {
@@ -424,8 +429,9 @@ CLEAR_ALL_EVENTS_c request(tcp, id.proc, id.parent, id.grand);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {
@@ -468,8 +474,9 @@ MAY_SET_c request(tcp, key, attempt);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {
@@ -491,8 +498,9 @@ MAY_USE_c request(tcp, key, attempt);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {
@@ -532,8 +540,9 @@ FIND_OFFERING_ID_c request(tcp, key);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {
@@ -557,8 +566,9 @@ GET_OFFERING_PROCS_c request(tcp, to_proc);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {
@@ -582,8 +592,9 @@ GET_OFFERED_VARS_c request(tcp, to_proc, from_proc);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {
@@ -606,8 +617,9 @@ IS_REGISTERED_ID_c request(tcp, id.proc, id.parent, id.grand);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {
@@ -642,8 +654,9 @@ FIND_PAIRING_KEY_c request(tcp, key);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {
@@ -665,8 +678,9 @@ PRINT_SVAR_DB_c request(tcp);
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 4000];
+const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0);
+                                               del, 0, &err_loc);
 
    if (response)
       {

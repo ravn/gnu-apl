@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ public:
    static UCS_string lambda_header(Fun_signature sig, int lambda_num);
 
    /// push Z (if defined), local variables, and labels.
-   void eval_common();
+   void eval_common() const;
 
    /// return the number of local variables
    ShapeItem local_var_count() const

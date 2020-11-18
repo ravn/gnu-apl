@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -114,10 +114,10 @@ public:
    virtual const Function * get_function() const   { return this; }
 
    /// the monadic inverse function of \b this function (if any)
-   virtual Function * get_monadic_inverse() const   { return 0; }
+   virtual Function_P get_monadic_inverse() const   { return 0; }
 
    /// the dyadic inverse function of \b this function (if any)
-   virtual Function * get_dyadic_inverse() const   { return 0; }
+   virtual Function_P get_dyadic_inverse() const   { return 0; }
 
    /// GMT when this function was created; 0 for system functions
    APL_time_us get_creation_time() const
@@ -163,67 +163,66 @@ public:
       { return 0; }
 
    /// return a \b Token for \b this function.
-   Token get_token() { return Token(tag, this); }
+   Token get_token() const { return Token(tag, this); }
 
    /// return the \b Token Tag for \b this function.
    TokenTag get_tag() const { return tag; }
 
    /// plain function, 0 arguments
-   virtual Token eval_();
+   virtual Token eval_() const;
 
    /// plain function, 2 arguments
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// monadic operator, 2 arguments
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B);
+   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    /// plain function, 2 arguments, with axis
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { AXIS_ERROR; }
 
    /// dyadic operator, 2 arguments
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B);
+   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// monadic operator, 2 arguments, with axis
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
       { AXIS_ERROR; }
 
    /// dyadic operator, 2 arguments, with axis
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
-                            Value_P X, Value_P B)
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const
       { AXIS_ERROR; }
 
    /// plain function, 1 argument
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// monadic operator, 1 argument
-   virtual Token eval_LB(Token & LO, Value_P B);
+   virtual Token eval_LB(Token & LO, Value_P B) const;
 
    /// plain function, 1 arguments, with axis
-   virtual Token eval_XB(Value_P X, Value_P B)
+   virtual Token eval_XB(Value_P X, Value_P B) const
       { AXIS_ERROR; }
 
    /// monadic operator, 1 arguments, with axis
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B)
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const
       { AXIS_ERROR; }
 
    /// dyadic operator, 1 arguments
-   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B);
+   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
 
    /// dyadic operator, 1 arguments, with axis
-   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B)
+   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
       { AXIS_ERROR; }
 
    /// Evaluate \b the fill function.
-   virtual Token eval_fill_B(Value_P B)
+   virtual Token eval_fill_B(Value_P B) const
       { DOMAIN_ERROR; }
 
    /// Evaluate \b the fill function.
-   virtual Token eval_fill_AB(Value_P A, Value_P B)
+   virtual Token eval_fill_AB(Value_P A, Value_P B) const
       { DOMAIN_ERROR; }
 
    /// Evaluate \b the identity function.
-   virtual Token eval_identity_fun(Value_P B, Axis axis)
+   virtual Token eval_identity_fun(Value_P B, Axis axis) const
       {  DOMAIN_ERROR; }
 
    /// Delete this function (do nothing, overloaded by UserFunction).
@@ -234,7 +233,7 @@ public:
       { NeverReach("Function::canonical() called"); }
 
    /// return axis (non-0 only for derived functions)
-   virtual Value_P * locate_X()
+   virtual const Value_P * locate_X() const
       { return 0; }
 
    /// return the signature of this function (currently only valid

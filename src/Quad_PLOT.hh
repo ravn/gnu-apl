@@ -65,23 +65,23 @@ public:
 
 protected:
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// print attribute help text
-   void help() const;
+   static void help();
 
    /// plot the data (creating a new plot window in X)
-   Value_P do_plot_data(Plot_window_properties * w_props,
-                     const Plot_data * data);
+   static Value_P do_plot_data(Plot_window_properties * w_props,
+                               const Plot_data * data);
 
    /// initialize the data to be plotted
-   Plot_data * setup_data(const Value * B);
+   static Plot_data * setup_data(const Value * B);
 
    /// whether to print some debug info during plotting
-   int verbosity;
+   static int verbosity;
 };
 
 #endif // __Quad_PLOT_DEFINED__

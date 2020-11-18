@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ Quad_TRACE * Quad_TRACE::fun = &Quad_TRACE::_fun;
 
 //=============================================================================
 Token
-Quad_AF::eval_B(Value_P B)
+Quad_AF::eval_B(Value_P B) const
 {
 const ShapeItem ec = B->element_count();
 Value_P Z(B->get_shape(), LOC);
@@ -122,7 +122,7 @@ Value_P Z(B->get_shape(), LOC);
 }
 //=============================================================================
 Token
-Quad_AT::eval_AB(Value_P A, Value_P B)
+Quad_AT::eval_AB(Value_P A, Value_P B) const
 {
    // A should be an integer scalar 1, 2, 3, or 4
    //
@@ -155,7 +155,7 @@ Value_P Z(shape_Z, LOC);
             symbol_name.append(uni);
            }
 
-        NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
+        const NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
         if (obj == 0)   Error::throw_symbol_error(symbol_name, LOC);
 
         const Function * function = obj->get_function();
@@ -165,8 +165,7 @@ Value_P Z(shape_Z, LOC);
              continue;
            }
 
-        Symbol * symbol = obj->get_symbol();
-        if (symbol)               // user defined or system var.
+        if (const Symbol * symbol = obj->get_symbol())   // defined or sys var
            {
              symbol->get_attributes(mode, &Z->get_ravel(r*mode_len));
              continue;
@@ -204,7 +203,7 @@ Value_P Z(shape_Z, LOC);
 }
 //=============================================================================
 Token
-Quad_DL::eval_B(Value_P B)
+Quad_DL::eval_B(Value_P B) const
 {
 const APL_time_us start = now();
 
@@ -240,7 +239,7 @@ Value_P Z(LOC);
 }
 //=============================================================================
 Token
-Quad_EA::eval_AB(Value_P A, Value_P B)
+Quad_EA::eval_AB(Value_P A, Value_P B) const
 {
    if (!A->is_char_string())
       {
@@ -258,7 +257,7 @@ Quad_EA::eval_AB(Value_P A, Value_P B)
 }
 //=============================================================================
 Token
-Quad_EB::eval_AB(Value_P A, Value_P B)
+Quad_EB::eval_AB(Value_P A, Value_P B) const
 {
    if (!A->is_char_string())
       {
@@ -276,7 +275,7 @@ Quad_EB::eval_AB(Value_P A, Value_P B)
 }
 //=============================================================================
 Token
-Quad_EC::eval_B(Value_P B)
+Quad_EC::eval_B(Value_P B) const
 {
 const UCS_string statement_B(*B.get());
 
@@ -318,7 +317,7 @@ ExecuteList * fun = 0;
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_EC::eval_fill_B(Value_P B)
+Quad_EC::eval_fill_B(Value_P B) const
 {
 Value_P Z2(2, LOC);
    Z2->next_ravel_Int(0);
@@ -444,7 +443,7 @@ Value_P Z2(2, LOC);
 }
 //=============================================================================
 Token
-Quad_ENV::eval_B(Value_P B)
+Quad_ENV::eval_B(Value_P B) const
 {
    if (!B->is_char_string())   DOMAIN_ERROR;
 
@@ -502,7 +501,7 @@ Value_P Z(sh_Z, LOC);
 }
 //=============================================================================
 Token
-Quad_ES::eval_AB(Value_P A, Value_P B)
+Quad_ES::eval_AB(Value_P A, Value_P B) const
 {
 const UCS_string ucs(*A.get());
 Error error(E_NO_ERROR, LOC);
@@ -513,7 +512,7 @@ const Token ret = event_simulate(&ucs, B, error);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_ES::eval_B(Value_P B)
+Quad_ES::eval_B(Value_P B) const
 {
 Error error(E_NO_ERROR, LOC);
 const Token ret = event_simulate(0, B, error);
@@ -642,7 +641,7 @@ const APL_Integer err = (B->get_ravel(0).get_near_int() << 16)
 }
 //=============================================================================
 Token
-Quad_EX::eval_B(Value_P B)
+Quad_EX::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
@@ -669,8 +668,17 @@ Symbol * symbol = Workspace::lookup_existing_symbol(name);
    return symbol->expunge();
 }
 //=============================================================================
+UCS_string Quad_INP::esc1;
+UCS_string Quad_INP::esc2;
+UCS_string Quad_INP::end_marker;
+UCS_string_vector Quad_INP::raw_lines;
+UCS_string_vector Quad_INP::prefixes;
+UCS_string_vector Quad_INP::escapes;
+UCS_string_vector Quad_INP::suffixes;
+bool Quad_INP::Quad_INP_running = false;
+
 Token
-Quad_INP::eval_AB(Value_P A, Value_P B)
+Quad_INP::eval_AB(Value_P A, Value_P B) const
 {
    if (Quad_INP_running)
       {
@@ -749,7 +757,7 @@ Token ret = Macro::get_macro(Macro::MAC_Z__Quad_INP_B)->eval_B(BB);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_INP::eval_B(Value_P B)
+Quad_INP::eval_B(Value_P B) const
 {
    if (Quad_INP_running)
       {
@@ -780,7 +788,7 @@ Value_P Z(raw_lines.size(), LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_INP::eval_XB(Value_P X, Value_P B)
+Quad_INP::eval_XB(Value_P X, Value_P B) const
 {
    if (X->element_count() != 1)
       {
@@ -991,7 +999,7 @@ UCS_string empty;
 }
 //=============================================================================
 Token
-Quad_NC::eval_B(Value_P B)
+Quad_NC::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
@@ -1179,7 +1187,7 @@ Value_P Z(shZ, LOC);
 }
 //=============================================================================
 Token
-Quad_SI::eval_AB(Value_P A, Value_P B)
+Quad_SI::eval_AB(Value_P A, Value_P B) const
 {
    if (A->element_count() != 1)   // not scalar-like
       {
@@ -1262,7 +1270,7 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_SI::eval_B(Value_P B)
+Quad_SI::eval_B(Value_P B) const
 {
    if (B->element_count() != 1)   // not scalar-like
       {
@@ -1337,7 +1345,7 @@ ShapeItem z = 0;
 }
 //=============================================================================
 Token
-Quad_UCS::eval_B(Value_P B)
+Quad_UCS::eval_B(Value_P B) const
 {
 Value_P Z(B->get_shape(), LOC);
 const ShapeItem ec = B->element_count();
@@ -1377,7 +1385,7 @@ const ShapeItem ec = B->element_count();
    return Token(TOK_APL_VALUE1, Z);
 }
 //=============================================================================
-UserFunction *
+const UserFunction *
 Stop_Trace::locate_fun(const Value & fun_name)
 {
    if (!fun_name.is_char_string())   return 0;
@@ -1392,14 +1400,14 @@ Symbol * fun_symbol = Workspace::lookup_existing_symbol(fun_name_ucs);
         return 0;
       }
 
-Function * fun = fun_symbol->get_function();
+Function_P fun = fun_symbol->get_function();
    if (fun == 0)
       {
         CERR << "symbol " << fun_name_ucs << " is not a function" << endl;
         return 0;
       }
 
-UserFunction * ufun = fun->get_ufun1();
+const UserFunction * ufun = fun->get_ufun1();
    if (ufun == 0)
       {
         CERR << "symbol " << fun_name_ucs
@@ -1438,17 +1446,17 @@ std::vector<Function_Line> lines;
 }
 //=============================================================================
 Token
-Quad_STOP::eval_AB(Value_P A, Value_P B)
+Quad_STOP::eval_AB(Value_P A, Value_P B) const
 {
    // Note: Quad_STOP::eval_AB can be called directly or via S∆. If
    //
    // 1. called via S∆   then A is the function and B are the lines.
    // 2. called directly then B is the function and A are the lines.
    //
-UserFunction * ufun = locate_fun(*A);
+const UserFunction * ufun = locate_fun(*A);
    if (ufun)   // case 1.
       {
-        assign(ufun, *B, true);
+        assign(const_cast<UserFunction *>(ufun), *B, true);
         return reference(ufun->get_stop_lines(), true);
       }
 
@@ -1457,31 +1465,31 @@ UserFunction * ufun = locate_fun(*A);
    ufun = locate_fun(*B);
    if (ufun == 0)   DOMAIN_ERROR;
 
-   assign(ufun, *A, true);
+   assign(const_cast<UserFunction *>(ufun), *A, true);
    return reference(ufun->get_stop_lines(), true);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_STOP::eval_B(Value_P B)
+Quad_STOP::eval_B(Value_P B) const
 {
-UserFunction * ufun = locate_fun(*B);
+const UserFunction * ufun = locate_fun(*B);
    if (ufun == 0)   DOMAIN_ERROR;
 
    return reference(ufun->get_stop_lines(), false);
 }
 //=============================================================================
 Token
-Quad_TRACE::eval_AB(Value_P A, Value_P B)
+Quad_TRACE::eval_AB(Value_P A, Value_P B) const
 {
    // Note: Quad_TRACE::eval_AB can be called directly or via S∆. If
    //
    // 1. called via S∆   then A is the function and B are the lines.
    // 2. called directly then B is the function and A are the lines.
    //
-UserFunction * ufun = locate_fun(*A);
+const UserFunction * ufun = locate_fun(*A);
    if (ufun)   // case 1.
       {
-        assign(ufun, *B, false);
+        assign(const_cast<UserFunction *>(ufun), *B, false);
         return reference(ufun->get_trace_lines(), true);
       }
 
@@ -1490,14 +1498,14 @@ UserFunction * ufun = locate_fun(*A);
    ufun = locate_fun(*B);
    if (ufun == 0)   DOMAIN_ERROR;
 
-   assign(ufun, *A, false);
+   assign(const_cast<UserFunction *>(ufun), *A, false);
    return reference(ufun->get_trace_lines(), true);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_TRACE::eval_B(Value_P B)
+Quad_TRACE::eval_B(Value_P B) const
 {
-UserFunction * ufun = locate_fun(*B);
+const UserFunction * ufun = locate_fun(*B);
    if (ufun == 0)   DOMAIN_ERROR;
 
    return reference(ufun->get_trace_lines(), false);

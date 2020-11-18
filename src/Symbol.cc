@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ Symbol::print_verbose(ostream & out) const
               case NC_FUNCTION:
               case NC_OPERATOR:
                    {
-                     Function * fun = item.sym_val.function;
+                     Function_P fun = item.sym_val.function;
                      Assert(fun);
 
                      fun->print_properties(out, 4);
@@ -310,10 +310,10 @@ const int incr_B = (ec_B == 1) ? 0 : 1;
 }
 //-----------------------------------------------------------------------------
 bool
-Symbol::assign_named_lambda(Function * lambda, const char * loc)
+Symbol::assign_named_lambda(Function_P lambda, const char * loc)
 {
 ValueStackItem & vs = value_stack.back();
-UserFunction * ufun = lambda->get_ufun1();
+const UserFunction * ufun = lambda->get_ufun1();
    Assert(ufun);
 const Executable * uexec = ufun;
    Assert(uexec);
@@ -323,10 +323,10 @@ const Executable * uexec = ufun;
         case NC_FUNCTION:
         case NC_OPERATOR:
              {
-               Function * old_fun = vs.sym_val.function;
+               Function_P old_fun = vs.sym_val.function;
                Assert(old_fun);
                if (!old_fun->is_lambda())   SYNTAX_ERROR;
-               UserFunction * old_ufun = old_fun->get_ufun1();
+               const UserFunction * old_ufun = old_fun->get_ufun1();
                Assert(old_ufun);
                for (StateIndicator * si = Workspace::SI_top();
                     si; si = si->get_parent())
@@ -340,7 +340,8 @@ const Executable * uexec = ufun;
                         }
                    }
 
-               vs.sym_val.function->get_ufun1()->decrement_refcount(LOC);
+               const_cast<UserFunction *>(vs.sym_val.function->get_ufun1())
+                         ->decrement_refcount(LOC);
              }
 
              /* fall through */
@@ -350,7 +351,7 @@ const Executable * uexec = ufun;
              else                         vs.name_class = NC_FUNCTION;
 
              vs.sym_val.function = ufun;
-             ufun->increment_refcount(LOC);
+             const_cast<UserFunction *>(ufun)->increment_refcount(LOC);
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
              return false;
 
@@ -428,7 +429,7 @@ Symbol::push_label(Function_Line label)
 }
 //-----------------------------------------------------------------------------
 void
-Symbol::push_function(Function * function)
+Symbol::push_function(Function_P function)
 {
    Log(LOG_SYMBOL_push_pop)
       {
@@ -568,7 +569,7 @@ Symbol::get_function() const
       }
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Symbol::get_function()
 {
 const ValueStackItem & vs = value_stack.back();
@@ -802,9 +803,10 @@ ValueStackItem & vs = value_stack.back();
            }
         else if (vs.sym_val.function->is_lambda())
            {
-             UserFunction * ufun = vs.sym_val.function->get_ufun1();
+             const UserFunction * ufun = vs.sym_val.function->get_ufun1();
              Assert(ufun);
-             ufun->decrement_refcount(LOC);
+               const_cast<UserFunction *>(vs.sym_val.function->get_ufun1())
+                          ->decrement_refcount(LOC);
            }
         else
            {
@@ -899,7 +901,7 @@ const SV_Coupling old_coupling = Svar_DB::get_coupling(key);
 }
 //-----------------------------------------------------------------------------
 void
-Symbol::set_nc(NameClass nc, Function * fun)
+Symbol::set_nc(NameClass nc, Function_P fun)
 {
 ValueStackItem & vs = value_stack.back();
 
@@ -959,7 +961,7 @@ UCS_string data;
              {
                // write a timestamp record
                //
-               Function & fun = *value_stack[0].sym_val.function;
+               const Function & fun = *value_stack[0].sym_val.function;
                const YMDhmsu ymdhmsu(fun.get_creation_time());
                sprintf(buffer, "*(%d %d %d %d %d %d %d)",
                        ymdhmsu.year, ymdhmsu.month, ymdhmsu.day,
@@ -1247,7 +1249,7 @@ ValueStackItem & tos = value_stack[0];
 
         case NC_FUNCTION:
         case NC_OPERATOR:
-             tos.sym_val.function->destroy();
+             const_cast<Function *>(tos.sym_val.function)->destroy();
              tos.name_class = NC_UNUSED_USER_NAME;
              break;
 
@@ -1329,8 +1331,9 @@ const TCP_socket tcp = Svar_DB::get_DB_tcp();
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE];
-const Signal_base * response = Signal_base::recv_TCP(tcp, buffer,
-                                                     sizeof(buffer), del, 0);
+const char * err_loc = 0;
+const Signal_base * response =
+      Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0, &err_loc);
 
    if (response == 0)
       {
@@ -1409,8 +1412,10 @@ const TCP_socket tcp = Svar_DB::get_DB_tcp();
 
         char * del = 0;
         char buffer[MAX_SIGNAL_CLASS_SIZE + 40000];
+        const char * err_loc = 0;
         const Signal_base * response =
-              Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0);
+              Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
+                                    del, 0, &err_loc);
 
         if (response == 0)
            {
@@ -1445,8 +1450,9 @@ GET_VALUE_c request(tcp, get_SV_key());
 
 char * del = 0;
 char buffer[MAX_SIGNAL_CLASS_SIZE + 40000];
-const Signal_base * response = Signal_base::recv_TCP(tcp, buffer,
-                                                     sizeof(buffer), del, 0);
+const char * err_loc = 0;
+const Signal_base * response =
+      Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0, &err_loc);
 
    if (response == 0)
       {

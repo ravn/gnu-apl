@@ -36,42 +36,41 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B) const
       { return Token(TOK_APL_VALUE1, do_eval_B(B)); }
 
    /// implementation of eval_B()
-   Value_P do_eval_B(Value_P B);
+   static Value_P do_eval_B(Value_P B);
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { return partition(A, B, B->get_rank() - 1); }
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B)
+   virtual Token eval_XB(Value_P X, Value_P B) const
       { return Token(TOK_APL_VALUE1, do_eval_XB(X, B)); }
 
    /// implementation of eval_XB()
-   Value_P do_eval_XB(Value_P X, Value_P B);
+   static Value_P do_eval_XB(Value_P X, Value_P B);
 
    /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    static Bif_F12_PARTITION * fun;   ///< Built-in function
    static Bif_F12_PARTITION  _fun;   ///< Built-in function
-
 
    /// enclose_with_axes
    static Value_P enclose_with_axes(const Shape & shape_X, Value_P B);
 
 protected:
    /// enclose B
-   Token enclose(Value_P B);
+   static Token enclose(Value_P B);
 
    /// enclose B
-   Token enclose_with_axis(Value_P B, Value_P X);
+   static Token enclose_with_axis(Value_P B, Value_P X);
 
    /// Partition B according to A
-   Token partition(Value_P A, Value_P B, Axis axis);
+   Token partition(Value_P A, Value_P B, Axis axis) const;
 
    /// Copy one partition to dest
    static void copy_segment(Cell * dest, Value & dest_owner, ShapeItem h,
@@ -91,17 +90,17 @@ public:
    {}
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B) const
       { return disclose(B, false); }
 
    /// ⊃B
    static Token disclose(Value_P B, bool rank_tolerant);
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B)
+   virtual Token eval_XB(Value_P X, Value_P B) const
       { const Shape axes_X = Value::to_shape(X.get());
         return disclose_with_axis(axes_X, B, false); }
 

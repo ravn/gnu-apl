@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ const Shape3 shape_B3(shape_B, axis);
 Token
 Bif_REDUCE::reduce(Token & _LO, Value_P B, uAxis axis)
 {
-Function * LO = _LO.get_function();
+Function_P LO = _LO.get_function();
    Assert1(LO);
    if (!LO->has_result())            DOMAIN_ERROR;
    if (LO->get_fun_valence() != 2)   SYNTAX_ERROR;
@@ -168,7 +168,7 @@ const Shape3 Z3(B3.h(), 1, B3.l());
 Token
 Bif_REDUCE::reduce_n_wise(Value_P A, Token & _LO, Value_P B, uAxis axis)
 {
-Function * LO = _LO.get_function();
+Function_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())   DOMAIN_ERROR;
 
@@ -248,10 +248,10 @@ const Shape3 B3(B->get_shape(), axis);
         Value_P vsh_Z3(LOC, &Z3);
         Value_P vsh_B3(LOC, &B3);
         Value_P X4(4, LOC);
-        new (X4->next_ravel())   IntCell(axis + Workspace::get_IO());   // X
-        new (X4->next_ravel())   PointerCell(vsh_Z.get(),  X4.getref());      // ⍴Z
-        new (X4->next_ravel())   PointerCell(vsh_Z3.get(), X4.getref());      // ⍴Z3
-        new (X4->next_ravel())   PointerCell(vsh_B3.get(), X4.getref());      // ⍴B3
+        new (X4->next_ravel())   IntCell(axis + Workspace::get_IO());    // X
+        new (X4->next_ravel())   PointerCell(vsh_Z.get(),  X4.getref()); // ⍴Z
+        new (X4->next_ravel())   PointerCell(vsh_Z3.get(), X4.getref()); // ⍴Z3
+        new (X4->next_ravel())   PointerCell(vsh_B3.get(), X4.getref()); // ⍴B3
         X4->check_value(LOC);
         if (A0 < 0)   return Macro::get_macro(Macro::MAC_Z__nA_LO_REDUCE_X4_B)
                                   ->eval_ALXB(A1,_LO,X4,B);
@@ -264,7 +264,7 @@ const Shape3 B3(B->get_shape(), axis);
 //-----------------------------------------------------------------------------
 Token
 Bif_REDUCE::do_reduce(const Shape & shape_Z, const Shape3 & Z3, ShapeItem nwise,
-                      Function * LO, Value_P B, ShapeItem bm)
+                      Function_P LO, Value_P B, ShapeItem bm)
 {
 Value_P Z(shape_Z, LOC);
 
@@ -342,29 +342,28 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_REDUCE::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_OPER1_REDUCE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return replicate(A, B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_REDUCE::eval_LXB(Token & _LO, Value_P X, Value_P B)
+Bif_OPER1_REDUCE::eval_LXB(Token & _LO, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return reduce(_LO, B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_REDUCE::eval_ALXB(Value_P A, Token & _LO, Value_P X, Value_P B)
+Bif_OPER1_REDUCE::eval_ALXB(Value_P A, Token & _LO, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return reduce_n_wise(A, _LO, B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_REDUCE1::eval_AXB(Value_P A,
-                            Value_P X, Value_P B)
+Bif_OPER1_REDUCE1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
 
@@ -372,14 +371,14 @@ const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_REDUCE1::eval_LXB(Token & LO, Value_P X, Value_P B)
+Bif_OPER1_REDUCE1::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return reduce(LO, B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER1_REDUCE1::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
+Bif_OPER1_REDUCE1::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return reduce_n_wise(A, LO, B, axis);

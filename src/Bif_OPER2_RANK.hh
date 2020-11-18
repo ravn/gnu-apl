@@ -34,28 +34,27 @@ public:
    Bif_OPER2_RANK() : PrimitiveOperator(TOK_OPER2_RANK) {}
 
    /// overloaded Function::eval_ALRB()
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO_y, Value_P B);
+   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO_y,
-                            Value_P X, Value_P B);
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// the 'normalized' implementation of all eval_ALxxx*( functions
    static Token do_ALyXB(Value_P A, Rank rk_chunk_A, Token & LO,
                          Value_P X, Value_P B, Rank rk_chunk_B);
 
    /// overloaded Function::eval_LRB()
-   virtual Token eval_LRB(Token & LO, Token & RO_y, Value_P B);
+   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
 
    /// overloaded Function::eval_LRXB()
-   virtual Token eval_LRXB(Token & LO, Token & RO_y, Value_P X, Value_P B);
+   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
       { return false; }
 
    /// the 'normalized' implementation of all eval_Lxxx*( functions
-   Token do_LyXB(Token & LO, Value_P X, Value_P B, Rank rk_chunkB);
+   static Token do_LyXB(Token & LO, Value_P X, Value_P B, Rank rk_chunkB);
 
    /// split j B into j and B
    static void split_y123_B(Value_P y123_B, Value_P & y123, Value_P & B);

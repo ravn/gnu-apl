@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,9 +49,10 @@
 extern uint64_t top_of_memory();
 uint64_t Quad_FIO::benchmark_cycles_from = 0;
 
+std::vector<Quad_FIO::file_entry> Quad_FIO::open_files;
+
 Quad_FIO  Quad_FIO::_fun;
 Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
-
 
    // CONVENTION: all functions must have an axis argument (like X
    // in A fun[X] B); the axis argument is a function number that selects
@@ -977,7 +978,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::eval_B(Value_P B)
+Quad_FIO::eval_B(Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_FIO);
 
@@ -1148,7 +1149,7 @@ out_errno:
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::eval_AB(Value_P A, Value_P B)
+Quad_FIO::eval_AB(Value_P A, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_FIO);
 
@@ -1199,7 +1200,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B)
+Quad_FIO::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
 const ShapeItem function_number = X->get_ravel(0).get_int_value();
    switch (function_number)
@@ -1213,7 +1214,7 @@ const ShapeItem function_number = X->get_ravel(0).get_int_value();
 
              // doit...
              //
-             Function * fun = LO.get_function();
+             Function_P fun = LO.get_function();
              Assert(fun);
              const uint64_t from = cycle_counter();
              Token result = fun->eval_AB(A, B);
@@ -1236,7 +1237,7 @@ const ShapeItem function_number = X->get_ravel(0).get_int_value();
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B)
+Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_FIO);
 
@@ -1266,7 +1267,7 @@ const ShapeItem function_number = X->get_ravel(0).get_int_value();
 
              // doit...
              //
-             Function * fun = LO.get_function();
+             Function_P fun = LO.get_function();
              Assert(fun);
              const uint64_t from = cycle_counter();
              Workspace::SI_top()->set_safe_execution();
@@ -1296,7 +1297,7 @@ const ShapeItem function_number = X->get_ravel(0).get_int_value();
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::eval_XB(Value_P X, Value_P B)
+Quad_FIO::eval_XB(Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_FIO);
 
@@ -2201,7 +2202,7 @@ char * from = filename;
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B)
+Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_FIO);
 
@@ -2729,7 +2730,7 @@ int function_number = -1;
          case 203:   // set dyadicadic parallel threshold
               {
                 const APL_Integer threshold = A->get_ravel(0).get_int_value();
-                Function * fun = 0;
+                Function_P fun = 0;
                 if (B->element_count() == 3)   // dyadic operator
                    {
                      const Unicode oper = B->get_ravel(1).get_char_value();
@@ -2748,12 +2749,14 @@ int function_number = -1;
                 if (function_number == 202)
                    {
                      old_threshold = fun->get_monadic_threshold();
-                     fun->set_monadic_threshold(threshold);
+                     const_cast<Function *>(fun)
+                                            ->set_monadic_threshold(threshold);
                    }
                 else
                    {
                      old_threshold = fun->get_dyadic_threshold();
-                     fun->set_dyadic_threshold(threshold);
+                     const_cast<Function *>(fun)
+                                            ->set_dyadic_threshold(threshold);
                    }
 
                  return Token(TOK_APL_VALUE1, IntScalar(old_threshold, LOC));

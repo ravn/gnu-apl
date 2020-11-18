@@ -38,7 +38,7 @@ enum { Quad_PP_TF = 17 };
 
 //-----------------------------------------------------------------------------
 Token
-Quad_TF::eval_AB(Value_P A, Value_P B)
+Quad_TF::eval_AB(Value_P A, Value_P B) const
 {
    // A should be an integer scalar or 1-element_vector with value 1 or 2
    //
@@ -98,7 +98,7 @@ Quad_TF::is_inverse(const UCS_string & maybe_name)
 Value_P
 Quad_TF::tf1(const UCS_string & name)
 {
-NamedObject * obj = Workspace::lookup_existing_name(name);
+const NamedObject * obj = Workspace::lookup_existing_name(name);
    if (obj == 0)   return Str0(LOC);
 
 const Function * function = obj->get_function();
@@ -111,8 +111,8 @@ const Function * function = obj->get_function();
         return Str0(LOC);
       }
 
-Symbol * symbol = obj->get_symbol();
-   if (symbol)
+
+   if (const Symbol * symbol = obj->get_symbol())
       {
         Value_P value = symbol->get_apl_value();
         if (!!value)   return tf1(name, value);
@@ -312,9 +312,9 @@ Shape shape;
         shape.add_shape_item(sh);
       }
 
-Symbol * symbol = 0;
+const Symbol * symbol = 0;
 NameClass nc = NC_UNUSED_USER_NAME;
-NamedObject * sym_or_fun = Workspace::lookup_existing_name(name); 
+const NamedObject * sym_or_fun = Workspace::lookup_existing_name(name); 
    if (sym_or_fun)   // existing name
       {
         symbol = sym_or_fun->get_symbol();
@@ -376,7 +376,7 @@ const int data_chars = len - idx;
         new_val->check_value(LOC);
 
         if (symbol == 0)   symbol = Workspace::lookup_symbol(name);
-        symbol->assign(new_val, false, LOC);
+        const_cast<Symbol *>(symbol)->assign(new_val, false, LOC);
       }
    else if (mode == UNI_ASCII_N)   // numeric array
       {
@@ -433,17 +433,17 @@ const int data_chars = len - idx;
 
         if (!symbol)   symbol = Workspace::lookup_symbol(name);
 
-        symbol->assign(new_val, false, LOC);
+        const_cast<Symbol *>(symbol)->assign(new_val, false, LOC);
       }
    else Assert(0);   // since checked above
-   
+
    return Value_P(name, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
 Quad_TF::tf2(const UCS_string & name)
 {
-NamedObject * obj = Workspace::lookup_existing_name(name);
+const NamedObject * obj = Workspace::lookup_existing_name(name);
    if (obj == 0)
       {
         Log(LOG_Quad_TF)   CERR << "bad name in tf2(" << name << ")" << endl;
@@ -466,7 +466,7 @@ const Function * function = obj->get_function();
         return Token(TOK_APL_VALUE1, Str0(LOC));
       }
 
-Symbol * symbol = obj->get_symbol();
+const Symbol * symbol = obj->get_symbol();
    if (symbol)
       {
         Value_P value = symbol->get_apl_value();
@@ -1436,7 +1436,7 @@ UCS_string ret;
 Value_P
 Quad_TF::tf3(const UCS_string & name)
 {
-NamedObject * obj = Workspace::lookup_existing_name(name);
+const NamedObject * obj = Workspace::lookup_existing_name(name);
    if (obj == 0)   return Str0(LOC);
 
    if (obj->get_function())
@@ -1446,7 +1446,7 @@ NamedObject * obj = Workspace::lookup_existing_name(name);
         return Str0(LOC);
       }
 
-Symbol * symbol = obj->get_symbol();
+const Symbol * symbol = obj->get_symbol();
    if (symbol)
       {
         const Value * value = &*symbol->get_apl_value();

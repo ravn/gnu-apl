@@ -39,77 +39,77 @@ public:
 
 protected:
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B) const
       { return Token(TOK_APL_VALUE1, do_eval_B(B.getref(), 0)); }
 
    /// do eval_AB(A, B);
-   Value_P do_eval_AB(int A, const Value & B);
+   static Value_P do_eval_AB(int A, const Value & B);
 
    /// do eval_B(B);
-   Value_P do_eval_B(const Value & B, int depth);
+   static Value_P do_eval_B(const Value & B, int depth);
 
    /// set or return the state of the random generator
-   Value_P generator_state(const Value & B);
+   static Value_P generator_state(const Value & B);
 
    /// set or return the desired rank of random numbers
-   Value_P result_rank(const Value & B);
+   static Value_P result_rank(const Value & B);
 
    /// set or return the desired ranks of random numbers
-   Value_P result_shape(const Value & B);
+   static Value_P result_shape(const Value & B);
 
    /// set or return the desired types of random numbers
-   Value_P result_type(const Value & B);
+   static Value_P result_type(const Value & B);
 
    /// set or return the desired max. depth of random numbers
-   Value_P result_maxdepth(const Value & B);
+   static Value_P result_maxdepth(const Value & B);
 
    /// choose an integer value at random according to distribution \b dist
-   int choose_integer(const vector<int> & dist);
+   static int choose_integer(const vector<int> & dist);
 
    /// initialize \b cell with a random character
-   void random_character(Cell * cell);
+   static void random_character(Cell * cell);
 
    /// initialize \b cell with a random integer
-   void random_integer(Cell * cell);
+   static void random_integer(Cell * cell);
 
    /// initialize \b cell with a random float
-   void random_float(Cell * cell);
+   static void random_float(Cell * cell);
 
    /// initialize \b cell with a random complex number
-   void random_complex(Cell * cell);
+   static void random_complex(Cell * cell);
 
    /// initialize \b cell with a random nested value
-   void random_nested(Cell * cell, Value & cell_owner,
-                      const Value & B, int depth);
+   static void random_nested(Cell * cell, Value & cell_owner,
+                             const Value & B, int depth);
 
    /// return a 17-bit random number
    // of random_r()
-   uint64_t rand17();
+   static uint64_t rand17();
 
    /// the number of bytes in the state of the random number generator
-   size_t N;
+   static size_t N;
 
    /// the desired rank of random values
-   vector<int> desired_ranks;
+   static vector<int> desired_ranks;
 
    /// the desired rank of random values
-   Shape desired_shape;
+   static Shape desired_shape;
 
    /// the desired types (or a distribution of types) of random values
-   vector<int> desired_types;
+   static vector<int> desired_types;
 
    /// the desiredlimit on the depths of the random values
-   int desired_maxdepth;
+   static int desired_maxdepth;
 
    /// the state buffer of the random number generator
-   char state[256];
+   static char state[256];
 
 #if HAVE_LIBC
    /// the state of the random number generator
-   struct random_data rdata;
+   static struct random_data rdata;
 #endif
 };
 

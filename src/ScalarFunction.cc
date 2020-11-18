@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ PJob_scalar_B  * job_B  = 0;
 
 //-----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_scalar_B(Value_P B, prim_f1 fun)
+ScalarFunction::eval_scalar_B(Value_P B, prim_f1 fun) const
 {
 const ShapeItem len_Z = B->element_count();
    if (len_Z == 0)   return eval_fill_B(B);
@@ -140,7 +140,7 @@ PERFORMANCE_END(fs_SCALAR_B, start, Z->nz_element_count());
 }
 //-----------------------------------------------------------------------------
 Value_P
-ScalarFunction::do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun)
+ScalarFunction::do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun) const
 {
 Value_P Z(B->get_shape(), LOC);
 
@@ -277,7 +277,7 @@ CELL_PERFORMANCE_END(job_B->fun->get_statistics_B(), start_2, z)
 void
 ScalarFunction::expand_pointers(Cell * cell_Z, Value & Z_owner,
                                 const Cell * cell_A, const Cell * cell_B,
-                                prim_f2 fun)
+                                prim_f2 fun) const
 {
    if (cell_A->is_pointer_cell())
       {
@@ -316,7 +316,7 @@ ScalarFunction::expand_pointers(Cell * cell_Z, Value & Z_owner,
 }
 //-----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_scalar_AB(Value_P A, Value_P B, prim_f2 fun)
+ScalarFunction::eval_scalar_AB(Value_P A, Value_P B, prim_f2 fun) const
 {
 PERFORMANCE_START(start)
 
@@ -339,7 +339,8 @@ PERFORMANCE_END(fs_SCALAR_AB, start, Z->nz_element_count());
 }
 //-----------------------------------------------------------------------------
 Value_P
-ScalarFunction::do_scalar_AB(ErrorCode & ec, Value_P A, Value_P B, prim_f2 fun)
+ScalarFunction::do_scalar_AB(ErrorCode & ec, Value_P A, Value_P B,
+                             prim_f2 fun) const
 {
 const int inc_A = A->get_increment();
 const int inc_B = B->get_increment();
@@ -666,7 +667,7 @@ CELL_PERFORMANCE_END(job_AB->fun->get_statistics_AB(), start_2, z)
 }
 //-----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_fill_AB(Value_P A, Value_P B)
+ScalarFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
    // eval_fill_AB() is called when A or B (or both) are empty.
    //
@@ -719,7 +720,7 @@ Value_P Z = B->clone(LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_fill_B(Value_P B)
+ScalarFunction::eval_fill_B(Value_P B) const
 {
    // eval_fill_B() is called when a scalar function with empty B is called
    //
@@ -792,7 +793,8 @@ const Cell & cell_FI0 = FI0->get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_scalar_AXB(Value_P A, Value_P X, Value_P B, prim_f2 fun)
+ScalarFunction::eval_scalar_AXB(Value_P A, Value_P X, Value_P B,
+                                prim_f2 fun) const
 {
 PERFORMANCE_START(start_1)
 
@@ -857,8 +859,8 @@ PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count())
 }
 //-----------------------------------------------------------------------------
 Value_P
-ScalarFunction::eval_scalar_AXB(Value_P A, bool * axis_in_X,
-                                Value_P B, prim_f2 fun, bool reversed)
+ScalarFunction::eval_scalar_AXB(Value_P A, bool * axis_in_X, Value_P B,
+                                prim_f2 fun, bool reversed) const
 {
    // A is the value with the smaller rank.
    // B the value with the larger rank.
@@ -916,7 +918,7 @@ const Cell * cB = &B->get_ravel(0);
 }
 //=============================================================================
 Token
-Bif_F2_FIND::eval_AB(Value_P A, Value_P B)
+Bif_F2_FIND::eval_AB(Value_P A, Value_P B) const
 {
 PERFORMANCE_START(start_1)
 
@@ -997,7 +999,7 @@ const Shape weight = B->get_shape().reverse_scan();
 }
 //=============================================================================
 Token
-Bif_F12_ROLL::eval_AB(Value_P A, Value_P B)
+Bif_F12_ROLL::eval_AB(Value_P A, Value_P B) const
 {
    // draw A items  from the set [quad-IO ... B]
    //
@@ -1040,7 +1042,7 @@ uint8_t * used = new uint8_t[(set_size + 7)/8];
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_ROLL::eval_B(Value_P B)
+Bif_F12_ROLL::eval_B(Value_P B) const
 {
    // the standard wants ? to be atomic. We therefore check beforehand
    // that all elements of B are proper, and throw an error if not
@@ -1075,7 +1077,7 @@ const Cell * C = &B.get_ravel(0);
 }
 //=============================================================================
 Token
-Bif_F12_WITHOUT::eval_AB(Value_P A, Value_P B)
+Bif_F12_WITHOUT::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
@@ -1130,7 +1132,7 @@ const ShapeItem len_B = B->element_count();
    /* pack pointers to the cells of the arguments A and B and of the
       result Z into one big array:
 
-        len_A    len_A      len_B
+        len_A    len_Z      len_B
      ┌─────────┬─────────┬─────────┐
      │ cells_A │ cells_Z │ cells_B │
      └─────────┴─────────┴─────────┘
@@ -1186,80 +1188,80 @@ Value_P Z(len_Z, LOC);
 // Inverse functions...
 
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_POWER::get_monadic_inverse() const
 {
    return Bif_F12_LOGA::fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_POWER::get_dyadic_inverse() const
 {
    return Bif_F12_LOGA::fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_LOGA::get_monadic_inverse() const
 {
    return Bif_F12_POWER::fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_LOGA::get_dyadic_inverse() const
 {
    return Bif_F12_POWER::fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_TIMES::get_dyadic_inverse() const
 {
    if (this == fun)   return fun_inverse;
    else               return fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_DIVIDE::get_monadic_inverse() const
 {
    // ÷ is self-inverse: B = ÷÷B
    return Bif_F12_DIVIDE::fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_DIVIDE::get_dyadic_inverse() const
 {
    // ÷ is self-inverse: B = (A÷(A÷B))
    return Bif_F12_DIVIDE::fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_PLUS::get_dyadic_inverse() const
 {
    if (this == fun)   return fun_inverse;
    else               return fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_MINUS::get_monadic_inverse() const
 {
    // - is self-inverse: B = --B
    return Bif_F12_PLUS::fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_MINUS::get_dyadic_inverse() const
 {
    // - is self-inverse: B = (A-(A-B))
    return Bif_F12_PLUS::fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_CIRCLE::get_monadic_inverse() const
 {
    if (this == fun)   return fun_inverse;
    else               return fun;
 }
 //-----------------------------------------------------------------------------
-Function *
+Function_P
 Bif_F12_CIRCLE::get_dyadic_inverse() const
 {
    if (this == fun)   return fun_inverse;

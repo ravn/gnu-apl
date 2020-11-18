@@ -75,7 +75,7 @@ Workspace::Workspace()
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::push_SI(Executable * fun, const char * loc)
+Workspace::push_SI(const Executable * fun, const char * loc)
 {
    Assert1(fun);
 
@@ -270,7 +270,7 @@ Workspace::immediate_execution(bool exit_on_error)
    return Token(TOK_ESCAPE);
 }
 //-----------------------------------------------------------------------------
-NamedObject *
+const NamedObject *
 Workspace::lookup_existing_name(const UCS_string & name)
 {
    if (name.size() == 0)   return 0;
@@ -420,7 +420,7 @@ Workspace::write_OUT(FILE * out, uint64_t & seq, const UCS_string_vector
       {
          loop(o, objects.size())
             {
-              NamedObject * obj = lookup_existing_name(objects[o]);
+              const NamedObject * obj = lookup_existing_name(objects[o]);
               if (obj == 0)   // not found
                  {
                    COUT << ")OUT: " << objects[o] << " NOT SAVED (not found)"

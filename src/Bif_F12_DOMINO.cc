@@ -41,7 +41,7 @@ Bif_F12_DOMINO * Bif_F12_DOMINO::fun = &Bif_F12_DOMINO::_fun;
 
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_DOMINO::eval_B(Value_P B)
+Bif_F12_DOMINO::eval_B(Value_P B) const
 {
    if (B->is_scalar())
       {
@@ -111,7 +111,7 @@ Token result = eval_AB(I, B);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B)
+Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
 {
    if (!X->is_scalar())   RANK_ERROR;
 const double EPS = X->get_ravel(0).get_real_value();
@@ -137,7 +137,7 @@ Value_P Z(3, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_DOMINO::eval_AB(Value_P A, Value_P B)
+Bif_F12_DOMINO::eval_AB(Value_P A, Value_P B) const
 {
 ShapeItem rows_A = 1;
 ShapeItem cols_A = 1;
@@ -195,13 +195,13 @@ Value_P Z(shape_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_DOMINO::eval_fill_B(Value_P B)
+Bif_F12_DOMINO::eval_fill_B(Value_P B) const
 {
    return Bif_F12_TRANSPOSE::fun->eval_B(B);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_DOMINO::eval_fill_AB(Value_P A, Value_P B)
+Bif_F12_DOMINO::eval_fill_AB(Value_P A, Value_P B) const
 {
 Shape shape_Z;
    loop(r, A->get_rank() - 1)  shape_Z.add_shape_item(A->get_shape_item(r + 1));
@@ -214,7 +214,7 @@ Value_P Z(shape_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    TODO;
 }

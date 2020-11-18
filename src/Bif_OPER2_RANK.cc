@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ Bif_OPER2_RANK * Bif_OPER2_RANK::fun = &Bif_OPER2_RANK::_fun;
 
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::eval_LRB(Token & LO, Token & y, Value_P B)
+Bif_OPER2_RANK::eval_LRB(Token & LO, Token & y, Value_P B) const
 {
    if (B->element_count() == 1 && B->get_ravel(0).is_pointer_cell())
       B = B->get_ravel(0).get_pointer_value();
@@ -46,7 +46,7 @@ Rank rank_chunk_B = B->get_rank();
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::eval_LRXB(Token & LO, Token & y, Value_P X, Value_P B)
+Bif_OPER2_RANK::eval_LRXB(Token & LO, Token & y, Value_P X, Value_P B) const
 {
    if (B->element_count() == 1 && B->get_ravel(0).is_pointer_cell())
       B = B->get_ravel(0).get_pointer_value();
@@ -61,7 +61,7 @@ Rank rank_chunk_B = B->get_rank();
 Token
 Bif_OPER2_RANK::do_LyXB(Token & _LO, Value_P X, Value_P B, Rank rank_chunk_B)
 {
-Function * LO = _LO.get_function();
+Function_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())   DOMAIN_ERROR;
 
@@ -105,7 +105,7 @@ Value_P X5(5, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::eval_ALRB(Value_P A, Token & LO, Token & y, Value_P B)
+Bif_OPER2_RANK::eval_ALRB(Value_P A, Token & LO, Token & y, Value_P B) const
 {
    if (B->element_count() == 1 && B->get_ravel(0).is_pointer_cell())
       B = B->get_ravel(0).get_pointer_value();
@@ -118,8 +118,7 @@ Rank rank_chunk_B = B->get_rank();
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::eval_ALRXB(Value_P A, Token & LO, Token & y,
-                           Value_P X, Value_P B)
+Bif_OPER2_RANK::eval_ALRXB(Value_P A, Token & LO, Token & y, Value_P X, Value_P B) const
 {
    if (B->element_count() == 1 && B->get_ravel(0).is_pointer_cell())
       B = B->get_ravel(0).get_pointer_value();
@@ -136,7 +135,7 @@ Token
 Bif_OPER2_RANK::do_ALyXB(Value_P A, Rank rank_chunk_A, Token & _LO,
                          Value_P X, Value_P B, Rank rank_chunk_B)
 {
-Function * LO = _LO.get_function();
+Function_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())   DOMAIN_ERROR;
 

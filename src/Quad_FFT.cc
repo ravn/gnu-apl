@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 Quad_FFT  Quad_FFT::_fun;
 Quad_FFT * Quad_FFT::fun = &Quad_FFT::_fun;
 
+bool Quad_FFT::system_wisdom_loaded = false;
+
 #if defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H)
 
 #include <fftw3.h>
@@ -32,7 +34,7 @@ Quad_FFT * Quad_FFT::fun = &Quad_FFT::_fun;
 
 //-----------------------------------------------------------------------------
 Token
-Quad_FFT::eval_B(Value_P B)
+Quad_FFT::eval_B(Value_P B) const
 {
    return do_fft(FFTW_FORWARD, B, 0);
 }
@@ -229,7 +231,7 @@ Value_P Z(B->get_shape(), LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FFT::eval_AB(Value_P A, Value_P B)
+Quad_FFT::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)         RANK_ERROR;
    if (A->element_count() != 1)   LENGTH_ERROR;
@@ -305,7 +307,7 @@ ShapeItem rlen = 1;
 
 //-----------------------------------------------------------------------------
 Token
-Quad_FFT::eval_B(Value_P B)
+Quad_FFT::eval_B(Value_P B) const
 {
     MORE_ERROR() <<
 "⎕FFT is not available because either no libfftw3 library was found on this\n"
@@ -316,7 +318,7 @@ Quad_FFT::eval_B(Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FFT::eval_AB(Value_P A, Value_P B)
+Quad_FFT::eval_AB(Value_P A, Value_P B) const
 {
     MORE_ERROR() <<
 "⎕FFT is not available because either no libfftw3 library was found on this\n"

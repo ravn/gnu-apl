@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,14 +35,14 @@ Quad_FX * Quad_FX::fun = &Quad_FX::_fun;
 
 //=============================================================================
 Token
-Quad_FX::eval_B(Value_P B)
+Quad_FX::eval_B(Value_P B) const
 {
 static const int eprops[] = { 0, 0, 0, 0 };
    return do_quad_FX(eprops, B, UTF8_string("⎕FX"), false);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FX::eval_AB(Value_P A, Value_P B)
+Quad_FX::eval_AB(Value_P A, Value_P B) const
 {
    CHECK_SECURITY(disable_native_functions);
 
@@ -104,7 +104,7 @@ UTF8_string creator("⎕FX");
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FX::eval_AXB(Value_P A, Value_P X, Value_P B)
+Quad_FX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_native_functions);
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -150,7 +150,7 @@ protected:
       };
 
    /// sort char vector B according to collationg sequence A
-   Token sort_collating(Value_P A, Value_P B, Sort_order order);
+   static Token sort_collating(Value_P A, Value_P B, Sort_order order);
 
    /// find or create the collating cache entry for \b uni
    static ShapeItem find_collating_cache_entry(Unicode uni,
@@ -169,14 +169,14 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B) const
       { Token ret = sort(B, SORT_ASCENDING);
         if (ret.get_Class() == TC_VALUE)   return ret;
         DOMAIN_ERROR;   // complex value(s)
       }
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { return sort_collating(A, B, SORT_ASCENDING); }
 
    static Bif_F12_SORT_ASC * fun;   ///< Built-in function
@@ -196,14 +196,14 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B) const
       { Token ret = sort(B, SORT_DESCENDING);
         if (ret.get_Class() == TC_VALUE)   return ret;
         DOMAIN_ERROR;   // complex value(s)
       }
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { return sort_collating(A, B, SORT_DESCENDING); }
 
    static Bif_F12_SORT_DES * fun;   ///< Built-in function

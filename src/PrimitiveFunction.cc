@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -89,13 +89,13 @@ int Bif_F1_EXECUTE::copy_pending = 0;
 
 //-----------------------------------------------------------------------------
 Token
-PrimitiveFunction::eval_fill_AB(Value_P A, Value_P B)
+PrimitiveFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
    return eval_AB(A, B);
 }
 //-----------------------------------------------------------------------------
 Token
-PrimitiveFunction::eval_fill_B(Value_P B)
+PrimitiveFunction::eval_fill_B(Value_P B) const
 {
    return eval_B(B);
 }
@@ -116,13 +116,13 @@ UCS_string ind(indent, UNI_ASCII_SPACE);
 }
 //=============================================================================
 Token
-Bif_F0_ZILDE::eval_()
+Bif_F0_ZILDE::eval_() const
 {
    return Token(TOK_APL_VALUE1, Idx0(LOC));
 }
 //=============================================================================
 Token
-Bif_F12_RHO::eval_B(Value_P B)
+Bif_F12_RHO::eval_B(Value_P B) const
 {
 Value_P Z(B->get_rank(), LOC);
 
@@ -133,7 +133,7 @@ Value_P Z(B->get_rank(), LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_RHO::eval_AB(Value_P A, Value_P B)
+Bif_F12_RHO::eval_AB(Value_P A, Value_P B) const
 {
 #ifdef PERFORMANCE_COUNTERS_WANTED
 const uint64_t start_1 = cycle_counter();
@@ -303,35 +303,35 @@ Value_P Z(B->get_shape(), LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_ROTATE::eval_XB(Value_P X, Value_P B)
+Bif_F12_ROTATE::eval_XB(Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return reverse(B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_ROTATE::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F12_ROTATE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return rotate(A, B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_ROTATE1::eval_XB(Value_P X, Value_P B)
+Bif_F12_ROTATE1::eval_XB(Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return reverse(B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_ROTATE1::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F12_ROTATE1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return rotate(A, B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_TRANSPOSE::eval_B(Value_P B)
+Bif_F12_TRANSPOSE::eval_B(Value_P B) const
 {
 Shape shape_A;
 
@@ -346,7 +346,7 @@ Value_P Z = transpose(shape_A, B);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B)
+Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B) const
 {
    // A should be a scalar or vector.
    //
@@ -524,7 +524,7 @@ ShapeItem rho[MAX_RANK];
 }
 //=============================================================================
 Token
-Bif_F12_DECODE::eval_AB(Value_P A, Value_P B)
+Bif_F12_DECODE::eval_AB(Value_P A, Value_P B) const
 {
    // ρZ  is: (¯1↓ρA),1↓ρB
    // ρρZ is: (0⌈¯1+ρρA) + (0⌈¯1+ρρB)
@@ -715,7 +715,7 @@ const ShapeItem len = (len_A == 1) ? len_B : len_A;
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_ENCODE::eval_AB(Value_P A, Value_P B)
+Bif_F12_ENCODE::eval_AB(Value_P A, Value_P B) const
 {
    if (A->is_scalar())   return Bif_F12_STILE::fun->eval_AB(A, B);
 
@@ -870,7 +870,7 @@ Bif_F12_ENCODE::encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_ELEMENT::eval_B(Value_P B)
+Bif_F12_ELEMENT::eval_B(Value_P B) const
 {
    // enlist
    //
@@ -949,7 +949,7 @@ Cell * z = &Z->get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_ELEMENT::eval_AB(Value_P A, Value_P B)
+Bif_F12_ELEMENT::eval_AB(Value_P A, Value_P B) const
 {
    // member
    //
@@ -976,7 +976,7 @@ Value_P Z(A->get_shape(), LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F2_INDEX::eval_AB(Value_P A, Value_P B)
+Bif_F2_INDEX::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
 
@@ -1025,7 +1025,7 @@ IndexExpr index_expr(ASS_none, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F2_INDEX::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F2_INDEX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
 
@@ -1083,7 +1083,7 @@ IndexExpr index_expr(ASS_none, LOC);
 }
 //=============================================================================
 Token
-Bif_F12_EQUIV::eval_B(Value_P B)
+Bif_F12_EQUIV::eval_B(Value_P B) const
 {
 const APL_types::Depth depth = B->compute_depth();
 
@@ -1094,7 +1094,7 @@ Value_P Z(LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_EQUIV::eval_AB(Value_P A, Value_P B)
+Bif_F12_EQUIV::eval_AB(Value_P A, Value_P B) const
 {
    // match
    //
@@ -1114,7 +1114,7 @@ const ShapeItem count = A->nz_element_count();  // compare at least prototype
 }
 //=============================================================================
 Token
-Bif_F12_NEQUIV::eval_B(Value_P B)
+Bif_F12_NEQUIV::eval_B(Value_P B) const
 {
    // Tally
    //
@@ -1124,7 +1124,7 @@ const ShapeItem len = B->is_scalar() ? 1 : B->get_shape().get_shape_item(0);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_NEQUIV::eval_AB(Value_P A, Value_P B)
+Bif_F12_NEQUIV::eval_AB(Value_P A, Value_P B) const
 {
    // match
    //
@@ -1144,7 +1144,7 @@ const ShapeItem count = A->nz_element_count();  // compare at least prototype
 }
 //=============================================================================
 Token
-Bif_F1_EXECUTE::eval_B(Value_P B)
+Bif_F1_EXECUTE::eval_B(Value_P B) const
 {
    if (B->get_rank() > 1)   RANK_ERROR;
 
@@ -1367,7 +1367,7 @@ const Cell ** Z0 = cells_Z;
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_UNION::eval_B(Value_P B)
+Bif_F12_UNION::eval_B(Value_P B) const
 {
    if (B->get_rank() > 1)   RANK_ERROR;
 
@@ -1439,7 +1439,7 @@ Value_P Z(len_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F2_INTER::eval_AB(Value_P A, Value_P B)
+Bif_F2_INTER::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
@@ -1523,7 +1523,7 @@ const double qct = Workspace::get_CT();
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_UNION::eval_AB(Value_P A, Value_P B)
+Bif_F12_UNION::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
@@ -1544,7 +1544,7 @@ Value_P Z(len_A + len_B, LOC);
 }
 //=============================================================================
 Token
-Bif_F2_RIGHT::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F2_RIGHT::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    // select corresponding items of A or B according to X. A, B, and X
    // must have matching shapes

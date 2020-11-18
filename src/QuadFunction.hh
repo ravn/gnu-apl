@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,11 +39,11 @@ public:
    virtual bool has_alpha() const   { return true; }
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B) const
       { VALENCE_ERROR; }
 
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { VALENCE_ERROR; }
 
    /// overloaded Function::has_result()
@@ -59,7 +59,7 @@ public:
    Quad_AF() : QuadFunction(TOK_Quad_AF) {}
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    static Quad_AF * fun;          ///< Built-in function.
    static Quad_AF  _fun;          ///< Built-in function.
@@ -76,7 +76,7 @@ public:
    Quad_AT() : QuadFunction(TOK_Quad_AT) {}
 
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    static Quad_AT * fun;          ///< Built-in function.
    static Quad_AT  _fun;          ///< Built-in function.
@@ -97,7 +97,7 @@ public:
 
 protected:
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 };
 //-----------------------------------------------------------------------------
 /**
@@ -118,7 +118,7 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 };
 //-----------------------------------------------------------------------------
 /**
@@ -139,7 +139,7 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 };
 //-----------------------------------------------------------------------------
 /**
@@ -163,10 +163,10 @@ public:
 
 protected:
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_fill_B().
-   virtual Token eval_fill_B(Value_P B);
+   virtual Token eval_fill_B(Value_P B) const;
 };
 //-----------------------------------------------------------------------------
 /**
@@ -184,7 +184,7 @@ public:
 
 protected:
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 };
 //-----------------------------------------------------------------------------
 /**
@@ -202,13 +202,13 @@ public:
 
 protected:
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// common inplementation for eval_AB() and eval_B()
-   Token event_simulate(const UCS_string * A, Value_P B, Error & error);
+   static Token event_simulate(const UCS_string * A, Value_P B, Error & error);
 
    /// compute error code for B
    static ErrorCode get_error_code(Value_P B);
@@ -229,10 +229,10 @@ public:
 
 protected:
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// disassociate name from value, return 0 on failure or 1 on success.
-   int expunge(UCS_string name);
+   static int expunge(UCS_string name);
 };
 //-----------------------------------------------------------------------------
 /**
@@ -244,56 +244,57 @@ class Quad_INP : public QuadFunction
 public:
    /// constructor.
    Quad_INP()
-   : QuadFunction(TOK_Quad_INP),
-     Quad_INP_running(false)
-   {}
+   : QuadFunction(TOK_Quad_INP)
+     {
+       Quad_INP_running = false;
+     }
 
    static Quad_INP * fun;          ///< Built-in function.
    static Quad_INP  _fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::eval_XB().
-   virtual Token eval_XB(Value_P X, Value_P B);
+   virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// extract the esc1 and esc2 strings from \b A
-   void get_esc(Value_P A, UCS_string & esc1, UCS_string & esc2);
+   static void get_esc(Value_P A, UCS_string & esc1, UCS_string & esc2);
 
    /// read \b raw_lines from stdin or file, stop at end_marker
-   void read_strings();
+   static void read_strings();
 
    /// split \b raw_lines into \b prefixes, \b escapes, and \b suffixes
-   void split_strings();
+   static void split_strings();
 
    /// the end merker for APL escapes (dyadic ⎕INP only)
    /// the start merker for APL escapes (dyadic ⎕INP only)
-   UCS_string esc1;
+   static UCS_string esc1;
 
    /// the end merker for APL escapes (dyadic ⎕INP only)
-   UCS_string esc2;
+   static UCS_string esc2;
 
    /// the end merker for the entire ⎕INP input
-   UCS_string end_marker;
+   static UCS_string end_marker;
 
    /// the raw lines read from stdin
-   UCS_string_vector raw_lines;
+   static UCS_string_vector raw_lines;
 
    /// the line parts left of the escapes
-   UCS_string_vector prefixes;
+   static UCS_string_vector prefixes;
 
    /// the line parts to exe executed
-   UCS_string_vector escapes;
+   static UCS_string_vector escapes;
 
    /// the line parts right of the escapes
-   UCS_string_vector suffixes;
+   static UCS_string_vector suffixes;
 
    /// bool to prevent recursive ⎕INP calls
-   bool Quad_INP_running;
+   static bool Quad_INP_running;
 };
 //-----------------------------------------------------------------------------
 /**
@@ -311,11 +312,11 @@ public:
 
 protected:
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { TODO; }
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B) const
       { TODO; }
 };
 //-----------------------------------------------------------------------------
@@ -330,7 +331,7 @@ public:
    Quad_NC() : QuadFunction(TOK_Quad_NC) {}
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    /// return the ⎕NC for variable name \b var
    static APL_Integer get_NC(const UCS_string var);
@@ -352,11 +353,11 @@ public:
    Quad_NL() : QuadFunction(TOK_Quad_NL) {}
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B)
+   virtual Token eval_B(Value_P B) const
       { return do_quad_NL(Value_P(), B); }
 
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { return do_quad_NL(A, B); }
 
    static Quad_NL * fun;          ///< Built-in function.
@@ -364,7 +365,7 @@ public:
 
 protected:
    /// return A ⎕NL B
-   Token do_quad_NL(Value_P A, Value_P B);
+   static Token do_quad_NL(Value_P A, Value_P B);
 };
 //-----------------------------------------------------------------------------
 /**
@@ -378,10 +379,10 @@ public:
    Quad_SI() : QuadFunction(TOK_Quad_SI) {}
 
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// overloaded Function::eval_AB().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    static Quad_SI * fun;          ///< Built-in function.
    static Quad_SI  _fun;          ///< Built-in function.
@@ -400,7 +401,7 @@ public:
    Quad_UCS() : QuadFunction(TOK_Quad_UCS) {}
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    static Quad_UCS * fun;          ///< Built-in function.
    static Quad_UCS  _fun;          ///< Built-in function.
@@ -418,13 +419,13 @@ protected:
    {}
 
    /// find UserFunction named \b fun_name
-   UserFunction * locate_fun(const Value & fun_name);
+   static const UserFunction * locate_fun(const Value & fun_name);
 
    /// return integers in lines
-   Token reference(const std::vector<Function_Line> & lines, bool assigned);
+   static Token reference(const std::vector<Function_Line> & lines, bool assigned);
 
    /// return assign lines in new_value to stop or trace vector in ufun
-   void assign(UserFunction * ufun, const Value & new_value, bool stop);
+   static void assign(UserFunction * ufun, const Value & new_value, bool stop);
 };
 //-----------------------------------------------------------------------------
 /// The class implementing ⎕STOP
@@ -437,10 +438,10 @@ public:
    {}
 
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    static Quad_STOP * fun;          ///< Built-in function.
    static Quad_STOP  _fun;          ///< Built-in function.
@@ -456,10 +457,10 @@ public:
    {}
 
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B);
+   virtual Token eval_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B) const;
 
    static Quad_TRACE * fun;          ///< Built-in function.
    static Quad_TRACE  _fun;          ///< Built-in function.

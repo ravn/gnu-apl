@@ -34,20 +34,20 @@ public:
    Bif_OPER2_POWER() : PrimitiveOperator(TOK_OPER2_POWER) {}
 
    /// overloaded Function::eval_ALRB()
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO_y, Value_P B);
+   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// overloaded Function::eval_LRB()
-   virtual Token eval_LRB(Token & LO, Token & RO_y, Value_P B);
+   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
 
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
       { return false; }
 
    /// eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)
-   Token eval_form_1(Value_P A, Token & LO, Value_P N, Value_P B);
+   static Token eval_form_1(Value_P A, Token & LO, Value_P N, Value_P B);
 
    /// eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)
-   Token eval_form_2(Value_P A, Token & LO, Token & RO, Value_P B);
+   static Token eval_form_2(Value_P A, Token & LO, Token & RO, Value_P B);
 
    static Bif_OPER2_POWER * fun;      ///< Built-in function
    static Bif_OPER2_POWER  _fun;      ///< Built-in function

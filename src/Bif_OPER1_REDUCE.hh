@@ -35,22 +35,22 @@ public:
 
    /// common implementation of reduce() and reduce_n_wise.
    static Token do_reduce(const Shape & shape_Z, const Shape3 & Z3, ShapeItem a,
-                          Function * LO, Value_P B, ShapeItem bm);
-
-protected:
-   /// Replicate B according to A along axis.
-   Token replicate(Value_P A, Value_P B, uAxis axis);
-
-   /// LO-reduce B along axis.
-   Token reduce(Token & _LO, Value_P B, uAxis axis);
-
-   /// LO-reduce B n-wise along axis.
-   Token reduce_n_wise(Value_P A, Token & _LO, Value_P B, uAxis axis);
+                          Function_P LO, Value_P B, ShapeItem bm);
 
 protected:
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
       { return false; }
+
+   /// Replicate B according to A along axis.
+   static Token replicate(Value_P A, Value_P B, uAxis axis);
+
+   /// LO-reduce B along axis.
+   static Token reduce(Token & _LO, Value_P B, uAxis axis);
+
+   /// LO-reduce B n-wise along axis.
+   static Token reduce_n_wise(Value_P A, Token & _LO, Value_P B, uAxis axis);
+
 };
 //-----------------------------------------------------------------------------
 /** Primitive operator reduce along last axis.
@@ -63,25 +63,25 @@ public:
    Bif_OPER1_REDUCE() : Bif_REDUCE(TOK_OPER1_REDUCE) {}
 
    /// Overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { return replicate(A, B, B->get_rank() - 1); }
 
    /// Overloaded Function::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LB().
-   virtual Token eval_LB(Token & LO, Value_P B)
+   virtual Token eval_LB(Token & LO, Value_P B) const
       { return reduce(LO, B, B->get_rank() - 1); }
 
    /// Overloaded Function::eval_ALB().
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B)
+   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const
       { return reduce_n_wise(A, LO, B, B->get_rank() - 1); }
 
    /// Overloaded Function::eval_LXB().
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALXB().
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B);
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
    static Bif_OPER1_REDUCE * fun;    ///< Built-in function.
    static Bif_OPER1_REDUCE  _fun;    ///< Built-in function.
@@ -99,29 +99,25 @@ public:
    Bif_OPER1_REDUCE1() : Bif_REDUCE(TOK_OPER1_REDUCE1) {}
 
    /// Overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B)
+   virtual Token eval_AB(Value_P A, Value_P B) const
       { return replicate(A, B, 0); }
 
    /// Overloaded Function::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_LB().
-   virtual Token eval_LB(Token & LO, Value_P B)
+   virtual Token eval_LB(Token & LO, Value_P B) const
       { return reduce(LO, B, 0); }
 
    /// Overloaded Function::eval_ALB().
-   virtual Token eval_ALB(Token & LO, Value_P B)
-      { return reduce(LO, B, 0); }
-
-   /// Overloaded Function::eval_ALB().
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B)
+   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const
       { return reduce_n_wise(A, LO, B, 0); }
 
    /// Overloaded Function::eval_LXB().
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B);
+   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALXB().
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B);
+   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
 
    static Bif_OPER1_REDUCE1 * fun;   ///< Built-in function.
    static Bif_OPER1_REDUCE1  _fun;   ///< Built-in function.

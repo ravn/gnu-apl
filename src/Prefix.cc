@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -803,7 +803,7 @@ Token * Prefix::locate_L()
    return 0;
 }
 //-----------------------------------------------------------------------------
-Value_P *
+const Value_P *
 Prefix::locate_X()
 {
    // expect at least B X (so we have at0() and at1() and at2()
@@ -817,10 +817,10 @@ Prefix::locate_X()
        {
          if (content[x].tok.get_ValueType() == TV_FUN)
             {
-              Function * fun = content[x].tok.get_function();
+              Function_P fun = content[x].tok.get_function();
               if (fun)
                  {
-                   Value_P * X = fun->locate_X();
+                   const Value_P * X = fun->locate_X();
                    if (X)   return  X;   // only for derived function
                  }
             }
@@ -1683,7 +1683,7 @@ Prefix::reduce_V_ASS_F_()
 {
    // named lambda: V ← { ... }
    //
-Function * F = at2().get_function();
+Function_P F = at2().get_function();
    if (!F->is_lambda())   SYNTAX_ERROR;
 
 Symbol * V = at0().get_sym_ptr();

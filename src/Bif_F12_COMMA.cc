@@ -440,7 +440,7 @@ Shape shape_Z;
 }
 //=============================================================================
 Token
-Bif_F12_COMMA::eval_B(Value_P B)
+Bif_F12_COMMA::eval_B(Value_P B) const
 {
    if (B->get_ravel(0).is_picked_lval_cell())
       {
@@ -468,7 +468,7 @@ const Shape shape_Z(B->element_count());
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_COMMA::eval_AB(Value_P A, Value_P B)
+Bif_F12_COMMA::eval_AB(Value_P A, Value_P B) const
 {
   if (A->is_scalar() && B->is_scalar())
      {
@@ -485,7 +485,7 @@ uRank max_rank = A->get_rank();
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_COMMA::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F12_COMMA::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
  if (A->is_scalar() && B->is_scalar())   RANK_ERROR;
 
@@ -513,7 +513,7 @@ const APL_Float axis = cX.get_real_value() - qio;
 }
 //=============================================================================
 Token
-Bif_F12_COMMA1::eval_B(Value_P B)
+Bif_F12_COMMA1::eval_B(Value_P B) const
 {
    // turn B into a matrix
    //
@@ -539,7 +539,7 @@ Shape shape_Z(c1, c2);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B)
+Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B) const
 {
   if (A->is_scalar() && B->is_scalar())
      {
@@ -554,7 +554,7 @@ Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_F12_COMMA1::eval_AXB(Value_P A, Value_P X, Value_P B)
+Bif_F12_COMMA1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    return Bif_F12_COMMA::fun->eval_AXB(A, X, B);
 }

@@ -139,7 +139,7 @@ UserPreferences::show_GPL(ostream & out)
 "    This program is GNU APL, a free implementation of the\n"
 "    ISO/IEC Standard 13751, \"Programming Language APL, Extended\"\n"
 "\n"
-"    Copyright (C) 2008-2019  Dr. Jürgen Sauermann\n"
+"    Copyright (C) 2008-2020  Dr. Jürgen Sauermann\n"
 "\n"
 "    This program is free software: you can redistribute it and/or modify\n"
 "    it under the terms of the GNU General Public License as published by\n"
@@ -1521,14 +1521,14 @@ int line = 0;
 }
 //-----------------------------------------------------------------------------
 void
-UserPreferences::set_threshold(Function * fun, int ab, int i_ab,
+UserPreferences::set_threshold(Function_P fun, int ab, int i_ab,
                                ShapeItem threshold)
 {
    if (fun == 0)    return;
    if (ab != i_ab)  return;
 
-   if (ab == 1)   fun->set_monadic_threshold(threshold);
-   else           fun->set_dyadic_threshold(threshold);
+   if (ab == 1)   const_cast<Function *>(fun)->set_monadic_threshold(threshold);
+   else           const_cast<Function *>(fun)->set_dyadic_threshold(threshold);
 }
 //-----------------------------------------------------------------------------
 

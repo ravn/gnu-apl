@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ Function::get_attributes(int mode, Cell * dest) const
 }
 //-----------------------------------------------------------------------------
 Token
-Function::eval_()
+Function::eval_() const
 {
    CERR << get_name() << "::" << __FUNCTION__
         << "() called (overloaded variant not yet implemented?)" << endl;
@@ -83,7 +83,7 @@ Function::eval_()
 }
 //-----------------------------------------------------------------------------
 Token
-Function::eval_B(Value_P B)
+Function::eval_B(Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
         << "() called (overloaded variant not yet implemented?)" << endl;
@@ -91,7 +91,7 @@ Function::eval_B(Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Function::eval_AB(Value_P A, Value_P B)
+Function::eval_AB(Value_P A, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
         << "() called (overloaded variant not yet implemented?)" << endl;
@@ -99,7 +99,7 @@ Function::eval_AB(Value_P A, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Function::eval_LB(Token & LO, Value_P B)
+Function::eval_LB(Token & LO, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
         << "() called (overloaded variant not yet implemented?)" << endl;
@@ -107,7 +107,7 @@ Function::eval_LB(Token & LO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Function::eval_ALB(Value_P A, Token & LO, Value_P B)
+Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
         << "() called (overloaded variant not yet implemented?)" << endl;
@@ -115,7 +115,7 @@ Function::eval_ALB(Value_P A, Token & LO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Function::eval_LRB(Token & LO, Token & RO, Value_P B)
+Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
         << "() called (overloaded variant not yet implemented?)" << endl;
@@ -123,7 +123,7 @@ Function::eval_LRB(Token & LO, Token & RO, Value_P B)
 }
 //-----------------------------------------------------------------------------
 Token
-Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B)
+Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
         << "() called (overloaded variant not yet implemented?)" << endl;

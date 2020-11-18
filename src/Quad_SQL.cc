@@ -367,21 +367,21 @@ Value_P value;
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_SQL::eval_B(Value_P B)
+Quad_SQL::eval_B(Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
    return list_functions(COUT);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_SQL::eval_AB(Value_P A, Value_P B)
+Quad_SQL::eval_AB(Value_P A, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
    return list_functions(COUT);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_SQL::eval_XB(Value_P X, Value_P B)
+Quad_SQL::eval_XB(Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
 
@@ -423,7 +423,7 @@ static Connection *param_to_db( Value_P X )
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_SQL::eval_AXB(const Value_P A, const Value_P X, const Value_P B)
+Quad_SQL::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
 

@@ -124,7 +124,7 @@ Quad_PLOT::~Quad_PLOT()
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_PLOT::eval_B(Value_P B)
+Quad_PLOT::eval_B(Value_P B) const
 {
     MORE_ERROR() <<
 "⎕PLOT is not available because some of its build prerequisites (in particular\n"
@@ -136,7 +136,7 @@ MISSING1 MISSING2 MISSING3 MISSING4 ") were either missing,\n"
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_PLOT::eval_AB(Value_P A, Value_P B)
+Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 {
    return eval_B(B);
 }
@@ -191,12 +191,14 @@ extern const Plot_window_properties *
              plot_stop(const Plot_window_properties * vp_props);
 
 //=============================================================================
+int Quad_PLOT::verbosity = 0;
+
 Quad_PLOT::Quad_PLOT()
-  : QuadFunction(TOK_Quad_PLOT),
-    verbosity(0)
+  : QuadFunction(TOK_Quad_PLOT)
 {
-    __sem_init(plot_threads_sema, 0, 1);
-    __sem_init(plot_window_sema, 1, 0);
+   __sem_init(plot_threads_sema, 0, 1);
+   __sem_init(plot_window_sema, 1, 0);
+   verbosity = 0;
 }
 //-----------------------------------------------------------------------------
 Quad_PLOT::~Quad_PLOT()
@@ -205,7 +207,7 @@ Quad_PLOT::~Quad_PLOT()
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_PLOT::eval_AB(Value_P A, Value_P B)
+Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_PLOT);
 
@@ -279,7 +281,7 @@ const APL_Integer qio = Workspace::get_IO();
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_PLOT::eval_B(Value_P B)
+Quad_PLOT::eval_B(Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_PLOT);
 
@@ -641,7 +643,7 @@ UCS_string ret(name_utf);
 }
 
 void
-Quad_PLOT::help() const
+Quad_PLOT::help()
 {
    CERR <<
 "\n"

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,11 +34,11 @@ Bif_OPER2_OUTER::PJob_product Bif_OPER2_OUTER::job;
 
 //-----------------------------------------------------------------------------
 Token
-Bif_OPER2_OUTER::eval_ALRB(Value_P A, Token & LO, Token & _RO, Value_P B)
+Bif_OPER2_OUTER::eval_ALRB(Value_P A, Token & LO, Token & _RO, Value_P B) const
 {
    if (!_RO.is_function())    SYNTAX_ERROR;
 
-Function * RO = _RO.get_function();
+Function_P RO = _RO.get_function();
    Assert(RO);
 
    if (!RO->has_result())   DOMAIN_ERROR;
