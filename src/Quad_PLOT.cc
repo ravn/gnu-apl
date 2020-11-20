@@ -114,9 +114,9 @@ vector<pthread_t> Quad_PLOT::plot_threads;
 #if defined(MISSING_LIBS)
 //-----------------------------------------------------------------------------
 Quad_PLOT::Quad_PLOT()
-  : QuadFunction(TOK_Quad_PLOT),
-    verbosity(0)
+  : QuadFunction(TOK_Quad_PLOT)
 {
+   verbosity = 0;
 }
 //-----------------------------------------------------------------------------
 Quad_PLOT::~Quad_PLOT()
@@ -126,7 +126,7 @@ Quad_PLOT::~Quad_PLOT()
 Token
 Quad_PLOT::eval_B(Value_P B) const
 {
-    MORE_ERROR() <<
+   MORE_ERROR() <<
 "⎕PLOT is not available because some of its build prerequisites (in particular\n"
 MISSING1 MISSING2 MISSING3 MISSING4 ") were either missing,\n"
 " or were explicitly disabled in ./configure.";
