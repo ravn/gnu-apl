@@ -1372,8 +1372,8 @@ const ShapeItem ec = B->element_count();
          if (cell_B.is_integer_cell())
             {
               const APL_Integer bint = cell_B.get_near_int();
-              if (bint < -0x80)       DOMAIN_ERROR;
-              if (bint > 0x7FFFFFF)   DOMAIN_ERROR;
+              if (bint < -0x80)        DOMAIN_ERROR;
+              if (bint > 0x7FFFFFFF)   DOMAIN_ERROR;
 
               Z->next_ravel_Char(Unicode(bint));
               continue;
@@ -1382,8 +1382,8 @@ const ShapeItem ec = B->element_count();
          if (cell_B.is_float_cell())
             {
               const APL_Integer bint = cell_B.get_near_int();
-              if (bint < -0x80)       DOMAIN_ERROR;
-              if (bint > 0x7FFFFFF)   DOMAIN_ERROR;
+              if (bint < -0x80)        DOMAIN_ERROR;
+              if (bint > 0x7FFFDFFF)   DOMAIN_ERROR;
 
               Z->next_ravel_Char(Unicode(bint));
               continue;
@@ -1393,8 +1393,8 @@ const ShapeItem ec = B->element_count();
             {
               if (!Cell::is_near_zero(cell_B.get_imag_value()))   DOMAIN_ERROR;
               const APL_Integer bint = cell_B.get_near_int();
-              if (bint < -0x80)       DOMAIN_ERROR;
-              if (bint > 0x7FFFFFF)   DOMAIN_ERROR;
+              if (bint < -0x80)        DOMAIN_ERROR;
+              if (bint > 0x7FFFFFFF)   DOMAIN_ERROR;
 
               Z->next_ravel_Char(Unicode(bint));
               continue;
