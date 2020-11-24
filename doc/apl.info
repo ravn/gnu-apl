@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-September 28, 2020
+November 24, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -583,106 +583,7 @@ File: apl.info,  Node: Chapter 2,  Next: Chapter 3,  Prev: Chapter 1,  Up: Top
 2 Design Decisions
 ******************
 
-The ISO standard leaves a few things unspecified and GNU APL may behave
-differently than other APL interpreters.
-
-2.1 APL symbols that can be functions or operators
-==================================================
-
-There are 4 APL symbols / ⌿ \ and ⍀ that can be functions or operators,
-depending on their context (i.e.  depending on the APL tokens left of
-them).  Neither the ISO standard nor the otherwise excellent IBM APL2
-language reference manual explain the rules that decide whether, for
-example /, should mean ’function compress’ or ’operator reduce’.  In
-simple cases the meaning of / is obvious: +/B means ’operator reduce’
-while 1/B means ’function compress’.
-
-   The following example may explain the problem:
-
-     ÷  /  \  2      ⍝ case (i)
-2
-   (÷  /) \  2       ⍝ case (ii)
-2
-   ÷ (/  \) 2        ⍝ case (iii)
-0.5
-
-   In (i) and (ii) / is an operator thanks to ÷ left of it while in
-(iii) / is a function bound to operator \.
-
-   Both (ii) and (iii) are valid interpretations of (i).  The ISO
-standard defined the result after the decision if / should be treated as
-function or as operator was made but says nothing about how to decide
-that.
-
-   The APL2 language reference gives additional information about such
-aspects (binding strength between token) but the ambiguity related to /
-⌿ \ and ⍀ is not resolved by these rules.
-
-   The first decision to make is at which point in time the role of /
-and friends shall be decided.  The options are:
-
-   (a) when the statement is tokenized and parsed (call that moment ’⎕FX
-time’ similar to compile-time for compiler languages), or
-
-   (b) when a statement is executed (call that ’run-time’), or
-
-   (c) theoretically a combination of (a) and (b)
-
-   The advantage of (a) is less run-time overhead which is important
-because / is probably the most frequently used APL operator.  As will be
-explained below there are cases where (a) fails.  The advantage of (b),
-at first glance, seems to be that it always gives the correct result
-(more precisely: the expected result because ’correct’ would require a
-valid specification).  A closer look reveals, however, that this is only
-true for the most simple cases but not in general.
-
-   To give you an idea where (b) becomes tricky is this (there are more
-of that kind):
-
-   A[FOO]/B ⍝ where FOO could define A via ⎕FX or do A←
-
-   It is still possible to resolve the last example at run time, but the
-parser would become far more complex to do that.  The same holds for
-(c).
-
-   For these reasons the decision was made in favor of (a) with a
-syntactic tweak to handle the (single) case where (a) fails.  In
-principle the symbol left of, for instance, / decides if / should be a
-function or an operators.  The matter can become more complex if index
-brackets or parentheses are involved.  The algorithm used in GNU APL for
-classifying / and friend is (simplified) this:
-
-   1.  / ⌿ \ and ⍀ are tokenized as operators
-
-   2.  Scan the tokenized statement from left to right to find / ⌿ \ or
-⍀
-
-   3.  If a / ⌿ \ or ⍀ is found, go backwards until a constant, or a
-function, or a user-defined name is found: 3a.  if a constant, a
-function, or a user-defined name is found then →4 3b.  if ) is seen then
-skip over it, That is, a parenthesized expression is entered.  3c.  if ]
-is seen then skip until the corresponding [ is found, That is an index
-list or axis is skipped over.  3d.  otherwise: SYNTAX ERROR
-
-   4.  decide the role of / \ ⌿ or ⍀ based on the kind of token that was
-found in 3a: 4a.  function: leave / as operator as initially tokenized
-4b.  constant: change / from operator to function (compress) 4c.  see
-below
-
-   This works fine except in case 4c.  which cannot be resolved at ⎕FX
-time.  For this case we introduce the following convention:
-
-   A user-defined name is assumed to be a function (and hence / is an
-operator) unless the name (and nothing else) is enclosed in parentheses.
-For example:
-
-       A  / B    ⍝ A is function, therefore / is operator
-
-      (A) / B    ⍝ A is value, therefore / is function
-
-   This rule is moderately compatible with ISO and APL2; in APL2 (A)
-would be redundant parentheses so in that case there would be a small
-incompatibility between GNU APL and IBM APL2.
+(removed)
 
 
 File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
@@ -5365,60 +5266,60 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11474
-Node: Chapter 219813
-Node: Chapter 324237
-Node: Section 3.125938
-Node: Section 3.242099
-Node: Section 3.342858
-Node: Section 3.444145
-Node: Section 3.547547
-Node: Section 3.647720
-Node: Section 3.748333
-Node: Section 3.852286
-Node: Section 3.953828
-Node: Section 3.1055283
-Node: Section 3.1157067
-Node: Section 3.1259007
-Node: Section 3.1359948
-Node: Section 3.1460200
-Node: Section 3.1561596
-Node: Section 3.1664114
-Node: Section 3.1770813
-Node: Section 3.1872258
-Node: Section 3.1977919
-Node: Section 3.2082953
-Node: Section 3.2186234
-Node: Section 3.2286525
-Node: Section 3.2397100
-Node: Section 3.2497372
-Node: Section 3.25103950
-Node: Section 3.26106407
-Node: Section 3.27107076
-Node: Section 3.28110199
-Node: Section 3.29117807
-Node: Section 3.30118754
-Node: Section 3.31132316
-Node: Section 3.32141816
-Node: Section 3.33144920
-Node: Section 3.34146909
-Node: Chapter 4151313
-Node: Chapter 5153061
-Node: Chapter 6154187
-Node: Section 6.1155724
-Node: Section 6.2157004
-Node: Section 6.3157364
-Node: Section 6.4157606
-Node: Section 6.5158268
-Node: Section 6.6158746
-Node: Section 6.7159518
-Node: Section 6.8159975
-Node: Chapter 7160377
-Node: Section 7.1160796
-Node: Section 7.2161483
-Node: Chapter 8162314
-Node: Section 8.1162817
-Node: Section 8.2188131
+Node: Chapter 11473
+Node: Chapter 219812
+Node: Chapter 319944
+Node: Section 3.121645
+Node: Section 3.237806
+Node: Section 3.338565
+Node: Section 3.439852
+Node: Section 3.543254
+Node: Section 3.643427
+Node: Section 3.744040
+Node: Section 3.847993
+Node: Section 3.949535
+Node: Section 3.1050990
+Node: Section 3.1152774
+Node: Section 3.1254714
+Node: Section 3.1355655
+Node: Section 3.1455907
+Node: Section 3.1557303
+Node: Section 3.1659821
+Node: Section 3.1766520
+Node: Section 3.1867965
+Node: Section 3.1973626
+Node: Section 3.2078660
+Node: Section 3.2181941
+Node: Section 3.2282232
+Node: Section 3.2392807
+Node: Section 3.2493079
+Node: Section 3.2599657
+Node: Section 3.26102114
+Node: Section 3.27102783
+Node: Section 3.28105906
+Node: Section 3.29113514
+Node: Section 3.30114461
+Node: Section 3.31128023
+Node: Section 3.32137523
+Node: Section 3.33140627
+Node: Section 3.34142616
+Node: Chapter 4147020
+Node: Chapter 5148768
+Node: Chapter 6149894
+Node: Section 6.1151431
+Node: Section 6.2152711
+Node: Section 6.3153071
+Node: Section 6.4153313
+Node: Section 6.5153975
+Node: Section 6.6154453
+Node: Section 6.7155225
+Node: Section 6.8155682
+Node: Chapter 7156084
+Node: Section 7.1156503
+Node: Section 7.2157190
+Node: Chapter 8158021
+Node: Section 8.1158524
+Node: Section 8.2183838
 
 End Tag Table
 

@@ -70,10 +70,7 @@ ul.no-bullet {list-style: none}
     <li><a name="toc-Config-File-for-GNU-APL" href="#Config-File-for-GNU-APL">1.4 Config File for GNU APL</a></li>
     <li><a name="toc-File-Names-and-Paths" href="#File-Names-and-Paths">1.5 File Names and Paths</a></li>
   </ul></li>
-  <li><a name="toc-Design-Decisions" href="#Chapter-2">2 Design Decisions</a>
-  <ul class="no-bullet">
-    <li><a name="toc-APL-symbols-that-can-be-functions-or-operators" href="#APL-symbols-that-can-be-functions-or-operators">2.1 APL symbols that can be functions or operators</a></li>
-  </ul></li>
+  <li><a name="toc-Design-Decisions" href="#Chapter-2">2 Design Decisions</a></li>
   <li><a name="toc-Non_002dstandard-GNU-APL-Features" href="#Chapter-3">3 Non-standard GNU APL Features</a>
   <ul class="no-bullet">
     <li><a name="toc-APL-Scripting" href="#Section-3_002e1">3.1 APL Scripting</a>
@@ -227,7 +224,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>September 28, 2020
+<p>November 24, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -802,104 +799,7 @@ Next: <a href="#Chapter-3" accesskey="n" rel="next">Chapter 3</a>, Previous: <a 
 <a name="Design-Decisions"></a>
 <h2 class="chapter">2 Design Decisions</h2>
 
-<p>The ISO standard leaves a few things unspecified and GNU APL may behave
-differently than other APL interpreters.
-</p>
-<a name="APL-symbols-that-can-be-functions-or-operators"></a>
-<h3 class="section">2.1 APL symbols that can be functions or operators</h3>
-
-<p>There are 4 APL symbols / ⌿ \ and ⍀ that can be functions or operators,
-depending on their context (i.e. depending on the APL tokens left of them).
-Neither the ISO standard nor the otherwise excellent IBM APL2 language
-reference manual explain the rules that decide whether, for example /, should
-mean &rsquo;function compress&rsquo; or &rsquo;operator reduce&rsquo;. In simple cases the meaning of
-/ is obvious: +/B means &rsquo;operator reduce&rsquo; while 1/B means &rsquo;function compress&rsquo;.
-</p>
-<p>The following example may explain the problem:
-</p>
-<pre class="verbatim">     ÷  /  \  2      ⍝ case (i)
-2
-   (÷  /) \  2       ⍝ case (ii)
-2
-   ÷ (/  \) 2        ⍝ case (iii)
-0.5
-</pre>
-<p>In (i) and (ii) / is an operator thanks to ÷ left of it while in (iii) / is
-a function bound to operator \.
-</p>
-<p>Both (ii) and (iii) are valid interpretations of (i). The ISO standard
-defined the result after the decision if / should be treated as function or
-as operator was made but says nothing about how to decide that.
-</p>
-<p>The APL2 language reference gives additional information about such aspects
-(binding strength between token) but the ambiguity related to / ⌿ \ and ⍀
-is not resolved by these rules.
-</p>
-<p>The first decision to make is at which point in time the role of / and friends
-shall be decided. The options are:
-</p>
-<p>(a) when the statement is tokenized and parsed (call that moment &rsquo;⎕FX time&rsquo;
- similar to compile-time for compiler languages), or
-</p>
-<p>(b) when a statement is executed (call that &rsquo;run-time&rsquo;), or
-</p>
-<p>(c) theoretically a combination of (a) and (b)
-</p>
-<p>The advantage of (a) is less run-time overhead which is important because / is
-probably the most frequently used APL operator. As will be explained below
-there are cases where (a) fails. The advantage of (b), at first glance,
-seems to be that it always gives the correct result (more precisely: the
-expected result because &rsquo;correct&rsquo; would require a valid specification). A
-closer look reveals, however, that this is only true for the most simple cases
-but not in general.
-</p>
-<p>To give you an idea where (b) becomes tricky is this (there are more of
-that kind):
-</p>
-<p>A[FOO]/B   ⍝ where FOO could define A via ⎕FX or do A←
-</p>
-<p>It is still possible to resolve the last example at run time, but the parser
-would become far more complex to do that. The same holds for (c).
-</p>
-<p>For these reasons the decision was made in favor of (a) with a syntactic
-tweak to handle the (single) case where (a) fails. In principle the symbol
-left of, for instance, / decides if / should be a function or an operators.
-The matter can become more complex if index brackets or parentheses are
-involved. The algorithm used in GNU APL for classifying / and friend is
-(simplified) this:
-</p>
-<p>1. / ⌿ \ and ⍀ are tokenized as operators
-</p>
-<p>2. Scan the tokenized statement from left to right to find / ⌿ \ or ⍀
-</p>
-<p>3. If a / ⌿ \ or ⍀ is found, go backwards until a constant, or a function,
-   or a user-defined  name is found:
-3a. if a constant, a function, or a user-defined name is found then →4
-3b. if ) is seen then skip over it, That is, a parenthesized expression is
-    entered.
-3c. if ] is seen then skip until the corresponding [ is found, That is an
-    index list or axis is skipped over.
-3d. otherwise: SYNTAX ERROR
-</p>
-<p>4. decide the role of / \ ⌿ or ⍀ based on the kind of token that was found
-   in 3a:
-4a. function: leave / as operator as initially tokenized
-4b. constant: change / from operator to function (compress)
-4c. see below
-</p>
-<p>This works fine except in case 4c. which cannot be resolved at ⎕FX time. For
-this case we introduce the following convention:
-</p>
-<p>A user-defined name is assumed to be a function (and hence / is an operator)
-unless the name (and nothing else) is enclosed in parentheses. For example:
-</p>
-<pre class="verbatim">       A  / B    ⍝ A is function, therefore / is operator
-
-      (A) / B    ⍝ A is value, therefore / is function
-</pre>
-<p>This rule is moderately compatible with ISO and APL2; in APL2 (A) would be
-redundant parentheses so in that case there would be a small incompatibility
-between GNU APL and IBM APL2.
+<p>(removed)
 </p>
 <hr>
 <a name="Chapter-3"></a>
