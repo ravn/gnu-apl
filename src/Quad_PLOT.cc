@@ -110,6 +110,7 @@ sem_t * Quad_PLOT::plot_window_sema = &__plot_window_sema;
    causes the thread to close its plot window and then to exit.
  **/
 vector<pthread_t> Quad_PLOT::plot_threads;
+int Quad_PLOT::verbosity = 0;
 
 #if defined(MISSING_LIBS)
 //-----------------------------------------------------------------------------
@@ -191,7 +192,6 @@ extern const Plot_window_properties *
              plot_stop(const Plot_window_properties * vp_props);
 
 //=============================================================================
-int Quad_PLOT::verbosity = 0;
 
 Quad_PLOT::Quad_PLOT()
   : QuadFunction(TOK_Quad_PLOT)
