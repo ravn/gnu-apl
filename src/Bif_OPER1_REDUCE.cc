@@ -120,16 +120,26 @@ const Shape3 shape_B3(shape_B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_REDUCE::reduce(Token & _LO, Value_P B, uAxis axis)
+Bif_REDUCE::reduce(Token & _LO, Value_P B, uAxis axis) const
 {
-Function_P LO = _LO.get_function();
-   Assert1(LO);
-   if (!LO->has_result())            DOMAIN_ERROR;
-   if (LO->get_fun_valence() != 2)   SYNTAX_ERROR;
-
    // if B is a scalar, then Z is B.
    //
    if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
+
+Function_P LO = _LO.get_function();
+   Assert1(LO);
+   if (!LO->has_result())
+      {
+        MORE_ERROR() << "The left (function-) argument of operator "
+                     << get_name() << " returns no result";
+        DOMAIN_ERROR;
+      }
+   if (LO->get_fun_valence() != 2)
+      {
+        MORE_ERROR() << "The left (function-) argument of operator "
+                     << get_name() << " is not dyadic";
+        SYNTAX_ERROR;
+      }
 
    if (axis >= B->get_rank())   AXIS_ERROR;
 

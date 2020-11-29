@@ -38,7 +38,7 @@ protected:
    static Token expand(Value_P A, Value_P B, uAxis axis);
 
    /// Compute the LO-scan of B.
-   static Token scan(Token & _LO, Value_P B, uAxis axis);
+   Token scan(Token & _LO, Value_P B, uAxis axis) const;
 
    /// Compute one scan item and store result in Z.
    static void scan_item(Cell * Z, Function_P LO, const Cell * B,

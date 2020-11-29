@@ -127,14 +127,28 @@ ShapeItem inc_2 = 0;              // increment after result m*l items
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_SCAN::scan(Token & _LO, Value_P B, uAxis axis)
+Bif_SCAN::scan(Token & _LO, Value_P B, uAxis axis) const
 {
+   // if B is a scalar, then Z is B.
+   //
+   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
+
 Function_P LO = _LO.get_function();
    Assert(LO);
 
-   if (!LO->has_result())   DOMAIN_ERROR;
+   if (!LO->has_result())
+      {
+        MORE_ERROR() << "The left (function-) argument of operator "
+                     << get_name() << " returns no result";
+        DOMAIN_ERROR;
+      }
 
-   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
+   if (LO->get_fun_valence() != 2)
+      {
+        MORE_ERROR() << "Th left (function-) argument of operator "
+                     << get_name() << " is not dyadic";
+        SYNTAX_ERROR;
+      }
 
    if (axis >= B->get_rank())   INDEX_ERROR;
 
