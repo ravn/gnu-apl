@@ -45,7 +45,7 @@ Shape shape_B = B->get_shape();
       }
 
    if (A->get_rank() > 1)             RANK_ERROR;
-   if (axis >= shape_B.get_rank())    INDEX_ERROR;
+   if (axis >= shape_B.get_rank())    AXIS_ERROR;
 
 const ShapeItem len_B = shape_B.get_shape_item(axis);
 ShapeItem len_A = A->element_count();
@@ -120,24 +120,32 @@ const Shape3 shape_B3(shape_B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_REDUCE::reduce(Token & _LO, Value_P B, uAxis axis) const
+Bif_REDUCE::reduce(Token & tok_LO, Value_P B, uAxis axis) const
 {
    // if B is a scalar, then Z is B.
    //
    if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
 
-Function_P LO = _LO.get_function();
+   if (!tok_LO.is_function())
+      {
+        MORE_ERROR() << "The left argument of operator "
+                     << get_name() << " is not a function";
+        DOMAIN_ERROR;
+      }
+
+Function_P LO = tok_LO.get_function();
    Assert1(LO);
    if (!LO->has_result())
       {
-        MORE_ERROR() << "The left (function-) argument of operator "
-                     << get_name() << " returns no result";
+        MORE_ERROR() << "The left argument of operator "
+                     << get_name() << " is a function that returns no result";
         DOMAIN_ERROR;
       }
+
    if (LO->get_fun_valence() != 2)
       {
-        MORE_ERROR() << "The left (function-) argument of operator "
-                     << get_name() << " is not dyadic";
+        MORE_ERROR() << "The left argument of operator "
+                     << get_name() << " is a function that is not dyadic";
         SYNTAX_ERROR;
       }
 
@@ -166,7 +174,7 @@ const Shape3 B3(B->get_shape(), axis);
         new (X4->next_ravel())   IntCell(B3.l());
         X4->check_value(LOC);
         return Macro::get_macro(Macro::MAC_Z__LO_REDUCE_X4_B)
-                    ->eval_LXB(_LO, X4, B);
+                    ->eval_LXB(tok_LO, X4, B);
       }
 
    if (shape_Z.is_empty())   return LO->eval_identity_fun(B, axis);
@@ -176,11 +184,30 @@ const Shape3 Z3(B3.h(), 1, B3.l());
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_REDUCE::reduce_n_wise(Value_P A, Token & _LO, Value_P B, uAxis axis)
+Bif_REDUCE::reduce_n_wise(Value_P A, Token & tok_LO, Value_P B,
+                          uAxis axis) const
 {
-Function_P LO = _LO.get_function();
-   Assert(LO);
-   if (!LO->has_result())   DOMAIN_ERROR;
+   if (!tok_LO.is_function())
+      {
+        MORE_ERROR() << "The left argument of operator A /"
+                     << get_name() << " is not a function";
+        DOMAIN_ERROR;
+      }
+
+Function_P LO = tok_LO.get_function();
+   if (!LO->has_result())
+      {
+        MORE_ERROR() << "The left argument of operator "
+                     << get_name() << " is a function that returns no result";
+        DOMAIN_ERROR;
+      }
+
+   if (LO->get_fun_valence() != 2)
+      {
+        MORE_ERROR() << "The left argument of operator "
+                     << get_name() << " is a function that is not dyadic";
+        SYNTAX_ERROR;
+      }
 
    if (A->element_count() != 1)   LENGTH_ERROR;
 const APL_Integer A0 = A->get_ravel(0).get_int_value();
@@ -264,9 +291,9 @@ const Shape3 B3(B->get_shape(), axis);
         new (X4->next_ravel())   PointerCell(vsh_B3.get(), X4.getref()); // ⍴B3
         X4->check_value(LOC);
         if (A0 < 0)   return Macro::get_macro(Macro::MAC_Z__nA_LO_REDUCE_X4_B)
-                                  ->eval_ALXB(A1,_LO,X4,B);
+                                  ->eval_ALXB(A1, tok_LO, X4, B);
         else        return Macro::get_macro(Macro::MAC_Z__pA_LO_REDUCE_X4_B)
-                                ->eval_ALXB(A1,_LO,X4,B);
+                                ->eval_ALXB(A1, tok_LO, X4, B);
       }
 
    return do_reduce(shape_Z, Z3, A0, LO, B, B->get_shape_item(axis));

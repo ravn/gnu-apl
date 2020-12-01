@@ -59,24 +59,29 @@ public:
    virtual bool is_derived() const
       { return true; }
 
-   /// Overloaded Function::has_result()
-   virtual bool has_result() const
-     { if (left_fun.get_tag() == TOK_VOID)   return oper->has_result();
-       return left_fun.is_function() && left_fun.get_function()->has_result(); }
+  Function_P get_LO() const
+      { return left_arg.get_function(); }
 
-  const Function * get_LO() const
-      { return left_fun.get_function(); }
+   // return the value (if any) bound to an operator (that allows it)
+   Value_P get_bound_LO_value() const
+      {
+        if (left_arg.is_apl_val())   return left_arg.get_apl_val();
+        return Value_P();
+      }
 
-   const Function * get_OPER() const
+   Function_P get_OPER() const
       { return oper; }
 
-   const Function * get_RO() const
+   Function_P get_RO() const
       {   if (right_fun.get_tag() == TOK_VOID)   return 0;
           return right_fun.get_function();
       }
 
    const Value * get_AXIS() const
       { return axis.get(); }
+
+   /// Overloaded Function::has_result();
+   virtual bool has_result() const;
 
 protected:
    /// Overloaded Function::print_properties()
@@ -97,7 +102,7 @@ protected:
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
       { return   oper->may_push_SI()
-        || (left_fun .is_function() && left_fun .get_function()->may_push_SI())
+        || (left_arg .is_function() && left_arg .get_function()->may_push_SI())
         || (right_fun.is_function() && right_fun.get_function()->may_push_SI());
       }
 
@@ -106,7 +111,7 @@ protected:
       { return (!axis) ? 0 : &axis; }
 
    /// the function (to the left of the operator)
-   Token left_fun;
+   Token left_arg;
 
    /// the monadic operator (to the right of the function)
    Function_P oper;

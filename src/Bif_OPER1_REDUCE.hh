@@ -37,6 +37,9 @@ public:
    static Token do_reduce(const Shape & shape_Z, const Shape3 & Z3, ShapeItem a,
                           Function_P LO, Value_P B, ShapeItem bm);
 
+   bool has_result() const
+      { return true; }
+
 protected:
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
@@ -49,7 +52,7 @@ protected:
    Token reduce(Token & _LO, Value_P B, uAxis axis) const;
 
    /// LO-reduce B n-wise along axis.
-   static Token reduce_n_wise(Value_P A, Token & _LO, Value_P B, uAxis axis);
+   Token reduce_n_wise(Value_P A, Token & _LO, Value_P B, uAxis axis) const;
 
 };
 //-----------------------------------------------------------------------------

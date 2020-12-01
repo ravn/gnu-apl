@@ -30,7 +30,7 @@
 DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Token & rfun,
                                  const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(lfun),
+     left_arg(lfun),
      oper(dyop),
      right_fun(rfun),
      axis(Value_P())
@@ -47,17 +47,17 @@ DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Token & rfun,
 DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Value_P X,
                                  Token & rfun, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(lfun),
+     left_arg(lfun),
      oper(dyop),
      right_fun(rfun),
      axis(X)
 {
 }
 //-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
+DerivedFunction::DerivedFunction(Token & LO, Function_P monop,
                                  const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(lfun),
+     left_arg(LO),
      oper(monop),
      right_fun(TOK_VOID),
      axis(Value_P())
@@ -74,7 +74,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
 DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
                                  Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(lfun),
+     left_arg(lfun),
      oper(monop),
      right_fun(TOK_VOID),
      axis(X)
@@ -90,7 +90,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
 //-----------------------------------------------------------------------------
 DerivedFunction::DerivedFunction(Function_P fun, Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_fun(TOK_VOID),
+     left_arg(TOK_VOID),
      oper(fun),
      right_fun(TOK_VOID),
      axis(X)
@@ -114,22 +114,31 @@ DerivedFunction::eval_B(Value_P B) const
              << voidP(this) << endl;
       }
 
-   if (left_fun.get_tag() == TOK_VOID)   // function bound to axis
+   if (left_arg.get_tag() == TOK_VOID)   // function bound to axis
       {
         return oper->eval_XB(axis, B);
       }
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        Token & left  = const_cast<Token &>(left_fun);
+        Token & left  = const_cast<Token &>(left_arg);
         Token & right = const_cast<Token &>(right_fun);
         return oper->eval_LRB(left, right, B);
       }
    else                                   // monadic operator
       {
-        Token & left  = const_cast<Token &>(left_fun);
-        if (!!axis)   return oper->eval_LXB(left, axis, B);
-        else          return oper->eval_LB(left, B);
+        if (left_arg.is_function())   // normal operator
+           {
+             Token & left = const_cast<Token &>(left_arg);
+             if (!axis)   return oper->eval_LB(left, B);
+             else         return oper->eval_LXB(left, axis, B);
+           }
+        else                         // operator with left value operand
+           {
+             Value_P A = left_arg.get_apl_val();
+             if (!axis)   return oper->eval_AB(A, B);
+             else         return oper->eval_AXB(A, axis, B);
+           }
       }
 }
 //-----------------------------------------------------------------------------
@@ -145,14 +154,24 @@ DerivedFunction::eval_XB(Value_P X, Value_P B) const
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        Token & left  = const_cast<Token &>(left_fun);
+        Token & left  = const_cast<Token &>(left_arg);
         Token & right = const_cast<Token &>(right_fun);
         return oper->eval_LRXB(left, right, X, B);
       }
    else                                   // monadic operator
       {
-        Token & left  = const_cast<Token &>(left_fun);
-        return oper->eval_LXB(left, X, B);
+        if (left_arg.is_function())   // normal operator
+           {
+             Token & left = const_cast<Token &>(left_arg);
+             if (!axis)   return oper->eval_LB(left, B);
+             else         return oper->eval_LXB(left, axis, B);
+           }
+        else                         // operator with left value operand
+           {
+             Value_P A = left_arg.get_apl_val();
+             if (!axis)   return oper->eval_AB(A, B);
+             else         return oper->eval_AXB(A, axis, B);
+           }
       }
 }
 //-----------------------------------------------------------------------------
@@ -165,23 +184,32 @@ DerivedFunction::eval_AB(Value_P A, Value_P B) const
         CERR << "::eval_AB()" << endl;
       }
 
-   if (left_fun.get_tag() == TOK_VOID)   // function bound to axis
+   if (left_arg.get_tag() == TOK_VOID)   // function bound to axis
       {
         return oper->eval_AXB(A, axis, B);
       }
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        Token & left  = const_cast<Token &>(left_fun);
+        Token & left  = const_cast<Token &>(left_arg);
         Token & right = const_cast<Token &>(right_fun);
         if (!axis)   return oper->eval_ALRB(A, left, right, B);
         else         return oper->eval_ALRXB(A, left, right, axis, B);
       }
    else                                   // monadic operator
       {
-        Token & left  = const_cast<Token &>(left_fun);
-        if (!axis)   return oper->eval_ALB(A, left, B);
-        else         return oper->eval_ALXB(A, left, axis, B);
+        if (left_arg.is_function())
+           {
+             Token & left  = const_cast<Token &>(left_arg);
+             if (!axis)   return oper->eval_ALB(A, left, B);
+             else         return oper->eval_ALXB(A, left, axis, B);
+           }
+        else
+           {
+             Value_P A = left_arg.get_apl_val();
+             if (!axis)   return oper->eval_AB(A, B);
+             else         return oper->eval_AXB(A, axis, B);
+           }
       }
 }
 //-----------------------------------------------------------------------------
@@ -196,13 +224,13 @@ DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        Token & left  = const_cast<Token &>(left_fun);
+        Token & left  = const_cast<Token &>(left_arg);
         Token & right = const_cast<Token &>(right_fun);
         return oper->eval_ALRXB(A, left, right, X, B);
       }
    else                                   // monadic operator
       {
-        Token & left  = const_cast<Token &>(left_fun);
+        Token & left  = const_cast<Token &>(left_arg);
         return oper->eval_ALXB(A, left, X, B);
       }
 }
@@ -211,7 +239,7 @@ ostream &
 DerivedFunction::print(ostream & out) const
 {
    out << "(";
-   if (left_fun.is_function())   left_fun.get_function()->print(out);
+   if (left_arg.is_function())   left_arg.get_function()->print(out);
    else                          out << "VAL";
    out << " ";
 
@@ -228,13 +256,21 @@ DerivedFunction::print(ostream & out) const
    return out << ")";
 }
 //-----------------------------------------------------------------------------
+bool
+DerivedFunction::has_result() const
+{
+   if (!oper->has_result())   return false;   // unlikely
+   if (left_arg.is_function())   return left_arg.get_function()->has_result();
+   return true;   // operator bound to left value
+}
+//-----------------------------------------------------------------------------
 void
 DerivedFunction::print_properties(ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_ASCII_SPACE);
    out << ind << "Function derived from operator" << endl
        << ind << "Left Function: ";
-   if (left_fun.is_function())   left_fun.get_function()->print(out);
+   if (left_arg.is_function())   left_arg.get_function()->print(out);
    else                          out << "VAL";
    out << endl << ind << "Operator:  ";
    oper->print(out);

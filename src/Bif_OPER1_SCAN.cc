@@ -127,30 +127,36 @@ ShapeItem inc_2 = 0;              // increment after result m*l items
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_SCAN::scan(Token & _LO, Value_P B, uAxis axis) const
+Bif_SCAN::scan(Token & tok_LO, Value_P B, uAxis axis) const
 {
    // if B is a scalar, then Z is B.
    //
    if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
 
-Function_P LO = _LO.get_function();
-   Assert(LO);
+   if (!tok_LO.is_function())
+      {
+        MORE_ERROR() << "The left argument of operator A /"
+                     << get_name() << " is not a function";
+        DOMAIN_ERROR;
+      }
+
+Function_P LO = tok_LO.get_function();
 
    if (!LO->has_result())
       {
-        MORE_ERROR() << "The left (function-) argument of operator "
-                     << get_name() << " returns no result";
+        MORE_ERROR() << "The left argument of operator "
+                     << get_name() << " is a function that returns no result";
         DOMAIN_ERROR;
       }
 
    if (LO->get_fun_valence() != 2)
       {
-        MORE_ERROR() << "Th left (function-) argument of operator "
-                     << get_name() << " is not dyadic";
+        MORE_ERROR() << "The left argument of operator "
+                     << get_name() << " is a function that is not dyadic";
         SYNTAX_ERROR;
       }
 
-   if (axis >= B->get_rank())   INDEX_ERROR;
+   if (axis >= B->get_rank())   AXIS_ERROR;
 
 const ShapeItem m_len = B->get_shape_item(axis);
 
@@ -216,7 +222,7 @@ const Shape3 Z3(B->get_shape(), axis);
         new (X4->next_ravel())   IntCell(Z3.l());
         X4->check_value(LOC);
         return Macro::get_macro(Macro::MAC_Z__LO_SCAN_X4_B)
-                    ->eval_LXB(_LO, X4, B);
+                    ->eval_LXB(tok_LO, X4, B);
       }
 
    if (B->get_shape().is_empty())   return LO->eval_identity_fun(B, axis);

@@ -1214,20 +1214,15 @@ DerivedFunction * derived =
 }
 //-----------------------------------------------------------------------------
 void
-Prefix::reduce_M_M__()
+Prefix::reduce_A_M__()
 {
-   if (is_fun_or_oper(PC))
-      {
-         action = RA_PUSH_NEXT;
-        return;
-      }
+   Assert1(prefix_len == 2);
 
-const TokenTag tag = at0().get_tag();
-   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
-      return reduce_F_M__();
+DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
+   new (derived) DerivedFunction(at0(), at1().get_function(), LOC);
 
-   syntax_error(LOC);
+   pop_args_push_result(Token(TOK_FUN1, derived));
+   action = RA_CONTINUE;
 }
 //-----------------------------------------------------------------------------
 void
@@ -1250,23 +1245,6 @@ DerivedFunction * derived =
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    action = RA_CONTINUE;
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_M_M_C_()
-{
-   if (is_fun_or_oper(PC))
-      {
-         action = RA_PUSH_NEXT;
-        return;
-      }
-
-const TokenTag tag = at0().get_tag();
-   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
-      return reduce_F_M_C_();
-
-   syntax_error(LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1296,23 +1274,6 @@ DerivedFunction * derived =
 }
 //-----------------------------------------------------------------------------
 void
-Prefix::reduce_M_C_M_()
-{
-   if (is_fun_or_oper(PC))
-      {
-         action = RA_PUSH_NEXT;
-        return;
-      }
-
-const TokenTag tag = at0().get_tag();
-   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
-      return reduce_F_C_M_();
-
-   syntax_error(LOC);
-}
-//-----------------------------------------------------------------------------
-void
 Prefix::reduce_F_C_M_C()
 {
    Assert1(prefix_len == 4);
@@ -1331,10 +1292,8 @@ Prefix::reduce_F_C_M_C()
         AXIS_ERROR;
       }
 
-DerivedFunction * F_C =
-   Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (F_C) DerivedFunction(at0().get_function(),
-                             at1().get_axes(), LOC);
+DerivedFunction * F_C = Workspace::SI_top()->fun_oper_cache.get(LOC);
+   new (F_C) DerivedFunction(at0().get_function(), at1().get_axes(), LOC);
 
 Token tok_F_C(TOK_FUN2, F_C);
 DerivedFunction * derived =
@@ -1344,23 +1303,6 @@ DerivedFunction * derived =
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    action = RA_CONTINUE;
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_M_C_M_C()
-{
-   if (is_fun_or_oper(PC))
-      {
-         action = RA_PUSH_NEXT;
-        return;
-      }
-
-const TokenTag tag = at0().get_tag();
-   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
-      return reduce_F_C_M_C();
-
-   syntax_error(LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1420,42 +1362,6 @@ DerivedFunction * derived =
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    action = RA_CONTINUE;
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_F_D_M_()
-{
-const TokenTag tag = at2().get_tag();
-   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
-      return reduce_F_D_G_();
-
-   syntax_error(LOC);
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_M_D_G_()
-{
-const TokenTag tag = at0().get_tag();
-   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
-      return reduce_F_D_G_();
-
-   syntax_error(LOC);
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_M_D_M_()
-{
-const TokenTag tag0 = at0().get_tag();
-const TokenTag tag2 = at2().get_tag();
-   if ((tag0 == TOK_OPER1_REDUCE  || tag0 == TOK_OPER1_SCAN ||
-        tag0 == TOK_OPER1_REDUCE1 || tag0 == TOK_OPER1_SCAN1) && 
-       (tag2 == TOK_OPER1_REDUCE  || tag2 == TOK_OPER1_SCAN ||
-        tag2 == TOK_OPER1_REDUCE1 || tag2 == TOK_OPER1_SCAN1))
-      return reduce_F_D_G_();
-
-   syntax_error(LOC);
 }
 //-----------------------------------------------------------------------------
 void

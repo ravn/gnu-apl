@@ -57,19 +57,13 @@ phrase(BS_LO_OP + 2,     F    , M    ,      ,      , ""    )   // e.g. +/
 phrase(BS_LO_OP + 3,     F    , M    , C    ,      , ""    )   // e.g. +/[2]
 phrase(BS_LO_OP + 3,     F    , C    , M    ,      , ""    )   // e.g. ,[2]/
 phrase(BS_LO_OP + 4,     F    , C    , M    , C    , ""    )   // e.g. ,[2]/[2]
-phrase(BS_LO_OP + 2,     M    , M    ,      ,      , ""    )   // e.g. /¨
-phrase(BS_LO_OP + 3,     M    , M    , C    ,      , ""    )   // e.g. /¨[2]
-phrase(BS_LO_OP + 3,     M    , C    , M    ,      , ""    )   // e.g. /[2]¨
-phrase(BS_LO_OP + 4,     M    , C    , M    , C    , ""    )   // e.g. /[2]¨[2]
+phrase(BS_LO_OP + 2,     A    , M    ,      ,      , ""    )   // e.g. A/
 
 // dyadic operator
 phrase(BS_OP_RO + 3,     A    , D    , B    ,      , "F_D_G_")
 phrase(BS_OP_RO + 3,     A    , D    , G    ,      , "F_D_G_")
 phrase(BS_OP_RO + 3,     F    , D    , B    ,      , ""    )
 phrase(BS_OP_RO + 3,     F    , D    , G    ,      , ""    )
-phrase(BS_OP_RO + 3,     F    , D    , M    ,      , ""    )
-phrase(BS_OP_RO + 3,     M    , D    , G    ,      , ""    )
-phrase(BS_OP_RO + 3,     M    , D    , M    ,      , ""    )
 phrase(BS_OP_RO + 4,     F    , D    , C    , B    , ""    )
 
 // indexed reference and assignment
