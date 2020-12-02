@@ -31,7 +31,13 @@
 Token::Token(const Token & other)
    : tag(TOK_VOID)
 {
-   copy_1(other, "Token::Token(other)");
+   copy_1(other, "Token::Token(const Token & other)");
+}
+//-----------------------------------------------------------------------------
+Token::Token(const Token & other, const char * loc)
+   : tag(TOK_VOID)
+{
+   copy_1(other, loc);
 }
 //-----------------------------------------------------------------------------
 Token::Token(TokenTag tg, IndexExpr & idx)

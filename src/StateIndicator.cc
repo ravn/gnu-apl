@@ -48,6 +48,7 @@ StateIndicator::~StateIndicator()
    // copied directly from the body of the executable are not killed.
    //
    current_stack.clean_up();
+   fun_oper_cache.reset();
 
    // if executable is a user defined function then pop its local vars.
    // otherwise delete the body token
@@ -365,9 +366,10 @@ void
 StateIndicator::unmark_all_values() const
 {
    Assert(executable);
-   executable->unmark_all_values();
+   executable->unmark_all_values();   // values in function body tokens
 
-   current_stack.unmark_all_values();
+   current_stack.unmark_all_values();   // values in the parsers
+   fun_oper_cache.unmark_all_values();   // values in the derived function cache
 }
 //-----------------------------------------------------------------------------
 int

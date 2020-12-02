@@ -91,6 +91,15 @@ Prefix::syntax_error(const char * loc)
            {
              Value_P val = tok.get_apl_val();
           }
+        else if (tok.get_Class() == TC_FUN2)
+          {
+            Function_P fun = tok.get_function();
+            if (fun && fun->is_derived())
+               {
+                 Function * fp = const_cast<Function *>(fun);
+                 reinterpret_cast<DerivedFunction *>(fp)->destroy(LOC);
+               }
+          }
       }
 
    // see if error was caused by a function not returning a value.

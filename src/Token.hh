@@ -55,6 +55,9 @@ public:
    /// copy constructor
    Token(const Token & other);
 
+   /// copy constructor with location
+   Token(const Token & other, const char * loc);
+
    /// copy \b src into \b this token. leaving APL value pointer in
    /// src (if any) and add events as needed
    void copy_1(const Token & src, const char * loc);

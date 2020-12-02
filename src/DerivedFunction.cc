@@ -27,10 +27,10 @@
 #include "Workspace.hh"
 
 //=============================================================================
-DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Token & rfun,
+DerivedFunction::DerivedFunction(Token & larg, Function_P dyop, Token & rfun,
                                  const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_arg(lfun),
+     left_arg(larg),
      oper(dyop),
      right_fun(rfun),
      axis(Value_P())
@@ -47,17 +47,16 @@ DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Token & rfun,
 DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Value_P X,
                                  Token & rfun, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_arg(lfun),
+     left_arg(lfun, loc),
      oper(dyop),
      right_fun(rfun),
-     axis(X)
+     axis(X, loc)
 {
 }
 //-----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & LO, Function_P monop,
-                                 const char * loc)
+DerivedFunction::DerivedFunction(Token & LO, Function_P monop, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_arg(LO),
+     left_arg(LO, loc),
      oper(monop),
      right_fun(TOK_VOID),
      axis(Value_P())
@@ -74,16 +73,16 @@ DerivedFunction::DerivedFunction(Token & LO, Function_P monop,
 DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
                                  Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
-     left_arg(lfun),
+     left_arg(lfun, loc),
      oper(monop),
      right_fun(TOK_VOID),
-     axis(X)
+     axis(X, loc)
 {
    Assert1(oper);
 
    Log(LOG_FunOperX)
       {
-        print(CERR<< "DerivedFunction(monadic with axis)");
+        print(CERR << "DerivedFunction(monadic with axis)");
         CERR << " at " << loc << endl;
      }
 }
@@ -102,6 +101,27 @@ DerivedFunction::DerivedFunction(Function_P fun, Value_P X, const char * loc)
         print(CERR<< "DerivedFunction(function with axis)");
         CERR << " at " << loc << endl;
      }
+}
+//-----------------------------------------------------------------------------
+DerivedFunction::~DerivedFunction()
+{
+   Log(LOG_FunOperX)
+      {
+        CERR << "~DerivedFunction()" << endl;
+      }
+}
+//-----------------------------------------------------------------------------
+void
+DerivedFunction::destroy(const char * loc)
+{
+   Log(LOG_FunOperX)
+      {
+        CERR << "DerivedFunction::destroy(" << get_name() << ")" << endl;
+      }
+
+   left_arg.clear(loc);
+   right_fun.clear(loc);
+   axis.clear(loc);
 }
 //-----------------------------------------------------------------------------
 Token
@@ -265,6 +285,13 @@ DerivedFunction::has_result() const
 }
 //-----------------------------------------------------------------------------
 void
+DerivedFunction::unmark_all_values() const
+{
+   if (!!axis)   axis->unmark();
+   if (left_arg.is_apl_val())   left_arg.get_apl_val()->unmark();
+}
+//-----------------------------------------------------------------------------
+void
 DerivedFunction::print_properties(ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_ASCII_SPACE);
@@ -300,6 +327,7 @@ DerivedFunctionCache::DerivedFunctionCache()
 //-----------------------------------------------------------------------------
 DerivedFunctionCache::~DerivedFunctionCache()
 {
+   reset();
    Log(LOG_FunOperX)
       {
          CERR << "DerivedFunctionCache deleted, cache at "
@@ -312,7 +340,12 @@ DerivedFunctionCache::~DerivedFunctionCache()
 void
 DerivedFunctionCache::reset()
 {
-   idx = 0;
+   while (idx)
+       {
+         --idx;   // back to last item
+         get(LOC)->destroy(LOC);
+         --idx;   // undo idx++ by get(LOC)
+       }
 
    Log(LOG_FunOperX)
       {
@@ -336,7 +369,8 @@ DerivedFunctionCache::get(const char * loc)
               << " at " << loc << endl;
       }
 
-   return cache + idx++;
+   return reinterpret_cast<DerivedFunction *>
+                          (cache + idx++*sizeof(DerivedFunction));
 }
 //=============================================================================
 

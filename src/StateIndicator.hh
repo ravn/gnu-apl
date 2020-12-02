@@ -110,7 +110,8 @@ public:
    /// execute token in body...
    Token run();
 
-   /// clear the marked bit in all parsers
+   /// clear the marked bit in the executable, in the fun_oper_cache, and
+   /// in all parsers
    void unmark_all_values() const;
 
    /// print all owners of \b value

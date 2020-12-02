@@ -26,10 +26,10 @@
 #include "Output.hh"
 
 //-----------------------------------------------------------------------------
-/** an operator bound to one or more functions. The bound operator is then
-    another operator (e.g. (+.) or a function (e.g. (+.×) or (+/).
+/** an operator bound to its left and (in the case of a dyadic operator) to
+   its right operand.
  **/
-/// An APL operator bound to its function argument(s)
+/// An APL operator bound to its function operand(s)
 class DerivedFunction : public Function
 {
 public:
@@ -52,6 +52,9 @@ public:
    /// Constructor (function with axis)
    DerivedFunction(Function_P func, Value_P X, const char * loc);
 
+   /// deallocate resources held by this DerivedFunction
+   void destroy(const char * loc);
+
    /// overloaded Function::print();
    virtual ostream & print(ostream & out) const;
 
@@ -65,16 +68,15 @@ public:
    // return the value (if any) bound to an operator (that allows it)
    Value_P get_bound_LO_value() const
       {
-        if (left_arg.is_apl_val())   return left_arg.get_apl_val();
-        return Value_P();
+        return left_arg.is_apl_val() ? left_arg.get_apl_val() : Value_P();
       }
 
    Function_P get_OPER() const
       { return oper; }
 
    Function_P get_RO() const
-      {   if (right_fun.get_tag() == TOK_VOID)   return 0;
-          return right_fun.get_function();
+      {
+        return right_fun.get_tag() == TOK_VOID ? 0 : right_fun.get_function();
       }
 
    const Value * get_AXIS() const
@@ -82,6 +84,9 @@ public:
 
    /// Overloaded Function::has_result();
    virtual bool has_result() const;
+
+   /// clear the marked bit in values bound to this derived functions (if any).
+   void unmark_all_values() const;   // unmark values bound to this operator
 
 protected:
    /// Overloaded Function::print_properties()
@@ -116,11 +121,18 @@ protected:
    /// the monadic operator (to the right of the function)
    Function_P oper;
 
-   /// the function on the right of the (dyadic) operator (if any)
+   /// the (normally) function on the right of the (dyadic) operator (if any).
+   //  Acording to lrm p. 35, the right operand is a function or array (even
+   //  though no primitive dyadic operator takes an array as right operand).
    Token right_fun;
 
    /// the axis for \b mon_oper, or 0 if no axis
    Value_P axis;
+
+private:
+   /// destructor
+   ~DerivedFunction();
+
 };
 //=============================================================================
 /// a small cache for storing a few DerivedFunction objects
@@ -133,8 +145,21 @@ public:
    /// destructor
    ~DerivedFunctionCache();
 
+   const DerivedFunction * at(size_t i) const
+      {
+        return reinterpret_cast<const DerivedFunction *>
+                               (cache + i*sizeof(DerivedFunction));
+      }
+
    const DerivedFunction & operator [](size_t i) const
-      { Assert(i < idx);    return cache[i]; }
+      {
+        Assert(i < idx);
+        return *(at(i));
+      }
+
+   /// clear the marked bit in values bound to derived functions (if any).
+   void unmark_all_values() const
+      { loop(d, size())   at(d)->unmark_all_values(); }
 
    /// return the number of items in the cache
    size_t size() const
@@ -149,7 +174,7 @@ public:
 
 protected:
    /// a cache for derived functions
-   DerivedFunction cache[MAX_FUN_OPER];
+   uint8_t cache[sizeof(DerivedFunction) * MAX_FUN_OPER];
 
    /// the number of elements in \b cache
    size_t idx;
