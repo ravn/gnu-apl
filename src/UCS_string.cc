@@ -885,6 +885,12 @@ char cc[40];
 void
 UCS_string::append_shape(const Shape & shape)
 {
+   if (shape.get_rank() == 0)   // empty shape (scalar)
+      {
+        append(UNI_ZILDE);   //  ⍬
+        return;
+      }
+
    loop(r, shape.get_rank())
        {
          if (r)   append(UNI_ASCII_SPACE);

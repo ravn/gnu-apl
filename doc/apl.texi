@@ -1224,17 +1224,18 @@ contains a description of all possible color settings.
 @section Comparison Rules
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥, and
-> (but not = or ≠) are integer or real numbers, and that the argument of monadic
-⍋ or ⍒ is a vector of integer or real numbers. In contrast GNU APL also allows
-the comparison of characters and numbers or the comparison of complex numbers
-according to the following, more general, rules.
+> (but not of = or ≠) are integer or real numbers, and that the argument of
+monadic ⍋ or ⍒ is a vector of integer or real numbers. In contrast GNU APL
+also allows the comparison of characters and numbers or the comparison of
+complex numbers according to the following, more general, rules.
 
 Let A and B two APL values to be compared. The first comparison below that
 succeeds (i.e. returns a result) is then the result of comparing A and B.
  
 1. Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
 
-2. Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa.
+2. Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa. The
+   first different shape item decides.
 
 3. Comparison of ravel elements: otherwise ⍴A and ⍴B are equal. If all
    corresponding ravel elements of A and B are equal (i.e. tolerantly equal
@@ -1298,6 +1299,31 @@ when comparing near-complex numbers or their true real companions. For
 example, a magnitude first comparison of complex numbers would make ¯1 < ¯2J∈
 for a near-complex ¯2J∈ but ¯1 > ¯2 for a true real ¯2.
 
+
+@strong{CAUTION}: The comparison of two strings (i.e. nested character
+vectors) may give unexpected results because shorter strings come before
+longer strings. For example, 'Zoo' comes @strong{before} 'Adam' even
+though one might expect the opposite.
+
+@verbatim
+      Z[⍋Z ← 'Adam' 'Zoo']
+ Zoo Adam 
+
+      Z[⍋Z ← 'Adam' 'Zora']
+ Adam Zora
+@end verbatim
+
+This pitfall can be avoided by enforcing the same length for all strings
+being compared or sorted. A simple way to achieve that is the use of
+@strong{⊂[2]⊃} like this (assuming IO←1):
+
+@verbatim
+      Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zoo']
+ Adam Zoo  
+
+      Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zora']
+ Adam Zora
+@end verbatim
 
 @node    Section 3.5
 @section Complex Numbers

@@ -224,7 +224,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>November 24, 2020
+<p>December 3, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -1395,17 +1395,18 @@ Next: <a href="#Section-3_002e5" accesskey="n" rel="next">Section 3.5</a>, Previ
 <h3 class="section">3.4 Comparison Rules</h3>
 
 <p>Both IBM APL2 and the ISO standard require that the arguments of &lt;, ≤, ≥, and
-&gt; (but not = or ≠) are integer or real numbers, and that the argument of monadic
-⍋ or ⍒ is a vector of integer or real numbers. In contrast GNU APL also allows
-the comparison of characters and numbers or the comparison of complex numbers
-according to the following, more general, rules.
+&gt; (but not of = or ≠) are integer or real numbers, and that the argument of
+monadic ⍋ or ⍒ is a vector of integer or real numbers. In contrast GNU APL
+also allows the comparison of characters and numbers or the comparison of
+complex numbers according to the following, more general, rules.
 </p>
 <p>Let A and B two APL values to be compared. The first comparison below that
 succeeds (i.e. returns a result) is then the result of comparing A and B.
 </p> 
 <p>1. Comparison by rank: if (⍴⍴A) &lt; (⍴⍴B) then A &lt; B. And vice versa.
 </p>
-<p>2. Comparison by shape: if (⍴A) &lt; (⍴B) then A &lt; B. And vice versa.
+<p>2. Comparison by shape: if (⍴A) &lt; (⍴B) then A &lt; B. And vice versa. The
+   first different shape item decides.
 </p>
 <p>3. Comparison of ravel elements: otherwise ⍴A and ⍴B are equal. If all
    corresponding ravel elements of A and B are equal (i.e. tolerantly equal
@@ -1468,6 +1469,27 @@ example, a magnitude first comparison of complex numbers would make ¯1 &lt; ¯2
 for a near-complex ¯2J∈ but ¯1 &gt; ¯2 for a true real ¯2.
 </p>
 
+<p><strong>CAUTION</strong>: The comparison of two strings (i.e. nested character
+vectors) may give unexpected results because shorter strings come before
+longer strings. For example, &rsquo;Zoo&rsquo; comes <strong>before</strong> &rsquo;Adam&rsquo; even
+though one might expect the opposite.
+</p>
+<pre class="verbatim">      Z[⍋Z ← 'Adam' 'Zoo']
+ Zoo Adam 
+
+      Z[⍋Z ← 'Adam' 'Zora']
+ Adam Zora
+</pre>
+<p>This pitfall can be avoided by enforcing the same length for all strings
+being compared or sorted. A simple way to achieve that is the use of
+<strong>⊂[2]⊃</strong> like this (assuming IO←1):
+</p>
+<pre class="verbatim">      Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zoo']
+ Adam Zoo  
+
+      Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zora']
+ Adam Zora
+</pre>
 <hr>
 <a name="Section-3_002e5"></a>
 <div class="header">

@@ -41,6 +41,7 @@ Backtrace.cc					Backtrace.hh		\
 Bif_F12_COMMA.cc				Bif_F12_COMMA.hh	\
 Bif_F12_DOMINO.cc				Bif_F12_DOMINO.hh	\
 Bif_F12_INDEX_OF.cc				Bif_F12_INDEX_OF.hh	\
+Bif_F12_INTERVAL_INDEX.cc			Bif_F12_INTERVAL_INDEX.hh \
 Bif_F12_FORMAT.cc				Bif_F12_FORMAT.hh	\
 Bif_F12_PARTITION_PICK.cc			Bif_F12_PARTITION_PICK.hh \
 Bif_F12_SORT.cc					Bif_F12_SORT.hh		\

@@ -468,12 +468,12 @@ enum CDR_type
    CDR_NEST32  = 7,   ///< 32 bit pointer to nested value
 };
 //-----------------------------------------------------------------------------
-/// the result of a comparison
+/// the result of a comparison cell_1.compare(cell_2)
 enum Comp_result
 {
-  COMP_LT = -1,   ///< less than
-  COMP_EQ =  0,   ///< equal
-  COMP_GT =  1,   ///< greter than
+  COMP_LT = -1,   ///< less than:     cell_1 < cell_2
+  COMP_EQ =  0,   ///< equal:         cell_1 = cell_2
+  COMP_GT =  1,   ///< greater than:  cell_1 > cell_2
 };
 //-----------------------------------------------------------------------------
 /// the order of a comparison

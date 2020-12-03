@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 24, 2020
+December 3, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1132,7 +1132,7 @@ File: apl.info,  Node: Section 3.4,  Next: Section 3.5,  Prev: Section 3.3,  Up:
 ====================
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤,
-≥, and > (but not = or ≠) are integer or real numbers, and that the
+≥, and > (but not of = or ≠) are integer or real numbers, and that the
 argument of monadic ⍋ or ⍒ is a vector of integer or real numbers.  In
 contrast GNU APL also allows the comparison of characters and numbers or
 the comparison of complex numbers according to the following, more
@@ -1145,6 +1145,7 @@ comparing A and B.
    1.  Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
 
    2.  Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa.
+The first different shape item decides.
 
    3.  Comparison of ravel elements: otherwise ⍴A and ⍴B are equal.  If
 all corresponding ravel elements of A and B are equal (i.e.  tolerantly
@@ -1208,6 +1209,27 @@ consistent results when comparing near-complex numbers or their true
 real companions.  For example, a magnitude first comparison of complex
 numbers would make ¯1 < ¯2J∈ for a near-complex ¯2J∈ but ¯1 > ¯2 for a
 true real ¯2.
+
+   *CAUTION*: The comparison of two strings (i.e.  nested character
+vectors) may give unexpected results because shorter strings come before
+longer strings.  For example, ’Zoo’ comes *before* ’Adam’ even though
+one might expect the opposite.
+
+      Z[⍋Z ← 'Adam' 'Zoo']
+ Zoo Adam 
+
+      Z[⍋Z ← 'Adam' 'Zora']
+ Adam Zora
+
+   This pitfall can be avoided by enforcing the same length for all
+strings being compared or sorted.  A simple way to achieve that is the
+use of *⊂[2]⊃* like this (assuming IO←1):
+
+      Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zoo']
+ Adam Zoo  
+
+      Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zora']
+ Adam Zora
 
 
 File: apl.info,  Node: Section 3.5,  Next: Section 3.6,  Prev: Section 3.4,  Up: Chapter 3
@@ -5266,60 +5288,60 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11473
-Node: Chapter 219812
-Node: Chapter 319944
-Node: Section 3.121645
-Node: Section 3.237806
-Node: Section 3.338565
-Node: Section 3.439852
-Node: Section 3.543254
-Node: Section 3.643427
-Node: Section 3.744040
-Node: Section 3.847993
-Node: Section 3.949535
-Node: Section 3.1050990
-Node: Section 3.1152774
-Node: Section 3.1254714
-Node: Section 3.1355655
-Node: Section 3.1455907
-Node: Section 3.1557303
-Node: Section 3.1659821
-Node: Section 3.1766520
-Node: Section 3.1867965
-Node: Section 3.1973626
-Node: Section 3.2078660
-Node: Section 3.2181941
-Node: Section 3.2282232
-Node: Section 3.2392807
-Node: Section 3.2493079
-Node: Section 3.2599657
-Node: Section 3.26102114
-Node: Section 3.27102783
-Node: Section 3.28105906
-Node: Section 3.29113514
-Node: Section 3.30114461
-Node: Section 3.31128023
-Node: Section 3.32137523
-Node: Section 3.33140627
-Node: Section 3.34142616
-Node: Chapter 4147020
-Node: Chapter 5148768
-Node: Chapter 6149894
-Node: Section 6.1151431
-Node: Section 6.2152711
-Node: Section 6.3153071
-Node: Section 6.4153313
-Node: Section 6.5153975
-Node: Section 6.6154453
-Node: Section 6.7155225
-Node: Section 6.8155682
-Node: Chapter 7156084
-Node: Section 7.1156503
-Node: Section 7.2157190
-Node: Chapter 8158021
-Node: Section 8.1158524
-Node: Section 8.2183838
+Node: Chapter 11472
+Node: Chapter 219811
+Node: Chapter 319943
+Node: Section 3.121644
+Node: Section 3.237805
+Node: Section 3.338564
+Node: Section 3.439851
+Node: Section 3.543930
+Node: Section 3.644103
+Node: Section 3.744716
+Node: Section 3.848669
+Node: Section 3.950211
+Node: Section 3.1051666
+Node: Section 3.1153450
+Node: Section 3.1255390
+Node: Section 3.1356331
+Node: Section 3.1456583
+Node: Section 3.1557979
+Node: Section 3.1660497
+Node: Section 3.1767196
+Node: Section 3.1868641
+Node: Section 3.1974302
+Node: Section 3.2079336
+Node: Section 3.2182617
+Node: Section 3.2282908
+Node: Section 3.2393483
+Node: Section 3.2493755
+Node: Section 3.25100333
+Node: Section 3.26102790
+Node: Section 3.27103459
+Node: Section 3.28106582
+Node: Section 3.29114190
+Node: Section 3.30115137
+Node: Section 3.31128699
+Node: Section 3.32138199
+Node: Section 3.33141303
+Node: Section 3.34143292
+Node: Chapter 4147696
+Node: Chapter 5149444
+Node: Chapter 6150570
+Node: Section 6.1152107
+Node: Section 6.2153387
+Node: Section 6.3153747
+Node: Section 6.4153989
+Node: Section 6.5154651
+Node: Section 6.6155129
+Node: Section 6.7155901
+Node: Section 6.8156358
+Node: Chapter 7156760
+Node: Section 7.1157179
+Node: Section 7.2157866
+Node: Chapter 8158697
+Node: Section 8.1159200
+Node: Section 8.2184514
 
 End Tag Table
 
