@@ -1087,6 +1087,7 @@ Function_P old_function = symbol->get_function();
       }
 
    // check that the function can be defined (e.g. is not on the )SI stack)
+   // and is not native
    //
    if (old_function)
       {
@@ -1100,6 +1101,13 @@ Function_P old_function = symbol->get_function();
              err_line = 0;
              delete ufun;
              return 0;
+           }
+
+        if (old_function->is_native())
+           {
+             MORE_ERROR() << "Attempt to re-define native function '"
+                          << old_function->get_name() << "'. ⎕EX it first.";
+             DEFN_ERROR;
            }
 
         const UserFunction * old_ufun = old_function->get_ufun1();
