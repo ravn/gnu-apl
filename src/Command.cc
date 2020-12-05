@@ -24,6 +24,8 @@
 #include <string.h>
 #include <sys/resource.h>
 
+#include "makefile.h"   // for configure paths
+
 #include "CharCell.hh"
 #include "ComplexCell.hh"
 #include "Command.hh"
@@ -1374,36 +1376,51 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
    out << "Library root: " << LibPaths::get_APL_lib_root() << 
 "\n"
 "\n"
-"Library reference number mapping:\n"
+"Library reference number to (absolute) path mapping:\n"
 "\n"
-"---------------------------------------------------------------------------\n"
-"Ref Conf  Path                                                State   Err\n"
-"---------------------------------------------------------------------------\n";
-         
+"╔═══╤═════╤═════════════╤══════════════════════════════════════════════════════╗\n"
+"║Ref│Conf │State (errno)│ Path to the directory containing the workspace files ║\n"
+"╟───┼─────┼─────────────┼──────────────────────────────────────────────────────╢\n";
 
    loop(d, 10)
        {
+          out << "║ " << d << " │";
           UTF8_string path = LibPaths::get_lib_dir(LibRef(d));
-          out << " " << d << " ";
           switch(LibPaths::get_cfg_src(LibRef(d)))
              {
-                case LibPaths::LibDir::CSRC_NONE:      out << "NONE" << endl;
-                                                     continue;
-                case LibPaths::LibDir::CSRC_ENV:       out << "ENV   ";   break;
-                case LibPaths::LibDir::CSRC_PWD:       out << "PWD   ";   break;
-                case LibPaths::LibDir::CSRC_PREF_SYS:  out << "PSYS  ";   break;
-                case LibPaths::LibDir::CSRC_PREF_HOME: out << "PUSER ";   break;
-                case LibPaths::LibDir::CSRC_CMD:       out << "CMD   ";   break;
+                case LibPaths::LibDir::CSRC_NONE:      out << "NONE │" << endl;
+                                                       continue;
+                case LibPaths::LibDir::CSRC_ENV:       out << "ENV  │";   break;
+                case LibPaths::LibDir::CSRC_PWD:       out << "PWD  │";   break;
+                case LibPaths::LibDir::CSRC_PREF_SYS:  out << "PSYS │";   break;
+                case LibPaths::LibDir::CSRC_PREF_HOME: out << "PUSER│";   break;
+                case LibPaths::LibDir::CSRC_CMD:       out << "CMD  │";   break;
              }
 
-        out << left << setw(52) << path.c_str();
-        DIR * dir = opendir(path.c_str());
-        if (dir)   { out << " present" << endl;   closedir(dir); }
-        else       { out << " missing (" << errno << ")" << endl; }
+        if (DIR * dir = opendir(path.c_str()))
+           { out << " present     │ ";   closedir(dir); }
+        else
+           {
+             char cc[10];
+             snprintf(cc, sizeof(cc), "(%u)", errno);
+             out << " missing " << setw(4) << cc << "│ ";
+           }
+
+        out << left << setw(53) << path.c_str() << "║\n";
       }
 
    out <<
-"===========================================================================\n" << endl;
+"╚═══╧══╤══╧═════════════╧══════════════════════════════════════════════════════╝\n"
+"       │\n"
+"       ├── NONE:  found no method to compute the library path\n"
+"       ├── CMD:   the path was set with )LIBS N path\n"
+"       ├── ENV:   the path came from environment variable $APL_LIB_ROOT\n"
+"       ├── PSYS:  the path came from the system preferences in file\n"
+"       │                   " << Makefile__sysconfdir << "/gnu-apl.d/preferences\n"
+"       ├── PUSER: the path came from user preferences in file\n"
+"       │                   $HOME/.config/gnu-apl or $HOME/.gnu-apl\n"
+"       └── PWD:   the path is relative to current directory $PWD (last resort)"
+       << endl;
 }
 //-----------------------------------------------------------------------------
 DIR *
