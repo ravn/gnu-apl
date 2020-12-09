@@ -112,11 +112,11 @@ DerivedFunction::~DerivedFunction()
 }
 //-----------------------------------------------------------------------------
 void
-DerivedFunction::destroy(const char * loc)
+DerivedFunction::destroy_derived(const char * loc)
 {
    Log(LOG_FunOperX)
       {
-        CERR << "DerivedFunction::destroy(" << get_name() << ")" << endl;
+        CERR << "DerivedFunction::destroy_derived(" << get_name() << ")" << endl;
       }
 
    left_arg.clear(loc);
@@ -343,7 +343,7 @@ DerivedFunctionCache::reset()
    while (idx)
        {
          --idx;   // back to last item
-         get(LOC)->destroy(LOC);
+         get(LOC)->destroy_derived(LOC);
          --idx;   // undo idx++ by get(LOC)
        }
 

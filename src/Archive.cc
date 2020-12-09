@@ -1989,7 +1989,7 @@ XML_Loading_Archive::read_Function()
 {
 const Fid fid = find_Fid_attr("fid", false, 16);
 const TokenTag primitive_tag = TokenTag(find_int_attr("tag", true, 16));
-   Assert(primitive_tag != -1);
+   Assert(primitive_tag != TOK_NONE);
    Function_P pfun = ID::get_system_function(primitive_tag);
    Assert(pfun);
    add_fid_function(fid, pfun, LOC);
@@ -2001,7 +2001,7 @@ XML_Loading_Archive::read_Function(int d, Symbol & symbol)
 const Fid fid = find_Fid_attr("fid", false, 16);
 const Macro::Macro_num macnum =
                        Macro::Macro_num(find_int_attr("macro", true, 10));
-   if (macnum != -1)   // function is a macro
+   if (macnum != Macro::MAC_NONE)   // function is a macro
       {
         Macro * macro = Macro::get_macro(macnum);
         Assert(macro);
@@ -2011,7 +2011,7 @@ const Macro::Macro_num macnum =
       }
 
 const TokenTag primitive_tag = TokenTag(find_int_attr("tag", true, 16));
-   if (primitive_tag != -1)   // function is an APL primitive
+   if (primitive_tag != TOK_NONE)   // function is an APL primitive
       {
         Function_P prim = ID::get_system_function(Id(primitive_tag >> 16));
         Assert(prim);

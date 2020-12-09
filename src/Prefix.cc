@@ -97,7 +97,7 @@ Prefix::syntax_error(const char * loc)
             if (fun && fun->is_derived())
                {
                  Function * fp = const_cast<Function *>(fun);
-                 reinterpret_cast<DerivedFunction *>(fp)->destroy(LOC);
+                 reinterpret_cast<DerivedFunction *>(fp)->destroy_derived(LOC);
                }
           }
       }

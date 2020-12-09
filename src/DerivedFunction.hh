@@ -53,7 +53,7 @@ public:
    DerivedFunction(Function_P func, Value_P X, const char * loc);
 
    /// deallocate resources held by this DerivedFunction
-   void destroy(const char * loc);
+   void destroy_derived(const char * loc);
 
    /// overloaded Function::print();
    virtual ostream & print(ostream & out) const;

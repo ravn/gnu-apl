@@ -33,7 +33,8 @@ public:
       {
 #define mac_def(name, _txt) MAC_ ## name,   ///< a Macro_num
 #include "Macro.def"
-        MAC_COUNT
+        MAC_COUNT,
+        MAC_NONE = -1
       };
 
    /// constructor
