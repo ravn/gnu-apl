@@ -208,38 +208,6 @@ TokenClass next = body[pc].get_Class();
 }
 //-----------------------------------------------------------------------------
 bool
-Prefix::is_fun_or_oper(int pc) const
-{
-   // this function is called when / ⌿ \ or ⍀ shall be resolved. pc points
-   // to the token left of / ⌿ \ or ⍀.
-   //
-TokenTag tag_LO = body[pc].get_tag();
-
-   if (tag_LO == TOK_R_BRACK)
-      {
-        // e.g. fun[...]/ or value[...]/ Skip over [...]
-        //
-        pc += body[pc].get_int_val2();
-        Assert1(body[pc++].get_Class() == TC_L_BRACK);   // opening [
-        tag_LO = body[pc].get_tag();
-      }
-
-   if (tag_LO == TOK_R_PARENT)   return !is_value_parenthesis(pc);
-   if (body[pc].get_Class() == TC_OPER2)   return false;   // make / a function
-
-   if ((tag_LO & TV_MASK) == TV_FUN)   return true;
-
-   if (tag_LO == TOK_SYMBOL)
-      {
-        Symbol * sym = body[pc].get_sym_ptr();
-        if (sym == 0)   return false;
-        return sym->get_function() != 0;
-      }
-
-   return false;   // not a function or operator
-}
-//-----------------------------------------------------------------------------
-bool
 Prefix::is_value_bracket() const
 {
    Assert1(body[PC - 1].get_Class() == TC_R_BRACK);
@@ -356,7 +324,7 @@ Prefix::value_expected()
    //
    if (saved_lookahead.tok.get_ValueType() == TV_INDEX)   return true;
 
-   for (int pc = PC; pc < int(body.size());)
+   for (size_t pc = PC; pc < body.size();)
       {
         const Token & tok = body[pc++];
         switch(tok.get_Class())
@@ -504,12 +472,25 @@ grow:
              }
           else
              {
+               const NameClass  nc = sym->get_nc();
+               if (size_t(PC) < body.size() &&
+                   body[PC + 1].get_tag() == TOK_OPER2_INNER)
+                  {
+                    // APL code is .SYM which could be a normal inner product f.g
+                    // or a value member. We
+                    if (nc != NC_FUNCTION && nc != NC_OPERATOR)   // not inner prod
+                       {
+                         PC = lookahead_high + 1;   // resolved: restore PC
+                         push(tl);
+                         goto again;
+                       }
+                  }
+
                const bool left_sym = get_assign_state() == ASS_arrow_seen;
                bool resolved = false;
                if (left_sym)
                  {
                     // assignment to only variable or undefined names
-                   const NameClass  nc = sym->get_nc();
 
                    if (NC_VARIABLE         != nc &&
                        NC_UNUSED_USER_NAME != nc &&
@@ -539,9 +520,8 @@ grow:
                if (left_sym)   set_assign_state(ASS_var_seen);
                Log(LOG_prefix_parser)
                   {
-                    if (left_sym)   CERR << "TOK_LSYMB ";
-                    else            CERR << "TOK_SYMBOL ";
-                    CERR << "resolved to " << tl.tok << endl;
+                    const char * what = left_sym ? "TOK_LSYMB" : "TOK_SYMBOL";
+                    CERR << what << " resolved to " << tl.tok << endl;
                   }
              }
           PC = lookahead_high + 1;   // resolve() succeeded: restore PC
@@ -667,7 +647,7 @@ found_prefix:
      const bool shift = dont_reduce(next);
      if (shift)
         {
-           Log(LOG_prefix_parser)  CERR
+          Log(LOG_prefix_parser)  CERR
                << "   phrase #" << (best - hash_table)
                << ": " << best->phrase_name
                << " matches, but prio " << best->prio
@@ -1363,6 +1343,64 @@ Token result = Token(TOK_FUN2, derived);
 }
 //-----------------------------------------------------------------------------
 void
+Prefix::reduce_D_V__()
+{
+   // end of an A.B.C...Z chain. at0() is the final member Z and at1() is
+   // the '.' before it. Collect members until no more '.' are found.
+   //
+vector<const Symbol *>members;
+   members.push_back(at1().get_sym_ptr());
+   while (size_t(PC) < (body.size() - 1))
+         {
+           if (body[PC].get_Class()   != TC_SYMBOL)         break;
+           if (body[PC + 1].get_tag() != TOK_OPER2_INNER)   break;
+
+           members.push_back(body[PC].get_sym_ptr());
+           PC = Function_PC(PC + 2);
+         }
+
+Symbol * top = body[PC].get_sym_ptr();
+   members.push_back(top);
+   PC = Function_PC(PC + 1);
+
+   if (get_assign_state() == ASS_none)              // member reference
+      {
+        Value_P toplevel_val = top->get_value();
+        if (!toplevel_val)
+           {
+             UCS_string & more =  MORE_ERROR() << "member access: top-level value "
+                 << top->get_name() << " for member ";
+             more.append_members(members, 0);
+             more << " not found";
+             VALUE_ERROR;
+           }
+
+        const Cell & member_cell = toplevel_val->get_member(members);
+        if (member_cell.is_pointer_cell())
+           {
+             Value_P Z(member_cell.get_pointer_value()->clone(LOC), LOC);
+              pop_args_push_result(Token(TOK_APL_VALUE1, Z));
+           }
+        else
+           {
+             Value_P Z(LOC);
+             Z->next_ravel()->init(member_cell, Z.getref(), LOC);
+              pop_args_push_result(Token(TOK_APL_VALUE1, Z));
+           }
+
+        action = RA_CONTINUE;
+        return;
+      }
+   else if (get_assign_state() == ASS_arrow_seen)   // member assignment
+      {
+Q(LOC)
+Q(top->get_name())
+TODO;
+      }
+   else FIXME;
+}
+//-----------------------------------------------------------------------------
+void
 Prefix::reduce_F_D_G_()
 {
 DerivedFunction * derived =
@@ -1578,6 +1616,15 @@ void
 Prefix::reduce_V_ASS_B_()
 {
 Value_P B = at2().get_apl_val();
+   if (size_t(PC) < body.size() && body[PC].get_tag() == TOK_OPER2_INNER)
+      {
+        // V is the end of a. b. ... .V←B so body[PC] is not an inner product
+        // but the end of a member chain. Shift the TOK_OPER2_INNER so that
+        // we will land in reduce_D_V__().1369
+        //
+        action = RA_PUSH_NEXT;
+        return;
+      }
 
    Assert1(B->get_owner_count() >= 2);   // owners are at least B and at2()
 const bool clone = B->get_owner_count() != 2 || at1().get_tag() != TOK_ASSIGN1;

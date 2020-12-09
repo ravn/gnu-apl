@@ -152,39 +152,34 @@ Function_P LO = _LO.get_function();
            }
       }
 
+
+   // use the same scheme as ScalarFunction::do_scalar_AB() to determine
+   // the shape of the result. In order to detect conformity errors we compute
+   // shape_Z even if no result is returned.
+   //
+const int inc_A = A->get_increment();
+const int inc_B = B->get_increment();
+
+const Shape * shape_Z = 0;
+   if      (A->is_scalar())      shape_Z = &B->get_shape();
+   else if (B->is_scalar())      shape_Z = &A->get_shape();
+   else if (inc_A == 0)          shape_Z = &B->get_shape();
+   else if (inc_B == 0)          shape_Z = &A->get_shape();
+   else if (A->same_shape(*B))   shape_Z = &B->get_shape();
+   else   // error
+      {
+        if (!A->same_rank(*B))   RANK_ERROR;
+        else                     LENGTH_ERROR;
+      }
+
+const ShapeItem len_Z = shape_Z->get_volume();
 Value_P Z;
-int dA = 1;   // assume A is non-scalar
-int dB = 1;   // assume B is non-scalar
-ShapeItem len_Z = 0;
-
-   if (A->is_scalar_or_len1_vector())          // scalar-extend A
-      {
-        len_Z = B->element_count();
-        dA = 0;
-        if (LO->has_result())   Z = Value_P(B->get_shape(), LOC);
-      }
-   else if (B->is_scalar_or_len1_vector())     // scalar-extend B
-      {
-        dB = 0;
-        len_Z = A->element_count();
-        if (LO->has_result())   Z = Value_P(A->get_shape(), LOC);
-      }
-   else if (A->same_shape(*B))  // A and B are non-scalars with identical shapes
-      {
-        len_Z = B->element_count();
-        if (LO->has_result())   Z = Value_P(B->get_shape(), LOC);
-      }
-   else                         // the shapes of A and B differ
-      {
-        if (A->get_rank() != B->get_rank())   RANK_ERROR;
-        else                                  LENGTH_ERROR;
-      }
-
+   if (LO->has_result())   Z = Value_P(*shape_Z, LOC);
 
    loop(z, len_Z)
       {
-        const Cell * cA = &A->get_ravel(dA * z);
-        const Cell * cB = &B->get_ravel(dB * z);
+        const Cell * cA = &A->get_ravel(inc_A * z);
+        const Cell * cB = &B->get_ravel(inc_B * z);
         const bool left_val = cB->is_lval_cell();
         Value_P LO_A = cA->to_value(LOC);     // left argument of LO
         Value_P LO_B = cB->to_value(LOC);     // right argument of LO;

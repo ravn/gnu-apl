@@ -493,6 +493,83 @@ const int src_incr = new_value->is_scalar() ? 0 : 1;
       }
 }
 //-----------------------------------------------------------------------------
+const Cell &
+Value::get_member(const vector<const Symbol *> & members) const
+{
+const Value * val_p = this;
+
+   // members[members.size() - 1] == this
+   //
+   for (int m = members.size() - 2; m >= 0; --m)
+       {
+         const UCS_string member_ucs = members[m]->get_name();
+         if (val_p->get_rank() != 2)
+            {
+              UCS_string & more = MORE_ERROR() << "member access: the rank of ";
+              more.append_members(members, m);
+              more << " is not 2.\n"
+                      "Expecting an N×2 matrix of member,value pairs.";
+              RANK_ERROR;
+            }
+
+         if (val_p->get_cols() != 2)
+            {
+              UCS_string & more = MORE_ERROR()
+                 << "member access: the number of columns of ";
+              more.append_members(members, m);
+              more << " is not 2.\n"
+                      "Expecting an N×2 matrix of member,value pairs.";
+              LENGTH_ERROR;
+            }
+
+         const ShapeItem rows = val_p->get_rows();
+         const Cell * member_cell = 0;
+         loop(r, rows)
+             {
+               const Cell & cell = val_p->get_ravel(2*r);
+               if (cell.get_cell_type() != CT_POINTER)               continue;
+               Value_P cell_sub = cell.get_pointer_value();
+               if (!cell_sub-> is_char_string())                     continue;
+               const UCS_string sub_ucs = cell_sub->get_UCS_ravel();
+               if (sub_ucs.compare(member_ucs) != COMP_EQ)           continue;
+
+               // at this point we found member_ucs in row r
+               //
+               member_cell = &val_p->get_ravel(2*r + 1);
+               if (m)   // more members coming
+                  {
+                    if (!member_cell->is_pointer_cell())
+                       {
+                         UCS_string & more = MORE_ERROR()
+                                 << "member access: member " << member_ucs
+                                 << " exists in ";
+                         more.append_members(members, m);
+                         more << "but its (internal) value is not nested";
+                         DOMAIN_ERROR;
+                       }
+
+                    // next member
+                    //
+                    val_p = member_cell->get_pointer_value().get();
+                    break;
+                  }
+               else   // final member
+                  {
+                    return *member_cell;
+                  }
+             }
+         if (member_cell)   continue;
+
+         UCS_string & more = MORE_ERROR()
+                          << "member access: could not find member "
+                          << member_ucs << " in ";
+         more.append_members(members, m);
+         VALUE_ERROR;
+       }
+
+   FIXME;
+}
+//-----------------------------------------------------------------------------
 Value *
 Value::get_lval_cellowner() const
 {
@@ -2067,6 +2144,16 @@ Idx0_0(const char * loc)
 {
 Shape sh(ShapeItem(0), ShapeItem(0));
 Value_P Z(sh, loc);
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+EmptyStruct(const char * loc)
+{
+Shape sh(ShapeItem(8), ShapeItem(2));
+Value_P Z(sh, loc);
+   while (Cell * cell = Z->next_ravel())   new (cell) IntCell(0);
    Z->check_value(LOC);
    return Z;
 }

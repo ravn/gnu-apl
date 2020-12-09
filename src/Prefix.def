@@ -35,37 +35,38 @@
    phrase 29:  F   [X]  OP1             3
    phrase 30:  F   [X]  OP1  [X]        4
    phrase 31:  VAL  OP1                 2
-   phrase 32:  VAL  OP2  VAL            3 F_D_G_
-   phrase 33:  VAL  OP2  F              3 F_D_G_
-   phrase 34:  F   OP2  VAL             3
-   phrase 35:  F   OP2  F               3
-   phrase 36:  F   OP2  [X]  VAL        4
-   phrase 37:  VAL  [X]                 2
-   phrase 38:  SYM  [X]                 2
-   phrase 39:  SYM  [X]  ←    VAL       4
-   phrase 40:  F   SYM                  2
-   phrase 41:  VAL  ←    VAL            3
-   phrase 42:  SYM  ←    VAL            3
-   phrase 43:  SYM  ←    F              3
-   phrase 44:  SYM  ←    F0             3 V_ASS_F_
-   phrase 45:  SYM  ←    OP1            3 V_ASS_F_
-   phrase 46:  SYM  ←    OP2            3 V_ASS_F_
-   phrase 47:  ]                        1
-   phrase 48:  [ ;  PIDX                2
-   phrase 49:  [ ;  VAL  PIDX           3
-   phrase 50:  VAL  VAL                 2
-   phrase 51:  SYM  )    ←    VAL       4
-   phrase 52:  END  VOID                2
-   phrase 53:  END  VAL                 2
-   phrase 54:  END  →                   2
-   phrase 55:  END  →    VAL            3
-   phrase 56:  END  VAL  →    VAL       4
-   phrase 57:  RET                      1
-   phrase 58:  RET  VOID                2
-   phrase 59:  RET  VAL                 2
-   phrase 60:  RET  →                   2
-   phrase 61:  RET  →    VAL            3
-   phrase 62:  RET  VAL  →    VAL       4
+   phrase 32:  OP2  SYM                 2
+   phrase 33:  VAL  OP2  VAL            3 F_D_G_
+   phrase 34:  VAL  OP2  F              3 F_D_G_
+   phrase 35:  F   OP2  VAL             3
+   phrase 36:  F   OP2  F               3
+   phrase 37:  F   OP2  [X]  VAL        4
+   phrase 38:  VAL  [X]                 2
+   phrase 39:  SYM  [X]                 2
+   phrase 40:  SYM  [X]  ←    VAL       4
+   phrase 41:  F   SYM                  2
+   phrase 42:  VAL  ←    VAL            3
+   phrase 43:  SYM  ←    VAL            3
+   phrase 44:  SYM  ←    F              3
+   phrase 45:  SYM  ←    F0             3 V_ASS_F_
+   phrase 46:  SYM  ←    OP1            3 V_ASS_F_
+   phrase 47:  SYM  ←    OP2            3 V_ASS_F_
+   phrase 48:  ]                        1
+   phrase 49:  [ ;  PIDX                2
+   phrase 50:  [ ;  VAL  PIDX           3
+   phrase 51:  VAL  VAL                 2
+   phrase 52:  SYM  )    ←    VAL       4
+   phrase 53:  END  VOID                2
+   phrase 54:  END  VAL                 2
+   phrase 55:  END  →                   2
+   phrase 56:  END  →    VAL            3
+   phrase 57:  END  VAL  →    VAL       4
+   phrase 58:  RET                      1
+   phrase 59:  RET  VOID                2
+   phrase 60:  RET  VAL                 2
+   phrase 61:  RET  →                   2
+   phrase 62:  RET  →    VAL            3
+   phrase 63:  RET  VAL  →    VAL       4
    ---------------------------------------------
 
    *** phrase table ***/
@@ -88,6 +89,7 @@
    void reduce_F_C_M_();             ///< reduce phrase F C M
    void reduce_F_C_M_C();            ///< reduce phrase F C M C
    void reduce_A_M__();              ///< reduce phrase A M
+   void reduce_D_V__();              ///< reduce phrase D V
    void reduce_F_D_B_();             ///< reduce phrase F D B
    void reduce_F_D_G_();             ///< reduce phrase F D G
    void reduce_F_D_C_B();            ///< reduce phrase F D C B
@@ -115,7 +117,7 @@
    void reduce_RETC_GOTO_B_();       ///< reduce phrase RETC GOTO B
    void reduce_RETC_A_GOTO_B();      ///< reduce phrase RETC A GOTO B
 
-   enum { PHRASE_COUNT   = 63,      ///< number of phrases
+   enum { PHRASE_COUNT   = 64,      ///< number of phrases
           PHRASE_MODU    = 415,     ///< hash table size
           MAX_PHRASE_LEN = 4 };     ///< max. number of token in a phrase
 
@@ -183,7 +185,7 @@ const Prefix::Phrase Prefix::hash_table[PHRASE_MODU] =
   PH( F V            , 0x001C7,   22,   0,  2, F_V__        )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )
-  PH(                , 0x00000,    0,   0,  0, ___          )
+  PH( D V            , 0x001CA,   62,   0,  2, D_V__        )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )

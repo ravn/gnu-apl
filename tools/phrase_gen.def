@@ -34,79 +34,93 @@
    so that the longest match of the same prefix wins
  */
 
+#define SHIFT ""
+
+//    (prio              TC0,   TC1,  TC2,   TC3,    reduce_ suffix
+//=================================================================
 // remove parentheses
-phrase(BS_ANY + 3,       LPAR , B    , RPAR ,      , ""    )
+//
+phrase(BS_ANY + 3,       LPAR , B    , RPAR ,      , SHIFT )
 phrase(BS_ANY + 3,       LPAR , F    , RPAR ,      , "LPAR_B_RPAR_")
 phrase(BS_ANY + 4,       LPAR , F    , C    , RPAR , ""    )
 
 // niladic function call
-phrase(BS_ANY +  1,      N    ,      ,      ,      , ""    )
+phrase(BS_ANY +  1,      N    ,      ,      ,      , SHIFT )
 
 // function called monadically
-phrase_MISC (BS_F_B + 2,        F    , B    ,      , ""    )
-phrase_MISC (BS_F_B + 3,        F    , C    , B    , ""    )
+//
+phrase_MISC (BS_F_B + 2,        F    , B    ,      , SHIFT )
+phrase_MISC (BS_F_B + 3,        F    , C    , B    , SHIFT )
 
 // function called dyadically
-phrase(BS_A_F + 3,       A    , F    , B    ,      , ""    )
-phrase(BS_A_F + 3,       A    , M    , B    ,      , ""    )   // e.g. A / B
-phrase(BS_A_F + 4,       A    , F    , C    , B    , ""    )
-phrase(BS_A_F + 4,       A    , M    , C    , B    , ""    )   // e.g. A /[X] B
+//
+phrase(BS_A_F + 3,       A    , F    , B    ,      , SHIFT )
+phrase(BS_A_F + 3,       A    , M    , B    ,      , SHIFT )   // e.g. A / B
+phrase(BS_A_F + 4,       A    , F    , C    , B    , SHIFT )
+phrase(BS_A_F + 4,       A    , M    , C    , B    , SHIFT )   // e.g. A /[X] B
 
 // monadic operator
-phrase(BS_LO_OP + 2,     F    , M    ,      ,      , ""    )   // e.g. +/
-phrase(BS_LO_OP + 3,     F    , M    , C    ,      , ""    )   // e.g. +/[2]
-phrase(BS_LO_OP + 3,     F    , C    , M    ,      , ""    )   // e.g. ,[2]/
-phrase(BS_LO_OP + 4,     F    , C    , M    , C    , ""    )   // e.g. ,[2]/[2]
-phrase(BS_LO_OP + 2,     A    , M    ,      ,      , ""    )   // e.g. A/
+//
+phrase(BS_LO_OP + 2,     F    , M    ,      ,      , SHIFT )   // e.g. +/
+phrase(BS_LO_OP + 3,     F    , M    , C    ,      , SHIFT )   // e.g. +/[2]
+phrase(BS_LO_OP + 3,     F    , C    , M    ,      , SHIFT )   // e.g. ,[2]/
+phrase(BS_LO_OP + 4,     F    , C    , M    , C    , SHIFT )   // e.g. ,[2]/[2]
+phrase(BS_LO_OP + 2,     A    , M    ,      ,      , SHIFT )   // e.g. A/
 
 // dyadic operator
+//
+phrase(BS_OP_RO + 2,     D    , V    ,      ,      , SHIFT )   // e.g. .MEMBER
 phrase(BS_OP_RO + 3,     A    , D    , B    ,      , "F_D_G_")
 phrase(BS_OP_RO + 3,     A    , D    , G    ,      , "F_D_G_")
-phrase(BS_OP_RO + 3,     F    , D    , B    ,      , ""    )
-phrase(BS_OP_RO + 3,     F    , D    , G    ,      , ""    )
-phrase(BS_OP_RO + 4,     F    , D    , C    , B    , ""    )
+phrase(BS_OP_RO + 3,     F    , D    , B    ,      , SHIFT )
+phrase(BS_OP_RO + 3,     F    , D    , G    ,      , SHIFT )
+phrase(BS_OP_RO + 4,     F    , D    , C    , B    , SHIFT )
 
 // indexed reference and assignment
-phrase(BS_ANY_BRA + 2,   A    , C    ,      ,      , ""    )
-phrase(BS_ANY_BRA + 2,   V    , C    ,      ,      , ""    )
-phrase(BS_ANY_BRA + 4,   V    , C    , ASS  , B    , ""    )
+phrase(BS_ANY_BRA + 2,   A    , C    ,      ,      , SHIFT )
+phrase(BS_ANY_BRA + 2,   V    , C    ,      ,      , SHIFT )
+phrase(BS_ANY_BRA + 4,   V    , C    , ASS  , B    , SHIFT )
 
 // selective specification
-phrase(BS_F_B + 2,       F    , V    ,     ,       , ""    )
+phrase(BS_F_B + 2,       F    , V    ,     ,       , SHIFT )
 
 // (reference) and assignment
-phrase(BS_V_ASS + 3,     A    , ASS  , B    ,      , ""    )   // selective spec.
-phrase(BS_V_ASS + 3,     V    , ASS  , B    ,      , ""    )   // variable spec.
-phrase(BS_V_ASS + 3,     V    , ASS  , F    ,      , ""    )   // λ: V ← { ... } ⍺ ⍵
+phrase(BS_V_ASS + 3,     A    , ASS  , B    ,      , SHIFT )   // selective ass.
+phrase(BS_V_ASS + 3,     V    , ASS  , B    ,      , SHIFT )   // variable ass.
+phrase(BS_V_ASS + 3,     V    , ASS  , F    ,      , SHIFT )   // λ: V ← { ... } ⍺ ⍵
 phrase(BS_V_ASS + 3,     V    , ASS  , N    ,      , "V_ASS_F_")   // λ: V ← { ... }
 phrase(BS_V_ASS + 3,     V    , ASS  , M    ,      , "V_ASS_F_")   // λ: V ← { ... } ⍶
 phrase(BS_V_ASS + 3,     V    , ASS  , D    ,      , "V_ASS_F_")   // λ: V ← { ... } ⍶ ⍹
 
 // build index list
-phrase(BS_ANY + 1,       RBRA ,      ,      ,      , ""    )
-phrase(BS_ANY + 2,       LBRA , I    ,      ,      , ""    )
-phrase(BS_ANY + 3,       LBRA , B    , I    ,      , ""    )
+//
+phrase(BS_ANY + 1,       RBRA ,      ,      ,      , SHIFT )
+phrase(BS_ANY + 2,       LBRA , I    ,      ,      , SHIFT )
+phrase(BS_ANY + 3,       LBRA , B    , I    ,      , SHIFT )
 
 // vector notation
-phrase(BS_VAL_VAL + 2,   A    , B    ,      ,      , ""    )
+phrase(BS_VAL_VAL + 2,   A    , B    ,      ,      , SHIFT )
 
 // vector assignment (A B ... C) ← B
-phrase(BS_VAL_VAL + 2,   V    , RPAR , ASS  , B    , ""    )
+//
+phrase(BS_VAL_VAL + 2,   V    , RPAR , ASS  , B    , SHIFT )
 
 // end of statement
-phrase(BS_ANY + 2,       END  , VOID ,      ,      , ""    )
-phrase(BS_ANY + 2,       END  , B    ,      ,      , ""    )
-phrase(BS_ANY + 2,       END  , GOTO ,      ,      , ""    )
-phrase(BS_ANY + 3,       END  , GOTO , B    ,      , ""    )
-phrase(BS_ANY + 4,       END  , A    , GOTO , B    , ""    )
+//
+phrase(BS_ANY + 2,       END  , VOID ,      ,      , SHIFT )
+phrase(BS_ANY + 2,       END  , B    ,      ,      , SHIFT )
+phrase(BS_ANY + 2,       END  , GOTO ,      ,      , SHIFT )
+phrase(BS_ANY + 3,       END  , GOTO , B    ,      , SHIFT )
+phrase(BS_ANY + 4,       END  , A    , GOTO , B    , SHIFT )
 
 // end of user defined function, ⍎, or ◊ context
-phrase(BS_ANY + 1,       RETC ,      ,      ,      , ""    )
-phrase(BS_ANY + 2,       RETC , VOID ,      ,      , ""    )
-phrase(BS_ANY + 2,       RETC , B    ,      ,      , ""    )
-phrase(BS_ANY + 2,       RETC , GOTO ,      ,      , ""    )
-phrase(BS_ANY + 3,       RETC , GOTO , B    ,      , ""    )
-phrase(BS_ANY + 4,       RETC , A    , GOTO , B    , ""    )
+//
+phrase(BS_ANY + 1,       RETC ,      ,      ,      , SHIFT )
+phrase(BS_ANY + 2,       RETC , VOID ,      ,      , SHIFT )
+phrase(BS_ANY + 2,       RETC , B    ,      ,      , SHIFT )
+phrase(BS_ANY + 2,       RETC , GOTO ,      ,      , SHIFT )
+phrase(BS_ANY + 3,       RETC , GOTO , B    ,      , SHIFT )
+phrase(BS_ANY + 4,       RETC , A    , GOTO , B    , SHIFT )
 
 #undef phrase
 

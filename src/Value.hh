@@ -250,6 +250,9 @@ public:
    /// assign \b val to the cell references in this value.
    void assign_cellrefs(Value_P val);
 
+   /// return member of this value, defined by \b members
+   const Cell & get_member(const vector<const Symbol *> & members) const;
+
    /// return the idx'th element of the ravel.
    Cell & get_ravel(ShapeItem idx)
       { Assert1(idx < nz_element_count());   return ravel[idx]; }
@@ -712,6 +715,9 @@ Value_P Str0_0(const char * loc);
 
 /// 0 0⍴0
 Value_P Idx0_0(const char * loc);
+
+/// empty struct
+Value_P EmptyStruct(const char * loc);
 
 // ----------------------------------------------------------------------------
 

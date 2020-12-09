@@ -29,6 +29,7 @@
 #include "Output.hh"
 #include "PrintBuffer.hh"
 #include "PrintOperator.hh"
+#include "Symbol.hh"
 #include "UCS_string.hh"
 #include "UTF8_string.hh"
 #include "Value.hh"
@@ -901,6 +902,16 @@ UCS_string::append_shape(const Shape & shape)
               append(UNI_OVERBAR);
             }
          append_number(s);
+       }
+}
+//-----------------------------------------------------------------------------
+void
+UCS_string::append_members(const vector<const Symbol *> & members, int m)
+{
+   for (int mm = members.size() - 1; mm >= m; --mm)
+       {
+         if (mm < int(members.size() - 1))   *this += Unicode('.');
+         append(members[mm]->get_name());
        }
 }
 //-----------------------------------------------------------------------------

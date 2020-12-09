@@ -323,6 +323,10 @@ public:
    /// append shape (in APL encoding tke left arg of ↑) this string
    void append_shape(const Shape & shape);
 
+   /// append members (like x.y.z) starting at members[m] and going backwards
+   /// from the end of \b members to \b this string.
+   void append_members(const vector<const Symbol *> & members, int m);
+
    /// append number (in ASCII encoding like %lf) to this string
    void append_float(APL_Float num);
 
