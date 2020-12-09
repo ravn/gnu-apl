@@ -2638,12 +2638,14 @@ int function_number = -1;
 
          case 56:   // write nested lines As to file Bs
               {
+                // 1. before opening the output file, check that A is valid.
+                //
                 errno = 0;
                 size_t items_written = 0;
                 UTF8_string path(*B.get());
                 if (A->get_rank() > 1)   RANK_ERROR;
-                const ShapeItem len_A = A->element_count();
-                loop(a, len_A)
+                const ShapeItem line_count = A->element_count();
+                loop(a, line_count)
                     {
                       const Cell & cA = A->get_ravel(a);
                       if (!cA.is_pointer_cell())
@@ -2654,7 +2656,7 @@ int function_number = -1;
                             DOMAIN_ERROR;
                          }
 
-                      Value_P Ai = A->get_ravel(a).get_pointer_value();
+                      Value_P Ai = cA.get_pointer_value();
                       if (!Ai->is_char_vector())
                          {
                             MORE_ERROR() <<
@@ -2664,17 +2666,19 @@ int function_number = -1;
                          }
                     }
 
-                // at this point As is OK. Write it to file Bs.
+                // 2. at this point As is OK. Write it to file Bs.
                 FILE * f = fopen(path.c_str(), "w");
                 if (f == 0)   goto out_errno;
 
-                loop(a, len_A)
+                loop(a, line_count)
                     {
-                      Value_P Ai = A->get_ravel(a).get_pointer_value();
-                      UTF8_string line(Ai.getref());
-                      line += '\n';
-                      const size_t len = line.size();
-                      size_t written = fwrite(line.c_str(), 1, len, f);
+                      const Cell & cA = A->get_ravel(a);
+                      const Value & Ai = cA.get_pointer_value().getref();
+                      UCS_string line_ucs(Ai);
+                      UTF8_string line_utf(line_ucs);
+                      line_utf += '\n';
+                      const size_t len = line_utf.size();
+                      size_t written = fwrite(line_utf.c_str(), 1, len, f);
                       if (len != written)   goto out_errno;
                       items_written += len;
                     }

@@ -173,6 +173,7 @@ enum ValueFlags
   VF_complete = 0x0400,   ///< CHECK called
   VF_marked   = 0x0800,   ///< marked to detect stale
   VF_temp     = 0x1000,   ///< computed value
+  VF_member   = 0x2000,   ///< used for member access
 };
 
 extern ostream & print_flags(ostream & out, ValueFlags flags);

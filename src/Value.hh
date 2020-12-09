@@ -251,7 +251,11 @@ public:
    void assign_cellrefs(Value_P val);
 
    /// return member of this value, defined by \b members
-   const Cell & get_member(const vector<const Symbol *> & members) const;
+   Cell & get_member(const vector<const Symbol *> & members, Value * & owner,
+                     bool create_if_needed);
+
+   // double the ravel length of \b this value (by appending integer 0s).
+   void double_ravel(const char * loc);
 
    /// return the idx'th element of the ravel.
    Cell & get_ravel(ShapeItem idx)
@@ -427,6 +431,16 @@ public:
 #else
  # define FLAG_TRACE(_f, _b)
 #endif
+
+   /// set the Value flag \b member
+   void SET_member(_loc_type _loc) const
+      { FLAG_TRACE(member, true)   flags |=  VF_member;
+        ADD_EVENT(this, VHE_SetFlag, VF_member, _loc); }
+
+   /// true if Value flag \b member is set
+   bool is_member() const      { return (flags & VF_member) != 0; }
+
+# define set_member() SET_member(_LOC)
 
    /// set the Value flag \b complete
    void SET_complete(_loc_type _loc) const

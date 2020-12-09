@@ -37,8 +37,8 @@ public:
    PointerCell(Value * val, Value & cell_owner);
 
    /// constructor: a cell containing nested sub-array \b val where val
-   /// is allowed to be a simkle scalar (used only in ScalarFunction.cc)
-   PointerCell(Value * val, Value & cell_owneri, uint32_t magic);
+   /// is allowed to be a simple scalar (used only in ScalarFunction.cc)
+   PointerCell(Value * val, Value & cell_owner, uint32_t magic);
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner,

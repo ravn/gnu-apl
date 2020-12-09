@@ -726,37 +726,46 @@ const uint64_t inst = instance;
 bool
 Prefix::dont_reduce(TokenClass next) const
 {
-   if (at0().get_Class() == TC_VALUE)
+   switch(at0().get_Class())
       {
-        if (next == TC_OPER2)           // DOP B
-           {
-             return true;
-           }
-        else if (next == TC_VALUE)      // A B
-           {
-             return best->prio < BS_VAL_VAL;
-           }
-        else if (next == TC_R_PARENT)   // ) B
-           {
-             if (is_value_parenthesis(PC))     // e.g. (X+Y) B
+        case TC_VALUE:
+             if (next == TC_OPER2)           // DOP B
+                {
+                  return true;
+                }
+             else if (next == TC_VALUE)      // A B
                 {
                   return best->prio < BS_VAL_VAL;
                 }
-              else                      // e.g. (+/) B
+             else if (next == TC_R_PARENT)   // ) B
                 {
-                  return false;
+                  if (is_value_parenthesis(PC))     // e.g. (X+Y) B
+                     {
+                       return best->prio < BS_VAL_VAL;
+                     }
+                   else                      // e.g. (+/) B
+                     {
+                       return false;
+                     }
                 }
-           }
-      }
-   else if (at0().get_Class() == TC_FUN12)
-      {
-        if (next == TC_OPER2)
-           {
-             return true;
-           }
-      }
+             return false;   // TC_VALUE
 
-   return false;
+        case TC_FUN12:
+             if (next == TC_OPER2)
+                {
+                  return true;
+                }
+             return false;   // TC_FUN12
+
+        case TC_SYMBOL:
+             if (next == TC_OPER2)
+                {
+                  return true;
+                }
+             return false;   // TC_SYMBOL
+
+        default: return false;
+      }
 }
 //-----------------------------------------------------------------------------
 bool
@@ -1348,6 +1357,23 @@ Prefix::reduce_D_V__()
    // end of an A.B.C...Z chain. at0() is the final member Z and at1() is
    // the '.' before it. Collect members until no more '.' are found.
    //
+bool assign;
+   if (prefix_len == 2)        // member reference
+      {
+        if (get_assign_state() != ASS_none)
+           {
+             MORE_ERROR() << "member access: is not allowed left of ←";
+             syntax_error(LOC);
+           }
+        assign = false;
+      }
+   else if (prefix_len == 4)   // member assignment
+      {
+        Assert(get_assign_state() == ASS_arrow_seen);   // from reduce_D_V_ASS_B
+        assign = true;
+      }
+   else Assert(0 && "Bad prefix length in Prefix::reduce_D_V__()");
+
 vector<const Symbol *>members;
    members.push_back(at1().get_sym_ptr());
    while (size_t(PC) < (body.size() - 1))
@@ -1359,45 +1385,69 @@ vector<const Symbol *>members;
            PC = Function_PC(PC + 2);
          }
 
-Symbol * top = body[PC].get_sym_ptr();
-   members.push_back(top);
+Symbol * top_sym = body[PC].get_sym_ptr();
+   members.push_back(top_sym);
    PC = Function_PC(PC + 1);
 
-   if (get_assign_state() == ASS_none)              // member reference
+Value_P toplevel_val = top_sym->get_value();
+   if (!toplevel_val)   // top_sym is not a variable (-name)
       {
-        Value_P toplevel_val = top->get_value();
-        if (!toplevel_val)
+        if (assign)
            {
-             UCS_string & more =  MORE_ERROR() << "member access: top-level value "
-                 << top->get_name() << " for member ";
-             more.append_members(members, 0);
-             more << " not found";
-             VALUE_ERROR;
+             toplevel_val = EmptyStruct(LOC);
+             top_sym->assign(toplevel_val, false, LOC);
            }
+        else
+           {
+            UCS_string & more = MORE_ERROR()
+                    << "member access: top-level value "
+                    << top_sym->get_name() << " for member ";
+            more.append_members(members, 0);
+            more << " not found";
+            VALUE_ERROR;
+           }
+      }
 
-        const Cell & member_cell = toplevel_val->get_member(members);
+Value * member_owner = 0;
+Cell & member_cell = toplevel_val->get_member(members, member_owner, assign);
+   Assert(member_owner);
+
+   if (assign)              // member assignment
+      {
+        member_cell.release(LOC);   // let it free
+
+        Value_P B = at3().get_apl_val();
+        if (B->is_scalar())
+           {
+             if (B->get_ravel(0).is_pointer_cell())
+                new (&member_cell)
+                    PointerCell(B->get_ravel(0).get_pointer_value().get(),
+                                *member_owner);
+             else
+             member_cell.init(B->get_ravel(0), *member_owner, LOC);
+           }
+        else
+           {
+             new (&member_cell)   PointerCell(B.get(), *member_owner);
+           }
+        pop_args_push_result(Token(TOK_APL_VALUE1, B));
+      }
+   else                     // member reference
+      {
         if (member_cell.is_pointer_cell())
            {
              Value_P Z(member_cell.get_pointer_value()->clone(LOC), LOC);
-              pop_args_push_result(Token(TOK_APL_VALUE1, Z));
+             pop_args_push_result(Token(TOK_APL_VALUE1, Z));
            }
         else
            {
              Value_P Z(LOC);
              Z->next_ravel()->init(member_cell, Z.getref(), LOC);
-              pop_args_push_result(Token(TOK_APL_VALUE1, Z));
+             pop_args_push_result(Token(TOK_APL_VALUE1, Z));
            }
+      }
 
-        action = RA_CONTINUE;
-        return;
-      }
-   else if (get_assign_state() == ASS_arrow_seen)   // member assignment
-      {
-Q(LOC)
-Q(top->get_name())
-TODO;
-      }
-   else FIXME;
+   action = RA_CONTINUE;
 }
 //-----------------------------------------------------------------------------
 void
@@ -1613,18 +1663,15 @@ Token result = Token(TOK_APL_VALUE2, B);
 }
 //-----------------------------------------------------------------------------
 void
+Prefix::reduce_D_V_ASS_B()
+{
+  reduce_D_V__();
+}
+//-----------------------------------------------------------------------------
+void
 Prefix::reduce_V_ASS_B_()
 {
 Value_P B = at2().get_apl_val();
-   if (size_t(PC) < body.size() && body[PC].get_tag() == TOK_OPER2_INNER)
-      {
-        // V is the end of a. b. ... .V←B so body[PC] is not an inner product
-        // but the end of a member chain. Shift the TOK_OPER2_INNER so that
-        // we will land in reduce_D_V__().1369
-        //
-        action = RA_PUSH_NEXT;
-        return;
-      }
 
    Assert1(B->get_owner_count() >= 2);   // owners are at least B and at2()
 const bool clone = B->get_owner_count() != 2 || at1().get_tag() != TOK_ASSIGN1;

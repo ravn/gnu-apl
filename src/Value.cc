@@ -408,6 +408,12 @@ const ShapeItem length = nz_element_count();
 Value_P
 Value::get_cellrefs(const char * loc)
 {
+   if (is_member())
+      {
+        MORE_ERROR() << "member access: not allowed in selective assignment";
+        DOMAIN_ERROR;
+      }
+
 Value_P ret(get_shape(), loc);
 
 const ShapeItem ec = element_count();
@@ -493,17 +499,27 @@ const int src_incr = new_value->is_scalar() ? 0 : 1;
       }
 }
 //-----------------------------------------------------------------------------
-const Cell &
-Value::get_member(const vector<const Symbol *> & members) const
+Cell &
+Value::get_member(const vector<const Symbol *> & members, Value * & owner,
+                  bool create_if_needed)
 {
-const Value * val_p = this;
+   if (!is_member())
+      {
+        UCS_string & more = MORE_ERROR()
+            << "member access: attempt to access ";
+        more.append_members(members, 0);
+        more << " of flat variable " << members.back()->get_name();
+        DOMAIN_ERROR;
+      }
+
+   owner = this;
 
    // members[members.size() - 1] == this
    //
    for (int m = members.size() - 2; m >= 0; --m)
        {
          const UCS_string member_ucs = members[m]->get_name();
-         if (val_p->get_rank() != 2)
+         if (owner->get_rank() != 2)
             {
               UCS_string & more = MORE_ERROR() << "member access: the rank of ";
               more.append_members(members, m);
@@ -512,7 +528,7 @@ const Value * val_p = this;
               RANK_ERROR;
             }
 
-         if (val_p->get_cols() != 2)
+         if (owner->get_cols() != 2)
             {
               UCS_string & more = MORE_ERROR()
                  << "member access: the number of columns of ";
@@ -522,11 +538,11 @@ const Value * val_p = this;
               LENGTH_ERROR;
             }
 
-         const ShapeItem rows = val_p->get_rows();
-         const Cell * member_cell = 0;
+         const ShapeItem rows = owner->get_rows();
+         Cell * member_cell = 0;
          loop(r, rows)
              {
-               const Cell & cell = val_p->get_ravel(2*r);
+               const Cell & cell = owner->get_ravel(2*r);
                if (cell.get_cell_type() != CT_POINTER)               continue;
                Value_P cell_sub = cell.get_pointer_value();
                if (!cell_sub-> is_char_string())                     continue;
@@ -535,7 +551,7 @@ const Value * val_p = this;
 
                // at this point we found member_ucs in row r
                //
-               member_cell = &val_p->get_ravel(2*r + 1);
+               member_cell = &owner->get_ravel(2*r + 1);
                if (m)   // more members coming
                   {
                     if (!member_cell->is_pointer_cell())
@@ -550,7 +566,7 @@ const Value * val_p = this;
 
                     // next member
                     //
-                    val_p = member_cell->get_pointer_value().get();
+                    owner = member_cell->get_pointer_value().get();
                     break;
                   }
                else   // final member
@@ -560,14 +576,63 @@ const Value * val_p = this;
              }
          if (member_cell)   continue;
 
-         UCS_string & more = MORE_ERROR()
-                          << "member access: could not find member "
-                          << member_ucs << " in ";
-         more.append_members(members, m);
+         if (create_if_needed)   // assignment to not (yet) existing member
+            {
+              // find an unused slot in owner
+              //
+              ShapeItem unused = rows;
+              loop(r, rows)
+                  {
+                    Cell & cell = owner->get_ravel(2*r);
+                    if (cell.is_integer_cell() && cell.get_int_value() == 0)
+                       {
+                          unused = r;
+                          break;
+                       }
+                  }
+
+              if (unused == rows)   owner->double_ravel(LOC);   // unused is OK
+
+              Value_P member_name(member_ucs, LOC);
+              Value_P member_data = EmptyStruct(LOC);
+              Cell & cell = owner->get_ravel(2*unused);
+              new (&cell)   PointerCell(member_name.get(), *owner);
+              member_cell = &cell + 1;
+              new (member_cell)   PointerCell(member_data.get(), *owner);
+
+              if (!m)   return *member_cell;   // last member
+              owner = member_cell->get_pointer_value().get();
+              continue;
+            }
+
+         UCS_string & more = MORE_ERROR() << "member access: structure ";
+         more.append_members(members, m + 1);
+         more << " has no member " << member_ucs;
          VALUE_ERROR;
        }
 
-   FIXME;
+   FIXME;   // not reached
+}
+//-----------------------------------------------------------------------------
+void
+Value::double_ravel(const char * loc)
+{
+   Assert(is_member());
+const char * del = 0;
+   if (ravel != short_value)   del = reinterpret_cast<char *>(ravel);
+
+   Assert(get_rank() == 2);
+   Assert(get_cols() == 2);
+
+const ShapeItem old_rows = get_rows();
+Cell * doubled = new Cell[4*old_rows];
+   memcpy(reinterpret_cast<void *>(doubled), ravel, 2*old_rows*sizeof(Cell));
+
+   ravel = doubled;
+   shape.set_shape_item(0, 2*old_rows);
+   loop(n, 2*old_rows)   new (next_ravel())   IntCell(0);
+
+   delete del;
 }
 //-----------------------------------------------------------------------------
 Value *
@@ -2155,6 +2220,7 @@ Shape sh(ShapeItem(8), ShapeItem(2));
 Value_P Z(sh, loc);
    while (Cell * cell = Z->next_ravel())   new (cell) IntCell(0);
    Z->check_value(LOC);
+   Z->set_member();
    return Z;
 }
 //-----------------------------------------------------------------------------
