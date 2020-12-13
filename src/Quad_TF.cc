@@ -115,7 +115,7 @@ const Function * function = obj->get_function();
    if (const Symbol * symbol = obj->get_symbol())
       {
         Value_P value = symbol->get_apl_value();
-        if (!!value)   return tf1(name, value);
+        if (+value)   return tf1(name, value);
 
         /* not a variable: fall through */
       }
@@ -470,7 +470,7 @@ const Symbol * symbol = obj->get_symbol();
    if (symbol)
       {
         Value_P value = symbol->get_apl_value();
-        if (!!value)   return tf2_var(name, value);
+        if (+value)   return tf2_var(name, value);
 
         /* not a variable: fall through */
       }
@@ -676,8 +676,8 @@ Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
         char cc[100];
         snprintf(cc, sizeof(cc), "tf2_value() initial level %u\n", level);
         CERR << "tf2_value(): ucs before at level " << level << ": "
-             << ucs << endl;
-        value.print_boxed(CERR, cc);
+             << ucs << endl << cc;
+        value.print_boxed(CERR, 0);
       }
 
 

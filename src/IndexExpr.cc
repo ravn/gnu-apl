@@ -182,7 +182,7 @@ operator <<(ostream & out, const IndexExpr & idx)
    loop(i, idx.value_count())
       {
         if (i)   out << ";";
-        if (!!idx.values[i])
+        if (+idx.values[i])
            {
              // value::print() may print a trailing LF that we dont want here.
              //

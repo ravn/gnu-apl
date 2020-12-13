@@ -36,11 +36,10 @@ NamedObject::get_nc() const
        id == ID_OMEGA_U     ||   // ⍹
        id == ID_CHI)             // χ
       {
-        const Symbol * sym = get_symbol();
-        if (sym)
+        if (const Symbol * sym = get_symbol())
            {
-             const ValueStackItem * tos = sym->top_of_stack();
-             if (tos)   return tos->name_class;
+             if (const ValueStackItem * tos = sym->top_of_stack())
+                return tos->get_nc();
            }
 
         return NC_UNUSED_USER_NAME;

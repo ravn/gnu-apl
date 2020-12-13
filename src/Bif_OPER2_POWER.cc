@@ -104,7 +104,7 @@ Bif_OPER2_POWER::eval_form_1(Value_P A, Token & _LO, Value_P N, Value_P B)
 Function_P LO = _LO.get_function();
    Assert(LO);
 
-   Assert(!!N);
+   Assert(+N);
    if (N->element_count() != 1)
       {
         if (N->get_rank() > 1)   RANK_ERROR;

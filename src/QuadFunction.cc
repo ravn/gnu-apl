@@ -659,13 +659,57 @@ Value_P Z(sh_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 int
-Quad_EX::expunge(UCS_string name)
+Quad_EX::expunge(const UCS_string & name)
 {
    if (name.size() == 0)   return 0;
 
-Symbol * symbol = Workspace::lookup_existing_symbol(name);
-   if (symbol == 0)   return 0;
-   return symbol->expunge();
+   if (!name.contains(UNI_ASCII_FULLSTOP))   // unless member access
+      {
+        Symbol * symbol = Workspace::lookup_existing_symbol(name);
+        if (symbol == 0)   return 0;
+        return symbol->expunge();
+      }
+
+   // expunge a member...
+   //
+int ret = 0;   // assume ⎕EX failure
+
+   // build vector of member names in reverse order
+   //
+vector<const UCS_string *>members;
+   {
+     int dot = name.size();
+     for (int from = dot - 1; from >= 0; --from)
+         {
+           if (name[from] != UNI_ASCII_FULLSTOP)   continue;
+
+           members.push_back(new UCS_string(name, from + 1, dot - from - 1));
+           dot = from;
+//         CERR << "MEMBER '" << *members.back() << "'" << endl;
+         }
+     members.push_back(new const UCS_string(name, 0, dot));
+   }
+
+//      CERR << "VAR '"     << *members.back() << "'" << endl;
+
+Symbol * symbol = Workspace::lookup_existing_symbol(*members.back());
+   if (symbol == 0)     goto cleanup;
+
+   {
+     Value_P toplevel_val = symbol->get_value();
+     if (!toplevel_val)   goto cleanup;
+     Value * owner = 0;   // not used
+     if (Cell * cell = toplevel_val->get_member(members, owner, false, false))
+        {
+          cell->release(LOC);   new (cell--)   IntCell(0);   // member value
+          cell->release(LOC);   new (cell)     IntCell(0);   // 'member'
+          ret = 1;   // ⎕EX success
+        }
+   }
+
+cleanup:
+        loop(m, members.size())   delete members[m];
+        return ret;
 }
 //=============================================================================
 UCS_string Quad_INP::esc1;
@@ -1010,7 +1054,12 @@ Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
 Value_P Z(sh_Z, LOC);
 
-   loop(v, var_count)   Z->next_ravel_Int(get_NC(vars[v]));
+   loop(v, var_count)
+       {
+         const int nc = get_NC(vars[v]);
+         if (nc == NC_INVALID)   Z->next_ravel_Int(-1);
+         else                    Z->next_ravel_Int(nc);
+       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -1044,7 +1093,7 @@ Symbol * symbol = 0;
    if (symbol)   // system variable (⎕xx, ⍺, ⍶, ⍵, ⍹, λ, or χ
       {
         const NameClass nc = symbol->get_nc();
-        if (nc == 0)   return nc;
+        if (nc == NC_UNUSED_USER_NAME)   return 0;
         return nc + 3;
       }
 
@@ -1064,17 +1113,18 @@ Symbol * symbol = 0;
         return 0;   // unused
       }
 
-const NameClass nc = symbol->get_nc();
-
-   // return nc, but map shared variables to regular variables
-   //
-   return nc == NC_SHARED_VAR ? NC_VARIABLE : nc;
+   switch(const NameClass nc = symbol->get_nc())
+      {
+        case NC_INVALID:      return -1;
+        case NC_SHARED_VAR:   return NC_VARIABLE;
+        default:              return nc & NC_case_mask;
+      }
 }
 //=============================================================================
 Token
 Quad_NL::do_quad_NL(Value_P A, Value_P B)
 {
-   if (!!A && !A->is_char_string())   DOMAIN_ERROR;
+   if (+A && !A->is_char_string())   DOMAIN_ERROR;
    if (B->get_rank() > 1)             RANK_ERROR;
    if (B->element_count() == 0)   // nothing requested
       {
@@ -1082,7 +1132,7 @@ Quad_NL::do_quad_NL(Value_P A, Value_P B)
       }
 
 UCS_string first_chars;
-   if (!!A)   first_chars = UCS_string(*A);
+   if (+A)   first_chars = UCS_string(*A);
 
    // 1. create a bitmap of ⎕NC values requested in B
    //

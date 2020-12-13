@@ -227,12 +227,12 @@ public:
    static Quad_EX * fun;          ///< Built-in function.
    static Quad_EX  _fun;          ///< Built-in function.
 
+   /// disassociate name from value, return 0 on failure or 1 on success.
+   static int expunge(const UCS_string & name);
+
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const;
-
-   /// disassociate name from value, return 0 on failure or 1 on success.
-   static int expunge(UCS_string name);
 };
 //-----------------------------------------------------------------------------
 /**

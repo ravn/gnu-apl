@@ -176,7 +176,7 @@ int symbol_count = 0;
 
                if (sym->is_erased() && !(which & LIST_ERASED))   continue;
 
-               const NameClass nc = sym->value_stack.back().name_class;
+               const NameClass nc = sym->value_stack.back().get_nc();
                if (((nc == NC_VARIABLE)         && (which & LIST_VARS))    ||
                    ((nc == NC_FUNCTION)         && (which & LIST_FUNS))    ||
                    ((nc == NC_OPERATOR)         && (which & LIST_OPERS))   ||
@@ -210,7 +210,7 @@ UCS_string_vector names;
         if (which == LIST_NAMES)   // append .NC
            {
              name.append(UNI_ASCII_FULLSTOP);
-             name.append_number(list[l]->value_stack.back().name_class);
+             name.append_number(list[l]->value_stack.back().get_nc());
            }
         names.push_back(name);
       }
@@ -342,6 +342,12 @@ Symbol * next;   // the symbol after sym
 bool
 SymbolTable::erase_one_symbol(const UCS_string & sym)
 {
+   if (sym.contains(UNI_ASCII_FULLSTOP))   // member access
+      {
+         const int result = Quad_EX::expunge(sym);
+         return result != 1;
+      }
+
 Symbol * symbol = lookup_existing_symbol(sym);
 
    if (symbol == 0)
@@ -381,7 +387,7 @@ Symbol * symbol = lookup_existing_symbol(sym);
 
 ValueStackItem & tos = symbol->value_stack[0];
 
-   switch(tos.name_class)
+   switch(tos.get_nc())
       {
         case NC_LABEL:
              Assert(0 && "should not happen since stack height == 1");
@@ -484,8 +490,8 @@ std::vector<const Symbol *> symbols;
       {
         const Symbol & sym = *symbols[s];
         const ValueStackItem & vs = sym[0];
-         if      (vs.name_class == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
-         else if (vs.name_class == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
+         if      (vs.get_nc() == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
+         else if (vs.get_nc() == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
       }
 
    // pass 2: variables
@@ -494,7 +500,7 @@ std::vector<const Symbol *> symbols;
       {
         const Symbol & sym = *symbols[s];
         const ValueStackItem & vs = sym[0];
-        if (vs.name_class == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
+        if (vs.get_nc() == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
       }
 }
 //=============================================================================

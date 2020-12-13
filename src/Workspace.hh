@@ -38,24 +38,25 @@
 #include "Symbol.hh"
 #include "SymbolTable.hh"
 #include "SystemVariable.hh"
-#include "UTF8_string.hh"
 
 class Executable;
 class StateIndicator;
+class UTF8_string;
 
 //-----------------------------------------------------------------------------
 /**
  The symbol tables of the Workspace. We put them into a base class for
- Workspace, so that they are initialized before all the members of Workspace.
+ Workspace, so that they are initialized before all other members of Workspace.
  **/
 /// The symbol tables of an APL workspace
 class Workspace_0
 {
 protected:
-   /// the (user-defined) symbol table of this workspace.
+   /// the symbol table for user-defined names of this workspace.
    SymbolTable symbol_table;
 
-   /// the (system aka distinguished name) symbol table of this workspace.
+   /// the symbol table for system names (aka. distinguished names) of
+   /// this workspace.
    SystemSymTab distinguished_names;
 };
 //-----------------------------------------------------------------------------

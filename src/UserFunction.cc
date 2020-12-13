@@ -535,7 +535,7 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
         message_2.append(UNI_ASCII_SPACE);
 #else
         Value_P val_A = header.A()->get_value();
-        if (!!val_A)
+        if (+val_A)
            {
              PrintContext pctx(PR_BOXED_GRAPHIC);
              PrintBuffer pb(*val_A, pctx, 0);
@@ -554,7 +554,7 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
         message_2.append(header.B()->get_name());
 #else
         Value_P val_B = header.B()->get_value();
-        if (!!val_B)
+        if (+val_B)
            {
              message_2.append(UNI_ASCII_SPACE);
              PrintContext pctx(PR_APL_FUN);

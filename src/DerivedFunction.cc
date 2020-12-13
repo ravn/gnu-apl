@@ -264,7 +264,7 @@ DerivedFunction::print(ostream & out) const
    out << " ";
 
    oper->print(out);
-   if (!!axis)   out << "[]";
+   if (+axis)   out << "[]";
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
@@ -287,7 +287,7 @@ DerivedFunction::has_result() const
 void
 DerivedFunction::unmark_all_values() const
 {
-   if (!!axis)   axis->unmark();
+   if (+axis)   axis->unmark();
    if (left_arg.is_apl_val())   left_arg.get_apl_val()->unmark();
 }
 //-----------------------------------------------------------------------------
@@ -301,7 +301,7 @@ UCS_string ind(indent, UNI_ASCII_SPACE);
    else                          out << "VAL";
    out << endl << ind << "Operator:  ";
    oper->print(out);
-   if (!!axis)   out << "Axis: " << *axis << endl;
+   if (+axis)   out << "Axis: " << *axis << endl;
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {

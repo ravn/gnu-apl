@@ -84,7 +84,7 @@ ProcessorID::init(bool log_startup)
            {
              CERR << "*** Another APL interpreter with --id "
                   << id.proc <<  " is already running" << endl;
- 
+
              return true;
            }
       }

@@ -47,7 +47,8 @@ const ShapeItem name_len = val.get_cols();
                   continue;
                 }
 
-             if (Avec::is_symbol_char(uni))   // valid symbol char
+             if (Avec::is_symbol_char(uni)      // valid symbol char
+                || uni == UNI_ASCII_FULLSTOP)   // .member dot
                 {
                   name.append(uni);
                   continue;

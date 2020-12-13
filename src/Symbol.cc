@@ -122,7 +122,7 @@ Symbol::print_verbose(ostream & out) const
 void
 Symbol::assign(Value_P new_value, bool clone, const char * loc)
 {
-   Assert(!!new_value);
+   Assert(+new_value);
    Assert(value_stack.size());
 
    if (!new_value->is_complete())
@@ -175,8 +175,9 @@ Symbol::assign_indexed(Value_P X, Value_P B)   // A[X] ← B
 const APL_Integer qio = Workspace::get_IO();
 
 Value_P A = get_apl_value();
+
 const ShapeItem max_idx = A->element_count();
-   if (!!X && X->is_scalar() && B->is_scalar() && A->get_rank() == 1)
+   if (+X && X->is_scalar() && B->is_scalar() && A->get_rank() == 1)
       {
         const APL_Integer idx = X->get_ravel(0).get_near_int() - qio;
         if (idx >= 0 && idx < max_idx)
@@ -229,7 +230,7 @@ const Cell * cB = &B->get_ravel(0);
 void
 Symbol::assign_indexed(IndexExpr & IX, Value_P B)   // A[IX;...] ← B
 {
-   if (IX.value_count() == 1 && !!IX.values[0])   // one-dimensional index
+   if (IX.value_count() == 1 && +IX.values[0])   // one-dimensional index
       {
          assign_indexed(IX.values[0], B);
         return;
@@ -238,6 +239,7 @@ Symbol::assign_indexed(IndexExpr & IX, Value_P B)   // A[IX;...] ← B
    // see Value::index() for comments.
 
 Value_P A = get_apl_value();
+
    if (A->get_rank() != IX.value_count())   RANK_ERROR;   // ISO p. 159
 
    // B must either be a scalar (and is then scalar extended to the size

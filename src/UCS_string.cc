@@ -906,12 +906,12 @@ UCS_string::append_shape(const Shape & shape)
 }
 //-----------------------------------------------------------------------------
 void
-UCS_string::append_members(const vector<const Symbol *> & members, int m)
+UCS_string::append_members(const vector<const UCS_string *> & members, int m)
 {
    for (int mm = members.size() - 1; mm >= m; --mm)
        {
          if (mm < int(members.size() - 1))   *this += Unicode('.');
-         append(members[mm]->get_name());
+         append(*members[mm]);
        }
 }
 //-----------------------------------------------------------------------------
@@ -1456,7 +1456,7 @@ UCS_string::round_last_digit()
 }
 //----------------------------------------------------------------------------
 bool
-UCS_string::contains(Unicode uni)
+UCS_string::contains(Unicode uni) const
 {
    loop(u, size())   if (at(u) == uni)   return true;
    return false;

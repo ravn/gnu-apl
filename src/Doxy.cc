@@ -137,7 +137,7 @@ std::vector<const Symbol *> variables;
         bool is_variable = false;
         loop(si, sym->value_stack_size())
             {
-              switch((*sym)[si].name_class)
+              switch((*sym)[si].get_nc())
                  {
                    case NC_VARIABLE: is_variable = true;   break;
                    case NC_FUNCTION: is_function = true;   break;
@@ -381,7 +381,7 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
             {
               if (var_sym[si].name_class != NC_VARIABLE)   continue;
 
-              Assert(!!var_sym[si].apl_val);
+              Assert(+var_sym[si].apl_val);
               Value_P value = var_sym[si].apl_val;
               const int si_level = var_sym.get_SI_level(value.get());
               const Token elem = Bif_F12_ELEMENT::fun->eval_B(value);

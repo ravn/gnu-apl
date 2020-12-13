@@ -1051,7 +1051,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
              return;
            }
 
-        switch(vs->name_class)
+        switch(vs->get_nc())
            {
              case NC_INVALID:
                   CERR << "has no valid name class" << endl;
@@ -1070,10 +1070,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                   {
                     CERR << "is a variable:" << endl;
                     Value_P val = sym->get_value();
-                    if (!!val)
-                       {
-                         val->print_properties(CERR, 4, true);
-                       }
+                    if (+val)   val->print_properties(CERR, 4, true);
                   }
                   CERR << endl;
                   return;
@@ -1124,6 +1121,8 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                   CERR << "is a shared variable" << endl;
                   return;
 
+             default:
+                  FIXME;
            }
 
         return;
@@ -2461,7 +2460,6 @@ const Unicode * cp_to_uni_map = Avec::IBM_quad_AV();
              case '^': data.append(UNI_AND);              break;   // ~ → ∼
              case '*': data.append(UNI_STAR_OPERATOR);    break;   // * → ⋆
              case '~': data.append(UNI_TILDE_OPERATOR);   break;   // ~ → ∼
-             
              default:  data.append(Unicode(cp_to_uni_map[utf]));
            }
       }

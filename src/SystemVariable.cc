@@ -455,7 +455,7 @@ StateIndicator * si = Workspace::SI_top_error();
    if (si)
       {
         Value_P ret = si->get_L();
-        if (!!ret)   return  ret;
+        if (+ret)   return  ret;
       }
 
    VALUE_ERROR;
@@ -853,7 +853,7 @@ StateIndicator * si = Workspace::SI_top_error();
    if (si)
       {
         Value_P ret = si->get_R();
-        if (!!ret)   return  ret;
+        if (+ret)   return  ret;
       }
 
    VALUE_ERROR;
@@ -865,7 +865,7 @@ Quad_SYL::assign(Value_P value, bool clone, const char * loc)
    // Quad_SYL is mostly read-only, so we only allow assign_indexed() with
    // certain values.
    //
-   if (!!value)   SYNTAX_ERROR;
+   if (+value)   SYNTAX_ERROR;
 
    // this assign is called from the constructor in order to trigger the
    // creation of a symbol for Quad_SYL.
@@ -1178,7 +1178,7 @@ StateIndicator * si = Workspace::SI_top_error();
    if (si)
       {
         Value_P ret = si->get_X();
-        if (!!ret)   return ret;
+        if (+ret)   return ret;
       }
 
    VALUE_ERROR;

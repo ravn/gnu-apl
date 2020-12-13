@@ -219,8 +219,8 @@ const Token & tok1 = body[PC + offset];
    if (tok1.get_Class() != TC_SYMBOL)   return false;
 
 Symbol * sym = tok1.get_sym_ptr();
-const bool left_sym = get_assign_state() == ASS_arrow_seen;
-   return sym->resolve_class(left_sym) == TC_VALUE;
+const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
+   return sym->resolve_class(is_left_sym) == TC_VALUE;
 }
 //-----------------------------------------------------------------------------
 int
@@ -370,7 +370,7 @@ Prefix::unmark_all_values() const
         if (tok.get_ValueType() != TV_VAL)      continue;
 
         Value_P value = tok.get_apl_val();
-        if (!!value)   value->unmark();
+        if (+value)   value->unmark();
       }
 }
 //-----------------------------------------------------------------------------
@@ -426,7 +426,7 @@ grow:
                            "Cannot assign a value to a function";
                         }
                      else if (at(j - 1).tok.get_Class() == TC_OPER1 ||
-                             at(j - 1).tok.get_Class() == TC_OPER1)
+                              at(j - 1).tok.get_Class() == TC_OPER2)
                         {
                            MORE_ERROR() <<
                            "Cannot assign a value to an operator";
@@ -468,7 +468,8 @@ grow:
                sym->resolve(tl.tok, true);
                Log(LOG_prefix_parser)
                   CERR << "TOK_LSYMB2 " << sym->get_name()
-                       << "resolved to " << tl.tok << endl;
+                       << "resolved to " << tl.tok
+                       << " at " << LOC  << endl;
              }
           else
              {
@@ -486,19 +487,15 @@ grow:
                        }
                   }
 
-               const bool left_sym = get_assign_state() == ASS_arrow_seen;
-               bool resolved = false;
-               if (left_sym)
+               const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
+               if (is_left_sym)
                  {
-                    // assignment to only variable or undefined names
-
-                   if (NC_VARIABLE         != nc &&
-                       NC_UNUSED_USER_NAME != nc &&
-                       NC_SHARED_VAR       != nc &&
-                       NC_INVALID          != nc)   // ⎕, ⍞, ⎕xx
-                      syntax_error(LOC);
+                   // allow assignment only to variables or undefined names
+                   //
+                   if (!(nc & NC_left))   syntax_error(LOC);
                  }
 
+               bool resolved = false;
                if (size() > 0 && at(0).tok.get_Class() == TC_INDEX && 
                    tl.tok.get_tag() == TOK_SYMBOL)   // user defined variable
                   {
@@ -508,20 +505,21 @@ grow:
                     // Symbol::get_value() directly in order to avoid that
                     //
                     Value_P val = sym->get_value();
-                    if (!!val && !left_sym)
+                    if (+val && !is_left_sym)
                        {
                          Token tok(TOK_APL_VALUE1, val);
                          tl.tok.move_1(tok, LOC);
                          resolved = true;
                        }
                   }
-               if (!resolved)   sym->resolve(tl.tok, left_sym);
+               if (!resolved)   sym->resolve(tl.tok, is_left_sym);
 
-               if (left_sym)   set_assign_state(ASS_var_seen);
+               if (is_left_sym)   set_assign_state(ASS_var_seen);
                Log(LOG_prefix_parser)
                   {
-                    const char * what = left_sym ? "TOK_LSYMB" : "TOK_SYMBOL";
-                    CERR << what << " resolved to " << tl.tok << endl;
+                    const char * what = is_left_sym ? "TOK_LSYMB" : "TOK_SYMBOL";
+                    CERR << what << " resolved to " << tl.tok
+                         << " at " << LOC  << endl;
                   }
              }
           PC = lookahead_high + 1;   // resolve() succeeded: restore PC
@@ -607,8 +605,8 @@ found_prefix:
           if (next == TC_SYMBOL)
              {
                Symbol * sym = tok.get_sym_ptr();
-               const bool left_sym = get_assign_state() == ASS_arrow_seen;
-               next = sym->resolve_class(left_sym);
+               const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
+               next = sym->resolve_class(is_left_sym);
             }
         }
 
@@ -771,8 +769,8 @@ Prefix::dont_reduce(TokenClass next) const
 bool
 Prefix::replace_AB(Value_P old_value, Value_P new_value)
 {
-   Assert(!!old_value);
-   Assert(!!new_value);
+   Assert(+old_value);
+   Assert(+new_value);
 
    loop(s, size())
      {
@@ -1357,42 +1355,49 @@ Prefix::reduce_D_V__()
    // end of an A.B.C...Z chain. at0() is the final member Z and at1() is
    // the '.' before it. Collect members until no more '.' are found.
    //
-bool assign;
+bool direct_assign;
    if (prefix_len == 2)        // member reference
       {
-        if (get_assign_state() != ASS_none)
-           {
-             MORE_ERROR() << "member access: is not allowed left of ←";
-             syntax_error(LOC);
-           }
-        assign = false;
+        direct_assign = false;
       }
    else if (prefix_len == 4)   // member assignment
       {
         Assert(get_assign_state() == ASS_arrow_seen);   // from reduce_D_V_ASS_B
-        assign = true;
+        direct_assign = true;
       }
    else Assert(0 && "Bad prefix length in Prefix::reduce_D_V__()");
 
-vector<const Symbol *>members;
-   members.push_back(at1().get_sym_ptr());
+vector<const UCS_string *>members;
+Symbol * top_sym = 0;
+   members.push_back(at1().get_sym_ptr()->get_name_ptr());
    while (size_t(PC) < (body.size() - 1))
          {
-           if (body[PC].get_Class()   != TC_SYMBOL)         break;
-           if (body[PC + 1].get_tag() != TOK_OPER2_INNER)   break;
-
-           members.push_back(body[PC].get_sym_ptr());
-           PC = Function_PC(PC + 2);
+           if (body[PC].get_Class() == TC_SYMBOL)
+              {
+                Symbol * symbol = body[PC].get_sym_ptr();
+                members.push_back(symbol->get_name_ptr());
+               if (body[PC + 1].get_tag() == TOK_OPER2_INNER)
+                  {
+                    PC = Function_PC(PC + 2);
+                  }
+               else
+                  {
+                    top_sym = symbol;
+                    PC = Function_PC(PC + 1);
+                    break;
+                  }
+              }
+           else
+              {
+                 MORE_ERROR() << "member access: missing variable name";
+                 syntax_error(LOC);
+              }
          }
 
-Symbol * top_sym = body[PC].get_sym_ptr();
-   members.push_back(top_sym);
-   PC = Function_PC(PC + 1);
-
 Value_P toplevel_val = top_sym->get_value();
-   if (!toplevel_val)   // top_sym is not a variable (-name)
+   if (!toplevel_val)   // top_sym is not a variable (-name). Maybe creeate one.
       {
-        if (assign)
+        if (direct_assign)
            {
              toplevel_val = EmptyStruct(LOC);
              top_sym->assign(toplevel_val, false, LOC);
@@ -1400,7 +1405,7 @@ Value_P toplevel_val = top_sym->get_value();
         else
            {
             UCS_string & more = MORE_ERROR()
-                    << "member access: top-level value "
+                    << "member access: missing top-level variable "
                     << top_sym->get_name() << " for member ";
             more.append_members(members, 0);
             more << " not found";
@@ -1409,40 +1414,63 @@ Value_P toplevel_val = top_sym->get_value();
       }
 
 Value * member_owner = 0;
-Cell & member_cell = toplevel_val->get_member(members, member_owner, assign);
+Cell * member_cell = toplevel_val->get_member(members, member_owner,
+                                              direct_assign, true);
    Assert(member_owner);
 
-   if (assign)              // member assignment
+   if (direct_assign)   // (direct) member assignment
       {
-        member_cell.release(LOC);   // let it free
+        if (member_cell->is_member_anchor())
+           {
+             UCS_string & more = MORE_ERROR() <<
+                          "member access: cannot override non-leaf member ";
+             more.append_members(members, 0);
+             more << "\n)ERASE or ⎕EX that member first.";
+             DOMAIN_ERROR;
+           }
+
+        member_cell->release(LOC);   // let it free
 
         Value_P B = at3().get_apl_val();
-        if (B->is_scalar())
+        if (B->is_simple_scalar())
            {
-             if (B->get_ravel(0).is_pointer_cell())
-                new (&member_cell)
-                    PointerCell(B->get_ravel(0).get_pointer_value().get(),
-                                *member_owner);
-             else
-             member_cell.init(B->get_ravel(0), *member_owner, LOC);
+             member_cell->init(B->get_ravel(0), *member_owner, LOC);
            }
         else
            {
-             new (&member_cell)   PointerCell(B.get(), *member_owner);
+             new (member_cell)   PointerCell(B.get(), *member_owner);
            }
-        pop_args_push_result(Token(TOK_APL_VALUE1, B));
+        pop_args_push_result(Token(TOK_APL_VALUE2, B));
       }
-   else                     // member reference
+   else                 // member reference (or selective specification)
       {
-        if (member_cell.is_pointer_cell())
+        if (member_cell->is_member_anchor() && get_assign_state() == ASS_arrow_seen)
            {
-             Value_P Z(member_cell.get_pointer_value()->clone(LOC), LOC);
-             pop_args_push_result(Token(TOK_APL_VALUE1, Z));
+             UCS_string & more = MORE_ERROR() <<
+                          "member access: cannot use non-leaf member ";
+             more.append_members(members, 0);
+             more << " in selective specification.\n"
+                     ")ERASE or ⎕EX that member first.";
+             DOMAIN_ERROR;
            }
+        else if (member_cell->is_pointer_cell())
+            {
+              if (get_assign_state() == ASS_arrow_seen)   // selective specification
+                 {
+                   Value_P cell_refs = member_cell->get_pointer_value()
+                                                 ->get_cellrefs(LOC);
+                   pop_args_push_result(Token(TOK_APL_VALUE2, cell_refs));
+                 }
+              else
+                 {
+                   Value_P Z(member_cell->get_pointer_value()->clone(LOC), LOC);
+                   pop_args_push_result(Token(TOK_APL_VALUE1, Z));
+                 }
+            }
         else
            {
              Value_P Z(LOC);
-             Z->next_ravel()->init(member_cell, Z.getref(), LOC);
+             Z->next_ravel()->init(*member_cell, Z.getref(), LOC);
              pop_args_push_result(Token(TOK_APL_VALUE1, Z));
            }
       }
@@ -1474,8 +1502,8 @@ Prefix::reduce_F_D_C_B()
           if (next == TC_SYMBOL)
              {
                Symbol * sym = tok.get_sym_ptr();
-               const bool left_sym = get_assign_state() == ASS_arrow_seen;
-               next = sym->resolve_class(left_sym);
+               const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
+               next = sym->resolve_class(is_left_sym);
              }
 
           if (next == TC_OPER2)
@@ -1787,7 +1815,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
         if (idx.is_axis())
            {
              Value_P X = idx.extract_value(0);
-             Assert1(!!X);
+             Assert1(+X);
              I.move_2(Token(TOK_AXES, X), LOC);
              Log(LOG_delete)
                 CERR << "delete " << voidP(&idx) << " at " LOC << endl;
@@ -2218,19 +2246,19 @@ Prefix::reduce_RETC___()
                Symbol * ufun_Z = ufun->get_sym_Z();
                Value_P Z;
                if (ufun_Z)   Z = ufun_Z->get_value();
-               if (!!Z)
-                  {
-                    Log(LOG_prefix_parser)
-                       CERR << "- end of ∇ context (function result is: "
-                            << *Z << ")" << endl;
-                    new (&at0()) Token(TOK_APL_VALUE1, Z);
-                  }
-               else
+               if (!Z)
                   {
                     Log(LOG_prefix_parser)
                        CERR << "- end of ∇ context (MISSING function result)."
                             << endl;
                     at0().clear(LOC);
+                  }
+               else
+                  {
+                    Log(LOG_prefix_parser)
+                       CERR << "- end of ∇ context (function result is: "
+                            << *Z << ")" << endl;
+                    new (&at0()) Token(TOK_APL_VALUE1, Z);
                   }
              }
              action = RA_RETURN;

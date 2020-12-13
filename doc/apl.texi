@@ -690,6 +690,7 @@ in a 'preferences' file still follow the library root scheme.
 * Section 3.32::  ⎕SQL  - SQL Database Interface
 * Section 3.33::  ⎕SI   - State Indicator
 * Section 3.34::  ⎕SYL  - System limits
+* Section 3.35:: Experimental features
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -3911,6 +3912,136 @@ is printed instead of VALUE. The shape SH is computed like this:
       SH←⍴VALUE
       while (ravel-length(SH) ≥ ⎕SYL[27;2])   { divide longest axis in SH by 2 }
 
+@end verbatim
+
+@node    Section 3.35
+@section Experimental features
+
+Experimental features are features which are intended to present new concepts
+or implementations to the GNU APL community, and whose long-term availability
+in GNU APL is not guaranteed. If an experimental feature is widely accepted and,
+more importantly, causes no problems for the standard APL and the GNU APL
+extensions, then it will become a new @strong{Non-standard GNU APL Feature} as
+listed above. Until then, expect an increased probability of implementation
+errors and changes, and avoid the use of experimental features in production code.
+
+@subsection Structured Variables
+
+A structured variable is an APL variable that contains several independent
+sub-variables. The different sub-variables of a structured variable are
+accessed by the (top-level) name of the variable followed by a non-empty
+sequence of member names, separated by '.'. For example:
+
+@verbatim
+      PERSON.address.street
+@end verbatim
+
+is a structured variable @strong{PERSON}, which has a member @strong{address},
+and @strong{PERSON.address} is a structured (sub-)variable of PERSON which has
+a member @strong{street}.
+
+For a structured variable and all its sub-variables, the usual rules for
+normal variables apply. They can be created, erased, and even passed as
+arguments to functions.
+
+A structured variable is created by assigning a value to one of its members.
+For example:
+
+@verbatim
+      PERSON.firstname ← 'Jane'   ⍝ create variable PERSON with member 'firstname'
+      PERSON.lastname  ← 'Doe'    ⍝ add a second member 'lastname' to PERSON
+@end verbatim
+
+The depth of a newly created member can be more than one. In this case the
+intermediate members are created automatically. For example:
+
+@verbatim
+      PERSON.address.street ←  '42 Main Street'   ⍝ also creates PERSON.address
+@end verbatim
+
+An entire structured variable can be erased with ⎕EX or )ERASE just like other
+variables. That erases the variable along with all its members. In
+addition to erasing an entire structured variable, individual members at any
+depth can also be deleted with ⎕EX or )ERASE:
+
+@verbatim
+      )ERASE PERSON.address      ⍝ OK, PERSON.address exists
+      )ERASE PERSON.address      ⍝ error: PERSON.address does not exist anymore
+NOT ERASED: PERSON.address
+@end verbatim
+
+After having been created, the members of a structured variable can be referenced
+and overriden just like normal variables:
+
+@verbatim
+      PERSON.address.street ←  '42 Main Street'   ⍝ create member address.street
+      PERSON.address.street   ⍝ reference member address.street of PERSON
+42 Main Street
+
+      PERSON.address.street ←  '44 Main Street'   ⍝ override address.street
+      PERSON.address.street
+44 Main Street
+@end verbatim
+
+The members of a structured variable form a tree of (sub-) variables, similar
+to the file system on a computer. This tree has:
+
+* one root variable (which is the structured variable itself),
+
+* zero or more non-leafs (like subdirectories of the top-level root directory
+  in a file system), and
+
+* zero or more leafs (like the files in a file system).
+
+Structured variables are, due to their tree-like structure, being printed somewhat
+differently than normal APL variables. For example:
+
+@verbatim
+      PERSON
+.firstname: ┌→───┐
+            │Jane│
+            └────┘
+
+.lastname: ┌→──┐
+           │Doe│
+           └───┘
+
+.address: 
+.address.street: ┌→─────────────┐
+                 │44 Main Street│
+                 └──────────────┘
+@end verbatim
+
+As a precaution, assigning a values to a non-leaf (includig the root) raises
+a DOMAIN ERROR (here the analogy to file systems ends, since directories can
+contain both files and sub-directories):
+
+@verbatim
+      A.b.c←'leaf-Abc'        ⍝ OK, since a.b.c will be a leaf
+      A.b←42                  ⍝ will fail since a.b is not a leaf
+DOMAIN ERROR+
+      A.b←42
+       ^ ^
+      )more
+member access: cannot override non-leaf member A.b
+That member must first be erased.
+
+      )ERASE A.b
+      A.b ← 'leaf-Ab'         ⍝ now OK, since A.b will now become a (new) leaf
+
+      )SIC
+@end verbatim
+
+On the other hand, assigning a structured variable to the leaf of another
+structured variable is valid and concatenates the members:
+
+@verbatim
+      )ERASE A
+      A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.C
+      C.d.e ← 'leaf-cde'      ⍝ variable C with leaf C.d.e
+      A.b.c ← C               ⍝ override leaf A.b.c of A
+      A.b.c.d.e
+leaf-cde
 @end verbatim
 
 @c ----------------------------------------------------------------------------

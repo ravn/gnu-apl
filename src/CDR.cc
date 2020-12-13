@@ -490,7 +490,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
               const uint32_t sub_cdr_len = get_4_be(sub_data + 4);
               CDR_string sub_cdr(sub_data, sub_cdr_len);
               Value_P sub_val = from_CDR(sub_cdr, LOC);
-              Assert(!!sub_val);
+              Assert(+sub_val);
               new (&ret->get_ravel(n))   PointerCell(sub_val.get(), ret.getref());
             }
       }

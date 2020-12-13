@@ -156,7 +156,7 @@ UCS_string text;
                 }
 
              Value_P line = cell.get_pointer_value();
-             Assert(!!line);
+             Assert(+line);
 
              Log(LOG_quad_FX)
                 {
@@ -195,7 +195,7 @@ UCS_string text;
                 }
              else
                 {
-line->print_boxed(CERR);
+                  line->print_boxed(CERR, 0);
                   MORE_ERROR() << "bad line at " LOC;
                   DOMAIN_ERROR;
                 }

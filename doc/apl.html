@@ -183,6 +183,10 @@ ul.no-bullet {list-style: none}
       <li><a name="toc-_005b_003f_005dSYL_005b24-25-26_003b_005d" href="#g_t_005b_003f_005dSYL_005b24-25-26_003b_005d">3.34.3 ⎕SYL[24 25 26;]</a></li>
       <li><a name="toc-_005b_003f_005dSYL_005b27_003b_005d" href="#g_t_005b_003f_005dSYL_005b27_003b_005d">3.34.4 ⎕SYL[27;]</a></li>
     </ul></li>
+    <li><a name="toc-Experimental-features" href="#Section-3_002e35">3.35 Experimental features</a>
+    <ul class="no-bullet">
+      <li><a name="toc-Structured-Variables" href="#Structured-Variables">3.35.1 Structured Variables</a></li>
+    </ul></li>
   </ul></li>
   <li><a name="toc-Limitations-and-Missing-Features" href="#Chapter-4">4 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -224,7 +228,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>December 3, 2020
+<p>December 13, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -878,6 +882,8 @@ Next: <a href="#Chapter-4" accesskey="n" rel="next">Chapter 4</a>, Previous: <a 
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e33">Section 3.33</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SI   - State Indicator
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Section-3_002e34">Section 3.34</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">⎕SYL  - System limits
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Section-3_002e35">Section 3.35</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Experimental features
 </td></tr>
 </table>
 
@@ -4031,7 +4037,7 @@ the caller, and so on.
 <a name="Section-3_002e34"></a>
 <div class="header">
 <p>
-Previous: <a href="#Section-3_002e33" accesskey="p" rel="prev">Section 3.33</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-3_002e35" accesskey="n" rel="next">Section 3.35</a>, Previous: <a href="#Section-3_002e33" accesskey="p" rel="prev">Section 3.33</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <a name="g_t_005b_003f_005dSYL-_002d-System-limits"></a>
 <h3 class="section">3.34 ⎕SYL - System limits</h3>
@@ -4131,6 +4137,127 @@ is printed instead of VALUE. The shape SH is computed like this:
       SH←⍴VALUE
       while (ravel-length(SH) ≥ ⎕SYL[27;2])   { divide longest axis in SH by 2 }
 
+</pre>
+<hr>
+<a name="Section-3_002e35"></a>
+<div class="header">
+<p>
+Previous: <a href="#Section-3_002e34" accesskey="p" rel="prev">Section 3.34</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<a name="Experimental-features"></a>
+<h3 class="section">3.35 Experimental features</h3>
+
+<p>Experimental features are features which are intended to present new concepts
+or implementations to the GNU APL community, and whose long-term availability
+in GNU APL is not guaranteed. If an experimental feature is widely accepted and,
+more importantly, causes no problems for the standard APL and the GNU APL
+extensions, then it will become a new <strong>Non-standard GNU APL Feature</strong> as
+listed above. Until then, expect an increased probability of implementation
+errors and changes, and avoid the use of experimental features in production code.
+</p>
+<a name="Structured-Variables"></a>
+<h4 class="subsection">3.35.1 Structured Variables</h4>
+
+<p>A structured variable is an APL variable that contains several independent
+sub-variables. The different sub-variables of a structured variable are
+accessed by the (top-level) name of the variable followed by a non-empty
+sequence of member names, separated by &rsquo;.&rsquo;. For example:
+</p>
+<pre class="verbatim">      PERSON.address.street
+</pre>
+<p>is a structured variable <strong>PERSON</strong>, which has a member <strong>address</strong>,
+and <strong>PERSON.address</strong> is a structured (sub-)variable of PERSON which has
+a member <strong>street</strong>.
+</p>
+<p>For a structured variable and all its sub-variables, the usual rules for
+normal variables apply. They can be created, erased, and even passed as
+arguments to functions.
+</p>
+<p>A structured variable is created by assigning a value to one of its members.
+For example:
+</p>
+<pre class="verbatim">      PERSON.firstname ← 'Jane'   ⍝ create variable PERSON with member 'firstname'
+      PERSON.lastname  ← 'Doe'    ⍝ add a second member 'lastname' to PERSON
+</pre>
+<p>The depth of a newly created member can be more than one. In this case the
+intermediate members are created automatically. For example:
+</p>
+<pre class="verbatim">      PERSON.address.street ←  '42 Main Street'   ⍝ also creates PERSON.address
+</pre>
+<p>An entire structured variable can be erased with ⎕EX or )ERASE just like other
+variables. That erases the variable along with all its members. In
+addition to erasing an entire structured variable, individual members at any
+depth can also be deleted with ⎕EX or )ERASE:
+</p>
+<pre class="verbatim">      )ERASE PERSON.address      ⍝ OK, PERSON.address exists
+      )ERASE PERSON.address      ⍝ error: PERSON.address does not exist anymore
+NOT ERASED: PERSON.address
+</pre>
+<p>After having been created, the members of a structured variable can be referenced
+and overriden just like normal variables:
+</p>
+<pre class="verbatim">      PERSON.address.street ←  '42 Main Street'   ⍝ create member address.street
+      PERSON.address.street   ⍝ reference member address.street of PERSON
+42 Main Street
+
+      PERSON.address.street ←  '44 Main Street'   ⍝ override address.street
+      PERSON.address.street
+44 Main Street
+</pre>
+<p>The members of a structured variable form a tree of (sub-) variables, similar
+to the file system on a computer. This tree has:
+</p>
+<p>* one root variable (which is the structured variable itself),
+</p>
+<p>* zero or more non-leafs (like subdirectories of the top-level root directory
+  in a file system), and
+</p>
+<p>* zero or more leafs (like the files in a file system).
+</p>
+<p>Structured variables are, due to their tree-like structure, being printed somewhat
+differently than normal APL variables. For example:
+</p>
+<pre class="verbatim">      PERSON
+.firstname: ┌→───┐
+            │Jane│
+            └────┘
+
+.lastname: ┌→──┐
+           │Doe│
+           └───┘
+
+.address: 
+.address.street: ┌→─────────────┐
+                 │44 Main Street│
+                 └──────────────┘
+</pre>
+<p>As a precaution, assigning a values to a non-leaf (includig the root) raises
+a DOMAIN ERROR (here the analogy to file systems ends, since directories can
+contain both files and sub-directories):
+</p>
+<pre class="verbatim">      A.b.c←'leaf-Abc'        ⍝ OK, since a.b.c will be a leaf
+      A.b←42                  ⍝ will fail since a.b is not a leaf
+DOMAIN ERROR+
+      A.b←42
+       ^ ^
+      )more
+member access: cannot override non-leaf member A.b
+That member must first be erased.
+
+      )ERASE A.b
+      A.b ← 'leaf-Ab'         ⍝ now OK, since A.b will now become a (new) leaf
+
+      )SIC
+</pre>
+<p>On the other hand, assigning a structured variable to the leaf of another
+structured variable is valid and concatenates the members:
+</p>
+<pre class="verbatim">      )ERASE A
+      A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.C
+      C.d.e ← 'leaf-cde'      ⍝ variable C with leaf C.d.e
+      A.b.c ← C               ⍝ override leaf A.b.c of A
+      A.b.c.d.e
+leaf-cde
 </pre>
 <hr>
 <a name="Chapter-4"></a>

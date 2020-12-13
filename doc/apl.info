@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 3, 2020
+December 13, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -627,6 +627,7 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.32::  ⎕SQL  - SQL Database Interface
 * Section 3.33::  ⎕SI   - State Indicator
 * Section 3.34::  ⎕SYL  - System limits
+* Section 3.35:: Experimental features
 
 There are a few possibly useful features in GNU APL:
 
@@ -3692,7 +3693,7 @@ while negative A count from the latest to the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 3.34,  Prev: Section 3.33,  Up: Chapter 3
+File: apl.info,  Node: Section 3.34,  Next: Section 3.35,  Prev: Section 3.33,  Up: Chapter 3
 
 3.34 ⎕SYL - System limits
 =========================
@@ -3792,6 +3793,125 @@ this:
       SH←⍴VALUE
       while (ravel-length(SH) ≥ ⎕SYL[27;2])   { divide longest axis in SH by 2 }
 
+
+
+File: apl.info,  Node: Section 3.35,  Prev: Section 3.34,  Up: Chapter 3
+
+3.35 Experimental features
+==========================
+
+Experimental features are features which are intended to present new
+concepts or implementations to the GNU APL community, and whose
+long-term availability in GNU APL is not guaranteed.  If an experimental
+feature is widely accepted and, more importantly, causes no problems for
+the standard APL and the GNU APL extensions, then it will become a new
+*Non-standard GNU APL Feature* as listed above.  Until then, expect an
+increased probability of implementation errors and changes, and avoid
+the use of experimental features in production code.
+
+3.35.1 Structured Variables
+---------------------------
+
+A structured variable is an APL variable that contains several
+independent sub-variables.  The different sub-variables of a structured
+variable are accessed by the (top-level) name of the variable followed
+by a non-empty sequence of member names, separated by ’.’.  For example:
+
+      PERSON.address.street
+
+   is a structured variable *PERSON*, which has a member *address*, and
+*PERSON.address* is a structured (sub-)variable of PERSON which has a
+member *street*.
+
+   For a structured variable and all its sub-variables, the usual rules
+for normal variables apply.  They can be created, erased, and even
+passed as arguments to functions.
+
+   A structured variable is created by assigning a value to one of its
+members.  For example:
+
+      PERSON.firstname ← 'Jane'   ⍝ create variable PERSON with member 'firstname'
+      PERSON.lastname  ← 'Doe'    ⍝ add a second member 'lastname' to PERSON
+
+   The depth of a newly created member can be more than one.  In this
+case the intermediate members are created automatically.  For example:
+
+      PERSON.address.street ←  '42 Main Street'   ⍝ also creates PERSON.address
+
+   An entire structured variable can be erased with ⎕EX or )ERASE just
+like other variables.  That erases the variable along with all its
+members.  In addition to erasing an entire structured variable,
+individual members at any depth can also be deleted with ⎕EX or )ERASE:
+
+      )ERASE PERSON.address      ⍝ OK, PERSON.address exists
+      )ERASE PERSON.address      ⍝ error: PERSON.address does not exist anymore
+NOT ERASED: PERSON.address
+
+   After having been created, the members of a structured variable can
+be referenced and overriden just like normal variables:
+
+      PERSON.address.street ←  '42 Main Street'   ⍝ create member address.street
+      PERSON.address.street   ⍝ reference member address.street of PERSON
+42 Main Street
+
+      PERSON.address.street ←  '44 Main Street'   ⍝ override address.street
+      PERSON.address.street
+44 Main Street
+
+   The members of a structured variable form a tree of (sub-) variables,
+similar to the file system on a computer.  This tree has:
+
+   * one root variable (which is the structured variable itself),
+
+   * zero or more non-leafs (like subdirectories of the top-level root
+directory in a file system), and
+
+   * zero or more leafs (like the files in a file system).
+
+   Structured variables are, due to their tree-like structure, being
+printed somewhat differently than normal APL variables.  For example:
+
+      PERSON
+.firstname: ┌→───┐
+            │Jane│
+            └────┘
+
+.lastname: ┌→──┐
+           │Doe│
+           └───┘
+
+.address: 
+.address.street: ┌→─────────────┐
+                 │44 Main Street│
+                 └──────────────┘
+
+   As a precaution, assigning a values to a non-leaf (includig the root)
+raises a DOMAIN ERROR (here the analogy to file systems ends, since
+directories can contain both files and sub-directories):
+
+      A.b.c←'leaf-Abc'        ⍝ OK, since a.b.c will be a leaf
+      A.b←42                  ⍝ will fail since a.b is not a leaf
+DOMAIN ERROR+
+      A.b←42
+       ^ ^
+      )more
+member access: cannot override non-leaf member A.b
+That member must first be erased.
+
+      )ERASE A.b
+      A.b ← 'leaf-Ab'         ⍝ now OK, since A.b will now become a (new) leaf
+
+      )SIC
+
+   On the other hand, assigning a structured variable to the leaf of
+another structured variable is valid and concatenates the members:
+
+      )ERASE A
+      A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.C
+      C.d.e ← 'leaf-cde'      ⍝ variable C with leaf C.d.e
+      A.b.c ← C               ⍝ override leaf A.b.c of A
+      A.b.c.d.e
+leaf-cde
 
 
 File: apl.info,  Node: Chapter 4,  Next: Chapter 5,  Prev: Chapter 3,  Up: Top
@@ -5288,60 +5408,61 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11472
-Node: Chapter 219811
-Node: Chapter 319943
-Node: Section 3.121644
-Node: Section 3.237805
-Node: Section 3.338564
-Node: Section 3.439851
-Node: Section 3.543930
-Node: Section 3.644103
-Node: Section 3.744716
-Node: Section 3.848669
-Node: Section 3.950211
-Node: Section 3.1051666
-Node: Section 3.1153450
-Node: Section 3.1255390
-Node: Section 3.1356331
-Node: Section 3.1456583
-Node: Section 3.1557979
-Node: Section 3.1660497
-Node: Section 3.1767196
-Node: Section 3.1868641
-Node: Section 3.1974302
-Node: Section 3.2079336
-Node: Section 3.2182617
-Node: Section 3.2282908
-Node: Section 3.2393483
-Node: Section 3.2493755
-Node: Section 3.25100333
-Node: Section 3.26102790
-Node: Section 3.27103459
-Node: Section 3.28106582
-Node: Section 3.29114190
-Node: Section 3.30115137
-Node: Section 3.31128699
-Node: Section 3.32138199
-Node: Section 3.33141303
-Node: Section 3.34143292
-Node: Chapter 4147696
-Node: Chapter 5149444
-Node: Chapter 6150570
-Node: Section 6.1152107
-Node: Section 6.2153387
-Node: Section 6.3153747
-Node: Section 6.4153989
-Node: Section 6.5154651
-Node: Section 6.6155129
-Node: Section 6.7155901
-Node: Section 6.8156358
-Node: Chapter 7156760
-Node: Section 7.1157179
-Node: Section 7.2157866
-Node: Chapter 8158697
-Node: Section 8.1159200
-Node: Section 8.2184514
+Node: Chapter 11473
+Node: Chapter 219812
+Node: Chapter 319944
+Node: Section 3.121684
+Node: Section 3.237845
+Node: Section 3.338604
+Node: Section 3.439891
+Node: Section 3.543970
+Node: Section 3.644143
+Node: Section 3.744756
+Node: Section 3.848709
+Node: Section 3.950251
+Node: Section 3.1051706
+Node: Section 3.1153490
+Node: Section 3.1255430
+Node: Section 3.1356371
+Node: Section 3.1456623
+Node: Section 3.1558019
+Node: Section 3.1660537
+Node: Section 3.1767236
+Node: Section 3.1868681
+Node: Section 3.1974342
+Node: Section 3.2079376
+Node: Section 3.2182657
+Node: Section 3.2282948
+Node: Section 3.2393523
+Node: Section 3.2493795
+Node: Section 3.25100373
+Node: Section 3.26102830
+Node: Section 3.27103499
+Node: Section 3.28106622
+Node: Section 3.29114230
+Node: Section 3.30115177
+Node: Section 3.31128739
+Node: Section 3.32138239
+Node: Section 3.33141343
+Node: Section 3.34143332
+Node: Section 3.35147757
+Node: Chapter 4152322
+Node: Chapter 5154070
+Node: Chapter 6155196
+Node: Section 6.1156733
+Node: Section 6.2158013
+Node: Section 6.3158373
+Node: Section 6.4158615
+Node: Section 6.5159277
+Node: Section 6.6159755
+Node: Section 6.7160527
+Node: Section 6.8160984
+Node: Chapter 7161386
+Node: Section 7.1161805
+Node: Section 7.2162492
+Node: Chapter 8163323
+Node: Section 8.1163826
+Node: Section 8.2189140
 
 End Tag Table
 

@@ -529,7 +529,7 @@ StateIndicator::statement_result(Token & result, bool trace)
 
 const TokenTag tag = result.get_tag();
 Value_P B(result.get_apl_val());
-   Assert(!!B);
+   Assert(+B);
 
    // print TOK_APL_VALUE and TOK_APL_VALUE1, but not TOK_APL_VALUE2
    //

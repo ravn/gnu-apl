@@ -473,7 +473,7 @@ Executable::unmark_all_values() const
         if (tok.get_ValueType() == TV_VAL)
            {
              Value_P value = tok.get_apl_val();
-             if (!!value)   value->unmark();
+             if (+value)   value->unmark();
            }
 
         if (tok.get_ValueType() == TV_FUN)

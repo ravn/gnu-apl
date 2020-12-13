@@ -105,7 +105,7 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
               continue;
             }
 
-         // different chars: try special matches (⁰, ¹, ², or ⁿ)...
+         // different chars: try special matches (⁰, ¹, ², ³, ⁴, ⁵, ⁶, or ⁿ)...
 
          if (r == UNI_PAD_U0)   // ⁰: match one or more digits
             {

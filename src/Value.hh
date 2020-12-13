@@ -251,8 +251,8 @@ public:
    void assign_cellrefs(Value_P val);
 
    /// return member of this value, defined by \b members
-   Cell & get_member(const vector<const Symbol *> & members, Value * & owner,
-                     bool create_if_needed);
+   Cell * get_member(const vector<const UCS_string *> & members,
+                     Value * & owner, bool create_if_needed, bool throw_error);
 
    // double the ravel length of \b this value (by appending integer 0s).
    void double_ravel(const char * loc);
@@ -301,6 +301,9 @@ public:
    /// print \b this value (line break at Workspace::get_PW())
    ostream & print(ostream & out) const;
 
+   /// print \b this member value
+   ostream & print_member(ostream & out, UCS_string member) const;
+
    /// print \b this value (line break at print_width)
    ostream & print1(ostream & out, PrintContext pctx) const;
 
@@ -311,7 +314,7 @@ public:
    void debug(const char * info) const;
 
    /// print this value in 4 ⎕CR style
-   ostream & print_boxed(ostream & out, const char * info = 0) const;
+   ostream & print_boxed(ostream & out, int indent) const;
 
    /// return \b this indexed by (multi-dimensional) \b IDX.
    Value_P index(const IndexExpr & IDX) const;

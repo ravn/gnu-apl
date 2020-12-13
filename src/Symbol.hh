@@ -41,6 +41,19 @@ class UserFunction;
 class ValueStackItem
 {
 public:
+   friend class Command;
+   friend class Doxy;
+   friend class Quad_RL;
+   friend class Symbol;
+   friend class SymbolTable;
+   friend class Workspace;
+   friend class XML_Loading_Archive;
+   friend class XML_Saving_Archive;
+
+   NameClass get_nc() const
+      { return name_class; }
+
+protected:
    /// constructor: ValueStackItem for an unused symbol
    ValueStackItem() : name_class(NC_UNUSED_USER_NAME)
       { memset(&sym_val, 0, sizeof(sym_val)); }
@@ -127,6 +140,9 @@ public:
    /// Set current NameClass of this Symbol to \b nc
    void set_nc(NameClass nc);
 
+   /// Set current NameClass of this Symbol to \b nc and function fun
+   void set_nc(NameClass nc, Function_P fun);
+
    /// share variable with \b proc
    void share_var(SV_key key);
 
@@ -135,9 +151,6 @@ public:
 
    /// clear the value stack of \b this symbol
    void clear_vs();
-
-   /// Set current NameClass of this Symbol to \b nc and function fun
-   void set_nc(NameClass nc, Function_P fun);
 
    /// Compare name of \b this value with \b other
    int compare(const Symbol & other) const
@@ -204,14 +217,17 @@ public:
 
    /// return true, iff this Symbol is not used (i.e. erased)
    bool is_erased() const
-   { return (value_stack_size() <= 1) && (value_stack_size() &&
-        (value_stack[0].name_class == NC_UNUSED_USER_NAME)); }
+   { return value_stack_size() == 0 ||
+            (value_stack_size() == 1 &&
+             value_stack[0].name_class == NC_UNUSED_USER_NAME); }
 
    /// Return the current function (or throw a VALUE_ERROR)
    virtual const Function * get_function() const;
 
    /// The name of \b this \b Symbol
    virtual UCS_string get_name() const   { return name; }
+
+   const UCS_string * get_name_ptr() const   { return &name; }
 
    /// overloaded NamedObject::get_function()
    virtual Function_P get_function();

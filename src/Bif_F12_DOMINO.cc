@@ -237,7 +237,8 @@ Value_P A(2, LOC);
    A->check_value(LOC);
 
 Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
-   Z->print_boxed(CERR, name);
+   CERR << name;
+   Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
 }
 //-----------------------------------------------------------------------------
@@ -259,7 +260,8 @@ Value_P A(2, LOC);
    A->check_value(LOC);
 
 Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
-   Z->print_boxed(CERR, name);
+   CERR << name;
+   Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
 }
 //----------------------------------------------------------------------------

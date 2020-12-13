@@ -408,12 +408,6 @@ const ShapeItem length = nz_element_count();
 Value_P
 Value::get_cellrefs(const char * loc)
 {
-   if (is_member())
-      {
-        MORE_ERROR() << "member access: not allowed in selective assignment";
-        DOMAIN_ERROR;
-      }
-
 Value_P ret(get_shape(), loc);
 
 const ShapeItem ec = element_count();
@@ -499,28 +493,30 @@ const int src_incr = new_value->is_scalar() ? 0 : 1;
       }
 }
 //-----------------------------------------------------------------------------
-Cell &
-Value::get_member(const vector<const Symbol *> & members, Value * & owner,
-                  bool create_if_needed)
+Cell *
+Value::get_member(const vector<const UCS_string *> & members, Value * & owner,
+                  bool create_if_needed, bool throw_error)
 {
-   if (!is_member())
-      {
-        UCS_string & more = MORE_ERROR()
-            << "member access: attempt to access ";
-        more.append_members(members, 0);
-        more << " of flat variable " << members.back()->get_name();
-        DOMAIN_ERROR;
-      }
-
    owner = this;
 
    // members[members.size() - 1] == this
    //
    for (int m = members.size() - 2; m >= 0; --m)
        {
-         const UCS_string member_ucs = members[m]->get_name();
+         if (!owner->is_member())
+            {
+              UCS_string & more = MORE_ERROR()
+                  << "member access: non-structured variable "
+                  << *members.back() << " has no member ";
+              more.append_members(members, 0);
+              if (throw_error)   DOMAIN_ERROR;
+              else               return 0;
+            }
+
+         const UCS_string & member_ucs = *members[m];
          if (owner->get_rank() != 2)
             {
+              if (!throw_error)   return 0;
               UCS_string & more = MORE_ERROR() << "member access: the rank of ";
               more.append_members(members, m);
               more << " is not 2.\n"
@@ -530,6 +526,7 @@ Value::get_member(const vector<const Symbol *> & members, Value * & owner,
 
          if (owner->get_cols() != 2)
             {
+              if (!throw_error)   return 0;
               UCS_string & more = MORE_ERROR()
                  << "member access: the number of columns of ";
               more.append_members(members, m);
@@ -554,8 +551,10 @@ Value::get_member(const vector<const Symbol *> & members, Value * & owner,
                member_cell = &owner->get_ravel(2*r + 1);
                if (m)   // more members coming
                   {
-                    if (!member_cell->is_pointer_cell())
+                    if (!member_cell->is_pointer_cell() ||
+                        !member_cell->get_pointer_value()->is_member())
                        {
+                         if (!throw_error)   return 0;
                          UCS_string & more = MORE_ERROR()
                                  << "member access: member " << member_ucs
                                  << " exists in ";
@@ -571,7 +570,7 @@ Value::get_member(const vector<const Symbol *> & members, Value * & owner,
                   }
                else   // final member
                   {
-                    return *member_cell;
+                    return member_cell;
                   }
              }
          if (member_cell)   continue;
@@ -593,18 +592,25 @@ Value::get_member(const vector<const Symbol *> & members, Value * & owner,
 
               if (unused == rows)   owner->double_ravel(LOC);   // unused is OK
 
-              Value_P member_name(member_ucs, LOC);
-              Value_P member_data = EmptyStruct(LOC);
               Cell & cell = owner->get_ravel(2*unused);
+              Value_P member_name(member_ucs, LOC);
               new (&cell)   PointerCell(member_name.get(), *owner);
-              member_cell = &cell + 1;
-              new (member_cell)   PointerCell(member_data.get(), *owner);
 
-              if (!m)   return *member_cell;   // last member
-              owner = member_cell->get_pointer_value().get();
-              continue;
+              member_cell = &cell + 1;
+              if (m)   // more members coming
+                 {
+                   Value_P member_data = EmptyStruct(LOC);
+                   new (member_cell)   PointerCell(member_data.get(), *owner);
+                   owner = member_cell->get_pointer_value().get();
+                   continue;
+                 }
+
+              // last member
+              new (member_cell) IntCell(0);
+              return member_cell;
             }
 
+         if (!throw_error)   return 0;
          UCS_string & more = MORE_ERROR() << "member access: structure ";
          more.append_members(members, m + 1);
          more << " has no member " << member_ucs;
@@ -626,7 +632,9 @@ const char * del = 0;
 
 const ShapeItem old_rows = get_rows();
 Cell * doubled = new Cell[4*old_rows];
-   memcpy(reinterpret_cast<void *>(doubled), ravel, 2*old_rows*sizeof(Cell));
+   memcpy(reinterpret_cast<void *>(doubled),
+          reinterpret_cast<const void *>(ravel),
+          2*old_rows*sizeof(Cell));
 
    ravel = doubled;
    shape.set_shape_item(0, 2*old_rows);
@@ -874,6 +882,7 @@ Value::list_one(ostream & out, bool show_owners) const
       {
         out << "   Flags =";
         char sep = ' ';
+        if (is_member())     { out << sep << "MEMBER";     sep = '+'; }
         if (is_complete())   { out << sep << "COMPLETE";   sep = '+'; }
         if (is_marked())     { out << sep << "MARKED";     sep = '+'; }
       }
@@ -1257,14 +1266,14 @@ Shape shape_Z;
          const ShapeItem idx_r = get_rank() - this_r - 1;
 
          Value_P I = IX.values[idx_r];
-         if (!!I)
+         if (!I)
             {
-              loop(s, I->get_rank())
-                shape_Z.add_shape_item(I->get_shape_item(s));
+              shape_Z.add_shape_item(this->get_shape_item(this_r));
             }
          else
             {
-              shape_Z.add_shape_item(this->get_shape_item(this_r));
+              loop(s, I->get_rank())
+                shape_Z.add_shape_item(I->get_shape_item(s));
             }
        }
 
@@ -1307,7 +1316,7 @@ const APL_Integer qio = Workspace::get_IO();
 
    // important special case: scalar X
    //
-   if (get_rank() == 1 && (!!X) && X->is_scalar())
+   if (get_rank() == 1 && +X && X->is_scalar())
       {
         const APL_Integer idx = X->get_ravel(0).get_near_int() - qio;
         if (idx >= 0 && idx < max_idx)
@@ -1737,6 +1746,8 @@ const Cell & cell_0 = get_ravel(0);
 ostream &
 Value::print(ostream & out) const
 {
+   if (is_member())   return print_member(out, UCS_string(""));
+
 PrintContext pctx = Workspace::get_PrintContext(PR_APL);
    if (get_rank() == 0)   // scalar
       {
@@ -1758,6 +1769,44 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
       }
 
 PrintBuffer pb(*this, pctx, &out);   // constructor prints it
+   return out;
+}
+//-----------------------------------------------------------------------------
+ostream &
+Value::print_member(ostream & out, UCS_string member_prefix) const
+{
+const ShapeItem rows = get_rows();
+   loop(r, rows)
+       {
+         const Cell * cell = &get_ravel(2*r);   // (nested) member-name or 0
+         if (!cell->is_pointer_cell())       continue;
+
+         Value_P cell_sub = cell->get_pointer_value();
+         Assert(cell_sub->is_char_string());
+
+         // print the member name
+         //
+         UCS_string member = member_prefix;
+         member += UNI_ASCII_FULLSTOP;
+         member += cell_sub->get_UCS_ravel();
+         out << member << ": ";
+
+         // print the member value
+         //
+         ++cell;   // member value
+         if (cell->is_pointer_cell())   // sub-member or leaf
+            {
+              Value_P sub = cell->get_pointer_value();
+              if (sub->is_member())   sub->print_member(out << endl, member);
+              else                    sub->print_boxed(out, member.size() + 2);
+            }
+         else                           // simple
+            {
+              Value_P sub(*cell, LOC);
+              sub->print_boxed(out, member.size() + 2);
+            }
+       }
+
    return out;
 }
 //-----------------------------------------------------------------------------
@@ -1827,14 +1876,21 @@ PrintBuffer pb(*this, pctx, 0);
 }
 //-----------------------------------------------------------------------------
 ostream &
-Value::print_boxed(ostream & out, const char * info) const
+Value::print_boxed(ostream & out, int indent) const
 {
-   if (info)   out << info << endl;
-
 const PrintContext pctx(PST_NONE);
 
-Value_P Z = Quad_CR::do_CR(4, this, pctx);
-   out << *Z << endl;
+Value_P Z = Quad_CR::do_CR(8, this, pctx);
+   Assert(Z->get_rank() == 2);
+const ShapeItem rows = Z->get_rows();
+const ShapeItem cols = Z->get_cols();
+   loop(r, rows)
+       {
+         if (indent && r)   out << UCS_string(indent, UNI_ASCII_SPACE);
+         loop(c, cols)   out << Z->get_ravel(c + r*cols).get_char_value();
+         out << endl;
+       }
+   out << endl;
    return out;
 }
 //-----------------------------------------------------------------------------
@@ -1895,6 +1951,7 @@ const uint64_t start_1 = cycle_counter();
 #endif
 
 Value_P Z(get_shape(), loc);
+   Z->flags |= flags & VF_member;   // propagate member flag
 
 const Cell * src = &get_ravel(0);
 Cell * dst = &Z->get_ravel(0);

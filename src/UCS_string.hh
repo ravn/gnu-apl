@@ -325,7 +325,7 @@ public:
 
    /// append members (like x.y.z) starting at members[m] and going backwards
    /// from the end of \b members to \b this string.
-   void append_members(const vector<const Symbol *> & members, int m);
+   void append_members(const vector<const UCS_string *> & members, int m);
 
    /// append number (in ASCII encoding like %lf) to this string
    void append_float(APL_Float num);
@@ -372,7 +372,7 @@ public:
    void round_last_digit();
 
    /// return true if \b this string contains \b uni
-   bool contains(Unicode uni);
+   bool contains(Unicode uni) const;
 
    /// erase 1 (!) character at pos
    void erase(ShapeItem pos)

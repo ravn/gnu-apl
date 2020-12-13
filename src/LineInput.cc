@@ -239,17 +239,36 @@ void
 LineHistory::add_line(const UCS_string & line)
 {
    if (max_lines == 0)      return;   // no history
-   if (!line.has_black())   return;
+   if (!line.has_black())   return;   // almost empty
+
+   // remove leading blanks
+   //
+int blanks = 0;
+   while (blanks < line.size() && line[blanks] <= UNI_ASCII_SPACE)   ++blanks;
+
+   // repeated cut-and-paste of entire lines increases the indentation every time
+   // due to the APL input prompt). we therefore limit this effect to 6 blanks.
+   //
+UCS_string line1;
+   if (blanks)
+      {
+        line1 = UCS_string(line, blanks, line.size() - blanks);
+      }
+   else
+      {
+        line1 = line;
+      }
+   while (line1.back() <= UNI_ASCII_SPACE)   line1.pop_back();
 
    if (int(hist_lines.size()) < max_lines)   // append
       {
-        hist_lines.push_back(line);
+        hist_lines.push_back(line1);
         put = 0;
       }
    else                            // override
       {
         if (put >= int(hist_lines.size()))   put = 0;   // wrap
-        hist_lines[put++] = line;
+        hist_lines[put++] = line1;
       }
 
    next();   // update current_line

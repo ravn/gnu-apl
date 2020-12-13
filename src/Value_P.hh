@@ -48,6 +48,10 @@ public:
    /// reset and add value event
    inline void clear(const char * loc);
 
+   /// return true if the pointer is valid
+   bool operator+() const
+      { return value_p != 0; }
+
    /// return true if the pointer is invalid
    bool operator!() const
       { return value_p == 0; }

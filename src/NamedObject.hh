@@ -33,13 +33,20 @@ class Value;
 /// The possible values returned by \b ⎕NC.
 enum NameClass
 {
-  NC_INVALID          = -1,   ///< invalid name class.
-  NC_UNUSED_USER_NAME =  0,   ///< unused user name eg. pushed but not assigned
-  NC_LABEL            =  1,   ///< Label.
-  NC_VARIABLE         =  2,   ///< (assigned) variable.
-  NC_FUNCTION         =  3,   ///< (user defined) function.
-  NC_OPERATOR         =  4,   ///< (user defined) operator.
-  NC_SHARED_VAR       =  5,   ///< shared variable.
+  NC_INVALID          =  0x0100,   ///< invalid name class.
+  NC_UNUSED_USER_NAME =  0x0200,   ///< unused user name, not yet assigned
+  NC_LABEL            =  0x0401,   ///< Label.
+  NC_VARIABLE         =  0x0802,   ///< (assigned) variable.
+  NC_FUNCTION         =  0x1003,   ///< (user defined) function.
+  NC_OPERATOR         =  0x2004,   ///< (user defined) operator.
+  NC_SHARED_VAR       =  0x4005,   ///< shared variable.
+  NC_case_mask        =  0x00FF,   ///< almost ⎕NC
+  NC_bool_mask        =  0xFF00,   ///< for fast selection
+  NC_left             = (NC_VARIABLE         |
+                         NC_UNUSED_USER_NAME |
+                         NC_SHARED_VAR       |
+                         NC_INVALID          //  ⎕, ⍞, ⎕xx
+                        ) & NC_bool_mask
 };
 //-----------------------------------------------------------------------------
 /**

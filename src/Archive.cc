@@ -737,8 +737,8 @@ void
 XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 {
    Log(LOG_archive)   CERR << "    save_vstack_item(name_class "
-                           << vsi.name_class << ")" << endl;
-   switch(vsi.name_class)
+                           << vsi.get_nc() << ")" << endl;
+   switch(vsi.get_nc())
       {
         case NC_UNUSED_USER_NAME:
              do_indent();
@@ -2516,7 +2516,7 @@ Symbol * symbol = Workspace::lookup_symbol(name_UCS);
    Assert(level >= 0);
    Assert(level < symbol->value_stack_size());
 ValueStackItem & vsi = (*symbol)[level];
-   Assert(vsi.name_class == NC_FUNCTION || vsi.name_class == NC_OPERATOR);
+   Assert(vsi.get_nc() == NC_FUNCTION || vsi.get_nc() == NC_OPERATOR);
 Function_P fun = vsi.sym_val.function;
    Assert(fun);
 const UserFunction * ufun = fun->get_ufun1();
@@ -2745,7 +2745,7 @@ const UTF8 * fun_name = find_attr("ufun-name", true);
         Assert(level >= 0);
         Assert(level < symbol.value_stack_size());
         const ValueStackItem & vsi = symbol[level];
-        Assert(vsi.name_class == NC_FUNCTION);
+        Assert(vsi.get_nc() == NC_FUNCTION);
         Function_P fun = vsi.sym_val.function;
         Assert(fun);
         return fun;
@@ -2898,8 +2898,8 @@ const Token_string & body = exec.get_body();
              loop(v, sym->value_stack_size())
                 {
                   const ValueStackItem & vs = (*sym)[v];
-                  if (vs.name_class == NC_FUNCTION ||
-                      vs.name_class == NC_OPERATOR)
+                  if (vs.get_nc() == NC_FUNCTION ||
+                      vs.get_nc() == NC_OPERATOR)
                      {
                        if (vs.sym_val.function->get_name() == lambda)
                           {

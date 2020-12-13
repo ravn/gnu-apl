@@ -62,7 +62,7 @@ PointerCell::init_other(void * other, Value & cell_owner,
 Value_P sub;   // instantiate beforehand so that sub is 0 if clone() fails
 
    sub = get_pointer_value()->clone(loc);
-   Assert(!!sub);
+   Assert(+sub);
    new (other) PointerCell(sub.get(), cell_owner);
 }
 //-----------------------------------------------------------------------------
@@ -151,6 +151,13 @@ Value_P ret(vp, LOC);   // Value_P constructor increments owner_count
    return ret;
 }
 //-----------------------------------------------------------------------------
+bool 
+PointerCell::is_member_anchor() const
+{
+   return value.pval.valp.value_p &&
+          value.pval.valp.value_p->is_member();
+}
+//-----------------------------------------------------------------------------
 CellType
 PointerCell::deep_cell_types() const
 {
@@ -167,7 +174,7 @@ PrintBuffer
 PointerCell::character_representation(const PrintContext & pctx) const
 {
 Value_P val = get_pointer_value();
-   Assert(!!val);
+   Assert(+val);
 
    if (pctx.get_style() & PST_QUOTE_CHARS)
       {

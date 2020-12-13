@@ -63,7 +63,7 @@ Quad_RL::get_random()
    state += Knuth_c;
 
    Assert(value_stack.size());
-   if (value_stack.back().name_class != NC_VARIABLE)   VALUE_ERROR;
+   if (value_stack.back().get_nc() != NC_VARIABLE)   VALUE_ERROR;
 
    new (&value_stack.back().apl_val->get_ravel(0))   IntCell(state);
    return state;

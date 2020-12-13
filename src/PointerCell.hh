@@ -50,6 +50,9 @@ public:
    /// overloaded Cell::get_pointer_value()
    virtual Value_P get_pointer_value()  const;
 
+   /// overloaded Cell::_is_member_anchor()
+   virtual bool is_member_anchor() const;
+
    /// overloaded Cell::greater()
    virtual bool greater(const Cell & other) const;
 

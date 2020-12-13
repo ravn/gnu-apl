@@ -221,12 +221,16 @@ public:
    virtual bool is_real_cell() const   // int or flt
       { return false; }
 
-   /// return \b true unless \b this cell contains infinity or NaN
+   /// Return \b true unless \b this cell contains infinity or NaN
    virtual bool is_finite() const
       { return true; }
 
    /// Return \b true iff \b this cell is an example field character cell
    virtual bool is_example_field() const
+      { return false; }
+
+   /// Return true iff this is a PointerCell which pouints to a member value
+   virtual bool is_member_anchor() const
       { return false; }
 
    /// convert this cell to its type
