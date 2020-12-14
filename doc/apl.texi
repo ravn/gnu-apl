@@ -90,7 +90,7 @@ APL is built and installed like this:
 @item download the tar file containing GNU APL, from
  @uref{ftp://ftp.gnu.org/gnu/apl} or from one of its mirrors
  (see @uref{http://www.gnu.org/prep/ftp.html}), and
-untar the file.
+un-tar the file.
 
 @item read (and follow) the instructions given in file README in the unpacked
 directory
@@ -187,7 +187,7 @@ GNU APL processes the -C option (i.e. it calls chroot("new_root")) before
 all other command line options. As a consequence, file names in other command
 line options of GNU APL are also affected by -C. That means that the file
 names in command line options arr being interpreted relative to new_root
-and @strong{not} relative to the curret directory of the process that had
+and @strong{not} relative to the current directory of the process that had
 started GNU APL.
 
 @item
@@ -236,14 +236,14 @@ run in (new) Emacs mode with argument arg.
 
 evaluate one APL line and exit. This option can be given several times; in
 that case several lines are being executed before GNU apl exits. Keep in
-mind that command line options are nrmally processed by your shell before
+mind that command line options are normally processed by your shell before
 being passed to apl. Therefore sometimes quoting the argument of --eval may
 be needed and common wisdom has it to always quote the argument of --eval.
 
 @item
 @option{-f file}
 
-read input from \fIfile\fP rather than from the keyboard. When the end of
+read input from @i{file} rather than from the keyboard. When the end of
 the file is reached, input is switched back to the keyboard. 
 If you want to terminate the APL interpreter after executing the file,
 then use )OFF as last line in the file.
@@ -3272,7 +3272,7 @@ raise an error if no match is found. This can be achieved with the E flag:
 DOMAIN ERROR+
       'g..' ⎕RE['E']'__foo___fun____fox'
       ^            ^
-      )more
+      )MORE
 No match
 @end verbatim
 
@@ -3986,14 +3986,17 @@ and overriden just like normal variables:
 The members of a structured variable form a tree of (sub-) variables, similar
 to the file system on a computer. This tree has:
 
-* one root variable (which is the structured variable itself),
+* one root variable (which is the structured variable itself).
 
 * zero or more non-leafs (like subdirectories of the top-level root directory
-  in a file system), and
+  in a file system). The case of zero non-leafs can only occur if a leaf below
+  it was created and then a parent of that leaf was erased.
 
-* zero or more leafs (like the files in a file system).
+* zero or more leafs (like the files in a file system). The case of zero leafs can
+  only occur if a lead was first created (which makes all its parents non-empty) and
+  then erased (which makes its parent empty unless it contains other leafs.
 
-Structured variables are, due to their tree-like structure, being printed somewhat
+Due to their tree-like structure, structured variables need to be printed somewhat
 differently than normal APL variables. For example:
 
 @verbatim
@@ -4013,18 +4016,17 @@ differently than normal APL variables. For example:
 @end verbatim
 
 As a precaution, assigning a values to a non-leaf (includig the root) raises
-a DOMAIN ERROR (here the analogy to file systems ends, since directories can
-contain both files and sub-directories):
+a DOMAIN ERROR:
 
 @verbatim
       A.b.c←'leaf-Abc'        ⍝ OK, since a.b.c will be a leaf
-      A.b←42                  ⍝ will fail since a.b is not a leaf
+      A.b←42                  ⍝ will fail since A.b is not a leaf
 DOMAIN ERROR+
       A.b←42
        ^ ^
-      )more
+      )MORE
 member access: cannot override non-leaf member A.b
-That member must first be erased.
+)ERASE or ⎕EX that member first.
 
       )ERASE A.b
       A.b ← 'leaf-Ab'         ⍝ now OK, since A.b will now become a (new) leaf
@@ -4037,7 +4039,7 @@ structured variable is valid and concatenates the members:
 
 @verbatim
       )ERASE A
-      A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.C
+      A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.c
       C.d.e ← 'leaf-cde'      ⍝ variable C with leaf C.d.e
       A.b.c ← C               ⍝ override leaf A.b.c of A
       A.b.c.d.e
@@ -4069,7 +4071,7 @@ by means of ./configure (see README-2-configure).
 @section Shared Variables
 
 The system functions and variables for shared variables, i.e. ⎕SVO, ⎕SVR,
-⎕SVC, ⎕SVS, ⎕SVQ are implemented.
+⎕SVC, ⎕SVS, and ⎕SVQ, are implemented.
 
 Communication between two workspaces is supported, but with some
 limitations. Two workspaces must run on the same machine in order

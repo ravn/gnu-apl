@@ -1107,8 +1107,8 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                     Function_P fun = sym->get_function();
                     Assert(fun);
                     CERR << "is a ";
-                    if      (fun->get_oper_valence() == 2)   CERR << "dyadic";
-                    else                                    CERR << "monadic";
+                    if (fun->get_oper_valence() == 2)   CERR << "dyadic";
+                    else                                CERR << "monadic";
                     CERR << " defined operator:" << endl;
 
                     const UserFunction * ufun = fun->get_ufun1();

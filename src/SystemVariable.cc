@@ -1074,7 +1074,9 @@ Quad_TZ::print_timestamp(ostream & out, APL_time_us when) const
 {
 const APL_time_us offset = get_offset();
 const YMDhmsu time(when + 1000000*offset);
-const char * tz_sign = (offset < 0) ? "" : "+";
+
+char gmt[40];
+   snprintf(gmt, sizeof(gmt), "(GMT%+2d)", int(offset/3600));
 
 ostringstream os;
    os << setfill('0') << time.year  << "-"
@@ -1082,8 +1084,8 @@ ostringstream os;
       << setw(2)      << time.day   << "  "
       << setw(2)      << time.hour  << ":"
       << setw(2)      << time.minute << ":"
-      << setw(2)      << time.second << " (GMT"
-      << tz_sign      << offset/3600 << ")";
+      << setw(2)      << time.second << " "
+      << setfill(' ') << left << setw(8) << gmt;
 
    return out << os.str();
 }

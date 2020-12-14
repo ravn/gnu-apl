@@ -174,12 +174,13 @@ XML_Saving_Archive &
 XML_Saving_Archive::save_shape(Vid vid)
 {
 const Value & v = *values[vid]._val;
+const Vid parent_vid = values[vid]._par;
 
    do_indent();
-   out << "<Value flg=\"" << HEX(v.get_flags()) << "\" vid=\"" << vid << "\"";
-
-const Vid parent_vid = values[vid]._par;
-   out << " parent=\"" << parent_vid << "\" rk=\"" << v.get_rank()<< "\"";
+   out << "<Value flg=\"" << HEX(v.get_flags()) << "\" "
+                 "vid=\"" << vid                << "\" "
+                 "parent=\"" << parent_vid      << "\"1637 "
+                 "rk=\"" << v.get_rank()        << "\"";
 
    loop (r, v.get_rank())
       {
@@ -1630,9 +1631,12 @@ XML_Loading_Archive::read_Value()
 {
    expect_tag("Value", LOC);
 
-const Vid  vid = find_Vid_attr("vid", false, 10);
-const Vid  parent = find_Vid_attr("parent", true, 10);
-const int  rk  = find_int_attr("rk",  false, 10);
+   // read all mandatory attributes even if they are no used in this pass
+   //
+const Vid  vid    = find_Vid_attr("vid",    false, 10);
+const int  flg    = find_int_attr("flg",    false, 16);
+const Vid  parent = find_Vid_attr("parent", false, 10);
+const int  rk     = find_int_attr("rk",     false, 10);
 
    Log(LOG_archive)   CERR << "  read_Value() vid=" << vid << endl;
 
@@ -1688,6 +1692,7 @@ bool no_copy = false;   // assume the value is needed
         Assert(vid == int(values.size()));
 
         Value_P val(sh_value, LOC);
+        if (flg & VF_member)   val->set_member();
         values.push_back(val);
       }
 }

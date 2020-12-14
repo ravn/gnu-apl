@@ -353,7 +353,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
         case NC_VARIABLE:
              {
                const Value & value = *symbol->get_apl_value().get();
-               do_CR10_var(result, symbol_name, value);
+               do_CR10_variable(result, symbol_name, value);
                return;
              }
 
@@ -417,15 +417,30 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_CR::do_CR10_var(UCS_string_vector & result, const UCS_string & var_name,
+Quad_CR::do_CR10_variable(UCS_string_vector & result, const UCS_string & var_name,
                      const Value & value)
 {
+   if (value.is_member())   // normal variable
+      {
+        if (const char * error = do_CR10_structured(result, var_name, value))
+           {
+             CERR << "could not )DUMP structured variable " << var_name
+                  << ": " << error
+                  << "\n)DUMPing it as regular variable instead..." << endl;
+             goto not_structured;
+           }
+
+        return;   // OK
+      }
+
+not_structured:
+
 Picker picker(var_name);
-   do_CR10_rec(result, value, picker, -99);
+   do_CR10_value(result, value, picker, -99);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_CR::do_CR10_rec(UCS_string_vector & result, const Value & value, 
+Quad_CR::do_CR10_value(UCS_string_vector & result, const Value & value, 
                      Picker & picker, ShapeItem pidx)
 {
    /*
@@ -441,7 +456,7 @@ Quad_CR::do_CR10_rec(UCS_string_vector & result, const Value & value,
       short format (the default) requires a reasonably short value
 
       If value is nested then the short or long format is followed
-      by recursive do_CR10_rec() calls for the sub-values.
+      by recursive do_CR10_value() calls for the sub-values.
    */
 
    picker.push(value.get_shape(), pidx);
@@ -476,7 +491,7 @@ UCS_string shape_rho;
         UCS_string proto_name;
         picker.get(proto_name);
         picker.pop();
-        do_CR10_rec(result, *proto, picker, pidx);
+        do_CR10_value(result, *proto, picker, pidx);
         result.back().append_UTF8(" ⍝ proto 1");
 
         // and then another line to reshape the prototype
@@ -548,7 +563,7 @@ bool nested = false;
      //
      close_mode(rhs, mode);
 
-     UCS_string line(2*(picker.get_level() - 1), UNI_ASCII_SPACE);
+UCS_string line(2*(picker.get_level() - 1), UNI_ASCII_SPACE);
      picker.get_indexed(line, pos, count);
      line.append_UTF8("←");
      line.append(rhs);
@@ -566,11 +581,56 @@ bool nested = false;
              if (!cell.is_pointer_cell())   continue;
 
              const Value & sub_value = *cell.get_pointer_value().get();
-             do_CR10_rec(result, sub_value, picker, p);
+             do_CR10_value(result, sub_value, picker, p);
            }
       }
 
    picker.pop();
+}
+//-----------------------------------------------------------------------------
+const char *
+Quad_CR::do_CR10_structured(UCS_string_vector & result, const UCS_string & var_name,
+                            const Value & value)
+{
+   if (value.get_rank() != 2)   return "bad rank";
+   if (value.get_cols() != 2)   return "bad shape";
+
+   loop(r, value.get_rows())
+       {
+         const Cell & member_cell = value.get_ravel(2*r);
+         if (!member_cell.is_pointer_cell())   continue;
+         const Value * member_name = member_cell.get_pointer_value().get();
+         if (!member_name->is_char_string())   continue;
+
+         const UCS_string member_ucs(*member_name);
+         UCS_string path = var_name;
+         path += UNI_ASCII_FULLSTOP;
+         path.append(member_ucs);
+
+         const Cell & data_cell = value.get_ravel(2*r + 1);
+         if (data_cell.is_member_anchor())   // non-leaf
+            {
+              const Value & sub_value = data_cell.get_pointer_value().getref();
+              do_CR10_structured(result, path, sub_value);
+            }
+         else                                // leaf
+            {
+              Picker picker(path);
+              if (data_cell.is_pointer_cell())   // nested data_cell
+                 {
+                   const Value & sub_value = data_cell.get_pointer_value().getref();
+                   do_CR10_value(result, sub_value, picker, -99);
+                 }
+              else                               // simple data_cell
+                 {
+                   Value_P sub_value(LOC);
+                   sub_value->next_ravel()->init(data_cell, sub_value.getref(), LOC);
+                   do_CR10_value(result, sub_value.getref(), picker, -99);
+                 }
+            }
+       }
+
+   return 0;
 }
 //-----------------------------------------------------------------------------
 bool

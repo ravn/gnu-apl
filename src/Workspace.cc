@@ -891,12 +891,17 @@ const YMDhmsu time(gmt + 1000000*offset);
                << " --script" << endl;
         }
 
-     *sout << " ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝" << endl
-          << "⍝" << endl
-          << "⍝ " << wsname << " ";
-     get_v_Quad_TZ().print_timestamp(*sout, gmt) << endl
-          << " ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝" << endl
-          << endl;
+UCS_string wsname_apl = wsname;
+   wsname_apl.append_UTF8(".apl");
+
+     *sout <<
+" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << endl <<
+"⍝                                                                    ⍝" << endl <<
+"⍝ " << setw(36) << wsname_apl << " ";
+     get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << " ⍝" << endl <<
+"⍝                                                                    ⍝" << endl <<
+" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << endl
+           << endl;
    }
 
 int function_count = 0;

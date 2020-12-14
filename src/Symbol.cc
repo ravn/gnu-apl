@@ -1112,13 +1112,21 @@ const ValueStackItem & vs = value_stack[0];
    if (vs.name_class == NC_VARIABLE)
       {
         UCS_string_vector CR10;
-        Quad_CR::do_CR10_var(CR10, get_name(), *vs.apl_val.get());
+        const Value & value = vs.apl_val.getref();
+        Quad_CR::do_CR10_variable(CR10, get_name(), value);
+
+        if (value.is_member())
+           out << "⍝ structured variable " << get_name() << endl;
 
         loop(l, CR10.size())
            {
-             if (l)   out << "  ";
+             if (l || value.is_member())   out << "  ";
              out << CR10[l] << endl;
            }
+
+        if (value.is_member())
+           out << "⍝ end of structured variable " << get_name() << endl;
+
         out << endl;
       }
    else if (vs.name_class == NC_FUNCTION ||

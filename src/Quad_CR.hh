@@ -57,8 +57,9 @@ public:
    static Quad_CR  _fun;          ///< Built-in function.
 
    /// portable variable encoding of value \b name (varname or varname ⊂)
-   static void do_CR10_var(UCS_string_vector & result, const UCS_string & name,
-                           const Value & value);
+   static void do_CR10_variable(UCS_string_vector & result,
+                                const UCS_string & var_name,
+                                const Value & value);
 
 protected:
    /// list all ⎕CR functions
@@ -174,8 +175,13 @@ protected:
       };
 
    /// compute 10 ⎕CR recursively
-   static void do_CR10_rec(UCS_string_vector & result, const Value & value,
-                           Picker & picker, ShapeItem pidx);
+   static void do_CR10_value(UCS_string_vector & result, const Value & value,
+                             Picker & picker, ShapeItem pidx);
+
+   /// compute 10 ⎕CR recursively (structured variable)
+   static const char * do_CR10_structured(UCS_string_vector & result,
+                                          const UCS_string & varname,
+                                          const Value & value);
 
    /// try to emit \b value in short format. Retrun true if that is not
    /// possible.

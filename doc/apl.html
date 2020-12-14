@@ -284,7 +284,7 @@ Next: <a href="#Chapter-2" accesskey="n" rel="next">Chapter 2</a>, Previous: <a 
 <li> download the tar file containing GNU APL, from
  <a href="ftp://ftp.gnu.org/gnu/apl">ftp://ftp.gnu.org/gnu/apl</a> or from one of its mirrors
  (see <a href="http://www.gnu.org/prep/ftp.html">http://www.gnu.org/prep/ftp.html</a>), and
-untar the file.
+un-tar the file.
 
 </li><li> read (and follow) the instructions given in file README in the unpacked
 directory
@@ -378,7 +378,7 @@ particular a shell, and possibly libraries needed by the shell. Consult
 all other command line options. As a consequence, file names in other command
 line options of GNU APL are also affected by -C. That means that the file
 names in command line options arr being interpreted relative to new_root
-and <strong>not</strong> relative to the curret directory of the process that had
+and <strong>not</strong> relative to the current directory of the process that had
 started GNU APL.
 
 </li><li> GNU APL may automatically start other processes such as APserver and friends
@@ -419,13 +419,13 @@ via the -f option.
 
 <p>evaluate one APL line and exit. This option can be given several times; in
 that case several lines are being executed before GNU apl exits. Keep in
-mind that command line options are nrmally processed by your shell before
+mind that command line options are normally processed by your shell before
 being passed to apl. Therefore sometimes quoting the argument of &ndash;eval may
 be needed and common wisdom has it to always quote the argument of &ndash;eval.
 </p>
 </li><li> <samp>-f file</samp>
 
-<p>read input from \fIfile\fP rather than from the keyboard. When the end of
+<p>read input from <i>file</i> rather than from the keyboard. When the end of
 the file is reached, input is switched back to the keyboard. 
 If you want to terminate the APL interpreter after executing the file,
 then use )OFF as last line in the file.
@@ -3526,7 +3526,7 @@ raise an error if no match is found. This can be achieved with the E flag:
 DOMAIN ERROR+
       'g..' ⎕RE['E']'__foo___fun____fox'
       ^            ^
-      )more
+      )MORE
 No match
 </pre>
 <p>The &rsquo;E&rsquo; flag has no effect if the &rsquo;g&rsquo; flag is also given because in that case
@@ -4207,14 +4207,17 @@ and overriden just like normal variables:
 <p>The members of a structured variable form a tree of (sub-) variables, similar
 to the file system on a computer. This tree has:
 </p>
-<p>* one root variable (which is the structured variable itself),
+<p>* one root variable (which is the structured variable itself).
 </p>
 <p>* zero or more non-leafs (like subdirectories of the top-level root directory
-  in a file system), and
+  in a file system). The case of zero non-leafs can only occur if a leaf below
+  it was created and then a parent of that leaf was erased.
 </p>
-<p>* zero or more leafs (like the files in a file system).
+<p>* zero or more leafs (like the files in a file system). The case of zero leafs can
+  only occur if a lead was first created (which makes all its parents non-empty) and
+  then erased (which makes its parent empty unless it contains other leafs.
 </p>
-<p>Structured variables are, due to their tree-like structure, being printed somewhat
+<p>Due to their tree-like structure, structured variables need to be printed somewhat
 differently than normal APL variables. For example:
 </p>
 <pre class="verbatim">      PERSON
@@ -4232,17 +4235,16 @@ differently than normal APL variables. For example:
                  └──────────────┘
 </pre>
 <p>As a precaution, assigning a values to a non-leaf (includig the root) raises
-a DOMAIN ERROR (here the analogy to file systems ends, since directories can
-contain both files and sub-directories):
+a DOMAIN ERROR:
 </p>
 <pre class="verbatim">      A.b.c←'leaf-Abc'        ⍝ OK, since a.b.c will be a leaf
-      A.b←42                  ⍝ will fail since a.b is not a leaf
+      A.b←42                  ⍝ will fail since A.b is not a leaf
 DOMAIN ERROR+
       A.b←42
        ^ ^
-      )more
+      )MORE
 member access: cannot override non-leaf member A.b
-That member must first be erased.
+)ERASE or ⎕EX that member first.
 
       )ERASE A.b
       A.b ← 'leaf-Ab'         ⍝ now OK, since A.b will now become a (new) leaf
@@ -4253,7 +4255,7 @@ That member must first be erased.
 structured variable is valid and concatenates the members:
 </p>
 <pre class="verbatim">      )ERASE A
-      A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.C
+      A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.c
       C.d.e ← 'leaf-cde'      ⍝ variable C with leaf C.d.e
       A.b.c ← C               ⍝ override leaf A.b.c of A
       A.b.c.d.e
@@ -4291,7 +4293,7 @@ by means of ./configure (see README-2-configure).
 <h3 class="section">4.2 Shared Variables</h3>
 
 <p>The system functions and variables for shared variables, i.e. ⎕SVO, ⎕SVR,
-⎕SVC, ⎕SVS, ⎕SVQ are implemented.
+⎕SVC, ⎕SVS, and ⎕SVQ, are implemented.
 </p>
 <p>Communication between two workspaces is supported, but with some
 limitations. Two workspaces must run on the same machine in order

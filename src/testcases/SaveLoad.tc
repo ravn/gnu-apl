@@ -13,7 +13,7 @@ SYNTAX ERROR
 ³
 
       )SAVE save_load_SI
-20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰)
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) 
 
       )LOAD save_load_SI.xml
 SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
@@ -38,13 +38,13 @@ WAS CLEAR WS
       cmp_b←{{⍵[⍋⍵]} (∨⌿ ⍺∘.= ⍵) / ⍵}
 
       )save
-20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰)  test
 
       )load test.xml
 SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 
       )save
-20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰)  test
 
       ⎕CR 'cmp_a'
 λ←⍺ λ0 ⍵                    
@@ -68,7 +68,7 @@ WAS CLEAR WS
 TEST0
 
       )SAVE
-20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰)  test
 
       )LOAD test.xml
 SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
