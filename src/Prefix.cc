@@ -1471,6 +1471,7 @@ Cell * member_cell = toplevel_val->get_member(members, member_owner,
            {
              Value_P Z(LOC);
              Z->next_ravel()->init(*member_cell, Z.getref(), LOC);
+             Z->check_value(LOC);
              pop_args_push_result(Token(TOK_APL_VALUE1, Z));
            }
       }
