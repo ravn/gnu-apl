@@ -221,12 +221,12 @@ public:
 
    /// return the axis specification of this token (expect non-zero axes)
    Value_P get_nonzero_axes() const
-      { Assert1(!!value.apl_val && (get_tag() == TOK_AXES));
+      { Assert1(!!value.apl_val && (get_tag() == TOK_AXIS));
         return value._apl_val(); }
 
    /// return the axis specification of this token
    Value_P get_axes() const
-      { Assert1(get_tag() == TOK_AXES);  return value._apl_val(); }
+      { Assert1(get_tag() == TOK_AXIS);  return value._apl_val(); }
 
    /// set the Value_P value of this token
    void set_apl_val(Value_P val)

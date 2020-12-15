@@ -71,7 +71,7 @@ Quad_CR::list_functions(ostream & out)
 "   Zm ← 25 ⎕CR B     20 ⎕CR B with double-line extra frame\n"
 "   Zi ← 26 ⎕CR B     Zi is the cell types of corresponding items in B\n"
 "   Zi ← 27 ⎕CR B     Zi is the primary values of Z items as integer\n"
-"   Zi ← 28 ⎕CR B     Zi is the secondary values of Z items as intege \n"
+"   Zi ← 28 ⎕CR B     Zi is the secondary values of Z items as integer\n"
 "   Zm ← 29 ⎕CR B     4 ⎕CR B with strings being quoted + extra frame\n"
 "   Z  ← 30 ⎕CR B     Z is B with all items expanded to the same shape\n"
 "   Zn ← 31 ⎕CR Bn    internal helper function for the ⎕INP macro\n"

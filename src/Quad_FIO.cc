@@ -63,66 +63,8 @@ Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
 
 Quad_FIO::_sub_fun Quad_FIO::sub_functions[] =
 {
-   { 35, "accept"       },
-   { 31, "access"       },
-   { 33, "bind"         },
-   { 54, "chdir"        },
-   { 36, "connect"      },
-   { 29, "dir_files"    },
-   {  1, "errno"        },
-   {  5, "errno_B"      },
-   {  4, "fclose"       },
-   { 59, "fcntl"        },
-   { 10, "feof"         },
-   { 11, "ferror"       },
-   { 16, "fflush"       },
-   {  9, "fgetc"        },
-   {  8, "fgets"        },
-   {  3, "fopen"        },
-   { 57, "fork_daemon"  },
-   { 22, "fprintf"      },
-   {  6, "fread"        },
-   { 48, "fscanf"       },
-   { 14, "fseek_cur"    },
-   { 15, "fseek_end"    },
-   { 13, "fseek_set"    },
-   { 18, "fstat"        },
-   { 17, "fsync"        },
-   { 12, "ftell"        },
-   {  7, "fwrite"       },
-   { 23, "fwrite_UNI"   },
-   { 45, "getpeername"  },
-   { 44, "getsockname"  },
-   { 46, "getsockopt"   },
-   { 50, "gettimeofday" },
-   { 53, "gmtime"       },
-   {  0, "help"         },
-   { 34, "listen"       },
-   { 52, "localtime"    },
-   { 20, "mkdir"        },
-   { 51, "mktime"       },
-   { 25, "pclose"       },
-   { 24, "popen"        },
-   { 60, "random"       },
-   { 41, "read"         },
-   { 28, "read_dir"     },
-   { 26, "read_file"    },
-   { 49, "read_text"    },
-   { 37, "recv"         },
-   { 27, "rename"       },
-   { 21, "rmdir"        },
-   { 40, "select"       },
-   { 38, "send"         },
-   { 39, "send_UNI"     },
-   { 47, "setsockopt"   },
-   { 32, "socket"       },
-   { 58, "sprintf"      },
-   { 55, "sscanf"       },
-   {  2, "strerror"     },
-   { 19, "unlink"       },
-   { 42, "write"        },
-   { 43, "write_UNI"    },
-   { 56, "write_text"   },
+#define fiodef(N, name)   { N, #name },
+#include "Quad_FIO.def"
 };
 //-----------------------------------------------------------------------------
 int
@@ -154,6 +96,13 @@ Quad_FIO::function_name_to_int(const char * function_name)
                                 SF_COUNT, SF_SIZE, axis_compare))
       return reinterpret_cast<const _sub_fun *>(vp)->val;
   return -1;    // not found
+}
+//-----------------------------------------------------------------------------
+ShapeItem
+Quad_FIO::string_to_axis(const UCS_string & name) const
+{
+UTF8_string name_utf(name);
+   return function_name_to_int(name_utf.c_str());
 }
 //-----------------------------------------------------------------------------
 Quad_FIO::Quad_FIO()
@@ -851,8 +800,14 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "strings\n      instead of function numbers:\n\n";
 
          loop(f, sizeof(sub_functions)/sizeof(_sub_fun))
-             out << "      ⎕FIO[" << setw(2) << sub_functions[f].val
-                 << "]  ←→  ⎕FIO['" << sub_functions[f].key << "']" << endl;
+             {
+               const int N = sub_functions[f].val;
+               const char * name = sub_functions[f].key;
+             out << "      ⎕FIO[" << setw(2) << N
+                 << "]  ←→  ⎕FIO['" << name << "']"
+                 << UCS_string(13 - strlen(name), UNI_ASCII_SPACE)
+                 << "←→  ⎕FIO." << name << endl;
+             }
 
          out << "\n      For a more detailed description of all functions:\n\n"
                 "      ⎕FIO ⍬" << endl;

@@ -82,9 +82,7 @@ protected:
    /// overloaded Function::get_fun_valence()
    virtual int get_fun_valence() const   { return 2; }
 
-   /// overloaded Function::get_oper_valence(). Most primitive operators are
-   /// monadic, so we return 1 and overload dyadic operators (i.e. inner/outer
-   /// product) to return 2
+   /// overloaded Function::get_oper_valence().
    virtual int get_oper_valence() const   { return 1; }
 
    /// overloaded Function::eval_ALXB().
@@ -92,6 +90,9 @@ protected:
 
    /// overloaded Function::eval_LXB().
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
+
+   /// overloaded Function::string_to_axis
+   virtual ShapeItem string_to_axis(const UCS_string & name) const;
 
    /// return one or more random values
    static Value_P get_random(APL_Integer mode, APL_Integer len);

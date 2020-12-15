@@ -206,12 +206,12 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh \
+	Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh \
+	Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
 	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
 	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
@@ -375,12 +375,12 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh \
+	Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh \
+	Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
 	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
 	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
@@ -524,12 +524,12 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc buildtag \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh \
+	Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh \
+	Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc \
+	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
+	Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
 	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
 	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
@@ -969,25 +969,25 @@ common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	PrintContext.hh PrintOperator.hh QuadFunction.cc \
 	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
 	Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc Quad_FFT.hh \
-	Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh Quad_GTK.cc \
-	Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
-	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Parallel.cc Parallel.hh Performance.cc Performance.def \
-	Performance.hh RealCell.cc RealCell.hh sbrk.cc Shape.cc \
-	Shape.hh ScalarFunction.cc ScalarFunction.hh Security.cc \
-	Security.def Security.hh StateIndicator.cc StateIndicator.hh \
-	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
-	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
-	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
-	SystemLimits.hh SystemVariable.cc SystemVariable.def \
-	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
-	Thread_context.cc Thread_context.hh Token.cc Token.def \
-	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
-	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
-	Unicode.hh UserFunction.cc UserFunction.hh \
-	UserFunction_header.cc UserFunction_header.hh \
+	Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
+	Quad_GTK.cc Quad_GTK.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
+	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
+	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
+	Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
+	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
+	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Security.cc Security.def Security.hh StateIndicator.cc \
+	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
+	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
+	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
+	SystemLimits.def SystemLimits.hh SystemVariable.cc \
+	SystemVariable.def SystemVariable.hh TabExpansion.cc \
+	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
+	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
+	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
+	UCS_string_vector.hh Unicode.hh UserFunction.cc \
+	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
 	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
 	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
 	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \

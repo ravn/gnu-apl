@@ -1,7 +1,10 @@
 ⍝ File_IO_1.tc
 ⍝ ----------------------------------
 
-      ⍝ same as File_IO.tc but WITHOUT using FILE_IO.apl library
+      ⍝ same as File_IO.tc but WITHOUT using FILE_IO.apl wrapper library
+      ⍝ Instead, lib_file_io.so is used directly (not recommended)
+      ⍝
+      ⍝ NOTE: Both FILE_IO.apl and lib_file_io.so are obsolete
       ⍝
       ⍝ This is NOT the recommeded way to use file_io.so but a way to
       ⍝ separate faults in file_io.cc from faults in FILE_IO.apl

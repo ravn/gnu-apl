@@ -57,7 +57,7 @@ Token::Token(TokenTag tg, IndexExpr & idx)
         Assert(tg == TOK_INDEX);
         if (idx.value_count() < 2)   // [idx] or []
            {
-             tag = TOK_AXES;
+             tag = TOK_AXIS;
              if (idx.value_count() == 0)   // []
                 {
                   new (&value.apl_val) Value_P;
@@ -204,7 +204,7 @@ operator << (ostream & out, const Token & token)
         case TC_PINDEX:
              if (token.get_tag() == TOK_INDEX)
                 return out << token.get_index_val();
-             else if (token.get_tag() == TOK_AXES)
+             else if (token.get_tag() == TOK_AXIS)
                 return out << *token.get_axes();
              else
                 FIXME;

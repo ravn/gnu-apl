@@ -1226,9 +1226,9 @@ Prefix::reduce_F_M_C_()
 {
    Assert1(prefix_len == 3);
 
-   if (at2().get_tag() != TOK_AXES)   // e.g. F[;2] instead of F[2]
+   if (at2().get_tag() != TOK_AXIS)   // e.g. F[;2] instead of F[2]
       {
-        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        // the user has provided a TOK_INDEX where TOK_AXIS was expected
         MORE_ERROR() << "illegal ; in axis";
         AXIS_ERROR;
       }
@@ -1248,9 +1248,9 @@ Prefix::reduce_F_C_M_()
 {
    Assert1(prefix_len == 3);
 
-   if (at1().get_tag() != TOK_AXES)   // e.g. F[;2] instead of F[2]
+   if (at1().get_tag() != TOK_AXIS)   // e.g. F[;2] instead of F[2]
       {
-        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        // the user has provided a TOK_INDEX where TOK_AXIS was expected
         MORE_ERROR() << "illegal ; in axis";
         AXIS_ERROR;
       }
@@ -1274,16 +1274,16 @@ Prefix::reduce_F_C_M_C()
 {
    Assert1(prefix_len == 4);
 
-   if (at1().get_tag() != TOK_AXES)   // e.g. F[;2] instead of F[2]
+   if (at1().get_tag() != TOK_AXIS)   // e.g. F[;2] instead of F[2]
       {
-        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        // the user has provided a TOK_INDEX where TOK_AXIS was expected
         MORE_ERROR() << "illegal ; in axis";
         AXIS_ERROR;
       }
 
-   if (at3().get_tag() != TOK_AXES)   // e.g. M[;2] instead of M[2]
+   if (at3().get_tag() != TOK_AXIS)   // e.g. M[;2] instead of M[2]
       {
-        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        // the user has provided a TOK_INDEX where TOK_AXIS was expected
         MORE_ERROR() << "illegal ; in axis";
         AXIS_ERROR;
       }
@@ -1389,10 +1389,22 @@ Symbol * top_sym = 0;
               }
            else
               {
+                if (members.size() == 1 && body[PC].get_Class() == TC_FUN12)
+                   {
+                     Function_P fun = body[PC].get_function();
+                     const ShapeItem axis = fun->string_to_axis(*members[0]);
+                     if (axis == -1)   syntax_error(LOC);
+
+                     pop_args_push_result(Token(TOK_AXIS, IntScalar(axis, LOC)));
+                     action = RA_CONTINUE;
+                     return;
+                   }
+
                  MORE_ERROR() << "member access: missing variable name";
                  syntax_error(LOC);
               }
          }
+
 
 Value_P toplevel_val = top_sym->get_value();
    if (!toplevel_val)   // top_sym is not a variable (-name). Maybe creeate one.
@@ -1520,9 +1532,9 @@ Value_P B;
    Bif_OPER2_RANK::split_y123_B(at3().get_apl_val(), y123, B);
 Token new_y123(TOK_APL_VALUE1, y123);
 
-   if (at2().get_tag() != TOK_AXES)   // e.g. D[;2] instead of D[;2]
+   if (at2().get_tag() != TOK_AXIS)   // e.g. D[;2] instead of D[;2]
       {
-        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        // the user has provided a TOK_INDEX where TOK_AXIS was expected
         MORE_ERROR() << "illegal ; in axis";
         AXIS_ERROR;
       }
@@ -1566,7 +1578,7 @@ Prefix::reduce_A_C__()
 Value_P A = at0().get_apl_val();
 Value_P Z;
 
-   if (at1().get_tag() == TOK_AXES)
+   if (at1().get_tag() == TOK_AXIS)
       {
         Z = A->index(at1().get_apl_val());
       }
@@ -1614,7 +1626,7 @@ Prefix::reduce_V_C_ASS_B()
 Symbol * V = at0().get_sym_ptr();
 Value_P B = at3().get_apl_val();
 
-   if (at1().get_tag() == TOK_AXES)   // [] or [x]
+   if (at1().get_tag() == TOK_AXIS)   // [] or [x]
       {
         Value_P v_idx = at1().get_axes();
 
@@ -1784,7 +1796,7 @@ Token result = at1();
       {
         assign_state = idx.get_assign_state();
 
-        if (idx.is_axis()) result.move_2(Token(TOK_AXES, idx.values[0]), LOC);
+        if (idx.is_axis()) result.move_2(Token(TOK_AXIS, idx.values[0]), LOC);
         else               result.move_2(Token(TOK_INDEX, idx), LOC);
       }
    else
@@ -1817,7 +1829,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
            {
              Value_P X = idx.extract_value(0);
              Assert1(+X);
-             I.move_2(Token(TOK_AXES, X), LOC);
+             I.move_2(Token(TOK_AXIS, X), LOC);
              Log(LOG_delete)
                 CERR << "delete " << voidP(&idx) << " at " LOC << endl;
              delete &idx;

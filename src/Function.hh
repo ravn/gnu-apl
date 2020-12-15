@@ -99,7 +99,8 @@ public:
         return 0;
       }
 
-   /// return the number of function arguments (1 or 2) of an operator.
+   /// return the number of function arguments (1 or 2) of an operator,
+   /// or 0 for a "normal" function that isn't an operator.
    virtual int get_oper_valence() const   { return 0; }
 
    /// return 1 if the function returns a result, otherwise 0.
@@ -235,6 +236,10 @@ public:
    /// return axis (non-0 only for derived functions)
    virtual const Value_P * locate_X() const
       { return 0; }
+
+   /// return a (pseudo-) axis for \b name
+   virtual ShapeItem string_to_axis(const UCS_string & name) const
+      { return -1; }
 
    /// return the signature of this function (currently only valid
    /// for user-defined functions)
