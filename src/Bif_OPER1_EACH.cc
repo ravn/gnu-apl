@@ -128,15 +128,21 @@ Function_P LO = _LO.get_function();
              if (extend_B && !B->is_scalar())   // 1-element non-scalar B
                 {
                   Value_P A1(LOC);
-                  Value_P B1(LOC);
                   A1->get_ravel(0).init(A->get_ravel(0), A1.getref(), LOC);
+                  A1->check_value(LOC);
+
+                  Value_P B1(LOC);
                   B1->get_ravel(0).init(B->get_ravel(0), B1.getref(), LOC);
+                  B1->check_value(LOC);
+
                   return macro->eval_ALB(A1, _LO, B1);
                 }
              else
                 {
                   Value_P A1(LOC);
                   A1->get_ravel(0).init(A->get_ravel(0), A1.getref(), LOC);
+                  A1->check_value(LOC);
+
                   return macro->eval_ALB(A1, _LO, B);
                 }
            }
@@ -144,6 +150,8 @@ Function_P LO = _LO.get_function();
            {
              Value_P B1(LOC);
              B1->get_ravel(0).init(B->get_ravel(0), B1.getref(), LOC);
+             B1->check_value(LOC);
+
              return macro->eval_ALB(A, _LO, B1);
            }
         else
@@ -209,7 +217,7 @@ Value_P Z;
              else
                 new (cZ)   PointerCell(vZ.get(), Z.getref());
 
-            continue;   // next z
+             continue;   // next z
            }
 
         if (result.get_tag() == TOK_ERROR)   return result;
