@@ -2245,7 +2245,6 @@ int function_number = -1;
 
          case 7:   // fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Zi
               {
-Q(LOC)
                 errno = 0;
                 const size_t bytes = A->element_count();
                 FILE * file = get_FILE(*B.get());
