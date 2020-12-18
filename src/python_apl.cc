@@ -234,7 +234,7 @@ Symbol * sym = Workspace::lookup_existing_symbol(varname_ucs);
       }
 
 const ValueStackItem * top = sym->top_of_stack();
-   if (top == 0 || top->name_class != NC_VARIABLE)
+   if (top == 0 || top->get_nc() != NC_VARIABLE)
       {
         CERR << "*** " << varname_ucs << "is not an APL variable." << endl;
         return 0;
