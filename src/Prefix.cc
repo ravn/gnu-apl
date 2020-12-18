@@ -1392,7 +1392,7 @@ Symbol * top_sym = 0;
                 if (members.size() == 1 && body[PC].get_Class() == TC_FUN12)
                    {
                      Function_P fun = body[PC].get_function();
-                     const ShapeItem axis = fun->string_to_axis(*members[0]);
+                     const ShapeItem axis = fun->string_to_int(*members[0]);
                      if (axis == -1)   syntax_error(LOC);
 
                      pop_args_push_result(Token(TOK_AXIS, IntScalar(axis, LOC)));

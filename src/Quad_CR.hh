@@ -41,6 +41,9 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
+   /// overloaded Function::string_to_int()
+   virtual ShapeItem string_to_int(const UCS_string & name) const;
+
    /// compute \b a ⎕CR \b B
    static Value_P do_CR(APL_Integer a, const Value * B, PrintContext pctx);
 
@@ -62,8 +65,21 @@ public:
                                 const Value & value);
 
 protected:
+   /// a mapping between function names and function numbers
+   struct _sub_fun
+      {
+        unsigned int val;   ///< the function number
+        const char * key;   ///< the name for it
+      };
+
+   /// a mapping between function names and function numbers
+   static _sub_fun sub_functions[];
+
+   /// compare two axis strings (function names)
+   static int fun_compare(const void * key, const void * sf);
+
    /// list all ⎕CR functions
-   static Token list_functions(ostream & out);
+   static Token list_functions(ostream & out, bool mapping);
 
    /// do eval_B() with extra spaces removed
    static Token do_eval_B(const Value & B, bool remove_extra_spaces);

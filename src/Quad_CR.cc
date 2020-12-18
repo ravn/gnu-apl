@@ -27,9 +27,43 @@
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
-Token
-Quad_CR::list_functions(ostream & out)
+Quad_CR::_sub_fun Quad_CR::sub_functions[] =
 {
+#define crdef(N, name)   { N, #name },
+#include "Quad_CR.def"
+};
+//-----------------------------------------------------------------------------
+int
+Quad_CR::fun_compare(const void * key, const void * sf)
+{
+   return strcasecmp(reinterpret_cast<const char *>(key),
+                     reinterpret_cast<const _sub_fun *>(sf)->key);
+}
+//-----------------------------------------------------------------------------
+Token
+Quad_CR::list_functions(ostream & out, bool mapping)
+{
+   if (mapping)
+      {
+         out <<
+"      With a small performance penalty, ⎕CR also accepts the following "
+"strings\n      instead of function numbers as left argument:\n\n";
+
+         loop(f, sizeof(sub_functions)/sizeof(_sub_fun))
+             {
+               const int N = sub_functions[f].val;
+               char NN[4];   snprintf(NN, sizeof(NN), "%2d", N);
+               const char * name = sub_functions[f].key;
+               out << "      " << NN << " ⎕CR  ←→"
+                   << UCS_string(24 - strlen(name), UNI_ASCII_SPACE)
+                   << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
+             }
+
+         out << "\n      For a more detailed description of all functions:\n\n"
+                "      ⎕CR ⍬" << endl;
+      }
+   else
+      {
    out <<
 "   Functions provided by A ⎕CR B...\n"
 "\n"
@@ -83,7 +117,7 @@ Quad_CR::list_functions(ostream & out)
 "   Zl ← 37 ⎕CR Bn    ⎕CR B without removing indentation\n"
 "\n"
 "   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
-
+      }
   return Token(TOK_APL_VALUE1, Str0(LOC));
 }
 //-----------------------------------------------------------------------------
@@ -92,7 +126,10 @@ Quad_CR::eval_B(Value_P B) const
 {
    if (B->element_count() == 0)   // ⎕CR '' : print help
       {
-        return list_functions(COUT);
+        if (B->get_ravel(0).is_character_cell())
+           return list_functions(CERR, true);
+        if (B->get_ravel(0).is_integer_cell())
+           return list_functions(CERR, false);
       }
 
    return do_eval_B(B.getref(), true);
@@ -178,15 +215,49 @@ Value_P Z(shape_Z, LOC);
 Token
 Quad_CR::eval_AB(Value_P A, Value_P B) const
 {
+int function_number = -1;
+
    if (A->get_rank() > 1)                    RANK_ERROR;
-   if (!A->is_scalar_or_len1_vector())       LENGTH_ERROR;
-const APL_Integer a = A->get_ravel(0).get_int_value();
+   if (A->is_char_array())   // function name, e.g. "APL_expression"
+      {
+        UCS_string ucs_A(A.getref());
+        UTF8_string utf_A(ucs_A);
+        function_number = string_to_int(utf_A.c_str());
+        if (function_number == -1)
+           {
+             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
+                          << ucs_A << "')";
+             DOMAIN_ERROR;
+           }
+      }
+   else
+      {
+        if (!A->is_scalar_or_len1_vector())       LENGTH_ERROR;
+        function_number = A->get_ravel(0).get_int_value();
+      }
 
 PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
 
-Value_P Z = do_CR(a, B.get(), pctx);
+Value_P Z = do_CR(function_number, B.get(), pctx);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
+}
+//-----------------------------------------------------------------------------
+ShapeItem
+Quad_CR::string_to_int(const UCS_string & name) const
+{
+UTF8_string name_utf(name);
+const char * function_name = name_utf.c_str();
+
+  enum { SF_SIZE = sizeof(_sub_fun),
+         SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
+
+ if (const void * vp = bsearch(function_name, sub_functions,
+                                SF_COUNT, SF_SIZE, fun_compare))
+      return reinterpret_cast<const _sub_fun *>(vp)->val;
+
+  return -1;    // not found
+
 }
 //-----------------------------------------------------------------------------
 Value_P

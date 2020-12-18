@@ -11,7 +11,7 @@
 
 
 ⍝ This library contains APL wrapper functions around the system function ⎕FIO.
-⍀ It is the same as FILE_IO.apl but uses the new ⎕FIO.xxx syntax instead of ⎕FIO[N]
+⍝ It is the same as FILE_IO.apl but uses the new ⎕FIO.xxx syntax instead of ⎕FIO[N]
 ⍝
 ⍝ The purpose is to give functions for file I/O meaningful names instead
 ⍝ of difficult-to-remember numbers. The function name is normally the name
@@ -112,7 +112,7 @@
 
 ∇Zi ← FIO∆fflush Bh
 ⍝⍝ fflush(Bh)
- Zi ← ⎕FI.fflush] Bh
+ Zi ← ⎕FIO.fflush Bh
 ∇
 
 ∇Zi ← FIO∆fsync Bh
@@ -147,7 +147,7 @@
 
 ∇Zi ← FIO∆printf B
 ⍝⍝ printf(B1, B2...) format B1
- Zi ← B ⎕FIO.printf 1
+ Zi ← B ⎕FIO.fprintf 1
 ∇
 
 ∇Zi ← FIO∆fprintf_stderr B
@@ -162,7 +162,7 @@
 
 ∇Zi ← Ac FIO∆fwrite_utf8 Bh
 ⍝⍝ fwrite(Ac, 1, ⍴Ac, Bh) Unicode Ac Output UTF-8
- Zi ← Ac ⎕FIO.fwrite Bh
+ Zi ← Ac ⎕FIO.fwrite_UNI Bh
 ∇
 
 ∇Zh ← As FIO∆popen Bs
@@ -205,7 +205,7 @@ end: txt←⎕ucs txt
 
 ∇Zs ← FIO∆read_file Bs
 ⍝⍝ return entire file Bs as byte vector
- Zs ← ⎕FIO.readfile Bs
+ Zs ← ⎕FIO.read_file Bs
 ∇
 
 ∇Zs ← As FIO∆rename Bs

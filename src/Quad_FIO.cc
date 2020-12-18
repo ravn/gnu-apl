@@ -95,11 +95,12 @@ Quad_FIO::function_name_to_int(const char * function_name)
   if (const void * vp = bsearch(function_name, sub_functions,
                                 SF_COUNT, SF_SIZE, axis_compare))
       return reinterpret_cast<const _sub_fun *>(vp)->val;
+
   return -1;    // not found
 }
 //-----------------------------------------------------------------------------
 ShapeItem
-Quad_FIO::string_to_axis(const UCS_string & name) const
+Quad_FIO::string_to_int(const UCS_string & name) const
 {
 UTF8_string name_utf(name);
    return function_name_to_int(name_utf.c_str());
@@ -197,7 +198,10 @@ file_entry & fe = get_file_entry(handle);
         else if (fe.fe_may_write)
            fe.fe_FILE = fdopen(fe.fe_fd, "a");
         else
-           DOMAIN_ERROR;   // internal error
+           {
+             MORE_ERROR() << "bad (closed ?) file handle " << handle;
+             DOMAIN_ERROR;   // internal error
+           }
       }
 
    return fe.fe_FILE;
@@ -797,13 +801,14 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
       {
          out <<
 "      With a small performance penalty, ⎕FIO also accepts the following "
-"strings\n      instead of function numbers:\n\n";
+"strings\n      instead of function numbers as axis argument:\n\n";
 
          loop(f, sizeof(sub_functions)/sizeof(_sub_fun))
              {
                const int N = sub_functions[f].val;
+               char NN[4];   snprintf(NN, sizeof(NN), "%2d", N);
                const char * name = sub_functions[f].key;
-             out << "      ⎕FIO[" << setw(2) << N
+             out << "      ⎕FIO[" << NN
                  << "]  ←→  ⎕FIO['" << name << "']"
                  << UCS_string(13 - strlen(name), UNI_ASCII_SPACE)
                  << "←→  ⎕FIO." << name << endl;
@@ -1118,7 +1123,6 @@ Quad_FIO::eval_AB(Value_P A, Value_P B) const
         if (B->get_ravel(0).is_integer_cell())
            return list_functions(CERR, false);
       }
-
 
 const APL_Integer function_number = B->get_ravel(0).get_int_value();
    switch(function_number)
@@ -2241,6 +2245,7 @@ int function_number = -1;
 
          case 7:   // fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Zi
               {
+Q(LOC)
                 errno = 0;
                 const size_t bytes = A->element_count();
                 FILE * file = get_FILE(*B.get());

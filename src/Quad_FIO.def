@@ -1,5 +1,6 @@
 
-// !!! keep names below sorted
+// !!! keep names below sorted by name (case insensitive!)
+// e.g.: sort -k 2 -t , Quad_FIO.def
 
 #ifdef fiodef
  fiodef(35, accept      )

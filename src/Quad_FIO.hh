@@ -91,8 +91,8 @@ protected:
    /// overloaded Function::eval_LXB().
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
-   /// overloaded Function::string_to_axis
-   virtual ShapeItem string_to_axis(const UCS_string & name) const;
+   /// overloaded Function::string_to_int
+   virtual ShapeItem string_to_int(const UCS_string & name) const;
 
    /// return one or more random values
    static Value_P get_random(APL_Integer mode, APL_Integer len);
@@ -100,14 +100,14 @@ protected:
    /// return the open FILE * for (APL integer) \b handle
    static FILE * get_FILE(int handle);
 
-   /// a mapping between strings and axis integers
+   /// a mapping between function names and function numbers
    struct _sub_fun
       {
-        unsigned int val;   ///< the axis number
+        unsigned int val;   ///< the function number
         const char * key;   ///< the name for it
       };
 
-   /// a mapping between strings and axis integers
+   /// a mapping between function names and function numbers
    static _sub_fun sub_functions[];
 
    /// one file (openend with open(), fopen(), or fdopen()).

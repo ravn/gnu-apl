@@ -108,7 +108,7 @@ PrintBuffer.cc					PrintBuffer.hh		\
 						PrintOperator.hh	\
 QuadFunction.cc					QuadFunction.hh		\
 ProcessorID.cc					ProcessorID.hh		\
-Quad_CR.cc					Quad_CR.hh		\
+Quad_CR.cc		Quad_CR.def		Quad_CR.hh		\
 Quad_DLX.cc					Quad_DLX.hh		\
 Quad_FFT.cc					Quad_FFT.hh		\
 Quad_FIO.cc		Quad_FIO.def		Quad_FIO.hh		\

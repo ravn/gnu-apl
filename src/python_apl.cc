@@ -240,7 +240,7 @@ const ValueStackItem * top = sym->top_of_stack();
         return 0;
       }
 
-   return top->apl_val.get();
+   return top->get_apl_value_ptr();
 }
 //-----------------------------------------------------------------------------
 static PyObject *

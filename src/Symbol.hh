@@ -50,8 +50,13 @@ public:
    friend class XML_Loading_Archive;
    friend class XML_Saving_Archive;
 
+   /// return the name class for \b this ValueStackItem
    NameClass get_nc() const
       { return name_class; }
+
+   /// return the name class for \b this ValueStackItem, or 0 if it has none
+   const Value * get_apl_value_ptr() const
+      { return apl_val.get(); }
 
 protected:
    /// constructor: ValueStackItem for an unused symbol
