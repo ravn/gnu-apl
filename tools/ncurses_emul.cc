@@ -33,6 +33,7 @@
 #include <../config.h>   // for HAVE_XXX macros
 #if HAVE_LIBTINFO && HAVE_NCURSES_H && HAVE_TERM_H
 
+#include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
 #include <term.h>
