@@ -167,7 +167,6 @@ const int seq_len = strlen(seq);
    return 0;
 }
 //----------------------------------------------------------------------------
-extern "C" void _nc_init_termtype(const char * term);
 int doit()
 {
 int errors = 0;
