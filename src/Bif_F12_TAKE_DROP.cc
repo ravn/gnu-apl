@@ -132,8 +132,10 @@ Bif_F12_TAKE::do_take(const Shape & ravel_A1, Value_P B)
    //
 Value_P Z(ravel_A1.abs(), LOC);
 
-   if (ravel_A1.is_empty())   Z->set_default(*B.get(), LOC); // empty Z
-   else                       fill(ravel_A1, &Z->get_ravel(0), Z.getref(), B);
+   if (ravel_A1.is_empty())
+      Z->get_ravel(0).init_type(B->get_ravel(0), Z.getref(), LOC);
+   else 
+      fill(ravel_A1, &Z->get_ravel(0), Z.getref(), B);
    Z->check_value(LOC);
    return Z;
 }
@@ -145,8 +147,14 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Cell * cZ, Value & Z_owner,
    for (TakeDropIterator i(true, shape_Zi, B->get_shape()); i.more(); ++i)
        {
          const ShapeItem offset = i();
-         if (offset == -1)   cZ++->init_type(B->get_ravel(0), Z_owner, LOC);
-         else                cZ++->init(B->get_ravel(offset), Z_owner, LOC);
+         if (offset != -1)                          // valid cell
+            {
+              cZ++->init(B->get_ravel(offset), Z_owner, LOC);
+            }
+         else                                       // invalid other Cell
+            {
+              cZ++->init_type(B->get_ravel(0), Z_owner, LOC);
+            }
        }
 }
 //=============================================================================

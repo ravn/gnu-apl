@@ -1362,8 +1362,8 @@ bool direct_assign;
       }
    else if (prefix_len == 4)   // member assignment
       {
-        Assert(get_assign_state() == ASS_arrow_seen);   // from reduce_D_V_ASS_B
         direct_assign = true;
+        Assert(get_assign_state() == ASS_arrow_seen);   // from reduce_D_V_ASS_B
       }
    else Assert(0 && "Bad prefix length in Prefix::reduce_D_V__()");
 

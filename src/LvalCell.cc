@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "Backtrace.hh"
 #include "LvalCell.hh"
 #include "PrintOperator.hh"
 #include "UTF8_string.hh"
@@ -28,6 +29,13 @@ LvalCell::LvalCell(Cell * cell, Value * cell_owner)
 {
    value.lval = cell;
    value.pval.owner = cell_owner;
+// check_consistency();
+}
+//-----------------------------------------------------------------------------
+void
+LvalCell::init_other(void * other, Value &, const char * loc) const
+{
+   new (other)  LvalCell(get_lval_value(), get_cell_owner());
 }
 //-----------------------------------------------------------------------------
 Cell *
@@ -53,5 +61,24 @@ PrintBuffer pb = value.lval->character_representation(pctx);
    pb.pad_r(Unicode('='), 1);
    return pb;
 }
+//-----------------------------------------------------------------------------
+void
+LvalCell::check_consistency() const
+{
+  if (value.lval)                      // valid owner
+     {
+        const Cell * C0 = &value.pval.owner->get_ravel(0);
+        const Cell * CN = C0 + value.pval.owner->element_count();
+       if (value.lval < C0 || value.lval >= CN)
+          {
+            Q1(C0)
+            Q1(value.lval)
+            Q1(CN)
+            Assert(0 && "LvalCell::check_consistency() failed");
+          }
+     }
+  else Assert(value.pval.owner == 0);   // no owner
+}
+
 //-----------------------------------------------------------------------------
 

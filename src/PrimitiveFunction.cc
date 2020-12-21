@@ -941,7 +941,8 @@ const ShapeItem len_Z = B->get_enlist_count();
 Value_P Z(len_Z, LOC);
 
 Cell * z = &Z->get_ravel(0);
-   B->enlist(z, Z.getref(), B->get_lval_cellowner());
+   if (B->get_lval_cellowner())   B->enlist_left(z, Z.getref());
+   else                           B->enlist_right(z, Z.getref());
 
    Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);

@@ -250,6 +250,11 @@ public:
    /// assign \b val to the cell references in this value.
    void assign_cellrefs(Value_P val);
 
+   /// check that this left-value is consistent and return its cell owner. If
+   /// \b quick then the first owner is returned, otherwise the entire value
+   /// is checked.
+   void check_lval_consistency() const;
+
    /// return member of this value, defined by \b members
    Cell * get_member(const vector<const UCS_string *> & members,
                      Value * & owner, bool create_if_needed, bool throw_error);
@@ -283,8 +288,11 @@ public:
    /// compute the depth of this value.
    APL_types::Depth compute_depth() const;
 
+   /// store the scalars in this (left-)value into dest...
+   void enlist_left(Cell * & dest, Value & dest_owner) const;
+
    /// store the scalars in this value into dest...
-   void enlist(Cell * & dest, Value & dest_owner, bool left) const;
+   void enlist_right(Cell * & dest, Value & dest_owner) const;
 
    /// compute the cell types contained in the top level of \b this value
    CellType flat_cell_types() const;

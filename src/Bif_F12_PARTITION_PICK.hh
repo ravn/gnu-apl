@@ -115,10 +115,14 @@ protected:
    /// the shape of the items being disclosed
    static Shape compute_item_shape(Value_P B, bool rank_tolerant);
 
+   /// compute the offset of the Cell in B that shall be picked.
+   static ShapeItem pick_offset(const Cell * const A0, ShapeItem idx_A,
+                                ShapeItem len_A, Value_P B, APL_Integer qio);
+
    /// Pick from B according to cA and len_A. \b cell_owner is non-zero
    /// if a left-vlues is picked, (e.g (2 1⊃B)←'TR')
-   static Value_P pick(const Cell * cA, ShapeItem len_A, Value_P B,
-                       APL_Integer qio, Value * cell_owner);
+   static Value_P pick(const Cell * const A0, ShapeItem idx_A, ShapeItem len_A,
+                       Value_P B, APL_Integer qio);
 };
 //=============================================================================
 

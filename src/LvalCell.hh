@@ -32,12 +32,11 @@
 class LvalCell : public Cell
 {
 public:
-   /// Construct an cell pointing to another cell
+   /// Constructor: a cell pointing to another cell
    LvalCell(Cell * cell, Value * cell_owner);
 
    /// overloaded Cell::init_other
-   virtual void init_other(void * other, Value & cell_owner, const char * loc)
-      const { new (other)   LvalCell(get_lval_value(), &cell_owner); }
+   virtual void init_other(void * other, Value & cell_owner, const char * loc) const;
 
    /// Overloaded Cell::is_lval_cell()
    virtual bool is_lval_cell()  const   { return true; }
@@ -51,6 +50,9 @@ public:
    /// return the owner of the cell pointed to
    Value * get_cell_owner() const
       { return value.pval.owner; }
+
+   // make sure that owner (if any) owns this Cell
+   void check_consistency() const;
 
 protected:
    ///  Overloaded Cell::get_cell_type()

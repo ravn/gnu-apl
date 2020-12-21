@@ -279,8 +279,7 @@ const ShapeItem ec_A = A->element_count();
 
 const APL_Integer qio = Workspace::get_IO();
 
-Value * B_cellowner = B->get_lval_cellowner();
-Value_P Z = pick(&A->get_ravel(0), ec_A, B, qio, B_cellowner);
+Value_P Z = pick(&A->get_ravel(0), 0, ec_A, B, qio);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -552,70 +551,126 @@ Shape ret;   // of the first non-scalar in B
    return ret;
 }
 //-----------------------------------------------------------------------------
-Value_P
-Bif_F12_PICK::pick(const Cell * cA, ShapeItem len_A, Value_P B,
-                   APL_Integer qio, Value * cell_owner)
+ShapeItem
+Bif_F12_PICK::pick_offset(const Cell * const A0, ShapeItem idx_A,
+                          ShapeItem len_A, Value_P B, APL_Integer qio)
 {
-ShapeItem c = 0;
+const Cell & cA = A0[idx_A];
 
-   if (cA->is_pointer_cell())   // then B shall be a 1-dimensional array
+   if (cA.is_pointer_cell())   // then B shall be a 1-dimensional array
       {
-        Value_P A = cA->get_pointer_value();
-        if (A->get_rank() > 1)   RANK_ERROR;
+        /*
+           cA = A[idx_A] is nested, e.g.
 
-        const ShapeItem len_A = A->element_count();
-        if (B->get_rank() != len_A)   RANK_ERROR;
+           case i.    (⊂"b") ⊃ A.b.c ← 'leaf-A.b.c'   (structured variable A)
 
-        const Shape weight = B->get_shape().reverse_scan();
-        const Shape A_as_shape(A.get(), qio);
+           case ii.   (⊂1 1) ⊃ A←3 3⍴⍳9               (normal A)
+         */
 
-        loop(r, A->element_count())
-            {
-              const ShapeItem ar = A_as_shape.get_shape_item(r);
-              if (ar < 0)                       INDEX_ERROR;
-              if (ar >= B->get_shape_item(r))   INDEX_ERROR;
-              c += weight.get_shape_item(r) * ar;
-            }
+        const Value * A = cA.get_pointer_value().get();
+
+        if (B->is_member())   // case i. (structured B)
+           {
+             if (!A->is_char_vector())
+                {
+                  MORE_ERROR() << "member name expected for A⊂B (nested A["
+                               << (idx_A + qio) << "])";
+                  DOMAIN_ERROR;
+                }
+
+             const UCS_string top_level("B");
+             const UCS_string member(*A);
+             vector<const UCS_string *> members;
+             members.push_back(&member);
+             members.push_back(&top_level);   // dummy, must be last
+             Value * val_B = B.get();
+             Cell * Bsub = B->get_member(members, val_B, false, true);
+             return Bsub - &B->get_ravel(0);
+           }
+        else                  // case ii. (normal B)
+           {
+             if (A->get_rank() > 1)
+                {
+                  MORE_ERROR() << "rank A ≤ 1 expected for A⊂B (nested A["
+                               << (idx_A + qio) << "])";
+                  RANK_ERROR;
+                }
+
+             const ShapeItem len_A = A->element_count();
+             if (B->get_rank() != len_A)
+                {
+                  MORE_ERROR() << "⍴⍴B (" << B->get_rank()
+                               << ") = ⍴,A (" << len_A
+                               << ") expected for A⊂B (nested A["
+                               << (idx_A + qio) << "])";
+                  RANK_ERROR;
+                }
+
+             const Shape weight = B->get_shape().reverse_scan();
+             const Shape A_as_shape(A, qio);
+             ShapeItem offset = 0;
+
+             loop(r, A->element_count())
+                 {
+                   const ShapeItem ar = A_as_shape.get_shape_item(r);
+                   if (ar < 0)                       INDEX_ERROR;
+                   if (ar >= B->get_shape_item(r))   INDEX_ERROR;
+                   offset += weight.get_shape_item(r) * ar;
+                 }
+             return offset;
+           }
       }
    else   // A is a scalar, so B must be a vector.
       {
-        if (B->get_rank() != 1)         RANK_ERROR;
-        const APL_Integer a = cA->get_near_int() - qio;
+        if (B->get_rank() != 1)
+           {
+             MORE_ERROR() << "⍴⍴B (" << B->get_rank()
+                          << ") = 1 expected for A⊂B (with scalar A)";
+             RANK_ERROR;
+           }
+        const APL_Integer a = cA.get_near_int() - qio;
         if (a < 0)                       INDEX_ERROR;
         if (a >= B->get_shape_item(0))   INDEX_ERROR;
-        c = a;
+        return a;
       }
+}
+//-----------------------------------------------------------------------------
+Value_P
+Bif_F12_PICK::pick(const Cell * const A0, ShapeItem idx_A, ShapeItem len_A,
+                   Value_P B, APL_Integer qio)
+{
+   // A0 points to ↑A and we are at depth idx_A, which means that A0[idx_A] is
+   // the current index of B.
+   //
+const ShapeItem offset = pick_offset(A0, idx_A, len_A, B, qio);
 
-const Cell * cB = &B->get_ravel(c);
+const Cell * cB = &B->get_ravel(offset);
 
    if (len_A > 1)   // more levels coming.
       {
         if (cB->is_pointer_cell())
            {
-             return pick(cA + 1, len_A - 1, cB->get_pointer_value(),
-                         qio, cell_owner);
+             return pick(A0, idx_A + 1, len_A - 1, cB->get_pointer_value(), qio);
            }
 
         if (cB->is_lval_cell())
            {
-             Assert(cell_owner);
              Cell & cell = *cB->get_lval_value();
              if (!cell.is_pointer_cell())   DOMAIN_ERROR;
 
              Value_P subval = cell.get_pointer_value();
              Value_P subrefs = subval->get_cellrefs(LOC);
-             Value * sub_cellowner = subrefs->get_lval_cellowner();
-             Assert(sub_cellowner);
-             return pick(cA + 1, len_A - 1, subrefs, qio, sub_cellowner);
+             return pick(A0, idx_A + 1, len_A - 1, subrefs, qio);
            }
 
-        // at this point the depth implied by A is greater than the
-        // depth of B.
+        // simple cell. This means that the depth of B does not suffice to pick
+        // the (too long) A 
         //
         RANK_ERROR;   // ISO p.166
       }
 
-   // at this point, cB is the cell in B pick'ed by A->
+   // len_A == 1, i.e. the nd of the recursion over A has been reached,
+   // cB is the cell in B that was pick'ed by A->
    //
    if (cB->is_pointer_cell())
       {
@@ -625,12 +680,11 @@ const Cell * cB = &B->get_ravel(c);
 
    if (cB->is_lval_cell())   // e.g. (A⊃B) ← C
       {
-        Assert(cell_owner);
-
         Cell * cell = cB->get_lval_value();
         Assert(cell);
 
         Value_P Z(LOC);
+        Value * cell_owner = B->get_lval_cellowner();
         if (cell->is_pointer_cell())
            new (Z->next_ravel())   LvalCell_picked(cell, cell_owner);
         else

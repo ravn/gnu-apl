@@ -85,7 +85,7 @@ public:
    ErrorCode error;
 
    /// the APL function being computed
-   PrimitiveFunction * fun;   // not initialized by constructor!
+   const PrimitiveFunction * fun;   // not initialized by constructor!
 
    /// the monadic cell function to be computed
    prim_f1 fun1;   // not initialized by constructor!
@@ -170,7 +170,7 @@ public:
    ErrorCode error;
 
    /// the APL function being computed
-   PrimitiveFunction * fun;   // not initialized by constructor!
+   const PrimitiveFunction * fun;   // not initialized by constructor!
 
    /// the dyadic cell function to be computed
    prim_f2 fun2;   // not initialized by constructor!
