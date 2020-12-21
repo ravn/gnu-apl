@@ -408,66 +408,76 @@ const ShapeItem length = nz_element_count();
 Value_P
 Value::get_cellrefs(const char * loc)
 {
-Value_P ret(get_shape(), loc);
+Value_P Z(get_shape(), loc);
 
 const ShapeItem ec = element_count();
 
    loop(e, ec)
       {
         Cell & cell = get_ravel(e);
-        new (ret->next_ravel())   LvalCell(&cell, this);
+        new (Z->next_ravel())   LvalCell(&cell, this);
       }
 
    // prototype
-   if (ec == 0)   new (&ret->get_ravel(0))   LvalCell(&get_ravel(0), this);
+   if (ec == 0)   new (&Z->get_ravel(0))   LvalCell(&get_ravel(0), this);
 
-   ret->check_value(LOC);
-   return ret;
+   Z->check_value(LOC);
+   return Z;
 }
 //-----------------------------------------------------------------------------
 void
 Value::assign_cellrefs(Value_P new_value)
 {
-const ShapeItem dest_count = nz_element_count();
+const ShapeItem dest_count = element_count();
+   if (dest_count == 0)   return;   // nothing to assign
+
+const int dest_incr = (dest_count == 1) ? 0 : 1;
+
 const ShapeItem value_count = new_value->nz_element_count();
-const Cell * src = &new_value->get_ravel(0);
+const int src_incr = (new_value->nz_element_count() == 1) ? 0 : 1;
 
-   // this:      a value containing LvalCells and possibly PointerCells.
-   // cellowner: the owner of the cells that this points to
+   if (src_incr && dest_incr && (dest_count != value_count))   LENGTH_ERROR;
+
+   /* this: a value containing LvalCells and possibly PointerCells.
+
+      test with:
+
+      C←"001011010010010110010100100001000010001101" ◊ ((C='0')/C)←' ' ◊ C
+      K←'RED' 'WHITE' 'BLUE'   ◊ (↑K)←'YELLOW' ◊ K
+      V←'v' 'vw' 'vwx' 'vwxyz' ◊ (2↑¨V)←5      ◊ 4 ⎕CR V
+
+    */
+
+   // consistency check: all items are LvalCells
    //
+   check_lval_consistency();
 
-   // consistency check: all items are LvalCell and have the same cellowner.
-   //
-// check_lval_consistency();
-
-const int src_incr = new_value->is_scalar() ? 0 : 1;
-
-   // if this is a scalar and new_value is not, then enclose new_value
-   //
    if (is_scalar() && !new_value->is_scalar())
       {
-        Cell * const C = &get_ravel(0);
-        if (!C->is_lval_cell())   LEFT_SYNTAX_ERROR;
-        const LvalCell * LVC = reinterpret_cast<const LvalCell *>(C);
-        Cell * target = LVC->get_lval_value();   // can be 0!
-        Value * owner = LVC->get_cell_owner();
+        Cell * const C0 = &get_ravel(0);
+        if (!C0->is_lval_cell())   LEFT_SYNTAX_ERROR;
+        const LvalCell * LVC0 = reinterpret_cast<const LvalCell *>(C0);
+        Cell * target = LVC0->get_lval_value();   // can be 0!
+        Value * owner = LVC0->get_cell_owner();
         if (target)   target->release(LOC);   // free sub-values etc (if any)
 
         new (target)   PointerCell(new_value.get(), *owner);
         return;
       }
 
-   // at this point both this and new_value should have the same number
-   // of elements
-   //
-   if (!new_value->is_scalar() && value_count != dest_count)   LENGTH_ERROR;
-
+const Cell * src = &new_value->get_ravel(0);
    loop(d, dest_count)
       {
         Cell * const C = &get_ravel(d);
         if (C->is_pointer_cell())
            {
-              Value_P sub = C->get_pointer_value();
+              // the initial cellrefs contain no pointercells. Therefore this one
+              // has been created by the left expression performed with the initial
+              // cellrefs
+              //
+              Value * sub = C->get_pointer_value().get();
+VH_entry::print_history(CERR, sub, LOC);
+Q(*sub)
               loop(s, sub->nz_element_count())
                   {
                     Cell * Csub = &sub->get_ravel(s);
@@ -486,11 +496,10 @@ const int src_incr = new_value->is_scalar() ? 0 : 1;
                        }
                   }
            }
-        else
+        else if (C->is_lval_cell())
            {
-             if (!C->is_lval_cell())   LEFT_SYNTAX_ERROR;
              const LvalCell * LVC = reinterpret_cast<const LvalCell *>(C);
-             if (Cell * target = C->get_lval_value())   // dest can be 0!
+             if (Cell * target = C->get_lval_value())   // target can be 0!
                 {
                   target->release(LOC);   // free sub-values etc (if any)
 
@@ -500,6 +509,7 @@ const int src_incr = new_value->is_scalar() ? 0 : 1;
                   target->init(*src, *owner, LOC);
                 }
            }
+        else   LEFT_SYNTAX_ERROR;
         src += src_incr;
       }
 }
@@ -1020,6 +1030,9 @@ Value::enlist_left(Cell * & dest, Value & dest_owner) const
    //
 const ShapeItem ec = element_count();
 
+VH_entry::print_history(CERR, this, LOC);
+Q(*this)
+
    loop(c, ec)
        {
          const Cell & cell = get_ravel(c);
@@ -1040,17 +1053,26 @@ const ShapeItem ec = element_count();
                  }
               else 
                  {
-Q(LOC)
                    dest++->init(cell, dest_owner, LOC);
                  }
             }
-         else
+         else   // neither PointerCell nor LvalCell
             {
-              // cell is a right hand cell in a left expression
-              //
-              // e.g. A ← 'ZIPPITY' 'dOO' 'DAH' ◊ (∈A[2])←'x' and cell is 'd'
-              //
-              new (dest++)   LvalCell(const_cast<Cell *>(&cell), &dest_owner);
+              /* cell is a right hand cell in a left expression. This happens if
+                 assign_cellrefs() is flat (i.e. always) and this left-value
+                 contains pointer-cells (supposedly created after get_celrefs()
+                 was called).
+
+                 test with:
+
+                 A←'ZIPPITY' 'DOO' 'DAH' ◊ (∊A[2])←0 ◊ A
+                 A←(10 20 30) 'AB'       ◊ (∈A)←⍳5   ◊ A
+                 A←''                    ◊ (↑A)←33   ◊ ↑A
+
+
+              */
+              new (dest++)   LvalCell(const_cast<Cell *>(&cell),
+                                      const_cast<Value *>(this));
             }
        }
 }
@@ -1388,7 +1410,8 @@ const APL_Integer qio = Workspace::get_IO();
         if (idx >= 0 && idx < max_idx)
            {
              Value_P Z(LOC);
-             Z->next_ravel()->init(get_ravel(idx), Z.getref(), LOC);
+             Cell & dest_cell = *Z->next_ravel();
+             dest_cell.init(get_ravel(idx), Z.getref(), LOC);
              Z->check_value(LOC);
              return Z;
            }

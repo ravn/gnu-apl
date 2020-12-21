@@ -442,15 +442,6 @@ Shape shape_Z;
 Token
 Bif_F12_COMMA::eval_B(Value_P B) const
 {
-   if (B->get_ravel(0).is_picked_lval_cell())
-      {
-// CERR << "*** PICKED ***" << endl;
-        Cell * ptr = B->get_ravel(0).get_lval_value();
-        Assert(ptr);
-        Value_P target = ptr->get_pointer_value()->get_cellrefs(LOC);
-        return eval_B(target);
-      }
-
 const Shape shape_Z(B->element_count());
 
    if (B->get_owner_count() == 2 &&

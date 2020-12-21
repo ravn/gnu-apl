@@ -685,13 +685,10 @@ const Cell * cB = &B->get_ravel(offset);
 
         Value_P Z(LOC);
         Value * cell_owner = B->get_lval_cellowner();
-        if (cell->is_pointer_cell())
-           new (Z->next_ravel())   LvalCell_picked(cell, cell_owner);
-        else
-           new (Z->next_ravel())   LvalCell(cell, cell_owner);
+        new (Z->next_ravel())   LvalCell(cell, cell_owner);
         return Z;
       }
-   else
+   else   // simple cell
       {
         Value_P Z(LOC);
         Z->next_ravel()->init(*cB, Z.getref(), LOC);

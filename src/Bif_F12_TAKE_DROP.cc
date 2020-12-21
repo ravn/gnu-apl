@@ -40,12 +40,15 @@ Bif_F12_TAKE::first(Value_P B)
 const Cell & first_B = B->get_ravel(0);
    if (B->element_count() == 0)   // empty value: return prototype
       {
-        if (first_B.is_lval_cell())   // (
+        if (first_B.is_lval_cell())   // (↑...)←V
             {
               Value_P Z(LOC);
               Z->next_ravel()->init(first_B, B.getref(), LOC);
               return Z;
             }
+
+        // normal (right-) value
+        //
         Value_P Z = B->prototype(LOC);
         Z->check_value(LOC);
         return Z;
@@ -161,6 +164,7 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Cell * cZ, Value & Z_owner,
 Token
 Bif_F12_DROP::eval_AB(Value_P A, Value_P B) const
 {
+Q(*B)
 Shape ravel_A(A.get(), /* ⎕IO */ 0);
    if (A->get_rank() > 1)   RANK_ERROR;
 

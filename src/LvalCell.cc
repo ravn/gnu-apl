@@ -29,7 +29,7 @@ LvalCell::LvalCell(Cell * cell, Value * cell_owner)
 {
    value.lval = cell;
    value.pval.owner = cell_owner;
-// check_consistency();
+   check_consistency();
 }
 //-----------------------------------------------------------------------------
 void
@@ -68,13 +68,14 @@ LvalCell::check_consistency() const
   if (value.lval)                      // valid owner
      {
         const Cell * C0 = &value.pval.owner->get_ravel(0);
-        const Cell * CN = C0 + value.pval.owner->element_count();
-       if (value.lval < C0 || value.lval >= CN)
+        const Cell * CN = C0 + value.pval.owner->nz_element_count();
+       if (value.lval < C0 || value.lval >= CN)   // wrong owner
           {
             Q1(C0)
             Q1(value.lval)
             Q1(CN)
             Assert(0 && "LvalCell::check_consistency() failed");
+            BACKTRACE;
           }
      }
   else Assert(value.pval.owner == 0);   // no owner

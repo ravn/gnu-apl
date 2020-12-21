@@ -367,12 +367,16 @@ public:
 
    /// return true iff more ravel items (as per shape) need to be initialized.
    /// (the prototype of empty values may still be missing)
-   bool more()
+   bool more() const
       { return valid_ravel_items < element_count(); }
 
    /// return the next ravel cell to be initialized (excluding prototype)
    Cell * next_ravel()
-      { return more() ? &ravel[valid_ravel_items++] : 0; }
+      { return more() ? ravel + valid_ravel_items++ : 0; }
+
+   /// return the current ravel cell to be initialized (excluding prototype)
+   Cell * current_ravel()
+      { return more() ? ravel + valid_ravel_items : 0; }
 
    /// initialize the next ravel cell with a character value
    inline void next_ravel_Char(Unicode u);

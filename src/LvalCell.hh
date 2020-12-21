@@ -76,20 +76,6 @@ protected:
    /// downcast to LvalCell
    virtual LvalCell & vLvalCell()   { return *this; }
 };
-
-/// a compatibility Cell for fixing a bug in ⊃. Will be removed 
-class LvalCell_picked : public LvalCell
-{
-public:
-   /// Construct an cell pointing to another cell
-   LvalCell_picked(Cell * cell, Value * cell_owner)
-   : LvalCell(cell, cell_owner)
-   {}
-
-protected:
-   virtual bool is_picked_lval_cell() const
-      { return true; }
-};
 //=============================================================================
 
 #endif // __LVALCELL_HH_DEFINED__
