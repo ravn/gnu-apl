@@ -841,7 +841,8 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
                const Pixel_XY P(w_props.valX2pixel(vx - w_props.get_min_X())
                                 + w_props.get_origin_X(),
                                 w_props.valY2pixel(vy - w_props.get_min_Y()));
-               if (n)   draw_line(cr, line_color, line_style, line_width, last, P);
+               if (n)   // unless starting point
+                  draw_line(cr, line_color, line_style, line_width, last, P);
                last = P;
              }
 
@@ -1033,7 +1034,10 @@ const int point_style  = lp0.get_point_style();
 static void
 do_plot(GtkWidget * drawing_area, const Plot_context & pctx, cairo_t * cr)
 {
-  cairo_set_source_rgb(cr, 1.0,  1.0,  1.0);
+const Plot_window_properties & w_props = pctx.w_props;
+const Color canvas_color = w_props.get_canvas_color();
+  cairo_set_RGB_source(cr, canvas_color);
+
   cairo_rectangle(cr, 0, 0, pctx.get_total_width(), pctx.get_total_height());
   cairo_fill(cr);
 
@@ -1044,7 +1048,7 @@ do_plot(GtkWidget * drawing_area, const Plot_context & pctx, cairo_t * cr)
 
    // draw grid lines...
    //
-const bool surface_plot = pctx.w_props.get_plot_data().is_surface_plot();
+const bool surface_plot = w_props.get_plot_data().is_surface_plot();
 
   draw_X_grid(cr, pctx, surface_plot);
   draw_Y_grid(cr, pctx, surface_plot);
