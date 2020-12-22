@@ -21,6 +21,7 @@
 #include <errno.h>
 
 #include "../config.h"
+
 #if HAVE_LIBX11 && HAVE_LIBXCB && HAVE_LIBX11_XCB && HAVE_X11_XLIB_XCB_H
 
 # include <X11/Xlib.h>

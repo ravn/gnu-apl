@@ -164,7 +164,6 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Cell * cZ, Value & Z_owner,
 Token
 Bif_F12_DROP::eval_AB(Value_P A, Value_P B) const
 {
-Q(*B)
 Shape ravel_A(A.get(), /* ⎕IO */ 0);
    if (A->get_rank() > 1)   RANK_ERROR;
 
