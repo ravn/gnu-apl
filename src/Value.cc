@@ -476,8 +476,6 @@ const Cell * src = &new_value->get_ravel(0);
               // cellrefs
               //
               Value * sub = C->get_pointer_value().get();
-VH_entry::print_history(CERR, sub, LOC);
-Q(*sub)
               loop(s, sub->nz_element_count())
                   {
                     Cell * Csub = &sub->get_ravel(s);
@@ -1029,9 +1027,6 @@ Value::enlist_left(Cell * & dest, Value & dest_owner) const
    // (non-pointer) items of this (left-) value
    //
 const ShapeItem ec = element_count();
-
-VH_entry::print_history(CERR, this, LOC);
-Q(*this)
 
    loop(c, ec)
        {
