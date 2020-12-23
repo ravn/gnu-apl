@@ -243,6 +243,9 @@ public:
    /// cells (including nested ones) are not complex
    bool can_be_compared() const;
 
+   /// optimized comparison function for strings
+   bool equal_string(const UCS_string & ucs) const;
+
    /// return a value containing pointers to all ravel cells of this value.
    /// the result is non-nested and has the same shape as \b this
    Value_P get_cellrefs(const char * loc);
@@ -258,6 +261,14 @@ public:
    /// return member of this value, defined by \b members
    Cell * get_member(const vector<const UCS_string *> & members,
                      Value * & owner, bool create_if_needed, bool throw_error);
+
+   /// return the Cell (if any) containing the data of structured value member
+   /// \b member, or 0 if member not found.
+   const Cell * get_member_data(const UCS_string & member) const;
+
+   /// return the Cell (if any) containing the data of structured value member
+   /// \b member, or 0 if member not found.
+   Cell * get_member_data(const UCS_string & member);
 
    // double the ravel length of \b this value (by appending integer 0s).
    void double_ravel(const char * loc);

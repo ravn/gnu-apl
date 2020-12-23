@@ -643,7 +643,6 @@ Bif_F12_PICK::pick(const Cell * const A0, ShapeItem idx_A, ShapeItem len_A,
    // the current index of B.
    //
 const ShapeItem offset = pick_offset(A0, idx_A, len_A, B, qio);
-
 const Cell * cB = &B->get_ravel(offset);
 
    if (len_A > 1)   // more levels coming.
@@ -655,21 +654,29 @@ const Cell * cB = &B->get_ravel(offset);
 
         if (cB->is_lval_cell())
            {
-             Cell & cell = *cB->get_lval_value();
-             if (!cell.is_pointer_cell())   DOMAIN_ERROR;
+             // Note: this is a little tricky...
 
-             Value_P subval = cell.get_pointer_value();
-             Value_P subrefs = subval->get_cellrefs(LOC);
+             // first of all, we need a pointer cell. Therefore the target of cB
+             // should be a PointerCell.
+             //
+             Cell & target = *cB->get_lval_value();
+             if (!target.is_pointer_cell())   DOMAIN_ERROR;
+
+             // secondly, get_cellrefs() is not recursive, therefore target has not
+             // (yet) been converted to a left-value. We do that now.
+             //
+             Value_P subval = target.get_pointer_value();   // right-value
+             Value_P subrefs = subval->get_cellrefs(LOC);   // left-value
              return pick(A0, idx_A + 1, len_A - 1, subrefs, qio);
            }
 
         // simple cell. This means that the depth of B does not suffice to pick
-        // the (too long) A 
+        // the item selected by A or, in other words, A is too long).
         //
-        RANK_ERROR;   // ISO p.166
+        RANK_ERROR;   // ISO p.166 wants rank-error. LENGTH ERROR would be correct.
       }
 
-   // len_A == 1, i.e. the nd of the recursion over A has been reached,
+   // len_A == 1, i.e. the end of the recursion over A has been reached,
    // cB is the cell in B that was pick'ed by A->
    //
    if (cB->is_pointer_cell())

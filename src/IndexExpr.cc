@@ -76,7 +76,7 @@ IndexExpr::check_range(const Shape & shape) const
            }
       }
 
-   return false;
+   return false;   // OK
 }
 //-----------------------------------------------------------------------------
 Rank

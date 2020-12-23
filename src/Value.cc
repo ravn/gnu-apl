@@ -583,47 +583,45 @@ Value::get_member(const vector<const UCS_string *> & members, Value * & owner,
             }
 
          const ShapeItem rows = owner->get_rows();
-         Cell * member_cell = 0;
-         loop(r, rows)
-             {
-               const Cell & cell = owner->get_ravel(2*r);
-               if (cell.get_cell_type() != CT_POINTER)               continue;
-               Value_P cell_sub = cell.get_pointer_value();
-               if (!cell_sub-> is_char_string())                     continue;
-               const UCS_string sub_ucs = cell_sub->get_UCS_ravel();
-               if (sub_ucs.compare(member_ucs) != COMP_EQ)           continue;
-
-               // at this point we found member_ucs in row r
-               //
-               member_cell = &owner->get_ravel(2*r + 1);
-               if (m)   // more members coming
-                  {
-                    if (!member_cell->is_pointer_cell() ||
-                        !member_cell->get_pointer_value()->is_member())
-                       {
-                         if (!throw_error)   return 0;
-                         UCS_string & more = MORE_ERROR()
-                                 << "member access: member " << member_ucs
-                                 << " exists in ";
-                         more.append_members(members, m);
-                         more << "but its (internal) value is not nested";
-                         DOMAIN_ERROR;
-                       }
-
-                    // next member
-                    //
-                    owner = member_cell->get_pointer_value().get();
-                    break;
-                  }
-               else   // final member
-                  {
-                    return member_cell;
-                  }
-             }
-         if (member_cell)   continue;
-
-         if (create_if_needed)   // assignment to not (yet) existing member
+         Cell * member_cell = owner->get_member_data(member_ucs);
+         if (member_cell)   // existing member
             {
+              // existing member
+              //
+              if (m == 0)   return member_cell; // final member
+
+              // more members coming. Then member_cell should point to a
+              // structured sub-member
+              //
+              if (!member_cell->is_pointer_cell() ||
+                  !member_cell->get_pointer_value()->is_member())
+                 {
+                   if (!throw_error)   return 0;
+                   UCS_string & more = MORE_ERROR()
+                      << "member access: member " << member_ucs << " exists in ";
+                   more.append_members(members, m);
+                   more << "but its (internal) value is not nested";
+                   DOMAIN_ERROR;
+                 }
+
+              // next member
+              //
+              owner = member_cell->get_pointer_value().get();
+            }
+         else   // member does not exist
+            {
+              if (!create_if_needed)   // give up
+                 {
+                   if (!throw_error)   return 0;   // silent
+
+                   UCS_string & more = MORE_ERROR() << "member access: structure ";
+                   more.append_members(members, m + 1);
+                   more << " has no member " << member_ucs;
+                   VALUE_ERROR;
+                 }
+
+              // create new member row...
+
               // find an unused slot in owner
               //
               ShapeItem unused = rows;
@@ -643,28 +641,60 @@ Value::get_member(const vector<const UCS_string *> & members, Value * & owner,
               Value_P member_name(member_ucs, LOC);
               new (&cell)   PointerCell(member_name.get(), *owner);
 
-              member_cell = &cell + 1;
-              if (m)   // more members coming
+              member_cell = &cell + 1;   // final member
+              if (m == 0)
                  {
-                   Value_P member_data = EmptyStruct(LOC);
-                   new (member_cell)   PointerCell(member_data.get(), *owner);
-                   owner = member_cell->get_pointer_value().get();
-                   continue;
-                 }
+                   new (member_cell) IntCell(0);
+                   return member_cell;
+                  }
 
-              // last member
-              new (member_cell) IntCell(0);
-              return member_cell;
-            }
-
-         if (!throw_error)   return 0;
-         UCS_string & more = MORE_ERROR() << "member access: structure ";
-         more.append_members(members, m + 1);
-         more << " has no member " << member_ucs;
-         VALUE_ERROR;
+              // more members coming
+              //
+              Value_P member_data = EmptyStruct(LOC);
+              new (member_cell)   PointerCell(member_data.get(), *owner);
+              owner = member_cell->get_pointer_value().get();
+            }   // if (member_cell == 0)
        }
 
    FIXME;   // not reached
+}
+//-----------------------------------------------------------------------------
+const Cell *
+Value::get_member_data(const UCS_string & member) const
+{
+const ShapeItem rows = get_rows();
+
+   loop(r, rows)   // loop ober member rows
+       {
+         const Cell & name_cell = get_ravel(2*r);
+
+         if (name_cell.is_pointer_cell() &&
+             name_cell.get_pointer_value()->equal_string(member))
+            return &get_ravel(2*r + 1);
+       }
+
+   // member row not found
+   //
+   return 0;
+}
+//-----------------------------------------------------------------------------
+Cell *
+Value::get_member_data(const UCS_string & member)
+{
+const ShapeItem rows = get_rows();
+
+   loop(r, rows)   // loop ober member rows
+       {
+         const Cell & name_cell = get_ravel(2*r);
+
+         if (name_cell.is_pointer_cell() &&
+             name_cell.get_pointer_value()->equal_string(member))
+            return &get_ravel(2*r + 1);
+       }
+
+   // member row not found
+   //
+   return 0;
 }
 //-----------------------------------------------------------------------------
 void
@@ -1189,6 +1219,26 @@ const ShapeItem count = nz_element_count();
 }
 //-----------------------------------------------------------------------------
 bool
+Value::equal_string(const UCS_string & ucs) const
+{
+   if (get_rank() == 1)        // most likely: char vector
+      {
+        const ShapeItem len = element_count();
+        if (ucs.size() != len)   return false;   // wrong length
+        loop(u, len)
+            if (ucs[u] != get_ravel(u).get_char_value())   return false; // mismatch
+        return true;
+      }
+   else if (get_rank() == 0)   // rarely: char scalar
+      {
+        if (ucs.size() != 1)   return false;   // wrong length
+        return ucs[0] == get_ravel(0).get_char_value();
+      }
+
+   RANK_ERROR;            // never
+}
+//-----------------------------------------------------------------------------
+bool
 Value::is_simple() const
 {
 const ShapeItem count = element_count();
@@ -1319,6 +1369,44 @@ const ShapeItem count = nz_element_count();
 Value_P
 Value::index(const IndexExpr & IX) const
 {
+   // if IX.value_count() were 1 (as in A[X] as opposed to A[X1;...]) then
+   // it should have been parsed as an axis and Value::index(Value_P X) should
+   // have been called instead of this one. This is an internal error.
+   //
+
+   if (is_member())
+      {
+         // for a structured variable VAR, we only allow VAR[1;] to obtain
+         // the valid member names...
+         //
+         if (IX.value_count() != 2)                RANK_ERROR;
+         if (+(IX.values[1]))   LENGTH_ERROR;   // not elided
+         if (IX.values[0]->element_count() != 1)   LENGTH_ERROR;   // not 1 columns
+         const APL_Integer col = IX.values[0]->get_ravel(0).get_int_value();
+         if (col != Workspace::get_IO())           INDEX_ERROR;
+
+         // count the number of member names.
+         //
+         ShapeItem member_count = 0;
+         const ShapeItem rows = get_rows();
+         loop(row, rows)
+             {
+               if (get_ravel(2*row).is_pointer_cell())   ++member_count;
+             }
+
+         Value_P Z(member_count, LOC);
+         loop(row, member_count)
+             {
+               if (get_ravel(2*row).is_pointer_cell())
+                  Z->next_ravel()->init(get_ravel(2*row), Z.getref(), LOC);
+             }
+         if (member_count == 0)   // no valid members (last member )ERASEd)
+            new (&Z->get_ravel(0)) PointerCell(Idx0(LOC).get(), Z.getref());
+
+         Z->check_value(LOC);
+         return Z;
+      }
+
    Assert(IX.value_count() != 1);   // should have called index(Value_P X)
 
    if (get_rank() != IX.value_count())   RANK_ERROR;   // ISO p. 158
@@ -1362,10 +1450,7 @@ Shape shape_Z;
 
    // check that all indices are valid
    //
-   if (IX.check_range(get_shape()))
-      {
-        INDEX_ERROR;
-      }
+   if (IX.check_range(get_shape()))   INDEX_ERROR;
 
 MultiIndexIterator mult(get_shape(), IX);
 
@@ -1394,6 +1479,34 @@ const ShapeItem ec_z = Z->element_count();
 Value_P
 Value::index(Value_P X) const
 {
+   if (is_member())
+      {
+        const UCS_string name(X.getref());
+
+        if (const Cell * data = get_member_data(name))   // member exists
+           {
+             if (data->is_pointer_cell())
+                {
+                  return data->get_pointer_value()->clone(LOC);
+                }
+             Value_P Z(LOC);
+             Z->next_ravel()->init(*data, Z.getref(), LOC);
+             Z->check_value(LOC);
+             return Z;
+           }
+
+        UCS_string & more = MORE_ERROR() << "member access: member " << name
+                                    << " was not found. The valid members are:";
+        const ShapeItem rows = get_rows();
+        loop(r, rows)
+            {
+              const Cell & cell_r = get_ravel(2*r);
+              if (cell_r.is_pointer_cell())   more << "\n      "
+                               << UCS_string(cell_r.get_pointer_value().getref());
+            }
+        INDEX_ERROR;
+      }
+
 const ShapeItem max_idx = element_count();
 const APL_Integer qio = Workspace::get_IO();
 
@@ -1405,8 +1518,7 @@ const APL_Integer qio = Workspace::get_IO();
         if (idx >= 0 && idx < max_idx)
            {
              Value_P Z(LOC);
-             Cell & dest_cell = *Z->next_ravel();
-             dest_cell.init(get_ravel(idx), Z.getref(), LOC);
+             Z->next_ravel()->init(get_ravel(idx), Z.getref(), LOC);
              Z->check_value(LOC);
              return Z;
            }
