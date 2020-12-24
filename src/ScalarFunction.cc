@@ -45,10 +45,10 @@ Bif_F2_EQUAL    Bif_F2_EQUAL   ::_fun;                // =
 Bif_F2_EQUAL_B  Bif_F2_EQUAL_B ::_fun;                // ==
 Bif_F2_FIND     Bif_F2_FIND    ::_fun;                // ⋸ (almost scalar)
 Bif_F2_GREATER  Bif_F2_GREATER ::_fun;                // >
-Bif_F2_LEQ      Bif_F2_LEQ     ::_fun;                // ≤
+Bif_F2_LEQU     Bif_F2_LEQU    ::_fun;                // ≤
 Bif_F2_LESS     Bif_F2_LESS    ::_fun;                // <
 Bif_F12_LOGA    Bif_F12_LOGA   ::_fun;                // ⍟
-Bif_F2_MEQ      Bif_F2_MEQ     ::_fun;                // ≥
+Bif_F2_MEQU     Bif_F2_MEQU    ::_fun;                // ≥
 Bif_F12_MINUS   Bif_F12_MINUS  ::_fun;                // -
 Bif_F2_NAND     Bif_F2_NAND    ::_fun;                // ⍲
 Bif_F2_NAND_B   Bif_F2_NAND_B  ::_fun;                // ⍲⍲
@@ -64,8 +64,8 @@ Bif_F12_RND_DN  Bif_F12_RND_DN ::_fun;                // ⌊
 Bif_F12_ROLL    Bif_F12_ROLL   ::_fun;                // ? (monadic is scalar)
 Bif_F12_STILE   Bif_F12_STILE  ::_fun;                // ∣
 Bif_F12_TIMES   Bif_F12_TIMES  ::_fun(false);         // ×
-Bif_F12_TIMES   Bif_F12_TIMES  ::_fun_inverse(true); // ×
-Bif_F2_UNEQ     Bif_F2_UNEQ    ::_fun;                // ≠
+Bif_F12_TIMES   Bif_F12_TIMES  ::_fun_inverse(true);  // ×
+Bif_F2_UNEQU    Bif_F2_UNEQU   ::_fun;                // ≠
 Bif_F2_UNEQ_B   Bif_F2_UNEQ_B  ::_fun;                // ≠
 Bif_F12_WITHOUT Bif_F12_WITHOUT::_fun;                // ∼ (monadic is scalar)
 
@@ -82,9 +82,9 @@ Bif_F2_EQUAL_B  * Bif_F2_EQUAL_B ::fun         = &Bif_F2_EQUAL_B ::_fun;
 Bif_F2_FIND     * Bif_F2_FIND    ::fun         = &Bif_F2_FIND    ::_fun;
 Bif_F2_GREATER  * Bif_F2_GREATER ::fun         = &Bif_F2_GREATER ::_fun;
 Bif_F2_LESS     * Bif_F2_LESS    ::fun         = &Bif_F2_LESS    ::_fun;
-Bif_F2_LEQ      * Bif_F2_LEQ     ::fun         = &Bif_F2_LEQ     ::_fun;
+Bif_F2_LEQU     * Bif_F2_LEQU    ::fun         = &Bif_F2_LEQU    ::_fun;
 Bif_F12_LOGA    * Bif_F12_LOGA   ::fun         = &Bif_F12_LOGA   ::_fun;
-Bif_F2_MEQ      * Bif_F2_MEQ     ::fun         = &Bif_F2_MEQ     ::_fun;
+Bif_F2_MEQU     * Bif_F2_MEQU    ::fun         = &Bif_F2_MEQU    ::_fun;
 Bif_F12_MINUS   * Bif_F12_MINUS  ::fun         = &Bif_F12_MINUS  ::_fun;
 Bif_F2_NAND     * Bif_F2_NAND    ::fun         = &Bif_F2_NAND    ::_fun;
 Bif_F2_NAND_B   * Bif_F2_NAND_B  ::fun         = &Bif_F2_NAND_B  ::_fun;
@@ -101,7 +101,7 @@ Bif_F12_ROLL    * Bif_F12_ROLL   ::fun         = &Bif_F12_ROLL   ::_fun;
 Bif_F12_TIMES   * Bif_F12_TIMES  ::fun         = &Bif_F12_TIMES  ::_fun;
 Bif_F12_TIMES   * Bif_F12_TIMES  ::fun_inverse = &Bif_F12_TIMES  ::_fun_inverse;
 Bif_F12_STILE   * Bif_F12_STILE  ::fun         = &Bif_F12_STILE  ::_fun;
-Bif_F2_UNEQ     * Bif_F2_UNEQ    ::fun         = &Bif_F2_UNEQ    ::_fun;
+Bif_F2_UNEQU    * Bif_F2_UNEQU   ::fun         = &Bif_F2_UNEQU   ::_fun;
 Bif_F2_UNEQ_B   * Bif_F2_UNEQ_B  ::fun         = &Bif_F2_UNEQ_B  ::_fun;
 Bif_F12_WITHOUT * Bif_F12_WITHOUT::fun         = &Bif_F12_WITHOUT::_fun;
 
@@ -716,7 +716,7 @@ Value_P Z = B->clone(LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 
-//   return Bif_F2_UNEQ::fun.eval_AB(A, B);
+//   return Bif_F2_UNEQU::fun.eval_AB(A, B);
 }
 //-----------------------------------------------------------------------------
 Token

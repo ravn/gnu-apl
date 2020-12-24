@@ -1437,7 +1437,7 @@ Cell * member_cell = toplevel_val->get_member(members, member_owner,
              UCS_string & more = MORE_ERROR() <<
                           "member access: cannot override non-leaf member ";
              more.append_members(members, 0);
-             more << "\n)ERASE or ⎕EX that member first.";
+             more << "\n      )ERASE or ⎕EX that member first.";
              DOMAIN_ERROR;
            }
 
@@ -1462,7 +1462,7 @@ Cell * member_cell = toplevel_val->get_member(members, member_owner,
                           "member access: cannot use non-leaf member ";
              more.append_members(members, 0);
              more << " in selective specification.\n"
-                     ")ERASE or ⎕EX that member first.";
+                     "      )ERASE or ⎕EX that member first.";
              DOMAIN_ERROR;
            }
         else if (member_cell->is_pointer_cell())

@@ -571,9 +571,9 @@ const Cell & cA = A0[idx_A];
 
         if (B->is_member())   // case i. (structured B)
            {
-             if (!A->is_char_vector())
+             if (!A->is_char_string())
                 {
-                  MORE_ERROR() << "member name expected for A⊂B (nested A["
+                  MORE_ERROR() << "member name expected for A⊃B (nested A["
                                << (idx_A + qio) << "])";
                   DOMAIN_ERROR;
                 }
@@ -591,7 +591,7 @@ const Cell & cA = A0[idx_A];
            {
              if (A->get_rank() > 1)
                 {
-                  MORE_ERROR() << "rank A ≤ 1 expected for A⊂B (nested A["
+                  MORE_ERROR() << "rank A ≤ 1 expected for A⊃B (nested A["
                                << (idx_A + qio) << "])";
                   RANK_ERROR;
                 }
@@ -601,7 +601,7 @@ const Cell & cA = A0[idx_A];
                 {
                   MORE_ERROR() << "⍴⍴B (" << B->get_rank()
                                << ") = ⍴,A (" << len_A
-                               << ") expected for A⊂B (nested A["
+                               << ") expected for A⊃B (nested A["
                                << (idx_A + qio) << "])";
                   RANK_ERROR;
                 }
@@ -625,7 +625,7 @@ const Cell & cA = A0[idx_A];
         if (B->get_rank() != 1)
            {
              MORE_ERROR() << "⍴⍴B (" << B->get_rank()
-                          << ") = 1 expected for A⊂B (with scalar A)";
+                          << ") = 1 expected for A⊃B (with scalar A)";
              RANK_ERROR;
            }
         const APL_Integer a = cA.get_near_int() - qio;
@@ -649,7 +649,7 @@ const Cell * cB = &B->get_ravel(offset);
       {
         if (cB->is_pointer_cell())
            {
-             return pick(A0, idx_A + 1, len_A - 1, cB->get_pointer_value(), qio);
+             return pick(A0, idx_A+1, len_A-1, cB->get_pointer_value(), qio);
            }
 
         if (cB->is_lval_cell())

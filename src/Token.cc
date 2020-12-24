@@ -313,9 +313,9 @@ Token::print_function(ostream & out) const
         case TOK_F2_OR:         return out << UNI_OR;
         case TOK_F2_OR_B:       return out << UNI_OR << UNI_OR;
         case TOK_F2_INDEX:      return out << UNI_SQUISH_Quad;
-        case TOK_F2_LEQ:        return out << UNI_LESS_OR_EQUAL;
-        case TOK_F2_MEQ:        return out << UNI_MORE_OR_EQUAL;
-        case TOK_F2_UNEQ:       return out << UNI_NOT_EQUAL;
+        case TOK_F2_LEQU:       return out << UNI_LESS_OR_EQUAL;
+        case TOK_F2_MEQU:       return out << UNI_MORE_OR_EQUAL;
+        case TOK_F2_UNEQU:      return out << UNI_NOT_EQUAL;
         case TOK_F2_NOR:        return out << UNI_NOR;
         case TOK_F2_NOR_B:      return out << UNI_NOR << UNI_NOR;
         case TOK_F2_NAND:       return out << UNI_NAND;

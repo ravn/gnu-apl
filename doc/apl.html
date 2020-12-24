@@ -186,6 +186,7 @@ ul.no-bullet {list-style: none}
     <li><a name="toc-Experimental-features" href="#Section-3_002e35">3.35 Experimental features</a>
     <ul class="no-bullet">
       <li><a name="toc-Structured-Variables" href="#Structured-Variables">3.35.1 Structured Variables</a></li>
+      <li><a name="toc-Associative-Arrays" href="#Associative-Arrays">3.35.2 Associative Arrays</a></li>
     </ul></li>
   </ul></li>
   <li><a name="toc-Limitations-and-Missing-Features" href="#Chapter-4">4 Limitations and Missing Features</a>
@@ -228,7 +229,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>December 13, 2020
+<p>December 24, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -4158,10 +4159,15 @@ errors and changes, and avoid the use of experimental features in production cod
 <a name="Structured-Variables"></a>
 <h4 class="subsection">3.35.1 Structured Variables</h4>
 
-<p>A structured variable is an APL variable that contains several independent
-sub-variables. The different sub-variables of a structured variable are
-accessed by the (top-level) name of the variable followed by a non-empty
-sequence of member names, separated by &rsquo;.&rsquo;. For example:
+<p>A structured variable is an APL variable that contains several related but
+otherwise independent sub-variables. Such structured variables can be convenient
+for passing a large number of related arguments to a function, or for returning
+a structured result from a function.
+</p>
+<p>The different sub-variables of a structured variable are accessed by the
+(top-level) name of the variable followed by a non-empty sequence of member
+names, separated by &rsquo;.&rsquo;. In the following we will use uppercase names for
+structured variables and lowercase names for their members. For example:
 </p>
 <pre class="verbatim">      PERSON.address.street
 </pre>
@@ -4182,19 +4188,31 @@ For example:
 <p>The depth of a newly created member can be more than one. In this case the
 intermediate members are created automatically. For example:
 </p>
-<pre class="verbatim">      PERSON.address.street ←  '42 Main Street'   ⍝ also creates PERSON.address
+<pre class="verbatim">      PERSON.address.street ←  '42 Main Street'   ⍝ implicitly creates PERSON.address
 </pre>
-<p>An entire structured variable can be erased with ⎕EX or )ERASE just like other
-variables. That erases the variable along with all its members. In
-addition to erasing an entire structured variable, individual members at any
-depth can also be deleted with ⎕EX or )ERASE:
+<p>Empty structured variables can be created with <strong>38 ⎕CR</strong>:
+</p>
+<pre class="verbatim">      EMPTY ← 38 ⎕CR CAPACITY ← 32
+</pre>
+<p>Note: A structured variable is automatically expanded when new members are
+added to it. From from time to time this expansion exceeds the space allocated
+for the members of the variable and then the existing members need to be
+copied into a new, larger structure. The overhead caused by this reorganization
+can be avoided by specifying a sufficiently large capacity when the structure is
+created (with <strong>38 ⎕CR</strong>).
+</p>
+<p>An entire structured variable can be erased with <strong>⎕EX</strong> or with\
+<strong>)ERASE</strong> just like other variables. That erases the variable along
+with all its members. In addition to erasing an entire structured variable,
+individual members at any depth can also be erased with <strong>⎕EX</strong> or
+<strong>)ERASE</strong>:
 </p>
 <pre class="verbatim">      )ERASE PERSON.address      ⍝ OK, PERSON.address exists
       )ERASE PERSON.address      ⍝ error: PERSON.address does not exist anymore
 NOT ERASED: PERSON.address
 </pre>
 <p>After having been created, the members of a structured variable can be referenced
-and overriden just like normal variables:
+and overridden just like normal variables:
 </p>
 <pre class="verbatim">      PERSON.address.street ←  '42 Main Street'   ⍝ create member address.street
       PERSON.address.street   ⍝ reference member address.street of PERSON
@@ -4207,18 +4225,18 @@ and overriden just like normal variables:
 <p>The members of a structured variable form a tree of (sub-) variables, similar
 to the file system on a computer. This tree has:
 </p>
-<p>* one root variable (which is the structured variable itself).
-</p>
-<p>* zero or more non-leafs (like subdirectories of the top-level root directory
-  in a file system). The case of zero non-leafs can only occur if a leaf below
-  it was created and then a parent of that leaf was erased.
-</p>
-<p>* zero or more leafs (like the files in a file system). The case of zero leafs can
-  only occur if a lead was first created (which makes all its parents non-empty) and
-  then erased (which makes its parent empty unless it contains other leafs.
-</p>
+<ul>
+<li> one root (which is the structured variable itself),
+
+</li><li> zero or more non-leafs (like subdirectories of the top-level root
+  directory), and
+
+</li><li> zero or more leafs. The case of zero non-leafs occurs, for example, directly
+  after a new empty variable was created with <strong>38 ⎕CR</strong>.
+</li></ul>
+
 <p>Due to their tree-like structure, structured variables need to be printed somewhat
-differently than normal APL variables. For example:
+different than normal APL variables. For example:
 </p>
 <pre class="verbatim">      PERSON
 .firstname: ┌→───┐
@@ -4234,20 +4252,21 @@ differently than normal APL variables. For example:
                  │44 Main Street│
                  └──────────────┘
 </pre>
-<p>As a precaution, assigning a values to a non-leaf (includig the root) raises
+<p>Only the leafs of a deeply structured variable can have values and, as a
+precaution, assigning a values to a non-leaf (includig the root) raises
 a DOMAIN ERROR:
 </p>
-<pre class="verbatim">      A.b.c←'leaf-Abc'        ⍝ OK, since a.b.c will be a leaf
-      A.b←42                  ⍝ will fail since A.b is not a leaf
+<pre class="verbatim">      B.b.c←'leaf-Abc'        ⍝ OK, since B.b.c will be a leaf
+      B.b←42                  ⍝ will fail since B.b is not a leaf
 DOMAIN ERROR+
-      A.b←42
+      B.b←42
        ^ ^
       )MORE
 member access: cannot override non-leaf member A.b
 )ERASE or ⎕EX that member first.
 
-      )ERASE A.b
-      A.b ← 'leaf-Ab'         ⍝ now OK, since A.b will now become a (new) leaf
+      )ERASE B.b
+      B.b ← 'leaf-Ab'         ⍝ now OK, since B.b will now become a (new) leaf
 
       )SIC
 </pre>
@@ -4261,6 +4280,102 @@ structured variable is valid and concatenates the members:
       A.b.c.d.e
 leaf-cde
 </pre>
+<a name="Associative-Arrays"></a>
+<h4 class="subsection">3.35.2 Associative Arrays</h4>
+
+<p>APL arrays are primarily indexed with numbers (or arrays of numbers), which is
+also the most efficient method. Many other languages provide, in addition or
+alternatively, a method to index an array by <strong>keys</strong>, where the keys are
+frequently characters strings. Such arrays are then
+commonly referred to as <strong>associative arrays</strong>.
+</p>
+<p>Also APL has no associative array per se, the structured variables in GNU APL
+can be used for the same purpose. The only limitation is that the keys have to be
+character strings (as opposed to arbitrary values).
+</p>
+<p>That is, in GNU APL an associative array
+</p>
+<ul>
+<li> is a structured variable, and
+</li><li> can be indexed with arbitrary (!) strings
+</li></ul>
+
+<p>As long as the strings that used as keys follow the same rules as APL variable
+names (no leading digit, no &rsquo;.&rsquo; etc.), a structured variable can also be indexed
+with a string. That can be useful if keys are being computed or passed as
+function arguments. However, unlike indexing of APL arrays with numbers, only
+one key per (bracket-) index is permitted.
+</p>
+<pre class="verbatim">   A.key ← 42
+   A.key
+42
+   A['key']
+42
+   A['key']←24
+   A.key
+24
+   A['key' 'key']   ⍝ not allowed even though 'key' is a valid member
+DOMAIN ERROR
+      D['key' 'key']
+
+</pre>
+<p>Strings that do not follow the rules for variable names can be used with bracket
+index, but not with the .member syntax:
+</p>
+<pre class="verbatim">      ASSOC ← 38 ⎕CR 8
+      KEY←'key.dot'   ⍝ works, but avoid such keys
+      ASSOC[KEY]←42
+      ASSOC[KEY]
+42
+      ASSOC[KEY]←43
+      ASSOC[KEY]
+43
+      ASSOC.key.dot   ⍝ won't work: 'key.dot' is a single key, but key.dot is 2 keys
+VALUE ERROR+
+      ASSOC.key.dot
+               ^
+      )MORE
+member access: structure ASSOC has no member key
+
+      ASSOC.key.dot←44   ⍝ works: 2 (nested) keys
+      ASSOC.key.dot
+44
+      ASSOC['key.dot']   ⍝ works: one key containing '.'
+43
+</pre>
+<p>This is beause ASSOC.key.dot above is being tokenized by the APL parser into
+[ASSOC] [key] [dot], while &rsquo;key.dot&rsquo; is a single key. The example above (with
+differen values for ASSOC.key.dot and for ASSOC[&rsquo;key.dot&rsquo;] demonstrates why
+such keys are better avoided.
+</p>
+<p>Even though (one) bracket index can only access the top-level members of a
+structured variable, repeated bracket index (or dyadic PICK) can be used to
+access deeper nesting levels:
+</p>
+<pre class="verbatim">      D.b.c←42
+      D['b.c']   ⍝ will fail
+INDEX ERROR+
+      D['b.c']
+      ^^
+      )MORE
+member access: member b.c was not found. The valid members are:
+      b
+
+      D['b']['c']   ⍝ will work
+42
+
+      ⍝ alternatively: use PICK
+      ⍝
+      'b' 'c' ⊃ D   ⍝ fails: 'b' 'c' is 'ab'
+      &quot;b&quot; &quot;c&quot; ⊃ D   ⍝ works
+42
+
+</pre>
+<p>In the above examples each bracket index (or each element of PICK) discards the
+current top-level structure and descends into the structured sub-variable of
+the chosen member. In this case PICK is more efficient since repeated bracket
+index creates copies of the intermediate structured sub-variables.
+</p>
 <hr>
 <a name="Chapter-4"></a>
 <div class="header">

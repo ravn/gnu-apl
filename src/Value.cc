@@ -697,6 +697,30 @@ const ShapeItem rows = get_rows();
    return 0;
 }
 //-----------------------------------------------------------------------------
+Cell *
+Value::get_new_member(const UCS_string & new_member)
+{
+   // find an unused slot in owner
+   //
+   for (int j = 0; j < 2; ++j)   // j == 1 will sicceed
+       {
+         const ShapeItem rows = get_rows();
+         loop(r, rows)
+             {
+               Cell * cell = &get_ravel(2*r);
+               if (cell->is_integer_cell() && cell->get_int_value() == 0)   // unused
+                  {
+                    Value_P new_name_val(new_member, LOC);
+                    new (cell) PointerCell(new_name_val.get(), *this);
+                    return cell + 1;
+                  }
+             }
+         double_ravel(LOC);
+       }
+
+   FIXME;   // j == 1 failed
+}
+//-----------------------------------------------------------------------------
 void
 Value::double_ravel(const char * loc)
 {
@@ -2469,8 +2493,8 @@ Value_P Z(sh, loc);
 Value_P
 EmptyStruct(const char * loc)
 {
-Shape sh(ShapeItem(8), ShapeItem(2));
-Value_P Z(sh, loc);
+Shape shape_Z(ShapeItem(8), ShapeItem(2));
+Value_P Z(shape_Z, loc);
    while (Cell * cell = Z->next_ravel())   new (cell) IntCell(0);
    Z->check_value(LOC);
    Z->set_member();

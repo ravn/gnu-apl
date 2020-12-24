@@ -42,13 +42,13 @@ perfo_2(F12_BINOM      , _AB, "A ! B",      8888888888888888888ULL)   // 27
 perfo_2(F12_POWER      , _AB, "A ⋆ B",      8888888888888888888ULL)   // 28
 perfo_2(F12_LOGA       , _AB, "A ⍟ B",      8888888888888888888ULL)   // 29
 perfo_2(F2_LESS        , _AB, "A < B",      8888888888888888888ULL)   // 30
-perfo_2(F2_LEQ         , _AB, "A ≤ B",      8888888888888888888ULL)   // 31
+perfo_2(F2_LEQU        , _AB, "A ≤ B",      8888888888888888888ULL)   // 31
 perfo_2(F2_EQUAL       , _AB, "A = B",      8888888888888888888ULL)   // 32
 perfo_2(F2_EQUAL_B     , _AB, "A = B",      8888888888888888888ULL)   // 33
-perfo_2(F2_UNEQ        , _AB, "A ≠ B",      8888888888888888888ULL)   // 34
+perfo_2(F2_UNEQU       , _AB, "A ≠ B",      8888888888888888888ULL)   // 34
 perfo_2(F2_UNEQ_B      , _AB, "A ⊤≠ B",     8888888888888888888ULL)   // 35
 perfo_2(F2_GREATER     , _AB, "A > B",      8888888888888888888ULL)   // 36
-perfo_2(F2_MEQ         , _AB, "A ≥ B",      8888888888888888888ULL)   // 37
+perfo_2(F2_MEQU        , _AB, "A ≥ B",      8888888888888888888ULL)   // 37
 perfo_2(F12_CIRCLE     , _AB, "A ○ B",      8888888888888888888ULL)   // 38
 perfo_2(F12_STILE      , _AB, "A ∣ B",      8888888888888888888ULL)   // 39
 perfo_2(F2_FIND        , _AB, "A ⋸ B",      8888888888888888888ULL)   // 40

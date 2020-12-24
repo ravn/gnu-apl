@@ -115,6 +115,7 @@ Quad_CR::list_functions(ostream & out, bool mapping)
 "   Zn ← 35 ⎕CR Bl    string of lines Bl → nested vector of lines Zn\n"
 "   Zl ← 36 ⎕CR Bn    nested vector of lines Bn → string of lines Bl\n"
 "   Zl ← 37 ⎕CR Bn    ⎕CR B without removing indentation\n"
+"   Zl ← 38 ⎕CR Bi    empty structure with capacity Bi\n"
 "\n"
 "   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
       }
@@ -339,6 +340,7 @@ bool extra_frame = false;
         case 35: return do_CR35(*B);             // lines to nested strings
         case 36: return do_CR36(*B);             // nested strings to lines
         case 37: return do_CR37(*B);             // ⎕CR B with extra spaces kept
+        case 38: return do_CR38(*B);             // empty structure
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A";
                  DOMAIN_ERROR;
@@ -1582,6 +1584,34 @@ UCS_string UZ;
        }
 
 Value_P Z(UZ, LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR38(const Value & B)
+{
+   if (B.get_rank() > 0)   RANK_ERROR;
+
+APL_Integer capacity = B.get_ravel(0).get_near_int();
+   if (capacity < 0)   DOMAIN_ERROR;
+   if (capacity < 8)   return EmptyStruct(LOC);
+
+   // round capacity up to next power of 2
+   //
+APL_Integer p2;
+   for (p2 = 8; p2 < capacity && p2 < 0x1000000000000;)   p2 += p2;
+   if (capacity < p2)   capacity = p2;
+
+Shape shape_Z(ShapeItem(capacity), ShapeItem(2));
+Value_P Z(shape_Z, LOC);
+   loop(c, capacity)
+       {
+         new (Z->next_ravel())   IntCell(0);
+         new (Z->next_ravel())   IntCell(0);
+       }
+
+   Z->check_value(LOC);
+   Z->set_member();
    return Z;
 }
 //-----------------------------------------------------------------------------

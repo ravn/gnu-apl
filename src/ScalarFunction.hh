@@ -457,16 +457,16 @@ protected:
 /** Scalar function less or equal.
  */
 /// The class implementing ≤
-class Bif_F2_LEQ : public ScalarFunction
+class Bif_F2_LEQU : public ScalarFunction
 {
 public:
    /// Constructor.
-   Bif_F2_LEQ()
-   : ScalarFunction(PERF_A(LEQ))
+   Bif_F2_LEQU()
+   : ScalarFunction(PERF_A(LEQU))
    {}
 
-   static Bif_F2_LEQ * fun;          ///< Built-in function.
-   static Bif_F2_LEQ  _fun;          ///< Built-in function.
+   static Bif_F2_LEQU * fun;          ///< Built-in function.
+   static Bif_F2_LEQU  _fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB().
@@ -489,16 +489,16 @@ protected:
 /** Scalar function greater or equal.
  */
 /// The class implementing ≥
-class Bif_F2_MEQ : public ScalarFunction
+class Bif_F2_MEQU : public ScalarFunction
 {
 public:
    /// Constructor.
-   Bif_F2_MEQ()
-   : ScalarFunction(PERF_A(MEQ))
+   Bif_F2_MEQU()
+   : ScalarFunction(PERF_A(MEQU))
    {}
 
-   static Bif_F2_MEQ * fun;          ///< Built-in function.
-   static Bif_F2_MEQ  _fun;          ///< Built-in function.
+   static Bif_F2_MEQU * fun;          ///< Built-in function.
+   static Bif_F2_MEQU  _fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB().
@@ -521,16 +521,16 @@ protected:
 /** Scalar function not equal
  */
 /// The class implementing ≠
-class Bif_F2_UNEQ : public ScalarFunction
+class Bif_F2_UNEQU : public ScalarFunction
 {
 public:
    /// Constructor.
-   Bif_F2_UNEQ()
-   : ScalarFunction(PERF_A(UNEQ))
+   Bif_F2_UNEQU()
+   : ScalarFunction(PERF_A(UNEQU))
    {}
 
-   static Bif_F2_UNEQ * fun;         ///< Built-in function.
-   static Bif_F2_UNEQ  _fun;         ///< Built-in function.
+   static Bif_F2_UNEQU * fun;         ///< Built-in function.
+   static Bif_F2_UNEQU  _fun;         ///< Built-in function.
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const

@@ -17,6 +17,7 @@
   crdef(28, secondary_cellto_int   )
   crdef(35, string_to_nested_lines )
   crdef(18, string_to_UTF8         )
+  crdef(38, structure              )
   crdef( 1, style_APL_in           )
   crdef( 0, style_APL_out          )
   crdef( 3, style_boxed_1          )

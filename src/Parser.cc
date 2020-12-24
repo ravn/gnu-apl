@@ -521,7 +521,7 @@ Parser::replace_bitwise_functions(Token_string & tos)
                    tos[++t].clear(LOC);
                    continue;
 
-              case TOK_F2_UNEQ:
+              case TOK_F2_UNEQU:
                    tos[t] = Token(TOK_F2_UNEQ_B, &Bif_F2_UNEQ_B::_fun);
                    tos[++t].clear(LOC);
                    continue;

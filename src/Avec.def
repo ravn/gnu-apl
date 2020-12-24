@@ -211,11 +211,11 @@ char_def(INTERSECTION      , 0x2229 , F2_INTER     , NO_SPACE ,  EF) /* ∩ */
 char_def(UNION             , 0x222A , F12_UNION    , NO_SPACE ,  AC) /* ∪ */
 char_def(DOTTED_DEL        , 0x2235 , END          , NO_SPACE ,  D2) /* ∵ */
 char_def(TILDE_OPERATOR    , 0x223C , F12_WITHOUT  , NO_SPACE ,  84) /* ∼ */
-char_def(NOT_EQUAL         , 0x2260 , F2_UNEQ      , NO_SPACE ,  F4) /* ≠ */
+char_def(NOT_EQUAL         , 0x2260 , F2_UNEQU     , NO_SPACE ,  F4) /* ≠ */
 char_def(EQUIVALENT        , 0x2261 , F12_EQUIV    , NO_SPACE ,  CF) /* ≡ */
 char_def(NEQUIVALENT       , 0x2262 , F12_NEQUIV   , NO_SPACE ,  A3) /* ≢ */
-char_def(LESS_OR_EQUAL     , 0x2264 , F2_LEQ       , NO_SPACE ,  F3) /* ≤ */
-char_def(MORE_OR_EQUAL     , 0x2265 , F2_MEQ       , NO_SPACE ,  F2) /* ≥ */
+char_def(LESS_OR_EQUAL     , 0x2264 , F2_LEQU      , NO_SPACE ,  F3) /* ≤ */
+char_def(MORE_OR_EQUAL     , 0x2265 , F2_MEQU      , NO_SPACE ,  F2) /* ≥ */
 char_def(BETWEEN           , 0x226C , END          , NO_SPACE , 085) /* ≬ */
 char_def(SUBSET            , 0x2282 , F12_PARTITION, NO_SPACE ,  E2) /* ⊂ */
 char_def(SUPERSET          , 0x2283 , F12_PICK     , NO_SPACE ,  E3) /* ⊃ */

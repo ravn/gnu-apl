@@ -176,6 +176,29 @@ const APL_Integer qio = Workspace::get_IO();
 
 Value_P A = get_apl_value();
 
+   if (A->is_member())
+      {
+        const UCS_string name(X.getref());
+        Cell * data = A->get_member_data(name);
+        if (data)   // member exists
+           {
+             if (data->is_pointer_cell() && data->get_pointer_value()->is_member())
+                {
+                  MORE_ERROR() << "member access: cannot override non-leaf member "
+                               << name << " of variable " << get_name()
+                               << ".\n      )ERASE or ⎕EX that member first.";
+                  DOMAIN_ERROR;
+                }
+           }
+        else                                       // new member
+           {
+             data = A->get_new_member(name);
+           }
+        data->release(LOC);
+        data->init_from_value(B.get(), A.getref(), LOC);
+        return;
+      }
+
 const ShapeItem max_idx = A->element_count();
    if (+X && X->is_scalar() && B->is_scalar() && A->get_rank() == 1)
       {
