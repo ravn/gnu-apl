@@ -75,6 +75,7 @@ dist_noinst_DATA =				           \
         Laminate.tc                                        \
         Logarithm.tc                                       \
         Macro.tc                                           \
+        Macros.tc                                          \
         Magnitude.tc                                       \
         Match.tc                                           \
         MatrixDivide.tc                                    \
