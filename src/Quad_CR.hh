@@ -152,6 +152,9 @@ protected:
    /// compute \b 38 ⎕CR \b B
    static Value_P do_CR38(const Value & B);
 
+   /// compute \b 39 ⎕CR \b B
+   static Value_P do_CR39(const Value & B);
+
    /// the left argument of Pick (⊃) which selects a sub-item of a variable
    /// being constructed
    class Picker

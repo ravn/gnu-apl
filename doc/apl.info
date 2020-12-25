@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 24, 2020
+December 25, 2020
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3277,18 +3277,15 @@ File: apl.info,  Node: Section 3.31,  Next: Section 3.32,  Prev: Section 3.30,  
 
 The standard way to produce random numbers is the primitive function ?
 aka.  *Roll*.  Roll returns a simple random array whose ravel elements
-are positive integers chosen in a random fashion.  While this is
-sufficient for many applications, one sometimes needs APL values whose
-randomness not only affects the ravel elements themselves, but also
-other aspects like:
+are positive integers chosen in a (pseudo-) random fashion.  While this
+is sufficient for many applications, one sometimes needs APL values
+whose randomness not only affects the ravel elements themselves, but
+also other aspects like:
 
-   * the rank of the value,
-
-   * the shape of the value,
-
-   * the data type of the ravel elements, and
-
-   * the depth (nesting) of the values.
+   • the rank of the value,
+   • the shape of the value,
+   • the data type of the ravel elements, and
+   • the depth (nesting) of the values.
 
    Such values can be produced with system function ⎕RVAL. The main use
 case for ⎕RVAL is the production of test data for the interpreter, but
@@ -3297,10 +3294,24 @@ case for ⎕RVAL is the production of test data for the interpreter, but
 3.31.1 General
 --------------
 
-In general, monadic ⎕RVAL, i.e.  Z←RVAL B returns a single random APL
-value Z, while dyadic ⎕RVAL, i.e.  A RVAL B is used to control the
-properties of subsequently generated random APL values returned by
-monadic ⎕RVAL.
+In general, monadic ⎕RVAL B, returns a single random APL value Z, while
+dyadic A RVAL B is used to control the properties of subsequently
+generated random APL values returned by monadic ⎕RVAL.
+
+   The typical use of ⎕RVAL is to firzt call A ⎕RVAL B zero or more
+times to override individual default properties of the subsequently
+produced values, followed by one or more calls of monadic ⎕RVAL B.
+
+   The default properties, i.e.  the properties used unless they were
+overridden by A ⎕RVAL B are:
+
+Rank:  0
+Shape: 1 1 1 1 1 1 1 1 (unused since Rank = 0)
+Type:  0 1 0 0 0       (only integers
+Max. Depth: 4
+
+   The default properties therefore return an integer scalar for every
+call of ⎕RVAL B.
 
 3.31.2 Dyadic ⎕RVAL
 -------------------
@@ -5558,27 +5569,27 @@ Node: Section 3.28106620
 Node: Section 3.29114228
 Node: Section 3.30115175
 Node: Section 3.31128737
-Node: Section 3.32138237
-Node: Section 3.33141341
-Node: Section 3.34143330
-Node: Section 3.35147755
-Node: Chapter 4156213
-Node: Chapter 5157966
-Node: Chapter 6159092
-Node: Section 6.1160629
-Node: Section 6.2161909
-Node: Section 6.3162269
-Node: Section 6.4162511
-Node: Section 6.5163173
-Node: Section 6.6163651
-Node: Section 6.7164423
-Node: Section 6.8164880
-Node: Chapter 7165282
-Node: Section 7.1165701
-Node: Section 7.2166388
-Node: Chapter 8167219
-Node: Section 8.1167722
-Node: Section 8.2193036
+Node: Section 3.32138734
+Node: Section 3.33141838
+Node: Section 3.34143827
+Node: Section 3.35148252
+Node: Chapter 4156710
+Node: Chapter 5158463
+Node: Chapter 6159589
+Node: Section 6.1161126
+Node: Section 6.2162406
+Node: Section 6.3162766
+Node: Section 6.4163008
+Node: Section 6.5163670
+Node: Section 6.6164148
+Node: Section 6.7164920
+Node: Section 6.8165377
+Node: Chapter 7165779
+Node: Section 7.1166198
+Node: Section 7.2166885
+Node: Chapter 8167716
+Node: Section 8.1168219
+Node: Section 8.2193533
 
 End Tag Table
 

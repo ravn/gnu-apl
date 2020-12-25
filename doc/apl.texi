@@ -3359,17 +3359,16 @@ The same for the pos+len output format:
 
 The standard way to produce random numbers is the primitive function ?
 aka. @strong{Roll}. Roll returns a simple random array whose ravel elements are
-positive integers chosen in a random fashion. While this is sufficient
+positive integers chosen in a (pseudo-) random fashion. While this is sufficient
 for many applications, one sometimes needs APL values whose randomness not
 only affects the ravel elements themselves, but also other aspects like:
 
-* the rank of the value,
-
-* the shape of the value,
-
-* the data type of the ravel elements, and
-
-* the depth (nesting) of the values.
+@itemize
+@item the rank of the value,
+@item the shape of the value,
+@item the data type of the ravel elements, and
+@item the depth (nesting) of the values.
+@end itemize
 
 Such values can be produced with system function ⎕RVAL. The main use case for
 ⎕RVAL is the production of test data for the interpreter, but ⎕RVAL might be
@@ -3377,9 +3376,25 @@ useful for other purposes as well.
 
 @subsection General
 
-In general, monadic ⎕RVAL, i.e. Z←RVAL B returns a single random APL value Z,
-while dyadic ⎕RVAL, i.e. A RVAL B is used to control the properties of
+In general, monadic ⎕RVAL B, returns a single random APL value Z,
+while dyadic A RVAL B is used to control the properties of
 subsequently generated random APL values returned by monadic ⎕RVAL.
+
+The typical use of ⎕RVAL is to firzt call A ⎕RVAL B zero or more times to
+override individual default properties of the subsequently produced values,
+followed by one or more calls of monadic ⎕RVAL B.
+
+The default properties, i.e. the properties used unless they were overridden by
+A ⎕RVAL B are:
+
+@verbatim
+Rank:  0
+Shape: 1 1 1 1 1 1 1 1 (unused since Rank = 0)
+Type:  0 1 0 0 0       (only integers
+Max. Depth: 4
+@end verbatim
+
+The default properties therefore return an integer scalar for every call of ⎕RVAL B.
 
 @subsection Dyadic ⎕RVAL
 

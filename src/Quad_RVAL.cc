@@ -67,12 +67,17 @@ Quad_RVAL::Quad_RVAL()
 Value_P
 Quad_RVAL::do_eval_B(const Value & B, int depth)
 {
-   if (B.get_rank() != 1)   RANK_ERROR;
+   if (B.get_rank() != 1)
+      {
+        MORE_ERROR() << "1≠⍴⍴B in in ⎕RVAL B";
+        RANK_ERROR;
+      }
+
 const ShapeItem ec_B = B.element_count();
    if (ec_B > 4)
       {
-        MORE_ERROR() << "monadic ⎕RVAL B expects at most 4 properties "
-                        "(rank, shape, type, and maxdepth)";
+        MORE_ERROR() << "monadic ⎕RVAL B expects at most 4 properties B←"
+                        "(rank, (shape), (type), and maxdepth)";
         LENGTH_ERROR;
       }
 
@@ -108,7 +113,7 @@ bool need_restore = false;
                  {
                    do_eval_AB(2, cell.get_pointer_value().getref());
                  }
-              else   // rank as scalar
+              else   // shape as scalar: Z← (rank⍴ec_B)⍴random_data
                  {
                    Value_P rank = IntScalar(cell.get_int_value(), LOC);
                    do_eval_AB(2, rank.getref());
@@ -189,8 +194,18 @@ const ShapeItem ec = Z->element_count();
 Token
 Quad_RVAL::eval_AB(Value_P A, Value_P B) const
 {
-   if (!A->is_scalar())       RANK_ERROR;
-   if (!A->is_int_scalar())   DOMAIN_ERROR;
+   // A shall be a scalar int (function number)
+
+   if (!A->is_scalar())
+      {
+        MORE_ERROR() << "non-scalar A in A ⎕RVAL B";
+        RANK_ERROR;
+      }
+   if (!A->is_int_scalar())
+      {
+        MORE_ERROR() << "non-integer A in A ⎕RVAL B";
+        DOMAIN_ERROR;
+      }
 
 Value_P Z = do_eval_AB(A->get_ravel(0).get_int_value(), B.getref());
    return Token(TOK_APL_VALUE1, Z);
@@ -222,7 +237,11 @@ Quad_RVAL::generator_state(const Value & B)
 
 const ShapeItem new_N = B.element_count();
    if (new_N !=   0 && new_N !=   8 && new_N !=  32 &&
-       new_N !=  64 && new_N != 128 && new_N != 256)   DOMAIN_ERROR;
+       new_N !=  64 && new_N != 128 && new_N != 256)
+      {
+        MORE_ERROR() << "bad new_N in generator_state()";
+        DOMAIN_ERROR;
+      }
 
    // always return the previous state
    //
@@ -410,19 +429,23 @@ Value_P Z(desired_types.size(), LOC);
 Value_P
 Quad_RVAL::result_maxdepth(const Value & B)
 {
-   if (B.get_rank() > 1)             RANK_ERROR;
-   if (B.element_count() > 1)        LENGTH_ERROR;
+   if (B.get_rank() > 1)        RANK_ERROR;
+   if (B.element_count() > 1)   LENGTH_ERROR;
 
 Value_P Z = IntScalar(desired_maxdepth, LOC);
 
    if (B.element_count())   // set the desired maxdepth
       {
         const APL_Integer mxd = B.get_ravel(0).get_int_value();
-        if (mxd < 0)   DOMAIN_ERROR;
+        if (mxd < 0)
+           {
+             MORE_ERROR() << "bad max.depth";
+             DOMAIN_ERROR;
+           }
         desired_maxdepth = mxd;
       }
 
-   return Z;
+   return Z;   // previous desired_maxdepth
 }
 //-----------------------------------------------------------------------------
 int

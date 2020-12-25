@@ -284,6 +284,8 @@ Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
         case -34: a = 33;   break;
         case -35: a = 36;   break;
         case -36: a = 35;   break;
+        case -38: a = 39;   break;
+        case -39: a = 38;   break;
         default: MORE_ERROR() << "A ⎕CR B with invalid A < 0";
                  DOMAIN_ERROR;
       }
@@ -340,7 +342,8 @@ bool extra_frame = false;
         case 35: return do_CR35(*B);             // lines to nested strings
         case 36: return do_CR36(*B);             // nested strings to lines
         case 37: return do_CR37(*B);             // ⎕CR B with extra spaces kept
-        case 38: return do_CR38(*B);             // empty structure
+        case 38: return do_CR38(*B);             // plain →  structure
+        case 39: return do_CR39(*B);             // structure → plain
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A";
                  DOMAIN_ERROR;
@@ -1590,28 +1593,123 @@ Value_P Z(UZ, LOC);
 Value_P
 Quad_CR::do_CR38(const Value & B)
 {
-   if (B.get_rank() > 0)   RANK_ERROR;
+   /*
+      return a structured value with:
 
-APL_Integer capacity = B.get_ravel(0).get_near_int();
-   if (capacity < 0)   DOMAIN_ERROR;
-   if (capacity < 8)   return EmptyStruct(LOC);
+      i.  integer scalar B:   empty (i.e. with B empty rows)
+      ii. 2×N matrix B:       members B[;1] and values B[;2]
+   */
 
-   // round capacity up to next power of 2
+   if (B.is_scalar())   // return a structured value with B unused rows
+      {
+        APL_Integer capacity = B.get_ravel(0).get_near_int();
+        if (capacity < 0)   DOMAIN_ERROR;
+        if (capacity < 8)   return EmptyStruct(LOC);
+
+        // round capacity up to next power of 2
+        //
+        APL_Integer p2;
+        for (p2 = 8; p2 < capacity && p2 < 0x1000000000000;)   p2 += p2;
+        if (capacity < p2)   capacity = p2;
+
+        Shape shape_Z(ShapeItem(capacity), ShapeItem(2));
+        Value_P Z(shape_Z, LOC);
+        loop(c, capacity)
+            {
+              new (Z->next_ravel())   IntCell(0);
+              new (Z->next_ravel())   IntCell(0);
+            }
+
+        Z->check_value(LOC);
+        Z->set_member();
+        return Z;
+      }
+
+   // array to structured value...
    //
-APL_Integer p2;
-   for (p2 = 8; p2 < capacity && p2 < 0x1000000000000;)   p2 += p2;
-   if (capacity < p2)   capacity = p2;
+   if (B.get_rank() != 2)   RANK_ERROR;
+   if (B.get_cols() != 2)    LENGTH_ERROR;
 
-Shape shape_Z(ShapeItem(capacity), ShapeItem(2));
+const ShapeItem rows_B = B.get_rows();
+ShapeItem valid_rows = B.get_member_count();
+
+ShapeItem capacity;
+   for (capacity = 8; capacity < valid_rows ;)   capacity += capacity;
+
+const Shape shape_Z(capacity, 2);
 Value_P Z(shape_Z, LOC);
+
+   // fill with unused
    loop(c, capacity)
        {
          new (Z->next_ravel())   IntCell(0);
          new (Z->next_ravel())   IntCell(0);
        }
 
-   Z->check_value(LOC);
+   loop(r, rows_B)
+      {
+        const Cell & member_name = B.get_ravel(2*r);
+        if (member_name.is_character_cell())             // valid row
+           {
+             UCS_string name(member_name.get_char_value());
+             Cell * data = Z->get_new_member(name);
+             data->init(B.get_ravel(2*r + 1), Z.getref(), LOC);
+           }
+        else if (member_name.is_pointer_cell())               // valid row
+           {
+             UCS_string name(member_name.get_pointer_value().getref());
+             Cell * data = Z->get_new_member(name);
+             data->init(B.get_ravel(2*r + 1), Z.getref(), LOC);
+           }
+      }
+
    Z->set_member();
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR39(const Value & B)
+{
+   // structured value to array
+   //
+   if (B.get_rank()  != 2)   RANK_ERROR;
+   if (B.get_cols() != 2)   LENGTH_ERROR;
+
+const ShapeItem rows_B = B.get_rows();
+const ShapeItem valid_rows = B.get_member_count();
+
+const Shape shape_Z(valid_rows, 2);
+Value_P Z(shape_Z, LOC);
+
+   loop(r, rows_B)
+       {
+         const Cell & name_cell = B.get_ravel(2*r);
+         if (name_cell.is_integer_cell())   continue;   // unused row
+
+         Z->next_ravel()->init(name_cell, Z.getref(), LOC);
+
+         const Cell & data_cell = B.get_ravel(2*r + 1);
+         if (data_cell.is_pointer_cell())   // non-leaf or nested leaf
+            {
+              Value_P B_sub = data_cell.get_pointer_value();
+              if (B_sub->is_member())   // non-leaf
+                 {
+                   Value_P B_struct = do_CR39(*B_sub);
+                   new (Z->next_ravel()) PointerCell(B_struct.get(), Z.getref());
+                 }
+              else                      // leaf
+                 {
+                   new (Z->next_ravel()) PointerCell(B_sub.get(), Z.getref());
+                 }
+            }
+         else                                               // leaf
+            {
+              Z->next_ravel()->init(data_cell, Z.getref(), LOC);
+            }
+       }
+
+   Z->check_value(LOC);
    return Z;
 }
 //-----------------------------------------------------------------------------

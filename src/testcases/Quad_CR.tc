@@ -391,9 +391,9 @@ foo
       ⍝ trigger a domain error if new left arguments are implemented
       ⍝ without adding a testcase
       ⍝
-      39 ⎕CR A
+      40 ⎕CR A
 DOMAIN ERROR+
-      39 ⎕CR A
+      40 ⎕CR A
       ^      ^
 
       )MORE

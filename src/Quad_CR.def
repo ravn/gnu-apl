@@ -8,6 +8,7 @@
   crdef(17, from_base64            )
   crdef(12, from_CDR               )
   crdef(15, from_CDR_from_hex      )
+  crdef(39, from_structure         )
   crdef(13, hex_to_bytes           )
   crdef(37, monadic_keeping_indent )
   crdef(36, nested_lines_to_string )
@@ -17,7 +18,6 @@
   crdef(28, secondary_cellto_int   )
   crdef(35, string_to_nested_lines )
   crdef(18, string_to_UTF8         )
-  crdef(38, structure              )
   crdef( 1, style_APL_in           )
   crdef( 0, style_APL_out          )
   crdef( 3, style_boxed_1          )
@@ -40,6 +40,7 @@
   crdef(11, to_CRD                 )
   crdef( 6, to_hex                 )
   crdef( 5, to_HEX                 )
+  crdef(38, to_structure           )
   crdef(33, TV_to_TLV_bytes        )
   crdef(19, UTF8_to_string         )
 #undef crdef

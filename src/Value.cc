@@ -697,6 +697,66 @@ const ShapeItem rows = get_rows();
    return 0;
 }
 //-----------------------------------------------------------------------------
+ShapeItem
+Value::get_member_count() const
+{
+   // this function shall only be called for values that have the same
+   // layout as structured variables.
+   //
+   // it checks if the first column of this value looks OK and returns
+   // the number of used rows.
+   //
+   Assert(get_cols() == 2);
+
+const ShapeItem rows = get_rows();
+ShapeItem valid_rows = 0;
+
+   loop(r, rows)
+      {
+        const Cell & name_cell = get_ravel(2*r);
+
+        /*
+           name_cell must  be:
+
+           i.   integer 0       for unused rows, or
+           ii.  any character   for 1-character member names, or else
+           iii. any string      for other member names
+
+         */
+        if (name_cell.is_integer_cell())   // maybe i.
+           {
+             if (name_cell.get_int_value() != 0)   // invalid unused
+                {
+                   MORE_ERROR() << "invalid member name in row "
+                                << r << " (integer)";
+                   DOMAIN_ERROR;
+                }
+           }
+        else
+           {
+             ++valid_rows;    // assume ii. or iii.
+
+             if (name_cell.is_pointer_cell())   // maybe iii ?
+                {
+                  if (!name_cell.get_pointer_value()->is_char_string())   // no.
+                     {
+                       MORE_ERROR() << "invalid member name in row "
+                                    << r << " (nested non-string)";
+                      DOMAIN_ERROR;
+                     }
+                }
+             else if (!name_cell.is_character_cell())   // unexpected type
+                     {
+                       MORE_ERROR() << "invalid member name in row "
+                                    << r << " (type)";
+                       DOMAIN_ERROR;
+                     }
+           }
+      }
+
+   return valid_rows;
+}
+//-----------------------------------------------------------------------------
 Cell *
 Value::get_new_member(const UCS_string & new_member)
 {
@@ -2493,7 +2553,7 @@ Value_P Z(sh, loc);
 Value_P
 EmptyStruct(const char * loc)
 {
-Shape shape_Z(ShapeItem(8), ShapeItem(2));
+const Shape shape_Z(ShapeItem(8), ShapeItem(2));
 Value_P Z(shape_Z, loc);
    while (Cell * cell = Z->next_ravel())   new (cell) IntCell(0);
    Z->check_value(LOC);

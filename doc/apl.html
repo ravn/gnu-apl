@@ -229,7 +229,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>December 24, 2020
+<p>December 25, 2020
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -3612,18 +3612,17 @@ Next: <a href="#Section-3_002e32" accesskey="n" rel="next">Section 3.32</a>, Pre
 
 <p>The standard way to produce random numbers is the primitive function ?
 aka. <strong>Roll</strong>. Roll returns a simple random array whose ravel elements are
-positive integers chosen in a random fashion. While this is sufficient
+positive integers chosen in a (pseudo-) random fashion. While this is sufficient
 for many applications, one sometimes needs APL values whose randomness not
 only affects the ravel elements themselves, but also other aspects like:
 </p>
-<p>* the rank of the value,
-</p>
-<p>* the shape of the value,
-</p>
-<p>* the data type of the ravel elements, and
-</p>
-<p>* the depth (nesting) of the values.
-</p>
+<ul>
+<li> the rank of the value,
+</li><li> the shape of the value,
+</li><li> the data type of the ravel elements, and
+</li><li> the depth (nesting) of the values.
+</li></ul>
+
 <p>Such values can be produced with system function ⎕RVAL. The main use case for
 ⎕RVAL is the production of test data for the interpreter, but ⎕RVAL might be
 useful for other purposes as well.
@@ -3631,9 +3630,23 @@ useful for other purposes as well.
 <a name="General"></a>
 <h4 class="subsection">3.31.1 General</h4>
 
-<p>In general, monadic ⎕RVAL, i.e. Z←RVAL B returns a single random APL value Z,
-while dyadic ⎕RVAL, i.e. A RVAL B is used to control the properties of
+<p>In general, monadic ⎕RVAL B, returns a single random APL value Z,
+while dyadic A RVAL B is used to control the properties of
 subsequently generated random APL values returned by monadic ⎕RVAL.
+</p>
+<p>The typical use of ⎕RVAL is to firzt call A ⎕RVAL B zero or more times to
+override individual default properties of the subsequently produced values,
+followed by one or more calls of monadic ⎕RVAL B.
+</p>
+<p>The default properties, i.e. the properties used unless they were overridden by
+A ⎕RVAL B are:
+</p>
+<pre class="verbatim">Rank:  0
+Shape: 1 1 1 1 1 1 1 1 (unused since Rank = 0)
+Type:  0 1 0 0 0       (only integers
+Max. Depth: 4
+</pre>
+<p>The default properties therefore return an integer scalar for every call of ⎕RVAL B.
 </p>
 <a name="Dyadic-_005b_003f_005dRVAL"></a>
 <h4 class="subsection">3.31.2 Dyadic ⎕RVAL</h4>

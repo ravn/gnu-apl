@@ -1103,13 +1103,16 @@ Bif_F12_EQUIV::eval_AB(Value_P A, Value_P B) const
 const double qct = Workspace::get_CT();
 const ShapeItem count = A->nz_element_count();  // compare at least prototype
 
-   if (!A->same_shape(*B))   return Token(TOK_APL_VALUE1, IntScalar(0, LOC));   // no match
+   if (!A->same_shape(*B))   //shape mismatch
+      return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
    loop(c, count)
-       if (!A->get_ravel(c).equal(B->get_ravel(c), qct))
-          {
-            return Token(TOK_APL_VALUE1, IntScalar(0, LOC));   // no match
-          }
+       {
+         if (!A->get_ravel(c).equal(B->get_ravel(c), qct))
+            {
+              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));   // no match
+            }
+       }
 
    return Token(TOK_APL_VALUE1, IntScalar(1, LOC));   // match
 }

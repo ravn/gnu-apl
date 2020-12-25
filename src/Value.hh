@@ -270,6 +270,9 @@ public:
    /// \b member, or 0 if member not found.
    Cell * get_member_data(const UCS_string & member);
 
+   /// return the number of (valid) members, as per this[1;]
+   ShapeItem get_member_count() const;
+
    /// create a new member and return the Cell containing the data for it
    Cell * get_new_member(const UCS_string & new_member);
 
