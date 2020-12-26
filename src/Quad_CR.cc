@@ -1635,6 +1635,7 @@ ShapeItem valid_rows = B.get_member_count();
 
 ShapeItem capacity;
    for (capacity = 8; capacity < valid_rows ;)   capacity += capacity;
+   capacity += capacity;   // one more to use ≤ 50%
 
 const Shape shape_Z(capacity, 2);
 Value_P Z(shape_Z, LOC);

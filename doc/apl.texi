@@ -3946,8 +3946,8 @@ errors and changes, and avoid the use of experimental features in production cod
 
 A structured variable is an APL variable that contains several related but
 otherwise independent sub-variables. Such structured variables can be convenient
-for passing a large number of related arguments to a function, or for returning
-a structured result from a function.
+for passing many related arguments to a function, or for returning multiple
+results from a function.
 
 The different sub-variables of a structured variable are accessed by the
 (top-level) name of the variable followed by a non-empty sequence of member
@@ -3988,7 +3988,7 @@ Empty structured variables can be created with @strong{38 ⎕CR}:
 @end verbatim
 
 Note: A structured variable is automatically expanded when new members are
-added to it. From from time to time this expansion exceeds the space allocated
+added to it. From time to time this expansion exceeds the space allocated
 for the members of the variable and then the existing members need to be
 copied into a new, larger structure. The overhead caused by this reorganization
 can be avoided by specifying a sufficiently large capacity when the structure is
@@ -4052,7 +4052,7 @@ different than normal APL variables. For example:
 @end verbatim
 
 Only the leafs of a deeply structured variable can have values and, as a
-precaution, assigning a values to a non-leaf (includig the root) raises
+precaution, assigning a value to a non-leaf (including the root) raises
 a DOMAIN ERROR:
 
 @verbatim
@@ -4087,14 +4087,14 @@ leaf-cde
 @subsection Associative Arrays
 
 APL arrays are primarily indexed with numbers (or arrays of numbers), which is
-also the most efficient method. Many other languages provide, in addition or
-alternatively, a method to index an array by @strong{keys}, where the keys are
-frequently characters strings. Such arrays are then
-commonly referred to as @strong{associative arrays}.
+also the most efficient method. Many other languages provide, in either addition
+or else alternatively, a method to index arrays by @strong{keys}, where the keys
+are frequently characters strings. Such arrays are commonly referred to
+as @strong{associative arrays}.
 
-Also APL has no associative array per se, the structured variables in GNU APL
-can be used for the same purpose. The only limitation is that the keys have to be
-character strings (as opposed to arbitrary values).
+APL has no associative array per se, but the structured variables in GNU APL
+can be used for the same purpose. The only limitation is (currently) that the
+keys need to be character strings (as opposed to arbitrary APL values).
 
 That is, in GNU APL an associative array
 
@@ -4103,11 +4103,11 @@ That is, in GNU APL an associative array
 @item can be indexed with arbitrary (!) strings
 @end itemize
 
-As long as the strings that used as keys follow the same rules as APL variable
-names (no leading digit, no '.' etc.), a structured variable can also be indexed
-with a string. That can be useful if keys are being computed or passed as
-function arguments. However, unlike indexing of APL arrays with numbers, only
-one key per (bracket-) index is permitted.
+As long as the strings that are used as keys follow the same rules as APL
+variable names (no leading digit, no '.' etc.), a structured variable can
+also be indexed with a string. That can be useful if keys are being computed
+or passed as function arguments. However, unlike indexing of APL arrays with
+numbers, only one key per (bracket-) index is permitted.
 
 @verbatim
    A.key ← 42
@@ -4150,9 +4150,9 @@ member access: structure ASSOC has no member key
 43
 @end verbatim
 
-This is beause ASSOC.key.dot above is being tokenized by the APL parser into
+This is because ASSOC.key.dot above is being tokenized by the APL parser into
 [ASSOC] [key] [dot], while 'key.dot' is a single key. The example above (with
-differen values for ASSOC.key.dot and for ASSOC['key.dot'] demonstrates why
+different values for ASSOC.key.dot and for ASSOC['key.dot'] demonstrates why
 such keys are better avoided.
 
 Even though (one) bracket index can only access the top-level members of a
@@ -4184,6 +4184,37 @@ In the above examples each bracket index (or each element of PICK) discards the
 current top-level structure and descends into the structured sub-variable of
 the chosen member. In this case PICK is more efficient since repeated bracket
 index creates copies of the intermediate structured sub-variables.
+
+If a variable is used as a structured variable then the number of its members
+is typically small (since every member name occurs explicitly in the APL code
+that uses it). If a variable is used as an associative array, then the member
+names are typically being computed and the number of members can become rather
+large (like the different key values in a database). When such a variable
+(i.e. with many members) reaches its capacity, then finding a member (when
+the array is indexed), or finding an unused place in the variable (when a new
+member is added) becomes slower and slower. The GNU APL implementation has
+addressed this by hashing into the variable (based on the member name)
+instead of, for example, sequentially allocating the members. This is very
+fast under normal circumstances, but becomes as slow as sequential allocation
+when the number of members in the variable reaches its current capacity.
+For this reason, if a structured variable is used as an associative array,
+e.g. as a database, then it is better to not rely on the (automatic)
+reorganization of the variable, but to create the variable with a large
+enough (with 38 ⎕CR) from the beginning.
+
+If that is not possible (because the (performance-) problem has occurred after
+the variable was created, then one can manually increase the capacity like this:
+
+@verbatim
+      TMP ← 39 ⎕CR ASSOC_ARRAY   ⍝ save ASSOC_ARRAY as normal APL array
+      ⊣ ⎕EX 'ASSOC_ARRAY'        ⍝ erase it so that it can be assigned
+      ASSOC_ARRAY ← 38 ⎕CR TMP   ⍝ new associative array with ≥ twice the size
+@end verbatim
+
+As a rule of thumb, associative arrays will be fast as long their capacity is
+more than twice the number of their members. The expression ASSOC_ARRAY[;1]
+returns all keys (= members) of ASSOC_ARRAY, therefore the number of members
+is ⍴ASSOC_ARRAY[;1] and the capacity is ↑⍴ASSOC_ARRAY.
 
 @c ----------------------------------------------------------------------------
 @node Chapter 4

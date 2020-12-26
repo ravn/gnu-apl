@@ -471,9 +471,9 @@ const Cell * src = &new_value->get_ravel(0);
         Cell * const C = &get_ravel(d);
         if (C->is_pointer_cell())
            {
-              // the initial cellrefs contain no pointercells. Therefore this one
-              // has been created by the left expression performed with the initial
-              // cellrefs
+              // the initial cellrefs contain no pointercells. Therefore this
+              // one has been created by the left expression performed with
+              // the initial cellrefs
               //
               Value * sub = C->get_pointer_value().get();
               loop(s, sub->nz_element_count())
@@ -598,7 +598,8 @@ Value::get_member(const vector<const UCS_string *> & members, Value * & owner,
                  {
                    if (!throw_error)   return 0;
                    UCS_string & more = MORE_ERROR()
-                      << "member access: member " << member_ucs << " exists in ";
+                                << "member access: member " << member_ucs
+                                << " exists in ";
                    more.append_members(members, m);
                    more << "but its (internal) value is not nested";
                    DOMAIN_ERROR;
@@ -614,9 +615,10 @@ Value::get_member(const vector<const UCS_string *> & members, Value * & owner,
                  {
                    if (!throw_error)   return 0;   // silent
 
-                   UCS_string & more = MORE_ERROR() << "member access: structure ";
+                   UCS_string & more = MORE_ERROR()
+                                       << "member access: structure ";
                    more.append_members(members, m + 1);
-                   more << " has no member " << member_ucs;
+                   more << " has no member '" << member_ucs << "'.";
                    VALUE_ERROR;
                  }
 
@@ -664,13 +666,15 @@ Value::get_member_data(const UCS_string & member) const
 {
 const ShapeItem rows = get_rows();
 
-   loop(r, rows)   // loop ober member rows
+ShapeItem row = member.FNV_hash();
+   loop(r, rows)   // loop vber member rows
        {
-         const Cell & name_cell = get_ravel(2*r);
+         if (++row >= rows)   row = 0;
+         const Cell & name_cell = get_ravel(2*row);
 
          if (name_cell.is_pointer_cell() &&
              name_cell.get_pointer_value()->equal_string(member))
-            return &get_ravel(2*r + 1);
+            return &get_ravel(2*row + 1);
        }
 
    // member row not found
@@ -683,13 +687,15 @@ Value::get_member_data(const UCS_string & member)
 {
 const ShapeItem rows = get_rows();
 
+ShapeItem row = member.FNV_hash();
    loop(r, rows)   // loop ober member rows
        {
-         const Cell & name_cell = get_ravel(2*r);
+         if (++row >= rows)   row = 0;
+         const Cell & name_cell = get_ravel(2*row);
 
          if (name_cell.is_pointer_cell() &&
              name_cell.get_pointer_value()->equal_string(member))
-            return &get_ravel(2*r + 1);
+            return &get_ravel(2*row + 1);
        }
 
    // member row not found
@@ -762,13 +768,16 @@ Value::get_new_member(const UCS_string & new_member)
 {
    // find an unused slot in owner
    //
-   for (int j = 0; j < 2; ++j)   // j == 1 will sicceed
+   for (int j = 0; j < 2; ++j)   // j == 1 will succeed
        {
-         const ShapeItem rows = get_rows();
+         const ShapeItem rows = get_rows();   // changed by double_ravel() !
+         ShapeItem row = new_member.FNV_hash();
          loop(r, rows)
              {
-               Cell * cell = &get_ravel(2*r);
-               if (cell->is_integer_cell() && cell->get_int_value() == 0)   // unused
+               if (++row >= rows)   row = 0;
+               Cell * cell = &get_ravel(2*row);
+               if (cell->is_integer_cell() &&
+                   cell->get_int_value() == 0)   // unused row
                   {
                     Value_P new_name_val(new_member, LOC);
                     new (cell) PointerCell(new_name_val.get(), *this);
@@ -784,6 +793,8 @@ Value::get_new_member(const UCS_string & new_member)
 void
 Value::double_ravel(const char * loc)
 {
+Cell * const old_ravel = ravel;
+
    Assert(is_member());
 const char * del = 0;
    if (ravel != short_value)   del = reinterpret_cast<char *>(ravel);
@@ -791,15 +802,27 @@ const char * del = 0;
    Assert(get_rank() == 2);
    Assert(get_cols() == 2);
 
-const ShapeItem old_rows = get_rows();
-Cell * doubled = new Cell[4*old_rows];
-   memcpy(reinterpret_cast<void *>(doubled),
-          reinterpret_cast<const void *>(ravel),
-          2*old_rows*sizeof(Cell));
+const ShapeItem old_rows  = get_rows();
+const ShapeItem new_rows  = 2*old_rows;
+const ShapeItem new_cells = 2*new_rows;
 
+Cell * doubled = new Cell[new_cells];
+   loop(n, new_cells)   new (doubled + n)   IntCell(0);
+   valid_ravel_items = new_cells;
+   shape.set_shape_item(0, new_rows);
    ravel = doubled;
-   shape.set_shape_item(0, 2*old_rows);
-   loop(n, 2*old_rows)   new (next_ravel())   IntCell(0);
+
+   // rehash the old rows into the doubled ravel
+   //
+   loop(r, old_rows)
+       {
+         const Cell & member_name_cell = old_ravel[2*r];
+         UCS_string member_name(member_name_cell.get_pointer_value().getref());
+         Cell * dest = get_new_member(member_name);
+
+         const Cell & member_data_cell = old_ravel[2*r + 1];
+         dest->init(member_data_cell, *this, LOC);
+       }
 
    delete del;
 }
