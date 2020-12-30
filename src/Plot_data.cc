@@ -43,6 +43,10 @@ uint32_t r, g, b;
            {
              return strtoll(str + 1, 0, 16);
            }
+        else if (strlen(h) == 9)   // #xxRRGGBB
+           {
+             return strtoll(str + 1, 0, 16);
+           }
       }
 
    error = "Bad color format";

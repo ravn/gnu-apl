@@ -151,7 +151,7 @@ xcb_generic_error_t * error = xcb_request_check(conn, cookie);
 }
 //-----------------------------------------------------------------------------
 xcb_gcontext_t
-setup_font_gc(Plot_context & pctx, const char * font_name)
+setup_font_gc(Plot_context & pctx, const char * font_name, Color canvas_color)
 {
    /* get font */
 
@@ -161,9 +161,7 @@ setup_font_gc(Plot_context & pctx, const char * font_name)
    // create graphics context
 xcb_gcontext_t gc = xcb_generate_id(pctx.conn);
 uint32_t mask     = XCB_GC_FOREGROUND | XCB_GC_BACKGROUND | XCB_GC_FONT;
-uint32_t values[3] = { pctx.screen->black_pixel,
-                       pctx.screen->white_pixel,
-                       pctx.font };
+uint32_t values[3] = { 0x00FFFFFF & ~canvas_color, canvas_color, pctx.font };
    testCookie(xcb_create_gc_checked(pctx.conn, gc, pctx.window, mask, values),
               pctx.conn, "can't create font gc");
    return gc;
@@ -369,6 +367,25 @@ const double denom = ((-Bx)*(Dy-Ay) - (-By)*(Dx-Ax));     // right factor
    return /* beta == */ numer/denom;
 }
 //-----------------------------------------------------------------------------
+inline void
+set_GC_attr(const Plot_context & pctx, xcb_gcontext_t gc,
+            xcb_gc_t mask, uint32_t value)
+{
+   xcb_change_gc(pctx.conn, gc, mask, &value);
+}
+//-----------------------------------------------------------------------------
+inline void
+set_GC_foreground(const Plot_context & pctx, xcb_gcontext_t gc, Color color)
+{
+   set_GC_attr(pctx, gc, XCB_GC_FOREGROUND, color);
+}
+//-----------------------------------------------------------------------------
+inline void
+set_GC_line_width(const Plot_context & pctx, xcb_gcontext_t gc, int width)
+{
+   set_GC_attr(pctx, gc, XCB_GC_LINE_WIDTH, width);
+}
+//-----------------------------------------------------------------------------
 void
 draw_triangle(const Plot_context & pctx, int verbosity,
               Pixel_XY P0, double H0, Pixel_XY P1, Pixel_XY P2, double H12)
@@ -392,7 +409,7 @@ const double dH = (H12 - H0) / steps;
          const double alpha = H0 + s*dH;
          const double beta  = 1.0 * s/ steps;
          const uint32_t color = pctx.w_props.get_color(alpha);
-         xcb_change_gc(pctx.conn, pctx.fill, XCB_GC_FOREGROUND, &color);
+         set_GC_foreground(pctx, pctx.fill, color);
 
          const Pixel_XY P0_P1(P0.x + beta * (P1.x - P0.x),
                               P0.y + beta * (P1.y - P0.y));
@@ -453,11 +470,15 @@ draw_point(const Plot_context & pctx, const Pixel_XY & xy, Color canvas_color,
            const Plot_line_properties & l_props)
 {
 const Pixel_X point_size  = l_props.get_point_size();   // outer point diameter
-const Pixel_X point_size2 = l_props.get_point_size();   // inner point diameter
+const Pixel_X point_size2 = l_props.get_point_size2();  // inner point diameter
 const int16_t half = point_size >> 1;                   // outer point radius
 const int point_style = l_props.get_point_style();
 const Color point_color = l_props.get_point_color();
 
+   // set outer point color for all point styles (and maybe inner point colors
+   // later
+   //
+   set_GC_foreground(pctx, pctx.point, point_color);
    if (point_style == 1)   // circle
       {
         xcb_arc_t arc = { I1616(xy.x - half, xy.y - half),   // positions
@@ -471,10 +492,9 @@ const Color point_color = l_props.get_point_color();
              xcb_arc_t arc2 = { I1616(xy.x - half2, xy.y - half2),   // pos
                                 point_size2, point_size2,            // dia
                                 0, int16_t(360 << 6) };              // ang
-             enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_poly_fill_arc(pctx.conn, pctx.window, pctx.point, 1, &arc2);
-             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
+             set_GC_foreground(pctx, pctx.point, point_color);
            }
       }
    else if (point_style == 2)   // triangle ∆
@@ -496,12 +516,11 @@ const Color point_color = l_props.get_point_color();
                  { int16_t(xy.x), center2_y   },
                  { int16_t(half2), hypo2_y },
                  { int16_t(-2*half2), 0    } };
-             enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
+             set_GC_foreground(pctx, pctx.point, point_color);
            }
       }
    else if (point_style == 3)   // triangle ∇
@@ -524,12 +543,11 @@ const Color point_color = l_props.get_point_color();
                  { int16_t(xy.x), center2_y   },
                  { int16_t(half2), hypo2_y },
                  { int16_t(-2*half2), 0    } };
-             enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
+             set_GC_foreground(pctx, pctx.point, point_color);
            }
       }
    else if (point_style == 4)   // caro
@@ -550,13 +568,12 @@ const Color point_color = l_props.get_point_color();
                    { I1616( half2,  half2)     },
                    { I1616(-half2,  half2)     },
                    { I1616(-half2, -half2)     } };
-             enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS,
                            ITEMS(points2));
-             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
+             set_GC_foreground(pctx, pctx.point, point_color);
            }
       }
    else if (point_style == 5)   // square
@@ -577,12 +594,11 @@ const Color point_color = l_props.get_point_color();
                    { int16_t(point_size2), 0  },
                    { 0, int16_t(point_size2)  },
                    { int16_t(-point_size2), 0 } };
-             enum { mask = XCB_GC_FOREGROUND };
-             xcb_change_gc(pctx.conn, pctx.point, mask, &canvas_color);
+             set_GC_foreground(pctx, pctx.point, canvas_color);
              xcb_fill_poly(pctx.conn, pctx.window, pctx.point,
                            XCB_POLY_SHAPE_CONVEX,
                            XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
-             xcb_change_gc(pctx.conn, pctx.point, mask, &point_color);
+             set_GC_foreground(pctx, pctx.point, point_color);
            }
       }
 
@@ -623,8 +639,7 @@ const int dy = w_props.get_legend_dY();
 
    // draw legend background
    {
-     enum { mask = XCB_GC_FOREGROUND };
-     xcb_change_gc(pctx.conn, pctx.fill, mask, &canvas_color);
+     set_GC_foreground(pctx, pctx.fill, canvas_color);
      xcb_rectangle_t rect = { int16_t(x0 - 10),
                               int16_t(y0 -  8),
                               uint16_t(20 + xt + longest_size.width - x0),
@@ -636,17 +651,15 @@ const int dy = w_props.get_legend_dY();
    for (int l = 0; l_props[l]; ++l)
        {
          const Plot_line_properties & lp = *l_props[l];
-
-         enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-         const uint32_t gc_l[] = { lp.get_line_color(),  lp.get_line_width() };
-         const uint32_t gc_p[] = { lp.get_point_color(), lp.get_point_size() };
-
          const Pixel_Y y1 = y0 + l*dy;
 
-         xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
+         set_GC_foreground(pctx, pctx.line, lp.get_line_color());
+         set_GC_line_width(pctx, pctx.line, lp.get_line_width());
          draw_line(pctx, pctx.line, Pixel_XY(x0, y1), Pixel_XY(x2, y1));
          draw_text(pctx, lp.get_legend_name().c_str(), Pixel_XY(xt, y1 + 5));
-         xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
+
+         set_GC_foreground(pctx, pctx.point, canvas_color);
+         set_GC_line_width(pctx, pctx.point, lp.get_point_size());
          draw_point(pctx, Pixel_XY(x1, y1), canvas_color, *l_props[l]);
        }
      xcb_flush(pctx.conn);
@@ -657,10 +670,8 @@ void
 draw_X_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
             bool surface)
 {
-enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-const uint32_t values[] = { w_props.get_gridX_color(),
-                            w_props.get_gridX_line_width() };
-   xcb_change_gc(pctx.conn, pctx.line, mask, values);
+   set_GC_foreground(pctx, pctx.line, w_props.get_gridX_color());
+   set_GC_line_width(pctx, pctx.line, w_props.get_gridX_line_width());
 
 const Pixel_Y py0 = w_props.valY2pixel(0);
 const double dy = w_props.get_max_Y() - w_props.get_min_Y();
@@ -677,7 +688,8 @@ const Pixel_Y py1 = w_props.valY2pixel(dy);
             }
          else if (w_props.get_gridX_style() == 2)
             {
-              draw_line(pctx, pctx.line, Pixel_XY(px0, py0 - 5), Pixel_XY(px0, py0 + 5));
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0 - 5),
+                                         Pixel_XY(px0, py0 + 5));
             }
 
          char * cc = format_tick(v);
@@ -686,7 +698,8 @@ const Pixel_Y py1 = w_props.valY2pixel(dy);
            {
               const Pixel_X px2 = px0 - w_props.get_origin_X();
               const Pixel_Y py2 = py0 + w_props.get_origin_Y();
-              draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px2, py2));
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0),
+                                         Pixel_XY(px2, py2));
 
               draw_text(pctx, cc,
                         Pixel_XY(px0 - wh.width/2 - w_props.get_origin_X(),
@@ -705,10 +718,8 @@ void
 draw_Y_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
             bool surface)
 {
-enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH};
-const uint32_t values[] = { w_props.get_gridY_color(),
-                            w_props.get_gridY_line_width() };
-   xcb_change_gc(pctx.conn, pctx.line, mask, values);
+   set_GC_foreground(pctx, pctx.line, w_props.get_gridY_color());
+   set_GC_line_width(pctx, pctx.line, w_props.get_gridY_line_width());
 
 const Pixel_X px0 = w_props.valX2pixel(0) + w_props.get_origin_X();
 const double dx = w_props.get_max_X() - w_props.get_min_X();
@@ -720,11 +731,13 @@ const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
          if (iy == 0 || iy == w_props.get_gridY_last() ||
                w_props.get_gridY_style() == 1)
             {
-              draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px1, py0));
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0),
+                                         Pixel_XY(px1, py0));
             }
          else if (w_props.get_gridY_style() == 2)
             {
-              draw_line(pctx, pctx.line, Pixel_XY(px0 - 5, py0), Pixel_XY(px0 + 5, py0));
+              draw_line(pctx, pctx.line, Pixel_XY(px0 - 5, py0),
+                                         Pixel_XY(px0 + 5, py0));
             }
 
         char * cc = format_tick(v);
@@ -754,10 +767,8 @@ const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
 void
 draw_Z_grid(const Plot_context & pctx, const Plot_window_properties & w_props)
 {
-enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-const uint32_t values[] = { w_props.get_gridZ_color(),
-                            w_props.get_gridZ_line_width() };
-   xcb_change_gc(pctx.conn, pctx.line, mask, values);
+   set_GC_foreground(pctx, pctx.line, w_props.get_gridZ_color());
+   set_GC_line_width(pctx, pctx.line, w_props.get_gridZ_line_width());
 
 const int iz_max = w_props.get_gridZ_last();
 const Pixel_X len_Zx = w_props.get_origin_X();
@@ -771,18 +782,20 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_max_Y())
                     - w_props.valY2pixel(w_props.get_min_Y());
    for (int iz = 1; iz <= iz_max; ++iz)
        {
-         const double v = w_props.get_min_Z() + iz*w_props.get_value_per_tile_Z();
+         const double v = w_props.get_min_Z()
+                        + iz*w_props.get_value_per_tile_Z();
          const Pixel_X px0 = orig.x - iz * len_Zx / iz_max;
          const Pixel_Y py0 = orig.y + iz * len_Zy / iz_max;
          const Pixel_X px1 = px0 + len_X;
-         draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px1,  py0));
-         draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px0,  py0 + len_Y));
+         draw_line(pctx, pctx.line, Pixel_XY(px0, py0),
+                                    Pixel_XY(px1,  py0));
+         draw_line(pctx, pctx.line, Pixel_XY(px0, py0),
+                                    Pixel_XY(px0,  py0 + len_Y));
 
         char * cc = format_tick(v);
         string_width_height wh(pctx, cc);
 
-        draw_text(pctx, cc,
-                  Pixel_XY(px1 + 10, py0 + wh.height/2 - 1));
+        draw_text(pctx, cc, Pixel_XY(px1 + 10, py0 + wh.height/2 - 1));
        }
 }
 //-----------------------------------------------------------------------------
@@ -797,10 +810,8 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
    loop(l, data.get_row_count())
        {
          const Plot_line_properties & lp = *l_props[l];
-
-         enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-         const uint32_t gc_l[] = { lp.get_line_color(), lp.get_line_width() };
-         xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
+         set_GC_foreground(pctx, pctx.line, lp.get_line_color());
+         set_GC_line_width(pctx, pctx.line, lp.get_line_width());
 
          // draw lines between points
          //
@@ -817,8 +828,8 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
 
          // draw points...
          //
-         const uint32_t gc_p[] = { lp.get_point_color(), lp.get_point_size() };
-         xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
+         set_GC_foreground(pctx, pctx.point, lp.get_point_color());
+         set_GC_line_width(pctx, pctx.point, lp.get_line_width());
          loop(n, data[l].get_N())
              {
                double vx, vy;   data.get_XY(vx, vy, l, n);
@@ -842,14 +853,11 @@ const Plot_line_properties & lp0 = *l_props[0];
 
    // 1. setup graphic contexts
    //
-enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-const uint32_t gc_l[] = { lp0.get_line_color(),        // XCB_GC_FOREGROUND
-                          lp0.get_line_width() };      // XCB_GC_LINE_WIDTH
-   xcb_change_gc(pctx.conn, pctx.line, mask, gc_l);
+   set_GC_foreground(pctx, pctx.line, lp0.get_line_color());
+   set_GC_line_width(pctx, pctx.line, lp0.get_line_width());
 
-const uint32_t gc_p[] = { lp0.get_point_color(),       // XCB_GC_FOREGROUND
-                          lp0.get_point_size() };      // XCB_GC_LINE_WIDTH
-   xcb_change_gc(pctx.conn, pctx.point, mask, gc_p);
+   set_GC_foreground(pctx, pctx.point, lp0.get_point_color());
+   set_GC_line_width(pctx, pctx.point, lp0.get_point_size());
 
    // 2. draw areas between plot lines...
    //
@@ -1014,8 +1022,7 @@ do_plot(const Plot_context & pctx,
    //
 const Color canvas_color = w_props.get_canvas_color();
    {
-     enum { mask = XCB_GC_FOREGROUND };
-     xcb_change_gc(pctx.conn, pctx.line, mask, &canvas_color);
+     set_GC_attr(pctx, pctx. line, XCB_GC_FOREGROUND, canvas_color);
      xcb_rectangle_t rect = { 0, 0, w_props.get_window_width(),
                                     w_props.get_window_height() };
      xcb_poly_fill_rectangle(pctx.conn, pctx.window, pctx.line, 1, &rect);
@@ -1267,19 +1274,24 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
    pctx.line  = xcb_generate_id(pctx.conn);
    pctx.point = xcb_generate_id(pctx.conn);
    pctx.font  = xcb_generate_id(pctx.conn);
-   pctx.text = setup_font_gc(pctx, "fixed");
+   pctx.text = setup_font_gc(pctx, "fixed", w_props.get_canvas_color());
 
    {
-     enum { mask = XCB_GC_GRAPHICS_EXPOSURES,
-            mask_fill = mask | XCB_GC_LINE_WIDTH
-          };
-     const uint32_t values[] = { 2,   // XCB_GC_LINE_WIDTH
-                                 0    // XCB_GC_GRAPHICS_EXPOSURES
-                               };
+     enum { mask1 = XCB_GC_GRAPHICS_EXPOSURES,
 
-     xcb_create_gc(pctx.conn, pctx.fill, pctx.screen->root, mask_fill, values);
-     xcb_create_gc(pctx.conn, pctx.line,  pctx.screen->root, mask, values + 1);
-     xcb_create_gc(pctx.conn, pctx.point, pctx.screen->root, mask, values + 1);
+            mask2 = XCB_GC_LINE_WIDTH
+                  | XCB_GC_GRAPHICS_EXPOSURES
+          };
+     const uint32_t values1[] = { 0    // XCB_GC_GRAPHICS_EXPOSURES
+                                };
+
+     const uint32_t values2[] = { 2,   // XCB_GC_LINE_WIDTH
+                                  0    // XCB_GC_GRAPHICS_EXPOSURES
+                                };
+
+     xcb_create_gc(pctx.conn, pctx.point,pctx.screen->root, mask1, values1);
+     xcb_create_gc(pctx.conn, pctx.line, pctx.screen->root, mask1, values1);
+     xcb_create_gc(pctx.conn, pctx.fill, pctx.screen->root, mask2, values2);
    }
 
    {
@@ -1361,6 +1373,19 @@ bool file_saved = false;
 
         switch(event->response_type & ~0x80)
            {
+             case 0:   // error
+                  {
+                    const xcb_request_error_t * e = reinterpret_cast
+                          <const xcb_request_error_t *>(event);
+                    const int error_code = e->error_code;
+                    CERR << "\n*** X11 ERROR " << error_code             << endl
+                         << "    major_opcode: " << int(e->major_opcode) << endl
+                         << "    minor_opcode: " << int(e->minor_opcode) << endl
+                         << "    bad_value:    " << HEX(e->bad_value) << endl
+                         << endl;
+                  }
+                     break;
+
              case XCB_EXPOSE:             // 12
                   if (w_props.get_verbosity() & SHOW_EVENTS)
                      CERR << "\n*** XCB_EXPOSE " << endl;
