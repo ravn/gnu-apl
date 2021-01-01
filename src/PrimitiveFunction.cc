@@ -1214,6 +1214,7 @@ Bif_F1_EXECUTE::execute_command(UCS_string & command)
    if (command.starts_iwith(")LOAD")  ||
        command.starts_iwith(")QLOAD") ||
        command.starts_iwith(")CLEAR") ||
+       command.starts_iwith(")RESET") ||
        command.starts_iwith(")SIC"))
       {
         // the command modifies the SI stack. We throw E_COMMAND_PUSHED
