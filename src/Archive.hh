@@ -213,7 +213,7 @@ class XML_Loading_Archive
 {
 public:
    /// constructor: remember file name and workspace
-   XML_Loading_Archive(const char * _filename, int & dump_fd);
+   XML_Loading_Archive(ostream & _out, const char * _filename, int & dump_fd);
 
    /// destructor (unmap()s file).
    ~XML_Loading_Archive();
@@ -242,6 +242,9 @@ public:
    bool next_tag(const char * loc);
 
 protected:
+   /// where to send the "SAVED..." message
+   ostream & out;
+
    /// a value ID in a )SAVEd workspace
    enum Vid { NO_VID = int(-1) };   ///< no (invalid) value ID
 

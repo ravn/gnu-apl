@@ -1135,8 +1135,10 @@ print_history(CERR, values[p]._val, 0);
    return *this;
 }
 //=============================================================================
-XML_Loading_Archive::XML_Loading_Archive(const char * _filename, int & dump_fd)
-   : fd(-1),
+XML_Loading_Archive::XML_Loading_Archive(ostream & _out, const char * _filename,
+                                         int & dump_fd)
+   : out(_out),
+     fd(-1),
      map_start(0),
      map_length(0),
      file_start(0),
@@ -1599,7 +1601,7 @@ const char ** tag_pos = tag_order;
    if (reading_vids)   return;
 
 const char * tz_sign = (offset < 0) ? "" : "+";
-   if (!silent)   COUT
+   if (!silent)   out
         << "SAVED "
         << setfill('0') << year        << "-"
         << setw(2)      << mon         << "-"

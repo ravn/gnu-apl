@@ -964,7 +964,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, true,
                                                   ".xml", ".apl");
 
 int dump_fd = -1;
-XML_Loading_Archive in(filename.c_str(), dump_fd);
+XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 
    if (dump_fd != -1)   // wsname.apl
       {
@@ -1035,7 +1035,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, true,
                                                   ".xml", ".apl");
 
 int dump_fd = -1;
-XML_Loading_Archive in(filename.c_str(), dump_fd);
+XML_Loading_Archive in(out, filename.c_str(), dump_fd);
    if (dump_fd != -1)
       {
         load_DUMP(out, filename, dump_fd, no_LX, false, &lib_ws_objects);
