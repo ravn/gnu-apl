@@ -387,13 +387,20 @@ AC_MSG_RESULT([$user_wants_libapl])
 #
 AC_MSG_CHECKING([if we want to build libpython_apl.so])
 user_wants_python=no
+AC_SUBST(PYTHON_CFLAGS)
+PYTHON_CFLAGS=
 AC_ARG_WITH( [python],
              [AS_HELP_STRING([--with-python],
              [enable to build python extension lib_gnu_apl.so])],
              [user_wants_python=yes])
 
-if test "x$user_wants_python" = xyes ; then
+if test "$user_wants_python" = yes ; then
    AC_DEFINE([WANT_PYTHON], [1], [Define if building lib_gnu_apl.so])
+   if test -x /usr/bin/pkg-config ; then        # we have pkg-config 
+        if pkg-config --exists python ; then    # and pkg-config knows python
+            PYTHON_CFLAGS=$( pkg-config --cflags python3 )
+        fi
+   fi
 fi
 AM_CONDITIONAL(WANT_PYTHON, test "x$user_wants_python" = xyes)
 AC_MSG_RESULT([$user_wants_python])
@@ -652,7 +659,7 @@ AC_MSG_RESULT([$VISIBLE_MARKERS_WANTED])
 
 # check if we are on i686 (to fix a strange rpmbuild problem)
 AC_MSG_CHECKING([whether we compile for an i686 CPU])
-AM_CONDITIONAL([ON_i686], [test `uname -m` = i686])
+AM_CONDITIONAL([ON_i686], [test $( uname -m) = i686])
 if test `uname -m` = "i686" ; then
     AC_MSG_RESULT([yes])
 else

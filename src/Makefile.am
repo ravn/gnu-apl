@@ -26,7 +26,9 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS)
+common_CXXFLAGS = -Wall -I sql $(CXX_WERROR)
+common_CXXFLAGS += $(GTK_CFLAGS) $(GTK_LIBS)
+common_CXXFLAGS += $(PYTHON_CFLAGS)
 common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS)
 common_SOURCES  = $(plot_SOURCES) 					\
 			buildtag		buildtag.hh		\
@@ -186,7 +188,7 @@ endif
 pkglib_LTLIBRARIES =
 if WANT_LIBAPL
 pkglib_LTLIBRARIES += libapl.la
-pkginclude_HEADERS = libapl.h
+pkginclude_HEADERS = libapl.h Error.def
 libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 libapl_la_LDFLAGS = $(common_LDFLAGS)
 libapl_la_LDFLAGS += -avoid-version

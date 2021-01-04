@@ -50,6 +50,13 @@ enum C_CellType
    CCT_NUMERIC = CCT_INT | CCT_FLOAT | CCT_COMPLEX,
 };
 
+// errors codes
+enum LIBAPL_error
+{
+#define err_def(c, _txt, major, minor)   LAE_ ## c = (major << 16 | minor),
+#include "Error.def"
+};
+
 #ifdef __cplusplus
 
 class Value;
@@ -98,11 +105,11 @@ extern void init_libapl(const char * progname, int log_startup);
 extern int expand_LF_to_CRLF(int on);
 
 /// Pass `line` to the interpreter for immediate execution as APL code.
-extern int apl_exec(const char * line_utf8);
+extern LIBAPL_error apl_exec(const char * line_utf8);
 
 /// Pass `line` to the interpreter for immediate execution as APL code.
 /// line_ucs is a 0-terminated string of unicode integers
-extern int apl_exec_ucs(const unsigned int * line_ucs);
+extern LIBAPL_error apl_exec_ucs(const unsigned int * line_ucs);
 
 /// Pass `command` to the command processor and return its output.
 extern const char * apl_command(const char * command_utf8);

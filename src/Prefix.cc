@@ -1365,7 +1365,12 @@ bool direct_assign;
         direct_assign = true;
         Assert(get_assign_state() == ASS_arrow_seen);   // from reduce_D_V_ASS_B
       }
-   else Assert(0 && "Bad prefix length in Prefix::reduce_D_V__()");
+   else
+      {
+        direct_assign = false;   // to avoid warnings
+        Assert(0 && "Bad prefix length in Prefix::reduce_D_V__()");
+        return;
+      }
 
 vector<const UCS_string *>members;
 Symbol * top_sym = 0;

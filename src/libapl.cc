@@ -28,7 +28,6 @@
 #include <Error.hh>
 #include <FloatCell.hh>
 #include <LineInput.hh>
-#include <Macro.hh>
 #include <PointerCell.hh>
 #include <Tokenizer.hh>
 #include <UserPreferences.hh>
@@ -352,21 +351,21 @@ Cell * cell = &val->get_ravel(idx);
    5. other
  */
 
-int
+LIBAPL_error
 apl_exec(const char* line)
 { 
 UTF8_string line_utf8(line);
 UCS_string line_ucs(line_utf8);
 const StateIndicator * si = Workspace::SI_top();
   Command::process_line(line_ucs);
-   if (si == Workspace::SI_top())   return E_NO_ERROR;
+   if (si == Workspace::SI_top())   return LAE_NO_ERROR;
 
    si = Workspace::SI_top_error();
-   if (si)   return StateIndicator::get_error(si).get_error_code();
-   return E_UNKNOWN_ERROR;
+   if (si == 0)   return LAE_UNKNOWN_ERROR;
+   return LIBAPL_error(StateIndicator::get_error(si).get_error_code());
 } 
 //-----------------------------------------------------------------------------
-int
+LIBAPL_error
 apl_exec_ucs(const unsigned int * line_ucs)
 { 
 UCS_string line;
@@ -375,11 +374,11 @@ UCS_string line;
 
 const StateIndicator * si = Workspace::SI_top();
   Command::process_line(line);
-   if (si == Workspace::SI_top())   return E_NO_ERROR;
+   if (si == Workspace::SI_top())   return LAE_NO_ERROR;
 
    si = Workspace::SI_top_error();
-   if (si)   return StateIndicator::get_error(si).get_error_code();
-   return E_UNKNOWN_ERROR;
+   if (si == 0)   return LAE_UNKNOWN_ERROR;
+   return LIBAPL_error(StateIndicator::get_error(si).get_error_code());
 }
 //-----------------------------------------------------------------------------
 const char *

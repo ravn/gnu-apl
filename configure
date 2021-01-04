@@ -666,6 +666,7 @@ DEVELOP_WANTED
 CXX_WERROR
 WANT_PYTHON_FALSE
 WANT_PYTHON_TRUE
+PYTHON_CFLAGS
 WANT_LIBAPL_FALSE
 WANT_LIBAPL_TRUE
 WANT_ERLANG_FALSE
@@ -7002,7 +7003,7 @@ esac
 fi
 
 : ${AR=ar}
-: ${AR_FLAGS=cru}
+: ${AR_FLAGS=cr}
 
 
 
@@ -19884,16 +19885,23 @@ $as_echo "$user_wants_libapl" >&6; }
 $as_echo_n "checking if we want to build libpython_apl.so... " >&6; }
 user_wants_python=no
 
+PYTHON_CFLAGS=
+
 # Check whether --with-python was given.
 if test "${with_python+set}" = set; then :
   withval=$with_python; user_wants_python=yes
 fi
 
 
-if test "x$user_wants_python" = xyes ; then
+if test "$user_wants_python" = yes ; then
 
 $as_echo "#define WANT_PYTHON 1" >>confdefs.h
 
+   if test -x /usr/bin/pkg-config ; then        # we have pkg-config
+        if pkg-config --exists python ; then    # and pkg-config knows python
+            PYTHON_CFLAGS=$( pkg-config --cflags python3 )
+        fi
+   fi
 fi
  if test "x$user_wants_python" = xyes; then
   WANT_PYTHON_TRUE=
@@ -20186,7 +20194,7 @@ $as_echo "$VISIBLE_MARKERS_WANTED" >&6; }
 # check if we are on i686 (to fix a strange rpmbuild problem)
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we compile for an i686 CPU" >&5
 $as_echo_n "checking whether we compile for an i686 CPU... " >&6; }
- if test `uname -m` = i686; then
+ if test $( uname -m) = i686; then
   ON_i686_TRUE=
   ON_i686_FALSE='#'
 else

@@ -706,7 +706,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__pkginclude_HEADERS_DIST = libapl.h
+am__pkginclude_HEADERS_DIST = libapl.h Error.def
 HEADERS = $(pkginclude_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
@@ -844,6 +844,7 @@ PG_CONFIG = @PG_CONFIG@
 POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
+PYTHON_CFLAGS = @PYTHON_CFLAGS@
 RANLIB = @RANLIB@
 RATIONAL_NUMBERS_WANTED = @RATIONAL_NUMBERS_WANTED@
 SECURITY_LEVEL_WANTED = @SECURITY_LEVEL_WANTED@
@@ -926,7 +927,7 @@ distcleancheck_listfile = buildtag
 # common means common to the apl and libapl builds
 #
 common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS) \
-	$(am__append_4) $(am__append_8)
+	$(PYTHON_CFLAGS) $(am__append_4) $(am__append_8)
 common_LDFLAGS = -export-dynamic $(GTK_LDFLAGS) $(am__append_5) \
 	$(am__append_9)
 common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
@@ -995,7 +996,7 @@ common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	$(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
-@WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
+@WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 @WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version
 # libapl_la_LDFLAGS += -module
