@@ -115,7 +115,7 @@ extern ostream CERR;
 extern ostream UERR;
 
 class UCS_string;
-extern UCS_string & MORE_ERROR();
+extern UCS_string & MORE_ERROR();   // in Workspace.cc
 
 #define loop(v, e) for (ShapeItem v = 0; v < ShapeItem(e); ++v)
 

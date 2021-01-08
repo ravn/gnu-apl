@@ -68,6 +68,9 @@ public:
                                 const UCS_string & var_name,
                                 const Value & value);
 
+   /// compute \b 35 ⎕CR \b B
+   static Value_P do_CR35(const Value & B);
+
 protected:
    /// a mapping between function names and function numbers
    struct _sub_fun
@@ -138,9 +141,6 @@ protected:
 
    /// compute \b 34 ⎕CR \b B
    static Value_P do_CR34(const Value & B);
-
-   /// compute \b 35 ⎕CR \b B
-   static Value_P do_CR35(const Value & B);
 
    /// compute \b 36 ⎕CR \b B
    static Value_P do_CR36(const Value & B);

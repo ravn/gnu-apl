@@ -97,7 +97,9 @@ NativeFunction.cc				NativeFunction.hh	\
 NumericCell.cc					NumericCell.hh		\
 Output.cc					Output.hh		\
 						PJob.hh		\
+Parallel.cc					Parallel.hh		\
 Parser.cc					Parser.hh		\
+Performance.cc		Performance.def		Performance.hh		\
 PointerCell.cc					PointerCell.hh		\
 Prefix.cc		Prefix.def		Prefix.hh		\
 Plot_line_properties.cc				Plot_line_properties.hh	\
@@ -125,8 +127,7 @@ Quad_SQL.cc					Quad_SQL.hh		\
 Quad_SVx.cc					Quad_SVx.hh		\
 Quad_TF.cc					Quad_TF.hh		\
 Quad_WA.cc					Quad_WA.hh		\
-Parallel.cc					Parallel.hh		\
-Performance.cc		Performance.def		Performance.hh		\
+Quad_XML.cc					Quad_XML.hh		\
 RealCell.cc					RealCell.hh		\
 sbrk.cc									\
 Shape.cc					Shape.hh		\

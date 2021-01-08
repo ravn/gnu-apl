@@ -75,7 +75,8 @@ protected:
    /// constructor: a general array with shape \b sh
    Value(const Shape & sh, const char * loc);
 
-   /// constructor: a simple character vector from a UCS string
+   /// constructor: a simple character vector from a UCS string.
+   /// Rank is always 1, so that is_char_vector() will be true.
    Value(const UCS_string & ucs, const char * loc);
 
    /// constructor: a simple character vector from a UTF8 string
@@ -500,6 +501,13 @@ public:
 
 # define set_marked()   SET_marked(_LOC)
 # define clear_marked() CLEAR_marked(_LOC)
+
+   /// return true if this variable is is_member() and a N×2 matrix
+   /// with proper keys
+   bool is_structured() const;
+
+   /// add a member to a structured variable
+   void add_member(const UCS_string & member_name, Value * member_value);
 
    /// mark all values, except static values
    static void mark_all_dynamic_values();

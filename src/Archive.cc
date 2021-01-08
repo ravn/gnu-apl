@@ -68,6 +68,7 @@
 #include "Quad_RVAL.hh"
 #include "Quad_SQL.hh"
 #include "Quad_TF.hh"
+#include "Quad_XML.hh"
 #include "Symbol.hh"
 #include "Token.hh"
 #include "UCS_string.hh"

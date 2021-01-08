@@ -40,6 +40,7 @@ using namespace std;
 #include "Quad_RVAL.hh"
 #include "Quad_SQL.hh"
 #include "Quad_TF.hh"
+#include "Quad_XML.hh"
 #include "SystemVariable.hh"
 #include "UserFunction.hh"
 #include "UserPreferences.hh"

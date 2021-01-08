@@ -244,7 +244,9 @@ pp( VOID               , ---       ,          )
 
 qv( WA                 , "⎕WA"     , = 0x5701 )
 sf( F12_WITHOUT        , "∼"       ,          )
+
 qv( X                  , "⎕X"      , = 0x5801 )
+qf( XML                , "⎕XML"    ,          )
 
 sf( F0_ZILDE           , "⍬"       , = 0x5A01 )
 

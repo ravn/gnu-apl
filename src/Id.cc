@@ -52,6 +52,7 @@
 #include "Quad_SQL.hh"
 #include "Quad_SVx.hh"
 #include "Quad_TF.hh"
+#include "Quad_XML.hh"
 #include "ScalarFunction.hh"
 #include "UCS_string.hh"
 #include "Workspace.hh"

@@ -18,38 +18,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __Quad_MAP_DEFINED__
-#define __Quad_MAP_DEFINED__
+#ifndef __Quad_XML_DEFINED__
+#define __Quad_XML_DEFINED__
 
 #include "QuadFunction.hh"
 
-//-----------------------------------------------------------------------------
-/// The implementation of ⎕MAP
-class Quad_MAP : public QuadFunction
+class XML_node;
+
+class Quad_XML : public QuadFunction
 {
 public:
    /// Constructor.
-   Quad_MAP()
-      : QuadFunction(TOK_Quad_MAP)
+   Quad_XML()
+      : QuadFunction(TOK_Quad_XML)
    {}
 
-   static Quad_MAP * fun;          ///< Built-in function.
-   static Quad_MAP  _fun;          ///< Built-in function.
+   static Quad_XML * fun;          ///< Built-in function.
+   static Quad_XML  _fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   Token eval_AB(Value_P A, Value_P B) const;
 
-   /// Heapsort helper
-   static bool greater_map(const ShapeItem & a, const ShapeItem & b,
-                           const void * cells);
-
-   /// compute ⎕MAP with (indices of) sorted A
-   static Value_P do_map(const Cell * ravel_A, ShapeItem len_A,
-                  const ShapeItem * sorted_indices_A, const Value * B,
-                  bool recursive);
+   /// overloaded Function::eval_B()
+   Token eval_B(Value_P B) const;
 };
-//-----------------------------------------------------------------------------
 
-#endif // __Quad_MAP_DEFINED__
+#endif // __Quad_XML_DEFINED__
 

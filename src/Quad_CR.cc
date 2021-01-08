@@ -1515,6 +1515,10 @@ Value_P Z(len_B - 7, LOC);
 Value_P
 Quad_CR::do_CR35(const Value & B)
 {
+   // B must be a true string (is_char_vector() == 1) that MAY contain
+   // \n which then separates different lines. The \n are removed and
+   // the result is a (nested) vector containing all lines.
+
    if (B.get_rank() != 1)   RANK_ERROR;
 
 const ShapeItem len_B = B.element_count();
@@ -1537,6 +1541,7 @@ ShapeItem lf_count = 0;
 
 Value_P Z(lf_count, LOC);
 UCS_string line;
+
    loop(b, len_B)
        {
          const Unicode uni = B.get_ravel(b).get_char_value();

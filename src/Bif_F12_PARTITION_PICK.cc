@@ -662,8 +662,8 @@ const Cell * cB = &B->get_ravel(offset);
              Cell & target = *cB->get_lval_value();
              if (!target.is_pointer_cell())   DOMAIN_ERROR;
 
-             // secondly, get_cellrefs() is not recursive, therefore target has not
-             // (yet) been converted to a left-value. We do that now.
+             // secondly, get_cellrefs() is not recursive, therefore target has
+             // not (yet) been converted to a left-value. We do that now.
              //
              Value_P subval = target.get_pointer_value();   // right-value
              Value_P subrefs = subval->get_cellrefs(LOC);   // left-value
@@ -687,12 +687,22 @@ const Cell * cB = &B->get_ravel(offset);
 
    if (cB->is_lval_cell())   // e.g. (A⊃B) ← C
       {
-        Cell * cell = cB->get_lval_value();
-        Assert(cell);
+        Cell * target = cB->get_lval_value();
+        Assert(target);
 
+        if (target->is_pointer_cell())
+           {
+             // cB was created by get_cellrefs(), which is flat (non-recursive).
+             // That means that PointerCell points to a right-hand value that
+             // needs to be converted to a left-hand value here.
+             //
+             Value_P sub = target->get_pointer_value();
+             Value_P Z = sub->get_cellrefs(LOC);
+             return Z;
+           }
         Value_P Z(LOC);
         Value * cell_owner = B->get_lval_cellowner();
-        new (Z->next_ravel())   LvalCell(cell, cell_owner);
+        new (Z->next_ravel())   LvalCell(target, cell_owner);
         return Z;
       }
    else   // simple cell

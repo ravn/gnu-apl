@@ -149,6 +149,7 @@ TD(TOK_Quad_EA       , TC_FUN2      , TV_FUN  , ID_Quad_EA      )
 TD(TOK_Quad_EB       , TC_FUN2      , TV_FUN  , ID_Quad_EB      )
 TD(TOK_Quad_SVC      , TC_FUN2      , TV_FUN  , ID_Quad_SVC     )
 TD(TOK_Quad_TF       , TC_FUN2      , TV_FUN  , ID_Quad_TF      )
+TD(TOK_Quad_XML      , TC_FUN2      , TV_FUN  , ID_Quad_XML     )
 
 TD(TOK_F12_BINOM     , TC_FUN2      , TV_FUN  , ID_F12_BINOM    )
 TD(TOK_F12_CIRCLE    , TC_FUN2      , TV_FUN  , ID_F12_CIRCLE   )

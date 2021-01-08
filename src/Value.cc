@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <vector>
 
+#include "Bif_F12_PARTITION_PICK.hh"
 #include "CDR_string.hh"
 #include "CharCell.hh"
 #include "ComplexCell.hh"
@@ -890,6 +891,48 @@ Value::init()
            << "sizeof(Value header) is " << sizeof(Value)  << " bytes" << endl
            << "Cell size            is " << sizeof(Cell)   << " bytes" << endl;
 };
+//-----------------------------------------------------------------------------
+bool
+Value::is_structured() const
+{
+   if (!is_member())      return false;
+   if (get_rank() != 2)   return false;
+   if (get_cols() != 2)   return false;
+
+const ShapeItem rows = get_rows();
+   loop(r, rows)
+       {
+         const Cell & key = get_ravel(2*r);
+         if (key.is_integer_cell() &&
+             key.get_int_value() == 0)                    ;   // OK: unused row
+         else if (key.is_pointer_cell() &&
+             key.get_pointer_value()->is_char_vector())   ;   // OK: key
+         else return false;
+       }
+
+   return true;    // OK: all rows were OK
+}
+//-----------------------------------------------------------------------------
+void
+Value::add_member(const UCS_string & member_name, Value * member_value)
+{
+   if (!is_structured())
+      {
+        MORE_ERROR() << "attempt to add member (" << member_name
+                     << "to a non-structured value";
+        DOMAIN_ERROR;
+      }
+
+vector<const UCS_string *> members;
+   members.push_back(&member_name);
+   members.push_back(&member_name);   // ignored
+
+Value * member_owner = 0;
+Cell * data = get_member(members, member_owner, true, false);
+   Assert(member_owner);
+   Assert(member_owner == this);
+   new (data) PointerCell(member_value, *this);
+}
 //-----------------------------------------------------------------------------
 void
 Value::mark_all_dynamic_values()
@@ -2099,11 +2142,36 @@ const ShapeItem rows = get_rows();
          ++cell;   // member value
          if (cell->is_pointer_cell())   // sub-member or leaf
             {
+              bool printed = false;
               Value_P sub = cell->get_pointer_value();
-              if (sub->is_member())   sub->print_member(out << endl, member);
-              else                    sub->print_boxed(out, member.size() + 2);
+              if (sub->is_member())
+                 {
+                   sub->print_member(out << endl, member);
+                   printed = true;
+                 }
+              else if (sub->is_char_vector())   // maybe multi-line with \n
+                 {
+                   Value_P sub1 = Quad_CR::do_CR35(sub.getref());
+                   Value_P sub2 = Bif_F12_PICK::disclose(sub1, false)
+                                                        .get_apl_val();
+                   if (sub2->get_rows() > 1)
+                      {
+                        sub2->print_boxed(out, member.size() + 2);
+                        printed = true;
+                      }
+
+                   // need to release the lines in sub1
+                   //
+                   loop(c1, sub1->nz_element_count())
+                       sub1->get_ravel(c1).release(LOC);
+                 }
+
+              if (!printed)
+                 {
+                   sub->print_boxed(out, member.size() + 2);
+                 }
             }
-         else                           // simple
+         else                           // simple member value
             {
               Value_P sub(*cell, LOC);
               sub->print_boxed(out, member.size() + 2);

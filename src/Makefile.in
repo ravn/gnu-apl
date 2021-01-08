@@ -197,7 +197,8 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
 	NamedObject.hh NativeFunction.cc NativeFunction.hh \
 	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parser.cc Parser.hh PointerCell.cc \
+	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
+	Performance.cc Performance.def Performance.hh PointerCell.cc \
 	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
 	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
 	Plot_data.hh Plot_window_properties.cc \
@@ -211,14 +212,13 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc \
 	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
 	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
-	Quad_TF.hh Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh \
-	Performance.cc Performance.def Performance.hh RealCell.cc \
-	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
-	ScalarFunction.hh Security.cc Security.def Security.hh \
-	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
-	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
-	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
+	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
 	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
@@ -286,7 +286,8 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Nabla.lo lib_gnu_apl_la-Macro.lo \
 	lib_gnu_apl_la-NamedObject.lo lib_gnu_apl_la-NativeFunction.lo \
 	lib_gnu_apl_la-NumericCell.lo lib_gnu_apl_la-Output.lo \
-	lib_gnu_apl_la-Parser.lo lib_gnu_apl_la-PointerCell.lo \
+	lib_gnu_apl_la-Parallel.lo lib_gnu_apl_la-Parser.lo \
+	lib_gnu_apl_la-Performance.lo lib_gnu_apl_la-PointerCell.lo \
 	lib_gnu_apl_la-Prefix.lo \
 	lib_gnu_apl_la-Plot_line_properties.lo \
 	lib_gnu_apl_la-Plot_data.lo \
@@ -302,13 +303,12 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Quad_RL.lo lib_gnu_apl_la-Quad_RVAL.lo \
 	lib_gnu_apl_la-Quad_SQL.lo lib_gnu_apl_la-Quad_SVx.lo \
 	lib_gnu_apl_la-Quad_TF.lo lib_gnu_apl_la-Quad_WA.lo \
-	lib_gnu_apl_la-Parallel.lo lib_gnu_apl_la-Performance.lo \
-	lib_gnu_apl_la-RealCell.lo lib_gnu_apl_la-sbrk.lo \
-	lib_gnu_apl_la-Shape.lo lib_gnu_apl_la-ScalarFunction.lo \
-	lib_gnu_apl_la-Security.lo lib_gnu_apl_la-StateIndicator.lo \
-	lib_gnu_apl_la-Svar_DB.lo lib_gnu_apl_la-Svar_record.lo \
-	lib_gnu_apl_la-Symbol.lo lib_gnu_apl_la-SymbolTable.lo \
-	lib_gnu_apl_la-SystemVariable.lo \
+	lib_gnu_apl_la-Quad_XML.lo lib_gnu_apl_la-RealCell.lo \
+	lib_gnu_apl_la-sbrk.lo lib_gnu_apl_la-Shape.lo \
+	lib_gnu_apl_la-ScalarFunction.lo lib_gnu_apl_la-Security.lo \
+	lib_gnu_apl_la-StateIndicator.lo lib_gnu_apl_la-Svar_DB.lo \
+	lib_gnu_apl_la-Svar_record.lo lib_gnu_apl_la-Symbol.lo \
+	lib_gnu_apl_la-SymbolTable.lo lib_gnu_apl_la-SystemVariable.lo \
 	lib_gnu_apl_la-TabExpansion.lo \
 	lib_gnu_apl_la-Thread_context.lo lib_gnu_apl_la-Token.lo \
 	lib_gnu_apl_la-Tokenizer.lo lib_gnu_apl_la-UCS_string.lo \
@@ -366,7 +366,8 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
 	NamedObject.hh NativeFunction.cc NativeFunction.hh \
 	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parser.cc Parser.hh PointerCell.cc \
+	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
+	Performance.cc Performance.def Performance.hh PointerCell.cc \
 	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
 	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
 	Plot_data.hh Plot_window_properties.cc \
@@ -380,14 +381,13 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc \
 	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
 	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
-	Quad_TF.hh Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh \
-	Performance.cc Performance.def Performance.hh RealCell.cc \
-	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
-	ScalarFunction.hh Security.cc Security.def Security.hh \
-	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
-	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
-	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
+	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
 	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
@@ -447,10 +447,10 @@ am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
 	libapl_la-Malloc_hooks.lo libapl_la-Nabla.lo \
 	libapl_la-Macro.lo libapl_la-NamedObject.lo \
 	libapl_la-NativeFunction.lo libapl_la-NumericCell.lo \
-	libapl_la-Output.lo libapl_la-Parser.lo \
-	libapl_la-PointerCell.lo libapl_la-Prefix.lo \
-	libapl_la-Plot_line_properties.lo libapl_la-Plot_data.lo \
-	libapl_la-Plot_window_properties.lo \
+	libapl_la-Output.lo libapl_la-Parallel.lo libapl_la-Parser.lo \
+	libapl_la-Performance.lo libapl_la-PointerCell.lo \
+	libapl_la-Prefix.lo libapl_la-Plot_line_properties.lo \
+	libapl_la-Plot_data.lo libapl_la-Plot_window_properties.lo \
 	libapl_la-PrimitiveFunction.lo libapl_la-PrimitiveOperator.lo \
 	libapl_la-PrintBuffer.lo libapl_la-QuadFunction.lo \
 	libapl_la-ProcessorID.lo libapl_la-Quad_CR.lo \
@@ -461,21 +461,20 @@ am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
 	libapl_la-Quad_RL.lo libapl_la-Quad_RVAL.lo \
 	libapl_la-Quad_SQL.lo libapl_la-Quad_SVx.lo \
 	libapl_la-Quad_TF.lo libapl_la-Quad_WA.lo \
-	libapl_la-Parallel.lo libapl_la-Performance.lo \
-	libapl_la-RealCell.lo libapl_la-sbrk.lo libapl_la-Shape.lo \
-	libapl_la-ScalarFunction.lo libapl_la-Security.lo \
-	libapl_la-StateIndicator.lo libapl_la-Svar_DB.lo \
-	libapl_la-Svar_record.lo libapl_la-Symbol.lo \
-	libapl_la-SymbolTable.lo libapl_la-SystemVariable.lo \
-	libapl_la-TabExpansion.lo libapl_la-Thread_context.lo \
-	libapl_la-Token.lo libapl_la-Tokenizer.lo \
-	libapl_la-UCS_string.lo libapl_la-UCS_string_vector.lo \
-	libapl_la-UserFunction.lo libapl_la-UserFunction_header.lo \
-	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
-	libapl_la-Value.lo libapl_la-ValueHistory.lo \
-	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
-	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
-	$(am__objects_11)
+	libapl_la-Quad_XML.lo libapl_la-RealCell.lo libapl_la-sbrk.lo \
+	libapl_la-Shape.lo libapl_la-ScalarFunction.lo \
+	libapl_la-Security.lo libapl_la-StateIndicator.lo \
+	libapl_la-Svar_DB.lo libapl_la-Svar_record.lo \
+	libapl_la-Symbol.lo libapl_la-SymbolTable.lo \
+	libapl_la-SystemVariable.lo libapl_la-TabExpansion.lo \
+	libapl_la-Thread_context.lo libapl_la-Token.lo \
+	libapl_la-Tokenizer.lo libapl_la-UCS_string.lo \
+	libapl_la-UCS_string_vector.lo libapl_la-UserFunction.lo \
+	libapl_la-UserFunction_header.lo libapl_la-UserPreferences.lo \
+	libapl_la-UTF8_string.lo libapl_la-Value.lo \
+	libapl_la-ValueHistory.lo libapl_la-Workspace.lo \
+	libapl_la-static_Objects.lo $(am__objects_8) $(am__objects_9) \
+	$(am__objects_10) $(am__objects_11)
 @WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_12) \
 @WANT_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
@@ -515,7 +514,8 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc buildtag \
 	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
 	NamedObject.hh NativeFunction.cc NativeFunction.hh \
 	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parser.cc Parser.hh PointerCell.cc \
+	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
+	Performance.cc Performance.def Performance.hh PointerCell.cc \
 	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
 	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
 	Plot_data.hh Plot_window_properties.cc \
@@ -529,14 +529,13 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc buildtag \
 	Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc \
 	Quad_RE.hh Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh \
 	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
-	Quad_TF.hh Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh \
-	Performance.cc Performance.def Performance.hh RealCell.cc \
-	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
-	ScalarFunction.hh Security.cc Security.def Security.hh \
-	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
-	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
-	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
-	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	Quad_TF.hh Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh \
+	RealCell.cc RealCell.hh sbrk.cc Shape.cc Shape.hh \
+	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
+	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
 	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
@@ -597,7 +596,8 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-Nabla.$(OBJEXT) apl-Macro.$(OBJEXT) \
 	apl-NamedObject.$(OBJEXT) apl-NativeFunction.$(OBJEXT) \
 	apl-NumericCell.$(OBJEXT) apl-Output.$(OBJEXT) \
-	apl-Parser.$(OBJEXT) apl-PointerCell.$(OBJEXT) \
+	apl-Parallel.$(OBJEXT) apl-Parser.$(OBJEXT) \
+	apl-Performance.$(OBJEXT) apl-PointerCell.$(OBJEXT) \
 	apl-Prefix.$(OBJEXT) apl-Plot_line_properties.$(OBJEXT) \
 	apl-Plot_data.$(OBJEXT) apl-Plot_window_properties.$(OBJEXT) \
 	apl-PrimitiveFunction.$(OBJEXT) \
@@ -610,9 +610,8 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-Quad_RE.$(OBJEXT) apl-Quad_RL.$(OBJEXT) \
 	apl-Quad_RVAL.$(OBJEXT) apl-Quad_SQL.$(OBJEXT) \
 	apl-Quad_SVx.$(OBJEXT) apl-Quad_TF.$(OBJEXT) \
-	apl-Quad_WA.$(OBJEXT) apl-Parallel.$(OBJEXT) \
-	apl-Performance.$(OBJEXT) apl-RealCell.$(OBJEXT) \
-	apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
+	apl-Quad_WA.$(OBJEXT) apl-Quad_XML.$(OBJEXT) \
+	apl-RealCell.$(OBJEXT) apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
 	apl-ScalarFunction.$(OBJEXT) apl-Security.$(OBJEXT) \
 	apl-StateIndicator.$(OBJEXT) apl-Svar_DB.$(OBJEXT) \
 	apl-Svar_record.$(OBJEXT) apl-Symbol.$(OBJEXT) \
@@ -961,8 +960,9 @@ common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
 	NativeFunction.cc NativeFunction.hh Native_interface.hh \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh PointerCell.cc PointerCell.hh Prefix.cc \
-	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Parallel.cc Parallel.hh Parser.cc Parser.hh Performance.cc \
+	Performance.def Performance.hh PointerCell.cc PointerCell.hh \
+	Prefix.cc Prefix.def Prefix.hh Plot_line_properties.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
@@ -975,24 +975,23 @@ common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	Quad_PLOT.cc Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh \
 	Quad_RL.cc Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc \
 	Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh \
-	Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh Performance.cc \
-	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
-	Security.cc Security.def Security.hh StateIndicator.cc \
-	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
-	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
-	Symbol.cc Symbol.hh SymbolTable.cc SymbolTable.hh \
-	SystemLimits.def SystemLimits.hh SystemVariable.cc \
-	SystemVariable.def SystemVariable.hh TabExpansion.cc \
-	TabExpansion.hh Thread_context.cc Thread_context.hh Token.cc \
-	Token.def Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh \
-	UCS_string.cc UCS_string.hh UCS_string_vector.cc \
-	UCS_string_vector.hh Unicode.hh UserFunction.cc \
-	UserFunction.hh UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh Value_P.icc \
-	Value_P.hh ValueHistory.cc ValueHistory.hh Workspace.cc \
-	Workspace.hh static_Objects.cc static_Objects.hh \
+	Quad_WA.cc Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc \
+	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	TabExpansion.cc TabExpansion.hh Thread_context.cc \
+	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
 	$(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
@@ -1299,6 +1298,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_SVx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_TF.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_WA.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_XML.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-RealCell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Regexp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-ScalarFunction.Po@am__quote@
@@ -1409,6 +1409,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_SVx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_TF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_WA.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_XML.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-RealCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Regexp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ScalarFunction.Plo@am__quote@
@@ -1519,6 +1520,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_SVx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_TF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_WA.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_XML.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-RealCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Regexp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-ScalarFunction.Plo@am__quote@
@@ -1981,12 +1983,26 @@ lib_gnu_apl_la-Output.lo: Output.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Output.lo `test -f 'Output.cc' || echo '$(srcdir)/'`Output.cc
 
+lib_gnu_apl_la-Parallel.lo: Parallel.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Parallel.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Parallel.Tpo -c -o lib_gnu_apl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Parallel.Tpo $(DEPDIR)/lib_gnu_apl_la-Parallel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parallel.cc' object='lib_gnu_apl_la-Parallel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
+
 lib_gnu_apl_la-Parser.lo: Parser.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Parser.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Parser.Tpo -c -o lib_gnu_apl_la-Parser.lo `test -f 'Parser.cc' || echo '$(srcdir)/'`Parser.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Parser.Tpo $(DEPDIR)/lib_gnu_apl_la-Parser.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parser.cc' object='lib_gnu_apl_la-Parser.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Parser.lo `test -f 'Parser.cc' || echo '$(srcdir)/'`Parser.cc
+
+lib_gnu_apl_la-Performance.lo: Performance.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Performance.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Performance.Tpo -c -o lib_gnu_apl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Performance.Tpo $(DEPDIR)/lib_gnu_apl_la-Performance.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Performance.cc' object='lib_gnu_apl_la-Performance.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
 
 lib_gnu_apl_la-PointerCell.lo: PointerCell.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-PointerCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-PointerCell.Tpo -c -o lib_gnu_apl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
@@ -2163,19 +2179,12 @@ lib_gnu_apl_la-Quad_WA.lo: Quad_WA.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_WA.lo `test -f 'Quad_WA.cc' || echo '$(srcdir)/'`Quad_WA.cc
 
-lib_gnu_apl_la-Parallel.lo: Parallel.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Parallel.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Parallel.Tpo -c -o lib_gnu_apl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Parallel.Tpo $(DEPDIR)/lib_gnu_apl_la-Parallel.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parallel.cc' object='lib_gnu_apl_la-Parallel.lo' libtool=yes @AMDEPBACKSLASH@
+lib_gnu_apl_la-Quad_XML.lo: Quad_XML.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_XML.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_XML.Tpo -c -o lib_gnu_apl_la-Quad_XML.lo `test -f 'Quad_XML.cc' || echo '$(srcdir)/'`Quad_XML.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_XML.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_XML.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_XML.cc' object='lib_gnu_apl_la-Quad_XML.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
-
-lib_gnu_apl_la-Performance.lo: Performance.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Performance.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Performance.Tpo -c -o lib_gnu_apl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Performance.Tpo $(DEPDIR)/lib_gnu_apl_la-Performance.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Performance.cc' object='lib_gnu_apl_la-Performance.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_XML.lo `test -f 'Quad_XML.cc' || echo '$(srcdir)/'`Quad_XML.cc
 
 lib_gnu_apl_la-RealCell.lo: RealCell.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-RealCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-RealCell.Tpo -c -o lib_gnu_apl_la-RealCell.lo `test -f 'RealCell.cc' || echo '$(srcdir)/'`RealCell.cc
@@ -2807,12 +2816,26 @@ libapl_la-Output.lo: Output.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Output.lo `test -f 'Output.cc' || echo '$(srcdir)/'`Output.cc
 
+libapl_la-Parallel.lo: Parallel.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Parallel.lo -MD -MP -MF $(DEPDIR)/libapl_la-Parallel.Tpo -c -o libapl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Parallel.Tpo $(DEPDIR)/libapl_la-Parallel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parallel.cc' object='libapl_la-Parallel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
+
 libapl_la-Parser.lo: Parser.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Parser.lo -MD -MP -MF $(DEPDIR)/libapl_la-Parser.Tpo -c -o libapl_la-Parser.lo `test -f 'Parser.cc' || echo '$(srcdir)/'`Parser.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Parser.Tpo $(DEPDIR)/libapl_la-Parser.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parser.cc' object='libapl_la-Parser.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Parser.lo `test -f 'Parser.cc' || echo '$(srcdir)/'`Parser.cc
+
+libapl_la-Performance.lo: Performance.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Performance.lo -MD -MP -MF $(DEPDIR)/libapl_la-Performance.Tpo -c -o libapl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Performance.Tpo $(DEPDIR)/libapl_la-Performance.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Performance.cc' object='libapl_la-Performance.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
 
 libapl_la-PointerCell.lo: PointerCell.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-PointerCell.lo -MD -MP -MF $(DEPDIR)/libapl_la-PointerCell.Tpo -c -o libapl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
@@ -2989,19 +3012,12 @@ libapl_la-Quad_WA.lo: Quad_WA.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Quad_WA.lo `test -f 'Quad_WA.cc' || echo '$(srcdir)/'`Quad_WA.cc
 
-libapl_la-Parallel.lo: Parallel.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Parallel.lo -MD -MP -MF $(DEPDIR)/libapl_la-Parallel.Tpo -c -o libapl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Parallel.Tpo $(DEPDIR)/libapl_la-Parallel.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parallel.cc' object='libapl_la-Parallel.lo' libtool=yes @AMDEPBACKSLASH@
+libapl_la-Quad_XML.lo: Quad_XML.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Quad_XML.lo -MD -MP -MF $(DEPDIR)/libapl_la-Quad_XML.Tpo -c -o libapl_la-Quad_XML.lo `test -f 'Quad_XML.cc' || echo '$(srcdir)/'`Quad_XML.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Quad_XML.Tpo $(DEPDIR)/libapl_la-Quad_XML.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_XML.cc' object='libapl_la-Quad_XML.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
-
-libapl_la-Performance.lo: Performance.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Performance.lo -MD -MP -MF $(DEPDIR)/libapl_la-Performance.Tpo -c -o libapl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Performance.Tpo $(DEPDIR)/libapl_la-Performance.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Performance.cc' object='libapl_la-Performance.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Quad_XML.lo `test -f 'Quad_XML.cc' || echo '$(srcdir)/'`Quad_XML.cc
 
 libapl_la-RealCell.lo: RealCell.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-RealCell.lo -MD -MP -MF $(DEPDIR)/libapl_la-RealCell.Tpo -c -o libapl_la-RealCell.lo `test -f 'RealCell.cc' || echo '$(srcdir)/'`RealCell.cc
@@ -4032,6 +4048,20 @@ apl-Output.obj: Output.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Output.obj `if test -f 'Output.cc'; then $(CYGPATH_W) 'Output.cc'; else $(CYGPATH_W) '$(srcdir)/Output.cc'; fi`
 
+apl-Parallel.o: Parallel.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Parallel.o -MD -MP -MF $(DEPDIR)/apl-Parallel.Tpo -c -o apl-Parallel.o `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Parallel.Tpo $(DEPDIR)/apl-Parallel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parallel.cc' object='apl-Parallel.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Parallel.o `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
+
+apl-Parallel.obj: Parallel.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Parallel.obj -MD -MP -MF $(DEPDIR)/apl-Parallel.Tpo -c -o apl-Parallel.obj `if test -f 'Parallel.cc'; then $(CYGPATH_W) 'Parallel.cc'; else $(CYGPATH_W) '$(srcdir)/Parallel.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Parallel.Tpo $(DEPDIR)/apl-Parallel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parallel.cc' object='apl-Parallel.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Parallel.obj `if test -f 'Parallel.cc'; then $(CYGPATH_W) 'Parallel.cc'; else $(CYGPATH_W) '$(srcdir)/Parallel.cc'; fi`
+
 apl-Parser.o: Parser.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Parser.o -MD -MP -MF $(DEPDIR)/apl-Parser.Tpo -c -o apl-Parser.o `test -f 'Parser.cc' || echo '$(srcdir)/'`Parser.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Parser.Tpo $(DEPDIR)/apl-Parser.Po
@@ -4045,6 +4075,20 @@ apl-Parser.obj: Parser.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parser.cc' object='apl-Parser.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Parser.obj `if test -f 'Parser.cc'; then $(CYGPATH_W) 'Parser.cc'; else $(CYGPATH_W) '$(srcdir)/Parser.cc'; fi`
+
+apl-Performance.o: Performance.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Performance.o -MD -MP -MF $(DEPDIR)/apl-Performance.Tpo -c -o apl-Performance.o `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Performance.Tpo $(DEPDIR)/apl-Performance.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Performance.cc' object='apl-Performance.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Performance.o `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
+
+apl-Performance.obj: Performance.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Performance.obj -MD -MP -MF $(DEPDIR)/apl-Performance.Tpo -c -o apl-Performance.obj `if test -f 'Performance.cc'; then $(CYGPATH_W) 'Performance.cc'; else $(CYGPATH_W) '$(srcdir)/Performance.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Performance.Tpo $(DEPDIR)/apl-Performance.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Performance.cc' object='apl-Performance.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Performance.obj `if test -f 'Performance.cc'; then $(CYGPATH_W) 'Performance.cc'; else $(CYGPATH_W) '$(srcdir)/Performance.cc'; fi`
 
 apl-PointerCell.o: PointerCell.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-PointerCell.o -MD -MP -MF $(DEPDIR)/apl-PointerCell.Tpo -c -o apl-PointerCell.o `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
@@ -4396,33 +4440,19 @@ apl-Quad_WA.obj: Quad_WA.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_WA.obj `if test -f 'Quad_WA.cc'; then $(CYGPATH_W) 'Quad_WA.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_WA.cc'; fi`
 
-apl-Parallel.o: Parallel.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Parallel.o -MD -MP -MF $(DEPDIR)/apl-Parallel.Tpo -c -o apl-Parallel.o `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Parallel.Tpo $(DEPDIR)/apl-Parallel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parallel.cc' object='apl-Parallel.o' libtool=no @AMDEPBACKSLASH@
+apl-Quad_XML.o: Quad_XML.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_XML.o -MD -MP -MF $(DEPDIR)/apl-Quad_XML.Tpo -c -o apl-Quad_XML.o `test -f 'Quad_XML.cc' || echo '$(srcdir)/'`Quad_XML.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_XML.Tpo $(DEPDIR)/apl-Quad_XML.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_XML.cc' object='apl-Quad_XML.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Parallel.o `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_XML.o `test -f 'Quad_XML.cc' || echo '$(srcdir)/'`Quad_XML.cc
 
-apl-Parallel.obj: Parallel.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Parallel.obj -MD -MP -MF $(DEPDIR)/apl-Parallel.Tpo -c -o apl-Parallel.obj `if test -f 'Parallel.cc'; then $(CYGPATH_W) 'Parallel.cc'; else $(CYGPATH_W) '$(srcdir)/Parallel.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Parallel.Tpo $(DEPDIR)/apl-Parallel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parallel.cc' object='apl-Parallel.obj' libtool=no @AMDEPBACKSLASH@
+apl-Quad_XML.obj: Quad_XML.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_XML.obj -MD -MP -MF $(DEPDIR)/apl-Quad_XML.Tpo -c -o apl-Quad_XML.obj `if test -f 'Quad_XML.cc'; then $(CYGPATH_W) 'Quad_XML.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_XML.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_XML.Tpo $(DEPDIR)/apl-Quad_XML.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_XML.cc' object='apl-Quad_XML.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Parallel.obj `if test -f 'Parallel.cc'; then $(CYGPATH_W) 'Parallel.cc'; else $(CYGPATH_W) '$(srcdir)/Parallel.cc'; fi`
-
-apl-Performance.o: Performance.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Performance.o -MD -MP -MF $(DEPDIR)/apl-Performance.Tpo -c -o apl-Performance.o `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Performance.Tpo $(DEPDIR)/apl-Performance.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Performance.cc' object='apl-Performance.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Performance.o `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
-
-apl-Performance.obj: Performance.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Performance.obj -MD -MP -MF $(DEPDIR)/apl-Performance.Tpo -c -o apl-Performance.obj `if test -f 'Performance.cc'; then $(CYGPATH_W) 'Performance.cc'; else $(CYGPATH_W) '$(srcdir)/Performance.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Performance.Tpo $(DEPDIR)/apl-Performance.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Performance.cc' object='apl-Performance.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Performance.obj `if test -f 'Performance.cc'; then $(CYGPATH_W) 'Performance.cc'; else $(CYGPATH_W) '$(srcdir)/Performance.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_XML.obj `if test -f 'Quad_XML.cc'; then $(CYGPATH_W) 'Quad_XML.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_XML.cc'; fi`
 
 apl-RealCell.o: RealCell.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-RealCell.o -MD -MP -MF $(DEPDIR)/apl-RealCell.Tpo -c -o apl-RealCell.o `test -f 'RealCell.cc' || echo '$(srcdir)/'`RealCell.cc
