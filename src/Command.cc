@@ -79,7 +79,7 @@ UCS_string prompt = Workspace::get_prompt();
                     accu = line;
                     prompt.prepend(UNI_RIGHT_ARROW);
                     accu.resize(line.size() - 3);   // discard """
-                    accu.append(UNI_ASCII_SPACE);
+                    accu.append(UNI_SPACE);
                   }
                else                     // end of multi-line
                   {
@@ -110,12 +110,12 @@ Command::process_line(UCS_string & line)
 
    switch(line[0])
       {
-         case UNI_ASCII_R_PARENT:      // regular command, e.g. )SI
+         case UNI_R_PARENT:      // regular command, e.g. )SI
               do_APL_command(COUT, line);
               if (line.size())   break;
               return;
 
-         case UNI_ASCII_R_BRACK:       // debug command, e.g. ]LOG
+         case UNI_R_BRACK:       // debug command, e.g. ]LOG
               do_APL_command(CERR, line);
               if (line.size())   break;
               return;
@@ -124,7 +124,7 @@ Command::process_line(UCS_string & line)
               Nabla::edit_function(line);
               return;
 
-         case UNI_ASCII_NUMBER_SIGN:   // e.g. # comment
+         case UNI_NUMBER_SIGN:   // e.g. # comment
          case UNI_COMMENT:             // e.g. ⍝ comment
               return;
 
@@ -263,7 +263,7 @@ Executable * statements = 0;
    catch (Error err)
       {
         UERR << Error::error_name(err.get_error_code());
-        if (Workspace::more_error().size())   UERR << UNI_ASCII_PLUS;
+        if (Workspace::more_error().size())   UERR << UNI_PLUS;
         UERR << endl;
         if (*err.get_error_line_2())
            {
@@ -1519,7 +1519,7 @@ const UCS_string * range = 0;
         loop(aa, arg.size())
             {
               const Unicode uni = arg[aa];
-              if (uni == UNI_ASCII_MINUS)
+              if (uni == UNI_MINUS)
                  {
                    is_range = true;
                    break;
@@ -1593,7 +1593,7 @@ UCS_string_vector directories;
          if (is_directory(entry, path))
             {
               if (filename_utf8[0] == '.')   continue;
-              filename.append(UNI_ASCII_SLASH);
+              filename.append(UNI_SLASH);
               directories.push_back(filename);
               continue;
             }
@@ -2078,16 +2078,16 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
   if (Workspace::get_user_commands()[uidx].mode > 0)   // dyadic
      {
         apl_cmd.append_quoted(cmd);
-        apl_cmd.append(UNI_ASCII_SPACE);
+        apl_cmd.append(UNI_SPACE);
         loop(a, args.size())
            {
              apl_cmd.append_quoted(args[a]);
-             apl_cmd.append(UNI_ASCII_SPACE);
+             apl_cmd.append(UNI_SPACE);
            }
      }
 
    apl_cmd.append(Workspace::get_user_commands()[uidx].apl_function);
-   apl_cmd.append(UNI_ASCII_SPACE);
+   apl_cmd.append(UNI_SPACE);
    apl_cmd.append_quoted(line);
 }
 //-----------------------------------------------------------------------------
@@ -2097,7 +2097,7 @@ Command::log_control(const UCS_string & arg)
 {
 UCS_string_vector args = split_arg(arg);
 
-   if (args.size() == 0 || arg[0] == UNI_ASCII_QUESTION)  // no arg or '?'
+   if (args.size() == 0 || arg[0] == UNI_QUESTION)  // no arg or '?'
       {
         for (LogId l = LID_MIN; l < LID_MAX; l = LogId(l + 1))
             {
@@ -2218,17 +2218,17 @@ int idx = 1;
 
    // data + 1 is: NAME RK SHAPE RAVEL...
    //
-   while (idx < data.size() && data[idx] != UNI_ASCII_SPACE)
+   while (idx < data.size() && data[idx] != UNI_SPACE)
          name.append(data[idx++]);
    ++idx;   // skip space after the name
 
 int rank = 0;
    while (idx < data.size() &&
-          data[idx] >= UNI_ASCII_0 &&
-          data[idx] <= UNI_ASCII_9)
+          data[idx] >= UNI_0 &&
+          data[idx] <= UNI_9)
       {
         rank *= 10;
-        rank += data[idx++] - UNI_ASCII_0;
+        rank += data[idx++] - UNI_0;
       }
    ++idx;   // skip space after the rank
 
@@ -2236,11 +2236,11 @@ int rank = 0;
       {
         ShapeItem s = 0;
         while (idx < data.size() &&
-               data[idx] >= UNI_ASCII_0 &&
-               data[idx] <= UNI_ASCII_9)
+               data[idx] >= UNI_0 &&
+               data[idx] <= UNI_9)
            {
              s *= 10;
-             s += data[idx++] - UNI_ASCII_0;
+             s += data[idx++] - UNI_0;
            }
         shape.add_shape_item(s);
         ++idx;   // skip space after shape[r]
@@ -2342,12 +2342,12 @@ Symbol * sym = 0;
 
 Value_P val(shape, LOC);
 const ShapeItem ec = val->element_count();
-   new (&val->get_ravel(0)) CharCell(UNI_ASCII_SPACE);   // prototype
+   new (&val->get_ravel(0)) CharCell(UNI_SPACE);   // prototype
 
 ShapeItem padded = 0;
    loop(e, ec)
       {
-        Unicode uni = UNI_ASCII_SPACE;
+        Unicode uni = UNI_SPACE;
         if (e < (data.size() - idx))   uni = data[e + idx];
         else                           ++padded;
          new (&val->get_ravel(e)) CharCell(uni);
@@ -2403,7 +2403,7 @@ int idx = 1;
 UCS_string fun_name;
 
    /// chars 1...' ' are the function name
-   while ((idx < data.size()) && (data[idx] != UNI_ASCII_SPACE))
+   while ((idx < data.size()) && (data[idx] != UNI_SPACE))
         fun_name.append(data[idx++]);
    ++idx;
 
@@ -2411,7 +2411,7 @@ UCS_string fun_name;
 
 UCS_string statement;
    while (idx < data.size())   statement.append(data[idx++]);
-   statement.append(UNI_ASCII_LF);
+   statement.append(UNI_LF);
 
 UCS_string fun_name1 = Quad_TF::tf2_inverse(statement);
    if (fun_name1.size() == 0)   // tf2_inverse() failed
@@ -2534,13 +2534,13 @@ Command::is_lib_ref(const UCS_string & lib)
         if (Avec::is_digit(lib[0]))   return true;
       }
 
-   if (lib[0] == UNI_ASCII_FULLSTOP)   return true;
+   if (lib[0] == UNI_FULLSTOP)   return true;
 
    loop(l, lib.size())
       {
         const Unicode uni = lib[l];
-        if (uni == UNI_ASCII_SLASH)       return true;
-        if (uni == UNI_ASCII_BACKSLASH)   return true;
+        if (uni == UNI_SLASH)       return true;
+        if (uni == UNI_BACKSLASH)   return true;
       }
 
    return false;

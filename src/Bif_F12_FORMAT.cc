@@ -194,7 +194,7 @@ Value_P Z;
    loop(w, width)
       {
         const Unicode uni = pb.get_char(w, h);
-        if (is_iPAD_char(uni))  new (Z->next_ravel()) CharCell(UNI_ASCII_SPACE);
+        if (is_iPAD_char(uni))  new (Z->next_ravel()) CharCell(UNI_SPACE);
         else                    new (Z->next_ravel()) CharCell(uni);
       }
 
@@ -321,13 +321,13 @@ UCS_string current_format;
 
          if (Avec::is_digit(cc))   digit_seen = true;
 
-         if ((cc == UNI_ASCII_SPACE) && digit_seen)   // end of field, case 1a.
+         if ((cc == UNI_SPACE) && digit_seen)   // end of field, case 1a.
             {
               col_formats.push_back(current_format);
               current_format.clear();    // start a new field;
               digit_seen = false;
             }
-         else if (cc == UNI_ASCII_6)                  // end of field, case 1b.
+         else if (cc == UNI_6)                  // end of field, case 1b.
             {
               ++f;   // next char is right decorator (and end of field)
               if (f < all_formats.size())
@@ -406,7 +406,7 @@ UCS_string ucs;
    else                                     // floating enabled, deco hidden
       {
         ucs.append(pad);
-        ucs.append(UCS_string(left_deco.size(), UNI_ASCII_SPACE));
+        ucs.append(UCS_string(left_deco.size(), UNI_SPACE));
       }
 
    ucs.append(data);
@@ -484,7 +484,7 @@ UCS_string ucs;
 }
 //-----------------------------------------------------------------------------
 Bif_F12_FORMAT::Format_LIFER::Format_LIFER(const UCS_string format)
-   : exponent_char(UNI_ASCII_E),
+   : exponent_char(UNI_E),
      expo_negative(false)
 {
    // split one column format into sub-format chunks...
@@ -506,16 +506,16 @@ integral_part:
       {
         const Unicode cc = format[f++];
 
-        if (cc == UNI_ASCII_FULLSTOP)
+        if (cc == UNI_FULLSTOP)
            {
              have_decimal_point = true;
              goto fractional_part;
            }
-        if (cc == UNI_ASCII_E)          goto exponent_part;
+        if (cc == UNI_E)          goto exponent_part;
         if (is_control_char(cc))
            {
              int_part.format.append(cc);
-             if (cc == UNI_ASCII_6)          goto right_decorator;
+             if (cc == UNI_6)          goto right_decorator;
            }
         else
            {
@@ -529,12 +529,12 @@ fractional_part:
    while (f < format.size())
       {
         const Unicode cc = format[f++];
-        if (cc == UNI_ASCII_7)          exponent_pending = true;
+        if (cc == UNI_7)          exponent_pending = true;
 
         if (is_control_char(cc))
            {
              fract_part.format.append(cc);
-             if (cc == UNI_ASCII_6)          goto right_decorator;
+             if (cc == UNI_6)          goto right_decorator;
            }
         else
            {
@@ -570,7 +570,7 @@ exponent_part:
         if (is_control_char(cc))
            {
              exponent.format.append(cc);
-             if (cc == UNI_ASCII_6)          goto right_decorator;
+             if (cc == UNI_6)          goto right_decorator;
            }
         else
            {
@@ -591,7 +591,7 @@ right_decorator:   /// the right decorator
         //
         // we put a trailing decimat point into the right decorator.
         //
-        right_deco.format.append(UNI_ASCII_FULLSTOP);
+        right_deco.format.append(UNI_FULLSTOP);
       }
 
    while (f < format.size())
@@ -639,16 +639,16 @@ int flt_cnt = 0;
       {
         switch(format[f])
            {
-             case UNI_ASCII_0:              flt_mask |= BIT_0;   break;
-             case UNI_ASCII_1: ++flt_cnt;   flt_mask |= BIT_1;   break;
-             case UNI_ASCII_2: ++flt_cnt;   flt_mask |= BIT_2;   break;
-             case UNI_ASCII_3: ++flt_cnt;   flt_mask |= BIT_3;   break;
-             case UNI_ASCII_4: ++flt_cnt;   flt_mask |= BIT_4;   break;
-             case UNI_ASCII_5:              flt_mask |= BIT_5;   break;
-             case UNI_ASCII_6:              flt_mask |= BIT_6;   break;
-             case UNI_ASCII_7:              flt_mask |= BIT_7;   break;
-             case UNI_ASCII_8:              flt_mask |= BIT_8;   break;
-             case UNI_ASCII_9:              flt_mask |= BIT_9;   break;
+             case UNI_0:              flt_mask |= BIT_0;   break;
+             case UNI_1: ++flt_cnt;   flt_mask |= BIT_1;   break;
+             case UNI_2: ++flt_cnt;   flt_mask |= BIT_2;   break;
+             case UNI_3: ++flt_cnt;   flt_mask |= BIT_3;   break;
+             case UNI_4: ++flt_cnt;   flt_mask |= BIT_4;   break;
+             case UNI_5:              flt_mask |= BIT_5;   break;
+             case UNI_6:              flt_mask |= BIT_6;   break;
+             case UNI_7:              flt_mask |= BIT_7;   break;
+             case UNI_8:              flt_mask |= BIT_8;   break;
+             case UNI_9:              flt_mask |= BIT_9;   break;
              default:                                            break;
            }
       }
@@ -660,8 +660,8 @@ int flt_cnt = 0;
             {
               const size_t pos = (type == 1) ? format.size() - f - 1 : f;
               const Unicode uni = format[pos];
-              if (uni == UNI_ASCII_0)   break;
-              if (uni == UNI_ASCII_9)   break;
+              if (uni == UNI_0)   break;
+              if (uni == UNI_9)   break;
               --min_len;
             }
       }
@@ -715,7 +715,7 @@ char * fract_end = 0;
 
         // insert leading zeros until we have at least min_len digits.
         //
-        for (; elen < exponent.min_len; ++elen)   data_expo.append(UNI_ASCII_0);
+        for (; elen < exponent.min_len; ++elen)   data_expo.append(UNI_0);
 
         data_expo.append(UCS_string(UTF8_string(ep)));
       }
@@ -735,7 +735,7 @@ char * fract_end = 0;
                              : strlen(data_buf);
         if (ilen > int_part.out_len)
            {
-             if (Workspace::get_FC(3) == UNI_ASCII_0)
+             if (Workspace::get_FC(3) == UNI_0)
                 {
                   MORE_ERROR() << "Overflow in integer part";
                   DOMAIN_ERROR;
@@ -773,14 +773,14 @@ const int ilen = int_end - &data_buf[0];
    // insert leading zeros so that we will have at least min_len digits
    // after appending the integer data.
    //
-   loop(d, int_part.min_len - ilen)   data_int.append(UNI_ASCII_0);
+   loop(d, int_part.min_len - ilen)   data_int.append(UNI_0);
 
    loop(i, ilen)   data_int.append(Unicode(data_buf[i]));
 
    // convert 0.xxx to .xxx
    //
    if (  data_int.size() == 1
-      && data_int[0] == UNI_ASCII_0
+      && data_int[0] == UNI_0
       && int_part.min_len == 0
       && fract_part.size())   data_int.clear();
 
@@ -799,7 +799,7 @@ UCS_string
 Format_sub::insert_int_commas(const UCS_string & data, bool & overflow) const
 {
 size_t fill_pos = -1;
-Unicode fill_char = UNI_ASCII_SPACE;
+Unicode fill_char = UNI_SPACE;
 
    // BIT_0: pad with 0
    // BIT_8: fille with ⎕FC[3] (* by default)
@@ -809,14 +809,14 @@ Unicode fill_char = UNI_ASCII_SPACE;
         loop(f, format.size())
            {
              const Unicode format_char = format[f];
-              if (format_char == UNI_ASCII_0 || format_char == UNI_ASCII_9)
+              if (format_char == UNI_0 || format_char == UNI_9)
                  {
                    fill_pos = f;
-                   fill_char = UNI_ASCII_0;
+                   fill_char = UNI_0;
                    break;
                  }
 
-              if (format_char == UNI_ASCII_8)
+              if (format_char == UNI_8)
                  {
                    fill_pos = f;
                    fill_char = Workspace::get_FC(2);
@@ -839,7 +839,7 @@ size_t d = data.size();
       {
         const size_t f = format.size() - f1 - 1;
         const Unicode format_char = format[f];
-         if (format_char == UNI_ASCII_COMMA)
+         if (format_char == UNI_COMMA)
             {
               // Workspace::get_FC(1) is ⎕FC[2] when ⎕IO is 1
               //
@@ -863,7 +863,7 @@ size_t d = data.size();
 
    if (d)   // format too short
       {
-         if (Workspace::get_FC(3) == UNI_ASCII_0)   DOMAIN_ERROR;
+         if (Workspace::get_FC(3) == UNI_0)   DOMAIN_ERROR;
          else                             overflow = true;
       }
 
@@ -881,7 +881,7 @@ int d = 0;
    loop(f, format.size())
       {
         const Unicode format_char = format[f];
-         if (format_char == UNI_ASCII_COMMA)
+         if (format_char == UNI_COMMA)
             {
               ucs.append(Workspace::get_FC(1));
             }
@@ -906,8 +906,8 @@ bool
 Bif_F12_FORMAT::is_control_char(Unicode uni)
 {
    return Avec::is_digit(uni)      ||
-          (uni == UNI_ASCII_COMMA) ||
-          (uni == UNI_ASCII_FULLSTOP);
+          (uni == UNI_COMMA) ||
+          (uni == UNI_FULLSTOP);
 }
 //-----------------------------------------------------------------------------
 Value_P
@@ -939,7 +939,7 @@ const ShapeItem len_A = A->element_count();
         const ShapeItem ec_Z = shape_Z.get_volume();
 
         Value_P Z(shape_Z, LOC);
-        loop(z, ec_Z)   new (Z->next_ravel()) CharCell(UNI_ASCII_SPACE);
+        loop(z, ec_Z)   new (Z->next_ravel()) CharCell(UNI_SPACE);
 
         Z->set_default_Spc();
         return Z;
@@ -971,7 +971,7 @@ PrintBuffer pb;
          PrintBuffer pb_col(format_one_col_by_spec(col_width, precision,
                                          &B->get_ravel(col), cols_B, rows_B));
 
-         if (col_width == 0)   pb_col.pad_l(UNI_ASCII_SPACE, 1);
+         if (col_width == 0)   pb_col.pad_l(UNI_SPACE, 1);
 
          if (col)   pb.append_col(pb_col);
          else       pb = pb_col;
@@ -1029,7 +1029,7 @@ bool has_complex = false;
               else
                  {
                    real->next_ravel()->init(cell, real.getref(), LOC);
-                   new (imag->next_ravel()) CharCell(UNI_ASCII_SPACE);
+                   new (imag->next_ravel()) CharCell(UNI_SPACE);
                  }
             }
 
@@ -1048,7 +1048,7 @@ bool has_complex = false;
                imag.remove_leading_whitespaces();
                if (imag.size())
                   {
-                    real_imag += UNI_ASCII_J;
+                    real_imag += UNI_J;
                     real_imag.append(imag);
                   }
                pb_real_imag.append_ucs(real_imag);
@@ -1066,7 +1066,7 @@ bool has_complex = false;
            {
              UCS_string data = UCS_string(cell.get_char_value());
 
-             add_row(ret, r, has_char, has_num, UNI_ASCII_E, data);
+             add_row(ret, r, has_char, has_num, UNI_E, data);
              continue;
            }
 
@@ -1077,12 +1077,12 @@ bool has_complex = false;
 
              if (width && data.size() > width)   // overflow
                 {
-                  if (Workspace::get_FC(3) == UNI_ASCII_0)   DOMAIN_ERROR;
+                  if (Workspace::get_FC(3) == UNI_0)   DOMAIN_ERROR;
 
                   data = UCS_string(width, Workspace::get_FC(3));
                 }
 
-             add_row(ret, r, has_char, has_num, UNI_ASCII_E, data);
+             add_row(ret, r, has_char, has_num, UNI_E, data);
              continue;
            }
 
@@ -1102,22 +1102,22 @@ bool has_complex = false;
              UCS_string data = format_spec_float(value, precision);
              if (width && data.size() > width)   // overflow
                 {
-                  if (Workspace::get_FC(3) == UNI_ASCII_0)   DOMAIN_ERROR;
+                  if (Workspace::get_FC(3) == UNI_0)   DOMAIN_ERROR;
                   data = UCS_string(width, Workspace::get_FC(3));
                 }
 
-             add_row(ret, r, has_char, has_num, UNI_ASCII_E, data);
+             add_row(ret, r, has_char, has_num, UNI_E, data);
            }
         else                  // exponential format
            {
              UCS_string data = UCS_string::from_double_expo_prec(value,
                                             -precision - 1);
-             add_row(ret, r, has_char, has_num, UNI_ASCII_E, data);
+             add_row(ret, r, has_char, has_num, UNI_E, data);
           }
       }
 
    if (width && ret.get_width(0) < width)
-      ret.pad_l(UNI_ASCII_SPACE, width - ret.get_width(0));
+      ret.pad_l(UNI_SPACE, width - ret.get_width(0));
 
    return ret;
 }
@@ -1137,15 +1137,15 @@ Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
    else if (!has_num)    // only chars: align left
       {
         const int d = ret.get_width(0) - data.size();
-        if      (d < 0)   ret.pad_r(UNI_ASCII_SPACE, -d);
-        else if (d > 0)   data.append(UCS_string(d, UNI_ASCII_SPACE));
+        if      (d < 0)   ret.pad_r(UNI_SPACE, -d);
+        else if (d > 0)   data.append(UCS_string(d, UNI_SPACE));
         ret.append_ucs(data);
       }
    else                 // chars and numbers: align right
       {
         const int d = ret.get_width(0) - data.size();
-        if      (d < 0)   ret.pad_l(UNI_ASCII_SPACE, -d);
-        else if (d > 0)   data = UCS_string(d, UNI_ASCII_SPACE) + data;
+        if      (d < 0)   ret.pad_l(UNI_SPACE, -d);
+        else if (d > 0)   data = UCS_string(d, UNI_SPACE) + data;
         ret.append_ucs(data);
       }
 }
@@ -1162,14 +1162,14 @@ UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
    //
    if (precision)   // we have a '.'
       {
-        if (ret[0] == UNI_ASCII_0    &&
-            ret[1] == UNI_ASCII_FULLSTOP)        // 0.xxx → .xxx
+        if (ret[0] == UNI_0    &&
+            ret[1] == UNI_FULLSTOP)        // 0.xxx → .xxx
            {
              ret.erase(0);
            }
         else if (ret[0] == UNI_OVERBAR     &&
-                 ret[1] == UNI_ASCII_0     &&
-                 ret[2] == UNI_ASCII_FULLSTOP)   //  ¯0.x → ¯.x
+                 ret[1] == UNI_0     &&
+                 ret[2] == UNI_FULLSTOP)   //  ¯0.x → ¯.x
            {
              ret[1] = UNI_OVERBAR;
              ret.erase(0);
@@ -1177,7 +1177,7 @@ UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
       }
    else if (ret.size() == 2       &&
             ret[0] == UNI_OVERBAR &&
-            ret[1] == UNI_ASCII_0)               // ¯0 → 0
+            ret[1] == UNI_0)               // ¯0 → 0
            {
              ret.erase(0);
            }

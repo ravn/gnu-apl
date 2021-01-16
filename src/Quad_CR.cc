@@ -55,7 +55,7 @@ Quad_CR::list_functions(ostream & out, bool mapping)
                char NN[4];   snprintf(NN, sizeof(NN), "%2d", N);
                const char * name = sub_functions[f].key;
                out << "      " << NN << " ⎕CR  ←→"
-                   << UCS_string(24 - strlen(name), UNI_ASCII_SPACE)
+                   << UCS_string(24 - strlen(name), UNI_SPACE)
                    << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
              }
 
@@ -206,7 +206,7 @@ Value_P Z(shape_Z, LOC);
             new (Z->next_ravel()) CharCell(line[col]);
 
         loop(col, max_len - line.size())
-            new (Z->next_ravel()) CharCell(UNI_ASCII_SPACE);
+            new (Z->next_ravel()) CharCell(UNI_SPACE);
       }
 
    Z->check_value(LOC);
@@ -442,22 +442,22 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                   {
                     UCS_string res = symbol->get_name();
                     res.append(UNI_LEFT_ARROW);
-                    res.append(UNI_ASCII_L_CURLY);
+                    res.append(UNI_L_CURLY);
                     int t = 0;
                     while (t < text.size())   // skip λ header
                        {
                          const Unicode uni = text[t++];
-                         if (uni == UNI_ASCII_LF)   break;
+                         if (uni == UNI_LF)   break;
                        }
 
 
                     while (t < text.size())   // copy body
                         {
                           const Unicode uni = text[t++];
-                          if (uni == UNI_ASCII_LF)   break;
+                          if (uni == UNI_LF)   break;
                            res.append(uni);
                         }
-                    res.append(UNI_ASCII_R_CURLY);
+                    res.append(UNI_R_CURLY);
 
                     result.push_back(res);
                   }
@@ -474,7 +474,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                                UCS_string next(text, u+1, text.size()-(u+1));
                                if (!next.is_comment_or_label() &&
                                    u < (text.size() - 1))
-                                  res.append(UNI_ASCII_SPACE);
+                                  res.append(UNI_SPACE);
                              }
                          else
                              {
@@ -560,7 +560,7 @@ UCS_string shape_rho;
 
    if (value.element_count() == 0)   // empty value
       {
-        UCS_string reshape(2*(picker.get_level() - 1), UNI_ASCII_SPACE);
+        UCS_string reshape(2*(picker.get_level() - 1), UNI_SPACE);
         Value_P proto = value.prototype(LOC);
 
         // emit one line for the prototype
@@ -600,7 +600,7 @@ bool nested = false;
            {
              // recompute line (which changes because count changes)
              //
-             UCS_string line(2*(picker.get_level() - 1), UNI_ASCII_SPACE);
+             UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);
              picker.get_indexed(line, pos, count);
              line.append_UTF8("←");
 
@@ -639,7 +639,7 @@ bool nested = false;
      //
      close_mode(rhs, mode);
 
-UCS_string line(2*(picker.get_level() - 1), UNI_ASCII_SPACE);
+UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);
      picker.get_indexed(line, pos, count);
      line.append_UTF8("←");
      line.append(rhs);
@@ -680,7 +680,7 @@ Quad_CR::do_CR10_structured(UCS_string_vector & result, const UCS_string & var_n
 
          const UCS_string member_ucs(*member_name);
          UCS_string path = var_name;
-         path += UNI_ASCII_FULLSTOP;
+         path += UNI_FULLSTOP;
          path.append(member_ucs);
 
          const Cell & data_cell = value.get_ravel(2*r + 1);
@@ -736,7 +736,7 @@ int len = 0;
 
    // at this point, a short ravel MAY be possible. Try it
    //
-UCS_string line(2*(picker.get_level() - 1), UNI_ASCII_SPACE);  // indent
+UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);  // indent
 
    line.append(left);
    line.append_UTF8("←");
@@ -774,8 +774,8 @@ Quad_CR::compute_prolog(int pick_level, const UCS_string & left,
 {
    // compute the prolog
    //
-UCS_string prolog(2 * (pick_level - 1), UNI_ASCII_SPACE);
-Unicode default_char = UNI_ASCII_SPACE;
+UCS_string prolog(2 * (pick_level - 1), UNI_SPACE);
+Unicode default_char = UNI_SPACE;
 APL_Integer default_int  = 0;
 const bool default_is_int = figure_default(value, default_char, default_int);
 
@@ -805,7 +805,7 @@ ShapeItem blanks = 0;
            }
         else if (cell.is_character_cell())
            {
-             if (cell.get_char_value() == UNI_ASCII_SPACE)   ++blanks;
+             if (cell.get_char_value() == UNI_SPACE)   ++blanks;
            }
       }
 
@@ -1368,12 +1368,12 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
             {
               Value_P item = row->get_ravel(col).get_pointer_value();
               PrintBuffer pb_item(*item, pctx, 0);
-              pb.pad_height(UNI_ASCII_SPACE, pb_item.get_height());
+              pb.pad_height(UNI_SPACE, pb_item.get_height());
               if (align_bottom)
-                 pb_item.pad_height_above(UNI_ASCII_SPACE, pb.get_height());
+                 pb_item.pad_height_above(UNI_SPACE, pb.get_height());
               else
-                 pb_item.pad_height(UNI_ASCII_SPACE, pb.get_height());
-              pb.add_column(UNI_ASCII_SPACE, 0, pb_item);
+                 pb_item.pad_height(UNI_SPACE, pb.get_height());
+              pb.add_column(UNI_SPACE, 0, pb_item);
             }
         if (pb.get_height() == 1)
            {
@@ -1534,10 +1534,10 @@ const ShapeItem len_B = B.element_count();
 ShapeItem lf_count = 0;
    loop(b, len_B)
        {
-         if (B.get_ravel(b).get_char_value() == UNI_ASCII_LF)   ++lf_count;
+         if (B.get_ravel(b).get_char_value() == UNI_LF)   ++lf_count;
        }
 
-   if (B.get_ravel(len_B - 1).get_char_value() != UNI_ASCII_LF)   ++lf_count;
+   if (B.get_ravel(len_B - 1).get_char_value() != UNI_LF)   ++lf_count;
 
 Value_P Z(lf_count, LOC);
 UCS_string line;
@@ -1545,7 +1545,7 @@ UCS_string line;
    loop(b, len_B)
        {
          const Unicode uni = B.get_ravel(b).get_char_value();
-         if (uni == UNI_ASCII_LF)
+         if (uni == UNI_LF)
             {
               Value_P Zb(line, LOC);
               new (Z->next_ravel()) PointerCell(Zb.get(), Z.getref());
@@ -1588,7 +1588,7 @@ UCS_string UZ;
          const Value & Bb = *B.get_ravel(b).get_pointer_value().get();
          UCS_string Ub(Bb);
          UZ.append(Ub);
-         UZ.append(UNI_ASCII_LF);
+         UZ.append(UNI_LF);
        }
 
 Value_P Z(UZ, LOC);

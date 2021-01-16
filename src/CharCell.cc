@@ -103,9 +103,9 @@ CharCell::compare(const Cell & other) const
 bool
 CharCell::is_example_field() const
 {
-   if (value.aval == UNI_ASCII_COMMA)       return true;
-   if (value.aval == UNI_ASCII_FULLSTOP)    return true;
-   return value.aval >= UNI_ASCII_0 && value.aval <= UNI_ASCII_9;
+   if (value.aval == UNI_COMMA)       return true;
+   if (value.aval == UNI_FULLSTOP)    return true;
+   return value.aval >= UNI_0 && value.aval <= UNI_9;
 }
 //-----------------------------------------------------------------------------
 PrintBuffer
@@ -117,7 +117,7 @@ ColInfo info;
 
 PrintStyle style = pctx.get_style();
 Unicode uni = get_char_value();
-   if ((style & PST_PRETTY) && uni < UNI_ASCII_SPACE)
+   if ((style & PST_PRETTY) && uni < UNI_SPACE)
       uni = Unicode(uni + 0x2400);
 
    if (style == PR_APL_FUN)

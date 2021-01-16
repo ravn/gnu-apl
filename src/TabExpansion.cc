@@ -148,7 +148,7 @@ UCS_string arg;
         // the command is longer than user, so we expand it.
         //
         user = matches[0];
-        if (ehint != EH_NO_PARAM)   user.append(UNI_ASCII_SPACE);
+        if (ehint != EH_NO_PARAM)   user.append(UNI_SPACE);
         return ER_REPLACE;
       }
 
@@ -162,7 +162,7 @@ UCS_string arg;
              // Otherwiese fall throught to expand_command_arg();
              //
              user = matches[0];
-             user.append(UNI_ASCII_SPACE);
+             user.append(UNI_SPACE);
              return ER_REPLACE;
       }
 
@@ -422,8 +422,8 @@ TabExpansion::expand_filename(UCS_string & user,
                     if (!LibPaths::is_present(LibRef(lib)))
                        continue;
 
-                    libs_present.append(UNI_ASCII_SPACE);
-                    libs_present.append(Unicode(UNI_ASCII_0 + lib));
+                    libs_present.append(UNI_SPACE);
+                    libs_present.append(Unicode(UNI_0 + lib));
                  }
              if (libs_present.size() == 0)   goto nothing;
 
@@ -447,9 +447,9 @@ TabExpansion::expand_filename(UCS_string & user,
         if (arg.size() == 1 && !have_trailing_blank)   // no space yet
            {
              user = cmd;
-             user.append(UNI_ASCII_SPACE);
+             user.append(UNI_SPACE);
              user.append(Unicode(arg[0]));
-             user.append(UNI_ASCII_SPACE);
+             user.append(UNI_SPACE);
              return ER_REPLACE;
            }
 
@@ -463,15 +463,15 @@ TabExpansion::expand_filename(UCS_string & user,
    // otherwise: real file name
    {
      UCS_string dir_ucs;
-     const bool slash_at_1 = arg.size() > 1 && arg[1] == UNI_ASCII_SLASH;
-     const bool tilde_at_0 = arg[0] == UNI_ASCII_TILDE ||
+     const bool slash_at_1 = arg.size() > 1 && arg[1] == UNI_SLASH;
+     const bool tilde_at_0 = arg[0] == UNI_TILDE ||
                              arg[0] == UNI_TILDE_OPERATOR;
 
-     if (arg[0] == UNI_ASCII_SLASH)                     // absolute path /xxx
+     if (arg[0] == UNI_SLASH)                     // absolute path /xxx
         {
           dir_ucs = arg;
         }
-     else if (arg[0] == UNI_ASCII_FULLSTOP && slash_at_1) // relative path ./xxx
+     else if (arg[0] == UNI_FULLSTOP && slash_at_1) // relative path ./xxx
         {
           const char * pwd = getenv("PWD");
           if (pwd == 0)   goto nothing;
@@ -520,7 +520,7 @@ TabExpansion::expand_filename(UCS_string & user,
         {
           UCS_string prefix(base_utf);
           user = cmd;                     // e.g. )LOAD
-          user.append(UNI_ASCII_SPACE);
+          user.append(UNI_SPACE);
           user.append(dir_ucs);           // e.g. )LOAD /usr/apl/
           return show_alternatives(user, prefix.size(), matches);
         }
@@ -528,7 +528,7 @@ TabExpansion::expand_filename(UCS_string & user,
      // unique match
      //
      user = cmd;
-     user.append(UNI_ASCII_SPACE);
+     user.append(UNI_SPACE);
      user.append(dir_ucs);
      user.append(matches[0]);
      return ER_REPLACE;
@@ -567,7 +567,7 @@ DIR * dir = opendir(path.c_str());
 << "  library reference number and the workspace name." << endl;
 
         user = cmd;
-        user.append(UNI_ASCII_SPACE);
+        user.append(UNI_SPACE);
         return ER_REPLACE;
       }
 
@@ -580,18 +580,18 @@ UTF8_string arg_utf(filename);
    if (matches.size() > 1)
       {
         user = cmd;
-        user.append(UNI_ASCII_SPACE);
+        user.append(UNI_SPACE);
         user.append_number(lib);
-        user.append(UNI_ASCII_SPACE);
+        user.append(UNI_SPACE);
         return show_alternatives(user, filename.size(), matches);
       }
 
    // unique match
    //
    user = cmd;
-   user.append(UNI_ASCII_SPACE);
+   user.append(UNI_SPACE);
    user.append_UTF8(path.c_str());
-   user.append(UNI_ASCII_SLASH);
+   user.append(UNI_SLASH);
    user.append(matches[0]);
    return ER_REPLACE;
 
@@ -640,7 +640,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
           UCS_string name(dent->d_name);
 
           const bool is_dir = Command::is_directory(dent, dirname);
-          if (is_dir)   name.append(UNI_ASCII_SLASH);
+          if (is_dir)   name.append(UNI_SLASH);
           else if (only_workspaces)
              {
                const UTF8_string filename(dent->d_name);

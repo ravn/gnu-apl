@@ -233,7 +233,7 @@ int expo = 0;
       {
        if (value < 1e-305)   // very small number: make it 0
           {
-            append(UNI_ASCII_0);
+            append(UNI_0);
             return;
           }
 
@@ -255,15 +255,15 @@ UCS_string digits;
            {
              // 10.0 or more is a rounding error from 9,999...
              digits.append(Unicode(10 + '0'));
-             while (digits.size() < (quad_pp + 2))   digits.append(UNI_ASCII_0);
+             while (digits.size() < (quad_pp + 2))   digits.append(UNI_0);
              break;
            }
         else if (value < 0.0)
            {
              // less than 0.0 is a rounding error from 0.000...
-             while (digits.size() < (quad_pp + 2))   digits.append(UNI_ASCII_0);
+             while (digits.size() < (quad_pp + 2))   digits.append(UNI_0);
              break;
-             digits.append(UNI_ASCII_0);
+             digits.append(UNI_0);
              value = 0.0;
            }
         else
@@ -300,14 +300,14 @@ const Unicode last = digits.back();
    if (digits[0] > '9')
       {
         digits[0] = Unicode(digits[0] - 10);
-        digits.insert(0, UNI_ASCII_1);
+        digits.insert(0, UNI_1);
         ++expo;
         digits.pop_back();
       }
 
    // remove trailing zeros
    //
-   while (digits.size() > 1 && digits.back() == UNI_ASCII_0)  digits.pop_back();
+   while (digits.size() > 1 && digits.back() == UNI_0)  digits.pop_back();
 
    // force scaled format if:
    //
@@ -323,33 +323,33 @@ const Unicode last = digits.back();
         append(digits[0]);       // integer part
         if (digits.size() > 1)   // fractional part
            {
-             append(UNI_ASCII_FULLSTOP);
+             append(UNI_FULLSTOP);
              loop(d, (digits.size() - 1))   append(digits[d + 1]);
            }
         if (expo < 0)
            {
-             append(UNI_ASCII_E);
+             append(UNI_E);
              append(UNI_OVERBAR);
              append_number(-expo);
            }
         else if (expo > 0)
            {
-             append(UNI_ASCII_E);
+             append(UNI_E);
              append_number(expo);
            }
         else if (!(pctx.get_style() & PST_NO_EXPO_0)) // expo == 0
            {
-             append(UNI_ASCII_E);
-             append(UNI_ASCII_0);
+             append(UNI_E);
+             append(UNI_0);
            }
       }
    else
       {
         if (expo < 0)   // 0.000...
            {
-             append(UNI_ASCII_0);
-             append(UNI_ASCII_FULLSTOP);
-             loop(e, (-(expo + 1)))   append(UNI_ASCII_0);
+             append(UNI_0);
+             append(UNI_FULLSTOP);
+             loop(e, (-(expo + 1)))   append(UNI_0);
              append(digits);
            }
         else   // expo >= 0
@@ -357,12 +357,12 @@ const Unicode last = digits.back();
              loop(e, expo + 1)
                 {
                   if (e < digits.size())   append(digits[e]);
-                  else                     append(UNI_ASCII_0);
+                  else                     append(UNI_0);
                 }
 
              if ((expo + 1) < digits.size())   // there are fractional digits
                 {
-                  append(UNI_ASCII_FULLSTOP);
+                  append(UNI_FULLSTOP);
                   for (int e = expo + 1; e < digits.size(); ++e)
                      {
                        if (e < digits.size())   append(digits[e]);
@@ -390,7 +390,7 @@ std::vector<int> breakpoints;
    //
    loop(row, pb.get_height())
        {
-         if (row)   append(UNI_ASCII_LF);   // end previous row
+         if (row)   append(UNI_LF);   // end previous row
          int col = 0;
          int b = 0;
 
@@ -420,7 +420,7 @@ std::vector<int> breakpoints;
    //
    loop(u, size())
        {
-         if (is_iPAD_char(at(u)))   at(u) = UNI_ASCII_SPACE;
+         if (is_iPAD_char(at(u)))   at(u) = UNI_SPACE;
        }
 }
 //-----------------------------------------------------------------------------
@@ -428,6 +428,22 @@ std::vector<int> breakpoints;
 UCS_string::UCS_string(const Value & value)
 {
    create(LOC);
+
+   if (value.get_rank() > 1) RANK_ERROR;
+
+const ShapeItem ec = value.element_count();
+   reserve(ec);
+
+   loop(e, ec)   append(value.get_ravel(e).get_char_value());
+}
+//-----------------------------------------------------------------------------
+/// constructor
+UCS_string::UCS_string(const Cell & cell)
+{
+   create(LOC);
+
+   Assert(cell.is_pointer_cell());
+const Value & value = *cell.get_pointer_value().get();
 
    if (value.get_rank() > 1) RANK_ERROR;
 
@@ -445,7 +461,7 @@ UCS_string::UCS_string(istream & in)
       {
         const Unicode uni = UTF8_string::getc(in);
         if (uni == Invalid_Unicode)   return;
-        if (uni == UNI_ASCII_LF)      return;
+        if (uni == UNI_LF)      return;
         append(uni);
       }
 }
@@ -513,7 +529,7 @@ UCS_string::remove_trailing_padchars()
 void
 UCS_string::remove_trailing_whitespaces()
 {
-   while (size() && back() <= UNI_ASCII_SPACE)   pop_back();
+   while (size() && back() <= UNI_SPACE)   pop_back();
 }
 //-----------------------------------------------------------------------------
 void
@@ -522,7 +538,7 @@ UCS_string::remove_leading_whitespaces()
 int count = 0;
    loop(s, size())
       {
-        if (at(s) <= UNI_ASCII_SPACE)   ++count;
+        if (at(s) <= UNI_SPACE)   ++count;
         else                            break;
       }
 
@@ -561,7 +577,7 @@ ShapeItem
 UCS_string::LF_count() const
 {
 ShapeItem count = 0;
-   loop(u, size())   if (at(u) == UNI_ASCII_LF)   ++count;
+   loop(u, size())   if (at(u) == UNI_LF)   ++count;
    return count;
 }
 //-----------------------------------------------------------------------------
@@ -674,7 +690,7 @@ UCS_string ret;
    loop(s, size())
       {
         Unicode uni = at(s);
-        if (is_iPAD_char(uni))   uni = UNI_ASCII_SPACE;
+        if (is_iPAD_char(uni))   uni = UNI_SPACE;
         ret.append(uni);
       }
 
@@ -686,7 +702,7 @@ UCS_string::map_pad()
 {
    loop(s, size())
       {
-        if (is_iPAD_char(at(s)))   at(s) = UNI_ASCII_SPACE;
+        if (is_iPAD_char(at(s)))   at(s) = UNI_SPACE;
       }
 }
 //-----------------------------------------------------------------------------
@@ -715,11 +731,11 @@ bool
 UCS_string::is_comment_or_label() const
 {
    if (size() == 0)                          return false;
-   if (at(0) == UNI_ASCII_NUMBER_SIGN)       return true;   // comment
+   if (at(0) == UNI_NUMBER_SIGN)       return true;   // comment
    if (at(0) == UNI_COMMENT)                 return true;   // comment
    loop(t, size())
        {
-         if (at(t) == UNI_ASCII_COLON)       return true;   // label
+         if (at(t) == UNI_COLON)       return true;   // label
          if (!Avec::is_symbol_char(at(t)))   return false;
        }
 
@@ -740,7 +756,7 @@ bool in_quote1 = false;
                   if (!in_quote2)   in_quote1 = ! in_quote1;
                   break;
 
-             case UNI_ASCII_DOUBLE_QUOTE:
+             case UNI_DOUBLE_QUOTE:
                   if (!in_quote1)
                      {
                        ++count;
@@ -748,11 +764,11 @@ bool in_quote1 = false;
                      }
                   break;
 
-             case UNI_ASCII_BACKSLASH:
+             case UNI_BACKSLASH:
                   if (in_quote2)    ++s;   // ignore next char inside ""
                   break;
 
-             case UNI_ASCII_NUMBER_SIGN:
+             case UNI_NUMBER_SIGN:
              case UNI_COMMENT:
                   if (!(in_quote1 || in_quote2))   return count;
 
@@ -777,15 +793,15 @@ bool in_quote2 = true;
                   if (!in_quote2)   in_quote1 = ! in_quote1;
                   break;
 
-             case UNI_ASCII_DOUBLE_QUOTE:
+             case UNI_DOUBLE_QUOTE:
                   if (!in_quote1)   return s;
                   break;
 
-             case UNI_ASCII_BACKSLASH:
+             case UNI_BACKSLASH:
                   if (in_quote2)    ++s;   // ignore next char inside ""
                   break;
 
-             case UNI_ASCII_NUMBER_SIGN:
+             case UNI_NUMBER_SIGN:
              case UNI_COMMENT:
                   if (in_quote1 || in_quote2)   ; // ignore # and ⍝ in atrings
                   else                          s = size();
@@ -814,15 +830,15 @@ bool in_quote2 = false;
                   if (!in_quote2)   in_quote1 = ! in_quote1;
                   break;
 
-             case UNI_ASCII_DOUBLE_QUOTE:
+             case UNI_DOUBLE_QUOTE:
                   if (!in_quote1)   ret = s;
                   break;
 
-             case UNI_ASCII_BACKSLASH:
+             case UNI_BACKSLASH:
                   if (in_quote2)    ++s;   // ignotr next char inside ""
                   break;
 
-             case UNI_ASCII_NUMBER_SIGN:
+             case UNI_NUMBER_SIGN:
              case UNI_COMMENT:
                   if (in_quote1 || in_quote2)   ; // ignore # and ⍝ in atrings
                   else                          s = size();
@@ -848,14 +864,14 @@ const UCS_string ucs(utf);
 void
 UCS_string::append_quoted(const UCS_string & other)
 {
-   append(UNI_ASCII_DOUBLE_QUOTE);
+   append(UNI_DOUBLE_QUOTE);
    loop(s, other.size())
        {
           const Unicode uni = other[s];
-          if (uni == UNI_ASCII_DOUBLE_QUOTE)   append(UNI_ASCII_BACKSLASH);
+          if (uni == UNI_DOUBLE_QUOTE)   append(UNI_BACKSLASH);
           append(uni);
        }
-   append(UNI_ASCII_DOUBLE_QUOTE);
+   append(UNI_DOUBLE_QUOTE);
 }
 //-----------------------------------------------------------------------------
 void
@@ -894,7 +910,7 @@ UCS_string::append_shape(const Shape & shape)
 
    loop(r, shape.get_rank())
        {
-         if (r)   append(UNI_ASCII_SPACE);
+         if (r)   append(UNI_SPACE);
          ShapeItem s = shape.get_shape_item(r);
          if (s < 0)
             {
@@ -939,7 +955,7 @@ UCS_string ret;
         loop(s, size())
             {
              const Unicode uni = at(s);
-             if (uni != UNI_ASCII_BACKSLASH)   // normal char
+             if (uni != UNI_BACKSLASH)   // normal char
                 {
                   ret.append(uni);
                   continue;
@@ -947,33 +963,33 @@ UCS_string ret;
 
              if (s >= (size() - 1))   // \ at end of string
                 {
-                  ret.append(UNI_ASCII_BACKSLASH);
+                  ret.append(UNI_BACKSLASH);
                   break;
                 }
 
              const Unicode uni1 = at(++s);
              switch(uni1)
                  {
-                  case UNI_ASCII_a:            ret << UNI_ASCII_BEL;   continue;
-                  case UNI_ASCII_b:            ret << UNI_ASCII_BS;    continue;
-                  case UNI_ASCII_f:            ret << UNI_ASCII_FF;    continue;
-                  case UNI_ASCII_n:            if (keep_LF)   break;
-                                               ret << UNI_ASCII_LF;    continue;
-                  case UNI_ASCII_r:            ret << UNI_ASCII_CR;    continue;
-                  case UNI_ASCII_t:            ret << UNI_ASCII_BS;    continue;
-                  case UNI_ASCII_v:            ret << UNI_ASCII_VT;    continue;
-                  case UNI_ASCII_DOUBLE_QUOTE:
-                  case UNI_ASCII_BACKSLASH:
+                  case UNI_a:            ret << UNI_BEL;   continue;
+                  case UNI_b:            ret << UNI_BS;    continue;
+                  case UNI_f:            ret << UNI_FF;    continue;
+                  case UNI_n:            if (keep_LF)   break;
+                                               ret << UNI_LF;    continue;
+                  case UNI_r:            ret << UNI_CR;    continue;
+                  case UNI_t:            ret << UNI_BS;    continue;
+                  case UNI_v:            ret << UNI_VT;    continue;
+                  case UNI_DOUBLE_QUOTE:
+                  case UNI_BACKSLASH:
                                                ret << uni1;            continue;
                   default:                     break;
                  }
 
              int max_len = 0;
-             if (uni1 == UNI_ASCII_u)
+             if (uni1 == UNI_u)
                 {
                   max_len = 4;
                 }
-             else if (uni1 == UNI_ASCII_x)
+             else if (uni1 == UNI_x)
                 {
                   max_len = 2;
                 }
@@ -1045,21 +1061,21 @@ UCS_string ret;
              const Unicode uni = at(s);
              switch(uni)
                 {
-                  case UNI_ASCII_BEL:            ret << "\\a";    continue;
-                  case UNI_ASCII_BS:             ret << "\\b";    continue;
-                  case UNI_ASCII_HT:             ret << "\\t";    continue;
-                  case UNI_ASCII_LF:             ret << "\\n";    continue;
-                  case UNI_ASCII_VT:             ret << "\\v";    continue;
-                  case UNI_ASCII_FF:             ret << "\\f";    continue;
-                  case UNI_ASCII_CR:             ret << "\\r";    continue;
-                  case UNI_ASCII_DOUBLE_QUOTE:   ret << "\\\"";   continue;
-                  case UNI_ASCII_BACKSLASH:      ret << "\\\\";   continue;
+                  case UNI_BEL:            ret << "\\a";    continue;
+                  case UNI_BS:             ret << "\\b";    continue;
+                  case UNI_HT:             ret << "\\t";    continue;
+                  case UNI_LF:             ret << "\\n";    continue;
+                  case UNI_VT:             ret << "\\v";    continue;
+                  case UNI_FF:             ret << "\\f";    continue;
+                  case UNI_CR:             ret << "\\r";    continue;
+                  case UNI_DOUBLE_QUOTE:   ret << "\\\"";   continue;
+                  case UNI_BACKSLASH:      ret << "\\\\";   continue;
                   default:                       break;
                 }
 
              // none of the above
              //
-             if (uni >= UNI_ASCII_SPACE && uni < UNI_ASCII_DELETE)
+             if (uni >= UNI_SPACE && uni < UNI_DELETE)
                 {
                   ret.append(uni);
                   continue;
@@ -1101,7 +1117,7 @@ size_t max_len = 0;
    loop(s, size())
       {
         const Unicode uni = at(s);
-        if (uni == UNI_ASCII_LF)    // line done
+        if (uni == UNI_LF)    // line done
            {
              const size_t len = result.back().size();
              if (max_len < len)   max_len = len;
@@ -1111,7 +1127,7 @@ size_t max_len = 0;
            }
         else
            {
-             if (uni != UNI_ASCII_CR)         // ignore \r.
+             if (uni != UNI_CR)         // ignore \r.
                 result.back().append(uni);
            }
       }
@@ -1135,17 +1151,17 @@ bool negative = false;
 
         if (!ret && Avec::is_white(uni))   continue;   // leading whitespace
 
-        if (uni == UNI_ASCII_MINUS || uni == UNI_OVERBAR)
+        if (uni == UNI_MINUS || uni == UNI_OVERBAR)
            {
              negative = true;
              continue;
            }
 
-        if (uni < UNI_ASCII_0)                break;      // non-digit
-        if (uni > UNI_ASCII_9)                break;      // non-digit
+        if (uni < UNI_0)                break;      // non-digit
+        if (uni > UNI_9)                break;      // non-digit
 
         ret *= 10;
-        ret += uni - UNI_ASCII_0;
+        ret += uni - UNI_0;
       }
 
    return negative ? -ret : ret;
@@ -1253,7 +1269,7 @@ int * d = digits;
       }
 
 UCS_string ret;
-   while (d > digits)   ret.append(Unicode(UNI_ASCII_0 + *--d));
+   while (d > digits)   ret.append(Unicode(UNI_0 + *--d));
    return ret;
 }
 //-----------------------------------------------------------------------------
@@ -1278,9 +1294,9 @@ long double fract;
    val = initial_fract;
 
 UCS_string ret;
-   if (d == digits)   ret.append(UNI_ASCII_0);   // 0.xxx
+   if (d == digits)   ret.append(UNI_0);   // 0.xxx
 
-   while (d > digits)   ret.append(Unicode(UNI_ASCII_0 + *--d));
+   while (d > digits)   ret.append(Unicode(UNI_0 + *--d));
    return ret;
 }
 //-----------------------------------------------------------------------------
@@ -1291,14 +1307,14 @@ UCS_string ret;
 
    if (v == 0.0)
       {
-        ret.append(UNI_ASCII_0);
+        ret.append(UNI_0);
         if (fract_digits)   // unless integer only
            {
-             ret.append(UNI_ASCII_FULLSTOP);
-             loop(f, fract_digits)   ret.append(UNI_ASCII_0);
+             ret.append(UNI_FULLSTOP);
+             loop(f, fract_digits)   ret.append(UNI_0);
            }
-        ret.append(UNI_ASCII_E);
-        ret.append(UNI_ASCII_0);
+        ret.append(UNI_E);
+        ret.append(UNI_0);
         return ret;
       }
 
@@ -1380,17 +1396,17 @@ int expo = 0;
    //
 UCS_string mantissa = from_double_fixed_prec(v, fract_digits);
    if (mantissa.size() > 2 &&
-       mantissa[0] == UNI_ASCII_1 &&
-       mantissa[1] == UNI_ASCII_0 &&
-       mantissa[2] == UNI_ASCII_FULLSTOP)   // 9.xxx rounded up to 10.xxx
+       mantissa[0] == UNI_1 &&
+       mantissa[1] == UNI_0 &&
+       mantissa[2] == UNI_FULLSTOP)   // 9.xxx rounded up to 10.xxx
       {
-        mantissa[1] = UNI_ASCII_FULLSTOP;
-        mantissa[2] = UNI_ASCII_0;
+        mantissa[1] = UNI_FULLSTOP;
+        mantissa[2] = UNI_0;
        ++expo;
       }
        
    ret.append(mantissa);
-   ret.append(UNI_ASCII_E);
+   ret.append(UNI_E);
    ret.append(from_int(expo));
 
    return ret;
@@ -1411,13 +1427,13 @@ UCS_string ret;
 
    ret.append(from_big(v));   // leaves fractional part of v in v
 
-   ret.append(UNI_ASCII_FULLSTOP);
+   ret.append(UNI_FULLSTOP);
 
    loop(f, fract_digits + 1)
       {
         v = v * 10.0;
         const int vv = v;   // subject to rounding errors!
-        ret.append(Unicode(UNI_ASCII_0 + vv));
+        ret.append(Unicode(UNI_0 + vv));
         v -= vv;
       }
 
@@ -1429,30 +1445,30 @@ void
 UCS_string::round_last_digit()
 {
    Assert1(size() > 1);
-   if (back() >= UNI_ASCII_5)   // round up
+   if (back() >= UNI_5)   // round up
       {
         for (int q = size() - 2; q >= 0; --q)
             {
               const Unicode cc = at(q);
-              if (cc < UNI_ASCII_0)   continue;   // not a digit
-              if (cc > UNI_ASCII_9)   continue;   // not a digit
+              if (cc < UNI_0)   continue;   // not a digit
+              if (cc > UNI_9)   continue;   // not a digit
 
               at(q) = Unicode(cc + 1);   // round up
-              if (cc != UNI_ASCII_9)   break;    // 0-8 rounded up: stop
+              if (cc != UNI_9)   break;    // 0-8 rounded up: stop
 
-              at(q) = UNI_ASCII_0;    // 9 rounded up: say 0 and repeat
+              at(q) = UNI_0;    // 9 rounded up: say 0 and repeat
               if (q)   continue;   // not first difit
 
               // something like 9.xxx has been rounded up to, say, 0.xxx
               // but should be 10.xxx Fix it.
               //
               for (int d = size() - 1; d > 0; --d)  at(d) = at(d - 1);
-              at(0) = UNI_ASCII_1;
+              at(0) = UNI_1;
             }
       }
 
    pop_back();
-   if (back() == UNI_ASCII_FULLSTOP)   pop_back();
+   if (back() == UNI_FULLSTOP)   pop_back();
 }
 //----------------------------------------------------------------------------
 bool

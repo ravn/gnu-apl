@@ -397,7 +397,7 @@ protected:
    virtual void push()
       {
         Symbol::push();
-        Symbol::assign(CharScalar(UNI_ASCII_SPACE, LOC), false, LOC);
+        Symbol::assign(CharScalar(UNI_SPACE, LOC), false, LOC);
       }
 };
 //-----------------------------------------------------------------------------

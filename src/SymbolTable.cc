@@ -209,7 +209,7 @@ UCS_string_vector names;
         UCS_string name = list[l]->get_name();
         if (which == LIST_NAMES)   // append .NC
            {
-             name.append(UNI_ASCII_FULLSTOP);
+             name.append(UNI_FULLSTOP);
              name.append_number(list[l]->value_stack.back().get_nc());
            }
         names.push_back(name);
@@ -342,7 +342,7 @@ Symbol * next;   // the symbol after sym
 bool
 SymbolTable::erase_one_symbol(const UCS_string & sym)
 {
-   if (sym.contains(UNI_ASCII_FULLSTOP))   // member access
+   if (sym.contains(UNI_FULLSTOP))   // member access
       {
          const int result = Quad_EX::expunge(sym);
          return result != 1;

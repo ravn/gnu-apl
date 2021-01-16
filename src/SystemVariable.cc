@@ -300,11 +300,11 @@ done:
 Quad_FC::Quad_FC() : SystemVariable(ID_Quad_FC)
 {
 Value_P QFC(6, LOC);
-   new (QFC->next_ravel()) CharCell(UNI_ASCII_FULLSTOP);
-   new (QFC->next_ravel()) CharCell(UNI_ASCII_COMMA);
+   new (QFC->next_ravel()) CharCell(UNI_FULLSTOP);
+   new (QFC->next_ravel()) CharCell(UNI_COMMA);
    new (QFC->next_ravel()) CharCell(UNI_STAR_OPERATOR);
-   new (QFC->next_ravel()) CharCell(UNI_ASCII_0);
-   new (QFC->next_ravel()) CharCell(UNI_ASCII_UNDERSCORE);
+   new (QFC->next_ravel()) CharCell(UNI_0);
+   new (QFC->next_ravel()) CharCell(UNI_UNDERSCORE);
    new (QFC->next_ravel()) CharCell(UNI_OVERBAR);
    QFC->check_value(LOC);
 
@@ -317,11 +317,11 @@ Quad_FC::push()
    Symbol::push();
 
 Value_P QFC(6, LOC);
-   new (QFC->next_ravel()) CharCell(UNI_ASCII_FULLSTOP);
-   new (QFC->next_ravel()) CharCell(UNI_ASCII_COMMA);
+   new (QFC->next_ravel()) CharCell(UNI_FULLSTOP);
+   new (QFC->next_ravel()) CharCell(UNI_COMMA);
    new (QFC->next_ravel()) CharCell(UNI_STAR_OPERATOR);
-   new (QFC->next_ravel()) CharCell(UNI_ASCII_0);
-   new (QFC->next_ravel()) CharCell(UNI_ASCII_UNDERSCORE);
+   new (QFC->next_ravel()) CharCell(UNI_0);
+   new (QFC->next_ravel()) CharCell(UNI_UNDERSCORE);
    new (QFC->next_ravel()) CharCell(UNI_OVERBAR);
    QFC->check_value(LOC);
 
@@ -341,8 +341,8 @@ ShapeItem value_len = value->element_count();
 
    // new value is correct. 
    //
-Unicode fc[6] = { UNI_ASCII_FULLSTOP, UNI_ASCII_COMMA,      UNI_STAR_OPERATOR,
-                  UNI_ASCII_0,        UNI_ASCII_UNDERSCORE, UNI_OVERBAR };
+Unicode fc[6] = { UNI_FULLSTOP, UNI_COMMA,      UNI_STAR_OPERATOR,
+                  UNI_0,        UNI_UNDERSCORE, UNI_OVERBAR };
                   
    loop(c, 6)   if (c < value_len)
          fc[c] = value->get_ravel(c).get_char_value();
@@ -350,7 +350,7 @@ Unicode fc[6] = { UNI_ASCII_FULLSTOP, UNI_ASCII_COMMA,      UNI_STAR_OPERATOR,
    // 0123456789,. are forbidden for ⎕FC[4 + ⎕IO]
    //
    if (Bif_F12_FORMAT::is_control_char(fc[4]))
-      fc[4] = UNI_ASCII_SPACE;
+      fc[4] = UNI_SPACE;
 
 UCS_string ucs(fc, 6);
 Value_P new_val(ucs, LOC);
@@ -401,7 +401,7 @@ Unicode fc[6];
    // 0123456789,. are forbidden for ⎕FC[4 + ⎕IO]
    //
    if (Bif_F12_FORMAT::is_control_char(fc[4]))
-      fc[4] = UNI_ASCII_SPACE;
+      fc[4] = UNI_SPACE;
 
 UCS_string ucs(fc, 6);
 Value_P new_val(ucs, LOC);
@@ -532,7 +532,7 @@ APL_Integer pp = value->get_sole_integer();
 Quad_PR::Quad_PR()
    : SystemVariable(ID_Quad_PR)
 {
-   Symbol::assign(CharScalar(UNI_ASCII_SPACE, LOC), false, LOC);
+   Symbol::assign(CharScalar(UNI_SPACE, LOC), false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -993,9 +993,9 @@ Quad_TC::Quad_TC()
    : RO_SystemVariable(ID_Quad_TC)
 {
 Value_P QCT(3, LOC);
-   new (QCT->next_ravel()) CharCell(UNI_ASCII_BS);
-   new (QCT->next_ravel()) CharCell(UNI_ASCII_CR);
-   new (QCT->next_ravel()) CharCell(UNI_ASCII_LF);
+   new (QCT->next_ravel()) CharCell(UNI_BS);
+   new (QCT->next_ravel()) CharCell(UNI_CR);
+   new (QCT->next_ravel()) CharCell(UNI_LF);
    QCT->check_value(LOC);
 
    Symbol::assign(QCT, false, LOC);

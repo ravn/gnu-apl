@@ -88,7 +88,7 @@ Unicode_source src(input);
       {
         Unicode uni = *src;
         if (uni == UNI_COMMENT)             break;   // ⍝ comment
-        if (uni == UNI_ASCII_NUMBER_SIGN)   break;   // # comment
+        if (uni == UNI_NUMBER_SIGN)   break;   // # comment
 
         const Token tok = Avec::uni_to_token(uni, LOC);
 
@@ -501,11 +501,11 @@ bool got_end = false;
               string_value.append(UNI_SINGLE_QUOTE);
               ++src;      // skip the second '
             }
-         else if (uni == UNI_ASCII_CR)
+         else if (uni == UNI_CR)
             {
               continue;
             }
-         else if (uni == UNI_ASCII_LF)
+         else if (uni == UNI_LF)
             {
               rest_2 = src.rest();
               Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
@@ -542,7 +542,7 @@ Tokenizer::tokenize_string2(Unicode_source & src, Token_string & tos)
      const Unicode uni = src.get();
      if (uni)   { /* do nothing, needed for -Wall */ }
 
-     Assert1(uni == UNI_ASCII_DOUBLE_QUOTE);
+     Assert1(uni == UNI_DOUBLE_QUOTE);
    }
 
 UCS_string string_value;
@@ -552,36 +552,36 @@ bool got_end = false;
        {
          const Unicode uni = src.get();
 
-         if (uni == UNI_ASCII_DOUBLE_QUOTE)     // terminating "
+         if (uni == UNI_DOUBLE_QUOTE)     // terminating "
             {
               got_end = true;
               break;
             }
-         else if (uni == UNI_ASCII_CR)          // ignore CR
+         else if (uni == UNI_CR)          // ignore CR
             {
               continue;
             }
-         else if (uni == UNI_ASCII_LF)          // end of line before "
+         else if (uni == UNI_LF)          // end of line before "
             {
               rest_2 = src.rest();
               Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
             }
-         else if (uni == UNI_ASCII_BACKSLASH)   // backslash
+         else if (uni == UNI_BACKSLASH)   // backslash
             {
               const Unicode uni1 = src.get();
               switch(uni1)
                  {
-                   case '0':  string_value.append(UNI_ASCII_NUL);         break;
-                   case 'a':  string_value.append(UNI_ASCII_BEL);         break;
-                   case 'b':  string_value.append(UNI_ASCII_BS);          break;
-                   case 't':  string_value.append(UNI_ASCII_HT);          break;
-                   case 'n':  string_value.append(UNI_ASCII_LF);          break;
-                   case 'v':  string_value.append(UNI_ASCII_VT);          break;
-                   case 'f':  string_value.append(UNI_ASCII_FF);          break;
-                   case 'r':  string_value.append(UNI_ASCII_CR);          break;
-                   case '[':  string_value.append(UNI_ASCII_ESC);         break;
-                   case '"':  string_value.append(UNI_ASCII_DOUBLE_QUOTE);break;
-                   case '\\': string_value.append(UNI_ASCII_BACKSLASH);   break;
+                   case '0':  string_value.append(UNI_NUL);         break;
+                   case 'a':  string_value.append(UNI_BEL);         break;
+                   case 'b':  string_value.append(UNI_BS);          break;
+                   case 't':  string_value.append(UNI_HT);          break;
+                   case 'n':  string_value.append(UNI_LF);          break;
+                   case 'v':  string_value.append(UNI_VT);          break;
+                   case 'f':  string_value.append(UNI_FF);          break;
+                   case 'r':  string_value.append(UNI_CR);          break;
+                   case '[':  string_value.append(UNI_ESC);         break;
+                   case '"':  string_value.append(UNI_DOUBLE_QUOTE);break;
+                   case '\\': string_value.append(UNI_BACKSLASH);   break;
                    default:   string_value.append(uni);
                               string_value.append(uni1);
                  }
@@ -622,7 +622,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
       }
 
-   if (src.rest() && (*src == UNI_ASCII_J || *src == UNI_ASCII_j))
+   if (src.rest() && (*src == UNI_J || *src == UNI_j))
       {
         ++src;   // skip 'J'
 
@@ -655,7 +655,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex "
                                  << real_flt << "J" << imag_flt << endl;
       }
-   else if (src.rest() && (*src == UNI_ASCII_D || *src == UNI_ASCII_d))
+   else if (src.rest() && (*src == UNI_D || *src == UNI_d))
       {
         ++src;   // skip 'D'
 
@@ -692,7 +692,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex " << real
                                  << "J" << imag << endl;
       }
-   else if (src.rest() && (*src == UNI_ASCII_R || *src == UNI_ASCII_r))
+   else if (src.rest() && (*src == UNI_R || *src == UNI_r))
       {
         ++src;   // skip 'R'
 
@@ -811,19 +811,19 @@ bool dot_seen = false;
 
    // hexadecimal ?
    //
-   if (src.rest() > 1 && *src == UNI_ASCII_DOLLAR_SIGN)
+   if (src.rest() > 1 && *src == UNI_DOLLAR_SIGN)
       {
         src.get();   // skip $
         if (!Avec::is_hex_digit(*src))   return false;   // no hex after $
         while (src.rest())
            {
              int digit;
-             if      (*src <  UNI_ASCII_0)   break;
-             else if (*src <= UNI_ASCII_9)   digit = src.get() - '0';
-             else if (*src <  UNI_ASCII_A)   break;
-             else if (*src <= UNI_ASCII_F)   digit = 10 + src.get() - 'A';
-             else if (*src <  UNI_ASCII_a)   break;
-             else if (*src <= UNI_ASCII_f)   digit = 10 + src.get() - 'a';
+             if      (*src <  UNI_0)   break;
+             else if (*src <= UNI_9)   digit = src.get() - '0';
+             else if (*src <  UNI_A)   break;
+             else if (*src <= UNI_F)   digit = 10 + src.get() - 'A';
+             else if (*src <  UNI_a)   break;
+             else if (*src <= UNI_f)   digit = 10 + src.get() - 'a';
              else                            break;
              int_val = int_val << 4 | digit;
            }
@@ -855,7 +855,7 @@ bool dot_seen = false;
 
    // fractional part
    //
-   if (src.rest() && *src == UNI_ASCII_FULLSTOP)   // fract part present
+   if (src.rest() && *src == UNI_FULLSTOP)   // fract part present
       {
         ++src;   // 1c. skip '.'
         dot_seen = true;
@@ -877,7 +877,7 @@ bool dot_seen = false;
    // exponent part (but could also be a name starting with E or e)
    //
    if (src.rest() >= 2 &&   // at least E and a digit or ¯
-       (*src == UNI_ASCII_E || *src == UNI_ASCII_e))   // maybe exponent
+       (*src == UNI_E || *src == UNI_e))   // maybe exponent
       {
         expo_negative = (src[1] == UNI_OVERBAR);
         if (expo_negative   &&
@@ -900,7 +900,7 @@ bool dot_seen = false;
       }
 
    // second dot ?
-   if (dot_seen && src.rest() && *src == UNI_ASCII_FULLSTOP)
+   if (dot_seen && src.rest() && *src == UNI_FULLSTOP)
       return false;   // error
 
 int expo = 0;
@@ -1009,7 +1009,7 @@ UCS_string symbol;
    if (macro)
       {
         symbol.append(UNI_MUE);
-        symbol.append(UNI_ASCII_MINUS);
+        symbol.append(UNI_MINUS);
       }
    symbol.append(src.get());
 
@@ -1022,15 +1022,15 @@ UCS_string symbol;
        }
 
    if (symbol.size() > 2 && symbol[1] == UNI_DELTA  &&
-       (symbol[0] == UNI_ASCII_S || symbol[0] == UNI_ASCII_T))
+       (symbol[0] == UNI_S || symbol[0] == UNI_T))
       {
         // S∆ or T∆
 
-        while (src.rest() && *src <= UNI_ASCII_SPACE)   src.get();   // spaces
+        while (src.rest() && *src <= UNI_SPACE)   src.get();   // spaces
         UCS_string symbol1(symbol, 2, symbol.size() - 2);   // without S∆/T∆
         Value_P AB(symbol1, LOC);
         Function_P ST = 0;
-        if (symbol[0] == UNI_ASCII_S) ST = Quad_STOP::fun;
+        if (symbol[0] == UNI_S) ST = Quad_STOP::fun;
         else                          ST = Quad_TRACE::fun;
 
         const bool assigned = (src.rest() && *src == UNI_LEFT_ARROW);

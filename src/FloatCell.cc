@@ -858,14 +858,14 @@ int int_fract = ucs.size();
    info.int_len = ucs.size();
    loop(u, ucs.size())
       {
-        if (ucs[u] == UNI_ASCII_FULLSTOP)
+        if (ucs[u] == UNI_FULLSTOP)
            {
              info.int_len = u;
              if (!pctx.get_scaled())   break;
              continue;
            }
 
-        if (ucs[u] == UNI_ASCII_E)
+        if (ucs[u] == UNI_E)
            {
              if (info.int_len > u)   info.int_len = u;
              int_fract = u;
@@ -935,8 +935,8 @@ FloatCell::map_FC(UCS_string & ucs)
       {
         switch(ucs[u])
            {
-             case UNI_ASCII_FULLSTOP: ucs[u] = Workspace::get_FC(0);   break;
-             case UNI_ASCII_COMMA:    ucs[u] = Workspace::get_FC(1);   break;
+             case UNI_FULLSTOP: ucs[u] = Workspace::get_FC(0);   break;
+             case UNI_COMMA:    ucs[u] = Workspace::get_FC(1);   break;
              case UNI_OVERBAR:        ucs[u] = Workspace::get_FC(5);   break;
              default:                 break;
            }

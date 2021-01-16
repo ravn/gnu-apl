@@ -146,6 +146,7 @@ dist_noinst_DATA =				           \
         Quad_UL.tc                                         \
         Quad_WA.tc                                         \
         Quad_X.tc                                          \
+        Quad_XML.tc                                        \
         Quote_quad.tc                                      \
         Rank.tc                                            \
         Ravel.tc                                           \

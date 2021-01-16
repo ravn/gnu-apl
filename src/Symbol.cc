@@ -976,7 +976,7 @@ UCS_string data;
       {
         case NC_VARIABLE:
              {
-               data.append(UNI_ASCII_A);
+               data.append(UNI_A);
                Quad_TF::tf2_var(get_name(), value_stack[0].apl_val);
              }
              break;
@@ -1000,9 +1000,9 @@ UCS_string data;
 
                // write function record(s)
                //
-               data.append(UNI_ASCII_F);
+               data.append(UNI_F);
                data.append(get_name());
-               data.append(UNI_ASCII_SPACE);
+               data.append(UNI_SPACE);
                Quad_TF::tf2_fun_ucs(data, get_name(), fun);
              }
              break;
@@ -1180,7 +1180,7 @@ const ValueStackItem & vs = value_stack[0];
              while (t < text.size())   // skip λ header
                 {
                   const Unicode uni = text[t++];
-                  if (uni == UNI_ASCII_LF)   break;
+                  if (uni == UNI_LF)   break;
                 }
 
              // skip λ← and spaces
@@ -1195,7 +1195,7 @@ const ValueStackItem & vs = value_stack[0];
              while (t < text.size())
                 {
                    const Unicode uni = text[t++];
-                   if (uni == UNI_ASCII_LF)   break;
+                   if (uni == UNI_LF)   break;
                    out << uni;
                 }
 
@@ -1205,7 +1205,7 @@ const ValueStackItem & vs = value_stack[0];
                  {
                    out << ";" << ufun->get_local_var(l)->get_name();
                  }
-             out << UNI_ASCII_R_CURLY << endl;
+             out << UNI_R_CURLY << endl;
            }
         else
            {

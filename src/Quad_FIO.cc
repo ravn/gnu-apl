@@ -254,7 +254,7 @@ char numbuf[50];
    for (int f = 0; f < A_format.size(); /* no f++ */ )
        {
          const Unicode uni = A_format[f++];
-         if (uni != UNI_ASCII_PERCENT)   // not %
+         if (uni != UNI_PERCENT)   // not %
             {
               UZ.append(uni);
               continue;
@@ -375,7 +375,7 @@ char numbuf[50];
                      case '%':
                           if (fm == 0)   // %% is %
                              {
-                               UZ.append(UNI_ASCII_PERCENT);
+                               UZ.append(UNI_PERCENT);
                                goto field_done;
                              }
                           /* no break */
@@ -555,7 +555,7 @@ public:
               const Unicode uni = get_next();
               if (Avec::is_digit(uni))           cc[cidx++] = uni;   // 0-9
               else if (uni == UNI_OVERBAR)       cc[cidx++] = '-';   // ¯
-              else if (uni == UNI_ASCII_MINUS)   cc[cidx++] = '-';   // -
+              else if (uni == UNI_MINUS)   cc[cidx++] = '-';   // -
               else { unget(uni);   break; }
             }
 
@@ -630,7 +630,7 @@ ShapeItem count = 0;
    //
    loop(f, format.size() - 1)
       {
-        if (format[f] == UNI_ASCII_PERCENT)   ++count;
+        if (format[f] == UNI_PERCENT)   ++count;
       }
 
 Value_P Z(count, LOC);
@@ -643,11 +643,11 @@ Unicode lookahead = input.get_next();
    loop(f, format.size())
       {
         const Unicode fmt_ch = format[f];
-        if (fmt_ch == UNI_ASCII_SPACE)
+        if (fmt_ch == UNI_SPACE)
            {
              // one space in the format matches 0 or more spaces in the input
              //
-             while (lookahead == UNI_ASCII_SPACE)
+             while (lookahead == UNI_SPACE)
                 {
                  lookahead = input.get_next();
                  if (lookahead == UNI_EOF)   goto out;
@@ -655,7 +655,7 @@ Unicode lookahead = input.get_next();
              continue;
            }
 
-        if (fmt_ch != UNI_ASCII_PERCENT)
+        if (fmt_ch != UNI_PERCENT)
            {
              // normal character in format: match with input
              //
@@ -668,7 +668,7 @@ Unicode lookahead = input.get_next();
 
         ++f;   // skip (first) %
         const Unicode fmt_ch1 = format[f];
-        if (fmt_ch1 == UNI_ASCII_PERCENT)   goto match;   // double % is %
+        if (fmt_ch1 == UNI_PERCENT)   goto match;   // double % is %
 
         Unicode conv = Unicode_0;
         int conv_len = 0;
@@ -676,7 +676,7 @@ Unicode lookahead = input.get_next();
         for (;f < format.size(); ++f)
            {
              const Unicode cc = format[f];
-             if (cc == UNI_ASCII_ASTERISK)   // assignment suppression
+             if (cc == UNI_ASTERISK)   // assignment suppression
                 {
                   suppress = true;
                   continue;
@@ -734,7 +734,7 @@ Unicode lookahead = input.get_next();
 
              if (!suppress)   new (&Z->get_ravel(z++))   FloatCell(val);
            }
-        else if (conv == UNI_ASCII_c)  // char(s)
+        else if (conv == UNI_c)  // char(s)
            {
              if (conv_len == 0)   // default: single char
                 {
@@ -760,10 +760,10 @@ Unicode lookahead = input.get_next();
                      }
                 }
            }
-        else if (conv == UNI_ASCII_s)  // string
+        else if (conv == UNI_s)  // string
            {
              UCS_string ucs;
-             while (lookahead > UNI_ASCII_SPACE)
+             while (lookahead > UNI_SPACE)
                  {
                    ucs.append(lookahead);
                    if (conv_len && ucs.size() >= conv_len)   break;
@@ -777,7 +777,7 @@ Unicode lookahead = input.get_next();
                   new (&Z->get_ravel(z++))   PointerCell(ZZ.get(), Z.getref());
                 }
            }
-        else if (conv == UNI_ASCII_n)  // characters consumed thus far
+        else if (conv == UNI_n)  // characters consumed thus far
            {
              if (!suppress)   new (&Z->get_ravel(z++))
                                   IntCell(input.get_count());
@@ -810,7 +810,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
                const char * name = sub_functions[f].key;
              out << "      ⎕FIO[" << NN
                  << "]  ←→  ⎕FIO['" << name << "']"
-                 << UCS_string(13 - strlen(name), UNI_ASCII_SPACE)
+                 << UCS_string(13 - strlen(name), UNI_SPACE)
                  << "←→  ⎕FIO." << name << endl;
              }
 
@@ -1251,8 +1251,7 @@ const ShapeItem function_number = X->get_ravel(0).get_int_value();
 "Bad function number (axis X) " << function_number << " in LO ⎕FIO[X] B.\n"
 "Chances are that you meant to use ⎕FIO[X] B and not LO ⎕FIO[X] B. In that\n"
 "case use (⎕FIO[X]) or H←⎕FIO[X]\n";
-                 DOMAIN_ERROR;
-
+   DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 Token
@@ -1305,7 +1304,7 @@ int function_number = -1;
 
          case 3:   // fopen(Bs, "r") filename Bs
               {
-                UTF8_string path(*B.get());
+                const UTF8_string path(*B.get());
                 errno = 0;
                 FILE * f = fopen(path.c_str(), "r");
                 if (f == 0)   return Token(TOK_APL_VALUE1, IntScalar(-1, LOC));
@@ -2041,7 +2040,7 @@ int function_number = -1;
                    {
                      const Unicode lfun = B->get_ravel(0).get_char_value();
                      const Unicode oper = B->get_ravel(1).get_char_value();
-                     if (oper == UNI_ASCII_FULLSTOP)
+                     if (oper == UNI_FULLSTOP)
                         {
                           if (lfun == UNI_RING_OPERATOR)   // ∘.g
                              fun = Bif_OPER2_OUTER::fun;
@@ -2697,7 +2696,7 @@ int function_number = -1;
                 if (B->element_count() == 3)   // dyadic operator
                    {
                      const Unicode oper = B->get_ravel(1).get_char_value();
-                     if (oper != UNI_ASCII_FULLSTOP)   DOMAIN_ERROR;
+                     if (oper != UNI_FULLSTOP)   DOMAIN_ERROR;
                      fun = Bif_OPER2_INNER::fun;
                    }
                 else

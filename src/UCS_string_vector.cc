@@ -48,7 +48,7 @@ const ShapeItem name_len = val.get_cols();
                 }
 
              if (Avec::is_symbol_char(uni)      // valid symbol char
-                || uni == UNI_ASCII_FULLSTOP)   // .member dot
+                || uni == UNI_FULLSTOP)   // .member dot
                 {
                   name.append(uni);
                   continue;
@@ -56,7 +56,7 @@ const ShapeItem name_len = val.get_cols();
              // end of (first) name reached. At this point we expect either
              // spaces until 'end' or some spaces and another name.
              //
-             if (uni != UNI_ASCII_SPACE)
+             if (uni != UNI_SPACE)
                 {
                   name.clear();
                   break;
@@ -71,7 +71,7 @@ const ShapeItem name_len = val.get_cols();
              // skip spaces from nidx and subsequent spaces
              //
              while (nidx < end &&
-                    val.get_ravel(nidx).get_char_value() == UNI_ASCII_SPACE)
+                    val.get_ravel(nidx).get_char_value() == UNI_SPACE)
                    ++nidx;
 
 
@@ -96,7 +96,7 @@ const ShapeItem name_len = val.get_cols();
                      {
                        name.append(uni);
                      }
-                  else if (uni == UNI_ASCII_SPACE)
+                  else if (uni == UNI_SPACE)
                      {
                        break;
                      }

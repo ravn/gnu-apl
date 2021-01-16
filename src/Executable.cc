@@ -47,8 +47,8 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
              const Unicode uni = ucs[t];
              switch (uni)
                 {
-                  case UNI_ASCII_CR:                         break;
-                  case UNI_ASCII_LF: text.push_back(line);
+                  case UNI_CR:                         break;
+                  case UNI_LF: text.push_back(line);
                                      line.clear();           break;
                   default:           line.append(uni);
                }
@@ -76,10 +76,10 @@ ShapeItem last_semi = -1;
    for (ShapeItem t = lambda_text.size() - 1; t >= 0; --t)
        {
          const Unicode cc = lambda_text[t];
-         if (cc == UNI_ASCII_SPACE)      continue;
+         if (cc == UNI_SPACE)      continue;
          if (Avec::is_symbol_char(cc))   continue;
          if (Avec::is_quad(cc))          continue;
-         if (cc == UNI_ASCII_SEMICOLON)   last_semi = t;
+         if (cc == UNI_SEMICOLON)   last_semi = t;
          else                             break;
        }
 
@@ -592,9 +592,9 @@ const UCS_string lambda_text = extract_lambda_text(signature, lambda_num - 1);
 #if 0  // not yet working
 
 UCS_string ufun_text = UserFunction_header::lambda_header(signature,lambda_num);
-   ufun_text.append(UNI_ASCII_LF);
+   ufun_text.append(UNI_LF);
    ufun_text.append(lambda_text);
-   ufun_text.append(UNI_ASCII_LF);
+   ufun_text.append(UNI_LF);
 
 Q1(ufun_text)
 
@@ -747,8 +747,8 @@ bool in_double_quotes = false;
 
          if (in_double_quotes)
             {
-              if (uni == UNI_ASCII_DOUBLE_QUOTE     // either \" or string end
-                 && !(tcol >= 2 && line[tcol - 2] == UNI_ASCII_BACKSLASH))
+              if (uni == UNI_DOUBLE_QUOTE     // either \" or string end
+                 && !(tcol >= 2 && line[tcol - 2] == UNI_BACKSLASH))
                  in_double_quotes = false;
               if (copying)   lambda_text.append(uni);
               continue;
@@ -756,7 +756,7 @@ bool in_double_quotes = false;
 
          // at this point uni is outside strings
          //
-         if (uni == UNI_COMMENT || uni == UNI_ASCII_NUMBER_SIGN)
+         if (uni == UNI_COMMENT || uni == UNI_NUMBER_SIGN)
             {
               ++tidx;
               tcol = 0;
@@ -773,15 +773,15 @@ bool in_double_quotes = false;
                    in_single_quotes = true;
                    continue;
 
-              case UNI_ASCII_DOUBLE_QUOTE:       // start of a new "..." string
+              case UNI_DOUBLE_QUOTE:       // start of a new "..." string
                    in_double_quotes = true;
                    continue;
 
-              case UNI_ASCII_L_CURLY:            // start of a new { ... }
+              case UNI_L_CURLY:            // start of a new { ... }
                    if (level++ == 0 && skip == 0)   copying = true;
                    continue;
 
-              case UNI_ASCII_R_CURLY:            // end of { ... }
+              case UNI_R_CURLY:            // end of { ... }
                    if (--level)   continue;      // but not top-level }
                    --skip;                       // next {...} at top-level
                    if (!copying)  continue;

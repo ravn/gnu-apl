@@ -118,7 +118,7 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
 
          if (r == UNI_PAD_U1)   // ¹: match zero or more spaces
             {
-              if (a != UNI_ASCII_SPACE)   return true;   // different
+              if (a != UNI_SPACE)   return true;   // different
 
               // skip trailing digits
               while (*apl == ' ')   ++apl;
@@ -129,18 +129,18 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
             {
               if (!Avec::is_digit(a) &&
                   a != UNI_OVERBAR   &&
-                  a != UNI_ASCII_E   &&
-                  a != UNI_ASCII_J   &&
-                  a != UNI_ASCII_FULLSTOP)   return true;   // different
+                  a != UNI_E   &&
+                  a != UNI_J   &&
+                  a != UNI_FULLSTOP)   return true;   // different
 
               // skip trailing digits
               //
               for (;;)
                   {
                     if (Avec::is_digit(Unicode(*apl)) ||
-                        *apl == UNI_ASCII_E           ||
-                        *apl == UNI_ASCII_J           ||
-                        *apl == UNI_ASCII_FULLSTOP)   ++apl;
+                        *apl == UNI_E           ||
+                        *apl == UNI_J           ||
+                        *apl == UNI_FULLSTOP)   ++apl;
                    else
                       {
                          int len;

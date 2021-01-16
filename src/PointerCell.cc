@@ -151,7 +151,7 @@ Value_P ret(vp, LOC);   // Value_P constructor increments owner_count
    return ret;
 }
 //-----------------------------------------------------------------------------
-bool 
+bool
 PointerCell::is_member_anchor() const
 {
    return value.pval.valp.value_p &&
@@ -199,16 +199,16 @@ Value_P val = get_pointer_value();
            }
         else
            {
-             ucs.append(UNI_ASCII_L_PARENT);
+             ucs.append(UNI_L_PARENT);
              loop(e, ec)
                 {
                   PrintBuffer pb = val->get_ravel(e).
                         character_representation(pctx);
                   ucs.append(UCS_string(pb, 0, Workspace::get_PW()));
 
-                  if (e < ec - 1)   ucs.append(UNI_ASCII_SPACE);
+                  if (e < ec - 1)   ucs.append(UNI_SPACE);
                 }
-             ucs.append(UNI_ASCII_R_PARENT);
+             ucs.append(UNI_R_PARENT);
            }
 
         ColInfo ci;

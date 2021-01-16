@@ -29,7 +29,7 @@
 void
 Value::set_proto_Spc()
 {
-  new (&ravel[0]) CharCell(UNI_ASCII_SPACE);
+  new (&ravel[0]) CharCell(UNI_SPACE);
 }
 //-----------------------------------------------------------------------------
 void
@@ -41,7 +41,7 @@ Value::set_default_Int()
 void
 Value::set_default_Spc()
 {
-  if (is_empty())   new (&ravel[0]) CharCell(UNI_ASCII_SPACE);
+  if (is_empty())   new (&ravel[0]) CharCell(UNI_SPACE);
 }
 //-----------------------------------------------------------------------------
 void

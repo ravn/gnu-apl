@@ -294,7 +294,7 @@ DerivedFunction::unmark_all_values() const
 void
 DerivedFunction::print_properties(ostream & out, int indent) const
 {
-UCS_string ind(indent, UNI_ASCII_SPACE);
+UCS_string ind(indent, UNI_SPACE);
    out << ind << "Function derived from operator" << endl
        << ind << "Left Function: ";
    if (left_arg.is_function())   left_arg.get_function()->print(out);

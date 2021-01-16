@@ -304,10 +304,10 @@ Token::print_function(ostream & out) const
 
         case TOK_F1_EXECUTE:    return out << UNI_EXECUTE;
 
-        case TOK_F2_LESS:       return out << UNI_ASCII_LESS;
+        case TOK_F2_LESS:       return out << UNI_LESS;
         case TOK_F2_FIND:       return out << UNI_EPSILON_UBAR;
-        case TOK_F2_EQUAL:      return out << UNI_ASCII_EQUAL;
-        case TOK_F2_GREATER:    return out << UNI_ASCII_GREATER;
+        case TOK_F2_EQUAL:      return out << UNI_EQUAL;
+        case TOK_F2_GREATER:    return out << UNI_GREATER;
         case TOK_F2_AND:        return out << UNI_AND;
         case TOK_F2_AND_B:      return out << UNI_AND << UNI_AND;
         case TOK_F2_OR:         return out << UNI_OR;
@@ -321,9 +321,9 @@ Token::print_function(ostream & out) const
         case TOK_F2_NAND:       return out << UNI_NAND;
         case TOK_F2_NAND_B:     return out << UNI_NAND << UNI_NAND;
 
-        case TOK_F12_BINOM:     return out << UNI_ASCII_EXCLAM;
+        case TOK_F12_BINOM:     return out << UNI_EXCLAM;
         case TOK_F12_CIRCLE:    return out << UNI_CIRCLE;
-        case TOK_F12_COMMA:     return out << UNI_ASCII_COMMA;
+        case TOK_F12_COMMA:     return out << UNI_COMMA;
         case TOK_F12_COMMA1:    return out << UNI_COMMA_BAR;
         case TOK_F12_DECODE:    return out << UNI_UP_TACK;
         case TOK_F12_DIVIDE:    return out << UNI_DIVIDE;
@@ -335,15 +335,15 @@ Token::print_function(ostream & out) const
         case TOK_F12_FORMAT:    return out << UNI_FORMAT;
         case TOK_F12_INDEX_OF:  return out << UNI_IOTA;
         case TOK_F12_LOGA:      return out << UNI_LOGARITHM;
-        case TOK_F12_MINUS:     return out << UNI_ASCII_MINUS;
+        case TOK_F12_MINUS:     return out << UNI_MINUS;
         case TOK_F12_PARTITION: return out << UNI_SUBSET;
         case TOK_F12_PICK:      return out << UNI_SUPERSET;
-        case TOK_F12_PLUS:      return out << UNI_ASCII_PLUS;
+        case TOK_F12_PLUS:      return out << UNI_PLUS;
         case TOK_F12_POWER:     return out << UNI_STAR_OPERATOR;
         case TOK_F12_RHO:       return out << UNI_RHO;
         case TOK_F12_RND_DN:    return out << UNI_LEFT_FLOOR;
         case TOK_F12_RND_UP:    return out << UNI_LEFT_CEILING;
-        case TOK_F12_ROLL:      return out << UNI_ASCII_QUESTION;
+        case TOK_F12_ROLL:      return out << UNI_QUESTION;
         case TOK_F12_ROTATE:    return out << UNI_CIRCLE_STILE;
         case TOK_F12_ROTATE1:   return out << UNI_CIRCLE_BAR;
         case TOK_F12_SORT_ASC:  return out << UNI_SORT_ASCENDING;
@@ -531,7 +531,7 @@ const Value & val = *get_apl_val();
       }
 
 PrintBuffer pb(val, pctx, 0);
-const UCS_string indent(fn.size(), UNI_ASCII_SPACE);
+const UCS_string indent(fn.size(), UNI_SPACE);
    loop(l, pb.get_height())
       {
         if (l)   out << indent;
@@ -564,15 +564,15 @@ UCS_string ucs;
 
         case TC_L_BRACK:
              if (get_tag() == TOK_L_BRACK)
-                ucs.append(UNI_ASCII_L_BRACK);
+                ucs.append(UNI_L_BRACK);
              else if (get_tag() == TOK_SEMICOL)
-                ucs.append(UNI_ASCII_SEMICOLON);
+                ucs.append(UNI_SEMICOLON);
              else
                 Assert(0);
                 break;
 
         case TC_R_BRACK:
-             ucs.append(UNI_ASCII_R_BRACK);
+             ucs.append(UNI_R_BRACK);
              break;
 
         case TC_END:
@@ -581,7 +581,7 @@ UCS_string ucs;
 
         case TC_RETURN:                                                  break;
         case TC_LINE:
-             ucs.append(UNI_ASCII_LF);
+             ucs.append(UNI_LF);
              break;
 
         case TC_VALUE:
@@ -649,7 +649,7 @@ const Unicode c2 = can.size() ? can[0] : Invalid_Unicode;
    //
 bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
 
-   if (need_space)   ucs.append(UNI_ASCII_SPACE);
+   if (need_space)   ucs.append(UNI_SPACE);
 
    ucs.append(can);
    return need_space ? -can.size() : can.size();

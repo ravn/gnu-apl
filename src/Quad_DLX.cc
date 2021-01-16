@@ -702,7 +702,7 @@ Value_P Z(shape_Z, LOC);
       {
         if (first_0)   Z->next_ravel()->init(*first_0, Z.getref(), LOC);
         else if (cB->is_integer_cell())   new (Z->next_ravel()) IntCell(0);
-        else                       new (Z->next_ravel()) CharCell(UNI_ASCII_0);
+        else                       new (Z->next_ravel()) CharCell(UNI_0);
       }
 
 ShapeItem c = 0;   // the column in the reduced matrix

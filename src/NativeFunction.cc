@@ -211,9 +211,9 @@ NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
    // if the name starts with / (or \ on Windows) or .
    // then take it as is without changes.
    //
-   if (so_path[0] == UNI_ASCII_SLASH     ||
-       so_path[0] == UNI_ASCII_BACKSLASH ||
-       so_path[0] == UNI_ASCII_FULLSTOP)
+   if (so_path[0] == UNI_SLASH     ||
+       so_path[0] == UNI_BACKSLASH ||
+       so_path[0] == UNI_FULLSTOP)
       {
         UTF8_string filename(so_path);
         void * handle = try_one_file(filename.c_str(), t4);
@@ -424,7 +424,7 @@ NativeFunction::is_operator() const
 void
 NativeFunction::print_properties(ostream & out, int indent) const
 {
-UCS_string ind(indent, UNI_ASCII_SPACE);
+UCS_string ind(indent, UNI_SPACE);
    out << ind << "Native Function " << endl;
 }
 //-----------------------------------------------------------------------------

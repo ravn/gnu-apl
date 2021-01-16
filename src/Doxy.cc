@@ -488,7 +488,7 @@ std::vector<const StateIndicator *> stack;
 
                     int spe2 = spc2;
                     while (spe2 < el2.size() &&
-                           el2[spe2] == UNI_ASCII_SPACE)   ++spe2;
+                           el2[spe2] == UNI_SPACE)   ++spe2;
                     const int spl2 = el2.size() - spe2;
                     const UCS_string & el3 =
                           StateIndicator::get_error(si).get_error_line_3();

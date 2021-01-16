@@ -61,7 +61,7 @@ Nabla::throw_edit_error(const char * why)
 {
    COUT << "DEFN ERROR+" << endl
         << "      " << first_command << endl
-        << "      " << UCS_string(first_command.size() - 1, UNI_ASCII_SPACE)
+        << "      " << UCS_string(first_command.size() - 1, UNI_SPACE)
         << "^" << endl;
 
    if (Workspace::more_error().size() == 0)
@@ -142,7 +142,7 @@ UCS_string fun_text;
    loop(l, lines.size())
       {
         fun_text.append(lines[l].text);
-        fun_text.append(UNI_ASCII_LF);
+        fun_text.append(UNI_LF);
       }
 
    // maybe copy function into the history
@@ -167,7 +167,7 @@ UCS_string fun_text;
               UCS_string line_l("[");
               line_l.append_number(l);
               line_l.append_UTF8("]  ");
-              while (line_l.size() < 6)   line_l.append(UNI_ASCII_SPACE);
+              while (line_l.size() < 6)   line_l.append(UNI_SPACE);
               line_l.append(lines[l].text);
               line_l.remove_trailing_whitespaces();
 
@@ -181,7 +181,7 @@ UCS_string fun_text;
 
 int error_line = 0;
 UCS_string creator(InputFile::current_filename());
-   creator.append(UNI_ASCII_COLON);
+   creator.append(UNI_COLON);
    creator.append_number(defn_line_no);
 UTF8_string creator_utf8(creator);
 
@@ -256,14 +256,14 @@ UCS_string::iterator c(first_command.begin());
 
    // function header.
    //
-   while (c.more() && c.get() != UNI_ASCII_L_BRACK)
+   while (c.more() && c.get() != UNI_L_BRACK)
          fun_header.append(c.next());
 
    // at this point there could be an axis specification [X] that
    // could be confused with an operation like [⎕]. We take the first char
    // after the [ to decide if there is an axis or an operation.
    //
-   if (c.get() == UNI_ASCII_L_BRACK)   // [
+   if (c.get() == UNI_L_BRACK)   // [
       {
         for (int off = 1; ; ++off)
             {
@@ -271,7 +271,7 @@ UCS_string::iterator c(first_command.begin());
               if (Avec::is_first_symbol_char(c.get(off)))   // axis
                  {
                    fun_header.append(c.next());   //  copy the [
-                   while (c.more() && c.get() != UNI_ASCII_L_BRACK)
+                   while (c.more() && c.get() != UNI_L_BRACK)
                          fun_header.append(c.next());
                  }
               break;
@@ -288,7 +288,7 @@ UserFunction_header hdr(fun_header, false);
 
    // optional operation
    //
-   if (c.get() == UNI_ASCII_L_BRACK)
+   if (c.get() == UNI_L_BRACK)
       {
         UCS_string oper;
         Unicode cc;
@@ -296,7 +296,7 @@ UserFunction_header hdr(fun_header, false);
           {
             if (!c.more())   return "no ] in ∇-command";
             oper.append(cc = c.next());
-          } while (cc != UNI_ASCII_R_BRACK);
+          } while (cc != UNI_R_BRACK);
 
         const char * loc = parse_oper(oper, true);
         if (loc)   return loc;   // error
@@ -409,7 +409,7 @@ UCS_string text = oper;
    // [n]                                           (goto)
    // text                                          (override text)
 
-   if (cc != UNI_ASCII_L_BRACK)   // override text
+   if (cc != UNI_L_BRACK)   // override text
       {
         ecmd = ECMD_EDIT;
         edit_from = current_line;
@@ -434,7 +434,7 @@ command_loop:
 
    // optional edit_from
    //
-   if (Avec::is_digit(c.get()) || c.get() == UNI_ASCII_FULLSTOP)
+   if (Avec::is_digit(c.get()) || c.get() == UNI_FULLSTOP)
       edit_from = parse_lineno(c);
 
    // operation, which is one of:
@@ -447,7 +447,7 @@ command_loop:
       {
         case UNI_Quad_Quad:
         case UNI_Quad_Quad1:    ecmd = ECMD_SHOW;     c.next();   break;
-        case UNI_ASCII_R_BRACK: ecmd = ECMD_EDIT;                 break;
+        case UNI_R_BRACK: ecmd = ECMD_EDIT;                 break;
         case UNI_DELTA:         ecmd = ECMD_DELETE;   c.next();   break;
         case UNI_RIGHT_ARROW:   ecmd = ECMD_ESCAPE;   c.next();   break;
         case Invalid_Unicode:   return "Bad ∇-command";
@@ -468,7 +468,7 @@ again:
    //
    if (Avec::is_digit(c.get()))   edit_to = parse_lineno(c);
 
-   if (c.get() == UNI_ASCII_MINUS)   // range
+   if (c.get() == UNI_MINUS)   // range
       {
         if (got_minus)   return "error: second -  in ∇-range";
         got_minus = true;
@@ -477,7 +477,7 @@ again:
         goto again;
       }
 
-   if (c.next() != UNI_ASCII_R_BRACK)   return "missing ] in ∇-range";
+   if (c.next() != UNI_R_BRACK)   return "missing ] in ∇-range";
 
    // at this point we have parsed an editor command, like:
    //
@@ -487,7 +487,7 @@ again:
 
    while (Avec::is_white(c.get()))   c.next();
 
-   if (c.get() == UNI_ASCII_L_BRACK)   // another command: ignore previous
+   if (c.get() == UNI_L_BRACK)   // another command: ignore previous
       {
          c.next();   // eat the [
          goto command_loop;
@@ -512,26 +512,26 @@ again:
                   do_close = true;
                   return 0;
 
-             case UNI_ASCII_DOUBLE_QUOTE:  // "
+             case UNI_DOUBLE_QUOTE:  // "
                   current_text.append(cc);
                   for (;;)
                       {
                         cc = c.next();
                         if (cc == Invalid_Unicode)   // premature end of input
                            {
-                             current_text.append(UNI_ASCII_DOUBLE_QUOTE);
+                             current_text.append(UNI_DOUBLE_QUOTE);
                              return 0;
                            }
 
                         current_text.append(cc);
-                        if (cc == UNI_ASCII_DOUBLE_QUOTE)   break; // string end
-                        if (cc == UNI_ASCII_BACKSLASH)      // \x
+                        if (cc == UNI_DOUBLE_QUOTE)   break; // string end
+                        if (cc == UNI_BACKSLASH)      // \x
                            {
                              cc = c.next();
                              if (cc == Invalid_Unicode)   // premature input end
                                 {
-                                  current_text.append(UNI_ASCII_BACKSLASH);
-                                  current_text.append(UNI_ASCII_DOUBLE_QUOTE);
+                                  current_text.append(UNI_BACKSLASH);
+                                  current_text.append(UNI_DOUBLE_QUOTE);
                                   return 0;
                                 }
                              current_text.append(cc);
@@ -575,10 +575,10 @@ LineLabel ret(0);
    while (Avec::is_digit(c.get()))
       {
         ret.ln_major *= 10;
-        ret.ln_major += c.next() - UNI_ASCII_0;
+        ret.ln_major += c.next() - UNI_0;
       }
 
-   if (c.get() == UNI_ASCII_FULLSTOP)
+   if (c.get() == UNI_FULLSTOP)
       {
         c.next();   // eat the .
         while (Avec::is_digit(c.get()))   ret.ln_minor.append(c.next());
@@ -976,7 +976,7 @@ UCS_string ret("[");
       }
 
    ret.append_UTF8("] ");
-   while (ret.size() < min_size)   ret.append(UNI_ASCII_SPACE);
+   while (ret.size() < min_size)   ret.append(UNI_SPACE);
    return ret;
 }
 //-----------------------------------------------------------------------------
@@ -992,14 +992,14 @@ LineLabel::next()
    // fract number: increment last fract digit
    //
 const Unicode cc = ln_minor[ln_minor.size() - 1];
-   if (cc != UNI_ASCII_9)   ln_minor[ln_minor.size() - 1] = Unicode(cc + 1);
-   else                     ln_minor.append(UNI_ASCII_1);
+   if (cc != UNI_9)   ln_minor[ln_minor.size() - 1] = Unicode(cc + 1);
+   else                     ln_minor.append(UNI_1);
 }
 //-----------------------------------------------------------------------------
 void
 LineLabel::insert()
 {
-   ln_minor.append(UNI_ASCII_1);
+   ln_minor.append(UNI_1);
 }
 //-----------------------------------------------------------------------------
 bool

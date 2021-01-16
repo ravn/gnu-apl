@@ -71,7 +71,7 @@ struct Format_sub
 
    /// return the pad character (default: space, otherwise controlled by ⎕FC)
    Unicode pad_char(Unicode qfc) const
-      { return flt_mask & BIT_8 ? qfc : UNI_ASCII_SPACE; }
+      { return flt_mask & BIT_8 ? qfc : UNI_SPACE; }
 
    /// Fill buf at position x,y with data according to fmt
    UCS_string insert_int_commas(const UCS_string & data,

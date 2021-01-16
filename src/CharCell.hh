@@ -99,7 +99,7 @@ protected:
 
    /// overloaded Cell::to_type()
    virtual void to_type()
-      { value.aval = UNI_ASCII_SPACE; }
+      { value.aval = UNI_SPACE; }
 };
 //-----------------------------------------------------------------------------
 

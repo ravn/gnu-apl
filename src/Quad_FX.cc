@@ -142,8 +142,8 @@ UCS_string text;
              if (cell.is_character_cell())   /// a line with a single char.
                 {
                   const Unicode uni = cell.get_char_value();
-                  if (uni > UNI_ASCII_SPACE)   text.append(uni);
-                  text.append(UNI_ASCII_LF);
+                  if (uni > UNI_SPACE)   text.append(uni);
+                  text.append(UNI_LF);
                   continue;
                 }
 
@@ -178,7 +178,7 @@ UCS_string text;
 
                        const Unicode uni = c.get_char_value();
                        if (l == 0 || skipping)
-                          skipping = (uni <= UNI_ASCII_SPACE);
+                          skipping = (uni <= UNI_SPACE);
                        if (!skipping)   text.append(uni);
                      }
                 }
@@ -191,7 +191,7 @@ UCS_string text;
                        DOMAIN_ERROR;
                      }
                   const Unicode uni = c1.get_char_value();
-                  if (uni > UNI_ASCII_SPACE)   text.append(uni);
+                  if (uni > UNI_SPACE)   text.append(uni);
                 }
              else
                 {
@@ -200,7 +200,7 @@ UCS_string text;
                   DOMAIN_ERROR;
                 }
 
-             text.append(UNI_ASCII_LF);
+             text.append(UNI_LF);
            }
       }
    else                      // case 2: simple character matrix
@@ -216,10 +216,10 @@ UCS_string text;
                  {
                    const Unicode uni = cB++->get_char_value();
                    if (col == 0 || skipping)
-                      skipping = (uni <= UNI_ASCII_SPACE);
+                      skipping = (uni <= UNI_SPACE);
                    if (!skipping)   text.append(uni);
                  }
-             text.append(UNI_ASCII_LF);
+             text.append(UNI_LF);
            }
       }
 

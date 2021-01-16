@@ -85,6 +85,10 @@ public:
    /// constructor: UCS_string from simple character vector value.
    UCS_string(const Value & value);
 
+   /// constructor: UCS_string from a pointer Cell pointing to a
+   /// character vector value (Asserts if not)
+   UCS_string(const Cell & cell);
+
 #if UCS_tracking
    /// common part of all constructors
    void create(const char * loc);
@@ -118,7 +122,7 @@ public:
 
    /// return true if every character in \b this string is the digit '0'
    bool all_zeroes() const
-      { loop(s, size())   if ((*this)[s] != UNI_ASCII_0)   return false;
+      { loop(s, size())   if ((*this)[s] != UNI_0)   return false;
         return true;
       }
 

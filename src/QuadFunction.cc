@@ -152,7 +152,7 @@ Value_P Z(shape_Z, LOC);
         loop(c, cols)
            {
             const Unicode uni = B->get_ravel(b + c).get_char_value();
-            if (uni == UNI_ASCII_SPACE)   break;
+            if (uni == UNI_SPACE)   break;
             symbol_name.append(uni);
            }
 
@@ -664,7 +664,7 @@ Quad_EX::expunge(const UCS_string & name)
 {
    if (name.size() == 0)   return 0;
 
-   if (!name.contains(UNI_ASCII_FULLSTOP))   // unless member access
+   if (!name.contains(UNI_FULLSTOP))   // unless member access
       {
         Symbol * symbol = Workspace::lookup_existing_symbol(name);
         if (symbol == 0)   return 0;
@@ -682,7 +682,7 @@ vector<const UCS_string *>members;
      int dot = name.size();
      for (int from = dot - 1; from >= 0; --from)
          {
-           if (name[from] != UNI_ASCII_FULLSTOP)   continue;
+           if (name[from] != UNI_FULLSTOP)   continue;
 
            members.push_back(new UCS_string(name, from + 1, dot - from - 1));
            dot = from;
@@ -1224,7 +1224,7 @@ Value_P Z(shZ, LOC);
         loop(l, longest)
            {
              const UCS_string & ucs = names[smallest];
-             Z->next_ravel_Char(l < ucs.size() ? ucs[l] : UNI_ASCII_SPACE);
+             Z->next_ravel_Char(l < ucs.size() ? ucs[l] : UNI_SPACE);
            }
 
         // remove smalles from table
@@ -1285,9 +1285,9 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
 
         case 3:  {
                    UCS_string fun_and_line(fun_name);
-                   fun_and_line.append(UNI_ASCII_L_BRACK);
+                   fun_and_line.append(UNI_L_BRACK);
                    fun_and_line.append_number(fun_line);
-                   fun_and_line.append(UNI_ASCII_R_BRACK);
+                   fun_and_line.append(UNI_R_BRACK);
                    Z = Value_P(fun_and_line, LOC); 
                  }
                  break;
@@ -1362,9 +1362,9 @@ ShapeItem z = 0;
 
              case 3:  {
                         UCS_string fun_and_line(fun_name);
-                        fun_and_line.append(UNI_ASCII_L_BRACK);
+                        fun_and_line.append(UNI_L_BRACK);
                         fun_and_line.append_number(fun_line);
-                        fun_and_line.append(UNI_ASCII_R_BRACK);
+                        fun_and_line.append(UNI_R_BRACK);
                         new (cZ) PointerCell(Value_P(
                                     fun_and_line, LOC).get(), Z.getref()); 
                       }
@@ -1406,7 +1406,7 @@ const ShapeItem ec = B->element_count();
         if (B->get_ravel(0).is_character_cell())   // char to Unicode
            new (&Z->get_ravel(0))   IntCell(0);
         else
-           new (&Z->get_ravel(0))   CharCell(UNI_ASCII_SPACE);
+           new (&Z->get_ravel(0))   CharCell(UNI_SPACE);
       }
 
    loop(v, ec)

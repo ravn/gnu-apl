@@ -532,7 +532,7 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
       {
 #if SHORT
         message_2.append(header.A()->get_name());
-        message_2.append(UNI_ASCII_SPACE);
+        message_2.append(UNI_SPACE);
 #else
         Value_P val_A = header.A()->get_value();
         if (+val_A)
@@ -540,7 +540,7 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
              PrintContext pctx(PR_BOXED_GRAPHIC);
              PrintBuffer pb(*val_A, pctx, 0);
              message_2.append(UCS_string(pb, 1, DEFAULT_Quad_PW));
-             message_2.append(UNI_ASCII_SPACE);
+             message_2.append(UNI_SPACE);
            }
 #endif
       }
@@ -550,13 +550,13 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
    if (header.B())
       {
 #if SHORT
-        message_2.append(UNI_ASCII_SPACE);
+        message_2.append(UNI_SPACE);
         message_2.append(header.B()->get_name());
 #else
         Value_P val_B = header.B()->get_value();
         if (+val_B)
            {
-             message_2.append(UNI_ASCII_SPACE);
+             message_2.append(UNI_SPACE);
              PrintContext pctx(PR_APL_FUN);
              PrintBuffer pb(*val_B, pctx, 0);
              message_2.append(UCS_string(pb, 1, DEFAULT_Quad_PW));
@@ -748,8 +748,8 @@ Line_status current = APL_text;
                    bool blanks_only = true;
                    for (ShapeItem c = 0; c < (len - 3); ++c)
                        {
-                          if (line[c] != UNI_ASCII_SPACE &&
-                              line[c] != UNI_ASCII_HT)   blanks_only = false;
+                          if (line[c] != UNI_SPACE &&
+                              line[c] != UNI_HT)   blanks_only = false;
                        }
 
                     if (blanks_only)
@@ -825,9 +825,9 @@ UCS_string_vector original_text;
               const UCS_string & line = get_text(l);
               const ShapeItem len = line.size();
               if (len >= 3 &&
-                  line[len - 1] == UNI_ASCII_DOUBLE_QUOTE &&
-                  line[len - 2] == UNI_ASCII_DOUBLE_QUOTE &&
-                  line[len - 3] == UNI_ASCII_DOUBLE_QUOTE)
+                  line[len - 1] == UNI_DOUBLE_QUOTE &&
+                  line[len - 2] == UNI_DOUBLE_QUOTE &&
+                  line[len - 3] == UNI_DOUBLE_QUOTE)
                  {
                    original_text = text;
                    const ErrorCode ec = transform_multi_line_strings_3();
@@ -1159,10 +1159,10 @@ ShapeItem semi = -1;
               case UNI_OMEGA_UNDERBAR:  signature |= SIG_RO;   continue;
               case UNI_ALPHA:           signature |= SIG_A;    continue;
 
-              case UNI_ASCII_SEMICOLON: if (semi == -1)   semi = t - 1;
+              case UNI_SEMICOLON: if (semi == -1)   semi = t - 1;
                                         continue;
 
-              case UNI_ASCII_LF:        break;   // header done
+              case UNI_LF:        break;   // header done
               default:                  continue;
             }
 
@@ -1171,12 +1171,12 @@ ShapeItem semi = -1;
 
    // discard leading spaces
    //
-   while (t < text.size() && text[t] == UNI_ASCII_SPACE)   ++t;
+   while (t < text.size() && text[t] == UNI_SPACE)   ++t;
 
 UCS_string body_text;
    for (; t < text.size(); ++t)   body_text.append(text[t]);
 
-   while (body_text.back() == UNI_ASCII_LF)  body_text.pop_back();
+   while (body_text.back() == UNI_LF)  body_text.pop_back();
 
 Token_string body;
    {
@@ -1189,7 +1189,7 @@ Token_string body;
 
    if (semi != -1)
       {
-        for (ShapeItem s = semi; text[s] != UNI_ASCII_LF; ++s)
+        for (ShapeItem s = semi; text[s] != UNI_LF; ++s)
            {
              body_text.append(text[s]);
            }
@@ -1269,7 +1269,7 @@ const UCS_string two_lamps(UTF8_string("⍝⍝"));
             }
 
          const bool double_lamps = line[1] == UNI_COMMENT;   // ⍝⍝ line
-         if (line[1] == UNI_ASCII_FULLSTOP)                  // ⍝. line
+         if (line[1] == UNI_FULLSTOP)                  // ⍝. line
             {
               toronto = true;
             }
@@ -1306,7 +1306,7 @@ void
 UserFunction::print_properties(ostream & out, int indent) const
 {
    header.print_properties(out, indent);
-UCS_string ind(indent, UNI_ASCII_SPACE);
+UCS_string ind(indent, UNI_SPACE);
    out << ind << "Body Lines:      " << line_starts.size() << endl
        << ind << "Creator:         " << get_creator()      << endl
        << ind << "Body: " << body << endl;
@@ -1321,7 +1321,7 @@ UCS_string ret = header.get_name();
         UCS_string name = Workspace::find_lambda_name(this);
         if (name.size())   ret = name;
       }
-   ret.append(UNI_ASCII_L_BRACK);
+   ret.append(UNI_L_BRACK);
 
    // pc may point to the next token already. If that is the case then
    // we go back one token.
@@ -1330,7 +1330,7 @@ UCS_string ret = header.get_name();
 
 const Function_Line line = get_line(pc);
    ret.append_number(line);
-   ret.append(UNI_ASCII_R_BRACK);
+   ret.append(UNI_R_BRACK);
    return ret;
 }
 //-----------------------------------------------------------------------------
@@ -1358,7 +1358,7 @@ UCS_string ucs;
       {
         if (with_lines)   ucs.append(line_prefix(Function_Line(t)));
         ucs.append(text[t]);
-        ucs.append(UNI_ASCII_LF);
+        ucs.append(UNI_LF);
       }
 
    return ucs;

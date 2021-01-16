@@ -125,7 +125,7 @@ const ShapeItem len_B = B->element_count();
               if (cell_Z0.is_pointer_cell())
                  cell_Z0.get_pointer_value()->to_proto();
         else if (cell_Z0.is_character_cell())
-                 new (&cell_Z0) CharCell(UNI_ASCII_SPACE);
+                 new (&cell_Z0) CharCell(UNI_SPACE);
         else
                  new (&cell_Z0) IntCell(0);
             }

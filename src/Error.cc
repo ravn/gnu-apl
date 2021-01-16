@@ -77,7 +77,7 @@ Error::print(ostream & out, const char * loc) const
         else
            {
              out << error_name(error_code);
-             if (Workspace::more_error().size())   out << UNI_ASCII_PLUS;
+             if (Workspace::more_error().size())   out << UNI_PLUS;
              out << endl;
            }
 
@@ -149,13 +149,13 @@ Error::get_error_line_3() const
    if (left_caret < 0)   return UCS_string();
 
 UCS_string ret;
-   if (left_caret > 0)   ret.append(UCS_string(left_caret, UNI_ASCII_SPACE));
-   ret.append(UNI_ASCII_CIRCUMFLEX);
+   if (left_caret > 0)   ret.append(UCS_string(left_caret, UNI_SPACE));
+   ret.append(UNI_CIRCUMFLEX);
 
 const int diff = right_caret - left_caret;
    if (diff <= 0)   return ret;
-   if (diff > 1)   ret.append(UCS_string(diff - 1, UNI_ASCII_SPACE));
-   ret.append(UNI_ASCII_CIRCUMFLEX);
+   if (diff > 1)   ret.append(UCS_string(diff - 1, UNI_SPACE));
+   ret.append(UNI_CIRCUMFLEX);
 
    return ret;
 }
@@ -241,7 +241,7 @@ Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
    Log(LOG_error_throw)   
       {   
         CERR << "throwing VALUE ERROR at " << loc;
-        if (sym_name.size())   CERR << " (symbol is " << sym_name << ")"; 
+        if (sym_name.size())   CERR << " (symbol is: '" << sym_name << "')"; 
         CERR << endl;
       }
 
@@ -302,8 +302,8 @@ const UserFunction * ufun = si->get_executable()->get_ufun();
         else
            {
              UCS_string ucs(ufun->get_name_and_line(si->get_PC()));
-             ucs.append(UNI_ASCII_SPACE);
-             ucs.append(UNI_ASCII_SPACE);
+             ucs.append(UNI_SPACE);
+             ucs.append(UNI_SPACE);
              UTF8_string utf(ucs);
              set_error_line_2(utf.c_str());
              set_left_caret(ucs.size());

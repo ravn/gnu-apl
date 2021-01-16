@@ -93,20 +93,20 @@ public:
 
    /// return \b true iff \b av is a comment char (⍝ or #)
    static bool is_comment(Unicode av)
-      { return av == UNI_ASCII_NUMBER_SIGN || av == UNI_COMMENT; }
+      { return av == UNI_NUMBER_SIGN || av == UNI_COMMENT; }
 
    /// Return \b true iff \b av is a valid char in a user defined symbol
    static bool is_first_symbol_char(Unicode uni);
 
    /// Return \b true iff \b av is a digit (i.e. 0 ≤ av ≤ 9)
    static bool is_digit(Unicode uni)
-      { return (uni <= UNI_ASCII_9 && uni >= UNI_ASCII_0); }
+      { return (uni <= UNI_9 && uni >= UNI_0); }
 
    /// Return \b true iff \b av is a digit (i.e. 0 ≤ av ≤ 9)
    static bool is_hex_digit(Unicode uni)
       { return is_digit(uni)
-            || (uni <= UNI_ASCII_F && uni >= UNI_ASCII_A)
-            || (uni <= UNI_ASCII_f && uni >= UNI_ASCII_a); }
+            || (uni <= UNI_F && uni >= UNI_A)
+            || (uni <= UNI_f && uni >= UNI_a); }
 
    /// Return \b true iff \b av is a digit or a space
    static bool is_digit_or_space(Unicode uni)
@@ -123,6 +123,10 @@ public:
    static bool is_quad(Unicode uni)
       { return uni == UNI_Quad_Quad || uni == UNI_Quad_Quad1; }
 
+   /// return the value (0..9 if decimal, or 0..15 if hex) for uni,
+   /// or -1 if uni is not a decimal or hex digit.
+   static int digit_value(Unicode uni, bool hex);
+
    /// return true if unicode \b uni needs ⎕UCS in 2 ⎕TF or )OUT
    static bool need_UCS(Unicode uni);
 
@@ -132,10 +136,10 @@ public:
    /// return \b true iff a token printed before \b av never needs a space
    static bool no_space_before(Unicode av);
 
-   /// return the subscript char for digit i
+   /// return the subscript char for digit i (i = 0..9)
    static Unicode subscript(uint32_t i);
 
-   /// return the superscript char for digit i
+   /// return the superscript char for digit i (i = 0..9)
    static Unicode superscript(uint32_t i);
 
    /// Find \b av in \b character_table. Return AV position if found or MAX_AV

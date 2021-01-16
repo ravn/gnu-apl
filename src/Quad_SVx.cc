@@ -665,7 +665,7 @@ int v = 0;
            }
         else
            {
-             new (Z->next_ravel()) CharCell(UNI_ASCII_SPACE);
+             new (Z->next_ravel()) CharCell(UNI_SPACE);
            }
       }
 

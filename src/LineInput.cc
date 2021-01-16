@@ -64,7 +64,7 @@ ESCmap ESCmap::the_ESCmap[] =
   { 3, Output::ESC_CursorEnd,     UNI_CursorEnd    },
   { 3, Output::ESC_CursorHome,    UNI_CursorHome   },
   { 4, Output::ESC_InsertMode,    UNI_InsertMode   },
-  { 4, Output::ESC_Delete,        UNI_ASCII_DELETE },
+  { 4, Output::ESC_Delete,        UNI_DELETE },
 
    // sequences with SHIFT and/or CTRL
   { 6, Output::ESC_CursorUp_1,    UNI_CursorUp     },
@@ -74,7 +74,7 @@ ESCmap ESCmap::the_ESCmap[] =
   { 6, Output::ESC_CursorEnd_1,   UNI_CursorEnd    },
   { 6, Output::ESC_CursorHome_1,  UNI_CursorHome   },
   { 6, Output::ESC_InsertMode_1,  UNI_InsertMode   },
-  { 6, Output::ESC_Delete_1,      UNI_ASCII_DELETE },
+  { 6, Output::ESC_Delete_1,      UNI_DELETE },
 };
 
 enum { ESCmap_entry_count = sizeof(ESCmap::the_ESCmap) / sizeof(ESCmap) };
@@ -244,7 +244,7 @@ LineHistory::add_line(const UCS_string & line)
    // remove leading blanks
    //
 int blanks = 0;
-   while (blanks < line.size() && line[blanks] <= UNI_ASCII_SPACE)   ++blanks;
+   while (blanks < line.size() && line[blanks] <= UNI_SPACE)   ++blanks;
 
    // repeated cut-and-paste of entire lines increases the indentation every time
    // due to the APL input prompt). we therefore limit this effect to 6 blanks.
@@ -258,7 +258,7 @@ UCS_string line1;
       {
         line1 = line;
       }
-   while (line1.back() <= UNI_ASCII_SPACE)   line1.pop_back();
+   while (line1.back() <= UNI_SPACE)   line1.pop_back();
 
    if (int(hist_lines.size()) < max_lines)   // append
       {
@@ -427,7 +427,7 @@ LineEditContext::delete_char()
 {
    if (uidx == (user_line.size() - 1))   // cursor on last char
       {
-        CIN << ' ' << UNI_ASCII_BS;
+        CIN << ' ' << UNI_BS;
         user_line.pop_back();
       }
    else
@@ -708,7 +708,7 @@ InputMux::get_line(LineInputMode mode, const UCS_string & prompt,
                        //
                        while (line.size()      &&
                               file_line.size() &&
-                              file_line[0] == UNI_ASCII_BS)
+                              file_line[0] == UNI_BS)
                              {
                                file_line.erase(0);
                                line.pop_back();
@@ -898,39 +898,39 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
                    eof = user_line.size() == 0;
                    break;
 
-              case UNI_ASCII_ETX:   // ^C
+              case UNI_ETX:   // ^C
                    lec.clear();
                    control_C(SIGINT);
                    break;
 
-              case UNI_ASCII_EOT:   // ^D
+              case UNI_EOT:   // ^D
                    CERR << "^D";
                    eof = true;
                    break;
 
-              case UNI_ASCII_BS:    // ^H (backspace)
+              case UNI_BS:    // ^H (backspace)
                    lec.backspc();
                    continue;
 
-              case UNI_ASCII_HT:    // ^I (tab)
+              case UNI_HT:    // ^I (tab)
                    lec.tab_expansion(mode);
                    continue;
 
-              case UNI_ASCII_VT:    // ^K
+              case UNI_VT:    // ^K
                    lec.cut_to_EOL();
                    continue;
 
-              case UNI_ASCII_DELETE:
+              case UNI_DELETE:
                    lec.delete_char();
                    continue;
 
-              case UNI_ASCII_CR:   // '\r' : ignore
+              case UNI_CR:   // '\r' : ignore
                    continue;
 
-              case UNI_ASCII_LF:   // '\n': done
+              case UNI_LF:   // '\n': done
                    break;
 
-              case UNI_ASCII_EM:    // ^Y
+              case UNI_EM:    // ^Y
                    lec.paste();
                    continue;
 
@@ -1044,9 +1044,9 @@ const int b0 = safe_fgetc();
         return Unicode(bx | uni);
       }
 
-   if (b0 == UNI_ASCII_ESC)
+   if (b0 == UNI_ESC)
       {
-        char seq[Output::MAX_ESC_LEN];   seq[0] = UNI_ASCII_ESC;
+        char seq[Output::MAX_ESC_LEN];   seq[0] = UNI_ESC;
         for (int s = 1; s < Output::MAX_ESC_LEN; ++s)
             {
               const int bs = safe_fgetc();
@@ -1072,27 +1072,27 @@ const int b0 = safe_fgetc();
               return Invalid_Unicode;
             }
       }
-   else if (b0 < UNI_ASCII_SPACE)   // ^something (except ESC)
+   else if (b0 < UNI_SPACE)   // ^something (except ESC)
       {
         switch(b0)
            {
-             case UNI_ASCII_SOH: return UNI_CursorHome;    // ^A
-             case UNI_ASCII_STX: return UNI_CursorLeft;    // ^B
-             case UNI_ASCII_ETX: return UNI_ASCII_ETX;     // ^C
-             case UNI_ASCII_EOT: return UNI_ASCII_EOT;     // ^D
-             case UNI_ASCII_ENQ: return UNI_CursorEnd;     // ^E
-             case UNI_ASCII_ACK: return UNI_CursorRight;   // ^F
-             case UNI_ASCII_BS:  return UNI_ASCII_BS;      // ^H
-             case UNI_ASCII_HT:  return UNI_ASCII_HT;      // ^I
-             case UNI_ASCII_LF:  return UNI_ASCII_LF;      // ^J
-             case UNI_ASCII_VT:  return UNI_ASCII_VT;      // ^K
-             case UNI_ASCII_SO:  return UNI_CursorDown;    // ^N
-             case UNI_ASCII_DLE: return UNI_CursorUp;      // ^P
-             case UNI_ASCII_EM:  return UNI_ASCII_EM;      // ^Y
+             case UNI_SOH: return UNI_CursorHome;    // ^A
+             case UNI_STX: return UNI_CursorLeft;    // ^B
+             case UNI_ETX: return UNI_ETX;     // ^C
+             case UNI_EOT: return UNI_EOT;     // ^D
+             case UNI_ENQ: return UNI_CursorEnd;     // ^E
+             case UNI_ACK: return UNI_CursorRight;   // ^F
+             case UNI_BS:  return UNI_BS;      // ^H
+             case UNI_HT:  return UNI_HT;      // ^I
+             case UNI_LF:  return UNI_LF;      // ^J
+             case UNI_VT:  return UNI_VT;      // ^K
+             case UNI_SO:  return UNI_CursorDown;    // ^N
+             case UNI_DLE: return UNI_CursorUp;      // ^P
+             case UNI_EM:  return UNI_EM;      // ^Y
              default: goto again;
            }
       }
-   else if (b0 == UNI_ASCII_DELETE)   return UNI_ASCII_BS;
+   else if (b0 == UNI_DELETE)   return UNI_BS;
 
    return Unicode(b0);
 }

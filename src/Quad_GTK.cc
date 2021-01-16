@@ -160,7 +160,7 @@ const int function = B->get_ravel(0).get_int_value();
                UCS_string arg;
                for (ShapeItem j = 1; j < HWF.size(); ++j)
                    {
-                     if (HWF[j] == UNI_ASCII_COLON)
+                     if (HWF[j] == UNI_COLON)
                         {
                           args.push_back(arg);
                           arg.clear();
@@ -255,7 +255,7 @@ UCS_string ucs_A;
                  }
               Value_P command = cell.get_pointer_value();
               ucs_A.append(UCS_string(*command));
-              ucs_A.append(UNI_ASCII_LF);
+              ucs_A.append(UNI_LF);
             }
       }
    else

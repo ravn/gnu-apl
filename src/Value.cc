@@ -296,7 +296,7 @@ Value::Value(const UCS_string & ucs, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   new (&get_ravel(0)) CharCell(UNI_ASCII_SPACE);   // prototype
+   new (&get_ravel(0)) CharCell(UNI_SPACE);   // prototype
    loop(l, ucs.size())   new (next_ravel()) CharCell(ucs[l]);
    set_complete();
 }
@@ -310,7 +310,7 @@ Value::Value(const UTF8_string & utf, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   new (&get_ravel(0)) CharCell(UNI_ASCII_SPACE);   // prototype
+   new (&get_ravel(0)) CharCell(UNI_SPACE);   // prototype
    loop(l, utf.size())
        new (next_ravel()) CharCell(Unicode(utf[l] & 0xFF));
    set_complete();
@@ -325,7 +325,7 @@ Value::Value(const CDR_string & ui8, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   new (&get_ravel(0)) CharCell(UNI_ASCII_SPACE);   // prototype
+   new (&get_ravel(0)) CharCell(UNI_SPACE);   // prototype
    loop(l, ui8.size())   new (next_ravel()) CharCell(Unicode(ui8[l]));
    set_complete();
 }
@@ -339,7 +339,7 @@ Value::Value(const PrintBuffer & pb, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   new (&get_ravel(0)) CharCell(UNI_ASCII_SPACE);   // prototype
+   new (&get_ravel(0)) CharCell(UNI_SPACE);   // prototype
 
 const ShapeItem height = pb.get_height();
 const ShapeItem width = pb.get_width(0);
@@ -817,12 +817,15 @@ Cell * doubled = new Cell[new_cells];
    //
    loop(r, old_rows)
        {
-         const Cell & member_name_cell = old_ravel[2*r];
+         Cell & member_name_cell = old_ravel[2*r];
          UCS_string member_name(member_name_cell.get_pointer_value().getref());
+         member_name_cell.release(LOC);
+
          Cell * dest = get_new_member(member_name);
 
-         const Cell & member_data_cell = old_ravel[2*r + 1];
-         dest->init(member_data_cell, *this, LOC);
+         Cell & member_data_cell = old_ravel[2*r + 1];
+         dest->init(member_data_cell, *this, LOC);   // before release() !
+         member_data_cell.release(LOC);
        }
 
    delete del;
@@ -2122,6 +2125,23 @@ ostream &
 Value::print_member(ostream & out, UCS_string member_prefix) const
 {
 const ShapeItem rows = get_rows();
+
+   // figure the longest member name...
+   //
+ShapeItem longest_name = 0;
+   loop(r, rows)
+      {
+        const Cell & cell = get_ravel(2*r);   // (nested) member-name or 0
+        if (cell.is_pointer_cell())
+           {
+              Value_P member_name = cell.get_pointer_value();
+              const ShapeItem name_len = member_name->nz_element_count();
+              if (longest_name < name_len)  longest_name = name_len;
+           }
+      }
+
+const size_t indent = member_prefix.size() + longest_name + 3;
+
    loop(r, rows)
        {
          const Cell * cell = &get_ravel(2*r);   // (nested) member-name or 0
@@ -2132,10 +2152,13 @@ const ShapeItem rows = get_rows();
 
          // print the member name
          //
-         UCS_string member = member_prefix;
-         member += UNI_ASCII_FULLSTOP;
-         member += cell_sub->get_UCS_ravel();
+         const UCS_string member_name = cell_sub->get_UCS_ravel();
+         const size_t pad = longest_name - member_name.size();
+         UCS_string member = member_prefix;   // ancestor.ancestor ...
+         member += UNI_FULLSTOP;
+         member += member_name;
          out << member << ": ";
+         out << UCS_string(pad, UNI_SPACE);
 
          // print the member value
          //
@@ -2146,7 +2169,8 @@ const ShapeItem rows = get_rows();
               Value_P sub = cell->get_pointer_value();
               if (sub->is_member())
                  {
-                   sub->print_member(out << endl, member);
+                   out << "□" << endl;
+                   sub->print_member(out, member);
                    printed = true;
                  }
               else if (sub->is_char_vector())   // maybe multi-line with \n
@@ -2156,7 +2180,7 @@ const ShapeItem rows = get_rows();
                                                         .get_apl_val();
                    if (sub2->get_rows() > 1)
                       {
-                        sub2->print_boxed(out, member.size() + 2);
+                        sub2->print_boxed(out, indent);
                         printed = true;
                       }
 
@@ -2168,13 +2192,13 @@ const ShapeItem rows = get_rows();
 
               if (!printed)
                  {
-                   sub->print_boxed(out, member.size() + 2);
+                   sub->print_boxed(out, indent);
                  }
             }
          else                           // simple member value
             {
               Value_P sub(*cell, LOC);
-              sub->print_boxed(out, member.size() + 2);
+              sub->print_boxed(out, indent);
             }
        }
 
@@ -2203,7 +2227,7 @@ PrintBuffer pb(*this, pctx, &out);
 ostream &
 Value::print_properties(ostream & out, int indent, bool help) const
 {
-UCS_string ind(indent, UNI_ASCII_SPACE);
+UCS_string ind(indent, UNI_SPACE);
    if (help)
       {
         out << ind << "Rank:  " << get_rank()  << endl
@@ -2257,7 +2281,7 @@ const ShapeItem rows = Z->get_rows();
 const ShapeItem cols = Z->get_cols();
    loop(r, rows)
        {
-         if (indent && r)   out << UCS_string(indent, UNI_ASCII_SPACE);
+         if (indent && r)   out << UCS_string(indent, UNI_SPACE);
          loop(c, cols)   out << Z->get_ravel(c + r*cols).get_char_value();
          out << endl;
        }
@@ -2285,7 +2309,7 @@ Cell * c = &get_ravel(0);
    loop(e, ec)
       {
         if (c->is_pointer_cell())          c->get_pointer_value()->to_proto();
-        else if (c->is_character_cell())   new (c) CharCell(UNI_ASCII_SPACE);
+        else if (c->is_character_cell())   new (c) CharCell(UNI_SPACE);
         else                               new (c) IntCell(0);
         ++c;
       }
@@ -2350,7 +2374,7 @@ Value::prototype(const char * loc) const
 
 const Cell & first = get_ravel(0);
    if (first.is_integer_cell())     return IntScalar(0, LOC);
-   if (first.is_character_cell())   return CharScalar(UNI_ASCII_SPACE, LOC);
+   if (first.is_character_cell())   return CharScalar(UNI_SPACE, LOC);
    if (first.is_pointer_cell())
       {
         Value_P B0 = first.get_pointer_value();
@@ -2548,7 +2572,7 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob) const
 
    VH_entry::print_history(out, dob->pValue(), LOC);
 
-   try 
+   try
       {
         print_structure(out, 0, 0);
         const PrintContext pctx(PST_NONE);

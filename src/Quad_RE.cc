@@ -60,13 +60,13 @@ int ofcnt = 0;
            {
              case UNI_SUBSET:      result_type = RT_partition;  ++ofcnt;  break;
              case UNI_DOWN_ARROW:  result_type = RT_pos_len;    ++ofcnt;  break;
-             case UNI_ASCII_SLASH: result_type = RT_reduce;     ++ofcnt;  break;
-             case UNI_ASCII_g:     global = true;                         break;
-             case UNI_ASCII_E:     error_on_no_match = true;              break;
-             case UNI_ASCII_i:     flags |= PCRE2_CASELESS;               break;
-             case UNI_ASCII_m:     flags |= PCRE2_MULTILINE;              break;
-             case UNI_ASCII_s:     flags |= PCRE2_DOTALL;                 break;
-             case UNI_ASCII_x:     flags |= PCRE2_EXTENDED;               break;
+             case UNI_SLASH: result_type = RT_reduce;     ++ofcnt;  break;
+             case UNI_g:     global = true;                         break;
+             case UNI_E:     error_on_no_match = true;              break;
+             case UNI_i:     flags |= PCRE2_CASELESS;               break;
+             case UNI_m:     flags |= PCRE2_MULTILINE;              break;
+             case UNI_s:     flags |= PCRE2_DOTALL;                 break;
+             case UNI_x:     flags |= PCRE2_EXTENDED;               break;
              default:
                 MORE_ERROR() << "Unknown ⎕RE flag: '" << UCS_string(1, uni)
                              << "'. Valid flags are: Eimsx⊂↓/";

@@ -261,7 +261,7 @@ Avec::map_alternative_char(Unicode alt_av)
         case 0x2018: return AV_SINGLE_QUOTE;     //  map ‘ to '
         case 0x2019: return AV_SINGLE_QUOTE;     //  map ’ to '
         case 0x220A: return AV_ELEMENT;          //  map ∊ to ∈
-        case 0x2212: return AV_ASCII_MINUS;      //  map − to -
+        case 0x2212: return AV_MINUS;            //  map − to -
         case 0x22BC: return AV_NAND;             //  map ⊼ to ⍲
         case 0x22BD: return AV_NOR;              //  map ⊽ to ⍱
         case 0x22C4: return AV_DIAMOND;          //  map ⋄ to ◊
@@ -297,11 +297,26 @@ Avec::is_known_char(Unicode av)
    return false;   // not found
 }
 //-----------------------------------------------------------------------------
+int
+Avec::digit_value(Unicode uni, bool hex)
+{
+   if (uni <  UNI_0)   return -1;
+   if (uni <= UNI_9)   return uni - '0';
+   if (hex)
+      {
+        if (uni <  UNI_A)   return -1;
+        if (uni <= UNI_F)   return 10 + uni - 'A';
+        if (uni <  UNI_a)   return -1;
+        if (uni <= UNI_f)   return 10 + uni - 'a';
+      }
+   return -1;
+}
+//-----------------------------------------------------------------------------
 bool
 Avec::need_UCS(Unicode uni)
 {
    if (is_control(uni))   return true;                      // ASCII control
-   if (uni >= 0 && uni < UNI_ASCII_DELETE)  return false;   // printable ASCII
+   if (uni >= 0 && uni < UNI_DELETE)  return false;   // printable ASCII
 
 const CHT_Index idx = find_char(uni);
    if (idx == Invalid_CHT)   return true;           // char not in GNU APL's ⎕AV

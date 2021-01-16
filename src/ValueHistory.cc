@@ -128,10 +128,10 @@ flags_name(ValueFlags flags)
 {
 UCS_string ret;
 
-  if (flags & VF_marked)   ret.append(UNI_ASCII_M);
-  if (flags & VF_complete) ret.append(UNI_ASCII_C);
+  if (flags & VF_marked)   ret.append(UNI_M);
+  if (flags & VF_complete) ret.append(UNI_C);
 
-   while (ret.size() < 4)   ret.append(UNI_ASCII_SPACE);
+   while (ret.size() < 4)   ret.append(UNI_SPACE);
    return ret;
 }
 //----------------------------------------------------------------------------

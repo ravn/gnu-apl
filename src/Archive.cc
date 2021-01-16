@@ -134,7 +134,7 @@ const void * item = bsearch(val, values, value_count, sizeof(_val_par),
 void
 XML_Saving_Archive::emit_unicode(Unicode uni, int & space)
 {
-   if (uni == UNI_ASCII_LF)
+   if (uni == UNI_LF)
       {
         leave_char_mode();
         out << UNI_PAD_U1 << "A" << "\n";
@@ -1145,7 +1145,7 @@ XML_Loading_Archive::XML_Loading_Archive(ostream & _out, const char * _filename,
      file_start(0),
      line_start(0),
      line_no(1),
-     current_char(UNI_ASCII_SPACE),
+     current_char(UNI_SPACE),
      data(0),
      file_end(0),
      copying(false),
@@ -2097,7 +2097,7 @@ UCS_string text;
       {
         int err = 0;
         UCS_string creator_UCS(filename);
-        creator_UCS.append(UNI_ASCII_COLON);
+        creator_UCS.append(UNI_COLON);
         creator_UCS.append_number(line_no);
         UTF8_string creator(creator_UCS);
 

@@ -102,9 +102,9 @@ const ShapeItem ec = value.element_count();
         if (value.is_char_vector())
            {
              UCS_string ucs;
-             ucs.append(UNI_ASCII_DOUBLE_QUOTE);
+             ucs.append(UNI_DOUBLE_QUOTE);
              loop(v, ec)   ucs.append(value.get_ravel(v).get_char_value());
-             ucs.append(UNI_ASCII_DOUBLE_QUOTE);
+             ucs.append(UNI_DOUBLE_QUOTE);
              append_ucs(ucs);
              update_info();
              complete = true;
@@ -574,7 +574,7 @@ UCS_string ucs;
            {
              PrintBuffer pb = value.get_ravel(e)
                                           .character_representation(pctx);
-             if (e)   ucs.append(UNI_ASCII_SPACE);
+             if (e)   ucs.append(UNI_SPACE);
              ucs.append(UCS_string(pb, 0, pctx.get_PW()));
            }
       }
@@ -662,7 +662,7 @@ PrintBuffer::pad_to_spaces()
 {
    loop(y, get_height())
    loop(x, get_width(y))
-      if (is_iPAD_char(get_char(x, y)))   set_char(x, y, UNI_ASCII_SPACE);
+      if (is_iPAD_char(get_char(x, y)))   set_char(x, y, UNI_SPACE);
 }
 //-----------------------------------------------------------------------------
 void
@@ -684,10 +684,10 @@ PrintBuffer::get_frame_chars(PrintStyle pst,
    switch(pst & PST_CS_MASK)
       {
         case PST_CS_ASCII:
-             HORI = UNI_ASCII_MINUS;
-             VERT = UNI_ASCII_BAR;
-             NW   = UNI_ASCII_FULLSTOP;
-             NE   = UNI_ASCII_FULLSTOP;
+             HORI = UNI_MINUS;
+             VERT = UNI_BAR;
+             NW   = UNI_FULLSTOP;
+             NE   = UNI_FULLSTOP;
              SE   = UNI_SINGLE_QUOTE;
              SW   = UNI_SINGLE_QUOTE;
              break;
@@ -761,7 +761,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
         buffer[y].prepend(VERT);
         buffer[y].append(VERT);
 
-        // change internal pad characters to ASCII_SPACE so that they will
+        // change internal pad characters to SPACE so that they will
         // not be removed later and the frame is printed correctly
         //
         buffer[y].map_pad();
@@ -868,7 +868,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
         buffer[y].prepend(VERT);
         buffer[y].append(VERT);
 
-        // change internal pad characters to ASCII_SPACE so that they will
+        // change internal pad characters to SPACE so that they will
         // not be removed later and the frame is printed correctly
         //
         buffer[y].map_pad();
@@ -1052,12 +1052,12 @@ int this_r = 0;   // padding right of this
 
 UCS_string ucs1;
 
-   if (ucs_l > 0)   ucs1.append(UCS_string(ucs_l, UNI_ASCII_SPACE));
+   if (ucs_l > 0)   ucs1.append(UCS_string(ucs_l, UNI_SPACE));
    ucs1.append(ucs);
-   if (ucs_r > 0)   ucs1.append(UCS_string(ucs_r, UNI_ASCII_SPACE));
+   if (ucs_r > 0)   ucs1.append(UCS_string(ucs_r, UNI_SPACE));
 
-   if (this_l > 0)   pad_l(UNI_ASCII_SPACE, this_l);
-   if (this_r > 0)   pad_r(UNI_ASCII_SPACE, this_r);
+   if (this_l > 0)   pad_l(UNI_SPACE, this_l);
+   if (this_r > 0)   pad_r(UNI_SPACE, this_r);
 
    buffer.push_back(ucs1);
 
@@ -1185,8 +1185,8 @@ PrintBuffer::align_dot(ColInfo & COL_INFO)
                   else                        // no expo yet: create one
                      {
                        Assert1(diff >= 2);
-                       pad_r(UNI_ASCII_E, 1);
-                       pad_r(UNI_ASCII_0, 1);
+                       pad_r(UNI_E, 1);
+                       pad_r(UNI_0, 1);
                        pad_r(UNI_iPAD_L4, diff - 2);
                      }
                   col_info.real_len = COL_INFO.real_len;
@@ -1290,12 +1290,12 @@ UCS_string new_buf(buffer[0], 0, col_info.int_len);
          }
       else if (col_info.fract_len == 0)   // no fractional part (yet), e.g. 1E2
          {
-           new_buf.append(UNI_ASCII_FULLSTOP);
-           loop(d, diff - 1)   new_buf.append(UNI_ASCII_0);
+           new_buf.append(UNI_FULLSTOP);
+           loop(d, diff - 1)   new_buf.append(UNI_0);
          }
       else
          {
-           loop(d, diff)   new_buf.append(UNI_ASCII_0);
+           loop(d, diff)   new_buf.append(UNI_0);
          }
 
    // copy exponent part

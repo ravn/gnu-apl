@@ -1096,7 +1096,7 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
    //
    if (lib != LIB0)
       {
-        arg.prepend(UNI_ASCII_SPACE);
+        arg.prepend(UNI_SPACE);
         arg.prepend(Unicode('0' + lib));
       }
    the_workspace.WS_name = arg;

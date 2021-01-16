@@ -242,7 +242,7 @@ StateIndicator::list(ostream & out, SI_mode mode) const
                        out << name_and_line
                            << "  " << executable->statement_text(get_PC())
                            << endl
-                           << UCS_string(name_and_line.size(), UNI_ASCII_SPACE)
+                           << UCS_string(name_and_line.size(), UNI_SPACE)
                            << "  ^";   // ^^^
                      }
                 }

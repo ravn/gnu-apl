@@ -354,7 +354,7 @@ const ShapeItem llen = item_shape.get_volume();
             {
               Z_from->init(B_item, Z.getref(), LOC);
               for (ShapeItem c = 1; c < llen; ++c)
-                  new (Z_from + c)   CharCell(UNI_ASCII_SPACE);
+                  new (Z_from + c)   CharCell(UNI_SPACE);
             }
          else                                   // simple numeric scalar
             {
@@ -458,7 +458,7 @@ PermutedArrayIterator it_Z(shape_Z, perm);
                         ++vB_it;
                       }
                    else if (vB->get_ravel(0).is_character_cell())  // char
-                      new (dest) CharCell(UNI_ASCII_SPACE);
+                      new (dest) CharCell(UNI_SPACE);
                    else                                   // simple numeric
                       new (dest) IntCell(0);
 
@@ -473,7 +473,7 @@ PermutedArrayIterator it_Z(shape_Z, perm);
                    if (it_it() == 0)   // first element: use B_item
                       dest->init(B_item, Z.getref(), LOC);
                    else if (B_item.is_character_cell())   // simple char scalar
-                      new (dest) CharCell(UNI_ASCII_SPACE);
+                      new (dest) CharCell(UNI_SPACE);
                    else                                // simple numeric scalar
                       new (dest) IntCell(0);
                    ++it_Z;

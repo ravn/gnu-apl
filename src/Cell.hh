@@ -105,7 +105,7 @@ public:
    static bool integral_within(APL_Float A, double qct);
 
    /// Return the character value of a cell
-   virtual Unicode get_char_value() const   { DOMAIN_ERROR; }
+   virtual Unicode get_char_value() const;
 
    /// Return the byte value (-128..255 incl) of a cell
    virtual int get_byte_value() const   { DOMAIN_ERROR; }

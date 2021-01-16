@@ -109,7 +109,7 @@ PrimitiveFunction::print(ostream & out) const
 void
 PrimitiveFunction::print_properties(ostream & out, int indent) const
 {
-UCS_string ind(indent, UNI_ASCII_SPACE);
+UCS_string ind(indent, UNI_SPACE);
    out << ind << "System Function ";
    print(out);
    out << endl;
@@ -911,13 +911,13 @@ Bif_F12_ELEMENT::eval_B(Value_P B) const
 
               if (C->is_numeric())
                  {
-                   new (&Z->get_ravel(0)) CharCell(UNI_ASCII_0);
+                   new (&Z->get_ravel(0)) CharCell(UNI_0);
                    break;
                  }
 
               if (C->is_character_cell())
                  {
-                   new (&Z->get_ravel(0)) CharCell(UNI_ASCII_SPACE);
+                   new (&Z->get_ravel(0)) CharCell(UNI_SPACE);
                    break;
                  }
 
@@ -1167,8 +1167,8 @@ Bif_F1_EXECUTE::execute_statement(UCS_string & statement)
    // check for commands
    //
    if (statement.size() &&
-       (statement[0] == UNI_ASCII_R_PARENT ||
-        statement[0] == UNI_ASCII_R_BRACK))   return execute_command(statement);
+       (statement[0] == UNI_R_PARENT ||
+        statement[0] == UNI_R_BRACK))   return execute_command(statement);
 
 ExecuteList * fun = ExecuteList::fix(statement.no_pad(), LOC);
    if (fun == 0)   SYNTAX_ERROR;
@@ -1232,14 +1232,14 @@ const bool user_cmd = Command::do_APL_command(out, command);
 
 UTF8_string result_utf8 = out.get_data();
    if (result_utf8.size() == 0 ||
-       result_utf8.back() != UNI_ASCII_LF)
+       result_utf8.back() != UNI_LF)
       result_utf8 += '\n';
 
 std::vector<ShapeItem> line_starts;
    line_starts.push_back(0);
    loop(r, result_utf8.size())
       {
-        if (result_utf8[r] == UNI_ASCII_LF)   line_starts.push_back(r + 1);
+        if (result_utf8[r] == UNI_LF)   line_starts.push_back(r + 1);
       }
 
 Value_P Z(ShapeItem(line_starts.size() - 1), LOC);

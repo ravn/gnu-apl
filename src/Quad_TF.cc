@@ -127,15 +127,15 @@ Value_P
 Quad_TF::tf1(const UCS_string & var_name, Value_P val)
 {
 const bool is_char_array = val->get_ravel(0).is_character_cell();
-UCS_string ucs(is_char_array ? UNI_ASCII_C : UNI_ASCII_N);
+UCS_string ucs(is_char_array ? UNI_C : UNI_N);
 
    ucs.append(var_name);
-   ucs.append(UNI_ASCII_SPACE);
+   ucs.append(UNI_SPACE);
    ucs.append_number(val->get_rank());   // rank
 
    loop(r, val->get_rank())
       {
-        ucs.append(UNI_ASCII_SPACE);
+        ucs.append(UNI_SPACE);
         ucs.append_number(val->get_shape_item(r));   // shape
       }
 
@@ -143,7 +143,7 @@ const ShapeItem ec = val->element_count();
 
    if (is_char_array)
       {
-        ucs.append(UNI_ASCII_SPACE);
+        ucs.append(UNI_SPACE);
 
         loop(e, ec)
            {
@@ -160,7 +160,7 @@ const ShapeItem ec = val->element_count();
       {
         loop(e, ec)
            {
-             ucs.append(UNI_ASCII_SPACE);
+             ucs.append(UNI_SPACE);
 
              const Cell & cell = val->get_ravel(e);
              if (cell.is_integer_cell())
@@ -183,7 +183,7 @@ const ShapeItem ec = val->element_count();
                   UCS_string ucs1(cell.get_real_value(), scaled, pctx);
                   ucs.append(ucs1);
 
-                  ucs.append(UNI_ASCII_J);
+                  ucs.append(UNI_J);
 
                   ucs1 = UCS_string(cell.get_imag_value(), scaled, pctx);
                   ucs.append(ucs1);
@@ -207,20 +207,20 @@ UCS_string_vector lines;
 const size_t max_len = text.to_vector(lines);
 
 UCS_string ucs;
-   ucs.append(UNI_ASCII_F);
+   ucs.append(UNI_F);
    ucs.append(fun_name);
-   ucs.append(UNI_ASCII_SPACE);
+   ucs.append(UNI_SPACE);
    ucs.append_number(2);   // rank
-   ucs.append(UNI_ASCII_SPACE);
+   ucs.append(UNI_SPACE);
    ucs.append_number(lines.size());   // rows
-   ucs.append(UNI_ASCII_SPACE);
+   ucs.append(UNI_SPACE);
    ucs.append_number(max_len);        // cols
-   ucs.append(UNI_ASCII_SPACE);
+   ucs.append(UNI_SPACE);
 
    loop(l, lines.size())
       {
        ucs.append(lines[l]);
-       loop(c, max_len - lines[l].size())   ucs.append(UNI_ASCII_SPACE);
+       loop(c, max_len - lines[l].size())   ucs.append(UNI_SPACE);
       }
 
    return Value_P(ucs, LOC);
@@ -262,7 +262,7 @@ ShapeItem idx = 2;
         return Value_P();
       }
 
-   if (ravel[idx++] != UNI_ASCII_SPACE)
+   if (ravel[idx++] != UNI_SPACE)
       {
         MORE_ERROR() << "missing space (before rank) in 1 ⎕TF record";
         return Value_P();
@@ -271,7 +271,7 @@ ShapeItem idx = 2;
 ShapeItem idx0 = idx;
 Rank rank = 0;
    while (idx < len && Avec::is_digit(ravel[idx]))
-      rank = 10 * rank + ravel[idx++] - UNI_ASCII_0;
+      rank = 10 * rank + ravel[idx++] - UNI_0;
 
    if (rank == 0 && idx0 == idx)
       {
@@ -279,7 +279,7 @@ Rank rank = 0;
         return Value_P();
       }
 
-   if (ravel[idx++] != UNI_ASCII_SPACE)
+   if (ravel[idx++] != UNI_SPACE)
       {
         MORE_ERROR() << "missing space (after rank) in 1 ⎕TF record";
         return Value_P();
@@ -297,14 +297,14 @@ Shape shape;
         idx0 = idx;
         ShapeItem sh = 0;
         while (idx < len && Avec::is_digit(ravel[idx]))
-           sh = 10 * sh + ravel[idx++] - UNI_ASCII_0;
+           sh = 10 * sh + ravel[idx++] - UNI_0;
         if (sh == 0 && idx0 == idx)   // no shape
            {
              MORE_ERROR() << "too few shape items in 1 ⎕TF record";
              return Value_P();
            }
 
-        if (ravel[idx++] != UNI_ASCII_SPACE)
+        if (ravel[idx++] != UNI_SPACE)
            {
              MORE_ERROR() << "missing space (in shape) in 1 ⎕TF record";
              return Value_P();
@@ -328,7 +328,7 @@ const NamedObject * sym_or_fun = Workspace::lookup_existing_name(name);
 
 const int data_chars = len - idx;
 
-   if (mode == UNI_ASCII_F)   // function
+   if (mode == UNI_F)   // function
       {
         if (rank != 2)
            {
@@ -355,7 +355,7 @@ const int data_chars = len - idx;
 
          Token t = Quad_FX::fun->eval_B(new_val);
       }
-   else if (mode == UNI_ASCII_C)   // char array
+   else if (mode == UNI_C)   // char array
       {
         if (data_chars != shape.get_volume())
            {
@@ -378,7 +378,7 @@ const int data_chars = len - idx;
         if (symbol == 0)   symbol = Workspace::lookup_symbol(name);
         const_cast<Symbol *>(symbol)->assign(new_val, false, LOC);
       }
-   else if (mode == UNI_ASCII_N)   // numeric array
+   else if (mode == UNI_N)   // numeric array
       {
         if (nc != NC_UNUSED_USER_NAME && nc != NC_VARIABLE)
            {
@@ -496,8 +496,8 @@ UCS_string ucs_value; /// the right hand side of VAR←VALUE
         tf2_value(0, ucs_value, value.getref(), 0);
       }
 
-   Assert(ucs_value[0] == UNI_ASCII_L_PARENT);
-   Assert(ucs_value[ucs_value.size() - 1] == UNI_ASCII_R_PARENT);
+   Assert(ucs_value[0] == UNI_L_PARENT);
+   Assert(ucs_value[ucs_value.size() - 1] == UNI_R_PARENT);
 
 UCS_string ucs(var_name);
    ucs.append(UNI_LEFT_ARROW);
@@ -650,7 +650,7 @@ const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val(),
 void
 Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape, ShapeItem nesting)
 {
-   ucs.append(UNI_ASCII_L_PARENT);
+   ucs.append(UNI_L_PARENT);
    loop(n, nesting)   ucs.append(UNI_SUBSET);   // ⊂...
 
    // scalars are ''⍴SCALAR but ''⍴ has no effect and can be omitted
@@ -659,7 +659,7 @@ Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape, ShapeItem nesting)
       {
         loop(r, shape.get_rank())
             {
-              if (r)   ucs.append(UNI_ASCII_SPACE);
+              if (r)   ucs.append(UNI_SPACE);
               ucs.append_number(shape.get_shape_item(r));
             }
 
@@ -687,10 +687,10 @@ Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
         const Cell & cell = value.get_ravel(0);
         if (cell.is_character_cell())
            {
-             ucs.append(UNI_ASCII_L_PARENT);
+             ucs.append(UNI_L_PARENT);
              ucs.append(UNI_SINGLE_QUOTE);
              ucs.append(UNI_SINGLE_QUOTE);
-             ucs.append(UNI_ASCII_R_PARENT);
+             ucs.append(UNI_R_PARENT);
              return;
            }
       }
@@ -702,7 +702,7 @@ const ShapeItem ec = value.nz_element_count();
    tf2_shape(ucs, value.get_shape(), nesting);
    if (value.NOTCHAR())   tf2_ravel(level, ucs, ec, &value.get_ravel(0));
    else                   tf2_all_char_ravel(level, ucs, value);
-   ucs.append(UNI_ASCII_R_PARENT);   // close corresponding '(' from tf2_shape()
+   ucs.append(UNI_R_PARENT);   // close corresponding '(' from tf2_shape()
 
    Log(LOG_Quad_TF)
       {
@@ -720,7 +720,7 @@ Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
 
    loop(e, len)
        {
-         if (e)   ucs.append(UNI_ASCII_SPACE);
+         if (e)   ucs.append(UNI_SPACE);
          const Cell & cell = *cells++;
 
          if (cell.is_pointer_cell())
@@ -747,7 +747,7 @@ Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
              UCS_string ucs1(cell.get_real_value(), scaled, pctx);
              UCS_string ucs2(cell.get_imag_value(), scaled, pctx);
              ucs.append(ucs1);
-             ucs.append(UNI_ASCII_J);
+             ucs.append(UNI_J);
              ucs.append(ucs2);
            }
         else if (cell.is_float_cell())
@@ -789,12 +789,12 @@ const ShapeItem ec = value.nz_element_count();
    if (use_UCS)
       {
         ucs.append(UNI_Quad_Quad);
-        ucs.append(UNI_ASCII_U);
-        ucs.append(UNI_ASCII_C);
-        ucs.append(UNI_ASCII_S);
+        ucs.append(UNI_U);
+        ucs.append(UNI_C);
+        ucs.append(UNI_S);
         loop(e, ec)
             {
-              ucs.append(UNI_ASCII_SPACE);
+              ucs.append(UNI_SPACE);
               const Unicode uni = value.get_ravel(e).get_char_value();
               ucs.append_number(uni);
             }
@@ -1357,7 +1357,7 @@ UCS_string_vector lines;
 
    loop(l, lines.size())
       {
-        ucs.append(UNI_ASCII_SPACE);
+        ucs.append(UNI_SPACE);
         tf2_char_vec(ucs, lines[l]);
       }
 }

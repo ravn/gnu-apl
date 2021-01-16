@@ -912,8 +912,8 @@ ComplexCell::character_representation(const PrintContext & pctx) const
                  {
                    const FloatCell imag_cell(value.cval[1]);
                    PrintBuffer ret = imag_cell.character_representation(pctx);
-                   ret.pad_l(UNI_ASCII_J, 1);
-                   ret.pad_l(UNI_ASCII_0, 1);
+                   ret.pad_l(UNI_J, 1);
+                   ret.pad_l(UNI_0, 1);
 
                    ret.get_info().flags |= CT_COMPLEX;
                    ret.get_info().imag_len = 1 + ret.get_info().real_len;
@@ -936,14 +936,14 @@ int int_fract = ucs.size();
    info.int_len = ucs.size();
    loop(u, ucs.size())
       {
-       if (ucs[u] == UNI_ASCII_FULLSTOP)
+       if (ucs[u] == UNI_FULLSTOP)
            {
              info.int_len = u;
              if (!scaled_real)   break;
              continue;
            }
 
-        if (ucs[u] == UNI_ASCII_E)
+        if (ucs[u] == UNI_E)
            {
              if (info.int_len > u)   info.int_len = u;
              int_fract = u;
@@ -954,7 +954,7 @@ int int_fract = ucs.size();
 
    if (!is_near_real())
       {
-        ucs.append(UNI_ASCII_J);
+        ucs.append(UNI_J);
         bool scaled_imag = pctx.get_scaled();  // may be changed by UCS_string()
         const UCS_string ucs_i(value.cval[1], scaled_imag, pctx);
 

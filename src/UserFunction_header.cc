@@ -163,8 +163,8 @@ UCS_string header_line;
    loop(t, text.size())
        {
          const Unicode uni = text[t];
-         if (uni == UNI_ASCII_CR)        ;        // ignore CR
-         else if (uni == UNI_ASCII_LF)   break;   // stop at LF
+         if (uni == UNI_CR)        ;        // ignore CR
+         else if (uni == UNI_LF)   break;   // stop at LF
          else                            header_line.append(uni);
        }
 
@@ -466,7 +466,7 @@ UserFunction_header::localizes(const Symbol * sym) const
 void
 UserFunction_header::print_properties(ostream & out, int indent) const
 {
-UCS_string ind(indent, UNI_ASCII_SPACE);
+UCS_string ind(indent, UNI_SPACE);
    if (is_operator())   out << "Operator " << function_name << endl;
    else                 out << "Function " << function_name << endl;
 

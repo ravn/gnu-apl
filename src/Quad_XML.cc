@@ -18,8 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+using namespace std;
+
+#include <errno.h>
+#include <string.h>
+
 #include <vector>
 
+#include "Avec.hh"
+#include "Quad_FIO.hh"
 #include "Quad_XML.hh"
 #include "Value.hh"
 #include "Workspace.hh"
@@ -28,293 +35,165 @@ Quad_XML  Quad_XML::_fun;
 Quad_XML * Quad_XML::fun = &Quad_XML::_fun;
 
 //-----------------------------------------------------------------------------
-/// a helper class (doubly linked list) for parsing XML
-class XML_node
-{
-public:
-   /// constructor
-   XML_node(XML_node * anchor, const UCS_string & src,
-            ShapeItem spos, ShapeItem slen);
-
-   /// the type of an XML_node
-   enum Node_type
-      {
-        NT_error       = -1,
-        NT_text        =  1,   // unstructured text (between the tags)
-        NT_leaf_tag    =  2,   // <Tag ... />
-        NT_start_tag   =  3,   // <Tag ... >
-        NT_end_tag     =  4,    // </Tag>
-        NT_comment     =  5,    // <!-- ... -->
-        NT_declaration =  6,    // <?xml ... ?>
-        NT_doctype     =  7,    // <!DOCTYPE ... >
-      };
-
-   /// return the next XML node in the document
-   const XML_node * get_next() const
-      { return next; }
-
-   /// return the next XML node in the document
-   XML_node * get_next()
-      { return next; }
-
-   /// return the previous XML node in the document
-   const XML_node * get_prev() const
-      { return prev; }
-
-   /// return the previous XML node in the document
-   XML_node * get_prev()
-      { return prev; }
-
-   /// return the type of this node
-   Node_type get_node_type() const
-        { return node_type; }
-
-   /// return the (source-) string for this node
-   UCS_string get_item() const
-      { return UCS_string(src, src_pos, src_len); }
-
-   /// return the number of characters in this node
-   size_t get_src_len() const
-      { return src_len; }
-
-   /// return the tagname of this node
-   UCS_string get_tagname() const;
-
-   bool is_parsed() const
-      { return (+value); }
-
-   /// unlink \b this node from the doubly-linked list that contains it
-   XML_node * unlink()
-      {
-        prev->next = next;
-        next->prev = prev;
-
-        prev = this;
-        next = this;
-
-        return this;
-      }
-
-   /// append \b garbage to this garbage can (for later deletion)
-   void append(XML_node * garbage)
-      {
-        // check that garbage was properly unlinked.
-        Assert(garbage->next == garbage);
-        Assert(garbage->prev == garbage);
-
-        garbage->prev = this;
-        garbage->next = next;
-        next = garbage;
-      }
-
-   /// (debug-) print this node
-   void print(ostream & out) const;
-
-   /// (debug-) print all nodes 
-   static void print_all(ostream & out, const XML_node & anchor);
-
-   /// return the type of this node as string
-   const char * get_node_type_name() const;
-
-   /// reduce nodes starting at \b start, return true on error
-   static bool translate(XML_node & anchor, XML_node & garbage);
-
-   /// collect nodes starting at \b anchor, return true on error
-   static bool collect(XML_node & anchor, XML_node & garbage, Value * Z);
-
-   /// add ∆-something member to Z
-   static void add_member(Value * Z, const char * delta_x, size_t num,
-                          Value * value);
-
-   /// merge the items drom start(-tag) to (end(-tag) into start tag
-   static bool merge_range(XML_node & start, XML_node & end, XML_node & garbage);
-
-   /// return true if uni is a valid char in an XML tag name
-   static bool is_tagname_char(Unicode uni);
-
-   /// return true if uni is a valid first char in an XML tag name
-   static bool is_first_tagname_char(Unicode uni);
-
-   /// parse an XML start or leaf tag, store result in \b this->value
-   bool parse_tag();
-
-protected:
-   /// the source string of the entire xml document
-   const UCS_string & src;   // B of ⎕XML B
-
-   /// the start of this node in src
-   const ShapeItem src_pos;
-
-   /// the length of this node in src
-   const ShapeItem src_len;
-
-   /// the next XML node in the document
-   XML_node * next;
-
-   /// the previous XML node in the document
-   XML_node * prev;
-
-   /// the type of this node
-   Node_type node_type;
-
-   /// the APL value for this node
-   Value_P value;
-
-   /// the error location (if any) when constructing this node
-   const char * err_loc;
-
-
-   /// the level of this node in the document (top-level = 0)
-   int level;
-
-   /// the position of this node (at its level)
-   int position;
-};
-//-----------------------------------------------------------------------------
 XML_node::XML_node(XML_node * anchor, const UCS_string & string_B,
                    ShapeItem spos, ShapeItem slen)
-: src(string_B),
-  src_pos(spos),
-  src_len(slen),
-  next(this),
-  prev(this),
-  err_loc(0),
-  level(-1),
-  position(-1)
+  : src(string_B),
+    src_pos(spos),
+    src_len(slen),
+    next(this),
+    prev(this),
+    err_loc(0),
+    level(-1),     // set in translate()
+    position(-1)   // set in collect()
 {
-  if (anchor)   // unless this node is the root node
-     {
-       prev = anchor->prev;
-       anchor->prev = this;
+   if (!anchor)   return;
 
-       next = anchor;
-       prev->next = this;
-     }
+   // insert this node at the end of the list that starts at anchor
+   //
+   prev = anchor->prev;   // the (old) end of the list
+   anchor->prev = this;   // make this node the new end of the list
+
+   next = anchor;         // this is the end, so this->next is the anchor
+   prev->next = this;     // and this is the next of the old end
 
    // figure the node type
    //
-const UCS_string item(src, spos, slen);
-   if (item[0] != '<')
-      {
-        node_type = NT_text;
-        return;
-      }
+  node_type = NT_error;
+  if (src[src_pos] != '<')
+     {
+       node_type = NT_text;
+       return;
+     }
 
-   node_type = NT_error;
-   if (slen < 3)
-      {
-        err_loc = LOC;
-        MORE_ERROR() << "⎕XML: Tag too short: " << UCS_string(src, spos, slen);
-        return;
-      }
+  if (src_len < 3)
+     {
+       err_loc = LOC;
+       MORE_ERROR() << "⎕XML: Tag too short: "
+                    << UCS_string(src, src_pos, src_len);
+       return;
+     }
 
    // <...
    //
-   if (!item.ends_with(">"))
+   if (src[src_pos + src_len - 1] != '>')
       {
         err_loc = LOC;
-        MORE_ERROR() << "⎕XML: No tag end: " << item;
+        MORE_ERROR() << "⎕XML: No tag end: "
+                     << UCS_string(src, src_pos, src_len);
         return;
       }
 
    // <...>
    //
-const Unicode ucs1 = item[1];   // the character after <
+const Unicode ucs1 = src[src_pos + 1];          // the character after <
    if (ucs1 == '!')   // XML declaration or comment <! ... >
       {
-        if (slen < 7)   // at least <!---->
+        if (src_len < 7)   // at least <!---->
            {
              err_loc = LOC;
-             MORE_ERROR() << "⎕XML: comment not terminated: " << item;
+             MORE_ERROR() << "⎕XML: comment not properly terminated: "
+                          << UCS_string(src, src_pos, src_len);
              return;
            }
 
-        if (item.starts_with("<!DOCTYPE") && item.ends_with(">"))
+        if (src[src_pos + 2] =='D' &&
+            src[src_pos + 3] =='O' &&
+            src[src_pos + 4] =='C' &&
+            src[src_pos + 5] =='T' &&
+            src[src_pos + 6] =='Y' &&
+            src[src_pos + 7] =='P' &&
+            src[src_pos + 8] =='E')   // <!DOCTYPE ...
            {
              node_type = NT_doctype;
              return;
            }
 
-        if (!item.starts_with("<!--"))   // XML comment
+        if (src[src_pos + 2] !='-' ||
+            src[src_pos + 3] !='-')        // not <!--
            {
              err_loc = LOC;
-             MORE_ERROR() <<
-             "⎕XML: bad comment start (expecting <!--) : " << item;
+             MORE_ERROR() << "⎕XML: bad comment start (expecting <!--) : "
+                          << UCS_string(src, src_pos, src_len);
              return;
            }
 
-        else if (!item.ends_with("-->"))
+        else if (src[src_pos + src_len - 2] != '-' ||
+                 src[src_pos + src_len - 3] != '-')
            {
              err_loc = LOC;
-             MORE_ERROR() <<
-             "⎕XML: bad comment end (expecting -->): " << item;
+             MORE_ERROR() << "⎕XML: bad comment end (expecting --> ): "
+                          << UCS_string(src, src_pos, src_len);
              return;
            }
         node_type = NT_comment;
       }
    else if (ucs1 == '?')   // <? ... >
       {
-        if (slen < 7)   // at least <?xml?>
+        if (src_len < 7)   // at least <?xml?>
            {
              err_loc = LOC;
-             MORE_ERROR() <<
-             "⎕XML: processing instruction not terminated: " << item;
+             MORE_ERROR() << "⎕XML: processing instruction not terminated: "
+                          << UCS_string(src, src_pos, src_len);
+             return;
+           }
+        else if (src[src_pos + 2] !='x' ||
+                 src[src_pos + 3] !='m' ||
+                 src[src_pos + 4] !='l')   // not <?xml
+           {
+             err_loc = LOC;
+             MORE_ERROR() << "⎕XML: bad declaration start (expecting <?xml): "
+                          << UCS_string(src, src_pos, src_len);
              return;
            }
 
-        else if (!item.starts_with("<?"))
+        else if (src[src_pos + src_len - 2] != '?')
            {
              err_loc = LOC;
-             MORE_ERROR() <<
-             "⎕XML: bad declaration start (expecting <?xml): " << item;
-             return;
-           }
-
-        else if (!item.ends_with("?>"))
-           {
-             err_loc = LOC;
-             MORE_ERROR() <<
-             "⎕XML: bad declaration end (expecting ?>): " << item;
+             MORE_ERROR() << "⎕XML: bad declaration end (expecting ?>): "
+                          << UCS_string(src, src_pos, src_len);
              return;
            }
         node_type = NT_declaration;
       }
    else if (ucs1 == '/')   // </ ... >
       {
-        const Unicode ucs2 = item[2];
-        if (ucs2 < 'A' || (ucs2 > 'Z' && ucs2 < 'a') || ucs2 > 'z')
+        if (!is_first_name_char(src[src_pos + 2]))
            {
              err_loc = LOC;
-             MORE_ERROR() <<
-             "⎕XML: bad tag name in closing tag : " << item;
+             MORE_ERROR() << "⎕XML: bad tag name in end tag : "
+                          << UCS_string(src, src_pos, src_len);
              return;
            }
         node_type = NT_end_tag;
       }
-   else if (item[item.size() - 2] == '/')   // leaf tag
+   else if (src[src_pos + src_len - 2] == '/')   // leaf tag
       {
-        if (ucs1 < 'A' || (ucs1 > 'Z' && ucs1 < 'a') || ucs1 > 'z')
+        if (!is_first_name_char(ucs1))
            {
              err_loc = LOC;
-             MORE_ERROR() <<
-             "⎕XML: bad tag name in leaf tag: " << item;
+             MORE_ERROR() << "⎕XML: bad tag name in empty (-leaf) tag: "
+                          << UCS_string(src, src_pos, src_len);
              return;
            }
         node_type = NT_leaf_tag;
       }
    else                              // start tag
       {
-        if (ucs1 < 'A' || (ucs1 > 'Z' && ucs1 < 'a') || ucs1 > 'z')
+        if (!is_first_name_char(ucs1))
            {
              err_loc = LOC;
-             MORE_ERROR() <<
-             "⎕XML: bad tag name in start tag: " << item;
+             MORE_ERROR() << "⎕XML: bad tag name in start tag: "
+                          << UCS_string(src, src_pos, src_len);
              return;
            }
         node_type = NT_start_tag;
       }
 
    Assert(node_type != NT_error);
+}
+//-----------------------------------------------------------------------------
+XML_node::~XML_node()
+{
 }
 //-----------------------------------------------------------------------------
 void
@@ -356,75 +235,353 @@ XML_node::get_node_type_name() const
 Token
 Quad_XML::eval_B(Value_P B) const
 {
+   if (B->is_structured())   // associative B array to XML string
+      {
+        Value_P Z =   APL_to_XML(B.getref());
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
    if (B->get_rank() != 1)   RANK_ERROR;
 
-const UCS_string string_B(*B);
+Value_P Z = XML_to_APL(B.getref());
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_XML::APL_to_XML(const Value & B)
+{
+vector<const UCS_string *> entities;
+   add_sorted_entities(entities, B);
 
-const ShapeItem len_B = B->element_count();
-bool inside_tag = false;   // inside < ... >
-bool inside_dq  = false;   // inside "..."
-bool inside_sq  = false;   // inside '...'
+ShapeItem len_Z = 0;
+   loop(e, entities.size())   len_Z += entities[e]->size();
+
+Value_P Z(len_Z, LOC);
+   loop(e, entities.size())
+       {
+         const UCS_string & entity = *entities[e];
+         const ShapeItem len = entity.size();
+         loop(l, len)   new (Z->next_ravel()) CharCell(entity[l]);
+       }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+void
+Quad_XML::add_sorted_entities(vector<const UCS_string *> & entities,
+                              const Value & B)
+{
+   Assert(B.is_structured());
+
+   // 1. construct a start tag (if any)
+   //
+const UCS_string * tag_name = 0;
+size_t pos = 0;   // the position (-prefix) of the member name
+   for (;; ++pos)
+       {
+         Unicode type;
+         const Cell * member_name_cell = find_entity(type, pos, B);
+         if (member_name_cell == 0)   // no name with that number
+            {
+              if (pos == 0)   continue;   // valid if ⎕IO←1
+
+              // pos > 0, so the end of rows was reached. Since we are still
+              // collecting attributes, this must be a leaf node.
+              //
+              if (tag_name)   // leaf node: close it
+                 {
+                   entities.push_back(new UCS_string("/>"));
+                   return;
+                 }
+
+              // end reached without seeing an attribute. This happens (only)
+              // at the top level.
+              //
+              break;
+            }
+
+         if (type != UNI_DELTA_UNDERBAR)   break;
+
+         const Cell * member_data_cell = member_name_cell + 1;
+         Assert(member_name_cell->is_pointer_cell());
+         Assert(member_data_cell->is_pointer_cell());
+
+         if (tag_name)   // tag attribute (subsequent ⍙member)
+            {
+              entities.push_back(new UCS_string(" "));
+              entities.push_back(new UCS_string(*member_name_cell));
+              entities.push_back(new UCS_string("=\""));
+              entities.push_back(new UCS_string(*member_data_cell));
+              entities.push_back(new UCS_string("\""));
+            }
+         else            // tag name (first ⍙member)
+            {
+              tag_name = new UCS_string(*member_data_cell);
+              entities.push_back(new UCS_string("<"));
+              entities.push_back(tag_name);
+            }
+       }
+
+   // at this point, all tag attributes were processed. start tag may or may
+   // not exist and is still open if it does. See what happpens.
+   //
+   if (tag_name)   entities.push_back(new UCS_string(">"));
+   for (;; ++pos)
+       {
+         Unicode type;
+         const Cell * member_name_cell = find_entity(type, pos, B);
+         if (member_name_cell == 0)   // no name with that number
+            {
+              if (pos == 0)   continue;   // valid if ⎕IO←1
+              break;                      // end of rows
+            }
+
+         const Cell * member_data_cell = member_name_cell + 1;
+         Assert(member_name_cell->is_pointer_cell());
+         Assert(member_data_cell->is_pointer_cell());
+
+         if (type == UNI_DELTA_UNDERBAR)
+            {
+              MORE_ERROR() << "unexpected tag attribute at index " << pos;
+              DOMAIN_ERROR;
+            }
+
+         if (type == UNI_DELTA)   // plain text
+            {
+              entities.push_back(new UCS_string(*member_data_cell));
+              continue;   // next index
+            }
+
+
+         if (type == UNI_UNDERSCORE)   // subnode
+            {
+              const Value & sub = *member_data_cell->get_pointer_value().get();
+              add_sorted_entities(entities, sub);
+              continue;   // next index
+            }
+
+         Q1(type) ; FIXME;
+       }
+
+   // no more (content-) members.
+   //
+   if (tag_name)        // start tag ... end tag
+      {
+        const UCS_string * end_tag = new UCS_string(*tag_name);   // copy it!
+        entities.push_back(new UCS_string("</"));
+        entities.push_back(end_tag);
+        entities.push_back(new UCS_string(">"));
+      }
+}
+//-----------------------------------------------------------------------------
+const Cell *
+Quad_XML::find_entity(Unicode & type, ShapeItem pos, const Value & B)
+{
+const ShapeItem rows = B.get_rows();
+   loop(r, rows)
+       {
+         const Cell & member_name_cell = B.get_ravel(2*r);
+         const Cell & member_data_cell = B.get_ravel(2*r + 1);
+         if (!member_name_cell.is_pointer_cell())   continue;
+
+         const Value * member_name = member_name_cell.get_pointer_value().get();
+         Assert(member_name->get_ravel(0).get_char_value() == UNI_UNDERSCORE);
+         ShapeItem member_pos = 0;     // the position in the name
+         for (ShapeItem j = 1;; ++j)   // position digits
+             {
+               const Unicode digit = member_name->get_ravel(j).get_char_value();
+               if (Avec::is_digit(digit))
+                  {
+                    member_pos *= 10;
+                    member_pos += digit - '0';
+                    continue;
+                  }
+
+               type = digit;
+               break;
+             }
+         if (member_pos != pos)   continue;   // wrong index
+
+         // position is correct, but maybe undesired type. If so then
+         // return since the same member_pos will not occur again.
+         //
+         if (type != UNI_DELTA_UNDERBAR &&
+             type != UNI_DELTA &&
+             type != UNI_UNDERSCORE)
+            {
+              MORE_ERROR() << "⎕XML: Bad position prefix in member "
+                           << UCS_string(*member_name)
+                           << " (should end with _, ∆, or ⍙)";
+              DOMAIN_ERROR;
+            }
+
+         Assert(member_data_cell.is_pointer_cell());
+         return &member_name_cell;   // found
+       }
+
+   return 0;   // not found
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_XML::XML_to_APL(const Value & B)
+{
+const ShapeItem len_B = B.element_count();
+   if (len_B == 0)   LENGTH_ERROR;
+
+UCS_string string_B(len_B, UNI_NUL);
+
+ShapeItem dest_B = 0;
+   loop(src_B, len_B)
+      {
+        const Unicode uni = B.get_ravel(src_B).get_char_value();
+        if (uni == UNI_CR)   // CR
+           {
+             // see XML standard "2.11 End-of-Line Handling"
+             //
+             if (src_B == (len_B - 1))          // CR at the end of the document
+                {
+                  string_B[dest_B++] = UNI_LF;
+                  continue;
+                }
+
+             const Unicode uni_1 = B.get_ravel(src_B + 1).get_char_value();
+             if (string_B[uni_1] == UNI_LF)   // CR/LF
+                {
+                  continue;   // discard CR (don't ++dest_B)
+                }
+
+             else                             // CR not followed by LF
+                {
+                  string_B[dest_B++] = UNI_LF;   // replace CR with LF
+                  continue;
+                }
+
+             // not reached
+             //
+             FIXME;
+           }
+
+        if (XML_node::is_XML_char(uni))   // valid XML character
+           {
+             string_B[dest_B++] = uni;
+           }
+         else                             // invalid XML character
+           {
+             char uni_cc[20];
+             snprintf(uni_cc, sizeof(uni_cc), "U+%4.4X", uni);
+             MORE_ERROR() << "⎕XML B: Invalid XML character " << uni_cc
+                          << " at B[" << (src_B + Workspace::get_IO()) << "]";
+             DOMAIN_ERROR;
+           }
+      }
+
+   Assert(dest_B <= len_B);
+   string_B.resize(dest_B);
 
 XML_node anchor(0,  string_B, 0, 0);
 XML_node garbage(0, string_B, 0, 0);
-ShapeItem start = 0;
+ShapeItem text_start = 0;
+Value_P Z = EmptyStruct(LOC);
+bool error = true;
 
    // create a (flat) doubly-linked list, starting at anchor, and containing
    // all XML_nodes of B.
    //
-   Workspace::more_error().clear();
    loop(b, len_B)
        {
-         const Unicode uni = B->get_ravel(b).get_char_value();
-         if (uni == '<')
+         const Unicode uni_b = B.get_ravel(b).get_char_value();
+         if (uni_b == '<')
             {
-               if (inside_tag)
-                  {
-                    if (inside_sq || inside_dq)
-                       MORE_ERROR() <<
-                           "⎕XML B: Unescaped '<' in attribute value";
-                    else
-                       MORE_ERROR() <<
-                           "⎕XML B: Unescaped '<' in attribute name";
-                    DOMAIN_ERROR;
-                  }
-               inside_tag = true;
-               new XML_node(&anchor, string_B, start, b - start);
-               start = b;
-            }
-           else if (inside_tag)
-            {
-              if (uni == '>')
+              if (text_start != b)   // some text before the '<'
                  {
-                   inside_tag = false;
-                   new XML_node(&anchor, string_B, start, b + 1 - start);
-                   start = b + 1;
+                   const ShapeItem text_len = b - text_start;
+                   new XML_node(&anchor, string_B, text_start, text_len);
                  }
-              else if (uni == '"' && !inside_sq)
-                 {
-                   inside_dq = !inside_dq;
-                 }
-              else if (uni == '\'' && !inside_dq)
-                 {
-                   inside_sq = !inside_sq;
-                 }
-            }
 
-         // else: unstructured text. Do nothing.
+              const ShapeItem taglen = XML_node::get_taglen(string_B, b);
+              if (taglen == -1)   goto cleanup;
+
+              new XML_node(&anchor, string_B, b, taglen);
+              b += taglen;
+              text_start = b;
+            }
        }
 
-   if (start != len_B)   // trailing unstructured text
-      new XML_node(&anchor, string_B, start, len_B - start);
+   if (text_start != len_B)   // trailing unstructured text
+      new XML_node(&anchor, string_B, text_start, len_B - text_start);
 
-   if (XML_node::translate(anchor, garbage))   DOMAIN_ERROR;
+  error = XML_node::translate(anchor, garbage);
+  if (!error)   error = XML_node::collect(anchor, garbage, Z.get());
 
-Value_P Z = EmptyStruct(LOC);
-   if (XML_node::collect(anchor, garbage, Z.get()))  DOMAIN_ERROR;
-
+cleanup:
    while (anchor.get_next() != &anchor)     delete anchor.get_next()->unlink();
    while (garbage.get_next() != &garbage)   delete garbage.get_next()->unlink();
 
-   return Token(TOK_APL_VALUE1, Z);
+   if (error)   DOMAIN_ERROR;
+   return Z;
+}
+//-----------------------------------------------------------------------------
+ShapeItem
+XML_node::get_taglen(const UCS_string & string_B, ShapeItem offset)
+{
+   Assert(string_B[offset] == '<');
+
+bool is_doctype = true;
+const char * cdoc = "!DOCTYPE";
+bool inside_dq  = false;   // inside "..."
+bool inside_sq  = false;   // inside '...'
+
+   for (ShapeItem pos = offset + 1; pos < string_B.size();)
+       {
+         const Unicode uni = string_B[pos++];
+
+         if (*cdoc && uni != *cdoc++)   is_doctype = false;
+
+         if (uni == '\'' && !inside_dq)        inside_sq = !inside_sq;
+         else if (uni == '"' && !inside_sq)    inside_dq = !inside_dq;
+         else if (uni == '<')   // invalid tag start inside tag attribute
+            {
+              if (inside_sq || inside_dq)   MORE_ERROR() <<
+                 "⎕XML B: Unescaped '<' in attribute value: '"
+                 << UCS_string(string_B, offset, 20) << "'...";
+              else                          MORE_ERROR() <<
+                 "⎕XML B: Unescaped '<' in attribute name: '"
+                 << UCS_string(string_B, offset, 20) << "'...";
+              return -1;
+            }
+         else if (uni == '>' && !(inside_sq || inside_dq))   // end of tag
+            {
+              return pos - offset;
+            }
+
+         if (is_doctype && !*cdoc)   // rarely: <!DOCTYPE...
+            {
+              size_t level = 1;
+              for (; pos < string_B.size();)
+                  {
+                    const Unicode uni = string_B[pos++];
+                    if (uni == '<')   ++level;
+                    else if (uni == '>')
+                      {
+                        --level;
+                        if (level == 0)
+                           {
+                             return pos - offset;
+                           }
+                      }
+                  }
+            }
+       }
+
+const int len = string_B.size() - offset;
+const int len1 = len > 50 ? 50 : len;
+UCS_string where(string_B, offset, len1);
+   if (len < 50)   MORE_ERROR() << "No tag end found in: " << where;
+   else            MORE_ERROR() << "No tag end found in: " << where;
+   return -1;
 }
 //-----------------------------------------------------------------------------
 bool
@@ -445,10 +602,10 @@ ShapeItem count = 0;
               case NT_comment:
               case NT_declaration:
               case NT_doctype:
-                   if (node->get_src_len())   // mot empty
+                   if (node->get_src_len())   // not empty
                       {
                         const UCS_string item = node->get_item();
-                        node->value = Value_P(item, LOC);
+                        node->APL_value = Value_P(item, LOC);
                       }
                    else   // empty string
                       {
@@ -461,15 +618,15 @@ ShapeItem count = 0;
                    ++level;
                    /* fall through */
               case NT_leaf_tag:
-                   if (node->parse_tag())   DOMAIN_ERROR;
+                   if (node->parse_tag())   return true;
                    break;
-
 
               case NT_end_tag:
                    node->level = --level;
                    break;
 
-              case NT_error: FIXME;
+              case NT_error:
+                   return true;
             }
 
          ++count;
@@ -481,93 +638,106 @@ ShapeItem count = 0;
 bool
 XML_node::collect(XML_node & anchor, XML_node & garbage, Value * Z)
 {
-XML_node * doctype = 0;
 XML_node * root = 0;
 
 vector<XML_node *> stack;   // a stack of start tags
-vector<int> pos_stack;   // a stack of start tags
+vector<size_t> pos_stack;   // a stack of node positions
 
-int position = 0;
+   // set the positions (before removing any nodes)
+   //
+   {
+     size_t position = Workspace::get_IO();
+     for (XML_node * n = anchor.get_next(); n != &anchor; n = n->get_next())
+       {
+         n->position = position++;
+       }
+   }
+
    for (XML_node * node = anchor.get_next(); node != &anchor;
         node = node->get_next())
        {
-         node->position = position++;
+         size_t position = node->position;
          switch(node->get_node_type())
             {
               case NT_declaration:
-                   {
-                     if (stack.size())   // only allowed at top-level
-                        {
-                          MORE_ERROR() <<
-                          "⎕XML: XML declaration below top-level: "
-                          << node->get_item();
-                          DOMAIN_ERROR;
-                        }
+                   if (stack.size())   // only allowed at top-level
+                      {
+                        MORE_ERROR() <<
+                        "⎕XML: XML declaration below top-level: "
+                        << node->get_item();
+                        return true;
+                      }
 
-                     add_member(Z, "∆declaration", position, node->value.get());
-                     node = node->get_prev();   // move back
-                     garbage.append(node->get_next()->unlink());
-                   }
+                   add_member(Z, "∆declaration", position,
+                              node->APL_value.get());
+                   node = node->get_prev();   // move back
+                   garbage.append(node->get_next()->unlink());
                    break;
 
               case NT_doctype:
-                   {
-                     if (stack.size())   // only allowed at top-level
-                        {
-                          MORE_ERROR() <<
-                          "⎕XML: !DOCTYPE below top-level: " << node->get_item();
-                          DOMAIN_ERROR;
-                        }
+                   if (stack.size())   // only allowed at top-level
+                      {
+                        MORE_ERROR() <<
+                        "⎕XML: !DOCTYPE below top-level: "
+                        << node->get_item();
+                        return true;
+                      }
 
-                     if (doctype)
-                        {
-                          MORE_ERROR() << "⎕XML: multiple !DOCTYPE declarations";
-                          DOMAIN_ERROR;
-                        }
-
-                     doctype = node;
-                     node = node->get_prev();
-                     garbage.append(node->get_next()->unlink());
-                   }
+                   add_member(Z, "∆doctype", position, node->APL_value.get());
+                   node = node->get_prev();   // move back
+                   garbage.append(node->get_next()->unlink());
                    break;
 
               case NT_comment:
-                   {
-                     if (stack.size() == 0)   // only at top-level
-                        {
-                          add_member(Z, "∆comment", position, node->value.get());
-                          node = node->get_prev();
-                          garbage.append(node->get_next()->unlink());
-                        }
-                   }
+                   if (stack.size())   continue;   // only top-level comments
+
+                   add_member(Z, "∆comment", position, node->APL_value.get());
+                   node = node->get_prev();
+                   garbage.append(node->get_next()->unlink());
                    break;
 
               case NT_text:
-                   {
-                     if (stack.size() == 0)   // only at top-level
-                        {
-                          add_member(Z, "∆text", position, node->value.get());
-                          node = node->get_prev();
-                          garbage.append(node->get_next()->unlink());
-                        }
-                   }
+                   if (stack.size())   continue;   // only top-level texts
+                   add_member(Z, "∆text", position, node->APL_value.get());
+                   node = node->get_prev();
+                   garbage.append(node->get_next()->unlink());
                    break;
 
               case NT_start_tag:
                    {
-                     if (root == 0)   root = node;
-                     Assert(stack.size() == size_t(node->level));  // translate()
+                     if (root == 0)   root = node;   // remember the root
+                     else if (stack.size() == 0)   // subsequent root
+                        {
+                          MORE_ERROR() << "⎕XML: more than one root";
+                          return true;
+                        }
+                     Assert(stack.size() == size_t(node->level));
                      stack.push_back(node);
                      pos_stack.push_back(position);
-                     position = 0;
+                     position = Workspace::get_IO();   // ⎕IO is ⍙
                    }
                    break;
 
               case NT_end_tag:
                    {
+                     if (stack.size() == 0)   // no start tag
+                        {
+                          MORE_ERROR() << "⎕XML: end tag " << node->get_item()
+                                       << " without start tag";
+                          return true;
+                        }
                      XML_node * start = stack.back();
                      stack.pop_back();
-                     position = pos_stack.back();
+
+                     if (!start->matches(node))
+                        {
+                          MORE_ERROR() << "⎕XML: end tag " << node->get_item()
+                                       << " does not match start tag "
+                                       << start->get_item();
+                          return true;
+                        }
+
+                     position = pos_stack.back() + 1;
                      pos_stack.pop_back();
                      merge_range(*start, *node, garbage);
                      node = start;
@@ -581,73 +751,87 @@ int position = 0;
             }
        }
 
-   if (doctype)   add_member(Z, "∆doctype", position, doctype->value.get());
-
-const char * root_name = "∆root";
    if (root)
       {
         UTF8_string root_utf(root->get_tagname());
-        root_name = root_utf.c_str();
+        add_member(Z, root_utf.c_str(), -1, anchor.get_next()->APL_value.get());
       }
-
-   add_member(Z, root_name, 0, anchor.get_next()->value.get());
+   else
+      {
+        MORE_ERROR() << "⎕XML B: no XML root element in B";
+        return true;
+      }
 
    return false;   // OK
 }
 //-----------------------------------------------------------------------------
 void
-XML_node::add_member(Value * Z, const char * delta_x, size_t num, Value * value)
+XML_node::add_member(Value * Z, const char * cp_member_name,
+                     int number, Value * member_value)
 {
-UTF8_string delta_utf(delta_x);
-UCS_string delta_ucs(delta_utf);
-   if (num)
+UCS_string member_name;
+   if (number >= 0)
       {
-        delta_ucs += UNI_OVERBAR;
-        delta_ucs.append_number(num);
+        member_name += UNI_UNDERSCORE;   // to make it a valid APL name
+        member_name.append_number(number);
       }
-   Z->add_member(delta_ucs, value);
+
+   member_name.append_UTF8(cp_member_name);
+   Z->add_member(member_name, member_value);
 }
 //-----------------------------------------------------------------------------
 bool
 XML_node::merge_range(XML_node & start, XML_node & end, XML_node & garbage)
 {
-   Assert(+start.value);   // ∆tagname
-   Assert(start.value->is_structured());
+   // start is a start tag and end its corresponding end tag. Remove the
+   // the nodes after start from the level of start and make them members
+   // of start instead.
+   //
+   Assert(+start.APL_value);   // start contains at least its tagname member (⍙)
+   Assert(start.APL_value->is_structured());
 
+size_t position = Workspace::get_IO();   // re-number sub nodes
    for (;;)
        {
          XML_node & sub = *(start.get_next());
+         sub.position = position++;
 
-       garbage.append(sub.unlink());
+         garbage.append(sub.unlink());   // remove from start's level
 
-       if (sub.get_node_type() == NT_end_tag)   break;
+         if (sub.get_node_type() == NT_end_tag)   break;
 
-       Assert(+sub.value);
-       switch(sub.get_node_type())
-          {
-            case NT_text:
-                 add_member(start.value.get(), "∆text", sub.position,
-                              sub.value.get());
-                 break;
+         Assert(+sub.APL_value);
+         switch(sub.get_node_type())
+            {
+              case NT_text:
+                   add_member(start.APL_value.get(), "∆text", sub.position,
+                                sub.APL_value.get());
+                   break;
 
-            case NT_comment:
-                 add_member(start.value.get(), "∆comment", sub.position,
-                              sub.value.get());
-                 break;
+              case NT_comment:
+                   add_member(start.APL_value.get(), "∆comment", sub.position,
+                                sub.APL_value.get());
+                   break;
 
-            case NT_leaf_tag:
-                 start.value->add_member(sub.get_tagname(), sub.value.get());
-                 break;
+              case NT_start_tag:
+              case NT_leaf_tag:
+                   start.APL_value->add_member(sub.get_tagname(),
+                                               sub.APL_value.get());
+                   break;
 
+              case NT_declaration:
+                   add_member(start.APL_value.get(), "∆declaration",
+                              sub.position, sub.APL_value.get());
+                   break;
 
-            // these should not occur, unless the algorithm is faulty.
-            //
-            case NT_start_tag:
-            case NT_declaration:
-            case NT_doctype:
-            case NT_error:
-            case NT_end_tag: FIXME;
-          }
+              case NT_doctype:
+                   add_member(start.APL_value.get(), "∆doctype", sub.position,
+                                sub.APL_value.get());
+                   break;
+
+              case NT_error:
+              case NT_end_tag: FIXME;
+            }
        }
 
    return false;   // OK
@@ -656,41 +840,219 @@ XML_node::merge_range(XML_node & start, XML_node & end, XML_node & garbage)
 bool
 XML_node::parse_tag()
 {
-   // return Z which is a sytructured variable with member
-   // ∆tagname set to the name in the tag and
-   // attname-N to the names of the attributes
+   // return Z which is a structured variable with member ⍙ set to the name
+   // in the tag and attname-N to the names of the attributes
    //
-value = EmptyStruct(LOC);
+   APL_value = EmptyStruct(LOC);
+const size_t start = src_pos + 1;   // start of tag_name
+size_t pos = start;                 // distance from  start
 
-size_t name_len = 0;
-   while (is_tagname_char(src[src_pos + 1 + name_len]))   ++name_len;
+   // parse the tag name
+   {
+     while (is_name_char(src[pos]))   ++pos;
+     const UCS_string tag_name(src, src_pos + 1, pos - start);
+     Value_P  member_value(tag_name, LOC);
 
-const UCS_string delta_tagname(UTF8_string("∆tagname"));
-const UCS_string Z_name("Z");
-vector<const UCS_string *> members;
-   members.push_back(&delta_tagname);
-   members.push_back(&Z_name);   // not used but needed
+     add_member(APL_value.get(), "⍙", Workspace::get_IO(), member_value.get());
+   }
 
-Value * member_owner = 0;
-Cell * cell = value->get_member(members, member_owner, true, false);
-   Assert(member_owner);
-   Assert(member_owner == value.get());
-const UCS_string tag_name(src, src_pos + 1, name_len);
-Value_P Z1(tag_name, LOC);
-   new (cell)   PointerCell(Z1.get(), value.getref());
+const size_t end = src_pos + src_len;   // end of tag
+size_t attribute_count = Workspace::get_IO();   // "⍙" gets ⎕IO
+   for (;;)
+      {
+        // skip leading whitespace
+        //
+        while (pos < end && src[pos] <= UNI_SPACE)   ++pos;
+
+        if (pos >= end || !is_first_name_char(src[pos]))   break;
+        // atribute name
+        //
+        const size_t attname = pos;
+        while (pos < end && is_name_char(src[pos]))   ++pos;
+        UCS_string attribute_name(src, attname, pos - attname);
+        attribute_name.prepend(UNI_DELTA_UNDERBAR);   // ⍙attribute_name
+
+        // skip whitespace before =
+        //
+        while (pos < end && src[pos] <= UNI_SPACE)   ++pos;
+
+        if (src[pos] != UNI_EQUAL)
+           {
+             MORE_ERROR() << "No '=' after attribute name '" << attribute_name;
+             return true;
+           }
+        ++pos;   // skip =
+
+        // skip whitespace after =
+        //
+        while (pos < end && src[pos] <= UNI_SPACE)   ++pos;
+
+        const Unicode start_quote = src[pos++];   // ' or "
+        if (start_quote != UNI_SINGLE_QUOTE &&
+            start_quote != UNI_DOUBLE_QUOTE)
+           {
+             MORE_ERROR() << "No ' or \" after attribute name '"
+                         << attribute_name << "'";
+             return true;
+           }
+
+        const size_t attvalue = pos;
+        while (pos < end && src[pos] != start_quote)   ++pos;
+        UCS_string attribute_value(src, attvalue, pos - attvalue);
+        ++pos;   // skip trailing ' or "
+        if (normalize_attribute_value(attribute_value))   return true;
+
+        UTF8_string member_name(attribute_name);
+        Value_P member_value(attribute_value, LOC);
+        add_member(APL_value.get(), member_name.c_str(), ++attribute_count,
+                   member_value.get());
+      }
+
+   // skip whitespace after last attribute
+   //
+   while (pos < end && src[pos] <= UNI_SPACE)   ++pos;
 
    return false;   // OK
+}
+//-----------------------------------------------------------------------------
+bool
+XML_node::normalize_attribute_value(UCS_string & attval)
+{
+   // XML standard "4.6 Predefined Entities"
+
+ShapeItem dest = 0;
+
+struct _mapping
+{
+  const char * entity;
+  int          string_len;
+  Unicode      replacement;
+};
+
+const _mapping predefined_entities[] =
+{ { "&lt;",   4, UNI_LESS         },
+  { "&gt;",   4, UNI_GREATER      },
+  { "&amp;",  5, UNI_AMPERSAND    },
+  { "&apos;", 6, UNI_SINGLE_QUOTE },
+  { "&quot;", 6, UNI_DOUBLE_QUOTE }
+};
+
+enum { PREDEFINED_COUNT = sizeof(predefined_entities)
+                        / sizeof(*predefined_entities) };
+
+   loop(src, attval.size())
+       {
+         const Unicode uni = attval[src];
+         if (uni < UNI_SPACE)
+            {
+              attval[dest++] = UNI_SPACE;
+              continue;
+            }
+
+         if (uni != UNI_AMPERSAND)   // normal char
+            {
+              attval[dest++] = uni;
+              continue;
+            }
+
+         // &#xxx
+         //
+         if ((src + 2) < attval.size() && attval[src + 1] == '#')
+            {
+              src += 2;   // skip &#
+              int number = 0;
+              Unicode bad_char = UNI_NUL;
+              if (attval[src] == 'x')   // hex value
+                 {
+                   ++src;   // skip 'x'
+                   while (src < attval.size() && !bad_char)
+                      {
+                        const Unicode digit = attval[src++];
+                        if (digit == ';')   break;   // end of hex digits
+                        const int digval = Avec::digit_value(digit, true);
+                        if (digval == -1)   bad_char = digit;
+                        else                number = 16*number + digval;
+                      }
+                 }
+              else                      // decimal value
+                 {
+                   while (src < attval.size())
+                      {
+                        const Unicode digit = attval[src++];
+                        if (digit == ';')   break;   // end of decimal digits
+                        const int digval = Avec::digit_value(digit, false);
+                        if (digval == -1)   bad_char = digit;
+                        else                number = 10*number + digval;
+                      }
+                 }
+
+              if (bad_char)
+                 {
+                   MORE_ERROR() << "⎕XML: bad character '"
+                                << UCS_string(1, bad_char)
+                                << "' in attribute value '" << attval << "'";
+                   return true;
+                 }
+              attval[dest++] = Unicode(number);
+              continue;
+            }
+
+         // &... but not &#... Try predefined entities
+         //
+         loop(p, PREDEFINED_COUNT)
+             {
+               const _mapping & pred = predefined_entities[p];
+               const int len = pred.string_len;
+               if ((src + len) > attval.size())   continue;   // too short
+
+               bool match = true;
+               loop(ll, len)
+                   {
+                     if (pred.entity[ll] != attval[src + ll])   // mismatch
+                        {
+                          match = false;
+                          break;   // loop(ll)
+                        }
+                   }
+
+               if (match)
+                  {
+                    attval[dest++] = pred.replacement;
+                    src += len - 1;   // except uni
+                    break;   // loop(p)
+                  }
+             }
+       }
+
+   attval.resize(dest);
+   return false;   // OK
+}
+//-----------------------------------------------------------------------------
+bool
+XML_node::matches(const XML_node * end_tag) const
+{
+   Assert(node_type == NT_start_tag);
+   Assert(end_tag->node_type == NT_end_tag);
+
+ShapeItem d = end_tag->src_pos + 2;   
+   for (ShapeItem s = src_pos + 1;;)
+       {
+          const Unicode uni = src[s++];
+          if (!is_name_char(uni))         return true;
+          if (uni != end_tag->src[d++])   return false;
+       }
 }
 //-----------------------------------------------------------------------------
 UCS_string
 XML_node::get_tagname() const
 {
 size_t start = 0;
-   if (node_type == NT_start_tag || node_type == NT_leaf_tag)   // <TAGNAME ...
+   if (node_type == NT_start_tag ||    // <TAGNAME ... >
+       node_type == NT_leaf_tag)       // <TAGNAME ... />
       {
         start = src_pos + 1;
       }
-   else if (node_type == NT_end_tag)                       // </TAGNAME
+   else if (node_type == NT_end_tag)   // </TAGNAME
       {
         start = src_pos + 2;
       }
@@ -701,8 +1063,8 @@ size_t start = 0;
       }
 
 size_t end = start;
-   if (is_first_tagname_char(src[start]))   ++end;
-   while (is_tagname_char(src[end]))        ++end;
+   if (is_first_name_char(src[start]))   ++end;
+   while (is_name_char(src[end]))        ++end;
 
    if (start == end)   // no valid tag name
       {
@@ -710,18 +1072,44 @@ size_t end = start;
         DOMAIN_ERROR;
       }
 
-UCS_string ret(src, start, end - start);
-   ret += UNI_OVERBAR;
-   ret.append_number(position);
+UCS_string ret;
+   if (position >= 0)
+      {
+        ret += UNI_UNDERSCORE;
+        ret.append_number(position);
+      }
+   ret += UNI_UNDERSCORE;
+   ret.append(UCS_string(src, start, end - start));
    return ret;
 }
 //-----------------------------------------------------------------------------
 bool
-XML_node::is_tagname_char(Unicode uni)
+XML_node::is_XML_char(Unicode uni)
+{
+   // XML standard chapter 2.2 "Characters"
+   //
+   if (uni > 0xD7FF)   // unlikely
+      {
+        return (uni  >= 0xE000  && uni <= 0xFFFD)
+            || (uni  >= 0x10000 && uni <= 0x10FFFF);
+      }
+
+   if (uni < UNI_SPACE)   // occasionally
+      {
+         return uni == 0x0A   // most likely
+             || uni == 0x09
+             || uni == 0x0D;   // windows only
+      }
+
+   return true;
+}
+//-----------------------------------------------------------------------------
+bool
+XML_node::is_name_char(Unicode uni)
 {
    // XML standard chapter 2.3 "Common Syntactic Constructs"
    //
-   if (is_first_tagname_char(uni))       return true;
+   if (is_first_name_char(uni))          return true;
    if (strchr("-.0123456789", uni))      return true;
    if (uni == 0xBF)                      return true;
    if (uni >= 0x0300 && uni <= 0x036F)   return true;
@@ -746,7 +1134,7 @@ const int first_ranges[] =
 };
 
 bool
-XML_node::is_first_tagname_char(Unicode uni)
+XML_node::is_first_name_char(Unicode uni)
 {
    // XML standard chapter 2.3 "Common Syntactic Constructs"
    //
@@ -765,7 +1153,183 @@ XML_node::is_first_tagname_char(Unicode uni)
 Token
 Quad_XML::eval_AB(Value_P A, Value_P B) const
 {
-   TODO;
-   return Token();
+   if (A->get_rank() > 0)   RANK_ERROR;
+
+   switch(const int function_number = A->get_ravel(0).get_int_value())
+      {
+         case 1:
+              {
+                return convert_file(B.getref());
+              }
+
+         case 2:
+              {
+                Value_P Z = tree(B.getref());
+                return Token(TOK_APL_VALUE1, Z);
+              }
+
+        default: MORE_ERROR() << "Bad function number A=" << function_number
+                              << " in A ⎕XML B";
+      }
+
+   DOMAIN_ERROR;
 }
+//-----------------------------------------------------------------------------
+Token
+Quad_XML::convert_file(const Value & B) const
+{
+   // safeguard against accidental use
+   //
+   if (B.is_structured())
+      {
+        MORE_ERROR() << "Bad B in 1 ⎕XML B (expecting filename)";
+        DOMAIN_ERROR;
+      }
+
+const UCS_string filename_ucs(B);
+const UTF8_string filename_utf(filename_ucs);
+
+   errno = 0;
+const int fd = open(filename_utf.c_str(), O_RDONLY);
+   if (fd == -1)
+      {
+        MORE_ERROR() << "1 ⎕XML B: error reading " << B
+                     << ": " << strerror(errno);
+       DOMAIN_ERROR;
+      }
+
+struct stat st;
+   if (fstat(fd, &st))
+      {
+        MORE_ERROR() << "1 ⎕XML B: error in fstat(" << B
+                     << "): " << strerror(errno);
+        ::close(fd);
+        DOMAIN_ERROR;
+      }
+
+UTF8 * buffer = new UTF8[st.st_size];
+   if (buffer == 0)
+      {
+        ::close(fd);
+        WS_FULL;
+      }
+
+const ssize_t bytes_read = read(fd, buffer, st.st_size);
+   if (bytes_read != st.st_size)
+      {
+        MORE_ERROR() << "1 ⎕XML B: error in reading " << B
+                     << "): " << strerror(errno);
+        ::close(fd);
+        DOMAIN_ERROR;
+        ::close(fd);
+        delete [] buffer;
+      }
+
+const UTF8_string xml_document_utf8(buffer, bytes_read);
+   delete buffer;
+   ::close(fd);
+
+UCS_string xml_document_ucs(xml_document_utf8);
+Value_P xml_document_value(xml_document_ucs, LOC);
+
+   return eval_B(xml_document_value);
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_XML::tree(const Value & B)
+{
+   if (!B.is_structured())
+      {
+        MORE_ERROR() << "Non-structured B in A ⎕XML B";
+        DOMAIN_ERROR;
+      }
+
+UCS_string z = "XML\n";
+UCS_string prefix = "";
+   tree(B, z, prefix);
+
+   return Value_P(z, LOC);
+}
+//-----------------------------------------------------------------------------
+void
+Quad_XML::tree(const Value & B, UCS_string & z, UCS_string & prefix)
+{
+   enum { LEG_IND = 1,    // blanks before  ├──
+          LEG_LEN = 3,    // number of ─ in ├──
+          LEG_SPC = 1,    // blanks after   ├──
+          LEG_TOT = LEG_LEN + LEG_SPC + LEG_IND
+        };
+
+const ShapeItem rows = B.get_rows();
+
+   // construct a vector of member names and a vector of their values...
+   // Unused entries in B are discarded. so typically members.size < rows!
+   //
+vector<UCS_string> members;
+vector<const Cell *> values;
+   loop(r, rows)
+      {
+        const Cell * cB = &B.get_ravel(2*r);
+        if (cB->is_pointer_cell())
+           {
+             Value_P member_name = cB->get_pointer_value();
+             const UCS_string member_ucs = member_name->get_UCS_ravel();
+             members.push_back(member_ucs);
+             values.push_back(cB + 1);
+           }
+      }
+
+   // add an "empty" line to make z look nicer
+   //
+   {
+     // the continuation lines (if any) below the indentation above
+     loop (p, prefix.size())
+         {
+           loop(l, LEG_IND)              z += UNI_SPACE;
+           if (prefix[p] == UNI_SPACE)   z += UNI_SPACE;
+           else                          z += UNI_LINE_VERT;
+           loop(l, LEG_TOT - LEG_IND)    z += UNI_SPACE;
+         }
+     loop(l, LEG_IND)                    z += UNI_SPACE;
+     z += UNI_LINE_VERT;
+     z += UNI_LF;
+   }
+
+
+   prefix += UNI_LINE_VERT_RIGHT;   // add ├
+   loop(m, members.size())
+      {
+        loop(l, LEG_IND)              z += UNI_SPACE;
+        Unicode last_char = prefix.back();
+        const bool last_member = size_t(m) == (members.size() - 1);
+        if (last_member)
+           {
+             last_char     = UNI_LINE_UP_RIGHT;   // └ in this line
+             prefix.back() = UNI_SPACE;           // ' ' in subsequent lines
+           }
+
+        loop(p, (prefix.size() - 1))
+            {
+              if (prefix[p] == UNI_SPACE)   z += UNI_SPACE;
+              else                          z += UNI_LINE_VERT;
+              loop(l, LEG_TOT)   z += UNI_SPACE;
+            }
+        z += last_char;
+        loop(l, LEG_LEN)   z += UNI_LINE_HORI;
+        z += UNI_SPACE;
+        z += members[m];
+        z += UNI_LF;
+        if (!values[m]->is_pointer_cell())   continue;
+
+        Value_P sub = values[m]->get_pointer_value();
+        if (!sub->is_structured())   continue;
+        tree(sub.getref(), z, prefix);
+        if (last_member && prefix.size() > 1)
+           {
+             prefix[prefix.size() - 2] = UNI_SPACE;
+           }
+      }
+   prefix.pop_back();
+}
+
 //=============================================================================
