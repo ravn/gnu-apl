@@ -4228,10 +4228,10 @@ is something like:
 
 @verbatim
       XML_string ← "<A><B><C>Hello</C></B></A>"   ⍝ input data (usually from an .xml file)
-      XML ← ⎕XML XML_string       ⍝ convert XML_string to associative array XML
-      ABC ← XML.a.b.c             ⍝ retrieve node a.b.c in XML
-      XML.a.b.c ← ABC, " World"   ⍝ modify node a.b.c in XML
-      Z ← ⎕XML XML                ⍝ convert associative array XML to Z
+      APL ← ⎕XML XML_string       ⍝ convert XML_string to associative array APL
+      ABC ← APL.a.b.c             ⍝ retrieve node a.b.c in APL
+      APL.a.b.c ← ABC, " World"   ⍝ modify node a.b.c in APL
+      Z ← ⎕XML APL                ⍝ convert associative array APL to XML string Z
 
       ABC   ⍝ the original value of XML.a.b.c
 Hello

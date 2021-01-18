@@ -18,8 +18,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using namespace std;
-
 #include <errno.h>
 #include <string.h>
 
@@ -1226,7 +1224,7 @@ const ssize_t bytes_read = read(fd, buffer, st.st_size);
       }
 
 const UTF8_string xml_document_utf8(buffer, bytes_read);
-   delete buffer;
+   delete[] buffer;
    ::close(fd);
 
 UCS_string xml_document_ucs(xml_document_utf8);

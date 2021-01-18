@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 16, 2021
+January 18, 2021
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -4086,10 +4086,10 @@ the XML standard.  The anticipated procedure for such modifications is
 something like:
 
       XML_string ← "<A><B><C>Hello</C></B></A>"   ⍝ input data (usually from an .xml file)
-      XML ← ⎕XML XML_string       ⍝ convert XML_string to associative array XML
-      ABC ← XML.a.b.c             ⍝ retrieve node a.b.c in XML
-      XML.a.b.c ← ABC, " World"   ⍝ modify node a.b.c in XML
-      Z ← ⎕XML XML                ⍝ convert associative array XML to Z
+      APL ← ⎕XML XML_string       ⍝ convert XML_string to associative array APL
+      ABC ← APL.a.b.c             ⍝ retrieve node a.b.c in APL
+      APL.a.b.c ← ABC, " World"   ⍝ modify node a.b.c in APL
+      Z ← ⎕XML APL                ⍝ convert associative array APL to XML string Z
 
       ABC   ⍝ the original value of XML.a.b.c
 Hello
@@ -5887,23 +5887,23 @@ Node: Section 3.32138733
 Node: Section 3.33141837
 Node: Section 3.34143826
 Node: Section 3.35148251
-Node: Chapter 4170957
-Node: Chapter 5172710
-Node: Chapter 6173836
-Node: Section 6.1175373
-Node: Section 6.2176653
-Node: Section 6.3177013
-Node: Section 6.4177255
-Node: Section 6.5177917
-Node: Section 6.6178395
-Node: Section 6.7179167
-Node: Section 6.8179624
-Node: Chapter 7180026
-Node: Section 7.1180445
-Node: Section 7.2181132
-Node: Chapter 8181963
-Node: Section 8.1182466
-Node: Section 8.2207780
+Node: Chapter 4170968
+Node: Chapter 5172721
+Node: Chapter 6173847
+Node: Section 6.1175384
+Node: Section 6.2176664
+Node: Section 6.3177024
+Node: Section 6.4177266
+Node: Section 6.5177928
+Node: Section 6.6178406
+Node: Section 6.7179178
+Node: Section 6.8179635
+Node: Chapter 7180037
+Node: Section 7.1180456
+Node: Section 7.2181143
+Node: Chapter 8181974
+Node: Section 8.1182477
+Node: Section 8.2207791
 
 End Tag Table
 
