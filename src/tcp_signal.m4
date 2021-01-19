@@ -83,7 +83,12 @@ and then:
 #include <iostream>
 #include <iomanip>
 
-using namespace std;
+/// Stringify x.
+#define STR(x) #x
+/// The current location in the source file.
+#define LOC Loc(__FILE__, __LINE__)
+/// The location line l in file f.
+#define Loc(f, l) f ":" STR(l)
 
 //-----------------------------------------------------------------------------
 /// an integer signal item of size \b bytes
@@ -305,7 +310,7 @@ public:
    /// get function for an item that is not defined for the signal
    void bad_get(const char * signal, const char * member) const
       {
-        cerr << std::endl << "*** called function get_" << signal << "__" << member
+        std::cerr << std::endl << "*** called function get_" << signal << "__" << member
              << "() with wrong signal " << get_sigName() << std::endl;
         assert(0 && "bad_get()");
       }
@@ -402,7 +407,7 @@ Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
       {
          // a too small bufsize happens easily but is hard to debug!
          //
-         cerr << "\n\n*** bufsize is " << bufsize
+         std::cerr << "\n\n*** bufsize is " << bufsize
               << " but MUST be at least " << 2*MAX_SIGNAL_CLASS_SIZE
               << " in recv_TCP() !!!" << std::endl;
 
@@ -470,7 +475,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
         del = new char[siglen];
         if (del == 0)
            {
-             cerr << "*** new(" << siglen <<") failed in recv_TCP()" << std::endl;
+             std::cerr << "*** new(" << siglen <<") failed in recv_TCP()" << std::endl;
              *loc = LOC;
              return 0;
            }
@@ -487,7 +492,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
 
           if (rx_bytes != siglen)
              {
-               cerr << "*** got " << rx_bytes
+               std::cerr << "*** got " << rx_bytes
                     << " when expecting " << siglen << std::endl;
                *loc = LOC;
                return 0;
@@ -508,7 +513,7 @@ Signal_base * ret = 0;
 define(`m4_signal',
        `        case sid_`'$1: ret = new $1`'_c(b);   break;')
 include(protocol.def)dnl
-        default: cerr << "Signal_base::recv_TCP() failed: unknown signal id "
+        default: std::cerr << "Signal_base::recv_TCP() failed: unknown signal id "
                       << signal_id.get_value() << std::endl;
                  errno = EINVAL;
                  *loc = LOC;

@@ -1,21 +1,21 @@
 /*
-    This file is part of GNU APL, a free implementation of the
-    ISO/IEC Standard 13751, "Programming Language APL, Extended"
-
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   This file is part of GNU APL, a free implementation of the
+   ISO/IEC Standard 13751, "Programming Language APL, Extended"
+ 
+   Copyright (C) 2008-2014  Dr. Jürgen Sauermann
+ 
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+ 
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -83,7 +83,12 @@ and then:
 #include <iostream>
 #include <iomanip>
 
-using namespace std;
+/// Stringify x.
+#define STR(x) #x
+/// The current location in the source file.
+#define LOC Loc(__FILE__, __LINE__)
+/// The location line l in file f.
+#define Loc(f, l) f ":" STR(l)
 
 //-----------------------------------------------------------------------------
 /// an integer signal item of size \b bytes
@@ -362,7 +367,7 @@ public:
    /// get function for an item that is not defined for the signal
    void bad_get(const char * signal, const char * member) const
       {
-        cerr << std::endl << "*** called function get_" << signal << "__" << member
+        std::cerr << std::endl << "*** called function get_" << signal << "__" << member
              << "() with wrong signal " << get_sigName() << std::endl;
         assert(0 && "bad_get()");
       }
@@ -2827,13 +2832,6 @@ struct _all_signal_classes_
 enum { MAX_SIGNAL_CLASS_SIZE = sizeof(_all_signal_classes_) };
 
 //----------------------------------------------------------------------------
-
-#ifndef LOC
-# define STR(x) #x
-# define LOC Loc(__FILE__, __LINE__)
-# define Loc(f, l) f ":" STR(l)
-#endif // LOC
-
 Signal_base *
 Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
                       char * & del, std::ostream * debug,
@@ -2843,7 +2841,7 @@ Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
       {
          // a too small bufsize happens easily but is hard to debug!
          //
-         cerr << "\n\n*** bufsize is " << bufsize
+         std::cerr << "\n\n*** bufsize is " << bufsize
               << " but MUST be at least " << 2*MAX_SIGNAL_CLASS_SIZE
               << " in recv_TCP() !!!" << std::endl;
 
@@ -2879,11 +2877,9 @@ ssize_t siglen = 0;
 
          if (rx_bytes != sizeof(uint32_t))
             {
-              // connection was probably closed by the peer
+              // connection was closed by the peer
               //
-             if (rx_bytes == 0)       *loc = LOC;   // closed by peer
-             else if (rx_bytes < 0)   *loc = LOC;   // errno set
-             else                     *loc = LOC;   // something else
+              *loc = LOC;
               return 0;
             }
 
@@ -2913,7 +2909,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
         del = new char[siglen];
         if (del == 0)
            {
-             cerr << "*** new(" << siglen <<") failed in recv_TCP()" << std::endl;
+             std::cerr << "*** new(" << siglen <<") failed in recv_TCP()" << std::endl;
              *loc = LOC;
              return 0;
            }
@@ -2930,7 +2926,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
 
           if (rx_bytes != siglen)
              {
-               cerr << "*** got " << rx_bytes
+               std::cerr << "*** got " << rx_bytes
                     << " when expecting " << siglen << std::endl;
                *loc = LOC;
                return 0;
@@ -3058,7 +3054,7 @@ Signal_base * ret = 0;
 /// APserver result for: print the entire database
         case sid_SVAR_DB_PRINTED: ret = new SVAR_DB_PRINTED_c(b);   break;
 
-        default: cerr << "Signal_base::recv_TCP() failed: unknown signal id "
+        default: std::cerr << "Signal_base::recv_TCP() failed: unknown signal id "
                       << signal_id.get_value() << std::endl;
                  errno = EINVAL;
                  *loc = LOC;

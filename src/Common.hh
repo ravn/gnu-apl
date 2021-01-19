@@ -66,8 +66,6 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #include "Logging.hh"
 #include "SystemLimits.hh"
 
-using namespace std;
-
 /// true when a WINCH (window size changed) signal was received
 extern bool got_WINCH;
 
@@ -349,8 +347,6 @@ enum LX_mode
 inline void * operator new(size_t size)   { return common_new(size); }
 inline void   operator delete(void * p)   { common_delete(p); }
 #endif
-
-using namespace std;
 
 //-----------------------------------------------------------------------------
 

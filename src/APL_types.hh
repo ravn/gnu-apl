@@ -34,8 +34,6 @@
 #include "../config.h"
 #include "Unicode.hh"
 
-using namespace std;
-
 #define APL_Float_is_class 0
 
 //////////////////////////////////////////////////////////////
@@ -95,7 +93,7 @@ typedef APL_Float_Base APL_Float;
 
 //-----------------------------------------------------------------------------
 /// One APL complex value.
-typedef complex<APL_Float> APL_Complex;
+typedef std::complex<APL_Float> APL_Complex;
 //-----------------------------------------------------------------------------
 /// APL time = microseconds since Jan. 1. 1970 00:00:00 UTC
 typedef int64_t APL_time_us;

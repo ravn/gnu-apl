@@ -31,8 +31,6 @@
 #include "ProcessorID.hh"
 #include "Svar_record.hh"
 
-using namespace std;
-
 #if APSERVER_TRANSPORT == 1
 # define ABSTRACT_OFFSET 1
 #else
