@@ -114,7 +114,7 @@ public:
    T get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a string
-   void store(string & buffer) const
+   void store(std::string & buffer) const
       {
         for (int b = bytes; b > 0;)   buffer += char(value >> (8*--b));
       }
@@ -150,9 +150,9 @@ public:
    /// print the item
    std::ostream & print(std::ostream & out) const
       {
-        return out << "0x" << hex << setfill('0') << setw(bytes)
+        return out << "0x" << std::hex << std::setfill('0') << std::setw(bytes)
                    << Sig_item_int<T, bytes>::value
-                   << setfill(' ') << dec;
+                   << std::setfill(' ') << std::dec;
       }
 };
 //-----------------------------------------------------------------------------
@@ -180,7 +180,7 @@ class Sig_item_string
 {
 public:
    /// construct an item with value \b v
-   Sig_item_string(const string & str)
+   Sig_item_string(const std::string & str)
    : value(str)
    {}
 
@@ -193,10 +193,10 @@ public:
       }
 
    /// return the value of the item
-   const string get_value() const   { return value; }
+   const std::string get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a buffer
-   void store(string & buffer) const
+   void store(std::string & buffer) const
       {
         const Sig_item_u16 len (value.size());
         len.store(buffer);
@@ -215,18 +215,18 @@ public:
 
         if (printable)   return out << "\"" << value << "\"";
 
-        out << hex << setfill('0');
+        out << std::hex << std::setfill('0');
         for (size_t b = 0; b < value.size(); ++b)
             {
               if (b > 16)   { out << "...";   break; }
-              out << " " << setw(2) << (value[b] & 0xFF);
+              out << " " << std::setw(2) << (value[b] & 0xFF);
             }
-        return out << dec << setfill(' ');
+        return out << std::dec << std::setfill(' ');
       }
 
 protected:
    /// the value of the item
-   string value;
+   std::string value;
 };
 //-----------------------------------------------------------------------------
 divert(`-1')
@@ -256,7 +256,7 @@ define(`typtrans', `ifelse(`$1', `x64',    `uint64_t',
                     ifelse(`$1', `x8',      `uint8_t',
                     ifelse(`$1', `u8',      `uint8_t',
                     ifelse(`$1', `i8',       `int8_t',
-                                             `string'))))))))))))))))))')
+                                             `std::string'))))))))))))))))))')
 define(`sig_args', `,
                 Sig_item_`'$2 _`'$3')
 define(`sig_init', `$3(`_'$3)')
@@ -296,7 +296,7 @@ public:
    virtual ~Signal_base() {}
 
    /// store (encode) the signal into buffer
-   virtual void store(string & buffer) const = 0;
+   virtual void store(std::string & buffer) const = 0;
 
    /// print the signal
    virtual std::ostream & print(std::ostream & out) const = 0;
@@ -328,7 +328,7 @@ protected:
    /// send this signal on TCP (or AF_UNIX) socket tcp_sock
    int send_TCP(int tcp_sock) const
        {
-         string buffer;
+         std::string buffer;
          store(buffer);
 
          uint32_t ll = htonl(buffer.size());
@@ -358,7 +358,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(string & buffer) const
+   virtual void store(std::string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_`'$1);
          signal_id.store(buffer);
