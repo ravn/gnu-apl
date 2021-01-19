@@ -85,7 +85,7 @@ BOOKS    6    31.50
 PAPER    8    42.11
 
       2⍕1(2 3)
-DOMAIN ERROR
+DOMAIN ERROR+
       2⍕1 (2 3)
       ^^
 
