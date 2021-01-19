@@ -68,7 +68,7 @@ VH_entry * entry = VH_entry::history + VH_entry::idx++;
 }
 //----------------------------------------------------------------------------
 void
-VH_entry::print_history(ostream & out, const Value * val, const char * loc)
+VH_entry::print_history(std::ostream & out, const Value * val, const char * loc)
 {
    // search backwards for events of val.
    //
@@ -101,15 +101,15 @@ int cidx = VH_entry::idx;
 
    if (VALUEHISTORY_SIZE == 0)
       {
-        out << "value history disabled" << endl;
+        out << "value history disabled" << std::endl;
       }
     else
       {
-        out << endl << "value " << voidP(val)
+        out << std::endl << "value " << voidP(val)
             << " has " << var_events.size()
             << " events in its history";
         if (loc)   out << " (at " << loc << ")";
-        out << ":" << endl;
+        out << ":" << std::endl;
       }
 
 int flags = 0;
@@ -120,7 +120,7 @@ const VH_entry * previous = 0;
         vev->print(flags, out, val, previous);
         previous = vev;
       }
-   out << endl;
+   out << std::endl;
 }
 //----------------------------------------------------------------------------
 static UCS_string
@@ -136,7 +136,7 @@ UCS_string ret;
 }
 //----------------------------------------------------------------------------
 void
-VH_entry::print(int & flags, ostream & out, const Value * val,
+VH_entry::print(int & flags, std::ostream & out, const Value * val,
                const VH_entry * previous) const
 {
 const ValueFlags flags_before = ValueFlags(flags);
@@ -147,7 +147,7 @@ const ValueFlags flags_before = ValueFlags(flags);
        strcmp(previous->testcase_file, testcase_file))
       {
         if (testcase_file)   out << "  FILE:        " << testcase_file
-                                 << ":" << testcase_line << endl;
+                                 << ":" << testcase_line << std::endl;
       }
 
    switch(event)
@@ -259,11 +259,11 @@ const ValueFlags flags_before = ValueFlags(flags);
              break;
 
         default:
-             out << "Unknown event  " << HEX(event) << endl;
+             out << "Unknown event  " << HEX(event) << std::endl;
              return;
       }
 
-   out << left << setw(30) << (loc ? loc : "<no-loc>") << endl;
+   out << left << setw(30) << (loc ? loc : "<no-loc>") << std::endl;
 }
 //----------------------------------------------------------------------------
 

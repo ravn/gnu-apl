@@ -43,26 +43,26 @@ int Output::color_CERR_background = 8;
 int Output::color_UERR_foreground = 5;
 int Output::color_UERR_background = 8;
 
-/// a filebuf for CERR
+/// a std::filebuf for CERR
 ErrOut CERR_filebuf;
 
 DiffOut DOUT_filebuf(false);
 DiffOut UERR_filebuf(true);
 
-// Android is supposed to define its own CIN, COUT, CERR, and UERR ostreams
+// Android is supposed to define its own CIN, COUT, CERR, and UERR std::ostreams
 #ifndef WANT_ANDROID
 
 CinOut CIN_filebuf;
 CIN_ostream CIN;
 
-ostream COUT(&DOUT_filebuf);
-ostream CERR(CERR_filebuf.use());
-ostream UERR(&UERR_filebuf);
+std::ostream COUT(&DOUT_filebuf);
+std::ostream CERR(CERR_filebuf.use());
+std::ostream UERR(&UERR_filebuf);
 
 #endif
 
-extern ostream & get_CERR();
-ostream & get_CERR()
+extern std::ostream & get_CERR();
+std::ostream & get_CERR()
 {
    return ErrOut::used ? CERR : cerr;
 };
@@ -152,11 +152,11 @@ Output::init(bool logit)
    if (logit)
       {
         CERR << "using ANSI terminal output ESC sequences (or those "
-                "configured in your preferences file(s))" << endl;
+                "configured in your preferences file(s))" << std::endl;
 
 
         CERR << "using ANSI terminal input ESC sequences(or those "
-                "configured in your preferences file(s))" << endl;
+                "configured in your preferences file(s))" << std::endl;
       }
 }
 //-----------------------------------------------------------------------------

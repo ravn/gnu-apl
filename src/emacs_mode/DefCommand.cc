@@ -26,24 +26,24 @@
 
 #include <sstream>
 
-static void log_error( Error &error, ostream &out )
+static void log_error( Error &error, std::ostream &out )
 {
     UCS_string l1 = error.get_error_line_1();
     UCS_string l2 = error.get_error_line_2();
     UCS_string l3 = error.get_error_line_3();
-    out << l1 << endl << l2 << endl << l3;
+    out << l1 << std::endl << l2 << std::endl << l3;
 }
 
 void DefCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
-    vector<string> content = conn.load_block();
+    std::vector<string> content = conn.load_block();
 
     try {
         stringstream out;
 
         Shape shape( content.size() );
         Value_P function_list_value(shape, LOC);
-        for( vector<string>::const_iterator i = content.begin() ; i != content.end() ; i++ ) {
+        for( std::vector<string>::const_iterator i = content.begin() ; i != content.end() ; i++ ) {
             Value_P v;
             if( i->size() == 0 ) {
                 v = Str0( LOC );

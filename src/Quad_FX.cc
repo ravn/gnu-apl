@@ -160,7 +160,7 @@ UCS_string text;
 
              Log(LOG_quad_FX)
                 {
-                  CERR << "[" << setw(2) << row << "] " << *line << endl;
+                  CERR << "[" << setw(2) << row << "] " << *line << std::endl;
                 }
 
              if (line->is_char_vector())

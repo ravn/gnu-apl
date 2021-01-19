@@ -49,7 +49,7 @@ void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<s
             tagged = true;
         }
         else {
-            CERR << "Illegal variable type: " << typespec << endl;
+            CERR << "Illegal variable type: " << typespec << std::endl;
             throw DisconnectedError( "Illegal variable type" );
         }
     }
@@ -72,7 +72,7 @@ void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<s
                    {
                      out << symbol->get_name();
                      if(tagged)   out << " " << symbol_nc;
-                     out << endl;
+                     out << std::endl;
                    }
              }
         }

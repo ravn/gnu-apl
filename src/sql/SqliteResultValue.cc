@@ -84,7 +84,7 @@ const int n = sqlite3_column_count( statement );
 
         default:
             CERR << "Unsupported column type, column="
-                 << i << ", type+" << type << endl;
+                 << i << ", type+" << type << std::endl;
             value = new NullResultValue();
         }
 

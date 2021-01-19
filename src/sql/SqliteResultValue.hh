@@ -92,10 +92,10 @@ public:
        }
 
     void add_values(sqlite3_stmt * statement);
-    const vector<const ResultValue *> & get_values() const { return values; }
+    const std::vector<const ResultValue *> & get_values() const { return values; }
 
 private:
-    vector<const ResultValue *> values;
+    std::vector<const ResultValue *> values;
 };
 
 #endif

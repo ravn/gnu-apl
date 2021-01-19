@@ -70,7 +70,7 @@ UCS_string prompt = Workspace::get_prompt();
          InputMux::get_line(LIM_ImmediateExecution, prompt,
                       line, eof, LineInput::get_history());
 
-         if (eof) CERR << "EOF at " << LOC << endl;
+         if (eof) CERR << "EOF at " << LOC << std::endl;
 
          if (line.ends_with("\"\"\""))   /// start or end of multi-line
             {
@@ -136,7 +136,7 @@ Command::process_line(UCS_string & line)
 }
 //-----------------------------------------------------------------------------
 bool
-Command::do_APL_command(ostream & out, UCS_string & line)
+Command::do_APL_command(std::ostream & out, UCS_string & line)
 {
 const UCS_string line1(line);   // the original line
 
@@ -173,12 +173,12 @@ UCS_string_vector args = split_arg(arg);
             }
        }
 
-     out << "BAD COMMAND" << endl;
+     out << "BAD COMMAND" << std::endl;
      return false;
 }
 //-----------------------------------------------------------------------------
 bool
-Command::check_params(ostream & out, const char * command, int argc,
+Command::check_params(std::ostream & out, const char * command, int argc,
                       const char * args)
 {
    // allow everything for ]USERCMD
@@ -229,7 +229,7 @@ UCS_string args_ucs(args);
 
    if (argc < mandatory_args)   // too few parameters
       {
-        out << "BAD COMMAND+" << endl;
+        out << "BAD COMMAND+" << std::endl;
         MORE_ERROR() << "missing parameter(s) in command " << command
                      << ". Usage:\n"
                      << "      " << command << " " << args;
@@ -240,7 +240,7 @@ UCS_string args_ucs(args);
 
    if (argc > (mandatory_args + opt_args))   // too many parameters
       {
-        out << "BAD COMMAND+" << endl;
+        out << "BAD COMMAND+" << std::endl;
         MORE_ERROR() << "too many (" << argc<< ") parameter(s) in command "
                      << command << ". Usage:\n"
                      << "      " << command << " " << args;
@@ -264,11 +264,11 @@ Executable * statements = 0;
       {
         UERR << Error::error_name(err.get_error_code());
         if (Workspace::more_error().size())   UERR << UNI_PLUS;
-        UERR << endl;
+        UERR << std::endl;
         if (*err.get_error_line_2())
            {
-             COUT << "      " << err.get_error_line_2() << endl
-                  << "      " << err.get_error_line_3() << endl;
+             COUT << "      " << err.get_error_line_2() << std::endl
+                  << "      " << err.get_error_line_3() << std::endl;
            }
 
         err.print(UERR, LOC);
@@ -277,15 +277,15 @@ Executable * statements = 0;
       }
    catch (...)
       {
-        CERR << "*** Command::process_line() caught other exception ***"
-             << endl;
+        CERR << "*** Command::process_line() caught other std::exception ***"
+             << std::endl;
         delete statements;
         cmd_OFF(0);
       }
 
    if (statements == 0)
       {
-        COUT << "main: Parse error." << endl;
+        COUT << "main: Parse error." << std::endl;
         return;
       }
 
@@ -536,7 +536,7 @@ check_EOC:
                  }
               else
                  {
-                    // CERR << "ERROR printed twice" << endl;
+                    // CERR << "ERROR printed twice" << std::endl;
                  }
 
               if (Workspace::SI_top()->get_level() == 0)
@@ -558,12 +558,12 @@ check_EOC:
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_XTERM(ostream & out, const UCS_string & arg)
+Command::cmd_XTERM(std::ostream & out, const UCS_string & arg)
 {
 const char * term = getenv("TERM");
    if (!strncmp(term, "dumb", 4) && arg.starts_iwith("ON"))
       {
-        out << "impossible on dumb terminal" << endl;
+        out << "impossible on dumb terminal" << std::endl;
       }
    else if (arg.starts_iwith("OFF") || arg.starts_iwith("ON"))
       {
@@ -573,11 +573,11 @@ const char * term = getenv("TERM");
       {
         out << "]COLOR/XTERM ";
         if (Output::color_enabled()) out << "ON"; else out << "OFF";
-        out << endl;
+        out << std::endl;
       }
    else
       {
-        out << "BAD COMMAND" << endl;
+        out << "BAD COMMAND" << std::endl;
         return;
       }
 }
@@ -597,7 +597,7 @@ UCS_string_vector result;
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_BOXING(ostream & out, const UCS_string & arg)
+Command::cmd_BOXING(std::ostream & out, const UCS_string & arg)
 {
 int format = arg.atoi();
 
@@ -606,7 +606,7 @@ int format = arg.atoi();
         out << "]BOXING ";
         if (boxing_format == 0) out << "OFF";
         else out << boxing_format;
-        out << endl;
+        out << std::endl;
         return;
       }
 
@@ -628,7 +628,7 @@ int format = arg.atoi();
                  return;
       }
 
-   out << "BAD ]BOXING PARAMETER+" << endl;
+   out << "BAD ]BOXING PARAMETER+" << std::endl;
    MORE_ERROR() << "Parameter " << arg << " is not valid for command ]BOXING.\n"
       "  Valid parameters are OFF, N, and -N with\n"
       "  N ∈ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
@@ -649,7 +649,7 @@ const void * Bv = reinterpret_cast<const val_val *>(B)->child;
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_CHECK(ostream & out)
+Command::cmd_CHECK(std::ostream & out)
 {
    // erase stale functions from failed ⎕EX
    //
@@ -659,28 +659,28 @@ Command::cmd_CHECK(ostream & out)
      if (stale)
         {
           out << "WARNING - " << stale << " stale functions ("
-               << (erased ? "" : "not ") << "erased)" << endl;
+               << (erased ? "" : "not ") << "erased)" << std::endl;
         }
-     else out << "OK      - no stale functions" << endl;
+     else out << "OK      - no stale functions" << std::endl;
    }
 
    {
      const int stale = Value::print_stale(CERR);
      if (stale)
         {
-          out << "ERROR   - " << stale << " stale values" << endl;
+          out << "ERROR   - " << stale << " stale values" << std::endl;
           IO_Files::apl_error(LOC);
         }
-     else out << "OK      - no stale values" << endl;
+     else out << "OK      - no stale values" << std::endl;
    }
    {
      const int stale = IndexExpr::print_stale(CERR);
      if (stale)
         {
-          out << "ERROR   - " << stale << " stale indices" << endl;
+          out << "ERROR   - " << stale << " stale indices" << std::endl;
           IO_Files::apl_error(LOC);
         }
-     else out << "OK      - no stale indices" << endl;
+     else out << "OK      - no stale indices" << std::endl;
    }
 
    // discover duplicate parents
@@ -727,15 +727,15 @@ ShapeItem duplicate_parents = 0;
                    ++duplicate_parents;
                    out << "Value * vvp=" << voidP(vvp) << " already has parent "
                        << voidP(vvp->parent) << " when checking Value * val="
-                       << voidP(vvp) << endl;
+                       << voidP(vvp) << std::endl;
 
-                   out << "History of the child:" << endl;
+                   out << "History of the child:" << std::endl;
                    VH_entry::print_history(out, vvp->child, LOC);
-                   out << "History of the first parent:" << endl;
+                   out << "History of the first parent:" << std::endl;
                    VH_entry::print_history(out, vvp->parent, LOC);
-                   out << "History of the second parent:" << endl;
+                   out << "History of the second parent:" << std::endl;
                    VH_entry::print_history(out, val, LOC);
-                   out << endl;
+                   out << std::endl;
                  }
            }
       }
@@ -743,14 +743,14 @@ ShapeItem duplicate_parents = 0;
    if (duplicate_parents)
         {
           out << "ERROR   - " << duplicate_parents
-              << " duplicate parents" << endl;
+              << " duplicate parents" << std::endl;
           IO_Files::apl_error(LOC);
         }
-   else out << "OK      - no duplicate parents" << endl;
+   else out << "OK      - no duplicate parents" << std::endl;
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_CONTINUE(ostream & out)
+Command::cmd_CONTINUE(std::ostream & out)
 {
 UCS_string wsname("CONTINUE");
    Workspace::wsid(out, wsname, LIB0, false);     // )WSID CONTINUE
@@ -759,7 +759,7 @@ UCS_string wsname("CONTINUE");
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_COPY(ostream & out, UCS_string_vector & args, bool protection)
+Command::cmd_COPY(std::ostream & out, UCS_string_vector & args, bool protection)
 {
 LibRef libref = LIB0;
 const Unicode l = args[0][0];
@@ -771,7 +771,7 @@ const Unicode l = args[0][0];
 
    if (args.size() == 0)   // at least workspace name is required
       {
-        out << "BAD COMMAND+" << endl;
+        out << "BAD COMMAND+" << std::endl;
         MORE_ERROR() << "missing workspace name in command )COPY or )PCOPY";
         return;
       }
@@ -782,7 +782,7 @@ UCS_string wsname = args[0];
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_DOXY(ostream & out, UCS_string_vector & args)
+Command::cmd_DOXY(std::ostream & out, UCS_string_vector & args)
 {
 UTF8_string root("/tmp");
    if (args.size())   root = UTF8_string(args[0]);
@@ -794,20 +794,20 @@ UTF8_string root("/tmp");
 
        if (doxy.get_errors())
           out << "Command ]DOXY failed (" << doxy.get_errors() << " errors)"
-              << endl;
+              << std::endl;
       else
-         out << "Command ]DOXY finished successfully." << endl
+         out << "Command ]DOXY finished successfully." << std::endl
              << "    The generated documentation was stored in directory "
-             << doxy.get_root_dir() << endl
+             << doxy.get_root_dir() << std::endl
              << "    You may now browse it from file://"
              << doxy.get_root_dir()
-             << "/index.html" << endl;
+             << "/index.html" << std::endl;
      }
    catch (...) {}
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
+Command::cmd_DROP(std::ostream & out, const UCS_string_vector & lib_ws)
 {
    // Command is:
    //
@@ -826,17 +826,17 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
 const int result = unlink(filename.c_str());
    if (result)
       {
-        out << wname << " NOT DROPPED: " << strerror(errno) << endl;
+        out << wname << " NOT DROPPED: " << strerror(errno) << std::endl;
         MORE_ERROR() << "could not unlink file " << filename;
       }
    else
       {
-        Workspace::get_v_Quad_TZ().print_timestamp(out, now()) << endl;
+        Workspace::get_v_Quad_TZ().print_timestamp(out, now()) << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
+Command::cmd_DUMP(std::ostream & out, const UCS_string_vector & args,
                   bool html, bool silent)
 {
    // Command is:
@@ -867,7 +867,7 @@ UCS_string wsid_name = Workspace::get_WS_name();
 
    if (wsid_name.compare(UCS_string("CLEAR WS")) == 0)   // don't dump CLEAR WS
       {
-        COUT << "NOT DUMPED: THIS WS IS CLEAR WS" << endl;
+        COUT << "NOT DUMPED: THIS WS IS CLEAR WS" << std::endl;
         MORE_ERROR() <<
         "the workspace was not dumped because 'CLEAR WS' is a special\n"
         "workspace name that cannot be dumped. "
@@ -879,13 +879,13 @@ UCS_string wsid_name = Workspace::get_WS_name();
 }
 //-----------------------------------------------------------------------------
 void
-Command::cmd_ERASE(ostream & out, UCS_string_vector & args)
+Command::cmd_ERASE(std::ostream & out, UCS_string_vector & args)
 {
    Workspace::erase_symbols(out, args);
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_KEYB(ostream & out)
+Command::cmd_KEYB(std::ostream & out)
 {
    // maybe print user-supplied keyboard layout file
    //
@@ -895,8 +895,8 @@ Command::cmd_KEYB(ostream & out)
         if (layout == 0)
            {
              out << "Could not open " << uprefs.keyboard_layout_file
-                 << ": " << strerror(errno) << endl
-                 << "Showing default layout instead" << endl;
+                 << ": " << strerror(errno) << std::endl
+                 << "Showing default layout instead" << std::endl;
            }
         else
            {
@@ -907,7 +907,7 @@ Command::cmd_KEYB(ostream & out)
                     if (cc == EOF)   break;
                     out << char(cc);
                  }
-             out << endl;
+             out << std::endl;
              return;
            }
       }
@@ -927,11 +927,11 @@ Command::cmd_KEYB(ostream & out)
 "║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?⍠ ║          ║\n"
 "║  SHIFT      ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT   ║\n"
 "╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝\n"
-   << endl;
+   << std::endl;
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
+Command::cmd_PSTAT(std::ostream & out, const UCS_string & arg)
 {
 #ifndef PERFORMANCE_COUNTERS_WANTED
    out << "\n"
@@ -955,7 +955,7 @@ Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
 
    if (arg.starts_iwith("CLEAR"))
       {
-        out << "Performance counters cleared" << endl;
+        out << "Performance counters cleared" << std::endl;
         Performance::reset_all();
         return;
       }
@@ -967,11 +967,11 @@ Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
         if (!outf.is_open())
            {
              out << "opening " << filename
-                 << " failed: " << strerror(errno) << endl;
+                 << " failed: " << strerror(errno) << std::endl;
              return;
            }
 
-        out << "Writing performance data to file " << filename << endl;
+        out << "Writing performance data to file " << filename << std::endl;
         Performance::save_data(out, outf);
         return;
       }
@@ -983,7 +983,7 @@ Pfstat_ID iarg = PFS_ALL;
 }
 //-----------------------------------------------------------------------------
 void
-Command::primitive_help(ostream & out, const char * arg, int arity,
+Command::primitive_help(std::ostream & out, const char * arg, int arity,
                         const char * prim, const char * name,
                         const char * brief, const char * descr)
 {
@@ -1007,10 +1007,10 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
         default: FIXME;
       }
 
-   out << "  (" << name  <<  ")" << endl
-       << "    " << brief << endl;
+   out << "  (" << name  <<  ")" << std::endl
+       << "    " << brief << std::endl;
 
-   if (descr)   out << descr << endl;
+   if (descr)   out << descr << std::endl;
 }
 //-----------------------------------------------------------------------------
 
@@ -1024,7 +1024,7 @@ int ret = 0;
 }
 
 void 
-Command::cmd_HELP(ostream & out, const UCS_string & arg)
+Command::cmd_HELP(std::ostream & out, const UCS_string & arg)
 {
    if (arg.size() > 0 && Avec::is_first_symbol_char(arg[0]))
       {
@@ -1034,45 +1034,45 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
         Symbol * sym = Workspace::lookup_existing_symbol(arg);
         if (sym == 0)
            {
-             CERR << "does not exist" << endl;
+             CERR << "does not exist" << std::endl;
              return;
            }
 
         if (sym->is_erased())
            {
-             CERR << "is erased." << endl;
+             CERR << "is erased." << std::endl;
              return;
            }
 
         ValueStackItem * vs = sym->top_of_stack();
         if (vs == 0)
            {
-             CERR << " has no stack." << endl;
+             CERR << " has no stack." << std::endl;
              return;
            }
 
         switch(vs->get_nc())
            {
              case NC_INVALID:
-                  CERR << "has no valid name class" << endl;
+                  CERR << "has no valid name class" << std::endl;
                   return;
 
              case NC_UNUSED_USER_NAME:
-                  CERR << "is an unused name" << endl;
+                  CERR << "is an unused name" << std::endl;
                   return;
 
              case NC_LABEL:
                   CERR << "is a label (line " << vs->sym_val.label
-                       << ")" << endl;
+                       << ")" << std::endl;
                   return;
 
              case NC_VARIABLE:
                   {
-                    CERR << "is a variable:" << endl;
+                    CERR << "is a variable:" << std::endl;
                     Value_P val = sym->get_value();
                     if (+val)   val->print_properties(CERR, 4, true);
                   }
-                  CERR << endl;
+                  CERR << std::endl;
                   return;
 
              case NC_FUNCTION:
@@ -1084,9 +1084,9 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                          const NativeFunction *nf =
                                reinterpret_cast<const NativeFunction *>(fun);
                          CERR << "is a native function implemented in "
-                              << nf->get_so_path() << endl
+                              << nf->get_so_path() << std::endl
                               << "    load state: " << (nf->is_valid() ?
-                                 "OK (loaded)" : "error") << endl;
+                                 "OK (loaded)" : "error") << std::endl;
                          return;
                        }
 
@@ -1094,7 +1094,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                     if      (fun->get_fun_valence() == 2)   CERR << "dyadic";
                     else if (fun->get_fun_valence() == 1)   CERR << "monadic";
                     else                                    CERR << "niladic";
-                    CERR << " defined function:" << endl;
+                    CERR << " defined function:" << std::endl;
 
                     const UserFunction * ufun = fun->get_ufun1();
                     Assert(ufun);
@@ -1109,7 +1109,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                     CERR << "is a ";
                     if (fun->get_oper_valence() == 2)   CERR << "dyadic";
                     else                                CERR << "monadic";
-                    CERR << " defined operator:" << endl;
+                    CERR << " defined operator:" << std::endl;
 
                     const UserFunction * ufun = fun->get_ufun1();
                     Assert(ufun);
@@ -1118,7 +1118,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                   return;
 
              case NC_SHARED_VAR:
-                  CERR << "is a shared variable" << endl;
+                  CERR << "is a shared variable" << std::endl;
                   return;
 
              default:
@@ -1145,7 +1145,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
 UCS_string_vector commands;
    commands.reserve(60);
 
-   out << left << "APL Commands:" << endl;
+   out << left << "APL Commands:" << std::endl;
 #define cmd_def(cmd_str, _cod, arg, _hint) \
    { UCS_string c(cmd_str " " arg);   commands.push_back(c); }
 #include "Command.def"
@@ -1161,14 +1161,14 @@ bool left_col = true;
            }
         else
            {
-              out << cmd << endl;
+              out << cmd << std::endl;
               left_col = true;
            }
       }
 
   if (Workspace::get_user_commands().size())
      {
-       out << endl << "User defined commands:" << endl;
+       out << std::endl << "User defined commands:" << std::endl;
        loop(u, Workspace::get_user_commands().size())
            {
              out << "      " << Workspace::get_user_commands()[u].prefix
@@ -1177,56 +1177,56 @@ bool left_col = true;
                 out << "tokenized-args ";
  
              out << Workspace::get_user_commands()[u].apl_function
-                 << " quoted-args" << endl;
+                 << " quoted-args" << std::endl;
            }
      }
 
-   out << endl << "System variables:" << endl
+   out << std::endl << "System variables:" << std::endl
        << "      " << setw(COL2)
        << "⍞       Character Input/Output"
-       << "⎕       Evaluated Input/Output" << endl;
+       << "⎕       Evaluated Input/Output" << std::endl;
    left_col = true;
 
 #define ro_sv_def(x, _str, txt)                                            \
    { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
      if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
-     else            out << setw(8) << ucs << txt << endl;                 \
+     else            out << setw(8) << ucs << txt << std::endl;                 \
         left_col = !left_col; }
 #define rw_sv_def(x, _str, txt)                                            \
    { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
      if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
-     else            out << setw(8) << ucs << txt << endl;                 \
+     else            out << setw(8) << ucs << txt << std::endl;                 \
         left_col = !left_col; }
 #include "SystemVariable.def"
 
-   out << endl << "System functions:" << endl;
+   out << std::endl << "System functions:" << std::endl;
    left_col = true;
 #define ro_sv_def(x, _str, _txt)
 #define rw_sv_def(x, _str, _txt)
 #define sf_def(_q, str, txt)                                              \
    if (left_col)   out << "      ⎕" << setw(7) << str << setw(30 +        \
                                         len_diff(txt)) << txt;            \
-   else            out << "⎕" << setw(7) << str << txt << endl;           \
+   else            out << "⎕" << setw(7) << str << txt << std::endl;           \
    left_col = !left_col;
 #include "SystemVariable.def"
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
+Command::cmd_HISTORY(std::ostream & out, const UCS_string & arg)
 {
    if (arg.size() == 0)                  LineInput::print_history(out);
    else if (arg.starts_iwith("CLEAR"))   LineInput::clear_history(out);
-   else                                  out << "BAD COMMAND" << endl;
+   else                                  out << "BAD COMMAND" << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-Command::cmd_HOST(ostream & out, const UCS_string & arg)
+Command::cmd_HOST(std::ostream & out, const UCS_string & arg)
 {
    if (uprefs.safe_mode)
       {
         out << 
 "This interpreter was started in \"safe mode\" (command line option --safe,\n"
-"see ⎕ARG). The APL command )HOST is not permitted in safe mode." << endl;
+"see ⎕ARG). The APL command )HOST is not permitted in safe mode." << std::endl;
         return;
       }
 
@@ -1234,7 +1234,7 @@ UTF8_string host_cmd(arg);
 FILE * pipe = popen(host_cmd.c_str(), "r");
    if (pipe == 0)   // popen() failed
       {
-        out << ")HOST command failed: " << strerror(errno) << endl;
+        out << ")HOST command failed: " << strerror(errno) << std::endl;
         return;
       }
 
@@ -1249,13 +1249,13 @@ int result = pclose(pipe);
    Log(LOG_verbose_error)
       {
         if (result)   CERR << "pclose(" << arg << ") says: "
-                           << strerror(errno) << endl;
+                           << strerror(errno) << std::endl;
       }
-   out << endl << IntCell(result) << endl;
+   out << std::endl << IntCell(result) << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-Command::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
+Command::cmd_IN(std::ostream & out, UCS_string_vector & args, bool protection)
 {
    // Command is:
    //
@@ -1273,7 +1273,7 @@ FILE * in = fopen(filename.c_str(), "r");
       {
         UTF8_string fname_utf8(fname);
         CERR << ")IN " << fname_utf8.c_str()
-             << " failed: " << strerror(errno) << endl;
+             << " failed: " << strerror(errno) << std::endl;
 
         char cc[200];
         snprintf(cc, sizeof(cc),
@@ -1294,7 +1294,7 @@ transfer_context tctx(protection);
         if (cc == EOF)   break;
         if (idx == 0 && cc == 0x0A)   // optional LF
            {
-             // CERR << "CRLF" << endl;
+             // CERR << "CRLF" << std::endl;
              continue;
            }
 
@@ -1315,7 +1315,7 @@ transfer_context tctx(protection);
              continue;
            }
 
-        CERR << "BAD record charset (neither ASCII nor EBCDIC)" << endl;
+        CERR << "BAD record charset (neither ASCII nor EBCDIC)" << std::endl;
         break;
       }
 
@@ -1323,7 +1323,7 @@ transfer_context tctx(protection);
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
+Command::cmd_LOAD(std::ostream & out, UCS_string_vector & args,
                   UCS_string & quad_lx, bool silent)
 {
    // Command is:
@@ -1339,7 +1339,7 @@ UCS_string wsname;
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
+Command::cmd_LIBS(std::ostream & out, const UCS_string_vector & args)
 {
    // Command is:
    //
@@ -1353,14 +1353,14 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
         const int libref = libref_ucs[0] - '0';
         if (libref_ucs.size() != 1 || libref < 0 || libref > 9)
            {
-             CERR << "Invalid library reference " << libref_ucs << "'" << endl;
+             CERR << "Invalid library reference " << libref_ucs << "'" << std::endl;
              return;
            }
 
         UTF8_string path(args[1]);
         LibPaths::set_lib_dir(LibRef(libref), path.c_str(),
                               LibPaths::LibDir::CSRC_CMD);
-        out << "LIBRARY REFERENCE " << libref << " SET TO " << path << endl;
+        out << "LIBRARY REFERENCE " << libref << " SET TO " << path << std::endl;
         return;
       }
 
@@ -1368,7 +1368,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
       {
         UTF8_string utf(args[0]);
         LibPaths::set_APL_lib_root(utf.c_str());
-        out << "LIBRARY ROOT SET TO " << args[0] << endl;
+        out << "LIBRARY ROOT SET TO " << args[0] << std::endl;
         return;
       }
 
@@ -1387,7 +1387,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
           UTF8_string path = LibPaths::get_lib_dir(LibRef(d));
           switch(LibPaths::get_cfg_src(LibRef(d)))
              {
-                case LibPaths::LibDir::CSRC_NONE:      out << "NONE │" << endl;
+                case LibPaths::LibDir::CSRC_NONE:      out << "NONE │" << std::endl;
                                                        continue;
                 case LibPaths::LibDir::CSRC_ENV:       out << "ENV  │";   break;
                 case LibPaths::LibDir::CSRC_PWD:       out << "PWD  │";   break;
@@ -1419,11 +1419,11 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 "       ├── PUSER: the path came from user preferences in file\n"
 "       │                   $HOME/.config/gnu-apl or $HOME/.gnu-apl\n"
 "       └── PWD:   the path is relative to current directory $PWD (last resort)"
-       << endl;
+       << std::endl;
 }
 //-----------------------------------------------------------------------------
 DIR *
-Command::open_LIB_dir(UTF8_string & path, ostream & out,
+Command::open_LIB_dir(UTF8_string & path, std::ostream & out,
                       const UCS_string_vector & args)
 {
    // args can be one of:
@@ -1451,7 +1451,7 @@ UCS_string arg("0");
       }
 
    // follow symbolic links, but not too often (because symbolic links may
-   // form an endless loop)...
+   // form an std::endless loop)...
    //
    loop(depth, 20)
        {
@@ -1476,7 +1476,7 @@ DIR * dir = opendir(path.c_str());
    if (dir == 0)
       {
         const char * why = strerror(errno);
-        out << "IMPROPER LIBRARY REFERENCE '" << arg << "': " << why << endl;
+        out << "IMPROPER LIBRARY REFERENCE '" << arg << "': " << why << std::endl;
 
         MORE_ERROR() <<
         "path '" << path << "' could not be opened as directory: " << why;
@@ -1504,7 +1504,7 @@ DIR * dir = opendir(filename.c_str());
 }
 //-----------------------------------------------------------------------------
 void 
-Command::lib_common(ostream & out, const UCS_string_vector & args_range,
+Command::lib_common(std::ostream & out, const UCS_string_vector & args_range,
                     int variant)
 {
    // 1. check for (and then extract) an optional range parameter...
@@ -1559,7 +1559,7 @@ UCS_string to;
         const bool bad_from_to = parse_from_to(from, to, *range);
         if (bad_from_to)
            {
-             CERR << "bad range argument" << endl;
+             CERR << "bad range argument" << std::endl;
              MORE_ERROR() << "bad range argument " << *range
                   << ", expecting from-to";
              return;
@@ -1656,7 +1656,7 @@ std::vector<int> col_widths;
            {
              // last column or last item: print newline
              //
-             out << endl;
+             out << std::endl;
            }
         else
            {
@@ -1670,7 +1670,7 @@ std::vector<int> col_widths;
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_LIB1(ostream & out, const UCS_string_vector & args)
+Command::cmd_LIB1(std::ostream & out, const UCS_string_vector & args)
 {
    // Command is:
    //
@@ -1683,7 +1683,7 @@ Command::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
+Command::cmd_LIB2(std::ostream & out, const UCS_string_vector & args)
 {
    // Command is:
    //
@@ -1696,7 +1696,7 @@ Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_LOG(ostream & out, const UCS_string & arg)
+Command::cmd_LOG(std::ostream & out, const UCS_string & arg)
 {
 #ifdef DYNAMIC_LOG_WANTED
 
@@ -1721,15 +1721,15 @@ Command::cmd_LOG(ostream & out, const UCS_string & arg)
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_MORE(ostream & out)
+Command::cmd_MORE(std::ostream & out)
 {
    if (Workspace::more_error().size() == 0)
       {
-        out << "NO MORE ERROR INFO" << endl;
+        out << "NO MORE ERROR INFO" << std::endl;
         return;
       }
 
-   out << Workspace::more_error() << endl;
+   out << Workspace::more_error() << std::endl;
    return;
 }
 //-----------------------------------------------------------------------------
@@ -1737,7 +1737,7 @@ void
 Command::cmd_OFF(int exit_val)
 {
    cleanup(true);
-   COUT << endl;
+   COUT << std::endl;
    if (!uprefs.silent)
       {
 
@@ -1746,9 +1746,9 @@ Command::cmd_OFF(int exit_val)
         end.tv_sec -= uprefs.session_start.tv_sec;
         end.tv_usec -= uprefs.session_start.tv_usec;
         if (end.tv_usec < 1000000)   { end.tv_usec += 1000000;   --end.tv_sec; }
-        COUT << "Goodbye." << endl
+        COUT << "Goodbye." << std::endl
              << "Session duration: " << (end.tv_sec + 0.000001*end.tv_usec)
-             << " seconds " << endl;
+             << " seconds " << std::endl;
 
       }
 
@@ -1767,7 +1767,7 @@ rlimit rl;
 }
 //-----------------------------------------------------------------------------
 void
-Command::cmd_OUT(ostream & out, UCS_string_vector & args)
+Command::cmd_OUT(std::ostream & out, UCS_string_vector & args)
 {
 UCS_string fname = args[0];
    args.erase(args.begin());
@@ -1779,7 +1779,7 @@ FILE * atf = fopen(filename.c_str(), "w");
    if (atf == 0)
       {
         const char * why = strerror(errno);
-        out << ")OUT " << fname << " failed: " << why << endl;
+        out << ")OUT " << fname << " failed: " << why << std::endl;
         MORE_ERROR() << "command )OUT: could not open file " << fname
                      << " for writing: " << why;
         return;
@@ -1792,7 +1792,7 @@ uint64_t seq = 1;   // sequence number for records written
 }
 //-----------------------------------------------------------------------------
 bool
-Command::check_name_conflict(ostream & out, const UCS_string & cnew,
+Command::check_name_conflict(std::ostream & out, const UCS_string & cnew,
                              const UCS_string cold)
 {
 int len = cnew.size();
@@ -1807,14 +1807,14 @@ int len = cnew.size();
         if (l && (c1 != c2))   return false;   // OK: different
      }
 
-   out << "BAD COMMAND+" << endl;
+   out << "BAD COMMAND+" << std::endl;
    MORE_ERROR() << "conflict with existing command name in command ]USERCMD";
 
    return true;
 }
 //-----------------------------------------------------------------------------
 bool
-Command::check_redefinition(ostream & out, const UCS_string & cnew,
+Command::check_redefinition(std::ostream & out, const UCS_string & cnew,
                             const UCS_string fnew, const int mnew)
 {
    loop(u, Workspace::get_user_commands().size())
@@ -1828,7 +1828,7 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
        // user command name matches; so must mode and function
        if (mnew != mold || fnew != fold)
          {
-           out << "BAD COMMAND" << endl;
+           out << "BAD COMMAND" << std::endl;
            MORE_ERROR() <<
            "conflict with existing user command definition in command ]USERCMD";
          }
@@ -1839,7 +1839,7 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
 }
 //-----------------------------------------------------------------------------
 void 
-Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
+Command::cmd_SAVE(std::ostream & out, const UCS_string_vector & args)
 {
    // )SAVE
    // )SAVE workspace
@@ -1867,7 +1867,7 @@ UCS_string wsid_name = Workspace::get_WS_name();
 
    if (wsid_name.compare(UCS_string("CLEAR WS")) == 0)   // don't save CLEAR WS
       {
-        COUT << "NOT SAVED: THIS WS IS CLEAR WS" << endl;
+        COUT << "NOT SAVED: THIS WS IS CLEAR WS" << std::endl;
         MORE_ERROR() <<
         "the workspace was not saved because 'CLEAR WS' is a special\n"
         "workspace name that cannot be saved. "
@@ -1879,7 +1879,7 @@ UCS_string wsid_name = Workspace::get_WS_name();
 }
 //-----------------------------------------------------------------------------
 bool
-Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
+Command::resolve_lib_wsname(std::ostream & out, const UCS_string_vector & args,
                             LibRef &lib, UCS_string & wsname)
 {
    Assert(args.size() > 0);
@@ -1892,7 +1892,7 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
 
    if (!(args[0].size() == 1 && Avec::is_digit(args[0][0])))
       {
-        out << "BAD COMMAND+" << endl;
+        out << "BAD COMMAND+" << std::endl;
         MORE_ERROR() << "invalid library reference '" << args[0] << "'";
         return true;   // error
       }
@@ -1903,7 +1903,7 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
 }
 //-----------------------------------------------------------------------------
 void
-Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
+Command::cmd_USERCMD(std::ostream & out, const UCS_string & cmd,
                      UCS_string_vector & args)
 {
    // ]USERCMD
@@ -1923,7 +1923,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                   if (Workspace::get_user_commands()[u].mode)   out << "A ";
                   out << Workspace::get_user_commands()[u].apl_function << " B"
                       << " (mode " << Workspace::get_user_commands()[u].mode
-                      << ")" << endl;
+                      << ")" << std::endl;
                 }
            }
         return;
@@ -1932,7 +1932,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
   if (args.size() == 1 && args[0].starts_iwith("REMOVE-ALL"))
      {
        Workspace::get_user_commands().clear();
-       out << "    All user-defined commands removed." << endl;
+       out << "    All user-defined commands removed." << std::endl;
        return;
      }
 
@@ -1949,14 +1949,14 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                   //
                   out << "    User-defined command "
                       << Workspace::get_user_commands()[u].prefix
-                      << " removed." << endl;
+                      << " removed." << std::endl;
                   Workspace::get_user_commands().
                      erase(Workspace::get_user_commands().begin() + u);
                   return;
                 }
            }
 
-       out << "BAD COMMAND+" << endl;
+       out << "BAD COMMAND+" << std::endl;
        MORE_ERROR() << "user command in command ]USERCMD REMOVE does not exist";
        return;
      }
@@ -1964,7 +1964,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
   // check if the user command is not followed by the string
   if (args.size() == 1)
      {
-        out << "BAD COMMAND+" << endl;
+        out << "BAD COMMAND+" << std::endl;
         MORE_ERROR() << "user command syntax in ]USERCMD:"
                         " ]new-command  APL-fun  [mode]";
         return;
@@ -1997,7 +1997,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
             }
          else
             {
-               out << "BAD COMMAND+" << endl;
+               out << "BAD COMMAND+" << std::endl;
                MORE_ERROR() << "closing } in lambda function not found";
                return;
             }
@@ -2005,7 +2005,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
 
    if (args.size() > 3 && !is_lambda)
       {
-        out << "BAD COMMAND+" << endl;
+        out << "BAD COMMAND+" << std::endl;
         MORE_ERROR() << "too many parameters in command ]USERCMD";
         return;
       }
@@ -2014,7 +2014,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
    if (!is_lambda && args.size() == 3)   mode = args[2].atoi();
    if (mode < 0 || mode > 1)
       {
-        out << "BAD COMMAND+" << endl;
+        out << "BAD COMMAND+" << std::endl;
         MORE_ERROR() << "unsupported mode " << mode
                      << " in command ]USERCMD (0 or 1 expected)";
         return;
@@ -2029,7 +2029,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
         else          error = error || !Avec::is_symbol_char(command_name[c]);
         if (error)
            {
-             out << "BAD COMMAND+" << endl;
+             out << "BAD COMMAND+" << std::endl;
              MORE_ERROR() << " bad user command name in command ]USERCMD";
              return;
            }
@@ -2043,7 +2043,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
    if (check_redefinition(out, command_name, apl_fun, mode))
      {
        out << "    User-defined command "
-           << command_name << " installed." << endl;
+           << command_name << " installed." << std::endl;
        return;
      }
 
@@ -2055,7 +2055,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
             {
                if (!Avec::is_symbol_char(apl_fun[c]))
                   {
-                     out << "BAD COMMAND+" << endl;
+                     out << "BAD COMMAND+" << std::endl;
                      MORE_ERROR() <<
                           "bad APL function name in command ]USERCMD";
                      return;
@@ -2067,11 +2067,11 @@ user_command new_user_command = { command_name, apl_fun, mode };
    Workspace::get_user_commands().push_back(new_user_command);
 
    out << "    User-defined command "
-       << new_user_command.prefix << " installed." << endl;
+       << new_user_command.prefix << " installed." << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
+Command::do_USERCMD(std::ostream & out, UCS_string & apl_cmd,
                     const UCS_string & line, const UCS_string & cmd,
                     UCS_string_vector & args, int uidx)
 {
@@ -2106,7 +2106,7 @@ UCS_string_vector args = split_arg(arg);
 
               const bool val = Log_status(l);
               CERR << "    " << setw(2) << right << l << ": " 
-                   << (val ? "(ON)  " : "(OFF) ") << left << info << endl;
+                   << (val ? "(ON)  " : "(OFF) ") << left << info << std::endl;
             }
 
         return;
@@ -2127,7 +2127,7 @@ int on_off = -1;
 
         Log_control(val, new_status);
         CERR << "    Log facility '" << info << "' is now "
-             << (new_status ? "ON " : "OFF") << endl;
+             << (new_status ? "ON " : "OFF") << std::endl;
       }
 }
 #endif
@@ -2164,7 +2164,7 @@ const char sub_type = record[1];
                 }
 
              CERR << "record #" << setw(3) << recnum << ": '" << rec_type
-                  << "'" << stype << endl;
+                  << "'" << stype << std::endl;
            }
       }
    else if (rec_type == ' ' || rec_type == 'X')   // object
@@ -2185,7 +2185,7 @@ const char sub_type = record[1];
                      }
 
                   CERR << "record #" << setw(3) << recnum
-                       << ": " << stype << endl;
+                       << ": " << stype << std::endl;
                 }
 
              item_type = sub_type;
@@ -2200,14 +2200,14 @@ const char sub_type = record[1];
              else if (item_type == 'C')   chars_1TF(objects);
              else if (item_type == 'N')   numeric_1TF(objects);
              else if (item_type == 'F')   function_2TF(objects);
-             else                         CERR << "????: " << data << endl;
+             else                         CERR << "????: " << data << std::endl;
              data.clear();
            }
       }
    else
       {
         CERR << "record #" << setw(3) << recnum << ": '" << rec_type << "'"
-             << "*** bad record type '" << rec_type << endl;
+             << "*** bad record type '" << rec_type << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -2274,9 +2274,9 @@ Symbol * sym = 0;
    
    Log(LOG_command_IN)
       {
-        CERR << endl << var_name << " rank " << shape.get_rank() << " IS '";
+        CERR << std::endl << var_name << " rank " << shape.get_rank() << " IS '";
         loop(j, data.size() - idx)   CERR << data[idx + j];
-        CERR << "'" << endl;
+        CERR << "'" << std::endl;
       }
 
 Token_string tos;
@@ -2335,9 +2335,9 @@ Symbol * sym = 0;
    
    Log(LOG_command_IN)
       {
-        CERR << endl << var_name << " shape " << shape << " IS: '";
+        CERR << std::endl << var_name << " shape " << shape << " IS: '";
         loop(j, data.size() - idx)   CERR << data[idx + j];
-        CERR << "'" << endl;
+        CERR << "'" << std::endl;
       }
 
 Value_P val(shape, LOC);
@@ -2356,7 +2356,7 @@ ShapeItem padded = 0;
    if (padded)
       {
         CERR << "WARNING: ATF Record for " << var_name << " is broken ("
-             << padded << " spaces added)" << endl;
+             << padded << " spaces added)" << std::endl;
       }
 
    val->check_value(LOC);
@@ -2392,7 +2392,7 @@ UCS_string var_or_fun;
 
    if (var_or_fun.size() == 0)
       {
-        CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << ";" << endl;
+        CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << ";" << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -2417,7 +2417,7 @@ UCS_string fun_name1 = Quad_TF::tf2_inverse(statement);
    if (fun_name1.size() == 0)   // tf2_inverse() failed
       {
         CERR << "inverse 2 ⎕TF failed for the following APL statement: "
-             << endl << "    " << statement << endl;
+             << std::endl << "    " << statement << std::endl;
         return;
       }
 
@@ -2432,11 +2432,11 @@ Symbol * sym1 = Workspace::lookup_existing_symbol(fun_name1);
    Log(LOG_command_IN)
       {
        const YMDhmsu ymdhmsu(timestamp);
-       CERR << "FUNCTION '" << fun_name1 <<  "'" << endl
+       CERR << "FUNCTION '" << fun_name1 <<  "'" << std::endl
             << "   created: " << ymdhmsu.day << "." << ymdhmsu.month
             << "." << ymdhmsu.year << "  " << ymdhmsu.hour
             << ":" << ymdhmsu.minute << ":" << ymdhmsu.second
-            << "." << ymdhmsu.micro << " (" << timestamp << ")" << endl;
+            << "." << ymdhmsu.micro << " (" << timestamp << ")" << std::endl;
       }
 }
 //-----------------------------------------------------------------------------

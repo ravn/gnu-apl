@@ -74,7 +74,7 @@ public:
    bool uses_function(const UserFunction * ufun) const;
 
    /// print the state of this parser
-   void print(ostream & out, int indent) const;
+   void print(std::ostream & out, int indent) const;
 
    /// throw an E_LEFT_SYNTAX_ERROR or an E_SYNTAX_ERROR
    void syntax_error(const char * loc);
@@ -86,7 +86,7 @@ public:
    void unmark_all_values() const;
 
    /// print all owners of \b value
-   int show_owners(const char * prfx, ostream & out, const Value & value) const;
+   int show_owners(const char * prfx, std::ostream & out, const Value & value) const;
 
    /// highest PC in current statement
    Function_PC get_range_high() const;
@@ -99,7 +99,7 @@ public:
    bool value_expected();
 
    /// print the current range (PC from - PC to) on out
-   void print_range(ostream & out) const;
+   void print_range(std::ostream & out) const;
 
    /// replace the left or right argument of a function (for retry) and
    /// return true on success
@@ -217,7 +217,7 @@ public:
         saved_lookahead.tok.clear(LOC); }
 
    /// print the current stack
-   void print_stack(ostream & out, const char * loc) const;
+   void print_stack(std::ostream & out, const char * loc) const;
 
    /// set a new PC
    void set_PC(Function_PC new_pc)
@@ -266,7 +266,7 @@ public:
                   return;
 
              default: CERR << "CLASS = " << result.get_Class()
-                           << " at " << LOC << endl;
+                           << " at " << LOC << std::endl;
                       TODO;
            }
       }

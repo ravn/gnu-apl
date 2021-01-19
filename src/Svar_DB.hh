@@ -164,7 +164,7 @@ public:
    static void add_event(SV_key key, AP_num3 id, Svar_event event);
 
    /// print the database
-   static void print(ostream & out);
+   static void print(std::ostream & out);
 
    /// return a socket that is connect to APserver
    static TCP_socket connect_to_APserver(const char * bin_path,

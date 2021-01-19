@@ -176,7 +176,7 @@ enum ValueFlags
   VF_member   = 0x2000,   ///< used for member access
 };
 
-extern ostream & print_flags(ostream & out, ValueFlags flags);
+extern std::ostream & print_flags(std::ostream & out, ValueFlags flags);
 
 //-----------------------------------------------------------------------------
 /// events for APL values

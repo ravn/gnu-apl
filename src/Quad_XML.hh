@@ -111,14 +111,14 @@ public:
       }
 
    /// (debug-) print this node
-   void print(ostream & out) const;
+   void print(std::ostream & out) const;
 
    /// parse an XML start or leaf tag, store result in \b this->APL_value
    /// On error set MORE_ERROR() and return \b true
    bool parse_tag();
 
    /// (debug-) print all nodes·
-   static void print_all(ostream & out, const XML_node & anchor);
+   static void print_all(std::ostream & out, const XML_node & anchor);
 
    /// return the type of this node as string
    const char * get_node_type_name() const;
@@ -211,7 +211,7 @@ protected:
    static Value_P APL_to_XML(const Value & B);
 
    /// return the entities in B, sorted by their position prefix
-   static void add_sorted_entities(vector<const UCS_string *> & entities,
+   static void add_sorted_entities(std::vector<const UCS_string *> & entities,
                                    const Value & B);
 
    /// find the data cell (if any) with position prefix prefix idx in B.

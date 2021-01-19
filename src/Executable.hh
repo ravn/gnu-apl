@@ -87,14 +87,14 @@ public:
       { return Function_Line_0; }
 
    /// print this user defined executable to \b out
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       { print_token(out);   return out; }
 
    /// print this user defined executable to \b out
-   void print_token(ostream & out) const;
+   void print_token(std::ostream & out) const;
 
    /// print the text of this user defined executable to \b out
-   void print_text(ostream & out) const;
+   void print_text(std::ostream & out) const;
 
    /// execute the body of this executable
    Token execute_body() const;
@@ -139,7 +139,7 @@ public:
    void unmark_all_values() const;
 
    /// print all owners of \b value
-   int show_owners(const char * prefix, ostream & out,
+   int show_owners(const char * prefix, std::ostream & out,
                    const Value & value) const;
 
    /// say where this SI entry was allocated

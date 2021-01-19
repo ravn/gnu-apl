@@ -49,7 +49,7 @@ public:
    /// process \b line which contains an APL command. Return true iff the
    /// command was user-defined (and then the function for that command is
    /// stored in \b line and shall be executed)).
-   static bool do_APL_command(ostream & out, UCS_string & line);
+   static bool do_APL_command(std::ostream & out, UCS_string & line);
 
    /// process \b line which contains APL statements
    static void do_APL_expression(UCS_string & line);
@@ -86,7 +86,7 @@ public:
       };
 
    /// check workspace integrity (stale Value and IndexExpr objects, etc)
-   static void cmd_CHECK(ostream & out);
+   static void cmd_CHECK(std::ostream & out);
 
    /// a helper for finding sub-values with two parents
    struct val_val
@@ -113,113 +113,113 @@ public:
 
 protected:
    /// )BOXING command
-   static void cmd_BOXING(ostream & out, const UCS_string & arg);
+   static void cmd_BOXING(std::ostream & out, const UCS_string & arg);
 
    /// )SAVE active WS as CONTINUE and )OFF
-   static void cmd_CONTINUE(ostream & out);
+   static void cmd_CONTINUE(std::ostream & out);
 
    /// )COPY: copy a workspace file
-   static void cmd_COPY(ostream & out, UCS_string_vector & args,
+   static void cmd_COPY(std::ostream & out, UCS_string_vector & args,
                         bool protection);
 
    /// ]DOXY: create doxygen-like documentation of the current workspace
-   static void cmd_DOXY(ostream & out, UCS_string_vector & args);
+   static void cmd_DOXY(std::ostream & out, UCS_string_vector & args);
 
    /// )DROP: delete a workspace file
-   static void cmd_DROP(ostream & out, const UCS_string_vector & args);
+   static void cmd_DROP(std::ostream & out, const UCS_string_vector & args);
 
    /// )DUMP: dump a workspace file (.apl)
-   static void cmd_DUMP(ostream & out, const UCS_string_vector & args,
+   static void cmd_DUMP(std::ostream & out, const UCS_string_vector & args,
                         bool html, bool silent);
 
    /// )ERASE: erase symbols
-   static void cmd_ERASE(ostream & out, UCS_string_vector & args);
+   static void cmd_ERASE(std::ostream & out, UCS_string_vector & args);
 
    /// show list of commands
-   static void cmd_HELP(ostream & out, const UCS_string & arg);
+   static void cmd_HELP(std::ostream & out, const UCS_string & arg);
 
    /// show help for APL primitives
-   static void primitive_help(ostream & out, const char * arg, int arity,
+   static void primitive_help(std::ostream & out, const char * arg, int arity,
                               const char * prim, const char * name,
                               const char * title, const char * descr);
 
    /// show or clear input history
-   static void cmd_HISTORY(ostream & out, const UCS_string & arg);
+   static void cmd_HISTORY(std::ostream & out, const UCS_string & arg);
 
    /// )HOST: execute OS command
-   static void cmd_HOST(ostream & out, const UCS_string & arg);
+   static void cmd_HOST(std::ostream & out, const UCS_string & arg);
 
    /// )IN: import a workspace file
-   static void cmd_IN(ostream & out, UCS_string_vector & args, bool protect);
+   static void cmd_IN(std::ostream & out, UCS_string_vector & args, bool protect);
 
    /// show US keyboard layout
-   static void cmd_KEYB(ostream & out);
+   static void cmd_KEYB(std::ostream & out);
 
    /// )LOAD: load a workspace file
-   static void cmd_LOAD(ostream & out, UCS_string_vector & args, 
+   static void cmd_LOAD(std::ostream & out, UCS_string_vector & args, 
                         UCS_string & quad_lx, bool silent);
 
    /// show performance counters
-   static void cmd_PSTAT(ostream & out, const UCS_string & arg);
+   static void cmd_PSTAT(std::ostream & out, const UCS_string & arg);
 
    /// open directory arg and follow symlinks
-   static DIR * open_LIB_dir(UTF8_string & path, ostream & out,
+   static DIR * open_LIB_dir(UTF8_string & path, std::ostream & out,
                             const UCS_string_vector & args);
 
    /// list library: common helper
-   static void lib_common(ostream & out, const UCS_string_vector & args,
+   static void lib_common(std::ostream & out, const UCS_string_vector & args,
                           int variant);
 
    /// list content of workspace and wslib directories: )LIB [N]
-   static void cmd_LIB1(ostream & out, const UCS_string_vector & args);
+   static void cmd_LIB1(std::ostream & out, const UCS_string_vector & args);
 
    /// list content of workspace and wslib directories: ]LIB [N]
-   static void cmd_LIB2(ostream & out, const UCS_string_vector & args);
+   static void cmd_LIB2(std::ostream & out, const UCS_string_vector & args);
 
    /// control logging facilities
-   static void cmd_LOG(ostream & out, const UCS_string & arg);
+   static void cmd_LOG(std::ostream & out, const UCS_string & arg);
 
    /// list paths of workspace and wslib directories
-   static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
+   static void cmd_LIBS(std::ostream & out, const UCS_string_vector & lib_ref);
 
    /// print more error info
-   static void cmd_MORE(ostream & out);
+   static void cmd_MORE(std::ostream & out);
 
    /// )OUT: export a workspace file
-   static void cmd_OUT(ostream & out, UCS_string_vector & args);
+   static void cmd_OUT(std::ostream & out, UCS_string_vector & args);
 
    /// )SAVE: save a workspace file (.xml)
-   static void cmd_SAVE(ostream & out, const UCS_string_vector & args);
+   static void cmd_SAVE(std::ostream & out, const UCS_string_vector & args);
 
    /// create a user defined command
-   static void cmd_USERCMD(ostream & out, const UCS_string & arg,
+   static void cmd_USERCMD(std::ostream & out, const UCS_string & arg,
                            UCS_string_vector & args);
 
    /// enable and disable colors
-   static void cmd_XTERM(ostream & out, const UCS_string & args);
+   static void cmd_XTERM(std::ostream & out, const UCS_string & args);
 
    /// split whitespace separated arguments into individual arguments
    static UCS_string_vector split_arg(const UCS_string & arg);
 
    /// execute a user defined command
-   static void do_USERCMD(ostream & out, UCS_string & line,
+   static void do_USERCMD(std::ostream & out, UCS_string & line,
                           const UCS_string & line1, const UCS_string & cmd,
                           UCS_string_vector & args, int uidx);
 
    /// check if a command name conflicts with an existing command
-   static bool check_name_conflict(ostream & out, const UCS_string & cnew,
+   static bool check_name_conflict(std::ostream & out, const UCS_string & cnew,
                                    const UCS_string cold);
 
    /// check if a command is being redefined
-   static bool check_redefinition(ostream & out, const UCS_string & cnew,
+   static bool check_redefinition(std::ostream & out, const UCS_string & cnew,
                                   const UCS_string fnew, const int mnew);
 
    /// check the number of parameters in a command
-   static bool check_params(ostream & out, const char * command, int argc,
+   static bool check_params(std::ostream & out, const char * command, int argc,
                             const char * args);
 
    /// resolve an optional lib followed by a WS name
-   static bool resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
+   static bool resolve_lib_wsname(std::ostream & out, const UCS_string_vector & args,
                                   LibRef &lib, UCS_string & wsname);
 
    /// a helper struct for the )IN command

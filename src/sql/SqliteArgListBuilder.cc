@@ -59,7 +59,7 @@ void SqliteArgListBuilder::append_string( const string &arg, int pos )
 {
     char *text = strdup( arg.c_str() );
     if( text == NULL ) {
-        CERR << "Failed to allocate memory for bind arg" << endl;
+        CERR << "Failed to allocate memory for bind arg" << std::endl;
         abort();
     }
     sqlite3_bind_text( statement, pos + 1, text, -1, free_text_arg );
@@ -82,7 +82,7 @@ void SqliteArgListBuilder::append_null( int pos )
 
 Value_P SqliteArgListBuilder::run_query( bool ignore_result )
 {
-    vector<ResultRow> results;
+    std::vector<ResultRow> results;
     int result;
     while( (result = sqlite3_step( statement )) != SQLITE_DONE ) {
         if( result != SQLITE_ROW ) {
@@ -100,9 +100,9 @@ Value_P SqliteArgListBuilder::run_query( bool ignore_result )
         int col_count = results[0].get_values().size();
         Shape result_shape( row_count, col_count );
         db_result_value = Value_P( result_shape, LOC );
-        for( vector<ResultRow>::iterator row_iterator = results.begin() ; row_iterator != results.end() ; row_iterator++ ) {
-            const vector<const ResultValue *> &row = row_iterator->get_values();
-            for( vector<const ResultValue *>::const_iterator col_iterator = row.begin() ; col_iterator != row.end() ; col_iterator++ ) {
+        for( std::vector<ResultRow>::iterator row_iterator = results.begin() ; row_iterator != results.end() ; row_iterator++ ) {
+            const std::vector<const ResultValue *> &row = row_iterator->get_values();
+            for( std::vector<const ResultValue *>::const_iterator col_iterator = row.begin() ; col_iterator != row.end() ; col_iterator++ ) {
                 (*col_iterator)->update( db_result_value->next_ravel(),
                                          db_result_value.getref() );
             }

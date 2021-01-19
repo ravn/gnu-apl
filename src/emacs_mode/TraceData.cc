@@ -50,7 +50,7 @@ void TraceData::remove_listener( NetworkConnection *connection )
     }
 }
 
-void TraceData::display_value_for_trace( ostream &out, const Value_P &value, int cr_level )
+void TraceData::display_value_for_trace( std::ostream &out, const Value_P &value, int cr_level )
 {
     if( cr_level < 0 ) {
         PrintContext context( PST_NONE, Workspace::get_PP(), 100000 );
@@ -79,10 +79,10 @@ void TraceData::send_update( Symbol_Event ev )
 
         stringstream out;
         if( ev == SEV_ERASED ) {
-            out << "sev_erased" << endl << symbol->get_name() << endl;
+            out << "sev_erased" << std::endl << symbol->get_name() << std::endl;
         }
         else {
-            out << "symbol_update" << endl << symbol->get_name() << endl;
+            out << "symbol_update" << std::endl << symbol->get_name() << std::endl;
             int cr_level = it->second.get_cr_level();
             display_value_for_trace( out, v, cr_level );
         }

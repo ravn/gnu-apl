@@ -207,27 +207,27 @@ protected:
    static bool colors_enabled;
 };
 
-/// a filebuf for stdin echo
-class CinOut : public filebuf
+/// a std::filebuf for stdin echo
+class CinOut : public std::filebuf
 {
-   /// overloaded filebuf::overflow
+   /// overloaded std::filebuf::overflow
    virtual int overflow(int c);
 };
 extern CinOut CIN_filebuf;
 
-/// an ostream for stdin echo and a few editing capabilities
-class CIN_ostream : public ostream
+/// an std::ostream for stdin echo and a few editing capabilities
+class CIN_ostream : public std::ostream
 {
 public:
    CIN_ostream()
-   : ostream(&CIN_filebuf)
+   : std::ostream(&CIN_filebuf)
    {}
 
    /// set cursor to y:x (upper left corner is 0:0, negative y: from bottom)
    void set_cursor(int y, int x);
 
    /// clear to end of line
-   ostream & clear_EOL()
+   std::ostream & clear_EOL()
       { return *this << Output::clear_EOL; }
 
    /// clear to end of screen supported ?
@@ -235,7 +235,7 @@ public:
       { return *Output::clear_EOS != 0; }
 
    /// clear to end of line
-   ostream & clear_EOS()
+   std::ostream & clear_EOS()
       { return *this << Output::clear_EOS; }
 };
 extern CIN_ostream CIN;

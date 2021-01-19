@@ -55,7 +55,7 @@ public:
    virtual ShapeItem get_pos(ShapeItem p) const = 0;
 
    /// print this iterator (for debugging purposes).
-   ostream & print(ostream & out) const;
+   std::ostream & print(std::ostream & out) const;
 
    /// return the next higher IndexIterator
    IndexIterator * get_upper() const   { return upper; };

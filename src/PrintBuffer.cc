@@ -53,12 +53,12 @@ PrintBuffer::PrintBuffer(const UCS_string & ucs, const ColInfo & ci)
 }
 //-----------------------------------------------------------------------------
 PrintBuffer::PrintBuffer(const Value & value, const PrintContext & _pctx,
-                         ostream * out)
+                         std::ostream * out)
    : complete(false)
 {
 PERFORMANCE_START(start_0)
 
-   // Note: if ostream is non-0 then this value may be incomplete
+   // Note: if std::ostream is non-0 then this value may be incomplete
    // (as indicated by member complete if it is huge). This is to speed
    // up printing if the value is discarded after having been printed
 
@@ -90,7 +90,7 @@ const ShapeItem ec = value.element_count();
         if (out)
            {
              UCS_string ucs(*this, value.get_rank(), _pctx.get_PW());
-             if (ucs.size())   *out << ucs << endl;
+             if (ucs.size())   *out << ucs << std::endl;
             }
         complete = true;
         PERFORMANCE_END(fs_PrintBuffer1_B, start_1, ec)
@@ -125,7 +125,7 @@ const ShapeItem ec = value.element_count();
         if (out)
            {
              UCS_string ucs(*this, value.get_rank(), _pctx.get_PW());
-             if (ucs.size())   *out << ucs << endl;
+             if (ucs.size())   *out << ucs << std::endl;
             }
         update_info();
         complete = true;
@@ -138,7 +138,7 @@ const ShapeItem ec = value.element_count();
         if (out)
            {
              UCS_string ucs(*this, value.get_rank(), _pctx.get_PW());
-             if (ucs.size())   *out << ucs << endl;
+             if (ucs.size())   *out << ucs << std::endl;
             }
         update_info();
         complete = true;
@@ -149,11 +149,11 @@ const ShapeItem ec = value.element_count();
    //
 const ShapeItem cols = value.get_last_shape_item();
 
-vector<bool> scaling;
+std::vector<bool> scaling;
    scaling.reserve(cols);
    loop(c, cols)   scaling.push_back(false);
 
-vector<PrintBuffer> pcols;
+std::vector<PrintBuffer> pcols;
    pcols.reserve(cols);
    loop(c, cols)   pcols.push_back(PrintBuffer());
 
@@ -175,8 +175,8 @@ PrintBuffer * item_matrix = 0;
 //-----------------------------------------------------------------------------
 void
 PrintBuffer::do_PrintBuffer(const Value & value, const PrintContext & pctx,
-                         ostream * out, PrintStyle outer_style,
-                         vector<bool> & scaling, vector<PrintBuffer> & pcols,
+                         std::ostream * out, PrintStyle outer_style,
+                         std::vector<bool> & scaling, std::vector<PrintBuffer> & pcols,
                          PrintBuffer * item_matrix)
 {
 const bool framed = outer_style & (PST_CS_MASK | PST_CS_OUTER);
@@ -212,7 +212,7 @@ const bool nested = !value.is_simple();
      //    therefore we have (⍴,value) items. Items are rectangular.
      //
      PERFORMANCE_START(start_2)
-     vector<Rank> max_row_ranks;
+     std::vector<Rank> max_row_ranks;
      max_row_ranks.reserve(rows);
      loop(y, rows)
         {
@@ -400,8 +400,8 @@ const bool nested = !value.is_simple();
      if (!is_rectangular())   // should not happen
         {
           Q1(get_height())
-          loop(h, get_height())   CERR << "w=" << get_width(h) << "*" << endl;
-          loop(h, get_height())   CERR << "*"  << get_line(h) << "*" << endl;
+          loop(h, get_height())   CERR << "w=" << get_width(h) << "*" << std::endl;
+          loop(h, get_height())   CERR << "*"  << get_line(h) << "*" << std::endl;
         }
 
      Assert(is_rectangular());
@@ -420,7 +420,7 @@ const bool nested = !value.is_simple();
      else if (out)
         {
           UCS_string ucs(*this, value.get_rank(), pctx.get_PW());
-          if (ucs.size())   *out << ucs << endl;
+          if (ucs.size())   *out << ucs << std::endl;
         }
 
      PERFORMANCE_END(fs_PrintBuffer5_B, start_5, ec)
@@ -433,11 +433,11 @@ const bool nested = !value.is_simple();
 interrupted:
    clear_attention_raised(LOC);
    clear_interrupt_raised(LOC);
-   *out << endl << "INTERRUPT" << endl;
+   *out << std::endl << "INTERRUPT" << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-PrintBuffer::print_interruptible(ostream & out, Rank rank, int quad_PW)
+PrintBuffer::print_interruptible(std::ostream & out, Rank rank, int quad_PW)
 {
    if (get_height() == 0)   return;      // empty PrintBuffer
 
@@ -455,7 +455,7 @@ ShapeItem bp_len = 0;
    //
    loop(row, get_height())
        {
-         if (row)   out << endl;   // end previous row
+         if (row)   out << std::endl;   // end previous row
          int col = 0;
          int b = 0;
 
@@ -472,7 +472,7 @@ ShapeItem bp_len = 0;
                    chunk_len = breakpoints[b++];
                  }
 
-              if (col)   out << endl << "      ";
+              if (col)   out << std::endl << "      ";
               UCS_string trow(get_line(row), col, chunk_len);
               trow.remove_trailing_padchars();
 
@@ -486,7 +486,7 @@ ShapeItem bp_len = 0;
 
               if (interrupt_is_raised())
                  {
-                   out << endl << "INTERRUPT" << endl;
+                   out << std::endl << "INTERRUPT" << std::endl;
                    clear_attention_raised(LOC);
                    clear_interrupt_raised(LOC);
                    delete del;
@@ -495,7 +495,7 @@ ShapeItem bp_len = 0;
             }
        }
 
-   out << endl;
+   out << std::endl;
    delete del;
 }
 //-----------------------------------------------------------------------------
@@ -891,28 +891,28 @@ UCS_string hori(get_width(0), HORI);
    Assert(is_rectangular());
 }
 //-----------------------------------------------------------------------------
-ostream &
-PrintBuffer::debug(ostream & out, const char * title) const
+std::ostream &
+PrintBuffer::debug(std::ostream & out, const char * title) const
 {
-   if (title)   out << title << endl;
+   if (title)   out << title << std::endl;
 
    if (get_height() == 0)
       {
-        out << UNI_LINE_DOWN_RIGHT << UNI_LINE_DOWN_LEFT << endl
+        out << UNI_LINE_DOWN_RIGHT << UNI_LINE_DOWN_LEFT << std::endl
             << UNI_LINE_UP_RIGHT   << UNI_LINE_UP_LEFT
             << "  flags=" << HEX(col_info.flags)
             << "  len="  << col_info.int_len
             << "."   << col_info.fract_len
-            << endl << endl;
+            << std::endl << std::endl;
         return out;
       }
 
    out << UNI_LINE_DOWN_RIGHT;
    loop(w, get_width(0))   out << UNI_LINE_HORI;
-   out << UNI_LINE_DOWN_LEFT << endl;
+   out << UNI_LINE_DOWN_LEFT << std::endl;
 
    loop(y, get_height())
-   out << UNI_LINE_VERT << buffer[y] << UNI_LINE_VERT << endl;
+   out << UNI_LINE_VERT << buffer[y] << UNI_LINE_VERT << std::endl;
 
    out << UNI_LINE_UP_RIGHT;
    loop(w, get_width(0))   out << UNI_LINE_HORI;
@@ -922,7 +922,7 @@ PrintBuffer::debug(ostream & out, const char * title) const
        << " fl="   << col_info.fract_len
        << " rl="   << col_info.real_len
        << " ÷l="   << col_info.denom_len
-       << endl << endl;
+       << std::endl << std::endl;
 
    return out;
 }
@@ -1122,17 +1122,17 @@ PrintBuffer::align_dot(ColInfo & COL_INFO)
    //
    Log(LOG_printbuf_align)
       {
-        CERR << "before align_dot():" << endl
+        CERR << "before align_dot():" << std::endl
              << "desired COL_INFO = "
                 "i-"  << COL_INFO.int_len
              << " f-" << COL_INFO.fract_len
              << " r-" << COL_INFO.real_len
-             << " ÷"  << COL_INFO.denom_len << endl
+             << " ÷"  << COL_INFO.denom_len << std::endl
              << "this row         = "
                 "i-"  << col_info.int_len
              << " f-" << col_info.fract_len
              << " r-" << col_info.real_len
-             << " ÷"  << col_info.denom_len << endl;
+             << " ÷"  << col_info.denom_len << std::endl;
         debug(CERR, 0);
       }
 
@@ -1225,7 +1225,7 @@ PrintBuffer::align_j(ColInfo & COL_INFO)
              << ":" << COL_INFO.real_len
              << ", this col = " << col_info.int_len
              << ":" << col_info.fract_len
-             << ":" << col_info.real_len << endl;
+             << ":" << col_info.real_len << std::endl;
         debug(CERR, 0);
       }
 
@@ -1332,7 +1332,7 @@ PrintBuffer::align_left(ColInfo & COL_INFO)
              << ":" << COL_INFO.real_len
              << ", this col = " << col_info.int_len
              << ":" << col_info.fract_len
-             << ":" << col_info.real_len << endl;
+             << ":" << col_info.real_len << std::endl;
         debug(CERR, 0);
       }
 
@@ -1403,9 +1403,9 @@ ColInfo::consider(const ColInfo & item)
    if (imag_len  < item.imag_len)    imag_len  = item.imag_len;
 }
 //-----------------------------------------------------------------------------
-ostream &
-operator << (ostream & out, const PrintBuffer & pb)
+std::ostream &
+operator << (std::ostream & out, const PrintBuffer & pb)
 {
-   out << endl;   return pb.debug(out);
+   out << std::endl;   return pb.debug(out);
 }
 //-----------------------------------------------------------------------------

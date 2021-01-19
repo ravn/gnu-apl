@@ -44,31 +44,31 @@ UCS_string::UCS_string()
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(Unicode uni)
-   : basic_string<Unicode>(1, uni)
+   : std::basic_string<Unicode>(1, uni)
 {
   create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const Unicode * data, size_t len)
-   : basic_string<Unicode>(data, len)
+   : std::basic_string<Unicode>(data, len)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(size_t len, Unicode uni)
-   : basic_string<Unicode>(len, uni)
+   : std::basic_string<Unicode>(len, uni)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs)
-   : basic_string<Unicode>(ucs)
+   : std::basic_string<Unicode>(ucs)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
-   : basic_string<Unicode>(ucs, pos, len)
+   : std::basic_string<Unicode>(ucs, pos, len)
 {
    create(LOC);
 }
@@ -90,7 +90,7 @@ UCS_string::UCS_string(const char * cstring)
       {
         if (0x80 & *cstring)   // ASCII
            {
-             CERR << "non-ASCII char in C-String '" << cstring << "'" << endl;
+             CERR << "non-ASCII char in C-String '" << cstring << "'" << std::endl;
              Assert(0 && "Bad C-string");
            }
         *this += Unicode(*str);
@@ -102,7 +102,7 @@ UCS_string::UCS_string(const UTF8_string & utf)
    create(LOC);
 
    Log(LOG_char_conversion)
-      CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
+      CERR << "UCS_string::UCS_string(): utf = " << utf << std::endl;
 
 size_t from = 0;
 
@@ -124,7 +124,7 @@ start_of_sequence:
              Log(LOG_char_conversion)
                 {
                  utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
-                                   << " at " << LOC <<  endl;
+                                   << " at " << LOC <<  std::endl;
                  Backtrace::show(__FILE__, __LINE__);
                 }
 
@@ -145,12 +145,12 @@ start_of_sequence:
                       {
                         utf.dump_hex(CERR << "Truncated UTF8 string: ", 40)
                                           << " len " << utf.size()
-                                          << " at " << LOC << endl;
+                                          << " at " << LOC << std::endl;
                         if (utf.size() >= 40)
                            {
                              const UTF8_string end(&utf[utf.size() - 10], 10);
-                             end.dump_hex(CERR << endl << "(ending with : ", 20)
-                                               << ")" << endl;
+                             end.dump_hex(CERR << std::endl << "(ending with : ", 20)
+                                               << ")" << std::endl;
                            }
                       }
 
@@ -166,12 +166,12 @@ start_of_sequence:
                       {
                         utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
                                           << " len " << utf.size()
-                                          << " at " << LOC <<  endl;
+                                          << " at " << LOC <<  std::endl;
                         if (utf.size() >= 40)
                            {
                              const UTF8_string end(&utf[utf.size() - 10], 10);
-                             end.dump_hex(CERR << endl << "(ending with : ", 20)
-                                               << ")" << endl;
+                             end.dump_hex(CERR << std::endl << "(ending with : ", 20)
+                                               << ")" << std::endl;
                            }
                         Backtrace::show(__FILE__, __LINE__);
                       }
@@ -191,7 +191,7 @@ start_of_sequence:
       }
 
    Log(LOG_char_conversion)
-      CERR << "UCS_string::UCS_string(): ucs = " << *this << endl;
+      CERR << "UCS_string::UCS_string(): ucs = " << *this << std::endl;
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(APL_Float value, bool & scaled,
@@ -453,7 +453,7 @@ const ShapeItem ec = value.element_count();
    loop(e, ec)   append(value.get_ravel(e).get_char_value());
 }
 //-----------------------------------------------------------------------------
-UCS_string::UCS_string(istream & in)
+UCS_string::UCS_string(std::istream & in)
 {
    create(LOC);
 
@@ -922,7 +922,7 @@ UCS_string::append_shape(const Shape & shape)
 }
 //-----------------------------------------------------------------------------
 void
-UCS_string::append_members(const vector<const UCS_string *> & members, int m)
+UCS_string::append_members(const std::vector<const UCS_string *> & members, int m)
 {
    for (int mm = members.size() - 1; mm >= m; --mm)
        {
@@ -1167,8 +1167,8 @@ bool negative = false;
    return negative ? -ret : ret;
 }
 //-----------------------------------------------------------------------------
-ostream &
-operator << (ostream & os, Unicode uni)
+std::ostream &
+operator << (std::ostream & os, Unicode uni)
 {       
    if (uni < 0x80)      return os << char(uni);
         
@@ -1198,8 +1198,8 @@ operator << (ostream & os, Unicode uni)
              << char(0x80 | (uni       & 0x3F));
 }
 //-----------------------------------------------------------------------------
-ostream &
-operator << (ostream & os, const UCS_string & ucs)
+std::ostream &
+operator << (std::ostream & os, const UCS_string & ucs)
 {
 const int fill_len = os.width() - ucs.size();
 
@@ -1232,8 +1232,8 @@ UCS_string::lexical_before(const UCS_string other) const
    return other.size() > size();
 }
 //-----------------------------------------------------------------------------
-ostream &
-UCS_string::dump(ostream & out) const
+std::ostream &
+UCS_string::dump(std::ostream & out) const
 {
    out << right << hex << uppercase << setfill('0');
    loop(s, size())
@@ -1533,18 +1533,18 @@ UCS_string ret;
 UCS_string::~UCS_string()
 {
    --total_count;
-   cerr << setfill('0') << endl << "@@ " << setw(5) << instance_id
+   cerr << setfill('0') << std::endl << "@@ " << setw(5) << instance_id
         << " DEL ##" << total_count
-        << " c= " << Backtrace::caller(3) << setfill(' ') << endl;
+        << " c= " << Backtrace::caller(3) << setfill(' ') << std::endl;
 }
 //----------------------------------------------------------------------------
 void UCS_string::create(const char * loc)
 {
    ++total_count;
    instance_id = ++total_id;
-   cerr << setfill('0') << endl << "@@ " << setw(5) << instance_id
+   cerr << setfill('0') << std::endl << "@@ " << setw(5) << instance_id
         << " NEW ##" << total_count << " " << loc
-        << " c= " << Backtrace::caller(3) << setfill(' ') << endl;
+        << " c= " << Backtrace::caller(3) << setfill(' ') << std::endl;
 }
 
 #endif

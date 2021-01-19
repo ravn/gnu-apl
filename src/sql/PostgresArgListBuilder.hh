@@ -66,7 +66,7 @@ public:
 private:
     PostgresConnection *connection;
     string sql;
-    vector<PostgresArg *> args;
+    std::vector<PostgresArg *> args;
 };
 
 class PostgresResultWrapper {

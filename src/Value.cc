@@ -132,12 +132,12 @@ const ShapeItem length = shape.get_volume();
 // try
 //    {
         ravel = reinterpret_cast<Cell *>(new char[length * sizeof(Cell)]);
-        if (ravel == 0)   // new failed (without trowing an exception)
+        if (ravel == 0)   // new failed (without trowing an std::exception)
            {
               Log(LOG_Value_alloc)
                  CERR << "new char[" << (length * sizeof(Cell))
                       << "] (aka. long ravel allocation) returned 0 at " LOC
-                      << endl;
+                      << std::endl;
 
               MORE_ERROR() << "The instatiation of a Value object succeeded, "
                               "but allocation of its (large) ravel failed.";
@@ -158,8 +158,8 @@ const ShapeItem length = shape.get_volume();
         Log(LOG_Value_alloc)
            {
              CERR << "new char[" << (length * sizeof(Cell))
-                  << "] (aka. long ravel allocation) threw an exception at " LOC
-                  << endl;
+                  << "] (aka. long ravel allocation) threw an std::exception at " LOC
+                  << std::endl;
            }
 
         MORE_ERROR() << "The instatiation of a Value object succeeded, "
@@ -191,29 +191,29 @@ const int64_t used_memory
        (used_memory + Quad_WA::WA_margin))   return false;   // OK
 
    Log(LOG_Value_alloc) CERR
-   << "    value_count:       " << value_count             << endl
-   << "    total_ravel_count: " << total_ravel_count       << " cells" << endl
-   << "    new cell_count:    " << requested_cell_count    << " cells" << endl
-   << "    total_memory:      " << Quad_WA::total_memory   << " bytes" << endl
-   << "    used_memory:       " << used_memory             << " bytes" << endl
-   << "    ⎕WA margin:        " << Quad_WA::WA_margin      << " bytes" << endl
-   << "    ⎕WA scale:         " << Quad_WA::WA_scale       << "%" << endl
+   << "    value_count:       " << value_count             << std::endl
+   << "    total_ravel_count: " << total_ravel_count       << " cells" << std::endl
+   << "    new cell_count:    " << requested_cell_count    << " cells" << std::endl
+   << "    total_memory:      " << Quad_WA::total_memory   << " bytes" << std::endl
+   << "    used_memory:       " << used_memory             << " bytes" << std::endl
+   << "    ⎕WA margin:        " << Quad_WA::WA_margin      << " bytes" << std::endl
+   << "    ⎕WA scale:         " << Quad_WA::WA_scale       << "%" << std::endl
 
-           << " at " << LOC << endl;
+           << " at " << LOC << std::endl;
    return true;
 }
 //-----------------------------------------------------------------------------
 void
 Value::catch_Error(const Error & error, const char * args, const char * loc)
 {
-   Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+   Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << std::endl;
    MORE_ERROR() << "new Value(" << args
                 << ") failed (APL error in ravel allocation)";
    throw error;   // rethrow
 }
 //-----------------------------------------------------------------------------
 void
-Value::catch_exception(const exception & ex, const char * args,
+Value::catch_exception(const std::exception & ex, const char * args,
                       const char * caller,  const char * loc)
 {
 const int64_t used_memory
@@ -223,14 +223,14 @@ const int64_t used_memory
 
    Log(LOG_Value_alloc)
       CERR << "Value_P::Value_P(" << args << ") failed at " << loc
-           << " (caller: "        << caller << ")" << endl
-           << " what: "           << ex.what() << endl
-           << " initial sbrk(): 0x" << hex << Quad_WA::initial_sbrk << endl
-           << " current sbrk(): 0x" << top_of_memory() << endl
+           << " (caller: "        << caller << ")" << std::endl
+           << " what: "           << ex.what() << std::endl
+           << " initial sbrk(): 0x" << hex << Quad_WA::initial_sbrk << std::endl
+           << " current sbrk(): 0x" << top_of_memory() << std::endl
            << " alloc_size:     0x" << alloc_size << dec << " ("
-                                    << alloc_size << ")" << endl
+                                    << alloc_size << ")" << std::endl
            << " used memory:    0x" << hex  << used_memory << dec
-                                    << " (" << used_memory << ")" << endl;
+                                    << " (" << used_memory << ")" << std::endl;
 
    MORE_ERROR() << "new Value(" << args << ") failed (" << ex.what() << ")";
    WS_FULL;
@@ -241,7 +241,7 @@ Value::catch_ANY(const char * args, const char * caller, const char * loc)
 {
    Log(LOG_Value_alloc)
       CERR << "Value_P::Value_P(Shape " << args << " failed at " << loc
-           << " (caller: " << caller << ")" << endl;
+           << " (caller: " << caller << ")" << std::endl;
    MORE_ERROR() << "new Value(" << args << ") failed (ANY)";
    WS_FULL;
 }
@@ -542,7 +542,7 @@ const ShapeItem ec = nz_element_count();
 }
 //-----------------------------------------------------------------------------
 Cell *
-Value::get_member(const vector<const UCS_string *> & members, Value * & owner,
+Value::get_member(const std::vector<const UCS_string *> & members, Value * & owner,
                   bool create_if_needed, bool throw_error)
 {
    owner = this;
@@ -883,16 +883,16 @@ const char * chg = flags == new_flags ? " (no change)" : " (changed)";
    CERR << "Value " << voidP(this)
         << sc << flag_name << " (" << HEX(flag) << ")"
         << " at " << loc << " now = " << HEX(new_flags)
-        << chg << endl;
+        << chg << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
 Value::init()
 {
    Log(LOG_startup)
-      CERR << "Max. Rank            is " << MAX_RANK << endl
-           << "sizeof(Value header) is " << sizeof(Value)  << " bytes" << endl
-           << "Cell size            is " << sizeof(Cell)   << " bytes" << endl;
+      CERR << "Max. Rank            is " << MAX_RANK << std::endl
+           << "sizeof(Value header) is " << sizeof(Value)  << " bytes" << std::endl
+           << "Cell size            is " << sizeof(Cell)   << " bytes" << std::endl;
 };
 //-----------------------------------------------------------------------------
 bool
@@ -926,7 +926,7 @@ Value::add_member(const UCS_string & member_name, Value * member_value)
         DOMAIN_ERROR;
       }
 
-vector<const UCS_string *> members;
+std::vector<const UCS_string *> members;
    members.push_back(&member_name);
    members.push_back(&member_name);   // ignored
 
@@ -975,14 +975,14 @@ Value::rollback(ShapeItem items, const char * loc)
 }
 //-----------------------------------------------------------------------------
 void
-Value::erase_all(ostream & out)
+Value::erase_all(std::ostream & out)
 {
    for (const DynamicObject * dob = DynamicObject::all_values.get_next();
         dob != &DynamicObject::all_values; dob = dob->get_next())
        {
          const Value * v = dob->pValue();
-         out << "erase_all sees Value:" << endl
-             << "  Allocated by " << v->where_allocated() << endl
+         out << "erase_all sees Value:" << std::endl
+             << "  Allocated by " << v->where_allocated() << std::endl
              << "  ";
          v->list_one(CERR, false);
        }
@@ -994,7 +994,7 @@ Value::erase_stale(const char * loc)
 int count = 0;
 
    Log(LOG_Value__erase_stale)
-      CERR << endl << endl << "erase_stale() called from " << loc << endl;
+      CERR << std::endl << std::endl << "erase_stale() called from " << loc << std::endl;
 
    for (DynamicObject * dob = all_values.get_next();
         dob != &all_values; dob = dob->get_next())
@@ -1004,13 +1004,13 @@ int count = 0;
             {
               CERR << "A loop in DynamicObject::all_values (detected in "
                       "function erase_stale() at object "
-                   << voidP(dob) << "): " << endl;
+                   << voidP(dob) << "): " << std::endl;
               all_values.print_chain(CERR);
-              CERR << endl;
+              CERR << std::endl;
 
-              CERR << " DynamicObject: " << dob << endl;
-              CERR << " Value:         " << v   << endl;
-              CERR << *v                        << endl;
+              CERR << " DynamicObject: " << dob << std::endl;
+              CERR << " Value:         " << v   << std::endl;
+              CERR << *v                        << std::endl;
             }
 
          Assert(dob != dob->get_next());
@@ -1021,8 +1021,8 @@ int count = 0;
          Log(LOG_Value__erase_stale)
             {
               CERR << "Erasing stale Value "
-                   << voidP(dob) << ":" << endl
-                   << "  Allocated by " << v->where_allocated() << endl
+                   << voidP(dob) << ":" << std::endl
+                   << "  Allocated by " << v->where_allocated() << std::endl
                    << "  ";
               v->list_one(CERR, false);
             }
@@ -1059,8 +1059,8 @@ int count = 0;
 
    Log(LOG_Value__erase_stale)
       {
-        CERR << endl << endl
-             << "finish_incomplete() called from " << loc << endl;
+        CERR << std::endl << std::endl
+             << "finish_incomplete() called from " << loc << std::endl;
       }
 
    for (DynamicObject * dob = all_values.get_next();
@@ -1071,13 +1071,13 @@ int count = 0;
             {
               CERR << "A loop in DynamicObject::all_values (detected in "
                       "function Value::finish_incomplete() at object "
-                   << voidP(dob) << "): " << endl;
+                   << voidP(dob) << "): " << std::endl;
               all_values.print_chain(CERR);
-              CERR << endl;
+              CERR << std::endl;
 
-              CERR << " DynamicObject: " << dob << endl;
-              CERR << " Value:         " << v   << endl;
-              CERR << *v                        << endl;
+              CERR << " DynamicObject: " << dob << std::endl;
+              CERR << " Value:         " << v   << std::endl;
+              CERR << *v                        << std::endl;
             }
 
          Assert(dob != dob->get_next());
@@ -1093,8 +1093,8 @@ int count = 0;
          Log(LOG_Value__erase_stale)
             {
               CERR << "Fixed incomplete Value "
-                   << voidP(dob) << ":" << endl
-                   << "  Allocated by " << v->where_allocated() << endl
+                   << voidP(dob) << ":" << std::endl
+                   << "  Allocated by " << v->where_allocated() << std::endl
                    << "  ";
               v->list_one(CERR, false);
             }
@@ -1105,8 +1105,8 @@ int count = 0;
    return count;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Value::list_one(ostream & out, bool show_owners) const
+std::ostream &
+Value::list_one(std::ostream & out, bool show_owners) const
 {
    if (flags)
       {
@@ -1121,24 +1121,24 @@ Value::list_one(ostream & out, bool show_owners) const
         out << "   Flags = NONE";
       }
 
-   out << ", ⍴" << get_shape() << " ≡" << compute_depth() << ":" << endl;
+   out << ", ⍴" << get_shape() << " ≡" << compute_depth() << ":" << std::endl;
    print(out);
-   out << endl;
+   out << std::endl;
 
    if (!show_owners)   return out;
 
    // print owners...
    //
-   out << "Owners of " << voidP(this) << ":" << endl;
+   out << "Owners of " << voidP(this) << ":" << std::endl;
 
    Workspace::show_owners(out, *this);
 
-   out << "---------------------------" << endl << endl;
+   out << "---------------------------" << std::endl << std::endl;
    return out;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Value::list_all(ostream & out, bool show_owners)
+std::ostream &
+Value::list_all(std::ostream & out, bool show_owners)
 {
 int num = 0;
    for (const DynamicObject * dob = all_values.get_prev();
@@ -1148,7 +1148,7 @@ int num = 0;
          dob->pValue()->list_one(out, show_owners);
        }
 
-   return out << endl;
+   return out << std::endl;
 }
 //-----------------------------------------------------------------------------
 ShapeItem
@@ -1223,7 +1223,7 @@ const ShapeItem ec = element_count();
               const Cell * target = cell.get_lval_value();
               if (target == 0)
                  {
-                   CERR << "0-pointer at " LOC << endl;
+                   CERR << "0-pointer at " LOC << std::endl;
                  }
               else if (target->is_pointer_cell())
                  {
@@ -1772,10 +1772,10 @@ const ShapeItem len_B = B->element_count();
 
    Log(LOG_glue)
       {
-        CERR << "gluing strands " << endl << *A
-             << "with shape " << A->get_shape() << endl
-             << " and " << endl << *B << endl
-             << "with shape " << B->get_shape() << endl;
+        CERR << "gluing strands " << std::endl << *A
+             << "with shape " << A->get_shape() << std::endl
+             << " and " << std::endl << *B << std::endl
+             << "with shape " << B->get_shape() << std::endl;
       }
 
    Assert(A->is_scalar_or_vector());
@@ -1798,8 +1798,8 @@ Value::glue_strand_closed(Token & result, Value_P A, Value_P B,
    //
    Log(LOG_glue)
       {
-        CERR << "gluing strand " << endl << *A
-             << " to non-strand " << endl << *B << endl;
+        CERR << "gluing strand " << std::endl << *A
+             << " to non-strand " << std::endl << *B << std::endl;
       }
 
    Assert(A->is_scalar_or_vector());
@@ -1832,8 +1832,8 @@ const ShapeItem len_A = A->element_count();
 const ShapeItem len_B = B->element_count();
    Log(LOG_glue)
       {
-        CERR << "gluing non-strand[" << len_A << "] " << endl << *A
-             << " to strand[" << len_B << "] " << endl << *B << endl;
+        CERR << "gluing non-strand[" << len_A << "] " << std::endl << *A
+             << " to strand[" << len_B << "] " << std::endl << *B << std::endl;
       }
 
    Assert(B->is_scalar_or_vector());
@@ -1863,8 +1863,8 @@ Value::glue_closed_closed(Token & result, Value_P A, Value_P B,
    //
    Log(LOG_glue)
       {
-        CERR << "gluing two non-strands " << endl << *A
-             << " and " << endl << *B << endl;
+        CERR << "gluing two non-strands " << std::endl << *A
+             << " and " << std::endl << *B << std::endl;
       }
 
 Value_P Z(2, LOC);
@@ -1921,17 +1921,17 @@ const ShapeItem ec = nz_element_count();
               case CT_COMPLEX:   break;   // OK
 
               default:
-                 CERR << endl
-                      << "*** check_value(" << loc << ") detects:" << endl
+                 CERR << std::endl
+                      << "*** check_value(" << loc << ") detects:" << std::endl
                       << "   bad ravel[" << c << "] (CellType "
-                      << ctype << ")" << endl;
+                      << ctype << ")" << std::endl;
 
                  ++error_count;
             }
 
          if (error_count >= 10)
             {
-              CERR << endl << "..." << endl;
+              CERR << std::endl << "..." << std::endl;
               break;
             }
 
@@ -1940,10 +1940,10 @@ const ShapeItem ec = nz_element_count();
 
    if (error_count)
       {
-        CERR << "Shape: " << get_shape() << endl;
-        print(CERR) << endl
+        CERR << "Shape: " << get_shape() << std::endl;
+        print(CERR) << std::endl
            << "************************************************"
-           << endl;
+           << std::endl;
         Assert(0 && "corrupt ravel ");
       }
 #endif
@@ -2092,8 +2092,8 @@ const Cell & cell_0 = get_ravel(0);
    return CDR_NEST32;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Value::print(ostream & out) const
+std::ostream &
+Value::print(std::ostream & out) const
 {
    if (is_member())   return print_member(out, UCS_string(""));
 
@@ -2107,7 +2107,7 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
         if (element_count() == 0 &&   // empty vector
             (get_ravel(0).is_simple_cell()))
            {
-             return out << endl;
+             return out << std::endl;
            }
 
         pctx.set_style(PR_APL_MIN);
@@ -2121,8 +2121,8 @@ PrintBuffer pb(*this, pctx, &out);   // constructor prints it
    return out;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Value::print_member(ostream & out, UCS_string member_prefix) const
+std::ostream &
+Value::print_member(std::ostream & out, UCS_string member_prefix) const
 {
 const ShapeItem rows = get_rows();
 
@@ -2169,7 +2169,7 @@ const size_t indent = member_prefix.size() + longest_name + 3;
               Value_P sub = cell->get_pointer_value();
               if (sub->is_member())
                  {
-                   out << "□" << endl;
+                   out << "□" << std::endl;
                    sub->print_member(out, member);
                    printed = true;
                  }
@@ -2205,8 +2205,8 @@ const size_t indent = member_prefix.size() + longest_name + 3;
    return out;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Value::print1(ostream & out, PrintContext pctx) const
+std::ostream &
+Value::print1(std::ostream & out, PrintContext pctx) const
 {
 int style = pctx.get_style();
    if (get_rank() < 2)   // scalar or vector
@@ -2224,17 +2224,17 @@ PrintBuffer pb(*this, pctx, &out);
    return out;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Value::print_properties(ostream & out, int indent, bool help) const
+std::ostream &
+Value::print_properties(std::ostream & out, int indent, bool help) const
 {
 UCS_string ind(indent, UNI_SPACE);
    if (help)
       {
-        out << ind << "Rank:  " << get_rank()  << endl
+        out << ind << "Rank:  " << get_rank()  << std::endl
             << ind << "Shape:";
         loop(r, get_rank())   out << " " << get_shape_item(r);
-        out << endl
-            << ind << "Depth: " << compute_depth()   << endl
+        out << std::endl
+            << ind << "Depth: " << compute_depth()   << std::endl
             << ind << "Type:  ";
 
        const CellType types = deep_cell_types();
@@ -2247,14 +2247,14 @@ UCS_string ind(indent, UNI_SPACE);
       }
    else
       {
-        out << ind << "Addr:    " << voidP(this) << endl
-            << ind << "Rank:    " << get_rank()  << endl
-            << ind << "Shape:   " << get_shape() << endl
+        out << ind << "Addr:    " << voidP(this) << std::endl
+            << ind << "Rank:    " << get_rank()  << std::endl
+            << ind << "Shape:   " << get_shape() << std::endl
             << ind << "Flags:   " << get_flags();
         if (is_complete())   out << " VF_complete";
         if (is_marked())     out << " VF_marked";
-        out << endl
-             << ind << "First:   " << get_ravel(0)  << endl
+        out << std::endl
+             << ind << "First:   " << get_ravel(0)  << std::endl
              << ind << "Dynamic: ";
 
         DynamicObject::print(out);
@@ -2270,8 +2270,8 @@ PrintBuffer pb(*this, pctx, 0);
    pb.debug(CERR, info);
 }
 //-----------------------------------------------------------------------------
-ostream &
-Value::print_boxed(ostream & out, int indent) const
+std::ostream &
+Value::print_boxed(std::ostream & out, int indent) const
 {
 const PrintContext pctx(PST_NONE);
 
@@ -2283,9 +2283,9 @@ const ShapeItem cols = Z->get_cols();
        {
          if (indent && r)   out << UCS_string(indent, UNI_SPACE);
          loop(c, cols)   out << Z->get_ravel(c + r*cols).get_char_value();
-         out << endl;
+         out << std::endl;
        }
-   out << endl;
+   out << std::endl;
    return out;
 }
 //-----------------------------------------------------------------------------
@@ -2316,7 +2316,7 @@ Cell * c = &get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 void
-Value::print_structure(ostream & out, int indent, ShapeItem idx) const
+Value::print_structure(std::ostream & out, int indent, ShapeItem idx) const
 {
    loop(i, indent)   out << "    ";
    if (indent)   out << "[" << idx << "] ";
@@ -2326,7 +2326,7 @@ Value::print_structure(ostream & out, int indent, ShapeItem idx) const
        << " flags: " << HEX4(get_flags()) << "   "
        << get_flags()
        << " " << where_allocated()
-       << endl;
+       << std::endl;
 
 const ShapeItem ec = nz_element_count();
 const Cell * c = &get_ravel(0);
@@ -2441,7 +2441,7 @@ const ShapeItem rows = ec/cols;
 }
 //-----------------------------------------------------------------------------
 int
-Value::print_incomplete(ostream & out)
+Value::print_incomplete(std::ostream & out)
 {
 std::vector<const Value *> incomplete;
 bool goon = true;
@@ -2454,13 +2454,13 @@ bool goon = true;
 
          if (val->is_complete())   continue;
 
-         out << "incomplete value at " << voidP(val) << endl;
+         out << "incomplete value at " << voidP(val) << std::endl;
          incomplete.push_back(val);
 
          if (!goon)
             {
-              out << "Value::print_incomplete() : endless loop in "
-                     "Value::all_values; stopping display." << endl;
+              out << "Value::print_incomplete() : std::endless loop in "
+                     "Value::all_values; stopping display." << std::endl;
             }
        }
 
@@ -2472,8 +2472,8 @@ int count = 0;
         incomplete[s]->print_stale_info(out, incomplete[s]);
         if (++count > 20)   // its getting boring
            {
-             CERR << endl << " ... ( " << (incomplete.size() - count) 
-                  << " more incomplete values)..." << endl;
+             CERR << std::endl << " ... ( " << (incomplete.size() - count) 
+                  << " more incomplete values)..." << std::endl;
              break;
            }
       }
@@ -2482,7 +2482,7 @@ int count = 0;
 }
 //-----------------------------------------------------------------------------
 int
-Value::print_stale(ostream & out)
+Value::print_stale(std::ostream & out)
 {
 std::vector<const Value *> stale_vals;
 std::vector<const DynamicObject *> stale_dobs;
@@ -2499,14 +2499,14 @@ int count = 0;
 
          if (val->owner_count)   continue;
 
-         out << "stale value at " << voidP(val) << endl;
+         out << "stale value at " << voidP(val) << std::endl;
          stale_vals.push_back(val);
          stale_dobs.push_back(dob);
 
          if (!goon)
             {
-              out << "Value::print_stale() : endless loop in "
-                     "Value::all_values; stopping display." << endl;
+              out << "Value::print_stale() : std::endless loop in "
+                     "Value::all_values; stopping display." << std::endl;
             }
        }
 
@@ -2519,8 +2519,8 @@ int count = 0;
         val->print_stale_info(out, dob);
         if (++count > 20)   // its getting boring
            {
-             CERR << endl << " ... ( " << (stale_vals.size() - count) 
-                  << " more stale values)..." << endl;
+             CERR << std::endl << " ... ( " << (stale_vals.size() - count) 
+                  << " more stale values)..." << std::endl;
              break;
            }
        }
@@ -2556,7 +2556,7 @@ int count = 0;
               ++count;
               if (count < 20)   val->print_stale_info(out, dob);
               else if (count == 20)
-              CERR << endl << " ... (more stale values)..." << endl;
+              CERR << std::endl << " ... (more stale values)..." << std::endl;
               val->unmark();
             }
        }
@@ -2565,10 +2565,10 @@ int count = 0;
 }
 //-----------------------------------------------------------------------------
 void
-Value::print_stale_info(ostream & out, const DynamicObject * dob) const
+Value::print_stale_info(std::ostream & out, const DynamicObject * dob) const
 {
    out << "print_stale_info():   alloc(" << dob->where_allocated()
-       << ") flags(" << get_flags() << ")" << endl;
+       << ") flags(" << get_flags() << ")" << std::endl;
 
    VH_entry::print_history(out, dob->pValue(), LOC);
 
@@ -2578,15 +2578,15 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob) const
         const PrintContext pctx(PST_NONE);
         Value_P Z = Quad_CR::do_CR(7, this, pctx);
         Z->print(out);
-        out << endl;
+        out << std::endl;
       }
    catch (...)   { out << " *** corrupt stale ***"; }
 
-   out << endl;
+   out << std::endl;
 }
 //-----------------------------------------------------------------------------
-ostream &
-operator<<(ostream & out, const Value & v)
+std::ostream &
+operator<<(std::ostream & out, const Value & v)
 {
    v.print(out);
    return out;
@@ -2676,7 +2676,7 @@ Value_P Z(shape_Z, loc);
    return Z;
 }
 //-----------------------------------------------------------------------------
-ostream & operator << (ostream & out, const AP_num3 & ap3)
+std::ostream & operator << (std::ostream & out, const AP_num3 & ap3)
 {
    return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
 }

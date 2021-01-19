@@ -89,8 +89,6 @@
 #include "Common.hh"
 #include "Quad_PLOT.hh"
 
-using namespace std;
-
 #define I1616(x, y) int16_t(x), int16_t(y)
 # define ITEMS(x) sizeof(x)/sizeof(*x), x
 
@@ -109,7 +107,7 @@ sem_t * Quad_PLOT::plot_window_sema = &__plot_window_sema;
    its presence in plot_threads so that removing a thread from \b plot_threads
    causes the thread to close its plot window and then to exit.
  **/
-vector<pthread_t> Quad_PLOT::plot_threads;
+std::vector<pthread_t> Quad_PLOT::plot_threads;
 int Quad_PLOT::verbosity = 0;
 
 #if defined(MISSING_LIBS)
@@ -180,8 +178,6 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 # include <iostream>
 # include <iomanip>
 
-using namespace std;
-
 #include "Plot_data.hh"
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
@@ -227,7 +223,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
       }
 
    Log(LOG_Quad_PLOT)
-     CERR << "wprops = " << w_props << " created." << endl;
+     CERR << "wprops = " << w_props << " created." << std::endl;
 
    // from here on 'data' is owned by 'w_props' (whose destructor
    // will delete it).
@@ -300,21 +296,21 @@ Quad_PLOT::eval_B(Value_P B) const
         if (u.B0 == 0)                 // reset plot verbosity
            {
              verbosity = 0;
-             CERR << "⎕PLOT verbosity turned off" << endl;
+             CERR << "⎕PLOT verbosity turned off" << std::endl;
              return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
 
         if (u.B0 == -1)                // enable SHOW_EVENTS
            {
              verbosity |= SHOW_EVENTS;
-             CERR << "⎕PLOT will show X events " << endl;
+             CERR << "⎕PLOT will show X events " << std::endl;
              return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
 
         if (u.B0 == -2)                // enable SHOW_DATA
            {
              verbosity |= SHOW_DATA;
-             CERR << "⎕PLOT will  show APL data " << endl;
+             CERR << "⎕PLOT will  show APL data " << std::endl;
              return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
 
@@ -329,7 +325,7 @@ Quad_PLOT::eval_B(Value_P B) const
         if (u.B0 == -4)                // enable SHOW_DRAW
            {
              verbosity |= SHOW_DRAW;
-             CERR << "⎕PLOT will  show rendering details " << endl;
+             CERR << "⎕PLOT will  show rendering details " << std::endl;
              return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
 
@@ -665,7 +661,7 @@ Quad_PLOT::help()
 
 # define gdef(ty,  na,  val, descr)                                        \
    CERR << setw(20) << #na ":  " << fill_14(Plot_data::ty ## _to_str(val)) \
-        << " (" << descr << ")" << endl;
+        << " (" << descr << ")" << std::endl;
 # include "Quad_PLOT.def"
 
    CERR <<
@@ -678,7 +674,7 @@ Quad_PLOT::help()
 
 # define ldef(ty,  na,  val, descr)             \
    CERR << setw(20) << #na "-N:  " << setw(14) \
-        << Plot_data::ty ## _to_str(val) << " (" << descr << ")" << endl;
+        << Plot_data::ty ## _to_str(val) << " (" << descr << ")" << std::endl;
 # include "Quad_PLOT.def"
 
    CERR << right;

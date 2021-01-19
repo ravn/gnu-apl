@@ -51,7 +51,7 @@
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
-inline ostream & operator << (ostream & out, const Unicode_source & src)
+inline std::ostream & operator << (std::ostream & out, const Unicode_source & src)
    { loop(s, src.rest())   out << src[s];   return out; }
 //-----------------------------------------------------------------------------
 /** convert \b UCS_string input into a Token_string tos.
@@ -81,7 +81,7 @@ Tokenizer::do_tokenize(const UCS_string & input, Token_string & tos)
 {
    Log(LOG_tokenize)
       CERR << "tokenize: input[" << input.size() << "] is: «"
-           << input << "»" << endl;
+           << input << "»" << std::endl;
 
 Unicode_source src(input);
    while ((rest_1 = rest_2 = src.rest()) != 0)
@@ -98,7 +98,7 @@ Unicode_source src(input);
              CERR << "  tokenize(" <<  src.rest() << " chars) sees [tag "
                   << tok.tag_name() << " «" << uni << "»] " << s1;
              if (src.rest() != s1.rest())   CERR << " ...";
-             CERR << endl;
+             CERR << std::endl;
            }
 
         switch(tok.get_Class())
@@ -107,9 +107,9 @@ Unicode_source src(input);
                    rest_2 = src.rest();
                    {
                      Log(LOG_error_throw)
-                     CERR << endl << "throwing "
+                     CERR << std::endl << "throwing "
                           << Error::error_name(E_NO_TOKEN)
-                          << " in  Tokenizer" << endl;
+                          << " in  Tokenizer" << std::endl;
 
                      char cc[20];
                      snprintf(cc, sizeof(cc), "U+%4.4X (", uni);
@@ -125,9 +125,9 @@ Unicode_source src(input);
               case TC_VALUE:
               case TC_INDEX:
                    CERR << "Offending token: " << tok.get_tag()
-                        << " (" << tok << ")" << endl;
+                        << " (" << tok << ")" << std::endl;
                    if (tok.get_tag() == TOK_CHARACTER)
-                      CERR << "Unicode: " << UNI(tok.get_char_val()) << endl;
+                      CERR << "Unicode: " << UNI(tok.get_char_val()) << std::endl;
                    rest_2 = src.rest();
                    Error::throw_parse_error(E_NON_APL_CHAR, LOC, loc);
                    break;
@@ -137,7 +137,7 @@ Unicode_source src(input);
                    //
                    rest_2 = src.rest();
                    UERR << "Unknown APL character: " << uni
-                        << " (" << UNI(uni) << ")" << endl;
+                        << " (" << UNI(uni) << ")" << std::endl;
                    Error::throw_parse_error(E_NON_APL_CHAR, LOC, loc);
                    break;
 
@@ -320,27 +320,27 @@ Unicode_source src(input);
                    break;
 
               default:
-                   CERR << "Input: " << input << endl
-                        << "uni:   " << uni << endl
-                        << "Token = " << tok.get_tag() << endl;
+                   CERR << "Input: " << input << std::endl
+                        << "uni:   " << uni << std::endl
+                        << "Token = " << tok.get_tag() << std::endl;
 
                    if (tok.get_Id() != ID_No_ID)
                       {
                         CERR << ", Id = " << Id(tok.get_tag() >> 16);
                       }
-                   CERR << endl;
+                   CERR << std::endl;
                    Assert(0 && "Should not happen");
             }
       }
 
    Log(LOG_tokenize)
-      CERR << "tokenize() done (no error)" << endl;
+      CERR << "tokenize() done (no error)" << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
 Tokenizer::tokenize_function(Unicode_source & src, Token_string & tos)
 {
-   Log(LOG_tokenize)   CERR << "tokenize_function(" << src << ")" << endl;
+   Log(LOG_tokenize)   CERR << "tokenize_function(" << src << ")" << std::endl;
 
 const Unicode uni = src.get();
 const Token tok = tokenize_function(uni);
@@ -439,7 +439,7 @@ const Token tok = Avec::uni_to_token(uni, LOC);
    // CAUTION: cannot print entire token here because Avec::uni_to_token()
    // inits the token tag but not any token pointers!
    //
-   CERR << endl << "Token = " << tok.get_tag() << endl;
+   CERR << std::endl << "Token = " << tok.get_tag() << std::endl;
    Assert(0 && "Missing Function");
 
 #undef sys
@@ -450,7 +450,7 @@ void
 Tokenizer::tokenize_quad(Unicode_source & src, Token_string & tos)
 {
    Log(LOG_tokenize)
-      CERR << "tokenize_quad(" << src.rest() << " chars)"<< endl;
+      CERR << "tokenize_quad(" << src.rest() << " chars)"<< std::endl;
 
    src.get();               // discard (possibly alternative) ⎕
 UCS_string ucs(UNI_Quad_Quad);
@@ -475,7 +475,7 @@ const Token t = Workspace::get_quad(ucs, len);
 void
 Tokenizer::tokenize_string1(Unicode_source & src, Token_string & tos)
 {
-   Log(LOG_tokenize)   CERR << "tokenize_string1(" << src << ")" << endl;
+   Log(LOG_tokenize)   CERR << "tokenize_string1(" << src << ")" << std::endl;
 
 const Unicode uni = src.get();
    Assert(Avec::is_single_quote(uni));
@@ -535,7 +535,7 @@ bool got_end = false;
 void
 Tokenizer::tokenize_string2(Unicode_source & src, Token_string & tos)
 {
-   Log(LOG_tokenize)   CERR << "tokenize_string2(" << src << ")" << endl;
+   Log(LOG_tokenize)   CERR << "tokenize_string2(" << src << ")" << std::endl;
 
    // skip the leading "
    {
@@ -603,7 +603,7 @@ bool got_end = false;
 void
 Tokenizer::tokenize_number(Unicode_source & src, Token_string & tos)
 {
-   Log(LOG_tokenize)   CERR << "tokenize_number(" << src << ")" << endl;
+   Log(LOG_tokenize)   CERR << "tokenize_number(" << src << ")" << std::endl;
 
    // numbers:
    // real
@@ -640,20 +640,20 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
                 {
                   tos.push_back(Token(TOK_REAL,    real_flt));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: real " << real_flt << endl;
+                     CERR << "  tokenize_number: real " << real_flt << std::endl;
                 }
              else
                 {
                   tos.push_back(Token(TOK_INTEGER, real_int));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: integer " << real_int << endl;
+                     CERR << "  tokenize_number: integer " << real_int << std::endl;
                 }
              goto done;;
            }
 
         tos.push_back(Token(TOK_COMPLEX, real_flt, imag_flt));
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex "
-                                 << real_flt << "J" << imag_flt << endl;
+                                 << real_flt << "J" << imag_flt << std::endl;
       }
    else if (src.rest() && (*src == UNI_D || *src == UNI_d))
       {
@@ -673,13 +673,13 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
                 {
                   tos.push_back(Token(TOK_REAL,    real_flt));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: real " << real_flt << endl;
+                     CERR << "  tokenize_number: real " << real_flt << std::endl;
                 }
              else
                 {
                   tos.push_back(Token(TOK_INTEGER, real_int));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: integer " << real_int << endl;
+                     CERR << "  tokenize_number: integer " << real_int << std::endl;
                 }
              goto done;;
            }
@@ -690,7 +690,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         APL_Float imag = real_flt * sin(M_PI*degrees_flt / 180.0);
         tos.push_back(Token(TOK_COMPLEX, real, imag));
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex " << real
-                                 << "J" << imag << endl;
+                                 << "J" << imag << std::endl;
       }
    else if (src.rest() && (*src == UNI_R || *src == UNI_r))
       {
@@ -710,13 +710,13 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
                 {
                   tos.push_back(Token(TOK_REAL,    real_flt));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: real " << real_flt << endl;
+                     CERR << "  tokenize_number: real " << real_flt << std::endl;
                 }
              else
                 {
                   tos.push_back(Token(TOK_INTEGER, real_int));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: integer " << real_int << endl;
+                     CERR << "  tokenize_number: integer " << real_int << std::endl;
                 }
              goto done;;
            }
@@ -727,7 +727,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         APL_Float imag = real_flt * sin(radian_flt);
         tos.push_back(Token(TOK_COMPLEX, real, imag));
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex " << real
-                                 << "J" << imag << endl;
+                                 << "J" << imag << std::endl;
       }
    else 
       {
@@ -735,13 +735,13 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
            {
              tos.push_back(Token(TOK_REAL,    real_flt));
              Log(LOG_tokenize)
-                CERR << "  tokenize_number: real " << real_flt << endl;
+                CERR << "  tokenize_number: real " << real_flt << std::endl;
            }
         else
            {
              tos.push_back(Token(TOK_INTEGER, real_int));
              Log(LOG_tokenize)
-                CERR << "  tokenize_number: integer " << real_int << endl;
+                CERR << "  tokenize_number: integer " << real_int << std::endl;
            }
       }
 
@@ -1003,7 +1003,7 @@ UTF8_string digits = int_digits;
 void
 Tokenizer::tokenize_symbol(Unicode_source & src, Token_string & tos)
 {
-   Log(LOG_tokenize)   CERR << "tokenize_symbol() : " << src.rest() << endl;
+   Log(LOG_tokenize)   CERR << "tokenize_symbol() : " << src.rest() << std::endl;
 
 UCS_string symbol;
    if (macro)
@@ -1038,14 +1038,14 @@ UCS_string symbol;
            {
              src.get();                                // skip ←
              Log(LOG_tokenize)
-                CERR << "Stop/Trace assigned: " << symbol1 << endl;
+                CERR << "Stop/Trace assigned: " << symbol1 << std::endl;
              tos.push_back(Token(TOK_APL_VALUE1, AB));   // left argument of ST
              tos.push_back(Token(TOK_FUN2, ST));
            }
         else
            {
              Log(LOG_tokenize)
-                CERR << "Stop/Trace referenved: " << symbol1 << endl;
+                CERR << "Stop/Trace referenved: " << symbol1 << std::endl;
              tos.push_back(Token(TOK_FUN2, ST));
              tos.push_back(Token(TOK_APL_VALUE1, AB));   // right argument of ST
            }

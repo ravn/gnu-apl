@@ -49,8 +49,8 @@ public:
     virtual void transaction_begin( void ) = 0;
     virtual void transaction_commit( void ) = 0;
     virtual void transaction_rollback( void ) = 0;
-    virtual void fill_tables( vector<string> &tables ) = 0;
-    virtual void fill_cols( const string &table, vector<ColumnDescriptor> &cols ) = 0;
+    virtual void fill_tables( std::vector<string> &tables ) = 0;
+    virtual void fill_cols( const string &table, std::vector<ColumnDescriptor> &cols ) = 0;
     virtual const string make_positional_param( int pos ) = 0;
 
     virtual const string replace_bind_args( const string &sql );

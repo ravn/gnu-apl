@@ -41,7 +41,7 @@
 #include "Svar_signals.hh"
 #include "UserPreferences.hh"
 
-extern ostream & get_CERR();
+extern std::ostream & get_CERR();
 
 uint16_t Svar_DB::APserver_port = APSERVER_PORT;
 
@@ -71,7 +71,7 @@ const int slen = snprintf(APserver_path, APL_PATH_MAX, "%s/APserver", bin_dir);
       {
         logit && get_CERR() << "    Executable " << APserver_path
                  << " not found (this is OK when apl was started\n"
-                    "    from the src directory): " << strerror(errno) << endl;
+                    "    from the src directory): " << strerror(errno) << std::endl;
 
         const int slen = snprintf(APserver_path, APL_PATH_MAX,
                                   "%s/APs/APserver", bin_dir);
@@ -82,13 +82,13 @@ const int slen = snprintf(APserver_path, APL_PATH_MAX, "%s/APserver", bin_dir);
 "This could means that 'apl' was not installed ('make install') or that it\n"
 "was started in a non-standard way. The expected location of APserver is \n"
 "either the same directory as the binary 'apl' or the subdirectory 'APs' of\n"
-"that directory (the directory should also be in $PATH)." << endl;
+"that directory (the directory should also be in $PATH)." << std::endl;
 
              return true;   // error
            }
       }
 
-   logit && get_CERR() << "Found " << APserver_path << endl;
+   logit && get_CERR() << "Found " << APserver_path << std::endl;
 
 char popen_args[APL_PATH_MAX + 1];
    {
@@ -102,13 +102,13 @@ char popen_args[APL_PATH_MAX + 1];
      if (slen >= APL_PATH_MAX)   popen_args[APL_PATH_MAX] = 0;
    }
 
-   logit && get_CERR() << "Starting " << popen_args << "..." << endl;
+   logit && get_CERR() << "Starting " << popen_args << "..." << std::endl;
 
 FILE * fp = popen(popen_args, "r");
    if (fp == 0)
       {
         get_CERR() << "popen(" << popen_args << " failed: " << strerror(errno)
-             << endl;
+             << std::endl;
         return true;   // error
       }
 
@@ -117,13 +117,13 @@ FILE * fp = popen(popen_args, "r");
          logit && get_CERR() << char(cc);
        }
 
-   logit && get_CERR() << endl;
+   logit && get_CERR() << std::endl;
 
 const int APserver_result = pclose(fp);
    if (APserver_result)
       {
          get_CERR() << "pclose(APserver) returned error:"
-                    << strerror(errno) << endl;
+                    << strerror(errno) << std::endl;
       }
 
    return false;   // success
@@ -144,13 +144,13 @@ char peer[100];
       {
         logit && get_CERR() << prog
                             << ": Using AF_UNIX socket towards APserver..."
-                            << endl;
+                            << std::endl;
         sock = socket(AF_UNIX, SOCK_STREAM, 0);
         if (sock == NO_TCP_SOCKET)
            {
              get_CERR() << prog
                         << ": socket(AF_UNIX, SOCK_STREAM, 0) failed at "
-                        << LOC << endl;
+                        << LOC << std::endl;
              return NO_TCP_SOCKET;
            }
 
@@ -162,12 +162,12 @@ char peer[100];
       {
         server_sockname = 0;
         logit && get_CERR() << "Using TCP socket towards APserver..."
-                            << endl;
+                            << std::endl;
         sock = TCP_socket(socket(AF_INET, SOCK_STREAM, 0));
         if (sock == NO_TCP_SOCKET)
            {
              get_CERR() << "*** socket(AF_INET, SOCK_STREAM, 0) failed at "
-                        << LOC << endl;
+                        << LOC << std::endl;
              return NO_TCP_SOCKET;
            }
 
@@ -187,7 +187,7 @@ char peer[100];
         if (::bind(sock, &local.addr, sizeof(sockaddr_in)))
            {
              get_CERR() << "bind(127.0.0.1) failed: "
-                        << strerror(errno) << endl;
+                        << strerror(errno) << std::endl;
              ::close(sock);
              return NO_TCP_SOCKET;
            }
@@ -234,7 +234,7 @@ char peer[100];
          // then most likely no APserver was started and we do it.
          //
          if (logit)   get_CERR() << "connecting to " << peer
-                                 << " failed." << endl;
+                                 << " failed." << std::endl;
 
          if (retry == 0)   // first attempt
             {
@@ -244,7 +244,7 @@ char peer[100];
               if (logit)   get_CERR() <<
 "    (the first ::connect() to APserver is expected to fail, unless\n" <<
 "     APserver was started manually)\n" <<
-"Starting a new APserver listening on " << peer << endl;
+"Starting a new APserver listening on " << peer << std::endl;
 
               if (start_APserver(server_sockname, bin_dir, logit))
                  {
@@ -262,7 +262,7 @@ char peer[100];
             {
               get_CERR() <<
                          "::connect() to supposedly existing APserver failed: "
-                         << strerror(errno) << endl;
+                         << strerror(errno) << std::endl;
 
               ::close(sock);
               return NO_TCP_SOCKET;
@@ -270,7 +270,7 @@ char peer[100];
 
          if (logit)   get_CERR() <<
             "    (::connect() should succeed eventually. This was attempt "
-            << retry << " of " << retry_max << ")" << endl;
+            << retry << " of " << retry_max << ")" << std::endl;
 
          usleep(200000);   // more time for APserver to start up
        }
@@ -278,7 +278,7 @@ char peer[100];
    // at this point sock is != NO_TCP_SOCKET and connected.
    //
    usleep(50000);
-   logit && get_CERR() << "connected to APserver, socket is " << sock << endl;
+   logit && get_CERR() << "connected to APserver, socket is " << sock << std::endl;
 
    return TCP_socket(sock);
 }
@@ -292,7 +292,7 @@ Svar_DB::DB_tcp_error(const char * op, int got, int expected)
       {
         get_CERR() << "⋆⋆⋆ " << op << " failed: got " << got
                    << " when expecting " << expected
-                   << " (" << strerror(errno) << ")" << endl;
+                   << " (" << strerror(errno) << ")" << std::endl;
       }
 
    ::close(DB_tcp);
@@ -311,7 +311,7 @@ const int sock = Svar_DB::get_DB_tcp();
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + sizeof(Svar_record)];
-ostream * log = (LOG_startup != 0 || LOG_Svar_DB_signals != 0) ? & cerr : 0;
+std::ostream * log = (LOG_startup != 0 || LOG_Svar_DB_signals != 0) ? & cerr : 0;
 const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
                                                del, log, &err_loc);
@@ -323,7 +323,7 @@ Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
 
         delete response;
       }
-   else   get_CERR() << "Svar_record_P() failed at " << LOC << endl;
+   else   get_CERR() << "Svar_record_P() failed at " << LOC << std::endl;
    if (del)   delete del;
 }
 //=============================================================================
@@ -335,14 +335,14 @@ Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
       {
         if (logit)
            get_CERR() << "Not opening shared memory because command "
-                         "line option --noSV (or similar) was given." << endl;
+                         "line option --noSV (or similar) was given." << std::endl;
         return;
       }
 
    DB_tcp = connect_to_APserver(bin_dir, prog, retry_max, logit);
    if (APserver_available())
       {
-        if (logit)   get_CERR() << "using Svar_DB on APserver!" << endl;
+        if (logit)   get_CERR() << "using Svar_DB on APserver!" << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -638,7 +638,7 @@ const TCP_socket tcp = Svar_DB::get_DB_tcp();
    if (tcp == NO_TCP_SOCKET)
       {
         get_CERR() << "Svar_DB not connected in Svar_DB::"
-             << calling_function << "()" << endl;
+             << calling_function << "()" << std::endl;
       }
 
    return tcp;
@@ -669,7 +669,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 }
 //-----------------------------------------------------------------------------
 void
-Svar_DB::print(ostream & out)
+Svar_DB::print(std::ostream & out)
 {
 const TCP_socket tcp = Svar_DB::get_DB_tcp();
    if (tcp == NO_TCP_SOCKET)   return;

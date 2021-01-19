@@ -42,7 +42,7 @@ static void send_reply( NetworkConnection &conn, std::string message )
     conn.write_string_to_fd( out.str() );
 }
 
-static void escape_char( ostream &out, Unicode unicode )
+static void escape_char( std::ostream &out, Unicode unicode )
 {
     if( unicode == '\\' ) {
         out << "\\\\";
@@ -56,7 +56,7 @@ static void escape_char( ostream &out, Unicode unicode )
     }
 }
 
-void scalar_value_to_el( ostream &out, Value_P value )
+void scalar_value_to_el( std::ostream &out, Value_P value )
 {
     Cell &cell = value->get_ravel( 0 );
     if( cell.is_integer_cell() ) {
@@ -76,9 +76,9 @@ void scalar_value_to_el( ostream &out, Value_P value )
     }
 }
 
-static void apl_value_to_el( ostream &out, Value_P value );
+static void apl_value_to_el( std::ostream &out, Value_P value );
 
-static void output_onelevel( ostream &out, Value_P value, int level, int start, int end )
+static void output_onelevel( std::ostream &out, Value_P value, int level, int start, int end )
 {
     const Shape &shape = value->get_shape();
     int size = shape.get_shape_item( level );
@@ -99,7 +99,7 @@ static void output_onelevel( ostream &out, Value_P value, int level, int start, 
     out << ")\n";
 }
 
-static void apl_value_to_el( ostream &out, Value_P value )
+static void apl_value_to_el( std::ostream &out, Value_P value )
 {
     const Shape &shape = value->get_shape();
     if( value->is_empty() ) {

@@ -43,7 +43,7 @@ SymbolTable::lookup_symbol(const UCS_string & sym_name)
    if (sym_name.size() == 0)   return 0;
    if (Avec::is_quad(sym_name[0]))   // should not be called for ⎕xx
       {
-        CERR << "Symbol is: '" << sym_name << "' at " << LOC << endl;
+        CERR << "Symbol is: '" << sym_name << "' at " << LOC << std::endl;
         FIXME;
       }
 
@@ -56,7 +56,7 @@ const uint32_t hash = compute_hash(sym_name);
         //
         Log(LOG_SYMBOL_lookup_symbol)
            {
-             CERR << "Symbol " << sym_name << " has hash " << HEX(hash) << endl;
+             CERR << "Symbol " << sym_name << " has hash " << HEX(hash) << std::endl;
            }
 
         Symbol * new_symbol = new Symbol(sym_name, ID_USER_SYMBOL);
@@ -99,8 +99,8 @@ SymbolTable::find_lambda_name(const UserFunction * lambda)
    return UCS_string();
 }
 //-----------------------------------------------------------------------------
-ostream &
-SymbolTable::list_symbol(ostream & out, const UCS_string & buf1) const
+std::ostream &
+SymbolTable::list_symbol(std::ostream & out, const UCS_string & buf1) const
 {
 UCS_string buf(buf1);
    buf.remove_leading_and_trailing_whitespaces();
@@ -121,13 +121,13 @@ const Symbol * sym = Workspace::lookup_existing_symbol(buf);
 
    if (sym)   return sym->print_verbose(out);
 
-   if (buf1[0] == UNI_Quad_Quad)   return out << "System Function" << endl;
+   if (buf1[0] == UNI_Quad_Quad)   return out << "System Function" << std::endl;
 
-   return out << "no symbol '" << buf1 << "'" << endl;
+   return out << "no symbol '" << buf1 << "'" << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-SymbolTable::list(ostream & out, ListCategory which, UCS_string from_to) const
+SymbolTable::list(std::ostream & out, ListCategory which, UCS_string from_to) const
 {
 UCS_string from;
 UCS_string to;
@@ -135,7 +135,7 @@ UCS_string to;
      const bool bad_from_to = Command::parse_from_to(from, to, from_to);
      if (bad_from_to)
         {
-          CERR << "bad range argument" << endl;
+          CERR << "bad range argument" << std::endl;
           MORE_ERROR() << "bad range argument " << from_to
                << ", expecting from-to";
           return;
@@ -158,13 +158,13 @@ int symbol_count = 0;
                if (from.size() && sym->get_name().lexical_before(from))
                   {
                     // CERR << "'" << sym->get_name() << "' comes before '"
-                    //       << from << "'" << endl;
+                    //       << from << "'" << std::endl;
                     continue;
                   }
                if (to.size() && to.lexical_before(sym->get_name()))
                   {
                     // CERR << "'" << to << "' comes before '"
-                    //      << sym->get_name() << "'" << endl;
+                    //      << sym->get_name() << "'" << std::endl;
                     continue;
                   }
 
@@ -198,7 +198,7 @@ int symbol_count = 0;
         // 2. )SYMBOLS N    (set symbol count, ignored by GNU APL)
         //
         if (from_to.size())   return;   // case 2
-        out << "IS " << symbol_count << endl;
+        out << "IS " << symbol_count << std::endl;
         return;
       }
 
@@ -231,7 +231,7 @@ std::vector<int> col_widths;
            {
              // last column or last item: print newline
              //
-             out << endl;
+             out << std::endl;
            }
         else
            {
@@ -257,7 +257,7 @@ SymbolTable::unmark_all_values() const
 }
 //-----------------------------------------------------------------------------
 int
-SymbolTable::show_owners(ostream & out, const Value & value) const
+SymbolTable::show_owners(std::ostream & out, const Value & value) const
 {
 int count = 0;
    loop(s, SYMBOL_HASH_TABLE_SIZE)
@@ -283,7 +283,7 @@ SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
 }
 //-----------------------------------------------------------------------------
 void
-SymbolTable::erase_symbols(ostream & out, const UCS_string_vector & symbols)
+SymbolTable::erase_symbols(std::ostream & out, const UCS_string_vector & symbols)
 {
 int error_count = 0;
    loop(s, symbols.size())
@@ -298,11 +298,11 @@ int error_count = 0;
             }
        }
 
-   if (error_count)   out << endl;
+   if (error_count)   out << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-SymbolTable::clear(ostream & out)
+SymbolTable::clear(std::ostream & out)
 {
    // SymbolTable::clear() should only be called after Workspace::clear_SI()
    //
@@ -312,7 +312,7 @@ SymbolTable::clear(ostream & out)
 }
 //-----------------------------------------------------------------------------
 void
-SymbolTable::clear_slot(ostream & out, int hash)
+SymbolTable::clear_slot(std::ostream & out, int hash)
 {
 Symbol * sym = symbol_table[hash];
    if (sym == 0)   return;   // no symbol with this hash
@@ -456,7 +456,7 @@ std::vector<const Symbol *> ret;
 }
 //-----------------------------------------------------------------------------
 void
-SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
+SymbolTable::dump(std::ostream & out, int & fcount, int & vcount) const
 {
 std::vector<const Symbol *> symbols;
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
@@ -505,7 +505,7 @@ std::vector<const Symbol *> symbols;
 }
 //=============================================================================
 void
-SystemSymTab::clear(ostream & out)
+SystemSymTab::clear(std::ostream & out)
 {
    // SymbolTable::clear() should only be called after Workspace::clear_SI()
    //
@@ -515,7 +515,7 @@ SystemSymTab::clear(ostream & out)
 }
 //-----------------------------------------------------------------------------
 void
-SystemSymTab::clear_slot(ostream & out, int hash)
+SystemSymTab::clear_slot(std::ostream & out, int hash)
 {
 SystemName * sym = symbol_table[hash];
    symbol_table[hash] = 0;

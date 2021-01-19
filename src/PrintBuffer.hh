@@ -93,11 +93,11 @@ public:
    PrintBuffer(const UCS_string & ucs, const ColInfo & ci);
 
    /// contructor: a PrintBuffer from an APL value
-   PrintBuffer(const Value & value, const PrintContext & pctx, ostream * out);
+   PrintBuffer(const Value & value, const PrintContext & pctx, std::ostream * out);
 
    /// helper for non-trivial PrintBuffer(const Value & ...) constructor
    void do_PrintBuffer(const Value & value,const PrintContext & pctx,
-                         ostream * out, PrintStyle outer_style,
+                         std::ostream * out, PrintStyle outer_style,
                          std::vector<bool> & scaling,
                          std::vector<PrintBuffer> & pcols,
                          PrintBuffer * item_matrix);
@@ -123,7 +123,7 @@ public:
       { Assert(y < get_height());   return buffer[y]; }
 
    /// print this buffer, interruptible with ^C
-   void print_interruptible(ostream & out, Rank rank, int quad_pw);
+   void print_interruptible(std::ostream & out, Rank rank, int quad_pw);
 
    /// return the number of columns.
    int get_width(int y) const
@@ -158,7 +158,7 @@ public:
    void add_outer_frame(PrintStyle style);
 
    /// print properties of \b this PrintBuffer
-   ostream & debug(ostream & out, const char * title = 0) const;
+   std::ostream & debug(std::ostream & out, const char * title = 0) const;
 
    /// append PrintBuffer \b pb1 to \b this PrintBuffer
    void append_col(const PrintBuffer & pb1);

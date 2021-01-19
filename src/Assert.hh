@@ -63,8 +63,8 @@ extern void do_Assert(const char * cond, const char * fun,
 
 /// assertion being fatal if wrong
 #define Assert_fatal(x) if (!(x)) {\
-   cerr << endl << endl << "FATAL error at " << __FILE__ << ":" << __LINE__ \
-        << endl;   exit(2); }
+   cerr << std::endl << std::endl << "FATAL error at " << __FILE__ << ":" << __LINE__ \
+        << std::endl;   exit(2); }
 
 #endif // __ASSERT_HH_DEFINED__
 

@@ -40,7 +40,7 @@ DerivedFunction::DerivedFunction(Token & larg, Function_P dyop, Token & rfun,
    Log(LOG_FunOperX)
       {
         print(CERR<< "DerivedFunction(dyadic with 2 functions)");
-        CERR << " at " << loc << endl;
+        CERR << " at " << loc << std::endl;
      }
 }
 //-----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ DerivedFunction::DerivedFunction(Token & LO, Function_P monop, const char * loc)
    Log(LOG_FunOperX)
       {
         print(CERR<< "DerivedFunction(monadic)");
-        CERR << " at " << loc << endl;
+        CERR << " at " << loc << std::endl;
      }
 }
 //-----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
    Log(LOG_FunOperX)
       {
         print(CERR << "DerivedFunction(monadic with axis)");
-        CERR << " at " << loc << endl;
+        CERR << " at " << loc << std::endl;
      }
 }
 //-----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ DerivedFunction::DerivedFunction(Function_P fun, Value_P X, const char * loc)
    Log(LOG_FunOperX)
       {
         print(CERR<< "DerivedFunction(function with axis)");
-        CERR << " at " << loc << endl;
+        CERR << " at " << loc << std::endl;
      }
 }
 //-----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ DerivedFunction::~DerivedFunction()
 {
    Log(LOG_FunOperX)
       {
-        CERR << "~DerivedFunction()" << endl;
+        CERR << "~DerivedFunction()" << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ DerivedFunction::destroy_derived(const char * loc)
 {
    Log(LOG_FunOperX)
       {
-        CERR << "DerivedFunction::destroy_derived(" << get_name() << ")" << endl;
+        CERR << "DerivedFunction::destroy_derived(" << get_name() << ")" << std::endl;
       }
 
    left_arg.clear(loc);
@@ -131,7 +131,7 @@ DerivedFunction::eval_B(Value_P B) const
       {
         print(CERR << "entering DerivedFunction");
         CERR << "::eval_B() , this = "
-             << voidP(this) << endl;
+             << voidP(this) << std::endl;
       }
 
    if (left_arg.get_tag() == TOK_VOID)   // function bound to axis
@@ -169,7 +169,7 @@ DerivedFunction::eval_XB(Value_P X, Value_P B) const
       {
         print(CERR << "entering DerivedFunction");
         CERR << "::eval_XB() , this = "
-             << voidP(this) << endl;
+             << voidP(this) << std::endl;
       }
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
@@ -201,7 +201,7 @@ DerivedFunction::eval_AB(Value_P A, Value_P B) const
    Log(LOG_FunOperX)
       {
         print(CERR << "entering DerivedFunction");
-        CERR << "::eval_AB()" << endl;
+        CERR << "::eval_AB()" << std::endl;
       }
 
    if (left_arg.get_tag() == TOK_VOID)   // function bound to axis
@@ -239,7 +239,7 @@ DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
    Log(LOG_FunOperX)
       {
         print(CERR << "entering DerivedFunction");
-        CERR << "::eval_AXB()" << endl;
+        CERR << "::eval_AXB()" << std::endl;
       }
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
@@ -255,8 +255,8 @@ DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
       }
 }
 //-----------------------------------------------------------------------------
-ostream &
-DerivedFunction::print(ostream & out) const
+std::ostream &
+DerivedFunction::print(std::ostream & out) const
 {
    out << "(";
    if (left_arg.is_function())   left_arg.get_function()->print(out);
@@ -292,16 +292,16 @@ DerivedFunction::unmark_all_values() const
 }
 //-----------------------------------------------------------------------------
 void
-DerivedFunction::print_properties(ostream & out, int indent) const
+DerivedFunction::print_properties(std::ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_SPACE);
-   out << ind << "Function derived from operator" << endl
+   out << ind << "Function derived from operator" << std::endl
        << ind << "Left Function: ";
    if (left_arg.is_function())   left_arg.get_function()->print(out);
    else                          out << "VAL";
-   out << endl << ind << "Operator:  ";
+   out << std::endl << ind << "Operator:  ";
    oper->print(out);
-   if (+axis)   out << "Axis: " << *axis << endl;
+   if (+axis)   out << "Axis: " << *axis << std::endl;
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
@@ -310,7 +310,7 @@ UCS_string ind(indent, UNI_SPACE);
         else                           out << "VAL";
       }
 
-   out << endl;
+   out << std::endl;
 }
 //=============================================================================
 DerivedFunctionCache::DerivedFunctionCache()
@@ -321,7 +321,7 @@ DerivedFunctionCache::DerivedFunctionCache()
          CERR << "DerivedFunctionCache created, cache at "
               << voidP(cache) << "..."
               << voidP(cache + MAX_FUN_OPER)
-              << endl;
+              << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -333,7 +333,7 @@ DerivedFunctionCache::~DerivedFunctionCache()
          CERR << "DerivedFunctionCache deleted, cache at "
               << voidP(cache) << "..."
               << voidP(cache + MAX_FUN_OPER)
-              << endl;
+              << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -352,7 +352,7 @@ DerivedFunctionCache::reset()
          CERR << "DerivedFunctionCache reset, cache at "
               << voidP(cache) << "..."
               << voidP(cache + MAX_FUN_OPER)
-              << endl;
+              << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -366,7 +366,7 @@ DerivedFunctionCache::get(const char * loc)
          CERR << "DerivedFunctionCache get( " << idx << " ), cache at "
               << voidP(cache) << "..."
               << voidP(cache + MAX_FUN_OPER)
-              << " at " << loc << endl;
+              << " at " << loc << std::endl;
       }
 
    return reinterpret_cast<DerivedFunction *>

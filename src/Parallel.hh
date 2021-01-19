@@ -149,17 +149,17 @@ typedef int _Atomic_word;
 
 /// atomic \b counter += \b increment, return old value
 inline int atomic_fetch_add(volatile _Atomic_word & counter, int increment)
-   { CERR << "\n*** something is VERY WRONG if this function is called" << endl;
+   { CERR << "\n*** something is VERY WRONG if this function is called" << std::endl;
       counter += increment; return counter - increment; }
 
 /// atomic read \b counter
 inline int atomic_read(volatile _Atomic_word & counter)
-   { CERR << "\n*** something is VERY WRONG if this function is called" << endl;
+   { CERR << "\n*** something is VERY WRONG if this function is called" << std::endl;
      return counter; }
 
 /// atomic \b counter += \b increment
 inline void atomic_add(volatile _Atomic_word & counter, int increment)
-   { CERR << "\n*** something is VERY WRONG if this function is called" << endl;
+   { CERR << "\n*** something is VERY WRONG if this function is called" << std::endl;
      counter += increment; }
 
 #endif

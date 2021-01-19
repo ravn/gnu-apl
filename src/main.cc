@@ -78,10 +78,10 @@ static void
 signal_SEGV_handler(int)
 {
    CERR << "\n\n===================================================\n"
-           "SEGMENTATION FAULT" << endl;
+           "SEGMENTATION FAULT" << std::endl;
 
 #if PARALLEL_ENABLED
-   CERR << "thread: " << reinterpret_cast<const void *>(pthread_self()) << endl;
+   CERR << "thread: " << reinterpret_cast<const void *>(pthread_self()) << std::endl;
    Thread_context::print_all(CERR);
 #endif // PARALLEL_ENABLED
 
@@ -132,7 +132,7 @@ static struct sigaction new_USR1_action;
 static void
 signal_USR1_handler(int)
 {
-   CERR << "Got signal USR1" << endl;
+   CERR << "Got signal USR1" << std::endl;
 }
 //-----------------------------------------------------------------------------
 /// old sigaction argument for SIGTERM
@@ -161,7 +161,7 @@ static struct sigaction new_control_BSL_action;
 static void
 control_BSL(int sig)
 {
-   CERR << endl << "^\\" << endl;
+   CERR << std::endl << "^\\" << std::endl;
    Thread_context::print_all(CERR);
 }
 #endif // PARALLEL_ENABLED
@@ -185,27 +185,27 @@ signal_HUP_handler(int)
 static void
 show_argv(int argc, const char ** argv)
 {
-   CERR << "argc: " << argc << endl;
-   loop(a, argc)   CERR << "  argv[" << a << "]: '" << argv[a] << "'" << endl;
+   CERR << "argc: " << argc << std::endl;
+   loop(a, argc)   CERR << "  argv[" << a << "]: '" << argv[a] << "'" << std::endl;
 
    // tell if stdin is open or closed
    //
    if (fcntl(STDIN_FILENO, F_GETFD))
-      CERR << "stdin is: CLOSED" << endl;
+      CERR << "stdin is: CLOSED" << std::endl;
    else
-      CERR << "stdin is: OPEN" << endl;
+      CERR << "stdin is: OPEN" << std::endl;
 
    // tell if fd 3 is open or closed
    //
    if (fcntl(3, F_GETFD))
-      CERR << "fd 3 is:  CLOSED" << endl;
+      CERR << "fd 3 is:  CLOSED" << std::endl;
    else
-      CERR << "fd 3 is:  OPEN" << endl;
+      CERR << "fd 3 is:  OPEN" << std::endl;
 }
 //-----------------------------------------------------------------------------
 /// print a welcome message (copyright notice)
 static void
-show_welcome(ostream & out, const char * argv0)
+show_welcome(std::ostream & out, const char * argv0)
 {
 char c1[200];
 char c2[200];
@@ -256,7 +256,7 @@ const int left_pad = (80 - len)/2;
               loop(p, pad)   out << " ";
               out << cl;
             }
-         out<< endl;
+         out<< std::endl;
        }
 }
 //-----------------------------------------------------------------------------
@@ -346,7 +346,7 @@ const bool log_startup = uprefs.parse_argv_1();
 
         if (info.size())   // problems loading library
            {
-             CERR << info << endl;
+             CERR << info << std::endl;
            }
         else
            {
@@ -390,13 +390,13 @@ const bool log_startup = uprefs.parse_argv_1();
            {
              Log(LOG_startup)
                 CERR << "parent pid = " << getpid()
-                     << " child pid = " << pid << endl;
+                     << " child pid = " << pid << std::endl;
 
              exit(0);   // parent returns
            }
 
         Log(LOG_startup)
-           CERR << "child forked (pid" << getpid() << ")" << endl;
+           CERR << "child forked (pid" << getpid() << ")" << std::endl;
       }
 
    if (uprefs.wait_ms)   usleep(1000*uprefs.wait_ms);
@@ -405,7 +405,7 @@ const bool log_startup = uprefs.parse_argv_1();
 
    if (!uprefs.silent)   show_welcome(cout, argv[0]);
 
-   if (log_startup)   CERR << "PID is " << getpid() << endl;
+   if (log_startup)   CERR << "PID is " << getpid() << std::endl;
    Log(LOG_argc_argv || log_startup)   show_argv(argc, argv);
 
    if (ProcessorID::init(log_startup))
@@ -423,7 +423,7 @@ const bool log_startup = uprefs.parse_argv_1();
         UCS_string lx(uprefs.latent_expression);
 
         if (log_startup)
-           CERR << "executing --LX '" << lx << "'" << endl;
+           CERR << "executing --LX '" << lx << "'" << std::endl;
 
         Command::process_line(lx);
       }

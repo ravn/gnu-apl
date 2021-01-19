@@ -42,7 +42,7 @@
 // this file (Svar_record.cc) is also used outside APL where Common.hh can
 // not be #included.
 
-extern ostream & get_CERR();
+extern std::ostream & get_CERR();
 
 //=============================================================================
 const char *
@@ -68,8 +68,8 @@ event_name(Svar_event ev)
    return "(unknown event)";
 }
 //-----------------------------------------------------------------------------
-ostream &
-Svar_partner::print(ostream & out) const
+std::ostream &
+Svar_partner::print(std::ostream & out) const
 {
    out << setw(5) << id.proc;
    if (id.parent)   out << "," << left << setw(5) << id.parent << right;
@@ -178,7 +178,7 @@ Svar_record::set_control(Svar_Control ctl)
       {
         get_CERR() << "set_control(" << ctl << ") on ";
         print_name(get_CERR());
-        get_CERR() << " by " << ProcessorID::get_id().proc << endl;
+        get_CERR() << " by " << ProcessorID::get_id().proc << std::endl;
       }
 
    if (ProcessorID::get_id() == offering.id)
@@ -218,7 +218,7 @@ usleep(50000);
         get_CERR() << "set_state(" << op << ") on ";
         print_name(get_CERR());
         get_CERR() << " by " << ProcessorID::get_id().proc
-                   << " at " << loc << endl;
+                   << " at " << loc << std::endl;
       }
 
    // the control vector as seen by the offering side
@@ -358,11 +358,11 @@ Svar_record::bad_proc(const char * function, const AP_num3 & id) const
 {
    get_CERR() << function << "(): proc " << id.proc
         << " does not match offering proc " << offering.id.proc
-        << " nor accepting proc " << accepting.id.proc << endl;
+        << " nor accepting proc " << accepting.id.proc << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-Svar_record::print(ostream & out) const
+Svar_record::print(std::ostream & out) const
 {
 const Svar_state st = get_state();
    out << "║" << setw(5) << (key & 0xFFFF) << "│" << get_coupling() << "║";
@@ -372,11 +372,11 @@ const Svar_state st = get_state();
    if (st & SET_BY_ACC)   out << "1";    else   out << "0";
    if (st & USE_BY_OFF)   out << "1";    else   out << "0";
    if (st & USE_BY_ACC)   out << "1│";   else   out << "0│";
-   print_name(out, varname, 10) << "║" << endl;
+   print_name(out, varname, 10) << "║" << std::endl;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Svar_record::print_name(ostream & out, const uint32_t * name, int len)
+std::ostream &
+Svar_record::print_name(std::ostream & out, const uint32_t * name, int len)
 {
    while (*name)
        {

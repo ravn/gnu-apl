@@ -85,7 +85,7 @@ void PostgresConnection::transaction_rollback( void )
     }
 }
 
-void PostgresConnection::fill_tables( vector<string> &tables )
+void PostgresConnection::fill_tables( std::vector<string> &tables )
 {
     PostgresResultWrapper result( PQexec( db, "select tablename from pg_tables where schemaname = 'public'" ) );
     ExecStatusType status = PQresultStatus( result.get_result() );
@@ -104,7 +104,7 @@ void PostgresConnection::fill_tables( vector<string> &tables )
 
 void
 PostgresConnection::fill_cols(const string &table,
-                              vector<ColumnDescriptor> &cols)
+                              std::vector<ColumnDescriptor> &cols)
 {
 const char * s = table.c_str();
 PostgresAllocMemoryWrapper

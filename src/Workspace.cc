@@ -24,8 +24,6 @@
 
 #include <fstream>
 
-using namespace std;
-
 #include "Archive.hh"
 #include "Command.hh"
 #include "InputFile.hh"
@@ -123,12 +121,12 @@ Workspace::push_SI(const Executable * fun, const char * loc)
          if (SI_top() && SI_top()->get_executable() &&
              the_workspace.SI_entry_count() > 100)
             MORE_ERROR() <<
-            "std::bad_alloc exception when calling a defined function\n"
+            "std::bad_alloc std::exception when calling a defined function\n"
             "This was most likely caused by some infinite recursion involving "
             << SI_top()->get_executable()->get_name();
          else
             MORE_ERROR() <<
-            "std::bad_alloc exception when calling a defined function";
+            "std::bad_alloc std::exception when calling a defined function";
          WS_FULL;
       }
 
@@ -140,7 +138,7 @@ Workspace::push_SI(const Executable * fun, const char * loc)
              << fun->get_name();
 
         CERR << " new SI is " << voidP(SI_top())
-             << " at " << loc << endl;
+             << " at " << loc << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -160,7 +158,7 @@ const Executable * exec = SI_top()->get_executable();
         if (exec->get_ufun())   CERR << exec->get_ufun()->get_name();
         else                    CERR << SI_top()->get_parse_mode_name();
         CERR << " " << voidP(SI_top())
-             << " at " << loc << endl;
+             << " at " << loc << std::endl;
       }
 
    // remove the top SI
@@ -241,7 +239,7 @@ Workspace::immediate_execution(bool exit_on_error)
                         CERR << __FUNCTION__ << "() caught APL error "
                              << HEX(err.get_error_code()) << " ("
                              << err.error_name(err.get_error_code()) << ")"
-                             << endl;
+                             << std::endl;
 
                         IO_Files::apl_error(LOC);
                       }
@@ -251,18 +249,18 @@ Workspace::immediate_execution(bool exit_on_error)
          catch (const std::bad_alloc & e)
             {
               CERR << "*** " << __FUNCTION__
-                   << "() caught bad_alloc: " << e.what() << " ***" << endl;
+                   << "() caught bad_alloc: " << e.what() << " ***" << std::endl;
               if (the_workspace.SI_entry_count() > 100)
                  CERR << ")SI depth is " << the_workspace.SI_entry_count()
                       <<  "; )SIC is strongly recommended !!!"
-                      << endl;
+                      << std::endl;
               try { WS_FULL } catch (...) {}
               if (exit_on_error)   return Token(TOK_OFF);
             }
          catch (...)
             {
               CERR << "*** " << __FUNCTION__
-                   << "() caught other exception ***" << endl;
+                   << "() caught other std::exception ***" << std::endl;
               IO_Files::apl_error(LOC);
               if (exit_on_error)   return Token(TOK_OFF);
             }
@@ -425,7 +423,7 @@ Workspace::write_OUT(FILE * out, uint64_t & seq, const UCS_string_vector
               if (obj == 0)   // not found
                  {
                    COUT << ")OUT: " << objects[o] << " NOT SAVED (not found)"
-                        << endl;
+                        << std::endl;
                    continue;
                  }
 
@@ -441,7 +439,7 @@ Workspace::write_OUT(FILE * out, uint64_t & seq, const UCS_string_vector
                    if (sym == 0)
                       {
                         COUT << ")OUT: " << objects[o]
-                             << " NOT SAVED (not a variable)" << endl;
+                             << " NOT SAVED (not a variable)" << std::endl;
                         continue;
                       }
 
@@ -478,7 +476,7 @@ Workspace::unmark_all_values()
 }
 //-----------------------------------------------------------------------------
 int
-Workspace::show_owners(ostream & out, const Value & value)
+Workspace::show_owners(std::ostream & out, const Value & value)
 {
 int count = 0;
 
@@ -510,14 +508,14 @@ int count = 0;
 }
 //-----------------------------------------------------------------------------
 int
-Workspace::cleanup_expunged(ostream & out, bool & erased)
+Workspace::cleanup_expunged(std::ostream & out, bool & erased)
 {
 const int ret = the_workspace.expunged_functions.size();
 
    if (SI_entry_count() > 0)
       {
         out << "SI not cleared (size " << SI_entry_count()
-            << "): not deleting ⎕EX'ed functions (try )SIC first)" << endl;
+            << "): not deleting ⎕EX'ed functions (try )SIC first)" << std::endl;
         erased = false;
         return ret;
       }
@@ -528,7 +526,7 @@ const int ret = the_workspace.expunged_functions.size();
          the_workspace.expunged_functions.pop_back();
          out << "finally deleting " << ufun->get_name() << "...";
          delete ufun;
-         out << " OK" << endl;
+         out << " OK" << std::endl;
        }
 
    erased = true;
@@ -536,7 +534,7 @@ const int ret = the_workspace.expunged_functions.size();
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::clear_WS(ostream & out, bool silent)
+Workspace::clear_WS(std::ostream & out, bool silent)
 {
    // remove user-defined commands
    //
@@ -586,11 +584,11 @@ const int tz = the_workspace.v_Quad_TZ.get_offset();
    Quad_FIO::fun->clear();
 
    set_WS_name(UCS_string("CLEAR WS"));
-   if (!silent)   out << "CLEAR WS" << endl;
+   if (!silent)   out << "CLEAR WS" << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::clear_SI(ostream & out)
+Workspace::clear_SI(std::ostream & out)
 {
    // clear the SI (pops all localized symbols)
    while (SI_top())
@@ -601,16 +599,16 @@ Workspace::clear_SI(ostream & out)
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::list_SI(ostream & out, SI_mode mode)
+Workspace::list_SI(std::ostream & out, SI_mode mode)
 {
    for (const StateIndicator * si = SI_top(); si; si = si->get_parent())
        si->list(out, mode);
 
-   if (mode & SIM_debug)   out << endl;
+   if (mode & SIM_debug)   out << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::save_WS(ostream & out, LibRef libref, const UCS_string & wsname,
+Workspace::save_WS(std::ostream & out, LibRef libref, const UCS_string & wsname,
                    bool name_from_WSID)
 {
 UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, false,
@@ -624,7 +622,7 @@ const bool file_exists = access(filename.c_str(), W_OK) == 0;
         if (wsname.compare(the_workspace.WS_name) != 0)   // names differ
            {
              out << "NOT SAVED: THIS WS IS "
-                 << the_workspace.WS_name << endl;
+                 << the_workspace.WS_name << std::endl;
 
              MORE_ERROR() << "the workspace was not saved because:\n"
                   << "   the workspace name '" << the_workspace.WS_name
@@ -639,7 +637,7 @@ const bool file_exists = access(filename.c_str(), W_OK) == 0;
    if (uprefs.backup_before_save && backup_existing_file(filename.c_str()))
       {
         COUT << "NOT SAVED: COULD NOT CREATE BACKUP FILE "
-             << filename << endl;
+             << filename << std::endl;
         return;
       }
 
@@ -649,22 +647,22 @@ ofstream outf(filename.c_str(), ofstream::out);
    if (!outf.is_open())   // open failed
       {
         CERR << "Unable to )SAVE workspace '" << wsname
-             << "'. " << strerror(errno) << endl;
+             << "'. " << strerror(errno) << std::endl;
         return;
       }
 
    the_workspace.WS_name = wsname;
 
-   Log(LOG_archive)   CERR << "constructing XML_Saving_Archive." << endl;
+   Log(LOG_archive)   CERR << "constructing XML_Saving_Archive." << std::endl;
 XML_Saving_Archive ar(outf);
-   Log(LOG_archive)   CERR << "saving XML_Saving_Archive..." << endl;
+   Log(LOG_archive)   CERR << "saving XML_Saving_Archive..." << std::endl;
    ar.save();
-   Log(LOG_archive)   CERR << "done XML_Saving_Archive." << endl;
+   Log(LOG_archive)   CERR << "done XML_Saving_Archive." << std::endl;
 
    // print time and date to COUT
    get_v_Quad_TZ().print_timestamp(out, now());
    if (name_from_WSID)   out << " " << the_workspace.WS_name;
-   out << endl;
+   out << std::endl;
 }
 //-----------------------------------------------------------------------------
 bool
@@ -685,13 +683,13 @@ UTF8_string backup_filename = filename;
         if (err)
            {
              CERR << "Could not remove backup file " << backup_filename
-                  << ": " << strerror(errno) << endl;
+                  << ": " << strerror(errno) << std::endl;
              return true;   // error
            }
 
          if (access(backup_filename.c_str(), F_OK) == 0)   // still exists
             {
-             CERR << "Could not remove backup file " << backup_filename << endl;
+             CERR << "Could not remove backup file " << backup_filename << std::endl;
              return true;   // error
             }
       }
@@ -703,14 +701,14 @@ const int err = rename(filename, backup_filename.c_str());
       {
         CERR << "Could not rename file " << filename
              << " to " << backup_filename
-             << ": " << strerror(errno) << endl;
+             << ": " << strerror(errno) << std::endl;
         return true;   // error
       }
 
    if (access(filename, F_OK) == 0)   // file still exists
       {
         CERR << "Could not rename file " << filename
-             << " to " << backup_filename << endl;
+             << " to " << backup_filename << std::endl;
         return true;   // error
       }
 
@@ -718,18 +716,18 @@ const int err = rename(filename, backup_filename.c_str());
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::load_DUMP(ostream & out, const UTF8_string & filename, int fd,
+Workspace::load_DUMP(std::ostream & out, const UTF8_string & filename, int fd,
                      LX_mode with_LX, bool silent,
                      UCS_string_vector * object_filter)
 {
    Log(LOG_command_IN)
-      CERR << "loading )DUMP file " << filename << "..." << endl;
+      CERR << "loading )DUMP file " << filename << "..." << std::endl;
 
    {
      struct stat st;
      fstat(fd, &st);
      const APL_time_us when = 1000000ULL * st.st_mtime;
-     Workspace::get_v_Quad_TZ().print_timestamp(out << "DUMPED ", when) << endl;
+     Workspace::get_v_Quad_TZ().print_timestamp(out << "DUMPED ", when) << std::endl;
    }
 
 FILE * file = fdopen(fd, "r");
@@ -742,7 +740,7 @@ FILE * file = fdopen(fd, "r");
         if (filename == InputFile::files_todo[f].filename)   // same filename
            {
              CERR << "*** )COPY " << filename
-                  << " would cause recursion (NOT COPIED)" << endl;
+                  << " would cause recursion (NOT COPIED)" << std::endl;
              return;
            }
       }
@@ -788,17 +786,17 @@ protected:
 };
 
 /// a stream that escapes certain HTML characters
-class HTML_stream : public ostream
+class HTML_stream : public std::ostream
 {
 public:
    /// constructor
    HTML_stream(HTML_streambuf * html_out)
-   : ostream(html_out)
+   : std::ostream(html_out)
    {}
 };
 //-----------------------------------------------------------------------------
 void
-Workspace::dump_WS(ostream & out, LibRef libref, const UCS_string & wsname,
+Workspace::dump_WS(std::ostream & out, LibRef libref, const UCS_string & wsname,
                    bool html, bool silent)
 {
    // )DUMP
@@ -810,7 +808,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, false,
                                                   extension, 0);
    if (wsname.compare(UCS_string("CLEAR WS")) == 0)   // don't save CLEAR WS
       {
-        COUT << "NOT DUMPED: THIS WS IS " << wsname << endl;
+        COUT << "NOT DUMPED: THIS WS IS " << wsname << std::endl;
         MORE_ERROR() <<
         "the workspace was not dumped because 'CLEAR WS' is a special\n"
         "workspace name that cannot be dumped. Use )WSID <name> first.";
@@ -820,7 +818,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, false,
    if (uprefs.backup_before_save && backup_existing_file(filename.c_str()))
       {
         COUT << "NOT DUMPED: COULD NOT CREATE BACKUP FILE "
-             << filename << endl;
+             << filename << std::endl;
         return;
       }
 
@@ -829,14 +827,14 @@ ofstream outf(filename.c_str(), ofstream::out);
    if (!outf.is_open())   // open failed
       {
         CERR << "Unable to )DUMP workspace '" << wsname
-             << "': " << strerror(errno) << "." << endl
-             << "    NOTE: filename: " << filename << endl;
+             << "': " << strerror(errno) << "." << std::endl
+             << "    NOTE: filename: " << filename << std::endl;
         return;
       }
 
 HTML_streambuf hout_buf(outf);
 HTML_stream hout(&hout_buf);
-ostream * sout = &outf;
+std::ostream * sout = &outf;
    if (html)   sout = &hout;
 
    // print header line, workspace name, time, and date to outf
@@ -848,61 +846,61 @@ const YMDhmsu time(gmt + 1000000*offset);
      if (html)
         {
           outf <<
-"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""               << endl <<
-"                      \"http://www.w3.org/TR/html4/strict.dtd\">"  << endl <<
-"<html>"                                                            << endl <<
-"  <head>"                                                          << endl <<
-"    <title>" << wsname << ".apl</title> "                          << endl <<
-"    <meta http-equiv=\"content-type\" "                            << endl <<
-"          content=\"text/html; charset=UTF-8\">"                   << endl <<
-"    <meta name=\"author\" content=\"??????\">"                     << endl <<
+"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""               << std::endl <<
+"                      \"http://www.w3.org/TR/html4/strict.dtd\">"  << std::endl <<
+"<html>"                                                            << std::endl <<
+"  <head>"                                                          << std::endl <<
+"    <title>" << wsname << ".apl</title> "                          << std::endl <<
+"    <meta http-equiv=\"content-type\" "                            << std::endl <<
+"          content=\"text/html; charset=UTF-8\">"                   << std::endl <<
+"    <meta name=\"author\" content=\"??????\">"                     << std::endl <<
 "    <meta name=\"copyright\" content=\"&copy; " << time.year
-                                                 <<" by ??????\">"  << endl <<
+                                                 <<" by ??????\">"  << std::endl <<
 "    <meta name=\"date\" content=\"" << time.year << "-"
                                      << time.month << "-"
-                                     << time.day << "\">"           << endl <<
-"    <meta name=\"description\""                                    << endl <<
-"          content=\"??????\">"                                     << endl <<
-"    <meta name=\"keywords\" lang=\"en\""                           << endl <<
-"          content=\"??????, APL, GNU\">"                           << endl <<
-" </head>"                                                          << endl <<
-" <body><pre>"                                                      << endl <<
-"⍝"                                                                 << endl <<
-"⍝ Author:      ??????"                                             << endl <<
+                                     << time.day << "\">"           << std::endl <<
+"    <meta name=\"description\""                                    << std::endl <<
+"          content=\"??????\">"                                     << std::endl <<
+"    <meta name=\"keywords\" lang=\"en\""                           << std::endl <<
+"          content=\"??????, APL, GNU\">"                           << std::endl <<
+" </head>"                                                          << std::endl <<
+" <body><pre>"                                                      << std::endl <<
+"⍝"                                                                 << std::endl <<
+"⍝ Author:      ??????"                                             << std::endl <<
 "⍝ Date:        " << time.year << "-"
                   << time.month << "-"
-                  << time.day                                       << endl <<
-"⍝ Copyright:   Copyright (C) " << time.year << " by ??????"        << endl <<
-"⍝ License:     GPL see http://www.gnu.org/licenses/gpl-3.0.en.html"<< endl <<
-"⍝ Support email: ??????@??????"                                    << endl <<
-"⍝ Portability:   L3 (GNU APL)"                                     << endl <<
-"⍝"                                                                 << endl <<
-"⍝ Purpose:"                                                        << endl <<
-"⍝ ??????"                                                          << endl <<
-"⍝"                                                                 << endl <<
-"⍝ Description:"                                                    << endl <<
-"⍝ ??????"                                                          << endl <<
-"⍝"                                                                 << endl <<
-                                                                       endl;
+                  << time.day                                       << std::endl <<
+"⍝ Copyright:   Copyright (C) " << time.year << " by ??????"        << std::endl <<
+"⍝ License:     GPL see http://www.gnu.org/licenses/gpl-3.0.en.html"<< std::endl <<
+"⍝ Support email: ??????@??????"                                    << std::endl <<
+"⍝ Portability:   L3 (GNU APL)"                                     << std::endl <<
+"⍝"                                                                 << std::endl <<
+"⍝ Purpose:"                                                        << std::endl <<
+"⍝ ??????"                                                          << std::endl <<
+"⍝"                                                                 << std::endl <<
+"⍝ Description:"                                                    << std::endl <<
+"⍝ ??????"                                                          << std::endl <<
+"⍝"                                                                 << std::endl <<
+                                                                       std::endl;
         }
      else
         {
           outf << "#!" << LibPaths::get_APL_bin_path()
                << "/" << LibPaths::get_APL_bin_name()
-               << " --script" << endl;
+               << " --script" << std::endl;
         }
 
 UCS_string wsname_apl = wsname;
    wsname_apl.append_UTF8(".apl");
 
      *sout <<
-" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << endl <<
-"⍝                                                                    ⍝" << endl <<
+" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << std::endl <<
+"⍝                                                                    ⍝" << std::endl <<
 "⍝ " << setw(36) << wsname_apl << " ";
-     get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << " ⍝" << endl <<
-"⍝                                                                    ⍝" << endl <<
-" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << endl
-           << endl;
+     get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << " ⍝" << std::endl <<
+"⍝                                                                    ⍝" << std::endl <<
+" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << std::endl
+           << std::endl;
    }
 
 int function_count = 0;
@@ -917,37 +915,37 @@ int variable_count = 0;
    { get_v_ ## x().dump(*sout);   ++variable_count; }
 #include "SystemVariable.def"
 
-   if (html)   outf << endl << "⍝ EOF </pre></body></html>" << endl;
+   if (html)   outf << std::endl << "⍝ EOF </pre></body></html>" << std::endl;
 
    if (silent)
       {
-        get_v_Quad_TZ().print_timestamp(out, gmt) << endl;
+        get_v_Quad_TZ().print_timestamp(out, gmt) << std::endl;
       }
    else
       {
-        out << "DUMPED WORKSPACE '" << wsname << "'" << endl
-            << " TO FILE '" << filename << "'" << endl
+        out << "DUMPED WORKSPACE '" << wsname << "'" << std::endl
+            << " TO FILE '" << filename << "'" << std::endl
             << " (" << function_count << " FUNCTIONS, " << variable_count
-            << " VARIABLES)" << endl;
+            << " VARIABLES)" << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::dump_commands(ostream & out)
+Workspace::dump_commands(std::ostream & out)
 {
-vector<Command::user_command> & cmds = get_user_commands();
+std::vector<Command::user_command> & cmds = get_user_commands();
 
    loop(c, cmds.size())
       out << "]USERCMD " << cmds[c].prefix
           << " " << cmds[c].apl_function
-          << " " << cmds[c].mode << endl;
+          << " " << cmds[c].mode << std::endl;
 
-   if (cmds.size())   out << endl;
+   if (cmds.size())   out << std::endl;
 }
 //-----------------------------------------------------------------------------
 // )LOAD WS, set ⎕LX of loaded WS on success
 void
-Workspace::load_WS(ostream & out, LibRef libref, const UCS_string & wsname,
+Workspace::load_WS(std::ostream & out, LibRef libref, const UCS_string & wsname,
                    UCS_string & quad_lx, bool silent)
 {
    // )LOAD wsname                              wsname /absolute or relative
@@ -955,7 +953,7 @@ Workspace::load_WS(ostream & out, LibRef libref, const UCS_string & wsname,
    //
    if (UTF8_string(wsname).ends_with(".bak"))
       {
-        out << "BAD COMMAND+" << endl;
+        out << "BAD COMMAND+" << std::endl;
         MORE_ERROR() << wsname <<
         " is a backup file! You need to rename it before it can be )LOADed";
         return;
@@ -972,7 +970,7 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
         the_workspace.clear_WS(out, true);
 
         Log(LOG_command_IN)   out << "LOADING " << wsname << " from file '"
-                                  << filename << "' ..." << endl;
+                                  << filename << "' ..." << std::endl;
 
         load_DUMP(out, filename, dump_fd, do_LX, silent, 0);   // closes dump_fd
 
@@ -999,12 +997,12 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
         if (!in.is_open())   // open failed
            {
              out << ")LOAD " << wsname << " (file " << filename
-                 << ") failed: " << strerror(errno) << endl;
+                 << ") failed: " << strerror(errno) << std::endl;
              return;
            }
 
         Log(LOG_command_IN)   out << "LOADING " << wsname << " from file '"
-                                  << filename << "' ..." << endl;
+                                  << filename << "' ..." << std::endl;
 
         // got open file. We assume that from here on everything will be fine.
         // clear current WS and load it from file
@@ -1024,7 +1022,7 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::copy_WS(ostream & out, LibRef libref, const UCS_string & wsname,
+Workspace::copy_WS(std::ostream & out, LibRef libref, const UCS_string & wsname,
                    UCS_string_vector & lib_ws_objects, bool protection)
 {
    // )COPY wsname                              wsname /absolute or relative
@@ -1047,12 +1045,12 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
    if (!in.is_open())   // open failed: try filename.xml unless already .xml
       {
         CERR << ")COPY " << wsname << " (file " << filename
-             << ") failed: " << strerror(errno) << endl;
+             << ") failed: " << strerror(errno) << std::endl;
         return;
       }
 
    Log(LOG_command_IN)   CERR << "LOADING " << wsname << " from file '"
-                              << filename << "' ..." << endl;
+                              << filename << "' ..." << std::endl;
 
    in.set_protection(protection, lib_ws_objects);
    in.read_vids();
@@ -1060,13 +1058,13 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 }
 //-----------------------------------------------------------------------------
 void
-Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
+Workspace::wsid(std::ostream & out, UCS_string arg, LibRef lib, bool silent)
 {
    arg.remove_leading_and_trailing_whitespaces();
 
    if (arg.size() == 0)   // inquire workspace name
       {
-        out << "IS " << the_workspace.WS_name << endl;
+        out << "IS " << the_workspace.WS_name << std::endl;
         return;
       }
 
@@ -1085,12 +1083,12 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
       {
         if (arg[a] <= ' ')
            {
-             out << "Bad WS name '" << arg << "'" << endl;
+             out << "Bad WS name '" << arg << "'" << std::endl;
              return;
            }
       }
 
-   if (!silent)   out << "WAS " << the_workspace.WS_name << endl;
+   if (!silent)   out << "WAS " << the_workspace.WS_name << std::endl;
 
    // prepend the lib number unless it is 0.
    //

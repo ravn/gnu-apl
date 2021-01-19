@@ -78,7 +78,7 @@ class Doxy
 {
 public:
    /// Constructor: create (and remember) the root directory
-   Doxy(ostream & out, const UCS_string & root_dir);
+   Doxy(std::ostream & out, const UCS_string & root_dir);
 
    /// generate the entire documentation
    void gen();
@@ -107,7 +107,7 @@ protected:
    void write_css();
 
    /// (HTML-)print a function header with the name in bold to file of
-   void bold_name(ostream & of, const UserFunction * ufun) const;
+   void bold_name(std::ostream & of, const UserFunction * ufun) const;
 
    /// write the page for one defined function. If the define function is a
    /// named lambda, then lambda_owner is the Symbol to which the lambda was
@@ -143,7 +143,7 @@ protected:
                  bool cmapx);
 
    /// the command output channel (COUR or CERR)
-   ostream & out;
+   std::ostream & out;
 
    /// the name of the workspace (for HTML output)
    UCS_string ws_name;

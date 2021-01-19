@@ -195,16 +195,16 @@ XML_node::~XML_node()
 }
 //-----------------------------------------------------------------------------
 void
-XML_node::print(ostream & out) const
+XML_node::print(std::ostream & out) const
 {
-   if (err_loc)   CERR << "    errloc: " << err_loc << endl;
+   if (err_loc)   CERR << "    errloc: " << err_loc << std::endl;
 
 const UCS_string item(src, src_pos, src_len);
-   out << get_node_type_name() << "[" << level << "] '" << item << "'" << endl;
+   out << get_node_type_name() << "[" << level << "] '" << item << "'" << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-XML_node::print_all(ostream & out, const XML_node & anchor)
+XML_node::print_all(std::ostream & out, const XML_node & anchor)
 {
    for (const XML_node * x = anchor.get_next(); x != &anchor; x = x->get_next())
        {
@@ -250,7 +250,7 @@ Value_P Z = XML_to_APL(B.getref());
 Value_P
 Quad_XML::APL_to_XML(const Value & B)
 {
-vector<const UCS_string *> entities;
+std::vector<const UCS_string *> entities;
    add_sorted_entities(entities, B);
 
 ShapeItem len_Z = 0;
@@ -269,7 +269,7 @@ Value_P Z(len_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_XML::add_sorted_entities(vector<const UCS_string *> & entities,
+Quad_XML::add_sorted_entities(std::vector<const UCS_string *> & entities,
                               const Value & B)
 {
    Assert(B.is_structured());
@@ -638,8 +638,8 @@ XML_node::collect(XML_node & anchor, XML_node & garbage, Value * Z)
 {
 XML_node * root = 0;
 
-vector<XML_node *> stack;   // a stack of start tags
-vector<size_t> pos_stack;   // a stack of node positions
+std::vector<XML_node *> stack;   // a stack of start tags
+std::vector<size_t> pos_stack;   // a stack of node positions
 
    // set the positions (before removing any nodes)
    //
@@ -1263,8 +1263,8 @@ const ShapeItem rows = B.get_rows();
    // construct a vector of member names and a vector of their values...
    // Unused entries in B are discarded. so typically members.size < rows!
    //
-vector<UCS_string> members;
-vector<const Cell *> values;
+std::vector<UCS_string> members;
+std::vector<const Cell *> values;
    loop(r, rows)
       {
         const Cell * cB = &B.get_ravel(2*r);

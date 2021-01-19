@@ -29,8 +29,6 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-using namespace std;
-
 // the implementation of gelsy<T>
 #include "LApack.hh"
 

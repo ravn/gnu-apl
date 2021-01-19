@@ -36,8 +36,8 @@ public:
     virtual void transaction_commit( void );
     virtual void transaction_rollback( void );
 
-    virtual void fill_tables( vector<string> &tables );
-    virtual void fill_cols( const string &table, vector<ColumnDescriptor> &cols );
+    virtual void fill_tables( std::vector<string> &tables );
+    virtual void fill_cols( const string &table, std::vector<ColumnDescriptor> &cols );
     virtual const string make_positional_param( int pos );
 
     PGconn *get_db() { return db; }

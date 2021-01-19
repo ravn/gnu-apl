@@ -70,7 +70,7 @@ Parser::parse(const Token_string & input, Token_string & tos) const
       {
         CERR << "parse 1 [" << input.size() << "]: ";
         input.print(CERR, true);
-        CERR << endl;
+        CERR << std::endl;
       }
 
    // split input line into statements (separated by ◊)
@@ -159,7 +159,7 @@ Parser::parse_statement(Token_string & tos)
    //
    if (tos.size() == 1)
       {
-        Log(LOG_parse)   CERR << "parse 3a: single value " << tos[0] << endl;;
+        Log(LOG_parse)   CERR << "parse 3a: single value " << tos[0] << std::endl;;
         return E_NO_ERROR;
       }
 
@@ -341,7 +341,7 @@ int others = 0;
    for (size_t p = pos + 1; p < tos.size(); ++p)
        {
          Log(LOG_find_closing)
-            CERR << "find_closing_bracket() sees " << tos[p] << endl;
+            CERR << "find_closing_bracket() sees " << tos[p] << std::endl;
 
          if (tos[p].get_tag() == TOK_R_BRACK)
             {
@@ -364,7 +364,7 @@ int others = 0;
    for (int p = pos - 1; p >= 0; --p)
        {
          Log(LOG_find_closing)
-            CERR << "find_opening_bracket() sees " << tos[p] << endl;
+            CERR << "find_opening_bracket() sees " << tos[p] << std::endl;
 
          if (tos[p].get_tag() == TOK_L_BRACK)
             {
@@ -387,7 +387,7 @@ int others = 0;
    for (size_t p = pos + 1; p < tos.size(); ++p)
        {
          Log(LOG_find_closing)
-            CERR << "find_closing_bracket() sees " << tos[p] << endl;
+            CERR << "find_closing_bracket() sees " << tos[p] << std::endl;
 
          if (tos[p].get_Class() == TC_R_PARENT)
             {
@@ -410,7 +410,7 @@ int others = 0;
    for (int p = pos - 1; p >= 0; --p)
        {
          Log(LOG_find_closing)
-            CERR << "find_opening_bracket() sees " << tos[p] << endl;
+            CERR << "find_opening_bracket() sees " << tos[p] << std::endl;
 
          if (tos[p].get_Class() == TC_L_PARENT)
             {
@@ -729,7 +729,7 @@ Parser::create_scalar_value(Token & output)
         default: break;
       }
 
-   CERR << "Unexpected token " << output.get_tag() << ": " << output << endl;
+   CERR << "Unexpected token " << output.get_tag() << ": " << output << std::endl;
    Assert(0 && "Unexpected token");
 }
 //-----------------------------------------------------------------------------

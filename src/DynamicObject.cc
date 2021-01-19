@@ -26,15 +26,15 @@
 #include "Value.hh"
 
 //-----------------------------------------------------------------------------
-ostream &
-operator << (ostream & out, const DynamicObject & dob)
+std::ostream &
+operator << (std::ostream & out, const DynamicObject & dob)
 {
    dob.print(out);
    return out;
 }
 //-----------------------------------------------------------------------------
 void
-DynamicObject::print_chain(ostream & out) const
+DynamicObject::print_chain(std::ostream & out) const
 {
 int pos = 0;
    for (const DynamicObject * p = this; ;)
@@ -43,7 +43,7 @@ int pos = 0;
              << voidP(p->prev) << " --> "
              << voidP(p)       << " --> "
              << voidP(p->next) << "    "
-             << p->where_allocated() << endl;
+             << p->where_allocated() << std::endl;
 
           p = p->next;
           if (p == this)   break;
@@ -51,19 +51,19 @@ int pos = 0;
 }
 //-----------------------------------------------------------------------------
 void
-DynamicObject::print_new(ostream & out, const char * loc) const
+DynamicObject::print_new(std::ostream & out, const char * loc) const
 {
-   out << "new    " << voidP(this) << " at " << loc << endl;
+   out << "new    " << voidP(this) << " at " << loc << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-DynamicObject::print(ostream & out) const
+DynamicObject::print(std::ostream & out) const
 {
    out << "DynamicObject: " << voidP(this)
-       << " (Value: " << voidP(this) << ") :"       << endl
-       << "    prev:      " << voidP(prev)          << endl
-       << "    next:      " << voidP(next)          << endl
-       << "    allocated: " << where_allocated()    << endl;
+       << " (Value: " << voidP(this) << ") :"       << std::endl
+       << "    prev:      " << voidP(prev)          << std::endl
+       << "    next:      " << voidP(next)          << std::endl
+       << "    allocated: " << where_allocated()    << std::endl;
 }
 //-----------------------------------------------------------------------------
 /// cast DynamicObject to derived class Value.

@@ -121,7 +121,7 @@ public:
       { clear_vs(); }
 
    /// List \b this \b Symbol ( for )VARS, )FNS )
-   ostream & list(ostream & out);
+   std::ostream & list(std::ostream & out);
 
    /// write this symbol in )OUT format to file \b out
    void write_OUT(FILE * out, uint64_t & seq) const;
@@ -181,10 +181,10 @@ public:
    virtual bool assign_named_lambda(Function_P lambda, const char * loc);
 
    /// Print \b this \b Symbol to \b out
-   virtual ostream & print(ostream & out) const;
+   virtual std::ostream & print(std::ostream & out) const;
 
    /// Print \b this \b Symbol and its stack to \b out
-   ostream & print_verbose(ostream & out) const;
+   std::ostream & print_verbose(std::ostream & out) const;
 
    /// Pop latest entry from the stack of \b this \b Symbol
    virtual void pop();
@@ -282,7 +282,7 @@ public:
    void unmark_all_values() const;
 
    /// print variables owning value
-   int show_owners(ostream & out, const Value & value) const;
+   int show_owners(std::ostream & out, const Value & value) const;
 
    /// perform a vector assignment (like (A B C)←1 2 3) for variables in
    /// \b symbols with values \b values
@@ -290,7 +290,7 @@ public:
                                  Value_P values);
 
    /// dump this symbol to out
-   void dump(ostream & out) const;
+   void dump(std::ostream & out) const;
 
    /// call the monitor callback function (if any) with event \b ev
    void call_monitor_callback(Symbol_Event ev)

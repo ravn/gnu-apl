@@ -14,8 +14,6 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
-using namespace std;
-
 static int display_mode = 1;
 
 //-----------------------------------------------------------------------------
@@ -55,7 +53,7 @@ apl_command(PyObject * self, PyObject * args)
 const char * command = 0;
    if (!PyArg_ParseTuple(args, "s", &command))
        {
-         CERR << "*** argument of command() is not a string." << endl;
+         CERR << "*** argument of command() is not a string." << std::endl;
          return 0;
        }
 
@@ -104,7 +102,7 @@ PyObject * ravel = PyList_New(ravel_len);
             }
          else
             {
-               CERR << "*** Bad cell type at " LOC << endl;
+               CERR << "*** Bad cell type at " LOC << std::endl;
                return 0;
             }
        }
@@ -153,7 +151,7 @@ bool do_display = false;
       }
    else
       {
-        CERR << "Unexpected Tag << HEX(tag) at " LOC << endl;
+        CERR << "Unexpected Tag << HEX(tag) at " LOC << std::endl;
         FIXME;
       }
 
@@ -166,7 +164,7 @@ apl_exec(PyObject * self, PyObject * args)
 const char * line = 0;
     if (!PyArg_ParseTuple(args, "s", &line))
        {
-         CERR << "*** argument of exec() is not a string." << endl;
+         CERR << "*** argument of exec() is not a string." << std::endl;
          return 0;
        }
 
@@ -179,17 +177,17 @@ UCS_string line_ucs(line_utf8);
    try { Command::process_line(line_ucs); }
    catch (const Error & error)
       {
-        CERR << "cought Error" << endl;
+        CERR << "cought Error" << std::endl;
         return PyLong_FromLong(error.get_error_code());
       }
    catch (ErrorCode error_code)
       {
-        CERR << "cought ErrorCode" << endl;
+        CERR << "cought ErrorCode" << std::endl;
         return PyLong_FromLong(error_code);
       }
    catch (...)
       {
-        CERR << "cought something else" << endl;
+        CERR << "cought something else" << std::endl;
         return PyLong_FromLong(-1);
       }
 
@@ -218,7 +216,7 @@ apl_get_var_value(PyObject * args)
 const char * varname = 0;
    if (!PyArg_ParseTuple(args, "s", &varname))
       {
-        CERR << "*** argument of get_shape(varname) is not a string." << endl;
+        CERR << "*** argument of get_shape(varname) is not a string." << std::endl;
         return 0;
       }
 
@@ -229,14 +227,14 @@ UCS_string varname_ucs(varname_utf8);
 Symbol * sym = Workspace::lookup_existing_symbol(varname_ucs);
    if (sym == 0)
       {
-        CERR << "*** " << varname_ucs << "is not an APL symbol." << endl;
+        CERR << "*** " << varname_ucs << "is not an APL symbol." << std::endl;
          return 0;
       }
 
 const ValueStackItem * top = sym->top_of_stack();
    if (top == 0 || top->get_nc() != NC_VARIABLE)
       {
-        CERR << "*** " << varname_ucs << "is not an APL variable." << endl;
+        CERR << "*** " << varname_ucs << "is not an APL variable." << std::endl;
         return 0;
       }
 
@@ -282,7 +280,7 @@ PyObject * result = PyList_New(len);
            }
         else
            {
-             CERR << "*** Warning: unsupported Cell type" << endl;
+             CERR << "*** Warning: unsupported Cell type" << std::endl;
            }
         PyList_SetItem(result, l, item);
       }
@@ -315,7 +313,7 @@ list_to_shape(PyObject * shape)
 Shape ret;
    if (!PyList_Check(shape))
       {
-        CERR << "*** tuple[1] is not a list at " LOC << endl;
+        CERR << "*** tuple[1] is not a list at " LOC << std::endl;
         return ret;
       }
 
@@ -341,7 +339,7 @@ shape_for_item(PyObject * item)
    if (!PyTuple_Check(item))   return Shape();
    if (PyTuple_Size(item) != 2)
       {
-        CERR << "*** tuple len ≠ 2 at " LOC << endl;
+        CERR << "*** tuple len ≠ 2 at " LOC << std::endl;
         return Shape();
       }
 
@@ -402,7 +400,7 @@ const ShapeItem len_Z = Z->nz_element_count();
       }
    else
       {
-        CERR << "*** " << "ravel is something else" << endl;
+        CERR << "*** " << "ravel is something else" << std::endl;
         FIXME;
       }
 
@@ -432,7 +430,7 @@ const int arg_count = PyTuple_Size(args);
         if (!PyArg_ParseTuple(args, "sO", &varname, &ravel))
            {
               CERR << "*** Bad arguments in set_value(varname, ravel) ."
-                   << endl;
+                   << std::endl;
               return 0;
            }
       }
@@ -441,20 +439,20 @@ const int arg_count = PyTuple_Size(args);
         if (!PyArg_ParseTuple(args, "sOO", &varname, &ravel, shape))
            {
               CERR << "*** Bad arguments in set_value(varname, ravel, shape) ."
-                   << endl;
+                   << std::endl;
               return 0;
            }
       }
    else if (arg_count > 3)
       {
         CERR << "*** Too many (" << arg_count << ") arguments in "
-                "set_value(varname, ravel, [shape]) ." << endl;
+                "set_value(varname, ravel, [shape]) ." << std::endl;
         return 0;
       }
    else
       {
         CERR << "*** Too few (" << arg_count << ") arguments in "
-                "set_value(varname, ravel, [shape]) ." << endl;
+                "set_value(varname, ravel, [shape]) ." << std::endl;
         return 0;
       }
 
@@ -465,14 +463,14 @@ UCS_string varname_ucs(varname_utf8);
 Symbol * sym = Workspace::lookup_symbol(varname_ucs);
    if (sym == 0)
       {
-        CERR << "*** " << varname_ucs << "cannot be assigned." << endl;
+        CERR << "*** " << varname_ucs << "cannot be assigned." << std::endl;
          return 0;
       }
 
 Value_P value = python_to_apl(ravel, shape);
    if (!value)
       {
-        CERR << "*** " << ravel << "could not be assigned." << endl;
+        CERR << "*** " << ravel << "could not be assigned." << std::endl;
          return 0;
       }
 
@@ -486,7 +484,7 @@ apl_fix_function(PyObject * self, PyObject * args)
 const char * text = 0;
     if (!PyArg_ParseTuple(args, "s", &text))
        {
-         CERR << "*** argument of fix_function() is not a string." << endl;
+         CERR << "*** argument of fix_function() is not a string." << std::endl;
          return 0;
        }
 
@@ -502,8 +500,8 @@ UserFunction * fun = UserFunction::fix(text_ucs, error_line, false, LOC,
 
    if (fun)   return Py_None;
 
-   CERR << "*** invalid string argument of fix_function()" << endl
-        << "*** offending function line: " << error_line << endl;
+   CERR << "*** invalid string argument of fix_function()" << std::endl
+        << "*** offending function line: " << error_line << std::endl;
 
    return PyLong_FromLong(error_line);
 }
@@ -514,14 +512,14 @@ apl_set_display(PyObject * self, PyObject * args)
 int mode;
     if (!PyArg_ParseTuple(args, "i", &mode))
        {
-         CERR << "*** argument of apl_set_display() is not an integer." << endl;
+         CERR << "*** argument of apl_set_display() is not an integer." << std::endl;
          return 0;
        }
 
    if (mode < 0 || mode > 2)
        {
          CERR << "*** invalid mode argument (" << mode
-              << ") for apl_set_display()." << endl;
+              << ") for apl_set_display()." << std::endl;
          return 0;
        }
 
@@ -768,22 +766,22 @@ const char * topic = 0;
                    << DESCR_get_value    << sep
                    << DESCR_set_value    << sep
                    << DESCR_set_display  << sep
-                   << DESCR_values       << sep << endl;
+                   << DESCR_values       << sep << std::endl;
               return Py_None;
             }
 
          if (help == 0)
             {
-              CERR << "*** " << topic << " is not a help() topic" << endl;
+              CERR << "*** " << topic << " is not a help() topic" << std::endl;
             }
          else
             {
-              CERR << help << endl;
+              CERR << help << std::endl;
             }
        }
    else                                       // no topic
        {
-         CERR << DESCR_help << endl;
+         CERR << DESCR_help << std::endl;
        }
 
    return Py_None;

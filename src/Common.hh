@@ -51,7 +51,7 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #endif
 
 // if someone (like curses on Solaris) has #defined erase() then
-// #undef it because class vector<> would complain about it
+// #undef it because class std::vector<> would complain about it
 #ifdef erase
 #undef erase
 #endif
@@ -106,13 +106,13 @@ extern APL_time_us interrupt_when;
 extern void control_C(int);
 
 /// normal APL output (to stdout)
-extern ostream COUT;
+extern std::ostream COUT;
 
 /// debug output (to stderrear_interrupt_raised
-extern ostream CERR;
+extern std::ostream CERR;
 
 /// debug output (to stderr)
-extern ostream UERR;
+extern std::ostream UERR;
 
 class UCS_string;
 extern UCS_string & MORE_ERROR();   // in Workspace.cc
@@ -371,11 +371,11 @@ inline bool is_iPAD_char(Unicode uni)
 extern std::ostream & get_CERR();
 
 /// print x and its source code location
-#define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
+#define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << std::endl;
 
 /// same as Q1 (for printouts guarded by Log macros). Unlike Q() which MUST
 /// NOT REMAIN IN THE CODE, Q1 should remain in the code.
-#define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
+#define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << std::endl;
 
 //-----------------------------------------------------------------------------
 

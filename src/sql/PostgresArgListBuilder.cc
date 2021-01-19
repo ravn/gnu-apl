@@ -96,7 +96,7 @@ PostgresArgListBuilder::~PostgresArgListBuilder()
 
 void PostgresArgListBuilder::clear_args( void )
 {
-    for( vector<PostgresArg *>::iterator i = args.begin() ; i != args.end() ; i++ ) {
+    for( std::vector<PostgresArg *>::iterator i = args.begin() ; i != args.end() ; i++ ) {
         delete *i;
     }
     args.clear();
@@ -160,10 +160,10 @@ Value_P PostgresArgListBuilder::run_query( bool ignore_result )
     const int n = args.size();
     const int array_len = n == 0 ? 1 : n;
     const char * cp_null = 0;
-    vector<Oid>          types  (array_len, 0);
-    vector<const char *> values (array_len, cp_null);
-    vector<int>          lengths(array_len, 0);
-    vector<int>          formats(array_len, 0);
+    std::vector<Oid>          types  (array_len, 0);
+    std::vector<const char *> values (array_len, cp_null);
+    std::vector<int>          lengths(array_len, 0);
+    std::vector<int>          formats(array_len, 0);
 
     for( int i = 0 ; i < n ; i++ ) {
         PostgresArg *arg = args[i];
@@ -229,7 +229,7 @@ Value_P PostgresArgListBuilder::run_query( bool ignore_result )
     }
     else {
         stringstream out;
-        out << "Error executing query: " << PQresStatus( status ) << endl
+        out << "Error executing query: " << PQresStatus( status ) << std::endl
             << "Message: " << PQresultErrorMessage( result.get_result() );
         Workspace::more_error() = out.str().c_str();
         DOMAIN_ERROR;

@@ -45,7 +45,7 @@ const void * unused = 0;
 void
 LibPaths::init(const char * argv0, bool logit)
 {
-   logit && CERR << "\ninitializing paths from argv[0] = " << argv0 << endl;
+   logit && CERR << "\ninitializing paths from argv[0] = " << argv0 << std::endl;
 
    compute_bin_path(argv0, logit);
    search_APL_lib_root();
@@ -75,7 +75,7 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
          if (path)
             {
               logit && CERR << "initializing paths from  $PATH = "
-                            << path << endl;
+                            << path << std::endl;
 
               // we must not modify path, so we copy it to path1 and
               // replace the semicolons in path1 by 0. That converts
@@ -117,7 +117,7 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
            else
             {
               logit && CERR << "initializing paths from $PATH failed because "
-                               "it was not set" << endl;
+                               "it was not set" << std::endl;
             }
       }
 
@@ -134,7 +134,7 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
    //
    if (const char * PWD = getenv("PWD"))   // we have a pwd
       {
-        logit && CERR << "initializing paths from  $PWD = " << PWD << endl;
+        logit && CERR << "initializing paths from  $PWD = " << PWD << std::endl;
         const int PWD_len = strlen(PWD);
         if (!strncmp(PWD, APL_bin_path, PWD_len) && PWD_len > 1)
            {
@@ -145,12 +145,12 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
    else
       {
         logit && CERR << "initializing paths from $PWD failed because "
-                         "it was not set" << endl;
+                         "it was not set" << std::endl;
       }
 
 done:
-   logit && CERR << "APL_bin_path is: " << APL_bin_path << endl
-                 << "APL_bin_name is: " << APL_bin_name << endl;
+   logit && CERR << "APL_bin_path is: " << APL_bin_path << std::endl
+                 << "APL_bin_name is: " << APL_bin_name << std::endl;
 }
 //-----------------------------------------------------------------------------
 bool
@@ -193,7 +193,7 @@ const char * path = getenv("APL_LIB_ROOT");
         else
            {
              CERR << "*** Cannot locate APL_lib_root: no / or \\ in "
-                  << APL_lib_root << endl;
+                  << APL_lib_root << std::endl;
              break;
            }
       }
@@ -256,11 +256,11 @@ UTF8_string filename_ext2 = name;
    filename_ext2.append_ASCII(ext2);
    if (access(filename_ext2.c_str(), F_OK))   return;   // not existing
 
-   CERR << endl 
-        << "WARNING: filename " << name << endl
-        << "    is ambiguous because another file" << endl << "    "
-        << filename_ext2 << endl
-        << "    exists as well. Using the first (.xml) file." << endl << endl;
+   CERR << std::endl 
+        << "WARNING: filename " << name << std::endl
+        << "    is ambiguous because another file" << std::endl << "    "
+        << filename_ext2 << std::endl
+        << "    exists as well. Using the first (.xml) file." << std::endl << std::endl;
 }
 //-----------------------------------------------------------------------------
 UTF8_string

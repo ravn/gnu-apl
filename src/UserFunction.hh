@@ -96,7 +96,7 @@ public:
       { header.pop_local_vars(); }
 
    /// print the local variables for command )SINL
-   void print_local_vars(ostream & out) const
+   void print_local_vars(std::ostream & out) const
       { return header.print_local_vars(out); }
 
    /// return the number of local variables
@@ -128,7 +128,7 @@ public:
       { loop(i, 4)   exec_properties[i] = props[i]; }
 
    /// overloaded Executable::print()
-   virtual ostream & print(ostream & out) const;
+   virtual std::ostream & print(std::ostream & out) const;
 
    /// return the name of this function
    virtual UCS_string get_name() const
@@ -138,7 +138,7 @@ public:
    UCS_string get_name_and_line(Function_PC pc) const;
 
    /// Overloaded Function::print_properties()
-   virtual void print_properties(ostream & out, int indent) const;
+   virtual void print_properties(std::ostream & out, int indent) const;
 
    /// )SAVE this function in the workspace named \b workspace
    /// (in the file system).
@@ -155,7 +155,7 @@ public:
    virtual bool pushes_sym(const Symbol * sym) const;
 
    /// print help for this function on out (for the )HELP command)
-   void help(ostream & out) const;
+   void help(std::ostream & out) const;
 
    /// Load this function into the workspace named \b workspace.
    static void load(const char * workspace, const char * function,
@@ -288,7 +288,7 @@ protected:
       { return error_info; }
 
    /// helper function to print token with Function or Value content
-   static ostream & print_val_or_fun(ostream & out, Token & tok);
+   static std::ostream & print_val_or_fun(std::ostream & out, Token & tok);
 
    /// "[nn] " prefix
    UCS_string line_prefix(Function_Line l) const;

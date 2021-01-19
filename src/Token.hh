@@ -259,13 +259,13 @@ public:
    void ChangeTag(TokenTag new_tag);
 
    /// helper function to print a function.
-   ostream & print_function(ostream & out) const;
+   std::ostream & print_function(std::ostream & out) const;
 
    /// helper function to print an APL value
-   ostream & print_value(ostream & out) const;
+   std::ostream & print_value(std::ostream & out) const;
 
    /// show trace output for this token
-   void show_trace(ostream & out, const UCS_string & fun_name,
+   void show_trace(std::ostream & out, const UCS_string & fun_name,
                    Function_Line line) const;
 
    /// the Quad_CR representation of the token.
@@ -313,7 +313,7 @@ protected:
    sval value;
 
    /// helper function to print Quad-function (system function or variable).
-   ostream & print_quad(ostream & out) const;
+   std::ostream & print_quad(std::ostream & out) const;
 };
 //-----------------------------------------------------------------------------
 /// A sequence of Token
@@ -335,7 +335,7 @@ public:
    void reverse_from_to(ShapeItem from, ShapeItem to);
 
    /// print this token string
-   void print(ostream & out, bool details) const;
+   void print(std::ostream & out, bool details) const;
 
 private:
    /// prevent accidental copying

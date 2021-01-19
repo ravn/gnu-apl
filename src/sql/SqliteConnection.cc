@@ -77,7 +77,7 @@ void SqliteConnection::transaction_rollback()
 }
 
 void
-SqliteConnection::fill_tables(vector<string> & tables)
+SqliteConnection::fill_tables(std::vector<string> & tables)
 {
     sqlite3_stmt *statement;
     if( sqlite3_prepare_v2( get_db(), "select name from sqlite_master where type = 'table'", -1,
@@ -104,7 +104,7 @@ SqliteConnection::fill_tables(vector<string> & tables)
 
 void
 SqliteConnection::fill_cols(const string &table,
-                            vector<ColumnDescriptor> & cols)
+                            std::vector<ColumnDescriptor> & cols)
 {
 sqlite3_stmt * statement;
 char * statement_content = sqlite3_mprintf("pragma table_info('%q')",

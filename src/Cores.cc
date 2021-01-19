@@ -41,8 +41,8 @@ const int err = pthread_getaffinity_np(thread, sizeof(CPUs), &CPUs);
    if (err)
       {
         get_CERR() << "pthread_getaffinity_np() failed with error "
-                   << err << endl
-                   << "setting __core_count to 1." << endl;
+                   << err << std::endl
+                   << "setting __core_count to 1." << std::endl;
         __max_count = CCNT_MIN;
       }
    else
@@ -61,14 +61,14 @@ CoreCount setup_cores(CoreCount count)
          get_CERR() << "There were " << count
                     << " cores requested, but only " << max_cores()
                     << " seem to be available.\n"
-                    << "Using " << max_cores() << " cores" << endl;
+                    << "Using " << max_cores() << " cores" << std::endl;
          count = max_cores();
       }
 
    __core_count = count;
    omp_set_num_threads(__core_count);
    get_CERR() << "OMP thread count set to " << __core_count << "("
-              << max_cores() << " cores)" << endl;
+              << max_cores() << " cores)" << std::endl;
    
    return count;
 }

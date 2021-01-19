@@ -36,8 +36,8 @@ public:
     virtual void transaction_commit();
     virtual void transaction_rollback();
 
-    virtual void fill_tables( vector<string> &tables );
-    virtual void fill_cols( const string &table, vector<ColumnDescriptor> &cols );
+    virtual void fill_tables( std::vector<string> &tables );
+    virtual void fill_cols( const string &table, std::vector<ColumnDescriptor> &cols );
     virtual const string make_positional_param( int pos );
 
     void raise_sqlite_error( const string &message );

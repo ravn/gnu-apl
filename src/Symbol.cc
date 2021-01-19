@@ -59,17 +59,17 @@ Symbol::Symbol(const UCS_string & ucs, Id id)
    push();
 }
 //-----------------------------------------------------------------------------
-ostream &
-Symbol::print(ostream & out) const
+std::ostream &
+Symbol::print(std::ostream & out) const
 {
    return out << name;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Symbol::print_verbose(ostream & out) const
+std::ostream &
+Symbol::print_verbose(std::ostream & out) const
 {
    out << "Symbol ";
-   print(out) << " " << voidP(this) << endl;
+   print(out) << " " << voidP(this) << std::endl;
 
    loop(v, value_stack.size())
        {
@@ -78,23 +78,23 @@ Symbol::print_verbose(ostream & out) const
          switch(item.name_class)
             {
               case NC_INVALID:
-                   out << "---INVALID---" << endl;
+                   out << "---INVALID---" << std::endl;
                    break;
 
               case NC_UNUSED_USER_NAME:
-                   out << "Unused user defined name" << endl;
+                   out << "Unused user defined name" << std::endl;
                    break;
 
               case NC_LABEL:
-                   out << "Label line " << item.sym_val.label << endl;
+                   out << "Label line " << item.sym_val.label << std::endl;
                    break;
 
               case NC_VARIABLE:
                    {
                       Value_P val = item.apl_val;
-                      out << "Variable at " << voidP(val.get()) << endl;
+                      out << "Variable at " << voidP(val.get()) << std::endl;
                       val->print_properties(out, 8, false);
-                      out << endl;
+                      out << std::endl;
                    }
                    break;
 
@@ -105,10 +105,10 @@ Symbol::print_verbose(ostream & out) const
                      Assert(fun);
 
                      fun->print_properties(out, 4);
-                     out << "    ⎕NC:            " << item.name_class << endl
-                         << "    addr:           " << voidP(fun) << endl;
+                     out << "    ⎕NC:            " << item.name_class << std::endl
+                         << "    addr:           " << voidP(fun) << std::endl;
 
-                     out << endl;
+                     out << std::endl;
                    }
                    break;
 
@@ -127,7 +127,7 @@ Symbol::assign(Value_P new_value, bool clone, const char * loc)
 
    if (!new_value->is_complete())
       {
-        CERR << "Incomplete value at " LOC << endl;
+        CERR << "Incomplete value at " LOC << std::endl;
         new_value->print_properties(CERR, 0, false);
         VH_entry::print_history(CERR, new_value.get(), LOC);
         Assert(0);
@@ -391,7 +391,7 @@ Symbol::pop()
 {
    if (value_stack.size() == 0)
       {
-        CERR << "Symbol is: '" << get_name() << "' at " << LOC << endl;
+        CERR << "Symbol is: '" << get_name() << "' at " << LOC << std::endl;
         FIXME;
       }
 
@@ -405,7 +405,7 @@ const ValueStackItem & vs = value_stack.back();
              CERR << "-pop-value " << name
                   << " flags " << ret->get_flags() << " ";
              if (value_stack.size() == 0)   CERR << " (last)";
-             CERR << " addr " << voidP(ret.get()) << endl;
+             CERR << " addr " << voidP(ret.get()) << std::endl;
            }
 
         value_stack.pop_back();
@@ -418,7 +418,7 @@ const ValueStackItem & vs = value_stack.back();
              CERR << "-pop " << name
                   << " name_class " << vs.name_class << " ";
              if (value_stack.size() == 0)   CERR << " (last)";
-             CERR << endl;
+             CERR << std::endl;
            }
         value_stack.pop_back();
         if (monitor_callback)   monitor_callback(*this, SEV_POPED);
@@ -432,7 +432,7 @@ Symbol::push()
       {
         CERR << "+push " << name;
         if (value_stack.size() == 0)   CERR << " (initial)";
-        CERR << endl;
+        CERR << std::endl;
       }
 
    value_stack.push_back(ValueStackItem());
@@ -446,7 +446,7 @@ Symbol::push_label(Function_Line label)
       {
         CERR << "+push_label " << name;
         if (value_stack.size() == 0)   CERR << " (initial)";
-        CERR << endl;
+        CERR << std::endl;
       }
 
    value_stack.push_back(ValueStackItem(label));
@@ -460,7 +460,7 @@ Symbol::push_function(Function_P function)
       {
         CERR << "+push_function " << name << " " << voidP(function);
         if (value_stack.size() == 0)   CERR << " (initial)";
-        CERR << endl;
+        CERR << std::endl;
       }
 
 ValueStackItem vs;
@@ -484,7 +484,7 @@ ValueStackItem vs;
         CERR << "+push-value " << name << " flags ";
         print_flags(CERR, get_value()->get_flags()) << " ";
         if (value_stack.size() == 0)   CERR << " (initial)";
-        CERR << " addr " << voidP(get_value().get()) << endl;
+        CERR << " addr " << voidP(get_value().get()) << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -701,7 +701,7 @@ void
 Symbol::resolve(Token & tok, bool left_sym)
 {
    Log(LOG_SYMBOL_resolve)
-      CERR << "resolve(" << left_sym << ") symbol " << get_name() << endl; 
+      CERR << "resolve(" << left_sym << ") symbol " << get_name() << std::endl; 
 
    Assert1(value_stack.size());
 
@@ -750,7 +750,7 @@ const ValueStackItem & vs = value_stack.back();
              return;
 
         default:
-             CERR << "Symbol is '" << get_name() << "' at " << LOC << endl;
+             CERR << "Symbol is '" << get_name() << "' at " << LOC << std::endl;
              SYNTAX_ERROR;
       }
 }
@@ -759,7 +759,7 @@ Token
 Symbol::resolve_lv(const char * loc)
 {
    Log(LOG_SYMBOL_resolve)
-      CERR << "resolve_lv() symbol " << get_name() << endl; 
+      CERR << "resolve_lv() symbol " << get_name() << std::endl; 
 
    Assert(value_stack.size());
 
@@ -768,8 +768,8 @@ Symbol::resolve_lv(const char * loc)
       {
         CERR << "Symbol '" << get_name()
              << "' has changed type from variable to name class "
-             << value_stack.back().name_class << endl
-             << " while executing an assignment" << endl;
+             << value_stack.back().name_class << std::endl
+             << " while executing an assignment" << std::endl;
         throw_apl_error(E_LEFT_SYNTAX_ERROR, loc);
       }
 
@@ -844,7 +844,7 @@ ValueStackItem & vs = value_stack.back();
                   // but merely remember it for deletion later on.
                   //
                   // CERR << "⎕EX function " << ufun->get_name()
-                  //      << " is on SI !" << endl;
+                  //      << " is on SI !" << std::endl;
                   Workspace::add_expunged_function(ufun);
                 }
              else
@@ -942,8 +942,8 @@ const bool can_set = (vs.name_class == NC_FUNCTION) ||
    else       vs.name_class = NC_UNUSED_USER_NAME;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Symbol::list(ostream & out)
+std::ostream &
+Symbol::list(std::ostream & out)
 {
    out << "   ";
    loop(s, name.size())   out << name[s];
@@ -961,7 +961,7 @@ const NameClass nc = value_stack.back().name_class;
    else if (nc == NC_OPERATOR)           out << "   Operator";
    else                                  out << "   !!! Error !!!";
 
-   return out << endl;
+   return out << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -1059,7 +1059,7 @@ Symbol::unmark_all_values() const
 }
 //-----------------------------------------------------------------------------
 int
-Symbol::show_owners(ostream & out, const Value & value) const
+Symbol::show_owners(std::ostream & out, const Value & value) const
 {
 int count = 0;
 
@@ -1072,7 +1072,7 @@ int count = 0;
                    if (Value::is_or_contains(item.apl_val.get(), value))
                       {
                          out << "    Variable[vs=" << v << "] "
-                            << get_name() << endl;
+                            << get_name() << std::endl;
                          ++count;
                       }
                    break;
@@ -1129,7 +1129,7 @@ const Cell * cV = &values->get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 void
-Symbol::dump(ostream & out) const
+Symbol::dump(std::ostream & out) const
 {
 const ValueStackItem & vs = value_stack[0];
    if (vs.name_class == NC_VARIABLE)
@@ -1139,18 +1139,18 @@ const ValueStackItem & vs = value_stack[0];
         Quad_CR::do_CR10_variable(CR10, get_name(), value);
 
         if (value.is_member())
-           out << "⍝ structured variable " << get_name() << endl;
+           out << "⍝ structured variable " << get_name() << std::endl;
 
         loop(l, CR10.size())
            {
              if (l || value.is_member())   out << "  ";
-             out << CR10[l] << endl;
+             out << CR10[l] << std::endl;
            }
 
         if (value.is_member())
-           out << "⍝ end of structured variable " << get_name() << endl;
+           out << "⍝ end of structured variable " << get_name() << std::endl;
 
-        out << endl;
+        out << std::endl;
       }
    else if (vs.name_class == NC_FUNCTION ||
             vs.name_class == NC_OPERATOR)
@@ -1159,7 +1159,7 @@ const ValueStackItem & vs = value_stack[0];
         if (fun == 0)
            {
              out << "⍝ function " << get_name() << " has function pointer 0!"
-                 << endl << endl;
+                 << std::endl << std::endl;
              return;
            }
 
@@ -1167,7 +1167,7 @@ const ValueStackItem & vs = value_stack[0];
         if (ufun == 0)
            {
              out << "⍝ function " << get_name() << " has ufun1 pointer 0!"
-                 << endl << endl;
+                 << std::endl << std::endl;
              return;
            }
 
@@ -1205,7 +1205,7 @@ const ValueStackItem & vs = value_stack[0];
                  {
                    out << ";" << ufun->get_local_var(l)->get_name();
                  }
-             out << UNI_R_CURLY << endl;
+             out << UNI_R_CURLY << std::endl;
            }
         else
            {
@@ -1217,12 +1217,12 @@ const ValueStackItem & vs = value_stack[0];
                   UCS_string & line = lines[l];
                   line.remove_leading_and_trailing_whitespaces();
                   if (l)   out << " ";
-                  out << line << endl;
+                  out << line << std::endl;
                 }
 
              if (ufun->get_exec_properties()[0])   out << "⍫";
              else                                  out << "∇";
-             out << endl << endl;
+             out << std::endl << std::endl;
            }
       }
 }
@@ -1290,8 +1290,8 @@ ValueStackItem & tos = value_stack[0];
       }
 }
 //-----------------------------------------------------------------------------
-ostream &
-operator <<(ostream & out, const Symbol & sym)
+std::ostream &
+operator <<(std::ostream & out, const Symbol & sym)
 {
    return sym.print(out);
 }
@@ -1318,7 +1318,7 @@ const bool ws_to_ws = Svar_DB::is_ws_to_ws(get_SV_key());
               if (w)
                  {
                    Log(LOG_shared_variables)
-                      CERR << " - OK." << endl;
+                      CERR << " - OK." << std::endl;
                  }
               break;
             }
@@ -1370,7 +1370,7 @@ const Signal_base * response =
 
    if (response == 0)
       {
-        cerr << "TIMEOUT on signal ASSIGN_VALUE" << endl;
+        cerr << "TIMEOUT on signal ASSIGN_VALUE" << std::endl;
         if (del)   delete del;
         VALUE_ERROR;
       }
@@ -1384,7 +1384,7 @@ const ErrorCode ec = ErrorCode(response->get__SVAR_ASSIGNED__error());
              cerr << Error::error_name(ec) << " assigning "
                   << get_name() << ", detected at "
                   << response->get__SVAR_ASSIGNED__error_loc()
-                  << endl;
+                  << std::endl;
            }
 
         delete response;
@@ -1409,7 +1409,7 @@ const bool ws_to_ws = Svar_DB::is_ws_to_ws(get_SV_key());
             {
               if (w)
                  {
-                   Log(LOG_shared_variables)   cerr << " - OK." << endl;
+                   Log(LOG_shared_variables)   cerr << " - OK." << std::endl;
                  }
               break;
             }
@@ -1453,7 +1453,7 @@ const TCP_socket tcp = Svar_DB::get_DB_tcp();
         if (response == 0)
            {
              if (del)   delete del;
-             CERR << "no response to signal READ_WSWS_VAR" << endl;
+             CERR << "no response to signal READ_WSWS_VAR" << std::endl;
              VALUE_ERROR;
            }
 
@@ -1462,7 +1462,7 @@ const TCP_socket tcp = Svar_DB::get_DB_tcp();
            {
              delete response;
              if (del)   delete del;
-             CERR << "no data in signal WSWS_VALUE_IS" << endl;
+             CERR << "no data in signal WSWS_VALUE_IS" << std::endl;
              VALUE_ERROR;
            }
 
@@ -1489,7 +1489,7 @@ const Signal_base * response =
 
    if (response == 0)
       {
-        CERR << "TIMEOUT on signal GET_VALUE" << endl;
+        CERR << "TIMEOUT on signal GET_VALUE" << std::endl;
         VALUE_ERROR;
       }
 
@@ -1500,7 +1500,7 @@ const ErrorCode err(ErrorCode(response->get__VALUE_IS__error()));
            {
              cerr << Error::error_name(err) << " referencing "
                   << get_name() << ", detected at "
-                  << response->get__VALUE_IS__error_loc() << endl;
+                  << response->get__VALUE_IS__error_loc() << std::endl;
            }
 
         string eloc = response->get__VALUE_IS__error_loc();

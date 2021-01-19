@@ -85,7 +85,7 @@ static void enable_trace( NetworkConnection &conn, Symbol *symbol, int cr_level 
     data->add_listener( &conn, cr_level );
 
     stringstream out;
-    out << "enabled" << endl;
+    out << "enabled" << std::endl;
     Value_P v = symbol->get_value();
     TraceData::display_value_for_trace( out, v, cr_level );
     conn.send_reply( out.str() );

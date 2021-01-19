@@ -59,10 +59,10 @@ Nabla::Nabla(const UCS_string & cmd)
 void
 Nabla::throw_edit_error(const char * why)
 {
-   COUT << "DEFN ERROR+" << endl
-        << "      " << first_command << endl
+   COUT << "DEFN ERROR+" << std::endl
+        << "      " << first_command << std::endl
         << "      " << UCS_string(first_command.size() - 1, UNI_SPACE)
-        << "^" << endl;
+        << "^" << std::endl;
 
    if (Workspace::more_error().size() == 0)
       {
@@ -81,7 +81,7 @@ const char * error = start();
         Log(LOG_verbose_error)   if (Workspace::more_error().size() == 0)
            {
              UERR << "Bad ∇-open '" << first_command
-                  << "' : '" << error << "'" << endl;
+                  << "' : '" << error << "'" << std::endl;
            }
         throw_edit_error(error);
       }
@@ -89,7 +89,7 @@ const char * error = start();
    // editor loop
    //
 int control_D_count = 0;
-   Log(LOG_nabla)   UERR << "Nabla(" << fun_header << ")..." << endl;
+   Log(LOG_nabla)   UERR << "Nabla(" << fun_header << ")..." << std::endl;
 try_again:
    while (!do_close)
        {
@@ -112,30 +112,30 @@ try_again:
               ++control_D_count;
               if (control_D_count < 5)
                  {
-                    COUT << "^D" << endl;
+                    COUT << "^D" << std::endl;
                     continue;
                  }
-               COUT << endl << "      *** end of input" << endl;
+               COUT << std::endl << "      *** end of input" << std::endl;
                Command::cmd_OFF(5);
             }
 
          if (const char * loc = parse_oper(line, false))
             {
-              UERR << "??? " << loc << endl;
+              UERR << "??? " << loc << std::endl;
               continue;
             }
 
          if (const char * loc = execute_oper())
             {
-              UERR << "∇-command failed: " << loc << endl;
+              UERR << "∇-command failed: " << loc << std::endl;
               Output::set_color_mode(Output::COLM_INPUT);
             }
        }
 
    Log(LOG_nabla)
       {
-        UERR << "done: '" << fun_header << "'" << endl;
-        loop(l, lines.size())   UERR << lines[l].text << endl;
+        UERR << "done: '" << fun_header << "'" << std::endl;
+        loop(l, lines.size())   UERR << lines[l].text << std::endl;
       }
 
 UCS_string fun_text;
@@ -195,7 +195,7 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
              // the ∇-editor runs from a script, therefore warning the user
              // interactively and asking to fix the fault makles no sense. We
              // therefore exit with DEFN_ERROR, so that the scrip does not hang
-             // in a endless try again loop.
+             // in a std::endless try again loop.
              //
              UTF8_string more_utf8(MORE_ERROR());
              throw_edit_error(more_utf8.c_str());
@@ -357,13 +357,13 @@ UserFunction_header hdr(fun_header, false);
       {
         if (ecmd != ECMD_SHOW)   return "illegal command between ∇ ... ∇";
         if (const char * loc = execute_oper())
-           UERR << "execute_oper() failed at " << loc << endl;
+           UERR << "execute_oper() failed at " << loc << std::endl;
         do_close = true;
         return 0;
       }
 
    if (const char * loc = execute_oper())
-      UERR << "execute_oper() failed at " << loc << endl;
+      UERR << "execute_oper() failed at " << loc << std::endl;
 
    return 0;   // no error
 }
@@ -372,7 +372,7 @@ const char *
 Nabla::parse_oper(UCS_string & oper, bool initial)
 {
    Log(LOG_nabla)
-      UERR << "parsing oper '" << oper << "'" << endl;
+      UERR << "parsing oper '" << oper << "'" << std::endl;
 
    // skip trailing spaces
    //
@@ -452,7 +452,7 @@ command_loop:
         case UNI_RIGHT_ARROW:   ecmd = ECMD_ESCAPE;   c.next();   break;
         case Invalid_Unicode:   return "Bad ∇-command";
 
-        default: UERR << "Bad edit op '" << c.get() << "'" << endl;
+        default: UERR << "Bad edit op '" << c.get() << "'" << std::endl;
                  return "Bad ∇-command";
       }
 
@@ -592,7 +592,7 @@ Nabla::open_new_function()
 {
    Log(LOG_nabla)
       UERR << "creating new function '" << fun_symbol->get_name() 
-           << "' with header '" << fun_header << "'" << endl;
+           << "' with header '" << fun_header << "'" << std::endl;
 
    lines.push_back(FunLine(0, fun_header));
    return 0;
@@ -603,7 +603,7 @@ Nabla::open_existing_function()
 {
    Log(LOG_nabla)
       UERR << "opening existing function '" << fun_symbol->get_name()
-           << "'" << endl;
+           << "'" << std::endl;
 
    if (const char * why = fun_symbol->cant_be_defined())   return why;
 
@@ -632,7 +632,7 @@ const UserFunction * ufun = function->get_ufun1();
       return "function is not editable at " LOC;
 
 const UCS_string ftxt = function->canonical(false);
-   Log(LOG_nabla)   UERR << "existing function is:\n" << ftxt << endl;
+   Log(LOG_nabla)   UERR << "existing function is:\n" << ftxt << std::endl;
 
 UCS_string_vector tlines;
    ftxt.to_vector(tlines);
@@ -677,7 +677,7 @@ Nabla::execute_oper()
    if (ecmd == ECMD_NOP)
       {
         Log(LOG_nabla)
-           UERR << "Nabla::execute_oper(NOP)" << endl;
+           UERR << "Nabla::execute_oper(NOP)" << std::endl;
         return 0;
       }
 
@@ -696,7 +696,7 @@ const bool have_to = edit_to.ln_major != -1;
    if (ecmd == ECMD_ESCAPE)   return execute_escape();
 
    UERR << "edit command " << ecmd
-        << " from " << edit_from << " to " << edit_to << endl;
+        << " from " << edit_from << " to " << edit_to << std::endl;
    FIXME;
 
    return LOC;
@@ -707,7 +707,7 @@ Nabla::execute_show()
 {
    Log(LOG_nabla)
       UERR << "Nabla::execute_oper(SHOW) from " << edit_from
-           << " to " << edit_to << " line-count " << lines.size() << endl;
+           << " to " << edit_to << " line-count " << lines.size() << std::endl;
 
 int idx_from = find_line(edit_from);
 int idx_to   = find_line(edit_to);
@@ -719,13 +719,13 @@ const LineLabel user_edit_to = edit_to;
 
    Log(LOG_nabla)
       UERR << "Nabla::execute_oper(SHOW) from "
-           << edit_from << " to " << edit_to << endl;
+           << edit_from << " to " << edit_to << std::endl;
 
    if (idx_from == 0)                     // then print header line
-      COUT << "    ∇" << endl;
+      COUT << "    ∇" << std::endl;
    for (int e = idx_from; e <= idx_to; ++e)   lines[e].print(COUT);
    if (idx_to == int(lines.size() - 1))   // then print last line
-      COUT << "    ∇" << endl;
+      COUT << "    ∇" << std::endl;
 
    if (user_edit_to.valid())   // eg. [⎕42] or [2⎕42]
       {
@@ -748,7 +748,7 @@ const LineLabel user_edit_to = edit_to;
 
    Log(LOG_nabla)
       UERR << "Nabla::execute_oper(SHOW) done with current_line '"
-           << current_line << "'" << endl;
+           << current_line << "'" << std::endl;
 
    return 0;
 }
@@ -808,7 +808,7 @@ UserFunction_header header(current_text, false);
    if (header.get_error() != E_NO_ERROR)
       {
         CERR << "BAD FUNCTION HEADER";
-        COUT << endl;
+        COUT << std::endl;
         return 0;
       }
 
@@ -831,7 +831,7 @@ const UCS_string & new_name = header.get_name();
         if (sym->get_nc() != NC_UNUSED_USER_NAME)
            {
              CERR << "BAD FUNCTION HEADER";
-             COUT << endl;
+             COUT << std::endl;
              return 0;
            }
       }
@@ -864,9 +864,9 @@ ErrorCode ec = parser.parse(current_text, in);
         CERR << "SYNTAX ERROR";
         if (Workspace::more_error().size())
            {
-             CERR << "+" << endl << Workspace::more_error();
+             CERR << "+" << std::endl << Workspace::more_error();
            }
-        COUT << endl;
+        COUT << std::endl;
         return 0;
       }
 
@@ -937,18 +937,18 @@ Nabla::find_line(const LineLabel & lab) const
 }
 //-----------------------------------------------------------------------------
 void
-Nabla::FunLine::print(ostream & out) const
+Nabla::FunLine::print(std::ostream & out) const
 {
    label.print(out);
 
    // print a space unless text is a label or a comment
    //
    if (!text.is_comment_or_label())   out << " ";
-   out << text << endl;
+   out << text << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-LineLabel::print(ostream & out) const
+LineLabel::print(std::ostream & out) const
 {
 UCS_string ucs("[");
    ucs.append_number(ln_major);
@@ -1015,8 +1015,8 @@ LineLabel::operator <(const LineLabel & other) const
  return  ln_minor.compare(other.ln_minor) < 0;
 }
 //-----------------------------------------------------------------------------
-ostream &
-operator <<(ostream & out, const LineLabel & lab)
+std::ostream &
+operator <<(std::ostream & out, const LineLabel & lab)
 {
    lab.print(out);
    return out;

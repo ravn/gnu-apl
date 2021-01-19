@@ -88,7 +88,7 @@ std::string TcpListener::start( void )
 
     if( listen( server_socket, 2 ) == -1 ) {
         stringstream errmsg;
-        errmsg << "Error calling accept: " << strerror( errno ) << endl;
+        errmsg << "Error calling accept: " << strerror( errno ) << std::endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
@@ -98,7 +98,7 @@ std::string TcpListener::start( void )
     socklen_t listen_address_len = sizeof( listen_address );
     if( getsockname( server_socket, (struct sockaddr *)&listen_address, &listen_address_len ) == -1 ) {
         stringstream errmsg;
-        errmsg << "Error getting port number of socket: " << strerror( errno ) << endl;
+        errmsg << "Error getting port number of socket: " << strerror( errno ) << std::endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
@@ -118,7 +118,7 @@ void TcpListener::wait_for_connection( void )
         int socket = accept( server_socket, &addr, &length );
         if( socket == -1 ) {
             if( !closing ) {
-                CERR << "Error accepting network connection: " << strerror( errno ) << endl;
+                CERR << "Error accepting network connection: " << strerror( errno ) << std::endl;
             }
             break;
         }
@@ -127,7 +127,7 @@ void TcpListener::wait_for_connection( void )
             pthread_t thread_id;
             int ret = pthread_create( &thread_id, NULL, connection_loop, conn );
             if( ret != 0 ) {
-                CERR << "Error creating thread" << endl;
+                CERR << "Error creating thread" << std::endl;
                 delete conn;
             }
         }

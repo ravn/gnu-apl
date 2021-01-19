@@ -31,15 +31,15 @@ Macro::Macro(Macro_num num, const char * text)
                   false, true),
      macro_number(num)
 {
-// CERR << "MACRO: " << endl << text;
+// CERR << "MACRO: " << std::endl << text;
 
    all_macros[macro_number] = this;
 
    if (error_info || (error_line != -1))   // something went wrong
       {
-        CERR << endl << "*** Fatal error in macro #" << macro_number << endl;
-        if (error_info)         CERR << "error_info: " << error_info << endl;
-        if (error_line != -1)   CERR << "error_line: " << error_line << endl;
+        CERR << std::endl << "*** Fatal error in macro #" << macro_number << std::endl;
+        if (error_info)         CERR << "error_info: " << error_info << std::endl;
+        if (error_line != -1)   CERR << "error_line: " << error_line << std::endl;
         exit(1);
       }
 }

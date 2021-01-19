@@ -257,8 +257,8 @@ const Cell * cell_B = cells + B * comp_len;
    return A > B;
 }
 //-----------------------------------------------------------------------------
-ostream &
-operator <<(ostream & out, const Cell & cell)
+std::ostream &
+operator <<(std::ostream & out, const Cell & cell)
 {
 PrintBuffer pb = cell.character_representation(PR_BOXED_GRAPHIC);
 UCS_string ucs(pb, 0, Workspace::get_PW());

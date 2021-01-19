@@ -46,52 +46,52 @@ const char more = Workspace::more_error().size() ? '+' : 0;
 }
 //-----------------------------------------------------------------------------
 void
-Error::print(ostream & out, const char * loc) const
+Error::print(std::ostream & out, const char * loc) const
 {
    if (print_loc)
       {
-        CERR << endl << "*** Error printed twice; first printed at "
-             << print_loc << endl
-             << "now printed at " << loc << endl;
+        CERR << std::endl << "*** Error printed twice; first printed at "
+             << print_loc << std::endl
+             << "now printed at " << loc << std::endl;
 
         return;
       }
 
    Log(LOG_verbose_error)
       {
-        out << endl
-            << "--------------------------" << endl;
+        out << std::endl
+            << "--------------------------" << std::endl;
 
         if (error_code == E_NO_ERROR)
            {
-             out << error_name(E_NO_ERROR) << endl
-                 << "--------------------------" << endl;
+             out << error_name(E_NO_ERROR) << std::endl
+                 << "--------------------------" << std::endl;
 
              return;
            }
 
         if (*error_message_1)
            {
-             out << error_message_1 << endl;
+             out << error_message_1 << std::endl;
            }
         else
            {
              out << error_name(error_code);
              if (Workspace::more_error().size())   out << UNI_PLUS;
-             out << endl;
+             out << std::endl;
            }
 
-        if (parser_loc)   out << "   Parser LOC: " << parser_loc  << endl;
-        if (print_loc)    out << "   Print LOC:  " << print_loc   << endl;
-        out                   << "   loc:        " << loc         << endl;
+        if (parser_loc)   out << "   Parser LOC: " << parser_loc  << std::endl;
+        if (print_loc)    out << "   Print LOC:  " << print_loc   << std::endl;
+        out                   << "   loc:        " << loc         << std::endl;
         loc = print_loc;
 
         if (*symbol_name)
-           out                << "   Symbol:     " << symbol_name << endl;
+           out                << "   Symbol:     " << symbol_name << std::endl;
 
-        out <<                   "   Thrown at:  " << throw_loc   << endl
-            <<                   "--------------------------"     << endl
-                                                                  << endl;
+        out <<                   "   Thrown at:  " << throw_loc   << std::endl
+            <<                   "--------------------------"     << std::endl
+                                                                  << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -161,22 +161,22 @@ const int diff = right_caret - left_caret;
 }
 //-----------------------------------------------------------------------------
 void
-Error::print_em(ostream & out, const char * loc)
+Error::print_em(std::ostream & out, const char * loc)
 {
    if (print_loc)
       {
-        CERR << endl << "*** Error printed twice; first printed at "
-             << print_loc << endl
-             << "now printed from " << loc << endl;
+        CERR << std::endl << "*** Error printed twice; first printed at "
+             << print_loc << std::endl
+             << "now printed from " << loc << std::endl;
 
         return;
       }
 
    print_loc = loc;
-   if (*get_error_line_1())   out << get_error_line_1() << endl;
+   if (*get_error_line_1())   out << get_error_line_1() << std::endl;
 
-   out << get_error_line_2() << endl
-       << get_error_line_3() << endl;
+   out << get_error_line_2() << std::endl
+       << get_error_line_3() << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -188,9 +188,9 @@ StateIndicator * si = Workspace::SI_top();
 
    Log(LOG_error_throw)
       {
-        CERR << endl
+        CERR << std::endl
              << "throwing " << Error::error_name(code)
-             << " at " << loc << endl;
+             << " at " << loc << std::endl;
       }
 
    Log(LOG_verbose_error)
@@ -218,8 +218,8 @@ void
 Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
 {
    Log(LOG_error_throw)
-      CERR << endl
-           << "throwing " << Error::error_name(code) << " at " << loc << endl;
+      CERR << std::endl
+           << "throwing " << Error::error_name(code) << " at " << loc << std::endl;
 
    Log(LOG_verbose_error)   Backtrace::show(__FILE__, __LINE__);
 
@@ -242,7 +242,7 @@ Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
       {   
         CERR << "throwing VALUE ERROR at " << loc;
         if (sym_name.size())   CERR << " (symbol is: '" << sym_name << "')"; 
-        CERR << endl;
+        CERR << std::endl;
       }
 
    Log(LOG_verbose_error)     Backtrace::show(__FILE__, __LINE__);
@@ -264,7 +264,7 @@ Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
    Log(LOG_error_throw)   
       {   
         CERR << "throwing DEFN ERROR at " << loc
-             << " (function is " << fun_name << ")" << endl;
+             << " (function is " << fun_name << ")" << std::endl;
       }
 
    Log(LOG_verbose_error)     Backtrace::show(__FILE__, __LINE__);

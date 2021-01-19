@@ -76,7 +76,7 @@ Parallel::init(bool logit)
          if (result)
             {
               CERR << "pthread_create() failed at " << LOC
-                   << " : " << strerror(result) << endl;
+                   << " : " << strerror(result) << std::endl;
               Thread_context::set_active_core_count(CCNT_1);
               return;
             }
@@ -124,7 +124,7 @@ CPU_pool::change_core_count(CoreCount new_count, bool logit)
    // other places. It returns true on error.
    //
    Log(LOG_Parallel || logit)
-      get_CERR() << "change_core_count(" << new_count << ")" << endl;
+      get_CERR() << "change_core_count(" << new_count << ")" << std::endl;
 
    if (new_count < CCNT_0)                  return true;   // error
    if (new_count > CPU_pool::get_count())   return true;   // error
@@ -139,7 +139,7 @@ const CoreCount current_count = Thread_context::get_active_core_count();
            {
              CERR <<
                 "Parallel::change_core_count(): keeping current core count of "
-                  << Thread_context::get_active_core_count() << endl;
+                  << Thread_context::get_active_core_count() << std::endl;
              Thread_context::print_all(CERR);
            }
       }
@@ -148,7 +148,7 @@ const CoreCount current_count = Thread_context::get_active_core_count();
         Log(LOG_Parallel || logit)
            CERR << "Parallel::change_core_count(): increasing core count from "
                 << Thread_context::get_active_core_count()
-                << " to " << new_count << endl;
+                << " to " << new_count << std::endl;
 
         lock_pool(logit);
         Thread_context::set_active_core_count(new_count);
@@ -164,7 +164,7 @@ const CoreCount current_count = Thread_context::get_active_core_count();
         Log(LOG_Parallel || logit)
            CERR << "Parallel::change_core_count(): decreasing core count from "
                 << Thread_context::get_active_core_count()
-                << " to " << new_count << endl;
+                << " to " << new_count << std::endl;
         lock_pool(logit);
         Thread_context::set_active_core_count(new_count);
         unlock_pool(logit);
@@ -228,7 +228,7 @@ CoreCount count = CoreCount(CORE_COUNT_WANTED);
         CERR <<
         "The number of cores could not be detected because function\n"
         "pthread_getaffinity_np() is not provided by your platform.\n"
-        "Assuming a maximum of 64 cores." << endl;
+        "Assuming a maximum of 64 cores." << std::endl;
       }
 
    Parallel::run_parallel = true;
@@ -244,7 +244,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
    if (err)
       {
         CERR << "pthread_getaffinity_np() failed with error "
-             << err << endl;
+             << err << std::endl;
         add_CPU(CPU_0);
         return;
       }
@@ -277,7 +277,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
    if (get_count() == 0)
       {
         CERR << "*** no cores detected, assuming at least one! "
-             << err << endl;
+             << err << std::endl;
         add_CPU(CPU_0);
         return;
       }
@@ -294,7 +294,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
       {
         CERR << "detected " << get_count() << " cores:";
         loop(cc, get_count())   CERR << " #" << get_CPU(cc);
-        CERR << endl;
+        CERR << std::endl;
       }
 }
 
@@ -319,7 +319,7 @@ CPU_pool::lock_pool(bool logit)
    Log(LOG_Parallel || logit)
       {
         PRINT_LOCKED(
-            CERR << "Parallel::lock_pool() : pool state is now :" << endl; )
+            CERR << "Parallel::lock_pool() : pool state is now :" << std::endl; )
         Thread_context::print_all(CERR);
       }
 }
@@ -333,12 +333,12 @@ CPU_pool::unlock_pool(bool logit)
      {
         for (int a = 1; a < Thread_context::get_active_core_count(); ++a)
             {
-              PRINT_LOCKED(CERR << "Parallel::unlock_pool() : " << endl; )
+              PRINT_LOCKED(CERR << "Parallel::unlock_pool() : " << std::endl; )
               Thread_context * tc = Thread_context::get_context(CoreNumber(a));
               sem_post(&tc->pool_sema);
               PRINT_LOCKED(
               CERR << "    pool_sema of thread #" << a << " incremented."
-                   << endl;)
+                   << std::endl;)
             }
      }
    else
@@ -355,7 +355,7 @@ Thread_context & tctx = *reinterpret_cast<Thread_context *>(arg);
 
    Log(LOG_Parallel)
       {
-        PRINT_LOCKED(CERR << "worker #" << tctx.get_N() << " started" << endl)
+        PRINT_LOCKED(CERR << "worker #" << tctx.get_N() << " started" << std::endl)
       }
 
    // tell the creator that we have started
@@ -370,7 +370,7 @@ Thread_context & tctx = *reinterpret_cast<Thread_context *>(arg);
 
    Log(LOG_Parallel)
       PRINT_LOCKED(CERR << "thread #" << tctx.get_N()
-                        << " was unblocked (initially) from pool_sema" << endl)
+                        << " was unblocked (initially) from pool_sema" << std::endl)
 
    for (;;)
        {

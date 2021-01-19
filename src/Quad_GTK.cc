@@ -74,7 +74,7 @@ int fd = -1;
              fd = A->get_ravel(0).get_int_value();
              if (write_TL0(fd, 7))
                 {
-                  CERR << "write(Tag 7) failed in Ah ⎕GTK 3" << endl;
+                  CERR << "write(Tag 7) failed in Ah ⎕GTK 3" << std::endl;
                   return Token(TOK_APL_VALUE1, IntScalar(-3, LOC));
                 }
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
@@ -84,7 +84,7 @@ int fd = -1;
              fd = A->get_ravel(0).get_int_value();
              if (write_TL0(fd, 8))
                 {
-                  CERR << "write(Tag 8) failed in Ah ⎕GTK 4" << endl;
+                  CERR << "write(Tag 8) failed in Ah ⎕GTK 4" << std::endl;
                   return Token(TOK_APL_VALUE1, IntScalar(-4, LOC));
                 }
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
@@ -368,14 +368,14 @@ char * V = TLV + 8;
 
    if (tag == -1)   // not waiting for a specific tag
       {
-        CERR << "*** ⎕GTK: ignoring event: " << V << endl;
+        CERR << "*** ⎕GTK: ignoring event: " << V << std::endl;
         return Value_P();   // i.e. NULL
       }
 
    if (TLV_tag != tag)
       {
         CERR << "Got unexpected tag " << TLV_tag
-             << " when waiting for response " << tag << endl;
+             << " when waiting for response " << tag << std::endl;
         return Value_P();
       }
 
@@ -423,7 +423,7 @@ const int ready = poll(fds, count, 0);
    else
       {
         if (errno == EINTR)   return;   // user hits ^C
-        CERR << "*** poll() failed: " << strerror(errno) << endl;
+        CERR << "*** poll() failed: " << strerror(errno) << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -455,7 +455,7 @@ const int ready = poll(&pfd, 1, 0);
         return Z;
       }
 
-   CERR << "*** poll() failed" << endl;
+   CERR << "*** poll() failed" << std::endl;
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -580,8 +580,8 @@ const size_t tx_len = write(fd, TLV, 8);
     if (tx_len != 8)
        {
          CERR << "write(Tag = " << tag << ") failed in ⎕GTK::write_TL0()"
-              << endl << "   tx_len = " << tx_len << endl
-              << "   errno says: " << strerror(errno) << endl;
+              << std::endl << "   tx_len = " << tx_len << std::endl
+              << "   errno says: " << strerror(errno) << std::endl;
          return -1;
        }
 

@@ -196,7 +196,7 @@ protected:
    bool char_mode;
 
    /// functions saved so far
-   vector<const Function *> saved_Functions;
+   std::vector<const Function *> saved_Functions;
 
    /// return true iff (the definition of) \b fun was already saved.
    bool is_saved(const Function * fun) const;
@@ -213,7 +213,7 @@ class XML_Loading_Archive
 {
 public:
    /// constructor: remember file name and workspace
-   XML_Loading_Archive(ostream & _out, const char * _filename, int & dump_fd);
+   XML_Loading_Archive(std::ostream & _out, const char * _filename, int & dump_fd);
 
    /// destructor (unmap()s file).
    ~XML_Loading_Archive();
@@ -243,7 +243,7 @@ public:
 
 protected:
    /// where to send the "SAVED..." message
-   ostream & out;
+   std::ostream & out;
 
    /// a value ID in a )SAVEd workspace
    enum Vid { NO_VID = int(-1) };   ///< no (invalid) value ID
@@ -335,10 +335,10 @@ protected:
    bool more() const   { return data < file_end; }
 
    /// show some characters starting at the current position
-   void where(ostream & out);
+   void where(std::ostream & out);
 
    /// show attributes of current tag
-   void where_att(ostream & out);
+   void where_att(std::ostream & out);
 
    /// set \b current_char to next (UTF-8 encoded) char, return true if EOF
    bool get_uni();
@@ -350,7 +350,7 @@ protected:
    void expect_tag(const char * prefix, const char * loc) const;
 
    /// print current tag
-   void print_tag(ostream & out) const;
+   void print_tag(std::ostream & out) const;
 
    /// find attribute \b att_name and return a pointer to its value if found)
    const UTF8 * find_attr(const char * att_name, bool optional);
@@ -476,7 +476,7 @@ protected:
         const char * loc;     ///< where \b this was initialized
       };
 
-      vector<_derived_todo> derived_todos;
+      std::vector<_derived_todo> derived_todos;
 
    /// instantiate the derived functions in \b derived_todos
    void instantiate_derived_functions(bool allocate);

@@ -216,7 +216,7 @@ const ShapeItem rows = B->get_rows();
    // split string all_formats into individual format fields, one per column.
    // If there is only one format field, then repeat it cols times.
    //
-vector<UCS_string> col_formats;
+std::vector<UCS_string> col_formats;
    split_example_into_columns(all_formats, col_formats);
    if (col_formats. size() == 1)
       {
@@ -233,7 +233,7 @@ vector<UCS_string> col_formats;
 
    // convert each column format string into a Format_LIFER
    //
-vector<Format_LIFER> col_items;
+std::vector<Format_LIFER> col_items;
    loop(c, col_formats.size())
        col_items.push_back(Format_LIFER(col_formats[c]));
 
@@ -245,19 +245,19 @@ vector<Format_LIFER> col_items;
 
         loop(c, col_items.size())
             {
-              CERR << "At " LOC " in format_by_example()" << endl
+              CERR << "At " LOC " in format_by_example()" << std::endl
                    << "    col_items[c].left_deco:     '"
-                   << col_items[c].left_deco << "'"      << endl
+                   << col_items[c].left_deco << "'"      << std::endl
                    << "    col_items[c].int_part:      '"
-                   << col_items[c].int_part << "'"       << endl
+                   << col_items[c].int_part << "'"       << std::endl
                    << "    col_items[c].fract_part:    '"
-                   << col_items[c].fract_part << "'"     << endl
+                   << col_items[c].fract_part << "'"     << std::endl
                    << "    col_items[c].expo_deco:     '"
-                   << col_items[c].expo_deco << "'"      << endl
+                   << col_items[c].expo_deco << "'"      << std::endl
                    << "    col_items[c].expo_negative: "
-                   << col_items[c].expo_negative         << endl
+                   << col_items[c].expo_negative         << std::endl
                    << "    col_items[c].right_deco:    '"
-                   << col_items[c].right_deco << "'"     << endl;
+                   << col_items[c].right_deco << "'"     << std::endl;
             }
       }
 
@@ -304,7 +304,7 @@ Value_P Z(shape_Z, LOC);
 //-----------------------------------------------------------------------------
 void
 Bif_F12_FORMAT::split_example_into_columns(const UCS_string & all_formats,
-                                   vector<UCS_string> & col_formats)
+                                   std::vector<UCS_string> & col_formats)
 {
    // split string 'all_formats' into fields, where:
    //
@@ -669,8 +669,8 @@ int flt_cnt = 0;
    return flt_cnt;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Format_sub::print(ostream & out) const
+std::ostream &
+Format_sub::print(std::ostream & out) const
 {
    out << "format: '" << format << "',"
           " min: " << min_len << ", out_len " << out_len << ", flags: ";
@@ -786,12 +786,12 @@ const int ilen = int_end - &data_buf[0];
 
    Log(LOG_Bif_F12_FORMAT)
       {
-        CERR << "At " LOC " in Format_LIFER::fill_data_fields()" << endl
-             << "    format:     '" << format << "'"     << endl
-             << "    value:      "  << value             << endl
-             << "    data_int:   '" << data_int << "'"   << endl
-             << "    data_fract: '" << data_fract << "'" << endl
-             << "    data_expo:  '" << data_expo << "'"  << endl;
+        CERR << "At " LOC " in Format_LIFER::fill_data_fields()" << std::endl
+             << "    format:     '" << format << "'"     << std::endl
+             << "    value:      "  << value             << std::endl
+             << "    data_int:   '" << data_int << "'"   << std::endl
+             << "    data_fract: '" << data_fract << "'" << std::endl
+             << "    data_expo:  '" << data_expo << "'"  << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -856,7 +856,7 @@ size_t d = data.size();
          else
             {
               CERR << "Offending format char [" << f << "] : '"
-                   << format_char << "' at " << LOC << endl;
+                   << format_char << "' at " << LOC << std::endl;
               break;
             }
       }
@@ -893,7 +893,7 @@ int d = 0;
          else
             {
               CERR << "Offending format char [" << f << "] : '"
-                   << format_char << "' at " << LOC << endl;
+                   << format_char << "' at " << LOC << std::endl;
             }
       }
 
@@ -1185,8 +1185,8 @@ UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
    return ret;
 }
 //-----------------------------------------------------------------------------
-ostream &
-operator <<(ostream & out, const Format_sub & fmt)
+std::ostream &
+operator <<(std::ostream & out, const Format_sub & fmt)
 {
    return fmt.print(out);
 }

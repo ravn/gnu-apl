@@ -40,8 +40,6 @@
 #include "Backtrace.hh"
 #include "makefile.h"
 
-using namespace std;
-
 Backtrace::_lines_status 
        Backtrace::lines_status = Backtrace::LINES_not_checked;
 
@@ -101,11 +99,11 @@ const time_t apl_lines_time = st.st_mtime;
 # define Makefile__srcdir "src"
 #endif
         close(fd);
-        get_CERR() << endl
+        get_CERR() << std::endl
                    << "Cannot show line numbers, since apl.lines is older "
-                      "than apl." << endl
-                   << "Consider running 'make apl.lines' in directory " << endl
-                   << Makefile__srcdir " to fix this" << endl;
+                      "than apl." << std::endl
+                   << "Consider running 'make apl.lines' in directory " << std::endl
+                   << Makefile__srcdir " to fix this" << std::endl;
         return;
       }
 
@@ -162,7 +160,7 @@ int64_t prev_pc = -1LL;
 
    fclose(file);   // also closes fd
 
-   cerr << "read " << pc_2_src.size() << " line numbers" << endl;
+   cerr << "read " << pc_2_src.size() << " line numbers" << std::endl;
    lines_status = LINES_valid;
 }
 //-----------------------------------------------------------------------------
@@ -229,7 +227,7 @@ char obuf[200] = "@@@@";
 
        size_t obuflen = sizeof(obuf) - 1;
        int status = 0;
-//     cerr << "mangled fun is: " << fun << endl;
+//     cerr << "mangled fun is: " << fun << std::endl;
        __cxxabiv1::__cxa_demangle(fun, obuf, &obuflen, &status);
        switch(status)
           {
@@ -240,7 +238,7 @@ char obuf[200] = "@@@@";
                  break;
 
             default:
-                 cerr << "__cxa_demangle() returned " << status << endl;
+                 cerr << "__cxa_demangle() returned " << status << std::endl;
                  break;
           }
       }
@@ -259,7 +257,7 @@ char obuf[200] = "@@@@";
 // if (offs)   cerr << " +" << offs;
 
    if (src_loc)   cerr << " at " << src_loc;
-   cerr << endl;
+   cerr << std::endl;
 #endif
 }
 //-----------------------------------------------------------------------------
@@ -270,7 +268,7 @@ Backtrace::show(const char * file, int line)
    //
 #ifndef HAVE_EXECINFO_H
    cerr << "Cannot show function call stack since execinfo.h seems not"
-           " to exist on this OS (WINDOWs ?)." << endl;
+           " to exist on this OS (WINDOWs ?)." << std::endl;
    return;
 
 #else
@@ -282,22 +280,22 @@ const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
 
 char ** strings = backtrace_symbols(buffer, size);
 
-   cerr << endl
-        << "----------------------------------------"  << endl
-        << "-- Stack trace at " << file << ":" << line << endl
-        << "----------------------------------------"  << endl;
+   cerr << std::endl
+        << "----------------------------------------"  << std::endl
+        << "-- Stack trace at " << file << ":" << line << std::endl
+        << "----------------------------------------"  << std::endl;
 
    if (strings == 0)
       {
         cerr << "backtrace_symbols() failed. Using backtrace_symbols_fd()"
-                " instead..." << endl << endl;
+                " instead..." << std::endl << std::endl;
         // backtrace_symbols_fd(buffer, size, STDERR_FILENO);
         for (int b = size - 1; b > 0; --b)
             {
               for (int s = b + 1; s < size; ++s)   cerr << " ";
                   backtrace_symbols_fd(buffer + b, 1, STDERR_FILENO);
             }
-        cerr << "========================================" << endl;
+        cerr << "========================================" << std::endl;
         return;
       }
 
@@ -312,7 +310,7 @@ char ** strings = backtrace_symbols(buffer, size);
          cc[sizeof(cc) - 1] = 0;
          show_item(i - 1, cc);
        }
-   cerr << "========================================" << endl;
+   cerr << "========================================" << std::endl;
 
 #if 0
    // crashes at times
@@ -342,7 +340,7 @@ char * p = strchr(&tmp[0], '(');
    if (e == 0)   goto error;
    else *e = 0;
 
-// cerr << "mangled fun is: " << p << endl;
+// cerr << "mangled fun is: " << p << std::endl;
    __cxxabiv1::__cxa_demangle(p, result, &result_max, &status);
    if (status)   goto error;
    return 0;

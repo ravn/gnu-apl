@@ -113,13 +113,13 @@ public:
    void bind_to_cpu(CPU_Number cpu, bool logit);
 
    /// print all TaskTree nodes
-   static void print_all(ostream & out);
+   static void print_all(std::ostream & out);
 
    /// print all mileages nodes
-   static void print_mileages(ostream & out, const char * loc);
+   static void print_mileages(std::ostream & out, const char * loc);
 
    /// print this TaskTree node
-   void print(ostream & out) const;
+   void print(std::ostream & out) const;
 
    /// initialize all thread contexts (set all but N and thread)
    static void init_parallel(CoreCount thread_count, bool logit);

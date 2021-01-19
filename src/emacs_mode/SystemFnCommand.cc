@@ -33,7 +33,7 @@ void SystemFnCommand::run_command( NetworkConnection &conn, const std::vector<st
 #include "../Command.def"
 
     loop(i, Workspace::get_user_commands().size()) {
-        out << Workspace::get_user_commands()[i].prefix << endl;
+        out << Workspace::get_user_commands()[i].prefix << std::endl;
     }
 
     out << END_TAG << "\n";

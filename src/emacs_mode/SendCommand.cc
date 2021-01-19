@@ -51,9 +51,9 @@ static void write_string_to_fd( const string &line, int fd )
 }
 
 void SendCommand::run_command(NetworkConnection &conn,
-                              const vector<string> &args )
+                              const std::vector<string> &args )
 {
-    vector<string> content = conn.load_block();
+    std::vector<string> content = conn.load_block();
 
     if( args.size() > 3 ) {
         throw ConnectionError( "Illegal argument count" );
@@ -72,7 +72,7 @@ void SendCommand::run_command(NetworkConnection &conn,
     }
 
     TempFileWrapper fd( "/tmp/apl_content" );
-    for( vector<string>::iterator i = content.begin() ; i != content.end() ; i++ ) {
+    for( std::vector<string>::iterator i = content.begin() ; i != content.end() ; i++ ) {
         stringstream s;
         s << *i << "\n";
         write_string_to_fd( s.str(), fd.get_fd() );

@@ -45,17 +45,17 @@ IndexIterator::operator ++()
    // print(CERR);
 }
 //-----------------------------------------------------------------------------
-ostream &
-IndexIterator::print(ostream & out) const
+std::ostream &
+IndexIterator::print(std::ostream & out) const
 {
-   out << "Iterator "     << voidP(this) << ":"  << endl
-       << "   upper:       " << voidP(upper)     << endl
-       << "   value:       " << get_value()      << endl
+   out << "Iterator "     << voidP(this) << ":"  << std::endl
+       << "   upper:       " << voidP(upper)     << std::endl
+       << "   value:       " << get_value()      << std::endl
        << "   indices[" << get_index_count()     << "] :";
 
    loop(i, get_index_count())   out << " " << get_pos(i);
 
-   return out << endl;
+   return out << std::endl;
 }
 //=============================================================================
 TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
@@ -63,7 +63,7 @@ TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
    : IndexIterator(w, value->element_count())
 {
 // CERR << "TrueIndexIterator(w=" << w << ", value=" << *value
-//      << ", max=" << max_idx << ")" << endl;
+//      << ", max=" << max_idx << ")" << std::endl;
 
    indices = new ShapeItem[count];
    loop(v, count)
@@ -128,7 +128,7 @@ ShapeItem weight = 1;
             }
 
          Log(LOG_delete)
-            CERR << "new    " << voidP(new_it) << " at " LOC << endl;
+            CERR << "new    " << voidP(new_it) << " at " LOC << std::endl;
 
          if (highest_it)   highest_it->set_upper(new_it);
          else              lowest_it = new_it;
@@ -146,7 +146,7 @@ MultiIndexIterator::~MultiIndexIterator()
          it = it->get_upper();
          Log(LOG_delete)
             CERR << "delete " HEX(uint64_t(del))
-                 << " at " LOC << endl;
+                 << " at " LOC << std::endl;
          delete del;
        }
 }

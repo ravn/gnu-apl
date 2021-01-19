@@ -63,7 +63,7 @@ void
 SystemVariable::assign(Value_P value, bool clone, const char * loc)
 {
    CERR << "SystemVariable::assign() not (yet) implemented for "
-        << get_Id() << endl;
+        << get_Id() << std::endl;
    FIXME;
 }
 //-----------------------------------------------------------------------------
@@ -71,12 +71,12 @@ void
 SystemVariable::assign_indexed(Value_P X, Value_P value)
 {
    CERR << "SystemVariable::assign_indexed() not (yet) implemented for "
-        << get_Id() << endl;
+        << get_Id() << std::endl;
    FIXME;
 }
 //-----------------------------------------------------------------------------
-ostream &
-SystemVariable::print(ostream & out) const
+std::ostream &
+SystemVariable::print(std::ostream & out) const
 {
    return out << get_Id();
 }
@@ -720,7 +720,7 @@ Quad_Quad::resolve(Token & token, bool left)
    // write pending LF from  ⍞ (if any)
    Quad_QUOTE::done(true, LOC);
 
-   COUT << UNI_Quad_Quad << ":" << endl;
+   COUT << UNI_Quad_Quad << ":" << std::endl;
 
 bool eof = false;
 UCS_string line;
@@ -747,11 +747,11 @@ Quad_QUOTE::done(bool with_LF, const char * loc)
 {
    Log(LOG_cork)
       CERR << "Quad_QUOTE::done(" << with_LF << ") called from " << loc
-           << " , buffer = [" << prompt << "]" << endl;
+           << " , buffer = [" << prompt << "]" << std::endl;
 
    if (prompt.size())
       {
-        if (with_LF)   COUT << endl;
+        if (with_LF)   COUT << std::endl;
         prompt.clear();
       }
 }
@@ -761,7 +761,7 @@ Quad_QUOTE::assign(Value_P value, bool clone, const char * loc)
 {
    Log(LOG_cork)
       CERR << "Quad_QUOTE::assign() called, buffer = ["
-           << prompt << "]" << endl;
+           << prompt << "]" << std::endl;
 
 PrintContext pctx(PR_QUOTE_Quad);
 PrintBuffer pb(*value, pctx, 0);
@@ -788,7 +788,7 @@ PrintBuffer pb(*value, pctx, 0);
 
    Log(LOG_cork)
       CERR << "Quad_QUOTE::assign() done, buffer = ["
-           << prompt << "]" << endl;
+           << prompt << "]" << std::endl;
 }
 //-----------------------------------------------------------------------------
 Value_P
@@ -796,7 +796,7 @@ Quad_QUOTE::get_apl_value() const
 {
    Log(LOG_cork)
       CERR << "Quad_QUOTE::get_apl_value() called, buffer = ["
-           << prompt << "]" << endl;
+           << prompt << "]" << std::endl;
 
    // get_quad_cr_line() may call done(), so we save the current prompt.
    //
@@ -1069,8 +1069,8 @@ int diff_minutes = local_minutes - gm_minutes;
    return 60*diff_minutes;
 }
 //-----------------------------------------------------------------------------
-ostream &
-Quad_TZ::print_timestamp(ostream & out, APL_time_us when) const
+std::ostream &
+Quad_TZ::print_timestamp(std::ostream & out, APL_time_us when) const
 {
 const APL_time_us offset = get_offset();
 const YMDhmsu time(when + 1000000*offset);

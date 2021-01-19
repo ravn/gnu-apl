@@ -40,7 +40,7 @@
 #include "../Common.hh"
 #include "Gtk_enums.hh"
 
-using namespace std;
+
 
 static int verbosity = 2;
 static bool verbose__calls     = false;
@@ -76,7 +76,7 @@ static struct _ID_DB
     {
        if (verbosity > 2)
           cerr << "Add class='" << cls << "' id='" << id
-                   << "' wname ='" << wn << "' to DB" << endl;
+                   << "' wname ='" << wn << "' to DB" << std::endl;
     }
 
   /// the next _ID_DB entry
@@ -192,14 +192,14 @@ char line[200];
                  {
                     top_level_widget = strdup(ib);
                     verbosity > 1 && cerr << "Top-level widget: "
-                                          << top_level_widget << endl;
+                                          << top_level_widget << std::endl;
                  }
 
               if (verbosity > 1)
                  {
                    indent(level);
                    cerr << "See class='" << cb << "' and id='"  << ib << "'"
-                         << endl;
+                         << std::endl;
                  }
             }
          else if (1 == sscanf(line, " <property name=\"name\">%s", wb))
@@ -209,7 +209,7 @@ char line[200];
               if (verbosity > 1)
                  {
                    indent(level);
-                   cerr << "property name='" << wb << endl;
+                   cerr << "property name='" << wb << std::endl;
                  }
             }
          else if (strstr(line, "</object>"))
@@ -218,14 +218,14 @@ char line[200];
                  {
                    indent(level);
                    cerr << "End of object class=" << cb << " id="
-                        << ib << " widget-name=" << wb << endl;
+                        << ib << " widget-name=" << wb << std::endl;
                  }
 
               if (*cb || *ib || *wb )
                  {
                    _ID_DB * new_db = new _ID_DB(cb, ib, wb, id_db);
                     id_db = new_db;
-                    verbosity > 1 && cerr << endl;
+                    verbosity > 1 && cerr << std::endl;
                  }
 
               *cb = 0;
@@ -235,7 +235,7 @@ char line[200];
             }
          else if (strstr(line, " <property name=\"name\""))   // name= property
             {
-              verbosity > 1 && cerr << "Existing name= property" << endl;
+              verbosity > 1 && cerr << "Existing name= property" << std::endl;
               continue;   // discard
             }
        }
@@ -247,12 +247,12 @@ char line[200];
 static void
 cmd_1_load_GUI(const char * filename)
 {
-   verbosity > 0 && cerr << "Loading GUI: " << filename << endl;
+   verbosity > 0 && cerr << "Loading GUI: " << filename << std::endl;
 
    if (init_id_db(filename))
       {
         cerr << "*** reading " << filename << " failed: "
-          << strerror(errno) << endl;
+          << strerror(errno) << std::endl;
       }
 
    builder = gtk_builder_new_from_file(filename);
@@ -268,10 +268,10 @@ cmd_1_load_GUI(const char * filename)
              {
                verbosity > 0 && cerr <<
                   "map glade id= '" << entry->xml_id << "' to GObject "
-                                 << reinterpret_cast<const void *>(obj) << endl;
+                                 << reinterpret_cast<const void *>(obj) << std::endl;
                entry->obj = obj;
              }
-           else cerr << "object '" << entry->xml_id << "' not found" << endl;
+           else cerr << "object '" << entry->xml_id << "' not found" << std::endl;
        }
 
 
@@ -284,7 +284,7 @@ gtk_drawingarea_draw_commands(GtkDrawingArea * widget, const char * data)
 {
    // this function is called when apl does DrawCmd ⎕GTK[H_ID] "draw_commands"
 
-   verbose__calls && cerr << "gtk_drawingarea_draw_commands()..." << endl;
+   verbose__calls && cerr << "gtk_drawingarea_draw_commands()..." << std::endl;
    sem_wait(drawarea_sema);
 
    while (*data && *data < ' ')   ++data;   // remove leading whitespace
@@ -313,16 +313,16 @@ gtk_drawingarea_draw_commands(GtkDrawingArea * widget, const char * data)
 
    sem_post(drawarea_sema);
    verbose__draw_data && cerr << "draw_data[" << drawarea_dlen << "]:\n"
-                              << drawarea_data << endl;
+                              << drawarea_data << std::endl;
 
    if (surface)   cairo_surface_destroy(surface);
    surface = 0;
 
    verbose__calls && cerr << "gtk_drawingarea_draw_commands() "
-                               "calls gtk_widget_queue_draw()." << endl;
+                               "calls gtk_widget_queue_draw()." << std::endl;
    gtk_widget_queue_draw(GTK_WIDGET(widget));
 
-   verbose__calls && cerr << "gtk_drawingarea_draw_commands() done." << endl;
+   verbose__calls && cerr << "gtk_drawingarea_draw_commands() done." << std::endl;
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -336,7 +336,7 @@ gtk_drawingarea_set_Y_origin(GtkDrawingArea * widget, int data)
 static void
 cmd_2_load_CSS(const char * filename)
 {
-   verbosity > 0 && cerr << "Loading CSS: " << filename << endl;
+   verbosity > 0 && cerr << "Loading CSS: " << filename << std::endl;
 
 GtkCssProvider * css_provider = gtk_css_provider_new();
    assert(css_provider);
@@ -346,7 +346,7 @@ GError * err = 0;
    if (err)
       {
         cerr << "error " << err->code << " when parsing stylesheet file '"
-             << filename << "':\n    " << err->message << endl;
+             << filename << "':\n    " << err->message << std::endl;
       }
    else
       {
@@ -392,8 +392,8 @@ static cmd_4_get_widget_class(const char * id)
 {
   assert(builder);
 GObject * obj = gtk_builder_get_object(builder, id);
-   if (obj)   cerr << "object " << id << " exists" << endl;
-   else       cerr << "object " << id << " DOES NOT EXIST" << endl;
+   if (obj)   cerr << "object " << id << " exists" << std::endl;
+   else       cerr << "object " << id << " DOES NOT EXIST" << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -402,7 +402,7 @@ static cmd_6_select_widget(const char * id)
   assert(builder);
   selected = gtk_builder_get_object(builder, id);
    if (!selected)
-      cerr << "cmd_6_select_widget(id='" << id << "') failed" << endl;
+      cerr << "cmd_6_select_widget(id='" << id << "') failed" << std::endl;
 }
 //-----------------------------------------------------------------------------
 enum Gtype
@@ -421,15 +421,15 @@ print_fun(Fnum N, const char * gid, const char * gclass, const char * gfun,
    if (Zt != gtype_V)   cout << ZAname << " ← ";
    if (At != gtype_V)   cout << ZAname << " ";
    cout << "⎕GTK[H_ID] " << N;
-   cout << "     *--or--* +" << endl << " ";
+   cout << "     *--or--* +" << std::endl << " ";
    if (Zt != gtype_V)   cout << ZAname << " ← ";
    if (At != gtype_V)   cout << ZAname << " ";
    cout << "⎕GTK[H_ID] \"" << gfun << "\"";
-   cout << endl;
+   cout << std::endl;
 
-   cout << "| " << N << endl;
+   cout << "| " << N << std::endl;
 
-   cout << "| " << help << endl;
+   cout << "| " << help << std::endl;
 }
 //-----------------------------------------------------------------------------
 static void
@@ -470,7 +470,7 @@ const char * end = sig + strlen(sig);
           else assert(0 && "Bad signature");
           cout << "+ ";
         }
-   cout << endl;
+   cout << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -478,7 +478,7 @@ static print_evs(int which)
 {
    if (which == 1)   // names
       {
-#define gtk_event_def(ev_name, ...)   cout << "** " << #ev_name << endl;
+#define gtk_event_def(ev_name, ...)   cout << "** " << #ev_name << std::endl;
 #include "Gtk_map.def"
       }
    else if (which == 2)   // details
@@ -511,14 +511,14 @@ char TLV[TLV_len + 1];
         cerr << "Gtk_server:   write(Tag=" << tag;
         if (Vlen)   cerr << ", Val[" << Vlen << "]=\"" << (TLV + 8) << "\"";
         else        cerr << ",  no Val)";
-        cerr << endl;
+        cerr << std::endl;
       }
 
    errno = 0;
    if (TLV_len != write(3, TLV, TLV_len))
       {
         cerr << "Gtk_server: write(tag " << tag << " failed: "
-             << strerror(errno) << endl;
+             << strerror(errno) << std::endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -590,8 +590,8 @@ bool do_ev2 = false;
           else
              {
                cerr << argv[0] << ": invalid option '"
-                    << argv[a] << "'" << endl
-                    << "try: --funs, --ev1, --ev2, or -v" << endl;
+                    << argv[a] << "'" << std::endl
+                    << "try: --funs, --ev1, --ev2, or -v" << std::endl;
                __sem_destroy(drawarea_sema);
                return a;
              }
@@ -622,17 +622,17 @@ const int flags = fcntl(3, F_GETFD);
    if (flags == -1)
       {
         cerr << argv[0] <<
-": fcntl(3, F_GETFD) failed: " << strerror(errno) << endl <<
+": fcntl(3, F_GETFD) failed: " << strerror(errno) << std::endl <<
 "    That typically happens if this program is started directly, more\n"
 "    precisely: without opening file descriptor 3 first. The anticipated\n"
 "    usage is to open this program from GNU APL using ⎕FIO[57] and then to\n"
 "    encode TLV buffers with 33 ⎕CR and send them to this program with ⎕FIO[43]"
-   << endl;
+   << std::endl;
         __sem_destroy(drawarea_sema);
         return 1;
       }
 
-// cerr << "Flags = " << hex << flags << endl;
+// cerr << "Flags = " << std::hex << flags << std::endl;
 
    if (getenv("DISPLAY") == 0)   // DISPLAY not set
       setenv("DISPLAY", ":0", true);
@@ -658,7 +658,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
             const ssize_t len = recv(3, TLV, 8, MSG_PEEK);
             if (len != 8)
                {
-                 cerr << "TLV socket closed (1): " << strerror(errno) << endl;
+                 cerr << "TLV socket closed (1): " << strerror(errno) << std::endl;
                  close(3);
                  __sem_destroy(drawarea_sema);
                  return 0;
@@ -682,7 +682,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
           const ssize_t rx_len = read(3, TLV, TLV_buflen);
           if (rx_len < 8)
              {
-               cerr << "TLV socket closed (2): " << strerror(errno) << endl;
+               cerr << "TLV socket closed (2): " << strerror(errno) << std::endl;
                close(3);
                __sem_destroy(drawarea_sema);
                return 0;
@@ -702,7 +702,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
              {
                cerr << "TLV socket closed (3): "
                     << strerror(errno) << ": V_len=" << V_len
-                                       << " rx_len=" << rx_len << endl;
+                                       << " rx_len=" << rx_len << std::endl;
                close(3);
                __sem_destroy(drawarea_sema);
                return 0;
@@ -711,11 +711,11 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
              {
                V[V_len] = 0;
                verbose__reads && cerr << ", Val[" << V_len
-                                     << "]=\"" << V << "\"" << endl;
+                                     << "]=\"" << V << "\"" << std::endl;
              }
           else
              {
-               verbose__reads && cerr << ", no Val)" << endl;;
+               verbose__reads && cerr << ", no Val)" << std::endl;;
              }
 
           switch(TLV_tag)
@@ -727,10 +727,10 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                 case 5:  break;  // stop Gtk_server
                 case 6:  cmd_6_select_widget(V);        continue;
                 case 7:  cerr << "increased verbosity to: "
-                              << ++verbosity << endl;
+                              << ++verbosity << std::endl;
                                                         continue;
                 case 8: cerr << "decreased verbosity to: "
-                             << --verbosity << endl;    continue;
+                             << --verbosity << std::endl;    continue;
 
                 // widget functions...
                 //
@@ -744,14 +744,14 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 #include "Gtk_map.def"
 
                 default:
-                    cerr << endl << argv[0]
-                         << " got unexpected command " << TLV_tag << endl;
+                    cerr << std::endl << argv[0]
+                         << " got unexpected command " << TLV_tag << std::endl;
                     continue;
              }
           break;
        }
 
-   cerr << endl << "Gtk_server closed from client" << endl;
+   cerr << std::endl << "Gtk_server closed from client" << std::endl;
    close(3);
    __sem_destroy(drawarea_sema);
    return 0;
@@ -760,7 +760,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 static void
 generic_callback(GtkWidget * widget, const char * callback, const char * sig)
 {
-   verbosity > 0 && cerr << "callback " << callback << "() called" << endl;
+   verbosity > 0 && cerr << "callback " << callback << "() called" << std::endl;
 
    for (_ID_DB * entry = id_db; entry; entry = entry->next)
        {
@@ -769,7 +769,7 @@ generic_callback(GtkWidget * widget, const char * callback, const char * sig)
               verbosity > 1 && cerr << "callback " << callback
                    << " found object in DB: class=" << entry->xml_class
                    << " id=" << entry->xml_id << " name="
-                   << entry->widget_name << endl;
+                   << entry->widget_name << std::endl;
 
               char data[strlen(10 + callback) + strlen(entry->xml_class)
                         + strlen(entry->xml_id) + strlen(entry->widget_name)];
@@ -777,7 +777,7 @@ generic_callback(GtkWidget * widget, const char * callback, const char * sig)
                              entry->xml_id, entry->xml_class);
               send_TLV(Event_widget_fun_id_class, data);
               verbosity > 0 &&
-                  cerr << "callback " << callback << "(new-style) done" << endl;
+                  cerr << "callback " << callback << "(new-style) done" << std::endl;
               return;
             }
        }
@@ -787,15 +787,15 @@ generic_callback(GtkWidget * widget, const char * callback, const char * sig)
 char none[] = { 0 };
 gchar * widget_name = none;
    g_object_get(widget, "name", &widget_name, NULL);
-   verbosity > 0 && cerr << "    widget_name is: " << widget_name << endl
-                         << "    callback is: " << callback << endl;
+   verbosity > 0 && cerr << "    widget_name is: " << widget_name << std::endl
+                         << "    callback is: " << callback << std::endl;
 
 char data[strlen(callback) + strlen(widget_name) + 10];
    sprintf(data, "H%s:%s", widget_name, callback);
    send_TLV(Event_widget_fun, data);
 
    if (verbosity > 0)
-      cerr << "callback " << callback << "(old-style) done" << endl;
+      cerr << "callback " << callback << "(old-style) done" << std::endl;
 }
 //-----------------------------------------------------------------------------
 inline void
@@ -860,7 +860,7 @@ const int cmd_len = cmd_end - cmd;
    if (count >= 3)
       {
         verbose__draw_cmd && cerr <<
-           "DRAW BACKGROUND " << i1 << " " << i2 << " " << i3 << endl;
+           "DRAW BACKGROUND " << i1 << " " << i2 << " " << i3 << std::endl;
         const double width  = gtk_widget_get_allocated_width(drawing_area);
         const double height = gtk_widget_get_allocated_height(drawing_area);
         cairo_t * cr1 = cairo_create(surface);
@@ -877,7 +877,7 @@ const int cmd_len = cmd_end - cmd;
       {
         verbose__draw_cmd && cerr <<
            "SET BRUSH COLOR (" << i1 << " " << i2 << " "
-                                << i3 << ")" << endl;
+                                << i3 << ")" << std::endl;
         draw_param.fill_color.red   = i1;
         draw_param.fill_color.green = i2;
         draw_param.fill_color.blue  = i3;
@@ -889,7 +889,7 @@ const int cmd_len = cmd_end - cmd;
    if (count >= 3)
       {
         verbose__draw_cmd && cerr <<
-           "SET LINE COLOR (" << i1 << " " << i2 << " " << i3 << ")" << endl;
+           "SET LINE COLOR (" << i1 << " " << i2 << " " << i3 << ")" << std::endl;
         draw_param.line_color.red   = i1;
         draw_param.line_color.green = i2;
         draw_param.line_color.blue  = i3;
@@ -925,7 +925,7 @@ const int cmd_len = cmd_end - cmd;
         else if (!strcasecmp(s1, "OBLIQUE"))
            draw_param.font_slant = CAIRO_FONT_SLANT_OBLIQUE;
         else
-           cerr << "bad font-slant: " << s1 << endl;
+           cerr << "bad font-slant: " << s1 << std::endl;
         return;
       }
 
@@ -938,7 +938,7 @@ const int cmd_len = cmd_end - cmd;
         else if (!strcasecmp(s1, "BOLD"))
            draw_param.font_weight = CAIRO_FONT_WEIGHT_BOLD;
         else
-           cerr << "bad font-weight: " << s1 << endl;
+           cerr << "bad font-weight: " << s1 << std::endl;
         return;
       }
 
@@ -946,7 +946,7 @@ const int cmd_len = cmd_end - cmd;
    if (count == 1)
       {
         verbose__draw_cmd && cerr <<
-           "SET LINE WIDTH " << i1 << endl;
+           "SET LINE WIDTH " << i1 << std::endl;
         draw_param.line_width = i1;
         return;
       }
@@ -954,7 +954,7 @@ const int cmd_len = cmd_end - cmd;
    if  (3 == sscanf(cmd, "circle (%u %u) %u", &i1, &i2, &i3))
       {
         verbose__draw_cmd && cerr <<
-           "DRAW CIRCLE (" << i1 << ":" << i2 << ") " << i3 << endl;
+           "DRAW CIRCLE (" << i1 << ":" << i2 << ") " << i3 << std::endl;
 
         const double x   = i1;   // center X
         const double y   = draw_param.real_Y(i2);   // center Y
@@ -988,7 +988,7 @@ const int cmd_len = cmd_end - cmd;
       {
         verbose__draw_cmd && cerr <<
            "DRAW ELLIPSE (" << i1 << ":" << i2 << ") ("
-                            << i3 << ":" << i4 << ")" << endl;
+                            << i3 << ":" << i4 << ")" << std::endl;
 
         const double x     = i1;   // center X
         const double y     = draw_param.real_Y(i2);   // center I
@@ -1030,7 +1030,7 @@ const int cmd_len = cmd_end - cmd;
       {
         verbose__draw_cmd && cerr <<
            "DRAW LINE (" << i1 << ":" << i2 << ") ("
-                              << i3 << ":" << i4 << ")" << endl;
+                              << i3 << ":" << i4 << ")" << std::endl;
         const double x0 = i1;
         const double y0 = draw_param.real_Y(i2);
         const double x1 = i3;
@@ -1054,7 +1054,7 @@ const int cmd_len = cmd_end - cmd;
       {
         verbose__draw_cmd && cerr <<
            "DRAW RECTANGLE (" << i1 << ":" << i2 << ") ("
-                                   << i3 << ":" << i4 << ")" << endl;
+                                   << i3 << ":" << i4 << ")" << std::endl;
         const double x0      = i1;
         const double y0      = draw_param.real_Y(i2);
         const double x1      = i3;
@@ -1106,11 +1106,11 @@ const int cmd_len = cmd_end - cmd;
               if (p >= cmd_end)   break;   // point in next command
               if (2 != sscanf(p, "(%u %u)", &i1, &i2))
                  {
-                   cerr << endl
-                        << "polygon: bad point " << point_count << endl
-                        << "    cmd: " << cmd << endl
-                        << "    p: "   << p << endl
-                        << p << endl;
+                   cerr << std::endl
+                        << "polygon: bad point " << point_count << std::endl
+                        << "    cmd: " << cmd << std::endl
+                        << "    p: "   << p << std::endl
+                        << p << std::endl;
                    return;
                  }
              verbose__draw_cmd && cerr << " (" << i1 << " " << i2 << ")";
@@ -1119,7 +1119,7 @@ const int cmd_len = cmd_end - cmd;
              ++point_idx;
              ++p;
            }
-        verbose__draw_cmd && cerr << endl;
+        verbose__draw_cmd && cerr << std::endl;
 
         if (draw_param.brush_visible())
            {
@@ -1173,9 +1173,9 @@ const int cmd_len = cmd_end - cmd;
         return;
       }
 
-   cerr << endl << "BAD DRAW COMMAND: ";
+   cerr << std::endl << "BAD DRAW COMMAND: ";
    for (const char * s = cmd; s < cmd_end; ++s)   cerr << *s;
-   cerr << endl << endl;
+   cerr << std::endl << std::endl;
 }
 //-----------------------------------------------------------------------------
 
@@ -1202,14 +1202,14 @@ clicked_0(GtkWidget * button, gpointer user_data = 0)
 gboolean
 do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
 {
-   verbose__calls && cerr << "*** callback do_draw()..." << endl ;
+   verbose__calls && cerr << "*** callback do_draw()..." << std::endl ;
 
    if (surface == 0)
       {
         if (drawarea_data == 0)   return false;
 
         verbose__do_draw && cerr << "   new surface: cr="
-                                 << reinterpret_cast<const void *>(cr) << endl;
+                                 << reinterpret_cast<const void *>(cr) << std::endl;
 
         sem_wait(drawarea_sema);
         assert(drawarea_data);
@@ -1239,7 +1239,7 @@ do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
 
    cairo_set_source_surface(cr, surface, 0, 0);
    cairo_paint(cr);
-   verbose__calls && cerr << "do_draw() done." << endl;
+   verbose__calls && cerr << "do_draw() done." << std::endl;
 
    return false;   // propagate the event further
 }

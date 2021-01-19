@@ -65,20 +65,20 @@ size_t diff_pos = 0;
    IO_Files::read_file_line(ref, eof);
    if (eof)   // nothing in current_testfile
       {
-        rep << "extra: " << apl << endl;
+        rep << "extra: " << apl << std::endl;
       }
    else if (different(utf8P(apl), utf8P(ref.c_str()), diff_pos))
       {
         IO_Files::diff_error();
-        rep << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl
-            << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << endl
+        rep << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << std::endl
+            << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << std::endl
             << " ∆ : ⋅⋅⋅";
         loop(p, diff_pos)   rep << " ";
-        rep << "^" << endl;
+        rep << "^" << std::endl;
       }
    else                    // same
       {
-        rep << "== " << apl << endl;
+        rep << "== " << apl << std::endl;
       }
 
    aplout.clear();

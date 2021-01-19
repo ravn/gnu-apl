@@ -33,8 +33,8 @@
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 
-vector<InputFile> InputFile::files_todo;
-vector<InputFile> InputFile::files_orig;
+std::vector<InputFile> InputFile::files_todo;
+std::vector<InputFile> InputFile::files_orig;
 int InputFile::stdin_line_no = 1;
 
 //-----------------------------------------------------------------------------
@@ -93,7 +93,7 @@ InputFile::randomize_files()
         if (files_todo[f].test == false)   // not a test file
            {
              CERR << "Cannot randomise testfiles when a mix of -T"
-                     " and -f is used (--TR ignored)" << endl;
+                     " and -f is used (--TR ignored)" << std::endl;
              return;
            }
       }

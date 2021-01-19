@@ -86,7 +86,7 @@ protected:
    static int fun_compare(const void * key, const void * sf);
 
    /// list all ⎕CR functions
-   static Token list_functions(ostream & out, bool mapping);
+   static Token list_functions(std::ostream & out, bool mapping);
 
    /// do eval_B() with extra spaces removed
    static Token do_eval_B(const Value & B, bool remove_extra_spaces);

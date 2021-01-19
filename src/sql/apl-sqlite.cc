@@ -43,7 +43,7 @@
 # include "PostgresProvider.hh"
 #endif
 
-typedef vector<Connection *> DbConnectionVector;
+typedef std::vector<Connection *> DbConnectionVector;
 
 map<const string, Provider *> providers;
 DbConnectionVector connections;
@@ -75,18 +75,18 @@ static void init_provider_map( void )
 #endif
 }
 
-static Token list_functions( ostream &out )
+static Token list_functions( std::ostream &out )
 {
-    out << "Available function numbers:" << endl
-        << "name FN[1] args     - open database. Returns reference ID" << endl
-        << "FN[2] ref           - close database" << endl
-        << "query FN[3,db] params  - send SQL query" << endl
-        << "query FN[4,db] params  - send SQL update" << endl
-        << "FN[5] ref           - begin transaction" << endl
-        << "FN[6] ref           - commit transaction" << endl
-        << "FN[7] ref           - rollback transaction" << endl
-        << "FN[8] ref           - list tables" << endl
-        << "ref FN[9] table     - list columns for table" << endl;
+    out << "Available function numbers:" << std::endl
+        << "name FN[1] args     - open database. Returns reference ID" << std::endl
+        << "FN[2] ref           - close database" << std::endl
+        << "query FN[3,db] params  - send SQL query" << std::endl
+        << "query FN[4,db] params  - send SQL update" << std::endl
+        << "FN[5] ref           - begin transaction" << std::endl
+        << "FN[6] ref           - commit transaction" << std::endl
+        << "FN[7] ref           - rollback transaction" << std::endl
+        << "FN[8] ref           - list tables" << std::endl
+        << "ref FN[9] table     - list columns for table" << std::endl;
     return Token(TOK_APL_VALUE1, Str0( LOC ) );
 }
 
@@ -287,7 +287,7 @@ static Token run_transaction_rollback( Value_P B )
 static Token show_tables( Value_P B )
 {
     Connection *conn = value_to_db_id( B );
-    vector<string> tables;
+    std::vector<string> tables;
     conn->fill_tables( tables );
 
     Value_P value;
@@ -297,7 +297,7 @@ static Token show_tables( Value_P B )
     else {
         Shape shape( tables.size () );
         value = Value_P( shape, LOC );
-        for( vector<string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
+        for( std::vector<string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
             new (value->next_ravel())
                PointerCell( make_string_cell( *i, LOC ).get(), value.getref() );
         }
@@ -310,7 +310,7 @@ static Token show_tables( Value_P B )
 static Token show_cols( Value_P A, Value_P B )
 {
     Connection *conn = value_to_db_id( A );
-    vector<ColumnDescriptor> cols;
+    std::vector<ColumnDescriptor> cols;
 
     if( !B->is_apl_char_vector() ) {
         Workspace::more_error() = "Illegal table name";
@@ -327,7 +327,7 @@ static Token show_cols( Value_P A, Value_P B )
     else {
         Shape shape( cols.size(), 2 );
         value = Value_P( shape, LOC );
-        for( vector<ColumnDescriptor>::iterator i = cols.begin() ; i != cols.end() ; i++ ) {
+        for( std::vector<ColumnDescriptor>::iterator i = cols.begin() ; i != cols.end() ; i++ ) {
             new (value->next_ravel())
                 PointerCell(make_string_cell(i->get_name(), LOC).get(),
                             value.getref());

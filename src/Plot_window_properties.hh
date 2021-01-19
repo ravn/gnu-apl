@@ -128,7 +128,7 @@ public:
       }
 
    /// print the properties (for debugging purposes)
-   int print(ostream & out) const;
+   int print(std::ostream & out) const;
 
    /// for e.g. att_and_val = "pa_width: 600" set pa_width to 600.
    /// Return error string on error.
@@ -195,7 +195,7 @@ public:
    const Plot_data & get_plot_data() const   { return plot_data; }
 
    /// return the 3D color gradient
-   const vector<level_color> & get_gradient() const
+   const std::vector<level_color> & get_gradient() const
       { return gradient; }
 
    /// for level 0.0 <= alpha <= 1.0: return the color for alpha according
@@ -282,7 +282,7 @@ protected:
    Plot_line_properties * * line_properties;
 
    /// some levels with colors (for surface plots)
-   vector<level_color> gradient;
+   std::vector<level_color> gradient;
 
    /// round val up to the next higher 1/2/5×10^N
    static double round_up_125(double val);

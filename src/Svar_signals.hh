@@ -115,7 +115,7 @@ public:
       }
 
    /// print the item
-   ostream & print(ostream & out) const
+   std::ostream & print(std::ostream & out) const
       {
         return out << value;
       }
@@ -143,7 +143,7 @@ public:
    Sig_item_xint(const uint8_t * & buffer) : Sig_item_int<T, bytes>(buffer) {}
 
    /// print the item
-   ostream & print(ostream & out) const
+   std::ostream & print(std::ostream & out) const
       {
         return out << "0x" << hex << setfill('0') << setw(bytes)
                    << Sig_item_int<T, bytes>::value
@@ -199,7 +199,7 @@ public:
       }
 
    /// print the item
-   ostream & print(ostream & out) const
+   std::ostream & print(std::ostream & out) const
       {
         bool printable = true;
         for (size_t b = 0; b < value.size(); ++b)
@@ -351,7 +351,7 @@ public:
    virtual void store(string & buffer) const = 0;
 
    /// print the signal
-   virtual ostream & print(ostream & out) const = 0;
+   virtual std::ostream & print(std::ostream & out) const = 0;
 
    /// return the ID of the signal
    virtual Signal_id get_sigID() const = 0;
@@ -362,8 +362,8 @@ public:
    /// get function for an item that is not defined for the signal
    void bad_get(const char * signal, const char * member) const
       {
-        cerr << endl << "*** called function get_" << signal << "__" << member
-             << "() with wrong signal " << get_sigName() << endl;
+        cerr << std::endl << "*** called function get_" << signal << "__" << member
+             << "() with wrong signal " << get_sigName() << std::endl;
         assert(0 && "bad_get()");
       }
 
@@ -655,7 +655,7 @@ public:
    /// receive a signal (TCP)
    inline static Signal_base * recv_TCP(int tcp_sock, char * buffer,
                                         int bufsize, char * & del,
-                                        ostream * debug, const char ** loc);
+                                        std::ostream * debug, const char ** loc);
 
 protected:
 
@@ -704,11 +704,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "MAKE_OFFER(";
         key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -752,11 +752,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "RETRACT_OFFER(";
         key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -800,11 +800,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "RETRACT_VAR(";
         key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -857,13 +857,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "SET_STATE(";
         key.print(out);   out << ", ";
         new_state.print(out);   out << ", ";
         sloc.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -920,12 +920,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "SET_CONTROL(";
         key.print(out);   out << ", ";
         new_control.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -974,11 +974,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "GET_VALUE(";
         key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1035,14 +1035,14 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "VALUE_IS(";
         key.print(out);   out << ", ";
         error.print(out);   out << ", ";
         error_loc.print(out);   out << ", ";
         cdr_value.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1103,12 +1103,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "ASSIGN_VALUE(";
         key.print(out);   out << ", ";
         cdr_value.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1164,13 +1164,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "SVAR_ASSIGNED(";
         key.print(out);   out << ", ";
         error.print(out);   out << ", ";
         error_loc.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1227,12 +1227,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "MAY_USE(";
         key.print(out);   out << ", ";
         attempt.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1285,12 +1285,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "MAY_SET(";
         key.print(out);   out << ", ";
         attempt.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1343,11 +1343,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "READ_SVAR_RECORD(";
         key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1391,11 +1391,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "SVAR_RECORD_IS(";
         record.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1448,13 +1448,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "IS_REGISTERED_ID(";
         proc.print(out);   out << ", ";
         parent.print(out);   out << ", ";
         grand.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1507,11 +1507,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "YES_NO(";
         yes.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1572,7 +1572,7 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "REGISTER_PROCESSOR(";
         proc.print(out);   out << ", ";
@@ -1580,7 +1580,7 @@ public:
         grand.print(out);   out << ", ";
         evconn.print(out);   out << ", ";
         progname.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1665,7 +1665,7 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "MATCH_OR_MAKE(";
         varname.print(out);   out << ", ";
@@ -1675,7 +1675,7 @@ public:
         from_proc.print(out);   out << ", ";
         from_parent.print(out);   out << ", ";
         from_grand.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1744,11 +1744,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "MATCH_OR_MAKE_RESULT(";
         key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1794,11 +1794,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "FIND_OFFERING_ID(";
         key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1851,13 +1851,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "OFFERING_ID_IS(";
         proc.print(out);   out << ", ";
         parent.print(out);   out << ", ";
         grand.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1910,11 +1910,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "GET_OFFERING_PROCS(";
         offered_to_proc.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -1959,11 +1959,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "OFFERING_PROCS_ARE(";
         offering_procs.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2012,12 +2012,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "GET_OFFERED_VARS(";
         offered_to_proc.print(out);   out << ", ";
         accepted_by_proc.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2066,11 +2066,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "OFFERED_VARS_ARE(";
         offered_vars.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2115,11 +2115,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "FIND_PAIRING_KEY(";
         key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2164,11 +2164,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "PAIRING_KEY_IS(";
         pairing_key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2222,13 +2222,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "GET_EVENTS(";
         proc.print(out);   out << ", ";
         parent.print(out);   out << ", ";
         grand.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2289,13 +2289,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "CLEAR_ALL_EVENTS(";
         proc.print(out);   out << ", ";
         parent.print(out);   out << ", ";
         grand.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2353,12 +2353,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "EVENTS_ARE(";
         key.print(out);   out << ", ";
         events.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2423,7 +2423,7 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "ADD_EVENT(";
         key.print(out);   out << ", ";
@@ -2431,7 +2431,7 @@ public:
         parent.print(out);   out << ", ";
         grand.print(out);   out << ", ";
         event.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2496,12 +2496,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "ASSIGN_WSWS_VAR(";
         key.print(out);   out << ", ";
         cdr_value.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2549,11 +2549,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "READ_WSWS_VAR(";
         key.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2597,11 +2597,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "WSWS_VALUE_IS(";
         cdr_value.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2642,11 +2642,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "PRINT_SVAR_DB(";
 
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2686,11 +2686,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual ostream & print(ostream & out) const
+   virtual std::ostream & print(std::ostream & out) const
       {
         out << "SVAR_DB_PRINTED(";
         printout.print(out);
-        return out << ")" << endl;
+        return out << ")" << std::endl;
       }
 
    /// a unique number for this signal
@@ -2836,7 +2836,7 @@ enum { MAX_SIGNAL_CLASS_SIZE = sizeof(_all_signal_classes_) };
 
 Signal_base *
 Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
-                      char * & del, ostream * debug,
+                      char * & del, std::ostream * debug,
                       const char ** loc)
 {
    if (bufsize < 2*MAX_SIGNAL_CLASS_SIZE)
@@ -2845,7 +2845,7 @@ Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
          //
          cerr << "\n\n*** bufsize is " << bufsize
               << " but MUST be at least " << 2*MAX_SIGNAL_CLASS_SIZE
-              << " in recv_TCP() !!!" << endl;
+              << " in recv_TCP() !!!" << std::endl;
 
          *loc = LOC;
          return 0;
@@ -2890,7 +2890,7 @@ ssize_t siglen = 0;
          break;   // got  sizeof(uint32_t) length bytes
        }
 //    debug && *debug << "rx_bytes is " << rx_bytes
-//                    << " when reading siglen in in recv_TCP()" << endl;
+//                    << " when reading siglen in in recv_TCP()" << std::endl;
 
    siglen = ntohl(*reinterpret_cast<uint32_t *>(buffer));
    if (siglen == 0)
@@ -2899,7 +2899,7 @@ ssize_t siglen = 0;
         return 0;   // close
       }
 
-// debug && *debug << "signal length is " << siglen << " in recv_TCP()" << endl;
+// debug && *debug << "signal length is " << siglen << " in recv_TCP()" << std::endl;
 
    // skip MAX_SIGNAL_CLASS_SIZE bytes at the beginning of buffer
    //
@@ -2913,7 +2913,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
         del = new char[siglen];
         if (del == 0)
            {
-             cerr << "*** new(" << siglen <<") failed in recv_TCP()" << endl;
+             cerr << "*** new(" << siglen <<") failed in recv_TCP()" << std::endl;
              *loc = LOC;
              return 0;
            }
@@ -2931,7 +2931,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
           if (rx_bytes != siglen)
              {
                cerr << "*** got " << rx_bytes
-                    << " when expecting " << siglen << endl;
+                    << " when expecting " << siglen << std::endl;
                *loc = LOC;
                return 0;
              }
@@ -2940,7 +2940,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
          break;   // got siglen bytes
        }
 
-// debug && *debug << "rx_bytes is " << rx_bytes << " in recv_TCP()" << endl;
+// debug && *debug << "rx_bytes is " << rx_bytes << " in recv_TCP()" << std::endl;
 
 const uint8_t * b = reinterpret_cast<const uint8_t *>(rx_buf);
 Sig_item_u16 signal_id(b);
@@ -3059,7 +3059,7 @@ Signal_base * ret = 0;
         case sid_SVAR_DB_PRINTED: ret = new SVAR_DB_PRINTED_c(b);   break;
 
         default: cerr << "Signal_base::recv_TCP() failed: unknown signal id "
-                      << signal_id.get_value() << endl;
+                      << signal_id.get_value() << std::endl;
                  errno = EINVAL;
                  *loc = LOC;
                  return 0;

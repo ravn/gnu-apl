@@ -39,10 +39,10 @@ void *connection_loop( void *arg )
         // Do nothing here
     }
     catch( ProtocolError &protocol_error ) {
-        CERR << "Communication error: " << protocol_error.get_message() << endl;
+        CERR << "Communication error: " << protocol_error.get_message() << std::endl;
     }
     catch( ConnectionError &connection_error ) {
-        CERR << "Disconnected: " << connection_error.get_message() << endl;
+        CERR << "Disconnected: " << connection_error.get_message() << std::endl;
     }
     return NULL;
 }
@@ -73,7 +73,7 @@ void start_listener( int port )
     listener->set_thread( thread_id );
     listener.release();
 
-    COUT << "Network listener started. Connection information: " << conninfo << endl;
+    COUT << "Network listener started. Connection information: " << conninfo << std::endl;
 }
 
 void register_listener( Listener *listener )
@@ -88,7 +88,7 @@ void unregister_listener( Listener *listener )
 {
     pthread_mutex_lock( &registered_listeners_lock );
     bool found = false;
-    for( vector<Listener *>::iterator i  = registered_listeners.begin() ; i != registered_listeners.end() ; i++ ) {
+    for( std::vector<Listener *>::iterator i  = registered_listeners.begin() ; i != registered_listeners.end() ; i++ ) {
         if( *i == listener ) {
             registered_listeners.erase( i );            
             found = true;
@@ -106,15 +106,15 @@ void unregister_listener( Listener *listener )
 
 void close_listeners( void )
 {
-    vector<Listener *> to_be_closed;
+    std::vector<Listener *> to_be_closed;
     pthread_mutex_lock( &registered_listeners_lock );
-    for( vector<Listener *>::iterator i = registered_listeners.begin() ; i != registered_listeners.end() ; i++ ) {
+    for( std::vector<Listener *>::iterator i = registered_listeners.begin() ; i != registered_listeners.end() ; i++ ) {
         to_be_closed.push_back( *i );
     }
 //    registered_listeners.clear();
     pthread_mutex_unlock( &registered_listeners_lock );
 
-    for( vector<Listener *>::iterator i = to_be_closed.begin() ; i != to_be_closed.end() ; i ++ ) {
+    for( std::vector<Listener *>::iterator i = to_be_closed.begin() ; i != to_be_closed.end() ; i ++ ) {
         (*i)->close_connection();
 //        delete *i;
     }

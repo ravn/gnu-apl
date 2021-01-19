@@ -449,7 +449,7 @@ const Shape shape_Z(B->element_count());
       {
         Log(LOG_optimization)
            CERR << "optimizing ,B (len="
-                << B->nz_element_count() << ")" << endl;
+                << B->nz_element_count() << ")" << std::endl;
 
         B->set_shape(shape_Z);
         return Token(TOK_APL_VALUE1, B);
@@ -521,7 +521,7 @@ Shape shape_Z(c1, c2);
    if (B->get_owner_count() == 2 &&
        this == Workspace::SI_top()->get_prefix().get_monadic_fun())
       {
-        Log(LOG_optimization) CERR << "optimizing ,B" << endl;
+        Log(LOG_optimization) CERR << "optimizing ,B" << std::endl;
         
         B->set_shape(shape_Z);
         return Token(TOK_APL_VALUE1, B);

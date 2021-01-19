@@ -126,11 +126,11 @@ UserPreferences::usage(const char * prog)
 "    -w milli             wait milli milliseconds at startup\n"
 "    --                   end of options for " << prog << "\n"
 "\n"
-"Please report problems to: bug-apl@gnu.org\n" << endl;
+"Please report problems to: bug-apl@gnu.org\n" << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
-UserPreferences::show_GPL(ostream & out)
+UserPreferences::show_GPL(std::ostream & out)
 {
    out <<
 "\n"
@@ -198,7 +198,7 @@ bool log_startup = false;
               ++a;
               if (!val)
                  {
-                   CERR << "-l without log level" << endl;
+                   CERR << "-l without log level" << std::endl;
                    exit(a);
                  }
 
@@ -211,7 +211,7 @@ bool log_startup = false;
               ++a;
               if (!val)
                  {
-                   CERR << "-p without profile number" << endl;
+                   CERR << "-p without profile number" << std::endl;
                    exit(a);
                  }
 
@@ -224,21 +224,21 @@ bool log_startup = false;
               ++a;
               if (!val)
                  {
-                   CERR << "-C without directory" << endl;
+                   CERR << "-C without directory" << std::endl;
                    exit(a);
                  }
 
               if (chroot(val))
                  {
                    CERR << "chroot(" << val << ") failed: "
-                        << strerror(errno) << endl;
+                        << strerror(errno) << std::endl;
                    exit(a);
                  }
 
               if (chdir("/"))
                  {
                    CERR << "chdir(\"/\") failed: "
-                        << strerror(errno) << endl;
+                        << strerror(errno) << std::endl;
                    exit(a);
                  }
 
@@ -250,13 +250,13 @@ bool log_startup = false;
               ++a;
               if (!val)
                  {
-                   CERR << "-u without user ID" << endl;
+                   CERR << "-u without user ID" << std::endl;
                    exit(a);
                  }
               if (setuid(strtol(val, 0, 10)))
                  {
                    CERR << "setuid(" << val << ") failed: "
-                        << strerror(errno) << endl;
+                        << strerror(errno) << std::endl;
                    exit(a);
                  }
               continue;
@@ -315,7 +315,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "--cc without core count" << endl;
+                   CERR << "--cc without core count" << std::endl;
                    exit(a);
                  }
               requested_cc = (CoreCount)atoi(val);
@@ -333,7 +333,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "--CPU_limit_secs without seconds" << endl;
+                   CERR << "--CPU_limit_secs without seconds" << std::endl;
                    exit(a);
                  }
               CPU_limit_secs = atoi(val);
@@ -371,7 +371,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "--emacs_arg without argument" << endl;
+                   CERR << "--emacs_arg without argument" << std::endl;
                    exit(a);
                  }
 
@@ -385,7 +385,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "--eval without APL line" << endl;
+                   CERR << "--eval without APL line" << std::endl;
                    exit(a);
                  }
               eval_exprs.push_back(val);
@@ -399,7 +399,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "-f without argument" << endl;
+                   CERR << "-f without argument" << std::endl;
                    exit(a);
                  }
 
@@ -427,7 +427,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "--id without processor number" << endl;
+                   CERR << "--id without processor number" << std::endl;
                    exit(a);
                  }
 
@@ -440,7 +440,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "-L without workspace name" << endl;
+                   CERR << "-L without workspace name" << std::endl;
                    exit(a);
                  }
 
@@ -453,7 +453,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "--LX without APL expression" << endl;
+                   CERR << "--LX without APL expression" << std::endl;
                    exit(a);
                  }
 
@@ -469,13 +469,13 @@ UserPreferences::parse_argv_2(bool logit)
               if (val)   Log_control(LogId(atoi(val)), true);
               else
                  {
-                   CERR << "-l without log facility" << endl;
+                   CERR << "-l without log facility" << std::endl;
                    exit(a);
                  }
 #else
    if (val && atoi(val) == LID_startup)   ;
    else  CERR << "the -l option was ignored (requires ./configure "
-                   "DYNAMIC_LOG_WANTED=yes)" << endl;
+                   "DYNAMIC_LOG_WANTED=yes)" << std::endl;
 #endif // DYNAMIC_LOG_WANTED
 
               continue;
@@ -523,7 +523,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "--par without processor number" << endl;
+                   CERR << "--par without processor number" << std::endl;
                    exit(a);
                  }
               requested_par = atoi(val);
@@ -535,14 +535,14 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                 {
-                  CERR << "--PW without screen width" << endl;
+                  CERR << "--PW without screen width" << std::endl;
                   exit(a);
                 }
 
               initial_pw = atoi(val);
               if (initial_pw < MIN_Quad_PW || initial_pw > MAX_Quad_PW)
                 {
-                  CERR << "bad --PW value (ignored)" << endl; 
+                  CERR << "bad --PW value (ignored)" << std::endl; 
                 }
               else
                 {
@@ -582,41 +582,41 @@ UserPreferences::parse_argv_2(bool logit)
 
          if (!strcmp(opt, "--show_bin_dir"))
             {
-              COUT << Makefile__bindir << endl;
+              COUT << Makefile__bindir << std::endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_doc_dir"))
             {
-              COUT << Makefile__docdir << endl;
+              COUT << Makefile__docdir << std::endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_etc_dir"))
             {
-              COUT << Makefile__sysconfdir << endl;
+              COUT << Makefile__sysconfdir << std::endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_lib_dir"))
             {
-              COUT << Makefile__pkglibdir << endl;
+              COUT << Makefile__pkglibdir << std::endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_src_dir"))
             {
-              COUT << Makefile__srcdir << endl;
+              COUT << Makefile__srcdir << std::endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_all_dirs"))
             {
-              COUT << "bindir: " << Makefile__bindir     << endl
-                   << "docdir: " << Makefile__docdir     << endl
-                   << "etcdir: " << Makefile__sysconfdir << endl
-                   << "libdir: " << Makefile__pkglibdir  << endl
-                   << "srcdir: " << Makefile__srcdir     << endl;
+              COUT << "bindir: " << Makefile__bindir     << std::endl
+                   << "docdir: " << Makefile__docdir     << std::endl
+                   << "etcdir: " << Makefile__sysconfdir << std::endl
+                   << "libdir: " << Makefile__pkglibdir  << std::endl
+                   << "srcdir: " << Makefile__srcdir     << std::endl;
               exit(0);
             }
 
@@ -666,7 +666,7 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "--TM without test mode" << endl;
+                   CERR << "--TM without test mode" << std::endl;
                    exit(a);
                  }
               const int mode = atoi(val);
@@ -699,23 +699,23 @@ UserPreferences::parse_argv_2(bool logit)
               ++a;
               if (!val)
                  {
-                   CERR << "-w without milli(seconds)" << endl;
+                   CERR << "-w without milli(seconds)" << std::endl;
                    exit(a);
                  }
               wait_ms = atoi(val);
               continue;
             }
 
-         CERR << "unknown option '" << opt << "'" << endl;
+         CERR << "unknown option '" << opt << "'" << std::endl;
          usage(expanded_argv[0]);
          exit(a);
        }
 
    if (logit)
       {
-        CERR << InputFile::files_todo.size() << " input files:" << endl;
+        CERR << InputFile::files_todo.size() << " input files:" << std::endl;
         loop(f, InputFile::files_todo.size())
-            CERR << "    " << InputFile::files_todo[f].filename << endl;
+            CERR << "    " << InputFile::files_todo[f].filename << std::endl;
       }
 
    if (randomize_testfiles)   InputFile::randomize_files();
@@ -845,10 +845,10 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
 }
 //-----------------------------------------------------------------------------
 void
-UserPreferences::show_version(ostream & out)
+UserPreferences::show_version(std::ostream & out)
 {
-   out << "BUILDTAG:" << endl
-       << "---------" << endl;
+   out << "BUILDTAG:" << std::endl
+       << "---------" << std::endl;
    for (const char ** bt = build_tag; *bt; ++bt)
        {
          switch(bt - build_tag)
@@ -860,10 +860,10 @@ UserPreferences::show_version(ostream & out)
               case 4:  out << "    config.status:  ";   break;
               default: out << "    [" << bt - build_tag << "] ";
             }
-         out << *bt << endl;
+         out << *bt << std::endl;
        }
 
-   out << "    Archive SVN:   " << ARCHIVE_SVN << endl;
+   out << "    Archive SVN:   " << ARCHIVE_SVN << std::endl;
 
    Output::set_color_mode(Output::COLM_OUTPUT);
 }
@@ -876,28 +876,28 @@ UserPreferences::show_configure_options()
           header_size = value_size - cell_size * SHORT_VALUE_LENGTH_WANTED,
         };
 
-   CERR << endl << "configurable options:" << endl <<
-                   "---------------------" << endl <<
+   CERR << std::endl << "configurable options:" << std::endl <<
+                   "---------------------" << std::endl <<
 
    "    ASSERT_LEVEL_WANTED=" << ASSERT_LEVEL_WANTED
         << is_default(ASSERT_LEVEL_WANTED == 1)
-   << endl <<
+   << std::endl <<
 
    "    SECURITY_LEVEL_WANTED=" << SECURITY_LEVEL_WANTED
         << is_default(SECURITY_LEVEL_WANTED == 0)
-   << endl <<
+   << std::endl <<
 
    "    APSERVER_PATH=" << APSERVER_PATH
         << is_default(!strcmp(APSERVER_PATH, "/tmp/GNU-APL/APserver"))
-   << endl <<
+   << std::endl <<
 
    "    APSERVER_PORT=" << APSERVER_PORT
         << is_default(APSERVER_PORT == 16366)
-   << endl <<
+   << std::endl <<
 
    "    APSERVER_TRANSPORT=" << APSERVER_TRANSPORT
         << is_default(APSERVER_TRANSPORT == 0)
-   << endl <<
+   << std::endl <<
 
    "    CORE_COUNT_WANTED=" << CORE_COUNT_WANTED <<
 #if   CORE_COUNT_WANTED == -3
@@ -911,66 +911,66 @@ UserPreferences::show_configure_options()
 #else
    ""
 #endif
-   << endl <<
+   << std::endl <<
 
 #ifdef DYNAMIC_LOG_WANTED
    "    DYNAMIC_LOG_WANTED=yes"
 #else
    "    DYNAMIC_LOG_WANTED=no (default)"
 #endif
-   << endl <<
+   << std::endl <<
 
    "    MAX_RANK_WANTED="     << MAX_RANK_WANTED
         << is_default(MAX_RANK_WANTED == 8)
-   << endl <<
+   << std::endl <<
 
 #ifdef RATIONAL_NUMBERS_WANTED
    "    RATIONAL_NUMBERS_WANTED=yes"
 #else
    "    RATIONAL_NUMBERS_WANTED=no (default)"
 #endif
-   << endl <<
+   << std::endl <<
 
    "    SHORT_VALUE_LENGTH_WANTED=" << SHORT_VALUE_LENGTH_WANTED
         << is_default(SHORT_VALUE_LENGTH_WANTED == 1)
-        << ", therefore:" << endl <<
-   "        sizeof(Value)       : "  << value_size  << " bytes" << endl <<
-   "        sizeof(Cell)        :  " << cell_size   << " bytes" << endl <<
-   "        sizeof(Value header): "  << header_size << " bytes" << endl
-   << endl <<
+        << ", therefore:" << std::endl <<
+   "        sizeof(Value)       : "  << value_size  << " bytes" << std::endl <<
+   "        sizeof(Cell)        :  " << cell_size   << " bytes" << std::endl <<
+   "        sizeof(Value header): "  << header_size << " bytes" << std::endl
+   << std::endl <<
 
 #ifdef VALUE_CHECK_WANTED
    "    VALUE_CHECK_WANTED=yes"
 #else
    "    VALUE_CHECK_WANTED=no (default)"
 #endif
-   << endl <<
+   << std::endl <<
 
 #ifdef VALUE_HISTORY_WANTED
    "    VALUE_HISTORY_WANTED=yes"
 #else
    "    VALUE_HISTORY_WANTED=no (default)"
 #endif
-   << endl <<
+   << std::endl <<
 
 #ifdef VF_TRACING_WANTED
    "    VF_TRACING_WANTED=yes"
 #else
    "    VF_TRACING_WANTED=no (default)"
 #endif
-   << endl <<
+   << std::endl <<
 
 #ifdef VISIBLE_MARKERS_WANTED
    "    VISIBLE_MARKERS_WANTED=yes"
 #else
    "    VISIBLE_MARKERS_WANTED=no (default)"
 #endif
-   << endl
-   << endl
-   << "how ./configure was (probably) called:" << endl
-   << "--------------------------------------" << endl
-   << "    " << configure_args << endl
-   << endl;
+   << std::endl
+   << std::endl
+   << "how ./configure was (probably) called:" << std::endl
+   << "--------------------------------------" << std::endl
+   << "    " << configure_args << std::endl
+   << std::endl;
 
    show_version(CERR);
 }
@@ -990,7 +990,7 @@ UserPreferences::open_user_file(const char * fname, char * filename,
         if (HOME == 0)
            {
              if (log_startup)
-                CERR << "environment variable 'HOME' is not defined!" << endl;
+                CERR << "environment variable 'HOME' is not defined!" << std::endl;
              return 0;
            }
 
@@ -1014,12 +1014,12 @@ FILE * f = fopen(filename, "r");
       {
          if (log_startup)
             CERR << "Not reading config file " << filename
-                 << " (" << strerror(errno) << ")" << endl;
+                 << " (" << strerror(errno) << ")" << std::endl;
          return 0;
       }
 
    if (log_startup)
-      CERR << "Reading config file " << filename << " ..." << endl;
+      CERR << "Reading config file " << filename << " ..." << std::endl;
 
    return f;
 }
@@ -1079,7 +1079,7 @@ int file_profile = 0;   // the current profile in the preferences file
          if (count < 2)
             {
               CERR << "bad tag or value at line " << line
-                   << " of config file " << filename << " (ignored)" << endl;
+                   << " of config file " << filename << " (ignored)" << std::endl;
               continue;
             }
          d[0] = strtoll(arg, 0, 16);
@@ -1129,11 +1129,11 @@ int file_profile = 0;   // the current profile in the preferences file
          //
          if (0 && sargs_idx < count)   // bogus assertion (disable it)
             {
-               CERR << "sargs_idx: "          << sargs_idx << endl
-                    << "count: "              << count << endl
-                    << "file_profile: "       << file_profile << endl
+               CERR << "sargs_idx: "          << sargs_idx << std::endl
+                    << "count: "              << count << std::endl
+                    << "file_profile: "       << file_profile << std::endl
                     << "sargs[" << (sargs_idx-1)
-                                << "]: " << sargs[sargs_idx-1] << endl
+                                << "]: " << sargs[sargs_idx-1] << std::endl
                     ;
 
                Assert(0);
@@ -1178,7 +1178,7 @@ int file_profile = 0;   // the current profile in the preferences file
               d[0] = strtoll(arg, 0, 10);   // decimal!
               Log_control(LogId(d[0]), true);
               log_startup && CERR << "    logging facility " << d[0]
-                                  << " enabled in " << filename << endl;
+                                  << " enabled in " << filename << std::endl;
             }
          else if (!strcasecmp(opt, "CIN-SEQUENCE"))
             {
@@ -1294,7 +1294,7 @@ int file_profile = 0;   // the current profile in the preferences file
                  {
                    CERR << "bad library reference number " << lib_ref
                         << " at line " << line << " of config file "
-                        << filename << " (ignored)" << endl;
+                        << filename << " (ignored)" << std::endl;
                    continue;
                  }
 
@@ -1317,7 +1317,7 @@ int file_profile = 0;   // the current profile in the preferences file
                         if (log_startup)
                            CERR << "environment variable 'HOME' is not "
                                    "defined for '~' expansion, will use "
-                                << (arg + 2) << endl;
+                                << (arg + 2) << std::endl;
                         line_history_path = UTF8_string(arg + 2);
                       }
                    else
@@ -1335,7 +1335,7 @@ int file_profile = 0;   // the current profile in the preferences file
               else if (!strcasecmp(arg, "Always"))     nabla_to_history = 2;
               else   CERR << "bad value " << arg << " for NABLA-TO-HISTORY"
                         << " at line " << line << " of config file "
-                        << filename << " (ignored)" << endl;
+                        << filename << " (ignored)" << std::endl;
             }
          else if (yes_no && !strcasecmp(opt, "BACKUP_BEFORE_SAVE"))
             {
@@ -1355,7 +1355,7 @@ int file_profile = 0;   // the current profile in the preferences file
                  initial_pw = atoi(arg);
               else
                  CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
-                      << endl;
+                      << std::endl;
             }
          else if (!strcasecmp(opt, "Multi-Line-Strings"))
             {
@@ -1391,7 +1391,7 @@ int file_profile = 0;   // the current profile in the preferences file
          else
             {
               CERR << "Invalid option '" << opt << " in preferences file "
-                   << filename << " (ignored)" << endl;
+                   << filename << " (ignored)" << std::endl;
             }
        }
 
@@ -1436,7 +1436,7 @@ UserPreferences::decode_ASCII(const char * strg)
 
    if (strlen(strg) == 1)   return *strg;                 // single char
    if (strlen(strg) == 2)   return strtol(strg, 0, 16);   // hex value, e.g. 4C
-   CERR << "invalid parameter " << strg << " in preferences file" << endl;
+   CERR << "invalid parameter " << strg << " in preferences file" << std::endl;
    return -1;
 }
 //-----------------------------------------------------------------------------
@@ -1476,7 +1476,7 @@ int line = 0;
          if (macro_type < 1 || macro_type > 3)
             {
                CERR << "Bad macro in file " << filename
-                    << " line " << line << endl;
+                    << " line " << line << std::endl;
                continue;
             }
 
@@ -1516,7 +1516,7 @@ int line = 0;
 
          param_error:
             CERR << "Bad macro format in file " << filename
-                 << " line " << line << endl;
+                 << " line " << line << std::endl;
        }
 }
 //-----------------------------------------------------------------------------

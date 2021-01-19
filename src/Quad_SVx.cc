@@ -95,14 +95,14 @@ Quad_SVx::start_AP(AP_num ap)
              // user wanted APs, but something went wrong
              //
              CERR << "*** Not starting AP << ap because the connecton to "
-                     " APserver has failed earlier." << endl;
+                     " APserver has failed earlier." << std::endl;
            }
         else                        // user gave --noSV
            {
              CERR << "*** Not starting AP " << ap
-                  << " because --noSV (or equivalent) was given." << endl
+                  << " because --noSV (or equivalent) was given." << std::endl
                   << " That conflicts with the use of ⎕SVxxx functions "
-                     "and variables." << endl;
+                     "and variables." << std::endl;
            }
         ATTENTION;
       }
@@ -134,7 +134,7 @@ bool found_executable = false;
    if (!found_executable)
       {
         CERR << "No binary found for AP " << ap << " (interpreter path = "
-             << LibPaths::get_APL_bin_path() << ")" << endl;
+             << LibPaths::get_APL_bin_path() << ")" << std::endl;
         return;
       }
 
@@ -142,12 +142,12 @@ FILE * fp = popen(filename, "r");
    if (fp == 0)
       {
         CERR << "popen(" << filename << " failed: " << strerror(errno)
-             << endl;
+             << std::endl;
         return;
       }
 
    for (int cc; (cc = getc(fp)) != EOF;)   CERR << char(cc);
-   CERR << endl;
+   CERR << std::endl;
 
    pclose(fp);
 
@@ -372,7 +372,7 @@ Value_P Z(sh_Z, LOC);
              case NC_SHARED_VAR:
                   {
                     // CERR << "Shared variable " << apl_vars[z]
-                    //      << " is already shared" << endl;
+                    //      << " is already shared" << std::endl;
 
                     const SV_key key = sym->get_SV_key();
                     new (Z->next_ravel()) IntCell(Svar_DB::get_coupling(key));
@@ -441,7 +441,7 @@ const SV_key key = Svar_DB::match_or_make(vname, to_proc, from);
    if (coupling == NO_COUPLING)
       {
         Log(LOG_shared_variables)
-           CERR << "Svar_DB::match_or_store() returned unexpected 0" << endl;
+           CERR << "Svar_DB::match_or_store() returned unexpected 0" << std::endl;
         return 0;
       }
 
@@ -552,7 +552,7 @@ const char * dirs[] = { "", "/APs" };
               if (*dirs[d] == 0)
                  {
                    CERR << "Could not open directory " << dirname << " : "
-                        << strerror(errno) << " at " << LOC << endl;
+                        << strerror(errno) << " at " << LOC << std::endl;
                  }
               continue;
             }

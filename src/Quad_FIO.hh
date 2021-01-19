@@ -175,7 +175,7 @@ protected:
       }
 
    /// list all ⎕IO functions to \b out
-   static Token list_functions(ostream & out, bool mapping);
+   static Token list_functions(std::ostream & out, bool mapping);
 
    /// convert bits set in \b fds to an APL integer vector
    static Value_P fds_to_val(fd_set * fds, int max_fd);

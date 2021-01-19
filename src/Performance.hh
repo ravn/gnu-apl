@@ -117,10 +117,10 @@ public:
       }
 
    /// print count, data, and data2
-   void print(ostream & out);
+   void print(std::ostream & out);
 
    /// write count, data, and data2 to file
-   void save_record(ostream & outf);
+   void save_record(std::ostream & outf);
 
    /// return the number of samples
    uint64_t get_count() const
@@ -143,7 +143,7 @@ public:
       { return count ? sum/count : 0; }
 
    /// print num as 5 characters (digits, dot, and multiplier (k, m, g, ...)
-   static void print5(ostream & out, uint64_t num);
+   static void print5(std::ostream & out, uint64_t num);
 
 protected:
    /// number of samples
@@ -169,10 +169,10 @@ public:
    virtual ~Statistics();
 
    /// print statistics
-   virtual void print(ostream & out) = 0;
+   virtual void print(std::ostream & out) = 0;
 
    /// write statistics to file
-   virtual void save_data(ostream & outf, const char * perf_name) = 0;
+   virtual void save_data(std::ostream & outf, const char * perf_name) = 0;
 
    /// reset \b this statistics
    virtual void reset() = 0;
@@ -214,10 +214,10 @@ public:
         }
 
    /// overloaded Statistics::print()
-   virtual void print(ostream & out);
+   virtual void print(std::ostream & out);
 
    /// overloaded Statistics::save_data()
-   virtual void save_data(ostream & outf, const char * perf_name);
+   virtual void save_data(std::ostream & outf, const char * perf_name);
 
    /// return the (CPU-)cycles statistics
    virtual const Statistics_record * get_record() const
@@ -266,10 +266,10 @@ public:
        }
 
    /// overloaded Statistics::print()
-   virtual void print(ostream & out);
+   virtual void print(std::ostream & out);
 
    /// overloaded Statistics::save_data()
-   virtual void save_data(ostream & outf, const char * perf_name);
+   virtual void save_data(std::ostream & outf, const char * perf_name);
 
    /// return the record for the first executions
    virtual const Statistics_record * get_first_record() const
@@ -322,10 +322,10 @@ public:
    static int get_statistics_type(Pfstat_ID id);
 
    /// print all counters
-   static void print(Pfstat_ID which, ostream & out);
+   static void print(Pfstat_ID which, std::ostream & out);
 
    /// write all counters to .def file
-   static void save_data(ostream & out, ostream & out_file);
+   static void save_data(std::ostream & out, std::ostream & out_file);
 
    /// reset all counters
    static void reset_all();
