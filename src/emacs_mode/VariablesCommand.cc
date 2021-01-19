@@ -32,12 +32,12 @@ enum TypeSpec {
 
 void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
-    stringstream out;
+    std::stringstream out;
     bool tagged = false;
 
     TypeSpec cls = ALL;
     if( args.size() >= 2 ) {
-        string typespec = args[1];
+        std::string typespec = args[1];
         if( typespec == "variable" ) {
             cls = VARIABLE;
         }

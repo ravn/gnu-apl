@@ -27,7 +27,7 @@
 class Provider {
 public:
     virtual ~Provider() {}
-    virtual const string get_name( void ) = 0;
+    virtual const std::string get_name( void ) = 0;
     virtual Connection *open_database( Value_P B ) = 0;
 };
 

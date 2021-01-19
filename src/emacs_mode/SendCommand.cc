@@ -32,14 +32,14 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-static void throw_with_error( const string &message )
+static void throw_with_error( const std::string &message )
 {
-    stringstream out;
+    std::stringstream out;
     out << message << ": " << strerror( errno );
     throw ConnectionError( out.str() );
 }
 
-static void write_string_to_fd( const string &line, int fd )
+static void write_string_to_fd( const std::string &line, int fd )
 {
     ssize_t ret = write( fd, line.c_str(), line.size() );
     if( ret == -1 ) {
@@ -51,15 +51,15 @@ static void write_string_to_fd( const string &line, int fd )
 }
 
 void SendCommand::run_command(NetworkConnection &conn,
-                              const std::vector<string> &args )
+                              const std::vector<std::string> &args )
 {
-    std::vector<string> content = conn.load_block();
+    std::vector<std::string> content = conn.load_block();
 
     if( args.size() > 3 ) {
         throw ConnectionError( "Illegal argument count" );
     }
 
-    string name = "";
+    std::string name = "";
     int line = 0;
     if( args.size() > 1 ) {
         name = args[1];
@@ -72,8 +72,8 @@ void SendCommand::run_command(NetworkConnection &conn,
     }
 
     TempFileWrapper fd( "/tmp/apl_content" );
-    for( std::vector<string>::iterator i = content.begin() ; i != content.end() ; i++ ) {
-        stringstream s;
+    for( std::vector<std::string>::iterator i = content.begin() ; i != content.end() ; i++ ) {
+        std::stringstream s;
         s << *i << "\n";
         write_string_to_fd( s.str(), fd.get_fd() );
     }
@@ -89,13 +89,13 @@ void SendCommand::run_command(NetworkConnection &conn,
         fam.set_line_no( line );
         InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
 
-        stringstream out;
+        std::stringstream out;
         out << "content sent\n"
             << END_TAG << "\n";
         conn.write_string_to_fd( out.str() );
     }
     catch( Error &error ) {
-        stringstream out;
+        std::stringstream out;
         out << "error\n"
             << END_TAG << "\n";
         conn.write_string_to_fd( out.str() );

@@ -28,12 +28,12 @@
 namespace {
 // prepare string for sending:
 // quotify, escape " and '\', convert newlines
-inline std::string prepare_string(const string& string)
+inline std::string prepare_string(const std::string& string)
 {
     std::string result;
     result.reserve(string.length()*1.25);
     result += "\"";
-    for (string::size_type i = 0; i < string.length(); ++i) {
+    for (std::string::size_type i = 0; i < string.length(); ++i) {
         switch (string[i]) {
         case '\n': 
             result += "\\n"; 
@@ -83,10 +83,10 @@ HelpCommand::HelpCommand( std::string name_in ) : NetworkCommand( name_in ) {
 
 void HelpCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
-    stringstream out;
+    std::stringstream out;
     HelpEntries::iterator it = help_entries.begin(),
         end = help_entries.end();
-    
+
     if (args.size() > 1) {
         FindEntry predicate(args[1]);
         bool found = false;

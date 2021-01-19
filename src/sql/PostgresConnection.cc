@@ -42,12 +42,12 @@ PostgresConnection::~PostgresConnection()
     PQfinish( db );
 }
 
-ArgListBuilder *PostgresConnection::make_prepared_query( const string &sql )
+ArgListBuilder *PostgresConnection::make_prepared_query( const std::string &sql )
 {
     return new PostgresArgListBuilder( this, sql );
 }
 
-ArgListBuilder *PostgresConnection::make_prepared_update( const string &sql )
+ArgListBuilder *PostgresConnection::make_prepared_update( const std::string &sql )
 {
     return new PostgresArgListBuilder( this, sql );    
 }
@@ -56,7 +56,7 @@ void PostgresConnection::transaction_begin( void )
 {
     PostgresResultWrapper result( PQexec( db, "begin" ) );
     if( PQresultStatus( result.get_result() ) != PGRES_COMMAND_OK ) {
-        stringstream out;
+        std::stringstream out;
         out << "Error when calling begin: " << PQresultErrorMessage( result.get_result() );
         Workspace::more_error() = out.str().c_str();
         DOMAIN_ERROR;
@@ -67,7 +67,7 @@ void PostgresConnection::transaction_commit( void )
 {
     PostgresResultWrapper result( PQexec( db, "commit" ) );
     if( PQresultStatus( result.get_result() ) != PGRES_COMMAND_OK ) {
-        stringstream out;
+        std::stringstream out;
         out << "Error when calling commit: " << PQresultErrorMessage( result.get_result() );
         Workspace::more_error() = out.str().c_str();
         DOMAIN_ERROR;
@@ -78,19 +78,19 @@ void PostgresConnection::transaction_rollback( void )
 {
     PostgresResultWrapper result( PQexec( db, "rollback" ) );
     if( PQresultStatus( result.get_result() ) != PGRES_COMMAND_OK ) {
-        stringstream out;
+        std::stringstream out;
         out << "Error when calling rollback: " << PQresultErrorMessage( result.get_result() );
         Workspace::more_error() = out.str().c_str();
         DOMAIN_ERROR;
     }
 }
 
-void PostgresConnection::fill_tables( std::vector<string> &tables )
+void PostgresConnection::fill_tables( std::vector<std::string> &tables )
 {
     PostgresResultWrapper result( PQexec( db, "select tablename from pg_tables where schemaname = 'public'" ) );
     ExecStatusType status = PQresultStatus( result.get_result() );
     if( status != PGRES_TUPLES_OK ) {
-        stringstream out;
+        std::stringstream out;
         out << "Error getting list of tables: " << PQresultErrorMessage( result.get_result() );
         Workspace::more_error() = out.str().c_str();
         DOMAIN_ERROR;            
@@ -103,14 +103,14 @@ void PostgresConnection::fill_tables( std::vector<string> &tables )
 }
 
 void
-PostgresConnection::fill_cols(const string &table,
+PostgresConnection::fill_cols(const std::string &table,
                               std::vector<ColumnDescriptor> &cols)
 {
 const char * s = table.c_str();
 PostgresAllocMemoryWrapper
              escaped_table_name(PQescapeLiteral(db, s, strlen(s)));
 
-stringstream sql;
+std::stringstream sql;
     sql << "select column_name,data_type from information_schema.columns"
           " where table_name = " << escaped_table_name.value();
 
@@ -118,7 +118,7 @@ PostgresResultWrapper result( PQexec( db, sql.str().c_str() ) );
 ExecStatusType status = PQresultStatus( result.get_result() );
     if (status != PGRES_TUPLES_OK )
        {
-         stringstream out;
+         std::stringstream out;
          out << "Error getting list of columns: "
              << PQresultErrorMessage(result.get_result());
          Workspace::more_error() = out.str().c_str();
@@ -134,10 +134,10 @@ int rows = PQntuples( result.get_result() );
         }
 }
 //-----------------------------------------------------------------------------
-const string
+const std::string
 PostgresConnection::make_positional_param(int pos)
 {
-    stringstream out;
+    std::stringstream out;
     out << "$" << (pos + 1);
     return out.str();
 }

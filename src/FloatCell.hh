@@ -128,7 +128,7 @@ public:
 
    /// Overloaded Cell::is_finite().
    virtual bool is_finite() const
-      { return isfinite(dfval()); }
+      { return std::isfinite(dfval()); }
 
    /// Overloaded Cell::greater().
    virtual bool greater(const Cell & other) const;

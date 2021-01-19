@@ -28,8 +28,6 @@
 #include "PrintOperator.hh"
 #include "UTF8_string.hh"
 
-using namespace std;
-
 //=============================================================================
 /// a std::filebuf that compares its output with a file.
 class DiffOut : public std::filebuf

@@ -225,11 +225,12 @@ const int64_t used_memory
       CERR << "Value_P::Value_P(" << args << ") failed at " << loc
            << " (caller: "        << caller << ")" << std::endl
            << " what: "           << ex.what() << std::endl
-           << " initial sbrk(): 0x" << hex << Quad_WA::initial_sbrk << std::endl
+           << " initial sbrk(): 0x" << std::hex
+                                    << Quad_WA::initial_sbrk << std::endl
            << " current sbrk(): 0x" << top_of_memory() << std::endl
-           << " alloc_size:     0x" << alloc_size << dec << " ("
+           << " alloc_size:     0x" << alloc_size << std::dec << " ("
                                     << alloc_size << ")" << std::endl
-           << " used memory:    0x" << hex  << used_memory << dec
+           << " used memory:    0x" << std::hex  << used_memory << std::dec
                                     << " (" << used_memory << ")" << std::endl;
 
    MORE_ERROR() << "new Value(" << args << ") failed (" << ex.what() << ")";

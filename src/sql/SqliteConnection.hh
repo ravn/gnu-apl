@@ -29,23 +29,23 @@ class SqliteConnection : public Connection {
 public:
     SqliteConnection( sqlite3 *db_in );
     virtual ~SqliteConnection();
-    virtual ArgListBuilder *make_prepared_query( const string &sql );
-    virtual ArgListBuilder *make_prepared_update( const string &sql );
+    virtual ArgListBuilder *make_prepared_query( const std::string &sql );
+    virtual ArgListBuilder *make_prepared_update( const std::string &sql );
 
     virtual void transaction_begin();
     virtual void transaction_commit();
     virtual void transaction_rollback();
 
-    virtual void fill_tables( std::vector<string> &tables );
-    virtual void fill_cols( const string &table, std::vector<ColumnDescriptor> &cols );
-    virtual const string make_positional_param( int pos );
+    virtual void fill_tables( std::vector<std::string> &tables );
+    virtual void fill_cols( const std::string &table, std::vector<ColumnDescriptor> &cols );
+    virtual const std::string make_positional_param( int pos );
 
-    void raise_sqlite_error( const string &message );
+    void raise_sqlite_error( const std::string &message );
     sqlite3 *get_db( void ) { return db; }
 
 private:
     sqlite3 *db;
-    void run_simple( const string &sql );
+    void run_simple( const std::string &sql );
 };
 
 class SqliteStmtWrapper {

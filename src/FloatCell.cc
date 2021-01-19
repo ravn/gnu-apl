@@ -231,7 +231,7 @@ FloatCell::bif_reciprocal(Cell * Z) const
 #endif
 
 const APL_Float z = 1.0/dfval();
-   if (!isfinite(z))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(z))   return E_DOMAIN_ERROR;
 
    return FloatCell::zv(Z, 1.0/dfval());
 }
@@ -533,7 +533,7 @@ const APL_Float ai = A->get_imag_value();
    if (ai == 0.0)   // real result
       {
         const APL_Float z = ar * dfval();
-        if (!isfinite(z))   return E_DOMAIN_ERROR;
+        if (!std::isfinite(z))   return E_DOMAIN_ERROR;
         return FloatCell::zv(Z, z);
       } 
 
@@ -541,8 +541,8 @@ const APL_Float ai = A->get_imag_value();
    //
 const double zr = ar * dfval();
 const double zi = ai * dfval();
-   if (!isfinite(zr))   return E_DOMAIN_ERROR;
-   if (!isfinite(zi))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(zr))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(zi))   return E_DOMAIN_ERROR;
    return ComplexCell::zv(Z, zr, zi);
 } 
 //-----------------------------------------------------------------------------
@@ -586,7 +586,7 @@ const APL_Float ai = A->get_imag_value();
    if (ai == 0.0)   // real result
       {
         const APL_Float real = ar / dfval() ;
-        if (isfinite(real))   return FloatCell::zv(Z, real);
+        if (std::isfinite(real))   return FloatCell::zv(Z, real);
         return E_DOMAIN_ERROR;
       }
 
@@ -594,8 +594,8 @@ const APL_Float ai = A->get_imag_value();
    //
 const double zar = ar / dfval();
 const double zai = ai / dfval();
-   if (!isfinite(zar))   return E_DOMAIN_ERROR;
-   if (!isfinite(zai))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(zar))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(zai))   return E_DOMAIN_ERROR;
    return ComplexCell::zv(Z, zar, zai);
 }
 //-----------------------------------------------------------------------------
@@ -627,7 +627,7 @@ const APL_Float ai = A->get_imag_value();
         if (ar >= 0)
            {
              const APL_Float z = pow(ar, dfval());
-             if (isfinite(z))   return zv(Z, z);
+             if (std::isfinite(z))   return zv(Z, z);
              return E_DOMAIN_ERROR;
            }
 
@@ -638,8 +638,8 @@ const APL_Float ai = A->get_imag_value();
    //
 const APL_Complex a(ar, ai);
 const APL_Complex z = complex_power(a, dfval());
-   if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
-   if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(z.real()))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(z.imag()))   return E_DOMAIN_ERROR;
 
    return ComplexCell::zv(Z, z);
 }
@@ -660,9 +660,9 @@ p_modulo_q(double P, double Q)
   //
 
 const APL_Float quotient = P / Q;   // quotient←b÷a and check overflows
-   if (!isfinite(quotient))   return 0.0;   // exponent overflow
+   if (!std::isfinite(quotient))   return 0.0;   // exponent overflow
 
-   if (!isfinite(Q / P))   // exponent underflow
+   if (!std::isfinite(Q / P))   // exponent underflow
       return ((P < 0) == (Q < 0)) ? P : 0.0;
 
    {
@@ -712,11 +712,11 @@ const APL_Float r              = P - prod2;
 // Q1(prod2)
 // Q1(r)
 
-Assert(isnormal(abs_quotient)   || abs_quotient   == 0.0);
-Assert(isnormal(floor_quotient) || floor_quotient == 0.0);
-Assert(isnormal(abs_prod)       || abs_prod       == 0.0);
-Assert(isnormal(prod2)          || prod2          == 0.0);
-Assert(isnormal(r)              || r              == 0.0);
+Assert(std::isnormal(abs_quotient)   || abs_quotient   == 0.0);
+Assert(std::isnormal(floor_quotient) || floor_quotient == 0.0);
+Assert(std::isnormal(abs_prod)       || abs_prod       == 0.0);
+Assert(std::isnormal(prod2)          || prod2          == 0.0);
+Assert(std::isnormal(r)              || r              == 0.0);
 
    return r;
 */
@@ -751,13 +751,13 @@ const APL_Float b = dfval();
    //
 const APL_Float null(0.0);
 const APL_Float z = p_modulo_q(b, a);
-Assert(isnormal(z) || z == null);
+Assert(std::isnormal(z) || z == null);
 
 APL_Float r2;
    if      (z < null && a < null)   r2 = z;     // (×R) = ×Q)
    else if (z > null && a > null)   r2 = z;     // (×R) = ×Q)
    else                       r2 = z + a;       // (×R) ≠ ×Q)
-Assert(isnormal(r2) || r2 == null);
+Assert(std::isnormal(r2) || r2 == null);
 
    if (r2 == null)   return IntCell::z0(Z);
    if (r2 == a)      return IntCell::z0(Z);

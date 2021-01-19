@@ -23,9 +23,9 @@
 #include "SqliteResultValue.hh"
 #include "SqliteArgListBuilder.hh"
 
-void SqliteConnection::raise_sqlite_error( const string &message )
+void SqliteConnection::raise_sqlite_error( const std::string &message )
 {
-    stringstream out;
+    std::stringstream out;
     out << message << ": " << sqlite3_errmsg( db );
     Workspace::more_error() = out.str().c_str();
     DOMAIN_ERROR;
@@ -43,19 +43,19 @@ SqliteConnection::~SqliteConnection()
     }
 }
 
-ArgListBuilder *SqliteConnection::make_prepared_query( const string &sql )
+ArgListBuilder *SqliteConnection::make_prepared_query( const std::string &sql )
 {
     SqliteArgListBuilder *builder = new SqliteArgListBuilder( this, sql );
     return builder;
 }
 
-ArgListBuilder *SqliteConnection::make_prepared_update( const string &sql )
+ArgListBuilder *SqliteConnection::make_prepared_update( const std::string &sql )
 {
     SqliteArgListBuilder *builder = new SqliteArgListBuilder( this, sql );
     return builder;
 }
 
-void SqliteConnection::run_simple( const string &sql )
+void SqliteConnection::run_simple( const std::string &sql )
 {
     SqliteArgListBuilder builder( this, sql );
     builder.run_query( false );
@@ -77,7 +77,7 @@ void SqliteConnection::transaction_rollback()
 }
 
 void
-SqliteConnection::fill_tables(std::vector<string> & tables)
+SqliteConnection::fill_tables(std::vector<std::string> & tables)
 {
     sqlite3_stmt *statement;
     if( sqlite3_prepare_v2( get_db(), "select name from sqlite_master where type = 'table'", -1,
@@ -103,7 +103,7 @@ SqliteConnection::fill_tables(std::vector<string> & tables)
 }
 
 void
-SqliteConnection::fill_cols(const string &table,
+SqliteConnection::fill_cols(const std::string &table,
                             std::vector<ColumnDescriptor> & cols)
 {
 sqlite3_stmt * statement;
@@ -127,7 +127,7 @@ SqliteStmtWrapper statement_wrapper(statement);
         }
 }
 
-const string
+const std::string
 SqliteConnection::make_positional_param(int)
 {
     return "?";

@@ -537,7 +537,7 @@ const Executable & exec = *si.get_executable();
    out << "<SI-entry level=\"" << si.get_level()
        << "\" pc=\"" << si.get_PC()
        << "\" line=\"" << exec.get_line(si.get_PC()) << "\""
-       <<">" << std::endl << flush;
+       <<">" << std::endl << std::flush;
 
    ++indent;
    do_indent();
@@ -1602,14 +1602,14 @@ const char ** tag_pos = tag_order;
 const char * tz_sign = (offset < 0) ? "" : "+";
    if (!silent)   out
         << "SAVED "
-        << setfill('0') << year        << "-"
-        << setw(2)      << mon         << "-"
-        << setw(2)      << day         << " "
-        << setw(2)      << hour        << ":"
-        << setw(2)      << min         << ":"
-        << setw(2)      << sec         << " (GMT"
+        << std::setfill('0') << year        << "-"
+        << std::setw(2)      << mon         << "-"
+        << std::setw(2)      << day         << " "
+        << std::setw(2)      << hour        << ":"
+        << std::setw(2)      << min         << ":"
+        << std::setw(2)      << sec         << " (GMT"
         << tz_sign      << offset/3600 << ")"
-        << setfill(' ') <<  std::endl;
+        << std::setfill(' ') <<  std::endl;
 
    if (!copying)
       {

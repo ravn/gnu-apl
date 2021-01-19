@@ -123,9 +123,9 @@ public:
         if (loc)   out << " at " << loc;
         if (error)   out << "(error " << error << ")";
         out << ":" << std::endl;
-        loop(i, size())   cerr << " " << hex << setfill('0')
-                               << setw(2) << (at(i) & 0xFF);
-              cerr << dec << setfill(' ') << std::endl;
+        loop(i, size())   std::cerr << " " << std::hex << std::setfill('0')
+                               << std::setw(2) << (at(i) & 0xFF);
+              std::cerr << std::dec << std::setfill(' ') << std::endl;
       }
 
 protected:

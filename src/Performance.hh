@@ -45,8 +45,6 @@
 
 #endif
 
-using namespace std;
-
 //-----------------------------------------------------------------------------
 /// performance statistics IDs
 enum Pfstat_ID

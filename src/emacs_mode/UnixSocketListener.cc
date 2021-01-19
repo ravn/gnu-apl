@@ -43,13 +43,13 @@ std::string UnixSocketListener::start( void )
 {
     server_socket = socket( AF_UNIX, SOCK_STREAM, 0 );
     if( server_socket == -1 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Error creating unix domain socket: " << strerror( errno ) << std::endl;
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
     }
 
-    stringstream name;
+    std::stringstream name;
     name << "/tmp/gnu_apl_conn_" << getpid();
     filename = name.str();
 
@@ -59,7 +59,7 @@ std::string UnixSocketListener::start( void )
     addr.sun_family = AF_UNIX;
     strncpy( addr.sun_path, filename.c_str(), sizeof( addr.sun_path ) );
     if( ::bind( server_socket, (struct sockaddr *)&addr, sizeof( addr ) ) == -1 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Error binding unix domain socket: " << strerror( errno ) << std::endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
@@ -69,7 +69,7 @@ std::string UnixSocketListener::start( void )
     initialised = true;
 
     if( chmod( filename.c_str(), 0600 ) == -1 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Error setting permissions: " << strerror( errno ) << std::endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
@@ -77,16 +77,16 @@ std::string UnixSocketListener::start( void )
     }
 
     if( listen( server_socket, 2 ) == -1 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Error starting listener on unix domain socket: " << strerror( errno ) << std::endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
     }
 
-    stringstream info_stream;
+    std::stringstream info_stream;
     info_stream << "mode:unix addr:" << name.str();
-    string conninfo = info_stream.str();
+    std::string conninfo = info_stream.str();
     return conninfo;
 }
 

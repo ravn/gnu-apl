@@ -193,64 +193,64 @@ const ValueFlags flags_before = ValueFlags(flags);
              break;
 
         case VHE_Destruct:
-             out << "  VHE_Destruct " << setw(26) << iarg;
+             out << "  VHE_Destruct " << std::setw(26) << iarg;
              break;
 
         case VHE_Error:
-             out << "  " << setw(38)
+             out << "  " << std::setw(38)
                  << Error::error_name(ErrorCode(iarg)) << " ";
              break;
 
         case VHE_PtrNew:
-             out << "  VHE_PtrNew   " << setw(26) << iarg;
+             out << "  VHE_PtrNew   " << std::setw(26) << iarg;
              break;
 
         case VHE_PtrNew0:
-             out << "  VHE_PtrNew0  " << setw(26) << iarg;
+             out << "  VHE_PtrNew0  " << std::setw(26) << iarg;
              break;
 
         case VHE_PtrCopy1:
-             out << "  VHE_PtrCopy1 " << setw(26) << iarg;
+             out << "  VHE_PtrCopy1 " << std::setw(26) << iarg;
              break;
 
         case VHE_PtrCopy2:
-             out << "  VHE_PtrCopy2 " << setw(26) << iarg;
+             out << "  VHE_PtrCopy2 " << std::setw(26) << iarg;
              break;
 
         case VHE_PtrCopy3:
-             out << "  VHE_PtrCopy3 " << setw(26) << iarg;
+             out << "  VHE_PtrCopy3 " << std::setw(26) << iarg;
              break;
 
         case VHE_PtrClr:
-             out << "  VHE_PtrClr   " << setw(26) << iarg;
+             out << "  VHE_PtrClr   " << std::setw(26) << iarg;
              break;
 
         case VHE_PtrDel:
-             out << "  VHE_PtrDel   " << setw(26) << iarg;
+             out << "  VHE_PtrDel   " << std::setw(26) << iarg;
              break;
 
         case VHE_PtrDel0:
-             out << "  VHE_PtrDel0  " << setw(26) << iarg;
+             out << "  VHE_PtrDel0  " << std::setw(26) << iarg;
              break;
 
         case VHE_TokCopy1:
-             out << "  VHE_TokCopy1 " << setw(26) << iarg;
+             out << "  VHE_TokCopy1 " << std::setw(26) << iarg;
              break;
 
         case VHE_TokMove1:
-             out << "  VHE_TokMove1 " << setw(26) << iarg;
+             out << "  VHE_TokMove1 " << std::setw(26) << iarg;
              break;
 
         case VHE_TokMove2:
-             out << "  VHE_TokMove2 " << setw(26) << iarg;
+             out << "  VHE_TokMove2 " << std::setw(26) << iarg;
              break;
 
         case VHE_Completed:
-             out << "  VHE_Completed" << setw(26) << iarg;
+             out << "  VHE_Completed" << std::setw(26) << iarg;
              break;
 
         case VHE_Stale:
-             out << "  VHE_Stale    " << setw(26) << iarg;
+             out << "  VHE_Stale    " << std::setw(26) << iarg;
              break;
 
         case VHE_Visit:
@@ -263,7 +263,7 @@ const ValueFlags flags_before = ValueFlags(flags);
              return;
       }
 
-   out << left << setw(30) << (loc ? loc : "<no-loc>") << std::endl;
+   out << std::left << std::setw(30) << (loc ? loc : "<no-loc>") << std::endl;
 }
 //----------------------------------------------------------------------------
 

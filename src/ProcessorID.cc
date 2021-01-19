@@ -102,7 +102,7 @@ ProcessorID::init(bool log_startup)
 const TCP_socket sock = Svar_DB::get_DB_tcp();
    if (sock != NO_TCP_SOCKET)
       {
-        string progname(prog_name());
+        std::string progname(prog_name());
         REGISTER_PROCESSOR_c request(sock, id.proc, id.parent, id.grand,
                              0, progname);
       }
@@ -258,7 +258,7 @@ const char * filename = getenv("APL2SVPPRF");
       }
    else
       {
-        string fname = LibPaths::get_APL_bin_path();
+        std::string fname = LibPaths::get_APL_bin_path();
         fname += "/apl2svp.prf";
         return read_network_profile(fname.c_str());
       }

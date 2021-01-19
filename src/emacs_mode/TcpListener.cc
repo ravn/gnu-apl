@@ -38,7 +38,7 @@ std::string TcpListener::start( void )
     struct addrinfo *addr;
     int ret;
 
-    stringstream serv_name;
+    std::stringstream serv_name;
     serv_name << port;
 
     struct addrinfo hints = { 0 };
@@ -53,7 +53,7 @@ std::string TcpListener::start( void )
 
     ret = getaddrinfo( "127.0.0.1", serv_name.str().c_str(), &hints, &addr );
     if( ret != 0 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Error looking up listener host: " << gai_strerror( ret );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
@@ -63,7 +63,7 @@ std::string TcpListener::start( void )
 
     server_socket = socket( AF_INET, SOCK_STREAM, 0 );
     if( server_socket == -1 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Error creating socket: " << strerror( errno );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
@@ -71,7 +71,7 @@ std::string TcpListener::start( void )
 
     int v = 1;
     if( setsockopt( server_socket, SOL_SOCKET, SO_REUSEADDR, (void *)&v, sizeof( v ) ) == -1 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Error setting SO_REUSEADDR parameter: " << strerror( errno );
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
@@ -79,7 +79,7 @@ std::string TcpListener::start( void )
     }
 
     if( ::bind( server_socket, addr->ai_addr, addr->ai_addrlen ) == -1 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Unable to bind to port " << port << ": " << strerror( errno );
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
@@ -87,7 +87,7 @@ std::string TcpListener::start( void )
     }
 
     if( listen( server_socket, 2 ) == -1 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Error calling accept: " << strerror( errno ) << std::endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
@@ -97,16 +97,16 @@ std::string TcpListener::start( void )
     struct sockaddr_in listen_address;
     socklen_t listen_address_len = sizeof( listen_address );
     if( getsockname( server_socket, (struct sockaddr *)&listen_address, &listen_address_len ) == -1 ) {
-        stringstream errmsg;
+        std::stringstream errmsg;
         errmsg << "Error getting port number of socket: " << strerror( errno ) << std::endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
     }
 
-    stringstream info_stream;
+    std::stringstream info_stream;
     info_stream << "mode:tcp addr:" << ntohs( listen_address.sin_port );
-    string conninfo = info_stream.str();
+    std::string conninfo = info_stream.str();
     return conninfo;
 }
 

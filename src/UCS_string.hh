@@ -31,8 +31,6 @@
 #include "Unicode.hh"
 #include "UTF8_string.hh"
 
-using namespace std;
-
 class PrintBuffer;
 class PrintContext;
 class Shape;

@@ -67,13 +67,13 @@ public:
 
 class StringResultValue : public ResultValue {
 public:
-    StringResultValue( string value_in ) : value( value_in ) {}
+    StringResultValue( std::string value_in ) : value( value_in ) {}
     virtual ~StringResultValue() {}
     virtual void update( Cell *cell, Value & cell_owner ) const;
    virtual ResultValue * clone() const { return new StringResultValue(value); }
 
 private:
-    string value;
+    std::string value;
 };
 
 class ResultRow

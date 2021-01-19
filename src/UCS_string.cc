@@ -210,9 +210,9 @@ int expo = 0;
 
    if (value >= 10.0)   // large number, positive exponent
       {
-        if (value > BIG_FLOAT || !isnormal(value))   // something odd
+        if (value > BIG_FLOAT || !std::isnormal(value))   // something odd
            {
-            if (isnormal(value) || isinf(value))   // rather large
+            if (std::isnormal(value) || std::isinf(value))   // rather large
                {
                  if (negative)   append_UTF8("¯∞");
                  else            append_UTF8("∞");
@@ -1235,13 +1235,13 @@ UCS_string::lexical_before(const UCS_string other) const
 std::ostream &
 UCS_string::dump(std::ostream & out) const
 {
-   out << right << hex << uppercase << setfill('0');
+   out << std::right << std::hex << std::uppercase << std::setfill('0');
    loop(s, size())
       {
-        out << " U+" << setw(4) << int(at(s));
+        out << " U+" << std::setw(4) << int(at(s));
       }
 
-   return out << left << dec << nouppercase << setfill(' ');
+   return out << std::left << std::dec << std::nouppercase << std::setfill(' ');
 }
 //-----------------------------------------------------------------------------
 UCS_string
@@ -1282,11 +1282,11 @@ long double value = val;
 int digits[320];   // DBL_MAX is 1.79769313486231470E+308
 int * d = digits;
 
-const long double initial_fract = modf(value, &value);
+const long double initial_fract = std::modf(value, &value);
 long double fract;
    for (; value >= 1.0; ++d)
       {
-         fract = modf(value / 10.0, &value);   // U.x -> .U
+         fract = std::modf(value / 10.0, &value);   // U.x -> .U
          *d = int((fract + .02) * 10.0);
          fract -= 0.1 * *d;
       }

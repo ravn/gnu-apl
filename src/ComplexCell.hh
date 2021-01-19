@@ -49,7 +49,7 @@ public:
 
    /// Overloaded Cell::is_finite().
    virtual bool is_finite() const
-      { return isfinite(value.cval[0]) && isfinite(value.cval[1]); }
+      { return std::isfinite(value.cval[0]) && std::isfinite(value.cval[1]); }
 
    /// overloaded Cell::greater().
    virtual bool greater(const Cell & other) const;

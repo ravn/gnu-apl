@@ -45,7 +45,7 @@
 
 typedef std::vector<Connection *> DbConnectionVector;
 
-map<const string, Provider *> providers;
+std::map<const std::string, Provider *> providers;
 DbConnectionVector connections;
 
 extern "C" {
@@ -54,7 +54,7 @@ extern "C" {
 
 static void add_provider( Provider *provider )
 {
-    providers.insert( pair<const string, Provider *>( provider->get_name(), provider ) );
+    providers.insert( std::pair<const std::string, Provider *>( provider->get_name(), provider ) );
 }
 
 static void init_provider_map( void )
@@ -108,10 +108,10 @@ static Token open_database( Value_P A, Value_P B )
         Workspace::more_error() = "Illegal database name";
         VALUE_ERROR;
     }
-    string type = to_string( A->get_UCS_ravel() );
-    map<const string, Provider *>::iterator provider_iterator = providers.find( type );
+    std::string type = to_string( A->get_UCS_ravel() );
+    std::map<const std::string, Provider *>::iterator provider_iterator = providers.find( type );
     if( provider_iterator == providers.end() ) {
-        stringstream out;
+        std::stringstream out;
         out << "Unknown database type: " << type;
         Workspace::more_error() = out.str().c_str();
         VALUE_ERROR;
@@ -195,7 +195,7 @@ static Value_P run_generic_one_query( ArgListBuilder *arg_list,
                 arg_list->append_string( to_string( value->get_UCS_ravel() ), i );
             }
             else {
-                stringstream out;
+                std::stringstream out;
                 out << "Illegal data type in argument " << i << " of arglist";
                 Workspace::more_error() = out.str().c_str();
                 VALUE_ERROR;
@@ -213,7 +213,7 @@ static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
         VALUE_ERROR;
     }
 
-    string statement = conn->replace_bind_args( to_string( A->get_UCS_ravel() ) );
+    std::string statement = conn->replace_bind_args( to_string( A->get_UCS_ravel() ) );
     ArgListBuilder *builder;
     if( query ) {
         builder = conn->make_prepared_query( statement );
@@ -221,7 +221,7 @@ static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
     else {
         builder = conn->make_prepared_update( statement );
     }
-    auto_ptr<ArgListBuilder> arg_list( builder );
+    std::auto_ptr<ArgListBuilder> arg_list( builder );
 
     const Shape &shape = B->get_shape();
     if( shape.get_rank() == 0 || shape.get_rank() == 1 ) {
@@ -287,7 +287,7 @@ static Token run_transaction_rollback( Value_P B )
 static Token show_tables( Value_P B )
 {
     Connection *conn = value_to_db_id( B );
-    std::vector<string> tables;
+    std::vector<std::string> tables;
     conn->fill_tables( tables );
 
     Value_P value;
@@ -297,7 +297,7 @@ static Token show_tables( Value_P B )
     else {
         Shape shape( tables.size () );
         value = Value_P( shape, LOC );
-        for( std::vector<string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
+        for( std::vector<std::string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
             new (value->next_ravel())
                PointerCell( make_string_cell( *i, LOC ).get(), value.getref() );
         }
@@ -317,7 +317,7 @@ static Token show_cols( Value_P A, Value_P B )
         VALUE_ERROR;
     }
 
-    string name = to_string( B->get_UCS_ravel() );
+    std::string name = to_string( B->get_UCS_ravel() );
     conn->fill_cols( name, cols );
 
     Value_P value;

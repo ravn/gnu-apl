@@ -41,7 +41,7 @@ int IO_Files::diff_errors = 0;
 int IO_Files::parse_errors = 0;
 IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST;
 bool IO_Files::need_total = false;
-ofstream IO_Files::current_testreport;
+std::ofstream IO_Files::current_testreport;
 
 //-----------------------------------------------------------------------------
 void
@@ -241,7 +241,7 @@ IO_Files::end_of_current_file()
 
    if (InputFile::is_validating())   // running a .tc file
       {
-        ofstream summary("testcases/summary.log", ios_base::app);
+        std::ofstream summary("testcases/summary.log", std::ios_base::app);
         summary << error_count() << " ";
 
         if (error_count())
@@ -288,7 +288,7 @@ IO_Files::end_of_current_file()
 void
 IO_Files::print_summary()
 {
-ofstream summary("testcases/summary.log", ios_base::app);
+std::ofstream summary("testcases/summary.log", std::ios_base::app);
 
 int done = testcases_done;
    if (done > testcase_count)   done = testcase_count;
@@ -336,14 +336,14 @@ IO_Files::open_next_file()
                         "#####################################\n"
                      << " ########################################"
                         "######################################\n"
-                     << " ##    Testfile: " << left << setw(60)
+                     << " ##    Testfile: " << std::left << std::setw(60)
                      << InputFile::current_filename() << "##\n"
-                     << " ##    Log file: " << setw(60) << log_name << "##\n"
+                     << " ##    Log file: " << std::setw(60) << log_name << "##\n"
                      << " ########################################"
                         "######################################" << std::endl
                      << "  #######################################"
                         "#####################################\n" << std::endl
-                     << right;
+                     << std::right;
               }
 
            InputFile::open_current_file();
@@ -367,7 +367,7 @@ IO_Files::open_next_file()
            if (InputFile::current_file()->test)
               {
                 current_testreport.open(log_name,
-                                        ofstream::out | ofstream::trunc);
+                                        std::ofstream::out | std::ofstream::trunc);
                 if (!current_testreport.is_open())
                    {
                      CERR << "could not open testcase log file " << log_name

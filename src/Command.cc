@@ -963,7 +963,7 @@ Command::cmd_PSTAT(std::ostream & out, const UCS_string & arg)
    if (arg.starts_iwith("SAVE"))
       {
         const char * filename = "./PerformanceData.def";
-        ofstream outf(filename, ofstream::out);
+        std::ofstream outf(filename, std::ofstream::out);
         if (!outf.is_open())
            {
              out << "opening " << filename
@@ -1145,7 +1145,7 @@ Command::cmd_HELP(std::ostream & out, const UCS_string & arg)
 UCS_string_vector commands;
    commands.reserve(60);
 
-   out << left << "APL Commands:" << std::endl;
+   out << std::left << "APL Commands:" << std::endl;
 #define cmd_def(cmd_str, _cod, arg, _hint) \
    { UCS_string c(cmd_str " " arg);   commands.push_back(c); }
 #include "Command.def"
@@ -1156,7 +1156,7 @@ bool left_col = true;
         const UCS_string & cmd = commands[c];
         if (left_col)
            {
-              out << "      " << setw(COL2 - 2) << cmd;
+              out << "      " << std::setw(COL2 - 2) << cmd;
               left_col = false;
            }
         else
@@ -1182,20 +1182,20 @@ bool left_col = true;
      }
 
    out << std::endl << "System variables:" << std::endl
-       << "      " << setw(COL2)
+       << "      " << std::setw(COL2)
        << "⍞       Character Input/Output"
        << "⎕       Evaluated Input/Output" << std::endl;
    left_col = true;
 
 #define ro_sv_def(x, _str, txt)                                            \
    { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
-     if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
-     else            out << setw(8) << ucs << txt << std::endl;                 \
+     if (left_col)   out << "      " << std::setw(8) << ucs << std::setw(30) << txt; \
+     else            out << std::setw(8) << ucs << txt << std::endl;                 \
         left_col = !left_col; }
 #define rw_sv_def(x, _str, txt)                                            \
    { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
-     if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
-     else            out << setw(8) << ucs << txt << std::endl;                 \
+     if (left_col)   out << "      " << std::setw(8) << ucs << std::setw(30) << txt; \
+     else            out << std::setw(8) << ucs << txt << std::endl;                 \
         left_col = !left_col; }
 #include "SystemVariable.def"
 
@@ -1204,9 +1204,9 @@ bool left_col = true;
 #define ro_sv_def(x, _str, _txt)
 #define rw_sv_def(x, _str, _txt)
 #define sf_def(_q, str, txt)                                              \
-   if (left_col)   out << "      ⎕" << setw(7) << str << setw(30 +        \
+   if (left_col)   out << "      ⎕" << std::setw(7) << str << std::setw(30 +        \
                                         len_diff(txt)) << txt;            \
-   else            out << "⎕" << setw(7) << str << txt << std::endl;           \
+   else            out << "⎕" << std::setw(7) << str << txt << std::endl;           \
    left_col = !left_col;
 #include "SystemVariable.def"
 }
@@ -1402,10 +1402,10 @@ Command::cmd_LIBS(std::ostream & out, const UCS_string_vector & args)
            {
              char cc[10];
              snprintf(cc, sizeof(cc), "(%u)", errno);
-             out << " missing " << setw(4) << cc << "│ ";
+             out << " missing " << std::setw(4) << cc << "│ ";
            }
 
-        out << left << setw(53) << path.c_str() << "║\n";
+        out << std::left << std::setw(53) << path.c_str() << "║\n";
       }
 
    out <<
@@ -2105,8 +2105,8 @@ UCS_string_vector args = split_arg(arg);
               Assert(info);
 
               const bool val = Log_status(l);
-              CERR << "    " << setw(2) << right << l << ": " 
-                   << (val ? "(ON)  " : "(OFF) ") << left << info << std::endl;
+              CERR << "    " << std::setw(2) << std::right << l << ": " 
+                   << (val ? "(ON)  " : "(OFF) ") << std::left << info << std::endl;
             }
 
         return;
@@ -2163,7 +2163,7 @@ const char sub_type = record[1];
                   case 'I': stype = " imbed";       break;
                 }
 
-             CERR << "record #" << setw(3) << recnum << ": '" << rec_type
+             CERR << "record #" << std::setw(3) << recnum << ": '" << rec_type
                   << "'" << stype << std::endl;
            }
       }
@@ -2184,7 +2184,7 @@ const char sub_type = record[1];
                        case 'N': stype = " 1 ⎕TF numeric array ";   break;
                      }
 
-                  CERR << "record #" << setw(3) << recnum
+                  CERR << "record #" << std::setw(3) << recnum
                        << ": " << stype << std::endl;
                 }
 
@@ -2206,7 +2206,7 @@ const char sub_type = record[1];
       }
    else
       {
-        CERR << "record #" << setw(3) << recnum << ": '" << rec_type << "'"
+        CERR << "record #" << std::setw(3) << recnum << ": '" << rec_type << "'"
              << "*** bad record type '" << rec_type << std::endl;
       }
 }

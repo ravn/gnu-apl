@@ -59,13 +59,11 @@ static void *listener_loop( void *arg )
 
 void start_listener( int port )
 {
-    pthread_t thread_id;
+pthread_t thread_id;
+std::auto_ptr<Listener> listener( Listener::create_listener( port ) );
+std::string conninfo = listener->start();
 
-    auto_ptr<Listener> listener( Listener::create_listener( port ) );
-
-    string conninfo = listener->start();
-    
-    int res = pthread_create( &thread_id, NULL, listener_loop, listener.get() );
+int res = pthread_create( &thread_id, NULL, listener_loop, listener.get() );
     if( res != 0 ) {
         throw InitProtocolError( "Unable to start network connection thread" );
     }

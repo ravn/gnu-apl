@@ -105,7 +105,7 @@ init_1(const char * argv0, bool log_startup)
            << std::endl
            << "⎕WA total memory is       " << Quad_WA::total_memory
            << " bytes (" << (Quad_WA::total_memory/1000000) << " MB, 0x"
-           << hex << Quad_WA::total_memory << ")" << dec << std::endl;
+           << std::hex << Quad_WA::total_memory << ")" << std::dec << std::endl;
 
    // CYGWIN does not have RLIMIT_NPROC
    //

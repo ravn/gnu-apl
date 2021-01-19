@@ -776,7 +776,7 @@ PrintBuffer pb(*value, pctx, 0);
       }
    else if (pb.get_height() > 0)
       {
-        COUT << pb.l1().no_pad() << flush;
+        COUT << pb.l1().no_pad() << std::flush;
         prompt.append(pb.l1());
       }
    else   // empty output
@@ -784,7 +784,7 @@ PrintBuffer pb(*value, pctx, 0);
         // nothing to do
       }
 
-   cout << flush;
+   std::cout << std::flush;
 
    Log(LOG_cork)
       CERR << "Quad_QUOTE::assign() done, buffer = ["
@@ -1078,14 +1078,14 @@ const YMDhmsu time(when + 1000000*offset);
 char gmt[40];
    snprintf(gmt, sizeof(gmt), "(GMT%+2d)", int(offset/3600));
 
-ostringstream os;
-   os << setfill('0') << time.year  << "-"
-      << setw(2)      << time.month << "-"
-      << setw(2)      << time.day   << "  "
-      << setw(2)      << time.hour  << ":"
-      << setw(2)      << time.minute << ":"
-      << setw(2)      << time.second << " "
-      << setfill(' ') << left << setw(8) << gmt;
+std::ostringstream os;
+   os << std::setfill('0') << time.year  << "-"
+      << std::setw(2)      << time.month << "-"
+      << std::setw(2)      << time.day   << "  "
+      << std::setw(2)      << time.hour  << ":"
+      << std::setw(2)      << time.minute << ":"
+      << std::setw(2)      << time.second << " "
+      << std::setfill(' ') << std::left << std::setw(8) << gmt;
 
    return out << os.str();
 }

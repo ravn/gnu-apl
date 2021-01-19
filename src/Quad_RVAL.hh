@@ -23,8 +23,6 @@
 
 #include <vector>
 
-using namespace std;
-
 #include "QuadFunction.hh"
 
 /// a random APL value

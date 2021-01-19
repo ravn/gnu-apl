@@ -643,7 +643,7 @@ const bool file_exists = access(filename.c_str(), W_OK) == 0;
 
    // at this point it is OK to rename and save the workspace
    //
-ofstream outf(filename.c_str(), ofstream::out);
+std::ofstream outf(filename.c_str(), std::ofstream::out);
    if (!outf.is_open())   // open failed
       {
         CERR << "Unable to )SAVE workspace '" << wsname
@@ -757,11 +757,11 @@ InputFile fam(filename, file, false, false, true, with_LX);
 }
 //-----------------------------------------------------------------------------
 /// a streambuf that escapes certain HTML characters
-class HTML_streambuf : public streambuf
+class HTML_streambuf : public std::streambuf
 {
 public:
    /// constructor
-   HTML_streambuf(ofstream & outf)
+   HTML_streambuf(std::ofstream & outf)
    : out_file(outf)
    {}
 
@@ -782,7 +782,7 @@ public:
 
 protected:
    /// the output file
-   ofstream & out_file;
+   std::ofstream & out_file;
 };
 
 /// a stream that escapes certain HTML characters
@@ -822,7 +822,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, false,
         return;
       }
 
-ofstream outf(filename.c_str(), ofstream::out);
+std::ofstream outf(filename.c_str(), std::ofstream::out);
 
    if (!outf.is_open())   // open failed
       {
@@ -896,7 +896,7 @@ UCS_string wsname_apl = wsname;
      *sout <<
 " ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << std::endl <<
 "⍝                                                                    ⍝" << std::endl <<
-"⍝ " << setw(36) << wsname_apl << " ";
+"⍝ " << std::setw(36) << wsname_apl << " ";
      get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << " ⍝" << std::endl <<
 "⍝                                                                    ⍝" << std::endl <<
 " ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << std::endl

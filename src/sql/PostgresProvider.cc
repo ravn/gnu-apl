@@ -28,7 +28,7 @@ static PostgresConnection *create_postgres_connection( Value_P B )
         DOMAIN_ERROR;
     }
 
-    string connect_args = to_string( B->get_UCS_ravel() );
+    std::string connect_args = to_string( B->get_UCS_ravel() );
 
     const char *keywords[] = { "dbname", NULL };
     const char *values[] = { connect_args.c_str(), NULL };
@@ -36,7 +36,7 @@ static PostgresConnection *create_postgres_connection( Value_P B )
 
     ConnStatusType status = PQstatus( db );
     if( status != CONNECTION_OK ) {
-        stringstream out;
+        std::stringstream out;
         out << "Error connecting to Postgres database: " << PQerrorMessage( db );
         Workspace::more_error() = out.str().c_str();
         PQfinish( db );
@@ -45,7 +45,7 @@ static PostgresConnection *create_postgres_connection( Value_P B )
 
     int result = PQsetClientEncoding( db, "UTF-8" );
     if( result != 0 ) {
-        stringstream out;
+        std::stringstream out;
         out << "Unable to set encoding to UTF-8: " << PQerrorMessage( db );
         Workspace::more_error() = out.str().c_str();
         PQfinish( db );

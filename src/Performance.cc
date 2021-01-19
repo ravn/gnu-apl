@@ -284,9 +284,9 @@ double sigma = 0;
         sigma = sqrt(data2/count - mu*mu);
       }
 
-   outf << setw(8) << count << ","
-        << setw(8) << mu << ","
-        << setw(8) << uint64_t(sigma + 0.5);
+   outf << std::setw(8) << count << ","
+        << std::setw(8) << mu << ","
+        << std::setw(8) << uint64_t(sigma + 0.5);
 }
 //----------------------------------------------------------------------------
 void
@@ -340,7 +340,7 @@ FunctionStatistics::save_data(std::ostream & outf, const char * perf_name)
 {
 char cc[100];
    snprintf(cc, sizeof(cc), "%s,", perf_name);
-   outf << "prf_3 (PFS_" << left << setw(12) << cc << right;
+   outf << "prf_3 (PFS_" << std::left << std::setw(12) << cc << std::right;
    vec_cycles.save_record(outf);
    outf << ")" << std::endl;
 }
@@ -365,7 +365,7 @@ CellFunctionStatistics::save_data(std::ostream & outf, const char * perf_name)
 {
 char cc[100];
    snprintf(cc, sizeof(cc), "%s,", perf_name);
-   outf << "prf_12(PFS_" << left << setw(12) << cc << right;
+   outf << "prf_12(PFS_" << std::left << std::setw(12) << cc << std::right;
    first.save_record(outf);
    outf << ",";
    subsequent.save_record(outf);

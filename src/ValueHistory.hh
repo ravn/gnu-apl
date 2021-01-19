@@ -24,8 +24,6 @@
 #include "Common.hh"
 #include <ostream>
 
-using namespace std;
-
 class Value;
 
 /// a ringbuffer of events related to the manipulation of values

@@ -78,7 +78,7 @@ TCP_socket get_TCP_for_key(SV_key key)
 bool
 Quad_SVx::is_executable(const char * file_and_args)
 {
-string filename(file_and_args);
+std::string filename(file_and_args);
 const char * end = strchr(file_and_args, ' ');
    if (end)   filename.resize(end - file_and_args);
 

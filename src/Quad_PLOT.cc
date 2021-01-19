@@ -657,10 +657,10 @@ Quad_PLOT::help()
 "   1. Global (plot window) Attributes:\n"
 "\n";
 
-   CERR << left;
+   CERR << std::left;
 
 # define gdef(ty,  na,  val, descr)                                        \
-   CERR << setw(20) << #na ":  " << fill_14(Plot_data::ty ## _to_str(val)) \
+   CERR << std::setw(20) << #na ":  " << fill_14(Plot_data::ty ## _to_str(val)) \
         << " (" << descr << ")" << std::endl;
 # include "Quad_PLOT.def"
 
@@ -673,11 +673,11 @@ Quad_PLOT::help()
 "\n";
 
 # define ldef(ty,  na,  val, descr)             \
-   CERR << setw(20) << #na "-N:  " << setw(14) \
+   CERR << std::setw(20) << #na "-N:  " << std::setw(14) \
         << Plot_data::ty ## _to_str(val) << " (" << descr << ")" << std::endl;
 # include "Quad_PLOT.def"
 
-   CERR << right;
+   CERR << std::right;
 }
 //-----------------------------------------------------------------------------
 #endif // defined(WHY_NOT)

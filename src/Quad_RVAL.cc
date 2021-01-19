@@ -502,7 +502,7 @@ union { uint64_t i; double f; } u;
         u.i = rand17() | rand17() << 17 | rand17() << 34;
         u.i &= 0x000FFFFFFFFFFFFFULL;
         u.i |= 0x3FE0000000000000ULL;
-      } while (!isnormal(u.f));
+      } while (!std::isnormal(u.f));
 
    new (cell) FloatCell(u.f);
 }
@@ -515,13 +515,13 @@ union { int64_t i; double f; } u1, u2;
         u1.i = rand17() | rand17() << 17 | rand17() << 34;
         u1.i &= 0x000FFFFFFFFFFFFFULL;
         u1.i |= 0x3FE0000000000000ULL;
-      } while (!isnormal(u1.f));
+      } while (!std::isnormal(u1.f));
 
    do {
         u2.i = rand17() | rand17() << 17 | rand17() << 34;
         u2.i &= 0x000FFFFFFFFFFFFFULL;
         u2.i |= 0x3FE0000000000000ULL;
-      } while (!isnormal(u2.f));
+      } while (!std::isnormal(u2.f));
    new (cell) ComplexCell(u1.f - 1.0, u2.f - 1.0);
 }
 //-----------------------------------------------------------------------------

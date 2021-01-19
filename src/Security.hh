@@ -55,9 +55,12 @@ extern void not_allowed(const char * what);
 /// normal assertion
 
 /// assertion being fatal if wrong
-#define Assert_fatal(x) if (!(x)) {\
-   cerr << std::endl << std::endl << "FATAL error at " << __FILE__ << ":" << __LINE__ \
+#ifndef Assert_fatal
+# define Assert_fatal(x) if (!(x)) {\
+   cerr << std::endl << std::endl << "FATAL error at "
+        << __FILE__ << ":" << __LINE__ \
         << std::endl;   exit(2); }
 
+# endif // Assert_fatal
 #endif // __SECURITY_HH_DEFINED__
 

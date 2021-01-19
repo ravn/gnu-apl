@@ -26,7 +26,7 @@
 class ArgListBuilder {
 public:
     virtual ~ArgListBuilder() {}
-    virtual void append_string( const string &arg, int pos ) = 0;
+    virtual void append_string( const std::string &arg, int pos ) = 0;
     virtual void append_long( long arg, int pos ) = 0;
     virtual void append_double( double arg, int pos ) = 0;
     virtual void append_null( int pos ) = 0;

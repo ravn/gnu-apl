@@ -188,7 +188,7 @@ LineHistory::save_history(const char * filename)
 {
    if (hist_lines.size() == 0)   return;
 
-ofstream outf(filename);
+std::ofstream outf(filename);
    if (!outf.is_open())
       {
         CERR << "Cannot write history file " << filename
@@ -209,7 +209,7 @@ int count = 0;
       }
 
    Log(LOG_get_line)
-      cerr << count << " history lines written to " << filename << std::endl;
+      std::cerr << count << " history lines written to " << filename << std::endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -338,7 +338,7 @@ LineEditContext::~LineEditContext()
 {
    // restore block cursor
    //
-   if (!ins_mode)   CIN << "\x1B[1 q" << flush;
+   if (!ins_mode)   CIN << "\x1B[1 q" << std::flush;
 }
 //-----------------------------------------------------------------------------
 void
@@ -511,8 +511,8 @@ LineEditContext::toggle_ins_mode()
    // CSI [5 q       : blinking bar (doesn't work) 
    // CSI [6 q       : steady   bar (doesn't work) 
 
-   if (ins_mode)   CIN << "\x1B[0 q" << flush;
-   else            CIN << "\x1B[3 q" << flush;
+   if (ins_mode)   CIN << "\x1B[0 q" << std::flush;
+   else            CIN << "\x1B[3 q" << std::flush;
 }
 //-----------------------------------------------------------------------------
 void

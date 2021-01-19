@@ -39,7 +39,7 @@ DynamicObject::print_chain(std::ostream & out) const
 int pos = 0;
    for (const DynamicObject * p = this; ;)
        {
-         out << "    Chain[" << setw(2) << pos++ << "]  " 
+         out << "    Chain[" << std::setw(2) << pos++ << "]  " 
              << voidP(p->prev) << " --> "
              << voidP(p)       << " --> "
              << voidP(p->next) << "    "

@@ -46,15 +46,15 @@ RealCell::bif_logarithm(Cell * Z, const Cell * A) const
           get_real_value() >= 0.0)
       {
         const APL_Float z = log(get_real_value()) / log(A->get_real_value());
-        if (!isfinite(z))   return E_DOMAIN_ERROR;
+        if (!std::isfinite(z))   return E_DOMAIN_ERROR;
         return FloatCell::zv(Z, z);
       }
 
    // complex result (complex B or negative A)
    //
 const APL_Complex z = log(get_complex_value()) / log(A->get_complex_value());
-   if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
-   if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(z.real()))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(z.imag()))   return E_DOMAIN_ERROR;
    return ComplexCell::zv(Z, z);
 }
 //-----------------------------------------------------------------------------

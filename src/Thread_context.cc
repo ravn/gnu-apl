@@ -91,9 +91,9 @@ Thread_context::print(std::ostream & out) const
 {
 const void * vpth = reinterpret_cast<const void *>(thread);
 
-   out << "thread #"     << setw(2) << N << ":" << setw(16) << vpth
+   out << "thread #"     << std::setw(2) << N << ":" << std::setw(16) << vpth
        << (blocked ? " BLKD" : " RUN ")
-       << " job:"        << setw(5) << int(job_number)
+       << " job:"        << std::setw(5) << int(job_number)
        << " " << job_name << std::endl;
 }
 //-----------------------------------------------------------------------------

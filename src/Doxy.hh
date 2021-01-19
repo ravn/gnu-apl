@@ -27,8 +27,6 @@
 #include <ostream>
 #include <vector>
 
-using namespace std;
-
 class UserFunction;
 
 //-----------------------------------------------------------------------------
@@ -85,14 +83,14 @@ public:
 
    /// HTML-print a table containing all defined functions to \b page
    void functions_table(const std::vector<const Symbol *> & functions,
-                       ofstream & page);
+                       std::ofstream & page);
 
    /// HTML-print a table with all variables to 'page'
    void variables_table(const std::vector<const Symbol *> & variables,
-                        ofstream & page);
+                        std::ofstream & page);
 
    /// HTML-print a table with the SI stack to 'page'
-   void SI_table(ofstream & page);
+   void SI_table(std::ofstream & page);
 
    /// return the number of errors that have occurred
    int get_errors() const

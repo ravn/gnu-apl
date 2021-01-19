@@ -311,7 +311,8 @@ const int sock = Svar_DB::get_DB_tcp();
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + sizeof(Svar_record)];
-std::ostream * log = (LOG_startup != 0 || LOG_Svar_DB_signals != 0) ? & cerr : 0;
+std::ostream * log = (LOG_startup != 0 || LOG_Svar_DB_signals != 0)
+                   ? & std::cerr : 0;
 const char * err_loc = 0;
 Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
                                                del, log, &err_loc);
@@ -362,7 +363,7 @@ uint32_t vname1[MAX_SVAR_NAMELEN];
         else                break;
       }
 
-string vname(charP(vname1), MAX_SVAR_NAMELEN*sizeof(uint32_t));
+std::string vname(charP(vname1), MAX_SVAR_NAMELEN*sizeof(uint32_t));
 
 MATCH_OR_MAKE_c request(tcp, vname,
                              to.proc,      to.parent,      to.grand,
@@ -460,7 +461,7 @@ Svar_DB::set_state(SV_key key, bool used, const char * loc)
 const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
    if (tcp == NO_TCP_SOCKET)   return;
 
-string sloc(loc);
+std::string sloc(loc);
 SET_STATE_c request(tcp, key, used, sloc);
 }
 //-----------------------------------------------------------------------------
@@ -572,7 +573,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    if (response)
       {
-        const string & op = response->get__OFFERING_PROCS_ARE__offering_procs();
+        const std::string & op = response->get__OFFERING_PROCS_ARE__offering_procs();
         const AP_num * procs = reinterpret_cast<const AP_num *>(op.data());
         const size_t count = op.size() / sizeof(AP_num);
 
@@ -598,7 +599,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    if (response)
       {
-        const string & ov = response->get__OFFERED_VARS_ARE__offered_vars();
+        const std::string & ov = response->get__OFFERED_VARS_ARE__offered_vars();
         const uint32_t * names = reinterpret_cast<const uint32_t *>(ov.data());
         const size_t count = ov.size() / sizeof(uint32_t);
 

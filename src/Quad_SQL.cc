@@ -118,7 +118,7 @@ Token open_database(Value_P A, Value_P B)
         VALUE_ERROR;
     }
 
-string type = to_string(A->get_UCS_ravel());
+std::string type = to_string(A->get_UCS_ravel());
    loop(p, providers.size())
        {
          if (providers[p]->get_name() == type)
@@ -231,7 +231,7 @@ run_generic(Connection *conn, Value_P A, Value_P B, bool query)
         VALUE_ERROR;
       }
 
-string statement = conn->replace_bind_args(to_string( A->get_UCS_ravel()));
+std::string statement = conn->replace_bind_args(to_string( A->get_UCS_ravel()));
 ArgListBuilder * builder;
     if (query)   builder = conn->make_prepared_query( statement );
     else         builder = conn->make_prepared_update( statement );
@@ -305,7 +305,7 @@ static Token run_transaction_rollback( Value_P B )
 static Token show_tables( Value_P B )
 {
     Connection *conn = value_to_db_id( B );
-    std::vector<string> tables;
+    std::vector<std::string> tables;
     conn->fill_tables( tables );
 
     Value_P value;
@@ -315,7 +315,7 @@ static Token show_tables( Value_P B )
     else {
         Shape shape( tables.size () );
         value = Value_P( shape, LOC );
-        for( std::vector<string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
+        for( std::vector<std::string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
             new (value->next_ravel()) PointerCell( make_string_cell( *i, LOC ).get(),
                value.getref() );
         }
@@ -336,7 +336,7 @@ std::vector<ColumnDescriptor> cols;
         VALUE_ERROR;
     }
 
-string name = to_string(B->get_UCS_ravel());
+std::string name = to_string(B->get_UCS_ravel());
     conn->fill_cols(name, cols);
 
 Value_P value;

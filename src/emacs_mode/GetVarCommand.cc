@@ -36,7 +36,7 @@ private:
 
 static void send_reply( NetworkConnection &conn, std::string message )
 {
-    stringstream out;
+    std::stringstream out;
     out << message << "\n"
         << END_TAG << "\n";
     conn.write_string_to_fd( out.str() );
@@ -165,7 +165,7 @@ void GetVarCommand::run_command( NetworkConnection &conn, const std::vector<std:
 
     Value_P value = symbol->get_value();
     try {
-        stringstream out;
+        std::stringstream out;
         out.precision( 20 );
         out << "content\n";
         apl_value_to_el( out, value );

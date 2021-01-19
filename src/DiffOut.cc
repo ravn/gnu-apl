@@ -36,9 +36,9 @@ PERFORMANCE_START(cout_perf)
 
    // expand LF to CRLF if desired
    //
-   if (expand_LF && c == '\n')   cout << "\r";
+   if (expand_LF && c == '\n')   std::cout << "\r";
 
-   cout << char(c);
+   std::cout << char(c);
 
    if (!InputFile::is_validating())
       {
@@ -55,7 +55,7 @@ PERFORMANCE_START(cout_perf)
 
    // complete line received
    //
-ofstream & rep = IO_Files::get_current_testreport();
+std::ofstream & rep = IO_Files::get_current_testreport();
    Assert(rep.is_open());
 
 const char * apl = aplout.c_str();

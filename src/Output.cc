@@ -64,7 +64,7 @@ std::ostream UERR(&UERR_filebuf);
 extern std::ostream & get_CERR();
 std::ostream & get_CERR()
 {
-   return ErrOut::used ? CERR : cerr;
+   return ErrOut::used ? CERR : std::cerr;
 };
 
 Output::ColorMode Output::color_mode = COLM_UNDEF;
@@ -122,7 +122,7 @@ PERFORMANCE_START(cerr_perf)
    if (!InputFile::echo_current_file())   return 0;
 
    Output::set_color_mode(Output::COLM_INPUT);
-   cerr << char(c);
+   std::cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
@@ -134,7 +134,7 @@ ErrOut::overflow(int c)
 PERFORMANCE_START(cerr_perf)
 
    Output::set_color_mode(Output::COLM_ERROR);
-   cerr << char(c);
+   std::cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
@@ -145,8 +145,8 @@ Output::init(bool logit)
 {
    if (!isatty(fileno(stdout)))
       {
-        cout.flush();
-        cout.setf(ios::unitbuf);
+        std::cout.flush();
+        std::cout.setf(std::ios::unitbuf);
       }
 
    if (logit)
@@ -171,8 +171,8 @@ Output::reset_colors()
 {
    if (!colors_changed)   return;
 
-   cout << color_RESET << clear_EOL;
-   cerr << color_RESET << clear_EOL;
+   std::cout << color_RESET << clear_EOL;
+   std::cerr << color_RESET << clear_EOL;
 }
 //-----------------------------------------------------------------------------
 void
@@ -188,13 +188,13 @@ Output::set_color_mode(Output::ColorMode mode)
 
    switch(color_mode)
       {
-        case COLM_INPUT:  cerr << color_CIN  << clear_EOL;   break;
+        case COLM_INPUT:  std::cerr << color_CIN  << clear_EOL;   break;
 
-        case COLM_OUTPUT: cout << color_COUT << clear_EOL;   break;
+        case COLM_OUTPUT: std::cout << color_COUT << clear_EOL;   break;
 
-        case COLM_ERROR:  cerr << color_CERR << clear_EOL;   break;
+        case COLM_ERROR:  std::cerr << color_CERR << clear_EOL;   break;
 
-        case COLM_UERROR: cout << color_UERR << clear_EOL;   break;
+        case COLM_UERROR: std::cout << color_UERR << clear_EOL;   break;
 
         default: break;
       }

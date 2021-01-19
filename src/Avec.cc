@@ -549,7 +549,7 @@ Unicode_to_IBM_codepoint * map = inverse_ibm_av;
            {
              const int pos = col + 4*row;
              CERR << " { " << HEX4(inverse_ibm_av[pos].uni) << ", "
-                  << setw(3) << inverse_ibm_av[pos].cp << " }";
+                  << std::setw(3) << inverse_ibm_av[pos].cp << " }";
              if (pos < 255)   CERR << ",";
            }
         CERR << std::endl;

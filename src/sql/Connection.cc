@@ -20,9 +20,9 @@
 
 #include "Connection.hh"
 
-const string Connection::replace_bind_args( const string &sql )
+const std::string Connection::replace_bind_args( const std::string &sql )
 {
-    stringstream out;
+    std::stringstream out;
     int pos = 0;
     for( size_t i = 0 ; i < sql.size() ; i++ ) {
         char ch = sql[i];

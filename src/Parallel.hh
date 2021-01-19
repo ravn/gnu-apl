@@ -169,8 +169,6 @@ inline void atomic_add(volatile _Atomic_word & counter, int increment)
 
 #include "Cell.hh"
 
-using namespace std;
-
 //=============================================================================
 /**
   Multi-core GNU APL uses a pool of threads numbered 0, 1, ... core_count()-1

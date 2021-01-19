@@ -922,7 +922,7 @@ UCS_string_vector original_text;
    Log(LOG_UserFunction__fix)
       {
         CERR << "body.size() is " << body.size() << std::endl
-             << "line_starts.size() is " << line_starts.size() <<endl; 
+             << "line_starts.size() is " << line_starts.size() << std::endl; 
       }
 
    // let [0] be the end of the function.

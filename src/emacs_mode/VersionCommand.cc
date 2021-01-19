@@ -26,7 +26,7 @@
 
 void VersionCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
-    stringstream out;
+    std::stringstream out;
     out << PROTOCOL_VERSION << "\n"
         << END_TAG << "\n";
     conn.write_string_to_fd( out.str() );

@@ -27,7 +27,7 @@
 
 void SystemFnCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
-    stringstream out;
+    std::stringstream out;
 
 #define cmd_def(NAME, CMD, ARG, HINT) out << NAME << "\n";
 #include "../Command.def"

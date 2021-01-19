@@ -41,12 +41,13 @@ static_Objects::static_Objects(const char * l, const char * w)
    : what(w),
      loc(l)
 {
-   if (show_constructors)   cerr << "++ constructing " << what << std::endl;
+   if (show_constructors)   std::cerr << "++ constructing "
+                                      << what << std::endl;
 }
 //-----------------------------------------------------------------------------
 static_Objects::~static_Objects()
 {
-   if (show_destructors)   cerr << "-- destructing " << what << std::endl;
+   if (show_destructors)   std::cerr << "-- destructing " << what << std::endl;
 }
 //-----------------------------------------------------------------------------
 

@@ -412,7 +412,7 @@ UserPreferences::parse_argv_2(bool logit)
 
          if (!strcmp(opt, "--gpl"))
             {
-              show_GPL(cout);
+              show_GPL(std::cout);
               exit(0);
             }
 
@@ -654,8 +654,8 @@ UserPreferences::parse_argv_2(bool logit)
                    //
                    if (!append_summary)
                       {
-                        ofstream summary("testcases/summary.log",
-                                         ios_base::trunc);
+                        std::ofstream summary("testcases/summary.log",
+                                         std::ios_base::trunc);
                       }
                  }
               continue;
@@ -685,7 +685,7 @@ UserPreferences::parse_argv_2(bool logit)
             }
          if (!strcmp(opt, "-v") || !strcmp(opt, "--version"))
             {
-              show_version(cout);
+              show_version(std::cout);
               exit(0);
             }
          if (!strcmp(opt, "-u"))

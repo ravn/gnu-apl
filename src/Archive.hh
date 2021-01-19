@@ -42,15 +42,13 @@ struct Token_loc;
 class Value;
 class ValueStackItem;
 
-using namespace std;
-
 //-----------------------------------------------------------------------------
 /// a helper class for saving an APL workspace
 class XML_Saving_Archive
 {
 public:
    /// constructor: remember output stream and  workspace
-   XML_Saving_Archive(ofstream & of)
+   XML_Saving_Archive(std::ofstream & of)
    : indent(0),
      out(of),
      values(0),

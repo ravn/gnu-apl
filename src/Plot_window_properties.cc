@@ -50,12 +50,12 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
      rangeZ_type(NO_RANGE)
 {
    if (verbosity & SHOW_DRAW)
-      CERR << setw(20) << "min_X: " << min_X << std::endl
-           << setw(20) << "max_X: " << max_X << std::endl
-           << setw(20) << "min_Y: " << min_Y << std::endl
-           << setw(20) << "max_Y: " << max_Y << std::endl
-           << setw(20) << "min_Z: " << min_Z << std::endl
-           << setw(20) << "max_Z: " << max_Z << std::endl;
+      CERR << std::setw(20) << "min_X: " << min_X << std::endl
+           << std::setw(20) << "max_X: " << max_X << std::endl
+           << std::setw(20) << "min_Y: " << min_Y << std::endl
+           << std::setw(20) << "max_Y: " << max_Y << std::endl
+           << std::setw(20) << "min_Z: " << min_Z << std::endl
+           << std::setw(20) << "max_Z: " << max_Z << std::endl;
 
    line_properties = new Plot_line_properties *[line_count + 1];
    loop (l, line_count)   line_properties[l] = new Plot_line_properties(l);
@@ -157,23 +157,23 @@ const double orig_len = sqrt(origin_X*origin_X + origin_Y*origin_Y);
    scale_Z = orig_len ? orig_len / delta_Z : 1.0;    // pixels per Z-value
 
    if (verbosity & SHOW_DRAW)
-      CERR << setw(20) << "delta_X (1): " << delta_X << " (Xmax-Xmin)" << std::endl
-           << setw(20) << "delta_Y (1): " << delta_Y << " (Ymax-Ymin)" << std::endl
-           << setw(20) << "delta_Z (1): " << delta_Z << " (Zmax-Zmin)" << std::endl
-           << setw(20) << "scale_X (1): " << scale_X << " pixels/X" << std::endl
-           << setw(20) << "scale_Y (1): " << scale_Y << " pixels/Y" << std::endl
-           << setw(20) << "scale_Z (1): " << scale_Z << " pixels/Z" << std::endl;
+      CERR << std::setw(20) << "delta_X (1): " << delta_X << " (Xmax-Xmin)" << std::endl
+           << std::setw(20) << "delta_Y (1): " << delta_Y << " (Ymax-Ymin)" << std::endl
+           << std::setw(20) << "delta_Z (1): " << delta_Z << " (Zmax-Zmin)" << std::endl
+           << std::setw(20) << "scale_X (1): " << scale_X << " pixels/X" << std::endl
+           << std::setw(20) << "scale_Y (1): " << scale_Y << " pixels/Y" << std::endl
+           << std::setw(20) << "scale_Z (1): " << scale_Z << " pixels/Z" << std::endl;
 
 const double tile_X_raw = gridX_pixels / scale_X;
 const double tile_Y_raw = gridY_pixels / scale_Y;
 const double tile_Z_raw = gridZ_pixels / scale_Z;
 
   if (verbosity & SHOW_DRAW)
-      CERR << setw(20) << "tile_X_raw: " << tile_X_raw
+      CERR << std::setw(20) << "tile_X_raw: " << tile_X_raw
                                          << "(∆X between grid lines)" << std::endl
-           << setw(20) << "tile_Y_raw: " << tile_Y_raw
+           << std::setw(20) << "tile_Y_raw: " << tile_Y_raw
                                          << "(∆Y between grid lines)" << std::endl
-           << setw(20) << "tile_Z_raw: " << tile_Z_raw
+           << std::setw(20) << "tile_Z_raw: " << tile_Z_raw
                                          << "(∆Z between grid lines)" << std::endl;
 
    tile_X = round_up_125(tile_X_raw);
@@ -207,23 +207,23 @@ const int max_Zi = ceil(max_Z / tile_Z);
    scale_Z = orig_len ? orig_len  / delta_Z : 1.0;
 
    if (verbosity & SHOW_DRAW)
-      CERR << setw(20) << "min_X (2): " << min_X << std::endl
-           << setw(20) << "max_X (2): " << max_X << std::endl
-           << setw(20) << "min_Y (2): " << min_Y << std::endl
-           << setw(20) << "max_Y (2): " << max_Y << std::endl
-           << setw(20) << "min_Z (2): " << min_Z << std::endl
-           << setw(20) << "max_Z (2): " << max_Z << std::endl
-           << setw(20) << "delta_X (2): " << delta_X << " (Xmax-Xmin)" << std::endl
-           << setw(20) << "delta_Y (2): " << delta_Y << " (Ymax-Ymin)" << std::endl
-           << setw(20) << "delta_Z (2): " << delta_Z << " (Zmax-Zmin)" << std::endl
-           << setw(20) << "scale_X (2): " << scale_X << " pixels/X" << std::endl
-           << setw(20) << "scale_Y (2): " << scale_Y << " pixels/Y" << std::endl
-           << setw(20) << "scale_Z (2): " << scale_Z << " pixels/Z" << std::endl
-           << setw(20) << "tile_X  (2): " << tile_X
+      CERR << std::setw(20) << "min_X (2): " << min_X << std::endl
+           << std::setw(20) << "max_X (2): " << max_X << std::endl
+           << std::setw(20) << "min_Y (2): " << min_Y << std::endl
+           << std::setw(20) << "max_Y (2): " << max_Y << std::endl
+           << std::setw(20) << "min_Z (2): " << min_Z << std::endl
+           << std::setw(20) << "max_Z (2): " << max_Z << std::endl
+           << std::setw(20) << "delta_X (2): " << delta_X << " (Xmax-Xmin)" << std::endl
+           << std::setw(20) << "delta_Y (2): " << delta_Y << " (Ymax-Ymin)" << std::endl
+           << std::setw(20) << "delta_Z (2): " << delta_Z << " (Zmax-Zmin)" << std::endl
+           << std::setw(20) << "scale_X (2): " << scale_X << " pixels/X" << std::endl
+           << std::setw(20) << "scale_Y (2): " << scale_Y << " pixels/Y" << std::endl
+           << std::setw(20) << "scale_Z (2): " << scale_Z << " pixels/Z" << std::endl
+           << std::setw(20) << "tile_X  (2): " << tile_X
                                           << "(∆X between grid lines)" << std::endl
-           << setw(20) << "tile_Y  (2): " << tile_Y
+           << std::setw(20) << "tile_Y  (2): " << tile_Y
                                           << "(∆Y between grid lines)" << std::endl
-           << setw(20) << "tile_Z  (2): " << tile_Z
+           << std::setw(20) << "tile_Z  (2): " << tile_Z
                                           << "(∆Z between grid lines)" << std::endl;
 
    return false;   // OK
@@ -233,14 +233,14 @@ int
 Plot_window_properties::print(std::ostream & out) const
 {
 # define gdef(ty,  na,  _val, _descr) \
-   out << setw(20) << #na ":  " << Plot_data::ty ## _to_str(na) << std::endl;
+   out << std::setw(20) << #na ":  " << Plot_data::ty ## _to_str(na) << std::endl;
 # include "Quad_PLOT.def"
 
    loop(g, gradient.size())
        {
          char cc[30];
          snprintf(cc, sizeof(cc), "color_level-%u: ", gradient[g].level);
-         out << setw(20) << cc
+         out << std::setw(20) << cc
              << Plot_data::Color_to_str(gradient[g].rgb) << std::endl;
        }
 

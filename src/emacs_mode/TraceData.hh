@@ -49,7 +49,7 @@ public:
 
 private:
     Symbol *symbol;
-    map<NetworkConnection *, TraceDataEntry> active_listeners;
+    std::map<NetworkConnection *, TraceDataEntry> active_listeners;
 };
 
 #endif

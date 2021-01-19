@@ -31,8 +31,6 @@
 #include "Assert.hh"
 #include "UCS_string.hh"
 
-using namespace std;
-
 /*
  The classes below are used to combine normal user I/O and automatic
  testcase execution. It works like this:

@@ -33,7 +33,7 @@ void SqliteArgListBuilder::init_sql( void )
     }
 }
 
-SqliteArgListBuilder::SqliteArgListBuilder( SqliteConnection *connection_in, const string &sql_in )
+SqliteArgListBuilder::SqliteArgListBuilder( SqliteConnection *connection_in, const std::string &sql_in )
     : sql( sql_in ), connection( connection_in )
 {
     init_sql();
@@ -55,7 +55,7 @@ static void free_text_arg( void *arg )
     free( arg );
 }
 
-void SqliteArgListBuilder::append_string( const string &arg, int pos )
+void SqliteArgListBuilder::append_string( const std::string &arg, int pos )
 {
     char *text = strdup( arg.c_str() );
     if( text == NULL ) {

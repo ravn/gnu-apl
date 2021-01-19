@@ -36,14 +36,15 @@ static void log_error( Error &error, std::ostream &out )
 
 void DefCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
-    std::vector<string> content = conn.load_block();
+    std::vector<std::string> content = conn.load_block();
 
     try {
-        stringstream out;
+        std::stringstream out;
 
         Shape shape( content.size() );
         Value_P function_list_value(shape, LOC);
-        for( std::vector<string>::const_iterator i = content.begin() ; i != content.end() ; i++ ) {
+        for(std::vector<std::string>::const_iterator i = content.begin();
+            i != content.end() ; i++ ) {
             Value_P v;
             if( i->size() == 0 ) {
                 v = Str0( LOC );
@@ -95,7 +96,7 @@ void DefCommand::run_command( NetworkConnection &conn, const std::vector<std::st
         conn.write_string_to_fd( out.str() );
     }
     catch( Error &error ) {
-        stringstream out;
+        std::stringstream out;
         out << "error\n";
 
         log_error( error, out );

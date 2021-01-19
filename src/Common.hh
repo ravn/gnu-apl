@@ -367,11 +367,12 @@ inline bool is_iPAD_char(Unicode uni)
 extern std::ostream & get_CERR();
 
 /// print x and its source code location
-#define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << std::endl;
+#define Q(x) get_CERR() << std::left << std::setw(20) << #x ":" \
+                        << " '" << x << "' at " LOC << std::endl;
 
 /// same as Q1 (for printouts guarded by Log macros). Unlike Q() which MUST
 /// NOT REMAIN IN THE CODE, Q1 should remain in the code.
-#define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << std::endl;
+#define Q1(x) get_CERR() << std::left << std::setw(20) << #x ":" << " '" << x << "' at " LOC << std::endl;
 
 //-----------------------------------------------------------------------------
 
@@ -448,17 +449,17 @@ charP(const void * vp)
 }
 //-----------------------------------------------------------------------------
 
-#define uhex  std::hex << uppercase << setfill('0')
-#define lhex  std::hex << nouppercase << setfill('0')
-#define nohex std::dec << nouppercase << setfill(' ')
+#define uhex  std::hex << std::uppercase   << std::setfill('0')
+#define lhex  std::hex << std::nouppercase << std::setfill('0')
+#define nohex std::dec << std::nouppercase << std::setfill(' ')
 
 /// formatting for hex (and similar) values
 #define HEX(x)     "0x" << uhex <<             int64_t(x) << nohex
 #define HEX2(x)    "0x" << uhex << std::right << \
-                           setw(2) << int(x) << std::left << nohex
+                           std::setw(2) << int(x) << std::left << nohex
 #define HEX4(x)    "0x" << uhex << std::right << \
-                           setw(4) << int(x) << std::left << nohex
-#define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
+                           std::setw(4) << int(x) << std::left << nohex
+#define UNI(x)     "U+" << uhex <<      std::setw(4) << int(x) << nohex
 
 /// cast to a const void *
 inline const void * voidP(const void * addr) { return addr; }

@@ -627,7 +627,7 @@ const int grid_style = w_props.get_gridX_style();
         Pixel_XY P(px, origin.y);
         draw_arrow(cr, origin, P, grid_color);
 
-        const string arrow_label = w_props.get_axisX_label();
+        const std::string arrow_label = w_props.get_axisX_label();
         if (arrow_label.size())
            {
              draw_text(cr, arrow_label.c_str(), Pixel_XY(P.x + 40, P.y + 5));
@@ -692,7 +692,7 @@ const int grid_style = w_props.get_gridY_style();
         Pixel_XY P(origin.x, Ay);
         draw_arrow(cr, origin, P, grid_color);
 
-        const string arrow_label = w_props.get_axisY_label();
+        const std::string arrow_label = w_props.get_axisY_label();
         if (arrow_label.size())
            {
              double cc_width, cc_height;
@@ -804,7 +804,7 @@ int grid_style = w_props.get_gridZ_style();
         const Pixel_XY P(orig.x - len_Zx, orig.y + len_Zy);
         draw_arrow(cr, origin, P, grid_color);
 
-        const string arrow_label = w_props.get_axisZ_label();
+        const std::string arrow_label = w_props.get_axisZ_label();
         if (arrow_label.size())
            {
              double cc_width, cc_height;
@@ -1123,7 +1123,7 @@ save_file(const Plot_context & pctx, cairo_surface_t * surface)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 
-string fname = w_props.get_output_filename();
+std::string fname = w_props.get_output_filename();
    if (fname.size() == 0)   return;
 
    if (fname.size() < 4 || strcmp(".png", fname.c_str() + fname.size() - 4))

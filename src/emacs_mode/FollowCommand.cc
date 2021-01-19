@@ -33,7 +33,7 @@
 #include <limits.h>
 #include <errno.h>
 
-typedef map<const Symbol *, TraceData *> SymbolTraceMap;
+typedef std::map<const Symbol *, TraceData *> SymbolTraceMap;
 
 SymbolTraceMap trace_data; 
 pthread_mutex_t trace_data_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -49,7 +49,7 @@ void symbol_assignment( const Symbol &symbol, Symbol_Event ev )
     }
 }
 
-static bool parse_boolean( string arg )
+static bool parse_boolean( std::string arg )
 {
     if( arg == "on" ) {
         return true;
@@ -84,7 +84,7 @@ static void enable_trace( NetworkConnection &conn, Symbol *symbol, int cr_level 
     TraceData *data = find_trace_data( symbol );
     data->add_listener( &conn, cr_level );
 
-    stringstream out;
+    std::stringstream out;
     out << "enabled" << std::endl;
     Value_P v = symbol->get_value();
     TraceData::display_value_for_trace( out, v, cr_level );
@@ -123,7 +123,7 @@ void FollowCommand::run_command( NetworkConnection &conn, const std::vector<std:
     if( enable ) {
         int cr_level = -1;
         if( num_args > 3 ) {
-            string cr_arg = args[3];
+            std::string cr_arg = args[3];
             if( cr_arg != "off" ) {
                 long v = strtol( cr_arg.c_str(), NULL, 10 );
                 if( v == LONG_MAX && errno == ERANGE ) {

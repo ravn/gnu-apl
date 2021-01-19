@@ -36,7 +36,7 @@
 #include "Svar_DB_server.hh"
 #include "Svar_signals.hh"
 
-extern ostream & get_CERR();
+extern std::ostream & get_CERR();
 extern TCP_socket get_tcp2_for_id();
 
 extern uint16_t get_udp_port_for_id(const AP_num3 & id);
@@ -133,7 +133,7 @@ Svar_DB_server::find_var(SV_key key, const char * loc) const
 {
    if (key == 0)
       {
-        cerr << "*** key 0 in find_var() called from " << loc << endl;
+        std::cerr << "*** key 0 in find_var() called from " << loc << std::endl;
         return 0;
       }
 
@@ -143,8 +143,8 @@ Svar_DB_server::find_var(SV_key key, const char * loc) const
          if (key == svar.key)   return (Svar_record *)&svar;
        }
 
-   cerr << "*** key 0x" << hex << key << dec
-        << " not found in find_var() called from " << loc << endl;
+   std::cerr << "*** key 0x" << std::hex << key << std::dec
+        << " not found in find_var() called from " << loc <<std::endl;
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -161,9 +161,9 @@ AP_num3 not_found(NO_AP, AP_NULL, NO_AP);
 //-----------------------------------------------------------------------------
 void
 Svar_DB_server::get_offering_processors(AP_num to_proc,
-                                        vector<AP_num> & processors)
+                                        std::vector<AP_num> & processors)
 {
-vector<AP_num> procs;
+std::vector<AP_num> procs;
 
    // return pending AND matched offers, general or to to_proc
    //
@@ -210,7 +210,7 @@ vector<AP_num> procs;
 //-----------------------------------------------------------------------------
 void
 Svar_DB_server::get_offered_variables(AP_num to_proc, AP_num from_proc,
-                                      vector<uint32_t> & vars) const
+                                      std::vector<uint32_t> & vars) const
 {
    // return pending variables but not matched offers, general or to to_proc
    //
@@ -273,7 +273,7 @@ Svar_DB_server::match_or_make(const uint32_t * UCS_varname, const AP_num3 & to,
                               const Svar_partner & from, TCP_socket tcp2)
 {
 // CERR << "got offer from ("; from.print(CERR); CERR << ") to " << to << " ";
-// Svar_record::print_name(CERR, UCS_varname) << endl;
+// Svar_record::print_name(CERR, UCS_varname) <<std::endl;
 
 Svar_record * svar = match_pending_offer(UCS_varname, to, from, tcp2);
    if (svar)
@@ -283,7 +283,8 @@ Svar_record * svar = match_pending_offer(UCS_varname, to, from, tcp2);
              get_CERR() << "found pending offer from "
                         << svar->offering.id.proc << " ";
              svar->print_name(get_CERR());
-             get_CERR() << " key 0x" << hex << svar->key << dec << endl;
+             get_CERR() << " key 0x" << std::hex << svar->key
+                        << std::dec <<std::endl;
            }
 
          usleep(50000);
@@ -295,7 +296,7 @@ usleep(50000);
 
    Log(LOG_shared_variables)
       {
-        get_CERR() << "created new offer:" << endl;
+        get_CERR() << "created new offer:" <<std::endl;
 //      Svar_DB::print(get_CERR());
       }
 

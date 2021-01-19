@@ -403,7 +403,7 @@ const bool log_startup = uprefs.parse_argv_1();
 
    init_2(log_startup);
 
-   if (!uprefs.silent)   show_welcome(cout, argv[0]);
+   if (!uprefs.silent)   show_welcome(std::cout, argv[0]);
 
    if (log_startup)   CERR << "PID is " << getpid() << std::endl;
    Log(LOG_argc_argv || log_startup)   show_argv(argc, argv);

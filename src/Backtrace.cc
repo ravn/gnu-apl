@@ -160,7 +160,7 @@ int64_t prev_pc = -1LL;
 
    fclose(file);   // also closes fd
 
-   cerr << "read " << pc_2_src.size() << " line numbers" << std::endl;
+   std::cerr << "read " << pc_2_src.size() << " line numbers" << std::endl;
    lines_status = LINES_valid;
 }
 //-----------------------------------------------------------------------------
@@ -238,26 +238,27 @@ char obuf[200] = "@@@@";
                  break;
 
             default:
-                 cerr << "__cxa_demangle() returned " << status << std::endl;
+                 std::cerr << "__cxa_demangle() returned "
+                           << status << std::endl;
                  break;
           }
       }
 
 // cerr << setw(2) << idx << ": ";
 
-   cerr << HEX(pc);
+   std::cerr << HEX(pc);
 
-// cerr << left << setw(20) << s << right << " ";
+// std::cerr << left << setw(20) << s << right << " ";
 
    // indent.
-   for (int i = -1; i < idx; ++i)   cerr << " ";
+   for (int i = -1; i < idx; ++i)   std::cerr << " ";
 
-   cerr << obuf;
+   std::cerr << obuf;
 
-// if (offs)   cerr << " +" << offs;
+// if (offs)   std::cerr << " +" << offs;
 
-   if (src_loc)   cerr << " at " << src_loc;
-   cerr << std::endl;
+   if (src_loc)   std::cerr << " at " << src_loc;
+   std::cerr << std::endl;
 #endif
 }
 //-----------------------------------------------------------------------------
@@ -267,7 +268,7 @@ Backtrace::show(const char * file, int line)
    // CYGWIN, for example, has no execinfo.h and the functions declared there
    //
 #ifndef HAVE_EXECINFO_H
-   cerr << "Cannot show function call stack since execinfo.h seems not"
+   std::cerr << "Cannot show function call stack since execinfo.h seems not"
            " to exist on this OS (WINDOWs ?)." << std::endl;
    return;
 
@@ -280,22 +281,22 @@ const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
 
 char ** strings = backtrace_symbols(buffer, size);
 
-   cerr << std::endl
+   std::cerr << std::endl
         << "----------------------------------------"  << std::endl
         << "-- Stack trace at " << file << ":" << line << std::endl
         << "----------------------------------------"  << std::endl;
 
    if (strings == 0)
       {
-        cerr << "backtrace_symbols() failed. Using backtrace_symbols_fd()"
+        std::cerr << "backtrace_symbols() failed. Using backtrace_symbols_fd()"
                 " instead..." << std::endl << std::endl;
         // backtrace_symbols_fd(buffer, size, STDERR_FILENO);
         for (int b = size - 1; b > 0; --b)
             {
-              for (int s = b + 1; s < size; ++s)   cerr << " ";
+              for (int s = b + 1; s < size; ++s)   std::cerr << " ";
                   backtrace_symbols_fd(buffer + b, 1, STDERR_FILENO);
             }
-        cerr << "========================================" << std::endl;
+        std::cerr << "========================================" << std::endl;
         return;
       }
 
@@ -310,7 +311,7 @@ char ** strings = backtrace_symbols(buffer, size);
          cc[sizeof(cc) - 1] = 0;
          show_item(i - 1, cc);
        }
-   cerr << "========================================" << std::endl;
+   std::cerr << "========================================" << std::endl;
 
 #if 0
    // crashes at times
@@ -340,7 +341,7 @@ char * p = strchr(&tmp[0], '(');
    if (e == 0)   goto error;
    else *e = 0;
 
-// cerr << "mangled fun is: " << p << std::endl;
+// std::cerr << "mangled fun is: " << p << std::endl;
    __cxxabiv1::__cxa_demangle(p, result, &result_max, &status);
    if (status)   goto error;
    return 0;

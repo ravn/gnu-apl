@@ -84,8 +84,8 @@ public:
    /// print the row and columns of \b this node
    std::ostream & print_RC(std::ostream & out) const
      {
-       return out << std::right << setw(2) << row << ":"
-                  << std::left  << setw(2) << col << std::right;
+       return out << std::right << std::setw(2) << row << ":"
+                  << std::left  << std::setw(2) << col << std::right;
      }
 
    /// print \b this node
@@ -436,7 +436,7 @@ ShapeItem pcnt = 0;
                *reinterpret_cast<const DLX_Header_Node *>(x);
          Assert(hdr.row == -1);
          if (hdr.col_type == Col_PRIMARY)   ++pcnt;
-         out << " " << setw(w) << hdr.count;
+         out << " " << std::setw(w) << hdr.count;
        }
    out << std::endl << "Col:";
    for (const DLX_Node * x = right; x != this; x = x->right)
@@ -444,7 +444,7 @@ ShapeItem pcnt = 0;
          const DLX_Header_Node & hdr =
                *reinterpret_cast<const DLX_Header_Node *>(x);
          Assert(hdr.row == -1);
-         out << " " << setw(w) << hdr.col;
+         out << " " << std::setw(w) << hdr.col;
        }
    out << " (" << pcnt << ")" << std::endl << "----";
    for (const DLX_Node * x = right; x != this; x = x->right)
@@ -474,10 +474,10 @@ char rows_used[rows];
                if (y->row == r)   row[y->col] = 1;
              }
 
-         out << setw(3) << r << ":";
+         out << std::setw(3) << r << ":";
          for (const DLX_Node * x = right; x != this; x = x->right)
              {
-               out << " " << setw(w) << row[x->col];
+               out << " " << std::setw(w) << row[x->col];
              }
          out << std::endl;
        }
@@ -548,7 +548,7 @@ DLX_Node * item = right;
         Log(LOG_Quad_DLX)
            {
              CERR << "!!!!! solution " << solution_count << ": rows are";
-             loop(s, level)   CERR << " " << setw(2) << headers[s].item_r->row;
+             loop(s, level)   CERR << " " << std::setw(2) << headers[s].item_r->row;
              CERR << std::endl;
            }
 

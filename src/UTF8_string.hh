@@ -27,8 +27,6 @@
 
 #include "Common.hh"
 
-using namespace std;
-
 class UCS_string;
 class Value;
 

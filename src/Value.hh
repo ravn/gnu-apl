@@ -29,8 +29,6 @@
 #include "PointerCell.hh"
 #include "Shape.hh"
 
-using namespace std;
-
 class CDR_string;
 class Error;
 class IndexExpr;

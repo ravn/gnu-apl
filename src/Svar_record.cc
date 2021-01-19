@@ -71,13 +71,15 @@ event_name(Svar_event ev)
 std::ostream &
 Svar_partner::print(std::ostream & out) const
 {
-   out << setw(5) << id.proc;
-   if (id.parent)   out << "," << left << setw(5) << id.parent << right;
+   out << std::setw(5) << id.proc;
+   if (id.parent)   out << "," << std::left << std::setw(5)
+                        << id.parent << std::right;
    else             out << "      ";
 
-   out << "│" << setw(3) << tcp_fd << "│"
-       << hex << uppercase << setfill('0') << setw(2) << flags
-       << dec << nouppercase << setfill(' ');
+   out << "│" << std::setw(3) << tcp_fd << "│"
+       << std::hex << std::uppercase << std::setfill('0')
+       << std::setw(2) << flags
+       << std::dec << std::nouppercase << std::setfill(' ');
 
    return out;
 }
@@ -365,7 +367,7 @@ void
 Svar_record::print(std::ostream & out) const
 {
 const Svar_state st = get_state();
-   out << "║" << setw(5) << (key & 0xFFFF) << "│" << get_coupling() << "║";
+   out << "║" << std::setw(5) << (key & 0xFFFF) << "│" << get_coupling() << "║";
    offering.print(out)  << "║";
    accepting.print(out) << "║";
    if (st & SET_BY_OFF)   out << "1";    else   out << "0";

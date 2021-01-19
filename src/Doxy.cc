@@ -90,7 +90,7 @@ UTF8_string css_filename(root_dir);
    Log(LOG_command_DOXY)
       out << "Writing style sheet file " << css_filename << std::endl;
 
-ofstream css(css_filename.c_str());
+std::ofstream css(css_filename.c_str());
    css <<
 "/* GNU APL Doxy css file */"                                              CRLF
 "BODY, TABLE.h1tab"                                                        CRLF
@@ -165,7 +165,7 @@ UTF8_string index_filename(root_dir);
    Log(LOG_command_DOXY)
       out << "Writing top-level HTML file " << index_filename << std::endl;
 
-ofstream page(index_filename.c_str());
+std::ofstream page(index_filename.c_str());
    page <<
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""                      CRLF
 "                      \"http://www.w3.org/TR/html4/strict.dtd\">"         CRLF
@@ -228,7 +228,7 @@ const UCS_string alias = "all_functions";
 //-----------------------------------------------------------------------------
 void
 Doxy::functions_table(const std::vector<const Symbol *> & functions,
-                      ofstream & page)
+                      std::ofstream & page)
 {
    if (functions.size() == 0)   return;
 
@@ -356,7 +356,7 @@ int total_lines = 0;
 //-----------------------------------------------------------------------------
 void
 Doxy::variables_table(const std::vector<const Symbol *> & variables,
-                       ofstream & page)
+                       std::ofstream & page)
 {
    if (variables.size() == 0)   return;
 
@@ -426,7 +426,7 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
 }
 //-----------------------------------------------------------------------------
 void
-Doxy::SI_table(ofstream & page)
+Doxy::SI_table(std::ofstream & page)
 {
    // collect SI entries in reverse order...
    //
@@ -539,7 +539,7 @@ UTF8_string fun_filename(root_dir);
    Log(LOG_command_DOXY)
       out << "Writing function HTML file " << fun_filename << std::endl;
 
-ofstream page(fun_filename.c_str());
+std::ofstream page(fun_filename.c_str());
    page <<
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""                      CRLF
 "                      \"http://www.w3.org/TR/html4/strict.dtd\">"         CRLF
@@ -882,7 +882,7 @@ UTF8_string cmapx_filename(cg_filename);
    Log(LOG_command_DOXY)
       out << "Writing function call graph .gv file " << cg_filename << std::endl;
 
-ofstream gv(cg_filename.c_str());
+std::ofstream gv(cg_filename.c_str());
 
 const char * node_attributes = " shape=rect"
                                " fontcolor=blue"

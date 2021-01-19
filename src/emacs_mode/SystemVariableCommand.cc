@@ -24,9 +24,11 @@
 
 #include <sstream>
 
-void SystemVariableCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
+void
+SystemVariableCommand::run_command(NetworkConnection &conn,
+                                   const std::vector<std::string> &args )
 {
-    stringstream out;
+    std::stringstream out;
 
 #define ro_sv_def(VAR, _str, txt) out << ID::get_name( ID_VAR ) << "\n";
 #define rw_sv_def(VAR, _str, txt) out << ID::get_name( ID_VAR ) << "\n";

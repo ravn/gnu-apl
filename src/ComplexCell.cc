@@ -214,16 +214,16 @@ ComplexCell::bif_reciprocal(Cell * Z) const
    if (is_near_real())
       {
         const APL_Float z = 1.0/value.cval[0];
-        if (!isfinite(z))   return E_DOMAIN_ERROR;
+        if (!std::isfinite(z))   return E_DOMAIN_ERROR;
         return FloatCell::zv(Z, z);
       }
 
 const APL_Float denom = mag2();
 const APL_Float r = value.cval[0]/denom;
-   if (!isfinite(r))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(r))   return E_DOMAIN_ERROR;
 
 const APL_Float i = value.cval[1]/denom;
-   if (!isfinite(i))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(i))   return E_DOMAIN_ERROR;
 
 const APL_Complex z(r, -i);
    return zv(Z, z);
@@ -351,8 +351,8 @@ ErrorCode
 ComplexCell::bif_multiply(Cell * Z, const Cell * A) const
 {
 const APL_Complex z = A->get_complex_value() * cval();
-   if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
-   if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(z.real()))   return E_DOMAIN_ERROR;
+   if (!std::isfinite(z.imag()))   return E_DOMAIN_ERROR;
 
    new (Z) ComplexCell(z);
    return E_NO_ERROR;
@@ -509,8 +509,8 @@ const APL_Float ai = A->get_imag_value();
    {
      const APL_Complex a(ar, ai);
      const APL_Complex z = complex_power(a, cval());
-     if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
-     if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+     if (!std::isfinite(z.real()))   return E_DOMAIN_ERROR;
+     if (!std::isfinite(z.imag()))   return E_DOMAIN_ERROR;
 
      new (Z) ComplexCell(z);
      return E_NO_ERROR;
@@ -536,16 +536,16 @@ ComplexCell::bif_logarithm(Cell * Z, const Cell * A) const
         const APL_Float lg_a = log(A->get_real_value());
         const APL_Complex lg_z = log(cval());
         const APL_Complex z(lg_z.real() / lg_a, lg_z.imag() / lg_a);
-        if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
-        if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+        if (!std::isfinite(z.real()))   return E_DOMAIN_ERROR;
+        if (!std::isfinite(z.imag()))   return E_DOMAIN_ERROR;
         return zv(Z, z);
       }
 
    if (A->is_complex_cell())
       {
         const APL_Complex z = log(cval()) / log(A->get_complex_value());
-        if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
-        if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
+        if (!std::isfinite(z.real()))   return E_DOMAIN_ERROR;
+        if (!std::isfinite(z.imag()))   return E_DOMAIN_ERROR;
         return zv(Z, z);
       }
 
@@ -780,8 +780,8 @@ const APL_Complex ret( (complex_sqrt(APL_Complex(2*M_PI)) / z)
                        * complex_exponent(-z1)
                      );
 
-   if (!isfinite(ret.real()))   DOMAIN_ERROR;
-   if (!isfinite(ret.imag()))   DOMAIN_ERROR;
+   if (!std::isfinite(ret.real()))   DOMAIN_ERROR;
+   if (!std::isfinite(ret.imag()))   DOMAIN_ERROR;
    return ret;
 
 #undef p0

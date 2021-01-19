@@ -1305,7 +1305,7 @@ CDR_string cdr;
    CDR::to_CDR(cdr, *new_value);
    if (cdr.size() > MAX_SVAR_SIZE)   LIMIT_ERROR_SVAR;
 
-string data(charP(cdr.get_items()), cdr.size());
+std::string data(charP(cdr.get_items()), cdr.size());
 
    // wait for shared variable to be ready
    //
@@ -1370,7 +1370,7 @@ const Signal_base * response =
 
    if (response == 0)
       {
-        cerr << "TIMEOUT on signal ASSIGN_VALUE" << std::endl;
+        std::cerr << "TIMEOUT on signal ASSIGN_VALUE" << std::endl;
         if (del)   delete del;
         VALUE_ERROR;
       }
@@ -1381,7 +1381,7 @@ const ErrorCode ec = ErrorCode(response->get__SVAR_ASSIGNED__error());
         Log(LOG_shared_variables)
            {
              Error e(ec, response->get__SVAR_ASSIGNED__error_loc().c_str());
-             cerr << Error::error_name(ec) << " assigning "
+             std::cerr << Error::error_name(ec) << " assigning "
                   << get_name() << ", detected at "
                   << response->get__SVAR_ASSIGNED__error_loc()
                   << std::endl;
@@ -1409,7 +1409,7 @@ const bool ws_to_ws = Svar_DB::is_ws_to_ws(get_SV_key());
             {
               if (w)
                  {
-                   Log(LOG_shared_variables)   cerr << " - OK." << std::endl;
+                   Log(LOG_shared_variables)   std::cerr << " - OK." << std::endl;
                  }
               break;
             }
@@ -1429,7 +1429,7 @@ const bool ws_to_ws = Svar_DB::is_ws_to_ws(get_SV_key());
             }
          else if (w%25 == 0)
             {
-              Log(LOG_shared_variables)   cerr << ".";
+              Log(LOG_shared_variables)   std::cerr << ".";
             }
 
          usleep(10000);   // wait 10 ms
@@ -1457,7 +1457,7 @@ const TCP_socket tcp = Svar_DB::get_DB_tcp();
              VALUE_ERROR;
            }
 
-        const string & data = response->get__WSWS_VALUE_IS__cdr_value();
+        const std::string & data = response->get__WSWS_VALUE_IS__cdr_value();
         if (data.size() == 0)
            {
              delete response;
@@ -1498,18 +1498,18 @@ const ErrorCode err(ErrorCode(response->get__VALUE_IS__error()));
       {
         Log(LOG_shared_variables)
            {
-             cerr << Error::error_name(err) << " referencing "
+             std::cerr << Error::error_name(err) << " referencing "
                   << get_name() << ", detected at "
                   << response->get__VALUE_IS__error_loc() << std::endl;
            }
 
-        string eloc = response->get__VALUE_IS__error_loc();
+        std::string eloc = response->get__VALUE_IS__error_loc();
         delete response;
         if (del)   delete del;
         throw_apl_error(err, eloc.c_str());
       }
 
-const string & data = response->get__VALUE_IS__cdr_value();
+const std::string & data = response->get__VALUE_IS__cdr_value();
 CDR_string cdr;
    loop(d, data.size())   cdr.push_back(data[d]);
    delete response;
