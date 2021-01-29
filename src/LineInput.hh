@@ -58,10 +58,10 @@ public:
    void save_history(const char * filename);
 
    /// clear history
-   void clear_history(std::ostream & out);
+   void clear_history(ostream & out);
 
    /// print history to \b out
-   void print_history(std::ostream & out);
+   void print_history(ostream & out);
 
    /// start a new up/down sequence
    void next()
@@ -78,10 +78,10 @@ public:
    const UCS_string * down();
 
    /// print relevant indices
-   std::ostream &  info(std::ostream & out) const
+   ostream &  info(ostream & out) const
       { return out << "   CUR=" << current_line
                    << "/P=" << put
-                   << "/S=" << hist_lines.size() << std::endl; }
+                   << "/S=" << hist_lines.size() << endl; }
 
    /// add one line to \b this history
    void add_line(const UCS_string & line);
@@ -300,11 +300,11 @@ public:
         delete the_line_input;   the_line_input = 0; }
 
    /// clear history
-   static void clear_history(std::ostream & out)
+   static void clear_history(ostream & out)
       {  the_line_input->history.clear_history(out); }
 
    /// print history to \b out
-   static void print_history(std::ostream & out)
+   static void print_history(ostream & out)
       {  the_line_input->history.print_history(out); }
 
    /// add a line to the history

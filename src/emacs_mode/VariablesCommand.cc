@@ -32,12 +32,12 @@ enum TypeSpec {
 
 void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
-    std::stringstream out;
+    stringstream out;
     bool tagged = false;
 
     TypeSpec cls = ALL;
     if( args.size() >= 2 ) {
-        std::string typespec = args[1];
+        string typespec = args[1];
         if( typespec == "variable" ) {
             cls = VARIABLE;
         }
@@ -49,7 +49,7 @@ void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<s
             tagged = true;
         }
         else {
-            CERR << "Illegal variable type: " << typespec << std::endl;
+            CERR << "Illegal variable type: " << typespec << endl;
             throw DisconnectedError( "Illegal variable type" );
         }
     }
@@ -72,7 +72,7 @@ void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<s
                    {
                      out << symbol->get_name();
                      if(tagged)   out << " " << symbol_nc;
-                     out << std::endl;
+                     out << endl;
                    }
              }
         }

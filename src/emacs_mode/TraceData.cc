@@ -37,7 +37,7 @@ void TraceData::add_listener( NetworkConnection *connection, int cr_level )
         symbol->set_monitor_callback( symbol_assignment );
     }
 
-    active_listeners.insert( std::pair<NetworkConnection *, int>( connection, cr_level ) );
+    active_listeners.insert( pair<NetworkConnection *, int>( connection, cr_level ) );
 }
 
 void TraceData::remove_listener( NetworkConnection *connection )
@@ -50,7 +50,7 @@ void TraceData::remove_listener( NetworkConnection *connection )
     }
 }
 
-void TraceData::display_value_for_trace( std::ostream &out, const Value_P &value, int cr_level )
+void TraceData::display_value_for_trace( ostream &out, const Value_P &value, int cr_level )
 {
     if( cr_level < 0 ) {
         PrintContext context( PST_NONE, Workspace::get_PP(), 100000 );
@@ -72,22 +72,22 @@ void TraceData::send_update( Symbol_Event ev )
 {
     const Value_P v = symbol->get_value();
 
-    for( std::map<NetworkConnection *, TraceDataEntry>::iterator it = active_listeners.begin()
+    for( map<NetworkConnection *, TraceDataEntry>::iterator it = active_listeners.begin()
              ; it != active_listeners.end()
              ; it++ ) {
         NetworkConnection *conn = it->first;
 
-        std::stringstream out;
+        stringstream out;
         if( ev == SEV_ERASED ) {
-            out << "sev_erased" << std::endl << symbol->get_name() << std::endl;
+            out << "sev_erased" << endl << symbol->get_name() << endl;
         }
         else {
-            out << "symbol_update" << std::endl << symbol->get_name() << std::endl;
+            out << "symbol_update" << endl << symbol->get_name() << endl;
             int cr_level = it->second.get_cr_level();
             display_value_for_trace( out, v, cr_level );
         }
 
-        std::string str = out.str();
+        string str = out.str();
         conn->send_notification( str );
     }
 }

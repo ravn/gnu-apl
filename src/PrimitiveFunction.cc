@@ -100,19 +100,19 @@ PrimitiveFunction::eval_fill_B(Value_P B) const
    return eval_B(B);
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-PrimitiveFunction::print(std::ostream & out) const
+ostream &
+PrimitiveFunction::print(ostream & out) const
 {
    return out << get_Id();
 }
 //-----------------------------------------------------------------------------
 void
-PrimitiveFunction::print_properties(std::ostream & out, int indent) const
+PrimitiveFunction::print_properties(ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_SPACE);
    out << ind << "System Function ";
    print(out);
-   out << std::endl;
+   out << endl;
 }
 //=============================================================================
 Token
@@ -161,7 +161,7 @@ const ShapeItem len_Z = shape_Z.get_volume();
         //  pop_args_push_result() in reduce_A_F_B_(), B is no longer used
         // and we can reshape it in place instead of copying B into a new Z.
         //
-        Log(LOG_optimization) CERR << "optimizing A⍴B" << std::endl;
+        Log(LOG_optimization) CERR << "optimizing A⍴B" << endl;
 
         // release unused cells
         //
@@ -893,7 +893,7 @@ Bif_F12_ELEMENT::eval_B(Value_P B) const
                    C = C->get_lval_value();
                    if (C == 0)
                       {
-                        CERR << "0-pointer at " LOC << std::endl;
+                        CERR << "0-pointer at " LOC << endl;
                         FIXME;
                       }
                    else if (C->is_pointer_cell())

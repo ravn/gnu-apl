@@ -58,6 +58,8 @@
 # include <iostream>
 # include <iomanip>
 
+using namespace std;
+
 # include "Plot_data.hh"
 # include "Plot_line_properties.hh"
 # include "Plot_window_properties.hh"
@@ -142,7 +144,7 @@ testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
 xcb_generic_error_t * error = xcb_request_check(conn, cookie);
    if (error)
       {
-        CERR <<"ERROR: " << errMessage << " : " << error->error_code << std::endl;
+        CERR <<"ERROR: " << errMessage << " : " << error->error_code << endl;
         xcb_disconnect(conn);
         exit (-1);
       }
@@ -396,7 +398,7 @@ draw_triangle(const Plot_context & pctx, int verbosity,
    if (verbosity & SHOW_DRAW)
       CERR <<   " ∆2: P0(" << P0.x << ":" << P0.y << ") @H0=" << H0
            << "     P1(" << P1.x << ":" << P1.y << ") @H12=" << H12
-           << "     P2(" << P2.x << ":" << P2.y << ") @H12=" << H12 << std::endl;
+           << "     P2(" << P2.x << ":" << P2.y << ") @H12=" << H12 << endl;
 
 const double d1 = P0.distance2(P1);
 const double d2 = P0.distance2(P2);
@@ -430,7 +432,7 @@ draw_triangle(const Plot_context & pctx, int verbosity, Pixel_XY P0, double H0,
    if (verbosity & SHOW_DRAW)
       CERR << "\n∆1: P0(" << P0.x << ":" << P0.y << ")@H=" << H0
            << "      P1(" << P1.x << ":" << P1.y << ")@H=" << H1
-           << "      P2(" << P2.x << ":" << P2.y << ")@H=" << H2 << std::endl;
+           << "      P2(" << P2.x << ":" << P2.y << ")@H=" << H2 << endl;
 
    if (H0 < H1)   pv_swap(P0, H0, P1, H1);   // then H0 >= H1
    if (H0 < H2)   pv_swap(P0, H0, P2, H2);   // then H0 >= H2
@@ -870,7 +872,7 @@ const int verbosity = w_props.get_verbosity();
             CERR << "B[" << row << ";" << col << "]"
                  << " X=" << data.get_X(row, col)
                  << " Y=" << data.get_Y(row, col)
-                 << " Z=" << data.get_Z(row, col) << std::endl;
+                 << " Z=" << data.get_Z(row, col) << endl;
 
          if (!w_props.get_gradient().size())   continue; // no gradient
 //       if (row != 3)   continue;   // show only given row
@@ -960,7 +962,7 @@ const int verbosity = w_props.get_verbosity();
             CERR << "data[" << row << "," << col << "]"
                  << " X=" << data.get_X(row, col)
                  << " Y=" << data.get_Y(row, col)
-                 << " Z=" << data.get_Z(row, col) << std::endl;
+                 << " Z=" << data.get_Z(row, col) << endl;
 
          const double X0 = data.get_X(row, col);
          const double Y0 = data.get_Y(row, col);
@@ -1068,7 +1070,7 @@ int x, y;   // position of the plot window in its parent
      /*
        XWindowAttributes xwa;
        XGetWindowAttributes(dpy, window, &xwa);
-       CERR << "POS: " <<  (x - xwa.x) << ":" << (y - xwa.y) << std::endl;
+       CERR << "POS: " <<  (x - xwa.x) << ":" << (y - xwa.y) << endl;
      */
    }
 
@@ -1080,16 +1082,16 @@ unsigned int geo_border_w, geo_depth;
                     &geo_border_w, &geo_depth))   // success
       {
         /*
-        CERR <<                                             std::endl
-             << "  POS:    "    << geo_x << ":" << geo_y << std::endl
-             << "  SIZE: "      << geo_w << "x" << geo_h << std::endl
-             << "  bw:   "      << geo_border_w          << std::endl
-             << "  bits/pixel=" << geo_depth             << std::endl;
+        CERR <<                                             endl
+             << "  POS:    "    << geo_x << ":" << geo_y << endl
+             << "  SIZE: "      << geo_w << "x" << geo_h << endl
+             << "  bw:   "      << geo_border_w          << endl
+             << "  bits/pixel=" << geo_depth             << endl;
          */
       }
    else   // error
       {
-        CERR << "  XGetGeometry() failed" << std::endl;
+        CERR << "  XGetGeometry() failed" << endl;
         MORE_ERROR() << "XGetGeometry() failed in save_file()";
         DOMAIN_ERROR;
       }
@@ -1127,7 +1129,7 @@ UTF8_string outfile_utf8(outfile);
 FILE * bmp = fopen(outfile_utf8.c_str(), "w");
    if (bmp == 0)
       {
-        CERR << "open " << outfile << ": " << strerror(errno) << std::endl;
+        CERR << "open " << outfile << ": " << strerror(errno) << endl;
         MORE_ERROR() << "save_file() failed: cannot open output file "
                      << outfile;
         DOMAIN_ERROR;
@@ -1208,7 +1210,7 @@ const Colormap cmap = XDefaultColormap(dpy, screen);
 
    XFree(image);
    fclose(bmp);
-   CERR << "output file " << outfile_utf8 << " written" << std::endl;
+   CERR << "output file " << outfile_utf8 << " written" << endl;
 }
 //-----------------------------------------------------------------------------
 void *
@@ -1376,17 +1378,17 @@ bool file_saved = false;
                     const xcb_request_error_t * e = reinterpret_cast
                           <const xcb_request_error_t *>(event);
                     const int error_code = e->error_code;
-                    CERR << "\n*** X11 ERROR " << error_code             << std::endl
-                         << "    major_opcode: " << int(e->major_opcode) << std::endl
-                         << "    minor_opcode: " << int(e->minor_opcode) << std::endl
-                         << "    bad_value:    " << HEX(e->bad_value) << std::endl
-                         << std::endl;
+                    CERR << "\n*** X11 ERROR " << error_code             << endl
+                         << "    major_opcode: " << int(e->major_opcode) << endl
+                         << "    minor_opcode: " << int(e->minor_opcode) << endl
+                         << "    bad_value:    " << HEX(e->bad_value) << endl
+                         << endl;
                   }
                      break;
 
              case XCB_EXPOSE:             // 12
                   if (w_props.get_verbosity() & SHOW_EVENTS)
-                     CERR << "\n*** XCB_EXPOSE " << std::endl;
+                     CERR << "\n*** XCB_EXPOSE " << endl;
                   do_plot(pctx, w_props, data);
                   xcb_flush(pctx.conn);
 
@@ -1462,7 +1464,7 @@ bool file_saved = false;
                   if (reinterpret_cast<xcb_client_message_event_t *>(event)
                            ->data.data32[0] == window_deleted)
                      {
-                       // CERR << "Killed!" << std::endl;
+                       // CERR << "Killed!" << endl;
                        free(event);
 
                        // make this thread a zombie
@@ -1489,7 +1491,7 @@ bool file_saved = false;
                 if (w_props.get_verbosity() & SHOW_EVENTS)
                    CERR << "unexpected event type "
                         << int(event->response_type)
-                         << " (ignored)" << std::endl;
+                         << " (ignored)" << endl;
            }
 
         free(event);

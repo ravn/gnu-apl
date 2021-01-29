@@ -333,7 +333,7 @@ Value_P INV(shape_INV, LOC);
          loop(x, M)   // for every column y
              {
                const double flt = (x < N) ? AUG.real(y, x) : 0.0;
-               if (!std::isfinite(flt))   DOMAIN_ERROR;
+               if (!isfinite(flt))   DOMAIN_ERROR;
                new (INV->next_ravel())   FloatCell(flt);
              }
        }
@@ -366,7 +366,7 @@ AUG.debug("AUG orig");
    //
    loop(y, N)   // for every row y
        {
-         const std::complex<double> diag_y = UTM.get_Z(y, y);
+         const complex<double> diag_y = UTM.get_Z(y, y);
          if (diag_y.real() == 0.0 && diag_y.imag())   DOMAIN_ERROR;
 
          // divide off-diagonal UTM | AUG[y;] by diag_y
@@ -374,7 +374,7 @@ AUG.debug("AUG orig");
              UTM.div_Z(y, x, diag_y);
 
          // divide diagonal of UTM | AUG by diag_y
-         UTM.set_Z(y, y, std::complex<double>(1.0, 0.0));
+         UTM.set_Z(y, y, complex<double>(1.0, 0.0));
          AUG.div_Z(y, y, diag_y);
        }
 
@@ -388,7 +388,7 @@ AUG.debug("AUG unity " LOC);
    loop (y1, y)     // for every row y1 above y
        {
 Q1(y) Q1(y1)
-         const std::complex<double> factor = UTM.get_Z(y1, y);
+         const complex<double> factor = UTM.get_Z(y1, y);
          if (factor.real() == 0 && factor.imag() == 0)   continue;
 Q1(factor)
          for (ShapeItem x1 = y1; x1 < N; ++x1)
@@ -414,8 +414,7 @@ Value_P INV(shape_INV, LOC);
                   {
                     const double re = AUG.real(y, x);
                     const double im = AUG.imag(y, x);
-                    if (!(std::isfinite(re) && std::isfinite(im)))
-                       DOMAIN_ERROR;
+                    if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
                     new (INV->next_ravel())   ComplexCell(re, im);
                   }
                else   // below diagonal
@@ -520,7 +519,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
               {
                 const double re = data[base_Q + 2*q];
                 const double im = data[base_Q + 2*q + 1];
-                if (!(std::isfinite(re) && std::isfinite(im)))   DOMAIN_ERROR;
+                if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
                 new (Qv->next_ravel()) ComplexCell(re, im);
               }
         }
@@ -529,7 +528,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
           loop(q, len)
               {
                 const double re = data[base_Q + q];
-                if (!std::isfinite(re))   DOMAIN_ERROR;
+                if (!isfinite(re))   DOMAIN_ERROR;
                 new (Qv->next_ravel()) FloatCell(re);
               }
         }
@@ -545,7 +544,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
               {
                 const double re = data[base_R + 2*r];
                 const double im = data[base_R + 2*r + 1];
-                if (!(std::isfinite(re) && std::isfinite(im)))   DOMAIN_ERROR;
+                if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
                 new (vR->next_ravel()) ComplexCell(re, im);
               }
         }
@@ -554,7 +553,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
           loop(r, rows*cols)
               {
                 const double re = data[base_R + r];
-                if (!std::isfinite(re))   DOMAIN_ERROR;
+                if (!isfinite(re))   DOMAIN_ERROR;
                 new (vR->next_ravel()) FloatCell(re);
               }
         }

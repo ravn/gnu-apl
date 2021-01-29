@@ -29,16 +29,16 @@ class PostgresConnection : public Connection {
 public:
     PostgresConnection( PGconn *db_in );
     virtual ~PostgresConnection();
-    virtual ArgListBuilder *make_prepared_query( const std::string &sql );
-    virtual ArgListBuilder *make_prepared_update( const std::string &sql );
+    virtual ArgListBuilder *make_prepared_query( const string &sql );
+    virtual ArgListBuilder *make_prepared_update( const string &sql );
 
     virtual void transaction_begin( void );
     virtual void transaction_commit( void );
     virtual void transaction_rollback( void );
 
-    virtual void fill_tables( std::vector<std::string> &tables );
-    virtual void fill_cols( const std::string &table, std::vector<ColumnDescriptor> &cols );
-    virtual const std::string make_positional_param( int pos );
+    virtual void fill_tables( vector<string> &tables );
+    virtual void fill_cols( const string &table, vector<ColumnDescriptor> &cols );
+    virtual const string make_positional_param( int pos );
 
     PGconn *get_db() { return db; }
 

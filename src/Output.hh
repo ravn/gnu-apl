@@ -31,6 +31,8 @@
 #include "Assert.hh"
 #include "UCS_string.hh"
 
+using namespace std;
+
 /*
  The classes below are used to combine normal user I/O and automatic
  testcase execution. It works like this:
@@ -205,27 +207,27 @@ protected:
    static bool colors_enabled;
 };
 
-/// a std::filebuf for stdin echo
-class CinOut : public std::filebuf
+/// a filebuf for stdin echo
+class CinOut : public filebuf
 {
-   /// overloaded std::filebuf::overflow
+   /// overloaded filebuf::overflow
    virtual int overflow(int c);
 };
 extern CinOut CIN_filebuf;
 
-/// an std::ostream for stdin echo and a few editing capabilities
-class CIN_ostream : public std::ostream
+/// an ostream for stdin echo and a few editing capabilities
+class CIN_ostream : public ostream
 {
 public:
    CIN_ostream()
-   : std::ostream(&CIN_filebuf)
+   : ostream(&CIN_filebuf)
    {}
 
    /// set cursor to y:x (upper left corner is 0:0, negative y: from bottom)
    void set_cursor(int y, int x);
 
    /// clear to end of line
-   std::ostream & clear_EOL()
+   ostream & clear_EOL()
       { return *this << Output::clear_EOL; }
 
    /// clear to end of screen supported ?
@@ -233,7 +235,7 @@ public:
       { return *Output::clear_EOS != 0; }
 
    /// clear to end of line
-   std::ostream & clear_EOS()
+   ostream & clear_EOS()
       { return *this << Output::clear_EOS; }
 };
 extern CIN_ostream CIN;

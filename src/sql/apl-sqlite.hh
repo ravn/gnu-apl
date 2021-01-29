@@ -35,7 +35,7 @@
 inline std::string to_string(const UCS_string & ucs)
 {
     UTF8_string utf(ucs);
-    return std::string(utf.c_str(), utf.size());
+    return string(utf.c_str(), utf.size());
 }
 
 Value_P make_string_cell( const std::string &string, const char *loc );

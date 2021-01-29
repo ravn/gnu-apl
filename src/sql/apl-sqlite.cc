@@ -43,9 +43,9 @@
 # include "PostgresProvider.hh"
 #endif
 
-typedef std::vector<Connection *> DbConnectionVector;
+typedef vector<Connection *> DbConnectionVector;
 
-std::map<const std::string, Provider *> providers;
+map<const string, Provider *> providers;
 DbConnectionVector connections;
 
 extern "C" {
@@ -54,7 +54,7 @@ extern "C" {
 
 static void add_provider( Provider *provider )
 {
-    providers.insert( std::pair<const std::string, Provider *>( provider->get_name(), provider ) );
+    providers.insert( pair<const string, Provider *>( provider->get_name(), provider ) );
 }
 
 static void init_provider_map( void )
@@ -75,18 +75,18 @@ static void init_provider_map( void )
 #endif
 }
 
-static Token list_functions( std::ostream &out )
+static Token list_functions( ostream &out )
 {
-    out << "Available function numbers:" << std::endl
-        << "name FN[1] args     - open database. Returns reference ID" << std::endl
-        << "FN[2] ref           - close database" << std::endl
-        << "query FN[3,db] params  - send SQL query" << std::endl
-        << "query FN[4,db] params  - send SQL update" << std::endl
-        << "FN[5] ref           - begin transaction" << std::endl
-        << "FN[6] ref           - commit transaction" << std::endl
-        << "FN[7] ref           - rollback transaction" << std::endl
-        << "FN[8] ref           - list tables" << std::endl
-        << "ref FN[9] table     - list columns for table" << std::endl;
+    out << "Available function numbers:" << endl
+        << "name FN[1] args     - open database. Returns reference ID" << endl
+        << "FN[2] ref           - close database" << endl
+        << "query FN[3,db] params  - send SQL query" << endl
+        << "query FN[4,db] params  - send SQL update" << endl
+        << "FN[5] ref           - begin transaction" << endl
+        << "FN[6] ref           - commit transaction" << endl
+        << "FN[7] ref           - rollback transaction" << endl
+        << "FN[8] ref           - list tables" << endl
+        << "ref FN[9] table     - list columns for table" << endl;
     return Token(TOK_APL_VALUE1, Str0( LOC ) );
 }
 
@@ -108,10 +108,10 @@ static Token open_database( Value_P A, Value_P B )
         Workspace::more_error() = "Illegal database name";
         VALUE_ERROR;
     }
-    std::string type = to_string( A->get_UCS_ravel() );
-    std::map<const std::string, Provider *>::iterator provider_iterator = providers.find( type );
+    string type = to_string( A->get_UCS_ravel() );
+    map<const string, Provider *>::iterator provider_iterator = providers.find( type );
     if( provider_iterator == providers.end() ) {
-        std::stringstream out;
+        stringstream out;
         out << "Unknown database type: " << type;
         Workspace::more_error() = out.str().c_str();
         VALUE_ERROR;
@@ -195,7 +195,7 @@ static Value_P run_generic_one_query( ArgListBuilder *arg_list,
                 arg_list->append_string( to_string( value->get_UCS_ravel() ), i );
             }
             else {
-                std::stringstream out;
+                stringstream out;
                 out << "Illegal data type in argument " << i << " of arglist";
                 Workspace::more_error() = out.str().c_str();
                 VALUE_ERROR;
@@ -213,7 +213,7 @@ static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
         VALUE_ERROR;
     }
 
-    std::string statement = conn->replace_bind_args( to_string( A->get_UCS_ravel() ) );
+    string statement = conn->replace_bind_args( to_string( A->get_UCS_ravel() ) );
     ArgListBuilder *builder;
     if( query ) {
         builder = conn->make_prepared_query( statement );
@@ -221,7 +221,7 @@ static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
     else {
         builder = conn->make_prepared_update( statement );
     }
-    std::auto_ptr<ArgListBuilder> arg_list( builder );
+    auto_ptr<ArgListBuilder> arg_list( builder );
 
     const Shape &shape = B->get_shape();
     if( shape.get_rank() == 0 || shape.get_rank() == 1 ) {
@@ -287,7 +287,7 @@ static Token run_transaction_rollback( Value_P B )
 static Token show_tables( Value_P B )
 {
     Connection *conn = value_to_db_id( B );
-    std::vector<std::string> tables;
+    vector<string> tables;
     conn->fill_tables( tables );
 
     Value_P value;
@@ -297,7 +297,7 @@ static Token show_tables( Value_P B )
     else {
         Shape shape( tables.size () );
         value = Value_P( shape, LOC );
-        for( std::vector<std::string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
+        for( vector<string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
             new (value->next_ravel())
                PointerCell( make_string_cell( *i, LOC ).get(), value.getref() );
         }
@@ -310,14 +310,14 @@ static Token show_tables( Value_P B )
 static Token show_cols( Value_P A, Value_P B )
 {
     Connection *conn = value_to_db_id( A );
-    std::vector<ColumnDescriptor> cols;
+    vector<ColumnDescriptor> cols;
 
     if( !B->is_apl_char_vector() ) {
         Workspace::more_error() = "Illegal table name";
         VALUE_ERROR;
     }
 
-    std::string name = to_string( B->get_UCS_ravel() );
+    string name = to_string( B->get_UCS_ravel() );
     conn->fill_cols( name, cols );
 
     Value_P value;
@@ -327,7 +327,7 @@ static Token show_cols( Value_P A, Value_P B )
     else {
         Shape shape( cols.size(), 2 );
         value = Value_P( shape, LOC );
-        for( std::vector<ColumnDescriptor>::iterator i = cols.begin() ; i != cols.end() ; i++ ) {
+        for( vector<ColumnDescriptor>::iterator i = cols.begin() ; i != cols.end() ; i++ ) {
             new (value->next_ravel())
                 PointerCell(make_string_cell(i->get_name(), LOC).get(),
                             value.getref());

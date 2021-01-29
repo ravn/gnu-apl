@@ -44,7 +44,7 @@ class Cell;
 struct CollatingCacheEntry
 {
    /// constructor: an invalid entry (for allocatingi
-   /// std::vector<CollatingCacheEntry> items)
+   /// vector<CollatingCacheEntry> items)
    CollatingCacheEntry()
    : ce_char(Invalid_Unicode),
      ce_shape()
@@ -80,8 +80,8 @@ struct CollatingCacheEntry
       { return key - entry.ce_char; }
 };
 //-----------------------------------------------------------------------------
-inline std::ostream &
-operator << (std::ostream & out, const CollatingCacheEntry & entry)
+inline ostream &
+operator << (ostream & out, const CollatingCacheEntry & entry)
 {
    return out << "CC-entry(" << entry.ce_char << ")";
 }

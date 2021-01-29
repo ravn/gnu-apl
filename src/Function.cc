@@ -78,7 +78,7 @@ Token
 Function::eval_() const
 {
    CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << std::endl;
+        << "() called (overloaded variant not yet implemented?)" << endl;
    FIXME;
 }
 //-----------------------------------------------------------------------------
@@ -86,7 +86,7 @@ Token
 Function::eval_B(Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << std::endl;
+        << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ Token
 Function::eval_AB(Value_P A, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << std::endl;
+        << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ Token
 Function::eval_LB(Token & LO, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << std::endl;
+        << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -110,7 +110,7 @@ Token
 Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << std::endl;
+        << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ Token
 Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << std::endl;
+        << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ Token
 Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
    Log(LOG_verbose_error)   CERR << get_name() << "::" << __FUNCTION__
-        << "() called (overloaded variant not yet implemented?)" << std::endl;
+        << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -146,8 +146,8 @@ int sig = SIG_FUN;
    return Fun_signature(sig);
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & out, const Function & fun)
+ostream &
+operator << (ostream & out, const Function & fun)
 {
    fun.print(out);
    return out;

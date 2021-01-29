@@ -56,7 +56,7 @@ public:
    void destroy_derived(const char * loc);
 
    /// overloaded Function::print();
-   virtual std::ostream & print(std::ostream & out) const;
+   virtual ostream & print(ostream & out) const;
 
    /// overloaded Function::is_derived();
    virtual bool is_derived() const
@@ -90,7 +90,7 @@ public:
 
 protected:
    /// Overloaded Function::print_properties()
-   virtual void print_properties(std::ostream & out, int indent) const;
+   virtual void print_properties(ostream & out, int indent) const;
 
    /// overloaded Function::eval_B();
    virtual Token eval_B(Value_P B) const;

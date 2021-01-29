@@ -130,7 +130,7 @@ Shape shape;
 }
 //-----------------------------------------------------------------------------
 int
-IndexExpr::print_stale(std::ostream & out)
+IndexExpr::print_stale(ostream & out)
 {
 int count = 0;
 
@@ -144,7 +144,7 @@ int count = 0;
          try           { out << *idx; }
          catch (...)   { out << " *** corrupt ***"; }
 
-         out << std::endl;
+         out << endl;
 
          ++count;
        }
@@ -156,7 +156,7 @@ void
 IndexExpr::erase_stale(const char * loc)
 {
    Log(LOG_Value__erase_stale)
-      CERR << std::endl << std::endl << "erase_stale() called from " << loc << std::endl;
+      CERR << endl << endl << "erase_stale() called from " << loc << endl;
 
    for (DynamicObject * dob = all_index_exprs.get_next();
         dob != &all_index_exprs; dob = dob->get_next())
@@ -165,8 +165,8 @@ IndexExpr::erase_stale(const char * loc)
 
          Log(LOG_Value__erase_stale)
             {
-              CERR << "Erasing stale IndexExpr:" << std::endl
-                   << "  Allocated by " << idx->alloc_loc << std::endl;
+              CERR << "Erasing stale IndexExpr:" << endl
+                   << "  Allocated by " << idx->alloc_loc << endl;
             }
 
          dob = dob->get_prev();
@@ -175,8 +175,8 @@ IndexExpr::erase_stale(const char * loc)
        }
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator <<(std::ostream & out, const IndexExpr & idx)
+ostream &
+operator <<(ostream & out, const IndexExpr & idx)
 {
    out << "[";
    loop(i, idx.value_count())

@@ -42,7 +42,7 @@
 // this file (Svar_record.cc) is also used outside APL where Common.hh can
 // not be #included.
 
-extern std::ostream & get_CERR();
+extern ostream & get_CERR();
 
 //=============================================================================
 const char *
@@ -68,18 +68,16 @@ event_name(Svar_event ev)
    return "(unknown event)";
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-Svar_partner::print(std::ostream & out) const
+ostream &
+Svar_partner::print(ostream & out) const
 {
-   out << std::setw(5) << id.proc;
-   if (id.parent)   out << "," << std::left << std::setw(5)
-                        << id.parent << std::right;
+   out << setw(5) << id.proc;
+   if (id.parent)   out << "," << left << setw(5) << id.parent << right;
    else             out << "      ";
 
-   out << "│" << std::setw(3) << tcp_fd << "│"
-       << std::hex << std::uppercase << std::setfill('0')
-       << std::setw(2) << flags
-       << std::dec << std::nouppercase << std::setfill(' ');
+   out << "│" << setw(3) << tcp_fd << "│"
+       << hex << uppercase << setfill('0') << setw(2) << flags
+       << dec << nouppercase << setfill(' ');
 
    return out;
 }
@@ -180,7 +178,7 @@ Svar_record::set_control(Svar_Control ctl)
       {
         get_CERR() << "set_control(" << ctl << ") on ";
         print_name(get_CERR());
-        get_CERR() << " by " << ProcessorID::get_id().proc << std::endl;
+        get_CERR() << " by " << ProcessorID::get_id().proc << endl;
       }
 
    if (ProcessorID::get_id() == offering.id)
@@ -220,7 +218,7 @@ usleep(50000);
         get_CERR() << "set_state(" << op << ") on ";
         print_name(get_CERR());
         get_CERR() << " by " << ProcessorID::get_id().proc
-                   << " at " << loc << std::endl;
+                   << " at " << loc << endl;
       }
 
    // the control vector as seen by the offering side
@@ -360,25 +358,25 @@ Svar_record::bad_proc(const char * function, const AP_num3 & id) const
 {
    get_CERR() << function << "(): proc " << id.proc
         << " does not match offering proc " << offering.id.proc
-        << " nor accepting proc " << accepting.id.proc << std::endl;
+        << " nor accepting proc " << accepting.id.proc << endl;
 }
 //-----------------------------------------------------------------------------
 void
-Svar_record::print(std::ostream & out) const
+Svar_record::print(ostream & out) const
 {
 const Svar_state st = get_state();
-   out << "║" << std::setw(5) << (key & 0xFFFF) << "│" << get_coupling() << "║";
+   out << "║" << setw(5) << (key & 0xFFFF) << "│" << get_coupling() << "║";
    offering.print(out)  << "║";
    accepting.print(out) << "║";
    if (st & SET_BY_OFF)   out << "1";    else   out << "0";
    if (st & SET_BY_ACC)   out << "1";    else   out << "0";
    if (st & USE_BY_OFF)   out << "1";    else   out << "0";
    if (st & USE_BY_ACC)   out << "1│";   else   out << "0│";
-   print_name(out, varname, 10) << "║" << std::endl;
+   print_name(out, varname, 10) << "║" << endl;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-Svar_record::print_name(std::ostream & out, const uint32_t * name, int len)
+ostream &
+Svar_record::print_name(ostream & out, const uint32_t * name, int len)
 {
    while (*name)
        {

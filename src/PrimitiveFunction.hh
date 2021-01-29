@@ -70,13 +70,13 @@ public:
 
 protected:
    /// overloaded Function::print_properties()
-   virtual void print_properties(std::ostream & out, int indent) const;
+   virtual void print_properties(ostream & out, int indent) const;
 
    /// overloaded Function::eval_fill_B()
    virtual Token eval_fill_B(Value_P B) const;
 
    /// Print the name of \b this PrimitiveFunction to \b out
-   virtual std::ostream & print(std::ostream & out) const;
+   virtual ostream & print(ostream & out) const;
 
    /// performance statistics for eval_B()
    CellFunctionStatistics * statistics_AB;

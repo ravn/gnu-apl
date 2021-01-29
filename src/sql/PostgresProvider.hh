@@ -23,6 +23,6 @@
 class PostgresProvider : public Provider {
 public:
     virtual ~PostgresProvider() {}
-    virtual const std::string get_name( void ) { return "postgresql"; }
+    virtual const string get_name( void ) { return "postgresql"; }
     virtual Connection *open_database( Value_P B );
 };

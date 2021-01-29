@@ -24,7 +24,7 @@
 
 void RunCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
-    std::stringstream out;
+    stringstream out;
     while( 1 ) {
         std::string line = conn.read_line_from_fd();
         if( line == END_TAG ) {
@@ -37,7 +37,7 @@ void RunCommand::run_command( NetworkConnection &conn, const std::vector<std::st
     Token result = Bif_F1_EXECUTE::execute_statement(uout);
     TokenTag tag = result.get_tag();
 
-    std::stringstream result_stream;
+    stringstream result_stream;
     if( tag == TOK_ERROR ) {
         result_stream << "error:" << result.get_int_val();
     }

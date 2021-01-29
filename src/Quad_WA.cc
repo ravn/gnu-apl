@@ -61,8 +61,8 @@ rlimit rl;
    if (log_startup)
       {
         CERR << "initial RLIMIT_AS (aka. virtual memory) is: ";
-        if (initial_rlimit == ~rlim_t(0))   CERR << "'unlimited'" << std::endl;
-        else CERR << initial_rlimit << std::endl;
+        if (initial_rlimit == ~rlim_t(0))   CERR << "'unlimited'" << endl;
+        else CERR << initial_rlimit << endl;
       }
 
    // if the user has set a memory rlimit (and hopefully knowing what she is
@@ -72,7 +72,7 @@ rlimit rl;
    total_memory = get_free_memory();
    if (log_startup)
       CERR << "estimated available memory: " << total_memory
-           << " bytes (" << (total_memory/1000000) << " MB)" << std::endl;
+           << " bytes (" << (total_memory/1000000) << " MB)" << endl;
 
    if (rl.rlim_cur == RLIM_INFINITY)
       {
@@ -88,7 +88,7 @@ rlimit rl;
              if (log_startup)
                 CERR << "decreasing RLIMIT_AS to: " << rl.rlim_cur
                      << " bytes (" << int64_t(rl.rlim_cur/1000000)
-                     << " MB)" << std::endl;
+                     << " MB)" << endl;
            }
       }
    else if (uint64_t(rl.rlim_cur) > total_memory)
@@ -97,9 +97,9 @@ rlimit rl;
         // memory
         //
         CERR <<
-"*** Warning: the process memory limit (RLIMIT_AS) of " << rl.rlim_cur << std::endl
-<< " is more than the estimated total_memory of " << total_memory << "." << std::endl
-<< " This could cause improper WS FULL handling." << std::endl;
+"*** Warning: the process memory limit (RLIMIT_AS) of " << rl.rlim_cur << endl
+<< " is more than the estimated total_memory of " << total_memory << "." << endl
+<< " This could cause improper WS FULL handling." << endl;
       }
 }
 //-----------------------------------------------------------------------------

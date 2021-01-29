@@ -1,0 +1,67 @@
+Tue Jan 19 22:13:48 CET 2021
+
+                    ______ _   __ __  __    ___     ____   __ 
+                   / ____// | / // / / /   /   |   / __ \ / / 
+                  / / __ /  |/ // / / /   / /| |  / /_/ // /  
+                 / /_/ // /|  // /_/ /   / ___ | / ____// /___
+                 \____//_/ |_/ \____/   /_/  |_|/_/    /_____/
+
+                    Welcome to GNU APL version 1.8 / 1410M
+
+                Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+                       Banner by FIGlet: www.figlet.org
+
+                This program comes with ABSOLUTELY NO WARRANTY;
+                         for details run: ./apl --gpl.
+
+     This program is free software, and you are welcome to redistribute it
+         according to the GNU Public License (GPL) version 3 or later.
+
+[0;30;47m[K      ⍝ APnnn_1011.tc2
+      ⍝ parner tectcase for APnnn.tc
+      ⍝ ----------------------------------
+      
+            ]xterm off
+      
+      ∇SYNC B;C;Q
+      
+            ⍝ offer VAR444 to AP 1010 and wait for sharing to complete
+            ⍝
+            SYNC 1010
+
+
+
+
+
+
+
+SYNC OK
+      
+            ⎕SVO 'VAR444'
+2
+      
+            ⍝ 1. set control vector
+            ⍝
+            1 0 1 0 ⎕SVC 'VAR444'
+1 0 1 0
+      
+            ⍝ 2. wait for AP 1001 to set control vector
+            ⍝
+            ⎕SVE←1.3 ◊ ⎕SVE
+1.243817
+            ⎕SVC 'VAR444'
+1 1 1 1
+      
+      
+            VAR444←⌽VAR444
+      
+            ⍝ wait for peer to finish reading VAR444
+            ⍝
+            ⎕DL 0.2
+0.200267
+      
+            )OFF
+[0;39;49m[K[0;39;49m[K
+Goodbye.
+Session duration: 1.64716 seconds 
+./apl done at Tue Jan 19 22:13:49 CET 2021

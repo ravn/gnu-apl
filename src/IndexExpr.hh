@@ -82,7 +82,7 @@ public:
    bool check_range(const Shape & shape) const;
 
    /// print stale IndexExprs, and return the number of stale IndexExprs.
-   static int print_stale(std::ostream & out);
+   static int print_stale(ostream & out);
 
    /// erase stale IndexExprs
    static void erase_stale(const char * loc);

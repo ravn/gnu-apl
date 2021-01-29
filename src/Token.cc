@@ -75,8 +75,8 @@ Token::Token(TokenTag tg, IndexExpr & idx)
       }
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & out, TokenTag tag)
+ostream &
+operator << (ostream & out, TokenTag tag)
 {
    if (tag > 0xFFFF)   out << HEX(tag);
    else                out << HEX4(tag);
@@ -84,8 +84,8 @@ operator << (std::ostream & out, TokenTag tag)
    return out;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & out, TokenClass tc)
+ostream &
+operator << (ostream & out, TokenClass tc)
 {
 #define tcc(x) case x: out << #x;   break;
    switch(tc)
@@ -125,8 +125,8 @@ operator << (std::ostream & out, TokenClass tc)
    return out;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & out, const Token & token)
+ostream &
+operator << (ostream & out, const Token & token)
 {
    if (token.get_tag() == TOK_CHARACTER)
       {
@@ -272,8 +272,8 @@ Value * ret = value.apl_val.get();
    return ret;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-Token::print_function(std::ostream & out) const
+ostream &
+Token::print_function(ostream & out) const
 {
    switch(tag)
       {
@@ -391,8 +391,8 @@ Token::print_function(std::ostream & out) const
    return out <<  ", }";
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-Token::print_value(std::ostream & out) const
+ostream &
+Token::print_value(ostream & out) const
 {
    switch(tag)
       {
@@ -468,7 +468,7 @@ Token::print_value(std::ostream & out) const
 }
 //-----------------------------------------------------------------------------
 void
-Token::show_trace(std::ostream & out, const UCS_string & fun_name, 
+Token::show_trace(ostream & out, const UCS_string & fun_name, 
                   Function_Line line) const
 {
 UCS_string fn = fun_name;
@@ -486,20 +486,20 @@ UCS_string fn = fun_name;
              break;   // continue below
 
         case TOK_BRANCH:
-             out << "→" << get_int_val() << std::endl;
+             out << "→" << get_int_val() << endl;
              return;
 
         case TOK_NOBRANCH:
-             out << "→⍬" << std::endl;
+             out << "→⍬" << endl;
              return;
 
         case TOK_ESCAPE:
-             out << "→" << std::endl;
+             out << "→" << endl;
              return;
 
         case TOK_VOID:
         case TOK_NO_VALUE:
-             out << std::endl;
+             out << endl;
              return;
 
         default: Q1(*this)
@@ -519,7 +519,7 @@ const Value & val = *get_apl_val();
         if (val.element_count() == 0 &&   // empty vector
             val.get_ravel(0).is_simple_cell())
            {
-             out << std::endl;
+             out << endl;
              return;
            }
             
@@ -535,14 +535,14 @@ const UCS_string indent(fn.size(), UNI_SPACE);
    loop(l, pb.get_height())
       {
         if (l)   out << indent;
-        out << pb.get_line(l).no_pad() << std::endl;
+        out << pb.get_line(l).no_pad() << endl;
       }
 
-   if (pb.get_height() == 0)   out << std::endl;
+   if (pb.get_height() == 0)   out << endl;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-Token::print_quad(std::ostream & out) const
+ostream &
+Token::print_quad(ostream & out) const
 {
    return out << UNI_Quad_Quad << get_Id();
 }
@@ -612,7 +612,7 @@ UCS_string ucs;
 
         default:
              CERR << "Token: " << HEX4(tag) << " " << *this
-                  << " at " << LOC << std::endl;
+                  << " at " << LOC << endl;
              Q1(get_Class())
              Backtrace::show(__FILE__, __LINE__);
              FIXME;
@@ -698,13 +698,13 @@ Token::short_class_name(TokenClass cls)
    return "???";
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & out, const Token_string & tos)
+ostream &
+operator << (ostream & out, const Token_string & tos)
 {
    out << "[" << tos.size() << " token]: ";
    loop(t, tos.size())   CERR << "`" << tos[t] << "  ";
-   out << std::endl;
-   out << std::endl;
+   out << endl;
+   out << endl;
    return out;
 }
 //-----------------------------------------------------------------------------
@@ -844,7 +844,7 @@ Token * t2 = &at(to);
 }
 //-----------------------------------------------------------------------------
 void
-Token_string::print(std::ostream & out, bool details) const
+Token_string::print(ostream & out, bool details) const
 {
    loop(t, size())
        {
@@ -858,6 +858,6 @@ Token_string::print(std::ostream & out, bool details) const
          out << "  ";
        }
 
-   out << std::endl;
+   out << endl;
 }
 //-----------------------------------------------------------------------------

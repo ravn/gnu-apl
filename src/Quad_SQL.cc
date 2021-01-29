@@ -84,19 +84,19 @@ Quad_SQL::~Quad_SQL()
    loop(p, providers.size())   delete providers[p];
 }
 //-----------------------------------------------------------------------------
-static Token list_functions( std::ostream &out )
+static Token list_functions( ostream &out )
 {
-    out << "Available function numbers:" << std::endl
+    out << "Available function numbers:" << endl
 << "type  ⎕SQL[1] file      - open a database file,"
-                            " return reference ID for it" << std::endl
-<< "      ⎕SQL[2] ref       - close database" << std::endl
-<< "query ⎕SQL[3,db] params - send SQL query" << std::endl
-<< "query ⎕SQL[4,db] params - send SQL update" << std::endl
-<< "      ⎕SQL[5] ref       - begin a transaction" << std::endl
-<< "      ⎕SQL[6] ref       - commit current transaction" << std::endl
-<< "      ⎕SQL[7] ref       - rollback current transaction" << std::endl
-<< "      ⎕SQL[8] ref       - list tables" << std::endl
-<< "ref   ⎕SQL[9] table     - list columns for table" << std::endl;
+                            " return reference ID for it" << endl
+<< "      ⎕SQL[2] ref       - close database" << endl
+<< "query ⎕SQL[3,db] params - send SQL query" << endl
+<< "query ⎕SQL[4,db] params - send SQL update" << endl
+<< "      ⎕SQL[5] ref       - begin a transaction" << endl
+<< "      ⎕SQL[6] ref       - commit current transaction" << endl
+<< "      ⎕SQL[7] ref       - rollback current transaction" << endl
+<< "      ⎕SQL[8] ref       - list tables" << endl
+<< "ref   ⎕SQL[9] table     - list columns for table" << endl;
     return Token(TOK_APL_VALUE1, Str0( LOC ) );
 }
 //-----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ Token open_database(Value_P A, Value_P B)
         VALUE_ERROR;
     }
 
-std::string type = to_string(A->get_UCS_ravel());
+string type = to_string(A->get_UCS_ravel());
    loop(p, providers.size())
        {
          if (providers[p]->get_name() == type)
@@ -231,7 +231,7 @@ run_generic(Connection *conn, Value_P A, Value_P B, bool query)
         VALUE_ERROR;
       }
 
-std::string statement = conn->replace_bind_args(to_string( A->get_UCS_ravel()));
+string statement = conn->replace_bind_args(to_string( A->get_UCS_ravel()));
 ArgListBuilder * builder;
     if (query)   builder = conn->make_prepared_query( statement );
     else         builder = conn->make_prepared_update( statement );
@@ -305,7 +305,7 @@ static Token run_transaction_rollback( Value_P B )
 static Token show_tables( Value_P B )
 {
     Connection *conn = value_to_db_id( B );
-    std::vector<std::string> tables;
+    vector<string> tables;
     conn->fill_tables( tables );
 
     Value_P value;
@@ -315,7 +315,7 @@ static Token show_tables( Value_P B )
     else {
         Shape shape( tables.size () );
         value = Value_P( shape, LOC );
-        for( std::vector<std::string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
+        for( vector<string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
             new (value->next_ravel()) PointerCell( make_string_cell( *i, LOC ).get(),
                value.getref() );
         }
@@ -329,14 +329,14 @@ static Token
 show_cols(Value_P A, Value_P B)
 {
 Connection * conn = value_to_db_id(A);
-std::vector<ColumnDescriptor> cols;
+vector<ColumnDescriptor> cols;
 
     if( !B->is_apl_char_vector() ) {
         MORE_ERROR() << "Illegal table name";
         VALUE_ERROR;
     }
 
-std::string name = to_string(B->get_UCS_ravel());
+string name = to_string(B->get_UCS_ravel());
     conn->fill_cols(name, cols);
 
 Value_P value;
@@ -346,7 +346,7 @@ Value_P value;
     else {
         Shape shape(cols.size(), 2);
         value = Value_P(shape, LOC);
-        for( std::vector<ColumnDescriptor>::iterator i = cols.begin() ; i != cols.end() ; i++ ) {
+        for( vector<ColumnDescriptor>::iterator i = cols.begin() ; i != cols.end() ; i++ ) {
             new (value->next_ravel())
                 PointerCell(make_string_cell(i->get_name(), LOC ).get(),
                             value.getref());

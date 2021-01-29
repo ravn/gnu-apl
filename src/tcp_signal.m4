@@ -2,7 +2,7 @@
    This file is part of GNU APL, a free implementation of the
    ISO/IEC Standard 13751, "Programming Language APL, Extended"
  
-   Copyright (C) 2008-2021  Dr. Jürgen Sauermann
+   Copyright (C) 2008-2014  Dr. Jürgen Sauermann
  
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -83,12 +83,7 @@ and then:
 #include <iostream>
 #include <iomanip>
 
-/// Stringify x.
-#define STR(x) #x
-/// The current location in the source file.
-#define LOC Loc(__FILE__, __LINE__)
-/// The location line l in file f.
-#define Loc(f, l) f ":" STR(l)
+using namespace std;
 
 //-----------------------------------------------------------------------------
 /// an integer signal item of size \b bytes
@@ -114,13 +109,13 @@ public:
    T get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a string
-   void store(std::string & buffer) const
+   void store(string & buffer) const
       {
         for (int b = bytes; b > 0;)   buffer += char(value >> (8*--b));
       }
 
    /// print the item
-   std::ostream & print(std::ostream & out) const
+   ostream & print(ostream & out) const
       {
         return out << value;
       }
@@ -148,11 +143,11 @@ public:
    Sig_item_xint(const uint8_t * & buffer) : Sig_item_int<T, bytes>(buffer) {}
 
    /// print the item
-   std::ostream & print(std::ostream & out) const
+   ostream & print(ostream & out) const
       {
-        return out << "0x" << std::hex << std::setfill('0') << std::setw(bytes)
+        return out << "0x" << hex << setfill('0') << setw(bytes)
                    << Sig_item_int<T, bytes>::value
-                   << std::setfill(' ') << std::dec;
+                   << setfill(' ') << dec;
       }
 };
 //-----------------------------------------------------------------------------
@@ -180,7 +175,7 @@ class Sig_item_string
 {
 public:
    /// construct an item with value \b v
-   Sig_item_string(const std::string & str)
+   Sig_item_string(const string & str)
    : value(str)
    {}
 
@@ -193,10 +188,10 @@ public:
       }
 
    /// return the value of the item
-   const std::string get_value() const   { return value; }
+   const string get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a buffer
-   void store(std::string & buffer) const
+   void store(string & buffer) const
       {
         const Sig_item_u16 len (value.size());
         len.store(buffer);
@@ -204,7 +199,7 @@ public:
       }
 
    /// print the item
-   std::ostream & print(std::ostream & out) const
+   ostream & print(ostream & out) const
       {
         bool printable = true;
         for (size_t b = 0; b < value.size(); ++b)
@@ -215,18 +210,18 @@ public:
 
         if (printable)   return out << "\"" << value << "\"";
 
-        out << std::hex << std::setfill('0');
+        out << hex << setfill('0');
         for (size_t b = 0; b < value.size(); ++b)
             {
               if (b > 16)   { out << "...";   break; }
-              out << " " << std::setw(2) << (value[b] & 0xFF);
+              out << " " << setw(2) << (value[b] & 0xFF);
             }
-        return out << std::dec << std::setfill(' ');
+        return out << dec << setfill(' ');
       }
 
 protected:
    /// the value of the item
-   std::string value;
+   string value;
 };
 //-----------------------------------------------------------------------------
 divert(`-1')
@@ -256,7 +251,7 @@ define(`typtrans', `ifelse(`$1', `x64',    `uint64_t',
                     ifelse(`$1', `x8',      `uint8_t',
                     ifelse(`$1', `u8',      `uint8_t',
                     ifelse(`$1', `i8',       `int8_t',
-                                             `std::string'))))))))))))))))))')
+                                             `string'))))))))))))))))))')
 define(`sig_args', `,
                 Sig_item_`'$2 _`'$3')
 define(`sig_init', `$3(`_'$3)')
@@ -296,10 +291,10 @@ public:
    virtual ~Signal_base() {}
 
    /// store (encode) the signal into buffer
-   virtual void store(std::string & buffer) const = 0;
+   virtual void store(string & buffer) const = 0;
 
    /// print the signal
-   virtual std::ostream & print(std::ostream & out) const = 0;
+   virtual ostream & print(ostream & out) const = 0;
 
    /// return the ID of the signal
    virtual Signal_id get_sigID() const = 0;
@@ -310,8 +305,8 @@ public:
    /// get function for an item that is not defined for the signal
    void bad_get(const char * signal, const char * member) const
       {
-        std::cerr << std::endl << "*** called function get_" << signal << "__" << member
-             << "() with wrong signal " << get_sigName() << std::endl;
+        cerr << endl << "*** called function get_" << signal << "__" << member
+             << "() with wrong signal " << get_sigName() << endl;
         assert(0 && "bad_get()");
       }
 define(`m4_signal', `   /// access functions for signal $1...
@@ -321,14 +316,14 @@ include(protocol.def)dnl
    /// receive a signal (TCP)
    inline static Signal_base * recv_TCP(int tcp_sock, char * buffer,
                                         int bufsize, char * & del,
-                                        std::ostream * debug, const char ** loc);
+                                        ostream * debug, const char ** loc);
 
 protected:
 
    /// send this signal on TCP (or AF_UNIX) socket tcp_sock
    int send_TCP(int tcp_sock) const
        {
-         std::string buffer;
+         string buffer;
          store(buffer);
 
          uint32_t ll = htonl(buffer.size());
@@ -358,7 +353,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_`'$1);
          signal_id.store(buffer);
@@ -366,12 +361,12 @@ expa(`sig_store', `', $@)dnl
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "$1(";
 expa(`sig_print', `   out << ", ";
 ', $@)
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -400,16 +395,16 @@ enum { MAX_SIGNAL_CLASS_SIZE = sizeof(_all_signal_classes_) };
 //----------------------------------------------------------------------------
 Signal_base *
 Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
-                      char * & del, std::ostream * debug,
+                      char * & del, ostream * debug,
                       const char ** loc)
 {
    if (bufsize < 2*MAX_SIGNAL_CLASS_SIZE)
       {
          // a too small bufsize happens easily but is hard to debug!
          //
-         std::cerr << "\n\n*** bufsize is " << bufsize
+         cerr << "\n\n*** bufsize is " << bufsize
               << " but MUST be at least " << 2*MAX_SIGNAL_CLASS_SIZE
-              << " in recv_TCP() !!!" << std::endl;
+              << " in recv_TCP() !!!" << endl;
 
          *loc = LOC;
          return 0;
@@ -452,7 +447,7 @@ ssize_t siglen = 0;
          break;   // got  sizeof(uint32_t) length bytes
        }
 //    debug && *debug << "rx_bytes is " << rx_bytes
-//                    << " when reading siglen in in recv_TCP()" << std::endl;
+//                    << " when reading siglen in in recv_TCP()" << endl;
 
    siglen = ntohl(*reinterpret_cast<uint32_t *>(buffer));
    if (siglen == 0)
@@ -461,7 +456,7 @@ ssize_t siglen = 0;
         return 0;   // close
       }
 
-// debug && *debug << "signal length is " << siglen << " in recv_TCP()" << std::endl;
+// debug && *debug << "signal length is " << siglen << " in recv_TCP()" << endl;
 
    // skip MAX_SIGNAL_CLASS_SIZE bytes at the beginning of buffer
    //
@@ -475,7 +470,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
         del = new char[siglen];
         if (del == 0)
            {
-             std::cerr << "*** new(" << siglen <<") failed in recv_TCP()" << std::endl;
+             cerr << "*** new(" << siglen <<") failed in recv_TCP()" << endl;
              *loc = LOC;
              return 0;
            }
@@ -492,8 +487,8 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
 
           if (rx_bytes != siglen)
              {
-               std::cerr << "*** got " << rx_bytes
-                    << " when expecting " << siglen << std::endl;
+               cerr << "*** got " << rx_bytes
+                    << " when expecting " << siglen << endl;
                *loc = LOC;
                return 0;
              }
@@ -502,7 +497,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
          break;   // got siglen bytes
        }
 
-// debug && *debug << "rx_bytes is " << rx_bytes << " in recv_TCP()" << std::endl;
+// debug && *debug << "rx_bytes is " << rx_bytes << " in recv_TCP()" << endl;
 
 const uint8_t * b = reinterpret_cast<const uint8_t *>(rx_buf);
 Sig_item_u16 signal_id(b);
@@ -513,8 +508,8 @@ Signal_base * ret = 0;
 define(`m4_signal',
        `        case sid_`'$1: ret = new $1`'_c(b);   break;')
 include(protocol.def)dnl
-        default: std::cerr << "Signal_base::recv_TCP() failed: unknown signal id "
-                      << signal_id.get_value() << std::endl;
+        default: cerr << "Signal_base::recv_TCP() failed: unknown signal id "
+                      << signal_id.get_value() << endl;
                  errno = EINVAL;
                  *loc = LOC;
                  return 0;

@@ -43,13 +43,13 @@ std::string UnixSocketListener::start( void )
 {
     server_socket = socket( AF_UNIX, SOCK_STREAM, 0 );
     if( server_socket == -1 ) {
-        std::stringstream errmsg;
-        errmsg << "Error creating unix domain socket: " << strerror( errno ) << std::endl;
+        stringstream errmsg;
+        errmsg << "Error creating unix domain socket: " << strerror( errno ) << endl;
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
     }
 
-    std::stringstream name;
+    stringstream name;
     name << "/tmp/gnu_apl_conn_" << getpid();
     filename = name.str();
 
@@ -59,8 +59,8 @@ std::string UnixSocketListener::start( void )
     addr.sun_family = AF_UNIX;
     strncpy( addr.sun_path, filename.c_str(), sizeof( addr.sun_path ) );
     if( ::bind( server_socket, (struct sockaddr *)&addr, sizeof( addr ) ) == -1 ) {
-        std::stringstream errmsg;
-        errmsg << "Error binding unix domain socket: " << strerror( errno ) << std::endl;
+        stringstream errmsg;
+        errmsg << "Error binding unix domain socket: " << strerror( errno ) << endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
@@ -69,24 +69,24 @@ std::string UnixSocketListener::start( void )
     initialised = true;
 
     if( chmod( filename.c_str(), 0600 ) == -1 ) {
-        std::stringstream errmsg;
-        errmsg << "Error setting permissions: " << strerror( errno ) << std::endl;
+        stringstream errmsg;
+        errmsg << "Error setting permissions: " << strerror( errno ) << endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
     }
 
     if( listen( server_socket, 2 ) == -1 ) {
-        std::stringstream errmsg;
-        errmsg << "Error starting listener on unix domain socket: " << strerror( errno ) << std::endl;
+        stringstream errmsg;
+        errmsg << "Error starting listener on unix domain socket: " << strerror( errno ) << endl;
         close( server_socket );
         Workspace::more_error() = UCS_string( errmsg.str().c_str() );
         DOMAIN_ERROR;
     }
 
-    std::stringstream info_stream;
+    stringstream info_stream;
     info_stream << "mode:unix addr:" << name.str();
-    std::string conninfo = info_stream.str();
+    string conninfo = info_stream.str();
     return conninfo;
 }
 
@@ -94,7 +94,7 @@ void UnixSocketListener::wait_for_connection( void )
 {
     int pipe_fd[2];
     if( pipe( pipe_fd ) == -1 ) {
-        CERR << "Error creating pipe" << std::endl;
+        CERR << "Error creating pipe" << endl;
         return;
     }
 
@@ -109,25 +109,25 @@ void UnixSocketListener::wait_for_connection( void )
 
         int ret = poll( fds, 2, -1 );
         if( ret == -1 ) {
-            CERR << "Error while waiting for connection: " << strerror( errno ) << std::endl;
+            CERR << "Error while waiting for connection: " << strerror( errno ) << endl;
             break;
         }
         if( ret == 0 ) {
-            CERR << "Timed out while waiting for incoming connection" << std::endl;
+            CERR << "Timed out while waiting for incoming connection" << endl;
             break;
         }
 
         if( fds[1].revents & (POLLIN | POLLPRI) ) {
-            CERR << "Connection interrupted (expected)" << std::endl;
+            CERR << "Connection interrupted (expected)" << endl;
             break;
         }
 
         if( fds[0].revents & POLLERR ) {
-            CERR << "Error on file handle" << std::endl;
+            CERR << "Error on file handle" << endl;
             break;
         }
         if( fds[0].revents & POLLHUP ) {
-            CERR << "Connection was closed" << std::endl;
+            CERR << "Connection was closed" << endl;
             break;
         }
 
@@ -137,7 +137,7 @@ void UnixSocketListener::wait_for_connection( void )
             int socket = accept( server_socket, &addr, &length );
             if( socket == -1 ) {
                 if( !closing ) {
-                    CERR << "Error accepting network connection: " << strerror( errno ) << std::endl;
+                    CERR << "Error accepting network connection: " << strerror( errno ) << endl;
                 }
                 break;
             }
@@ -146,13 +146,13 @@ void UnixSocketListener::wait_for_connection( void )
                 pthread_t thread_id;
                 int ret = pthread_create( &thread_id, NULL, connection_loop, conn );
                 if( ret != 0 ) {
-                    CERR << "Error creating thread" << std::endl;
+                    CERR << "Error creating thread" << endl;
                     delete conn;
                 }
             }
         }
         else {
-            CERR << "Unexpected result from poll on socket" << std::endl;
+            CERR << "Unexpected result from poll on socket" << endl;
         }
     }
 }
@@ -165,7 +165,7 @@ void UnixSocketListener::close_connection( void )
         if( server_socket != 0 ) {
             int v = 1;
             if( write( notification_fd, &v, sizeof( v ) ) == -1 ) {
-                CERR << "Error writing message to notification file" << std::endl;
+                CERR << "Error writing message to notification file" << endl;
             }
             close( server_socket );
         }
@@ -174,7 +174,7 @@ void UnixSocketListener::close_connection( void )
         pthread_join( thread_id, &result );
 
         if( unlink( filename.c_str() ) == -1 ) {
-            CERR << "Error removing socket file name: " << filename << ": " << strerror( errno ) << std::endl;
+            CERR << "Error removing socket file name: " << filename << ": " << strerror( errno ) << endl;
         }
     }
 }

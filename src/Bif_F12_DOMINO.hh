@@ -195,16 +195,16 @@ protected:
           }
 
        /// return the complex number at row y, column x of this matrix
-       inline std::complex<double> get_Z(ShapeItem y, ShapeItem x) const
+       inline complex<double> get_Z(ShapeItem y, ShapeItem x) const
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
              matrix_assert(y >= 0);   matrix_assert(y <  M);
              const ShapeItem offset = x*dpi + y*dY;
-             return std::complex<double>(data[offset], data[offset + 1]);
+             return complex<double>(data[offset], data[offset + 1]);
           }
 
        /// set the complex number at row y, column x of this matrix
-       inline void set_Z(ShapeItem y, ShapeItem x, std::complex<double> val)
+       inline void set_Z(ShapeItem y, ShapeItem x, complex<double> val)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
              matrix_assert(y >= 0);   matrix_assert(y <  M);
@@ -214,7 +214,7 @@ protected:
           }
 
        /// subtract val from the matrix element at row y, column x.
-       inline void sub_Z(ShapeItem y, ShapeItem x, std::complex<double> val)
+       inline void sub_Z(ShapeItem y, ShapeItem x, complex<double> val)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
              matrix_assert(y >= 0);   matrix_assert(y <  M);
@@ -224,13 +224,13 @@ protected:
           }
 
        /// divide the matrix element at row y, col x by val.
-       inline void div_Z(ShapeItem y, ShapeItem x, std::complex<double> val)
+       inline void div_Z(ShapeItem y, ShapeItem x, complex<double> val)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
              matrix_assert(y >= 0);   matrix_assert(y <  M);
              const ShapeItem offset = x*dpi + y*dY;
-             const std::complex<double> quot =
-                         std::complex<double>(data[offset], data[offset + 1]) / val;
+             const complex<double> quot =
+                         complex<double>(data[offset], data[offset + 1]) / val;
              data[offset]     = quot.real();
              data[offset + 1] = quot.imag();
           }
@@ -318,14 +318,14 @@ double sum_imag = 0;
          sum_imag += 2*r*i;
        }
 
-const std::complex<double> sum(sum_real, sum_imag);
+const complex<double> sum(sum_real, sum_imag);
    result.norm2_real = sum.real();
    result.norm2_imag = sum.imag();
-const std::complex<double> root = sqrt(sum);
+const complex<double> root = sqrt(sum);
    result.norm_real  = root.real();
    result.norm_imag  = root.imag();
 
-const std::complex<double> _2__sum = 2.0 / sum;
+const complex<double> _2__sum = 2.0 / sum;
    result.norm__2_real = _2__sum.real();
    result.norm__2_imag = _2__sum.imag();
 }
@@ -500,16 +500,16 @@ Bif_F12_DOMINO::Matrix<true>::init_outer_product(const norm_result & scale,
    //
    matrix_assert(M == N);
 
-const std::complex<double> sc(scale.norm__2_real, scale.norm__2_imag);
+const complex<double> sc(scale.norm__2_real, scale.norm__2_imag);
 
    // off-diagonal elements...
    //
    for (ShapeItem y = 1; y < M; ++y)   // for every row below the first
    loop(x, y)                          // for every column left of the diagonal
        {
-         const std::complex<double> sx(src.real(x, 0), src.imag(x, 0));
-         const std::complex<double> sy(src.real(y, 0), src.imag(y, 0));
-         const std::complex<double> prod = sc*sx*sy;
+         const complex<double> sx(src.real(x, 0), src.imag(x, 0));
+         const complex<double> sy(src.real(y, 0), src.imag(y, 0));
+         const complex<double> prod = sc*sx*sy;
          real(x, y) = real(y, x) = prod.real();
          imag(x, y) = imag(y, x) = prod.imag();
        }
@@ -518,8 +518,8 @@ const std::complex<double> sc(scale.norm__2_real, scale.norm__2_imag);
    //
    loop(y, M)
        {
-         const std::complex<double> sd(src.real(y, 0), src.imag(y, 0));
-         const std::complex<double> prod = sc*sd*sd;
+         const complex<double> sd(src.real(y, 0), src.imag(y, 0));
+         const complex<double> prod = sc*sd*sd;
          real(y, y) = prod.real();
          imag(y, y) = prod.imag();
        }
@@ -590,11 +590,11 @@ const ShapeItem Z = src_A.N;
    loop(y, src_A.M)   // for every row y of src_A
    loop(x, src_B.N)   // for every column x of src_B
        {
-         std::complex<double> sum(0.0, 0.0);
+         complex<double> sum(0.0, 0.0);
          loop(z, Z)
              {
-               const std::complex<double> row_a(src_A.real(y, z), src_A.imag(y, z));
-               const std::complex<double> col_b(src_B.real(z, x), src_B.imag(z, x));
+               const complex<double> row_a(src_A.real(y, z), src_A.imag(y, z));
+               const complex<double> col_b(src_B.real(z, x), src_B.imag(z, x));
                  sum += row_a * col_b;
              }
          real(y, x) = sum.real();

@@ -1,0 +1,1 @@
+./configure --enable-maintainer-mode DEVELOP_WANTED=yes

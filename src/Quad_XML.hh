@@ -80,7 +80,8 @@ public:
    size_t get_src_len() const
       { return src_len; }
 
-   /// return the tagname of this node
+   /// return the tagname of this node. Starts with a valid XML name, thus no
+   /// leading <, /m or _.
    UCS_string get_tagname() const;
 
    bool is_parsed() const
@@ -111,14 +112,14 @@ public:
       }
 
    /// (debug-) print this node
-   void print(std::ostream & out) const;
+   void print(ostream & out) const;
 
    /// parse an XML start or leaf tag, store result in \b this->APL_value
    /// On error set MORE_ERROR() and return \b true
    bool parse_tag();
 
    /// (debug-) print all nodes·
-   static void print_all(std::ostream & out, const XML_node & anchor);
+   static void print_all(ostream & out, const XML_node & anchor);
 
    /// return the type of this node as string
    const char * get_node_type_name() const;
@@ -130,8 +131,8 @@ public:
    static bool collect(XML_node & anchor, XML_node & garbage, Value * Z);
 
    /// add member \b name with value \b value to structured value Z
-   static void add_member(Value * Z, const char * name, int number,
-                          Value * value);
+   static void add_member(Value * Z, Unicode first, const char * name,
+                          int number, Value * value);
 
    /// merge the items from start(-tag) to (end(-tag) into start tag
    static bool merge_range(XML_node & start, XML_node & end,
@@ -152,6 +153,10 @@ public:
    /// perform an in-place attribute value normalization (XML standard 3.3.3).
    /// On error set MORE_ERROR() and return \b true
    static bool normalize_attribute_value(UCS_string & attval);
+
+   /// return the inverse of normalize_attribute_value()
+   static UCS_string denormalize_attribute_value(const UCS_string & UCS_string,
+                                                 bool quoted);
 
 protected:
    /// return true iff \b end_tag matches \b this start tag
@@ -203,6 +208,12 @@ public:
    static Quad_XML * fun;          ///< Built-in function.
    static Quad_XML  _fun;          ///< Built-in function.
 
+   static UCS_string skip_pos_prefix(const UCS_string & ucs);
+
+   /// split src, e.g. "_2_name" into integer 2, Unicode '_', and
+   /// UCS_string 'name'. Null pointers if not relevant.
+   static int split_name(Unicode * category, ShapeItem * position,
+                         UCS_string * name, const Value & src);
 protected:
    /// overloaded Function::eval_AB()
    Token eval_AB(Value_P A, Value_P B) const;
@@ -211,13 +222,7 @@ protected:
    static Value_P APL_to_XML(const Value & B);
 
    /// return the entities in B, sorted by their position prefix
-   static void add_sorted_entities(std::vector<const UCS_string *> & entities,
-                                   const Value & B);
-
-   /// find the data cell (if any) with position prefix prefix idx in B.
-   /// \b is_tag distinguishes (flat) attribute arrays from (recursive)
-   /// subtag arrays
-   static const Cell * find_entity(Unicode & type, ShapeItem pos,
+   static void add_sorted_entities(vector<const UCS_string *> & entities,
                                    const Value & B);
 
    /// convert XML string to APL associative array
@@ -229,11 +234,42 @@ protected:
    /// return XML file (-name in B) converted to APL structured value
    Token convert_file(const Value & B) const;
 
-   /// return a tree-view of the members in B
-   static Value_P tree(const Value & B);
+   /// "M1" M2" ... "Mn" ← "M1.M2...Mn"
+   static Value_P path_split(const Value & B);
+
+   /// (POS CATEGORY TAG_NAME) ← MEMBER_NAME
+   static Value_P name_split(const Value & B);
+
+   /// return all XML nodes as member names
+   static Token all_members(const Value & B, int flags);
+
+   static Token next_member(const Value & A, const Value & B);
+   /// display details for tree() functions
+   enum tree_flags
+      {
+        tf_none      = 0x0000,   ///< show position prefix in member names
+        tf_with_pos  = 0x0001,   ///< show position prefix in member names
+        tf_with_decl = 0x0002,   ///< ∆-nodes (∆text, ∆decl. etc)
+        tf_fullpath  = 0x0004,   ///< display full path
+        tf_tagname   = 0x0010,   ///< display ⍙ nodes
+        tf_decl      = 0x0020,   ///< display ∆ nodes ≠ ∆text
+        tf_text      = 0x0040,   ///< display ∆text nodes
+        tf_sub       = 0x0080,   ///< display _NAME nodes
+        tf_all       = 0x00F0,   ///< display all node categories
+        tf_flat      = 0x0100,   /// do not recurse
+        tf_delta     = tf_decl | tf_text
+      };
+
+   /// return a tree-view of the members in B according to flags
+   static Value_P tree(const Value & B, int flags);
 
    /// return a sub-tree-view of the members in B at \b level
-   static void tree(const Value & B, UCS_string & z, UCS_string & prefix);
+   static void tree(const Value & B, UCS_string & z, UCS_string & prefix,
+                    const UCS_string & name_prefix, int flags);
+
+   /// return all member names according to flags
+   static void all_members(UCS_string_vector & result, const Value & B,
+                           const UCS_string & name_prefix, int flags);
 };
 
 #endif // __Quad_XML_DEFINED__

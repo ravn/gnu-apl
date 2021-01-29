@@ -24,6 +24,8 @@
 #include "Common.hh"
 #include <ostream>
 
+using namespace std;
+
 class Value;
 
 /// a ringbuffer of events related to the manipulation of values
@@ -40,7 +42,7 @@ public:
    static void init();
 
    /// print the history of \b value
-   static void print_history(std::ostream & out, const Value * value,
+   static void print_history(ostream & out, const Value * value,
                              const char * loc);
 
    /// ring buffer of events
@@ -51,7 +53,7 @@ public:
 
 protected:
    /// print the event
-   void print(int & flags, std::ostream & out, const Value * val,
+   void print(int & flags, ostream & out, const Value * val,
                const VH_entry * previous) const;
 
    /// the Value to which this event belongs

@@ -35,6 +35,8 @@
 
 #include "libapl.h"
 
+using namespace std;
+
 /******************************************************************************
    1. APL value constructor functions. The APL_value returned must be released
       with release_value() below at some point in time (unless it is 0)
@@ -581,8 +583,8 @@ const string st = out.str();
    return strndup(st.data(), st.size());
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-print_value(const APL_value value, std::ostream & out)
+ostream &
+print_value(const APL_value value, ostream & out)
 {
    value->print(out);
    return out;

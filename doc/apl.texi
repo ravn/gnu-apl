@@ -4263,36 +4263,44 @@ invalid XML characters.
 
 The XML document is a sequence of sub-strings, where each sub-strings is:
 @itemize
-
 @item either markup (-string),
 @item or non-markup (-string).
-
 @end itemize
 
 A markup (sub-)string:
 
 @itemize
-@item starts with <,
+@item starts with <, and
 @item ends with >, and
-@item all other characters are different from < and >.
+@item all other characters in the markup string differ from < and >.
 @end itemize
 
 A non-markup (sub-)string:
 
 @itemize
-@item starts either at the beginning of the XML document or directly after a
-      markup string,
-@item end at the end of the document or directly before a markup string, and
+@item starts either at the beginning of the XML document or else directly
+      after a markup string,
+@item end at the end of the document or else directly before a markup
+      string, and
       therefore
 @item cannot be adjacent to another non-markup string.
 @end itemize
 
-Non-markup is sometimes referred to as "unstructured text". The XML standard
-requires that whitespace in non-markup (allowed are only TAB, CR, LF, and SPACE)
-is being preserved in non-markup string. As a consequence, many markup strings
-begin with LF (i.e. if the preceeding markup was on the previous line).
+Non-markup is sometimes referred to as "unstructured text". The producer of
+an XML document has a principal choice as to where to put the information
+that the document contains is located: in the unstructured text or in the
+atttribute values inside the tags. For that reason the XML standard is somewhat
+picky about keeping the unstructured text as well as attribute values intact
+and requires that whitespace in non-markup (the only allowed whitspace
+characters in XML being TAB, CR, LF, and SPACE) is preserved in non-markup
+strings.
 
-The markup strings fall into into several categories:
+As a consequence, many non-markup strings begin with LF because the
+preceeding markup was on the previous line and therefore the LF after the
+preceeding markup is whitespace of the non-markup and therefore needs to be
+preserved.
+
+Every markup belongs to one of 4 categories:
 
 @itemize
 @item Processing instructions: "<? ... ?>",
@@ -4306,7 +4314,7 @@ The markup strings fall into into several categories:
   @end itemize
 @end itemize
 
-The tags recursively define a tree structure where:
+The XML tags recursively define a tree structure where:
 
 @itemize
 @item the nodes of the trees are either Empty Tags or else a start tag,
@@ -4333,84 +4341,89 @@ entities (i.e. &, <, >, ', and ") are recognized (and translated) by ⎕XML.
 The principal mapping between XML strings and APL values is:
 
 @itemize
-@item XML document ←→ structured APL (top-level) Value (an associative array)
-@item XML node  ←→ structured APL (sub-) Value (an associative (sub-) array of
-either the top-level value or of another XML node)
-@item XML name ←→ name of a member in a structured APL value
-@item Other ←→ member value
+@item @strong{XML document} ←→ structured (top-level) APL value or variable
+  (= an associative array)
+@item @strong{XML node}  ←→ structured APL (sub-) value (= an associative (sub-)
+  array of either the top-level value or of another XML node)
+@item @strong{XML name} ←→ name of a member in a structured APL value
+@item @strong{Other} ←→ member value
 @end itemize
 
-This mapping is straigtforward and leads to simple syntax for addressing
-of XML nodes in APL. Unfortunately, one can not map XML names directly to
-APL member names, even though a valid XML name is always a valid APL variable
-name. This is because:
+Every valid name in XML is also a valid name for an APL variable or structure
+member. Unfortunately, mapping XML names directly to APL member names cannot
+work because:
 
 @itemize
 @item In any associative array are the names of the members necessarily distinct.
- In XML node tags may occur repeatedly. If an XML document contains several
- nodes with the same tag, then the applications usually knows how to interpret
- the order in which the tags occur, but this order may not be detectable at
- the XML level (i.e. the nodes may not only have the same tag names, but also
- the same attributes and attribute values).
+ Assigning a value to an already existing member of a structured value overrides
+ the icurrent value of that member instead of creating a second member with
+ that value. On the other hand, in XML nodes tags may (and frequently do)
+ occur repeatedly. If an XML document contains several nodes with the same tag,
+ then the applications usually knows how to interpret the order in which the
+ tags occur, but this order may not be detectable at the XML level (i.e. the
+ nodes may not only have the same tag names, but also the same attributes and
+ attribute values).
 
- The applications that use the XML document may, however, depend on the order.
+ The applications that use the XML document frequently require that the order
+ of XML nodes with the same name remains intact when the document is modified.
  For example, the entries of a telephone book may be sorted alphabetically
  without XML being aware of that. Reading, modifying, and writing back the
  data in the telephone book must therefore not destroy that order.
 
 @item Likewise, at least for readability reasons, the order if XML the order
-  of nodes attributes, should not be changed. XML documents are frequently
-  processed with text tools like @strong{diff} which would incorrectly show
-  differences if (only) the attribute order has changed.
+ of nodes attributes, should not be changed. XML documents are frequently
+ processed with text tools like @strong{diff} which would incorrectly show
+ differences between XML documents that are equivalent from an XML perspective.
+
 
 @item Conflicts between tag names and attribute names. In XML, the same name
-  can designate an attribute in one node and a tag in another node.
+  can designate an attribute in one node and a tag in another node. ⎕XML keeps
+  all information from the < of a start tag to the > of an end tag in a single
+  associative array, therefore the attribute names must somehow differ from
+  the (sub-) tag names.
 
-@item Every XML node has a tag name that can be used to construct the
-  corresponding APL member name. The other parts of an XML document (i.e.
-  unstructured text between the XML nodes, XML comments, XML declarations etc.)
-  do not have a and thus need another way of referring to them.
+@item Every XML node has a tag name that can be used to derive a
+  corresponding APL member name. However, the text segments between an XML
+  tag and its corresponding end tag, are a mixture of unstructured text, XML
+  subnodes and comments of which only the XML subnodes have tags of their own.
+  These untagged segments may, however, contain relevant information and,
+  from an XML standard perspective, both their content and their order must
+  be preserved.
 @end itemize
 
-These issues are handled by a simple naming convention for all member names
-in the (recursive) associative array produced by monadic ⎕XML. Every member
-name consists of 2 or 3 components that together yield a valid APL variable
-name (and therefore a valid member name that is understood by the APL parser:
+⎕XML solves these issues with a simple naming convention for all member names
+in the (recursive) associative array that is produced by monadic ⎕XML. Every
+member name consists of 3 components that together yield a valid APL variable
+name (and therefore a valid member name that is understood by the APL parser):
 
 @itemize
-@item a position prefix of the form @strong{_NNN}, where NNN is a number
-that indicates the position of the member in relation to the tag to which
-it belongs. The numbering starts at ⎕IO and restarts at every XML start
-or leaf tag.
-
-@item A single character ⍙, ∆, or _, that indicates the nature of the name:
+@item A single character ⍙, ∆, or _, that indicates the role of the name in
+  the XML document as follows:
   @itemize
-  @item the character ⍙ for attribute names, i.e. for names that occur
-  @strong{inside} (i.e. between < and >) of an XML start tag or leaf tag.
+  @item the character ⍙ characterizes an attribute name, i.e. a names that
+  was used @strong{inside} (i.e. between < and >) of an XML start or leaf tag.
   The character ⍙ alone is the name of a special member which is present
-  in every associative array below the top-level and whose value is the original
-  XML tag name of a tag, or
+  in every associative array below the top-level and whose value is the
+  original XML tag name of a tag, or
 
-  @item the character ∆ for names that were synthesized by ⎕XML because the
-  corresponding XML entity was not a tag (and therefore cwhad no tag name).
-  Only the following synthesized names are produced by ⎕XML:
+  @item the character ∆ characterizes a name that was synthesized by ⎕XML
+  itself in order to tag a text (sub-) segment that has no tag of its own.
+  corresponding XML entity was not a tag (and therefore had no tag name), or
 
-  @item the character _ for XML entities that occur @strong{between} the
-  start tag and the corresponding end tag (if any, leaf tags have no such
-  members, or
+  @item the character _ characterizes the name of an XML entity, i.e. an
+    CML name that occur @strong{between} the
+  start tag and the corresponding end tag (if any: leaf tags have no such
+  entities
   @end itemize
+
+@item a position prefix of the form @strong{NN}, where NN is the position
+ of the member in relation to the tag to which it belongs. The numbering
+ starts at ⎕IO and restarts at every XML start or leaf tag.
 
 @item the attribute name or tag name. For those parts of an XML parts that
-do not have a name, the name is synthesized by ⎕XML and will be:
-  @itemize
-  @item @strong{∆declaration} for XML declarations such as
-  <?xml version='1.0' ... ?>
-  @item @strong{∆doctype} for !DOCTYPE declaration such as <!DOCTYPE ... >
-  @item @strong{∆comment} for XML comments such as <!--- ... --->
-  @item @strong{∆text} for the unstructured text between other XML entities,
-  @end itemize
-  The value of these synthesized members will be the text in the XML document
-  with predefined XML entities replaced by their single characters, i.e.:
+  do not have a tag name, the member name is being synthesized by ⎕XML and the
+  member value will be the text in the XML document with predefined XML
+  entities replaced by their single characters, i.e.:
   @itemize
   @item & for &amp,
   @item < for &lt,
@@ -4420,6 +4433,18 @@ do not have a name, the name is synthesized by ⎕XML and will be:
   @item ⎕UCS nnn for &#nnn, and
   @item ⎕UCS $xxx for &#xxx
   @end itemize
+@end itemize
+
+Let NN be a sequence of decimal digits. Then only the following 4
+synthesized names are produced by ⎕XML:
+
+@itemize
+@item @strong{∆NNcomment} for XML comments, i.e. <!--- ... ---> in XML,
+@item @strong{∆NNdeclaration} for XML declarations, i.e. <? ... ?> in XML,
+@item @strong{∆NNdoctype} for document type declarations, i.e.i
+    <!DOCTYPE ... > in XML
+@item @strong{∆NNtext} for unstructured (and hence untagged) text segemnts
+  in XML.
 @end itemize
 
 Every XML name (of a tag or attribute) is also a valid APL name, but
@@ -4435,36 +4460,42 @@ be contained in a single associative array.
 Examples of APL member names (assuming ⎕IO←1):
 
 @verbatim
-      _1⍙              ⍝ the first member in every XML node. Its value is the node tag.
-      _1∆declaration   ⍝ the first member in most XML documents. E.g. <?xml version= ...>
-      _2∆text          ⍝ whitespace (LF) between _1∆declaration and _3∆doctype
-      _3∆doctype       ⍝ DTD in XML documents that have one. E.g. <!DOCTYPE  ...
-      _6_Workspace     ⍝ Sub-array for <Workspace ... at position 6.
-      _1⍙wsid          ⍝ first attribute wsid from e.g. <Workspace wsid=...
-      _2⍙year          ⍝ second attribute year
+      ⍙1              ⍝ the first member in every XML node. Its value is the node tag.
+      ∆1declaration   ⍝ the first member in most XML documents. E.g. <?xml version= ...>
+      ∆2text          ⍝ whitespace (LF) between _1∆declaration and _3∆doctype
+      ∆3doctype       ⍝ DTD in XML documents that have one. E.g. <!DOCTYPE  ...
+      _6Workspace     ⍝ Sub-array for <Workspace ... at position 6.
+      ⍙1wsid          ⍝ first attribute wsid from e.g. <Workspace wsid=...
+      ⍙2year          ⍝ second attribute year
 @end verbatim
-
 
 @subsubsection Monadic ⎕XML
 
 @strong{Z ← ⎕XML B} converts APL string B that contains a valid XML document
 to an associative APL array Z and vice versa.
 
+@strong{Note}: If you convert an associative APL array back to a an XML document,
+then the result is a possibly very long strings with containing several linefeed
+characters. That is OK if the string is written to a file, but causes problems
+when the string is being displayed and longer than ⎕PW. The standard APL folding
+of output near ⎕PW make the string then look somewhat garbled. This effenct can
+be suppressed in 2 ways:
+
+@enumerate
+@item set ⎕PW large enough, or
+@item prefix the string with ⊃35⎕CR as in the examples below.
+@end enumerate
+
 @subsubsection Dyadic ⎕XML
 
 @strong{Z ← A ⎕XML B} provides a number of convenience functions. Its left
 argument A is an interger function number, possibly followed by arguments
-of the function chosen.
+of the function number ↑A.
 
-@itemize
-@item @strong{1 ⎕XML B} is like monadic ⎕XML B, except that B is a file name
- from which an XML document is read.
 
-@item @strong{2 ⎕XML B} is a string that shows the member names of the
- associative array B in a tree-like fashion. For example:
+In the following examples, let
 
 @verbatim
-
       XML←36 ⎕CR """
 <?xml version='1.0' encoding='UTF-8'?>
   <Document>
@@ -4478,37 +4509,140 @@ of the function chosen.
 """
 
 APL←⎕XML XML
+@end verbatim
 
-⊃35⎕CR 2 ⎕XML APL   ⍝ ⊃35⎕CR breaks long XML strings into (nested) lines
+Then
+
+@itemize
+@item @strong{0 ⎕XML B} is the same as monadic ⎕XML B.
+
+@item @strong{1 ⎕XML B} is like 0 ⎕XML B, except that B is not the XML
+document (string) itself but the name of a file from which an XML document
+is read.
+
+@item @strong{2 ⎕XML B} splits an APL member path (a sequence of member names)
+into a vector P of (nested) member names. This vector P is understood by
+the ASPL primitive PICK (i.e. Z←P⊃APL or (P⊃APL←value) and can be used to
+address the data in an XML node.
+
+@item @strong{3 ⎕XML B} splits an APL member name as produced by monadic
+⎕XML into a 3-item vector containing the (numeric) position, a character
+indicating the category (i.e. _, ∆, or ⍙) and the name from the XML tag:
+
+@verbatim
+      8 ⎕CR (P C N)←3 ⎕XML "_2∆comment"
+┌→────────────┐
+│2 ∆ ┌→──────┐│
+│    │comment││
+│    └───────┘│
+└∊────────────┘
+      P
+2
+      C
+∆
+      N
+comment
+@end verbatim
+
+@item @strong{4 ⎕XML B} is a string that shows the member names of the
+ associative array B in a tree-like fashion. For example:
+
+@verbatim
+      ⊃35⎕CR 4 ⎕XML APL
+XML                     
+ │                      
+ └─── Document          
+       │                
+       └─── Tag1        
+             │          
+             └─── Subtag
+@end verbatim
+
+@item @strong{5 ⎕XML B} is like 4 ⎕XML but displays not only the XML tags but
+also other XML nodes (declarations, attrinutes, etc.):
+
+@verbatim
+      ⊃35⎕CR 5 ⎕XML APL
 XML                               
  │                                
  ├─── _1∆declaration              
  ├─── _2∆text                     
- ├─── _18∆text                    
  └─── _3_Document                 
        │                          
-       ├─── _1⍙                   
        ├─── _1∆text               
        ├─── _2_Tag1               
        │     │                    
-       │     ├─── _1⍙             
-       │     ├─── _2⍙name         
        │     ├─── _1∆text         
        │     ├─── _2∆comment      
        │     ├─── _3∆text         
        │     ├─── _4_Subtag       
        │     │     │              
-       │     │     ├─── _1⍙       
-       │     │     ├─── _2⍙name   
        │     │     ├─── _1∆text   
        │     │     ├─── _2∆comment
        │     │     └─── _3∆text   
        │     └─── _5∆text         
        └─── _3∆text               
+@end verbatim
 
+@item @strong{6 ⎕XML B} is like 4 ⎕XML but displays not only the member
+name but the entire path to the member:
+
+@verbatim
+      ⊃35⎕CR 6 ⎕XML APL
+XML                                             
+ │                                              
+ └─── ._3_Document                              
+       │                                        
+       └─── ._3_Document._2_Tag1                
+             │                                  
+             └─── ._3_Document._2_Tag1._4_Subtag
+@end verbatim
+
+@item @strong{7 ⎕XML B} returns a list of all members in a depth-first order.
+This list can be used as an iterator to traverse the entire tree (and possibly
+filter out items along the way).
+
+@verbatim
+      ⊃7 ⎕XML APL
+._1∆declaration                          
+._2∆text                                 
+._18∆text                                
+._3_Document                             
+._3_Document._1⍙                         
+._3_Document._1∆text                     
+._3_Document._3∆text                     
+._3_Document._2_Tag1                     
+._3_Document._2_Tag1._1⍙                 
+._3_Document._2_Tag1._2⍙name             
+._3_Document._2_Tag1._1∆text             
+._3_Document._2_Tag1._2∆comment          
+._3_Document._2_Tag1._3∆text             
+._3_Document._2_Tag1._5∆text             
+._3_Document._2_Tag1._4_Subtag           
+._3_Document._2_Tag1._4_Subtag._1⍙       
+._3_Document._2_Tag1._4_Subtag._2⍙name   
+._3_Document._2_Tag1._4_Subtag._1∆text   
+._3_Document._2_Tag1._4_Subtag._2∆comment
+._3_Document._2_Tag1._4_Subtag._3∆text   
 @end verbatim
 
 @end itemize
+
+@subsubsection XML Queries
+
+The different functions in dyadic ⎕XML are intended to construct XML queries.
+An XML query extracts information from, or modifies information in, an XML
+document. XML queries may differ considerably in their details, but usually
+follow these top-level steps:
+
+@enumerate
+@item Read an XML document into, say, APL (APL←0 ⎕XML B or APL←1 ⎕XML B)
+@item Optionally, display the structure of the document (3, 4, or 5 ⎕XML)
+@item Select a subset of XML nodes (= GNU APL member names, 6 ⎕XML APL)
+@item retrieve or modify the data in the selected XML nodes
+ (with something like MEMBERS←(⊂APL) FUN¨6⎕XML APL←⎕XML followed by MEMBER⊃ )
+@item Optionally, convert the modified XML document back to XML (0 ⎕XML
+@end enumerate
 
 @c ----------------------------------------------------------------------------
 @node Chapter 4

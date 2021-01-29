@@ -107,14 +107,14 @@ Statistics::get_name(Pfstat_ID id)
 }
 //----------------------------------------------------------------------------
 void
-Performance::print(Pfstat_ID which, std::ostream & out)
+Performance::print(Pfstat_ID which, ostream & out)
 {
    if (which != PFS_ALL)   // individual statistics
       {
          Statistics * stat = get_statistics(which);
          if (!stat)
             {
-              out << "No such statistics: " << which << std::endl;
+              out << "No such statistics: " << which << endl;
               return;
             }
 
@@ -122,21 +122,21 @@ Performance::print(Pfstat_ID which, std::ostream & out)
             {
               out <<
 "╔═════════════════╦══════════╤═════════╤════════╦══════════╤═════════╤════════╗"
-                  << std::endl;
+                  << endl;
               stat->print(out);
               out <<
 "╚═════════════════╩══════════╧═════════╧════════╩══════════╧═════════╧════════╝"
-                  << std::endl;
+                  << endl;
             }
          else
             {
               out <<
 "╔═════════════════╦════════════╤══════════╤══════════╤══════════╤══════════╗"
-                  << std::endl;
+                  << endl;
               stat->print(out);
               out <<
 "╚═════════════════╩════════════╧══════════╧══════════╧══════════╧══════════╝"
-                   << std::endl;
+                   << endl;
             }
          return;
       }
@@ -218,7 +218,7 @@ const uint64_t subsq_avg_AB = Statistics_record::average(sum_subsq_cycles_AB,
 "║        or       ╟───────┬───────┼───────┬───────┤  per  ║\n"
 "║    Operation    ║     N │Cycles │ Items │Cycles │ Item  ║\n"
 "╟─────────────────╫───────┼───────┼───────┼───────┼───────╢"
-       << std::endl;
+       << endl;
 
    // other statistics...
    //
@@ -231,11 +231,11 @@ const uint64_t subsq_avg_AB = Statistics_record::average(sum_subsq_cycles_AB,
 
    out <<
 "╚═════════════════╩═══════╧═══════╧═══════╧═══════╧═══════╝"
-       << std::endl;
+       << endl;
 }
 //----------------------------------------------------------------------------
 void
-Performance::save_data(std::ostream & out, std::ostream & out_file)
+Performance::save_data(ostream & out, ostream & out_file)
 {
 #define perfo_1(id, ab, _name, _thr)  cfs_ ## id ## ab.save_data(out_file, #id);
 #define perfo_2(id, ab, _name, _thr)  cfs_ ## id ## ab.save_data(out_file, #id);
@@ -255,7 +255,7 @@ Performance::reset_all()
 }
 //----------------------------------------------------------------------------
 void
-Statistics_record::print(std::ostream & out)
+Statistics_record::print(ostream & out)
 {
 uint64_t mu = 0;
 int sigma_percent = 0;
@@ -274,7 +274,7 @@ int sigma_percent = 0;
 }
 //----------------------------------------------------------------------------
 void
-Statistics_record::save_record(std::ostream & outf)
+Statistics_record::save_record(ostream & outf)
 {
 uint64_t mu = 0;
 double sigma = 0;
@@ -284,13 +284,13 @@ double sigma = 0;
         sigma = sqrt(data2/count - mu*mu);
       }
 
-   outf << std::setw(8) << count << ","
-        << std::setw(8) << mu << ","
-        << std::setw(8) << uint64_t(sigma + 0.5);
+   outf << setw(8) << count << ","
+        << setw(8) << mu << ","
+        << setw(8) << uint64_t(sigma + 0.5);
 }
 //----------------------------------------------------------------------------
 void
-Statistics_record::print5(std::ostream & out, uint64_t num)
+Statistics_record::print5(ostream & out, uint64_t num)
 {
 char cc[40];
    if (num < 100000)   // special case: no multiplier
@@ -318,7 +318,7 @@ double fnum = num;
 }
 //============================================================================
 void
-FunctionStatistics::print(std::ostream & out)
+FunctionStatistics::print(ostream & out)
 {
 UTF8_string utf(get_name());
 UCS_string uname(utf);
@@ -332,21 +332,21 @@ const uint64_t div = vec_lengths.get_average() ? vec_lengths.get_average() : 1;
    out << " │ ";   Statistics_record::print5(out, vec_lengths.get_average());
    out << " │ ";   Statistics_record::print5(out, vec_cycles.get_average());
    out << " │ ";   Statistics_record::print5(out, vec_cycles.get_average()/div);
-   out << " ║" << std::endl;
+   out << " ║" << endl;
 }
 //----------------------------------------------------------------------------
 void
-FunctionStatistics::save_data(std::ostream & outf, const char * perf_name)
+FunctionStatistics::save_data(ostream & outf, const char * perf_name)
 {
 char cc[100];
    snprintf(cc, sizeof(cc), "%s,", perf_name);
-   outf << "prf_3 (PFS_" << std::left << std::setw(12) << cc << std::right;
+   outf << "prf_3 (PFS_" << left << setw(12) << cc << right;
    vec_cycles.save_record(outf);
-   outf << ")" << std::endl;
+   outf << ")" << endl;
 }
 //============================================================================
 void
-CellFunctionStatistics::print(std::ostream & out)
+CellFunctionStatistics::print(ostream & out)
 {
 UTF8_string utf(get_name());
 UCS_string uname(utf);
@@ -357,19 +357,19 @@ UCS_string uname(utf);
    first.print(out);
    out << " ║ ";
    subsequent.print(out);
-   out << " ║" << std::endl;
+   out << " ║" << endl;
 }
 //----------------------------------------------------------------------------
 void
-CellFunctionStatistics::save_data(std::ostream & outf, const char * perf_name)
+CellFunctionStatistics::save_data(ostream & outf, const char * perf_name)
 {
 char cc[100];
    snprintf(cc, sizeof(cc), "%s,", perf_name);
-   outf << "prf_12(PFS_" << std::left << std::setw(12) << cc << std::right;
+   outf << "prf_12(PFS_" << left << setw(12) << cc << right;
    first.save_record(outf);
    outf << ",";
    subsequent.save_record(outf);
-   outf << ")" << std::endl;
+   outf << ")" << endl;
 }
 //============================================================================
 

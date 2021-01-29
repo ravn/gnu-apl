@@ -127,8 +127,8 @@ const char * name = "unknown ID";
    return reinterpret_cast<const UTF8 *>(name);
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & out, Id id)
+ostream &
+operator << (ostream & out, Id id)
 {
    return out << ID::get_name(id);
 }

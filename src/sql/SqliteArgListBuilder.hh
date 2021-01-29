@@ -27,9 +27,9 @@
 
 class SqliteArgListBuilder : public ArgListBuilder {
 public:
-    SqliteArgListBuilder( SqliteConnection *connection_in, const std::string &sql );
+    SqliteArgListBuilder( SqliteConnection *connection_in, const string &sql );
     virtual ~SqliteArgListBuilder();
-    virtual void append_string( const std::string &arg, int pos );
+    virtual void append_string( const string &arg, int pos );
     virtual void append_long( long arg, int pos );
     virtual void append_double( double arg, int pos );
     virtual void append_null( int pos );
@@ -38,7 +38,7 @@ public:
 
 private:
     void init_sql( void );
-    std::string sql;
+    string sql;
     SqliteConnection *connection;
     sqlite3_stmt *statement;
 };

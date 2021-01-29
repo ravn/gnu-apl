@@ -139,7 +139,7 @@ Quad_FIO::clear()
          if (fe.fe_FILE)   fclose(fe.fe_FILE);   // also closes fe.fe_fd
          else              close(fe.fe_fd);
          CERR << "WARNING: File " << fe.path << " still open - closing it"
-              << std::endl;
+              << endl;
         ::close(open_files.back().fe_fd);
         open_files.pop_back();
       }
@@ -795,7 +795,7 @@ Shape sh_Z(z);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::list_functions(std::ostream & out, bool mapping)
+Quad_FIO::list_functions(ostream & out, bool mapping)
 {
    if (mapping)
       {
@@ -811,11 +811,11 @@ Quad_FIO::list_functions(std::ostream & out, bool mapping)
              out << "      ⎕FIO[" << NN
                  << "]  ←→  ⎕FIO['" << name << "']"
                  << UCS_string(13 - strlen(name), UNI_SPACE)
-                 << "←→  ⎕FIO." << name << std::endl;
+                 << "←→  ⎕FIO." << name << endl;
              }
 
          out << "\n      For a more detailed description of all functions:\n\n"
-                "      ⎕FIO ⍬" << std::endl;
+                "      ⎕FIO ⍬" << endl;
       }
    else
       {
@@ -1010,17 +1010,17 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
         case -7: // throw a segfault
              {
                CERR << "NOTE: Triggering a segfault (keeping the current "
-                       "SIGSEGV handler)..." << std::endl;
+                       "SIGSEGV handler)..." << endl;
 
                const APL_Integer result = *reinterpret_cast<char *>(4343);
-               CERR << "NOTE: Throwing a segfault failed." << std::endl;
+               CERR << "NOTE: Throwing a segfault failed." << endl;
                return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
              }
 
         case -6: // throw a segfault
              {
                CERR << "NOTE: Resetting SIGSEGV handler and triggering "
-                       "a segfault..." << std::endl;
+                       "a segfault..." << endl;
 
                // reset the SSEGV handler
                //
@@ -1029,7 +1029,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
                action.sa_handler = 0;
                sigaction(SIGSEGV, &action, 0);
                const APL_Integer result = *reinterpret_cast<char *>(4343);
-               CERR << "NOTE: Throwing a segfault failed." << std::endl;
+               CERR << "NOTE: Throwing a segfault failed." << endl;
                return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
              }
 
@@ -1539,7 +1539,7 @@ int function_number = -1;
                 DIR * dir = opendir(path.c_str());
                 if (dir == 0)   goto out_errno;
 
-                std::vector<struct dirent> entries;
+                vector<struct dirent> entries;
                 for (;;)
                     {
                       dirent * entry = readdir(dir);
@@ -2075,7 +2075,7 @@ int function_number = -1;
    MORE_ERROR() << "bad function number " << function_number <<
                    " in Quad_FIO::eval_XB()";
 
-   CERR << "Bad eval_XB() function number: " << function_number << std::endl;
+   CERR << "Bad eval_XB() function number: " << function_number << endl;
    DOMAIN_ERROR;
 
 out_errno:
@@ -2730,7 +2730,7 @@ int function_number = -1;
    MORE_ERROR() << "bad function number " << function_number <<
                    " in Quad_FIO::eval_AXB()";
 
-   CERR << "eval_AXB() function number: " << function_number << std::endl;
+   CERR << "eval_AXB() function number: " << function_number << endl;
    DOMAIN_ERROR;
 
 out_errno:

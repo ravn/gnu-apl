@@ -435,7 +435,7 @@ Value_P Z2(2, LOC);
              break;
 
         default: CERR << "unexpected result tag " << result.get_tag()
-                      << " in Quad_EC::eoc()" << std::endl;
+                      << " in Quad_EC::eoc()" << endl;
                  Assert(0);
       }
 
@@ -677,7 +677,7 @@ int ret = 0;   // assume ⎕EX failure
 
    // build vector of member names in reverse order
    //
-std::vector<const UCS_string *>members;
+vector<const UCS_string *>members;
    {
      int dot = name.size();
      for (int from = dot - 1; from >= 0; --from)
@@ -686,12 +686,12 @@ std::vector<const UCS_string *>members;
 
            members.push_back(new UCS_string(name, from + 1, dot - from - 1));
            dot = from;
-//         CERR << "MEMBER '" << *members.back() << "'" << std::endl;
+//         CERR << "MEMBER '" << *members.back() << "'" << endl;
          }
      members.push_back(new const UCS_string(name, 0, dot));
    }
 
-//      CERR << "VAR '"     << *members.back() << "'" << std::endl;
+//      CERR << "VAR '"     << *members.back() << "'" << endl;
 
 Symbol * symbol = Workspace::lookup_existing_symbol(*members.back());
    if (symbol == 0)     goto cleanup;
@@ -1472,14 +1472,14 @@ UCS_string fun_name_ucs(fun_name);
 Symbol * fun_symbol = Workspace::lookup_existing_symbol(fun_name_ucs);
    if (fun_symbol == 0)
       {
-        CERR << "symbol " << fun_name_ucs << " not found" << std::endl;
+        CERR << "symbol " << fun_name_ucs << " not found" << endl;
         return 0;
       }
 
 Function_P fun = fun_symbol->get_function();
    if (fun == 0)
       {
-        CERR << "symbol " << fun_name_ucs << " is not a function" << std::endl;
+        CERR << "symbol " << fun_name_ucs << " is not a function" << endl;
         return 0;
       }
 
@@ -1487,7 +1487,7 @@ const UserFunction * ufun = fun->get_ufun1();
    if (ufun == 0)
       {
         CERR << "symbol " << fun_name_ucs
-             << " is not a defined function" << std::endl;
+             << " is not a defined function" << endl;
         return 0;
       }
 

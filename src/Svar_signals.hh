@@ -1,21 +1,21 @@
 /*
-   This file is part of GNU APL, a free implementation of the
-   ISO/IEC Standard 13751, "Programming Language APL, Extended"
- 
-   Copyright (C) 2008-2014  Dr. Jürgen Sauermann
- 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
- 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
- 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    This file is part of GNU APL, a free implementation of the
+    ISO/IEC Standard 13751, "Programming Language APL, Extended"
+
+    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -83,12 +83,7 @@ and then:
 #include <iostream>
 #include <iomanip>
 
-/// Stringify x.
-#define STR(x) #x
-/// The current location in the source file.
-#define LOC Loc(__FILE__, __LINE__)
-/// The location line l in file f.
-#define Loc(f, l) f ":" STR(l)
+using namespace std;
 
 //-----------------------------------------------------------------------------
 /// an integer signal item of size \b bytes
@@ -114,13 +109,13 @@ public:
    T get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a string
-   void store(std::string & buffer) const
+   void store(string & buffer) const
       {
         for (int b = bytes; b > 0;)   buffer += char(value >> (8*--b));
       }
 
    /// print the item
-   std::ostream & print(std::ostream & out) const
+   ostream & print(ostream & out) const
       {
         return out << value;
       }
@@ -148,11 +143,11 @@ public:
    Sig_item_xint(const uint8_t * & buffer) : Sig_item_int<T, bytes>(buffer) {}
 
    /// print the item
-   std::ostream & print(std::ostream & out) const
+   ostream & print(ostream & out) const
       {
-        return out << "0x" << std::hex << std::setfill('0') << std::setw(bytes)
+        return out << "0x" << hex << setfill('0') << setw(bytes)
                    << Sig_item_int<T, bytes>::value
-                   << std::setfill(' ') << std::dec;
+                   << setfill(' ') << dec;
       }
 };
 //-----------------------------------------------------------------------------
@@ -180,7 +175,7 @@ class Sig_item_string
 {
 public:
    /// construct an item with value \b v
-   Sig_item_string(const std::string & str)
+   Sig_item_string(const string & str)
    : value(str)
    {}
 
@@ -193,10 +188,10 @@ public:
       }
 
    /// return the value of the item
-   const std::string get_value() const   { return value; }
+   const string get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a buffer
-   void store(std::string & buffer) const
+   void store(string & buffer) const
       {
         const Sig_item_u16 len (value.size());
         len.store(buffer);
@@ -204,7 +199,7 @@ public:
       }
 
    /// print the item
-   std::ostream & print(std::ostream & out) const
+   ostream & print(ostream & out) const
       {
         bool printable = true;
         for (size_t b = 0; b < value.size(); ++b)
@@ -215,18 +210,18 @@ public:
 
         if (printable)   return out << "\"" << value << "\"";
 
-        out << std::hex << std::setfill('0');
+        out << hex << setfill('0');
         for (size_t b = 0; b < value.size(); ++b)
             {
               if (b > 16)   { out << "...";   break; }
-              out << " " << std::setw(2) << (value[b] & 0xFF);
+              out << " " << setw(2) << (value[b] & 0xFF);
             }
-        return out << std::dec << std::setfill(' ');
+        return out << dec << setfill(' ');
       }
 
 protected:
    /// the value of the item
-   std::string value;
+   string value;
 };
 //-----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
@@ -353,10 +348,10 @@ public:
    virtual ~Signal_base() {}
 
    /// store (encode) the signal into buffer
-   virtual void store(std::string & buffer) const = 0;
+   virtual void store(string & buffer) const = 0;
 
    /// print the signal
-   virtual std::ostream & print(std::ostream & out) const = 0;
+   virtual ostream & print(ostream & out) const = 0;
 
    /// return the ID of the signal
    virtual Signal_id get_sigID() const = 0;
@@ -367,8 +362,8 @@ public:
    /// get function for an item that is not defined for the signal
    void bad_get(const char * signal, const char * member) const
       {
-        std::cerr << std::endl << "*** called function get_" << signal << "__" << member
-             << "() with wrong signal " << get_sigName() << std::endl;
+        cerr << endl << "*** called function get_" << signal << "__" << member
+             << "() with wrong signal " << get_sigName() << endl;
         assert(0 && "bad_get()");
       }
 
@@ -398,7 +393,7 @@ public:
       { bad_get("SET_STATE", "key"); return 0; }
    virtual uint8_t get__SET_STATE__new_state() const   ///< dito
       { bad_get("SET_STATE", "new_state"); return 0; }
-   virtual std::string get__SET_STATE__sloc() const   ///< dito
+   virtual string get__SET_STATE__sloc() const   ///< dito
       { bad_get("SET_STATE", "sloc"); return 0; }
 
 
@@ -422,9 +417,9 @@ public:
       { bad_get("VALUE_IS", "key"); return 0; }
    virtual uint32_t get__VALUE_IS__error() const   ///< dito
       { bad_get("VALUE_IS", "error"); return 0; }
-   virtual std::string get__VALUE_IS__error_loc() const   ///< dito
+   virtual string get__VALUE_IS__error_loc() const   ///< dito
       { bad_get("VALUE_IS", "error_loc"); return 0; }
-   virtual std::string get__VALUE_IS__cdr_value() const   ///< dito
+   virtual string get__VALUE_IS__cdr_value() const   ///< dito
       { bad_get("VALUE_IS", "cdr_value"); return 0; }
 
 
@@ -432,7 +427,7 @@ public:
    /// access functions for signal ASSIGN_VALUE...
    virtual uint64_t get__ASSIGN_VALUE__key() const   ///< dito
       { bad_get("ASSIGN_VALUE", "key"); return 0; }
-   virtual std::string get__ASSIGN_VALUE__cdr_value() const   ///< dito
+   virtual string get__ASSIGN_VALUE__cdr_value() const   ///< dito
       { bad_get("ASSIGN_VALUE", "cdr_value"); return 0; }
 
 /// APserver result for: SVAR←X
@@ -441,7 +436,7 @@ public:
       { bad_get("SVAR_ASSIGNED", "key"); return 0; }
    virtual uint32_t get__SVAR_ASSIGNED__error() const   ///< dito
       { bad_get("SVAR_ASSIGNED", "error"); return 0; }
-   virtual std::string get__SVAR_ASSIGNED__error_loc() const   ///< dito
+   virtual string get__SVAR_ASSIGNED__error_loc() const   ///< dito
       { bad_get("SVAR_ASSIGNED", "error_loc"); return 0; }
 
 
@@ -472,7 +467,7 @@ public:
 
 /// APserver result (record) for: read SVAR database record from APserver
    /// access functions for signal SVAR_RECORD_IS...
-   virtual std::string get__SVAR_RECORD_IS__record() const   ///< dito
+   virtual string get__SVAR_RECORD_IS__record() const   ///< dito
       { bad_get("SVAR_RECORD_IS", "record"); return 0; }
 
 
@@ -502,13 +497,13 @@ public:
       { bad_get("REGISTER_PROCESSOR", "grand"); return 0; }
    virtual uint8_t get__REGISTER_PROCESSOR__evconn() const   ///< dito
       { bad_get("REGISTER_PROCESSOR", "evconn"); return 0; }
-   virtual std::string get__REGISTER_PROCESSOR__progname() const   ///< dito
+   virtual string get__REGISTER_PROCESSOR__progname() const   ///< dito
       { bad_get("REGISTER_PROCESSOR", "progname"); return 0; }
 
 
 /// APserver request: match offered shared variable or make a new offer
    /// access functions for signal MATCH_OR_MAKE...
-   virtual std::string get__MATCH_OR_MAKE__varname() const   ///< dito
+   virtual string get__MATCH_OR_MAKE__varname() const   ///< dito
       { bad_get("MATCH_OR_MAKE", "varname"); return 0; }
    virtual uint32_t get__MATCH_OR_MAKE__to_proc() const   ///< dito
       { bad_get("MATCH_OR_MAKE", "to_proc"); return 0; }
@@ -555,7 +550,7 @@ public:
 
 /// APserver result for: get offering processors  (⎕SVQ)
    /// access functions for signal OFFERING_PROCS_ARE...
-   virtual std::string get__OFFERING_PROCS_ARE__offering_procs() const   ///< dito
+   virtual string get__OFFERING_PROCS_ARE__offering_procs() const   ///< dito
       { bad_get("OFFERING_PROCS_ARE", "offering_procs"); return 0; }
 
 
@@ -569,7 +564,7 @@ public:
 
 /// APserver result for: get offered variables  (⎕SVQ)
    /// access functions for signal OFFERED_VARS_ARE...
-   virtual std::string get__OFFERED_VARS_ARE__offered_vars() const   ///< dito
+   virtual string get__OFFERED_VARS_ARE__offered_vars() const   ///< dito
       { bad_get("OFFERED_VARS_ARE", "offered_vars"); return 0; }
 
 
@@ -633,7 +628,7 @@ public:
    /// access functions for signal ASSIGN_WSWS_VAR...
    virtual uint64_t get__ASSIGN_WSWS_VAR__key() const   ///< dito
       { bad_get("ASSIGN_WSWS_VAR", "key"); return 0; }
-   virtual std::string get__ASSIGN_WSWS_VAR__cdr_value() const   ///< dito
+   virtual string get__ASSIGN_WSWS_VAR__cdr_value() const   ///< dito
       { bad_get("ASSIGN_WSWS_VAR", "cdr_value"); return 0; }
 
 /// APserver request: X←ws-ws SVAR
@@ -643,7 +638,7 @@ public:
 
 /// APserver result for: X←ws-ws SVAR
    /// access functions for signal WSWS_VALUE_IS...
-   virtual std::string get__WSWS_VALUE_IS__cdr_value() const   ///< dito
+   virtual string get__WSWS_VALUE_IS__cdr_value() const   ///< dito
       { bad_get("WSWS_VALUE_IS", "cdr_value"); return 0; }
 
 
@@ -652,7 +647,7 @@ public:
 
 /// APserver result for: print the entire database
    /// access functions for signal SVAR_DB_PRINTED...
-   virtual std::string get__SVAR_DB_PRINTED__printout() const   ///< dito
+   virtual string get__SVAR_DB_PRINTED__printout() const   ///< dito
       { bad_get("SVAR_DB_PRINTED", "printout"); return 0; }
 
 
@@ -660,14 +655,14 @@ public:
    /// receive a signal (TCP)
    inline static Signal_base * recv_TCP(int tcp_sock, char * buffer,
                                         int bufsize, char * & del,
-                                        std::ostream * debug, const char ** loc);
+                                        ostream * debug, const char ** loc);
 
 protected:
 
    /// send this signal on TCP (or AF_UNIX) socket tcp_sock
    int send_TCP(int tcp_sock) const
        {
-         std::string buffer;
+         string buffer;
          store(buffer);
 
          uint32_t ll = htonl(buffer.size());
@@ -701,7 +696,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MAKE_OFFER);
          signal_id.store(buffer);
@@ -709,11 +704,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "MAKE_OFFER(";
         key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -749,7 +744,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_RETRACT_OFFER);
          signal_id.store(buffer);
@@ -757,11 +752,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "RETRACT_OFFER(";
         key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -797,7 +792,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_RETRACT_VAR);
          signal_id.store(buffer);
@@ -805,11 +800,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "RETRACT_VAR(";
         key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -852,7 +847,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SET_STATE);
          signal_id.store(buffer);
@@ -862,13 +857,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "SET_STATE(";
         key.print(out);   out << ", ";
         new_state.print(out);   out << ", ";
         sloc.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -884,7 +879,7 @@ public:
    virtual uint8_t get__SET_STATE__new_state() const { return new_state.get_value(); }
 
   /// return item sloc of this signal 
-   virtual std::string get__SET_STATE__sloc() const { return sloc.get_value(); }
+   virtual string get__SET_STATE__sloc() const { return sloc.get_value(); }
 
 
 protected:
@@ -916,7 +911,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SET_CONTROL);
          signal_id.store(buffer);
@@ -925,12 +920,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "SET_CONTROL(";
         key.print(out);   out << ", ";
         new_control.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -971,7 +966,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_VALUE);
          signal_id.store(buffer);
@@ -979,11 +974,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "GET_VALUE(";
         key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1029,7 +1024,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_VALUE_IS);
          signal_id.store(buffer);
@@ -1040,14 +1035,14 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "VALUE_IS(";
         key.print(out);   out << ", ";
         error.print(out);   out << ", ";
         error_loc.print(out);   out << ", ";
         cdr_value.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1063,10 +1058,10 @@ public:
    virtual uint32_t get__VALUE_IS__error() const { return error.get_value(); }
 
   /// return item error_loc of this signal 
-   virtual std::string get__VALUE_IS__error_loc() const { return error_loc.get_value(); }
+   virtual string get__VALUE_IS__error_loc() const { return error_loc.get_value(); }
 
   /// return item cdr_value of this signal 
-   virtual std::string get__VALUE_IS__cdr_value() const { return cdr_value.get_value(); }
+   virtual string get__VALUE_IS__cdr_value() const { return cdr_value.get_value(); }
 
 
 protected:
@@ -1099,7 +1094,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_ASSIGN_VALUE);
          signal_id.store(buffer);
@@ -1108,12 +1103,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "ASSIGN_VALUE(";
         key.print(out);   out << ", ";
         cdr_value.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1126,7 +1121,7 @@ public:
    virtual uint64_t get__ASSIGN_VALUE__key() const { return key.get_value(); }
 
   /// return item cdr_value of this signal 
-   virtual std::string get__ASSIGN_VALUE__cdr_value() const { return cdr_value.get_value(); }
+   virtual string get__ASSIGN_VALUE__cdr_value() const { return cdr_value.get_value(); }
 
 
 protected:
@@ -1159,7 +1154,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SVAR_ASSIGNED);
          signal_id.store(buffer);
@@ -1169,13 +1164,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "SVAR_ASSIGNED(";
         key.print(out);   out << ", ";
         error.print(out);   out << ", ";
         error_loc.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1191,7 +1186,7 @@ public:
    virtual uint32_t get__SVAR_ASSIGNED__error() const { return error.get_value(); }
 
   /// return item error_loc of this signal 
-   virtual std::string get__SVAR_ASSIGNED__error_loc() const { return error_loc.get_value(); }
+   virtual string get__SVAR_ASSIGNED__error_loc() const { return error_loc.get_value(); }
 
 
 protected:
@@ -1223,7 +1218,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MAY_USE);
          signal_id.store(buffer);
@@ -1232,12 +1227,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "MAY_USE(";
         key.print(out);   out << ", ";
         attempt.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1281,7 +1276,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MAY_SET);
          signal_id.store(buffer);
@@ -1290,12 +1285,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "MAY_SET(";
         key.print(out);   out << ", ";
         attempt.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1340,7 +1335,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_READ_SVAR_RECORD);
          signal_id.store(buffer);
@@ -1348,11 +1343,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "READ_SVAR_RECORD(";
         key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1388,7 +1383,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SVAR_RECORD_IS);
          signal_id.store(buffer);
@@ -1396,11 +1391,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "SVAR_RECORD_IS(";
         record.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1410,7 +1405,7 @@ public:
    virtual const char * get_sigName() const   { return "SVAR_RECORD_IS"; }
 
   /// return item record of this signal 
-   virtual std::string get__SVAR_RECORD_IS__record() const { return record.get_value(); }
+   virtual string get__SVAR_RECORD_IS__record() const { return record.get_value(); }
 
 
 protected:
@@ -1443,7 +1438,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_IS_REGISTERED_ID);
          signal_id.store(buffer);
@@ -1453,13 +1448,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "IS_REGISTERED_ID(";
         proc.print(out);   out << ", ";
         parent.print(out);   out << ", ";
         grand.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1504,7 +1499,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_YES_NO);
          signal_id.store(buffer);
@@ -1512,11 +1507,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "YES_NO(";
         yes.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1565,7 +1560,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_REGISTER_PROCESSOR);
          signal_id.store(buffer);
@@ -1577,7 +1572,7 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "REGISTER_PROCESSOR(";
         proc.print(out);   out << ", ";
@@ -1585,7 +1580,7 @@ public:
         grand.print(out);   out << ", ";
         evconn.print(out);   out << ", ";
         progname.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1607,7 +1602,7 @@ public:
    virtual uint8_t get__REGISTER_PROCESSOR__evconn() const { return evconn.get_value(); }
 
   /// return item progname of this signal 
-   virtual std::string get__REGISTER_PROCESSOR__progname() const { return progname.get_value(); }
+   virtual string get__REGISTER_PROCESSOR__progname() const { return progname.get_value(); }
 
 
 protected:
@@ -1656,7 +1651,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MATCH_OR_MAKE);
          signal_id.store(buffer);
@@ -1670,7 +1665,7 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "MATCH_OR_MAKE(";
         varname.print(out);   out << ", ";
@@ -1680,7 +1675,7 @@ public:
         from_proc.print(out);   out << ", ";
         from_parent.print(out);   out << ", ";
         from_grand.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1690,7 +1685,7 @@ public:
    virtual const char * get_sigName() const   { return "MATCH_OR_MAKE"; }
 
   /// return item varname of this signal 
-   virtual std::string get__MATCH_OR_MAKE__varname() const { return varname.get_value(); }
+   virtual string get__MATCH_OR_MAKE__varname() const { return varname.get_value(); }
 
   /// return item to_proc of this signal 
    virtual uint32_t get__MATCH_OR_MAKE__to_proc() const { return to_proc.get_value(); }
@@ -1741,7 +1736,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MATCH_OR_MAKE_RESULT);
          signal_id.store(buffer);
@@ -1749,11 +1744,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "MATCH_OR_MAKE_RESULT(";
         key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1791,7 +1786,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_FIND_OFFERING_ID);
          signal_id.store(buffer);
@@ -1799,11 +1794,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "FIND_OFFERING_ID(";
         key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1846,7 +1841,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_OFFERING_ID_IS);
          signal_id.store(buffer);
@@ -1856,13 +1851,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "OFFERING_ID_IS(";
         proc.print(out);   out << ", ";
         parent.print(out);   out << ", ";
         grand.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1907,7 +1902,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_OFFERING_PROCS);
          signal_id.store(buffer);
@@ -1915,11 +1910,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "GET_OFFERING_PROCS(";
         offered_to_proc.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1956,7 +1951,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_OFFERING_PROCS_ARE);
          signal_id.store(buffer);
@@ -1964,11 +1959,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "OFFERING_PROCS_ARE(";
         offering_procs.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -1978,7 +1973,7 @@ public:
    virtual const char * get_sigName() const   { return "OFFERING_PROCS_ARE"; }
 
   /// return item offering_procs of this signal 
-   virtual std::string get__OFFERING_PROCS_ARE__offering_procs() const { return offering_procs.get_value(); }
+   virtual string get__OFFERING_PROCS_ARE__offering_procs() const { return offering_procs.get_value(); }
 
 
 protected:
@@ -2008,7 +2003,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_OFFERED_VARS);
          signal_id.store(buffer);
@@ -2017,12 +2012,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "GET_OFFERED_VARS(";
         offered_to_proc.print(out);   out << ", ";
         accepted_by_proc.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2063,7 +2058,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_OFFERED_VARS_ARE);
          signal_id.store(buffer);
@@ -2071,11 +2066,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "OFFERED_VARS_ARE(";
         offered_vars.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2085,7 +2080,7 @@ public:
    virtual const char * get_sigName() const   { return "OFFERED_VARS_ARE"; }
 
   /// return item offered_vars of this signal 
-   virtual std::string get__OFFERED_VARS_ARE__offered_vars() const { return offered_vars.get_value(); }
+   virtual string get__OFFERED_VARS_ARE__offered_vars() const { return offered_vars.get_value(); }
 
 
 protected:
@@ -2112,7 +2107,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_FIND_PAIRING_KEY);
          signal_id.store(buffer);
@@ -2120,11 +2115,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "FIND_PAIRING_KEY(";
         key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2161,7 +2156,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_PAIRING_KEY_IS);
          signal_id.store(buffer);
@@ -2169,11 +2164,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "PAIRING_KEY_IS(";
         pairing_key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2217,7 +2212,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_EVENTS);
          signal_id.store(buffer);
@@ -2227,13 +2222,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "GET_EVENTS(";
         proc.print(out);   out << ", ";
         parent.print(out);   out << ", ";
         grand.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2284,7 +2279,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_CLEAR_ALL_EVENTS);
          signal_id.store(buffer);
@@ -2294,13 +2289,13 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "CLEAR_ALL_EVENTS(";
         proc.print(out);   out << ", ";
         parent.print(out);   out << ", ";
         grand.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2349,7 +2344,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_EVENTS_ARE);
          signal_id.store(buffer);
@@ -2358,12 +2353,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "EVENTS_ARE(";
         key.print(out);   out << ", ";
         events.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2416,7 +2411,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_ADD_EVENT);
          signal_id.store(buffer);
@@ -2428,7 +2423,7 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "ADD_EVENT(";
         key.print(out);   out << ", ";
@@ -2436,7 +2431,7 @@ public:
         parent.print(out);   out << ", ";
         grand.print(out);   out << ", ";
         event.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2492,7 +2487,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_ASSIGN_WSWS_VAR);
          signal_id.store(buffer);
@@ -2501,12 +2496,12 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "ASSIGN_WSWS_VAR(";
         key.print(out);   out << ", ";
         cdr_value.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2519,7 +2514,7 @@ public:
    virtual uint64_t get__ASSIGN_WSWS_VAR__key() const { return key.get_value(); }
 
   /// return item cdr_value of this signal 
-   virtual std::string get__ASSIGN_WSWS_VAR__cdr_value() const { return cdr_value.get_value(); }
+   virtual string get__ASSIGN_WSWS_VAR__cdr_value() const { return cdr_value.get_value(); }
 
 
 protected:
@@ -2546,7 +2541,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_READ_WSWS_VAR);
          signal_id.store(buffer);
@@ -2554,11 +2549,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "READ_WSWS_VAR(";
         key.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2594,7 +2589,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_WSWS_VALUE_IS);
          signal_id.store(buffer);
@@ -2602,11 +2597,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "WSWS_VALUE_IS(";
         cdr_value.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2616,7 +2611,7 @@ public:
    virtual const char * get_sigName() const   { return "WSWS_VALUE_IS"; }
 
   /// return item cdr_value of this signal 
-   virtual std::string get__WSWS_VALUE_IS__cdr_value() const { return cdr_value.get_value(); }
+   virtual string get__WSWS_VALUE_IS__cdr_value() const { return cdr_value.get_value(); }
 
 
 protected:
@@ -2640,18 +2635,18 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_PRINT_SVAR_DB);
          signal_id.store(buffer);
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "PRINT_SVAR_DB(";
 
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2683,7 +2678,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
-   virtual void store(std::string & buffer) const
+   virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SVAR_DB_PRINTED);
          signal_id.store(buffer);
@@ -2691,11 +2686,11 @@ public:
        }
 
    /// print this signal on out.
-   virtual std::ostream & print(std::ostream & out) const
+   virtual ostream & print(ostream & out) const
       {
         out << "SVAR_DB_PRINTED(";
         printout.print(out);
-        return out << ")" << std::endl;
+        return out << ")" << endl;
       }
 
    /// a unique number for this signal
@@ -2705,7 +2700,7 @@ public:
    virtual const char * get_sigName() const   { return "SVAR_DB_PRINTED"; }
 
   /// return item printout of this signal 
-   virtual std::string get__SVAR_DB_PRINTED__printout() const { return printout.get_value(); }
+   virtual string get__SVAR_DB_PRINTED__printout() const { return printout.get_value(); }
 
 
 protected:
@@ -2832,18 +2827,25 @@ struct _all_signal_classes_
 enum { MAX_SIGNAL_CLASS_SIZE = sizeof(_all_signal_classes_) };
 
 //----------------------------------------------------------------------------
+
+#ifndef LOC
+# define STR(x) #x
+# define LOC Loc(__FILE__, __LINE__)
+# define Loc(f, l) f ":" STR(l)
+#endif // LOC
+
 Signal_base *
 Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
-                      char * & del, std::ostream * debug,
+                      char * & del, ostream * debug,
                       const char ** loc)
 {
    if (bufsize < 2*MAX_SIGNAL_CLASS_SIZE)
       {
          // a too small bufsize happens easily but is hard to debug!
          //
-         std::cerr << "\n\n*** bufsize is " << bufsize
+         cerr << "\n\n*** bufsize is " << bufsize
               << " but MUST be at least " << 2*MAX_SIGNAL_CLASS_SIZE
-              << " in recv_TCP() !!!" << std::endl;
+              << " in recv_TCP() !!!" << endl;
 
          *loc = LOC;
          return 0;
@@ -2877,16 +2879,18 @@ ssize_t siglen = 0;
 
          if (rx_bytes != sizeof(uint32_t))
             {
-              // connection was closed by the peer
+              // connection was probably closed by the peer
               //
-              *loc = LOC;
+             if (rx_bytes == 0)       *loc = LOC;   // closed by peer
+             else if (rx_bytes < 0)   *loc = LOC;   // errno set
+             else                     *loc = LOC;   // something else
               return 0;
             }
 
          break;   // got  sizeof(uint32_t) length bytes
        }
 //    debug && *debug << "rx_bytes is " << rx_bytes
-//                    << " when reading siglen in in recv_TCP()" << std::endl;
+//                    << " when reading siglen in in recv_TCP()" << endl;
 
    siglen = ntohl(*reinterpret_cast<uint32_t *>(buffer));
    if (siglen == 0)
@@ -2895,7 +2899,7 @@ ssize_t siglen = 0;
         return 0;   // close
       }
 
-// debug && *debug << "signal length is " << siglen << " in recv_TCP()" << std::endl;
+// debug && *debug << "signal length is " << siglen << " in recv_TCP()" << endl;
 
    // skip MAX_SIGNAL_CLASS_SIZE bytes at the beginning of buffer
    //
@@ -2909,7 +2913,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
         del = new char[siglen];
         if (del == 0)
            {
-             std::cerr << "*** new(" << siglen <<") failed in recv_TCP()" << std::endl;
+             cerr << "*** new(" << siglen <<") failed in recv_TCP()" << endl;
              *loc = LOC;
              return 0;
            }
@@ -2926,8 +2930,8 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
 
           if (rx_bytes != siglen)
              {
-               std::cerr << "*** got " << rx_bytes
-                    << " when expecting " << siglen << std::endl;
+               cerr << "*** got " << rx_bytes
+                    << " when expecting " << siglen << endl;
                *loc = LOC;
                return 0;
              }
@@ -2936,7 +2940,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
          break;   // got siglen bytes
        }
 
-// debug && *debug << "rx_bytes is " << rx_bytes << " in recv_TCP()" << std::endl;
+// debug && *debug << "rx_bytes is " << rx_bytes << " in recv_TCP()" << endl;
 
 const uint8_t * b = reinterpret_cast<const uint8_t *>(rx_buf);
 Sig_item_u16 signal_id(b);
@@ -3054,8 +3058,8 @@ Signal_base * ret = 0;
 /// APserver result for: print the entire database
         case sid_SVAR_DB_PRINTED: ret = new SVAR_DB_PRINTED_c(b);   break;
 
-        default: std::cerr << "Signal_base::recv_TCP() failed: unknown signal id "
-                      << signal_id.get_value() << std::endl;
+        default: cerr << "Signal_base::recv_TCP() failed: unknown signal id "
+                      << signal_id.get_value() << endl;
                  errno = EINVAL;
                  *loc = LOC;
                  return 0;

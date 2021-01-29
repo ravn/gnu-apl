@@ -157,8 +157,8 @@ Shape::check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
       }
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator <<(std::ostream & out, const Shape & shape)
+ostream &
+operator <<(ostream & out, const Shape & shape)
 {
    out << "⊏";
    loop(r, shape.get_rank())

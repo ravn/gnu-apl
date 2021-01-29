@@ -26,24 +26,24 @@
 #include "Value.hh"
 
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & out, const DynamicObject & dob)
+ostream &
+operator << (ostream & out, const DynamicObject & dob)
 {
    dob.print(out);
    return out;
 }
 //-----------------------------------------------------------------------------
 void
-DynamicObject::print_chain(std::ostream & out) const
+DynamicObject::print_chain(ostream & out) const
 {
 int pos = 0;
    for (const DynamicObject * p = this; ;)
        {
-         out << "    Chain[" << std::setw(2) << pos++ << "]  " 
+         out << "    Chain[" << setw(2) << pos++ << "]  " 
              << voidP(p->prev) << " --> "
              << voidP(p)       << " --> "
              << voidP(p->next) << "    "
-             << p->where_allocated() << std::endl;
+             << p->where_allocated() << endl;
 
           p = p->next;
           if (p == this)   break;
@@ -51,19 +51,19 @@ int pos = 0;
 }
 //-----------------------------------------------------------------------------
 void
-DynamicObject::print_new(std::ostream & out, const char * loc) const
+DynamicObject::print_new(ostream & out, const char * loc) const
 {
-   out << "new    " << voidP(this) << " at " << loc << std::endl;
+   out << "new    " << voidP(this) << " at " << loc << endl;
 }
 //-----------------------------------------------------------------------------
 void
-DynamicObject::print(std::ostream & out) const
+DynamicObject::print(ostream & out) const
 {
    out << "DynamicObject: " << voidP(this)
-       << " (Value: " << voidP(this) << ") :"       << std::endl
-       << "    prev:      " << voidP(prev)          << std::endl
-       << "    next:      " << voidP(next)          << std::endl
-       << "    allocated: " << where_allocated()    << std::endl;
+       << " (Value: " << voidP(this) << ") :"       << endl
+       << "    prev:      " << voidP(prev)          << endl
+       << "    next:      " << voidP(next)          << endl
+       << "    allocated: " << where_allocated()    << endl;
 }
 //-----------------------------------------------------------------------------
 /// cast DynamicObject to derived class Value.

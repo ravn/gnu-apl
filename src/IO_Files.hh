@@ -28,6 +28,8 @@
 #include "Assert.hh"
 #include "UTF8_string.hh"
 
+using namespace std;
+
 /*
  The classes below are used to combine normal user I/O and automatic
  testcase execution. It works like this:
@@ -109,7 +111,7 @@ public:
    static void next_file();
 
    /// return the current test report
-   static std::ofstream & get_current_testreport()
+   static ofstream & get_current_testreport()
       { return current_testreport; }
 
    /// read one line from the current input file with CR and LF removed
@@ -172,7 +174,7 @@ protected:
    static int assert_errors;
 
    /// the current test report
-   static std::ofstream current_testreport;
+   static ofstream current_testreport;
 };
 
 #endif // __IO_FILES_HH_DEFINED__

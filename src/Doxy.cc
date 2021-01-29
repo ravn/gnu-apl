@@ -30,6 +30,8 @@
 #include "UTF8_string.hh"
 #include "Workspace.hh"
 
+using namespace std;
+
 #define BRLF "<BR>\r\n"
 #define CRLF "\r\n"
 
@@ -41,7 +43,7 @@ symcomp(const Symbol * const & s1, const Symbol * const & s2, const void *)
    return s2->get_name().compare(s1->get_name()) == COMP_LT;
 }
 //-----------------------------------------------------------------------------
-Doxy::Doxy(std::ostream & cout, const UCS_string & dest_dir)
+Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
    : out(cout),
      root_dir(dest_dir),
      errors(0)
@@ -63,7 +65,7 @@ Doxy::Doxy(std::ostream & cout, const UCS_string & dest_dir)
    root_dir.append_UTF8(UTF8_string(ws_name));
 
    Log(LOG_command_DOXY)
-      out << "Creating output directory " << root_dir << std::endl;
+      out << "Creating output directory " << root_dir << endl;
 
    errno = 0;
    if (mkdir(root_dir.c_str(), 0777))
@@ -74,7 +76,7 @@ Doxy::Doxy(std::ostream & cout, const UCS_string & dest_dir)
         if (errno == EEXIST)   why = "Directory already exists";
 
         CERR << "Cannot create fresh destination directory "
-             << root_dir << ": " << why << std::endl;
+             << root_dir << ": " << why << endl;
         ++errors;
         DOMAIN_ERROR;
       }
@@ -88,9 +90,9 @@ UTF8_string css_filename(root_dir);
    css_filename.append_ASCII("/apl_doxy.css");
 
    Log(LOG_command_DOXY)
-      out << "Writing style sheet file " << css_filename << std::endl;
+      out << "Writing style sheet file " << css_filename << endl;
 
-std::ofstream css(css_filename.c_str());
+ofstream css(css_filename.c_str());
    css <<
 "/* GNU APL Doxy css file */"                                              CRLF
 "BODY, TABLE.h1tab"                                                        CRLF
@@ -163,9 +165,9 @@ UTF8_string index_filename(root_dir);
    index_filename.append_ASCII("/index.html");
 
    Log(LOG_command_DOXY)
-      out << "Writing top-level HTML file " << index_filename << std::endl;
+      out << "Writing top-level HTML file " << index_filename << endl;
 
-std::ofstream page(index_filename.c_str());
+ofstream page(index_filename.c_str());
    page <<
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""                      CRLF
 "                      \"http://www.w3.org/TR/html4/strict.dtd\">"         CRLF
@@ -213,7 +215,7 @@ const UCS_string alias = "all_functions";
            else
               {
                 CERR << "*** Cannot open " << cmapx_filename
-                     << ": " << strerror(errno) << std::endl;
+                     << ": " << strerror(errno) << endl;
               }
 
            Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
@@ -228,7 +230,7 @@ const UCS_string alias = "all_functions";
 //-----------------------------------------------------------------------------
 void
 Doxy::functions_table(const std::vector<const Symbol *> & functions,
-                      std::ofstream & page)
+                      ofstream & page)
 {
    if (functions.size() == 0)   return;
 
@@ -356,7 +358,7 @@ int total_lines = 0;
 //-----------------------------------------------------------------------------
 void
 Doxy::variables_table(const std::vector<const Symbol *> & variables,
-                       std::ofstream & page)
+                       ofstream & page)
 {
    if (variables.size() == 0)   return;
 
@@ -426,7 +428,7 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
 }
 //-----------------------------------------------------------------------------
 void
-Doxy::SI_table(std::ofstream & page)
+Doxy::SI_table(ofstream & page)
 {
    // collect SI entries in reverse order...
    //
@@ -537,9 +539,9 @@ UTF8_string fun_filename(root_dir);
    fun_filename.append_ASCII(".html");
 
    Log(LOG_command_DOXY)
-      out << "Writing function HTML file " << fun_filename << std::endl;
+      out << "Writing function HTML file " << fun_filename << endl;
 
-std::ofstream page(fun_filename.c_str());
+ofstream page(fun_filename.c_str());
    page <<
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""                      CRLF
 "                      \"http://www.w3.org/TR/html4/strict.dtd\">"         CRLF
@@ -591,7 +593,7 @@ std::ofstream page(fun_filename.c_str());
           if (cmap == 0)
              {
                CERR << "cannot open " << cmapx_filename << ": "
-                    << strerror(errno) << std::endl;
+                    << strerror(errno) << endl;
                return;
              }
           char buffer[400];
@@ -647,7 +649,7 @@ std::ofstream page(fun_filename.c_str());
 }
 //-----------------------------------------------------------------------------
 void
-Doxy::bold_name(std::ostream & of, const UserFunction * ufun) const
+Doxy::bold_name(ostream & of, const UserFunction * ufun) const
 {
 const UserFunction_header & header = ufun->get_header();
 const char * bold = "<span style='font-weight: bold'>";
@@ -693,7 +695,7 @@ Doxy::add_fun_to_call_graph(const Symbol * caller_sym,
                             const UserFunction * ufun)
 {
    Log(LOG_command_DOXY)
-      out << "   add (caller-) Symbol " << caller_sym->get_name() << std::endl;
+      out << "   add (caller-) Symbol " << caller_sym->get_name() << endl;
 
 const Token_string & body = ufun->get_body();
 
@@ -747,7 +749,7 @@ const Token_string & body = ufun->get_body();
                          call_graph.push_back(edge);
                          Log(LOG_command_DOXY)
                             out << "    " << caller_sym->get_name()
-                                << " calls " << callee->get_name() << std::endl;
+                                << " calls " << callee->get_name() << endl;
                        }
                  }
             }
@@ -825,7 +827,7 @@ bool progress = true;
             out << "edge " << edge.caller->get_name() << " → "
                 << edge.callee->get_name()
                 << " has distance " << edge.value
-                << " from " << root_name << std::endl;
+                << " from " << root_name << endl;
           }
 
    // create a list of nodes that are reachable
@@ -861,7 +863,7 @@ bool progress = true;
       {
         loop(n, nodes.size())
         out << "Node: " << nodes[n]->get_name()
-            << " alias: " << aliases[n] << std::endl;
+            << " alias: " << aliases[n] << endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -880,9 +882,9 @@ UTF8_string cmapx_filename(cg_filename);
    cmapx_filename.append_ASCII(".cmapx");
 
    Log(LOG_command_DOXY)
-      out << "Writing function call graph .gv file " << cg_filename << std::endl;
+      out << "Writing function call graph .gv file " << cg_filename << endl;
 
-std::ofstream gv(cg_filename.c_str());
+ofstream gv(cg_filename.c_str());
 
 const char * node_attributes = " shape=rect"
                                " fontcolor=blue"
@@ -891,15 +893,15 @@ const char * node0_attributes = " shape=rect"
                                " style=filled"
                                " fillcolor=\"#D0D0D0\"";
 
-   if (caller)   gv << "digraph GC" << std::endl;
-   else          gv << "digraph CG" << std::endl;
+   if (caller)   gv << "digraph GC" << endl;
+   else          gv << "digraph CG" << endl;
 
-   gv << "{"       << std::endl
-      << "  graph [rankdir=\"LR\"];" << std::endl;
+   gv << "{"       << endl
+      << "  graph [rankdir=\"LR\"];" << endl;
 
    if (nodes.size() == 0)   // no edges, single node
       {
-        gv << "n0 [label=" << alias << node0_attributes << "];" << std::endl;
+        gv << "n0 [label=" << alias << node0_attributes << "];" << endl;
       }
    else   // normal graph, > 0 edges
       {
@@ -914,11 +916,11 @@ const char * node0_attributes = " shape=rect"
               const UCS_string & alias = aliases[n];
               if (nodes[n] == ufun)   // the root
                  gv << "n" << n << " [label= " << alias
-                    << node0_attributes << "];" << std::endl;
+                    << node0_attributes << "];" << endl;
               else
                  gv << "n" << n << " [label= <<u>" << alias << "</u>>"
                     << node_attributes << " URL=\"f_" << alias << ".html\"];"
-                    << std::endl;
+                    << endl;
             }
 
         // create edges
@@ -932,12 +934,12 @@ const char * node0_attributes = " shape=rect"
              const int n1 = node_ID(edge.callee);
              Assert(n0 != -1);
              Assert(n1 != -1);
-             if (caller)   gv << "n" << n1 << " -> n" << n0 << std::endl;
-             else          gv << "n" << n0 << " -> n" << n1 << std::endl;
+             if (caller)   gv << "n" << n1 << " -> n" << n0 << endl;
+             else          gv << "n" << n0 << " -> n" << n1 << endl;
            }
       }
 
-   gv << "}" << std::endl;
+   gv << "}" << endl;
 
    gv.close();
 
@@ -983,10 +985,10 @@ FILE * dot = popen(cmd, "r");
    if (dot == 0)
       {
         if (errno)
-           CERR << "Could not run 'dot': " << strerror(errno) << std::endl;
+           CERR << "Could not run 'dot': " << strerror(errno) << endl;
         else
            CERR << "Could not run 'dot'. Maybe install package 'graphviz'?"
-                << std::endl;
+                << endl;
         ++errors;
         return 1;
       }
@@ -1004,7 +1006,7 @@ char buffer[1000];
    // if LOG_command_DOXY then do not remove temporary files
    Log(LOG_command_DOXY)
       {
-        out << "  converted " << gv_filename << " to " << out_filename << std::endl;
+        out << "  converted " << gv_filename << " to " << out_filename << endl;
       }
    else
       {

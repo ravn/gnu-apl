@@ -56,7 +56,7 @@
 UTF8_string::UTF8_string(const UCS_string & ucs)
 {
    Log(LOG_char_conversion)
-      CERR << "UTF8_string::UTF8_string(ucs = " << ucs << ")" << std::endl;
+      CERR << "UTF8_string::UTF8_string(ucs = " << ucs << ")" << endl;
 
    loop(i, ucs.size())
       {
@@ -117,10 +117,10 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
            }
         else
            {
-             CERR << "Bad Unicode: " << UNI(uni) << std::endl
+             CERR << "Bad Unicode: " << UNI(uni) << endl
                   << "The offending ucs string is:";
              loop(ii, ucs.size()) CERR << " " << HEX(ucs[ii]);
-             CERR << std::endl;
+             CERR << endl;
 
              BACKTRACE
              Assert(0 && "Error in UTF8_string::UTF8_string(ucs)");
@@ -128,7 +128,7 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
       }
 
    Log(LOG_char_conversion)
-      CERR << "UTF8_string::UTF8_string(): utf = " << *this << std::endl;
+      CERR << "UTF8_string::UTF8_string(): utf = " << *this << endl;
 }
 //-----------------------------------------------------------------------------
 UTF8_string::UTF8_string(const Value & value)
@@ -139,8 +139,8 @@ UTF8_string::UTF8_string(const Value & value)
        }
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-UTF8_string::dump_hex(std::ostream & out, int max_bytes) const
+ostream &
+UTF8_string::dump_hex(ostream & out, int max_bytes) const
 {
    loop(b, size())
       {
@@ -175,7 +175,7 @@ uint32_t bx = b0;   // the "significant" bits in b0
              else              break;
            }
 
-        CERR <<  " at " LOC << std::endl;
+        CERR <<  " at " LOC << endl;
 
         BACKTRACE
         Assert(0 && "Internal error in UTF8_string::toUni()");
@@ -192,7 +192,7 @@ uint32_t uni = 0;
          const UTF8 subc = *string++;
          if ((subc & 0xC0) != 0x80)
             {
-              CERR << "Bad UTF8 sequence: " << HEX(b0) << "... at " LOC << std::endl;
+              CERR << "Bad UTF8 sequence: " << HEX(b0) << "... at " LOC << endl;
               Assert(0 && "Internal error in UTF8_string::toUni()");
             }
 
@@ -205,7 +205,7 @@ uint32_t uni = 0;
 }
 //-----------------------------------------------------------------------------
 Unicode
-UTF8_string::getc(std::istream & in)
+UTF8_string::getc(istream & in)
 {
 const uint32_t b0 = in.get() & 0xFF;
    if (!in.good())         return Invalid_Unicode;
@@ -219,7 +219,7 @@ int len;
    else if ((b0 & 0xF8) == 0xF0)   { len = 3;   bx &= 0x0E; }
    else
       {
-        CERR << "Bad UTF8 sequence: " << HEX(b0) << "... at " LOC << std::endl;
+        CERR << "Bad UTF8 sequence: " << HEX(b0) << "... at " LOC << endl;
         BACKTRACE
         return Invalid_Unicode;
       }
@@ -234,7 +234,7 @@ uint32_t uni = 0;
          const UTF8 subc = cc[l];
          if ((subc & 0xC0) != 0x80)
             {
-              CERR << "Bad UTF8 sequence: " << HEX(b0) << "... at " LOC << std::endl;
+              CERR << "Bad UTF8 sequence: " << HEX(b0) << "... at " LOC << endl;
               return Invalid_Unicode;
             }
 
@@ -397,8 +397,8 @@ UTF8_string::round_0_1()
    return true;   // 1.0 → 0.1
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator<<(std::ostream & os, const UTF8_string & utf)
+ostream &
+operator<<(ostream & os, const UTF8_string & utf)
 {
    loop(c, utf.size())   os << utf[c];
    return os;

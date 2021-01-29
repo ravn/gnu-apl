@@ -36,7 +36,7 @@
 class StateIndicator;
 
 /**
- ** The std::exception that is thrown when errors occur. 
+ ** The exception that is thrown when errors occur. 
  ** The primary item is the error_code; the other items are only valid if
  ** error_code != NO_ERROR
  **/
@@ -107,7 +107,7 @@ public:
       { return show_locked; }
 
    /// print the error and its related information
-   void print(std::ostream & out, const char * loc) const;
+   void print(ostream & out, const char * loc) const;
 
    /// set the first error line
    void set_error_line_1(const char * msg_1)
@@ -123,7 +123,7 @@ public:
    void set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret);
 
    /// print the 3 error message lines as per ⎕EM
-   void print_em(std::ostream & out, const char * loc);
+   void print_em(ostream & out, const char * loc);
 
    /// set the error code
    void clear_error_code()

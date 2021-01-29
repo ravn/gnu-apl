@@ -73,6 +73,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+using namespace std;
 /// a real number
 typedef APL_Float DD;
 

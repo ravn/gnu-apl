@@ -152,14 +152,14 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
 UserFunction::~UserFunction()
 {
    Log(LOG_UserFunction__enter_leave)
-      CERR << "Function " << get_name() << " deleted." << std::endl;
+      CERR << "Function " << get_name() << " deleted." << endl;
 }
 //-----------------------------------------------------------------------------
 Token
 UserFunction::eval_() const
 {
    Log(LOG_UserFunction__enter_leave)
-      CERR << "Function " << get_name() << " calls eval_()" << std::endl;
+      CERR << "Function " << get_name() << " calls eval_()" << endl;
 
    if (header.B())   SYNTAX_ERROR;   // not defined niladic
 
@@ -177,7 +177,7 @@ UserFunction::eval_B(Value_P B) const
    Log(LOG_UserFunction__enter_leave)
       {
         CERR << "Function " << get_name() << " calls eval_B("
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (header.LO())    SYNTAX_ERROR;   // defined as operator
@@ -200,7 +200,7 @@ UserFunction::eval_XB(Value_P X, Value_P B) const
    Log(LOG_UserFunction__enter_leave)
       {
         CERR << "Function " << get_name() << " calls eval_B("
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (!header.X())    AXIS_ERROR;
@@ -225,7 +225,7 @@ UserFunction::eval_AB(Value_P A, Value_P B) const
       {
         CERR << "Function " << get_name() << " calls eval_AB("
              << Token(TOK_APL_VALUE1, A) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (header.LO())    SYNTAX_ERROR;    // defined as operator
@@ -250,7 +250,7 @@ UserFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
       {
         CERR << "Function " << get_name() << " calls eval_AB("
              << Token(TOK_APL_VALUE1, A) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (header.LO())    SYNTAX_ERROR;    // defined as operator
@@ -276,7 +276,7 @@ UserFunction::eval_LB(Token & LO, Value_P B) const
       {
         CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
         print_val_or_fun(CERR, LO) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (header.RO())    SYNTAX_ERROR;   // dyadic operator called monadically
@@ -303,7 +303,7 @@ UserFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
         CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
         print_val_or_fun(CERR, LO) << ", "
              << Token(TOK_APL_VALUE1, X) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (header.RO())    SYNTAX_ERROR;   // dyadic operator called monadically
@@ -329,9 +329,9 @@ UserFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
    Log(LOG_UserFunction__enter_leave)
       {
         CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "("
-             << Token(TOK_APL_VALUE1, A) << ", " << std::endl;
+             << Token(TOK_APL_VALUE1, A) << ", " << endl;
         print_val_or_fun(CERR, LO) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (header.RO())    SYNTAX_ERROR;    // defined as dyadic operator
@@ -358,10 +358,10 @@ UserFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
    Log(LOG_UserFunction__enter_leave)
       {
         CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "("
-             << Token(TOK_APL_VALUE1, A) << ", " << std::endl;
+             << Token(TOK_APL_VALUE1, A) << ", " << endl;
         print_val_or_fun(CERR, LO) << ", "
              << Token(TOK_APL_VALUE1, X) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (header.RO())    SYNTAX_ERROR;    // defined as dyadic operator
@@ -390,7 +390,7 @@ UserFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
         CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "(";
         print_val_or_fun(CERR, LO) << ", ";
         print_val_or_fun(CERR, RO) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (!header.RO())    SYNTAX_ERROR;   // not defined as dyadic operator
@@ -421,7 +421,7 @@ UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
         print_val_or_fun(CERR, LO) << ", ";
         print_val_or_fun(CERR, RO) << ", "
              << Token(TOK_APL_VALUE1, X) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (!header.RO())   SYNTAX_ERROR;   // not defined as dyadic operator
@@ -449,10 +449,10 @@ UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
    Log(LOG_UserFunction__enter_leave)
       {
         CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "("
-             << Token(TOK_APL_VALUE1, A) << ", " << std::endl;
+             << Token(TOK_APL_VALUE1, A) << ", " << endl;
         print_val_or_fun(CERR, LO) << ", ";
         print_val_or_fun(CERR, RO) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (!header.RO())    SYNTAX_ERROR;   // defined monadic op called dyadically
@@ -481,11 +481,11 @@ UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B
    Log(LOG_UserFunction__enter_leave)
       {
         CERR << "Function " << get_name() << " calls " << __FUNCTION__ << "("
-             << Token(TOK_APL_VALUE1, A) << ", " << std::endl;
+             << Token(TOK_APL_VALUE1, A) << ", " << endl;
         print_val_or_fun(CERR, LO) << ", ";
         print_val_or_fun(CERR, RO) << ", "
              << Token(TOK_APL_VALUE1, X) << ", "
-             << Token(TOK_APL_VALUE1, B) << ")" << std::endl;
+             << Token(TOK_APL_VALUE1, B) << ")" << endl;
       }
 
    if (!header.RO())   SYNTAX_ERROR;   // defined monadic op called dyadically
@@ -693,8 +693,8 @@ Line_status current = APL_text;
    while (get_text_size() && get_text(get_text_size() - 1).size() == 0)
          text.pop_back();
 
-// CERR << std::endl;
-// loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << std::endl;
+// CERR << endl;
+// loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
 
    return E_NO_ERROR;
 }
@@ -797,8 +797,8 @@ Line_status current = APL_text;
    while (get_text_size() && get_text(get_text_size() - 1).size() == 0)
          text.pop_back();
 
-// CERR << std::endl;
-// loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << std::endl;
+// CERR << endl;
+// loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
 
    return E_NO_ERROR;
 }
@@ -907,7 +907,7 @@ UCS_string_vector original_text;
                    new_line.append(line);
                    text[l] = new_line;
                    CERR << "WARNING: SYNTAX ERROR in function "
-                        << header.get_name() << std::endl;
+                        << header.get_name() << endl;
                  }
             }
         catch(const Error & err)
@@ -921,8 +921,8 @@ UCS_string_vector original_text;
 
    Log(LOG_UserFunction__fix)
       {
-        CERR << "body.size() is " << body.size() << std::endl
-             << "line_starts.size() is " << line_starts.size() << std::endl; 
+        CERR << "body.size() is " << body.size() << endl
+             << "line_starts.size() is " << line_starts.size() <<endl; 
       }
 
    // let [0] be the end of the function.
@@ -953,7 +953,7 @@ UserFunction * fun = 0;
    catch (...)
       {
         delete fun;
-        CERR << "Caught some std::exception\n";
+        CERR << "Caught some exception\n";
         return 0;
       }
 
@@ -970,7 +970,7 @@ char filename[FILENAME_MAX + 10];
 
    if (strlen(filename) > FILENAME_MAX)
       {
-        CERR << "file name '" << filename << "' is too long" << std::endl;
+        CERR << "file name '" << filename << "' is too long" << endl;
         throw_apl_error(E_SYS_LIMIT_FILENAME, LOC);
       }
 
@@ -978,7 +978,7 @@ int in = open(filename, O_RDONLY);
    if (in == -1)
       {
         CERR << "Can't open() workspace file '" 
-             << filename << "': " << strerror(errno) << std::endl;
+             << filename << "': " << strerror(errno) << endl;
         throw_apl_error(E_WS_OPEN, LOC);
       }
 
@@ -986,7 +986,7 @@ struct stat st;
    if (fstat(in, &st) == -1)
       {
         CERR << "Can't fstat() workspace file '" 
-             << filename << "': " << strerror(errno) << std::endl;
+             << filename << "': " << strerror(errno) << endl;
         close(in);
         throw_apl_error(E_WS_FSTAT, LOC);
       }
@@ -997,7 +997,7 @@ void * start = mmap(0, len, PROT_READ, MAP_SHARED, in, 0);
    if (start == reinterpret_cast<const void *>(-1))
       {
         CERR << "Can't mmap() workspace file '" 
-             << filename << "': " << strerror(errno) << std::endl;
+             << filename << "': " << strerror(errno) << endl;
         close(in);
         throw_apl_error(E_WS_MMAP, LOC);
       }
@@ -1033,8 +1033,8 @@ UserFunction::fix(const UCS_string & text, int & err_line,
 {
    Log(LOG_UserFunction__fix)
       {
-        CERR << "fix pmode=user function:" << std::endl << text << std::endl
-             <<  "------------------- UserFunction::fix() --" << std::endl;
+        CERR << "fix pmode=user function:" << endl << text << endl
+             <<  "------------------- UserFunction::fix() --" << endl;
       }
 
 UserFunction * ufun = new UserFunction(text, loc, creator, tolerant, false);
@@ -1046,7 +1046,7 @@ const bool bad_function = info || err_line != -1;
       {
         if (info)
            {
-             Log(LOG_UserFunction__fix)   CERR << "Error: " << info << std::endl;
+             Log(LOG_UserFunction__fix)   CERR << "Error: " << info << endl;
              MORE_ERROR() << info;
            }
          else info = "Error";
@@ -1054,7 +1054,7 @@ const bool bad_function = info || err_line != -1;
          if (err_line == 0)
            {
              MORE_ERROR() << info << "in function header";
-             Log(LOG_UserFunction__fix) CERR << "Bad header line" <<  std::endl;
+             Log(LOG_UserFunction__fix) CERR << "Bad header line" <<  endl;
            }
          else if (err_line > 0)
            {
@@ -1064,7 +1064,7 @@ const bool bad_function = info || err_line != -1;
                 more << "[" << l << "] " << ufun->get_text(l) << "\n";
 
              Log(LOG_UserFunction__fix)
-                CERR << "Bad function line: " << err_line << std::endl;
+                CERR << "Bad function line: " << err_line << endl;
            }
 
         delete ufun;
@@ -1079,7 +1079,7 @@ Function_P old_function = symbol->get_function();
            {
              CERR << "not fixing '" << ufun->header.get_name()
                   << "' (function already exists, and keep_existing set)"
-                  << std::endl;
+                  << endl;
            }
         err_line = 0;
         delete ufun;
@@ -1096,7 +1096,7 @@ Function_P old_function = symbol->get_function();
              Log(LOG_UserFunction__fix)
                 {
                   CERR << "not fixing '" << ufun->header.get_name()
-                       << "' (function already exists, and " << reason << std::endl;
+                       << "' (function already exists, and " << reason << endl;
                 }
              err_line = 0;
              delete ufun;
@@ -1122,9 +1122,9 @@ Function_P old_function = symbol->get_function();
 
    Log(LOG_UserFunction__fix)
       {
-        CERR << " addr " << voidP(ufun) << std::endl;
+        CERR << " addr " << voidP(ufun) << endl;
         ufun->print(CERR);
-        CERR <<  "------------------- UserFunction::fix() OK --" << std::endl;
+        CERR <<  "------------------- UserFunction::fix() OK --" << endl;
       }
 
    return ufun;
@@ -1199,7 +1199,7 @@ const Parser parser(PM_FUNCTION, LOC, false);
 const ErrorCode ec = parser.parse(body_text, body);
    if (ec)
       {
-        CERR << "Parsing '" << body_text << "' failed" << std::endl;
+        CERR << "Parsing '" << body_text << "' failed" << endl;
         return 0;
       }
 
@@ -1236,9 +1236,9 @@ UserFunction::pushes_sym(const Symbol * sym) const
 }
 //-----------------------------------------------------------------------------
 void 
-UserFunction::help(std::ostream & out) const
+UserFunction::help(ostream & out) const
 {
-   CERR << "    Header: " << get_text(0) << std::endl;
+   CERR << "    Header: " << get_text(0) << endl;
 
    if (is_lambda())
       {
@@ -1249,7 +1249,7 @@ UserFunction::help(std::ostream & out) const
               const Symbol & sym = *get_local_var(v);
               CERR << ";" << sym.get_name();
             }
-         CERR << " }" << std::endl;
+         CERR << " }" << endl;
          return;
       }
 
@@ -1277,39 +1277,39 @@ const UCS_string two_lamps(UTF8_string("⍝⍝"));
          if (double_lamps || toronto)
             {
               got_lamps = true;
-              CERR << "    " << line << std::endl;
+              CERR << "    " << line << endl;
             }
        }
 
-   if (!got_lamps)   CERR << "    (no ⍝⍝ or ⍝. comment lines)" << std::endl;
+   if (!got_lamps)   CERR << "    (no ⍝⍝ or ⍝. comment lines)" << endl;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-UserFunction::print(std::ostream & out) const
+ostream &
+UserFunction::print(ostream & out) const
 {
    out << header.get_name();
    return out;
 
 /*
-   out << "Function header:" << std::endl;
-   if (header.Z())     out << "Result:         " << *header.Z()   << std::endl;
-   if (header.A())     out << "Left Argument:  " << *header.A()   << std::endl;
-   if (header.LO())    out << "Left Op Arg:    " << *header.LO()  << std::endl;
-                       out << "Function:       " << header.get_name() << std::endl;
-   if (header.RO())    out << "Right Op Arg:   " << *header.RO()  << std::endl;
-   if (header.B())     out << "Right Argument: " << *header.B()   << std::endl;
+   out << "Function header:" << endl;
+   if (header.Z())     out << "Result:         " << *header.Z()   << endl;
+   if (header.A())     out << "Left Argument:  " << *header.A()   << endl;
+   if (header.LO())    out << "Left Op Arg:    " << *header.LO()  << endl;
+                       out << "Function:       " << header.get_name() << endl;
+   if (header.RO())    out << "Right Op Arg:   " << *header.RO()  << endl;
+   if (header.B())     out << "Right Argument: " << *header.B()   << endl;
    return Executable::print(out);
 */
 }
 //-----------------------------------------------------------------------------
 void
-UserFunction::print_properties(std::ostream & out, int indent) const
+UserFunction::print_properties(ostream & out, int indent) const
 {
    header.print_properties(out, indent);
 UCS_string ind(indent, UNI_SPACE);
-   out << ind << "Body Lines:      " << line_starts.size() << std::endl
-       << ind << "Creator:         " << get_creator()      << std::endl
-       << ind << "Body: " << body << std::endl;
+   out << ind << "Body Lines:      " << line_starts.size() << endl
+       << ind << "Creator:         " << get_creator()      << endl
+       << ind << "Body: " << body << endl;
 }
 //-----------------------------------------------------------------------------
 UCS_string
@@ -1409,8 +1409,8 @@ UserFunction::line_start(Function_Line line) const
    return line_starts[line];
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-UserFunction::print_val_or_fun(std::ostream & out, Token & tok)
+ostream &
+UserFunction::print_val_or_fun(ostream & out, Token & tok)
 {
    if (tok.is_function())         out << *tok.get_function();
    else if (tok.is_apl_val())     out << tok;

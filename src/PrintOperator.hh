@@ -45,31 +45,31 @@ class  UCS_string;
 class  UTF8_string;
 class  Value;
 
-std::ostream & operator << (std::ostream &, const AP_num3 &);
-std::ostream & operator << (std::ostream &, const Format_sub &);
-std::ostream & operator << (std::ostream &, const Function &);
-std::ostream & operator << (std::ostream &, const Function_PC2 &);
-std::ostream & operator << (std::ostream &, const Cell &);
-std::ostream & operator << (std::ostream &, const DynamicObject &);
-std::ostream & operator << (std::ostream &,       Id id);
-std::ostream & operator << (std::ostream &, const IndexExpr &);
-std::ostream & operator << (std::ostream &, const LineLabel &);
-std::ostream & operator << (std::ostream &, const PrintBuffer &);
-std::ostream & operator << (std::ostream &, const Shape &);
-std::ostream & operator << (std::ostream &, const Symbol &);
-std::ostream & operator << (std::ostream &, const Token &);
-std::ostream & operator << (std::ostream &, const Token_string &);
-std::ostream & operator << (std::ostream &,       TokenTag);
-std::ostream & operator << (std::ostream &,       TokenClass);
-std::ostream & operator << (std::ostream &, const UCS_string &);
-std::ostream & operator << (std::ostream &,       Unicode);
-std::ostream & operator << (std::ostream &, const UTF8_string &);
-std::ostream & operator << (std::ostream &, const Value &);
+ostream & operator << (ostream &, const AP_num3 &);
+ostream & operator << (ostream &, const Format_sub &);
+ostream & operator << (ostream &, const Function &);
+ostream & operator << (ostream &, const Function_PC2 &);
+ostream & operator << (ostream &, const Cell &);
+ostream & operator << (ostream &, const DynamicObject &);
+ostream & operator << (ostream &,       Id id);
+ostream & operator << (ostream &, const IndexExpr &);
+ostream & operator << (ostream &, const LineLabel &);
+ostream & operator << (ostream &, const PrintBuffer &);
+ostream & operator << (ostream &, const Shape &);
+ostream & operator << (ostream &, const Symbol &);
+ostream & operator << (ostream &, const Token &);
+ostream & operator << (ostream &, const Token_string &);
+ostream & operator << (ostream &,       TokenTag);
+ostream & operator << (ostream &,       TokenClass);
+ostream & operator << (ostream &, const UCS_string &);
+ostream & operator << (ostream &,       Unicode);
+ostream & operator << (ostream &, const UTF8_string &);
+ostream & operator << (ostream &, const Value &);
 
-inline std::ostream & operator << (std::ostream & out,       ValueFlags flags)
+inline ostream & operator << (ostream & out,       ValueFlags flags)
    { return print_flags(out, flags); }
 
-inline std::ostream & operator << (std::ostream & out, const labVal & lv)
+inline ostream & operator << (ostream & out, const labVal & lv)
    { return out << "Line-" << lv.line << ":"; }
 
 #endif // __PRINTOPERATOR_HH_DEFINED

@@ -40,7 +40,7 @@ struct LineLabel
    {}
 
    /// print the line number
-   void print(std::ostream & out) const;
+   void print(ostream & out) const;
 
    /// print a prompt like [1.2] into buffer
    UCS_string print_prompt(int min_size) const;
@@ -119,7 +119,7 @@ protected:
         {}
 
         /// print the line
-        void print(std::ostream & out) const;
+        void print(ostream & out) const;
 
         /// return the line label (sucah as [1]) and the line text
         UCS_string get_label_and_text() const;
@@ -190,7 +190,7 @@ protected:
    Symbol * fun_symbol;
 
    /// the lines of the function.
-   std::vector<FunLine> lines;
+   vector<FunLine> lines;
 
    /// editor commands
    enum Ecmd

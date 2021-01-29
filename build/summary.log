@@ -1,0 +1,33 @@
+Build Summary:
+    make OK for configuration: standard
+    build standard: OK (88 seconds)
+    configuration: "standard" done.
+*** test standard: FAILED (11 seconds)
+    make OK for configuration: libxcb
+    build libxcb: OK (86 seconds)
+    configuration: "libxcb" done.
+*** test standard: FAILED (11 seconds)
+    make OK for configuration: rational
+    build rational: OK (91 seconds)
+    configuration: "rational" done.
+    make OK for configuration: libapl
+    build libapl: OK (137 seconds)
+    configuration: "libapl" done.
+    make OK for configuration: python
+    build python: OK (137 seconds)
+    configuration: "python" done.
+    make OK for configuration: parallel_bench
+    build parallel_bench: OK (89 seconds)
+    configuration: "parallel_bench" done.
+    make OK for configuration: erlang
+    build erlang: OK (138 seconds)
+    configuration: "erlang" done.
+    make OK for configuration: develop
+    build develop: OK (90 seconds)
+    configuration: "develop" done.
+*** test develop: FAILED (11 seconds)
+
+0 build errors
+0 missing files
+0 configurations failed
+8 configurations succeeded

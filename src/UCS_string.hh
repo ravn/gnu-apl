@@ -31,6 +31,8 @@
 #include "Unicode.hh"
 #include "UTF8_string.hh"
 
+using namespace std;
+
 class PrintBuffer;
 class PrintContext;
 class Shape;
@@ -42,7 +44,7 @@ class UCS_string_vector;
 
 //=============================================================================
 /// A string of Unicode characters (32-bit)
-class UCS_string : public  std::basic_string<Unicode>
+class UCS_string : public std::basic_string<Unicode>
 {
 public:
    /// default constructor: empty string
@@ -78,7 +80,7 @@ public:
    UCS_string(APL_Float value, bool & scaled, const PrintContext & pctx);
 
    /// constructor: read one line from UTF8-encoded file.
-   UCS_string(std::istream & in);
+   UCS_string(istream & in);
 
    /// constructor: UCS_string from simple character vector value.
    UCS_string(const Value & value);
@@ -210,7 +212,7 @@ public:
    bool lexical_before(const UCS_string other) const;
 
    /// dump \b this string to out (like U+nnn U+mmm ... )
-   std::ostream & dump(std::ostream & out) const;
+   ostream & dump(ostream & out) const;
 
    /// sort the characters in this string by their Unicode
    UCS_string sort() const;
@@ -255,7 +257,7 @@ public:
 
    /// append UCS_string other to this string
    void append(const UCS_string & other)
-      {  std::basic_string<Unicode>::append(other); }
+      {  basic_string<Unicode>::append(other); }
 
    /// append 0-terminated ASCII string \b str to this string. str is NOT
    /// interpreted as UTF8 string (use append_UTF8() if such interpretation        /// is desired)
@@ -279,7 +281,7 @@ public:
 
    /// more intuitive insert() function
    void insert(ShapeItem pos, Unicode uni)
-      {  std::basic_string<Unicode>::insert(pos, 1, uni); }
+      {  basic_string<Unicode>::insert(pos, 1, uni); }
 
    /// prepend character \b uni
    void prepend(Unicode uni)
@@ -303,7 +305,7 @@ public:
 
    /// append UCS_string \b other
    UCS_string & operator <<(const UCS_string & other)
-      {  std::basic_string<Unicode>::append(other);   return *this; }
+      {  basic_string<Unicode>::append(other);   return *this; }
 
    /// compare \b this with UCS_string \b other
    Comp_result compare(const UCS_string & other) const
@@ -327,14 +329,14 @@ public:
 
    /// append members (like x.y.z) starting at members[m] and going backwards
    /// from the end of \b members to \b this string.
-   void append_members(const std::vector<const UCS_string *> & members, int m);
+   void append_members(const vector<const UCS_string *> & members, int m);
 
    /// append number (in ASCII encoding like %lf) to this string
    void append_float(APL_Float num);
 
    /// overload basic_string::size() so that it returns a signed length
    ShapeItem size() const
-      { return  std::basic_string<Unicode>::size(); }
+      { return  basic_string<Unicode>::size(); }
 
    /// an iterator for UCS_strings
    class iterator
@@ -378,7 +380,7 @@ public:
 
    /// erase 1 (!) character at pos
    void erase(ShapeItem pos)
-      {  std::basic_string<Unicode>::erase(pos, 1); }
+      {  basic_string<Unicode>::erase(pos, 1); }
 
    /// helper function for Heapsort<Unicode>::sort()
    static bool greater_uni(const Unicode & u1, const Unicode & u2, const void *)
@@ -441,7 +443,7 @@ private:
 private:
    /// prevent accidental usage of the rather dangerous default len parameter
    /// in basic_strng::erase(pos, len = npos)
-    std::basic_string<Unicode> & erase(size_type pos, size_type len);
+    basic_string<Unicode> & erase(size_type pos, size_type len);
 };
 //-----------------------------------------------------------------------------
 inline void

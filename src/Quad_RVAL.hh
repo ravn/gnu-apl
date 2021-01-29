@@ -23,6 +23,8 @@
 
 #include <vector>
 
+using namespace std;
+
 #include "QuadFunction.hh"
 
 /// a random APL value
@@ -65,7 +67,7 @@ protected:
    static Value_P result_maxdepth(const Value & B);
 
    /// choose an integer value at random according to distribution \b dist
-   static int choose_integer(const std::vector<int> & dist);
+   static int choose_integer(const vector<int> & dist);
 
    /// initialize \b cell with a random character
    static void random_character(Cell * cell);
@@ -91,13 +93,13 @@ protected:
    static size_t N;
 
    /// the desired rank of random values
-   static std::vector<int> desired_ranks;
+   static vector<int> desired_ranks;
 
    /// the desired rank of random values
    static Shape desired_shape;
 
    /// the desired types (or a distribution of types) of random values
-   static std::vector<int> desired_types;
+   static vector<int> desired_types;
 
    /// the desiredlimit on the depths of the random values
    static int desired_maxdepth;

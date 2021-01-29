@@ -28,9 +28,11 @@
 #include "PrintOperator.hh"
 #include "UTF8_string.hh"
 
+using namespace std;
+
 //=============================================================================
-/// a std::filebuf that compares its output with a file.
-class DiffOut : public std::filebuf
+/// a filebuf that compares its output with a file.
+class DiffOut : public filebuf
 {
 public:
    /// constructor
@@ -49,7 +51,7 @@ public:
       { const int old = expand_LF;   expand_LF = on;   return old; }
 
 protected:
-   /// overloaded std::filebuf::overflow()
+   /// overloaded filebuf::overflow()
    virtual int overflow(int c);
 
    /// return true iff 0-terminated strings apl and ref differ
@@ -66,11 +68,11 @@ protected:
    bool expand_LF;
 };
 //=============================================================================
-/// a std::filebuf for stderr output
-class ErrOut : public std::filebuf
+/// a filebuf for stderr output
+class ErrOut : public filebuf
 {
 protected:
-   /// overloaded std::filebuf::overflow()
+   /// overloaded filebuf::overflow()
    virtual int overflow(int c);
 
 public:
@@ -95,7 +97,7 @@ public:
        get_CERR() checks \b used and returns cerr instead of CERR if it is
        false.
     **/
-   std::filebuf * use()   { used = true;   return this; }
+   filebuf * use()   { used = true;   return this; }
 
    /// true iff the constructor for CERR was called
    static bool used;   // set when CERR is constructed

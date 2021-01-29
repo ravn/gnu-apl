@@ -89,10 +89,10 @@ protected:
    virtual bool is_operator() const;
 
    /// Overloaded Function::print_properties()
-   virtual void print_properties(std::ostream & out, int indent) const;
+   virtual void print_properties(ostream & out, int indent) const;
 
    /// Overloaded Function::print()
-   virtual std::ostream & print(std::ostream&) const;
+   virtual ostream & print(std::ostream&) const;
 
    /// Overloaded Function::canonical()
    virtual UCS_string canonical(bool with_lines) const;

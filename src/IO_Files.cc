@@ -41,7 +41,7 @@ int IO_Files::diff_errors = 0;
 int IO_Files::parse_errors = 0;
 IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST;
 bool IO_Files::need_total = false;
-std::ofstream IO_Files::current_testreport;
+ofstream IO_Files::current_testreport;
 
 //-----------------------------------------------------------------------------
 void
@@ -79,7 +79,7 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
               else                        break;      // done
            }
 
-        current_testreport << "----> " << line.c_str() << std::endl;
+        current_testreport << "----> " << line.c_str() << endl;
         return;
       }
 
@@ -94,7 +94,7 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
         if ((test_mode == TM_EXIT_AFTER_LAST) ||
             (test_mode == TM_EXIT_AFTER_LAST_IF_OK && !error_count()))
           {
-            CERR << "Exiting (test_mode " << test_mode << ")" << std::endl;
+            CERR << "Exiting (test_mode " << test_mode << ")" << endl;
             cleanup(true);
             if (total_errors)   Command::cmd_OFF(1);
             else                Command::cmd_OFF(0);
@@ -154,7 +154,7 @@ InputFile * input = InputFile::current_file();
        }
 
    Log(LOG_test_execution)
-      CERR << "read_file_line() -> " << file_line << std::endl;
+      CERR << "read_file_line() -> " << file_line << endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -167,7 +167,7 @@ IO_Files::next_file()
       }
    else
       {
-        CERR << "]NEXTFILE: no file" << std::endl;
+        CERR << "]NEXTFILE: no file" << endl;
       }
    open_next_file();
 }
@@ -182,19 +182,19 @@ IO_Files::end_of_current_file()
         //
         if (Workspace::SI_entry_count() > 1)
            {
-             CERR << std::endl << ")SI not cleared at the end of "
-                  << InputFile::current_filename() << ":" << std::endl;
+             CERR << endl << ")SI not cleared at the end of "
+                  << InputFile::current_filename() << ":" << endl;
              Workspace::list_SI(CERR, SIM_SIS);
-             CERR << std::endl;
+             CERR << endl;
 
              if (current_testreport.is_open())
                 {
-                  current_testreport << std::endl
+                  current_testreport << endl
                                      << ")SI not cleared at the end of "
                                      << InputFile::current_filename()<< ":"
-                                     << std::endl;
+                                     << endl;
                   Workspace::list_SI(current_testreport, SIM_SIS);
-                  current_testreport << std::endl;
+                  current_testreport << endl;
                 }
              apl_error(LOC);
            }
@@ -207,7 +207,7 @@ IO_Files::end_of_current_file()
                 {
                   current_testreport
                      << " (automatic check for incomplete values failed)"
-                     << std::endl;
+                     << endl;
                   apl_error(LOC);
                 }
 
@@ -215,7 +215,7 @@ IO_Files::end_of_current_file()
                 {
                   current_testreport
                      << " (automatic check for stale values failed,"
-                        " offending Value erased)." << std::endl;
+                        " offending Value erased)." << endl;
 
                   apl_error(LOC);
                   Value::erase_stale(LOC);
@@ -225,7 +225,7 @@ IO_Files::end_of_current_file()
                 {
                   current_testreport
                      << " (automatic check for stale indices failed,"
-                        " offending IndexExpr erased)." << std::endl;
+                        " offending IndexExpr erased)." << endl;
                   apl_error(LOC);
                   IndexExpr::erase_stale(LOC);
                 }
@@ -237,11 +237,11 @@ IO_Files::end_of_current_file()
 
    Log(LOG_test_execution)
       CERR << "closed testcase file " << InputFile::current_filename()
-           << std::endl;
+           << endl;
 
    if (InputFile::is_validating())   // running a .tc file
       {
-        std::ofstream summary("testcases/summary.log", std::ios_base::app);
+        ofstream summary("testcases/summary.log", ios_base::app);
         summary << error_count() << " ";
 
         if (error_count())
@@ -250,7 +250,7 @@ IO_Files::end_of_current_file()
              summary << "(" << apl_errors    << " APL, ";
              if (apl_errors)
                 summary << "    loc=" << last_apl_error_loc 
-                        << " .tc line="  << last_apl_error_line << std::endl
+                        << " .tc line="  << last_apl_error_line << endl
                    << "    ";
 
              summary << assert_errors << " assert, "
@@ -258,18 +258,18 @@ IO_Files::end_of_current_file()
                      << parse_errors  << " parse) ";
            }
 
-        summary << InputFile::current_filename() << std::endl;
+        summary << InputFile::current_filename() << endl;
 
         if ((test_mode == TM_STOP_AFTER_ERROR ||
              test_mode == TM_EXIT_AFTER_ERROR) && error_count())
            {
-             CERR << std::endl
+             CERR << endl
                   << "Stopping test execution since an error has occurred"
-                  << std::endl
-                  << "The error count is " << error_count() << std::endl
+                  << endl
+                  << "The error count is " << error_count() << endl
                   << "Failed testcase is " << InputFile::current_filename()
-                  << std::endl 
-                  << std::endl;
+                  << endl 
+                  << endl;
 
              InputFile::files_todo.clear();
              return false;
@@ -288,23 +288,23 @@ IO_Files::end_of_current_file()
 void
 IO_Files::print_summary()
 {
-std::ofstream summary("testcases/summary.log", std::ios_base::app);
+ofstream summary("testcases/summary.log", ios_base::app);
 
 int done = testcases_done;
    if (done > testcase_count)   done = testcase_count;
 
    summary << "======================================="
-              "=======================================" << std::endl
+              "=======================================" << endl
            << total_errors << " errors in " << done
            << "(" << testcase_count << ")"
-           << " testcase files" << std::endl;
+           << " testcase files" << endl;
 
-   CERR    << std::endl
+   CERR    << endl
            << "======================================="
-           "=======================================" << std::endl
+           "=======================================" << endl
            << total_errors << " errors in " << done
            << "(" << testcase_count << ")"
-           << " testcase files" << std::endl;
+           << " testcase files" << endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -312,13 +312,13 @@ IO_Files::open_next_file()
 {
    if (InputFile::current_file() == 0)
       {
-        CERR << "IO_Files::open_next_file(): no more files" << std::endl;
+        CERR << "IO_Files::open_next_file(): no more files" << endl;
         return;
       }
 
    if (InputFile::current_file()->file)
       {
-        CERR << "IO_Files::open_next_file(): already open" << std::endl;
+        CERR << "IO_Files::open_next_file(): already open" << endl;
         return;
       }
 
@@ -336,28 +336,28 @@ IO_Files::open_next_file()
                         "#####################################\n"
                      << " ########################################"
                         "######################################\n"
-                     << " ##    Testfile: " << std::left << std::setw(60)
+                     << " ##    Testfile: " << left << setw(60)
                      << InputFile::current_filename() << "##\n"
-                     << " ##    Log file: " << std::setw(60) << log_name << "##\n"
+                     << " ##    Log file: " << setw(60) << log_name << "##\n"
                      << " ########################################"
-                        "######################################" << std::endl
+                        "######################################" << endl
                      << "  #######################################"
-                        "#####################################\n" << std::endl
-                     << std::right;
+                        "#####################################\n" << endl
+                     << right;
               }
 
            InputFile::open_current_file();
            if (InputFile::current_file()->file == 0)
               {
                 CERR << "could not open "
-                     << InputFile::current_filename() << std::endl;
+                     << InputFile::current_filename() << endl;
                 InputFile::files_todo.erase(InputFile::files_todo.begin());
                 continue;
               }
 
            Log(LOG_test_execution)
               CERR << "opened testcase file "
-                   << InputFile::current_filename() << std::endl;
+                   << InputFile::current_filename() << endl;
 
            Output::reset_dout();
            reset_errors();
@@ -367,11 +367,11 @@ IO_Files::open_next_file()
            if (InputFile::current_file()->test)
               {
                 current_testreport.open(log_name,
-                                        std::ofstream::out | std::ofstream::trunc);
+                                        ofstream::out | ofstream::trunc);
                 if (!current_testreport.is_open())
                    {
                      CERR << "could not open testcase log file " << log_name
-                          << "; producing no .log file" << std::endl;
+                          << "; producing no .log file" << endl;
                    }
               }
 
@@ -387,7 +387,7 @@ const int cnt = arg.atoi();
       {
         Log(LOG_test_execution)
            CERR << "APL errors reset from (expected) " << apl_errors
-                << " to 0" << std::endl;
+                << " to 0" << endl;
         apl_errors = 0;
         last_apl_error_line = -1;
         last_apl_error_loc = "";
@@ -396,7 +396,7 @@ const int cnt = arg.atoi();
       {
         Log(LOG_test_execution)
            CERR << "*** Not reseting APL errors (got " << apl_errors
-                << " expecing " << cnt << std::endl;
+                << " expecing " << cnt << endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -409,9 +409,9 @@ IO_Files::syntax_error()
    ++parse_errors;
 
    Log(LOG_test_execution)
-      CERR << "parse errors incremented to " << parse_errors << std::endl;
+      CERR << "parse errors incremented to " << parse_errors << endl;
 
-   current_testreport << "**\n** Parse Error ********\n**" << std::endl;
+   current_testreport << "**\n** Parse Error ********\n**" << endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -425,7 +425,7 @@ IO_Files::apl_error(const char * loc)
    last_apl_error_line = InputFile::current_line_no();
 
    Log(LOG_test_execution)
-      CERR << "APL errors incremented to " << apl_errors << std::endl;
+      CERR << "APL errors incremented to " << apl_errors << endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -436,7 +436,7 @@ IO_Files::assert_error()
 
    ++assert_errors;
    Log(LOG_test_execution)
-      CERR << "Assert errors incremented to " << assert_errors << std::endl;
+      CERR << "Assert errors incremented to " << assert_errors << endl;
 }
 //-----------------------------------------------------------------------------
 void
@@ -447,6 +447,6 @@ IO_Files::diff_error()
 
    ++diff_errors;
    Log(LOG_test_execution)
-      CERR << "Diff errors incremented to " << diff_errors << std::endl;
+      CERR << "Diff errors incremented to " << diff_errors << endl;
 }
 //-----------------------------------------------------------------------------

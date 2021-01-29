@@ -82,21 +82,21 @@ public:
       }
 
    /// print the row and columns of \b this node
-   std::ostream & print_RC(std::ostream & out) const
+   ostream & print_RC(ostream & out) const
      {
-       return out << std::right << std::setw(2) << row << ":"
-                  << std::left  << std::setw(2) << col << std::right;
+       return out << std::right << setw(2) << row << ":"
+                  << std::left  << setw(2) << col << std::right;
      }
 
    /// print \b this node
-   void print(std::ostream & out) const
+   void print(ostream & out) const
       {
         print_RC(out);
         up->print_RC(out << " ↑");
         down->print_RC(out << " ↓");
         left->print_RC(out << " ←");
         right->print_RC(out << " →");
-        out << std::endl;
+        out << endl;
         check();
       }
 
@@ -200,7 +200,7 @@ public:
    void deep_check() const;
 
    /// indent for current level
-   std::ostream & indent(std::ostream & out)
+   ostream & indent(ostream & out)
       {
         loop(s, level)   out << "  ";
         return out;
@@ -249,7 +249,7 @@ public:
      }
 
    /// display the matrix
-   void display(std::ostream & out) const;
+   void display(ostream & out) const;
 
    /// solve the constraints matrix
    void solve();
@@ -350,7 +350,7 @@ const Cell * b = &B.get_ravel(0);
         else if (!first_0)   first_0 = &cell;
       }
 
-   Log(LOG_Quad_DLX)   CERR << "Matrix has " << ones << " ones" << std::endl;
+   Log(LOG_Quad_DLX)   CERR << "Matrix has " << ones << " ones" << endl;
 
    // set up column headers. std::vector.push_back() may move the headers so
    // we first append all headers and initialize then
@@ -420,7 +420,7 @@ const Cell * b = &B.get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 void
-DLX_Root_Node::display(std::ostream & out) const
+DLX_Root_Node::display(ostream & out) const
 {
 int w = 1;
    if (cols >= 10)   w = 2;
@@ -429,29 +429,29 @@ int w = 1;
 
 ShapeItem pcnt = 0;
 
-   out << std::endl << "  N:";
+   out << endl << "  N:";
    for (const DLX_Node * x = right; x != this; x = x->right)
        {
          const DLX_Header_Node & hdr =
                *reinterpret_cast<const DLX_Header_Node *>(x);
          Assert(hdr.row == -1);
          if (hdr.col_type == Col_PRIMARY)   ++pcnt;
-         out << " " << std::setw(w) << hdr.count;
+         out << " " << setw(w) << hdr.count;
        }
-   out << std::endl << "Col:";
+   out << endl << "Col:";
    for (const DLX_Node * x = right; x != this; x = x->right)
        {
          const DLX_Header_Node & hdr =
                *reinterpret_cast<const DLX_Header_Node *>(x);
          Assert(hdr.row == -1);
-         out << " " << std::setw(w) << hdr.col;
+         out << " " << setw(w) << hdr.col;
        }
-   out << " (" << pcnt << ")" << std::endl << "----";
+   out << " (" << pcnt << ")" << endl << "----";
    for (const DLX_Node * x = right; x != this; x = x->right)
        {
          for (int ww = -1; ww < w; ++ww)   out << "-";
        }
-   out << std::endl;
+   out << endl;
 
 char rows_used[rows];
    memset(rows_used, 0, sizeof(rows_used));
@@ -474,12 +474,12 @@ char rows_used[rows];
                if (y->row == r)   row[y->col] = 1;
              }
 
-         out << std::setw(3) << r << ":";
+         out << setw(3) << r << ":";
          for (const DLX_Node * x = right; x != this; x = x->right)
              {
-               out << " " << std::setw(w) << row[x->col];
+               out << " " << setw(w) << row[x->col];
              }
-         out << std::endl;
+         out << endl;
        }
 
    out << "----";
@@ -487,7 +487,7 @@ char rows_used[rows];
        {
          for (int ww = -1; ww < w; ++ww)   out << "-";
        }
-   out << std::endl;
+   out << endl;
 
 }
 //-----------------------------------------------------------------------------
@@ -523,7 +523,7 @@ new_level:
         CERR << "⎕DLX[" << level << "]";
         loop(s, level)
             CERR << " " << (headers[s].item_r->row + Workspace::get_IO());
-        CERR << std::endl;
+        CERR << endl;
         clear_attention_raised(LOC);
       }
 
@@ -537,7 +537,7 @@ new_level:
    //
 DLX_Node * item = right;
 
-   Log(LOG_Quad_DLX)   item->print_RC(CERR << "At header item ") << std::endl;
+   Log(LOG_Quad_DLX)   item->print_RC(CERR << "At header item ") << endl;
 
    if (primary_count == 0)
       {
@@ -548,8 +548,8 @@ DLX_Node * item = right;
         Log(LOG_Quad_DLX)
            {
              CERR << "!!!!! solution " << solution_count << ": rows are";
-             loop(s, level)   CERR << " " << std::setw(2) << headers[s].item_r->row;
-             CERR << std::endl;
+             loop(s, level)   CERR << " " << setw(2) << headers[s].item_r->row;
+             CERR << endl;
            }
 
         ++solution_count;
@@ -575,14 +575,14 @@ DLX_Node * item = right;
         if (col_size == 0)
            {
               Log(LOG_Quad_DLX)   CERR << "column " << item-> col
-                                       << " is empty" << std::endl;
+                                       << " is empty" << endl;
               goto level_done;   // empty column: no solution
            }
       }
 
    Assert(item->row == -1);
    Log(LOG_Quad_DLX)   indent(CERR) << "Choose and cover column c="
-                                    << item->col << std::endl;
+                                    << item->col << endl;
    cover(item->col);
 
    headers[level].item_r = item;
@@ -591,20 +591,20 @@ rloop:   // running ↓
    {
      DLX_Node * r = headers[level].item_r->down;
 
-     Log(LOG_Quad_DLX)   r->print_RC(indent(CERR) << "rloop ↓ at r= ") << std::endl;
+     Log(LOG_Quad_DLX)   r->print_RC(indent(CERR) << "rloop ↓ at r= ") << endl;
 
      for (DLX_Node * j = r->right; j != r; j = j->right)
          {
            Log(LOG_Quad_DLX)
               {
-                indent(CERR) << "Covering column j=" << j->col << std::endl;
+                indent(CERR) << "Covering column j=" << j->col << endl;
               }
            cover(j->col);
          }
 
          Log(LOG_Quad_DLX)
             {
-              r->print_RC(indent(CERR) << "Picking item ") << std::endl;
+              r->print_RC(indent(CERR) << "Picking item ") << endl;
             }
          headers[level].item_r = r;
          ++level;
@@ -619,14 +619,14 @@ level_done:
         DLX_Node * r = headers[level].item_r;
         Log(LOG_Quad_DLX)
            {
-             r->print_RC(indent(CERR) << "Backtracking") << std::endl;
+             r->print_RC(indent(CERR) << "Backtracking") << endl;
            }
 
         for (DLX_Node * j = r->left; j != r; j = j->left)
             {
               Log(LOG_Quad_DLX)
                  {
-                   indent(CERR) << "Uncovering column j=" << j->col << std::endl;
+                   indent(CERR) << "Uncovering column j=" << j->col << endl;
                  }
               uncover(j->col);
             }
@@ -636,7 +636,7 @@ level_done:
            {
              Log(LOG_Quad_DLX)
                 {
-                  indent(CERR) << "Uncovering column c=" << r->col << std::endl;
+                  indent(CERR) << "Uncovering column c=" << r->col << endl;
                 }
               uncover(r->col);
              goto level_done;
@@ -671,14 +671,14 @@ const int qio = Workspace::get_IO();
                   found_a = true;
                   Log(LOG_Quad_DLX)
                      n.print_RC(CERR << "Covering column " << n.col
-                                     << " of rightmost item ") << std::endl;
+                                     << " of rightmost item ") << endl;
                   cover(n.col);
 
                   for (DLX_Node * j = n.right; j != &n; j = j->right)
                       {
                         Log(LOG_Quad_DLX)
                            {
-                             CERR << "Covering column j=" << j->col << std::endl;
+                             CERR << "Covering column j=" << j->col << endl;
                            }
                         cover(j->col);
                       }

@@ -32,10 +32,10 @@ PostgresBindArg<T>::~PostgresBindArg()
 }
 
 template<>
-void PostgresBindArg<std::string>::update( Oid *types, const char **values, int *lengths, int *formats, int pos )
+void PostgresBindArg<string>::update( Oid *types, const char **values, int *lengths, int *formats, int pos )
 {
     types[pos] = 1043; // VARCHAROID
-    std::stringstream out;
+    stringstream out;
     out << arg;
     string_arg = strdup( out.str().c_str() );
     if( string_arg == NULL ) {
@@ -50,7 +50,7 @@ template<>
 void PostgresBindArg<long>::update( Oid *types, const char **values, int *lengths, int *formats, int pos )
 {
     types[pos] = 20; // INT8OID
-    std::stringstream out;
+    stringstream out;
     out << arg;
     string_arg = strdup( out.str().c_str() );
     if( string_arg == NULL ) {
@@ -65,8 +65,8 @@ template<>
 void PostgresBindArg<double>::update( Oid *types, const char **values, int *lengths, int *formats, int pos )
 {
     types[pos] = 701; // FLOAT8OID
-    std::stringstream out;
-    out << std::setprecision(20) << arg;
+    stringstream out;
+    out << setprecision(20) << arg;
     string_arg = strdup( out.str().c_str() );
     if( string_arg == NULL ) {
         abort();
@@ -84,7 +84,7 @@ void PostgresNullArg::update( Oid *types, const char **values, int *lengths, int
     formats[pos] = 0;
 }
 
-PostgresArgListBuilder::PostgresArgListBuilder( PostgresConnection *connection_in, const std::string &sql_in )
+PostgresArgListBuilder::PostgresArgListBuilder( PostgresConnection *connection_in, const string &sql_in )
     : connection( connection_in ), sql( sql_in )
 {
 }
@@ -96,16 +96,16 @@ PostgresArgListBuilder::~PostgresArgListBuilder()
 
 void PostgresArgListBuilder::clear_args( void )
 {
-    for( std::vector<PostgresArg *>::iterator i = args.begin() ; i != args.end() ; i++ ) {
+    for( vector<PostgresArg *>::iterator i = args.begin() ; i != args.end() ; i++ ) {
         delete *i;
     }
     args.clear();
 }
 
-void PostgresArgListBuilder::append_string( const std::string &arg, int pos )
+void PostgresArgListBuilder::append_string( const string &arg, int pos )
 {
     Assert( static_cast<size_t>( pos ) == args.size() );
-    args.push_back( new PostgresBindArg<std::string>( arg ) );
+    args.push_back( new PostgresBindArg<string>( arg ) );
 }
 
 void PostgresArgListBuilder::append_long( long arg, int pos )
@@ -160,10 +160,10 @@ Value_P PostgresArgListBuilder::run_query( bool ignore_result )
     const int n = args.size();
     const int array_len = n == 0 ? 1 : n;
     const char * cp_null = 0;
-    std::vector<Oid>          types  (array_len, 0);
-    std::vector<const char *> values (array_len, cp_null);
-    std::vector<int>          lengths(array_len, 0);
-    std::vector<int>          formats(array_len, 0);
+    vector<Oid>          types  (array_len, 0);
+    vector<const char *> values (array_len, cp_null);
+    vector<int>          lengths(array_len, 0);
+    vector<int>          formats(array_len, 0);
 
     for( int i = 0 ; i < n ; i++ ) {
         PostgresArg *arg = args[i];
@@ -228,8 +228,8 @@ Value_P PostgresArgListBuilder::run_query( bool ignore_result )
         }
     }
     else {
-        std::stringstream out;
-        out << "Error executing query: " << PQresStatus( status ) << std::endl
+        stringstream out;
+        out << "Error executing query: " << PQresStatus( status ) << endl
             << "Message: " << PQresultErrorMessage( result.get_result() );
         Workspace::more_error() = out.str().c_str();
         DOMAIN_ERROR;

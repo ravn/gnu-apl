@@ -195,16 +195,16 @@ XML_node::~XML_node()
 }
 //-----------------------------------------------------------------------------
 void
-XML_node::print(std::ostream & out) const
+XML_node::print(ostream & out) const
 {
-   if (err_loc)   CERR << "    errloc: " << err_loc << std::endl;
+   if (err_loc)   CERR << "    errloc: " << err_loc << endl;
 
 const UCS_string item(src, src_pos, src_len);
-   out << get_node_type_name() << "[" << level << "] '" << item << "'" << std::endl;
+   out << get_node_type_name() << "[" << level << "] '" << item << "'" << endl;
 }
 //-----------------------------------------------------------------------------
 void
-XML_node::print_all(std::ostream & out, const XML_node & anchor)
+XML_node::print_all(ostream & out, const XML_node & anchor)
 {
    for (const XML_node * x = anchor.get_next(); x != &anchor; x = x->get_next())
        {
@@ -235,7 +235,7 @@ Quad_XML::eval_B(Value_P B) const
 {
    if (B->is_structured())   // associative B array to XML string
       {
-        Value_P Z =   APL_to_XML(B.getref());
+        Value_P Z = APL_to_XML(B.getref());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -250,7 +250,7 @@ Value_P Z = XML_to_APL(B.getref());
 Value_P
 Quad_XML::APL_to_XML(const Value & B)
 {
-std::vector<const UCS_string *> entities;
+vector<const UCS_string *> entities;
    add_sorted_entities(entities, B);
 
 ShapeItem len_Z = 0;
@@ -262,6 +262,7 @@ Value_P Z(len_Z, LOC);
          const UCS_string & entity = *entities[e];
          const ShapeItem len = entity.size();
          loop(l, len)   new (Z->next_ravel()) CharCell(entity[l]);
+         delete entities[e];
        }
 
    Z->check_value(LOC);
@@ -269,158 +270,116 @@ Value_P Z(len_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_XML::add_sorted_entities(std::vector<const UCS_string *> & entities,
+Quad_XML::add_sorted_entities(vector<const UCS_string *> & entities,
                               const Value & B)
 {
    Assert(B.is_structured());
 
-   // 1. construct a start tag (if any)
-   //
-const UCS_string * tag_name = 0;
-size_t pos = 0;   // the position (-prefix) of the member name
-   for (;; ++pos)
-       {
-         Unicode type;
-         const Cell * member_name_cell = find_entity(type, pos, B);
-         if (member_name_cell == 0)   // no name with that number
-            {
-              if (pos == 0)   continue;   // valid if ⎕IO←1
+std::vector<ShapeItem> member_indices;
+   B.sorted_members(member_indices, /* filter */ 0);
 
-              // pos > 0, so the end of rows was reached. Since we are still
-              // collecting attributes, this must be a leaf node.
-              //
-              if (tag_name)   // leaf node: close it
+UCS_string start_tag_name;   // for constructing the corresponding end tag
+UCS_string start_tag;        // the start tag
+bool start_tag_open = false;
+bool tag_open = false;
+
+   loop(m, member_indices.size())
+       {
+         ShapeItem member_pos;     // the position in the XML file
+         Unicode category;
+         UCS_string name;
+         const Value & member_name = B.get_ravel(2*member_indices[m])
+                                      .get_pointer_value().getref();
+
+         split_name(&category, &member_pos, &name, member_name);
+
+         const Value & member_data = B.get_ravel(2*member_indices[m] + 1)
+                                      .get_pointer_value().getref();
+
+         // one tag; the member_indices items occur in the following
+         // order (also below):
+         //
+         //  ⍙1               start tag name
+         //  ⍙NNNattr         attribute N
+         //  ∆NNN and _NNN    declarations, unstructured text and subnodes
+         //
+         if (category == UNI_DELTA_UNDERBAR)
+            {
+              if (name.size() == 0)   // start of next start tag
                  {
-                   entities.push_back(new UCS_string("/>"));
-                   return;
+                   if (start_tag_open)   // previous tag still open
+                      {
+                        start_tag.append_UTF8("/>");
+                        entities.push_back(new UCS_string(start_tag));
+                        start_tag_open = false;
+                      }
+                   else if (tag_open)
+                      {
+                        DOMAIN_ERROR;
+                      }
+
+                   start_tag_name = UCS_string(member_data);
+                   start_tag.clear();
+                   start_tag += UNI_LESS;   // <
+                   start_tag.append(start_tag_name);
+                   start_tag_open = true;
+                   tag_open = true;
+                 }
+              else                       // tag attribute
+                 {
+                   if (!tag_open)
+                      {
+                        DOMAIN_ERROR;
+                      }
+
+                   start_tag += UNI_SPACE;
+                   start_tag.append(UCS_string(name));
+                   start_tag += UNI_EQUAL;
+                   start_tag.append(XML_node::denormalize_attribute_value(
+                                              UCS_string(member_data), true));
+                 }
+            }
+         else   // ∆ or _
+            {
+              if (start_tag_open)   // start tag still open
+                 {
+                   start_tag.append_UTF8(">");
+                   entities.push_back(new UCS_string(start_tag));
+                   start_tag_open = false;
                  }
 
-              // end reached without seeing an attribute. This happens (only)
-              // at the top level.
-              //
-              break;
-            }
-
-         if (type != UNI_DELTA_UNDERBAR)   break;
-
-         const Cell * member_data_cell = member_name_cell + 1;
-         Assert(member_name_cell->is_pointer_cell());
-         Assert(member_data_cell->is_pointer_cell());
-
-         if (tag_name)   // tag attribute (subsequent ⍙member)
-            {
-              entities.push_back(new UCS_string(" "));
-              entities.push_back(new UCS_string(*member_name_cell));
-              entities.push_back(new UCS_string("=\""));
-              entities.push_back(new UCS_string(*member_data_cell));
-              entities.push_back(new UCS_string("\""));
-            }
-         else            // tag name (first ⍙member)
-            {
-              tag_name = new UCS_string(*member_data_cell);
-              entities.push_back(new UCS_string("<"));
-              entities.push_back(tag_name);
-            }
-       }
-
-   // at this point, all tag attributes were processed. start tag may or may
-   // not exist and is still open if it does. See what happpens.
-   //
-   if (tag_name)   entities.push_back(new UCS_string(">"));
-   for (;; ++pos)
-       {
-         Unicode type;
-         const Cell * member_name_cell = find_entity(type, pos, B);
-         if (member_name_cell == 0)   // no name with that number
-            {
-              if (pos == 0)   continue;   // valid if ⎕IO←1
-              break;                      // end of rows
-            }
-
-         const Cell * member_data_cell = member_name_cell + 1;
-         Assert(member_name_cell->is_pointer_cell());
-         Assert(member_data_cell->is_pointer_cell());
-
-         if (type == UNI_DELTA_UNDERBAR)
-            {
-              MORE_ERROR() << "unexpected tag attribute at index " << pos;
-              DOMAIN_ERROR;
-            }
-
-         if (type == UNI_DELTA)   // plain text
-            {
-              entities.push_back(new UCS_string(*member_data_cell));
-              continue;   // next index
-            }
-
-
-         if (type == UNI_UNDERSCORE)   // subnode
-            {
-              const Value & sub = *member_data_cell->get_pointer_value().get();
-              add_sorted_entities(entities, sub);
-              continue;   // next index
-            }
-
-         Q1(type) ; FIXME;
-       }
-
-   // no more (content-) members.
-   //
-   if (tag_name)        // start tag ... end tag
-      {
-        const UCS_string * end_tag = new UCS_string(*tag_name);   // copy it!
-        entities.push_back(new UCS_string("</"));
-        entities.push_back(end_tag);
-        entities.push_back(new UCS_string(">"));
-      }
-}
-//-----------------------------------------------------------------------------
-const Cell *
-Quad_XML::find_entity(Unicode & type, ShapeItem pos, const Value & B)
-{
-const ShapeItem rows = B.get_rows();
-   loop(r, rows)
-       {
-         const Cell & member_name_cell = B.get_ravel(2*r);
-         const Cell & member_data_cell = B.get_ravel(2*r + 1);
-         if (!member_name_cell.is_pointer_cell())   continue;
-
-         const Value * member_name = member_name_cell.get_pointer_value().get();
-         Assert(member_name->get_ravel(0).get_char_value() == UNI_UNDERSCORE);
-         ShapeItem member_pos = 0;     // the position in the name
-         for (ShapeItem j = 1;; ++j)   // position digits
-             {
-               const Unicode digit = member_name->get_ravel(j).get_char_value();
-               if (Avec::is_digit(digit))
+              if (category == UNI_DELTA)
                   {
-                    member_pos *= 10;
-                    member_pos += digit - '0';
-                    continue;
+                    entities.push_back(new UCS_string(member_data));
                   }
-
-               type = digit;
-               break;
-             }
-         if (member_pos != pos)   continue;   // wrong index
-
-         // position is correct, but maybe undesired type. If so then
-         // return since the same member_pos will not occur again.
-         //
-         if (type != UNI_DELTA_UNDERBAR &&
-             type != UNI_DELTA &&
-             type != UNI_UNDERSCORE)
-            {
-              MORE_ERROR() << "⎕XML: Bad position prefix in member "
-                           << UCS_string(*member_name)
-                           << " (should end with _, ∆, or ⍙)";
-              DOMAIN_ERROR;
+               else if (category == UNI_UNDERSCORE)
+                  {
+                    add_sorted_entities(entities, member_data);
+                  }
+               else
+                  {
+                    DOMAIN_ERROR;
+                  }
             }
-
-         Assert(member_data_cell.is_pointer_cell());
-         return &member_name_cell;   // found
        }
 
-   return 0;   // not found
+   // all items processed.
+   //
+   if (tag_open)
+      {
+        if (start_tag_open)   // <TAG att=val att=val...   : close tag
+           {
+             start_tag.append_UTF8("/>");
+           }
+        else                // <TAG> ...  : add end tag
+           {
+             start_tag.clear();
+             start_tag.append_UTF8("</");
+             start_tag.append(start_tag_name);
+             start_tag += UNI_GREATER;
+           }
+        entities.push_back(new UCS_string(start_tag));
+      }
 }
 //-----------------------------------------------------------------------------
 Value_P
@@ -638,8 +597,8 @@ XML_node::collect(XML_node & anchor, XML_node & garbage, Value * Z)
 {
 XML_node * root = 0;
 
-std::vector<XML_node *> stack;   // a stack of start tags
-std::vector<size_t> pos_stack;   // a stack of node positions
+vector<XML_node *> stack;   // a stack of start tags
+vector<size_t> pos_stack;   // a stack of node positions
 
    // set the positions (before removing any nodes)
    //
@@ -666,7 +625,7 @@ std::vector<size_t> pos_stack;   // a stack of node positions
                         return true;
                       }
 
-                   add_member(Z, "∆declaration", position,
+                   add_member(Z, UNI_DELTA, "declaration", position,
                               node->APL_value.get());
                    node = node->get_prev();   // move back
                    garbage.append(node->get_next()->unlink());
@@ -681,7 +640,8 @@ std::vector<size_t> pos_stack;   // a stack of node positions
                         return true;
                       }
 
-                   add_member(Z, "∆doctype", position, node->APL_value.get());
+                   add_member(Z, UNI_DELTA, "doctype", position,
+                              node->APL_value.get());
                    node = node->get_prev();   // move back
                    garbage.append(node->get_next()->unlink());
                    break;
@@ -689,14 +649,16 @@ std::vector<size_t> pos_stack;   // a stack of node positions
               case NT_comment:
                    if (stack.size())   continue;   // only top-level comments
 
-                   add_member(Z, "∆comment", position, node->APL_value.get());
+                   add_member(Z, UNI_DELTA, "comment", position,
+                              node->APL_value.get());
                    node = node->get_prev();
                    garbage.append(node->get_next()->unlink());
                    break;
 
               case NT_text:
                    if (stack.size())   continue;   // only top-level texts
-                   add_member(Z, "∆text", position, node->APL_value.get());
+                   add_member(Z, UNI_DELTA, "text", position,
+                              node->APL_value.get());
                    node = node->get_prev();
                    garbage.append(node->get_next()->unlink());
                    break;
@@ -743,6 +705,7 @@ std::vector<size_t> pos_stack;   // a stack of node positions
                    break;
 
               case NT_leaf_tag:
+                   if (root == 0)   root = node;   // remember the root
                    break;
 
               case NT_error: FIXME;
@@ -752,7 +715,8 @@ std::vector<size_t> pos_stack;   // a stack of node positions
    if (root)
       {
         UTF8_string root_utf(root->get_tagname());
-        add_member(Z, root_utf.c_str(), -1, anchor.get_next()->APL_value.get());
+        add_member(Z, UNI_UNDERSCORE, root_utf.c_str(), -1,
+                   anchor.get_next()->APL_value.get());
       }
    else
       {
@@ -764,15 +728,11 @@ std::vector<size_t> pos_stack;   // a stack of node positions
 }
 //-----------------------------------------------------------------------------
 void
-XML_node::add_member(Value * Z, const char * cp_member_name,
+XML_node::add_member(Value * Z, Unicode first, const char * cp_member_name,
                      int number, Value * member_value)
 {
-UCS_string member_name;
-   if (number >= 0)
-      {
-        member_name += UNI_UNDERSCORE;   // to make it a valid APL name
-        member_name.append_number(number);
-      }
+UCS_string member_name(first);
+   if (number >= 0)   member_name.append_number(number);
 
    member_name.append_UTF8(cp_member_name);
    Z->add_member(member_name, member_value);
@@ -802,29 +762,33 @@ size_t position = Workspace::get_IO();   // re-number sub nodes
          switch(sub.get_node_type())
             {
               case NT_text:
-                   add_member(start.APL_value.get(), "∆text", sub.position,
-                                sub.APL_value.get());
+                   add_member(start.APL_value.get(), UNI_DELTA, "text",
+                              sub.position, sub.APL_value.get());
                    break;
 
               case NT_comment:
-                   add_member(start.APL_value.get(), "∆comment", sub.position,
-                                sub.APL_value.get());
+                   add_member(start.APL_value.get(), UNI_DELTA, "comment",
+                              sub.position, sub.APL_value.get());
                    break;
 
               case NT_start_tag:
               case NT_leaf_tag:
-                   start.APL_value->add_member(sub.get_tagname(),
+                   {
+                      UCS_string member_name(UNI_UNDERSCORE);
+                      member_name.append(sub.get_tagname());
+                   start.APL_value->add_member(member_name,
                                                sub.APL_value.get());
+                   }
                    break;
 
               case NT_declaration:
-                   add_member(start.APL_value.get(), "∆declaration",
+                   add_member(start.APL_value.get(), UNI_DELTA, "declaration",
                               sub.position, sub.APL_value.get());
                    break;
 
               case NT_doctype:
-                   add_member(start.APL_value.get(), "∆doctype", sub.position,
-                                sub.APL_value.get());
+                   add_member(start.APL_value.get(), UNI_DELTA, "doctype",
+                              sub.position, sub.APL_value.get());
                    break;
 
               case NT_error:
@@ -851,7 +815,8 @@ size_t pos = start;                 // distance from  start
      const UCS_string tag_name(src, src_pos + 1, pos - start);
      Value_P  member_value(tag_name, LOC);
 
-     add_member(APL_value.get(), "⍙", Workspace::get_IO(), member_value.get());
+     add_member(APL_value.get(), UNI_DELTA_UNDERBAR, "",
+                Workspace::get_IO(), member_value.get());
    }
 
 const size_t end = src_pos + src_len;   // end of tag
@@ -868,7 +833,6 @@ size_t attribute_count = Workspace::get_IO();   // "⍙" gets ⎕IO
         const size_t attname = pos;
         while (pos < end && is_name_char(src[pos]))   ++pos;
         UCS_string attribute_name(src, attname, pos - attname);
-        attribute_name.prepend(UNI_DELTA_UNDERBAR);   // ⍙attribute_name
 
         // skip whitespace before =
         //
@@ -889,21 +853,21 @@ size_t attribute_count = Workspace::get_IO();   // "⍙" gets ⎕IO
         if (start_quote != UNI_SINGLE_QUOTE &&
             start_quote != UNI_DOUBLE_QUOTE)
            {
-             MORE_ERROR() << "No ' or \" after attribute name '"
+             MORE_ERROR() << "No ' or \" after attribute= '"
                          << attribute_name << "'";
              return true;
            }
 
         const size_t attvalue = pos;
         while (pos < end && src[pos] != start_quote)   ++pos;
-        UCS_string attribute_value(src, attvalue, pos - attvalue);
+        UCS_string attribute_value(src, attvalue-1, pos + 2 - attvalue);
         ++pos;   // skip trailing ' or "
         if (normalize_attribute_value(attribute_value))   return true;
 
         UTF8_string member_name(attribute_name);
         Value_P member_value(attribute_value, LOC);
-        add_member(APL_value.get(), member_name.c_str(), ++attribute_count,
-                   member_value.get());
+        add_member(APL_value.get(), UNI_DELTA_UNDERBAR, member_name.c_str(),
+                   ++attribute_count, member_value.get());
       }
 
    // skip whitespace after last attribute
@@ -960,7 +924,7 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
               src += 2;   // skip &#
               int number = 0;
               Unicode bad_char = UNI_NUL;
-              if (attval[src] == 'x')   // hex value
+              if (attval[src] == 'x')   // hex value &#xHH
                  {
                    ++src;   // skip 'x'
                    while (src < attval.size() && !bad_char)
@@ -972,7 +936,7 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
                         else                number = 16*number + digval;
                       }
                  }
-              else                      // decimal value
+              else                      // decimal value &#DDD
                  {
                    while (src < attval.size())
                       {
@@ -1026,6 +990,45 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
    return false;   // OK
 }
 //-----------------------------------------------------------------------------
+UCS_string
+XML_node::denormalize_attribute_value(const UCS_string & attval, bool quoted)
+{
+UCS_string ret;
+   ret.reserve(attval.size() + 100);
+
+   loop(a, attval.size())
+      {
+        const Unicode uni = attval[a];
+        if (quoted)
+           {
+             if (a == 0 || a == (attval.size() - 1))
+                {
+                  ret += uni;
+                  continue;
+                }
+           }
+
+        switch(uni)
+            {
+              case 0x00 ... 0x1F:
+                   {
+                     char cc[20];   snprintf(cc, sizeof(cc), "&#x%X;", uni);
+                     ret.append_UTF8(cc);
+                   }
+                   continue;
+
+              case UNI_LESS:         ret.append_UTF8("&lt;");     continue;
+              case UNI_GREATER:      ret.append_UTF8("&gt;");     continue;
+              case UNI_AMPERSAND:    ret.append_UTF8("&amp;");    continue;
+              case UNI_SINGLE_QUOTE: ret.append_UTF8("&apos;");   continue;
+              case UNI_DOUBLE_QUOTE: ret.append_UTF8("&quot;");   continue;
+              default: ret += uni;
+            }
+      }
+
+   return ret;
+}
+//-----------------------------------------------------------------------------
 bool
 XML_node::matches(const XML_node * end_tag) const
 {
@@ -1048,11 +1051,11 @@ size_t start = 0;
    if (node_type == NT_start_tag ||    // <TAGNAME ... >
        node_type == NT_leaf_tag)       // <TAGNAME ... />
       {
-        start = src_pos + 1;
+        start = src_pos + 1;   // char after <
       }
    else if (node_type == NT_end_tag)   // </TAGNAME
       {
-        start = src_pos + 2;
+        start = src_pos + 2;   // char after </
       }
    else
       {
@@ -1071,12 +1074,8 @@ size_t end = start;
       }
 
 UCS_string ret;
-   if (position >= 0)
-      {
-        ret += UNI_UNDERSCORE;
-        ret.append_number(position);
-      }
-   ret += UNI_UNDERSCORE;
+   Assert(position >= 0);
+   ret.append_number(position);
    ret.append(UCS_string(src, start, end - start));
    return ret;
 }
@@ -1148,22 +1147,102 @@ XML_node::is_first_name_char(Unicode uni)
    return false;
 }
 //=============================================================================
+UCS_string
+Quad_XML::skip_pos_prefix(const UCS_string & ucs)
+{
+ShapeItem pos = 1;
+UCS_string ret;
+
+   while (ucs[pos] >= UNI_0 && ucs[pos] <= UNI_9)   ++pos;   // skip digits
+   while (pos < ucs.size())   ret += ucs[pos++];
+   return ret;
+}
+//-----------------------------------------------------------------------------
 Token
 Quad_XML::eval_AB(Value_P A, Value_P B) const
 {
-   if (A->get_rank() > 0)   RANK_ERROR;
+   if (A->get_rank() > 1)   RANK_ERROR;
 
    switch(const int function_number = A->get_ravel(0).get_int_value())
       {
-         case 1:
+         case 0:
+              {
+                return eval_B(B);
+              }
+
+         case 1:   // read and convert an XML file
               {
                 return convert_file(B.getref());
               }
 
          case 2:
               {
-                Value_P Z = tree(B.getref());
+                Value_P Z = path_split(B.getref());
                 return Token(TOK_APL_VALUE1, Z);
+              }
+
+         case 3:
+              {
+                Value_P Z = name_split(B.getref());
+                return Token(TOK_APL_VALUE1, Z);
+              }
+
+         case 4:
+              {
+                Value_P Z = tree(B.getref(), tf_none);
+                return Token(TOK_APL_VALUE1, Z);
+              }
+
+         case 5:
+              {
+                Value_P Z = tree(B.getref(), tf_with_pos | tf_with_decl);
+                return Token(TOK_APL_VALUE1, Z);
+              }
+
+         case 6:
+              {
+                Value_P Z = tree(B.getref(), tf_with_pos | tf_fullpath);
+                return Token(TOK_APL_VALUE1, Z);
+              }
+
+         case 7:
+              {
+                return all_members(B.getref(), tf_all);
+              }
+
+         case 8:
+              {
+                return all_members(B.getref(), tf_tagname);
+              }
+
+         case 9:
+              {
+                return all_members(B.getref(), tf_decl);
+              }
+
+         case 10:
+              {
+                return all_members(B.getref(), tf_text);
+              }
+
+         case 11:
+              {
+                return all_members(B.getref(), tf_sub);
+              }
+
+         case 12:
+              {
+                return all_members(B.getref(), tf_all | tf_flat);
+              }
+
+         case 13:
+              {
+                return all_members(B.getref(), tf_sub | tf_flat);
+              }
+
+         case 14:
+              {
+                return next_member(A.getref(), B.getref());
               }
 
         default: MORE_ERROR() << "Bad function number A=" << function_number
@@ -1234,7 +1313,82 @@ Value_P xml_document_value(xml_document_ucs, LOC);
 }
 //-----------------------------------------------------------------------------
 Value_P
-Quad_XML::tree(const Value & B)
+Quad_XML::path_split(const Value & B)
+{
+   if (B.get_rank() != 1)       RANK_ERROR;
+
+UCS_string path(B);
+
+   // remove leading and trailing dots from path
+   //
+   while (path.size() && path.back() == UNI_FULLSTOP)   path.pop_back();
+   while (path.size() && path[0]     == UNI_FULLSTOP)   path = path.drop(1);
+
+ShapeItem len_Z = 1;
+
+   // count number of dots
+   loop(p, path.size())
+       {
+         if (path[p] == UNI_FULLSTOP)   ++len_Z;
+       }
+
+Value_P Z(len_Z, LOC);
+ShapeItem from = 0;
+
+   loop(p, path.size())
+       {
+         if (path[p] == UNI_FULLSTOP)
+            {
+              if (p == from)
+                 {
+                   while (Cell * cell = Z->next_ravel())   new (cell) IntCell(0);
+                   Z->check_value(LOC);
+                   MORE_ERROR() << "Empty member name in 2 ⎕XML";
+                   LENGTH_ERROR;
+                 }
+
+              const UCS_string member(path, from, p - from);
+              Value_P Zp(member, LOC);
+              new (Z->next_ravel())   PointerCell(Zp.get(), Z.getref());
+              from = p + 1;
+            }
+       }
+
+   if (from < path.size())
+      {
+        const UCS_string member(path, from, len_Z - from);
+        Value_P Zp(member, LOC);
+        new (Z->next_ravel())   PointerCell(Zp.get(), Z.getref());
+      }
+
+
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_XML::name_split(const Value & B)
+{
+   if (B.get_rank() != 1)       RANK_ERROR;
+   if (B.element_count() < 3)   LENGTH_ERROR;
+
+ShapeItem member_pos;     // the position in the XML file
+Unicode category;
+UCS_string name;
+   split_name(&category, &member_pos, &name, B);
+
+Value_P Z(3, LOC);
+   new(Z->next_ravel())   CharCell(category);
+   new (Z->next_ravel())  IntCell(member_pos);
+
+Value_P Z3(name, LOC);
+   new (Z->next_ravel()) PointerCell(Z3.get(), Z.getref());
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_XML::tree(const Value & B, int flags)
 {
    if (!B.is_structured())
       {
@@ -1244,13 +1398,66 @@ Quad_XML::tree(const Value & B)
 
 UCS_string z = "XML\n";
 UCS_string prefix = "";
-   tree(B, z, prefix);
+const UCS_string name_prefix = "";
+   tree(B, z, prefix, name_prefix, flags);
 
    return Value_P(z, LOC);
 }
 //-----------------------------------------------------------------------------
+int
+Quad_XML::split_name(Unicode * category, ShapeItem * position,
+                     UCS_string * name, const Value & value)
+{
+   // name is one of:
+   // ⍙N                        (tag namei, N per ⎕IO
+   // ⍙NNNattribute_name        (attribute position NNN with name
+   // ∆NNNsynmthetic_tag_name   (synthetic position NNN and tag name
+   // _NNNuser_name             (user tag position NNN and tag name)
+
+const ShapeItem len = value.element_count();
+   Assert(len >= 2);   // "⍙2" is the shortest member name
+const Cell * src = &value.get_ravel(0);
+const Cell * end = src + len;
+
+   // decode the category...
+   //
+const Unicode val0 = src++->get_char_value();
+int ret = -1;
+   if (val0 == UNI_DELTA_UNDERBAR)        ret = 0;
+   else if (val0 == UNI_DELTA)            ret = 1;
+   else if (val0 == UNI_UNDERSCORE)       ret = 2;
+   else
+      {
+        MORE_ERROR() << "⎕XML: bad name '" << UCS_string() << "'; "
+                        "it shall begin with ⍙ (name inside an XML tag),\n"
+                        "    ∆ (synthetic name), or _ (tag name)";
+        DOMAIN_ERROR;
+      }
+
+   // decode the position...
+   //
+ShapeItem pos = 0;
+   for (;src < end; ++src)
+       {
+         const Unicode digit = src->get_char_value();
+         if (digit >= UNI_0 && digit <= UNI_9)
+            {
+              pos = 10 * pos + digit - UNI_0;
+            }
+          else break;
+       }
+
+   // end of digits reached
+   //
+   if (category)   *category = val0;
+   if (position)   *position = pos;
+   if (name)   { while (src < end)   *name += src++->get_char_value(); }
+   return ret;
+}
+//-----------------------------------------------------------------------------
 void
-Quad_XML::tree(const Value & B, UCS_string & z, UCS_string & prefix)
+Quad_XML::tree(const Value & B, UCS_string & z, UCS_string & prefix,
+               const UCS_string & name_prefix, int flags)
 {
    enum { LEG_IND = 1,    // blanks before  ├──
           LEG_LEN = 3,    // number of ─ in ├──
@@ -1258,27 +1465,33 @@ Quad_XML::tree(const Value & B, UCS_string & z, UCS_string & prefix)
           LEG_TOT = LEG_LEN + LEG_SPC + LEG_IND
         };
 
-const ShapeItem rows = B.get_rows();
-
-   // construct a vector of member names and a vector of their values...
-   // Unused entries in B are discarded. so typically members.size < rows!
-   //
-std::vector<UCS_string> members;
-std::vector<const Cell *> values;
-   loop(r, rows)
+std::vector<ShapeItem> member_indices;
+   if (flags & tf_with_decl)   // all (no filter)
+      B.sorted_members(member_indices, /* filter */ 0);
+   else
       {
-        const Cell * cB = &B.get_ravel(2*r);
-        if (cB->is_pointer_cell())
-           {
-             Value_P member_name = cB->get_pointer_value();
-             const UCS_string member_ucs = member_name->get_UCS_ravel();
-             members.push_back(member_ucs);
-             values.push_back(cB + 1);
-           }
+        const Unicode filter[] = { UNI_UNDERSCORE, Unicode_0 };
+        B.sorted_members(member_indices, filter);
+      }
+
+std::vector<UCS_string>member_names;
+std::vector<const Cell *>member_values;
+
+   loop(m, member_indices.size())
+      {
+        const Cell * cB = &B.get_ravel(2*member_indices[m]);
+        Assert(cB->is_pointer_cell());
+        if (flags & tf_with_pos)
+           member_names.push_back(cB->get_pointer_value()->get_UCS_ravel());
+        else
+           member_names.push_back(skip_pos_prefix(cB->get_pointer_value()
+                                                    ->get_UCS_ravel()));
+        member_values.push_back(cB + 1);
       }
 
    // add an "empty" line to make z look nicer
    //
+   if (member_indices.size())
    {
      // the continuation lines (if any) below the indentation above
      loop (p, prefix.size())
@@ -1293,13 +1506,12 @@ std::vector<const Cell *> values;
      z += UNI_LF;
    }
 
-
    prefix += UNI_LINE_VERT_RIGHT;   // add ├
-   loop(m, members.size())
+   loop(m, member_names.size())
       {
         loop(l, LEG_IND)              z += UNI_SPACE;
         Unicode last_char = prefix.back();
-        const bool last_member = size_t(m) == (members.size() - 1);
+        const bool last_member = size_t(m) == (member_names.size() - 1);
         if (last_member)
            {
              last_char     = UNI_LINE_UP_RIGHT;   // └ in this line
@@ -1315,19 +1527,224 @@ std::vector<const Cell *> values;
         z += last_char;
         loop(l, LEG_LEN)   z += UNI_LINE_HORI;
         z += UNI_SPACE;
-        z += members[m];
-        z += UNI_LF;
-        if (!values[m]->is_pointer_cell())   continue;
+        if (flags & tf_fullpath)
+           {
+             z += name_prefix;
+             z += UNI_FULLSTOP;
+           }
 
-        Value_P sub = values[m]->get_pointer_value();
+        z += member_names[m];
+        z += UNI_LF;
+        if (!member_values[m]->is_pointer_cell())   continue;
+
+        Value_P sub = member_values[m]->get_pointer_value();
         if (!sub->is_structured())   continue;
-        tree(sub.getref(), z, prefix);
+        UCS_string subname(name_prefix);
+        subname += UNI_FULLSTOP;
+        subname += member_names[m];
+        tree(sub.getref(), z, prefix, subname, flags);
         if (last_member && prefix.size() > 1)
            {
+             // the char was │ initially, has now become └, and should be
+             // blank in subsequent lines.
+             //
              prefix[prefix.size() - 2] = UNI_SPACE;
            }
       }
    prefix.pop_back();
 }
+//-----------------------------------------------------------------------------
+Token
+Quad_XML::all_members(const Value & B, int flags)
+{
+   if (!B.is_structured())
+      {
+        MORE_ERROR() << "Non-structured B in A ⎕XML B";
+        DOMAIN_ERROR;
+      }
 
+const UCS_string name_prefix = "";
+UCS_string_vector result;
+   result.reserve(B.get_all_members_count());
+
+   all_members(result, B, name_prefix, flags);
+Value_P Z(result.size(), LOC);
+   loop(r, result.size())
+       {
+          Value_P Zr(result[r], LOC);
+          new (Z->next_ravel())   PointerCell(Zr.get(), Z.getref());
+       }
+
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//-----------------------------------------------------------------------------
+void
+Quad_XML::all_members(UCS_string_vector & result, const Value & B,
+                      const UCS_string & name_prefix, int flags)
+{
+Unicode filters[4];
+int f = 0;
+   if (flags & tf_tagname)   filters[f++] = UNI_DELTA_UNDERBAR;
+   if (flags & tf_delta)     filters[f++] = UNI_DELTA;
+   filters[f++] = UNI_UNDERSCORE;   // always return subnodes
+   filters[f++] = Unicode_0;
+
+std::vector<ShapeItem> member_indices;
+   B.sorted_members(member_indices, filters);
+
+std::vector<UCS_string>member_names;
+std::vector<const Cell *>member_values;
+   loop(m, member_indices.size())
+      {
+        const Cell & cB = B.get_ravel(2*member_indices[m]);
+        Assert(cB.is_pointer_cell());
+        const UCS_string member_name = cB.get_pointer_value()->get_UCS_ravel();
+        member_names.push_back(member_name);
+        member_values.push_back(&cB + 1);
+      }
+
+   loop(m, member_names.size())
+      {
+        UCS_string path(name_prefix);
+        path += UNI_FULLSTOP;
+        path.append(member_names[m]);
+
+        // see if the path is desired in the result. In most cases the
+        // filter has suppressed them, so we only need to check the special
+       // cases where we have overridden the filter
+        //
+        if (member_names[m].contains(UNI_DELTA_UNDERBAR))
+           {
+             result.push_back(path);
+           }
+        else if (member_names[m].contains(UNI_DELTA))
+           {
+             if (member_names[m].ends_with("text"))   // ∆text
+                {
+                  if (flags & tf_text) result.push_back(path);
+                }
+             else
+                {
+                  if (flags & tf_decl) result.push_back(path);
+                }
+           }
+        else if (member_names[m].contains(UNI_UNDERSCORE))
+           {
+             if (flags & tf_sub)   result.push_back(path);
+           }
+        else FIXME;
+
+        if (flags & tf_flat)   continue;                 // don't recurse
+
+        const Cell & member_data = *member_values[m];
+        if (!member_data.is_pointer_cell())   continue;  // can't recurse
+
+        const Value & sub = member_data.get_pointer_value().getref();
+        if (sub.is_structured())   all_members(result, sub, path, flags);
+      }
+}
+//-----------------------------------------------------------------------------
+Token
+Quad_XML::next_member(const Value & A, const Value & B)
+{
+   // A is (14, ⊂A1)
+   // B is an associative array;
+   // Return the next member after A1 (e.g. the unstructured text after tag A1)
+   //
+   if (!B.is_structured())
+      {
+        MORE_ERROR() << "Non-structured B in 14 ⎕XML B";
+        DOMAIN_ERROR;
+      }
+
+const ShapeItem B_total = B.get_all_members_count();
+
+   if (A.get_rank() != 1)        RANK_ERROR;
+   if (A.element_count() != 2)
+      {
+        if (A.element_count() < 2)
+           MORE_ERROR() << "too few items in left argument of (14 A) ⎕XML B";
+        else
+           MORE_ERROR() << "too many items in left argument of (14 A) ⎕XML B";
+        LENGTH_ERROR; 
+      }
+
+const Value & A1 = *A.get_ravel(1).get_pointer_value();
+   if (A1.element_count() == 0)
+      {
+        // an empty A1 shall return the smallest element
+        //
+        std::vector<ShapeItem> member_indices;
+        B.sorted_members(member_indices, /* filters */ 0);
+
+        const Cell & cell = B.get_ravel(2*member_indices[0]);
+        const Value & name =  cell.get_pointer_value().getref();
+        return Token(TOK_APL_VALUE1, name.clone(LOC));
+      }
+
+Value_P path = path_split(A1);
+const ShapeItem path_length = path->element_count();
+   if (path_length < 1)
+      {
+        MORE_ERROR() << "too few path elements in A of (14 A) ⎕XML B";
+        LENGTH_ERROR; 
+      }
+
+   // walk along path to find get the value that contains the
+   // final item in the path.
+   //
+size_t path_idx = 0;
+const Value * container = &B;
+   for (;path_idx < size_t(path_length - 1); ++path_idx)
+       {
+         const UCS_string member(path->get_ravel(path_idx));
+         const Cell * data_cell = container->get_member_data(member);
+         if (data_cell == 0)
+            {
+              MORE_ERROR() << "(14 PATH) ⎕XML: could not find the "
+                           << (path_idx+1) << ". member '" << member
+                           << "' of PATH (= '" << UCS_string(A1) << "')";
+              DOMAIN_ERROR;
+            }
+
+         container = data_cell->get_pointer_value().get();
+         if (!container->is_structured())
+            {
+              MORE_ERROR() << "(14 A) ⎕XML: member " << member
+                           << " of path A (" << UCS_string(A1)
+                           << " exists, but is not a structured value)";
+              DOMAIN_ERROR;
+            }
+       }
+const Value & last_path_item = path->get_ravel(path_length - 1)
+                                    .get_pointer_value().getref();
+
+ShapeItem leaf_position;
+   {
+     const int weight = split_name(0, &leaf_position, 0, last_path_item);
+     leaf_position += weight * B_total;
+   }
+
+std::vector<ShapeItem> member_indices;
+   container->sorted_members(member_indices, /* filters */ 0);
+
+   loop(m, member_indices.size())
+      {
+        const Cell & cell = container->get_ravel(2*member_indices[m]);
+        Assert(cell.is_pointer_cell());
+
+        const Value & name_m =  cell.get_pointer_value().getref();
+        ShapeItem position_m;
+        const int weight = split_name(0, &position_m, 0, name_m);
+        position_m += weight*B_total;
+
+        if (position_m > leaf_position)   // next item after leaf
+           {
+             return Token(TOK_APL_VALUE1, name_m.clone(LOC));
+           }
+      }
+
+   return Token(TOK_APL_VALUE1, Str0(LOC));   // no next item: return ""
+}
 //=============================================================================

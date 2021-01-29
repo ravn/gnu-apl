@@ -155,7 +155,7 @@ struct Svar_partner
       { return Svar_Control(flags); }
 
    /// print this partner
-   std::ostream & print(std::ostream & out) const;
+   ostream & print(ostream & out) const;
 
    /// the processor
    AP_num3 id;
@@ -248,14 +248,14 @@ struct Svar_record
    bool may_set(int attempt);
 
    /// print the variable
-   void print(std::ostream & out) const;
+   void print(ostream & out) const;
 
    /// print a name
-   static std::ostream & print_name(std::ostream & out, const uint32_t * name,
+   static ostream & print_name(ostream & out, const uint32_t * name,
                                int len = MAX_SVAR_NAMELEN);
 
    /// print the name of this variable
-   std::ostream & print_name(std::ostream & out) const
+   ostream & print_name(ostream & out) const
       { return print_name(out, varname, 0); }
 
    /// name of the offered variable (UCS), 0-terminated

@@ -30,35 +30,30 @@
 
 class ColumnDescriptor {
 public:
-    ColumnDescriptor( const std::string &name_in, const std::string &type_in )
-    : name(name_in),
-      type(type_in)
-    {}
-
-    ColumnDescriptor operator=(ColumnDescriptor &orig)
-       { return ColumnDescriptor( orig.name, orig.type ); }
-    const std::string &get_name( void ) { return name; }
-    const std::string &get_type( void ) { return type; }
+    ColumnDescriptor( const string &name_in, const string &type_in ) : name( name_in ), type( type_in ) {}
+    ColumnDescriptor operator=( ColumnDescriptor &orig ) { return ColumnDescriptor( orig.name, orig.type ); }
+    const string &get_name( void ) { return name; }
+    const string &get_type( void ) { return type; }
 
 private:
-    const std::string name;
-    const std::string type;
+    const string name;
+    const string type;
 };
 
 class Connection
 {
 public:
     virtual ~Connection() {}
-    virtual ArgListBuilder *make_prepared_query( const std::string &sql ) = 0;
-    virtual ArgListBuilder *make_prepared_update( const std::string &sql ) = 0;
+    virtual ArgListBuilder *make_prepared_query( const string &sql ) = 0;
+    virtual ArgListBuilder *make_prepared_update( const string &sql ) = 0;
     virtual void transaction_begin( void ) = 0;
     virtual void transaction_commit( void ) = 0;
     virtual void transaction_rollback( void ) = 0;
-    virtual void fill_tables( std::vector<std::string> &tables ) = 0;
-    virtual void fill_cols( const std::string &table, std::vector<ColumnDescriptor> &cols ) = 0;
-    virtual const std::string make_positional_param( int pos ) = 0;
+    virtual void fill_tables( vector<string> &tables ) = 0;
+    virtual void fill_cols( const string &table, vector<ColumnDescriptor> &cols ) = 0;
+    virtual const string make_positional_param( int pos ) = 0;
 
-    virtual const std::string replace_bind_args( const std::string &sql );
+    virtual const string replace_bind_args( const string &sql );
 };
 
 #endif

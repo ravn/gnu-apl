@@ -60,7 +60,7 @@ void * fmux = dlsym(handle, "get_function_mux");
      if (!fmux)
         {
           CERR << "shared library " << so_name << " is lacking the mandatory "
-                  "function get_function_mux() !" << std::endl;
+                  "function get_function_mux() !" << endl;
           t4 << "is invalid (no get_function_mux())";
           MORE_ERROR() = t4;
           return;
@@ -77,7 +77,7 @@ void * (*get_function_mux)(const char *) =
      if (!get_sig)
         {
           CERR << "shared library is lacking the mandatory "
-                  "function signature() !" << std::endl;
+                  "function signature() !" << endl;
           t4 << "is invalid (no get_signature())";
           MORE_ERROR() << t4;
           return;
@@ -155,7 +155,7 @@ const char * why = sym->cant_be_defined();
 NativeFunction::~NativeFunction()
 {
   Log(LOG_UserFunction__enter_leave)
-      get_CERR() << "Native function " << get_name() << " deleted." << std::endl;
+      get_CERR() << "Native function " << get_name() << " deleted." << endl;
 
    loop(v, valid_functions.size())
       {
@@ -385,13 +385,13 @@ NativeFunction::fix(const UCS_string & so_name,
 
 NativeFunction * new_function = new NativeFunction(so_name, function_name);
    Log(LOG_delete)
-      CERR << "new    " << voidP(new_function) << " at " LOC << std::endl;
+      CERR << "new    " << voidP(new_function) << " at " LOC << endl;
 
 
    if (!new_function->valid)   // something went wrong
       {
         Log(LOG_delete)
-          CERR << "delete " << voidP(new_function) << " at " LOC << std::endl;
+          CERR << "delete " << voidP(new_function) << " at " LOC << endl;
         delete new_function;
         return 0;
       }
@@ -422,10 +422,10 @@ NativeFunction::is_operator() const
 }
 //-----------------------------------------------------------------------------
 void
-NativeFunction::print_properties(std::ostream & out, int indent) const
+NativeFunction::print_properties(ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_SPACE);
-   out << ind << "Native Function " << std::endl;
+   out << ind << "Native Function " << endl;
 }
 //-----------------------------------------------------------------------------
 UCS_string
@@ -434,11 +434,11 @@ NativeFunction::canonical(bool with_lines) const
    return original_so_path;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
+ostream &
 NativeFunction::print(std::ostream & out) const
 {
-   if (is_operator())   out << "native Operator " << name << std::endl;
-   else                 out << "native Function " << name << std::endl;
+   if (is_operator())   out << "native Operator " << name << endl;
+   else                 out << "native Function " << name << endl;
 
    return out;
 }

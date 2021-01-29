@@ -44,31 +44,31 @@ UCS_string::UCS_string()
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(Unicode uni)
-   : std::basic_string<Unicode>(1, uni)
+   : basic_string<Unicode>(1, uni)
 {
   create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const Unicode * data, size_t len)
-   : std::basic_string<Unicode>(data, len)
+   : basic_string<Unicode>(data, len)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(size_t len, Unicode uni)
-   : std::basic_string<Unicode>(len, uni)
+   : basic_string<Unicode>(len, uni)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs)
-   : std::basic_string<Unicode>(ucs)
+   : basic_string<Unicode>(ucs)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
-   : std::basic_string<Unicode>(ucs, pos, len)
+   : basic_string<Unicode>(ucs, pos, len)
 {
    create(LOC);
 }
@@ -90,7 +90,7 @@ UCS_string::UCS_string(const char * cstring)
       {
         if (0x80 & *cstring)   // ASCII
            {
-             CERR << "non-ASCII char in C-String '" << cstring << "'" << std::endl;
+             CERR << "non-ASCII char in C-String '" << cstring << "'" << endl;
              Assert(0 && "Bad C-string");
            }
         *this += Unicode(*str);
@@ -102,7 +102,7 @@ UCS_string::UCS_string(const UTF8_string & utf)
    create(LOC);
 
    Log(LOG_char_conversion)
-      CERR << "UCS_string::UCS_string(): utf = " << utf << std::endl;
+      CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
 
 size_t from = 0;
 
@@ -124,7 +124,7 @@ start_of_sequence:
              Log(LOG_char_conversion)
                 {
                  utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
-                                   << " at " << LOC <<  std::endl;
+                                   << " at " << LOC <<  endl;
                  Backtrace::show(__FILE__, __LINE__);
                 }
 
@@ -145,12 +145,12 @@ start_of_sequence:
                       {
                         utf.dump_hex(CERR << "Truncated UTF8 string: ", 40)
                                           << " len " << utf.size()
-                                          << " at " << LOC << std::endl;
+                                          << " at " << LOC << endl;
                         if (utf.size() >= 40)
                            {
                              const UTF8_string end(&utf[utf.size() - 10], 10);
-                             end.dump_hex(CERR << std::endl << "(ending with : ", 20)
-                                               << ")" << std::endl;
+                             end.dump_hex(CERR << endl << "(ending with : ", 20)
+                                               << ")" << endl;
                            }
                       }
 
@@ -166,12 +166,12 @@ start_of_sequence:
                       {
                         utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
                                           << " len " << utf.size()
-                                          << " at " << LOC <<  std::endl;
+                                          << " at " << LOC <<  endl;
                         if (utf.size() >= 40)
                            {
                              const UTF8_string end(&utf[utf.size() - 10], 10);
-                             end.dump_hex(CERR << std::endl << "(ending with : ", 20)
-                                               << ")" << std::endl;
+                             end.dump_hex(CERR << endl << "(ending with : ", 20)
+                                               << ")" << endl;
                            }
                         Backtrace::show(__FILE__, __LINE__);
                       }
@@ -191,7 +191,7 @@ start_of_sequence:
       }
 
    Log(LOG_char_conversion)
-      CERR << "UCS_string::UCS_string(): ucs = " << *this << std::endl;
+      CERR << "UCS_string::UCS_string(): ucs = " << *this << endl;
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(APL_Float value, bool & scaled,
@@ -210,9 +210,9 @@ int expo = 0;
 
    if (value >= 10.0)   // large number, positive exponent
       {
-        if (value > BIG_FLOAT || !std::isnormal(value))   // something odd
+        if (value > BIG_FLOAT || !isnormal(value))   // something odd
            {
-            if (std::isnormal(value) || std::isinf(value))   // rather large
+            if (isnormal(value) || isinf(value))   // rather large
                {
                  if (negative)   append_UTF8("¯∞");
                  else            append_UTF8("∞");
@@ -442,10 +442,21 @@ UCS_string::UCS_string(const Cell & cell)
 {
    create(LOC);
 
+   if (cell.is_character_cell())
+      {
+        append(cell.get_char_value());
+        return;
+      }
+
    Assert(cell.is_pointer_cell());
 const Value & value = *cell.get_pointer_value().get();
 
-   if (value.get_rank() > 1) RANK_ERROR;
+   if (value.get_rank() > 1)
+      {
+        MORE_ERROR() << "Bad rank " << value.get_rank()
+                     << " when expecting a character string";
+        RANK_ERROR;
+      }
 
 const ShapeItem ec = value.element_count();
    reserve(ec);
@@ -453,7 +464,7 @@ const ShapeItem ec = value.element_count();
    loop(e, ec)   append(value.get_ravel(e).get_char_value());
 }
 //-----------------------------------------------------------------------------
-UCS_string::UCS_string(std::istream & in)
+UCS_string::UCS_string(istream & in)
 {
    create(LOC);
 
@@ -922,7 +933,7 @@ UCS_string::append_shape(const Shape & shape)
 }
 //-----------------------------------------------------------------------------
 void
-UCS_string::append_members(const std::vector<const UCS_string *> & members, int m)
+UCS_string::append_members(const vector<const UCS_string *> & members, int m)
 {
    for (int mm = members.size() - 1; mm >= m; --mm)
        {
@@ -1167,8 +1178,8 @@ bool negative = false;
    return negative ? -ret : ret;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & os, Unicode uni)
+ostream &
+operator << (ostream & os, Unicode uni)
 {       
    if (uni < 0x80)      return os << char(uni);
         
@@ -1198,8 +1209,8 @@ operator << (std::ostream & os, Unicode uni)
              << char(0x80 | (uni       & 0x3F));
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & os, const UCS_string & ucs)
+ostream &
+operator << (ostream & os, const UCS_string & ucs)
 {
 const int fill_len = os.width() - ucs.size();
 
@@ -1232,16 +1243,16 @@ UCS_string::lexical_before(const UCS_string other) const
    return other.size() > size();
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-UCS_string::dump(std::ostream & out) const
+ostream &
+UCS_string::dump(ostream & out) const
 {
-   out << std::right << std::hex << std::uppercase << std::setfill('0');
+   out << right << hex << uppercase << setfill('0');
    loop(s, size())
       {
-        out << " U+" << std::setw(4) << int(at(s));
+        out << " U+" << setw(4) << int(at(s));
       }
 
-   return out << std::left << std::dec << std::nouppercase << std::setfill(' ');
+   return out << left << dec << nouppercase << setfill(' ');
 }
 //-----------------------------------------------------------------------------
 UCS_string
@@ -1282,11 +1293,11 @@ long double value = val;
 int digits[320];   // DBL_MAX is 1.79769313486231470E+308
 int * d = digits;
 
-const long double initial_fract = std::modf(value, &value);
+const long double initial_fract = modf(value, &value);
 long double fract;
    for (; value >= 1.0; ++d)
       {
-         fract = std::modf(value / 10.0, &value);   // U.x -> .U
+         fract = modf(value / 10.0, &value);   // U.x -> .U
          *d = int((fract + .02) * 10.0);
          fract -= 0.1 * *d;
       }
@@ -1533,18 +1544,18 @@ UCS_string ret;
 UCS_string::~UCS_string()
 {
    --total_count;
-   cerr << setfill('0') << std::endl << "@@ " << setw(5) << instance_id
+   cerr << setfill('0') << endl << "@@ " << setw(5) << instance_id
         << " DEL ##" << total_count
-        << " c= " << Backtrace::caller(3) << setfill(' ') << std::endl;
+        << " c= " << Backtrace::caller(3) << setfill(' ') << endl;
 }
 //----------------------------------------------------------------------------
 void UCS_string::create(const char * loc)
 {
    ++total_count;
    instance_id = ++total_id;
-   cerr << setfill('0') << std::endl << "@@ " << setw(5) << instance_id
+   cerr << setfill('0') << endl << "@@ " << setw(5) << instance_id
         << " NEW ##" << total_count << " " << loc
-        << " c= " << Backtrace::caller(3) << setfill(' ') << std::endl;
+        << " c= " << Backtrace::caller(3) << setfill(' ') << endl;
 }
 
 #endif

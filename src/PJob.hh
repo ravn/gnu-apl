@@ -227,9 +227,9 @@ public:
          if (started_loc)
             {
               PRINT_LOCKED(
-              CERR << std::endl << "*** Attempt to start a new joblist at " << loc
+              CERR << endl << "*** Attempt to start a new joblist at " << loc
                    << " while joblist from " << started_loc
-                   << " is not finished" << std::endl;
+                   << " is not finished" << endl;
               Backtrace::show(__FILE__, __LINE__))
             }
 #endif

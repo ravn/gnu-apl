@@ -71,9 +71,9 @@ Fun_signature get_signature()
     return SIG_Z_A_F2_B;
 }
 
-static Token list_functions( std::ostream &out )
+static Token list_functions( ostream &out )
 {
-    out << "Information about the functions" << std::endl;
+    out << "Information about the functions" << endl;
     return Token(TOK_APL_VALUE1, Str0(LOC));
 }
 
@@ -117,7 +117,7 @@ Token eval_XB(Value_P X, Value_P B)
     }
 
     default:
-        CERR << "Bad function number: " << function_number << std::endl;
+        CERR << "Bad function number: " << function_number << endl;
         DOMAIN_ERROR;
     }
 
@@ -126,7 +126,7 @@ Token eval_XB(Value_P X, Value_P B)
 
 Token eval_AXB(const Value_P A, const Value_P X, const Value_P B)
 {
-    COUT << "eval_AXB" << std::endl;
+    COUT << "eval_AXB" << endl;
     return Token(TOK_APL_VALUE1, Str0(LOC));
 }
 

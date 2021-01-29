@@ -1,0 +1,149 @@
+----> ⍝ Quad_XML.tc vim: syntax=apl
+----> 
+----> ⍝ XML errors...
+----> 
+----> ⍝ invalid XML character ------------------------------------------------------
+----> 
+----> ⎕XML "  ", ⎕UCS20, "  "
+== DOMAIN ERROR+
+==       ⎕XML '  ',⎕UCS 20,'  '
+==       ^
+----> )MORE
+== ⎕XML B: Invalid XML character U+0014 at B[3]
+----> )SIC
+----> 
+----> ⍝ missing root element -------------------------------------------------------
+----> 
+----> ⎕XML " "
+== DOMAIN ERROR+
+==       ⎕XML ' '
+==       ^
+----> )MORE
+== ⎕XML B: no XML root element in B
+----> )SIC
+----> 
+----> ⍝ tag not closed -------------------------------------------------------------
+----> 
+----> ⎕XML "<TAG attribute='25'"
+== DOMAIN ERROR+
+==       ⎕XML '<TAG attribute=''25'''
+==       ^
+----> )MORE
+== No tag end found in: <TAG attribute='25'
+----> )SIC
+----> 
+----> ⍝ tag not closed -------------------------------------------------------------
+----> 
+---->       ⎕XML "<root><sub "
+== DOMAIN ERROR+
+==       ⎕XML '<root><sub '
+==       ^
+----> )MORE
+== ⎕XML: No tag end: <sub 
+----> )SIC
+----> 
+----> ⍝ tag too short---------------------------------------------------------------
+----> 
+---->       ⎕XML "<root><s"
+== DOMAIN ERROR+
+==       ⎕XML '<root><s'
+==       ^
+----> )MORE
+== ⎕XML: Tag too short: <s
+----> )MORE
+== ⎕XML: Tag too short: <s
+----> )SIC
+----> ⍝ comment too short-----------------------------------------------------------
+----> ⎕XML "<root><!--->"
+== DOMAIN ERROR+
+==       ⎕XML '<root><!--->'
+==       ^
+----> )MORE
+== ⎕XML: comment not properly terminated: <!--->
+----> )SIC
+----> 
+----> ⍝ bad closing tag ------------------------------------------------------------
+----> 
+----> ⎕XML '<root></#>'
+== DOMAIN ERROR+
+==       ⎕XML '<root></#>'
+==       ^
+---->       )MORE
+== ⎕XML: bad tag name in end tag : </#>
+----> )SIC
+----> 
+----> ⍝ bad empty tag --------------------------------------------------------------
+---->       ⎕XML '<root><#/>'
+== DOMAIN ERROR+
+==       ⎕XML '<root><#/>'
+==       ^
+----> )MORE
+== ⎕XML: bad tag name in empty (-leaf) tag: <#/>
+----> )SIC
+----> 
+----> ⍝ bad start tag --------------------------------------------------------------
+----> 
+----> ⎕XML '<root><#>'
+== DOMAIN ERROR+
+==       ⎕XML '<root><#>'
+==       ^
+----> )MORE
+== ⎕XML: bad tag name in start tag: <#>
+----> )SIC
+----> 
+----> ⍝ unescaped < in attribute name ----------------------------------------------
+----> 
+---->       ⎕XML "<root na<me='' >"
+== DOMAIN ERROR+
+==       ⎕XML '<root na<me='''' >'
+==       ^
+---->       )more
+== ⎕XML B: Unescaped '<' in attribute name: '<root na<me='' >'...
+----> )SIC
+----> 
+----> ⍝ unescaped < in attribute value ---------------------------------------------
+----> 
+----> ⎕XML "<root name='val<ue' >"
+== DOMAIN ERROR+
+==       ⎕XML '<root name=''val<ue'' >'
+==       ^
+---->       )MORE
+== ⎕XML B: Unescaped '<' in attribute value: '<root name='val<ue' '...
+----> )SIC
+----> 
+----> ⍝ non-error cases ============================================================
+----> 
+----> ⍝ attribute value normalization  ---------------------------------------------
+----> 
+---->       XML←⎕XML 36 ⎕CR """
+---->   <ROOT>
+---->     <LT name='A &lt; B'/>
+---->     <GT name='A&gt;B'/>
+---->     <AMP name='&amp;B'/>
+---->     <QU1 name='&apos;B&apos;'/>
+---->     <QU2 name='&quot;B&quot;'/>
+---->   </ROOT>
+----> """
+---->       XML._2_ROOT._2_LT._2⍙name
+== A < B
+---->       XML._2_ROOT._4_GT._2⍙name
+== A>B
+---->       XML._2_ROOT._6_AMP._2⍙name
+== &B
+---->       XML._2_ROOT._8_QU1._2⍙name
+== 'B'
+---->       XML._2_ROOT._10_QU2._2⍙name
+== "B"
+----> 
+----> ⍝ unescaped < in attribute value ---------------------------------------------
+----> 
+----> ⍝ ============================================================================
+----> )SI
+----> 
+----> )CHECK
+== OK      - no stale functions
+== OK      - no stale values
+== OK      - no stale indices
+== OK      - no duplicate parents
+----> 
+----> 

@@ -45,7 +45,7 @@ public:
       { return Token(ID::get_token_tag(get_Id()), this); }
 
    /// overloaded Symbol::print().
-   virtual std::ostream & print(std::ostream & out) const;
+   virtual ostream & print(ostream & out) const;
 
    /// overloaded Symbol::assign().
    virtual void assign(Value_P value, bool clone, const char * loc);
@@ -304,7 +304,7 @@ public:
    Quad_L();
 
    /// overloaded Symbol::save()
-   virtual void save(std::ostream & out) const {}
+   virtual void save(ostream & out) const {}
 
 protected:
    /// overloaded Symbol::assign()
@@ -533,7 +533,7 @@ public:
    Quad_R();
 
    /// overloaded Symbol::save()
-   virtual void save(std::ostream & out) const {}
+   virtual void save(ostream & out) const {}
 
 protected:
    /// overloaded Symbol::assign()
@@ -638,8 +638,8 @@ public:
    /// compute the offset (in seconds) from GMT
    static int compute_offset();
 
-   /// print e.g. 2017-05-17  15:09:12 (GMT+2) to out (no trailing std::endl)
-   std::ostream & print_timestamp(std::ostream & out, APL_time_us when) const;
+   /// print e.g. 2017-05-17  15:09:12 (GMT+2) to out (no trailing endl)
+   ostream & print_timestamp(ostream & out, APL_time_us when) const;
 
 protected:
    /// overloaded Symbol::assign().
@@ -692,7 +692,7 @@ public:
    Quad_X();
 
    /// overloaded Symbol::save()
-   virtual void save(std::ostream & out) const {}
+   virtual void save(ostream & out) const {}
 
 protected:
    /// overloaded Symbol::assign()

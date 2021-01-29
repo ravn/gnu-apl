@@ -68,7 +68,7 @@ VH_entry * entry = VH_entry::history + VH_entry::idx++;
 }
 //----------------------------------------------------------------------------
 void
-VH_entry::print_history(std::ostream & out, const Value * val, const char * loc)
+VH_entry::print_history(ostream & out, const Value * val, const char * loc)
 {
    // search backwards for events of val.
    //
@@ -101,15 +101,15 @@ int cidx = VH_entry::idx;
 
    if (VALUEHISTORY_SIZE == 0)
       {
-        out << "value history disabled" << std::endl;
+        out << "value history disabled" << endl;
       }
     else
       {
-        out << std::endl << "value " << voidP(val)
+        out << endl << "value " << voidP(val)
             << " has " << var_events.size()
             << " events in its history";
         if (loc)   out << " (at " << loc << ")";
-        out << ":" << std::endl;
+        out << ":" << endl;
       }
 
 int flags = 0;
@@ -120,7 +120,7 @@ const VH_entry * previous = 0;
         vev->print(flags, out, val, previous);
         previous = vev;
       }
-   out << std::endl;
+   out << endl;
 }
 //----------------------------------------------------------------------------
 static UCS_string
@@ -136,7 +136,7 @@ UCS_string ret;
 }
 //----------------------------------------------------------------------------
 void
-VH_entry::print(int & flags, std::ostream & out, const Value * val,
+VH_entry::print(int & flags, ostream & out, const Value * val,
                const VH_entry * previous) const
 {
 const ValueFlags flags_before = ValueFlags(flags);
@@ -147,7 +147,7 @@ const ValueFlags flags_before = ValueFlags(flags);
        strcmp(previous->testcase_file, testcase_file))
       {
         if (testcase_file)   out << "  FILE:        " << testcase_file
-                                 << ":" << testcase_line << std::endl;
+                                 << ":" << testcase_line << endl;
       }
 
    switch(event)
@@ -193,64 +193,64 @@ const ValueFlags flags_before = ValueFlags(flags);
              break;
 
         case VHE_Destruct:
-             out << "  VHE_Destruct " << std::setw(26) << iarg;
+             out << "  VHE_Destruct " << setw(26) << iarg;
              break;
 
         case VHE_Error:
-             out << "  " << std::setw(38)
+             out << "  " << setw(38)
                  << Error::error_name(ErrorCode(iarg)) << " ";
              break;
 
         case VHE_PtrNew:
-             out << "  VHE_PtrNew   " << std::setw(26) << iarg;
+             out << "  VHE_PtrNew   " << setw(26) << iarg;
              break;
 
         case VHE_PtrNew0:
-             out << "  VHE_PtrNew0  " << std::setw(26) << iarg;
+             out << "  VHE_PtrNew0  " << setw(26) << iarg;
              break;
 
         case VHE_PtrCopy1:
-             out << "  VHE_PtrCopy1 " << std::setw(26) << iarg;
+             out << "  VHE_PtrCopy1 " << setw(26) << iarg;
              break;
 
         case VHE_PtrCopy2:
-             out << "  VHE_PtrCopy2 " << std::setw(26) << iarg;
+             out << "  VHE_PtrCopy2 " << setw(26) << iarg;
              break;
 
         case VHE_PtrCopy3:
-             out << "  VHE_PtrCopy3 " << std::setw(26) << iarg;
+             out << "  VHE_PtrCopy3 " << setw(26) << iarg;
              break;
 
         case VHE_PtrClr:
-             out << "  VHE_PtrClr   " << std::setw(26) << iarg;
+             out << "  VHE_PtrClr   " << setw(26) << iarg;
              break;
 
         case VHE_PtrDel:
-             out << "  VHE_PtrDel   " << std::setw(26) << iarg;
+             out << "  VHE_PtrDel   " << setw(26) << iarg;
              break;
 
         case VHE_PtrDel0:
-             out << "  VHE_PtrDel0  " << std::setw(26) << iarg;
+             out << "  VHE_PtrDel0  " << setw(26) << iarg;
              break;
 
         case VHE_TokCopy1:
-             out << "  VHE_TokCopy1 " << std::setw(26) << iarg;
+             out << "  VHE_TokCopy1 " << setw(26) << iarg;
              break;
 
         case VHE_TokMove1:
-             out << "  VHE_TokMove1 " << std::setw(26) << iarg;
+             out << "  VHE_TokMove1 " << setw(26) << iarg;
              break;
 
         case VHE_TokMove2:
-             out << "  VHE_TokMove2 " << std::setw(26) << iarg;
+             out << "  VHE_TokMove2 " << setw(26) << iarg;
              break;
 
         case VHE_Completed:
-             out << "  VHE_Completed" << std::setw(26) << iarg;
+             out << "  VHE_Completed" << setw(26) << iarg;
              break;
 
         case VHE_Stale:
-             out << "  VHE_Stale    " << std::setw(26) << iarg;
+             out << "  VHE_Stale    " << setw(26) << iarg;
              break;
 
         case VHE_Visit:
@@ -259,11 +259,11 @@ const ValueFlags flags_before = ValueFlags(flags);
              break;
 
         default:
-             out << "Unknown event  " << HEX(event) << std::endl;
+             out << "Unknown event  " << HEX(event) << endl;
              return;
       }
 
-   out << std::left << std::setw(30) << (loc ? loc : "<no-loc>") << std::endl;
+   out << left << setw(30) << (loc ? loc : "<no-loc>") << endl;
 }
 //----------------------------------------------------------------------------
 

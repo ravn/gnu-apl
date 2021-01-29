@@ -1,0 +1,166 @@
+----> ⍝ ZZ01_Invariants.tc
+----> 
+----> ⍝ Test some (and in the long run all) APL2 invariants
+----> ⍝ Source references: lrm NNN means: IBM APL2 Language reference page NNN
+----> ⍝                    iso NNN means: ISO standard page NN
+----> ⍝
+----> 
+---->       )CLEAR
+== CLEAR WS
+----> 
+----> ⍝ -----------------------------------------------------------------------------
+----> ∇A EQUIV B
+----> ⍝⍝ check that A ≡ B and complain if not, detailing A and B
+----> →(A ≡ B)⍴0 ⍝ OK
+----> '*** A EQUIV B failed'
+----> 
+----> '≡A:'       (≡A)
+----> '≡B:'       (≡B)
+----> '⍴A:'       (⍴A)
+----> '⍴B:'       (⍴B)
+----> '4 ⎕CR A:'  (4 ⎕CR A)
+----> '4 ⎕CR B:'  (4 ⎕CR B)
+----> '10 ⎕CR A:' (10 ⎕CR 'A')
+----> '10 ⎕CR B:' (10 ⎕CR 'B')
+----> '2 ⎕TF A:' (2 ⎕TF 'A')
+----> '2 ⎕TF B:' (2 ⎕TF 'B')
+----> →((⍴A)≢⍴B)⍴0   ⍝ cannot compare A and B
+----> 'A=B:'     (A=B)
+----> ∇
+----> 
+----> ⍝ -----------------------------------------------------------------------------
+----> ⍝ test EQUIV itself (equivalent value)
+----> 1 2 3 EQUIV 1,2,3
+----> 
+----> ⍝ test EQUIV itself (different values)
+----> 1 2 3 EQUIV 1 2 3 4
+== *** A EQUIV B failed
+==  ≡A: 1 
+==  ≡B: 1 
+==  ⍴A:  3 
+==  ⍴B:  4 
+==  4 ⎕CR A:  ┏→━━━━┓ 
+==            ┃1 2 3┃ 
+==            ┗━━━━━┛ 
+==  4 ⎕CR B:  ┏→━━━━━━┓ 
+==            ┃1 2 3 4┃ 
+==            ┗━━━━━━━┛ 
+==  10 ⎕CR A:   A←1 2 3  
+==  10 ⎕CR B:   B←1 2 3 4  
+==  2 ⎕TF A: A←3⍴1 2 3 
+==  2 ⎕TF B: B←4⍴1 2 3 4 
+----> 
+---->       ⊣0 ⎕RVAL 8⍴256|⎕TS + 256|⎕FIO ¯1
+----> 
+----> ⍝ ================================ INVARIANTS... ===============================
+----> 
+----> ⍝ lrm 14
+---->       1 2    EQUIV 1(2)
+---->       1(2)   EQUIV (1)2
+---->       (1)2   EQUIV (1)(2)
+---->       (1)(2) EQUIV 1     2
+----> 
+---->       2 'X' 8 EQUIV 2'X'8
+---->       2'X'8   EQUIV 2('X')8
+---->       2('X')8 EQUIV (2('X')(8))
+----> 
+---->       'FACE' EQUIV ('F' 'A' 'C' 'E')
+----> 
+----> ⍝ lrm 30
+---->       'IN' 'OUT'    EQUIV ('IN')('OUT')
+---->       ('IN')('OUT') EQUIV ('IN')'OUT'
+----> 
+---->       ( 8 1 4 3(+.÷)9 2 4 2 ) EQUIV ( 8 1 4 3+.÷9 2 4 2 )
+----> 
+----> ⍝ lrm 35
+---->       A←2 3 4
+---->       B←8
+---->       C←'NEW'
+----> 
+---->      ( A B←C ) EQUIV ( A C )
+----> 
+---->       ( ,¨/ 1 2 3 )  EQUIV ( (,¨) / 1 2 3 )
+---->       ( +.×/ 1 2 3 ) EQUIV ( (+.×) / 1 2 3 )
+----> 
+----> ⍝ lrm 36
+---->       A←1 2 3
+---->       ( 2 1 3/A ) EQUIV ( (2 1 3)/A )
+----> 
+---->       A←1 2 3
+---->       B←7 8
+---->       LO  ← {⍺ - ⍵}
+---->       RO  ← {⍺ ⌈ ⍵}
+---->       DOP ← {⍺ ⍶ . ⍹ ⍵}
+---->       ( 5 LO DOP RO B ) EQUIV ( 5 (LO DOP RO) B )
+----> 
+----> ⍝ lrm 37
+---->       A←2 3 4
+---->       ( 2(+)3     )  EQUIV  ( 2+3     )     ⍝ Primitive function name
+---->       ( A+(.)×A   )  EQUIV  ( A+.×A   )     ⍝ Primitive operator name
+---->       ( (2)+1     )  EQUIV  ( 2+1     )     ⍝ Primitive array name
+---->       ( (A)←3     )  EQUIV  ( A←3     )     ⍝ Constructed array name
+---->       ( ('ABC')   )  EQUIV  ( 'ABC'   )     ⍝ Character string
+---->       ( ((2-3))+1 )  EQUIV (  (2-3)+1 )     ⍝ Parenthesized expression
+----> 
+---->       ( 2 (3) 4 )  EQUIV  ( 2 3 4 )    ⍝ These separate but do not group.
+---->       ( (2 3 4) )  EQUIV  ( 2 3 4 )    ⍝ These group but do not separate.
+----> 
+----> ⍝ lrm 74
+---->       A←⎕RVAL ¯3 ¯4 (50 50) 4
+---->       B←⎕RVAL ¯3 ¯4 (50 50) 4
+---->       C←⎕RVAL ¯3 ¯4 (50 50) 4
+---->       (A B C) EQUIV (⊂A),(⊂B),⊂C
+----> 
+----> ⍝ lrm 80
+----> 
+---->       A←⎕RVAL 3 ¯10 (0 25 25 25) 4
+---->       (I1 I2 I3)←⍳¨⍴A
+---->       I1←(1 ⊤∧ ⎕RVAL 1 (⍴I1) (0 100) 4)/I1   ⍝ pick some indices
+---->       I2←(1 ⊤∧ ⎕RVAL 1 (⍴I2) (0 100) 4)/I2   ⍝ pick some indices
+---->       I3←(1 ⊤∧ ⎕RVAL 1 (⍴I3) (0 100) 4)/I3   ⍝ pick some indices
+---->       Z←A[I1;I2;I3]
+---->       (⍴Z)  EQUIV (⍴I1)  , (⍴I2)  , ⍴I3
+---->       (⍴⍴Z) EQUIV (⍴⍴I1) + (⍴⍴I2) + ⍴⍴I3
+----> 
+----> ⍝ lrm 83
+---->       ⍝
+---->       ⍝
+---->       ⍝        ┌─────────────────────────── rank:  random 0-3
+---->       ⍝        │  ┌──────────────────────── shape: random 0 0 0 - 4 4 4
+---->       ⍝        │  │       ┌──┬───────────── type: (80% real, 20% complex)
+---->       ⍝        │  │       │  │         ┌─── max. depth: 4
+---->       ⍝        │  │       │  │         │
+---->       R←⎕RVAL ¯3 ¯4 (0 0 80 20) 4
+----> 
+---->       ( 0○R)  EQUIV  2○¯1○R
+---->       ( 0○R)  EQUIV  1○¯2○R
+---->       ( 4○R)  EQUIV  6○¯5○R
+---->       (¯4○R)  EQUIV  5○¯6○R
+----> 
+----> ⍝ lrm 81
+---->       X← 9○R   ⍝ real R
+---->       Y←11○R   ⍝ imag R
+---->       I←0J1
+---->       S¯4← ¯1+2×(X≥0) ∨ (¯1<X)∧(X<0)∧(Y=0)                     ⍝ sign ¯4○
+---->       S¯8← ¯1+2×((X>0)∧(Y>0))∨((X=0)∧(Y>1))∨((X<0)∧(Y≥0))      ⍝ sign ¯8○
+----> 
+---->       ( 0○R) EQUIV (1-R⋆2)⋆.5                                  ⍝
+---->       ( 1○R) EQUIV ((1○X)×(6○Y)) + I×(2○X)×(5○Y)               ⍝ SINZ R
+---->       (¯1○R) EQUIV -I×¯5○I×R                                   ⍝ ASINZ R
+---->       ( 2○R) EQUIV ((2○X)×(6○Y)) - I×(1○X)×(5○Y)               ⍝ COSZ R
+---->       (¯2○R) EQUIV (.5×○1) - ¯1○R                              ⍝ ACOSZ R
+---->       ( 3○R) EQUIV ((1○X)+I×(2○X)×(7○Y))÷(2○X)-I×(1○X)×(7○Y)   ⍝ TANZ R
+---->       ( 4○R) EQUIV (1+R⋆2)⋆.5                                  ⍝ ATANZ R
+---->       (¯4○R) EQUIV S¯4 × (¯1 + R⋆2)⋆.5
+---->       ( 5○R) EQUIV -I×1○I×R                                    ⍝ SINHZ R
+---->       (¯5○R) EQUIV -I×¯1○I×R                                   ⍝ ASINHZ R
+---->       ( 6○R) EQUIV 2○I×R                                       ⍝ COSHZ R
+---->       (¯6○R) EQUIV ⍟(R+¯4○R)                                   ⍝ ACOSHZ R
+---->       ( 7○R) EQUIV -I×3○I×R                                    ⍝ TANHZ R
+---->       (¯7○R) EQUIV -I×¯3○I×R                                   ⍝ ATANHZ R
+---->       ( 8○R) EQUIV S¯8 × (¯1-R⋆2)⋆.5
+---->       (¯8○R) EQUIV -8○R
+----> 
+---->       )CLEAR
+== CLEAR WS
+----> 

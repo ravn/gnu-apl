@@ -192,8 +192,8 @@ TabExpansion::expand_command_arg(UCS_string & user,
              return expand_help_topics(user);
 
         default:
-             CIN << std::endl;
-             CERR << cmd << " " << shint << std::endl;
+             CIN << endl;
+             CERR << cmd << " " << shint << endl;
              return ER_AGAIN;
       }
 }
@@ -250,7 +250,7 @@ ExpandResult
 TabExpansion::expand_help_topics()
 {
    CIN << "\n";
-   CERR << "Help topics (APL primitives and user-defined names) are:" << std::endl;
+   CERR << "Help topics (APL primitives and user-defined names) are:" << endl;
 
    // show APL primotives (but only once). For that Help.def must be sorted.
    //
@@ -261,7 +261,7 @@ const int max_col = Workspace::get_PW() - 4;
 #define help_def(_ar, prim, _name, _title, _descr)                          \
    if (strcmp(prim, last))                                                  \
       { CERR << " " << (last = prim);   col += 2;                           \
-        if (col > max_col)   { CERR << std::endl;   col = 0; } \
+        if (col > max_col)   { CERR << endl;   col = 0; } \
       }
 #include "Help.def"
 
@@ -298,7 +298,7 @@ int c1 = col;
             {
               const int len = 1 + names[n].size();
               col += len;
-              if (col > max_col)   { CERR << std::endl;   col = len; }
+              if (col > max_col)   { CERR << endl;   col = len; }
               CERR << " " << names[n];
             }
       }
@@ -311,11 +311,11 @@ int c1 = col;
               if (names[n][0] == uni)   continue;   // same first character
               uni = names[n][0];
               CERR << " " << uni;   col += 2;
-              if (col > max_col)   { CERR << std::endl;   col = 0; }
+              if (col > max_col)   { CERR << endl;   col = 0; }
             }
       }
 
-   CERR << std::endl;
+   CERR << endl;
    return ER_AGAIN;
 }
 //-----------------------------------------------------------------------------
@@ -372,12 +372,12 @@ int qpos = -1;
                  // qxx is already the common part of all matching ⎕xx
                  // display matching ⎕xx
                  //
-                 CIN << std::endl;
+                 CIN << endl;
                  loop(m, matches.size())
                      {
                         CERR << "⎕" << matches[m] << " ";
                      }
-                 CERR << std::endl;
+                 CERR << endl;
                  return ER_AGAIN;
                }
             else
@@ -427,8 +427,8 @@ TabExpansion::expand_filename(UCS_string & user,
                  }
              if (libs_present.size() == 0)   goto nothing;
 
-             CIN << std::endl;
-             CERR << cmd << libs_present << " <workspace-name>" << std::endl;
+             CIN << endl;
+             CERR << cmd << libs_present << " <workspace-name>" << endl;
              return ER_AGAIN;
            }
 
@@ -511,8 +511,8 @@ TabExpansion::expand_filename(UCS_string & user,
 
      if (matches.size() == 0)
         {
-          CIN << std::endl;
-          CERR << "  no matching filesnames" << std::endl;
+          CIN << endl;
+          CERR << "  no matching filesnames" << endl;
           return ER_AGAIN;
         }
 
@@ -535,8 +535,8 @@ TabExpansion::expand_filename(UCS_string & user,
    }
 
 nothing:
-   CIN << std::endl;
-   CERR << cmd << " " << shint << std::endl;
+   CIN << endl;
+   CERR << cmd << " " << shint << endl;
    return ER_AGAIN;
 }
 //-----------------------------------------------------------------------------
@@ -547,24 +547,24 @@ TabExpansion::expand_wsname(UCS_string & user, const UCS_string cmd,
 UTF8_string path = LibPaths::get_lib_dir(lib);
    if (path.size() == 0)
       {
-        CIN << std::endl;
-        CERR << "Invalib library reference " << lib << std::endl;
+        CIN << endl;
+        CERR << "Invalib library reference " << lib << endl;
         return ER_AGAIN;
       }
 
 DIR * dir = opendir(path.c_str());
    if (dir == 0)
       {
-        CIN << std::endl;
+        CIN << endl;
         CERR
 << "  library reference " << lib
-<< " is a valid number, but the corresponding directory " << std::endl
-<< "  " << path << " does not exist" << std::endl
-<< "  or is not readable. " << std::endl
-<< "  The relation between library reference numbers and filenames" << std::endl
-<< "  (aka. paths) can be configured file 'preferences'." << std::endl << std::endl
-<< "  At this point, you can use a path instead of the optional" << std::endl
-<< "  library reference number and the workspace name." << std::endl;
+<< " is a valid number, but the corresponding directory " << endl
+<< "  " << path << " does not exist" << endl
+<< "  or is not readable. " << endl
+<< "  The relation between library reference numbers and filenames" << endl
+<< "  (aka. paths) can be configured file 'preferences'." << endl << endl
+<< "  At this point, you can use a path instead of the optional" << endl
+<< "  library reference number and the workspace name." << endl;
 
         user = cmd;
         user.append(UNI_SPACE);
@@ -596,8 +596,8 @@ UTF8_string arg_utf(filename);
    return ER_REPLACE;
 
 nothing:
-   CIN << std::endl;
-   CERR << cmd << " " << lib << " '" << filename << "'" << std::endl;
+   CIN << endl;
+   CERR << cmd << " " << lib << " '" << filename << "'" << endl;
    return ER_AGAIN;
 }
 //-----------------------------------------------------------------------------
@@ -665,12 +665,12 @@ const int common_len = compute_common_length(prefix_len, matches);
         // prefix is already the common part of all matching files
         // display matching items
         //
-        CIN << std::endl;
+        CIN << endl;
         loop(m, matches.size())
             {
               CERR << matches[m] << " ";
             }
-        CERR << std::endl;
+        CERR << endl;
         return ER_AGAIN;
       }
    else

@@ -51,7 +51,7 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #endif
 
 // if someone (like curses on Solaris) has #defined erase() then
-// #undef it because class std::vector<> would complain about it
+// #undef it because class vector<> would complain about it
 #ifdef erase
 #undef erase
 #endif
@@ -65,6 +65,8 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #include "Assert.hh"
 #include "Logging.hh"
 #include "SystemLimits.hh"
+
+using namespace std;
 
 /// true when a WINCH (window size changed) signal was received
 extern bool got_WINCH;
@@ -104,13 +106,13 @@ extern APL_time_us interrupt_when;
 extern void control_C(int);
 
 /// normal APL output (to stdout)
-extern std::ostream COUT;
+extern ostream COUT;
 
 /// debug output (to stderrear_interrupt_raised
-extern std::ostream CERR;
+extern ostream CERR;
 
 /// debug output (to stderr)
-extern std::ostream UERR;
+extern ostream UERR;
 
 class UCS_string;
 extern UCS_string & MORE_ERROR();   // in Workspace.cc
@@ -348,6 +350,8 @@ inline void * operator new(size_t size)   { return common_new(size); }
 inline void   operator delete(void * p)   { common_delete(p); }
 #endif
 
+using namespace std;
+
 //-----------------------------------------------------------------------------
 
 /// return true iff \b uni is a padding character (used internally).
@@ -367,12 +371,11 @@ inline bool is_iPAD_char(Unicode uni)
 extern std::ostream & get_CERR();
 
 /// print x and its source code location
-#define Q(x) get_CERR() << std::left << std::setw(20) << #x ":" \
-                        << " '" << x << "' at " LOC << std::endl;
+#define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
 
 /// same as Q1 (for printouts guarded by Log macros). Unlike Q() which MUST
 /// NOT REMAIN IN THE CODE, Q1 should remain in the code.
-#define Q1(x) get_CERR() << std::left << std::setw(20) << #x ":" << " '" << x << "' at " LOC << std::endl;
+#define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
 
 //-----------------------------------------------------------------------------
 
@@ -449,17 +452,17 @@ charP(const void * vp)
 }
 //-----------------------------------------------------------------------------
 
-#define uhex  std::hex << std::uppercase   << std::setfill('0')
-#define lhex  std::hex << std::nouppercase << std::setfill('0')
-#define nohex std::dec << std::nouppercase << std::setfill(' ')
+#define uhex  std::hex << uppercase << setfill('0')
+#define lhex  std::hex << nouppercase << setfill('0')
+#define nohex std::dec << nouppercase << setfill(' ')
 
 /// formatting for hex (and similar) values
 #define HEX(x)     "0x" << uhex <<             int64_t(x) << nohex
 #define HEX2(x)    "0x" << uhex << std::right << \
-                           std::setw(2) << int(x) << std::left << nohex
+                           setw(2) << int(x) << std::left << nohex
 #define HEX4(x)    "0x" << uhex << std::right << \
-                           std::setw(4) << int(x) << std::left << nohex
-#define UNI(x)     "U+" << uhex <<      std::setw(4) << int(x) << nohex
+                           setw(4) << int(x) << std::left << nohex
+#define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
 
 /// cast to a const void *
 inline const void * voidP(const void * addr) { return addr; }
@@ -479,5 +482,11 @@ union SockAddr
   sockaddr_un uNix;
 };
 //-----------------------------------------------------------------------------
+
+#if 1   // disable using namespace std;
+# define USING_NAMESPACE_STD
+#else   // enable it
+# define USING_NAMESPACE_STD using namespace std;
+#endif
 
 #endif // __COMMON_HH_DEFINED__

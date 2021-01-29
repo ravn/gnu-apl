@@ -1,0 +1,3 @@
+lib_gnu_apl_la-Malloc_hooks.lo: Malloc_hooks.cc \
+ /usr/include/stdc-predef.h
+/usr/include/stdc-predef.h:

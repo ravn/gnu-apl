@@ -73,7 +73,7 @@ const Function_PC pc = get_executable()->get_ufun()->pc_for_line(new_line);
 
    Log(LOG_StateIndicator__push_pop)
       CERR << "Continue SI[" << level << "] at line " << new_line
-           << " pc=" << pc << " at " << loc << std::endl;
+           << " pc=" << pc << " at " << loc << endl;
 
    if (get_executable()->get_body()[pc].get_tag() == TOK_STOP_LINE)   // S∆
       {
@@ -87,7 +87,7 @@ const Function_PC pc = get_executable()->get_ufun()->pc_for_line(new_line);
         set_PC(pc);
       }
 
-   Log(LOG_prefix_parser)   CERR << "GOTO [" << get_line() << "]" << std::endl;
+   Log(LOG_prefix_parser)   CERR << "GOTO [" << get_line() << "]" << endl;
 
    current_stack.reset(LOC);
 }
@@ -96,7 +96,7 @@ void
 StateIndicator::retry(const char * loc)
 {
    Log(LOG_StateIndicator__push_pop || LOG_prefix_parser)
-      CERR << std::endl << "RETRY " << loc << ")" << std::endl;
+      CERR << endl << "RETRY " << loc << ")" << endl;
 }
 //-----------------------------------------------------------------------------
 bool
@@ -163,11 +163,11 @@ StateIndicator::function_name() const
 } 
 //-----------------------------------------------------------------------------
 void
-StateIndicator::print(std::ostream & out) const
+StateIndicator::print(ostream & out) const
 {
-   out << "Depth:      " << level                << std::endl;
-   out << "Exec:       " << executable           << std::endl;
-   out << "Safe exec:  " << safe_execution_count << std::endl;
+   out << "Depth:      " << level                << endl;
+   out << "Exec:       " << executable           << endl;
+   out << "Safe exec:  " << safe_execution_count << endl;
 
    Assert(executable);
 
@@ -189,26 +189,26 @@ StateIndicator::print(std::ostream & out) const
         default:
              out << "??? Bad pmode " << get_parse_mode();
       }
-   out << std::endl;
+   out << endl;
 
    out << "PC:         " << get_PC() << " (" << executable->get_body().size()
                        << ")";
-   out << " " << executable->get_body()[get_PC()] << std::endl;
+   out << " " << executable->get_body()[get_PC()] << endl;
    out << "Stat:       " << executable->statement_text(get_PC());
-   out << std::endl;
+   out << endl;
 
-   out << "err_code:   " << HEX(error.get_error_code()) << std::endl;
+   out << "err_code:   " << HEX(error.get_error_code()) << endl;
    if (error.get_error_code())
-      out << "thrown at:  " << error.get_throw_loc() << std::endl
-       << "e_msg_1:    '" << error.get_error_line_1() << "'" << std::endl
-       << "e_msg_2:    '" << error.get_error_line_2() << "'" << std::endl
-       << "e_msg_3:    '" << error.get_error_line_3() << "'" << std::endl;
+      out << "thrown at:  " << error.get_throw_loc() << endl
+       << "e_msg_1:    '" << error.get_error_line_1() << "'" << endl
+       << "e_msg_2:    '" << error.get_error_line_2() << "'" << endl
+       << "e_msg_3:    '" << error.get_error_line_3() << "'" << endl;
 
-   out << std::endl;
+   out << endl;
 }
 //-----------------------------------------------------------------------------
 void
-StateIndicator::list(std::ostream & out, SI_mode mode) const
+StateIndicator::list(ostream & out, SI_mode mode) const
 {
    if (mode & SIM_debug)   // command ]SI or ]SIS
       {
@@ -232,7 +232,7 @@ StateIndicator::list(std::ostream & out, SI_mode mode) const
                 {
                   if (error.get_error_code())
                      {
-                       out << error.get_error_line_2() << std::endl
+                       out << error.get_error_line_2() << endl
                            << error.get_error_line_3();
                      }
                   else
@@ -241,7 +241,7 @@ StateIndicator::list(std::ostream & out, SI_mode mode) const
                             executable->get_ufun()->get_name_and_line(get_PC());
                        out << name_and_line
                            << "  " << executable->statement_text(get_PC())
-                           << std::endl
+                           << endl
                            << UCS_string(name_and_line.size(), UNI_SPACE)
                            << "  ^";   // ^^^
                      }
@@ -266,7 +266,7 @@ StateIndicator::list(std::ostream & out, SI_mode mode) const
                   //
                   out << "  "
                       << executable->statement_text(get_PC())
-                      << std::endl << "   ^";   // ^^^
+                      << endl << "   ^";   // ^^^
                 }
              break;
 
@@ -279,7 +279,7 @@ StateIndicator::list(std::ostream & out, SI_mode mode) const
                   // )SIS and we have a statement
                   //
                   if (error.get_error_code())
-                     out << error.get_error_line_2() << std::endl
+                     out << error.get_error_line_2() << endl
                          << error.get_error_line_3();
                   else
                      out << "  "
@@ -288,19 +288,19 @@ StateIndicator::list(std::ostream & out, SI_mode mode) const
              break;
       }
 
-   out << std::endl;
+   out << endl;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-StateIndicator::indent(std::ostream & out) const
+ostream &
+StateIndicator::indent(ostream & out) const
 {
    if (level < 0)
       {
-         CERR << "[negative level " << HEX(level) << "]" << std::endl;
+         CERR << "[negative level " << HEX(level) << "]" << endl;
       }
    else if (level > 100)
       {
-         CERR << "[huge level " << HEX(level) << "]" << std::endl;
+         CERR << "[huge level " << HEX(level) << "]" << endl;
       }
    else
       {
@@ -358,7 +358,7 @@ Token result = current_stack.reduce_statements();
 
    Log(LOG_prefix_parser)
       CERR << "Prefix::reduce_statements(si=" << level << ") returned "
-           << result << " in StateIndicator::run()" << std::endl;
+           << result << " in StateIndicator::run()" << endl;
    return result;
 }
 //-----------------------------------------------------------------------------
@@ -373,7 +373,7 @@ StateIndicator::unmark_all_values() const
 }
 //-----------------------------------------------------------------------------
 int
-StateIndicator::show_owners(std::ostream & out, const Value & value) const
+StateIndicator::show_owners(ostream & out, const Value & value) const
 {
 int count = 0;
 
@@ -389,12 +389,12 @@ char cc[100];
 }
 //-----------------------------------------------------------------------------
 void
-StateIndicator::info(std::ostream & out, const char * loc) const
+StateIndicator::info(ostream & out, const char * loc) const
 {
    out << "SI[" << level << ":" << get_PC() << "] "
        << get_parse_mode_name() << " "
        << executable->get_text(0) << " creator: " << executable->get_loc()
-       << "   seen at: " << loc << std::endl;
+       << "   seen at: " << loc << endl;
 }
 //-----------------------------------------------------------------------------
 Value_P
@@ -498,7 +498,7 @@ StateIndicator::statement_result(Token & result, bool trace)
 {
    Log(LOG_StateIndicator__enter_leave)
       CERR << "StateIndicator::statement_result(pmode="
-           << get_parse_mode_name() << ", result=" << result << std::endl;
+           << get_parse_mode_name() << ", result=" << result << endl;
 
    if (trace)
       {
@@ -581,7 +581,7 @@ const int boxing_format = Command::get_boxing_format();
 
              CERR << "      *** display of value was truncated (limit "
                      "⎕SYL[⎕IO + " << Quad_SYL::SYL_PRINT_LIMIT
-                  << "] reached)  ***" << std::endl;
+                  << "] reached)  ***" << endl;
            }
         else   // no print length limit or small B
            {
@@ -615,7 +615,7 @@ StateIndicator::get_parse_mode_name() const
         case PM_EXECUTE:        return UNI_EXECUTE;
      }
 
-   CERR << "pmode = " << get_parse_mode() << std::endl;
+   CERR << "pmode = " << get_parse_mode() << endl;
    FIXME;
    return Invalid_Unicode;
 }

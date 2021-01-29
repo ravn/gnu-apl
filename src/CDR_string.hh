@@ -116,16 +116,16 @@ public:
       }
 
    /// print properties
-   void debug(std::ostream & out, const char * loc = 0) const
+   void debug(ostream & out, const char * loc = 0) const
       {
         const int error = check();
         out << "CDR record";
         if (loc)   out << " at " << loc;
         if (error)   out << "(error " << error << ")";
-        out << ":" << std::endl;
-        loop(i, size())   std::cerr << " " << std::hex << std::setfill('0')
-                               << std::setw(2) << (at(i) & 0xFF);
-              std::cerr << std::dec << std::setfill(' ') << std::endl;
+        out << ":" << endl;
+        loop(i, size())   cerr << " " << hex << setfill('0')
+                               << setw(2) << (at(i) & 0xFF);
+              cerr << dec << setfill(' ') << endl;
       }
 
 protected:

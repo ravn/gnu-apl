@@ -91,10 +91,10 @@ struct UserPreferences
    static void show_configure_options();
 
    /// print the GPL
-   static void show_GPL(std::ostream & out);
+   static void show_GPL(ostream & out);
 
    /// show version information
-   static void show_version(std::ostream & out);
+   static void show_version(ostream & out);
 
    /// parse command line parameters (before reading preference files)
    bool parse_argv_1();

@@ -238,7 +238,7 @@ int count = 0;
 }
 //-----------------------------------------------------------------------------
 void
-Prefix::print_stack(std::ostream & out, const char * loc) const
+Prefix::print_stack(ostream & out, const char * loc) const
 {
 const int si_depth = si.get_level();
 
@@ -251,11 +251,11 @@ const int si_depth = si.get_level();
         out << " " << Token::class_name(tc);
       }
 
-   out << "  at " << loc << std::endl;
+   out << "  at " << loc << endl;
 }
 //-----------------------------------------------------------------------------
 int
-Prefix::show_owners(const char * prefix, std::ostream & out,
+Prefix::show_owners(const char * prefix, ostream & out,
                           const Value & value) const
 {
 int count = 0;
@@ -267,7 +267,7 @@ int count = 0;
 
         if (Value::is_or_contains(tok.get_apl_val().get(), value))
            {
-             out << prefix << " Fifo [" << s << "]" << std::endl;
+             out << prefix << " Fifo [" << s << "]" << endl;
              ++count;
            }
 
@@ -386,8 +386,8 @@ Prefix::reduce_statements()
 {
    Log(LOG_prefix_parser)
       {
-        CERR << std::endl << "changed to Prefix[si=" << si.get_level()
-             << "]) ============================================" << std::endl;
+        CERR << endl << "changed to Prefix[si=" << si.get_level()
+             << "]) ============================================" << endl;
       }
 
    if (size() > 0)   goto again;
@@ -443,7 +443,7 @@ grow:
           CERR << "    [si=" << si.get_level() << " PC=" << (PC - 1)
                << "] Read token[" << size()
                << "] (←" << get_assign_state() << "←) " << tl.tok << " "
-               << Token::class_name(tl.tok.get_Class()) << std::endl;
+               << Token::class_name(tl.tok.get_Class()) << endl;
         }
 
      lookahead_high = tl.pc;
@@ -469,7 +469,7 @@ grow:
                Log(LOG_prefix_parser)
                   CERR << "TOK_LSYMB2 " << sym->get_name()
                        << "resolved to " << tl.tok
-                       << " at " << LOC  << std::endl;
+                       << " at " << LOC  << endl;
              }
           else
              {
@@ -519,7 +519,7 @@ grow:
                   {
                     const char * what = is_left_sym ? "TOK_LSYMB" : "TOK_SYMBOL";
                     CERR << what << " resolved to " << tl.tok
-                         << " at " << LOC  << std::endl;
+                         << " at " << LOC  << endl;
                   }
              }
           PC = lookahead_high + 1;   // resolve() succeeded: restore PC
@@ -527,7 +527,7 @@ grow:
           Log(LOG_prefix_parser)
              {
                CERR << "   resolved symbol " << sym->get_name()
-                    << " to " << tl.tok.get_Class() << std::endl;
+                    << " to " << tl.tok.get_Class() << endl;
              }
 
           if (tl.tok.get_tag() == TOK_SI_PUSHED)
@@ -650,7 +650,7 @@ found_prefix:
                << ": " << best->phrase_name
                << " matches, but prio " << best->prio
                << " is too small to call " << best->reduce_name
-               << "()" << std::endl;
+               << "()" << endl;
           goto grow;
         }
    }
@@ -660,7 +660,7 @@ found_prefix:
       << ": " << best->phrase_name
       << " matches, prio " << best->prio
       << ", calling reduce_" << best->reduce_name
-      << "()" << std::endl;
+      << "()" << endl;
 
    action = RA_FIXME;
    prefix_len = best->phrase_len;
@@ -690,31 +690,31 @@ const uint64_t inst = instance;
    //
    if (action == RA_CONTINUE)
       {
-        Log(LOG_prefix_parser)   CERR << "RA_CONTINUE" << std::endl;
+        Log(LOG_prefix_parser)   CERR << "RA_CONTINUE" << endl;
         goto again;
       }
 
    if (action == RA_PUSH_NEXT)
       {
-        Log(LOG_prefix_parser)   CERR << "RA_PUSH_NEXT" << std::endl;
+        Log(LOG_prefix_parser)   CERR << "RA_PUSH_NEXT" << endl;
         goto grow;
       }
 
    if (action == RA_SI_PUSHED)
       {
-        Log(LOG_prefix_parser)   CERR << "RA_SI_PUSHED" << std::endl;
+        Log(LOG_prefix_parser)   CERR << "RA_SI_PUSHED" << endl;
         return Token(TOK_SI_PUSHED);
       }
 
    if (action == RA_RETURN)
       {
-        Log(LOG_prefix_parser)   CERR << "RA_RETURN" << std::endl;
+        Log(LOG_prefix_parser)   CERR << "RA_RETURN" << endl;
         return pop().tok;
       }
 
    if (action == RA_FIXME)
       {
-        Log(LOG_prefix_parser)   CERR << "RA_FIXME" << std::endl;
+        Log(LOG_prefix_parser)   CERR << "RA_FIXME" << endl;
         FIXME;
       }
 
@@ -851,12 +851,12 @@ Token * ret = &content[put - prefix_len].tok;
 }
 //-----------------------------------------------------------------------------
 void
-Prefix::print(std::ostream & out, int indent) const
+Prefix::print(ostream & out, int indent) const
 {
    loop(i, indent)   out << "    ";
    out << "Token: ";
    loop(s, size())   out << " " << at(s).tok;
-   out << std::endl;
+   out << endl;
 }
 //=============================================================================
 //
@@ -1096,7 +1096,7 @@ Prefix::reduce_MISC_F_C_B()
    if (at1().get_ValueType() != TV_VAL)   // [i1;i2...] instead of [axis]
       {
         IndexExpr * idx = &at1().get_index_val();
-        Log(LOG_delete)   CERR << "delete " << voidP(idx) << " at " LOC << std::endl;
+        Log(LOG_delete)   CERR << "delete " << voidP(idx) << " at " LOC << endl;
         delete idx;
          at1().clear(LOC);
          SYNTAX_ERROR;
@@ -1372,7 +1372,7 @@ bool direct_assign;
         return;
       }
 
-std::vector<const UCS_string *>members;
+vector<const UCS_string *>members;
 Symbol * top_sym = 0;
    members.push_back(at1().get_sym_ptr()->get_name_ptr());
    while (size_t(PC) < (body.size() - 1))
@@ -1594,14 +1594,14 @@ Value_P Z;
            {
              Z = A->index(*idx);
              Log(LOG_delete)
-                CERR << "delete " << voidP(idx) << " at " LOC << std::endl;
+                CERR << "delete " << voidP(idx) << " at " LOC << endl;
              delete idx;
            }
         catch (Error err)
            {
              Token result = Token(TOK_ERROR, err.get_error_code());
              Log(LOG_delete)   CERR << "delete " << voidP(idx)
-                                    << " at " LOC << std::endl;
+                                    << " at " LOC << endl;
              delete idx;
              pop_args_push_result(result);
              set_action(result);
@@ -1657,7 +1657,7 @@ Value_P B = at3().get_apl_val();
            {
              V->assign_indexed(*idx, B);
              Log(LOG_delete)   CERR << "delete " << voidP(idx)
-                                    << " at " LOC << std::endl;
+                                    << " at " LOC << endl;
              delete idx;
            }
         catch (Error err)
@@ -1666,7 +1666,7 @@ Value_P B = at3().get_apl_val();
              at1().clear(LOC);
              at3().clear(LOC);
              Log(LOG_delete)   CERR << "delete " << voidP(idx)
-                                    << " at " LOC << std::endl;
+                                    << " at " LOC << endl;
              delete idx;
              pop_args_push_result(result);
              set_assign_state(ASS_none);
@@ -1763,7 +1763,7 @@ Prefix::reduce_RBRA___()
    //
 IndexExpr * idx = new IndexExpr(get_assign_state(), LOC);
    Log(LOG_delete)
-      CERR << "new    " << voidP(idx) << " at " LOC << std::endl;
+      CERR << "new    " << voidP(idx) << " at " LOC << endl;
 
    new (&at0()) Token(TOK_PINDEX, *idx);
    set_assign_state(ASS_none);
@@ -1787,7 +1787,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);
         pop_args_push_result(result);
         action = RA_CONTINUE;
         Log(LOG_delete)   CERR << "delete " << voidP(&idx)
-                               << " at " LOC << std::endl;
+                               << " at " LOC << endl;
         delete &idx;
         return;
       }
@@ -1836,7 +1836,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
              Assert1(+X);
              I.move_2(Token(TOK_AXIS, X), LOC);
              Log(LOG_delete)
-                CERR << "delete " << voidP(&idx) << " at " LOC << std::endl;
+                CERR << "delete " << voidP(&idx) << " at " LOC << endl;
              delete &idx;
            }
         else
@@ -2088,7 +2088,7 @@ const Token result = si.jump(line);
       {
         Log(LOG_prefix_parser)
            {
-             CERR << "Leaving context after " << result << std::endl;
+             CERR << "Leaving context after " << result << endl;
            }
 
         pop_args_push_result(result);
@@ -2140,7 +2140,7 @@ const Token result = si.jump(line);
 const Function_PC new_pc = si.get_PC();
    Log(LOG_prefix_parser)
       {
-        CERR << "Staying in context after →PC(" << new_pc << ")" << std::endl;
+        CERR << "Staying in context after →PC(" << new_pc << ")" << endl;
         print_stack(CERR, LOC);
       }
 
@@ -2189,7 +2189,7 @@ const bool trace = at0().get_Class() == TC_END &&
               return;
            }
 
-        COUT << si.function_name() << "[" << si.get_line() << "]" << std::endl;
+        COUT << si.function_name() << "[" << si.get_line() << "]" << endl;
         Token result(TOK_ERROR, E_STOP_LINE);
         pop_args_push_result(result);
         action = RA_RETURN;
@@ -2232,21 +2232,21 @@ Prefix::reduce_RETC___()
       {
         case TOK_RETURN_EXEC:   // immediate execution context
              Log(LOG_prefix_parser)
-                CERR << "- end of ⍎ context (no result)" << std::endl;
+                CERR << "- end of ⍎ context (no result)" << endl;
              at0().clear(LOC);
              action = RA_RETURN;
              return;
 
         case TOK_RETURN_STATS:   // immediate execution context
              Log(LOG_prefix_parser)
-                CERR << "- end of ◊ context" << std::endl;
+                CERR << "- end of ◊ context" << endl;
              at0().clear(LOC);
              action = RA_RETURN;
              return;
 
         case TOK_RETURN_VOID:   // user-defined function not returning a value
              Log(LOG_prefix_parser)
-                CERR << "- end of ∇ context (function has no result)" << std::endl;
+                CERR << "- end of ∇ context (function has no result)" << endl;
 
              {
                const UserFunction * ufun = si.get_executable()->get_ufun();
@@ -2268,14 +2268,14 @@ Prefix::reduce_RETC___()
                   {
                     Log(LOG_prefix_parser)
                        CERR << "- end of ∇ context (MISSING function result)."
-                            << std::endl;
+                            << endl;
                     at0().clear(LOC);
                   }
                else
                   {
                     Log(LOG_prefix_parser)
                        CERR << "- end of ∇ context (function result is: "
-                            << *Z << ")" << std::endl;
+                            << *Z << ")" << endl;
                     new (&at0()) Token(TOK_APL_VALUE1, Z);
                   }
              }

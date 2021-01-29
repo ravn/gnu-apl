@@ -194,6 +194,7 @@ ul.no-bullet {list-style: none}
         <li><a name="toc-How-_005b_003f_005dXML-maps-XML-documents-to-APL-Values" href="#How-_005b_003f_005dXML-maps-XML-documents-to-APL-Values">3.35.3.3 How ⎕XML maps XML documents to APL Values</a></li>
         <li><a name="toc-Monadic-_005b_003f_005dXML" href="#Monadic-_005b_003f_005dXML">3.35.3.4 Monadic ⎕XML</a></li>
         <li><a name="toc-Dyadic-_005b_003f_005dXML" href="#Dyadic-_005b_003f_005dXML">3.35.3.5 Dyadic ⎕XML</a></li>
+        <li><a name="toc-XML-Queries" href="#XML-Queries">3.35.3.6 XML Queries</a></li>
       </ul></li>
     </ul></li>
   </ul></li>
@@ -237,7 +238,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>January 16, 2021
+<p>January 29, 2021
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -4475,33 +4476,42 @@ invalid XML characters.
 </p><ul>
 <li> either markup (-string),
 </li><li> or non-markup (-string).
-
 </li></ul>
 
 <p>A markup (sub-)string:
 </p>
 <ul>
-<li> starts with &lt;,
+<li> starts with &lt;, and
 </li><li> ends with &gt;, and
-</li><li> all other characters are different from &lt; and &gt;.
+</li><li> all other characters in the markup string differ from &lt; and &gt;.
 </li></ul>
 
 <p>A non-markup (sub-)string:
 </p>
 <ul>
-<li> starts either at the beginning of the XML document or directly after a
-      markup string,
-</li><li> end at the end of the document or directly before a markup string, and
+<li> starts either at the beginning of the XML document or else directly
+      after a markup string,
+</li><li> end at the end of the document or else directly before a markup
+      string, and
       therefore
 </li><li> cannot be adjacent to another non-markup string.
 </li></ul>
 
-<p>Non-markup is sometimes referred to as &quot;unstructured text&quot;. The XML standard
-requires that whitespace in non-markup (allowed are only TAB, CR, LF, and SPACE)
-is being preserved in non-markup string. As a consequence, many markup strings
-begin with LF (i.e. if the preceeding markup was on the previous line).
+<p>Non-markup is sometimes referred to as &quot;unstructured text&quot;. The producer of
+an XML document has a principal choice as to where to put the information
+that the document contains is located: in the unstructured text or in the
+atttribute values inside the tags. For that reason the XML standard is somewhat
+picky about keeping the unstructured text as well as attribute values intact
+and requires that whitespace in non-markup (the only allowed whitspace
+characters in XML being TAB, CR, LF, and SPACE) is preserved in non-markup
+strings.
 </p>
-<p>The markup strings fall into into several categories:
+<p>As a consequence, many non-markup strings begin with LF because the
+preceeding markup was on the previous line and therefore the LF after the
+preceeding markup is whitespace of the non-markup and therefore needs to be
+preserved.
+</p>
+<p>Every markup belongs to one of 4 categories:
 </p>
 <ul>
 <li> Processing instructions: &quot;&lt;? ... ?&gt;&quot;,
@@ -4515,7 +4525,7 @@ begin with LF (i.e. if the preceeding markup was on the previous line).
   </li></ul>
 </li></ul>
 
-<p>The tags recursively define a tree structure where:
+<p>The XML tags recursively define a tree structure where:
 </p>
 <ul>
 <li> the nodes of the trees are either Empty Tags or else a start tag,
@@ -4543,85 +4553,90 @@ entities (i.e. &amp;, &lt;, &gt;, &rsquo;, and &quot;) are recognized (and trans
 <p>The principal mapping between XML strings and APL values is:
 </p>
 <ul>
-<li> XML document ←→ structured APL (top-level) Value (an associative array)
-</li><li> XML node  ←→ structured APL (sub-) Value (an associative (sub-) array of
-either the top-level value or of another XML node)
-</li><li> XML name ←→ name of a member in a structured APL value
-</li><li> Other ←→ member value
+<li> <strong>XML document</strong> ←→ structured (top-level) APL value or variable
+  (= an associative array)
+</li><li> <strong>XML node</strong>  ←→ structured APL (sub-) value (= an associative (sub-)
+  array of either the top-level value or of another XML node)
+</li><li> <strong>XML name</strong> ←→ name of a member in a structured APL value
+</li><li> <strong>Other</strong> ←→ member value
 </li></ul>
 
-<p>This mapping is straigtforward and leads to simple syntax for addressing
-of XML nodes in APL. Unfortunately, one can not map XML names directly to
-APL member names, even though a valid XML name is always a valid APL variable
-name. This is because:
+<p>Every valid name in XML is also a valid name for an APL variable or structure
+member. Unfortunately, mapping XML names directly to APL member names cannot
+work because:
 </p>
 <ul>
 <li> In any associative array are the names of the members necessarily distinct.
- In XML node tags may occur repeatedly. If an XML document contains several
- nodes with the same tag, then the applications usually knows how to interpret
- the order in which the tags occur, but this order may not be detectable at
- the XML level (i.e. the nodes may not only have the same tag names, but also
- the same attributes and attribute values).
+ Assigning a value to an already existing member of a structured value overrides
+ the icurrent value of that member instead of creating a second member with
+ that value. On the other hand, in XML nodes tags may (and frequently do)
+ occur repeatedly. If an XML document contains several nodes with the same tag,
+ then the applications usually knows how to interpret the order in which the
+ tags occur, but this order may not be detectable at the XML level (i.e. the
+ nodes may not only have the same tag names, but also the same attributes and
+ attribute values).
 
-<p>The applications that use the XML document may, however, depend on the order.
+<p>The applications that use the XML document frequently require that the order
+ of XML nodes with the same name remains intact when the document is modified.
  For example, the entries of a telephone book may be sorted alphabetically
  without XML being aware of that. Reading, modifying, and writing back the
  data in the telephone book must therefore not destroy that order.
 </p>
 </li><li> Likewise, at least for readability reasons, the order if XML the order
-  of nodes attributes, should not be changed. XML documents are frequently
-  processed with text tools like <strong>diff</strong> which would incorrectly show
-  differences if (only) the attribute order has changed.
+ of nodes attributes, should not be changed. XML documents are frequently
+ processed with text tools like <strong>diff</strong> which would incorrectly show
+ differences between XML documents that are equivalent from an XML perspective.
+
 
 </li><li> Conflicts between tag names and attribute names. In XML, the same name
-  can designate an attribute in one node and a tag in another node.
+  can designate an attribute in one node and a tag in another node. ⎕XML keeps
+  all information from the &lt; of a start tag to the &gt; of an end tag in a single
+  associative array, therefore the attribute names must somehow differ from
+  the (sub-) tag names.
 
-</li><li> Every XML node has a tag name that can be used to construct the
-  corresponding APL member name. The other parts of an XML document (i.e.
-  unstructured text between the XML nodes, XML comments, XML declarations etc.)
-  do not have a and thus need another way of referring to them.
+</li><li> Every XML node has a tag name that can be used to derive a
+  corresponding APL member name. However, the text segments between an XML
+  tag and its corresponding end tag, are a mixture of unstructured text, XML
+  subnodes and comments of which only the XML subnodes have tags of their own.
+  These untagged segments may, however, contain relevant information and,
+  from an XML standard perspective, both their content and their order must
+  be preserved.
 </li></ul>
 
-<p>These issues are handled by a simple naming convention for all member names
-in the (recursive) associative array produced by monadic ⎕XML. Every member
-name consists of 2 or 3 components that together yield a valid APL variable
-name (and therefore a valid member name that is understood by the APL parser:
+<p>⎕XML solves these issues with a simple naming convention for all member names
+in the (recursive) associative array that is produced by monadic ⎕XML. Every
+member name consists of 3 components that together yield a valid APL variable
+name (and therefore a valid member name that is understood by the APL parser):
 </p>
 <ul>
-<li> a position prefix of the form <strong>_NNN</strong>, where NNN is a number
-that indicates the position of the member in relation to the tag to which
-it belongs. The numbering starts at ⎕IO and restarts at every XML start
-or leaf tag.
-
-</li><li> A single character ⍙, ∆, or _, that indicates the nature of the name:
+<li> A single character ⍙, ∆, or _, that indicates the role of the name in
+  the XML document as follows:
   <ul>
-<li> the character ⍙ for attribute names, i.e. for names that occur
-  <strong>inside</strong> (i.e. between &lt; and &gt;) of an XML start tag or leaf tag.
+<li> the character ⍙ characterizes an attribute name, i.e. a names that
+  was used <strong>inside</strong> (i.e. between &lt; and &gt;) of an XML start or leaf tag.
   The character ⍙ alone is the name of a special member which is present
-  in every associative array below the top-level and whose value is the original
-  XML tag name of a tag, or
+  in every associative array below the top-level and whose value is the
+  original XML tag name of a tag, or
 
-</li><li> the character ∆ for names that were synthesized by ⎕XML because the
-  corresponding XML entity was not a tag (and therefore cwhad no tag name).
-  Only the following synthesized names are produced by ⎕XML:
+</li><li> the character ∆ characterizes a name that was synthesized by ⎕XML
+  itself in order to tag a text (sub-) segment that has no tag of its own.
+  corresponding XML entity was not a tag (and therefore had no tag name), or
 
-</li><li> the character _ for XML entities that occur <strong>between</strong> the
-  start tag and the corresponding end tag (if any, leaf tags have no such
-  members, or
+</li><li> the character _ characterizes the name of an XML entity, i.e. an
+    CML name that occur <strong>between</strong> the
+  start tag and the corresponding end tag (if any: leaf tags have no such
+  entities
   </li></ul>
+
+</li><li> a position prefix of the form <strong>NN</strong>, where NN is the position
+ of the member in relation to the tag to which it belongs. The numbering
+ starts at ⎕IO and restarts at every XML start or leaf tag.
 
 </li><li> the attribute name or tag name. For those parts of an XML parts that
-do not have a name, the name is synthesized by ⎕XML and will be:
+  do not have a tag name, the member name is being synthesized by ⎕XML and the
+  member value will be the text in the XML document with predefined XML
+  entities replaced by their single characters, i.e.:
   <ul>
-<li> <strong>∆declaration</strong> for XML declarations such as
-  &lt;?xml version=&rsquo;1.0&rsquo; ... ?&gt;
-  </li><li> <strong>∆doctype</strong> for !DOCTYPE declaration such as &lt;!DOCTYPE ... &gt;
-  </li><li> <strong>∆comment</strong> for XML comments such as &lt;!&mdash; ... &mdash;&gt;
-  </li><li> <strong>∆text</strong> for the unstructured text between other XML entities,
-  </li></ul>
-<p>The value of these synthesized members will be the text in the XML document
-  with predefined XML entities replaced by their single characters, i.e.:
-  </p><ul>
 <li> &amp; for &amp;amp,
   </li><li> &lt; for &amp;lt,
   </li><li> &gt; for &amp;gt,
@@ -4630,6 +4645,18 @@ do not have a name, the name is synthesized by ⎕XML and will be:
   </li><li> ⎕UCS nnn for &amp;#nnn, and
   </li><li> ⎕UCS $xxx for &amp;#xxx
   </li></ul>
+</li></ul>
+
+<p>Let NN be a sequence of decimal digits. Then only the following 4
+synthesized names are produced by ⎕XML:
+</p>
+<ul>
+<li> <strong>∆NNcomment</strong> for XML comments, i.e. &lt;!&mdash; ... &mdash;&gt; in XML,
+</li><li> <strong>∆NNdeclaration</strong> for XML declarations, i.e. &lt;? ... ?&gt; in XML,
+</li><li> <strong>∆NNdoctype</strong> for document type declarations, i.e.i
+    &lt;!DOCTYPE ... &gt; in XML
+</li><li> <strong>∆NNtext</strong> for unstructured (and hence untagged) text segemnts
+  in XML.
 </li></ul>
 
 <p>Every XML name (of a tag or attribute) is also a valid APL name, but
@@ -4644,37 +4671,43 @@ be contained in a single associative array.
 </p>
 <p>Examples of APL member names (assuming ⎕IO←1):
 </p>
-<pre class="verbatim">      _1⍙              ⍝ the first member in every XML node. Its value is the node tag.
-      _1∆declaration   ⍝ the first member in most XML documents. E.g. &lt;?xml version= ...&gt;
-      _2∆text          ⍝ whitespace (LF) between _1∆declaration and _3∆doctype
-      _3∆doctype       ⍝ DTD in XML documents that have one. E.g. &lt;!DOCTYPE  ...
-      _6_Workspace     ⍝ Sub-array for &lt;Workspace ... at position 6.
-      _1⍙wsid          ⍝ first attribute wsid from e.g. &lt;Workspace wsid=...
-      _2⍙year          ⍝ second attribute year
+<pre class="verbatim">      ⍙1              ⍝ the first member in every XML node. Its value is the node tag.
+      ∆1declaration   ⍝ the first member in most XML documents. E.g. &lt;?xml version= ...&gt;
+      ∆2text          ⍝ whitespace (LF) between _1∆declaration and _3∆doctype
+      ∆3doctype       ⍝ DTD in XML documents that have one. E.g. &lt;!DOCTYPE  ...
+      _6Workspace     ⍝ Sub-array for &lt;Workspace ... at position 6.
+      ⍙1wsid          ⍝ first attribute wsid from e.g. &lt;Workspace wsid=...
+      ⍙2year          ⍝ second attribute year
 </pre>
-
 <a name="Monadic-_005b_003f_005dXML"></a>
 <h4 class="subsubsection">3.35.3.4 Monadic ⎕XML</h4>
 
 <p><strong>Z ← ⎕XML B</strong> converts APL string B that contains a valid XML document
 to an associative APL array Z and vice versa.
 </p>
+<p><strong>Note</strong>: If you convert an associative APL array back to a an XML document,
+then the result is a possibly very long strings with containing several linefeed
+characters. That is OK if the string is written to a file, but causes problems
+when the string is being displayed and longer than ⎕PW. The standard APL folding
+of output near ⎕PW make the string then look somewhat garbled. This effenct can
+be suppressed in 2 ways:
+</p>
+<ol>
+<li> set ⎕PW large enough, or
+</li><li> prefix the string with ⊃35⎕CR as in the examples below.
+</li></ol>
+
 <a name="Dyadic-_005b_003f_005dXML"></a>
 <h4 class="subsubsection">3.35.3.5 Dyadic ⎕XML</h4>
 
 <p><strong>Z ← A ⎕XML B</strong> provides a number of convenience functions. Its left
 argument A is an interger function number, possibly followed by arguments
-of the function chosen.
+of the function number ↑A.
 </p>
-<ul>
-<li> <strong>1 ⎕XML B</strong> is like monadic ⎕XML B, except that B is a file name
- from which an XML document is read.
 
-</li><li> <strong>2 ⎕XML B</strong> is a string that shows the member names of the
- associative array B in a tree-like fashion. For example:
-
-<pre class="verbatim">
-      XML←36 ⎕CR &quot;&quot;&quot;
+<p>In the following examples, let
+</p>
+<pre class="verbatim">      XML←36 ⎕CR &quot;&quot;&quot;
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
   &lt;Document&gt;
     &lt;Tag1 name='tag1'&gt;   &lt;!-- first tag --&gt;
@@ -4687,36 +4720,130 @@ of the function chosen.
 &quot;&quot;&quot;
 
 APL←⎕XML XML
+</pre>
+<p>Then
+</p>
+<ul>
+<li> <strong>0 ⎕XML B</strong> is the same as monadic ⎕XML B.
 
-⊃35⎕CR 2 ⎕XML APL   ⍝ ⊃35⎕CR breaks long XML strings into (nested) lines
+</li><li> <strong>1 ⎕XML B</strong> is like 0 ⎕XML B, except that B is not the XML
+document (string) itself but the name of a file from which an XML document
+is read.
+
+</li><li> <strong>2 ⎕XML B</strong> splits an APL member path (a sequence of member names)
+into a vector P of (nested) member names. This vector P is understood by
+the ASPL primitive PICK (i.e. Z←P⊃APL or (P⊃APL←value) and can be used to
+address the data in an XML node.
+
+</li><li> <strong>3 ⎕XML B</strong> splits an APL member name as produced by monadic
+⎕XML into a 3-item vector containing the (numeric) position, a character
+indicating the category (i.e. _, ∆, or ⍙) and the name from the XML tag:
+
+<pre class="verbatim">      8 ⎕CR (P C N)←3 ⎕XML &quot;_2∆comment&quot;
+┌→────────────┐
+│2 ∆ ┌→──────┐│
+│    │comment││
+│    └───────┘│
+└∊────────────┘
+      P
+2
+      C
+∆
+      N
+comment
+</pre>
+</li><li> <strong>4 ⎕XML B</strong> is a string that shows the member names of the
+ associative array B in a tree-like fashion. For example:
+
+<pre class="verbatim">      ⊃35⎕CR 4 ⎕XML APL
+XML                     
+ │                      
+ └─── Document          
+       │                
+       └─── Tag1        
+             │          
+             └─── Subtag
+</pre>
+</li><li> <strong>5 ⎕XML B</strong> is like 4 ⎕XML but displays not only the XML tags but
+also other XML nodes (declarations, attrinutes, etc.):
+
+<pre class="verbatim">      ⊃35⎕CR 5 ⎕XML APL
 XML                               
  │                                
  ├─── _1∆declaration              
  ├─── _2∆text                     
- ├─── _18∆text                    
  └─── _3_Document                 
        │                          
-       ├─── _1⍙                   
        ├─── _1∆text               
        ├─── _2_Tag1               
        │     │                    
-       │     ├─── _1⍙             
-       │     ├─── _2⍙name         
        │     ├─── _1∆text         
        │     ├─── _2∆comment      
        │     ├─── _3∆text         
        │     ├─── _4_Subtag       
        │     │     │              
-       │     │     ├─── _1⍙       
-       │     │     ├─── _2⍙name   
        │     │     ├─── _1∆text   
        │     │     ├─── _2∆comment
        │     │     └─── _3∆text   
        │     └─── _5∆text         
        └─── _3∆text               
+</pre>
+</li><li> <strong>6 ⎕XML B</strong> is like 4 ⎕XML but displays not only the member
+name but the entire path to the member:
 
+<pre class="verbatim">      ⊃35⎕CR 6 ⎕XML APL
+XML                                             
+ │                                              
+ └─── ._3_Document                              
+       │                                        
+       └─── ._3_Document._2_Tag1                
+             │                                  
+             └─── ._3_Document._2_Tag1._4_Subtag
+</pre>
+</li><li> <strong>7 ⎕XML B</strong> returns a list of all members in a depth-first order.
+This list can be used as an iterator to traverse the entire tree (and possibly
+filter out items along the way).
+
+<pre class="verbatim">      ⊃7 ⎕XML APL
+._1∆declaration                          
+._2∆text                                 
+._18∆text                                
+._3_Document                             
+._3_Document._1⍙                         
+._3_Document._1∆text                     
+._3_Document._3∆text                     
+._3_Document._2_Tag1                     
+._3_Document._2_Tag1._1⍙                 
+._3_Document._2_Tag1._2⍙name             
+._3_Document._2_Tag1._1∆text             
+._3_Document._2_Tag1._2∆comment          
+._3_Document._2_Tag1._3∆text             
+._3_Document._2_Tag1._5∆text             
+._3_Document._2_Tag1._4_Subtag           
+._3_Document._2_Tag1._4_Subtag._1⍙       
+._3_Document._2_Tag1._4_Subtag._2⍙name   
+._3_Document._2_Tag1._4_Subtag._1∆text   
+._3_Document._2_Tag1._4_Subtag._2∆comment
+._3_Document._2_Tag1._4_Subtag._3∆text   
 </pre>
 </li></ul>
+
+<a name="XML-Queries"></a>
+<h4 class="subsubsection">3.35.3.6 XML Queries</h4>
+
+<p>The different functions in dyadic ⎕XML are intended to construct XML queries.
+An XML query extracts information from, or modifies information in, an XML
+document. XML queries may differ considerably in their details, but usually
+follow these top-level steps:
+</p>
+<ol>
+<li> Read an XML document into, say, APL (APL←0 ⎕XML B or APL←1 ⎕XML B)
+</li><li> Optionally, display the structure of the document (3, 4, or 5 ⎕XML)
+</li><li> Select a subset of XML nodes (= GNU APL member names, 6 ⎕XML APL)
+</li><li> retrieve or modify the data in the selected XML nodes
+ (with something like MEMBERS←(⊂APL) FUN¨6⎕XML APL←⎕XML followed by MEMBER⊃ )
+</li><li> Optionally, convert the modified XML document back to XML (0 ⎕XML
+</li></ol>
 
 <hr>
 <a name="Chapter-4"></a>

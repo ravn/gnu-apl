@@ -36,9 +36,9 @@ PERFORMANCE_START(cout_perf)
 
    // expand LF to CRLF if desired
    //
-   if (expand_LF && c == '\n')   std::cout << "\r";
+   if (expand_LF && c == '\n')   cout << "\r";
 
-   std::cout << char(c);
+   cout << char(c);
 
    if (!InputFile::is_validating())
       {
@@ -55,7 +55,7 @@ PERFORMANCE_START(cout_perf)
 
    // complete line received
    //
-std::ofstream & rep = IO_Files::get_current_testreport();
+ofstream & rep = IO_Files::get_current_testreport();
    Assert(rep.is_open());
 
 const char * apl = aplout.c_str();
@@ -65,20 +65,20 @@ size_t diff_pos = 0;
    IO_Files::read_file_line(ref, eof);
    if (eof)   // nothing in current_testfile
       {
-        rep << "extra: " << apl << std::endl;
+        rep << "extra: " << apl << endl;
       }
    else if (different(utf8P(apl), utf8P(ref.c_str()), diff_pos))
       {
         IO_Files::diff_error();
-        rep << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << std::endl
-            << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << std::endl
+        rep << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl
+            << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << endl
             << " ∆ : ⋅⋅⋅";
         loop(p, diff_pos)   rep << " ";
-        rep << "^" << std::endl;
+        rep << "^" << endl;
       }
    else                    // same
       {
-        rep << "== " << apl << std::endl;
+        rep << "== " << apl << endl;
       }
 
    aplout.clear();

@@ -123,7 +123,7 @@ public:
    virtual APL_Complex get_complex_value() const   { DOMAIN_ERROR; }
 
    /// Return the APL value of a cell (Asserts for non-pointer cells)
-   virtual Value_P get_pointer_value()  const   { DOMAIN_ERROR; }
+   virtual Value_P get_pointer_value()  const;
 
    /// Return the APL value of a cell (Asserts for non-lval cells)
    virtual Cell * get_lval_value() const   { LEFT_SYNTAX_ERROR; }
@@ -587,6 +587,9 @@ public:
    /// the caller must delete[] the result. Returns 0 on error (= WS FULL).
    static ShapeItem * sorted_indices(const Cell * ravel, ShapeItem length,
                                      Sort_order order, ShapeItem comp_len);
+
+   /// the name of \b ct
+   static const char * get_cell_type_name(CellType ct);
 
 protected:
    /// the primary value of \b this cell

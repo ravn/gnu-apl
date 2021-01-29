@@ -106,7 +106,7 @@ public:
    bool localizes(const Symbol * sym) const;
 
    /// print local vars etc.
-   void print_properties(std::ostream & out, int indent) const;
+   void print_properties(ostream & out, int indent) const;
 
    /// add a local variable
    void add_local_var(Symbol * sym);
@@ -115,7 +115,7 @@ public:
    void pop_local_vars() const;
 
    /// print the local variables for command )SINL
-   void print_local_vars(std::ostream & out) const;
+   void print_local_vars(ostream & out) const;
 
    /// reverse the order of the local vars (if parsed back-to-front)
    void reverse_local_vars();

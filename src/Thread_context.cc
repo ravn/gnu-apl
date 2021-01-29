@@ -48,7 +48,7 @@ Thread_context::Thread_context()
 //-----------------------------------------------------------------------------
 Thread_context::~Thread_context()
 {
-   // CERR << "\n*** DELETING Thread_context #" << N << std::endl;
+   // CERR << "\n*** DELETING Thread_context #" << N << endl;
    if (thread)   pthread_kill(thread, SIGKILL);
    thread = 0;
 }
@@ -64,7 +64,7 @@ Thread_context::init_sequential(bool logit)
 void
 Thread_context::cleanup()
 {
-   // CERR << "Thread_context::cleanup()" << std::endl;
+   // CERR << "Thread_context::cleanup()" << endl;
    thread_contexts_count = CCNT_0;
 
 //  delete [] thread_contexts;
@@ -72,36 +72,36 @@ Thread_context::cleanup()
 }
 //-----------------------------------------------------------------------------
 void
-Thread_context::print_all(std::ostream & out)
+Thread_context::print_all(ostream & out)
 {
    if (thread_contexts_count)
       {
         PRINT_LOCKED(
-           out << "thread_contexts_count: " << thread_contexts_count << std::endl
-               << "busy_worker_count:     " << busy_worker_count     << std::endl
-               << "active_core_count:     " << active_core_count     << std::endl;
+           out << "thread_contexts_count: " << thread_contexts_count << endl
+               << "busy_worker_count:     " << busy_worker_count     << endl
+               << "active_core_count:     " << active_core_count     << endl;
 
            loop(e, thread_contexts_count)   thread_contexts[e].print(out);
-           out << std::endl)
+           out << endl)
       }
 }
 //-----------------------------------------------------------------------------
 void
-Thread_context::print(std::ostream & out) const
+Thread_context::print(ostream & out) const
 {
 const void * vpth = reinterpret_cast<const void *>(thread);
 
-   out << "thread #"     << std::setw(2) << N << ":" << std::setw(16) << vpth
+   out << "thread #"     << setw(2) << N << ":" << setw(16) << vpth
        << (blocked ? " BLKD" : " RUN ")
-       << " job:"        << std::setw(5) << int(job_number)
-       << " " << job_name << std::endl;
+       << " job:"        << setw(5) << int(job_number)
+       << " " << job_name << endl;
 }
 //-----------------------------------------------------------------------------
 void
 Thread_context::PF_no_work(Thread_context & tctx)
 {
    PRINT_LOCKED(CERR << "*** function no_work() called by thread #"
-                     << tctx.get_N() << std::endl)
+                     << tctx.get_N() << endl)
 }
 //-----------------------------------------------------------------------------
 void
@@ -117,7 +117,7 @@ Thread_context::PF_lock_unlock_pool(Thread_context & tctx)
    Log(LOG_Parallel)
       {
         PRINT_LOCKED(CERR << "worker #" << tctx.get_N()
-                          << " will now block itself on its pool_sema" << std::endl)
+                          << " will now block itself on its pool_sema" << endl)
       }
 
    tctx.do_join = false;
@@ -130,7 +130,7 @@ Thread_context::PF_lock_unlock_pool(Thread_context & tctx)
    Log(LOG_Parallel)
       {
         PRINT_LOCKED(CERR << "thread #" << tctx.get_N()
-                          << " was unblocked from pool_sema" << std::endl)
+                          << " was unblocked from pool_sema" << endl)
       }
 }
 
@@ -139,7 +139,7 @@ void Thread_context::set_active_core_count(CoreCount new_count)
 {
    Log(LOG_Parallel)
       get_CERR() << "Thread_context::set_active_core_count("
-                 << new_count << ")" << std::endl;
+                 << new_count << ")" << endl;
 
    active_core_count = new_count;
 }
@@ -181,7 +181,7 @@ Thread_context::bind_to_cpu(CPU_Number core, bool logit)
    Log(LOG_Parallel || logit)
       {
         PRINT_LOCKED(CERR << "Binding thread #" << N
-                          << " to core " << core << std::endl;);
+                          << " to core " << core << endl;);
       }
 
 cpu_set_t cpus;
@@ -204,7 +204,7 @@ const int err = pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpus);
    if (err)
       {
         cerr << "pthread_setaffinity_np() failed with error "
-             << err << std::endl;
+             << err << endl;
       }
 #endif // HAVE_AFFINITY_NP
 }

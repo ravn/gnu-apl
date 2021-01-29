@@ -41,7 +41,7 @@ Quad_CR::fun_compare(const void * key, const void * sf)
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_CR::list_functions(std::ostream & out, bool mapping)
+Quad_CR::list_functions(ostream & out, bool mapping)
 {
    if (mapping)
       {
@@ -56,11 +56,11 @@ Quad_CR::list_functions(std::ostream & out, bool mapping)
                const char * name = sub_functions[f].key;
                out << "      " << NN << " ⎕CR  ←→"
                    << UCS_string(24 - strlen(name), UNI_SPACE)
-                   << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << std::endl;
+                   << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
              }
 
          out << "\n      For a more detailed description of all functions:\n\n"
-                "      ⎕CR ⍬" << std::endl;
+                "      ⎕CR ⍬" << endl;
       }
    else
       {
@@ -502,7 +502,7 @@ Quad_CR::do_CR10_variable(UCS_string_vector & result, const UCS_string & var_nam
            {
              CERR << "could not )DUMP structured variable " << var_name
                   << ": " << error
-                  << "\n)DUMPing it as regular variable instead..." << std::endl;
+                  << "\n)DUMPing it as regular variable instead..." << endl;
              goto not_structured;
            }
 

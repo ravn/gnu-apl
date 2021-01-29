@@ -147,30 +147,18 @@ Cell::compare_ptr(const Cell * const & A, const Cell * const & B,
 Unicode
 Cell::get_char_value() const
 {
-const char * celltype;
-   switch(get_cell_type() & CT_MASK)
-      {
-        case CT_NONE:     celltype = "NONE";      break;
-         case CT_BASE:    celltype = "BASE";      break;
-         case CT_CHAR:    celltype = "CHARACTER"; break;
-         case CT_POINTER: {
-                            celltype = "NESTED";
-                            const Value * subval = get_pointer_value().get();
-                            if (subval && subval->is_char_string())
-                               celltype = "STRING (NESTED)";
-                            else if (subval)
-                               celltype = "(nested) NULL";
-                          }
-                          break;
-         case CT_CELLREF: celltype = "LEFTVAL";   break;
-         case CT_INT:     celltype = "INTEGER";   break;
-         case CT_FLOAT:   celltype = "FLOAT";     break;
-         case CT_COMPLEX: celltype = "COMPLEX";   break;
-         default:         celltype = "??";
-      }
-
-   MORE_ERROR() << "Bad cell type " << celltype
-                << " when expecting a character cell";
+   MORE_ERROR() << "Bad cell type " << int(get_cell_type())
+                << " aka. " << get_cell_type_name(get_cell_type())
+                << " when expecting a CHARACTER cell";
+   DOMAIN_ERROR;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Cell::get_pointer_value() const
+{
+   MORE_ERROR() << "Bad cell type " << int(get_cell_type())
+                << " aka. " << get_cell_type_name(get_cell_type())
+                << " when expecting a nested cell";
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -257,8 +245,8 @@ const Cell * cell_B = cells + B * comp_len;
    return A > B;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator <<(std::ostream & out, const Cell & cell)
+ostream &
+operator <<(ostream & out, const Cell & cell)
 {
 PrintBuffer pb = cell.character_representation(PR_BOXED_GRAPHIC);
 UCS_string ucs(pb, 0, Workspace::get_PW());
@@ -325,5 +313,23 @@ const ravel_comp_len ctx = { ravel, comp_len};
    else
       Heapsort<ShapeItem>::sort(indices, length, &ctx, &Cell::smaller_cp);
    return indices;
+}
+//-----------------------------------------------------------------------------
+const char *
+Cell::get_cell_type_name(CellType ct)
+{
+   switch(ct & CT_MASK)
+      {
+        case CT_NONE:    return "NONE";
+        case CT_BASE:    return "BASE";
+        case CT_CHAR:    return "CHARACTER";
+        case CT_POINTER: return "NESTED";
+        case CT_CELLREF: return "LEFTVAL";
+        case CT_INT:     return "INTEGER";
+        case CT_FLOAT:   return "FLOAT";
+        case CT_COMPLEX: return "COMPLEX";
+      }
+
+   return "UNKNOWN";
 }
 //-----------------------------------------------------------------------------

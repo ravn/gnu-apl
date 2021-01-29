@@ -42,10 +42,10 @@ ProcessorID::init(bool log_startup)
 {
    if (log_startup)
       {
-        CERR << "uprefs.user_do_svars:   " << uprefs.user_do_svars   << std::endl
-             << "uprefs.system_do_svars: " << uprefs.system_do_svars << std::endl
-             << "uprefs.requested_id:    " << uprefs.requested_id    << std::endl
-             << "uprefs.requested_par:   " << uprefs.requested_par   << std::endl;
+        CERR << "uprefs.user_do_svars:   " << uprefs.user_do_svars   << endl
+             << "uprefs.system_do_svars: " << uprefs.system_do_svars << endl
+             << "uprefs.requested_id:    " << uprefs.requested_id    << endl
+             << "uprefs.requested_par:   " << uprefs.requested_par   << endl;
       }
 
    id.proc = AP_num(uprefs.requested_id);
@@ -59,7 +59,7 @@ ProcessorID::init(bool log_startup)
         // trust the provided ID.
         //
         if (id.proc == 0)   id.proc = AP_INTERPRETER;
-        if (log_startup)   CERR << "id.proc: " << id.proc << " at " LOC << std::endl;
+        if (log_startup)   CERR << "id.proc: " << id.proc << " at " LOC << endl;
         return false;
       }
 
@@ -74,7 +74,7 @@ ProcessorID::init(bool log_startup)
               if (!Svar_DB::is_registered_id(AP_num(id.proc)))   break;
             }
 
-        if (log_startup)   CERR << "id.proc: " << id.proc << " at " LOC << std::endl;
+        if (log_startup)   CERR << "id.proc: " << id.proc << " at " LOC << endl;
       }
    else
       {
@@ -83,7 +83,7 @@ ProcessorID::init(bool log_startup)
         if (Svar_DB::is_registered_id(AP_num(id.proc)))
            {
              CERR << "*** Another APL interpreter with --id "
-                  << id.proc <<  " is already running" << std::endl;
+                  << id.proc <<  " is already running" << endl;
 
              return true;
            }
@@ -92,8 +92,8 @@ ProcessorID::init(bool log_startup)
    if (log_startup)
       {
         CERR << "Processor ID was completely initialized: "
-             << id.proc << ":" << id.parent << ":" << id.grand << std::endl
-             << "system_do_svars is: " << uprefs.system_do_svars << std::endl;
+             << id.proc << ":" << id.parent << ":" << id.grand << endl
+             << "system_do_svars is: " << uprefs.system_do_svars << endl;
 
       }
 
@@ -102,7 +102,7 @@ ProcessorID::init(bool log_startup)
 const TCP_socket sock = Svar_DB::get_DB_tcp();
    if (sock != NO_TCP_SOCKET)
       {
-        std::string progname(prog_name());
+        string progname(prog_name());
         REGISTER_PROCESSOR_c request(sock, id.proc, id.parent, id.grand,
                              0, progname);
       }
@@ -156,7 +156,7 @@ const char * loc = 0;
               hostent * host = gethostbyname(s);
               if (host == 0)
                  {
-                   CERR << "gethostbyname(" << s << ") failed" << std::endl;
+                   CERR << "gethostbyname(" << s << ") failed" << endl;
                    loc = LOC;
                    break;
                  }
@@ -258,7 +258,7 @@ const char * filename = getenv("APL2SVPPRF");
       }
    else
       {
-        std::string fname = LibPaths::get_APL_bin_path();
+        string fname = LibPaths::get_APL_bin_path();
         fname += "/apl2svp.prf";
         return read_network_profile(fname.c_str());
       }
@@ -273,7 +273,7 @@ const char * loc = 0;
 
    if (file == 0)
       {
-        CERR << "Cannot open network profile '" << filename << "'" << std::endl;
+        CERR << "Cannot open network profile '" << filename << "'" << endl;
         return 1;
       }
 
@@ -337,7 +337,7 @@ const char * loc = 0;
    if (loc)
       {
         CERR << "Syntax error in network profile '" << filename
-             << "' line " << line << ", detected at " << loc << std::endl;
+             << "' line " << line << ", detected at " << loc << endl;
       }
 
    return line;

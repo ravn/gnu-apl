@@ -1,0 +1,283 @@
++ ./configure --enable-maintainer-mode VALUE_CHECK_WANTED=no VALUE_HISTORY_WANTED=no ASSERT_LEVEL_WANTED=0 PERFORMANCE_COUNTERS_WANTED=yes DYNAMIC_LOG_WANTED=yes CORE_COUNT_WANTED=-3
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking whether gcc understands -c and -o together... yes
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking for style of include used by make... GNU
+checking whether make supports nested variables... yes
+checking dependency style of gcc... gcc3
+checking whether to enable maintainer-specific portions of Makefiles... yes
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+checking how to print strings... printf
+checking for a sed that does not truncate output... /bin/sed
+checking for fgrep... /bin/grep -F
+checking for ld used by gcc... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+checking the name lister (/usr/bin/nm -B) interface... BSD nm
+checking whether ln -s works... yes
+checking the maximum length of command line arguments... 1572864
+checking how to convert x86_64-unknown-linux-gnu file names to x86_64-unknown-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-unknown-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for /usr/bin/ld option to reload object files... -r
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for g++... g++
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking dependency style of g++... gcc3
+checking for ar... ar
+checking for archiver @FILE support... @
+checking for strip... strip
+checking for ranlib... ranlib
+checking command to parse /usr/bin/nm -B output from gcc object... ok
+checking for sysroot... no
+checking for a working dd... /bin/dd
+checking how to truncate binary pipes... /bin/dd bs=4096 count=1
+checking for mt... mt
+checking if mt is a manifest tool... no
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if gcc supports -fno-rtti -fno-exceptions... no
+checking for gcc option to produce PIC... -fPIC -DPIC
+checking if gcc PIC flag -fPIC -DPIC works... yes
+checking if gcc static flag -static works... yes
+checking if gcc supports -c -o file.o... yes
+checking if gcc supports -c -o file.o... (cached) yes
+checking whether the gcc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking for shl_load... no
+checking for shl_load in -ldld... no
+checking for dlopen... no
+checking for dlopen in -ldl... yes
+checking whether a program can dlopen itself... yes
+checking whether a statically linked program can dlopen itself... no
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking how to run the C++ preprocessor... g++ -E
+checking for ld used by g++... /usr/bin/ld -m elf_x86_64
+checking if the linker (/usr/bin/ld -m elf_x86_64) is GNU ld... yes
+checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking for g++ option to produce PIC... -fPIC -DPIC
+checking if g++ PIC flag -fPIC -DPIC works... yes
+checking if g++ static flag -static works... yes
+checking if g++ supports -c -o file.o... yes
+checking if g++ supports -c -o file.o... (cached) yes
+checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... (cached) GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether we are using the GNU C++ compiler... (cached) yes
+checking whether g++ accepts -g... (cached) yes
+checking dependency style of g++... (cached) gcc3
+checking for gcc... (cached) gcc
+checking whether we are using the GNU C compiler... (cached) yes
+checking whether gcc accepts -g... (cached) yes
+checking for gcc option to accept ISO C89... (cached) none needed
+checking whether gcc understands -c and -o together... (cached) yes
+checking ncurses.h usability... yes
+checking ncurses.h presence... yes
+checking for ncurses.h... yes
+checking for term.h... yes
+checking execinfo.h usability... yes
+checking execinfo.h presence... yes
+checking for execinfo.h... yes
+checking fcntl.h usability... yes
+checking fcntl.h presence... yes
+checking for fcntl.h... yes
+checking fftw3.h usability... yes
+checking fftw3.h presence... yes
+checking for fftw3.h... yes
+checking for inttypes.h... (cached) yes
+checking for stdint.h... (cached) yes
+checking for stdlib.h... (cached) yes
+checking for string.h... (cached) yes
+checking for strings.h... (cached) yes
+checking for unistd.h... (cached) yes
+checking sys/un.h usability... yes
+checking sys/un.h presence... yes
+checking for sys/un.h... yes
+checking ext/atomicity.h usability... yes
+checking ext/atomicity.h presence... yes
+checking for ext/atomicity.h... yes
+checking xcb/xcb.h usability... yes
+checking xcb/xcb.h presence... yes
+checking for xcb/xcb.h... yes
+checking X11/Xlib.h usability... yes
+checking X11/Xlib.h presence... yes
+checking for X11/Xlib.h... yes
+checking X11/Xlib-xcb.h usability... yes
+checking X11/Xlib-xcb.h presence... yes
+checking for X11/Xlib-xcb.h... yes
+checking X11/Xutil.h usability... yes
+checking X11/Xutil.h presence... yes
+checking for X11/Xutil.h... yes
+checking utmpx.h usability... yes
+checking utmpx.h presence... yes
+checking for utmpx.h... yes
+checking for xcb/xproto.h... yes
+checking for stdbool.h that conforms to C99... no
+checking for _Bool... no
+checking for inline... inline
+checking for int32_t... yes
+checking for int64_t... yes
+checking for off_t... yes
+checking for size_t... yes
+checking for uint32_t... yes
+checking for uint64_t... yes
+checking for uint8_t... yes
+checking for error_at_line... yes
+checking for stdlib.h... (cached) yes
+checking for unistd.h... (cached) yes
+checking for sys/param.h... yes
+checking for getpagesize... yes
+checking for working mmap... yes
+checking for floor... yes
+checking for memset... yes
+checking for munmap... yes
+checking for pow... yes
+checking for sqrt... yes
+checking for strchr... yes
+checking for strerror... yes
+checking for XGetXCBConnection in -lX11-xcb... yes
+checking for XOpenDisplay in -lX11... yes
+checking for xcb_connect in -lxcb... yes
+checking for tparm in -ltinfo... yes
+checking for socket in -lsocket... no
+checking for sem_init in -lpthread... yes
+checking for yp_all in -lnsl... yes
+checking for setupterm in -lcurses... yes
+checking for setupterm in -lncurses... yes
+checking for acosh in -lm... yes
+checking for gtk_init in -lgtk-3... yes
+checking for gdk_init in -lgdk-3... yes
+checking for fftw_plan_dft in -lfftw3... yes
+checking for backtrace in -lexecinfo... no
+checking for dlopen in -ldl... (cached) yes
+checking for cairo_fill in -lcairo... yes
+checking for initstate_r in -lc... yes
+checking for __atomic_fetch_add_4 in -latomicity... no
+checking for SQLite3 library >= 3.0.0... yes
+checking for pg_config... /usr/bin/pg_config
+checking for PostgreSQL libraries... yes
+checking for PostgreSQL usability... yes
+checking for pcre2_compile_32 in -lpcre2-32... yes
+checking whether support for ⎕GTK (needs GTK version 3) is desired... yes
+checking if pkg-config is executable... yes
+checking if package gtk+-3.0 is installed... yes
+checking whether CPU has rdtsc (read CPU cycle counter) opcode... yes
+checking whether sem_init() works... yes
+checking whether pthread_setaffinity_np is available... yes
+checking whether pthread_setname_np is available... yes
+checking whether OSAtomicAdd32Barrier() is available... no
+checking whether atomic_add_32_nv() is available... no
+
+   *** decisions made by the user ... ***
+
+checking if we are compiling for Android... no
+checking if we want to build an erlang interface (implies libapl.so)... no
+checking if we want to build libapl.so... no
+checking if we want to build libpython_apl.so... no
+checking whether internal performance counters shall be enabled)... yes
+checking whether to remember the history of APL values (debug feature)... no
+checking whether gprof profiling shall be enabled... no
+checking whether gcov coverage testing shall be enabled... no
+checking whether dynamic logging shall be enabled... yes
+checking whether value flags shall be traced... no
+checking how picky internal tests shall be... 0
+checking security level (0=none, 1=configured in preferences, 2=all)... 0
+checking how many CPU cores shall be used by APL (experimental!)... -3
+checking which type of socket APserver shall use... 0
+checking which port number APserver shall use for TCP or UDP sockets... 16366
+checking which unix port name APserver shall use... /tmp/GNU-APL/APserver
+checking how long a short APL value shall be at most... 12
+checking whether visible markers shall be used... no
+checking whether support for rational numbers is desired ... no
+checking whether we compile for an i686 CPU... no
+
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating build/Makefile
+config.status: creating debian/Makefile
+config.status: creating debian/source/Makefile
+config.status: creating doc/Makefile
+config.status: creating erlang/Makefile
+config.status: creating erlang/apl.erl
+config.status: creating gnu-apl.d/Makefile
+config.status: creating gnu-apl.d/preferences
+config.status: creating HOWTOs/Makefile
+config.status: creating rpm/Makefile
+config.status: creating rpm/apl.spec
+config.status: creating src/Makefile
+config.status: creating src/APs/Makefile
+config.status: creating src/Gtk/Makefile
+config.status: creating src/emacs_mode/Makefile
+config.status: creating src/native/Makefile
+config.status: creating src/sql/Makefile
+config.status: creating src/testcases/Makefile
+config.status: creating src/workspaces/Makefile
+config.status: creating support-files/Makefile
+config.status: creating support-files/105-key-International-Keyboard/Makefile
+config.status: creating support-files/Bill_Daly_Ubuntu/Makefile
+config.status: creating support-files/Dirk/Makefile
+config.status: creating support-files/Dyalog-Keyboard/Makefile
+config.status: creating support-files/Juergen-Mint-19/Makefile
+config.status: creating support-files/old-Keyboard/Makefile
+config.status: creating support-files/OS-X-Keyboard/Makefile
+config.status: creating support-files/Unicomp-Keyboard/Makefile
+config.status: creating support-files/WASD-Keyboard/Makefile
+config.status: creating tools/Makefile
+config.status: creating websock/Makefile
+config.status: creating websock/client/Makefile
+config.status: creating websock/server/Makefile
+config.status: creating workspaces/Makefile
+config.status: creating wslib3/Makefile
+config.status: creating wslib4/Makefile
+config.status: creating wslib5/Makefile
+config.status: creating wslib5/APLComponentFiles/Makefile
+config.status: creating wslib5/iso-apl-cf/Makefile
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+
+configure: creating ./src//buildtag.hh
+configure: creating ./src/makefile.h
+configure: creating ./src/configure_args.cc
+ 
+configure: saving configure options in ./configure_options
++ set +o xtrace

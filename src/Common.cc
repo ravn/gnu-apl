@@ -86,26 +86,26 @@ init_1(const char * argv0, bool log_startup)
    Quad_WA::init(log_startup);
 
    if (log_startup)
-      CERR << std::endl
-           << "sizeof(int) is            " << sizeof(int)               << std::endl
-           << "sizeof(long) is           " << sizeof(long)              << std::endl
-           << "sizeof(void *) is         " << sizeof(void *)            << std::endl
-           << std::endl
-           << "sizeof(Cell) is           " << sizeof(Cell)              << std::endl
-           << "sizeof(SI stack item) is  " << sizeof(StateIndicator)    << std::endl
-           << "sizeof(Svar_partner) is   " << sizeof(Svar_partner)      << std::endl
-           << "sizeof(Svar_record) is    " << sizeof(Svar_record)       << std::endl
-           << "sizeof(Symbol) is         " << sizeof(Symbol)            << std::endl
-           << "sizeof(Token) is          " << sizeof(Token)             << std::endl
+      CERR << endl
+           << "sizeof(int) is            " << sizeof(int)               << endl
+           << "sizeof(long) is           " << sizeof(long)              << endl
+           << "sizeof(void *) is         " << sizeof(void *)            << endl
+           << endl
+           << "sizeof(Cell) is           " << sizeof(Cell)              << endl
+           << "sizeof(SI stack item) is  " << sizeof(StateIndicator)    << endl
+           << "sizeof(Svar_partner) is   " << sizeof(Svar_partner)      << endl
+           << "sizeof(Svar_record) is    " << sizeof(Svar_record)       << endl
+           << "sizeof(Symbol) is         " << sizeof(Symbol)            << endl
+           << "sizeof(Token) is          " << sizeof(Token)             << endl
            << "sizeof(Value) is          " << sizeof(Value)
-           << " (including " << SHORT_VALUE_LENGTH_WANTED << " Cells)"  << std::endl
-           << "sizeof(ValueStackItem) is " << sizeof(ValueStackItem)    << std::endl
-           << "sizeof(UCS_string) is     " << sizeof(UCS_string)        << std::endl
-           << "sizeof(UserFunction) is   " << sizeof(UserFunction)      << std::endl
-           << std::endl
+           << " (including " << SHORT_VALUE_LENGTH_WANTED << " Cells)"  << endl
+           << "sizeof(ValueStackItem) is " << sizeof(ValueStackItem)    << endl
+           << "sizeof(UCS_string) is     " << sizeof(UCS_string)        << endl
+           << "sizeof(UserFunction) is   " << sizeof(UserFunction)      << endl
+           << endl
            << "⎕WA total memory is       " << Quad_WA::total_memory
            << " bytes (" << (Quad_WA::total_memory/1000000) << " MB, 0x"
-           << std::hex << Quad_WA::total_memory << ")" << std::dec << std::endl;
+           << hex << Quad_WA::total_memory << ")" << dec << endl;
 
    // CYGWIN does not have RLIMIT_NPROC
    //
@@ -117,7 +117,7 @@ rlimit rl;
    getrlimit(RLIMIT_NPROC, &rl);
    if (log_startup)
       CERR << "increasing rlimit RLIMIT_NPROC from " <<  rl.rlim_cur
-           << " to infinity" << std::endl;
+           << " to infinity" << endl;
    rl.rlim_cur = RLIM_INFINITY;
    setrlimit(RLIMIT_NPROC, &rl);
 
@@ -211,14 +211,14 @@ common_new(size_t size)
 void * ret = malloc(size);
 const uint64_t iret = uint64_t(ret);
    CERR << "NEW " << HEX(iret) << "-" << HEX(iret + size)
-        << "  (" << HEX(size) << ")" << std::endl;
+        << "  (" << HEX(size) << ")" << endl;
    return ret;
 }
 //-----------------------------------------------------------------------------
 void
 common_delete(void * p)
 {
-   CERR << "DEL " << HEX(uint64_t(p)) << std::endl;
+   CERR << "DEL " << HEX(uint64_t(p)) << endl;
    free(p);
 }
 //-----------------------------------------------------------------------------
@@ -267,14 +267,14 @@ APL_time_us ret =  mktime(&t);
    return ret;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-operator << (std::ostream & out, const Function_PC2 & ft)
+ostream &
+operator << (ostream & out, const Function_PC2 & ft)
 {
    return out << ft.low << ":" << ft.high;
 }
 //-----------------------------------------------------------------------------
-std::ostream &
-print_flags(std::ostream & out, ValueFlags flags)
+ostream &
+print_flags(ostream & out, ValueFlags flags)
 {
    return out << ((flags & VF_marked)   ?  "M" : "-")
               << ((flags & VF_complete) ?  "C" : "-");

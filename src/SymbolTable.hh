@@ -111,7 +111,7 @@ public:
            {
               CERR << "name[len=" << name.size() << "] " << name
                    << " has hash " << HEX(hash)
-                   << " in table of size " << SYMBOL_COUNT << std::endl;
+                   << " in table of size " << SYMBOL_COUNT << endl;
            }
 
         return  hash;
@@ -136,25 +136,25 @@ public:
    UCS_string find_lambda_name(const UserFunction * lambda);
 
    /// List all symbols in \b this \b SymbolTable (for )VARS, )FNS etc.)
-   void list(std::ostream & out, ListCategory which, UCS_string from_to) const;
+   void list(ostream & out, ListCategory which, UCS_string from_to) const;
 
    /// clear the marked flag of all symbols
    void unmark_all_values() const;
 
    /// print variables owning value
-   int show_owners(std::ostream & out, const Value & value) const;
+   int show_owners(ostream & out, const Value & value) const;
 
    /// clear this symbol table (remove all user-defined symbols)
-   void clear(std::ostream & out);
+   void clear(ostream & out);
 
    /// clear one slot (hash) in this symbol table
-   void clear_slot(std::ostream & out, int hash);
+   void clear_slot(ostream & out, int hash);
 
    /// erase symbols from \b this SymbolTable
-   void erase_symbols(std::ostream & out, const UCS_string_vector & symbols);
+   void erase_symbols(ostream & out, const UCS_string_vector & symbols);
 
    /// List details of single symbol in buf.
-   std::ostream & list_symbol(std::ostream & out, const UCS_string & buf) const;
+   ostream & list_symbol(ostream & out, const UCS_string & buf) const;
 
    /// write all symbols in )OUT format to file \b out
    void write_all_symbols(FILE * out, uint64_t & seq) const;
@@ -163,7 +163,7 @@ public:
    std::vector<const Symbol *> get_all_symbols() const;
 
    /// dump symbols to out
-   void dump(std::ostream & out, int & fcount, int & vcount) const;
+   void dump(ostream & out, int & fcount, int & vcount) const;
 
 protected:
    /// erase one symbol, return \b true on error, \b false on success
@@ -236,10 +236,10 @@ public:
    {}
 
    /// clear this symbol table (remove all user-defined symbols)
-   void clear(std::ostream & out);
+   void clear(ostream & out);
 
    /// clear one slot (hash) in this symbol table
-   void clear_slot(std::ostream & out, int hash);
+   void clear_slot(ostream & out, int hash);
 
    /// add \b function to the symbol table
    void add_function(const UCS_string & name, Id id, QuadFunction * function)

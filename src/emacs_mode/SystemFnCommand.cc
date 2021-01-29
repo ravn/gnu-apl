@@ -27,13 +27,13 @@
 
 void SystemFnCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
-    std::stringstream out;
+    stringstream out;
 
 #define cmd_def(NAME, CMD, ARG, HINT) out << NAME << "\n";
 #include "../Command.def"
 
     loop(i, Workspace::get_user_commands().size()) {
-        out << Workspace::get_user_commands()[i].prefix << std::endl;
+        out << Workspace::get_user_commands()[i].prefix << endl;
     }
 
     out << END_TAG << "\n";

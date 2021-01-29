@@ -25,9 +25,9 @@
 #include "Value.hh"
 
 size_t N;
-std::vector<int> Quad_RVAL::desired_ranks;
+vector<int> Quad_RVAL::desired_ranks;
 Shape       Quad_RVAL::desired_shape;
-std::vector<int> Quad_RVAL::desired_types;
+vector<int> Quad_RVAL::desired_types;
 int         Quad_RVAL::desired_maxdepth;
 char        Quad_RVAL::state[256];
 size_t      Quad_RVAL::N;
@@ -83,9 +83,9 @@ const ShapeItem ec_B = B.element_count();
 
    // save properties values so that we can restore them
    //
-std::vector<int> old_desired_ranks = desired_ranks;
+vector<int> old_desired_ranks = desired_ranks;
 Shape old_desired_shape = desired_shape;
-std::vector<int> old_desired_types = desired_types;
+vector<int> old_desired_types = desired_types;
 int old_desired_maxdepth = desired_maxdepth;
 bool need_restore = false;
 
@@ -152,7 +152,7 @@ Shape shape;
 
    for (Rank r = MAX_RANK - rank; r < MAX_RANK; ++r)
        {
-         std::vector<int> vsh_r;   vsh_r.push_back(desired_shape.get_shape_item(r));
+         vector<int> vsh_r;   vsh_r.push_back(desired_shape.get_shape_item(r));
          const int sh_r = choose_integer(vsh_r);
          shape.add_shape_item(sh_r);
        }
@@ -304,7 +304,7 @@ Value_P Z(desired_ranks.size(), LOC);
       }
    else if (B.element_count())   // distribution of ranks
       {
-        std::vector<int>new_ranks;
+        vector<int>new_ranks;
         loop(b, B.element_count())
             {
               const int rank_b = B.get_ravel(b).get_int_value();
@@ -394,7 +394,7 @@ Value_P Z(desired_types.size(), LOC);
 
    if (B.element_count())   // distribution of depths
       {
-        std::vector<int>new_types;
+        vector<int>new_types;
         bool B_has_simple = false;
         loop(b, B.element_count())
             {
@@ -449,7 +449,7 @@ Value_P Z = IntScalar(desired_maxdepth, LOC);
 }
 //-----------------------------------------------------------------------------
 int
-Quad_RVAL::choose_integer(const std::vector<int> & dist)
+Quad_RVAL::choose_integer(const vector<int> & dist)
 {
 const int n = dist.size();
    Assert(n > 0);
@@ -502,7 +502,7 @@ union { uint64_t i; double f; } u;
         u.i = rand17() | rand17() << 17 | rand17() << 34;
         u.i &= 0x000FFFFFFFFFFFFFULL;
         u.i |= 0x3FE0000000000000ULL;
-      } while (!std::isnormal(u.f));
+      } while (!isnormal(u.f));
 
    new (cell) FloatCell(u.f);
 }
@@ -515,13 +515,13 @@ union { int64_t i; double f; } u1, u2;
         u1.i = rand17() | rand17() << 17 | rand17() << 34;
         u1.i &= 0x000FFFFFFFFFFFFFULL;
         u1.i |= 0x3FE0000000000000ULL;
-      } while (!std::isnormal(u1.f));
+      } while (!isnormal(u1.f));
 
    do {
         u2.i = rand17() | rand17() << 17 | rand17() << 34;
         u2.i &= 0x000FFFFFFFFFFFFFULL;
         u2.i |= 0x3FE0000000000000ULL;
-      } while (!std::isnormal(u2.f));
+      } while (!isnormal(u2.f));
    new (cell) ComplexCell(u1.f - 1.0, u2.f - 1.0);
 }
 //-----------------------------------------------------------------------------

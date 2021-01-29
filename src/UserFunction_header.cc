@@ -176,7 +176,7 @@ UCS_string header_line;
 
    Log(LOG_UserFunction__set_line)
       {
-        CERR << "[0] " << header_line << std::endl;
+        CERR << "[0] " << header_line << endl;
         // show_backtrace(__FILE__, __LINE__);
       }
 
@@ -284,7 +284,7 @@ const int sc100_tc = sym_count * 100 + tos_idx;
                               && tag != TOK_Quad_PW
                               && tag != TOK_Quad_RL)
            {
-             CERR << "Offending token at " LOC " is: " << tos[tos_idx] << std::endl;
+             CERR << "Offending token at " LOC " is: " << tos[tos_idx] << endl;
              error_info = "Bad token in function header";
              return;
            }
@@ -364,7 +364,7 @@ UserFunction_header::pop_local_vars() const
 }
 //-----------------------------------------------------------------------------
 void
-UserFunction_header::print_local_vars(std::ostream & out) const
+UserFunction_header::print_local_vars(ostream & out) const
 {
    if (sym_Z)     out << " " << *sym_Z;
    if (sym_A)     out << " " << *sym_A;
@@ -464,23 +464,23 @@ UserFunction_header::localizes(const Symbol * sym) const
 }
 //-----------------------------------------------------------------------------
 void
-UserFunction_header::print_properties(std::ostream & out, int indent) const
+UserFunction_header::print_properties(ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_SPACE);
-   if (is_operator())   out << "Operator " << function_name << std::endl;
-   else                 out << "Function " << function_name << std::endl;
+   if (is_operator())   out << "Operator " << function_name << endl;
+   else                 out << "Function " << function_name << endl;
 
-   if (sym_Z)    out << ind << "Result:         " << *sym_Z  << std::endl;
-   if (sym_A)    out << ind << "Left Argument:  " << *sym_A  << std::endl;
-   if (sym_LO)   out << ind << "Left Op Arg:    " << *sym_LO << std::endl;
-   if (sym_RO)   out << ind << "Right Op Arg:   " << *sym_RO << std::endl;
-   if (sym_B)    out << ind << "Right Argument: " << *sym_B  << std::endl;
+   if (sym_Z)    out << ind << "Result:         " << *sym_Z  << endl;
+   if (sym_A)    out << ind << "Left Argument:  " << *sym_A  << endl;
+   if (sym_LO)   out << ind << "Left Op Arg:    " << *sym_LO << endl;
+   if (sym_RO)   out << ind << "Right Op Arg:   " << *sym_RO << endl;
+   if (sym_B)    out << ind << "Right Argument: " << *sym_B  << endl;
 
    if (local_vars.size())
       {
         out << ind << "Local Variables:";
         loop(l, local_vars.size())   out << " " << *local_vars[l];
-        out << std::endl;
+        out << endl;
       }
 
    if (label_values.size())
@@ -492,14 +492,14 @@ UCS_string ind(indent, UNI_SPACE);
              out << " " << *label_values[l].sym
                  << "=" << label_values[l].line;
            }
-        out << std::endl;
+        out << endl;
       }
 }
 //-----------------------------------------------------------------------------
 void
 UserFunction_header::eval_common() const
 {
-   Log(LOG_UserFunction__enter_leave)   CERR << "eval_common()" << std::endl;
+   Log(LOG_UserFunction__enter_leave)   CERR << "eval_common()" << endl;
 
    // push local variables...
    //

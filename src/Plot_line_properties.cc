@@ -21,6 +21,8 @@
 #include "Plot_data.hh"
 #include "Plot_line_properties.hh"
 
+using namespace std;
+
 //=============================================================================
 int
 Plot_line_properties::print(std::ostream & out) const
@@ -29,7 +31,7 @@ char cc[40];
 # define ldef(ty,  na,  _val, _descr)                   \
    snprintf(cc, sizeof(cc), #na "-%d:  ",              \
             int(line_number + Workspace::get_IO()));   \
-   CERR << std::setw(20) << cc << Plot_data::ty ## _to_str(na) << std::endl;
+   CERR << setw(20) << cc << Plot_data::ty ## _to_str(na) << endl;
 # include "Quad_PLOT.def"
 
    return 0;

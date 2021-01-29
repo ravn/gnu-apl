@@ -52,7 +52,7 @@ struct Format_sub
    int map_field(int type);
 
    /// a debug function for printing \b this Format_sub
-   std::ostream & print(std::ostream & out) const;
+   ostream & print(ostream & out) const;
 
    /// return true iff format contains a '4' (i.e. counteract the effect of 
    /// 1, 2, or 3) or none of 1 (float if negative), 2 (float if positive),

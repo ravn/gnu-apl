@@ -159,7 +159,7 @@ static char get_char_and_check( const std::string &command, std::string::const_i
 
 static std::string unescape( const std::string &command )
 {
-    std::stringstream out;
+    stringstream out;
     for( std::string::const_iterator i = command.begin() ; i != command.end() ; i++ ) {
         if( *i == '&' ) {
             char buf[3];
@@ -205,7 +205,7 @@ int NetworkConnection::process_command( const std::string &command )
 
         std::map<std::string, NetworkCommand *>::iterator command_iterator = commands.find( operation );
         if( command_iterator == commands.end() ) {
-            std::stringstream out;
+            stringstream out;
             out << "unknown command: '" << operation << "'";
             throw ProtocolError( out.str() );
         }

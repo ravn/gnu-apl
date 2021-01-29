@@ -700,7 +700,7 @@ const bool invert_Z = b < 0;
         if (af < 0.0)   af = -af;
 
         APL_Float z = pow(af, bf);
-        if (!std::isfinite(z))   return E_DOMAIN_ERROR;
+        if (!isfinite(z))   return E_DOMAIN_ERROR;
 
         if (negate_Z)   z = - z;
         if (invert_Z)
@@ -718,8 +718,8 @@ const bool invert_Z = b < 0;
      APL_Complex cb(APL_Float(b), 0.0);
 
      APL_Complex z = complex_power(ca, cb);
-     if (!std::isfinite(z.real()))   return E_DOMAIN_ERROR;
-     if (!std::isfinite(z.imag()))   return E_DOMAIN_ERROR;
+     if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
+     if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
 
      const APL_Float denom = ComplexCell::mag2(z);
      if (!invert_Z)   return ComplexCell::zv(Z, z);

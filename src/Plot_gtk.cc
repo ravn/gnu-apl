@@ -87,7 +87,7 @@ struct Plot_context
 };
 
 /// all Plot_contexts (= all open windows)
-static std::vector<const Plot_context *> all_plot_contexts;
+static vector<const Plot_context *> all_plot_contexts;
 static int plot_window_count = 0;
 
 //----------------------------------------------------------------------------
@@ -498,7 +498,7 @@ draw_triangle(cairo_t * cr, const Plot_context & pctx, int verbosity,
    if (verbosity & SHOW_DRAW)
       CERR <<   " ∆2: P0(" << P0.x << ":" << P0.y << ") @H0=" << H0
            << "     P1(" << P1.x << ":" << P1.y << ") @H12=" << H12
-           << "     P2(" << P2.x << ":" << P2.y << ") @H12=" << H12 << std::endl;
+           << "     P2(" << P2.x << ":" << P2.y << ") @H12=" << H12 << endl;
 
    // every line is ~1 pixel, so the max y should suffice for steps
    //
@@ -537,7 +537,7 @@ draw_triangle(cairo_t * cr, const Plot_context & pctx, int verbosity,
    if (verbosity & SHOW_DRAW)
       CERR << "\n∆1: P0(" << P0.x << ":" << P0.y << ")@H=" << H0
            << "      P1(" << P1.x << ":" << P1.y << ")@H=" << H1
-           << "      P2(" << P2.x << ":" << P2.y << ")@H=" << H2 << std::endl;
+           << "      P2(" << P2.x << ":" << P2.y << ")@H=" << H2 << endl;
 
    if (H0 < H1)   pv_swap(P0, H0, P1, H1);   // then H0 >= H1
    if (H0 < H2)   pv_swap(P0, H0, P2, H2);   // then H0 >= H2
@@ -549,10 +549,10 @@ draw_triangle(cairo_t * cr, const Plot_context & pctx, int verbosity,
    Assert(H1 >= H2);
 
 const Plot_window_properties & w_props = pctx.w_props;
-const std::vector<level_color> & color_steps = w_props.get_gradient();
+const vector<level_color> & color_steps = w_props.get_gradient();
    if (color_steps.size() == 0)
       {
-        CERR << "*** no color_steps" << std::endl;
+        CERR << "*** no color_steps" << endl;
         return;
       }
 
@@ -627,7 +627,7 @@ const int grid_style = w_props.get_gridX_style();
         Pixel_XY P(px, origin.y);
         draw_arrow(cr, origin, P, grid_color);
 
-        const std::string arrow_label = w_props.get_axisX_label();
+        const string arrow_label = w_props.get_axisX_label();
         if (arrow_label.size())
            {
              draw_text(cr, arrow_label.c_str(), Pixel_XY(P.x + 40, P.y + 5));
@@ -692,7 +692,7 @@ const int grid_style = w_props.get_gridY_style();
         Pixel_XY P(origin.x, Ay);
         draw_arrow(cr, origin, P, grid_color);
 
-        const std::string arrow_label = w_props.get_axisY_label();
+        const string arrow_label = w_props.get_axisY_label();
         if (arrow_label.size())
            {
              double cc_width, cc_height;
@@ -804,7 +804,7 @@ int grid_style = w_props.get_gridZ_style();
         const Pixel_XY P(orig.x - len_Zx, orig.y + len_Zy);
         draw_arrow(cr, origin, P, grid_color);
 
-        const std::string arrow_label = w_props.get_axisZ_label();
+        const string arrow_label = w_props.get_axisZ_label();
         if (arrow_label.size())
            {
              double cc_width, cc_height;
@@ -889,7 +889,7 @@ const int verbosity = w_props.get_verbosity();
             CERR << "B[" << row << ";" << col << "]"
                  << " X=" << data.get_X(row, col)
                  << " Y=" << data.get_Y(row, col)
-                 << " Z=" << data.get_Z(row, col) << std::endl;
+                 << " Z=" << data.get_Z(row, col) << endl;
 
          if (!w_props.get_gradient().size())   continue; // no gradient
 
@@ -978,7 +978,7 @@ const int verbosity = w_props.get_verbosity();
             CERR << "data[" << row << "," << col << "]"
                  << " X=" << data.get_X(row, col)
                  << " Y=" << data.get_Y(row, col)
-                 << " Z=" << data.get_Z(row, col) << std::endl;
+                 << " Z=" << data.get_Z(row, col) << endl;
 
          const double X0 = data.get_X(row, col);
          const double Y0 = data.get_Y(row, col);
@@ -1068,7 +1068,7 @@ plot_destroyed(GtkWidget * top_level);
 gboolean
 plot_destroyed(GtkWidget * top_level)
 {
-   if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << std::endl;
+   if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
   // gtk_main_quit();
   return TRUE;   // event handled by this handler
 }
@@ -1123,7 +1123,7 @@ save_file(const Plot_context & pctx, cairo_surface_t * surface)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 
-std::string fname = w_props.get_output_filename();
+string fname = w_props.get_output_filename();
    if (fname.size() == 0)   return;
 
    if (fname.size() < 4 || strcmp(".png", fname.c_str() + fname.size() - 4))
@@ -1143,13 +1143,13 @@ cairo_status_t stat;
 
    if (stat == CAIRO_STATUS_SUCCESS)
       {
-        CERR << "wrote output file: " << fname << std::endl;
+        CERR << "wrote output file: " << fname << endl;
   //    if (w_props.get_auto_close() == 1)   gtk_main_quit();
       }
 
    else
       {
-        CERR << "*** writing output fil: " << fname << " failed." << std::endl;
+        CERR << "*** writing output fil: " << fname << " failed." << endl;
   //    if (w_props.get_auto_close() == 2)   gtk_main_quit();
       }
 }
@@ -1167,7 +1167,7 @@ const int new_height = gtk_widget_get_allocated_height(drawing_area);
    if (verbosity & SHOW_EVENTS)
       CERR << "draw_callback(drawing_area = " << drawing_area << ")  " 
 
-   << "width: " << new_width << ", height: " << new_height << std::endl;
+   << "width: " << new_width << ", height: " << new_height << endl;
 
    // find the Plot_context for this event...
    //
@@ -1184,7 +1184,7 @@ const Plot_context * pctx = 0;
    if (pctx == 0)
       {
         CERR << "*** Could not find thread handling drawing_area "
-             << reinterpret_cast<void *>(drawing_area) << std::endl;
+             << reinterpret_cast<void *>(drawing_area) << endl;
         return false;
       }
 
@@ -1208,7 +1208,7 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
 
    cairo_surface_destroy(surface);
 
-   if (verbosity & SHOW_EVENTS)   CERR << "draw_callback() done." << std::endl;
+   if (verbosity & SHOW_EVENTS)   CERR << "draw_callback() done." << endl;
    return TRUE;   // event handled by this handler
 }
 //----------------------------------------------------------------------------
@@ -1217,10 +1217,10 @@ gtk_main_wrapper(void * w_props)
 {
    gtk_main();
 
-   if (verbosity & SHOW_EVENTS)   CERR << "gtk_main() thread done" << std::endl;
+   if (verbosity & SHOW_EVENTS)   CERR << "gtk_main() thread done" << endl;
 
    if (verbosity & SHOW_EVENTS)
-      CERR << "wprops " << w_props << " deleted." << std::endl;
+      CERR << "wprops " << w_props << " deleted." << endl;
 
    if (--plot_window_count == 0)   // last window closed
       {
@@ -1238,7 +1238,7 @@ gtk_main_wrapper(void * w_props)
 const Plot_window_properties *
 plot_stop(const Plot_window_properties * props)
 {
-// CERR << "plot_stop(" << vp_props << ")" << std::endl;
+// CERR << "plot_stop(" << vp_props << ")" << endl;
 
    // find the Plot_context for this event...
    //
@@ -1256,14 +1256,14 @@ plot_stop(const Plot_window_properties * props)
        }
 
    CERR << "*** Could not find w_props " << props
-        << " in plot_stop() ***" << std::endl;
+        << " in plot_stop() ***" << endl;
    return 0;
 }
 //----------------------------------------------------------------------------
 void *
 plot_main(void * vp_props)
 {
-// CERR << "plot_main(" << vp_props << ")" << std::endl;
+// CERR << "plot_main(" << vp_props << ")" << endl;
 
    if (getenv("DISPLAY") == 0)   // DISPLAY not set
       setenv("DISPLAY", ":0", true);

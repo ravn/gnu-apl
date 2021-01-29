@@ -27,6 +27,8 @@
 
 #include "Common.hh"
 
+using namespace std;
+
 class UCS_string;
 class Value;
 
@@ -85,7 +87,7 @@ public:
    /// prevent basic_string::erase() with its dangerous default value for
    /// the number of erased character.
    void erase(size_t pos)
-      { std::basic_string<UTF8>::erase(pos, 1); }
+      { basic_string<UTF8>::erase(pos, 1); }
 
    /// return the last byte in this string
    UTF8 back() const
@@ -104,7 +106,7 @@ public:
       { loop(s, suffix.size())   *this += suffix[s]; }
 
    /// display bytes in this UTF string
-   std::ostream & dump_hex(std::ostream & out, int max_bytes) const;
+   ostream & dump_hex(ostream & out, int max_bytes) const;
 
    /// return true iff string ends with ext (usually a file name extennsion)
    bool ends_with(const char * ext) const;
@@ -125,32 +127,32 @@ public:
    static Unicode toUni(const UTF8 * string, int & len, bool verbose);
 
    /// return the next UTF8 encoded char from an input file
-   static Unicode getc(std::istream & in);
+   static Unicode getc(istream & in);
 };
 //=============================================================================
-/// A UTF8 string to be used as std::filebuf in UTF8_ostream
-class UTF8_filebuf : public std::filebuf
+/// A UTF8 string to be used as filebuf in UTF8_ostream
+class UTF8_filebuf : public filebuf
 {
 public:
-   /// return the data in this std::filebuf
+   /// return the data in this filebuf
    const UTF8_string & get_data()
       { return data; }
 
 protected:
-   /// insert \b c into this std::filebuf
+   /// insert \b c into this filebuf
    virtual int overflow(int c);
 
-   /// the data in this std::filebuf
+   /// the data in this filebuf
    UTF8_string data;
 };
 //=============================================================================
-/// a UTF8 string that can be used as std::ostream
-class UTF8_ostream : public std::ostream
+/// a UTF8 string that can be used as ostream
+class UTF8_ostream : public ostream
 {
 public:
-   /// An UTF8_string that can be used like an std::ostream to format data
+   /// An UTF8_string that can be used like an ostream to format data
    UTF8_ostream()
-   : std::ostream(&utf8_filebuf)
+   : ostream(&utf8_filebuf)
    {}
 
    /// return the data in this UTF8_string
@@ -158,7 +160,7 @@ public:
       { return utf8_filebuf.get_data(); }
 
 protected:
-   /// the std::filebuf of this std::ostream
+   /// the filebuf of this ostream
    UTF8_filebuf utf8_filebuf;
 };
 //=============================================================================

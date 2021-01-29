@@ -446,7 +446,7 @@ Quad_TF::tf2(const UCS_string & name)
 const NamedObject * obj = Workspace::lookup_existing_name(name);
    if (obj == 0)
       {
-        Log(LOG_Quad_TF)   CERR << "bad name in tf2(" << name << ")" << std::endl;
+        Log(LOG_Quad_TF)   CERR << "bad name in tf2(" << name << ")" << endl;
         return Token(TOK_APL_VALUE1, Str0(LOC));
       }
 
@@ -475,14 +475,14 @@ const Symbol * symbol = obj->get_symbol();
         /* not a variable: fall through */
       }
 
-   Log(LOG_Quad_TF)   CERR << "error in tf2(" << name << ")" << std::endl;
+   Log(LOG_Quad_TF)   CERR << "error in tf2(" << name << ")" << endl;
    return Token(TOK_APL_VALUE1, Str0(LOC));
 }
 //-----------------------------------------------------------------------------
 Token
 Quad_TF::tf2_var(const UCS_string & var_name, Value_P value)
 {
-   Log(LOG_Quad_TF)   CERR << "tf2_var(" << var_name << ")" << std::endl;
+   Log(LOG_Quad_TF)   CERR << "tf2_var(" << var_name << ")" << endl;
 
 UCS_string ucs_value; /// the right hand side of VAR←VALUE
    if (value->is_scalar() && !value->is_simple_scalar())
@@ -506,7 +506,7 @@ UCS_string ucs(var_name);
    for (ShapeItem v = 1; v < (ucs_value.size() - 1); ++v)
        ucs.append(ucs_value[v]);
 
-   Log(LOG_Quad_TF)   CERR << "success in tf2_var(): " << ucs << std::endl;
+   Log(LOG_Quad_TF)   CERR << "success in tf2_var(): " << ucs << endl;
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -518,7 +518,7 @@ Quad_TF::tf2_inverse(const UCS_string & ravel)
 Token_string tos;
    tos.push_back(Token(TOK_L_PARENT, int64_t(0)));
 
-   Log(LOG_Quad_TF)   CERR << "inverse ⎕TF2: " << ravel << std::endl;
+   Log(LOG_Quad_TF)   CERR << "inverse ⎕TF2: " << ravel << endl;
 
    try
       {
@@ -528,7 +528,7 @@ Token_string tos;
       }
    catch(...)
       {
-        Log(LOG_Quad_TF)   CERR << "parse error in tf2_inverse()" << std::endl;
+        Log(LOG_Quad_TF)   CERR << "parse error in tf2_inverse()" << endl;
         return UCS_string();
       }
 
@@ -554,13 +554,13 @@ Token_string tos;
       {
         CERR << "inverse ⎕TF2: tos[" << tos.size() << "] after reduce() is: ";
         tos.print(CERR, false);
-        CERR << std::endl;
+        CERR << endl;
       }
 
    if (tos.size() < 2)
       {
         Log(LOG_Quad_TF)
-           CERR << "short tos in tf2_inverse()" << tos.size() << std::endl;
+           CERR << "short tos in tf2_inverse()" << tos.size() << endl;
         return UCS_string();   // too short for an inverse 2⎕TF
       }
 
@@ -573,7 +573,7 @@ Token_string tos;
       {
         UCS_string new_var_or_fun = tos[1].get_sym_ptr()->get_name();
         CERR << "*** Unknown system variable ⎕" << new_var_or_fun
-             << " in 2⎕TF / )IN (assignment ignored)" << std::endl;
+             << " in 2⎕TF / )IN (assignment ignored)" << endl;
         return new_var_or_fun;
       }
 
@@ -590,7 +590,7 @@ Token_string tos;
         if (tos[2].get_Class() != TC_VALUE)   return UCS_string();
 
          tos[0].get_sym_ptr()->assign(tos[2].get_apl_val(), true, LOC);
-         Log(LOG_Quad_TF)   CERR << "valid inverse 2 ⎕TF" << std::endl;
+         Log(LOG_Quad_TF)   CERR << "valid inverse 2 ⎕TF" << endl;
          return tos[0].get_sym_ptr()->get_name();   // valid 2⎕TF
       }
 
@@ -611,12 +611,12 @@ Token_string tos;
            {
              Value_P val = tok.get_apl_val();
         Log(LOG_Quad_TF)
-           CERR << "valid inverse 2 ⎕TF (native function):" << std::endl;
+           CERR << "valid inverse 2 ⎕TF (native function):" << endl;
              return UCS_string(*val.get());
            }
 
         Log(LOG_Quad_TF)
-           CERR << "invalid inverse 2 ⎕TF (native function):" << std::endl;
+           CERR << "invalid inverse 2 ⎕TF (native function):" << endl;
         return UCS_string();
       }
 
@@ -626,7 +626,7 @@ Token_string tos;
     */
 
    Log(LOG_Quad_TF)
-      CERR << "inverse 2 ⎕TF (monadic ⎕FX):" << std::endl;
+      CERR << "inverse 2 ⎕TF (monadic ⎕FX):" << endl;
    if (tos.size() != 4)                   return UCS_string();
    if (tos[1].get_tag() != TOK_Quad_FX)   return UCS_string();
    if (tos[2].get_Class() != TC_VALUE)    return UCS_string();
@@ -638,7 +638,7 @@ const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val(),
    if (tok.get_Class() != TC_VALUE)
       {
         Log(LOG_Quad_TF)
-           CERR << "Quad_FX::do_quad_FX() failed in tf2_inverse()" << std::endl;
+           CERR << "Quad_FX::do_quad_FX() failed in tf2_inverse()" << endl;
         return UCS_string();   // error in ⎕FX
       }
 
@@ -676,7 +676,7 @@ Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
         char cc[100];
         snprintf(cc, sizeof(cc), "tf2_value() initial level %u\n", level);
         CERR << "tf2_value(): ucs before at level " << level << ": "
-             << ucs << std::endl << cc;
+             << ucs << endl << cc;
         value.print_boxed(CERR, 0);
       }
 
@@ -707,7 +707,7 @@ const ShapeItem ec = value.nz_element_count();
    Log(LOG_Quad_TF)
       {
         CERR << "tf2_value(): ucs after at level " << level
-             << ": " << ucs << std::endl;
+             << ": " << ucs << endl;
       }
    return;
 }
@@ -860,7 +860,7 @@ ShapeItem skipped = 0;
       {
         Log(LOG_Quad_TF)
            CERR << "tf2_reduce_UCS() has skipped "
-                << skipped << " token" << std::endl;
+                << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
@@ -914,7 +914,7 @@ ShapeItem skipped = 0;
       {
         Log(LOG_Quad_TF)
            CERR << "tf2_reduce_RHO() has skipped "
-                << skipped << " token" << std::endl;
+                << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
@@ -968,7 +968,7 @@ ShapeItem skipped = 0;
       {
         Log(LOG_Quad_TF)
            CERR << "tf2_reduce_sequence() has skipped "
-                << skipped << " token" << std::endl;
+                << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
@@ -1027,7 +1027,7 @@ ShapeItem skipped = 0;
       {
         Log(LOG_Quad_TF)
            CERR << "tf2_reduce_sequence1() has skipped "
-                << skipped << " token" << std::endl;
+                << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
@@ -1074,7 +1074,7 @@ ShapeItem skipped = 0;
       {
         Log(LOG_Quad_TF)
            CERR << "tf2_reduce_ENCLOSE() has skipped "
-                << skipped << " token" << std::endl;
+                << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
@@ -1142,7 +1142,7 @@ ShapeItem skipped = 0;
       {
         Log(LOG_Quad_TF)
            CERR << "tf2_reduce_COMMA() has skipped "
-                << skipped << " token" << std::endl;
+                << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
@@ -1176,7 +1176,7 @@ ShapeItem skipped = 0;
       {
         Log(LOG_Quad_TF)
            CERR << "tf2_reduce_ENCLOSE_ENCLOSE() has skipped "
-                << skipped << " token" << std::endl;
+                << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
@@ -1225,7 +1225,7 @@ ShapeItem skipped = 0;
       {
         Log(LOG_Quad_TF)
            CERR << "tf2_reduce_ENCLOSE1() has skipped "
-                << skipped << " token" << std::endl;
+                << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
@@ -1275,7 +1275,7 @@ ShapeItem skipped = 0;
       {
         Log(LOG_Quad_TF)
            CERR << "tf2_reduce_parentheses() has skipped "
-                << skipped << " token" << std::endl;
+                << skipped << " token" << endl;
         tos.resize(tos.size() - skipped);
       }
 
@@ -1312,7 +1312,7 @@ ShapeItem skipped = 0;
    if (skipped)
       {
         Log(LOG_Quad_TF)
-           CERR << "tf2_glue() has skipped " << skipped << " token" << std::endl;
+           CERR << "tf2_glue() has skipped " << skipped << " token" << endl;
 
         tos.resize(tos.size() - skipped);
       }
@@ -1338,9 +1338,9 @@ const UCS_string text = fun.canonical(false);
    if (fun.is_native())
       {
         CERR << "Warning: the workspace contains a native function '"
-             << fun_name << "', making the" << std::endl
+             << fun_name << "', making the" << endl
              << "   .atf output file incompatible with other APL interpreters."
-             << std::endl;
+             << endl;
 
         ucs.append_UTF8("'");
         ucs.append(fun_name);

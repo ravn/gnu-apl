@@ -67,13 +67,13 @@ public:
 
 class StringResultValue : public ResultValue {
 public:
-    StringResultValue( std::string value_in ) : value( value_in ) {}
+    StringResultValue( string value_in ) : value( value_in ) {}
     virtual ~StringResultValue() {}
     virtual void update( Cell *cell, Value & cell_owner ) const;
    virtual ResultValue * clone() const { return new StringResultValue(value); }
 
 private:
-    std::string value;
+    string value;
 };
 
 class ResultRow
@@ -92,10 +92,10 @@ public:
        }
 
     void add_values(sqlite3_stmt * statement);
-    const std::vector<const ResultValue *> & get_values() const { return values; }
+    const vector<const ResultValue *> & get_values() const { return values; }
 
 private:
-    std::vector<const ResultValue *> values;
+    vector<const ResultValue *> values;
 };
 
 #endif

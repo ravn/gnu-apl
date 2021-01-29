@@ -1,6 +1,6 @@
 ⍝ Quad_XML.tc vim: syntax=apl
 
-⍝ XML errors...
+⍝ XML errors... ==============================================================
 
 ⍝ invalid XML character ------------------------------------------------------
 
@@ -111,11 +111,13 @@ DOMAIN ERROR+
 ⎕XML B: Unescaped '<' in attribute value: '<root name='val<ue' '...
 )SIC
 
-⍝ non-error cases ============================================================
+⍝ ============================================================================
+⍝ ============================= non-error cases ==============================
+⍝ ============================================================================
 
 ⍝ attribute value normalization  ---------------------------------------------
 
-      XML←⎕XML 36 ⎕CR """
+      APL←⎕XML 36 ⎕CR """
   <ROOT>
     <LT name='A &lt; B'/>
     <GT name='A&gt;B'/>
@@ -124,18 +126,55 @@ DOMAIN ERROR+
     <QU2 name='&quot;B&quot;'/>
   </ROOT>
 """
-      XML._2_ROOT._2_LT._2⍙name
-A < B
-      XML._2_ROOT._4_GT._2⍙name
-A>B
-      XML._2_ROOT._6_AMP._2⍙name
-&B
-      XML._2_ROOT._8_QU1._2⍙name
-'B'
-      XML._2_ROOT._10_QU2._2⍙name
-"B"
 
-⍝ unescaped < in attribute value ---------------------------------------------
+      ⊃35 ⎕CR⎕XML APL      ⍝ inverse monadic ⎕XML
+  <ROOT>                       
+    <LT name='A &lt; B'/>      
+    <GT name='A&gt;B'/>        
+    <AMP name='&amp;B'/>       
+    <QU1 name='&apos;B&apos;'/>
+    <QU2 name='&quot;B&quot;'/>
+  </ROOT>                      
+                               
+
+
+⊃7 ⎕XML APL
+.∆1text              
+._2ROOT              
+._2ROOT.⍙1           
+._2ROOT.∆1text       
+._2ROOT._2LT         
+._2ROOT._2LT.⍙1      
+._2ROOT._2LT.⍙2name  
+._2ROOT.∆3text       
+._2ROOT._4GT         
+._2ROOT._4GT.⍙1      
+._2ROOT._4GT.⍙2name  
+._2ROOT.∆5text       
+._2ROOT._6AMP        
+._2ROOT._6AMP.⍙1     
+._2ROOT._6AMP.⍙2name 
+._2ROOT.∆7text       
+._2ROOT._8QU1        
+._2ROOT._8QU1.⍙1     
+._2ROOT._8QU1.⍙2name 
+._2ROOT.∆9text       
+._2ROOT._10QU2       
+._2ROOT._10QU2.⍙1    
+._2ROOT._10QU2.⍙2name
+._2ROOT.∆11text      
+.∆15text             
+
+      APL._2ROOT._2LT.⍙2name
+'A < B'
+      APL._2ROOT._4GT.⍙2name
+'A>B'
+      APL._2ROOT._6AMP.⍙2name
+'&B'
+      APL._2ROOT._8QU1.⍙2name
+''B''
+      APL._2ROOT._10QU2.⍙2name
+'"B"'
 
 ⍝ ============================================================================
 )SI
@@ -145,5 +184,145 @@ OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
+
+⍝ valid XML ... ===============================================================
+
+)SIC
+
+      APL ← ⎕XML XML←36 ⎕CR """
+<?xml version='1.0' encoding='UTF-8'?>
+  <Document>
+    <Tag1 name='tag1'>   <!-- first tag -->
+      TEXT1
+      <Subtag name='subtag_1.1'>   <!-- first subtag -->
+        SUBTEXT1_1
+      </Subtag>
+    </Tag1>
+  </Document>
+"""
+
+      ⊃35 ⎕CR⎕XML APL      ⍝ inverse monadic ⎕XML
+<?xml version='1.0' encoding='UTF-8'?>                  
+  <Document>                                            
+    <Tag1 name='tag1'>   <!-- first tag -->             
+      TEXT1                                             
+      <Subtag name='subtag_1.1'>   <!-- first subtag -->
+        SUBTEXT1_1                                      
+      </Subtag>                                         
+    </Tag1>                                             
+  </Document>                                           
+
+      ⊃35 ⎕CR 4 ⎕XML APL   ⍝ show tree (only XML tag names)
+XML                     
+ │                      
+ └─── Document          
+       │                
+       └─── Tag1        
+             │          
+             └─── Subtag
+
+      ⊃35 ⎕CR 5 ⎕XML APL   ⍝ show tree (all nodes, APL member names)
+XML                              
+ │                               
+ ├─── ∆1declaration              
+ ├─── ∆2text                     
+ ├─── _3Document                 
+ │     │                         
+ │     ├─── ⍙1                   
+ │     ├─── ∆1text               
+ │     ├─── _2Tag1               
+ │     │     │                   
+ │     │     ├─── ⍙1             
+ │     │     ├─── ⍙2name         
+ │     │     ├─── ∆1text         
+ │     │     ├─── ∆2comment      
+ │     │     ├─── ∆3text         
+ │     │     ├─── _4Subtag       
+ │     │     │     │             
+ │     │     │     ├─── ⍙1       
+ │     │     │     ├─── ⍙2name   
+ │     │     │     ├─── ∆1text   
+ │     │     │     ├─── ∆2comment
+ │     │     │     └─── ∆3text   
+ │     │     └─── ∆5text         
+ │     └─── ∆3text               
+ └─── ∆18text                    
+
+      ⊃35 ⎕CR 6 ⎕XML APL   ⍝ show tree (only tags, full APL path)
+XML                                          
+ │                                           
+ └─── ._3Document                            
+       │                                     
+       └─── ._3Document._2Tag1               
+             │                               
+             └─── ._3Document._2Tag1._4Subtag
+
+      ⊃7 ⎕XML APL   ⍝ all member names
+.∆1declaration                       
+.∆2text                              
+._3Document                          
+._3Document.⍙1                       
+._3Document.∆1text                   
+._3Document._2Tag1                   
+._3Document._2Tag1.⍙1                
+._3Document._2Tag1.⍙2name            
+._3Document._2Tag1.∆1text            
+._3Document._2Tag1.∆2comment         
+._3Document._2Tag1.∆3text            
+._3Document._2Tag1._4Subtag          
+._3Document._2Tag1._4Subtag.⍙1       
+._3Document._2Tag1._4Subtag.⍙2name   
+._3Document._2Tag1._4Subtag.∆1text   
+._3Document._2Tag1._4Subtag.∆2comment
+._3Document._2Tag1._4Subtag.∆3text   
+._3Document._2Tag1.∆5text            
+._3Document.∆3text                   
+.∆18text                             
+
+      ⊃8 ⎕XML APL   ⍝ all tag related member names (tag names and attributes)
+._3Document.⍙1                    
+._3Document._2Tag1.⍙1             
+._3Document._2Tag1.⍙2name         
+._3Document._2Tag1._4Subtag.⍙1    
+._3Document._2Tag1._4Subtag.⍙2name
+
+      ⊃9 ⎕XML APL   ⍝ all synthetic member names (except unstructured text)
+.∆1declaration                       
+._3Document._2Tag1.∆2comment         
+._3Document._2Tag1._4Subtag.∆2comment
+
+      ⊃10 ⎕XML APL   ⍝ all synthetic member names with unstructured text
+.∆2text                           
+._3Document.∆1text                
+._3Document._2Tag1.∆1text         
+._3Document._2Tag1.∆3text         
+._3Document._2Tag1._4Subtag.∆1text
+._3Document._2Tag1._4Subtag.∆3text
+._3Document._2Tag1.∆5text         
+._3Document.∆3text                
+.∆18text                          
+
+      ⊃11 ⎕XML APL   ⍝ all tag member names
+._3Document                
+._3Document._2Tag1         
+._3Document._2Tag1._4Subtag
+
+      ⊃12 ⎕XML APL   ⍝ all member names (7 ⎕XML, but non-recursive)
+.∆1declaration
+.∆2text       
+._3Document   
+.∆18text      
+
+     ⊃13 ⎕XML APL   ⍝ all member names (8 ⎕XML, but non-recursive)
+._3Document
+
+      ⊃15 ⎕XML APL
+DOMAIN ERROR+
+      ⊃15 ⎕XML APL
+       ^       ^
+      )MORE
+Bad function number A=15 in A ⎕XML B
+
+      )SIC
 
 

@@ -99,14 +99,14 @@ public:
 
    /// print this object
    ///
-   void print(std::ostream & out) const;
+   void print(ostream & out) const;
 
    /// print new object message
    ///
-   void print_new(std::ostream & out, const char * loc) const;
+   void print_new(ostream & out, const char * loc) const;
 
    /// print the list of objects starting at this object
-   void print_chain(std::ostream & out) const;
+   void print_chain(ostream & out) const;
 
    /// where this value was allocated.
    const char * where_allocated() const

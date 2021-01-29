@@ -64,13 +64,13 @@ public:
    UCS_string function_name() const;
 
    /// list the stack entry (for commands ]SI, )SI, and )SIS)
-   void list(std::ostream & out, SI_mode mode) const;
+   void list(ostream & out, SI_mode mode) const;
 
    /// list the stack entry (for command ]SI)
-   void print(std::ostream & out) const;
+   void print(ostream & out) const;
 
    /// print spaces according to level
-   std::ostream & indent(std::ostream & out) const;
+   ostream & indent(ostream & out) const;
 
    /// return pointer to the current user function, statements, or execute
    const Executable * get_executable() const
@@ -115,10 +115,10 @@ public:
    void unmark_all_values() const;
 
    /// print all owners of \b value
-   int show_owners(std::ostream & out, const Value & value) const;
+   int show_owners(ostream & out, const Value & value) const;
 
    /// print a short debug info
-   void info(std::ostream & out, const char * loc) const;
+   void info(ostream & out, const char * loc) const;
 
    /// return the error related info in this context
    static Error & get_error(StateIndicator * si)

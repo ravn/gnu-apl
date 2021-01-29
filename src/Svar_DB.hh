@@ -31,6 +31,8 @@
 #include "ProcessorID.hh"
 #include "Svar_record.hh"
 
+using namespace std;
+
 #if APSERVER_TRANSPORT == 1
 # define ABSTRACT_OFFSET 1
 #else
@@ -162,7 +164,7 @@ public:
    static void add_event(SV_key key, AP_num3 id, Svar_event event);
 
    /// print the database
-   static void print(std::ostream & out);
+   static void print(ostream & out);
 
    /// return a socket that is connect to APserver
    static TCP_socket connect_to_APserver(const char * bin_path,

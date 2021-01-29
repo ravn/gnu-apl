@@ -1354,16 +1354,16 @@ const APL_Float r_1_B__A = r_1_B - A->get_real_value();
    if (r_1_B__A < 0.0 && is_near_int(r_1_B__A))   return E_DOMAIN_ERROR;
 
 const APL_Float gam_r_1_B = tgamma(r_1_B);
-   if (!std::isfinite(gam_r_1_B))   return E_DOMAIN_ERROR;
+   if (!isfinite(gam_r_1_B))   return E_DOMAIN_ERROR;
 
 const APL_Float gam_r_1_A = tgamma(r_1_A);
-   if (!std::isfinite(gam_r_1_A))   return E_DOMAIN_ERROR;
+   if (!isfinite(gam_r_1_A))   return E_DOMAIN_ERROR;
 
 const APL_Float gam_r_1_B__A = tgamma(r_1_B__A);
-   if (!std::isfinite(gam_r_1_B__A))   return E_DOMAIN_ERROR;
+   if (!isfinite(gam_r_1_B__A))   return E_DOMAIN_ERROR;
 
 const APL_Float z = (gam_r_1_B / gam_r_1_A) / gam_r_1_B__A;
-   if (!std::isfinite(z))   return E_DOMAIN_ERROR;
+   if (!isfinite(z))   return E_DOMAIN_ERROR;
 
    return FloatCell::zv(Z, z);
 }

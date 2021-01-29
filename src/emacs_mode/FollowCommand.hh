@@ -31,7 +31,7 @@ public:
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
 
-typedef std::map<const Symbol *, TraceData *> SymbolTraceMap;
+typedef map<const Symbol *, TraceData *> SymbolTraceMap;
 
 void symbol_assignment( const Symbol &symbol, Symbol_Event ev );
 

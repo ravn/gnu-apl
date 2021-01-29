@@ -149,17 +149,17 @@ typedef int _Atomic_word;
 
 /// atomic \b counter += \b increment, return old value
 inline int atomic_fetch_add(volatile _Atomic_word & counter, int increment)
-   { CERR << "\n*** something is VERY WRONG if this function is called" << std::endl;
+   { CERR << "\n*** something is VERY WRONG if this function is called" << endl;
       counter += increment; return counter - increment; }
 
 /// atomic read \b counter
 inline int atomic_read(volatile _Atomic_word & counter)
-   { CERR << "\n*** something is VERY WRONG if this function is called" << std::endl;
+   { CERR << "\n*** something is VERY WRONG if this function is called" << endl;
      return counter; }
 
 /// atomic \b counter += \b increment
 inline void atomic_add(volatile _Atomic_word & counter, int increment)
-   { CERR << "\n*** something is VERY WRONG if this function is called" << std::endl;
+   { CERR << "\n*** something is VERY WRONG if this function is called" << endl;
      counter += increment; }
 
 #endif
@@ -168,6 +168,8 @@ inline void atomic_add(volatile _Atomic_word & counter, int increment)
 #include <semaphore.h>
 
 #include "Cell.hh"
+
+using namespace std;
 
 //=============================================================================
 /**

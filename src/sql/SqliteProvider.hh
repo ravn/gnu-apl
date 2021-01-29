@@ -23,6 +23,6 @@
 class SqliteProvider : public Provider {
 public:
     virtual ~SqliteProvider() {}
-    virtual const std::string get_name( void ) { return "sqlite"; }
+    virtual const string get_name( void ) { return "sqlite"; }
     virtual Connection *open_database( Value_P B );
 };

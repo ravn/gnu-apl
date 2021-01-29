@@ -31,6 +31,8 @@
 #include "UTF8_string.hh"
 #include "Value.hh"
 
+using namespace std;
+
 // See RFC 3629 for UTF-8
 
 /// Various character attributes.
@@ -60,7 +62,7 @@ Avec::show_error_pos(int i, int line, bool cond, int def_line)
    if (!cond)
       {
         CERR << "Error index (line " << line << ", Avec.def line "
-             << def_line << ") = " << i << " = " << HEX(i) << std::endl;
+             << def_line << ") = " << i << " = " << HEX(i) << endl;
         Assert(0);
       }
 }
@@ -73,7 +75,7 @@ Avec::check_file(const char * filename)
 const int fd = open(filename, O_RDONLY);
    if (fd == -1)   return;
 
-   Log(LOG_startup)   CERR << "Checking " << filename << std::endl;
+   Log(LOG_startup)   CERR << "Checking " << filename << endl;
 
 uint32_t datalen;
    {
@@ -93,7 +95,7 @@ UCS_string ucs(utf);
        {
          if (!is_known_char(ucs[i]))
             CERR << "APL char " << UNI(ucs[i]) << " is missing in AV ("
-                 << i << ")" << std::endl;
+                 << i << ")" << endl;
        }
 
    close(fd);
@@ -111,7 +113,7 @@ Avec::check_av_table()
 {
    if (MAX_AV != 256)
       {
-        CERR << "AV has " << MAX_AV << " entries (should be 256)" << std::endl;
+        CERR << "AV has " << MAX_AV << " entries (should be 256)" << endl;
         return;
       }
 
@@ -142,14 +144,14 @@ Avec::check_av_table()
           if (count == 0)
              {
                ++holes;
-               CERR << "AV position " << HEX(pos) << " unused" << std::endl;
+               CERR << "AV position " << HEX(pos) << " unused" << endl;
              }
 
           if (count > 1)
-             CERR << "duplicate AV position " << HEX(pos) << std::endl;
+             CERR << "duplicate AV position " << HEX(pos) << endl;
         }
 
-     if (holes)   CERR << holes << " unused positions in ⎕AV" << std::endl;
+     if (holes)   CERR << holes << " unused positions in ⎕AV" << endl;
    }
 
    // check that find_char() works
@@ -162,7 +164,7 @@ Avec::check_av_table()
         for (int i = 0x80; i < MAX_AV; ++i)
             {
               CERR << character_table[i].unicode << " is AV[" << i << "] AV_"
-                   << character_table[i].char_name << std::endl;
+                   << character_table[i].char_name << endl;
             }
       }
 
@@ -204,9 +206,9 @@ CHT_Index idx = find_char(uni);
 
    Log(LOG_verbose_error)
       {
-        CERR << std::endl << "Avec::uni_to_token() : Char " << UNI(uni)
+        CERR << endl << "Avec::uni_to_token() : Char " << UNI(uni)
              << " (" << uni << ") not found in ⎕AV! (called from "
-             << loc << ")" << std::endl;
+             << loc << ")" << endl;
 
          Backtrace::show(__FILE__, __LINE__);
       }
@@ -549,10 +551,10 @@ Unicode_to_IBM_codepoint * map = inverse_ibm_av;
            {
              const int pos = col + 4*row;
              CERR << " { " << HEX4(inverse_ibm_av[pos].uni) << ", "
-                  << std::setw(3) << inverse_ibm_av[pos].cp << " }";
+                  << setw(3) << inverse_ibm_av[pos].cp << " }";
              if (pos < 255)   CERR << ",";
            }
-        CERR << std::endl;
+        CERR << endl;
       }
 }
 //-----------------------------------------------------------------------------

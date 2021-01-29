@@ -140,15 +140,15 @@ public:
       { return the_workspace.more_error_info; }
 
    /// erase the symbols in \b symbols from the symbol table
-   static void erase_symbols(std::ostream & out, const UCS_string_vector & symbols)
+   static void erase_symbols(ostream & out, const UCS_string_vector & symbols)
       { the_workspace.symbol_table.erase_symbols(CERR, symbols); }
 
    /// list all symbols (of category \b which) with names in \b from_to
-   static void list(std::ostream & out, ListCategory which, UCS_string from_to)
+   static void list(ostream & out, ListCategory which, UCS_string from_to)
       { the_workspace.symbol_table.list(out, which, from_to); }
 
    /// list all symbols with names in \b buf
-   static std::ostream & list_symbol(std::ostream & out, const UCS_string & buf)
+   static ostream & list_symbol(ostream & out, const UCS_string & buf)
       { return the_workspace.symbol_table.list_symbol(out, buf); }
 
    /// add \b ufun to list of that were ⎕EX'ed while on the SI stack
@@ -172,7 +172,7 @@ public:
       { the_workspace.WS_name = new_name; }
 
    /// Return all user-defined commands
-   static std::vector<Command::user_command> & get_user_commands()
+   static vector<Command::user_command> & get_user_commands()
       {  return the_workspace.user_commands; }
 
    /// Create a new SI-entry on the SI stack.
@@ -193,13 +193,13 @@ public:
    static Token immediate_execution(bool exit_on_error);
 
    /// clear the workspace
-   static void clear_WS(std::ostream & out, bool silent);
+   static void clear_WS(ostream & out, bool silent);
 
    /// clear the SI
-   static void clear_SI(std::ostream & out);
+   static void clear_SI(ostream & out);
 
    /// print the SI on \b out
-   static void list_SI(std::ostream & out, SI_mode mode);
+   static void list_SI(ostream & out, SI_mode mode);
 
    /// the topmost SI with parse mode PM_FUNCTION
    static StateIndicator * SI_top_fun();
@@ -219,33 +219,33 @@ public:
       { return the_workspace.symbol_table.find_lambda_name(lambda); }
 
    /// save this workspace
-   static void save_WS(std::ostream & out, LibRef lib, const UCS_string & wsname,
+   static void save_WS(ostream & out, LibRef lib, const UCS_string & wsname,
                        bool name_from_WSID);
 
    /// backup an existing file \b filename, return true on error
    static bool backup_existing_file(const char * filename);
 
    /// dump this workspace
-   static void dump_WS(std::ostream & out, LibRef lib, const UCS_string & wsname,
+   static void dump_WS(ostream & out, LibRef lib, const UCS_string & wsname,
                        bool html, bool silent);
 
    /// dump the commands in this workspace
-   static void dump_commands(std::ostream & out);
+   static void dump_commands(ostream & out);
 
    /// set or inquire the workspace ID
-   static void wsid(std::ostream & out, UCS_string arg, LibRef lib, bool silent);
+   static void wsid(ostream & out, UCS_string arg, LibRef lib, bool silent);
 
    /// load )DUMPed file from open file descriptor fd (closes fd)
-   static void load_DUMP(std::ostream & out, const UTF8_string & filename, int fd,
+   static void load_DUMP(ostream & out, const UTF8_string & filename, int fd,
                          LX_mode with_LX, bool silent,
                          UCS_string_vector * object_filter);
 
    /// load \b lib_ws into the_workspace, maybe set ⎕LX of the new WS.
-   static void load_WS(std::ostream & out, LibRef lib, const UCS_string & wsname,
+   static void load_WS(ostream & out, LibRef lib, const UCS_string & wsname,
                        UCS_string & quad_lx, bool silent);
 
    /// copy objects from another workspace
-   static void copy_WS(std::ostream & out, LibRef lib, const UCS_string & wsname,
+   static void copy_WS(ostream & out, LibRef lib, const UCS_string & wsname,
                        UCS_string_vector & objects, bool protection);
 
    /// return a token for system function or variable \b ucs
@@ -265,10 +265,10 @@ public:
    static void unmark_all_values();
 
    /// print all owners of \b value
-   static int show_owners(std::ostream & out, const Value & value);
+   static int show_owners(ostream & out, const Value & value);
 
    /// maybe remove functions for which ⎕EX has failed
-   static int cleanup_expunged(std::ostream & out, bool & erased);
+   static int cleanup_expunged(ostream & out, bool & erased);
 
    // access to system variables.
    //

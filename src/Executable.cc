@@ -34,7 +34,7 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
      pmode(pm),
      refcount(0)
 {
-// { cerr << "Executable " << (void *)this << " created at " << loc << std::endl; }
+// { cerr << "Executable " << (void *)this << " created at " << loc << endl; }
 
    // initialize text, stripping carriage returns and line feeds.
    //
@@ -106,7 +106,7 @@ Executable::~Executable()
    Log(LOG_UserFunction__fix)
       {
         CERR << "deleting Executable " << voidP(this)
-             << " (body size=" << body.size() << ")" << std::endl;
+             << " (body size=" << body.size() << ")" << endl;
       }
 
    clear_body();
@@ -138,7 +138,7 @@ Executable::parse_body_line(Function_Line line, const UCS_string & ucs_line,
                             bool macro)
 {
    Log(LOG_UserFunction__set_line)
-      CERR << "[" << line << "]" << ucs_line << std::endl;
+      CERR << "[" << line << "]" << ucs_line << endl;
 
 Token_string in;
 const Parser parser(get_parse_mode(), loc, macro);
@@ -215,12 +215,12 @@ Token_string out;
                  {
                    if (tolerant)   return E_SYNTAX_ERROR;
 
-                   CERR << "Line " << line << std::endl
+                   CERR << "Line " << line << endl
                         << "Offending token: (tag > TC_MAX_PERM) "
-                        << tok.get_tag() << " " << tok << std::endl
+                        << tok.get_tag() << " " << tok << endl
                         << "Statement: ";
                    loop(t, input.size())   CERR << "`" << input[t] << "  ";
-                   CERR << std::endl;
+                   CERR << endl;
                    SYNTAX_ERROR;
                  }
               out.push_back(tok);
@@ -268,18 +268,18 @@ StateIndicator & si = *Workspace::SI_top();
 }
 //-----------------------------------------------------------------------------
 void
-Executable::print_token(std::ostream & out) const
+Executable::print_token(ostream & out) const
 {
-   out << std::endl
-       <<  "Function body [" << body.size() << " token]:" << std::endl;
+   out << endl
+       <<  "Function body [" << body.size() << " token]:" << endl;
 
    body.print(out, false);
 }
 //-----------------------------------------------------------------------------
 void
-Executable::print_text(std::ostream & out) const
+Executable::print_text(ostream & out) const
 {
-   loop(l, text.size())   out << text[l] << std::endl;
+   loop(l, text.size())   out << text[l] << endl;
 }
 //-----------------------------------------------------------------------------
 UCS_string
@@ -489,7 +489,7 @@ Executable::unmark_all_values() const
 }
 //-----------------------------------------------------------------------------
 int
-Executable::show_owners(const char * prefix, std::ostream & out, const Value & value) const
+Executable::show_owners(const char * prefix, ostream & out, const Value & value) const
 {
 int count = 0;
 
@@ -500,7 +500,7 @@ int count = 0;
 
         if (Value::is_or_contains(tok.get_apl_val().get(), value))
            {
-             out << prefix << get_name() << "[" << b << "]" << std::endl;
+             out << prefix << get_name() << "[" << b << "]" << endl;
              ++count;
            }
       }
@@ -834,7 +834,7 @@ Executable::increment_refcount(const char * loc)
    ++refcount;
 
 // CERR << "*** increment_refcount() of " << get_name()
-//      << " to " << refcount << " at " << loc << std::endl;A
+//      << " to " << refcount << " at " << loc << endl;A
 }
 //-----------------------------------------------------------------------------
 void
@@ -847,7 +847,7 @@ UserFunction * ufun = get_ufun();
    if (refcount <= 0)
       {
         CERR << "*** Warning: refcount of " << get_name() << " is " << refcount
-             << ":" << std::endl;
+             << ":" << endl;
         print_text(CERR);
         FIXME;
       }
@@ -855,12 +855,12 @@ UserFunction * ufun = get_ufun();
    --refcount;
 
 // CERR << "*** decrement_refcount() of " << get_name()
-//      << " to " << refcount << " at " << loc << std::endl;
+//      << " to " << refcount << " at " << loc << endl;
 
 
    if (refcount <= 0)
       {
-//      CERR << "*** lambda died" << std::endl;
+//      CERR << "*** lambda died" << endl;
 //      clear_body();
         delete ufun;
       }
@@ -876,9 +876,9 @@ ExecuteList * fun = new ExecuteList(data, loc);
 
    Log(LOG_UserFunction__fix)
       {
-        CERR << "fix pmode=execute list:" << std::endl << data
-             << " addr " << voidP(fun) << std::endl
-             << "------------------- ExecuteList::fix() --" << std::endl;
+        CERR << "fix pmode=execute list:" << endl << data
+             << " addr " << voidP(fun) << endl
+             << "------------------- ExecuteList::fix() --" << endl;
       }
 
    {
@@ -888,7 +888,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
           Log(LOG_UserFunction__fix)
              {
                 CERR << "fix pmode=execute list failed with error "
-                     << Error::error_name(err->get_error_code()) << std::endl;
+                     << Error::error_name(err->get_error_code()) << endl;
              }
 
           err->set_parser_loc(0);
@@ -913,7 +913,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
 
    Log(LOG_UserFunction__fix)
       {
-        CERR << "fun->body.size() is " << fun->body.size() << std::endl;
+        CERR << "fun->body.size() is " << fun->body.size() << endl;
       }
 
    // for ⍎ we do not append TOK_END, but only TOK_RETURN_EXEC.
@@ -930,9 +930,9 @@ StatementList * fun = new StatementList(data, loc);
 
    Log(LOG_UserFunction__fix)
       {
-        CERR << "fix pmode=statement list:" << std::endl << data << std::endl
-             << " addr " << voidP(fun) << std::endl
-             << "------------------- StatementList::fix() --" << std::endl;
+        CERR << "fix pmode=statement list:" << endl << data << endl
+             << " addr " << voidP(fun) << endl
+             << "------------------- StatementList::fix() --" << endl;
       }
 
    if (Error * err = Workspace::get_error())   err->set_parser_loc(0);
@@ -945,14 +945,14 @@ StatementList * fun = new StatementList(data, loc);
    catch (Error & e)
       {
         Log(LOG_UserFunction__fix)
-           CERR << "parse_body_line(line 0) failed" << std::endl;
+           CERR << "parse_body_line(line 0) failed" << endl;
         delete fun;
         throw e;
       }
 
    Log(LOG_UserFunction__fix)
       {
-        CERR << "fun->body.size() is " << fun->body.size() << std::endl;
+        CERR << "fun->body.size() is " << fun->body.size() << endl;
       }
 
    fun->body.push_back(Token(TOK_RETURN_STATS));

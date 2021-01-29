@@ -76,7 +76,7 @@ close_fun(Cause cause, const NativeFunction * caller)
 }
 //-----------------------------------------------------------------------------
 static Token
-list_functions(std::ostream & out)
+list_functions(ostream & out)
 {
    out << 
 "   Functions provided by this library.\n"

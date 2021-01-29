@@ -43,28 +43,28 @@ int Output::color_CERR_background = 8;
 int Output::color_UERR_foreground = 5;
 int Output::color_UERR_background = 8;
 
-/// a std::filebuf for CERR
+/// a filebuf for CERR
 ErrOut CERR_filebuf;
 
 DiffOut DOUT_filebuf(false);
 DiffOut UERR_filebuf(true);
 
-// Android is supposed to define its own CIN, COUT, CERR, and UERR std::ostreams
+// Android is supposed to define its own CIN, COUT, CERR, and UERR ostreams
 #ifndef WANT_ANDROID
 
 CinOut CIN_filebuf;
 CIN_ostream CIN;
 
-std::ostream COUT(&DOUT_filebuf);
-std::ostream CERR(CERR_filebuf.use());
-std::ostream UERR(&UERR_filebuf);
+ostream COUT(&DOUT_filebuf);
+ostream CERR(CERR_filebuf.use());
+ostream UERR(&UERR_filebuf);
 
 #endif
 
-extern std::ostream & get_CERR();
-std::ostream & get_CERR()
+extern ostream & get_CERR();
+ostream & get_CERR()
 {
-   return ErrOut::used ? CERR : std::cerr;
+   return ErrOut::used ? CERR : cerr;
 };
 
 Output::ColorMode Output::color_mode = COLM_UNDEF;
@@ -122,7 +122,7 @@ PERFORMANCE_START(cerr_perf)
    if (!InputFile::echo_current_file())   return 0;
 
    Output::set_color_mode(Output::COLM_INPUT);
-   std::cerr << char(c);
+   cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
@@ -134,7 +134,7 @@ ErrOut::overflow(int c)
 PERFORMANCE_START(cerr_perf)
 
    Output::set_color_mode(Output::COLM_ERROR);
-   std::cerr << char(c);
+   cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
@@ -145,18 +145,18 @@ Output::init(bool logit)
 {
    if (!isatty(fileno(stdout)))
       {
-        std::cout.flush();
-        std::cout.setf(std::ios::unitbuf);
+        cout.flush();
+        cout.setf(ios::unitbuf);
       }
 
    if (logit)
       {
         CERR << "using ANSI terminal output ESC sequences (or those "
-                "configured in your preferences file(s))" << std::endl;
+                "configured in your preferences file(s))" << endl;
 
 
         CERR << "using ANSI terminal input ESC sequences(or those "
-                "configured in your preferences file(s))" << std::endl;
+                "configured in your preferences file(s))" << endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -171,8 +171,8 @@ Output::reset_colors()
 {
    if (!colors_changed)   return;
 
-   std::cout << color_RESET << clear_EOL;
-   std::cerr << color_RESET << clear_EOL;
+   cout << color_RESET << clear_EOL;
+   cerr << color_RESET << clear_EOL;
 }
 //-----------------------------------------------------------------------------
 void
@@ -188,13 +188,13 @@ Output::set_color_mode(Output::ColorMode mode)
 
    switch(color_mode)
       {
-        case COLM_INPUT:  std::cerr << color_CIN  << clear_EOL;   break;
+        case COLM_INPUT:  cerr << color_CIN  << clear_EOL;   break;
 
-        case COLM_OUTPUT: std::cout << color_COUT << clear_EOL;   break;
+        case COLM_OUTPUT: cout << color_COUT << clear_EOL;   break;
 
-        case COLM_ERROR:  std::cerr << color_CERR << clear_EOL;   break;
+        case COLM_ERROR:  cerr << color_CERR << clear_EOL;   break;
 
-        case COLM_UERROR: std::cout << color_UERR << clear_EOL;   break;
+        case COLM_UERROR: cout << color_UERR << clear_EOL;   break;
 
         default: break;
       }

@@ -159,7 +159,7 @@ FILE * hist = fopen(filename, "r");
       {
         Log(LOG_get_line)
            CERR << "Cannot open history file " << filename
-                << ": " << strerror(errno) << std::endl;
+                << ": " << strerror(errno) << endl;
         return;
       }
 
@@ -188,32 +188,32 @@ LineHistory::save_history(const char * filename)
 {
    if (hist_lines.size() == 0)   return;
 
-std::ofstream outf(filename);
+ofstream outf(filename);
    if (!outf.is_open())
       {
         CERR << "Cannot write history file " << filename
-             << ": " << strerror(errno) << std::endl;
+             << ": " << strerror(errno) << endl;
          return;
       }
 
 int count = 0;
    for (size_t p = put + 1; p < hist_lines.size(); ++p)
       {
-        outf << hist_lines[p] << std::endl;
+        outf << hist_lines[p] << endl;
         ++count;
       }
    for (int p = 0; p < put; ++p)
       {
-        outf << hist_lines[p] << std::endl;
+        outf << hist_lines[p] << endl;
         ++count;
       }
 
    Log(LOG_get_line)
-      std::cerr << count << " history lines written to " << filename << std::endl;
+      cerr << count << " history lines written to " << filename << endl;
 }
 //-----------------------------------------------------------------------------
 void
-LineHistory::clear_history(std::ostream & out)
+LineHistory::clear_history(ostream & out)
 {
    current_line = 0;
    put = 0;
@@ -223,15 +223,15 @@ UCS_string u("xxx");
 }
 //-----------------------------------------------------------------------------
 void
-LineHistory::print_history(std::ostream & out)
+LineHistory::print_history(ostream & out)
 {
    for (size_t p = put + 1; p < hist_lines.size(); ++p)
       {
-        out << "      " << hist_lines[p] << std::endl;
+        out << "      " << hist_lines[p] << endl;
       }
    for (int p = 0; p < put; ++p)
       {
-        out << "      " << hist_lines[p] << std::endl;
+        out << "      " << hist_lines[p] << endl;
       }
 }
 //-----------------------------------------------------------------------------
@@ -338,7 +338,7 @@ LineEditContext::~LineEditContext()
 {
    // restore block cursor
    //
-   if (!ins_mode)   CIN << "\x1B[1 q" << std::flush;
+   if (!ins_mode)   CIN << "\x1B[1 q" << flush;
 }
 //-----------------------------------------------------------------------------
 void
@@ -351,7 +351,7 @@ const int rows = 1 + get_total_length() / screen_cols;
    // scroll some lines so that prior text is not overridden.
    //
    CIN.set_cursor(-1, 0);
-   loop(a, rows - allocated_height)   CIN << std::endl;
+   loop(a, rows - allocated_height)   CIN << endl;
 
    allocated_height = rows;
 
@@ -511,8 +511,8 @@ LineEditContext::toggle_ins_mode()
    // CSI [5 q       : blinking bar (doesn't work) 
    // CSI [6 q       : steady   bar (doesn't work) 
 
-   if (ins_mode)   CIN << "\x1B[0 q" << std::flush;
-   else            CIN << "\x1B[3 q" << std::flush;
+   if (ins_mode)   CIN << "\x1B[0 q" << flush;
+   else            CIN << "\x1B[3 q" << flush;
 }
 //-----------------------------------------------------------------------------
 void
@@ -551,13 +551,13 @@ const ExpandResult expand_result = tab_exp.expand_tab(line);
 void
 LineEditContext::cursor_UP()
 {
-   Log(LOG_get_line)   history.info(CERR << "cursor_UP()") << std::endl;
+   Log(LOG_get_line)   history.info(CERR << "cursor_UP()") << endl;
 
 const UCS_string * ucs = history.up();
    if (ucs == 0)   // no line above
       {
-        Log(LOG_get_line)   CERR << "hit top of history()" << std::endl;
-        Log(LOG_get_line)   history.info(CERR << "cursor_UP() done" << std::endl);
+        Log(LOG_get_line)   CERR << "hit top of history()" << endl;
+        Log(LOG_get_line)   history.info(CERR << "cursor_UP() done" << endl);
         return;
       }
 
@@ -573,18 +573,18 @@ const UCS_string * ucs = history.up();
    uidx = 0;
    refresh_from_cursor();
    move_idx(user_line.size());
-   Log(LOG_get_line)   history.info(CERR << "cursor_UP() done" << std::endl);
+   Log(LOG_get_line)   history.info(CERR << "cursor_UP() done" << endl);
 }
 //-----------------------------------------------------------------------------
 void
 LineEditContext::cursor_DOWN()
 {
-   Log(LOG_get_line)   history.info(CERR << "cursor_DOWN()" << std::endl);
+   Log(LOG_get_line)   history.info(CERR << "cursor_DOWN()" << endl);
 
 const UCS_string * ucs = history.down();
    if (ucs == 0)   // no line below
       {
-        Log(LOG_get_line)   CERR << "hit bottom of history()" << std::endl;
+        Log(LOG_get_line)   CERR << "hit bottom of history()" << endl;
         // if inside history: restore user_line
         //
         if (history_entered)   user_line = user_line_before_history;
@@ -605,7 +605,7 @@ refresh:
    uidx = 0;
    refresh_from_cursor();
    move_idx(user_line.size());
-   Log(LOG_get_line)   history.info(CERR << "cursor_DOWN() done" << std::endl);
+   Log(LOG_get_line)   history.info(CERR << "cursor_DOWN() done" << endl);
 }
 //=============================================================================
 LineInput::LineInput(bool do_read_history)
@@ -696,7 +696,7 @@ InputMux::get_line(LineInputMode mode, const UCS_string & prompt,
                   case LIM_ImmediateExecution:
                   case LIM_Quad_Quad:
                   case LIM_Quad_INP:
-                       CIN << prompt << line << std::endl;
+                       CIN << prompt << line << endl;
                        break;
 
                   case LIM_Quote_Quad:
@@ -775,7 +775,7 @@ const APL_time_us from = now();
             {
               if (control_D_count >= uprefs.control_Ds_to_exit)
                  {
-                   CIN << std::endl;
+                   CIN << endl;
 #if PARALLEL_ENABLED
                    Thread_context::kill_pool();
 #endif // PARALLEL_ENABLED
@@ -786,10 +786,10 @@ const APL_time_us from = now();
             }
          else if (control_D_count < 5)
             {
-              CIN << std::endl;
+              CIN << endl;
               COUT << "      ^D or end-of-input detected ("
                    << control_D_count << "). Use )OFF to leave APL!"
-                   << std::endl;
+                   << endl;
            } 
 
          eof = true;
@@ -800,8 +800,8 @@ const APL_time_us from = now();
               // of 10 ms or faster. That looks like end-of-input rather
               // than ^D typed by the user. Abort the interpreter.
               //
-              CIN << std::endl;
-              COUT << "      *** end of input" << std::endl;
+              CIN << endl;
+              COUT << "      *** end of input" << endl;
 #if PARALLEL_ENABLED
               Thread_context::kill_pool();
 #endif
@@ -813,12 +813,12 @@ const APL_time_us from = now();
    CPU_pool::unlock_pool(false);
 #endif
 
-   Log(LOG_get_line)   CERR << " '" << line << "'" << std::endl;
+   Log(LOG_get_line)   CERR << " '" << line << "'" << endl;
 
    Workspace::add_wait(now() - from);
    if (end_input)   (*end_input)();
 
-   if (uprefs.echo_CIN)   COUT << prompt << line << std::endl;
+   if (uprefs.echo_CIN)   COUT << prompt << line << endl;
 }
 //=============================================================================
 void
@@ -980,7 +980,7 @@ bool add_hist = false;
  
    if (add_hist)   hist.add_line(user_line);
 
-   CIN << std::endl;
+   CIN << endl;
 }
 //-----------------------------------------------------------------------------
 int
@@ -1021,7 +1021,7 @@ const int b0 = safe_fgetc();
         else if ((b0 & 0xFE) == 0xFC)   { len = 6;   bx &= 0x0E; }
         else
            {
-             CERR << "Bad UTF8 sequence start at " << LOC << std::endl;
+             CERR << "Bad UTF8 sequence start at " << LOC << endl;
              return Invalid_Unicode;
            }
 
@@ -1032,7 +1032,7 @@ const int b0 = safe_fgetc();
               if ((subc & 0xC0) != 0x80)
                  {
                    CERR << "Bad UTF8 sequence: " << HEX(b0)
-                        << "... at " LOC << std::endl;
+                        << "... at " LOC << endl;
                    return Invalid_Unicode;
                  }
 
@@ -1065,9 +1065,9 @@ const int b0 = safe_fgetc();
               //
               if (ESCmap::need_more(seq, s))   continue;
 
-//            CERR << std::endl << "Unknown ESC sequence: ESC";
+//            CERR << endl << "Unknown ESC sequence: ESC";
 //            loop(ss, s)   CERR << " " << HEX2(seq[ss + 1]);
-//            CERR << std::endl;
+//            CERR << endl;
 
               return Invalid_Unicode;
             }

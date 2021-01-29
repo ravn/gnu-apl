@@ -37,12 +37,11 @@ struct Svar_DB_server
                         const Svar_partner & from, TCP_socket tcp2);
 
    /// see Svar_DB::get_offering_processors()
-   void get_offering_processors(AP_num to_proc,
-                                std::vector<AP_num> & processors);
+   void get_offering_processors(AP_num to_proc, vector<AP_num> & processors);
 
    /// see Svar_DB::get_offered_variables()
    void get_offered_variables(AP_num to_proc, AP_num from_proc,
-                      std::vector<uint32_t> & varnames) const;
+                      vector<uint32_t> & varnames) const;
 
    /// see Svar_DB::add_event()
    void add_event(SV_key key, AP_num3 proc, Svar_event event);
@@ -79,7 +78,7 @@ struct Svar_DB_server
    AP_num3 find_offering_id(SV_key key) const;
 
    /// the offered variables
-   std::vector<Svar_record> offered_vars;
+   vector<Svar_record> offered_vars;
 
 protected:
    /// a sequence number helping to create unique keys
@@ -104,7 +103,7 @@ struct AP3_fd
    TCP_socket fd2;
 
    /// the name of the program that the peer is running
-   std::string progname;
+   string progname;
 };
 //-----------------------------------------------------------------------------
 

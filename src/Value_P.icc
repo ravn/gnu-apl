@@ -66,7 +66,7 @@ const char * args = "const char * loc";
 
    try                           { value_p = new Value(loc); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (const std::exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    value_p->increment_owner_count(loc);
@@ -90,7 +90,7 @@ const char * args = "const Cell & cell, const char * loc";
 
    try                           { value_p = new Value(cell, loc); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (const std::exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    value_p->increment_owner_count(loc);
@@ -104,7 +104,7 @@ const char * args = "ShapeItem len, const char * loc";
 
    try                           { value_p = new Value(len, loc); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (const std::exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    value_p->increment_owner_count(loc);
@@ -118,7 +118,7 @@ const char * args = "const UCS_string & ucs, const char * loc";
 
    try                           { value_p = new Value(ucs, loc); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (const std::exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    value_p->increment_owner_count(loc);
@@ -132,7 +132,7 @@ const char * args = "const CDR_string & cdr, const char * loc";
 
    try                           { value_p = new Value(cdr, loc); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (const std::exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    value_p->increment_owner_count(loc);
@@ -146,7 +146,7 @@ const char * args = "const PrintBuffer & ob, const char * loc";
 
    try                   { value_p = new Value(pb, loc); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (const std::exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    value_p->increment_owner_count(loc);
@@ -160,7 +160,7 @@ const char * args = "const UTF8_string & utf, const char * loc";
 
    try                           { value_p = new Value(utf, loc); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (const std::exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    value_p->increment_owner_count(loc);
@@ -174,7 +174,7 @@ const char * args = "const char * loc, const Shape & shape";
 
    try                           { value_p = new Value(loc, shape); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (const std::exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    value_p->increment_owner_count(loc);
@@ -232,7 +232,7 @@ const char * args = "const Shape & shape, const char * loc";
 
    try                           { value_p = new Value(shape, loc); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (const std::exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    value_p->increment_owner_count(loc);

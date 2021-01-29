@@ -38,32 +38,32 @@ const int loc_len = strlen(file) + 40;
 char * loc = new char[loc_len + 1];
 
    Log(LOG_delete)
-      get_CERR() << "new    " << voidP(loc) << " at " LOC << std::endl;
+      get_CERR() << "new    " << voidP(loc) << " at " LOC << endl;
 
    snprintf(loc, loc_len, "%s:%d", file, line);
    loc[loc_len] = 0;
 
-   get_CERR() << std::endl
+   get_CERR() << endl
         << "======================================="
-           "=======================================" << std::endl;
+           "=======================================" << endl;
 
 
    if (cond)       // normal assert()
       {
-        get_CERR() << "Assertion failed: " << cond << std::endl
-             << "in Function:      " << fun  << std::endl
-             << "in file:          " << loc  << std::endl << std::endl;
+        get_CERR() << "Assertion failed: " << cond << endl
+             << "in Function:      " << fun  << endl
+             << "in file:          " << loc  << endl << endl;
       }
    else if (fun)   // segfault etc.
       {
         get_CERR() << "\n\n================ " << fun <<  " ================\n";
       }
 
-   get_CERR() << "Call stack:" << std::endl;
+   get_CERR() << "Call stack:" << endl;
 
    if (asserting)
       {
-        get_CERR() << "*** do_Assert() called recursively ***" << std::endl;
+        get_CERR() << "*** do_Assert() called recursively ***" << endl;
       }
    else
       {
@@ -71,11 +71,11 @@ char * loc = new char[loc_len + 1];
 
         Backtrace::show(file, line);
 
-        get_CERR() << std::endl << "SI stack:" << std::endl << std::endl;
+        get_CERR() << endl << "SI stack:" << endl << endl;
         Workspace::list_SI(get_CERR(), SIM_SIS_dbg);
       }
    get_CERR() << "======================================="
-           "=======================================" << std::endl;
+           "=======================================" << endl;
 
    // count errors
    IO_Files::assert_error();

@@ -29,6 +29,8 @@
 #include "PointerCell.hh"
 #include "Shape.hh"
 
+using namespace std;
+
 class CDR_string;
 class Error;
 class IndexExpr;
@@ -216,7 +218,7 @@ public:
    /// return the first integer of a value (the line number of →Value).
    Function_Line get_line_number() const
       { const APL_Integer line(ravel[0].get_near_int());
-        Log(LOG_execute_goto)   CERR << "goto line " << line << std::endl;
+        Log(LOG_execute_goto)   CERR << "goto line " << line << endl;
         return Function_Line(line); }
 
    /// return \b true iff \b this value is simple (i.e. not nested).
@@ -258,7 +260,7 @@ public:
    void check_lval_consistency() const;
 
    /// return member of this value, defined by \b members
-   Cell * get_member(const std::vector<const UCS_string *> & members,
+   Cell * get_member(const vector<const UCS_string *> & members,
                      Value * & owner, bool create_if_needed, bool throw_error);
 
    /// return the Cell (if any) containing the data of structured value member
@@ -268,6 +270,11 @@ public:
    /// return the Cell (if any) containing the data of structured value member
    /// \b member, or 0 if member not found.
    Cell * get_member_data(const UCS_string & member);
+
+   /// store the row numbers (starting at 0) so that this[rows] is sorted
+   /// in result. Only used rows are returned.
+   void sorted_members(std::vector<ShapeItem> & result,
+                       const Unicode * filter) const;
 
    /// return the number of (valid) members, as per this[1;]
    ShapeItem get_member_count() const;
@@ -285,6 +292,14 @@ public:
    /// return the idx'th element of the ravel.
    const Cell & get_ravel(ShapeItem idx) const
       { Assert1(idx < nz_element_count());   return ravel[idx]; }
+
+   /// return the first element of the ravel (which is always present)
+   Cell & get_proto()
+      { return ravel[0]; }
+
+   /// return the first element of the ravel (which is always present)
+   const Cell & get_proto() const
+      { return ravel[0]; }
 
    /// set the prototype (according to B) if this value is empty.
    inline void set_default(const Value & B, const char * loc);
@@ -323,22 +338,22 @@ public:
    CellType deep_cell_subtypes() const;
 
    /// print \b this value (line break at Workspace::get_PW())
-   std::ostream & print(std::ostream & out) const;
+   ostream & print(ostream & out) const;
 
    /// print \b this member value
-   std::ostream & print_member(std::ostream & out, UCS_string member) const;
+   ostream & print_member(ostream & out, UCS_string member) const;
 
    /// print \b this value (line break at print_width)
-   std::ostream & print1(std::ostream & out, PrintContext pctx) const;
+   ostream & print1(ostream & out, PrintContext pctx) const;
 
    /// print the properties (shape, flags etc) of \b this value
-   std::ostream & print_properties(std::ostream & out, int indent, bool help) const;
+   ostream & print_properties(ostream & out, int indent, bool help) const;
 
    /// debug-print \b this value
    void debug(const char * info) const;
 
    /// print this value in 4 ⎕CR style
-   std::ostream & print_boxed(std::ostream & out, int indent) const;
+   ostream & print_boxed(ostream & out, int indent) const;
 
    /// return \b this indexed by (multi-dimensional) \b IDX.
    Value_P index(const IndexExpr & IDX) const;
@@ -507,6 +522,9 @@ public:
    /// add a member to a structured variable
    void add_member(const UCS_string & member_name, Value * member_value);
 
+   /// return the (recursive) number of members in this value
+   ShapeItem get_all_members_count() const;
+
    /// mark all values, except static values
    static void mark_all_dynamic_values();
 
@@ -528,7 +546,7 @@ public:
    int32_t get_col_spacing(bool & numeric, ShapeItem col, bool framed) const;
 
    /// list a value
-   std::ostream & list_one(std::ostream & out, bool show_owners) const;
+   ostream & list_one(ostream & out, bool show_owners) const;
 
    /// check \b that this value is completely initialized, and set complete flag
    void check_value(const char * loc);
@@ -555,10 +573,10 @@ public:
    static int finish_incomplete(const char * loc);
 
    /// erase all values (clean-up after )CLEAR)
-   static void erase_all(std::ostream & out);
+   static void erase_all(ostream & out);
 
    /// list all values
-   static std::ostream & list_all(std::ostream & out, bool show_owners);
+   static ostream & list_all(ostream & out, bool show_owners);
 
    /// return the ravel of \b this value as UCS string, or throw DOMAIN error
    /// if the ravel contains non-char or nested cells.
@@ -568,22 +586,22 @@ public:
    void to_proto();
 
    /// print address, shape, and flags of this value
-   void print_structure(std::ostream & out, int indent, ShapeItem idx) const;
+   void print_structure(ostream & out, int indent, ShapeItem idx) const;
 
    /// return the current flags
    ValueFlags get_flags() const   { return ValueFlags(flags); }
 
    /// print info related to a stale value
-   void print_stale_info(std::ostream & out, const DynamicObject * dob) const;
+   void print_stale_info(ostream & out, const DynamicObject * dob) const;
 
    /// number of Value_P objects pointing to this value
    int owner_count;
 
    /// print incomplete Values, and return the number of incomplete Values.
-   static int print_incomplete(std::ostream & out);
+   static int print_incomplete(ostream & out);
 
    /// print stale Values, and return the number of stale Values.
-   static int print_stale(std::ostream & out);
+   static int print_stale(ostream & out);
 
    /// total nz_element_counts of all non-short values
    static uint64_t total_ravel_count;
@@ -640,8 +658,8 @@ public:
    static void catch_Error(const Error & error, const char * args,
                            const char * loc);
 
-   /// handler for catch(std::exception) in init_ravel() (never called)
-   static void catch_exception(const std::exception & ex, const char * args,
+   /// handler for catch(exception) in init_ravel() (never called)
+   static void catch_exception(const exception & ex, const char * args,
                         const char * caller,  const char * loc);
 
    /// handler for catch(...) in init_ravel() (never called)
@@ -740,7 +758,7 @@ private:
 };
 // ----------------------------------------------------------------------------
 
-extern void print_history(std::ostream & out, const Value * val, const char * loc);
+extern void print_history(ostream & out, const Value * val, const char * loc);
 
 // shortcuts for frequently used APL values...
 

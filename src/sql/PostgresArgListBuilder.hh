@@ -54,9 +54,9 @@ public:
 
 class PostgresArgListBuilder : public ArgListBuilder {
 public:
-    PostgresArgListBuilder( PostgresConnection *connection_in, const std::string &sql_in );
+    PostgresArgListBuilder( PostgresConnection *connection_in, const string &sql_in );
     virtual ~PostgresArgListBuilder();
-    virtual void append_string( const std::string &arg, int pos );
+    virtual void append_string( const string &arg, int pos );
     virtual void append_long( long arg, int pos );
     virtual void append_double( double arg, int pos );
     virtual void append_null( int pos );
@@ -65,8 +65,8 @@ public:
 
 private:
     PostgresConnection *connection;
-    std::string sql;
-    std::vector<PostgresArg *> args;
+    string sql;
+    vector<PostgresArg *> args;
 };
 
 class PostgresResultWrapper {

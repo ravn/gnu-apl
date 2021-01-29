@@ -133,7 +133,7 @@ public:
       { static int ep[] = { 1, 1, 1, 0 };   return ep; }
 
    /// print the properties of this function
-   virtual void print_properties(std::ostream & out, int indent) const = 0;
+   virtual void print_properties(ostream & out, int indent) const = 0;
 
    /// store the attributes (as per ⎕AT) of symbol at dest, ...
    virtual void get_attributes(int mode, Cell * dest) const;
@@ -149,7 +149,7 @@ public:
    virtual bool has_alpha() const   { return false; }
 
    /// Print \b this function.
-   virtual std::ostream & print(std::ostream & out) const = 0;
+   virtual ostream & print(ostream & out) const = 0;
 
    /// return the dyadic scalar primitive if \b this function
    virtual prim_f2 get_scalar_f2() const

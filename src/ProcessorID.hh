@@ -23,6 +23,8 @@
 
 #include <vector>
 
+using namespace std;
+
 #ifdef AP_NUM
 
 /// a simple ProcessorID to be used by APs
