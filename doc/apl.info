@@ -4485,6 +4485,11 @@ their details, but usually follow these top-level steps:
      MEMBER⊃ )
   5. Optionally, convert the modified XML document back to XML (0 ⎕XML
 
+3.35.4 JSON Parsing: ⎕JSON
+--------------------------
+
+TODO.
+
 
 File: apl.info,  Node: Chapter 4,  Next: Chapter 5,  Prev: Chapter 3,  Up: Top
 
@@ -6018,23 +6023,23 @@ Node: Section 3.32139388
 Node: Section 3.33142492
 Node: Section 3.34144481
 Node: Section 3.35148906
-Node: Chapter 4176989
-Node: Chapter 5178742
-Node: Chapter 6179868
-Node: Section 6.1181405
-Node: Section 6.2182685
-Node: Section 6.3183045
-Node: Section 6.4183287
-Node: Section 6.5183949
-Node: Section 6.6184427
-Node: Section 6.7185199
-Node: Section 6.8185656
-Node: Chapter 7186058
-Node: Section 7.1186477
-Node: Section 7.2187164
-Node: Chapter 8187995
-Node: Section 8.1188498
-Node: Section 8.2213812
+Node: Chapter 4177053
+Node: Chapter 5178806
+Node: Chapter 6179932
+Node: Section 6.1181469
+Node: Section 6.2182749
+Node: Section 6.3183109
+Node: Section 6.4183351
+Node: Section 6.5184013
+Node: Section 6.6184491
+Node: Section 6.7185263
+Node: Section 6.8185720
+Node: Chapter 7186122
+Node: Section 7.1186541
+Node: Section 7.2187228
+Node: Chapter 8188059
+Node: Section 8.1188562
+Node: Section 8.2213876
 
 End Tag Table
 

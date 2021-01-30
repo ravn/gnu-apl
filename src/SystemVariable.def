@@ -95,7 +95,8 @@
   sf_def(Quad_SVS,   "SVS",   "Shared Variable State"        )
   sf_def(Quad_STOP,  "STOP",  "STOP vector"                  )
   sf_def(Quad_TF,    "TF",    "Transfer Form"                )
-  sf_def(Quad_XML,   "XML",   "XML processor"                )
+  sf_def(Quad_JSON,  "JSON",   "JSON parser"                 )
+  sf_def(Quad_XML,   "XML",   "XML parser"                   )
   sf_def(Quad_TRACE, "TRACE", "TRACE vector"                 )
   sf_def(Quad_UCS,   "UCS",   "Universal Char Set (Unicode)" )
 # undef sf_def

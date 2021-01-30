@@ -914,13 +914,12 @@ Cell * doubled = new Cell[new_cells];
          UCS_string member_name(member_name_cell.get_pointer_value().getref());
          member_name_cell.release(LOC);
 
-         void * dest = get_new_member(member_name);
-
          // transfer the member value. memcpy() should work because ownership
          // remains the same
          //
-         Cell * member_data_cell = old_ravel + 2*r + 1;
-         memcpy(dest, member_data_cell, sizeof(Cell));
+         void * dest = get_new_member(member_name);
+         void * old_member_data_cell = old_ravel + 2*r + 1;
+         memcpy(dest, old_member_data_cell, sizeof(Cell));
        }
 
    delete del;   // del is char *, so no cell destructor is called

@@ -35,6 +35,7 @@ using namespace std;
 #include "Quad_FFT.hh"
 #include "Quad_FX.hh"
 #include "Quad_GTK.hh"
+#include "Quad_JSON.hh"
 #include "Quad_MAP.hh"
 #include "Quad_PLOT.hh"
 #include "Quad_RVAL.hh"

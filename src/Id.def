@@ -120,7 +120,8 @@ sf( F2_INTER           , "∩"       ,          )
 sf( OPER2_INNER        , "."       ,          )
 sf( F12_INTERVAL_INDEX , "⍸"       ,          )
 
-sf( JOT           , "∘"       , = 0x4A01 )
+sf( JOT           , "∘"            , = 0x4A01 )
+qf( JSON               , "⎕JSON"   ,          )
 
 qv( L                  , "⎕L"      , = 0x4C01 )
 st( L_BRACK            , "["       ,          )
