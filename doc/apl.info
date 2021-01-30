@@ -1246,12 +1246,12 @@ File: apl.info,  Node: Section 3.6,  Next: Section 3.7,  Prev: Section 3.5,  Up:
 3.6 Debug Commands
 ==================
 
-Besides the classical commands like )LOAD or )SAVE there are a number of
-debug commands that start with ] rather than ).  Regular commands start
-with ) and print their output on stdout.  Debug commands start with ]
-and print their output on stderr.  Normally you cannot easily
-distinguish between stdout and stderr, but another feature, colored
-output, uses different colors for stdout and stderr.
+In addition to the classical APL commands like )LOAD or )SAVE, GNU APL
+has a number of debug commands for debugging purposes.  Regular APL
+commands start with ) and print their output on stdout.  Debug commands
+start with ] and print their output on stderr.  Normally you cannot
+easily distinguish between stdout and stderr, but another GNU APL
+feature, colored output, uses different colors for stdout and stderr.
 
    Type )HELP or ]HELP in the interpreter for a list of all commands
 available.
@@ -1414,8 +1414,12 @@ explain what a function is supposed to do.
 
 File: apl.info,  Node: Section 3.9,  Next: Section 3.10,  Prev: Section 3.8,  Up: Chapter 3
 
-3.9 )DUMP and DUMP-HTML Commands
-================================
+3.9 Commands )COPY_ONCE, )DUMP, and DUMP-HTML
+=============================================
+
+In standard APL, workspaces are processed with the standard commands
+)LOAD, )COPY, and )SAVE. GNU APL provides additional commands to process
+workspaces.
 
 3.9.1 )DUMP Command
 -------------------
@@ -1444,6 +1448,16 @@ therefore be directly used by a web server to display workspace listings
 HTML <head> section template.  The user should replace the fields marked
 with ??????  with proper values (for the author, the copyright owner,
 and a short description) before publishing the page.
+
+3.9.3 )COPY_ONCE Command
+------------------------
+
+Command )COPY_ONCE copies all objects (variables, functions and
+operators) from some other workspace into the current workspace similar
+to )COPY. However, )COPY_ONCE does this only once; a second invocation
+of )COPY_ONCE with the same workspace (and the same library reference
+number) is silently being ignored.  This speeds up the )COPYing of
+libraries that occur in several )DUMPed or )SAVEd workspace.
 
 
 File: apl.info,  Node: Section 3.10,  Next: Section 3.11,  Prev: Section 3.9,  Up: Chapter 3
@@ -5975,52 +5989,52 @@ Node: Section 3.338601
 Node: Section 3.439888
 Node: Section 3.543967
 Node: Section 3.644140
-Node: Section 3.744753
-Node: Section 3.848706
-Node: Section 3.950248
-Node: Section 3.1051703
-Node: Section 3.1153487
-Node: Section 3.1255427
-Node: Section 3.1356368
-Node: Section 3.1456620
-Node: Section 3.1558016
-Node: Section 3.1660534
-Node: Section 3.1767233
-Node: Section 3.1868678
-Node: Section 3.1974339
-Node: Section 3.2079373
-Node: Section 3.2182654
-Node: Section 3.2282945
-Node: Section 3.2393520
-Node: Section 3.2493792
-Node: Section 3.25100370
-Node: Section 3.26102827
-Node: Section 3.27103496
-Node: Section 3.28106619
-Node: Section 3.29114227
-Node: Section 3.30115174
-Node: Section 3.31128736
-Node: Section 3.32138733
-Node: Section 3.33141837
-Node: Section 3.34143826
-Node: Section 3.35148251
-Node: Chapter 4176334
-Node: Chapter 5178087
-Node: Chapter 6179213
-Node: Section 6.1180750
-Node: Section 6.2182030
-Node: Section 6.3182390
-Node: Section 6.4182632
-Node: Section 6.5183294
-Node: Section 6.6183772
-Node: Section 6.7184544
-Node: Section 6.8185001
-Node: Chapter 7185403
-Node: Section 7.1185822
-Node: Section 7.2186509
-Node: Chapter 8187340
-Node: Section 8.1187843
-Node: Section 8.2213157
+Node: Section 3.744770
+Node: Section 3.848723
+Node: Section 3.950265
+Node: Section 3.1052358
+Node: Section 3.1154142
+Node: Section 3.1256082
+Node: Section 3.1357023
+Node: Section 3.1457275
+Node: Section 3.1558671
+Node: Section 3.1661189
+Node: Section 3.1767888
+Node: Section 3.1869333
+Node: Section 3.1974994
+Node: Section 3.2080028
+Node: Section 3.2183309
+Node: Section 3.2283600
+Node: Section 3.2394175
+Node: Section 3.2494447
+Node: Section 3.25101025
+Node: Section 3.26103482
+Node: Section 3.27104151
+Node: Section 3.28107274
+Node: Section 3.29114882
+Node: Section 3.30115829
+Node: Section 3.31129391
+Node: Section 3.32139388
+Node: Section 3.33142492
+Node: Section 3.34144481
+Node: Section 3.35148906
+Node: Chapter 4176989
+Node: Chapter 5178742
+Node: Chapter 6179868
+Node: Section 6.1181405
+Node: Section 6.2182685
+Node: Section 6.3183045
+Node: Section 6.4183287
+Node: Section 6.5183949
+Node: Section 6.6184427
+Node: Section 6.7185199
+Node: Section 6.8185656
+Node: Chapter 7186058
+Node: Section 7.1186477
+Node: Section 7.2187164
+Node: Chapter 8187995
+Node: Section 8.1188498
+Node: Section 8.2213812
 
 End Tag Table
 

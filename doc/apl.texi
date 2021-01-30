@@ -1335,12 +1335,12 @@ Complex numbers are fully supported.
 @node    Section 3.6
 @section Debug Commands
 
-Besides the classical commands like )LOAD or )SAVE there are a number of
-debug commands that start with ] rather than ).
-Regular commands start with ) and print their output on stdout.
+In addition to the classical APL commands like )LOAD or )SAVE, GNU APL
+has a number of debug commands for debugging purposes.
+Regular APL commands start with ) and print their output on stdout.
 Debug commands start with ] and print their output on stderr. Normally
 you cannot easily distinguish between stdout and stderr, but another
-feature, colored output, uses different colors for stdout and stderr.
+GNU APL feature, colored output, uses different colors for stdout and stderr.
 
 Type )HELP or ]HELP in the interpreter for a list of all commands available.
 
@@ -1507,7 +1507,10 @@ For example:
 
 
 @node    Section 3.9
-@section )DUMP and DUMP-HTML Commands
+@section Commands )COPY_ONCE, )DUMP, and DUMP-HTML
+
+In standard APL, workspaces are processed with the standard commands )LOAD,
+)COPY, and )SAVE. GNU APL provides additional commands to process workspaces.
 
 @subsection )DUMP Command
 
@@ -1534,6 +1537,15 @@ In addition to the APL code, the .html files produced have a short HTML
 <head> section template. The user should replace the fields marked
 with @b{??????} with proper values (for the author, the copyright owner,
 and a short description) before publishing the page.
+
+@subsection )COPY_ONCE Command
+
+Command )COPY_ONCE copies all objects (variables, functions and operators)
+from some other workspace into the current workspace similar to )COPY.
+However, )COPY_ONCE does this only once; a second invocation of
+)COPY_ONCE with the same workspace (and the same library reference number)
+is silently being ignored. This speeds up the )COPYing of libraries that
+occur in several )DUMPed or )SAVEd workspace.
 
 @node    Section 3.10
 @section History and TAB completion

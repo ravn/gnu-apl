@@ -43,7 +43,7 @@ public:
         return false;
       }
 
-   /// sort strings
+   /// sort the strings in this vector alphabetically
    void sort()
       {
         if (size() < 2)   return;
@@ -51,8 +51,33 @@ public:
                                    UCS_string::compare_names);
       }
 
-   /// compute columns widths so that items align nicely
+   /// compute columns width so that items align nicely (for )VARS, )FNS, etc.)
    void compute_column_width(int tab_size, std::vector<int> & result);
+
+   /// replacement for erase(std::vector::iterator position)
+   void erase(size_t pos)
+      { std::vector<UCS_string>::erase(begin() + pos); }
+
+   /// replacement for insert(std::vector::iterator position, value)
+   void insert(size_t pos, const UCS_string & value)
+      { std::vector<UCS_string>::insert(begin() + pos, value); }
+
+   /// print items of \b this vector in a table with \b column_count columns
+   std::ostream & print_table(std::ostream & out, size_t column_count) const;
+
+protected:
+   /// return the size of the longest UCS_string in \b this vector.
+   ShapeItem max_width(size_t col, size_t column_count) const;
+
+private:
+   /// prevent the inadvertent use of iterator nonsense
+   std::vector<UCS_string>::iterator erase(
+        std::vector<UCS_string>::iterator position);
+
+   /// prevent the inadvertent use of iterator nonsense
+   std::vector<UCS_string>::iterator insert(
+        std::vector<UCS_string>::iterator position,
+        const UCS_string & value);
 };
 //-----------------------------------------------------------------------------
 

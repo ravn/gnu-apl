@@ -151,7 +151,7 @@ const int function = B->get_ravel(0).get_int_value();
 
              {
                UCS_string HWF = event_queue[0];   // fd, widget : fun
-               event_queue.erase(event_queue.begin());
+               event_queue.erase(0);
 
                // split (Unicode)Handle,"widget:function"
                // into a 3-element APL vector Handle (⊂"widget") (⊂"function")

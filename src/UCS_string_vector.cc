@@ -191,3 +191,77 @@ int max_nb = 0;
    result.push_back(max_nb);
 }
 //----------------------------------------------------------------------------
+ShapeItem
+UCS_string_vector::max_width(size_t col, size_t column_count) const
+{
+ShapeItem ret = 0;
+
+   for (size_t s = col; s < size(); s += column_count)
+       {
+          const ShapeItem len_s = at(s).size();
+          if (ret < len_s)   ret = len_s;
+       }
+
+   return ret;
+}
+//----------------------------------------------------------------------------
+std::ostream & 
+UCS_string_vector::print_table(std::ostream & out, size_t column_count) const
+{
+const ShapeItem column_count1 = column_count - 1;
+ShapeItem column_widths[column_count];
+   loop(col, column_count)   column_widths[col] = max_width(col, column_count);
+
+const UCS_string frame(UTF8_string("╔╤╗╚╧╝═║│"));
+
+   // top row
+   //
+   out << frame[0];                                  // ╔
+   loop(col, column_count)
+       {
+         const ShapeItem width = column_widths[col];
+         loop(w, width)   out << frame[6];           // ═
+         if (col < column_count1)   out << frame[1];   // ╤
+         else                       out << frame[2];   // ╗
+       }
+   out << std::endl;
+
+   // data rows
+   //
+   for (size_t d = 0; d < size();)
+       {
+         out << frame[7];                                  // ║
+         loop(col, column_count)
+             {
+               const ShapeItem width = column_widths[col];
+               if (d < size())   // valid data available
+                  {
+                    const UCS_string & data = (*this)[d++];
+                    loop(j, data.size())             out << data[j];
+                    loop(l, (width - data.size()))   out << UNI_SPACE;
+                   }
+               else              // no more data: fill with blanks
+                   {
+                    loop(j, width)                   out << UNI_SPACE;
+                   }
+               if (col < column_count1)   out << frame[8];   // │
+               else                       out << frame[7];   // ║
+             }
+         out << std::endl;
+       }
+
+   // bottom row
+   //
+   out << frame[3];                                  // ╚
+   loop(col, column_count)
+       {
+         const ShapeItem width = column_widths[col];
+         loop(w, width)   out << frame[6];           // ═
+         if (col < column_count1)   out << frame[4];   // ╧
+         else                       out << frame[5];   // ╝
+       }
+   out << std::endl;
+
+   return out;
+}
+//-----------------------------------------------------------------------------

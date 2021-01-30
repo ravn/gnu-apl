@@ -98,10 +98,11 @@ ul.no-bullet {list-style: none}
       <li><a name="toc-Limitations-of-Lambdas" href="#Limitations-of-Lambdas">3.7.3 Limitations of Lambdas</a></li>
     </ul></li>
     <li><a name="toc-_005dDOXY-Command" href="#Section-3_002e8">3.8 ]DOXY Command</a></li>
-    <li><a name="toc-_0029DUMP-and-DUMP_002dHTML-Commands" href="#Section-3_002e9">3.9 )DUMP and DUMP-HTML Commands</a>
+    <li><a name="toc-Commands-_0029COPY_005fONCE_002c-_0029DUMP_002c-and-DUMP_002dHTML" href="#Section-3_002e9">3.9 Commands )COPY_ONCE, )DUMP, and DUMP-HTML</a>
     <ul class="no-bullet">
       <li><a name="toc-_0029DUMP-Command" href="#g_t_0029DUMP-Command">3.9.1 )DUMP Command</a></li>
       <li><a name="toc-_0029DUMP_002dHTML-Command" href="#g_t_0029DUMP_002dHTML-Command">3.9.2 )DUMP-HTML Command</a></li>
+      <li><a name="toc-_0029COPY_005fONCE-Command" href="#g_t_0029COPY_005fONCE-Command">3.9.3 )COPY_ONCE Command</a></li>
     </ul></li>
     <li><a name="toc-History-and-TAB-completion" href="#Section-3_002e10">3.10 History and TAB completion</a></li>
     <li><a name="toc-Logging-Facilities" href="#Section-3_002e11">3.11 Logging Facilities</a>
@@ -1527,12 +1528,12 @@ Next: <a href="#Section-3_002e7" accesskey="n" rel="next">Section 3.7</a>, Previ
 <a name="Debug-Commands"></a>
 <h3 class="section">3.6 Debug Commands</h3>
 
-<p>Besides the classical commands like )LOAD or )SAVE there are a number of
-debug commands that start with ] rather than ).
-Regular commands start with ) and print their output on stdout.
+<p>In addition to the classical APL commands like )LOAD or )SAVE, GNU APL
+has a number of debug commands for debugging purposes.
+Regular APL commands start with ) and print their output on stdout.
 Debug commands start with ] and print their output on stderr. Normally
 you cannot easily distinguish between stdout and stderr, but another
-feature, colored output, uses different colors for stdout and stderr.
+GNU APL feature, colored output, uses different colors for stdout and stderr.
 </p>
 <p>Type )HELP or ]HELP in the interpreter for a list of all commands available.
 </p>
@@ -1707,9 +1708,12 @@ typically one-liners that briefly explain what a function is supposed to do.
 <p>
 Next: <a href="#Section-3_002e10" accesskey="n" rel="next">Section 3.10</a>, Previous: <a href="#Section-3_002e8" accesskey="p" rel="prev">Section 3.8</a>, Up: <a href="#Chapter-3" accesskey="u" rel="up">Chapter 3</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<a name="g_t_0029DUMP-and-DUMP_002dHTML-Commands"></a>
-<h3 class="section">3.9 )DUMP and DUMP-HTML Commands</h3>
+<a name="Commands-_0029COPY_005fONCE_002c-_0029DUMP_002c-and-DUMP_002dHTML"></a>
+<h3 class="section">3.9 Commands )COPY_ONCE, )DUMP, and DUMP-HTML</h3>
 
+<p>In standard APL, workspaces are processed with the standard commands )LOAD,
+)COPY, and )SAVE. GNU APL provides additional commands to process workspaces.
+</p>
 <a name="g_t_0029DUMP-Command"></a>
 <h4 class="subsection">3.9.1 )DUMP Command</h4>
 
@@ -1737,6 +1741,16 @@ code).
 &lt;head&gt; section template. The user should replace the fields marked
 with <b>??????</b> with proper values (for the author, the copyright owner,
 and a short description) before publishing the page.
+</p>
+<a name="g_t_0029COPY_005fONCE-Command"></a>
+<h4 class="subsection">3.9.3 )COPY_ONCE Command</h4>
+
+<p>Command )COPY_ONCE copies all objects (variables, functions and operators)
+from some other workspace into the current workspace similar to )COPY.
+However, )COPY_ONCE does this only once; a second invocation of
+)COPY_ONCE with the same workspace (and the same library reference number)
+is silently being ignored. This speeds up the )COPYing of libraries that
+occur in several )DUMPed or )SAVEd workspace.
 </p>
 <hr>
 <a name="Section-3_002e10"></a>

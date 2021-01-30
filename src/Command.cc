@@ -57,6 +57,8 @@
 int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;
 
+UCS_string_vector Command::copy_once_table;
+
 //-----------------------------------------------------------------------------
 void
 Command::process_line()
@@ -557,7 +559,7 @@ check_EOC:
    Workspace::pop_SI(LOC);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_XTERM(ostream & out, const UCS_string & arg)
 {
 const char * term = getenv("TERM");
@@ -596,7 +598,7 @@ UCS_string_vector result;
       }
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_BOXING(ostream & out, const UCS_string & arg)
 {
 int format = arg.atoi();
@@ -648,7 +650,7 @@ const void * Bv = reinterpret_cast<const val_val *>(B)->child;
    return charP(key) - charP(Bv);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_CHECK(ostream & out)
 {
    // erase stale functions from failed ⎕EX
@@ -749,7 +751,7 @@ ShapeItem duplicate_parents = 0;
    else out << "OK      - no duplicate parents" << endl;
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_CONTINUE(ostream & out)
 {
 UCS_string wsname("CONTINUE");
@@ -758,16 +760,10 @@ UCS_string wsname("CONTINUE");
    cmd_OFF(0);                                    // )OFF
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_COPY(ostream & out, UCS_string_vector & args, bool protection)
 {
-LibRef libref = LIB0;
-const Unicode l = args[0][0];
-      if (Avec::is_digit(l))
-      {
-        libref = LibRef(l - '0');
-        args.erase(args.begin());
-      }
+LibRef libref = LIB0;   // library reference number to copy from, default is 0
 
    if (args.size() == 0)   // at least workspace name is required
       {
@@ -776,12 +772,90 @@ const Unicode l = args[0][0];
         return;
       }
 
+   // process and skip the optional library number
+   {
+     const Unicode l = args[0][0];
+     if (Avec::is_digit(l))
+        {
+          libref = LibRef(l - '0');
+          args.erase(0);
+        }
+   }
+
 UCS_string wsname = args[0];
-   args.erase(args.begin());
+   args.erase(0);
    Workspace::copy_WS(out, libref, wsname, args, protection);
 }
 //-----------------------------------------------------------------------------
-void 
+void
+Command::cmd_COPY_ONCE(ostream & out, UCS_string_vector & args)
+{
+   if (args.size() > 2)   // too many arguments
+      {
+        MORE_ERROR() << "too many parameters in command ]COPY_ONCE";
+        return;
+      }
+
+LibRef libref = LIB0;   // library reference number to copy from, default is 0
+   if (args.size() == 0)   // no argument means: display current table
+      {
+        if (copy_once_table.size() == 0)
+           {
+             out << "There were no )COPY_ONCE workspaces copied." << endl;
+             return;
+           }
+
+        out << "There were " << copy_once_table.size()
+            << " )COPY_ONCE workspaces copied:" << endl;
+        UCS_string_vector usv;
+        loop(row, copy_once_table.size())
+            {
+              const UCS_string & src = copy_once_table[row];
+              UCS_string ws(UNI_SPACE);
+              ws += src[0];   // Nwsname
+              ws += UNI_SPACE;
+              ws.append(UCS_string(src, 2, src.size() - 2));
+              ws += UNI_SPACE;
+              usv.push_back(ws);
+            }
+        usv.print_table(out, 1);
+        return;
+      }
+
+   // process and skip the optional library number
+   if (args.size() == 2)
+      {
+        const Unicode l = args[0][0];
+        if (Avec::is_digit(l))
+           {
+             libref = LibRef(l - '0');
+             args.erase(0);
+           }
+      }
+
+   Assert(args.size() == 1);   // only wsname left
+const UCS_string wsname(args[0]);
+   args.erase(0);
+
+   // lib_wsname is the name in the copy_once_table
+   //
+UCS_string lib_wsname(Unicode(libref + UNI_0));
+   lib_wsname += UNI_UNDERSCORE;
+   lib_wsname.append(wsname);
+
+   // silently return if wsname is already contained in the copy_once_table
+   //
+   if (copy_once_table.contains(lib_wsname))   return;
+
+   // add it to the table;
+   //
+CERR << "NEW )COPY_ONCE workspace:" << lib_wsname << endl;
+
+   copy_once_table.push_back(lib_wsname);
+   Workspace::copy_WS(out, libref, wsname, args, false);
+}
+//-----------------------------------------------------------------------------
+void
 Command::cmd_DOXY(ostream & out, UCS_string_vector & args)
 {
 UTF8_string root("/tmp");
@@ -806,7 +880,7 @@ UTF8_string root("/tmp");
    catch (...) {}
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
 {
    // Command is:
@@ -835,7 +909,7 @@ const int result = unlink(filename.c_str());
       }
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
                   bool html, bool silent)
 {
@@ -884,7 +958,7 @@ Command::cmd_ERASE(ostream & out, UCS_string_vector & args)
    Workspace::erase_symbols(out, args);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_KEYB(ostream & out)
 {
    // maybe print user-supplied keyboard layout file
@@ -930,7 +1004,7 @@ Command::cmd_KEYB(ostream & out)
    << endl;
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
 {
 #ifndef PERFORMANCE_COUNTERS_WANTED
@@ -1023,7 +1097,7 @@ int ret = 0;
    return ret;
 }
 
-void 
+void
 Command::cmd_HELP(ostream & out, const UCS_string & arg)
 {
    if (arg.size() > 0 && Avec::is_first_symbol_char(arg[0]))
@@ -1211,7 +1285,7 @@ bool left_col = true;
 #include "SystemVariable.def"
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
 {
    if (arg.size() == 0)                  LineInput::print_history(out);
@@ -1322,7 +1396,7 @@ transfer_context tctx(protection);
    fclose(in);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
                   UCS_string & quad_lx, bool silent)
 {
@@ -1338,7 +1412,7 @@ UCS_string wsname;
    Workspace::load_WS(out, lib, wsname, quad_lx, silent);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 {
    // Command is:
@@ -1503,7 +1577,7 @@ DIR * dir = opendir(filename.c_str());
    return dir != 0;
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::lib_common(ostream & out, const UCS_string_vector & args_range,
                     int variant)
 {
@@ -1669,7 +1743,7 @@ std::vector<int> col_widths;
       }
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 {
    // Command is:
@@ -1682,7 +1756,7 @@ Command::cmd_LIB1(ostream & out, const UCS_string_vector & args)
    Command::lib_common(out, args, 1);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 {
    // Command is:
@@ -1695,7 +1769,7 @@ Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
    Command::lib_common(out, args, 2);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_LOG(ostream & out, const UCS_string & arg)
 {
 #ifdef DYNAMIC_LOG_WANTED
@@ -1720,7 +1794,7 @@ Command::cmd_LOG(ostream & out, const UCS_string & arg)
 #endif
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_MORE(ostream & out)
 {
    if (Workspace::more_error().size() == 0)
@@ -1733,7 +1807,7 @@ Command::cmd_MORE(ostream & out)
    return;
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_OFF(int exit_val)
 {
    cleanup(true);
@@ -1770,7 +1844,7 @@ void
 Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
 UCS_string fname = args[0];
-   args.erase(args.begin());
+   args.erase(0);
 
 UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, false,
                                                   ".atf", 0);
@@ -1838,7 +1912,7 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
    return false;
 }
 //-----------------------------------------------------------------------------
-void 
+void
 Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
 {
    // )SAVE

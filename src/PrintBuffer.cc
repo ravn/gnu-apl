@@ -671,7 +671,7 @@ PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
    if (height > get_height())
       {
         UCS_string ucs(get_width(0), pad);
-        while (height > get_height())   buffer.insert(buffer.begin(), ucs);
+        while (height > get_height())   buffer.insert(0, ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -772,7 +772,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
 UCS_string hori(get_width(0), HORI);
 
-   buffer.insert(buffer.begin(), hori);
+   buffer.insert(0, hori);
    buffer.push_back(hori);
 
    // draw the corners
@@ -878,7 +878,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
 UCS_string hori(get_width(0), HORI);
 
-   buffer.insert(buffer.begin(), hori);
+   buffer.insert(0, hori);
    buffer.push_back(hori);
 
    // draw the corners

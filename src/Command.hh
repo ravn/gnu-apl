@@ -122,6 +122,9 @@ protected:
    static void cmd_COPY(ostream & out, UCS_string_vector & args,
                         bool protection);
 
+   /// )COPY_ONCE: copy a workspace file, nut at most once
+   static void cmd_COPY_ONCE(ostream & out, UCS_string_vector & args);
+
    /// ]DOXY: create doxygen-like documentation of the current workspace
    static void cmd_DOXY(ostream & out, UCS_string_vector & args);
 
@@ -282,6 +285,9 @@ protected:
 
    /// the number of APL expressions entered in immediate execution mode
    static ShapeItem APL_expression_count;
+
+   /// workspaces that shall not be copied twice
+   static UCS_string_vector copy_once_table;
 };
 //-----------------------------------------------------------------------------
 inline void Hswap(Command::val_val & vp1, Command::val_val & vp2)
