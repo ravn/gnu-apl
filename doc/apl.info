@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 29, 2021
+January 30, 2021
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -4289,7 +4289,7 @@ synthesized names are produced by ⎕XML:
      XML.
 
    Every XML name (of a tag or attribute) is also a valid APL name, but
-valid APL names may also contain the characters ¯, ∆, and ⍙ whioch are
+valid APL names may also contain the characters ¯, ∆, and ⍙ which are
 not valid in XML and used in the naming convention above to clearly
 separate the member names used in APL from the names used in the XML
 document.
@@ -4367,17 +4367,18 @@ APL←⎕XML XML
      indicating the category (i.e.  _, ∆, or ⍙) and the name from the
      XML tag:
 
-           8 ⎕CR (P C N)←3 ⎕XML "_2∆comment"
+                 8 ⎕CR (C P N)←3 ⎕XML "∆2comment"
      ┌→────────────┐
-     │2 ∆ ┌→──────┐│
+     │∆ 2 ┌→──────┐│
      │    │comment││
      │    └───────┘│
      └∊────────────┘
-           P
-     2
-           C
+     
+           C   ⍝ category
      ∆
-           N
+           P   ⍝ position
+     2
+           N   ⍝ (XML-) name
      comment
 
    • *4 ⎕XML B* is a string that shows the member names of the
@@ -4393,7 +4394,7 @@ APL←⎕XML XML
                   └─── Subtag
 
    • *5 ⎕XML B* is like 4 ⎕XML but displays not only the XML tags but
-     also other XML nodes (declarations, attrinutes, etc.):
+     also other XML nodes (declarations, attributes, etc.):
 
            ⊃35⎕CR 5 ⎕XML APL
      XML                               
@@ -6003,23 +6004,23 @@ Node: Section 3.32138733
 Node: Section 3.33141837
 Node: Section 3.34143826
 Node: Section 3.35148251
-Node: Chapter 4176276
-Node: Chapter 5178029
-Node: Chapter 6179155
-Node: Section 6.1180692
-Node: Section 6.2181972
-Node: Section 6.3182332
-Node: Section 6.4182574
-Node: Section 6.5183236
-Node: Section 6.6183714
-Node: Section 6.7184486
-Node: Section 6.8184943
-Node: Chapter 7185345
-Node: Section 7.1185764
-Node: Section 7.2186451
-Node: Chapter 8187282
-Node: Section 8.1187785
-Node: Section 8.2213099
+Node: Chapter 4176334
+Node: Chapter 5178087
+Node: Chapter 6179213
+Node: Section 6.1180750
+Node: Section 6.2182030
+Node: Section 6.3182390
+Node: Section 6.4182632
+Node: Section 6.5183294
+Node: Section 6.6183772
+Node: Section 6.7184544
+Node: Section 6.8185001
+Node: Chapter 7185403
+Node: Section 7.1185822
+Node: Section 7.2186509
+Node: Chapter 8187340
+Node: Section 8.1187843
+Node: Section 8.2213157
 
 End Tag Table
 

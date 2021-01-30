@@ -4448,7 +4448,7 @@ synthesized names are produced by ⎕XML:
 @end itemize
 
 Every XML name (of a tag or attribute) is also a valid APL name, but
-valid APL names may also contain the characters ¯, ∆, and ⍙ whioch are not
+valid APL names may also contain the characters ¯, ∆, and ⍙ which are not
 valid in XML and used in the naming convention above to clearly separate
 the member names used in APL from the names used in the XML document.
 
@@ -4530,17 +4530,18 @@ address the data in an XML node.
 indicating the category (i.e. _, ∆, or ⍙) and the name from the XML tag:
 
 @verbatim
-      8 ⎕CR (P C N)←3 ⎕XML "_2∆comment"
+            8 ⎕CR (C P N)←3 ⎕XML "∆2comment"
 ┌→────────────┐
-│2 ∆ ┌→──────┐│
+│∆ 2 ┌→──────┐│
 │    │comment││
 │    └───────┘│
 └∊────────────┘
-      P
-2
-      C
+
+      C   ⍝ category
 ∆
-      N
+      P   ⍝ position
+2
+      N   ⍝ (XML-) name
 comment
 @end verbatim
 
@@ -4559,7 +4560,7 @@ XML
 @end verbatim
 
 @item @strong{5 ⎕XML B} is like 4 ⎕XML but displays not only the XML tags but
-also other XML nodes (declarations, attrinutes, etc.):
+also other XML nodes (declarations, attributes, etc.):
 
 @verbatim
       ⊃35⎕CR 5 ⎕XML APL

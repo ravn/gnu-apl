@@ -238,7 +238,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>January 29, 2021
+<p>January 30, 2021
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -4660,7 +4660,7 @@ synthesized names are produced by ⎕XML:
 </li></ul>
 
 <p>Every XML name (of a tag or attribute) is also a valid APL name, but
-valid APL names may also contain the characters ¯, ∆, and ⍙ whioch are not
+valid APL names may also contain the characters ¯, ∆, and ⍙ which are not
 valid in XML and used in the naming convention above to clearly separate
 the member names used in APL from the names used in the XML document.
 </p>
@@ -4739,17 +4739,18 @@ address the data in an XML node.
 ⎕XML into a 3-item vector containing the (numeric) position, a character
 indicating the category (i.e. _, ∆, or ⍙) and the name from the XML tag:
 
-<pre class="verbatim">      8 ⎕CR (P C N)←3 ⎕XML &quot;_2∆comment&quot;
+<pre class="verbatim">            8 ⎕CR (C P N)←3 ⎕XML &quot;∆2comment&quot;
 ┌→────────────┐
-│2 ∆ ┌→──────┐│
+│∆ 2 ┌→──────┐│
 │    │comment││
 │    └───────┘│
 └∊────────────┘
-      P
-2
-      C
+
+      C   ⍝ category
 ∆
-      N
+      P   ⍝ position
+2
+      N   ⍝ (XML-) name
 comment
 </pre>
 </li><li> <strong>4 ⎕XML B</strong> is a string that shows the member names of the
@@ -4765,7 +4766,7 @@ XML
              └─── Subtag
 </pre>
 </li><li> <strong>5 ⎕XML B</strong> is like 4 ⎕XML but displays not only the XML tags but
-also other XML nodes (declarations, attrinutes, etc.):
+also other XML nodes (declarations, attributes, etc.):
 
 <pre class="verbatim">      ⊃35⎕CR 5 ⎕XML APL
 XML                               
