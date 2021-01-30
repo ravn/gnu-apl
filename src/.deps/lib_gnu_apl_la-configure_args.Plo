@@ -1,3 +1,0 @@
-lib_gnu_apl_la-configure_args.lo: configure_args.cc \
- /usr/include/stdc-predef.h
-/usr/include/stdc-predef.h:
