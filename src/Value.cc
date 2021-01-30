@@ -51,13 +51,14 @@ extern uint64_t top_of_memory();
 uint64_t Value::value_count = 0;
 uint64_t Value::total_ravel_count = 0;
 
-// the static Value instances are defined in static_Objects.cc
+// the static Value instances are defined in StaticObjects.cc
 
 _deleted_value * Value::deleted_values = 0;
 int Value::deleted_values_count = 0;
 uint64_t Value::fast_new = 0;
 uint64_t Value::slow_new = 0;
 uint64_t Value::alloc_size = 0;
+
 
 //-----------------------------------------------------------------------------
 void
