@@ -584,12 +584,9 @@ Value::get_member(const vector<const UCS_string *> & members, Value * & owner,
               LENGTH_ERROR;
             }
 
-         const ShapeItem rows = owner->get_rows();
          Cell * member_cell = owner->get_member_data(member_ucs);
          if (member_cell)   // existing member
             {
-              // existing member
-              //
               if (m == 0)   return member_cell; // final member
 
               // more members coming. Then member_cell should point to a
@@ -626,37 +623,17 @@ Value::get_member(const vector<const UCS_string *> & members, Value * & owner,
 
               // create new member row...
 
-              // find an unused slot in owner
+              // find an unused slot in owner. get_new_member() is guaranteed
+              // to find one (by possibly increasing the ravel of owner.
               //
-              ShapeItem unused = rows;
-              loop(r, rows)
-                  {
-                    Cell & cell = owner->get_ravel(2*r);
-                    if (cell.is_integer_cell() && cell.get_int_value() == 0)
-                       {
-                          unused = r;
-                          break;
-                       }
-                  }
-
-              if (unused == rows)   owner->double_ravel(LOC);   // unused is OK
-
-              Cell & cell = owner->get_ravel(2*unused);
-              Value_P member_name(member_ucs, LOC);
-              new (&cell)   PointerCell(member_name.get(), *owner);
-
-              member_cell = &cell + 1;   // final member
-              if (m == 0)
-                 {
-                   new (member_cell) IntCell(0);
-                   return member_cell;
-                  }
+              Cell * member_data = owner->get_new_member(member_ucs);
+              if (m == 0)   return member_data;
 
               // more members coming
               //
-              Value_P member_data = EmptyStruct(LOC);
-              new (member_cell)   PointerCell(member_data.get(), *owner);
-              owner = member_cell->get_pointer_value().get();
+              Value_P member_sub = EmptyStruct(LOC);
+              new (member_data)   PointerCell(member_sub.get(), *owner);
+              owner = member_sub.get();
             }   // if (member_cell == 0)
        }
 
@@ -691,11 +668,54 @@ const ShapeItem rows = get_rows();
 }
 //-----------------------------------------------------------------------------
 void
+Value::used_members(std::vector<ShapeItem> & result, bool sorted) const
+{
+   Assert(is_structured());
+
+   // 1. colllect the used columns...
+   //
+const ShapeItem rows = get_rows();
+   result.reserve(rows);
+   loop(r, rows)
+       {
+         const Cell & member_name_cell = get_ravel(2*r);
+         if (!member_name_cell.is_pointer_cell())   continue;   // unused
+
+         result.push_back(r);
+       }
+
+   if (!sorted)   return;
+
+   // make result[m] ≤ result[m+k] for all k > 0 and all m ≥ 0
+   //
+   loop(m, result.size())   // for all m
+       {
+         ShapeItem small = m;   // assume that m is already the smallest
+         for (size_t j = m + 1; j < result.size(); ++j)   // for all j = m + k
+             {
+               if (get_ravel(2*result[small]).greater(get_ravel(2*result[j])))
+                  small = j;
+             }
+
+         if (small != m)   // there was an even smaller item above m
+            {
+              const ShapeItem tmp = result[m];
+              result[m] = result[small];
+              result[small] = tmp;
+            }
+       }
+
+}
+//-----------------------------------------------------------------------------
+void
 Value::sorted_members(std::vector<ShapeItem> & result,
                       const Unicode * filters) const
 {
    // we take advantage of the fact that the positions in the member
    // prefixes are limited, so we can sort them in linear time.
+   //
+   // CAUTION: This function works only for members with a _NNN prefix
+   // indication the sorting order (as produced by ⎕XML) @@@
    //
    Assert(is_structured());
 
@@ -755,8 +775,8 @@ Value::get_member_data(const UCS_string & member) const
 {
 const ShapeItem rows = get_rows();
 
-ShapeItem row = member.FNV_hash();
-   loop(r, rows)   // loop vber member rows
+ShapeItem row = member.FNV_hash() % rows;
+   loop(r, rows)   // loop over member rows
        {
          if (++row >= rows)   row = 0;
          const Cell & name_cell = get_ravel(2*row);
@@ -776,7 +796,7 @@ Value::get_member_data(const UCS_string & member)
 {
 const ShapeItem rows = get_rows();
 
-ShapeItem row = member.FNV_hash();
+ShapeItem row = member.FNV_hash() % rows;
    loop(r, rows)   // loop ober member rows
        {
          if (++row >= rows)   row = 0;
@@ -855,12 +875,12 @@ ShapeItem valid_rows = 0;
 Cell *
 Value::get_new_member(const UCS_string & new_member)
 {
-   // find an unused slot in owner
+   // find an unused slot in owner. Return its data cell (= name cell + 1)
    //
    for (int j = 0; j < 2; ++j)   // j == 1 will succeed
        {
          const ShapeItem rows = get_rows();   // changed by double_ravel() !
-         ShapeItem row = new_member.FNV_hash();
+         ShapeItem row = new_member.FNV_hash() % rows;
          loop(r, rows)
              {
                if (++row >= rows)   row = 0;
@@ -901,15 +921,13 @@ Cell * doubled = new Cell[new_cells];
    shape.set_shape_item(0, new_rows);
    ravel = doubled;
 
-   // rehash the old rows into the doubled ravel. Since the table is full,
-   // all member names must be pointer cells.
-   //
    loop(r, old_rows)
        {
          // transfer the member name. The old member_name_cell must be released
          // since get_new_member() below creates a new one in the new ravel.
          //
          Cell & member_name_cell = old_ravel[2*r];
+         if (!member_name_cell.is_pointer_cell())   continue;   // unused
          Assert(member_name_cell.is_pointer_cell());
          UCS_string member_name(member_name_cell.get_pointer_value().getref());
          member_name_cell.release(LOC);
@@ -1651,11 +1669,12 @@ Value::index(const IndexExpr & IX) const
              }
 
          Value_P Z(member_count, LOC);
-         loop(row, member_count)
+         loop(row, rows)
              {
                if (get_ravel(2*row).is_pointer_cell())
                   Z->next_ravel()->init(get_ravel(2*row), Z.getref(), LOC);
              }
+
          if (member_count == 0)   // no valid members (last member )ERASEd)
             new (&Z->get_ravel(0)) PointerCell(Idx0(LOC).get(), Z.getref());
 
@@ -2783,7 +2802,7 @@ Value_P Z(sh, loc);
 Value_P
 EmptyStruct(const char * loc)
 {
-const Shape shape_Z(ShapeItem(8), ShapeItem(2));
+const Shape shape_Z(8, 2);
 Value_P Z(shape_Z, loc);
    while (Cell * cell = Z->next_ravel())   new (cell) IntCell(0);
    Z->check_value(LOC);

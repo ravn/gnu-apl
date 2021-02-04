@@ -137,7 +137,6 @@ DOMAIN ERROR+
   </ROOT>                      
                                
 
-
 ⊃7 ⎕XML APL
 .∆1text              
 ._2ROOT              
@@ -316,12 +315,32 @@ XML
      ⊃13 ⎕XML APL   ⍝ all member names (8 ⎕XML, but non-recursive)
 ._3Document
 
+      (14 "_3Document._2Tag1.∆1text")  ⎕XML APL
+∆2comment
+      (14 "_2Tag1.∆1text")  ⎕XML APL._3Document
+∆2comment
+      (14 "∆1text")  ⎕XML APL._3Document._2Tag1
+∆2comment
+
+
+      APL ← ⎕XML XML←"<ROOT><A/><B/><C/></ROOT>"
+      (14 "") ⎕XML APL._1ROOT
+⍙1
+      (14 "⍙1") ⎕XML APL._1ROOT
+_1A
+      (14 "_1A") ⎕XML APL._1ROOT
+_2B
+      (14 "_2B") ⎕XML APL._1ROOT
+_3C
+      (14 "_3C") ⎕XML APL._1ROOT
+
+
       ⊃15 ⎕XML APL
 DOMAIN ERROR+
       ⊃15 ⎕XML APL
        ^       ^
       )MORE
-Bad function number A=15 in A ⎕XML B
+A ⎕XML B: Bad function number A=15
 
       )SIC
 

@@ -1163,9 +1163,10 @@ Quad_XML::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
 
-   switch(const int function_number = A->get_ravel(0).get_int_value())
+const int function_number = A->get_ravel(0).get_int_value();
+   switch(function_number)
       {
-         case 0:
+         case 0:   // same as monadic ⎕XML
               {
                 return eval_B(B);
               }
@@ -1245,10 +1246,9 @@ Quad_XML::eval_AB(Value_P A, Value_P B) const
                 return next_member(A.getref(), B.getref());
               }
 
-        default: MORE_ERROR() << "Bad function number A=" << function_number
-                              << " in A ⎕XML B";
       }
 
+   MORE_ERROR() << "A ⎕XML B: Bad function number A=" << function_number;
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -1409,13 +1409,13 @@ Quad_XML::split_name(Unicode * category, ShapeItem * position,
                      UCS_string * name, const Value & value)
 {
    // name is one of:
-   // ⍙N                        (tag namei, N per ⎕IO
+   // ⍙N                        (tag name, N was ⎕IO
    // ⍙NNNattribute_name        (attribute position NNN with name
    // ∆NNNsynmthetic_tag_name   (synthetic position NNN and tag name
    // _NNNuser_name             (user tag position NNN and tag name)
 
 const ShapeItem len = value.element_count();
-   Assert(len >= 2);   // "⍙2" is the shortest member name
+   Assert(len >= 1);
 const Cell * src = &value.get_ravel(0);
 const Cell * end = src + len;
 
@@ -1687,16 +1687,16 @@ Value_P path = path_split(A1);
 const ShapeItem path_length = path->element_count();
    if (path_length < 1)
       {
-        MORE_ERROR() << "too few path elements in A of (14 A) ⎕XML B";
+        MORE_ERROR() << "(14 A) ⎕XML B: too few path elements in A";
         LENGTH_ERROR; 
       }
 
-   // walk along path to find get the value that contains the
-   // final item in the path.
+   // walk along path to find the value that contains the final item in the
+   // path. path_idx is the position in the path, corresponding to the
+   // depth in the value tree.
    //
-size_t path_idx = 0;
 const Value * container = &B;
-   for (;path_idx < size_t(path_length - 1); ++path_idx)
+   for (size_t path_idx = 0; path_idx < size_t(path_length - 1); ++path_idx)
        {
          const UCS_string member(path->get_ravel(path_idx));
          const Cell * data_cell = container->get_member_data(member);
@@ -1717,9 +1717,10 @@ const Value * container = &B;
               DOMAIN_ERROR;
             }
        }
-const Value & last_path_item = path->get_ravel(path_length - 1)
+const Value & last_path_item = path_length == 1
+                             ? A1
+                             : path->get_ravel(path_length - 1)
                                     .get_pointer_value().getref();
-
 ShapeItem leaf_position;
    {
      const int weight = split_name(0, &leaf_position, 0, last_path_item);

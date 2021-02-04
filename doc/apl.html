@@ -197,7 +197,11 @@ ul.no-bullet {list-style: none}
         <li><a name="toc-Dyadic-_005b_003f_005dXML" href="#Dyadic-_005b_003f_005dXML">3.35.3.5 Dyadic ⎕XML</a></li>
         <li><a name="toc-XML-Queries" href="#XML-Queries">3.35.3.6 XML Queries</a></li>
       </ul></li>
-      <li><a name="toc-JSON-Parsing_003a-_005b_003f_005dJSON" href="#JSON-Parsing_003a-_005b_003f_005dJSON">3.35.4 JSON Parsing: ⎕JSON</a></li>
+      <li><a name="toc-JSON-Parsing_003a-_005b_003f_005dJSON" href="#JSON-Parsing_003a-_005b_003f_005dJSON">3.35.4 JSON Parsing: ⎕JSON</a>
+      <ul class="no-bullet">
+        <li><a name="toc-Monadic-_005b_003f_005dJSON" href="#Monadic-_005b_003f_005dJSON">3.35.4.1 Monadic  ⎕JSON</a></li>
+        <li><a name="toc-Dyadic-_005b_003f_005dJSON" href="#Dyadic-_005b_003f_005dJSON">3.35.4.2 Dyadic  ⎕JSON</a></li>
+      </ul></li>
     </ul></li>
   </ul></li>
   <li><a name="toc-Limitations-and-Missing-Features" href="#Chapter-4">4 Limitations and Missing Features</a>
@@ -240,7 +244,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>January 30, 2021
+<p>February 4, 2021
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -4197,9 +4201,9 @@ errors and changes, and avoid the use of experimental features in production cod
 <h4 class="subsection">3.35.1 Structured Variables</h4>
 
 <p>A structured variable is an APL variable that contains several related but
-otherwise independent sub-variables. Such structured variables can be convenient
-for passing many related arguments to a function, or for returning multiple
-results from a function.
+otherwise independent sub-variables aka members. Such structured variables
+can be convenient for passing many related arguments to a function, or
+for returning multiple results from a function.
 </p>
 <p>The different sub-variables of a structured variable are accessed by the
 (top-level) name of the variable followed by a non-empty sequence of member
@@ -4317,6 +4321,9 @@ structured variable is valid and concatenates the members:
       A.b.c.d.e
 leaf-cde
 </pre>
+<p>The file <strong>src/testcases/Structured_variable.tc</strong> contains the examples
+above (and more) 
+</p>
 <a name="Associative-Arrays"></a>
 <h4 class="subsection">3.35.2 Associative Arrays</h4>
 
@@ -4739,18 +4746,18 @@ APL←⎕XML XML
 <p>Then
 </p>
 <ul>
-<li> <strong>0 ⎕XML B</strong> is the same as monadic ⎕XML B.
+<li> <strong>Z←0 ⎕XML B</strong> is the same as monadic Z←⎕XML B.
 
-</li><li> <strong>1 ⎕XML B</strong> is like 0 ⎕XML B, except that B is not the XML
+</li><li> <strong>Z←1 ⎕XML B</strong> is like 0 ⎕XML B, except that B is not the XML
 document (string) itself but the name of a file from which an XML document
 is read.
 
-</li><li> <strong>2 ⎕XML B</strong> splits an APL member path (a sequence of member names)
+</li><li> <strong>Z←2 ⎕XML B</strong> splits an APL member path (a sequence of member names)
 into a vector P of (nested) member names. This vector P is understood by
 the ASPL primitive PICK (i.e. Z←P⊃APL or (P⊃APL←value) and can be used to
 address the data in an XML node.
 
-</li><li> <strong>3 ⎕XML B</strong> splits an APL member name as produced by monadic
+</li><li> <strong>Z←3 ⎕XML B</strong> splits an APL member name as produced by monadic
 ⎕XML into a 3-item vector containing the (numeric) position, a character
 indicating the category (i.e. _, ∆, or ⍙) and the name from the XML tag:
 
@@ -4768,7 +4775,7 @@ indicating the category (i.e. _, ∆, or ⍙) and the name from the XML tag:
       N   ⍝ (XML-) name
 comment
 </pre>
-</li><li> <strong>4 ⎕XML B</strong> is a string that shows the member names of the
+</li><li> <strong>Z←4 ⎕XML B</strong> is a string that shows the member names of the
  associative array B in a tree-like fashion. For example:
 
 <pre class="verbatim">      ⊃35⎕CR 4 ⎕XML APL
@@ -4780,7 +4787,7 @@ XML
              │          
              └─── Subtag
 </pre>
-</li><li> <strong>5 ⎕XML B</strong> is like 4 ⎕XML but displays not only the XML tags but
+</li><li> <strong>Z←5 ⎕XML B</strong> is like 4 ⎕XML but displays not only the XML tags but
 also other XML nodes (declarations, attributes, etc.):
 
 <pre class="verbatim">      ⊃35⎕CR 5 ⎕XML APL
@@ -4804,7 +4811,7 @@ XML
        │     └─── _5∆text         
        └─── _3∆text               
 </pre>
-</li><li> <strong>6 ⎕XML B</strong> is like 4 ⎕XML but displays not only the member
+</li><li> <strong>Z←6 ⎕XML B</strong> is like 4 ⎕XML but displays not only the member
 name but the entire path to the member:
 
 <pre class="verbatim">      ⊃35⎕CR 6 ⎕XML APL
@@ -4816,7 +4823,7 @@ XML
              │                                  
              └─── ._3_Document._2_Tag1._4_Subtag
 </pre>
-</li><li> <strong>7 ⎕XML B</strong> returns a list of all members in a depth-first order.
+</li><li> <strong>Z←7 ⎕XML B</strong> returns a list of all members in a depth-first order.
 This list can be used as an iterator to traverse the entire tree (and possibly
 filter out items along the way).
 
@@ -4842,7 +4849,83 @@ filter out items along the way).
 ._3_Document._2_Tag1._4_Subtag._2∆comment
 ._3_Document._2_Tag1._4_Subtag._3∆text   
 </pre>
-</li></ul>
+</li><li> <strong>Z←8 ⎕XML B</strong> is like Z←7 ⎕XML B, except that only the aubset of
+those members that are related to tags (the tag name ⍙ and tag attributes)
+are returned:
+
+<pre class="verbatim">      ⊃8 ⎕XML APL   ⍝ all tag related member names (tag names and attributes)
+._3Document.⍙1····················
+._3Document._2Tag1.⍙1·············
+._3Document._2Tag1.⍙2name·········
+._3Document._2Tag1._4Subtag.⍙1····
+._3Document._2Tag1._4Subtag.⍙2name
+</pre>
+</li><li> <strong>Z←9 ⎕XML B</strong> is like Z←7 ⎕XML B, except that only the aubset of
+synthesized members other than ∆text are returned:
+
+<pre class="verbatim">      ⊃9 ⎕XML APL   ⍝ all synthetic member names (except unstructured text)
+.∆1declaration·······················
+._3Document._2Tag1.∆2comment·········
+._3Document._2Tag1._4Subtag.∆2comment
+</pre>
+</li><li> <strong>Z←10 ⎕XML B</strong> is like Z←7 ⎕XML B, except that only the aubset of
+synthesized ∆text members are returned:
+
+<pre class="verbatim">.∆2text···························
+._3Document.∆1text················
+._3Document._2Tag1.∆1text·········
+._3Document._2Tag1.∆3text·········
+._3Document._2Tag1._4Subtag.∆1text
+._3Document._2Tag1._4Subtag.∆3text
+._3Document._2Tag1.∆5text·········
+._3Document.∆3text················
+.∆18text··························
+</pre>
+</li><li> <strong>Z←11 ⎕XML B</strong> is like Z←7 ⎕XML B, except that only the tag
+names are returned:
+
+<pre class="verbatim">      ⊃11 ⎕XML APL   ⍝ all tag member names
+._3Document················
+._3Document._2Tag1·········
+._3Document._2Tag1._4Subtag
+</pre>
+</li><li> <strong>Z←12 ⎕XML B</strong> is like Z←7 ⎕XML B, except that all member
+names of B are returned without descending into sub-tree:
+
+<pre class="verbatim">      ⊃12 ⎕XML APL   ⍝ all member names (7 ⎕XML, but non-recursive)
+.∆1declaration
+.∆2text·······
+._3Document···
+.∆18text······
+</pre>
+<p>This variant may also be useful for structured variables that were not
+created by ⎕XML.
+</p>
+</li><li> <strong>Z←13 ⎕XML B</strong> shows the (flat) tag names in B, but but does
+not descend into any sub-tree if B.
+
+<pre class="verbatim">     ⊃13 ⎕XML APL   ⍝ all tag members (8 ⎕XML, but non-recursive)
+ ._3Document 
+</pre>
+</li><li> <strong>Z←(14 &quot;member-name&quot;)  ⎕XML B</strong> shows the next member in B
+after &quot;member-name&quot;. It can be used as an iterator that walks through
+the tags. an empty member name returns the first member:
+
+<pre class="verbatim">      APL ← ⎕XML XML←&quot;&lt;ROOT&gt;&lt;A/&gt;&lt;B/&gt;&lt;C/&gt;&lt;/ROOT&gt;&quot;
+
+      (14 &quot;&quot;) ⎕XML APL._1ROOT   ⍝ get first memebr in APL._1ROOT
+⍙1
+      (14 &quot;⍙1&quot;) ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT.⍙1
+_1A
+      (14 &quot;_1A&quot;) ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT._1A
+_2B
+      (14 &quot;_2B&quot;) ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT._2B
+_3C
+      (14 &quot;_3C&quot;) ⎕XML APL._1ROOT   ⍝ last member: will be empty
+
+
+</pre><p>4786
+</p></li></ul>
 
 <a name="XML-Queries"></a>
 <h4 class="subsubsection">3.35.3.6 XML Queries</h4>
@@ -4864,8 +4947,46 @@ follow these top-level steps:
 <a name="JSON-Parsing_003a-_005b_003f_005dJSON"></a>
 <h4 class="subsection">3.35.4 JSON Parsing: ⎕JSON</h4>
 
-<p>TODO.
+<p>GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
+A (valid) JSON string is mapped to an APL value as follows:
 </p>
+<ul>
+<li> JSON value ←→ APL value
+</li><li> JSON number ←→  APL number
+</li><li> JSON string ←→  APL string
+</li><li> JSON literal ←→  enclosed APL string ( ⊂&rsquo;null&rsquo;, ⊂&rsquo;true&rsquo;, or ⊂&rsquo;false&rsquo; )
+</li><li> JSON array ←→  APL vector
+</li><li> JSON object ←→  structured APL value (associative array)
+</li></ul>
+
+<a name="Monadic-_005b_003f_005dJSON"></a>
+<h4 class="subsubsection">3.35.4.1 Monadic  ⎕JSON</h4>
+
+<p>Z←⎕JSON B converts the string B into an APL value according to the mapping
+above. If that fails then command )MORE provides information about the error
+and where in B the error was detected.
+</p>
+<a name="Dyadic-_005b_003f_005dJSON"></a>
+<h4 class="subsubsection">3.35.4.2 Dyadic  ⎕JSON</h4>
+
+<p>Z←A ⎕JSON B performs one of the following conversions:
+</p>
+<ul>
+<li> <strong>Z←0 ⎕JSON B</strong> is the same as monadic Z←⎕JSON B.
+
+</li><li> <strong>Z←1 ⎕JSON B</strong> is like Z←0 ⎕XML B, except that B is not the JSON
+string itself but the name of a file from which an JSON string
+is read.
+
+</li><li> <strong>Z←2 ⎕JSON B</strong> is the inverse of Z←0 ⎕XML B. It converts an APL
+value to a JSON string.
+
+</li><li> <strong>Z←3 ⎕JSON B</strong> is like 2 ⎕JSON B, except that the member names
+of JSON objects are sorted alphabetically. That is of little use (and costs
+perfomance) if the JSON string is being processed further, but could help
+troubleshooting when the JSON string is displayed.
+</li></ul>
+
 <hr>
 <a name="Chapter-4"></a>
 <div class="header">

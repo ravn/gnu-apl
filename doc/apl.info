@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 30, 2021
+February 4, 2021
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3838,9 +3838,9 @@ the use of experimental features in production code.
 ---------------------------
 
 A structured variable is an APL variable that contains several related
-but otherwise independent sub-variables.  Such structured variables can
-be convenient for passing many related arguments to a function, or for
-returning multiple results from a function.
+but otherwise independent sub-variables aka members.  Such structured
+variables can be convenient for passing many related arguments to a
+function, or for returning multiple results from a function.
 
    The different sub-variables of a structured variable are accessed by
 the (top-level) name of the variable followed by a non-empty sequence of
@@ -3958,6 +3958,9 @@ another structured variable is valid and concatenates the members:
       A.b.c ← C               ⍝ override leaf A.b.c of A
       A.b.c.d.e
 leaf-cde
+
+   The file *src/testcases/Structured_variable.tc* contains the examples
+above (and more)
 
 3.35.2 Associative Arrays
 -------------------------
@@ -4365,18 +4368,18 @@ APL←⎕XML XML
 
    Then
 
-   • *0 ⎕XML B* is the same as monadic ⎕XML B.
+   • *Z←0 ⎕XML B* is the same as monadic Z←⎕XML B.
 
-   • *1 ⎕XML B* is like 0 ⎕XML B, except that B is not the XML document
-     (string) itself but the name of a file from which an XML document
-     is read.
+   • *Z←1 ⎕XML B* is like 0 ⎕XML B, except that B is not the XML
+     document (string) itself but the name of a file from which an XML
+     document is read.
 
-   • *2 ⎕XML B* splits an APL member path (a sequence of member names)
+   • *Z←2 ⎕XML B* splits an APL member path (a sequence of member names)
      into a vector P of (nested) member names.  This vector P is
      understood by the ASPL primitive PICK (i.e.  Z←P⊃APL or
      (P⊃APL←value) and can be used to address the data in an XML node.
 
-   • *3 ⎕XML B* splits an APL member name as produced by monadic ⎕XML
+   • *Z←3 ⎕XML B* splits an APL member name as produced by monadic ⎕XML
      into a 3-item vector containing the (numeric) position, a character
      indicating the category (i.e.  _, ∆, or ⍙) and the name from the
      XML tag:
@@ -4395,7 +4398,7 @@ APL←⎕XML XML
            N   ⍝ (XML-) name
      comment
 
-   • *4 ⎕XML B* is a string that shows the member names of the
+   • *Z←4 ⎕XML B* is a string that shows the member names of the
      associative array B in a tree-like fashion.  For example:
 
            ⊃35⎕CR 4 ⎕XML APL
@@ -4407,7 +4410,7 @@ APL←⎕XML XML
                   │          
                   └─── Subtag
 
-   • *5 ⎕XML B* is like 4 ⎕XML but displays not only the XML tags but
+   • *Z←5 ⎕XML B* is like 4 ⎕XML but displays not only the XML tags but
      also other XML nodes (declarations, attributes, etc.):
 
            ⊃35⎕CR 5 ⎕XML APL
@@ -4431,8 +4434,8 @@ APL←⎕XML XML
             │     └─── _5∆text         
             └─── _3∆text               
 
-   • *6 ⎕XML B* is like 4 ⎕XML but displays not only the member name but
-     the entire path to the member:
+   • *Z←6 ⎕XML B* is like 4 ⎕XML but displays not only the member name
+     but the entire path to the member:
 
            ⊃35⎕CR 6 ⎕XML APL
      XML                                             
@@ -4443,7 +4446,7 @@ APL←⎕XML XML
                   │                                  
                   └─── ._3_Document._2_Tag1._4_Subtag
 
-   • *7 ⎕XML B* returns a list of all members in a depth-first order.
+   • *Z←7 ⎕XML B* returns a list of all members in a depth-first order.
      This list can be used as an iterator to traverse the entire tree
      (and possibly filter out items along the way).
 
@@ -4469,6 +4472,83 @@ APL←⎕XML XML
      ._3_Document._2_Tag1._4_Subtag._2∆comment
      ._3_Document._2_Tag1._4_Subtag._3∆text   
 
+   • *Z←8 ⎕XML B* is like Z←7 ⎕XML B, except that only the aubset of
+     those members that are related to tags (the tag name ⍙ and tag
+     attributes) are returned:
+
+           ⊃8 ⎕XML APL   ⍝ all tag related member names (tag names and attributes)
+     ._3Document.⍙1····················
+     ._3Document._2Tag1.⍙1·············
+     ._3Document._2Tag1.⍙2name·········
+     ._3Document._2Tag1._4Subtag.⍙1····
+     ._3Document._2Tag1._4Subtag.⍙2name
+
+   • *Z←9 ⎕XML B* is like Z←7 ⎕XML B, except that only the aubset of
+     synthesized members other than ∆text are returned:
+
+           ⊃9 ⎕XML APL   ⍝ all synthetic member names (except unstructured text)
+     .∆1declaration·······················
+     ._3Document._2Tag1.∆2comment·········
+     ._3Document._2Tag1._4Subtag.∆2comment
+
+   • *Z←10 ⎕XML B* is like Z←7 ⎕XML B, except that only the aubset of
+     synthesized ∆text members are returned:
+
+     .∆2text···························
+     ._3Document.∆1text················
+     ._3Document._2Tag1.∆1text·········
+     ._3Document._2Tag1.∆3text·········
+     ._3Document._2Tag1._4Subtag.∆1text
+     ._3Document._2Tag1._4Subtag.∆3text
+     ._3Document._2Tag1.∆5text·········
+     ._3Document.∆3text················
+     .∆18text··························
+
+   • *Z←11 ⎕XML B* is like Z←7 ⎕XML B, except that only the tag names
+     are returned:
+
+           ⊃11 ⎕XML APL   ⍝ all tag member names
+     ._3Document················
+     ._3Document._2Tag1·········
+     ._3Document._2Tag1._4Subtag
+
+   • *Z←12 ⎕XML B* is like Z←7 ⎕XML B, except that all member names of B
+     are returned without descending into sub-tree:
+
+           ⊃12 ⎕XML APL   ⍝ all member names (7 ⎕XML, but non-recursive)
+     .∆1declaration
+     .∆2text·······
+     ._3Document···
+     .∆18text······
+
+     This variant may also be useful for structured variables that were
+     not created by ⎕XML.
+
+   • *Z←13 ⎕XML B* shows the (flat) tag names in B, but but does not
+     descend into any sub-tree if B.
+
+          ⊃13 ⎕XML APL   ⍝ all tag members (8 ⎕XML, but non-recursive)
+      ._3Document 
+
+   • *Z←(14 "member-name") ⎕XML B* shows the next member in B after
+     "member-name".  It can be used as an iterator that walks through
+     the tags.  an empty member name returns the first member:
+
+           APL ← ⎕XML XML←"<ROOT><A/><B/><C/></ROOT>"
+     
+           (14 "") ⎕XML APL._1ROOT   ⍝ get first memebr in APL._1ROOT
+     ⍙1
+           (14 "⍙1") ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT.⍙1
+     _1A
+           (14 "_1A") ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT._1A
+     _2B
+           (14 "_2B") ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT._2B
+     _3C
+           (14 "_3C") ⎕XML APL._1ROOT   ⍝ last member: will be empty
+     
+     
+     4786
+
 3.35.3.6 XML Queries
 ....................
 
@@ -4488,7 +4568,42 @@ their details, but usually follow these top-level steps:
 3.35.4 JSON Parsing: ⎕JSON
 --------------------------
 
-TODO.
+GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
+A (valid) JSON string is mapped to an APL value as follows:
+
+   • JSON value ←→ APL value
+   • JSON number ←→ APL number
+   • JSON string ←→ APL string
+   • JSON literal ←→ enclosed APL string ( ⊂’null’, ⊂’true’, or ⊂’false’
+     )
+   • JSON array ←→ APL vector
+   • JSON object ←→ structured APL value (associative array)
+
+3.35.4.1 Monadic ⎕JSON
+......................
+
+Z←⎕JSON B converts the string B into an APL value according to the
+mapping above.  If that fails then command )MORE provides information
+about the error and where in B the error was detected.
+
+3.35.4.2 Dyadic ⎕JSON
+.....................
+
+Z←A ⎕JSON B performs one of the following conversions:
+
+   • *Z←0 ⎕JSON B* is the same as monadic Z←⎕JSON B.
+
+   • *Z←1 ⎕JSON B* is like Z←0 ⎕XML B, except that B is not the JSON
+     string itself but the name of a file from which an JSON string is
+     read.
+
+   • *Z←2 ⎕JSON B* is the inverse of Z←0 ⎕XML B. It converts an APL
+     value to a JSON string.
+
+   • *Z←3 ⎕JSON B* is like 2 ⎕JSON B, except that the member names of
+     JSON objects are sorted alphabetically.  That is of little use (and
+     costs perfomance) if the JSON string is being processed further,
+     but could help troubleshooting when the JSON string is displayed.
 
 
 File: apl.info,  Node: Chapter 4,  Next: Chapter 5,  Prev: Chapter 3,  Up: Top
@@ -6023,23 +6138,23 @@ Node: Section 3.32139388
 Node: Section 3.33142492
 Node: Section 3.34144481
 Node: Section 3.35148906
-Node: Chapter 4177053
-Node: Chapter 5178806
-Node: Chapter 6179932
-Node: Section 6.1181469
-Node: Section 6.2182749
-Node: Section 6.3183109
-Node: Section 6.4183351
-Node: Section 6.5184013
-Node: Section 6.6184491
-Node: Section 6.7185263
-Node: Section 6.8185720
-Node: Chapter 7186122
-Node: Section 7.1186541
-Node: Section 7.2187228
-Node: Chapter 8188059
-Node: Section 8.1188562
-Node: Section 8.2213876
+Node: Chapter 4181790
+Node: Chapter 5183543
+Node: Chapter 6184669
+Node: Section 6.1186206
+Node: Section 6.2187486
+Node: Section 6.3187846
+Node: Section 6.4188088
+Node: Section 6.5188750
+Node: Section 6.6189228
+Node: Section 6.7190000
+Node: Section 6.8190457
+Node: Chapter 7190859
+Node: Section 7.1191278
+Node: Section 7.2191965
+Node: Chapter 8192796
+Node: Section 8.1193299
+Node: Section 8.2218613
 
 End Tag Table
 

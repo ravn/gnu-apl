@@ -39,21 +39,87 @@ public:
    static Quad_JSON * fun;          ///< Built-in function.
    static Quad_JSON  _fun;          ///< Built-in function.
 
-   static UCS_string skip_pos_prefix(const UCS_string & ucs);
-
-   /// split src, e.g. "_2_name" into integer 2, Unicode '_', and
-   /// UCS_string 'name'. Null pointers if not relevant.
-   static int split_name(Unicode * category, ShapeItem * position,
-                         UCS_string * name, const Value & src);
 protected:
-   /// convert APL associative array to JSON string
-   static Value_P APL_to_JSON(const Value & B);
+   /// overloaded Function::eval_B()
+   Token eval_AB(Value_P A, Value_P B) const;
+
+   /// overloaded Function::eval_B()
+   Token eval_B(Value_P B) const;
+
+   /// return JSON file (-name in B) converted to APL structured value
+   Token convert_file(const Value & B) const;
+
+   /// convert APL value to JSON string
+   static Value_P APL_to_JSON(const Value & B, bool sorted);
+
+   /// append APL value to JSON string \b result
+   static void APL_to_JSON_string(UCS_string & result, const Value & B,
+                                  bool level, bool sorted);
+
+   /// append Cell value to JSON string \b result
+   static void APL_to_JSON_string(UCS_string & result, const Cell & B,
+                                  bool level, bool sorted);
 
    /// convert JSON string to APL associative array
    static Value_P JSON_to_APL(const Value & B);
 
-   /// overloaded Function::eval_B()
-   Token eval_B(Value_P B) const;
+   /// skip string token starting at ucs_B[b]. Return the content length.
+   /// @start: ucs_B[b] = left " of the string
+   /// @end:   ucs_B[b] = right " of the string
+   static size_t skip_string(const UCS_string & ucs_B, ShapeItem & b);
+
+   /// return the length-1 of the number(-token) starting at \b b in \b ucs_B
+   inline static size_t number_len(const UCS_string & ucs_B, ShapeItem b);
+
+   /// parse a JSON value (false, null, true, object, array, number, or string)
+   /// and increment along the way.
+   static void parse_value(Value & Z, const UCS_string & ucs_B,
+                           const std::vector<ShapeItem> & tokens_B,
+                           size_t & token0);
+
+   /// parse a JSON array: [ value (, value)* ] and increment token0
+   /// along the way.
+   static void parse_array(Value & Z, const UCS_string & ucs_B,
+                           const std::vector<ShapeItem> & tokens_B,
+                           size_t & token0);
+
+   /// parse a JSON object: { member ( , member)* } and increment token0
+   static void parse_object(Value & Z, const UCS_string & ucs_B,
+                           const std::vector<ShapeItem> & tokens_B,
+                           size_t & token0);
+
+   /// parse a JSON object member: "name" : value , ; and increment token0
+   /// along the way.
+   static void parse_object_member(Value & Z, const UCS_string & ucs_B,
+                                   const std::vector<ShapeItem> & tokens_B,
+                                   size_t & token0);
+
+   /// parse a JSON number
+   static void parse_number(Value & Z, const UCS_string & ucs_B, ShapeItem b);
+
+   /// parse a JSON string
+   static void parse_string(Value & Z, const UCS_string & ucs_B, ShapeItem b);
+
+   /// decode a \uUUUU sequence, return non-Unicode_0 on success and increment b,
+   /// b, or else return Unicode_0 and leave b as is.
+   static Unicode decode_UUUU(const UCS_string & ucs_B, ShapeItem b);
+
+   static bool is_high_surrogate(int uni)
+      { return (uni & ~0x03FF) == 0xD800; }
+
+   static bool is_low_surrogate(int uni)
+      { return (uni & ~0x03FF) == 0xDC00; }
+
+   /// parse a JSON literal (false, null, or true)
+   static void parse_literal(Value & Z, const UCS_string & ucs_B,
+                             ShapeItem b, const char * expected_literal);
+
+   /// return the number of name-separators or value-separators at the
+   /// top-level of the object or array starting at token0 and increment token0
+   /// along the way.
+   static size_t comma_count(const UCS_string & ucs_B,
+                             const std::vector<ShapeItem> & tokens_B,
+                             size_t & token0);
 };
 
 #endif // __Quad_JSON_DEFINED__
