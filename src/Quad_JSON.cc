@@ -225,8 +225,8 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
                    default: if (uni < UNI_SPACE)
                                {
                                  char cc[10];
-                                 snprintf(cc, sizeof(cc), "\\u%4.4X", int(uni));
-Q(cc)
+                                 snprintf(cc, sizeof(cc), "\\u%4.4X",
+                                                          int(uni));
                                  result.append_UTF8(cc);
                                }
                             else
