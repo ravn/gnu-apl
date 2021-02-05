@@ -477,9 +477,12 @@ grow:
                if (size_t(PC) < body.size() &&
                    body[PC + 1].get_tag() == TOK_OPER2_INNER)
                   {
-                    // APL code is .SYM which could be a normal inner product f.g
-                    // or a value member. We
-                    if (nc != NC_FUNCTION && nc != NC_OPERATOR)   // not inner prod
+                    // APL code is .SYM which could be a normal inner product
+                    // product f.SYM or a value member Val.g . We check the
+                    // name class to decide.
+                    //
+                    if (nc != NC_FUNCTION &&
+                        nc != NC_OPERATOR)   // not inner product
                        {
                          PC = lookahead_high + 1;   // resolved: restore PC
                          push(tl);
@@ -517,7 +520,8 @@ grow:
                if (is_left_sym)   set_assign_state(ASS_var_seen);
                Log(LOG_prefix_parser)
                   {
-                    const char * what = is_left_sym ? "TOK_LSYMB" : "TOK_SYMBOL";
+                    const char * what = is_left_sym ? "TOK_LSYMB"
+                                                    : "TOK_SYMBOL";
                     CERR << what << " resolved to " << tl.tok
                          << " at " << LOC  << endl;
                   }
@@ -1353,7 +1357,7 @@ void
 Prefix::reduce_D_V__()
 {
    // end of an A.B.C...Z chain. at0() is the final member Z and at1() is
-   // the '.' before it. Collect members until no more '.' are found.
+   // the '.' before Z. Collect members until no more '.' token are found.
    //
 bool direct_assign;
    if (prefix_len == 2)        // member reference
@@ -1363,7 +1367,7 @@ bool direct_assign;
    else if (prefix_len == 4)   // member assignment
       {
         direct_assign = true;
-        Assert(get_assign_state() == ASS_arrow_seen);   // from reduce_D_V_ASS_B
+        Assert(get_assign_state() == ASS_var_seen);   // by reduce_D_V_ASS_B
       }
    else
       {
@@ -1400,7 +1404,8 @@ Symbol * top_sym = 0;
                      const ShapeItem axis = fun->string_to_int(*members[0]);
                      if (axis == -1)   syntax_error(LOC);
 
-                     pop_args_push_result(Token(TOK_AXIS, IntScalar(axis, LOC)));
+                     pop_args_push_result(Token(TOK_AXIS,
+                                                IntScalar(axis, LOC)));
                      action = RA_CONTINUE;
                      return;
                    }
@@ -1418,6 +1423,7 @@ Value_P toplevel_val = top_sym->get_value();
            {
              toplevel_val = EmptyStruct(LOC);
              top_sym->assign(toplevel_val, false, LOC);
+             set_assign_state(ASS_none);
            }
         else
            {
@@ -1461,7 +1467,8 @@ Cell * member_cell = toplevel_val->get_member(members, member_owner,
       }
    else                 // member reference (or selective specification)
       {
-        if (member_cell->is_member_anchor() && get_assign_state() == ASS_arrow_seen)
+        if (member_cell->is_member_anchor() &&
+            get_assign_state() == ASS_arrow_seen)
            {
              UCS_string & more = MORE_ERROR() <<
                           "member access: cannot use non-leaf member ";
@@ -1472,7 +1479,7 @@ Cell * member_cell = toplevel_val->get_member(members, member_owner,
            }
         else if (member_cell->is_pointer_cell())
             {
-              if (get_assign_state() == ASS_arrow_seen)   // selective specification
+              if (get_assign_state() == ASS_arrow_seen)   // selective spec.
                  {
                    Value_P cell_refs = member_cell->get_pointer_value()
                                                  ->get_cellrefs(LOC);
@@ -1711,7 +1718,9 @@ Token result = Token(TOK_APL_VALUE2, B);
 void
 Prefix::reduce_D_V_ASS_B()
 {
+  set_assign_state(ASS_var_seen);
   reduce_D_V__();
+  set_assign_state(ASS_none);
 }
 //-----------------------------------------------------------------------------
 void
