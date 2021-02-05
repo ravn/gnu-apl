@@ -873,30 +873,50 @@ ShapeItem valid_rows = 0;
 }
 //-----------------------------------------------------------------------------
 Cell *
-Value::get_new_member(const UCS_string & new_member)
+Value::get_new_member(const UCS_string & new_member_name)
 {
-   // find an unused slot in owner. Return its data cell (= name cell + 1)
+   // find an unused slot in owner. Return its data cell (= its name cell + 1)
    //
-   for (int j = 0; j < 2; ++j)   // j == 1 will succeed
+   for (;;)   // until an unused row was found
        {
          const ShapeItem rows = get_rows();   // changed by double_ravel() !
-         ShapeItem row = new_member.FNV_hash() % rows;
-         loop(r, rows)
+         ShapeItem row = new_member_name.FNV_hash() % rows;
+         loop(r, 14)
              {
                if (++row >= rows)   row = 0;
                Cell * cell = &get_ravel(2*row);
                if (cell->is_integer_cell() &&
                    cell->get_int_value() == 0)   // unused row
                   {
-                    Value_P new_name_val(new_member, LOC);
-                    new (cell) PointerCell(new_name_val.get(), *this);
+                    Value_P name_val(new_member_name, LOC);
+                    new (cell) PointerCell(name_val.get(), *this);
                     return cell + 1;
                   }
              }
+
+          /* at this point a cluster of 14 consecutive used rows was hit.
+             Common wisdom (Knuth) has it, that a hash table should maintain
+             fill level (i.e. used rows ÷ all rows) below 50%.
+
+             For a hash table with N rows and an unknown fill level (like this
+             one) we could either:
+
+             A1. first determine the fill level (an O(N) operation), and
+             A2. double the table size (another O(n) operation) if the fill
+                 level is > 50 %,
+
+                 or:
+
+             B.   double the table size regardless of the fill level (and
+                  an 1:16384 chance that the doubling was premature).
+
+
+             We choose B. because it is simpler and because prematurely
+             doubling the table could very well amortize itself later.
+          */
+
          double_ravel(LOC);
        }
-
-   FIXME;   // j == 1 failed
 }
 //-----------------------------------------------------------------------------
 void
