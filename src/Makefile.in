@@ -16,6 +16,7 @@
 
 
 
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -129,8 +130,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-DIST_COMMON = $(srcdir)/Makefile.am $(am__pkginclude_HEADERS_DIST) \
-	$(am__DIST_COMMON)
+DIST_COMMON = $(srcdir)/Makefile.am $(dist_noinst_DATA) \
+	$(am__pkginclude_HEADERS_DIST) $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
@@ -711,6 +712,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+DATA = $(dist_noinst_DATA)
 am__pkginclude_HEADERS_DIST = libapl.h Error.def
 HEADERS = $(pkginclude_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
@@ -926,6 +928,7 @@ SUBDIRS = native $(EXTRA_DIRS) $(am__append_2)
 @HAVE_GTK3_TRUE@plot_SOURCES = Plot_gtk.cc
 @HAVE_GTK3_FALSE@EXTRA_apl_SOURCES = Plot_gtk.cc
 @HAVE_GTK3_TRUE@EXTRA_apl_SOURCES = Plot_xcb.cc
+dist_noinst_DATA = valgrind.supp
 DIST_SUBDIRS = $(SUBDIRS) testcases
 distcleancheck_listfile = buildtag
 
@@ -5152,7 +5155,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA) $(HEADERS)
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgincludedir)"; do \

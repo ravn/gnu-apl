@@ -960,7 +960,7 @@ Cell * doubled = new Cell[new_cells];
          memcpy(dest, old_member_data_cell, sizeof(Cell));
        }
 
-   delete del;   // del is char *, so no cell destructor is called
+   delete [] del;   // del is char *, so no cell destructor is called
 }
 //-----------------------------------------------------------------------------
 Value *

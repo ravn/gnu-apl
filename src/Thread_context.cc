@@ -67,7 +67,7 @@ Thread_context::cleanup()
    // CERR << "Thread_context::cleanup()" << endl;
    thread_contexts_count = CCNT_0;
 
-//  delete [] thread_contexts;
+    delete [] thread_contexts;
    thread_contexts = 0;
 }
 //-----------------------------------------------------------------------------

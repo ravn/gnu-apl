@@ -16,6 +16,7 @@ else
    EXTRA_apl_SOURCES = Plot_gtk.cc
 endif
 
+dist_noinst_DATA = valgrind.supp
 DIST_SUBDIRS = $(SUBDIRS) testcases
 
 datadir = @datadir@
