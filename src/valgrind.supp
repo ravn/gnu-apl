@@ -135,7 +135,7 @@
 }
 
 {
-   dl_init_7
+   dl_init_8
    Memcheck:Leak
    match-leak-kinds: possible
    fun:realloc

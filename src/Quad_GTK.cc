@@ -703,45 +703,5 @@ window_entry we = { fd };
    return fd;
 }
 //-----------------------------------------------------------------------------
-
-#else // not HAVE_GTK3
-
-//-----------------------------------------------------------------------------
-Token
-Quad_GTK::eval_AB(Value_P A, Value_P B) const
-{
-   MORE_ERROR() <<
-   "libgtk+ version 3 was not found (or disabled) at ./configure time";
-   DOMAIN_ERROR;
-}
-//-----------------------------------------------------------------------------
-Token
-Quad_GTK::eval_B(Value_P B) const
-{
-   MORE_ERROR() <<
-   "libgtk+ version 3 was not found (or disabled) at ./configure time";
-   DOMAIN_ERROR;
-}
-//-----------------------------------------------------------------------------
-Token
-Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-   MORE_ERROR() << "libgtk+ version 3 was not found at ./configure time";
-   DOMAIN_ERROR;
-}
-//-----------------------------------------------------------------------------
-Token
-Quad_GTK::eval_XB(Value_P X, Value_P B) const
-{
-   MORE_ERROR() << "libgtk+ version 3 was not found at ./configure time";
-   DOMAIN_ERROR;
-}
-//-----------------------------------------------------------------------------
-void
-Quad_GTK::clear()
-{
-}
-//-----------------------------------------------------------------------------
 #endif   // HAVE_GTK3
-
 

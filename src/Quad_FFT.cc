@@ -22,7 +22,7 @@
 #include "Quad_FFT.hh"
 #include "Workspace.hh"
 
-Quad_FFT  Quad_FFT::_fun;
+Quad_FFT   Quad_FFT::_fun;
 Quad_FFT * Quad_FFT::fun = &Quad_FFT::_fun;
 
 bool Quad_FFT::system_wisdom_loaded = false;
@@ -302,32 +302,7 @@ ShapeItem rlen = 1;
        }
 
 }
-
-#else // no libfftw3...
-
-//-----------------------------------------------------------------------------
-Token
-Quad_FFT::eval_B(Value_P B) const
-{
-    MORE_ERROR() <<
-"⎕FFT is not available because either no libfftw3 library was found on this\n"
-"system when GNU APL was compiled, or because it was disabled in ./configure.";
-
-   SYNTAX_ERROR;
-   return Token();
-}
-//-----------------------------------------------------------------------------
-Token
-Quad_FFT::eval_AB(Value_P A, Value_P B) const
-{
-    MORE_ERROR() <<
-"⎕FFT is not available because either no libfftw3 library was found on this\n"
-"system when GNU APL was compiled, or because it was disabled in ./configure.";
-
-   SYNTAX_ERROR;
-   return Token();
-}
 //-----------------------------------------------------------------------------
 
-#endif // HAVE_FFTW3_H
+#endif // defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H)
 

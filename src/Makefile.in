@@ -195,27 +195,28 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
 	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
 	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
-	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
-	Performance.cc Performance.def Performance.hh PointerCell.cc \
-	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
-	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
-	Plot_data.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
-	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Nabla.hh Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
+	NamedObject.cc NamedObject.hh NativeFunction.cc \
+	NativeFunction.hh Native_interface.hh NumericCell.cc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
+	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
+	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -286,6 +287,7 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-LineInput.lo lib_gnu_apl_la-Logging.lo \
 	lib_gnu_apl_la-LvalCell.lo lib_gnu_apl_la-Malloc_hooks.lo \
 	lib_gnu_apl_la-Nabla.lo lib_gnu_apl_la-Macro.lo \
+	lib_gnu_apl_la-Missing_Libraries.lo \
 	lib_gnu_apl_la-NamedObject.lo lib_gnu_apl_la-NativeFunction.lo \
 	lib_gnu_apl_la-NumericCell.lo lib_gnu_apl_la-Output.lo \
 	lib_gnu_apl_la-Parallel.lo lib_gnu_apl_la-Parser.lo \
@@ -366,27 +368,28 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
 	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
 	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
-	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
-	Performance.cc Performance.def Performance.hh PointerCell.cc \
-	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
-	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
-	Plot_data.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
-	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Nabla.hh Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
+	NamedObject.cc NamedObject.hh NativeFunction.cc \
+	NativeFunction.hh Native_interface.hh NumericCell.cc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
+	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
+	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -449,9 +452,10 @@ am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
 	libapl_la-LibPaths.lo libapl_la-LineInput.lo \
 	libapl_la-Logging.lo libapl_la-LvalCell.lo \
 	libapl_la-Malloc_hooks.lo libapl_la-Nabla.lo \
-	libapl_la-Macro.lo libapl_la-NamedObject.lo \
-	libapl_la-NativeFunction.lo libapl_la-NumericCell.lo \
-	libapl_la-Output.lo libapl_la-Parallel.lo libapl_la-Parser.lo \
+	libapl_la-Macro.lo libapl_la-Missing_Libraries.lo \
+	libapl_la-NamedObject.lo libapl_la-NativeFunction.lo \
+	libapl_la-NumericCell.lo libapl_la-Output.lo \
+	libapl_la-Parallel.lo libapl_la-Parser.lo \
 	libapl_la-Performance.lo libapl_la-PointerCell.lo \
 	libapl_la-Prefix.lo libapl_la-Plot_line_properties.lo \
 	libapl_la-Plot_data.lo libapl_la-Plot_window_properties.lo \
@@ -516,27 +520,28 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc buildtag \
 	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
 	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
 	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
-	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
-	Performance.cc Performance.def Performance.hh PointerCell.cc \
-	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
-	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
-	Plot_data.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
-	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Nabla.hh Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
+	NamedObject.cc NamedObject.hh NativeFunction.cc \
+	NativeFunction.hh Native_interface.hh NumericCell.cc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
+	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
+	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -600,12 +605,13 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-LineInput.$(OBJEXT) apl-Logging.$(OBJEXT) \
 	apl-LvalCell.$(OBJEXT) apl-Malloc_hooks.$(OBJEXT) \
 	apl-Nabla.$(OBJEXT) apl-Macro.$(OBJEXT) \
-	apl-NamedObject.$(OBJEXT) apl-NativeFunction.$(OBJEXT) \
-	apl-NumericCell.$(OBJEXT) apl-Output.$(OBJEXT) \
-	apl-Parallel.$(OBJEXT) apl-Parser.$(OBJEXT) \
-	apl-Performance.$(OBJEXT) apl-PointerCell.$(OBJEXT) \
-	apl-Prefix.$(OBJEXT) apl-Plot_line_properties.$(OBJEXT) \
-	apl-Plot_data.$(OBJEXT) apl-Plot_window_properties.$(OBJEXT) \
+	apl-Missing_Libraries.$(OBJEXT) apl-NamedObject.$(OBJEXT) \
+	apl-NativeFunction.$(OBJEXT) apl-NumericCell.$(OBJEXT) \
+	apl-Output.$(OBJEXT) apl-Parallel.$(OBJEXT) \
+	apl-Parser.$(OBJEXT) apl-Performance.$(OBJEXT) \
+	apl-PointerCell.$(OBJEXT) apl-Prefix.$(OBJEXT) \
+	apl-Plot_line_properties.$(OBJEXT) apl-Plot_data.$(OBJEXT) \
+	apl-Plot_window_properties.$(OBJEXT) \
 	apl-PrimitiveFunction.$(OBJEXT) \
 	apl-PrimitiveOperator.$(OBJEXT) apl-PrintBuffer.$(OBJEXT) \
 	apl-QuadFunction.$(OBJEXT) apl-ProcessorID.$(OBJEXT) \
@@ -966,12 +972,13 @@ common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
 	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
 	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parallel.cc Parallel.hh Parser.cc Parser.hh Performance.cc \
-	Performance.def Performance.hh PointerCell.cc PointerCell.hh \
-	Prefix.cc Prefix.def Prefix.hh Plot_line_properties.cc \
+	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
+	NamedObject.cc NamedObject.hh NativeFunction.cc \
+	NativeFunction.hh Native_interface.hh NumericCell.cc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
@@ -1273,6 +1280,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-LvalCell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Macro.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Malloc_hooks.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Missing_Libraries.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Nabla.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-NamedObject.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-NativeFunction.Po@am__quote@
@@ -1385,6 +1393,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-LvalCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Macro.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Malloc_hooks.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Missing_Libraries.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Nabla.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-NamedObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-NativeFunction.Plo@am__quote@
@@ -1497,6 +1506,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-LvalCell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Macro.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Malloc_hooks.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Missing_Libraries.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Nabla.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-NamedObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-NativeFunction.Plo@am__quote@
@@ -1967,6 +1977,13 @@ lib_gnu_apl_la-Macro.lo: Macro.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Macro.cc' object='lib_gnu_apl_la-Macro.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Macro.lo `test -f 'Macro.cc' || echo '$(srcdir)/'`Macro.cc
+
+lib_gnu_apl_la-Missing_Libraries.lo: Missing_Libraries.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Missing_Libraries.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Missing_Libraries.Tpo -c -o lib_gnu_apl_la-Missing_Libraries.lo `test -f 'Missing_Libraries.cc' || echo '$(srcdir)/'`Missing_Libraries.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Missing_Libraries.Tpo $(DEPDIR)/lib_gnu_apl_la-Missing_Libraries.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Missing_Libraries.cc' object='lib_gnu_apl_la-Missing_Libraries.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Missing_Libraries.lo `test -f 'Missing_Libraries.cc' || echo '$(srcdir)/'`Missing_Libraries.cc
 
 lib_gnu_apl_la-NamedObject.lo: NamedObject.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-NamedObject.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-NamedObject.Tpo -c -o lib_gnu_apl_la-NamedObject.lo `test -f 'NamedObject.cc' || echo '$(srcdir)/'`NamedObject.cc
@@ -2807,6 +2824,13 @@ libapl_la-Macro.lo: Macro.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Macro.cc' object='libapl_la-Macro.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Macro.lo `test -f 'Macro.cc' || echo '$(srcdir)/'`Macro.cc
+
+libapl_la-Missing_Libraries.lo: Missing_Libraries.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Missing_Libraries.lo -MD -MP -MF $(DEPDIR)/libapl_la-Missing_Libraries.Tpo -c -o libapl_la-Missing_Libraries.lo `test -f 'Missing_Libraries.cc' || echo '$(srcdir)/'`Missing_Libraries.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Missing_Libraries.Tpo $(DEPDIR)/libapl_la-Missing_Libraries.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Missing_Libraries.cc' object='libapl_la-Missing_Libraries.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Missing_Libraries.lo `test -f 'Missing_Libraries.cc' || echo '$(srcdir)/'`Missing_Libraries.cc
 
 libapl_la-NamedObject.lo: NamedObject.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-NamedObject.lo -MD -MP -MF $(DEPDIR)/libapl_la-NamedObject.Tpo -c -o libapl_la-NamedObject.lo `test -f 'NamedObject.cc' || echo '$(srcdir)/'`NamedObject.cc
@@ -4018,6 +4042,20 @@ apl-Macro.obj: Macro.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Macro.cc' object='apl-Macro.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Macro.obj `if test -f 'Macro.cc'; then $(CYGPATH_W) 'Macro.cc'; else $(CYGPATH_W) '$(srcdir)/Macro.cc'; fi`
+
+apl-Missing_Libraries.o: Missing_Libraries.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Missing_Libraries.o -MD -MP -MF $(DEPDIR)/apl-Missing_Libraries.Tpo -c -o apl-Missing_Libraries.o `test -f 'Missing_Libraries.cc' || echo '$(srcdir)/'`Missing_Libraries.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Missing_Libraries.Tpo $(DEPDIR)/apl-Missing_Libraries.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Missing_Libraries.cc' object='apl-Missing_Libraries.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Missing_Libraries.o `test -f 'Missing_Libraries.cc' || echo '$(srcdir)/'`Missing_Libraries.cc
+
+apl-Missing_Libraries.obj: Missing_Libraries.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Missing_Libraries.obj -MD -MP -MF $(DEPDIR)/apl-Missing_Libraries.Tpo -c -o apl-Missing_Libraries.obj `if test -f 'Missing_Libraries.cc'; then $(CYGPATH_W) 'Missing_Libraries.cc'; else $(CYGPATH_W) '$(srcdir)/Missing_Libraries.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Missing_Libraries.Tpo $(DEPDIR)/apl-Missing_Libraries.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Missing_Libraries.cc' object='apl-Missing_Libraries.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Missing_Libraries.obj `if test -f 'Missing_Libraries.cc'; then $(CYGPATH_W) 'Missing_Libraries.cc'; else $(CYGPATH_W) '$(srcdir)/Missing_Libraries.cc'; fi`
 
 apl-NamedObject.o: NamedObject.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-NamedObject.o -MD -MP -MF $(DEPDIR)/apl-NamedObject.Tpo -c -o apl-NamedObject.o `test -f 'NamedObject.cc' || echo '$(srcdir)/'`NamedObject.cc
