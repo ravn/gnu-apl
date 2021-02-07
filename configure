@@ -17514,6 +17514,7 @@ fi
 
 
 for ac_header in   \
+    dirent.h        \
     execinfo.h      \
     fcntl.h         \
     fftw3.h         \
@@ -19547,7 +19548,7 @@ _ACEOF
 
 fi
 
-################################# rdtsc check #################################
+################################# rdtsc check ################################
 # check if rdtsc (read CPU cycle counter is available.
 # This is expected to succeed only on Intel CPUs
 #
@@ -19576,6 +19577,47 @@ if test "x$HAVE_rdtsc" = "xyes"; then
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_RDTSC 1
+_ACEOF
+
+fi
+ if test "x$HAVE_rdtsc" = xyes; then
+  HAVE_RDTSC_TRUE=
+  HAVE_RDTSC_FALSE='#'
+else
+  HAVE_RDTSC_TRUE='#'
+  HAVE_RDTSC_FALSE=
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_rdtsc" >&5
+$as_echo "$HAVE_rdtsc" >&6; }
+
+################################# gettimeofday check #########################
+# check if gettimeofday() counter is available on the OS
+#
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gettimeofday exists" >&5
+$as_echo_n "checking whether gettimeofday exists... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sys/time.h>
+int
+main ()
+{
+timeval tv; gettimeofday(&tv, 0);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  HAVE_gettimeofday=yes
+else
+  HAVE_gettimeofday=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+if test "x$HAVE_gettimeofday" = "xyes"; then
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_GETTIMEOFDAY 1
 _ACEOF
 
 fi
@@ -20388,6 +20430,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_GTK3_TRUE}" && test -z "${HAVE_GTK3_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_GTK3\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_RDTSC_TRUE}" && test -z "${HAVE_RDTSC_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_RDTSC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_RDTSC_TRUE}" && test -z "${HAVE_RDTSC_FALSE}"; then

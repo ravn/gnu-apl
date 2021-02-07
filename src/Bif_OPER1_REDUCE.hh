@@ -49,10 +49,10 @@ protected:
    static Token replicate(Value_P A, Value_P B, uAxis axis);
 
    /// LO-reduce B along axis.
-   Token reduce(Token & _LO, Value_P B, uAxis axis) const;
+   Token reduce(Token & LO, Value_P B, uAxis axis) const;
 
    /// LO-reduce B n-wise along axis.
-   Token reduce_n_wise(Value_P A, Token & _LO, Value_P B, uAxis axis) const;
+   Token reduce_n_wise(Value_P A, Token & LO, Value_P B, uAxis axis) const;
 
 };
 //-----------------------------------------------------------------------------

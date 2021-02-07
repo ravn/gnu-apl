@@ -30,6 +30,9 @@
 /* Define to 1 iff <curses.h> is present */
 #undef HAVE_CURSES_H
 
+/* Define to 1 if you have the <dirent.h> header file. */
+#undef HAVE_DIRENT_H
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
@@ -50,6 +53,9 @@
 
 /* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
+
+/* Define to 1 iff the OS has gettimeofday() */
+#undef HAVE_GETTIMEOFDAY
 
 /* GTK+ version 3 NOT installed */
 #undef HAVE_GTK3

@@ -26,7 +26,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #include "Common.hh"   // for HAVE_EXECINFO_H
 #ifdef HAVE_EXECINFO_H

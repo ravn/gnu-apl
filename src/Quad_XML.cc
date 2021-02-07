@@ -20,6 +20,8 @@
 
 #include <errno.h>
 #include <string.h>
+#include <sys/fcntl.h>   // for O_RDONLY
+#include <sys/stat.h>
 
 #include <vector>
 

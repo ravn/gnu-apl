@@ -18,11 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #include "CDR.hh"
 #include "CharCell.hh"

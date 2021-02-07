@@ -21,7 +21,6 @@
 #include <limits.h>
 #include <string.h>
 #include <sys/time.h>
-#include <unistd.h>
 
 #include "../config.h"
 

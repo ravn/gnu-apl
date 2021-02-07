@@ -18,20 +18,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <termios.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <netinet/in.h>
+#include <sys/un.h>   // for sockaddr_un
 
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER2_OUTER.hh"
@@ -53,6 +52,20 @@ std::vector<Quad_FIO::file_entry> Quad_FIO::open_files;
 
 Quad_FIO  Quad_FIO::_fun;
 Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
+
+// A union holding a sockaddr and a sockaddr_in as to avoid casting
+/// between sockaddr and a sockaddr_in
+union SockAddr
+{
+  /// an arbitrary socket address
+  sockaddr    addr;
+
+  /// an AF_INET socket address
+  sockaddr_in inet;
+
+  ///  an AF_UNIX socket address
+  sockaddr_un uNix;
+};
 
    // CONVENTION: all functions must have an axis argument (like X
    // in A fun[X] B); the axis argument is a function number that selects

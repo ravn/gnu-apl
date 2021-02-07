@@ -21,6 +21,8 @@
 #ifndef __QUAD_WA_HH_DEFINED__
 #define __QUAD_WA_HH_DEFINED__
 
+#include <sys/resource.h>   // for rlim_t
+
 #include "SystemVariable.hh"
 
 //-----------------------------------------------------------------------------

@@ -173,7 +173,6 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 # include <math.h>
 # include <stdlib.h>
 # include <string.h>
-# include <unistd.h>
 # include <xcb/xcb.h>
 # include <xcb/xproto.h>
 

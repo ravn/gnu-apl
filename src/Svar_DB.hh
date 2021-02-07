@@ -21,9 +21,6 @@
 #ifndef __SVAR_DB_HH_DEFINED__
 #define __SVAR_DB_HH_DEFINED__
 
-#include <stdint.h>
-#include <unistd.h>
-
 #include <iostream>
 #include <vector>
 
@@ -175,7 +172,7 @@ public:
    static void disconnect()
       {
         if (DB_tcp != NO_TCP_SOCKET)
-           { ::close(DB_tcp);   DB_tcp = NO_TCP_SOCKET; }
+           { close(DB_tcp);   DB_tcp = NO_TCP_SOCKET; }
       }
 
    /// return true if the connection to APserver is up

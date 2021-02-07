@@ -23,32 +23,34 @@
 
 #include "../config.h"   // for xxx_WANTED and other macros from ./configure
 
+// #include some notoriously needed include files, but only if they
+// exist on the platform
+
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+
+#ifdef HAVE_DIRENT_H
+# include <dirent.h>
+#else
+  typedef struct __dirstream DIR;
+#endif
+
 #include <string.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/un.h>
-#include <sys/fcntl.h>
-
-#ifdef ENABLE_NLS
-#include <libintl.h>
-#endif
-
-#ifndef MAX_RANK_WANTED
-#define MAX_RANK_WANTED 6
-#endif
-
-enum { MAX_RANK = MAX_RANK_WANTED };
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/resource.h>
-#include <sys/time.h>
 
 #ifndef RLIM_INFINITY   // Raspberry
 #define RLIM_INFINITY (~rlim_t(0))
 #endif
+
+#ifndef MAX_RANK_WANTED
+# define MAX_RANK_WANTED 6
+#endif
+
+enum { MAX_RANK = MAX_RANK_WANTED };
 
 // if someone (like curses on Solaris) has #defined erase() then
 // #undef it because class vector<> would complain about it
@@ -136,7 +138,7 @@ uint32_t lo, hi;
    return uint64_t(hi) << 32 | lo;
 }
 
-#else // not HAVE_RDTSC
+#elif HAVE_GETTIMEOFDAY
 
 inline uint64_t cycle_counter()
 {
@@ -144,6 +146,8 @@ timeval tv;
    gettimeofday(&tv, 0);
    return tv.tv_sec * 1000000ULL + tv.tv_usec;
 }
+#else // neither HAVE_RDTSC nor HAVE_GETTIMEOFDAY
+#define cycle_counter() 0
 #endif // HAVE_RDTSC
 
 //-----------------------------------------------------------------------------
@@ -466,27 +470,5 @@ charP(const void * vp)
 
 /// cast to a const void *
 inline const void * voidP(const void * addr) { return addr; }
-
-//-----------------------------------------------------------------------------
-/// A union holding a sockaddr and a sockaddr_in as to avoid casting
-/// between sockaddr and a sockaddr_in
-union SockAddr
-{
-  /// an arbitrary socket address
-  sockaddr    addr;
-
-  /// an AF_INET socket address
-  sockaddr_in inet;
-
-  ///  an AF_UNIX socket address
-  sockaddr_un uNix;
-};
-//-----------------------------------------------------------------------------
-
-#if 1   // disable using namespace std;
-# define USING_NAMESPACE_STD
-#else   // enable it
-# define USING_NAMESPACE_STD using namespace std;
-#endif
 
 #endif // __COMMON_HH_DEFINED__

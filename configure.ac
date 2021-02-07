@@ -64,6 +64,7 @@ AC_CHECK_HEADER(
     ])
 
 AC_CHECK_HEADERS([  \
+    dirent.h        \
     execinfo.h      \
     fcntl.h         \
     fftw3.h         \
@@ -218,7 +219,7 @@ else
    AC_DEFINE_UNQUOTED(HAVE_GTK3, [0], [GTK+ version 3 NOT installed])
 fi
 
-################################# rdtsc check #################################
+################################# rdtsc check ################################
 # check if rdtsc (read CPU cycle counter is available.
 # This is expected to succeed only on Intel CPUs
 #
@@ -231,6 +232,21 @@ AC_COMPILE_IFELSE(
 if test "x$HAVE_rdtsc" = "xyes"; then
    AC_DEFINE_UNQUOTED([HAVE_RDTSC], [1],
                       [Define to 1 iff the CPU has rdtsc opcode])
+fi
+AM_CONDITIONAL(HAVE_RDTSC, test "x$HAVE_rdtsc" = xyes)
+AC_MSG_RESULT([$HAVE_rdtsc])
+
+################################# gettimeofday check #########################
+# check if gettimeofday() counter is available on the OS
+#
+AC_MSG_CHECKING([whether gettimeofday exists])
+AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[#include <sys/time.h>]],
+        [[timeval tv; gettimeofday(&tv, 0); ]]
+    )], [HAVE_gettimeofday=yes], [HAVE_gettimeofday=no])
+if test "x$HAVE_gettimeofday" = "xyes"; then
+   AC_DEFINE_UNQUOTED([HAVE_GETTIMEOFDAY], [1],
+                      [Define to 1 iff the OS has gettimeofday()])
 fi
 AM_CONDITIONAL(HAVE_RDTSC, test "x$HAVE_rdtsc" = xyes)
 AC_MSG_RESULT([$HAVE_rdtsc])

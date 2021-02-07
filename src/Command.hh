@@ -21,8 +21,6 @@
 #ifndef __COMMAND_HH_DEFINED__
 #define __COMMAND_HH_DEFINED__
 
-#include <dirent.h>
-
 #include "Common.hh"
 #include "LibPaths.hh"
 #include "Value.hh"
@@ -30,6 +28,7 @@
 #include "UTF8_string.hh"
 
 class Workspace;
+struct dirent;
 
 //-----------------------------------------------------------------------------
 /*!

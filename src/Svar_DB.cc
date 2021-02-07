@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#include "config.h"   // for HAVE_ macros
+#include "../config.h"   // for HAVE_ macros
 
 #ifdef HAVE_SYS_UN_H
 #include <sys/un.h>
@@ -49,6 +49,19 @@ TCP_socket Svar_DB::DB_tcp = NO_TCP_SOCKET;
 
 Svar_record Svar_record_P::cache;
 
+// A union holding a sockaddr and a sockaddr_in as to avoid casting
+/// between sockaddr and a sockaddr_in
+union SockAddr
+{
+  /// an arbitrary socket address
+  sockaddr    addr;
+
+  /// an AF_INET socket address
+  sockaddr_in inet;
+
+  ///  an AF_UNIX socket address
+  sockaddr_un uNix;
+};
 //-----------------------------------------------------------------------------
 bool
 Svar_DB::start_APserver(const char * server_sockname,
