@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-February 4, 2021
+February 9, 2021
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -4116,7 +4116,7 @@ Hello
    The scope (functionality) of ⎕XML is then:
 
    • Conversion of (valid) XML strings to associative APL arrays that
-     can be more easily processes in APL than the XML strings,
+     can be more easily processed in APL than the XML strings,
    • Conversion of associative APL arrays back to valid XML strings,
    • Simple (at APL level) access to the data contained in the XML
      strings, and

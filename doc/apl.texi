@@ -4258,7 +4258,7 @@ The scope (functionality) of ⎕XML is then:
 
 @itemize
 @item Conversion of (valid) XML strings to associative APL arrays that can be
-  more easily processes in APL than the XML strings,
+  more easily processed in APL than the XML strings,
 @item Conversion of associative APL arrays back to valid XML strings,
 @item Simple (at APL level) access to the data contained in the XML strings, and
 @item Transparent access to those (mostly XML specific) portions of the XML

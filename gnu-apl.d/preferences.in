@@ -408,7 +408,6 @@ CONTROL-Ds-TO-EXIT 0
 #
 # DISCARD-INDENTATION Yes
 
-# With the option below you can cause the WINCH signal to change ⎕PW. The
 ###############################################################################
 #
 # The following lines show examples of GNU APL capabilities that can be
