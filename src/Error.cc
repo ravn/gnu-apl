@@ -195,8 +195,7 @@ StateIndicator * si = Workspace::SI_top();
 
    Log(LOG_verbose_error)
       {
-        if (!(si && si->get_safe_execution()))
-           Backtrace::show(__FILE__, __LINE__);
+        if (!(si && si->get_safe_execution()))   BACKTRACE
       }
 
    // maybe map error to DOMAIN ERROR.
@@ -221,7 +220,7 @@ Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
       CERR << endl
            << "throwing " << Error::error_name(code) << " at " << loc << endl;
 
-   Log(LOG_verbose_error)   Backtrace::show(__FILE__, __LINE__);
+   Log(LOG_verbose_error)   BACKTRACE
 
    MORE_ERROR() << Error::error_name(code);
 
@@ -245,15 +244,15 @@ Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
         CERR << endl;
       }
 
-   Log(LOG_verbose_error)     Backtrace::show(__FILE__, __LINE__);
+   Log(LOG_verbose_error)     BACKTRACE
 
-Error error(E_VALUE_ERROR, loc);
+Error err(E_VALUE_ERROR, loc);
 UTF8_string sym_name_utf(sym_name);
-   snprintf(error.symbol_name, sizeof(error.symbol_name), "%s",
+   snprintf(err.symbol_name, sizeof(err.symbol_name), "%s",
             sym_name_utf.c_str());
-   if (StateIndicator * si = Workspace::SI_top())   error.update_error_info(si);
+   if (StateIndicator * si = Workspace::SI_top())   err.update_error_info(si);
 
-Error & eref = error;
+Error & eref = err;
    throw eref;
 }
 //-----------------------------------------------------------------------------
@@ -267,16 +266,16 @@ Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
              << " (function is " << fun_name << ")" << endl;
       }
 
-   Log(LOG_verbose_error)     Backtrace::show(__FILE__, __LINE__);
+   Log(LOG_verbose_error)     BACKTRACE
 
-Error error(E_DEFN_ERROR, loc);
-Error & eref = error;
+Error err(E_DEFN_ERROR, loc);
+Error & eref = err;
 UTF8_string fun_name_utf(fun_name);
-   snprintf(error.symbol_name, sizeof(error.symbol_name), "%s",
+   snprintf(err.symbol_name, sizeof(err.symbol_name), "%s",
             fun_name_utf.c_str());
 
 UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
-   snprintf(error.error_message_2, sizeof(error.error_message_2),
+   snprintf(err.error_message_2, sizeof(err.error_message_2),
             " aaa  %s", cmd_utf.c_str());
    eref.left_caret = 5 + cmd.size();
    if (Workspace::SI_top())   *Workspace::get_error() = eref;

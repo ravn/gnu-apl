@@ -795,9 +795,9 @@ XML_Saving_Archive::save()
 
 tm * t;
    {
-     timeval now;
-     gettimeofday(&now, 0);
-     t = gmtime(&now.tv_sec);
+     timeval now;   gettimeofday(&now, 0);
+     time_t seconds = now.tv_sec;
+     t = gmtime(&seconds);
    }
 
 const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset

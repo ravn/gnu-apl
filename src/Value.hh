@@ -422,9 +422,6 @@ public:
    /// initialize the next ravel cell with an integer value
    inline void next_ravel_Int(APL_Integer i);
 
-   /// initialize the next ravel cell with an floating-point value
-   inline void next_ravel_Float(APL_Float f);
-
    /// initialize the next ravel cell with an APL sub-value
    inline void next_ravel_Pointer(Value * val);
 

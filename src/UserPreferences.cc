@@ -83,7 +83,9 @@ UserPreferences::usage(const char * prog)
 #endif
 
    CERR <<
+#ifndef WINDOWS
 "    -C new_root          do chroot(new_root) before starting APL (root only)\n"
+#endif // WINDOWS
 "    --cfg                show ./configure options used and exit\n"
 "    --noCIN              do not echo input (for scripting)\n"
 "    --CPU_limit_secs sec set CPU time limit to sec seconds\n"
@@ -120,7 +122,9 @@ UserPreferences::usage(const char * prog)
 "                         4:   exit after first error\n"
 "    --TR                 randomize order of testfiles\n"
 "    --TS                 append to (rather than override) summary.log\n"
+#ifndef WINDOWS
 "    -u UID               run as user UID (root only)\n"
+#endif // WINDOWS
 "    -v, --version        show version information and exit\n"
 "    -w milli             wait milli milliseconds at startup\n"
 "    --                   end of options for " << prog << "\n"
@@ -227,12 +231,14 @@ bool log_startup = false;
                    exit(a);
                  }
 
+#ifndef WINDOWS
               if (chroot(val))
                  {
                    CERR << "chroot(" << val << ") failed: "
                         << strerror(errno) << endl;
                    exit(a);
                  }
+#endif // WINDOWS
 
               if (chdir("/"))
                  {
@@ -244,6 +250,7 @@ bool log_startup = false;
               continue;
             }
 
+#ifndef WINDOWS
          if (!strcmp(opt, "-u"))
             {
               ++a;
@@ -260,6 +267,7 @@ bool log_startup = false;
                  }
               continue;
             }
+#endif // WINDOWS
        }
 
    return log_startup;

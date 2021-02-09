@@ -50,6 +50,13 @@
 #define __COMMON_HH_DEFINED__ // to avoid #error in APL_types.hh
 #define AP_NUM /* simple AP_NUM */
 
+/// Stringify x.
+#define STR(x) #x
+/// The current location in the source file.
+#define LOC Loc(__FILE__, __LINE__)
+/// The location line l in file f.
+#define Loc(f, l) f ":" STR(l)
+
 #include "APL_types.hh"
 #include "ProcessorID.hh"
 #include "SystemLimits.hh"
@@ -64,13 +71,6 @@ ostream * debug = 0;
 
 #define Log(x) if (verbosity > 0)
 bool LOG_shared_variables = false;
-
-/// Stringify x.
-#define STR(x) #x
-/// The current location in the source file.
-#define LOC Loc(__FILE__, __LINE__)
-/// The location line l in file f.
-#define Loc(f, l) f ":" STR(l)
 
 AP_num3 ProcessorID::id;
 

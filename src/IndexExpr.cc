@@ -36,7 +36,7 @@ IndexExpr::IndexExpr(Assign_state astate, const char * loc)
 IndexExpr::~IndexExpr()
 {
 // Q1(this)
-// Backtrace::show(__FILE__, __LINE__);
+// BACKTRACE
 }
 //-----------------------------------------------------------------------------
 Value_P

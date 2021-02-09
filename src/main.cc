@@ -85,7 +85,7 @@ signal_SEGV_handler(int)
    Thread_context::print_all(CERR);
 #endif // PARALLEL_ENABLED
 
-   Backtrace::show(__FILE__, __LINE__);
+   BACKTRACE
 
    CERR << "====================================================\n";
 

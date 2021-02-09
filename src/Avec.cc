@@ -209,7 +209,7 @@ CHT_Index idx = find_char(uni);
              << " (" << uni << ") not found in ⎕AV! (called from "
              << loc << ")" << endl;
 
-         Backtrace::show(__FILE__, __LINE__);
+         BACKTRACE
       }
    return Token();
 }

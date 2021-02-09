@@ -413,20 +413,20 @@ inline void Bif_F12_DOMINO::Matrix<false>::imbed(const Matrix<false>& S)
    matrix_assert(S.M == S.N);   // S  is quadratic (M×M)
    matrix_assert(S.M <=   M);   // S is smaller than Qi
 
-const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
+const ShapeItem iN = M - S.M;   // the number of rows and columns from ID N
 
    loop(y, M)
    loop(x, N)
       {
-         if (y < IN || x < IN)         // upper row or left col: init from ID N
+         if (y < iN || x < iN)         // upper row or left col: init from ID N
             real(x, y) = real(y, x) = 0.0;
          else                          // lower row and right col: init from S
-            real(y, x) = S.real(y - IN, x - IN);
+            real(y, x) = S.real(y - iN, x - iN);
       }
 
    // upper diagonal
    //
-   loop(y, IN)   real(y,y) = 1.0;
+   loop(y, iN)   real(y,y) = 1.0;
 }
 //-----------------------------------------------------------------------------
 /// insert S into \b this complex matrix
@@ -437,11 +437,11 @@ inline void Bif_F12_DOMINO::Matrix<true>::imbed(const Matrix<true>& S)
    matrix_assert(S.M == S.N);   // S  is quadratic (M×M)
    matrix_assert(S.M <=   M);   // S is smaller than Qi
 
-const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
+const ShapeItem iN = M - S.M;   // the number of rows and columns from ID N
 
    loop(y, M)
       {
-         if (y < IN)   // upper row: init from identity matrix
+         if (y < iN)   // upper row: init from identity matrix
             {
               loop(x, N)   real(y, x) = imag(y, x) = 0.0;
               real(y, y) = 1.0;   // diagonal
@@ -450,12 +450,12 @@ const ShapeItem IN = M - S.M;   // the number of rows and columns from ID N
             {
               loop(x, N)
                   {
-                    if (x < IN)   // left columns: init from identity matrix
+                    if (x < iN)   // left columns: init from identity matrix
                        real(y, x) = imag(y, x) = 0.0;
                     else          // right columns: init from S
                        {
-                         real(y, x) = S.real(y - IN, x - IN);
-                         imag(y, x) = S.imag(y - IN, x - IN);
+                         real(y, x) = S.real(y - iN, x - iN);
+                         imag(y, x) = S.imag(y - iN, x - iN);
                        }
                   }
             }

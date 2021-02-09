@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <netdb.h>
+#include <netdb.h>   // gethostbyname() etc.
 
 #include "Common.hh"
 #include "LibPaths.hh"

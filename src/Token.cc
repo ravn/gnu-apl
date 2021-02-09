@@ -614,7 +614,7 @@ UCS_string ucs;
              CERR << "Token: " << HEX4(tag) << " " << *this
                   << " at " << LOC << endl;
              Q1(get_Class())
-             Backtrace::show(__FILE__, __LINE__);
+             BACKTRACE
              FIXME;
       }
 

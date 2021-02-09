@@ -1,21 +1,21 @@
 /*
-    This file is part of GNU APL, a free implementation of the
-    ISO/IEC Standard 13751, "Programming Language APL, Extended"
-
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   This file is part of GNU APL, a free implementation of the
+   ISO/IEC Standard 13751, "Programming Language APL, Extended"
+ 
+   Copyright (C) 2008-2014  Dr. Jürgen Sauermann
+ 
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+ 
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -666,7 +666,7 @@ protected:
          store(buffer);
 
          uint32_t ll = htonl(buffer.size());
-         send(tcp_sock, &ll, 4, 0);
+         send(tcp_sock, reinterpret_cast<const char *>(&ll), 4, 0);
          ssize_t sent = send(tcp_sock, buffer.data(), buffer.size(), 0);
          return sent;
        }
@@ -2827,13 +2827,6 @@ struct _all_signal_classes_
 enum { MAX_SIGNAL_CLASS_SIZE = sizeof(_all_signal_classes_) };
 
 //----------------------------------------------------------------------------
-
-#ifndef LOC
-# define STR(x) #x
-# define LOC Loc(__FILE__, __LINE__)
-# define Loc(f, l) f ":" STR(l)
-#endif // LOC
-
 Signal_base *
 Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
                       char * & del, ostream * debug,
@@ -2879,11 +2872,9 @@ ssize_t siglen = 0;
 
          if (rx_bytes != sizeof(uint32_t))
             {
-              // connection was probably closed by the peer
+              // connection was closed by the peer
               //
-             if (rx_bytes == 0)       *loc = LOC;   // closed by peer
-             else if (rx_bytes < 0)   *loc = LOC;   // errno set
-             else                     *loc = LOC;   // something else
+              *loc = LOC;
               return 0;
             }
 

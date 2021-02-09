@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef __VALUE_ICC_DEFINED__
+#define __VALUE_ICC_DEFINED__
+
 #include "CharCell.hh"
 #include "FloatCell.hh"
 #include "IntCell.hh"
@@ -63,12 +66,6 @@ Value::next_ravel_Char(Unicode u)
 }
 //-----------------------------------------------------------------------------
 void
-Value::next_ravel_Float(APL_Float f)
-{
-  new (next_ravel()) FloatCell(f);
-}
-//-----------------------------------------------------------------------------
-void
 Value::next_ravel_Int(APL_Integer i)
 {
   new (next_ravel()) IntCell(i);
@@ -80,3 +77,4 @@ Value::next_ravel_Pointer(Value * val)
   new (next_ravel()) PointerCell(val, *this);
 }
 //-----------------------------------------------------------------------------
+#endif // __VALUE_ICC_DEFINED__

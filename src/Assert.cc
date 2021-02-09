@@ -69,7 +69,7 @@ char * loc = new char[loc_len + 1];
       {
         asserting = true;
 
-        Backtrace::show(file, line);
+        BACKTRACE
 
         get_CERR() << endl << "SI stack:" << endl << endl;
         Workspace::list_SI(get_CERR(), SIM_SIS_dbg);

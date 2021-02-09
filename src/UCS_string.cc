@@ -125,7 +125,7 @@ start_of_sequence:
                 {
                  utf.dump_hex(CERR << "Bad UTF8 string: ", 40)
                                    << " at " << LOC <<  endl;
-                 Backtrace::show(__FILE__, __LINE__);
+                 BACKTRACE
                 }
 
              // map this string to the "supplementary private use area B" so
@@ -173,7 +173,7 @@ start_of_sequence:
                              end.dump_hex(CERR << endl << "(ending with : ", 20)
                                                << ")" << endl;
                            }
-                        Backtrace::show(__FILE__, __LINE__);
+                        BACKTRACE
                       }
 
                    append(Unicode(utf[from] | 0x100000));

@@ -55,6 +55,7 @@ rlimit rl;
 # define RLIMIT_AS RLIMIT_DATA
 #endif
 
+   rl.rlim_cur = 0;   // suppress warning if getrlimit() is faked
    getrlimit(RLIMIT_AS, &rl);
    initial_rlimit = rl.rlim_cur;
 

@@ -21,6 +21,8 @@
 #ifndef __THREAD_CONTEXT_HH_DEFINED__
 #define __THREAD_CONTEXT_HH_DEFINED__
 
+#include <pthread.h>
+
 #include "PJob.hh"
 
 //=============================================================================

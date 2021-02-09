@@ -232,11 +232,7 @@ const APL_time_us end = start + 1000000 * B->get_ravel(0).get_real_value();
 
    // return time elapsed.
    //
-Value_P Z(LOC);
-   Z->next_ravel_Float(0.000001*(now() - start));
-
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   return Token(TOK_APL_VALUE1, FloatScalar(0.000001*(now() - start), LOC));
 }
 //=============================================================================
 Token

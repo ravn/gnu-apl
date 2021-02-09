@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <time.h>
 
 #include "Common.hh"
 #include "LineInput.hh"
@@ -238,15 +239,14 @@ YMDhmsu::YMDhmsu(APL_time_us at)
    : micro(at % 1000000)
 {
 const time_t secs = at/1000000;
-tm t;
-   gmtime_r(&secs, &t);
+struct tm * t = gmtime(&secs);
 
-   year   = t.tm_year + 1900;
-   month  = t.tm_mon  + 1;
-   day    = t.tm_mday;
-   hour   = t.tm_hour;
-   minute = t.tm_min;
-   second = t.tm_sec;
+   year   = t->tm_year + 1900;
+   month  = t->tm_mon  + 1;
+   day    = t->tm_mday;
+   hour   = t->tm_hour;
+   minute = t->tm_min;
+   second = t->tm_sec;
 }
 //-----------------------------------------------------------------------------
 APL_time_us
