@@ -1190,6 +1190,12 @@ const int function_number = A->get_ravel(0).get_int_value();
                 return Token(TOK_APL_VALUE1, Z);
               }
 
+         case -3:
+              {
+                Value_P Z = name_unsplit(B.getref());
+                return Token(TOK_APL_VALUE1, Z);
+              }
+
          case 4:
               {
                 Value_P Z = tree(B.getref(), tf_none);
@@ -1386,6 +1392,49 @@ Value_P Z(3, LOC);
 Value_P Z3(name, LOC);
    new (Z->next_ravel()) PointerCell(Z3.get(), Z.getref());
    Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_XML::name_unsplit(const Value & B)
+{
+   if (B.get_rank() != 1)        RANK_ERROR;
+   if (B.element_count() != 3)   LENGTH_ERROR;
+
+const Cell & b0 =  B.get_ravel(0);
+const Cell & b1 =  B.get_ravel(1);
+const Cell & b2 =  B.get_ravel(2);
+
+const APL_Integer position = b1.get_int_value();
+   if (position < Workspace::get_IO())
+      {
+         MORE_ERROR() << "¯3 ⎕XML B←NS POS NAME: POS is < ⎕IO";
+         DOMAIN_ERROR;
+      }
+
+UCS_string UCS_Z;
+   UCS_Z += b0.get_char_value();    // namespace (normally ∆, ⍙, or _)
+   UCS_Z.append_number(position);   // position
+
+   if (b2.is_character_cell())   // single char name: OK
+      {
+        UCS_Z += b2.get_char_value();
+      }
+   else                     // multi char name (the normal case)
+      {
+        const Value * B2 = b2.get_pointer_value().get();
+        if (B2->get_rank() > 1)
+           {
+             MORE_ERROR() << "¯3 ⎕XML B←NS POS NAME: NAME has bad rank "
+                          << B2->get_rank() << " (expected  1)";
+             RANK_ERROR;
+           }
+
+         const ShapeItem len_B2 = B2->element_count();
+         loop(bb, len_B2)   UCS_Z += B2->get_ravel(bb).get_char_value();
+      }
+
+Value_P Z(UCS_Z, LOC);
    return Z;
 }
 //-----------------------------------------------------------------------------

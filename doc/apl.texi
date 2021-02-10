@@ -4540,8 +4540,13 @@ into a vector P of (nested) member names. This vector P is understood by
 the ASPL primitive PICK (i.e. Z←P⊃APL or (P⊃APL←value) and can be used to
 address the data in an XML node.
 
-@item @strong{Z←3 ⎕XML B} splits an APL member name as produced by monadic
-⎕XML into a 3-item vector containing the (numeric) position, a character
+@item @strong{Z←3 ⎕XML B} splits an APL member name (as produced by e.g.
+monadic ⎕XML into a 3-item vector Z. Z[1] is a single character indicating
+the category (i.e. a character scalar ∆, ⍙, or _). Z[2] is the position (an
+integer scalar ≥ ⎕IO). Z[3] is a (nested) APL string. 3 ⎕XML has an
+inverse function ¯3 ⎕XML which converts a 3-item vector as produced by 3 ⎕XML
+back into an APL member name.
+
 indicating the category (i.e. _, ∆, or ⍙) and the name from the XML tag:
 
 @verbatim
@@ -4558,6 +4563,10 @@ indicating the category (i.e. _, ∆, or ⍙) and the name from the XML tag:
 2
       N   ⍝ (XML-) name
 comment
+
+      ¯3 ⎕XML C P N   ⍝ inverse of 3 ⎕XML
+∆2comment
+
 @end verbatim
 
 @item @strong{Z←4 ⎕XML B} is a string that shows the member names of the

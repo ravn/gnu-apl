@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-February 9, 2021
+February 10, 2021
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -4379,8 +4379,13 @@ APL←⎕XML XML
      understood by the ASPL primitive PICK (i.e.  Z←P⊃APL or
      (P⊃APL←value) and can be used to address the data in an XML node.
 
-   • *Z←3 ⎕XML B* splits an APL member name as produced by monadic ⎕XML
-     into a 3-item vector containing the (numeric) position, a character
+   • *Z←3 ⎕XML B* splits an APL member name (as produced by e.g.
+     monadic ⎕XML into a 3-item vector Z. Z[1] is a single character
+     indicating the category (i.e.  a character scalar ∆, ⍙, or _).
+     Z[2] is the position (an integer scalar ≥ ⎕IO). Z[3] is a (nested)
+     APL string.  3 ⎕XML has an inverse function ¯3 ⎕XML which converts
+     a 3-item vector as produced by 3 ⎕XML back into an APL member name.
+
      indicating the category (i.e.  _, ∆, or ⍙) and the name from the
      XML tag:
 
@@ -4397,6 +4402,10 @@ APL←⎕XML XML
      2
            N   ⍝ (XML-) name
      comment
+     
+           ¯3 ⎕XML C P N   ⍝ inverse of 3 ⎕XML
+     ∆2comment
+     
 
    • *Z←4 ⎕XML B* is a string that shows the member names of the
      associative array B in a tree-like fashion.  For example:
@@ -6100,61 +6109,61 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11472
-Node: Chapter 219809
-Node: Chapter 319941
-Node: Section 3.121681
-Node: Section 3.237842
-Node: Section 3.338601
-Node: Section 3.439888
-Node: Section 3.543967
-Node: Section 3.644140
-Node: Section 3.744770
-Node: Section 3.848723
-Node: Section 3.950265
-Node: Section 3.1052358
-Node: Section 3.1154142
-Node: Section 3.1256082
-Node: Section 3.1357023
-Node: Section 3.1457275
-Node: Section 3.1558671
-Node: Section 3.1661189
-Node: Section 3.1767888
-Node: Section 3.1869333
-Node: Section 3.1974994
-Node: Section 3.2080028
-Node: Section 3.2183309
-Node: Section 3.2283600
-Node: Section 3.2394175
-Node: Section 3.2494447
-Node: Section 3.25101025
-Node: Section 3.26103482
-Node: Section 3.27104151
-Node: Section 3.28107274
-Node: Section 3.29114882
-Node: Section 3.30115829
-Node: Section 3.31129391
-Node: Section 3.32139388
-Node: Section 3.33142492
-Node: Section 3.34144481
-Node: Section 3.35148906
-Node: Chapter 4181790
-Node: Chapter 5183543
-Node: Chapter 6184669
-Node: Section 6.1186206
-Node: Section 6.2187486
-Node: Section 6.3187846
-Node: Section 6.4188088
-Node: Section 6.5188750
-Node: Section 6.6189228
-Node: Section 6.7190000
-Node: Section 6.8190457
-Node: Chapter 7190859
-Node: Section 7.1191278
-Node: Section 7.2191965
-Node: Chapter 8192796
-Node: Section 8.1193299
-Node: Section 8.2218613
+Node: Chapter 11473
+Node: Chapter 219810
+Node: Chapter 319942
+Node: Section 3.121682
+Node: Section 3.237843
+Node: Section 3.338602
+Node: Section 3.439889
+Node: Section 3.543968
+Node: Section 3.644141
+Node: Section 3.744771
+Node: Section 3.848724
+Node: Section 3.950266
+Node: Section 3.1052359
+Node: Section 3.1154143
+Node: Section 3.1256083
+Node: Section 3.1357024
+Node: Section 3.1457276
+Node: Section 3.1558672
+Node: Section 3.1661190
+Node: Section 3.1767889
+Node: Section 3.1869334
+Node: Section 3.1974995
+Node: Section 3.2080029
+Node: Section 3.2183310
+Node: Section 3.2283601
+Node: Section 3.2394176
+Node: Section 3.2494448
+Node: Section 3.25101026
+Node: Section 3.26103483
+Node: Section 3.27104152
+Node: Section 3.28107275
+Node: Section 3.29114883
+Node: Section 3.30115830
+Node: Section 3.31129392
+Node: Section 3.32139389
+Node: Section 3.33142493
+Node: Section 3.34144482
+Node: Section 3.35148907
+Node: Chapter 4182164
+Node: Chapter 5183917
+Node: Chapter 6185043
+Node: Section 6.1186580
+Node: Section 6.2187860
+Node: Section 6.3188220
+Node: Section 6.4188462
+Node: Section 6.5189124
+Node: Section 6.6189602
+Node: Section 6.7190374
+Node: Section 6.8190831
+Node: Chapter 7191233
+Node: Section 7.1191652
+Node: Section 7.2192339
+Node: Chapter 8193170
+Node: Section 8.1193673
+Node: Section 8.2218987
 
 End Tag Table
 
