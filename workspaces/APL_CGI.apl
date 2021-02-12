@@ -184,8 +184,15 @@ The normal (and fully supported) way to install GNU APL is this:
 GNU APL compiles under CYGWIN, (see
 <?apl  ('http://',xCYGWIN) HTML∆A xCYGWIN ?>),
 provided that the necessary libraries are installed. A 32-bit <B>apl.exe</B>
-that may run under CYGWIN lives in the download area. Use at your own risk and
-see <B>README-5-WINDOWS</B> for further information.
+that should run under CYGWIN lives in the download area. Use at your own risk
+and see <B>README-5-WINDOWS</B> for further information. Building GNU APL under
+cygwin is the method of choice if you need some of the special purpose system
+functions (⎕FFT, ⎕PLOT, ⎕RE, etc) that depend on non-default libraries.
+
+A compiled 64-bit version of GNU APL (briefly tested under Windows 10)
+which was built under cygwin, but runs without cygwin being installed,
+is contained in file <B>apl-1.8-windows.zip</B>. This zip file also contains
+an installer for an APL keyboard layout.
 
 <?apl HTML∆H4[''] 'Subversion (SVN) repository for GNU APL' ?>
 

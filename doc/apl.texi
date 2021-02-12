@@ -2911,15 +2911,15 @@ in text mode see file @b{doc/PLOT_circle.png}):
 @subsubsection Real Plot Data
 
 On the other hand, if a data item B[N] or B[row;N] is @b{real}, then it is
-placed at position (N, x) of the plot. The X-range is then\
-[⎕IO ... ⎕IO + ¯1↑⍴B] and the Y-range [Ymin ... Ymax] of the plot is
-determined by the values parts of B. That is:
+placed at position (N, x) of the plot. The X-range is then
+[⎕IO ... ⎕IO + ¯1↑⍴B] and the Y-range [Y@sub{min} ... Y@sub{max}] of the
+plot is determined by the values parts of B. That is:
 
 @verbatim
-Xmin ← ⎕IO         ⍝ smallest real part of B
-Xmax ← ⎕IO + ⌈/B   ⍝ largest real part of B
-Ymin ← ⌊/,B        ⍝ smallest value in B
-Ymax ← ⌈/,B        ⍝ largest value in B
+Xmin ← ⎕IO             ⍝ smallest real part of B
+Xmax ← ¯1 + ⎕IO + ⍴B   ⍝ largest real part of B
+Ymin ← ⌊/,B            ⍝ smallest value in B
+Ymax ← ⌈/,B            ⍝ largest value in B
 @end verbatim
 
 Example:
@@ -3031,14 +3031,17 @@ details.
 
 Each call of ⎕PLOT with some plot data B opens a separate window in the X
 server (which implies that ⎕PLOT requires X). That window runs in its own
-thread until it is being closed. A window can be closed in different ways:
+thread until it is being closed. A plot window can be closed in different ways:
 
 @itemize
-@item By the user clicking on the close button (at the top-right) of the
-window, or
-@item By the user opening the drop down menu of the window (at the top left of
-the window) and selecting the option named "Close", or
-@item from APL by calling ⎕PLOT ¯3.
+@item by clicking on the close button (at the top-right) of the
+  window, or
+@item by opening the drop down menu of the window (at the top left of
+  the window) and selecting the option named "Close", or
+@item from APL by calling ⎕PLOT ¯3 (which closes all open plot windows), or
+@item from APL by calling ⎕PLOT H (which closes a specific plot window),
+  where H is the plot window handle returned by monadic ⎕PLOT B or by dyadic
+  A ⎕PLOT B with plot attributes A
 @end itemize
 
 @node    Section 3.29

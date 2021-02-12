@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-February 10, 2021
+February 12, 2021
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -2833,14 +2833,14 @@ document; in text mode see file doc/PLOT_circle.png):
 .......................
 
 On the other hand, if a data item B[N] or B[row;N] is real, then it is
-placed at position (N, x) of the plot.  The X-range is then\ [⎕IO ...
-⎕IO + ¯1↑⍴B] and the Y-range [Ymin ...  Ymax] of the plot is determined
-by the values parts of B. That is:
+placed at position (N, x) of the plot.  The X-range is then [⎕IO ...
+⎕IO + ¯1↑⍴B] and the Y-range [Y_{min} ...  Y_{max}] of the plot is
+determined by the values parts of B. That is:
 
-Xmin ← ⎕IO         ⍝ smallest real part of B
-Xmax ← ⎕IO + ⌈/B   ⍝ largest real part of B
-Ymin ← ⌊/,B        ⍝ smallest value in B
-Ymax ← ⌈/,B        ⍝ largest value in B
+Xmin ← ⎕IO             ⍝ smallest real part of B
+Xmax ← ¯1 + ⎕IO + ⍴B   ⍝ largest real part of B
+Ymin ← ⌊/,B            ⍝ smallest value in B
+Ymax ← ⌈/,B            ⍝ largest value in B
 
    Example:
 
@@ -2946,14 +2946,18 @@ with )MORE providing details.
 
 Each call of ⎕PLOT with some plot data B opens a separate window in the
 X server (which implies that ⎕PLOT requires X). That window runs in its
-own thread until it is being closed.  A window can be closed in
+own thread until it is being closed.  A plot window can be closed in
 different ways:
 
-   • By the user clicking on the close button (at the top-right) of the
-     window, or
-   • By the user opening the drop down menu of the window (at the top
-     left of the window) and selecting the option named "Close", or
-   • from APL by calling ⎕PLOT ¯3.
+   • by clicking on the close button (at the top-right) of the window,
+     or
+   • by opening the drop down menu of the window (at the top left of the
+     window) and selecting the option named "Close", or
+   • from APL by calling ⎕PLOT ¯3 (which closes all open plot windows),
+     or
+   • from APL by calling ⎕PLOT H (which closes a specific plot window),
+     where H is the plot window handle returned by monadic ⎕PLOT B or by
+     dyadic A ⎕PLOT B with plot attributes A
 
 
 File: apl.info,  Node: Section 3.29,  Next: Section 3.30,  Prev: Section 3.28,  Up: Chapter 3
@@ -6140,30 +6144,30 @@ Node: Section 3.25101026
 Node: Section 3.26103483
 Node: Section 3.27104152
 Node: Section 3.28107275
-Node: Section 3.29114883
-Node: Section 3.30115830
-Node: Section 3.31129392
-Node: Section 3.32139389
-Node: Section 3.33142493
-Node: Section 3.34144482
-Node: Section 3.35148907
-Node: Chapter 4182164
-Node: Chapter 5183917
-Node: Chapter 6185043
-Node: Section 6.1186580
-Node: Section 6.2187860
-Node: Section 6.3188220
-Node: Section 6.4188462
-Node: Section 6.5189124
-Node: Section 6.6189602
-Node: Section 6.7190374
-Node: Section 6.8190831
-Node: Chapter 7191233
-Node: Section 7.1191652
-Node: Section 7.2192339
-Node: Chapter 8193170
-Node: Section 8.1193673
-Node: Section 8.2218987
+Node: Section 3.29115135
+Node: Section 3.30116082
+Node: Section 3.31129644
+Node: Section 3.32139641
+Node: Section 3.33142745
+Node: Section 3.34144734
+Node: Section 3.35149159
+Node: Chapter 4182416
+Node: Chapter 5184169
+Node: Chapter 6185295
+Node: Section 6.1186832
+Node: Section 6.2188112
+Node: Section 6.3188472
+Node: Section 6.4188714
+Node: Section 6.5189376
+Node: Section 6.6189854
+Node: Section 6.7190626
+Node: Section 6.8191083
+Node: Chapter 7191485
+Node: Section 7.1191904
+Node: Section 7.2192591
+Node: Chapter 8193422
+Node: Section 8.1193925
+Node: Section 8.2219239
 
 End Tag Table
 

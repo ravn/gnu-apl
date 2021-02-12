@@ -244,7 +244,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>February 10, 2021
+<p>February 12, 2021
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -3180,14 +3180,14 @@ in text mode see file <b>doc/PLOT_circle.png</b>):
 <h4 class="subsubsection">3.28.1.2 Real Plot Data</h4>
 
 <p>On the other hand, if a data item B[N] or B[row;N] is <b>real</b>, then it is
-placed at position (N, x) of the plot. The X-range is then\
-[⎕IO ... ⎕IO + ¯1↑⍴B] and the Y-range [Ymin ... Ymax] of the plot is
-determined by the values parts of B. That is:
+placed at position (N, x) of the plot. The X-range is then
+[⎕IO ... ⎕IO + ¯1↑⍴B] and the Y-range [Y<sub>min</sub> ... Y<sub>max</sub>] of the
+plot is determined by the values parts of B. That is:
 </p>
-<pre class="verbatim">Xmin ← ⎕IO         ⍝ smallest real part of B
-Xmax ← ⎕IO + ⌈/B   ⍝ largest real part of B
-Ymin ← ⌊/,B        ⍝ smallest value in B
-Ymax ← ⌈/,B        ⍝ largest value in B
+<pre class="verbatim">Xmin ← ⎕IO             ⍝ smallest real part of B
+Xmax ← ¯1 + ⎕IO + ⍴B   ⍝ largest real part of B
+Ymin ← ⌊/,B            ⍝ smallest value in B
+Ymax ← ⌈/,B            ⍝ largest value in B
 </pre>
 <p>Example:
 </p>
@@ -3292,14 +3292,17 @@ details.
 
 <p>Each call of ⎕PLOT with some plot data B opens a separate window in the X
 server (which implies that ⎕PLOT requires X). That window runs in its own
-thread until it is being closed. A window can be closed in different ways:
+thread until it is being closed. A plot window can be closed in different ways:
 </p>
 <ul>
-<li> By the user clicking on the close button (at the top-right) of the
-window, or
-</li><li> By the user opening the drop down menu of the window (at the top left of
-the window) and selecting the option named &quot;Close&quot;, or
-</li><li> from APL by calling ⎕PLOT ¯3.
+<li> by clicking on the close button (at the top-right) of the
+  window, or
+</li><li> by opening the drop down menu of the window (at the top left of
+  the window) and selecting the option named &quot;Close&quot;, or
+</li><li> from APL by calling ⎕PLOT ¯3 (which closes all open plot windows), or
+</li><li> from APL by calling ⎕PLOT H (which closes a specific plot window),
+  where H is the plot window handle returned by monadic ⎕PLOT B or by dyadic
+  A ⎕PLOT B with plot attributes A
 </li></ul>
 
 <hr>

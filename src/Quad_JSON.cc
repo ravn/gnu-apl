@@ -164,6 +164,15 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
         return;
       }
 
+   if (cell.is_complex_cell())
+      {
+        char cc[50];
+        snprintf(cc, sizeof(cc), "%lgJ%lg", cell.get_real_value(),
+                                            cell.get_imag_value());
+        result.append_UTF8(cc);
+        return;
+      }
+
    if (!cell.is_pointer_cell())
       {
         MORE_ERROR() << "2 ⎕JSON B: Unexpected/unsupported Celltype "

@@ -5,7 +5,8 @@ dist_doc_DATA =	APL_CGI.apl		\
 		ScalarBenchmark.apl	\
 		Scalar2.apl		\
 		Scalar3.apl		\
-		gnuplot.apl
+		sudoku.apl		\
+		sudoku_DLX.apl
 
 docdir = $(pkglibdir)/workspaces
 
