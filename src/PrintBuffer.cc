@@ -33,10 +33,10 @@
 /// max sizes for arrays on the stack. Larger values are allocated with new()
 enum
 {
-   PB_MAX_COLS        = 200,
-   PB_MAX_ROWS        = 100,
-   PB_MAX_ITEMS       = PB_MAX_COLS * PB_MAX_ROWS,
-   PB_MAX_BREAKPOINTS = 200,
+   PB_MAX_COLS   = 200,
+   PB_MAX_ROWS   = 100,
+   PB_MAX_ITEMS  = PB_MAX_COLS * PB_MAX_ROWS,
+   PB_MAX_CHUNKS = 200,
 };
 
 //-----------------------------------------------------------------------------
@@ -338,7 +338,7 @@ const bool nested = !value.is_simple();
               }
 
           bool not_char = false;   // determined by get_col_spacing()
-	  const int col_spacing = value.get_col_spacing(not_char, x, framed);
+          const int col_spacing = value.get_col_spacing(not_char, x, framed);
 
           const int32_t max_spacing = (col_spacing > last_col_spacing) 
                                     ?  col_spacing : last_col_spacing;
@@ -365,12 +365,11 @@ const bool nested = !value.is_simple();
                     ++not_char_spaces;
                   }
 
-               // we want a total spacing of 'max_spacing'
-               // but we deduct the 'not_char_spaces' chars ² and ³
+               // we want a total spacing of 'max_spacing', but we
+               // do not count the 'not_char_spaces' chars ² and ³
                // that were appended above.
                //
-               const int u7_pad_len = max_spacing - not_char_spaces;
-               if (u7_pad_len)
+               if (const int u7_pad_len = max_spacing - not_char_spaces)
                   {
                      pcols[x - 1].pad_r(UNI_iPAD_U7, u7_pad_len);
                   }
@@ -441,38 +440,43 @@ PrintBuffer::print_interruptible(ostream & out, Rank rank, int quad_PW)
 {
    if (get_height() == 0)   return;      // empty PrintBuffer
 
+   // lines may be (very) long (compared to ⎕PW) and if they are then they
+   // need to be broken into 2 or more chunks. A chunk is smaller than ⎕PW;
+   // the first chunk is printed un-indented, while subsequent chunk are
+   // indented by 6 blanks.
+   //
 const int total_width = get_width(0);
-const int max_breaks = 2*total_width/quad_PW;
+const int max_breaks = 2 + total_width/quad_PW;   // an upper limit
 
 ShapeItem * del = 0;
-ShapeItem __breakpoints[PB_MAX_BREAKPOINTS];
-ShapeItem * breakpoints = __breakpoints;
-   if (max_breaks >= PB_MAX_BREAKPOINTS)
-      breakpoints = del = new ShapeItem[max_breaks];
+size_t chunk_len = 0;
+ShapeItem __chunk_lengths[PB_MAX_CHUNKS];
+ShapeItem * chunk_lengths = __chunk_lengths;
+   if (max_breaks >= PB_MAX_CHUNKS)
+      chunk_lengths = del = new ShapeItem[max_breaks];
 ShapeItem bp_len = 0;
 
-   // print rows, breaking at breakpoints
+   // initialize chunk_lengths, based on the first row of the PrintBuffer.
+   // All subsequent rows are aligned to the first row, therefore the first
+   // row can be taken as a prototype for all rows.
+   //
+   for (int col = 0; col < total_width; col += chunk_len)
+       {
+         chunk_len = get_line(0).compute_chunk_length(quad_PW, col);
+         chunk_lengths[bp_len++] = chunk_len;
+       }
+
+   // print rows, breaking each row at chunk_lengths
    //
    loop(row, get_height())
        {
-         if (row)   out << endl;   // end previous row
-         int col = 0;
-         int b = 0;
+         int brk_idx = 0;   // chunk_lengths index
 
-         while (col < total_width)
+         for (int col = 0; col < total_width; col += chunk_len)
             {
-              int chunk_len;
-              if (row == 0)   // first row: set up breakpoints
-                 {
-                   chunk_len = get_line(0).compute_chunk_length(quad_PW, col);
-                   breakpoints[bp_len++] = chunk_len;
-                 }
-              else            // subsequent row: re-use breakpoints
-                 {
-                   chunk_len = breakpoints[b++];
-                 }
-
               if (col)   out << endl << "      ";
+
+              chunk_len = chunk_lengths[brk_idx++];
               UCS_string trow(get_line(row), col, chunk_len);
               trow.remove_trailing_padchars();
 
@@ -493,9 +497,10 @@ ShapeItem bp_len = 0;
                    return;
                  }
             }
+
+         out << endl;   // end of row
        }
 
-   out << endl;
    delete del;
 }
 //-----------------------------------------------------------------------------
@@ -938,18 +943,18 @@ PrintBuffer::append_col(const PrintBuffer & pb1)
 void
 PrintBuffer::append_ucs(const UCS_string & ucs)
 {
-   if (buffer.size() == 0)   // empty
+   if (buffer.size() == 0)   // empty buffer (no lines yet)
       {
         buffer.push_back(ucs);
       }
-   else if (ucs.size() < get_width(0))
+   else if (ucs.size() < get_width(0))  // new line is shoter: pad it)
       {
         UCS_string ucs1(ucs);
         UCS_string pad(get_width(0) - ucs.size(), UNI_iPAD_L1);
         ucs1.append(pad);
         buffer.push_back(ucs1);
       }
-   else if (ucs.size() > get_width(0))
+   else if (ucs.size() > get_width(0))   // new line is longer: pad PrintBufer
       {
         UCS_string pad(ucs.size() - get_width(0), UNI_iPAD_L2);
         loop(h, get_height())   buffer[h].append(pad);

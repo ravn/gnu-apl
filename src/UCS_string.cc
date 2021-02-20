@@ -383,37 +383,34 @@ UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
 
 const int total_width = pb.get_width(0);
 
-std::vector<int> breakpoints;
-   breakpoints.reserve(2*total_width/quad_PW);
+   // initialize chunk_lengths, based on the first row of the PrintBuffer.
+   // All subsequent rows are aligned to the first row, therefore the first
+   // row can be taken as a prototype for all rows.
+size_t chunk_len = 0;
+std::vector<int> chunk_lengths;
+   chunk_lengths.reserve(2*total_width/quad_PW);
+   for (int col = 0; col < total_width; col += chunk_len)
+       {
+         chunk_len = pb.get_line(0).compute_chunk_length(quad_PW,col);
+         chunk_lengths.push_back(chunk_len);
+       }
 
-   // print rows, breaking at breakpoints
+   // print rows, breaking at chunk_lengths
    //
    loop(row, pb.get_height())
        {
          if (row)   append(UNI_LF);   // end previous row
-         int col = 0;
-         int b = 0;
+         int brk_idx = 0;
 
-         while (col < total_width)
-            {
-              int chunk_len;
-              if (row == 0)   // first row: set up breakpoints
-                 {
-                   chunk_len = pb.get_line(0).compute_chunk_length(quad_PW,col);
-                   breakpoints.push_back(chunk_len);
-                 }
-              else
-                 {
-                   chunk_len = breakpoints[b++];
-                 }
+         for (int col = 0; col < total_width; col += chunk_len)
+               {
+                 chunk_len = chunk_lengths[brk_idx++];
 
-              if (col)   append_UTF8("\n      ");
-              UCS_string trow(pb.get_line(row), col, chunk_len);
-              trow.remove_trailing_padchars();
-              append(trow);
-
-              col += chunk_len;
-            }
+                 if (col)   append_UTF8("\n      ");
+                 UCS_string trow(pb.get_line(row), col, chunk_len);
+                 trow.remove_trailing_padchars();
+                 append(trow);
+               }
        }
 
    // replace pad chars with blanks.
@@ -480,23 +477,32 @@ UCS_string::UCS_string(istream & in)
 int
 UCS_string::compute_chunk_length(int quad_PW, int col) const
 {
-int chunk_len = quad_PW;
+   // the space available is ⎕PW for the first line or ⎕PW less the usual
+   // 6 space indentation for subsequent lines.
+   //
+const int chunk_len = col ? quad_PW - 6 : quad_PW;
 
-   if (col)   chunk_len -= 6;   // subsequent line inden
-
+   // if the rest of the line (from col to the end of the line) is small,
+   //  then return the length of the rest.
+   //
 int pos = col + chunk_len;
    if (pos >= size())   return size() - col;
 
+   // otherwise the rest does not fit into ⎕PW. Find a whitespace
+   // at which the line should be broken.
+   //
    while (--pos > col)
       {
          const Unicode uni = at(pos);
-         if (uni == UNI_iPAD_U2 || uni == UNI_iPAD_U3)
+         if (uni == UNI_SPACE || uni == UNI_iPAD_U2 || uni == UNI_iPAD_U3)
             {
-               chunk_len = pos - col + 1;
-               break;
+               return pos - col + 1;
             }
       }
 
+   // no whitespace found (the entire string may not have any).
+   // Break at chunk_len.
+   //
    return chunk_len;
 }
 //-----------------------------------------------------------------------------
@@ -509,12 +515,12 @@ UCS_string::remove_trailing_padchars()
    //
 
    // If the line contains UNI_iPAD_L0 (higher dimension separator)
-   // then discard all chars.
+   // then discard all chars (unless the line is framed)..
    //
    loop(u, size())
        {
-         if (at(u) == UNI_LINE_VERT)    break;
-         if (at(u) == UNI_LINE_VERT2)   break;
+         if (at(u) == UNI_LINE_VERT)    break;   // │   (framed)
+         if (at(u) == UNI_LINE_VERT2)   break;   // ║   (framed)
          if (at(u) == UNI_iPAD_L0)
             {
               clear();
@@ -525,12 +531,13 @@ UCS_string::remove_trailing_padchars()
    while (size())
       {
         const Unicode last = back();
-        if (last == UNI_iPAD_L0 ||
-            last == UNI_iPAD_L1 ||
-            last == UNI_iPAD_L2 ||
-            last == UNI_iPAD_L3 ||
-            last == UNI_iPAD_L4 ||
-            last == UNI_iPAD_U7)
+        if (last == UNI_iPAD_L0 ||   // ₀: Block separator
+            last == UNI_iPAD_L1 ||   // ₁: pad line to PrintBuffer width
+            last == UNI_iPAD_L2 ||   // ₂: pad PrintBuffer width to line
+            last == UNI_iPAD_L3 ||   // ₃: pad integer part to the left
+            last == UNI_iPAD_L4 ||   // ₄: pad fractional part to the right
+            last == UNI_iPAD_U2 ||   // ²  column separator (after notchar)
+            last == UNI_iPAD_U7)     // ⁷  pad final to the right
             pop_back();
         else
             break;
