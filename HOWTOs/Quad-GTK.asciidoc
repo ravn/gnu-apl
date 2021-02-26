@@ -106,8 +106,9 @@ libraries, so that Gtk itself remains outside GNU APL.
   details such as a button changing its form or its color when being pressed
   are handled by the Gtk_server server process (resp. one of the Gtk
   libraries) and are not communicated to APL. The encoding and decoding of
-  TLVs that are between *apl* and &Gtk_server takes place inside ⎕GTK so that
-  the APL programmer is not concerned with the details of this communication.
+  TLVs that are exchanged between *apl* and *Gtk_server) takes place inside
+  ⎕GTK so that the APL programmer is not concerned with the details of
+  this communication.
 ----
                                                           ╔════════════════════════════╗
                                                           ║ GUI-description.xml file   ║
@@ -364,7 +365,7 @@ following we assume that:
 
 * The GUI file is /home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui
 
-You most likely need to adjust there paths on your machine. Then start
+You need to adjust these paths on your machine. Then start
 GNU APL and enter the following:
 
 ----
@@ -548,7 +549,7 @@ whether the user has entered any data or not).
 0
 ----
 
-Let *Bint* be:
+Let *B~int~* be:
 
 * the (positive) function number B if B is a positive integer scalar, or
 * the  function number corresponding to B if B is a function name like
@@ -556,14 +557,14 @@ Let *Bint* be:
 
 Then result of *⎕GTK[H_ID] B* is:
 
-* *Bint* if the corresponding Gtk function was successful but returns no data
+* *B~int~* if the corresponding Gtk function was successful but returns no data
   (which is typical is  for all set_XXX() functions like set_text() above), or
 
-* *-Bint* if the corresponding Gtk function has failed, or
+* *-B~int~* if the corresponding Gtk function has failed, or
 
-* a vector *Bint, DATA* if the corresponding Gtk function was successful and
-  has returned the result *DATA* (which is typical is  for all get_XXX()
-  functions like get_text() above).
+* a vector *B~int~, DATA* if the corresponding Gtk function was successful and
+  has returned the result *DATA* (which is typical is  for all *get_XXX()*
+  functions such as *get_text()* above).
 
 Therefore, even though some Gtk functions (i.e. those having a C/C++ result
 type of *void*) do not return values, ⎕GTK always returns a value.
@@ -637,7 +638,7 @@ The entire life-cycle of an event is this:
 
 . Gtk calls the function *clicked()* in the Gtk_server.
 
-. function *clicked()* in the Gtk_server *fries()* the event onto the
+. function *clicked()* in the Gtk_server *send()s* the event to APL over the
   connection between APL and Gtk_server. 
 
 . APL *read()s* the event from the connection between APL and

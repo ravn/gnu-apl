@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.9" />
+<meta name="generator" content="AsciiDoc 8.6.10" />
 <title>The GNU APL ⎕GTK Cookbook</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -910,8 +911,9 @@ The <strong>Gtk_server</strong> is started by ⎕GTK, and after that ⎕GTK comm
   details such as a button changing its form or its color when being pressed
   are handled by the Gtk_server server process (resp. one of the Gtk
   libraries) and are not communicated to APL. The encoding and decoding of
-  TLVs that are between <strong>apl</strong> and &amp;Gtk_server takes place inside ⎕GTK so that
-  the APL programmer is not concerned with the details of this communication.
+  TLVs that are exchanged between <strong>apl</strong> and *Gtk_server) takes place inside
+  ⎕GTK so that the APL programmer is not concerned with the details of
+  this communication.
 </p>
 </li>
 </ol></div>
@@ -1512,7 +1514,7 @@ The GUI file is /home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>You most likely need to adjust there paths on your machine. Then start
+<div class="paragraph"><p>You need to adjust these paths on your machine. Then start
 GNU APL and enter the following:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1747,7 +1749,7 @@ whether the user has entered any data or not).</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>Let <strong>Bint</strong> be:</p></div>
+<div class="paragraph"><p>Let <strong>B<sub>int</sub></strong> be:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1765,20 +1767,20 @@ the  function number corresponding to B if B is a function name like
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Bint</strong> if the corresponding Gtk function was successful but returns no data
+<strong>B<sub>int</sub></strong> if the corresponding Gtk function was successful but returns no data
   (which is typical is  for all set_XXX() functions like set_text() above), or
 </p>
 </li>
 <li>
 <p>
-<strong>-Bint</strong> if the corresponding Gtk function has failed, or
+<strong>-B<sub>int</sub></strong> if the corresponding Gtk function has failed, or
 </p>
 </li>
 <li>
 <p>
-a vector <strong>Bint, DATA</strong> if the corresponding Gtk function was successful and
-  has returned the result <strong>DATA</strong> (which is typical is  for all get_XXX()
-  functions like get_text() above).
+a vector <strong>B<sub>int</sub>, DATA</strong> if the corresponding Gtk function was successful and
+  has returned the result <strong>DATA</strong> (which is typical is  for all <strong>get_XXX()</strong>
+  functions such as <strong>get_text()</strong> above).
 </p>
 </li>
 </ul></div>
@@ -1926,7 +1928,7 @@ Gtk calls the function <strong>clicked()</strong> in the Gtk_server.
 </li>
 <li>
 <p>
-function <strong>clicked()</strong> in the Gtk_server <strong>fries()</strong> the event onto the
+function <strong>clicked()</strong> in the Gtk_server <strong>send()s</strong> the event to APL over the
   connection between APL and Gtk_server.
 </p>
 </li>
@@ -2837,7 +2839,8 @@ top-level group).</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-02-17 16:47:59 CET
+Last updated
+ 2021-02-26 16:42:52 CET
 </div>
 </div>
 </body>

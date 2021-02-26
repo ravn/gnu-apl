@@ -20230,8 +20230,8 @@ _ACEOF
 
 else RATIONAL_NUMBERS_WANTED="no"
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $VISIBLE_MARKERS_WANTED" >&5
-$as_echo "$VISIBLE_MARKERS_WANTED" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $RATIONAL_NUMBERS_WANTED" >&5
+$as_echo "$RATIONAL_NUMBERS_WANTED" >&6; }
 
 # check if we are on i686 (to fix a strange rpmbuild problem)
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we compile for an i686 CPU" >&5

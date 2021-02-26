@@ -65,13 +65,12 @@ and texts about APL. We would like to refer the reader to the following:
 
 @menu
 * Chapter 1::    Installing and Starting GNU APL
-* Chapter 2::    Design Decisions
-* Chapter 3::    Non-standard GNU APL Features
-* Chapter 4::    Limitations and Missing Features
-* Chapter 5::    Internationalization
-* Chapter 6::    Project Structure
-* Chapter 7::    Libraries Contributed by GNU APL Users
-* Chapter 8::    Licenses for GNU APL and this Manual
+* Chapter 2::    Non-standard GNU APL Features
+* Chapter 3::    Limitations and Missing Features
+* Chapter 4::    Internationalization
+* Chapter 5::    Project Structure
+* Chapter 6::    Libraries Contributed by GNU APL Users
+* Chapter 7::    Licenses for GNU APL and this Manual
 @end menu
 
 @c ============================================================================
@@ -648,58 +647,52 @@ numbers 0 to 9) and provide your own paths. The library numbers NOT overridden
 in a 'preferences' file still follow the library root scheme.
 
 @c ----------------------------------------------------------------------------
-@node Chapter 2
-@chapter Design Decisions
-
-(removed)
-
-@c ----------------------------------------------------------------------------
-@node    Chapter 3
+@node    Chapter 2
 @chapter Non-standard GNU APL Features
 
 @menu
-* Section 3.1::   APL Scripting
-* Section 3.2::   Axis argument in defined functions
-* Section 3.3::   Colored Output
-* Section 3.4::   Comparison Rules
-* Section 3.5::   Complex Numbers
-* Section 3.6::   Debug Commands
-* Section 3.7::   Direct Functions (Lambdas)
-* Section 3.8::   ]DOXY Command
-* Section 3.9::   )DUMP and DUMP-HTML Commands
-* Section 3.10::  History and TAB completion
-* Section 3.11::  Logging Facilities
-* Section 3.12::  Rational Numbers
-* Section 3.13::  Hex Numbers
-* Section 3.14::  User-defined Commands
-* Section 3.15::  Structured Variables and Associative Arrays
-* Section 3.16::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
-* Section 3.17::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
-* Section 3.18::  Generalized ⍳
-* Section 3.19::  ⌹[X] - QR Factorization
-* Section 3.20::  Dyadic ⎕CR
-* Section 3.21::  Dyadic ⎕FX (Native Functions)
-* Section 3.22::  ⎕ARG  - Interpreter command line arguments
-* Section 3.23::  ⎕DLX  - Knuth's Dancing Links Algorithm
-* Section 3.24::  ⎕ENV  - Environment Variable
-* Section 3.25::  ⎕FIO  - File I/O Functions
-* Section 3.26::  ⎕FFT  - Fast Fourier Transform
-* Section 3.27::  ⎕GTK  - GTK Interface
-* Section 3.28::  ⎕JSON - JSON Parsing
-* Section 3.29::  ⎕MAP  - Map Value
-* Section 3.30::  ⎕PLOT - Plot Data
-* Section 3.31::  ⎕PS   - Print Style
-* Section 3.32::  ⎕RE   - Regular Expressions
-* Section 3.33::  ⎕RVAL - Random APL value
-* Section 3.34::  ⎕SQL  - SQL Database Interface
-* Section 3.35::  ⎕SI   - State Indicator
-* Section 3.36::  ⎕SYL  - System limits
-* Section 3.37::  ⎕XML - XML Parsing
+* Section 2.1::   APL Scripting
+* Section 2.2::   Axis argument in defined functions
+* Section 2.3::   Colored Output
+* Section 2.4::   Comparison Rules
+* Section 2.5::   Complex Numbers
+* Section 2.6::   Debug Commands
+* Section 2.7::   Direct Functions (Lambdas)
+* Section 2.8::   ]DOXY Command
+* Section 2.9::   )DUMP and DUMP-HTML Commands
+* Section 2.10::  History and TAB completion
+* Section 2.11::  Logging Facilities
+* Section 2.12::  Rational Numbers
+* Section 2.13::  Hex Numbers
+* Section 2.14::  User-defined Commands
+* Section 2.15::  Structured Variables and Associative Arrays
+* Section 2.16::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
+* Section 2.17::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
+* Section 2.18::  Generalized ⍳
+* Section 2.19::  ⌹[X] - QR Factorization
+* Section 2.20::  Dyadic ⎕CR
+* Section 2.21::  Dyadic ⎕FX (Native Functions)
+* Section 2.22::  ⎕ARG  - Interpreter command line arguments
+* Section 2.23::  ⎕DLX  - Knuth's Dancing Links Algorithm
+* Section 2.24::  ⎕ENV  - Environment Variable
+* Section 2.25::  ⎕FIO  - File I/O Functions
+* Section 2.26::  ⎕FFT  - Fast Fourier Transform
+* Section 2.27::  ⎕GTK  - GTK Interface
+* Section 2.28::  ⎕JSON - JSON Parsing
+* Section 2.29::  ⎕MAP  - Map Value
+* Section 2.30::  ⎕PLOT - Plot Data
+* Section 2.31::  ⎕PS   - Print Style
+* Section 2.32::  ⎕RE   - Regular Expressions
+* Section 2.33::  ⎕RVAL - Random APL value
+* Section 2.34::  ⎕SQL  - SQL Database Interface
+* Section 2.35::  ⎕SI   - State Indicator
+* Section 2.36::  ⎕SYL  - System limits
+* Section 2.37::  ⎕XML - XML Parsing
 @end menu
 
-There are a few possibly useful features in GNU APL:
+There are a few hopefully useful features in GNU APL:
 
-@node    Section 3.1
+@node    Section 2.1
 @section APL Scripting
 
 As already mentioned, it is possible to write APL scripts. Similar to other
@@ -1169,7 +1162,7 @@ For that reason, if the ∇-editor is used in a script and attempts to redefine
 an existing defined function then the existing function is simply overridden
 with the new one and no DEFN ERROR is raised.
 
-@node    Section 3.2
+@node    Section 2.2
 @section Axis argument in defined functions
 
 Defined functions and operators (including lambdas) accept an axis argument.
@@ -1198,7 +1191,7 @@ doing so will make your APL code incompatible with other APL interpreters.
 Use this feature carefully!
 
 
-@node    Section 3.3
+@node    Section 2.3
 @section Colored Output
 
 The APL interpreter gets its input from the standard input (stdin),
@@ -1225,7 +1218,7 @@ configured in the 'preferences' file.  The 'preferences' file also
 contains a description of all possible color settings.
 
 
-@node    Section 3.4
+@node    Section 2.4
 @section Comparison Rules
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥, and
@@ -1330,13 +1323,13 @@ being compared or sorted. A simple way to achieve that is the use of
  Adam Zora
 @end verbatim
 
-@node    Section 3.5
+@node    Section 2.5
 @section Complex Numbers
 
 Complex numbers are fully supported.
 
 
-@node    Section 3.6
+@node    Section 2.6
 @section Debug Commands
 
 In addition to the classical APL commands like )LOAD or )SAVE, GNU APL
@@ -1349,7 +1342,7 @@ GNU APL feature, colored output, uses different colors for stdout and stderr.
 Type )HELP or ]HELP in the interpreter for a list of all commands available.
 
 
-@node    Section 3.7
+@node    Section 2.7
 @section Direct Functions (Lambdas)
 
 GNU APL supports direct functions (aka. lambdas), but only in a rather
@@ -1462,7 +1455,7 @@ There are a number of features related to lambdas that are present in other
 APL interpreters but that are NOT implemented in GNU APL. This includes
 multiple statements, guards, lexical scoping, and probably more.
 
-@node    Section 3.8
+@node    Section 2.8
 @section ]DOXY Command
 
 A particularly useful debug command is ]Doxy. It dumps the current workspace
@@ -1510,7 +1503,7 @@ For example:
 @end verbatim
 
 
-@node    Section 3.9
+@node    Section 2.9
 @section Commands )COPY_ONCE, )DUMP, and DUMP-HTML
 
 In standard APL, workspaces are processed with the standard commands )LOAD,
@@ -1551,7 +1544,7 @@ However, )COPY_ONCE does this only once; a second invocation of
 is silently being ignored. This speeds up the )COPYing of libraries that
 occur in several )DUMPed or )SAVEd workspace.
 
-@node    Section 3.10
+@node    Section 2.10
 @section History and TAB completion
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user
@@ -1593,7 +1586,7 @@ recalling function lines (and which are not fully supported in GNU APL).
     function or variable name.
 
 
-@node    Section 3.11
+@node    Section 2.11
 @section Logging Facilities
 
 The APL interpreter has over 30 logging facilities. Each logging facility
@@ -1642,7 +1635,7 @@ state. The command
 toggles the state of logging facility N from OFF to ON and back.
 
 
-@node    Section 3.12
+@node    Section 2.12
 @section Rational Numbers
 
 GNU APL has limited support for rational numbers. Instead of dividing integers
@@ -1662,7 +1655,7 @@ For that reason support for rational numbers is disabled by default and must
 be enabled via ./configure (see README-2-configure).
 
 
-@node    Section 3.13
+@node    Section 2.13
 @section Hex Numbers
 
 GNU APL supports sedecimal numbers. They start with $ and can be uppercase or
@@ -1677,7 +1670,7 @@ lowercase:
 
 @end verbatim
 
-@node    Section 3.14
+@node    Section 2.14
 @section User-defined Commands
 
 There is a simple mechanism to define additional APL commands. This mechanism
@@ -1714,7 +1707,7 @@ be deleted like this:
 
 XXXXXX
 @c ----------------------------------------------------------------------------
-@node    Section 3.15
+@node    Section 2.15
 @section Structured Variables and Associative Arrays
 
 GNU APL has implemented two features that are closely related because, under the
@@ -2001,7 +1994,7 @@ is ⍴ASSOC_ARRAY[;1] and the capacity is ↑⍴ASSOC_ARRAY.
 
 
 XXXXXX
-@node    Section 3.16
+@node    Section 2.16
 @section Monadic ⊢ and ⊣, dyadic ⊢ with Axis
 
 Monadic ⊢ is the identity function. It returns its (committed or non-committed)
@@ -2067,7 +2060,7 @@ a*c
 @end verbatim
 
 
-@node    Section 3.17
+@node    Section 2.17
 @section Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, T≠, and T=
 
 The APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate primarily on
@@ -2242,7 +2235,7 @@ BE
 255 255 255 190
 @end verbatim
 
-@node    Section 3.18
+@node    Section 2.18
 @section Generalized ⍳
 
 @subsection Generalized monadic ⍳
@@ -2271,7 +2264,7 @@ Each item of the result Z is then either a nested integer vector (if the item
 was found) or @b{- different from the standard case (!) -} the empty vector ⍬
 if the item was not found).
 
-@node    Section 3.19
+@node    Section 2.19
 @section ⌹[X] - QR Factorization
 
 Z←⌹[X] B computes a QR factorization of the real or complex matrix B. The axis
@@ -2397,7 +2390,7 @@ Example 2 (complex over-determined B)
 Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
 
-@node    Section 3.20
+@node    Section 2.20
 @section Dyadic ⎕CR
 
 The ⎕CR function has an optional left argument that selects one of several
@@ -2521,7 +2514,7 @@ positive char in C/C++). Real, Complex, or rational numbers are never proper
 byte values even if their value is close to an integer. Nor are nested APL
 values or values being assigned.
 
-@node    Section 3.21
+@node    Section 2.21
 @section  Dyadic ⎕FX (Native Functions)
 
 A Native Function is a function that can be called in APL like a normal user
@@ -2597,14 +2590,14 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 )CLEAR workspace command will close all open files. 
 
 
-@node    Section 3.22
+@node    Section 2.22
 @section ⎕ARG - Interpreter command line arguments
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
-@xref{Section 3.1}.
+@xref{Section 2.1}.
 
 
-@node    Section 3.23
+@node    Section 2.23
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
@@ -2839,14 +2832,14 @@ a little more complicated, but the principle is the same. GNU APL is shipped
 with two workspaces: sudoku.apl (which solves sudokus without using ⎕DLX) and
 sudoku_DLX.apl (which solves sudokus using ⎕DLX).
 
-@node    Section 3.24
+@node    Section 2.24
 @section ⎕ENV - Environment Variables
 
 ⎕ENV contains the environment variables of the process that is running
-GNU APL. @xref{Section 3.1}.
+GNU APL. @xref{Section 2.1}.
 
 
-@node    Section 3.25
+@node    Section 2.25
 @section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -2991,7 +2984,7 @@ Z F¨Z←⎕FIO[49] 'filename'
 @end smallexample
 
 
-@node    Section 3.26
+@node    Section 2.26
 @section ⎕FFT - Fast Fourier Transform
 
 For those interested in signal processing and the like, GNU APL provides ⎕FFT:
@@ -3046,7 +3039,7 @@ if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom will take a
 few hours, though, so that creating it will not pay off for most mortals.
 
-@node    Section 3.27
+@node    Section 2.27
 @section ⎕GTK - GTK Interface
 
 GTK (Gimp Toolkit) is a rather powerful library for creating graphical user
@@ -3060,7 +3053,7 @@ and has therefore been put into a separate document.
 See: @b{HOWTOs/Quad-GTK.html}.
 
 @c ----------------------------------------------------------------------------
-@node    Section 3.28
+@node    Section 2.28
 @section ⎕JSON - JSON Parsing
 
 GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
@@ -3103,7 +3096,7 @@ it could help troubleshooting when Z is displayed and the number of keys in Z
 is large.
 @end itemize
 
-@node    Section 3.29
+@node    Section 2.29
 @section ⎕MAP  - Map Value
 
 ⎕MAP changes the ravel items of its right argument according to a mapping
@@ -3187,7 +3180,7 @@ shown in the examples below.
 
 @end verbatim
 
-@node    Section 3.30
+@node    Section 2.30
 @section ⎕PLOT - Plot Data
 
 ⎕PLOT is a function for visualizing numerical APL values. The values to be
@@ -3381,7 +3374,7 @@ thread until it is being closed. A plot window can be closed in different ways:
   A ⎕PLOT B with plot attributes A
 @end itemize
 
-@node    Section 3.31
+@node    Section 2.31
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
@@ -3406,7 +3399,7 @@ Note: For compatibility with older workspaces, assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-@node    Section 3.32
+@node    Section 2.32
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -3706,7 +3699,7 @@ The same for the pos+len output format:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 @end verbatim
 
-@node    Section 3.33
+@node    Section 2.33
 @section ⎕RVAL - Random APL value
 
 The standard way to produce random numbers is the primitive function ?
@@ -3996,7 +3989,7 @@ Examples:
 @end verbatim
 
 
-@node    Section 3.34
+@node    Section 2.34
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -4116,7 +4109,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 3.35
+@node    Section 2.35
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -4180,7 +4173,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 3.36
+@node    Section 2.36
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -4282,7 +4275,7 @@ is printed instead of VALUE. The shape SH is computed like this:
 @end verbatim
 
 @c ----------------------------------------------------------------------------
-@node    Section 3.37
+@node    Section 2.37
 @section ⎕XML - XML Parsing
 
 @subsection Purpose
@@ -4813,38 +4806,49 @@ follow these top-level steps:
 @end enumerate
 
 @c ----------------------------------------------------------------------------
-@node Chapter 4
+@node Chapter 3
 @chapter Limitations and Missing Features
 
-APL is an almost full implementation of the ISO standard 13751.
+GNU APL is an almost full implementation of the ISO standard 13751.
 However, a few limitations exist. See file README-4-compliance for
 an up-to-date descriptions of limitations.
 
 @section System Limits
 
-APL integers are 64-bit wide, ranging from
--9200000000000000000 to 9200000000000000000
-
-Due to rounding and similar, some integers can become slightly larger, but
-the above limits are guaranteed for some operations (e.g. + and -)
-
 APL floating point values are 64-bit wide, thus ranging from
 -8.98E307 to 8.98E307.
 
-APL values have a maximum rank of 8. This value can be increased, however,
+GNU APL integers have a guaranteed range from -9200000000000000000 to
+9200000000000000000, which is a slighly smaller range.
+
+A 64-bit integer represents a value between -9223372036854775808L and
+9223372036854775807.
+
+If the result of a computation is integer by nature, for example +, -, or ×
+with integer arguments, @strong{and} falls into the guaranteed range, then
+the result will be an APL integer. If the result is to large for a 64-bit signed
+integer then the result will be automatically converted to an APL floating 
+point value. However, if the result is outside the guaranteed range but still
+within the 64-bit integer range, e.g. between i(excluding) 9200000000000000000
+and 9223372036854775807, then GNU APL gives no guarantees as to whether
+the result will be a 64-bit integer or as a 64-bit floating point (and then
+loosing precision). This decision is usually function-specific and driven by
+performance considerations.
+
+APL values have a maximum rank of 8. However, the maximum range can be
 by means of ./configure (see README-2-configure).
 
 @section Shared Variables
 
-The system functions and variables for shared variables, i.e. ⎕SVO, ⎕SVR,
+The system functions and variables related to shared variables, i.e. ⎕SVO, ⎕SVR,
 ⎕SVC, ⎕SVS, and ⎕SVQ, are implemented.
 
 Communication between two workspaces is supported, but with some
-limitations. Two workspaces must run on the same machine in order
-to communicate via shared variables.
+limitations. Two workspaces can only communicate via shared variables if they
+(i.e. their processes) run on the same machine.
 
 However, only two auxiliary processors, AP100 and AP210, are provided as
-examples for implementing auxiliary processors.
+examples of how to implementing auxiliary processors in GNU APL.
 
 Shared variables for auxiliary processors are provided for some backward
 compatibility. In the past - without access to the source code of the APL
@@ -4856,7 +4860,7 @@ convenient to add your own commands or your own system variables to the
 APL interpreter rather that adding auxiliary processors.
 
 @c ----------------------------------------------------------------------------
-@node Chapter 5
+@node Chapter 4
 @chapter Internationalization
 
 GNU APL used to be internationalized by means of GNU gettext, but is not
@@ -4885,7 +4889,7 @@ As far as xterm is concerned, the xterm command line options --u8, --lc, and
 --en might solve problems related to the terminal.
 
 @c ----------------------------------------------------------------------------
-@node Chapter 6
+@node Chapter 5
 @chapter Project Structure
 
 The top-level directory of the GNU APL project has a structure like this:
@@ -4926,17 +4930,17 @@ handful of README-XXX files that might be of interest when building GNU APL.
 The subdirectories are (in order of decreasing relevance):
 
 @menu
-* Section 6.1:: The subdirectory src
-* Section 6.2:: The subdirectory support-files
-* Section 6.3:: The subdirectory doc
-* Section 6.4:: The subdirectory HOWTOs
-* Section 6.5:: The subdirectories workspaces and wslib2 ... wslib5
-* Section 6.6:: The subdirectory m4
-* Section 6.7:: The subdirectories rpm, debian, and debian_tmp
-* Section 6.8:: The subdirectory tools
+* Section 5.1:: The subdirectory src
+* Section 5.2:: The subdirectory support-files
+* Section 5.3:: The subdirectory doc
+* Section 5.4:: The subdirectory HOWTOs
+* Section 5.5:: The subdirectories workspaces and wslib2 ... wslib5
+* Section 5.6:: The subdirectory m4
+* Section 5.7:: The subdirectories rpm, debian, and debian_tmp
+* Section 5.8:: The subdirectory tools
 @end menu
 
-@node Section 6.1
+@node Section 5.1
 @section The subdirectory src
 
 The subdirectory src contains all C++ source files that are needed to build
@@ -4964,20 +4968,20 @@ directory determines, which optional components shall be included on the build.
 GNU APL comes with an automated test suite, the testcases are
 contained in subdirectory src/testcases
 
-@node Section 6.2
+@node Section 5.2
 @section The subdirectory support-files
 
 The subdirectory support-file contains a number of configuration files that aim
 at making a standard keyboard produce APL characters. Details are explained in
 top-level file README-3-keyboard.
 
-@node Section 6.3
+@node Section 5.3
 @section The subdirectory doc
 
 The subdirectory doc is used to create @b{this} info file in different file
 formats (.info, .html).
 
-@node Section 6.4
+@node Section 5.4
 @section The subdirectory HOWTOs
 
 The subdirectory HOWTOs contains some documents that try to explain how some
@@ -4988,7 +4992,7 @@ in directory /usr/local/share/doc/apl by @b{make install} while the documents
 for GNU APL hackers (i.e. C++ programmers or trouble-shooters) are not
 installed by @b{make install}, but rather remain in the source tree.
 
-@node Section 6.5
+@node Section 5.5
 @section The subdirectories workspaces and wslib2 ... wslib5
 
 These directories (and their content) are, by default, copied to
@@ -4996,7 +5000,7 @@ These directories (and their content) are, by default, copied to
 others contain small workspaces or libraries for various purposes (mostly
 demonstrating the use of some non-standard APL features).
 
-@node Section 6.6
+@node Section 5.6
 @section The subdirectory m4
 
 The subdirectory m4 contains macros used by autoconf and automake. In most
@@ -5015,7 +5019,7 @@ Re-creating the ./configure script requires:
 @item running autoreconf
 @end itemize
 
-@node Section 6.7
+@node Section 5.7
 @section The subdirectories rpm, debian, and debian_tmp
 
 These subdirectories are templates for building (binary) RPM resp. Debian
@@ -5023,7 +5027,7 @@ packages that contain GNU APL. Subdirectory debian_tmp is initially empty and
 acts as a scratch directory inside which the interpreter is being compiled
 when a Debian package is built.
 
-@node Section 6.8
+@node Section 5.8
 @section The subdirectory tools
 
 GNU APL uses generated C++ code. The subdirectory tools contains the source
@@ -5032,7 +5036,7 @@ various purposes. These tools are typically used by GNU APL hackers and are
 therefore not installed by @b{make install}.
 
 @c ----------------------------------------------------------------------------
-@node Chapter 7
+@node Chapter 6
 @chapter Libraries Contributed by GNU APL Users
 
 Since the first release of GNU APL, a number of libraries, but also other
@@ -5040,11 +5044,11 @@ developments, have been made by users of GNU APL. Below are links to these
 contributions.
 
 @menu
-* Section 7.1::  The GNU APL Community Webpage
-* Section 7.2::  Core Libraries
+* Section 6.1::  The GNU APL Community Webpage
+* Section 6.2::  Core Libraries
 @end menu
 
-@node Section 7.1
+@node Section 6.1
 @section The GNU APL Community Webpage
 
 The GNU APL project maintains a web page that lists contributions made by
@@ -5062,7 +5066,7 @@ more likely that it was overlooked. Just send an email to bug-apl@@gnu.org
 to fix that.
 
 
-@node Section 7.2
+@node Section 6.2
 @section Core Libraries
 
 There is a small number of libraries that are considered "core" APL because,
@@ -5086,21 +5090,21 @@ Component File System  (as required by ISO 13751)  by Blake McBride
 SQL
 
 @c ----------------------------------------------------------------------------
-@node Chapter 8
+@node Chapter 7
 @chapter Licenses for this GNU APL Manual and for GNU APL
 
 This manual for GNU APL is licensed under the GNU Free Documentation
-License, *Note Section 4.1:: below.
+License, *Note Section 7.1:: below.
 
 GNU APL itself is licensed under the GNU Public License version 3 or later
-(aka GPLv3+), *Note Section 4.2:: below.
+(aka GPLv3+), *Note Section 7.2:: below.
 
 @menu
-* Section 8.1::  The GNU Free Documentation License
-* Section 8.2::  The GNU General Public License
+* Section 7.1::  The GNU Free Documentation License
+* Section 7.2::  The GNU General Public License
 @end menu
 
-@node Section 8.1
+@node Section 7.1
 @section The GNU Free Documentation License
 
 @c The GNU Free Documentation License.
@@ -5602,7 +5606,7 @@ recommend releasing these examples in parallel under your choice of
 free software license, such as the GNU General Public License,
 to permit their use in free software.
 
-@node Section 8.2
+@node Section 7.2
 @section The GNU GENERAL PUBLIC LICENSE
 
                     GNU GENERAL PUBLIC LICENSE

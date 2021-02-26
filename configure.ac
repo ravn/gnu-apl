@@ -671,7 +671,7 @@ AC_DEFINE_UNQUOTED([RATIONAL_NUMBERS_WANTED], [yes],
                    [ define to have support for rational numbers (EXPERIMENTAL!)])
 else RATIONAL_NUMBERS_WANTED="no"
 fi
-AC_MSG_RESULT([$VISIBLE_MARKERS_WANTED])
+AC_MSG_RESULT([$RATIONAL_NUMBERS_WANTED])
 
 # check if we are on i686 (to fix a strange rpmbuild problem)
 AC_MSG_CHECKING([whether we compile for an i686 CPU])
