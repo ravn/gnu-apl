@@ -23,17 +23,15 @@ datadir = @datadir@
 localedir = $(datadir)/locale
 host_os = @host_os@
 
-distcleancheck_listfile = buildtag
-
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Wall -I sql $(CXX_WERROR)
+common_CXXFLAGS = -Wall -I sql -I $(abs_top_srcdir) $(CXX_WERROR)
 common_CXXFLAGS += $(GTK_CFLAGS) $(GTK_LIBS)
 common_CXXFLAGS += $(PYTHON_CFLAGS)
 common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS)
 
 common_SOURCES  = $(plot_SOURCES) 					\
-			buildtag		buildtag.hh		\
+						../buildtag.hh		\
 						../config.h		\
 						APL_Float_as_class.hh	\
 						APL_types.hh		\
@@ -89,7 +87,7 @@ LibPaths.cc					LibPaths.hh		\
 LineInput.cc					LineInput.hh		\
 Logging.cc		Logging.def		Logging.hh		\
 LvalCell.cc					LvalCell.hh		\
-						makefile.h		\
+						../makefile.h		\
 Malloc_hooks.cc								\
 Nabla.cc					Nabla.hh		\
 Macro.cc		Macro.def		Macro.hh		\
@@ -263,19 +261,6 @@ testAP: all
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt
 
-
-makefile.h:
-	@echo "// some strings exported from Makefile"            > $@
-	@echo "//"                                               >> $@
-	@echo "#define xSTR(x) #x"                               >> $@
-	@echo "#define Makefile__bindir     xSTR(${bindir})"     >> $@
-	@echo "#define Makefile__docdir     xSTR(${docdir})"     >> $@
-	@echo "#define Makefile__sysconfdir xSTR(${sysconfdir})" >> $@
-	@echo "#define Makefile__pkglibdir  xSTR(${pkglibdir})"  >> $@
-	@echo "#define Makefile__localedir  xSTR(${localedir})"  >> $@
-	@echo "#define Makefile__srcdir     xSTR(${abs_srcdir})" >> $@
-	@echo "#define Makefile__host_os    xSTR(${host_os})"    >> $@
-	@echo ""                                                 >> $@
 
 .PHONY:	patch
 patch:

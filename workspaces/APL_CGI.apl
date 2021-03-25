@@ -90,6 +90,7 @@ xTRY_GNU_APL←'http://juergen-sauermann.de/try-GNU-APL'
 xDocker_GNU_APL←'https://hub.docker.com/r/juergensauermann/gnu-apl'
 xDocker_GNU_APL_18←'https://hub.docker.com/r/juergensauermann/gnu-apl-1.8'
 xSVN_APL←'https://savannah.gnu.org/svn/?group=apl'
+xGIT_APL←'https://savannah.gnu.org/git/?group=apl'
 
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 ⍝ some features of GNU APL
@@ -194,17 +195,25 @@ which was built under cygwin, but runs without cygwin being installed,
 is contained in file <B>apl-1.8-windows.zip</B>. This zip file also contains
 an installer for an APL keyboard layout.
 
-<?apl HTML∆H4[''] 'Subversion (SVN) repository for GNU APL' ?>
+<?apl HTML∆H4[''] 'Subversion (SVN) and Git repositories for GNU APL' ?>
 
 You can also check out the latest version of GNU APL from its subversion
-repository on Savannah. The subversion command to do that is:
+or Git repository on Savannah. The subversion command to do that is:
 <BR>
 <BR>
-<B>svn co http://svn.savannah.gnu.org/svn/apl/trunk</B>
+<B>svn checkout http://svn.savannah.gnu.org/svn/apl/trunk</B>
 <BR>
 <BR>
 Here is <?apl HTML∆x2y xSVN_APL HTML∆A "<EM>more information</EM>" ?>
-about using Subversion with GNU APL.
+about using Subversion with GNU APL. Likewise, the command for a Git
+checkout is:
+<BR>
+<BR>
+<B>git clone https://git.savannah.gnu.org/git/apl.git</B>
+<BR>
+<BR>
+and here is <?apl HTML∆x2y xGIT_APL HTML∆A "<EM>more information</EM>" ?>
+about using Git with GNU APL.
 
 <?apl HTML∆H4[''] 'RPMs for GNU APL' ?>
 

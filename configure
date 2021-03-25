@@ -19523,7 +19523,7 @@ $as_echo "no (cannot use GTK without pkg-config)" >&6; }
     fi
 fi
 
-# make HAVE_GTK3 visible im Makefile.am
+# make HAVE_GTK3 visible in Makefile.am
  if test "x$HAVE_gtk3" = xyes; then
   HAVE_GTK3_TRUE=
   HAVE_GTK3_FALSE='#'
@@ -22936,22 +22936,37 @@ fi
 
 echo
 
-# create src/buildtag.hh
+# create buildtag.hh and set apl_top to the directory that contains buildtag.sh
 #
-echo "configure: creating $srcdir/src//buildtag.hh"
-cd $srcdir/src ; . ./buildtag ; cd ..
+echo "configure: creating buildtag.hh..."
+for f in "." ".." "../.." "../../.."  "../../../.."
+do
+   if test -f "$f/buildtag.sh"
+   then
+      source "$f/buildtag.sh"
+      apl_top="$f"
+      abs_apl_top=$(readlink -f "$apl_top")
+   fi
+done
+echo "configure: top-level apl directory is: $abs_apl_top"
 
 # create src/makefile.h
 #
-echo "configure: creating $srcdir/src/makefile.h"
-rm -f $srcdir/src/makefile.h
-make -C $srcdir/src makefile.h >/dev/null
+echo "configure: creating $apl_top/makefile.h ..."
+rm -f "$apl_top/makefile.h"
+echo "configure: old $apl_top/makefile.h (if any) removed."
+make makefile.h >/dev/null
+if test "$apl_top" != "."   # vpath build
+then
+   cp makefile.h "$apl_top"/makefile.h
+fi
 
 # remember how ./configure was called
-echo "configure: creating $srcdir/src/configure_args.cc"
-echo "extern const char * configure_args;" > $srcdir/src/configure_args.cc
-echo "const char * configure_args = \
-              \"$0 $ac_configure_args\";" >> $srcdir/src/configure_args.cc
+echo "configure: creating $apl_top/configure_args.cc"
+echo "
+extern const char * configure_args;
+const char * configure_args = \
+     \"$0 $ac_configure_args\";" > $apl_top/configure_args.cc
 
 # summary
   echo " "
@@ -22969,6 +22984,6 @@ fi
   echo " "
 fi
 
-echo "configure: saving configure options in $srcdir/configure_options"
-echo "$configure_options" > $srcdir/configure_options
+echo "configure: saving configure options in $apl_top/configure_options"
+echo "$configure_options" > $apl_top/configure_options
 

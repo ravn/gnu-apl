@@ -9,12 +9,12 @@ the option will not occur.
 --with-android
    This option prevents the instantiation of CIN, COUT, and CERR. This may
    be needed when GNU APL is compiled for Android, since Android applications
-   are using a different I/O model than are standard C++ programs.
+   use a different I/O model than standard C++ programs.
 
 --with-libapl
    This option builds GNU APL as a shared library (libapl.so) rather than an
    integrated executable. This option is often combined with option
-   --with-android, and is automatically set by option --with-Eng. The
+   --with-android, and is automatically set by option --with-erlang. The
    --with-libapl option not only builds approproate Makefiles, but it also
    changes the GNU APL code in some places.
 

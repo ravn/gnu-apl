@@ -24,9 +24,9 @@
 
 #include "../config.h"   // for HAVE_xxx macros
 
-#include "apl-sqlite.hh"
-#include "Connection.hh"
-#include "Provider.hh"
+#include "sql/apl-sqlite.hh"
+#include "sql/Connection.hh"
+#include "sql/Provider.hh"
 
 #include "Quad_SQL.hh"
 #include "Security.hh"
@@ -39,14 +39,14 @@ Quad_SQL  Quad_SQL::_fun;
 Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
 
 #ifdef HAVE_SQLITE3
-# include "SqliteResultValue.hh"
-# include "SqliteConnection.hh"
-# include "SqliteProvider.hh"
+# include "sql/SqliteResultValue.hh"
+# include "sql/SqliteConnection.hh"
+# include "sql/SqliteProvider.hh"
 #endif
 
 #ifdef USABLE_PostgreSQL
-# include "PostgresConnection.hh"
-# include "PostgresProvider.hh"
+# include "sql/PostgresConnection.hh"
+# include "sql/PostgresProvider.hh"
 #endif
 
 //-----------------------------------------------------------------------------

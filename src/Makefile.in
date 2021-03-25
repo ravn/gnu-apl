@@ -167,8 +167,8 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 lib_gnu_apl_la_LIBADD =
-am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
-	buildtag.hh ../config.h APL_Float_as_class.hh APL_types.hh \
+am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc \
+	../buildtag.hh ../config.h APL_Float_as_class.hh APL_types.hh \
 	Archive.cc Archive.hh ArrayIterator.hh Assert.cc Assert.hh \
 	Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
 	Bif_F12_COMMA.cc Bif_F12_COMMA.hh Bif_F12_DOMINO.cc \
@@ -194,7 +194,7 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
 	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
-	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	LvalCell.cc LvalCell.hh ../makefile.h Malloc_hooks.cc Nabla.cc \
 	Nabla.hh Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
 	NamedObject.cc NamedObject.hh NativeFunction.cc \
 	NativeFunction.hh Native_interface.hh NumericCell.cc \
@@ -340,12 +340,12 @@ lib_gnu_apl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_rpath = -rpath \
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(pkglibdir)
 libapl_la_LIBADD =
-am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
-	buildtag.hh ../config.h APL_Float_as_class.hh APL_types.hh \
-	Archive.cc Archive.hh ArrayIterator.hh Assert.cc Assert.hh \
-	Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
-	Bif_F12_COMMA.cc Bif_F12_COMMA.hh Bif_F12_DOMINO.cc \
-	Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
+am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
+	../config.h APL_Float_as_class.hh APL_types.hh Archive.cc \
+	Archive.hh ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
+	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc \
+	Bif_F12_COMMA.hh Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh \
+	Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
 	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
 	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
 	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
@@ -367,7 +367,7 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc buildtag \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
 	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
-	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	LvalCell.cc LvalCell.hh ../makefile.h Malloc_hooks.cc Nabla.cc \
 	Nabla.hh Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
 	NamedObject.cc NamedObject.hh NativeFunction.cc \
 	NativeFunction.hh Native_interface.hh NumericCell.cc \
@@ -492,12 +492,12 @@ libapl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(libapl_la_LDFLAGS) $(LDFLAGS) -o $@
 @WANT_LIBAPL_TRUE@am_libapl_la_rpath = -rpath $(pkglibdir)
 PROGRAMS = $(bin_PROGRAMS)
-am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc buildtag \
-	buildtag.hh ../config.h APL_Float_as_class.hh APL_types.hh \
-	Archive.cc Archive.hh ArrayIterator.hh Assert.cc Assert.hh \
-	Avec.cc Avec.def Avec.hh Backtrace.cc Backtrace.hh \
-	Bif_F12_COMMA.cc Bif_F12_COMMA.hh Bif_F12_DOMINO.cc \
-	Bif_F12_DOMINO.hh Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
+am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
+	../config.h APL_Float_as_class.hh APL_types.hh Archive.cc \
+	Archive.hh ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
+	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc \
+	Bif_F12_COMMA.hh Bif_F12_DOMINO.cc Bif_F12_DOMINO.hh \
+	Bif_F12_INDEX_OF.cc Bif_F12_INDEX_OF.hh \
 	Bif_F12_INTERVAL_INDEX.cc Bif_F12_INTERVAL_INDEX.hh \
 	Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh Bif_F12_PARTITION_PICK.cc \
 	Bif_F12_PARTITION_PICK.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
@@ -519,7 +519,7 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc buildtag \
 	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
 	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
 	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
-	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	LvalCell.cc LvalCell.hh ../makefile.h Malloc_hooks.cc Nabla.cc \
 	Nabla.hh Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
 	NamedObject.cc NamedObject.hh NativeFunction.cc \
 	NativeFunction.hh Native_interface.hh NumericCell.cc \
@@ -936,15 +936,15 @@ SUBDIRS = native $(EXTRA_DIRS) $(am__append_2)
 @HAVE_GTK3_TRUE@EXTRA_apl_SOURCES = Plot_xcb.cc
 dist_noinst_DATA = valgrind.supp
 DIST_SUBDIRS = $(SUBDIRS) testcases
-distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS) \
-	$(PYTHON_CFLAGS) $(am__append_4) $(am__append_8)
+common_CXXFLAGS = -Wall -I sql -I $(abs_top_srcdir) $(CXX_WERROR) \
+	$(GTK_CFLAGS) $(GTK_LIBS) $(PYTHON_CFLAGS) $(am__append_4) \
+	$(am__append_8)
 common_LDFLAGS = -export-dynamic $(GTK_LDFLAGS) $(am__append_5) \
 	$(am__append_9)
-common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
+common_SOURCES = $(plot_SOURCES) ../buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
 	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
 	Backtrace.cc Backtrace.hh Bif_F12_COMMA.cc Bif_F12_COMMA.hh \
@@ -971,7 +971,7 @@ common_SOURCES = $(plot_SOURCES) buildtag buildtag.hh ../config.h \
 	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
 	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
 	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
+	LvalCell.hh ../makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
 	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
 	NamedObject.cc NamedObject.hh NativeFunction.cc \
 	NativeFunction.hh Native_interface.hh NumericCell.cc \
@@ -5354,19 +5354,6 @@ testAP: all
 
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt
-
-makefile.h:
-	@echo "// some strings exported from Makefile"            > $@
-	@echo "//"                                               >> $@
-	@echo "#define xSTR(x) #x"                               >> $@
-	@echo "#define Makefile__bindir     xSTR(${bindir})"     >> $@
-	@echo "#define Makefile__docdir     xSTR(${docdir})"     >> $@
-	@echo "#define Makefile__sysconfdir xSTR(${sysconfdir})" >> $@
-	@echo "#define Makefile__pkglibdir  xSTR(${pkglibdir})"  >> $@
-	@echo "#define Makefile__localedir  xSTR(${localedir})"  >> $@
-	@echo "#define Makefile__srcdir     xSTR(${abs_srcdir})" >> $@
-	@echo "#define Makefile__host_os    xSTR(${host_os})"    >> $@
-	@echo ""                                                 >> $@
 
 .PHONY:	patch
 patch:

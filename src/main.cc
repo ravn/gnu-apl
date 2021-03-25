@@ -36,7 +36,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "buildtag.hh"
+#include "../buildtag.hh"
 #include "Command.hh"
 #include "Common.hh"
 #include "IO_Files.hh"

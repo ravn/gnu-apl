@@ -10,3 +10,5 @@ dist_doc_DATA =	APL_CGI.apl		\
 
 docdir = $(pkglibdir)/workspaces
 
+distclean:
+

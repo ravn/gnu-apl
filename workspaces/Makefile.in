@@ -456,8 +456,6 @@ clean: clean-am
 
 clean-am: clean-generic clean-libtool mostlyclean-am
 
-distclean: distclean-am
-	-rm -f Makefile
 distclean-am: clean-am distclean-generic
 
 dvi: dvi-am
@@ -535,6 +533,8 @@ uninstall-am: uninstall-dist_docDATA
 
 .PRECIOUS: Makefile
 
+
+distclean:
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
