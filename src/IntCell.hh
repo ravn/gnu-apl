@@ -21,7 +21,7 @@
 #ifndef __INTCELL_HH_DEFINED__
 #define __INTCELL_HH_DEFINED__
 
-#include "../config.h"   // for RATIONAL_NUMBERS_WANTED
+#include "Common.hh"   // for RATIONAL_NUMBERS_WANTED
 #include "RealCell.hh"
 
 //-----------------------------------------------------------------------------

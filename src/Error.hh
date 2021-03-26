@@ -21,7 +21,6 @@
 #ifndef __ERROR_HH_DEFINED__
 #define __ERROR_HH_DEFINED__
 
-#include "../config.h"
 #include "Backtrace.hh"
 #include "Common.hh"
 #include "ErrorCode.hh"

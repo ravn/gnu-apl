@@ -187,8 +187,11 @@ using namespace std;
 
 // the pthread that handles one plot window.
 extern void * plot_main(void * vp_props);
+
+#if HAVE_GTK3
 extern const Plot_window_properties *
              plot_stop(const Plot_window_properties * vp_props);
+#endif
 
 //=============================================================================
 

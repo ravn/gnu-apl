@@ -22952,9 +22952,12 @@ echo "configure: top-level apl directory is: $abs_apl_top"
 
 # create src/makefile.h
 #
-echo "configure: creating $apl_top/makefile.h ..."
-rm -f "$apl_top/makefile.h"
-echo "configure: old $apl_top/makefile.h (if any) removed."
+echo "configure: creating $abs_apl_top/makefile.h ..."
+if test -f "$apl_top/makefile.h"
+then
+   echo "configure: removing old $apl_top/makefile.h"
+   rm -f "$apl_top/makefile.h"
+fi
 make makefile.h >/dev/null
 if test "$apl_top" != "."   # vpath build
 then
@@ -22962,7 +22965,7 @@ then
 fi
 
 # remember how ./configure was called
-echo "configure: creating $apl_top/configure_args.cc"
+echo "configure: creating $abs_apl_top/configure_args.cc"
 echo "
 extern const char * configure_args;
 const char * configure_args = \

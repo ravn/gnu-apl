@@ -25,7 +25,7 @@
 # error This file shall NOT be #included directly, but by #including Common.hh
 #endif
 
-#include "../config.h"
+#include "Common.hh"
 
 /// One Unicode character
 enum Unicode

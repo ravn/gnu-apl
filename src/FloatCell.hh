@@ -21,7 +21,7 @@
 #ifndef __FLOATCELL_HH_DEFINED__
 #define __FLOATCELL_HH_DEFINED__
 
-#include "../config.h"   // for RATIONAL_NUMBERS_WANTED
+#include "Common.hh"   // for RATIONAL_NUMBERS_WANTED
 #include "IntCell.hh"
 #include "RealCell.hh"
 

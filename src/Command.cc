@@ -23,7 +23,7 @@
 #include <string.h>
 #include <sys/resource.h>
 
-#include "makefile.h"   // for configure paths
+#include "Common.hh"
 
 #include "CharCell.hh"
 #include "ComplexCell.hh"

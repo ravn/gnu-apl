@@ -23,8 +23,6 @@
 
 #include <complex>
 
-#include "../config.h"   // for RATIONAL_NUMBERS_WANTED
-
 #include "Common.hh"
 #include "ErrorCode.hh"
 #include "PrintBuffer.hh"

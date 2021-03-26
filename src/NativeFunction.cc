@@ -23,8 +23,8 @@
 #include <errno.h>
 #include <string.h>
 
+#include "Common.hh"
 #include "Error.hh"
-#include "makefile.h"
 #include "NativeFunction.hh"
 #include "Symbol.hh"
 #include "Workspace.hh"

@@ -21,7 +21,8 @@
 #ifndef __COMMON_HH_DEFINED__
 #define __COMMON_HH_DEFINED__
 
-#include "../config.h"   // for xxx_WANTED and other macros from ./configure
+#include "../config.h"     // for xxx_WANTED and other macros from ./configure
+#include "../makefile.h"   // various paths
 
 // #include some notoriously needed include files, but only if they
 // exist on the platform

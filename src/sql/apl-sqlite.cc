@@ -18,8 +18,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "config.h"   // for HAVE_xxx macros
-
 #include "apl-sqlite.hh"
 #include "NativeFunction.hh"
 

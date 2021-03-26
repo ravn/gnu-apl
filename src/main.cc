@@ -42,7 +42,6 @@
 #include "IO_Files.hh"
 #include "LibPaths.hh"
 #include "Macro.hh"
-#include "makefile.h"
 #include "Output.hh"
 #include "NativeFunction.hh"
 #include "Workspace.hh"

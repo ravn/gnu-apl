@@ -25,7 +25,7 @@
 
 #include <iostream>
 
-#include "../config.h"
+#include "Common.hh"
 
 #if defined(PERFORMANCE_COUNTERS_WANTED)
 

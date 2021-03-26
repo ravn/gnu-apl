@@ -31,7 +31,7 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "../config.h"
+#include "Common.hh"
 #include "Unicode.hh"
 
 using namespace std;

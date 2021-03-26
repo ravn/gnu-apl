@@ -36,7 +36,6 @@ extern const char * configure_args;
 #include "IO_Files.hh"
 #include "InputFile.hh"
 #include "LibPaths.hh"
-#include "makefile.h"
 #include "Output.hh"
 #include "ScalarFunction.hh"
 #include "UserPreferences.hh"

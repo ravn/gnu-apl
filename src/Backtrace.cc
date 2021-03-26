@@ -36,8 +36,8 @@
 #define EXEC(x)
 #endif
 
+#include "Common.hh"
 #include "Backtrace.hh"
-#include "makefile.h"
 
 using namespace std;
 
