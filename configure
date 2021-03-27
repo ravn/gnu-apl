@@ -22939,16 +22939,24 @@ echo
 # create buildtag.hh and set apl_top to the directory that contains buildtag.sh
 #
 echo "configure: creating buildtag.hh..."
+apl_top=""
 for f in "." ".." "../.." "../../.."  "../../../.."
 do
    if test -f "$f/buildtag.sh"
    then
-      source "$f/buildtag.sh"
       apl_top="$f"
+      source "$f/buildtag.sh"
       abs_apl_top=$(readlink -f "$apl_top")
    fi
 done
-echo "configure: top-level apl directory is: $abs_apl_top"
+
+if test -z "$apl_top"
+then
+   echo "configure: *** could not find top-level GNU APL directory, using '.'"
+   apl_top="."
+else
+   echo "configure: top-level apl directory is: $abs_apl_top"
+fi
 
 # create src/makefile.h
 #

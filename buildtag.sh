@@ -4,28 +4,6 @@
 # it is being source'd by ./configure
 #
 
-# locate top-level apl directiory.
-# $abs_top_srcdir and friends do not work here.
-
-apl_top="$PWD"
-apl_top_found=0
-for f in "." ".." "../.." "../../.." "../../../.."
-do
-   dir=$(basename $apl_top)
-   if [ "${dir:0:4}" = "apl-" ]
-   then
-      apl_top_found=1
-      break
-   fi
-   apl_top=$(dirname "$apl_top")
-done
-
-if test ! $apl_top_found   # bad luck
-then
-   echo "*** No directory apl-* in $PWD. keeping old buildtag."
-   return 0
-fi
-
 if [ -z `which svnversion` ]
 then
    echo "*** svnversion not installed: keeping old buildtag"
