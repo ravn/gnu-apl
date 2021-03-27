@@ -21,7 +21,8 @@
 
 static int verbosity;
 
-#include "../config.h"
+#include "Common.hh"
+
 #if HAVE_GTK3
 
 #include <X11/Xlib.h>

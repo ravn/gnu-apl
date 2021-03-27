@@ -86,7 +86,6 @@ common_SOURCES += LibPaths.cc					LibPaths.hh
 common_SOURCES += LineInput.cc					LineInput.hh
 common_SOURCES += Logging.cc		Logging.def		Logging.hh
 common_SOURCES += LvalCell.cc					LvalCell.hh
-common_SOURCES +=						makefile.h
 common_SOURCES += Malloc_hooks.cc
 common_SOURCES += Nabla.cc					Nabla.hh
 common_SOURCES += Macro.cc		Macro.def		Macro.hh

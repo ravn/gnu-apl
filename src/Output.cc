@@ -18,10 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../config.h"          // for HAVE_ macros from configure
-
-#include "Command.hh"
 #include "Common.hh"
+#include "Command.hh"
 #include "DiffOut.hh"
 #include "InputFile.hh"
 #include "LineInput.hh"

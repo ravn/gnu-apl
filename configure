@@ -17466,7 +17466,13 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
-CXXFLAGS = $CXXFLAGS -I $(pwd)
+# add the current directory (i.e. from where ./configure was called) to the
+# include path do that the files created by ./configure are found. This
+# is (only) needed for VPATH builds since otherwise the directory from which
+# ./configure is run is the same as the directory where ./configure places
+# its output files (i.e. directory '.').
+#
+CXXFLAGS="$CXXFLAGS -I $(pwd)"
 
 ##############################################################################
 # Checks for header files.
@@ -22992,7 +22998,4 @@ fi
   echo "      installation appears to be missing or incomplete (see details above)"
   echo " "
 fi
-
-echo "configure: saving configure options in $apl_top/configure_options"
-echo "$configure_options" > $apl_top/configure_options
 

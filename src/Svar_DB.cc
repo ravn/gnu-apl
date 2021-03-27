@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#include "../config.h"   // for HAVE_ macros
+#include "Common.hh"   // for HAVE_xxx macros
 
 #ifdef HAVE_SYS_UN_H
 #include <sys/un.h>

@@ -23,7 +23,7 @@
 #include <poll.h>
 #include <sys/ioctl.h>
 
-#include "../config.h"
+#include "Common.hh"
 #include "LibPaths.hh"
 #include "PointerCell.hh"
 #include "Quad_GTK.hh"

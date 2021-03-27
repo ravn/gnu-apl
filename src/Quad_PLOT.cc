@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "../config.h"
+#include "Common.hh"
 
 // always require libX11
 //

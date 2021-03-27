@@ -22,8 +22,6 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "../config.h"
-
 #include "Common.hh"
 #include "InputFile.hh"
 #include "IO_Files.hh"

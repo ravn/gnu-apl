@@ -19,7 +19,8 @@
 */
 
 #include <stdlib.h>
-#include "../config.h"   // for HAVE_LIBC
+
+#include "Common.hh"
 #include "ComplexCell.hh"
 #include "Quad_RVAL.hh"
 #include "Value.hh"

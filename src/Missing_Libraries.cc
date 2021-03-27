@@ -34,8 +34,9 @@
 #include "Quad_RE.hh"
 #include "Token.hh"
 
-/// a generic function for all ⎕XXX errors
-static Token missing_files(const char * qfun,
+/// a generic function for all ⎕XXX errors. Declared extern (rather than
+/// static) to avoid -Wunused-function warnings.
+extern Token missing_files(const char * qfun,
                            const char ** libs,
                            const char ** hdrs,
                            const char ** pkgs);

@@ -22,7 +22,7 @@
 #include <typeinfo>
 #include <vector>
 
-#include "../config.h"   // for HAVE_xxx macros
+#include "Common.hh"
 
 #include "sql/apl-sqlite.hh"
 #include "sql/Connection.hh"

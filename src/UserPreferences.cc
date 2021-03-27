@@ -24,10 +24,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "../config.h"
-
 #include "buildtag.hh"
-static const char * build_tag[] = { BUILDTAG, 0 };
 
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER2_OUTER.hh"
@@ -42,6 +39,7 @@ static const char * build_tag[] = { BUILDTAG, 0 };
 
 #include "Value.hh"
 
+static const char * build_tag[] = { BUILDTAG, 0 };
 UserPreferences uprefs;
 
 /// CYGWIN defines _B

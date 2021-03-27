@@ -48,19 +48,19 @@ build_one()
      ../../configure $2
      set +o xtrace
    } > "$LOG_dir/configure-$1.log" 2>&1
-   cp config.h makefile.h $ROOT_dir/
 
    echo "building configuration \"$1\"..."
 
    {
      echo "building \"$1\"..."
 
-     make -j6 all
+     make -j8 all
    } > "$LOG_dir/build-$1.log"
    local make_result=$?
    local time_TO=`date +%s`
    local secs=$(( $time_TO - $time_FROM ))
    local summ="$LOG_dir/summary.log"
+   local OK_failed="OK"
    if [ $make_result -eq 0 ] ; then   # make succeeded
       echo "    make OK for configuration: $1" >> $summ
       if [ -f "$VSRC_dir/apl" ] ; then
@@ -76,6 +76,7 @@ build_one()
          echo "**** no file $3 after building $1" >> $summ
          missing_files=$((missing_files+1))
          configs_bad=$((configs_bad+1))
+         OK_failed="FAILED (make target missing)"
       fi
       echo "    build $1: OK ($secs seconds)" >> $summ
    else                        # make failed
@@ -84,8 +85,10 @@ build_one()
        echo "!!! configure options were: $2"
        build_errors=$((build_errors+1))
        configs_bad=$((configs_bad+1))
+       OK_failed="FAILED (make failed)"
    fi
    echo "    configuration: \"$1\" done." >> $summ
+   echo "  └─── configuration: \"$1\" done ($OK_failed)"
 }
 
 ###################################################################

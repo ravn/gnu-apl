@@ -25,8 +25,6 @@
 Quad_RE Quad_RE::_fun;
 Quad_RE * Quad_RE::fun = &Quad_RE::_fun;
 
-#include "../config.h"   // for HAVE_LIBPCRE2_32 (from ./configure)
-
 #if HAVE_LIBPCRE2_32
 
 # include "Regexp.hh"

@@ -11,13 +11,13 @@ help:
 	@echo "In addition to the standard make targets (all, install, clean, ...), "
 	@echo "the following make targets may be supported (at this level):"
 	@echo ""
-	@echo "    make help      - print this text"
-	@echo "    make DIST      - dist + a Makefile that calls ./configure"
-	@echo "    make DOXY      - create Doxygen documentation"
-	@echo "    make RPM       - create (source and binary) RPMs"
-	@echo "    make DEB       - create Debian packages"
+	@echo "    make help        - print this text"
+	@echo "    make DIST        - dist + a Makefile that calls ./configure"
+	@echo "    make DOXY        - create Doxygen documentation"
+	@echo "    make RPM         - create (source and binary) RPMs"
+	@echo "    make DEB         - create Debian packages"
 	@echo ""
-	@echo "    make SVNUP     - update from SVN and ./configure"
+	@echo "    make SVNUP       - update from SVN and ./configure"
 	@echo ""
 	@echo "NOTE: The RPM and DEB targets may fail because they require additional tools" 
 	@echo "that may not be present on your machine. Don't worry if that happens, unless"
@@ -26,11 +26,12 @@ help:
 	@echo "The following targets are shortcuts for lazy developers (like the GNU APL "
 	@echo "author) and are not very useful for normal users:"
 	@echo ""
-	@echo "    make develop   - enable full dependency tracking"
-	@echo "    make gprof     - make develop + enable gprof profiling"
-	@echo "    make python    - make develop + build python module"
-	@echo "    make parallel  - enable multi-core APL (buggy and experimental!)"
-	@echo "    make parallel1 - make parallel for benchmarking"
+	@echo "    make develop     - enable full dependency tracking"
+	@echo "    make gprof       - make develop + enable gprof profiling"
+	@echo "    make python      - make develop + build python module"
+	@echo "    make parallel    - enable multi-core APL (buggy and experimental!)"
+	@echo "    make parallel1   - make parallel for benchmarking"
+	@echo "    make VPATH_clean - prepare for VPATH build"
 	@echo ""
 
 ###############################################################################
@@ -96,4 +97,9 @@ parallel1:
                     ASSERT_LEVEL_WANTED=0               \
                     CORE_COUNT_WANTED=-3
 	make all
+
+.PHONY: VPATH_clean
+VPATH_clean:
+	make -C src clean
+	rm config.status
 

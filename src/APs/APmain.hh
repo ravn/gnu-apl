@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "../../config.h"
+#include "config.h"
 #include "../Svar_DB.hh"
 
 extern ostream & get_CERR();
