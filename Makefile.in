@@ -1096,7 +1096,6 @@ SYNC:	DIST
 	tar xvzf apl-$(VERSION).tar.gz
 	rm -f apl-$(VERSION)/src/makefile.h
 	rm -f apl-$(VERSION)/src/buildtag.hh
-	rm -f apl-$(VERSION)/src/configure_args.cc
 	cp -a apl-$(VERSION)/* ../savannah-repo-apl/trunk/
 	echo "exported from SVN version " `svnversion` > \
     ../savannah-repo-apl/trunk/exported_from
@@ -1162,17 +1161,19 @@ git-pull:
 	make -C wslib5 $@
 
 makefile.h:
-	@echo "// some strings exported from Makefile"            > $@
-	@echo "//"                                               >> $@
-	@echo "#define xSTR(x) #x"                               >> $@
-	@echo "#define Makefile__bindir     xSTR(${bindir})"     >> $@
-	@echo "#define Makefile__docdir     xSTR(${docdir})"     >> $@
-	@echo "#define Makefile__sysconfdir xSTR(${sysconfdir})" >> $@
-	@echo "#define Makefile__pkglibdir  xSTR(${pkglibdir})"  >> $@
-	@echo "#define Makefile__localedir  xSTR(${localedir})"  >> $@
-	@echo "#define Makefile__srcdir     xSTR(${abs_srcdir})" >> $@
-	@echo "#define Makefile__host_os    xSTR(${host_os})"    >> $@
-	@echo ""                                                 >> $@
+	@echo "/* this makefile.h exports some paths known by"     > $@
+	@echo "   Makefile. See chapter 20.5 of the autoconf"     >> $@
+	@echo "   manual (keyword: "dedicated header file")."     >> $@
+	@echo " */"                                               >> $@
+	@echo "#define xSTR(x) #x"                                >> $@
+	@echo "#define Makefile__bindir     xSTR(${bindir})"      >> $@
+	@echo "#define Makefile__docdir     xSTR(${docdir})"      >> $@
+	@echo "#define Makefile__sysconfdir xSTR(${sysconfdir})"  >> $@
+	@echo "#define Makefile__pkglibdir  xSTR(${pkglibdir})"   >> $@
+	@echo "#define Makefile__localedir  xSTR(${localedir})"   >> $@
+	@echo "#define Makefile__srcdir     xSTR(${abs_srcdir})"  >> $@
+	@echo "#define Makefile__host_os    xSTR(${host_os})"     >> $@
+	@echo ""                                                  >> $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

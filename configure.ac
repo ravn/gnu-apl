@@ -723,17 +723,13 @@ then
    rm -f "$apl_top/makefile.h"
 fi
 make makefile.h >/dev/null
+echo "#define CONFIGURE_ARGS         xSTR($0 $ac_configure_args)
+" >> makefile.h
+
 if test "$apl_top" != "."   # vpath build
 then
    cp makefile.h "$apl_top"/makefile.h
 fi
-
-# remember how ./configure was called
-echo "configure: creating $abs_apl_top/configure_args.cc"
-echo "
-extern const char * configure_args;
-const char * configure_args = \
-     \"$0 $ac_configure_args\";" > $apl_top/configure_args.cc
 
 # summary
   echo " "

@@ -28,7 +28,6 @@
 
 #include "buildtag.hh"
 static const char * build_tag[] = { BUILDTAG, 0 };
-extern const char * configure_args;
 
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER2_OUTER.hh"
@@ -975,7 +974,7 @@ UserPreferences::show_configure_options()
    << endl
    << "how ./configure was (probably) called:" << endl
    << "--------------------------------------" << endl
-   << "    " << configure_args << endl
+   << "    " << CONFIGURE_ARGS << endl
    << endl;
 
    show_version(CERR);

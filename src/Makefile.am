@@ -63,7 +63,6 @@ common_SOURCES += CharCell.cc					CharCell.hh
 common_SOURCES += Command.cc		Command.def		Command.hh
 common_SOURCES += Common.cc					Common.hh
 common_SOURCES += ComplexCell.cc				ComplexCell.hh
-common_SOURCES += configure_args.cc
 common_SOURCES += DerivedFunction.cc				DerivedFunction.hh
 common_SOURCES += DiffOut.cc					DiffOut.hh
 common_SOURCES += DynamicObject.cc				DynamicObject.hh

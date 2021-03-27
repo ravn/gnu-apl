@@ -183,39 +183,38 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
 	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
 	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh configure_args.cc \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Function.cc Function.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
-	NamedObject.cc NamedObject.hh NativeFunction.cc \
-	NativeFunction.hh Native_interface.hh NumericCell.cc \
-	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
-	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
-	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
-	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
-	Plot_window_properties.cc Plot_window_properties.hh \
-	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
-	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
-	PrintContext.hh PrintOperator.hh QuadFunction.cc \
-	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
-	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
-	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
-	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
-	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Common.hh ComplexCell.cc ComplexCell.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DiffOut.hh DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh Help.def Heapsort.hh \
+	Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
+	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
+	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
+	Performance.cc Performance.def Performance.hh PointerCell.cc \
+	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
+	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
+	Plot_data.hh Plot_window_properties.cc \
+	Plot_window_properties.hh PrimitiveFunction.cc \
+	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
+	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
+	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
+	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
+	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
+	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
+	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
+	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
+	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -275,7 +274,6 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Cell.lo lib_gnu_apl_la-Doxy.lo \
 	lib_gnu_apl_la-CharCell.lo lib_gnu_apl_la-Command.lo \
 	lib_gnu_apl_la-Common.lo lib_gnu_apl_la-ComplexCell.lo \
-	lib_gnu_apl_la-configure_args.lo \
 	lib_gnu_apl_la-DerivedFunction.lo lib_gnu_apl_la-DiffOut.lo \
 	lib_gnu_apl_la-DynamicObject.lo lib_gnu_apl_la-Error.lo \
 	lib_gnu_apl_la-Executable.lo lib_gnu_apl_la-FloatCell.lo \
@@ -356,39 +354,38 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
 	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
 	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh configure_args.cc \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Function.cc Function.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
-	NamedObject.cc NamedObject.hh NativeFunction.cc \
-	NativeFunction.hh Native_interface.hh NumericCell.cc \
-	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
-	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
-	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
-	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
-	Plot_window_properties.cc Plot_window_properties.hh \
-	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
-	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
-	PrintContext.hh PrintOperator.hh QuadFunction.cc \
-	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
-	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
-	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
-	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
-	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Common.hh ComplexCell.cc ComplexCell.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DiffOut.hh DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh Help.def Heapsort.hh \
+	Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
+	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
+	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
+	Performance.cc Performance.def Performance.hh PointerCell.cc \
+	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
+	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
+	Plot_data.hh Plot_window_properties.cc \
+	Plot_window_properties.hh PrimitiveFunction.cc \
+	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
+	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
+	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
+	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
+	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
+	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
+	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
+	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
+	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -441,13 +438,12 @@ am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
 	libapl_la-Bif_OPER1_SCAN.lo libapl_la-CDR.lo libapl_la-Cell.lo \
 	libapl_la-Doxy.lo libapl_la-CharCell.lo libapl_la-Command.lo \
 	libapl_la-Common.lo libapl_la-ComplexCell.lo \
-	libapl_la-configure_args.lo libapl_la-DerivedFunction.lo \
-	libapl_la-DiffOut.lo libapl_la-DynamicObject.lo \
-	libapl_la-Error.lo libapl_la-Executable.lo \
-	libapl_la-FloatCell.lo libapl_la-Function.lo libapl_la-Id.lo \
-	libapl_la-IndexExpr.lo libapl_la-IndexIterator.lo \
-	libapl_la-InputFile.lo libapl_la-IntCell.lo \
-	libapl_la-IO_Files.lo libapl_la-LApack.lo \
+	libapl_la-DerivedFunction.lo libapl_la-DiffOut.lo \
+	libapl_la-DynamicObject.lo libapl_la-Error.lo \
+	libapl_la-Executable.lo libapl_la-FloatCell.lo \
+	libapl_la-Function.lo libapl_la-Id.lo libapl_la-IndexExpr.lo \
+	libapl_la-IndexIterator.lo libapl_la-InputFile.lo \
+	libapl_la-IntCell.lo libapl_la-IO_Files.lo libapl_la-LApack.lo \
 	libapl_la-LibPaths.lo libapl_la-LineInput.lo \
 	libapl_la-Logging.lo libapl_la-LvalCell.lo \
 	libapl_la-Malloc_hooks.lo libapl_la-Nabla.lo \
@@ -508,39 +504,38 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
 	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
 	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh configure_args.cc \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Function.cc Function.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
-	NamedObject.cc NamedObject.hh NativeFunction.cc \
-	NativeFunction.hh Native_interface.hh NumericCell.cc \
-	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
-	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
-	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
-	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
-	Plot_window_properties.cc Plot_window_properties.hh \
-	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
-	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
-	PrintContext.hh PrintOperator.hh QuadFunction.cc \
-	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
-	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
-	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
-	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
-	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Common.hh ComplexCell.cc ComplexCell.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DiffOut.hh DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh Help.def Heapsort.hh \
+	Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
+	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
+	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
+	Performance.cc Performance.def Performance.hh PointerCell.cc \
+	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
+	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
+	Plot_data.hh Plot_window_properties.cc \
+	Plot_window_properties.hh PrimitiveFunction.cc \
+	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
+	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
+	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
+	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
+	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
+	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
+	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
+	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
+	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -593,24 +588,23 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-CDR.$(OBJEXT) apl-Cell.$(OBJEXT) apl-Doxy.$(OBJEXT) \
 	apl-CharCell.$(OBJEXT) apl-Command.$(OBJEXT) \
 	apl-Common.$(OBJEXT) apl-ComplexCell.$(OBJEXT) \
-	apl-configure_args.$(OBJEXT) apl-DerivedFunction.$(OBJEXT) \
-	apl-DiffOut.$(OBJEXT) apl-DynamicObject.$(OBJEXT) \
-	apl-Error.$(OBJEXT) apl-Executable.$(OBJEXT) \
-	apl-FloatCell.$(OBJEXT) apl-Function.$(OBJEXT) \
-	apl-Id.$(OBJEXT) apl-IndexExpr.$(OBJEXT) \
-	apl-IndexIterator.$(OBJEXT) apl-InputFile.$(OBJEXT) \
-	apl-IntCell.$(OBJEXT) apl-IO_Files.$(OBJEXT) \
-	apl-LApack.$(OBJEXT) apl-LibPaths.$(OBJEXT) \
-	apl-LineInput.$(OBJEXT) apl-Logging.$(OBJEXT) \
-	apl-LvalCell.$(OBJEXT) apl-Malloc_hooks.$(OBJEXT) \
-	apl-Nabla.$(OBJEXT) apl-Macro.$(OBJEXT) \
-	apl-Missing_Libraries.$(OBJEXT) apl-NamedObject.$(OBJEXT) \
-	apl-NativeFunction.$(OBJEXT) apl-NumericCell.$(OBJEXT) \
-	apl-Output.$(OBJEXT) apl-Parallel.$(OBJEXT) \
-	apl-Parser.$(OBJEXT) apl-Performance.$(OBJEXT) \
-	apl-PointerCell.$(OBJEXT) apl-Prefix.$(OBJEXT) \
-	apl-Plot_line_properties.$(OBJEXT) apl-Plot_data.$(OBJEXT) \
-	apl-Plot_window_properties.$(OBJEXT) \
+	apl-DerivedFunction.$(OBJEXT) apl-DiffOut.$(OBJEXT) \
+	apl-DynamicObject.$(OBJEXT) apl-Error.$(OBJEXT) \
+	apl-Executable.$(OBJEXT) apl-FloatCell.$(OBJEXT) \
+	apl-Function.$(OBJEXT) apl-Id.$(OBJEXT) \
+	apl-IndexExpr.$(OBJEXT) apl-IndexIterator.$(OBJEXT) \
+	apl-InputFile.$(OBJEXT) apl-IntCell.$(OBJEXT) \
+	apl-IO_Files.$(OBJEXT) apl-LApack.$(OBJEXT) \
+	apl-LibPaths.$(OBJEXT) apl-LineInput.$(OBJEXT) \
+	apl-Logging.$(OBJEXT) apl-LvalCell.$(OBJEXT) \
+	apl-Malloc_hooks.$(OBJEXT) apl-Nabla.$(OBJEXT) \
+	apl-Macro.$(OBJEXT) apl-Missing_Libraries.$(OBJEXT) \
+	apl-NamedObject.$(OBJEXT) apl-NativeFunction.$(OBJEXT) \
+	apl-NumericCell.$(OBJEXT) apl-Output.$(OBJEXT) \
+	apl-Parallel.$(OBJEXT) apl-Parser.$(OBJEXT) \
+	apl-Performance.$(OBJEXT) apl-PointerCell.$(OBJEXT) \
+	apl-Prefix.$(OBJEXT) apl-Plot_line_properties.$(OBJEXT) \
+	apl-Plot_data.$(OBJEXT) apl-Plot_window_properties.$(OBJEXT) \
 	apl-PrimitiveFunction.$(OBJEXT) \
 	apl-PrimitiveOperator.$(OBJEXT) apl-PrintBuffer.$(OBJEXT) \
 	apl-QuadFunction.$(OBJEXT) apl-ProcessorID.$(OBJEXT) \
@@ -960,39 +954,38 @@ common_SOURCES = $(plot_SOURCES) ../buildtag.hh ../config.h \
 	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
 	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
 	Command.cc Command.def Command.hh Common.cc Common.hh \
-	ComplexCell.cc ComplexCell.hh configure_args.cc \
-	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
-	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
-	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Function.cc Function.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
-	NamedObject.cc NamedObject.hh NativeFunction.cc \
-	NativeFunction.hh Native_interface.hh NumericCell.cc \
-	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
-	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
-	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
-	Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
-	Plot_window_properties.cc Plot_window_properties.hh \
-	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
-	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
-	PrintContext.hh PrintOperator.hh QuadFunction.cc \
-	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
-	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
-	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
-	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
-	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	ComplexCell.cc ComplexCell.hh DerivedFunction.cc \
+	DerivedFunction.hh DiffOut.cc DiffOut.hh DynamicObject.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh Help.def Heapsort.hh \
+	Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
+	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
+	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
+	Performance.cc Performance.def Performance.hh PointerCell.cc \
+	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
+	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
+	Plot_data.hh Plot_window_properties.cc \
+	Plot_window_properties.hh PrimitiveFunction.cc \
+	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
+	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
+	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
+	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
+	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
+	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
+	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
+	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
+	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -1341,7 +1334,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Value.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-ValueHistory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Workspace.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-configure_args.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-sbrk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-static_Objects.Po@am__quote@
@@ -1454,7 +1446,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Value.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ValueHistory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Workspace.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-configure_args.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-python_apl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-sbrk.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-static_Objects.Plo@am__quote@
@@ -1567,7 +1558,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Value.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-ValueHistory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Workspace.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-configure_args.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-libapl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-sbrk.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-static_Objects.Plo@am__quote@
@@ -1822,13 +1812,6 @@ lib_gnu_apl_la-ComplexCell.lo: ComplexCell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ComplexCell.cc' object='lib_gnu_apl_la-ComplexCell.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-ComplexCell.lo `test -f 'ComplexCell.cc' || echo '$(srcdir)/'`ComplexCell.cc
-
-lib_gnu_apl_la-configure_args.lo: configure_args.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-configure_args.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-configure_args.Tpo -c -o lib_gnu_apl_la-configure_args.lo `test -f 'configure_args.cc' || echo '$(srcdir)/'`configure_args.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-configure_args.Tpo $(DEPDIR)/lib_gnu_apl_la-configure_args.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='configure_args.cc' object='lib_gnu_apl_la-configure_args.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-configure_args.lo `test -f 'configure_args.cc' || echo '$(srcdir)/'`configure_args.cc
 
 lib_gnu_apl_la-DerivedFunction.lo: DerivedFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-DerivedFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-DerivedFunction.Tpo -c -o lib_gnu_apl_la-DerivedFunction.lo `test -f 'DerivedFunction.cc' || echo '$(srcdir)/'`DerivedFunction.cc
@@ -2669,13 +2652,6 @@ libapl_la-ComplexCell.lo: ComplexCell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ComplexCell.cc' object='libapl_la-ComplexCell.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-ComplexCell.lo `test -f 'ComplexCell.cc' || echo '$(srcdir)/'`ComplexCell.cc
-
-libapl_la-configure_args.lo: configure_args.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-configure_args.lo -MD -MP -MF $(DEPDIR)/libapl_la-configure_args.Tpo -c -o libapl_la-configure_args.lo `test -f 'configure_args.cc' || echo '$(srcdir)/'`configure_args.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-configure_args.Tpo $(DEPDIR)/libapl_la-configure_args.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='configure_args.cc' object='libapl_la-configure_args.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-configure_args.lo `test -f 'configure_args.cc' || echo '$(srcdir)/'`configure_args.cc
 
 libapl_la-DerivedFunction.lo: DerivedFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-DerivedFunction.lo -MD -MP -MF $(DEPDIR)/libapl_la-DerivedFunction.Tpo -c -o libapl_la-DerivedFunction.lo `test -f 'DerivedFunction.cc' || echo '$(srcdir)/'`DerivedFunction.cc
@@ -3733,20 +3709,6 @@ apl-ComplexCell.obj: ComplexCell.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ComplexCell.cc' object='apl-ComplexCell.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-ComplexCell.obj `if test -f 'ComplexCell.cc'; then $(CYGPATH_W) 'ComplexCell.cc'; else $(CYGPATH_W) '$(srcdir)/ComplexCell.cc'; fi`
-
-apl-configure_args.o: configure_args.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-configure_args.o -MD -MP -MF $(DEPDIR)/apl-configure_args.Tpo -c -o apl-configure_args.o `test -f 'configure_args.cc' || echo '$(srcdir)/'`configure_args.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-configure_args.Tpo $(DEPDIR)/apl-configure_args.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='configure_args.cc' object='apl-configure_args.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-configure_args.o `test -f 'configure_args.cc' || echo '$(srcdir)/'`configure_args.cc
-
-apl-configure_args.obj: configure_args.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-configure_args.obj -MD -MP -MF $(DEPDIR)/apl-configure_args.Tpo -c -o apl-configure_args.obj `if test -f 'configure_args.cc'; then $(CYGPATH_W) 'configure_args.cc'; else $(CYGPATH_W) '$(srcdir)/configure_args.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-configure_args.Tpo $(DEPDIR)/apl-configure_args.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='configure_args.cc' object='apl-configure_args.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-configure_args.obj `if test -f 'configure_args.cc'; then $(CYGPATH_W) 'configure_args.cc'; else $(CYGPATH_W) '$(srcdir)/configure_args.cc'; fi`
 
 apl-DerivedFunction.o: DerivedFunction.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-DerivedFunction.o -MD -MP -MF $(DEPDIR)/apl-DerivedFunction.Tpo -c -o apl-DerivedFunction.o `test -f 'DerivedFunction.cc' || echo '$(srcdir)/'`DerivedFunction.cc

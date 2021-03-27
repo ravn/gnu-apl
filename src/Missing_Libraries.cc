@@ -27,7 +27,7 @@
    raise a SYNTAX ERROR.
  */
 
-#include "../config.h"
+#include "Common.hh"
 #include "Error_macros.hh"
 #include "Quad_FFT.hh"
 #include "Quad_GTK.hh"
@@ -35,12 +35,10 @@
 #include "Token.hh"
 
 /// a generic function for all ⎕XXX errors
-extern Token missing_files(const char * qfun,
+static Token missing_files(const char * qfun,
                            const char ** libs,
                            const char ** hdrs,
                            const char ** pkgs);
-
-extern const char * configure_args;
 
 //=============================================================================
 Token
@@ -88,7 +86,7 @@ UCS_string & more = MORE_ERROR() <<
 "\n"
 "This instance of the GNU APL interpreter was configured as follows:\n"
 "\n"
-"      " << configure_args << "\n\n";
+"      " << CONFIGURE_ARGS << "\n\n";
 
    if (pkgs && pkgs[0])
       {
@@ -104,7 +102,7 @@ UCS_string & more = MORE_ERROR() <<
 "\n"
 "and after that, reconfigure, recompile, and reinstall GNU APL:\n\n" 
 "      ./configure    # if the ./configure options were incorrect, or else\n"
-"      " << configure_args << "\n"
+"      " << CONFIGURE_ARGS << "\n"
 "      make\n"
 "      sudo make install\n"
 "\n"
