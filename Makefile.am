@@ -1,6 +1,5 @@
 
 ACLOCAL_AMFLAGS = -I m4
-DISTCHECK_CONFIGURE_FLAGS =--enable-maintainer-mode=no
 
 APL_DIRS	= workspaces wslib3 wslib4 wslib5
 SUBDIRS		= $(APL_DIRS)
@@ -9,7 +8,6 @@ SUBDIRS		+= src support-files tools websock
 DIST_SUBDIRS	= $(SUBDIRS) rpm debian
 
 dist_noinst_SCRIPTS = buildtag.sh
-# distcleancheck_listfile = buildtag.sh
 
 dist_doc_DATA = README				\
 		README-1-prerequisites		\
@@ -26,7 +24,7 @@ dist_doc_DATA = README				\
 
 nobase_dist_sysconf_DATA = gnu-apl.d/preferences
 
-dist_noinst_DATA = Doxyfile Makefile.incl
+dist_noinst_DATA = Doxyfile Makefile.incl buildtag.hh config.h makefile.h
 
 include Makefile.incl
 

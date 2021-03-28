@@ -99,7 +99,6 @@ parallel1:
 	make all
 
 .PHONY: VPATH_clean
-VPATH_clean:
-	make -C src clean
+VPATH_clean: clean
 	rm config.status
 
