@@ -28,6 +28,8 @@ dist_noinst_DATA = Doxyfile Makefile.incl buildtag.hh config.h makefile.h
 
 include Makefile.incl
 
+all: makefile.h
+
 # doxygen documentation
 #
 .PHONY:	DOXY
@@ -142,7 +144,7 @@ git-pull:
 	make -C src $@
 	make -C wslib5 $@
 
-makefile.h:
+makefile.h: Makefile
 	@echo "/* this makefile.h exports some paths known by"     > $@
 	@echo "   Makefile. See chapter 20.5 of the autoconf"     >> $@
 	@echo "   manual (keyword: "dedicated header file")."     >> $@
@@ -156,4 +158,6 @@ makefile.h:
 	@echo "#define Makefile__srcdir     xSTR(${abs_srcdir})"  >> $@
 	@echo "#define Makefile__host_os    xSTR(${host_os})"     >> $@
 	@echo ""                                                  >> $@
+	@echo "#define CONFIGURE_ARGS       xSTR(configure $(ac_configure_args))" >> $@
+
 

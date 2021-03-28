@@ -722,21 +722,12 @@ else
    echo "configure: top-level apl directory is: $abs_apl_top"
 fi
 
-# create makefile.h
+# remove makefile.h
 #
-echo "configure: creating $(pwd)/makefile.h ..."
-if test -f "$(pwd)/makefile.h"
+if test -f "$apl_top/makefile.h"
 then
    echo "configure: removing old $apl_top/makefile.h"
-   rm -f "$(pwd)/makefile.h"
-fi
-make makefile.h >/dev/null
-echo "#define CONFIGURE_ARGS       xSTR($0 $ac_configure_args)
-" >> makefile.h
-
-if test "$apl_top" != "."   # vpath build
-then
-   cp makefile.h "$apl_top"/makefile.h
+   rm -f "$apl_top/makefile.h"
 fi
 
 # summary
