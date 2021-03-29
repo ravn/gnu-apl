@@ -32,7 +32,7 @@ all: makefile.h
 makefile.h: Makefile
 
 buildtag.hh: Makefile buildtag.sh
-	source buildtag.sh
+	source ${top_srcdir}/buildtag.sh
 	touch $@
 
 # doxygen documentation
@@ -150,6 +150,7 @@ git-pull:
 	make -C wslib5 $@
 
 makefile.h: Makefile
+	@echo creating a fresh $@...
 	@echo "/* this makefile.h exports some paths known by"     > $@
 	@echo "   Makefile. See chapter 20.5 of the autoconf"     >> $@
 	@echo "   manual (keyword: "dedicated header file")."     >> $@
