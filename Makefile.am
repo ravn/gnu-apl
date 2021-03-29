@@ -162,6 +162,5 @@ makefile.h: Makefile
 	@echo "#define Makefile__localedir  xSTR(${localedir})"   >> $@
 	@echo "#define Makefile__srcdir     xSTR(${abs_srcdir})"  >> $@
 	@echo "#define Makefile__host_os    xSTR(${host_os})"     >> $@
-	@echo "#undef  xSTR"                                      >> $@
 	@echo ""                                                  >> $@
 
