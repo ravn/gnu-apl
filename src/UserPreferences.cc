@@ -972,7 +972,7 @@ UserPreferences::show_configure_options()
    << endl
    << "how ./configure was (probably) called:" << endl
    << "--------------------------------------" << endl
-   << "    " << CONFIGURE_ARGS << endl
+   << "    " CONFIGURE_ARGS << endl
    << endl;
 
    show_version(CERR);

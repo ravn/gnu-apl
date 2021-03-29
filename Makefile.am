@@ -29,6 +29,11 @@ dist_noinst_DATA = Doxyfile Makefile.incl buildtag.hh config.h makefile.h
 include Makefile.incl
 
 all: makefile.h
+makefile.h: Makefile
+
+buildtag.hh: Makefile buildtag.sh
+	source buildtag.sh
+	touch $@
 
 # doxygen documentation
 #
@@ -157,7 +162,6 @@ makefile.h: Makefile
 	@echo "#define Makefile__localedir  xSTR(${localedir})"   >> $@
 	@echo "#define Makefile__srcdir     xSTR(${abs_srcdir})"  >> $@
 	@echo "#define Makefile__host_os    xSTR(${host_os})"     >> $@
+	@echo "#undef  xSTR"                                      >> $@
 	@echo ""                                                  >> $@
-	@echo "#define CONFIGURE_ARGS       xSTR(configure $(ac_configure_args))" >> $@
-
 

@@ -105,7 +105,11 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 
-#################################################################################
+AC_DEFINE_UNQUOTED([CONFIGURE_ARGS],
+                   "$0 $ac_configure_args",
+                   [how ./configure was called])
+
+##############################################################################
 #
 # Various checks for library functions. We use inverse alphabetic order although
 # the order should be least-dependent to most-dependent (or vice versa?). The
@@ -115,7 +119,7 @@ AC_TYPE_UINT8_T
 # ... lib_A ... lib_B   and the test for lib_B should come before the test for
 # lib_A in this file.
 #
-#################################################################################
+##############################################################################
 
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP

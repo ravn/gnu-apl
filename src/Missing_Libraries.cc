@@ -85,9 +85,9 @@ UCS_string & more = MORE_ERROR() <<
 
    more <<
 "\n"
-"This instance of the GNU APL interpreter was configured as follows:\n"
+"This GNU APL interpreter instance was probably configured like this:\n"
 "\n"
-"      " << CONFIGURE_ARGS << "\n\n";
+"      " CONFIGURE_ARGS "\n\n";
 
    if (pkgs && pkgs[0])
       {
@@ -103,7 +103,7 @@ UCS_string & more = MORE_ERROR() <<
 "\n"
 "and after that, reconfigure, recompile, and reinstall GNU APL:\n\n" 
 "      ./configure    # if the ./configure options were incorrect, or else\n"
-"      " << CONFIGURE_ARGS << "\n"
+"      ./configure " CONFIGURE_ARGS "\n"
 "      make\n"
 "      sudo make install\n"
 "\n"

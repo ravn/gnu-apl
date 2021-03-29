@@ -1,6 +1,6 @@
 
 # NOTE: without 'no-dependencies' make target distclean won't work.
-AUTOMAKE_OPTIONS = no-dependencies
+# AUTOMAKE_OPTIONS = no-dependencies
 
 EXTRA_DIRS =
 if ! WANT_ANDROID

@@ -11,4 +11,3 @@
 #define Makefile__srcdir     xSTR(/home/eedjsa/apl-1.8)
 #define Makefile__host_os    xSTR(linux-gnu)
 
-#define CONFIGURE_ARGS       xSTR(configure )

@@ -13,6 +13,9 @@
 /* assert level */
 #define ASSERT_LEVEL_WANTED 1
 
+/* how ./configure was called */
+#define CONFIGURE_ARGS "./configure  '--disable-maintainer-mode'"
+
 /* core count */
 #define CORE_COUNT_WANTED 0
 
