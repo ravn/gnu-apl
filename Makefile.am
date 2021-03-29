@@ -151,17 +151,19 @@ git-pull:
 
 makefile.h: Makefile
 	@echo creating a fresh $@...
-	@echo "/* this makefile.h exports some paths known by"     > $@
-	@echo "   Makefile. See chapter 20.5 of the autoconf"     >> $@
-	@echo "   manual (keyword: "dedicated header file")."     >> $@
-	@echo " */"                                               >> $@
-	@echo "#define xSTR(x) #x"                                >> $@
-	@echo "#define Makefile__bindir     xSTR(${bindir})"      >> $@
-	@echo "#define Makefile__docdir     xSTR(${docdir})"      >> $@
-	@echo "#define Makefile__sysconfdir xSTR(${sysconfdir})"  >> $@
-	@echo "#define Makefile__pkglibdir  xSTR(${pkglibdir})"   >> $@
-	@echo "#define Makefile__localedir  xSTR(${localedir})"   >> $@
-	@echo "#define Makefile__srcdir     xSTR(${abs_srcdir})"  >> $@
-	@echo "#define Makefile__host_os    xSTR(${host_os})"     >> $@
-	@echo ""                                                  >> $@
+	@echo "/* this makefile.h exports some paths known by"    > $@
+	@echo "   Makefile. See chapter 20.5 of the autoconf"    >> $@
+	@echo "   manual (keyword: "dedicated header file")."    >> $@
+	@echo " */"                                              >> $@
+	@echo "#ifndef __makefile_h_DEFINED__"                   > $@
+	@echo "# define __makefile_h_DEFINED__"                  >> $@
+	@echo "# define Makefile__bindir     STR(${bindir})"     >> $@
+	@echo "# define Makefile__docdir     STR(${docdir})"     >> $@
+	@echo "# define Makefile__sysconfdir STR(${sysconfdir})" >> $@
+	@echo "# define Makefile__pkglibdir  STR(${pkglibdir})"  >> $@
+	@echo "# define Makefile__localedir  STR(${localedir})"  >> $@
+	@echo "# define Makefile__srcdir     STR(${abs_srcdir})" >> $@
+	@echo "# define Makefile__host_os    STR(${host_os})"    >> $@
+	@echo "#endif  // __makefile_h_DEFINED__"                >> $@
+	@echo ""                                                 >> $@
 

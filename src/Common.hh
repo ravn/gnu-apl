@@ -24,6 +24,9 @@
 // NOTE: the path to config.h and makefile.h is set as -I $(pwd) in ./configure
 //
 #include "config.h"     // for xxx_WANTED and other macros from ./configure
+
+// makefile.h uses STR(), so define it before
+#define STR(x) #x
 #include "makefile.h"   // various paths
 
 // #include some notoriously needed include files, but only if they
@@ -369,7 +372,6 @@ inline bool is_iPAD_char(Unicode uni)
 //-----------------------------------------------------------------------------
 
 /// Stringify x.
-#define STR(x) #x
 /// The current location in the source file.
 #define LOC Loc(__FILE__, __LINE__)
 /// The location line l in file f.
