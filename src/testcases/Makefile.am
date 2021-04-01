@@ -216,7 +216,6 @@ dist_noinst_DATA =                              \
         ZZ33_Regression.tc                      \
         ZZ34_Regression.tc                      \
         ZZ35_Regression.tc                      \
-        ZZ36_Regression.tc                      \
         ZZ37_Regression.tc                      \
         ZZ38_Regression.tc                      \
         ZZ39_Regression.tc                      \

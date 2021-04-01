@@ -1049,7 +1049,9 @@ parallel1:
 
 .PHONY: VPATH_clean
 VPATH_clean: clean
-	rm config.status
+	rm -f config.status
+	rm -f config.h
+	rm -f makefile.h
 
 all: makefile.h
 makefile.h: Makefile

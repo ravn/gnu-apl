@@ -243,7 +243,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>March 26, 2021
+<p>March 30, 2021
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -1408,45 +1408,62 @@ Next: <a href="#Section-2_002e5" accesskey="n" rel="next">Section 2.5</a>, Previ
 <a name="Comparison-Rules"></a>
 <h3 class="section">2.4 Comparison Rules</h3>
 
-<p>Both IBM APL2 and the ISO standard require that the arguments of &lt;, ≤, ≥, and
-&gt; (but not of = or ≠) are integer or real numbers, and that the argument of
-monadic ⍋ or ⍒ is a vector of integer or real numbers. In contrast GNU APL
-also allows the comparison of characters and numbers or the comparison of
-complex numbers according to the following, more general, rules.
+<p>Both IBM APL2 and the ISO standard require that the arguments of &lt;, ≤, ≥,
+and &gt; (but not of = or ≠) are integer or real numbers, and, as a consequence,
+that the argument of ⍋ or ⍒ is a vector of integer or real numbers.
+In contrast GNU APL also allows the comparison of characters and numbers or
+the comparison of complex numbers according to the following, more general,
+rules.
 </p>
-<p>Let A and B two APL values to be compared. The first comparison below that
-succeeds (i.e. returns a result) is then the result of comparing A and B.
-</p> 
-<p>1. Comparison by rank: if (⍴⍴A) &lt; (⍴⍴B) then A &lt; B. And vice versa.
+<p>Let A and B two APL values to be compared. Then the final result of comparing
+A and B is the first decision (i.e. A &lt; B, A &gt; B, or A = B) made when
+following the rules below:
 </p>
-<p>2. Comparison by shape: if (⍴A) &lt; (⍴B) then A &lt; B. And vice versa. The
-   first different shape item decides.
+<ol>
+<li> Comparison by rank: if (⍴⍴A) &lt; (⍴⍴B) then A &lt; B. And vice versa.
+
+</li><li> Comparison by shape: if (⍴A) &lt; (⍴B) then A &lt; B. And vice versa. The
+first different shape item decides.
+
+</li><li> Comparison of ravel elements: at this point ⍴A ≡ ⍴B. If all
+corresponding ravel elements of A and B are equal (i.e. tolerantly equal
+within ⎕CT as defined in the ISO standard) then A = B.
+
+<p>Otherwise let A1 and B1 the first corresponding ravel elements of A and B
+with A1≠B1. If A1 &lt; B1 then A &lt; B and vice versa. The comparison A1 &lt; B1
+is made according to the following rules 4. - 7. below.
 </p>
-<p>3. Comparison of ravel elements: otherwise ⍴A and ⍴B are equal. If all
-   corresponding ravel elements of A and B are equal (i.e. tolerantly equal
-   within ⎕CT as defined in the ISO standard) then A = B. Otherwise let A1
-   and B1 the first corresponding ravel elements of A and B with A1≠B1.
-   If A1 &lt; B1 then A &lt; B and vice versa. The comparison A1 &lt; B1 is made
-   according tho the following rules.
-</p>
-<p>4. Comparison by depth: if A1 is simple (a single character or number) and
-   B1 is not (i.e. B is nested) then A1 &lt; B1 and vice versa. If A1 and B1 are
-   both nested, then the above rules are applied recursively. If both are simple
-   then they are compared according to the rules below.
-</p>
-<p>5. Comparison by Unicode: if A1 and B1 are both character values and
-   (⎕UCS A1) &lt; (⎕UCS B1) then A &lt; B. And vice versa.
-</p>
-<p>6. Comparison by type: If A1 is a character and B1 is numeric, then A &lt; B.
-   And vice versa.
-</p>
-<p>7. Comparison by numeric value: if A1 and B1 are both numeric values then:
-</p>
-<p>7a. Comparison by real part: if (9○A1) &lt; (9○B1) then A &lt; B. And vice versa.
-</p>
-<p>7a. Comparison by imaginary part: otherwise if (11○A1) &lt; (11○B1) then A &lt; B.
-    And vice versa.
-</p>
+</li><li> Comparison by depth:
+
+<ul>
+<li> if A1 is simple (i.e. A1 is a single character or number) and
+B1 is nested then A1 &lt; B1. And vice versa.
+
+</li><li> otherwise, If A1 and B1 are both nested, then the rules 1. - 4. are
+(recursively) applied to the corresponding ravel elements of A and B.
+
+</li><li> otherwise both A1 and B1 are simple and they are compared according to
+the rules 5. - 8. below.
+</li></ul>
+
+</li><li> Comparison by Unicode: if A1 and B1 are both character values and
+(⎕UCS A1) &lt; (⎕UCS B1) then A &lt; B. And vice versa.
+
+</li><li> Comparison by type: If A1 is a character and B1 is numeric, then A &lt; B.
+And vice versa.
+
+</li><li> Comparison by numeric value: if A1 and B1 are both numeric values then:
+
+<ul>
+<li> Comparison by real part: if (9○A1) &lt; (9○B1) then A &lt; B. And vice versa.
+
+</li><li> Comparison by imaginary part: otherwise if (11○A1) &lt; (11○B1) then A &lt; B.
+And vice versa.
+</li></ul>
+
+</li><li> Otherwise: A = B.
+</li></ol>
+
 <p>Another way of describing the rules above is that the comparison of two values
 is comprised of sub-comparisons of certain properties of the values in the
 following order:
@@ -1479,10 +1496,9 @@ LENGTH ERROR
 by their imaginary part and not, for example, first by their magnitude and
 then by their angle is that the chosen order gives more consistent results
 when comparing near-complex numbers or their true real companions. For
-example, a magnitude first comparison of complex numbers would make ¯1 &lt; ¯2J∈
-for a near-complex ¯2J∈ but ¯1 &gt; ¯2 for a true real ¯2.
+example, a magnitude first comparison of complex numbers would make
+¯2 &lt; ¯1 &lt; ¯2J0E¯20 for the near-complex number ¯2J0E¯20.
 </p>
-
 <p><strong>CAUTION</strong>: The comparison of two strings (i.e. nested character
 vectors) may give unexpected results because shorter strings come before
 longer strings. For example, &rsquo;Zoo&rsquo; comes <strong>before</strong> &rsquo;Adam&rsquo; even

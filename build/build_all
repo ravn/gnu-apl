@@ -32,6 +32,10 @@ START_dir=$(pwd)
 cd $(dirname $0)
 TOP_BUILD_dir=$(pwd)
 
+# NOTE: -j8 fails with out of memory on small hosts (as used for nightly builds)
+J8="-j8"
+J8=""
+
 # TOP_LOG_dir="/tmp"       # where to store longer build logs
 TOP_LOG_dir="$TOP_BUILD_dir"   # where to store longer build logs
 
@@ -42,6 +46,7 @@ declare -i build_errors=0
 declare -i missing_files=0
 declare -i configs_bad=0
 declare -i configs_good=0
+declare -i test_errors=0
 
 # remove old build results and start a fresh summary file
 #
@@ -63,8 +68,6 @@ then
    echo "*** $ROOT_dir is not clean. Please run 'make VPATH_clean' there."
    exit 1
 fi
-
-echo "Build Summary:" > "$TOP_LOG_dir/summary.log"
 
 ###################################################################
 # build one configuration
@@ -95,13 +98,13 @@ build_one()
    } > "$Logfile" 2>&1
 
    Logfile="$TOP_LOG_dir/build-$1.log"
-   echo "running make -j8 all for configuration \"$1\"..."
-   echo "  ├─── see result in: $Logfile"
+   echo "running make $J8 all for configuration \"$1\"..."
+   echo "  └─── see result in: $Logfile"
 
    {
      echo "building \"$1\"..."
 
-     make -j8 all
+     make $J8 all
    } > "$Logfile" 2>&1
 
    local make_result=$?
@@ -136,7 +139,7 @@ build_one()
        OK_failed="FAILED (make failed)"
    fi
    echo "    configuration: \"$1\" done." >> $summ
-   echo "  └─── configuration: \"$1\" done ($OK_failed)"
+   echo "  configuration: \"$1\" done ($OK_failed)"
 }
 
 ###################################################################
@@ -159,6 +162,7 @@ test_one()
       echo "    test $1: OK ($secs seconds)"     >> $summ
    else
       echo "*** test $1: FAILED ($secs seconds)" >> $summ
+      test_errors=$((1+$test_errors))
    fi
 }
 
@@ -189,59 +193,105 @@ noVH="VALUE_HISTORY_WANTED=no"
 AL0="ASSERT_LEVEL_WANTED=0"             # no ASSERTions
 FAST="$noVC $noVH $AL0"
 
-# the standard configuration
+################################################################################
+# build the standard configuration
 #
-build_one "standard" "$STD" "$VSRC_dir/apl"
-test_one  "standard"
-
-####################################################################################
-# the standard configuration with libxcb (even if GTK3 is present)
-#
-build_one "libxcb" "$STD $XCB" "$VSRC_dir/apl"
-test_one  "standard"
-
-# the developer configuration with rational number support
-#
-build_one "rational" "$STD $DEV $RAT" "$VSRC_dir/apl"
-
-####################################################################################
-# apl as a library
-#
-build_one "libapl" "$STD $LIBAPL" "$VSRC_dir/.libs/libapl.so"
-
-####################################################################################
-# python interface to APL
-#
-build_one "python" "$STD $PYTHON" "$VSRC_dir/.libs/lib_gnu_apl.so"
-
-
-####################################################################################
-# parallel benchmarking
-#
-build_one "parallel_bench" "$STD $FAST $PERF $DYLO $CC_3" "$VSRC_dir/apl"
-
-####################################################################################
-# erlang interface to APL
-#
-build_one "erlang" "$STD $ERLANG" "$VSRC_dir/.libs/erlang_APL_nif.so"
-
-
-####################################################################################
-# the developer configuration.
-#
-build_one "develop" "$STD $DEV" "$VSRC_dir/apl"
-test_one "develop"
-
+build_standard()
 {
+  build_one "standard" "$STD" "$VSRC_dir/apl"
+  test_one  "standard"
+}
+
+################################################################################
+# build the standard configuration with libxcb (even if GTK3 is present)
+#
+build_libxcb()
+{
+  build_one "libxcb" "$STD $XCB" "$VSRC_dir/apl"
+  test_one  "standard"
+}
+
+# build the developer configuration with rational number support
+#
+build_rational()
+{
+  build_one "rational" "$STD $DEV $RAT" "$VSRC_dir/apl"
+}
+################################################################################
+# build apl as a library
+#
+build_libapl()
+{
+  build_one "libapl" "$STD $LIBAPL" "$VSRC_dir/.libs/libapl.so"
+}
+################################################################################
+# build the python interface to APL
+#
+build_python()
+{
+build_one "python" "$STD $PYTHON" "$VSRC_dir/.libs/lib_gnu_apl.so"
+}
+################################################################################
+# build apl for parallel benchmarking
+#
+build_parallel_bench()
+{
+ build_one "parallel_bench" "$STD $FAST $PERF $DYLO $CC_3" "$VSRC_dir/apl"
+}
+################################################################################
+# build the erlang interface to APL
+#
+build_erlang()
+{
+  build_one "erlang" "$STD $ERLANG" "$VSRC_dir/.libs/erlang_APL_nif.so"
+}
+################################################################################
+# build the developer configuration.
+#
+build_develop()
+{
+  build_one "develop" "$STD $DEV" "$VSRC_dir/apl"
+  test_one "develop"
+}
+
+# build all relevant configurations
+{
+  echo "Build Summary:" > "$TOP_LOG_dir/summary.log"
+
+  for config in \
+      standard develop libxcb rational libapl parallel_bench erlang python
+      do build_$config
+  done
+
   echo
-  echo "$build_errors build errors"
-  echo "$missing_files missing files"
-  echo "$configs_bad configurations failed"
-  echo "$configs_good configurations succeeded"
+  echo  "$build_errors build errors"
+  echo "$missing_files missing files (build results)"
+  echo   "$configs_bad configurations failed"
+  echo  "$configs_good configurations succeeded"
+  echo   "$test_errors testcases failed"
 } >> "$TOP_LOG_dir/summary.log"
 
 cat "$TOP_LOG_dir/summary.log"
 
+   if [ -d /var/www/html ]
+   then echo "<!DOCTYPE html>
+<html>
+<head>
+  <title>Nighly Build Results for GNU APL</title>
+</head>
+<body>
+  <H1>Nighly Build Results for GNU APL</H1>
+  Date: $(date)<br>
+  $build_errors build errors<br>
+  $missing_files missing files (build results)<br>
+  $configs_bad configurations failed<br>
+  $configs_good configurations succeeded<br>
+  $test_errors testcases failed<br>
+</body>
+</html>
+" > /var/www/html/nightly_build_results.html
+   fi
+
 cd $START_dir     # undo all cds in this script
-stty sane         # in case some test failed badly
+stty sane         # in case some testcase failed badly
 

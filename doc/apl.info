@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-February 20, 2021
+March 30, 2021
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1129,48 +1129,58 @@ File: apl.info,  Node: Section 2.4,  Next: Section 2.5,  Prev: Section 2.3,  Up:
 ====================
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤,
-≥, and > (but not of = or ≠) are integer or real numbers, and that the
-argument of monadic ⍋ or ⍒ is a vector of integer or real numbers.  In
-contrast GNU APL also allows the comparison of characters and numbers or
-the comparison of complex numbers according to the following, more
-general, rules.
+≥, and > (but not of = or ≠) are integer or real numbers, and, as a
+consequence, that the argument of ⍋ or ⍒ is a vector of integer or real
+numbers.  In contrast GNU APL also allows the comparison of characters
+and numbers or the comparison of complex numbers according to the
+following, more general, rules.
 
-   Let A and B two APL values to be compared.  The first comparison
-below that succeeds (i.e.  returns a result) is then the result of
-comparing A and B.
+   Let A and B two APL values to be compared.  Then the final result of
+comparing A and B is the first decision (i.e.  A < B, A > B, or A = B)
+made when following the rules below:
 
-   1.  Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
+  1. Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
 
-   2.  Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa.
-The first different shape item decides.
+  2. Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa.
+     The first different shape item decides.
 
-   3.  Comparison of ravel elements: otherwise ⍴A and ⍴B are equal.  If
-all corresponding ravel elements of A and B are equal (i.e.  tolerantly
-equal within ⎕CT as defined in the ISO standard) then A = B. Otherwise
-let A1 and B1 the first corresponding ravel elements of A and B with
-A1≠B1.  If A1 < B1 then A < B and vice versa.  The comparison A1 < B1 is
-made according tho the following rules.
+  3. Comparison of ravel elements: at this point ⍴A ≡ ⍴B. If all
+     corresponding ravel elements of A and B are equal (i.e.  tolerantly
+     equal within ⎕CT as defined in the ISO standard) then A = B.
 
-   4.  Comparison by depth: if A1 is simple (a single character or
-number) and B1 is not (i.e.  B is nested) then A1 < B1 and vice versa.
-If A1 and B1 are both nested, then the above rules are applied
-recursively.  If both are simple then they are compared according to the
-rules below.
+     Otherwise let A1 and B1 the first corresponding ravel elements of A
+     and B with A1≠B1.  If A1 < B1 then A < B and vice versa.  The
+     comparison A1 < B1 is made according to the following rules 4.  -
+     7.  below.
 
-   5.  Comparison by Unicode: if A1 and B1 are both character values and
-(⎕UCS A1) < (⎕UCS B1) then A < B. And vice versa.
+  4. Comparison by depth:
 
-   6.  Comparison by type: If A1 is a character and B1 is numeric, then
-A < B. And vice versa.
+        • if A1 is simple (i.e.  A1 is a single character or number) and
+          B1 is nested then A1 < B1.  And vice versa.
 
-   7.  Comparison by numeric value: if A1 and B1 are both numeric values
-then:
+        • otherwise, If A1 and B1 are both nested, then the rules 1.  -
+          4.  are (recursively) applied to the corresponding ravel
+          elements of A and B.
 
-   7a.  Comparison by real part: if (9○A1) < (9○B1) then A < B. And vice
-versa.
+        • otherwise both A1 and B1 are simple and they are compared
+          according to the rules 5.  - 8.  below.
 
-   7a.  Comparison by imaginary part: otherwise if (11○A1) < (11○B1)
-then A < B. And vice versa.
+  5. Comparison by Unicode: if A1 and B1 are both character values and
+     (⎕UCS A1) < (⎕UCS B1) then A < B. And vice versa.
+
+  6. Comparison by type: If A1 is a character and B1 is numeric, then A
+     < B. And vice versa.
+
+  7. Comparison by numeric value: if A1 and B1 are both numeric values
+     then:
+
+        • Comparison by real part: if (9○A1) < (9○B1) then A < B. And
+          vice versa.
+
+        • Comparison by imaginary part: otherwise if (11○A1) < (11○B1)
+          then A < B. And vice versa.
+
+  8. Otherwise: A = B.
 
    Another way of describing the rules above is that the comparison of
 two values is comprised of sub-comparisons of certain properties of the
@@ -1204,8 +1214,8 @@ and then by their imaginary part and not, for example, first by their
 magnitude and then by their angle is that the chosen order gives more
 consistent results when comparing near-complex numbers or their true
 real companions.  For example, a magnitude first comparison of complex
-numbers would make ¯1 < ¯2J∈ for a near-complex ¯2J∈ but ¯1 > ¯2 for a
-true real ¯2.
+numbers would make ¯2 < ¯1 < ¯2J0E¯20 for the near-complex number
+¯2J0E¯20.
 
    *CAUTION*: The comparison of two strings (i.e.  nested character
 vectors) may give unexpected results because shorter strings come before
@@ -6127,62 +6137,62 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11439
-Node: Chapter 219978
-Node: Section 2.121822
-Node: Section 2.237982
-Node: Section 2.338741
-Node: Section 2.440028
-Node: Section 2.544107
-Node: Section 2.644280
-Node: Section 2.744910
-Node: Section 2.848863
-Node: Section 2.950398
-Node: Section 2.1052491
-Node: Section 2.1154275
-Node: Section 2.1256215
-Node: Section 2.1357156
-Node: Section 2.1457408
-Node: Section 2.1558815
-Node: Section 2.1668971
-Node: Section 2.1771489
-Node: Section 2.1878188
-Node: Section 2.1979633
-Node: Section 2.2085294
-Node: Section 2.2190328
-Node: Section 2.2293609
-Node: Section 2.2393900
-Node: Section 2.24104475
-Node: Section 2.25104747
-Node: Section 2.26111325
-Node: Section 2.27113782
-Node: Section 2.28114451
-Node: Section 2.29116110
-Node: Section 2.30119233
-Node: Section 2.31127093
-Node: Section 2.32128040
-Node: Section 2.33141602
-Node: Section 2.34151599
-Node: Section 2.35154703
-Node: Section 2.36156692
-Node: Section 2.37161117
-Node: Chapter 3182535
-Node: Chapter 4185038
-Node: Chapter 5186164
-Node: Section 5.1187701
-Node: Section 5.2188981
-Node: Section 5.3189341
-Node: Section 5.4189583
-Node: Section 5.5190245
-Node: Section 5.6190723
-Node: Section 5.7191495
-Node: Section 5.8191952
-Node: Chapter 6192354
-Node: Section 6.1192773
-Node: Section 6.2193460
-Node: Chapter 7194291
-Node: Section 7.1194794
-Node: Section 7.2220108
+Node: Chapter 11436
+Node: Chapter 219975
+Node: Section 2.121819
+Node: Section 2.237979
+Node: Section 2.338738
+Node: Section 2.440025
+Node: Section 2.544390
+Node: Section 2.644563
+Node: Section 2.745193
+Node: Section 2.849146
+Node: Section 2.950681
+Node: Section 2.1052774
+Node: Section 2.1154558
+Node: Section 2.1256498
+Node: Section 2.1357439
+Node: Section 2.1457691
+Node: Section 2.1559098
+Node: Section 2.1669254
+Node: Section 2.1771772
+Node: Section 2.1878471
+Node: Section 2.1979916
+Node: Section 2.2085577
+Node: Section 2.2190611
+Node: Section 2.2293892
+Node: Section 2.2394183
+Node: Section 2.24104758
+Node: Section 2.25105030
+Node: Section 2.26111608
+Node: Section 2.27114065
+Node: Section 2.28114734
+Node: Section 2.29116393
+Node: Section 2.30119516
+Node: Section 2.31127376
+Node: Section 2.32128323
+Node: Section 2.33141885
+Node: Section 2.34151882
+Node: Section 2.35154986
+Node: Section 2.36156975
+Node: Section 2.37161400
+Node: Chapter 3182818
+Node: Chapter 4185321
+Node: Chapter 5186447
+Node: Section 5.1187984
+Node: Section 5.2189264
+Node: Section 5.3189624
+Node: Section 5.4189866
+Node: Section 5.5190528
+Node: Section 5.6191006
+Node: Section 5.7191778
+Node: Section 5.8192235
+Node: Chapter 6192637
+Node: Section 6.1193056
+Node: Section 6.2193743
+Node: Chapter 7194574
+Node: Section 7.1195077
+Node: Section 7.2220391
 
 End Tag Table
 

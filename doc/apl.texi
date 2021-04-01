@@ -1221,44 +1221,74 @@ contains a description of all possible color settings.
 @node    Section 2.4
 @section Comparison Rules
 
-Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥, and
-> (but not of = or ≠) are integer or real numbers, and that the argument of
-monadic ⍋ or ⍒ is a vector of integer or real numbers. In contrast GNU APL
-also allows the comparison of characters and numbers or the comparison of
-complex numbers according to the following, more general, rules.
+Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥,
+and > (but not of = or ≠) are integer or real numbers, and, as a consequence,
+that the argument of ⍋ or ⍒ is a vector of integer or real numbers.
+In contrast GNU APL also allows the comparison of characters and numbers or
+the comparison of complex numbers according to the following, more general,
+rules.
 
-Let A and B two APL values to be compared. The first comparison below that
-succeeds (i.e. returns a result) is then the result of comparing A and B.
- 
-1. Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
+Let A and B two APL values to be compared. Then the final result of comparing
+A and B is the first decision (i.e. A < B, A > B, or A = B) made when
+following the rules below:
 
-2. Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa. The
-   first different shape item decides.
+@enumerate
+@item
+Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
 
-3. Comparison of ravel elements: otherwise ⍴A and ⍴B are equal. If all
-   corresponding ravel elements of A and B are equal (i.e. tolerantly equal
-   within ⎕CT as defined in the ISO standard) then A = B. Otherwise let A1
-   and B1 the first corresponding ravel elements of A and B with A1≠B1.
-   If A1 < B1 then A < B and vice versa. The comparison A1 < B1 is made
-   according tho the following rules.
+@item
+Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa. The
+first different shape item decides.
 
-4. Comparison by depth: if A1 is simple (a single character or number) and
-   B1 is not (i.e. B is nested) then A1 < B1 and vice versa. If A1 and B1 are
-   both nested, then the above rules are applied recursively. If both are simple
-   then they are compared according to the rules below.
+@item
+Comparison of ravel elements: at this point ⍴A ≡ ⍴B. If all
+corresponding ravel elements of A and B are equal (i.e. tolerantly equal
+within ⎕CT as defined in the ISO standard) then A = B.
 
-5. Comparison by Unicode: if A1 and B1 are both character values and
-   (⎕UCS A1) < (⎕UCS B1) then A < B. And vice versa.
+Otherwise let A1 and B1 the first corresponding ravel elements of A and B
+with A1≠B1. If A1 < B1 then A < B and vice versa. The comparison A1 < B1
+is made according to the following rules 4. - 7. below.
 
-6. Comparison by type: If A1 is a character and B1 is numeric, then A < B.
-   And vice versa.
+@item
+Comparison by depth:
 
-7. Comparison by numeric value: if A1 and B1 are both numeric values then:
+@itemize
+@item
+if A1 is simple (i.e. A1 is a single character or number) and
+B1 is nested then A1 < B1. And vice versa.
 
-7a. Comparison by real part: if (9○A1) < (9○B1) then A < B. And vice versa.
+@item
+otherwise, If A1 and B1 are both nested, then the rules 1. - 4. are
+(recursively) applied to the corresponding ravel elements of A and B.
 
-7a. Comparison by imaginary part: otherwise if (11○A1) < (11○B1) then A < B.
-    And vice versa.
+@item
+otherwise both A1 and B1 are simple and they are compared according to
+the rules 5. - 8. below.
+@end itemize
+
+@item
+Comparison by Unicode: if A1 and B1 are both character values and
+(⎕UCS A1) < (⎕UCS B1) then A < B. And vice versa.
+
+@item
+Comparison by type: If A1 is a character and B1 is numeric, then A < B.
+And vice versa.
+
+@item
+Comparison by numeric value: if A1 and B1 are both numeric values then:
+
+@itemize
+@item
+Comparison by real part: if (9○A1) < (9○B1) then A < B. And vice versa.
+
+@item
+Comparison by imaginary part: otherwise if (11○A1) < (11○B1) then A < B.
+And vice versa.
+@end itemize
+
+@item
+Otherwise: A = B.
+@end enumerate
 
 Another way of describing the rules above is that the comparison of two values
 is comprised of sub-comparisons of certain properties of the values in the
@@ -1294,9 +1324,8 @@ The reason for comparing complex numbers first by their real parts and then
 by their imaginary part and not, for example, first by their magnitude and
 then by their angle is that the chosen order gives more consistent results
 when comparing near-complex numbers or their true real companions. For
-example, a magnitude first comparison of complex numbers would make ¯1 < ¯2J∈
-for a near-complex ¯2J∈ but ¯1 > ¯2 for a true real ¯2.
-
+example, a magnitude first comparison of complex numbers would make
+¯2 < ¯1 < ¯2J0E¯20 for the near-complex number ¯2J0E¯20.
 
 @strong{CAUTION}: The comparison of two strings (i.e. nested character
 vectors) may give unexpected results because shorter strings come before
