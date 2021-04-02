@@ -280,15 +280,13 @@ cat "$TOP_LOG_dir/summary.log"
   <title>Nighly Build Results for GNU APL</title>
 </head>
 <body>
-  <H1>Nighly Build Results for GNU APL</H1>
-  Date: $(date)<br>
+  <H1><center>Nighly Build Results for GNU APL</center></H1>
+  Date: $(date)<br><br>
   $build_errors build errors<br>
   $missing_files missing files (build results)<br>
   $configs_bad configurations failed<br>
   $configs_good configurations succeeded<br>
   $test_errors testcases failed<br>
-</body>
-</html>
 " > /var/www/html/nightly_build_results.html
    fi
 
