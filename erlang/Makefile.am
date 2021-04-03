@@ -9,6 +9,8 @@ if WANT_ERLANG
 # Ubuntu but may require manual fixes on other platforms.
 #
 FILES = apl.beam apl_example.beam erlang_APL_nif.so
+noinst_LIBRARIES = erlang_APL_nif.so
+erlang_APL_nif_so_SOURCES = erlang_APL_nif.c
 
 CLEANFILES = ${FILES}
 

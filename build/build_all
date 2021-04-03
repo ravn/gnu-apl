@@ -47,6 +47,7 @@ declare -i missing_files=0
 declare -i configs_bad=0
 declare -i configs_good=0
 declare -i test_errors=0
+bad_configs=""
 
 # remove old build results and start a fresh summary file
 #
@@ -127,6 +128,7 @@ build_one()
          echo "**** no file $3 after building $1" >> $summ
          missing_files=$((missing_files+1))
          configs_bad=$((configs_bad+1))
+         bad_configs="$bad_configs $1"
          OK_failed="FAILED (make target missing)"
       fi
       echo "    build $1: OK ($secs seconds)" >> $summ
@@ -266,7 +268,7 @@ build_develop()
   echo
   echo  "$build_errors build errors"
   echo "$missing_files missing files (build results)"
-  echo   "$configs_bad configurations failed"
+  [ ! -z $bad_configs ] && echo "$configs_bad configurations failed: $bad_configs"
   echo  "$configs_good configurations succeeded"
   echo   "$test_errors testcases failed"
 } >> "$TOP_LOG_dir/summary.log"
