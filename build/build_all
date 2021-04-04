@@ -138,6 +138,7 @@ build_one()
        echo "!!! configure options were: $2"
        build_errors=$((build_errors+1))
        configs_bad=$((configs_bad+1))
+       bad_configs="$bad_configs $1"
        OK_failed="FAILED (make failed)"
    fi
    echo "    configuration: \"$1\" done." >> $summ

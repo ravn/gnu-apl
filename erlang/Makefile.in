@@ -280,7 +280,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = erlang_APL_nif.c README apl_example.erl
-distdir = $(pkglibdir)
+distdir = $(top_srcdir)/erlang
 
 # for some reason, using libtool causes Erlang to try to load the file
 # erlang_APL_nif.so.so instead of erlang_APL_nif.so. We therefore do not

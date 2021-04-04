@@ -1,5 +1,5 @@
 EXTRA_DIST = erlang_APL_nif.c README apl_example.erl
-distdir=$(pkglibdir)
+distdir=$(top_srcdir)/erlang
 
 if WANT_ERLANG
 
@@ -9,8 +9,6 @@ if WANT_ERLANG
 # Ubuntu but may require manual fixes on other platforms.
 #
 FILES = apl.beam apl_example.beam erlang_APL_nif.so
-noinst_LIBRARIES = erlang_APL_nif.so
-erlang_APL_nif_so_SOURCES = erlang_APL_nif.c
 
 CLEANFILES = ${FILES}
 
