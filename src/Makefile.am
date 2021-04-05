@@ -218,8 +218,9 @@ lib_gnu_apl_la_CXXFLAGS += -D_FORTIFY_SOURCE=2
 lib_gnu_apl_la_CXXFLAGS += -fwrapv
 lib_gnu_apl_la_CXXFLAGS += -fPIC
 lib_gnu_apl_la_CXXFLAGS += -fstack-protector
-lib_gnu_apl_la_CXXFLAGS += --param=ssp-buffer-size=4 
-lib_gnu_apl_la_CXXFLAGS += -I/usr/include/python3.4m
+lib_gnu_apl_la_CXXFLAGS += --param=ssp-buffer-size=4
+lib_gnu_apl_la_CXXFLAGS += -I/usr/include/python3.4m   # server57
+lib_gnu_apl_la_CXXFLAGS += -I/usr/include/python3.6m   # server68
 
 else
 
