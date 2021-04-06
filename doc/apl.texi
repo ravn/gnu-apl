@@ -296,6 +296,25 @@ do not echo stdin to stdout. Almost a must for scripting (unless you
 troubleshoot a script).
 
 @item
+@option{--to_COUT}
+
+normally GNU APL writes its output to stderr (i.e. file descriptor 2) so that,
+when GNU APL is started in a script, the output of the script appears on stdout
+(i.e. file descriptor 1) while the output of GNU APL appears on stderr.
+
+This option redirects the stderr output of GNU APL to stdout. The same effect
+can be achieved with the option "OUTPUT-TO-COUT   Yes" in a preferences file.
+
+@item
+@option{--tcp_port PORT}
+
+this option starts GNU APL as server that listens on TCP port PORT.
+Every TCP connection accepted by the server forks a new GNU APL instance
+which has its stdin, stdout, and stderr redirected to the TCP connection.
+
+WARNING: This option is dangerous if PORT is directly exposed to the internet!
+
+@item
 @option{--noCONT}
 
 do not load a SETUP or CONTINUE workspace on start-up.

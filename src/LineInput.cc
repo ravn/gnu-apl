@@ -246,8 +246,9 @@ LineHistory::add_line(const UCS_string & line)
 int blanks = 0;
    while (blanks < line.size() && line[blanks] <= UNI_SPACE)   ++blanks;
 
-   // repeated cut-and-paste of entire lines increases the indentation every time
-   // due to the APL input prompt). we therefore limit this effect to 6 blanks.
+   // a repeated cut-and-paste of entire lines increases the indentation every
+   // time due to the APL input prompt). We therefore limit this effect
+   // to 6 blanks.
    //
 UCS_string line1;
    if (blanks)

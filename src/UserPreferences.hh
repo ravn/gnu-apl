@@ -71,7 +71,10 @@ struct UserPreferences
      user_profile(0),
      wait_ms(0),
      WINCH_sets_pw(false),
-     discard_indentation(false)
+     discard_indentation(false),
+     output_to_cout(false),
+     tcp_port(0),
+     tcp_websocket(false)
    { gettimeofday(&session_start, 0); }
 
    /// read a \b preference file and update parameters set there
@@ -227,6 +230,15 @@ struct UserPreferences
 
    /// true if leading spaces in the ∇-editor shall be dropped
    bool discard_indentation;
+
+   /// true if output shall go to cout, otherwise to cerr
+   bool output_to_cout;
+
+   /// TCP port to be used (instead of stdin/stderr)
+   int tcp_port;
+
+   /// enable websocket protocol on the TCP port
+   bool tcp_websocket;
 
 protected:
    /// decode a byte in a preferences file. The byte can be given as ASCII name

@@ -232,9 +232,7 @@ build_libapl()
 #
 build_python()
 {
-CXXFLAGS="/usr/include/python3.5m"
-build_one "python" "$STD $PYTHON" "$VSRC_dir/.libs/lib_gnu_apl.so"
-CXXFLAGS=""
+  build_one "python" "$STD $PYTHON" "$VSRC_dir/.libs/lib_gnu_apl.so"
 }
 ################################################################################
 # build apl for parallel benchmarking

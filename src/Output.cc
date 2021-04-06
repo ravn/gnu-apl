@@ -62,7 +62,8 @@ ostream UERR(&UERR_filebuf);
 extern ostream & get_CERR();
 ostream & get_CERR()
 {
-   return ErrOut::used ? CERR : cerr;
+   if (uprefs.output_to_cout)       return ErrOut::used ? CERR : cout;
+   else                             return ErrOut::used ? CERR : cerr;
 };
 
 Output::ColorMode Output::color_mode = COLM_UNDEF;
@@ -132,7 +133,8 @@ ErrOut::overflow(int c)
 PERFORMANCE_START(cerr_perf)
 
    Output::set_color_mode(Output::COLM_ERROR);
-   cerr << char(c);
+   if (uprefs.output_to_cout)   cout << char(c);
+   else                         cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;

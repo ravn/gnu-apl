@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-March 30, 2021
+April 6, 2021
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -248,6 +248,27 @@ GNU APL understands the following command line options:
 
      do not echo stdin to stdout.  Almost a must for scripting (unless
      you troubleshoot a script).
+
+   • ‘--to_COUT’
+
+     normally GNU APL writes its output to stderr (i.e.  file descriptor
+     2) so that, when GNU APL is started in a script, the output of the
+     script appears on stdout (i.e.  file descriptor 1) while the output
+     of GNU APL appears on stderr.
+
+     This option redirects the stderr output of GNU APL to stdout.  The
+     same effect can be achieved with the option "OUTPUT-TO-COUT Yes" in
+     a preferences file.
+
+   • ‘--tcp_port PORT’
+
+     this option starts GNU APL as server that listens on TCP port PORT.
+     Every TCP connection accepted by the server forks a new GNU APL
+     instance which has its stdin, stdout, and stderr redirected to the
+     TCP connection.
+
+     WARNING: This option is dangerous if PORT is directly exposed to
+     the internet!
 
    • ‘--noCONT’
 
@@ -6137,62 +6158,62 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11436
-Node: Chapter 219975
-Node: Section 2.121819
-Node: Section 2.237979
-Node: Section 2.338738
-Node: Section 2.440025
-Node: Section 2.544390
-Node: Section 2.644563
-Node: Section 2.745193
-Node: Section 2.849146
-Node: Section 2.950681
-Node: Section 2.1052774
-Node: Section 2.1154558
-Node: Section 2.1256498
-Node: Section 2.1357439
-Node: Section 2.1457691
-Node: Section 2.1559098
-Node: Section 2.1669254
-Node: Section 2.1771772
-Node: Section 2.1878471
-Node: Section 2.1979916
-Node: Section 2.2085577
-Node: Section 2.2190611
-Node: Section 2.2293892
-Node: Section 2.2394183
-Node: Section 2.24104758
-Node: Section 2.25105030
-Node: Section 2.26111608
-Node: Section 2.27114065
-Node: Section 2.28114734
-Node: Section 2.29116393
-Node: Section 2.30119516
-Node: Section 2.31127376
-Node: Section 2.32128323
-Node: Section 2.33141885
-Node: Section 2.34151882
-Node: Section 2.35154986
-Node: Section 2.36156975
-Node: Section 2.37161400
-Node: Chapter 3182818
-Node: Chapter 4185321
-Node: Chapter 5186447
-Node: Section 5.1187984
-Node: Section 5.2189264
-Node: Section 5.3189624
-Node: Section 5.4189866
-Node: Section 5.5190528
-Node: Section 5.6191006
-Node: Section 5.7191778
-Node: Section 5.8192235
-Node: Chapter 6192637
-Node: Section 6.1193056
-Node: Section 6.2193743
-Node: Chapter 7194574
-Node: Section 7.1195077
-Node: Section 7.2220391
+Node: Chapter 11435
+Node: Chapter 220779
+Node: Section 2.122623
+Node: Section 2.238783
+Node: Section 2.339542
+Node: Section 2.440829
+Node: Section 2.545194
+Node: Section 2.645367
+Node: Section 2.745997
+Node: Section 2.849950
+Node: Section 2.951485
+Node: Section 2.1053578
+Node: Section 2.1155362
+Node: Section 2.1257302
+Node: Section 2.1358243
+Node: Section 2.1458495
+Node: Section 2.1559902
+Node: Section 2.1670058
+Node: Section 2.1772576
+Node: Section 2.1879275
+Node: Section 2.1980720
+Node: Section 2.2086381
+Node: Section 2.2191415
+Node: Section 2.2294696
+Node: Section 2.2394987
+Node: Section 2.24105562
+Node: Section 2.25105834
+Node: Section 2.26112412
+Node: Section 2.27114869
+Node: Section 2.28115538
+Node: Section 2.29117197
+Node: Section 2.30120320
+Node: Section 2.31128180
+Node: Section 2.32129127
+Node: Section 2.33142689
+Node: Section 2.34152686
+Node: Section 2.35155790
+Node: Section 2.36157779
+Node: Section 2.37162204
+Node: Chapter 3183622
+Node: Chapter 4186125
+Node: Chapter 5187251
+Node: Section 5.1188788
+Node: Section 5.2190068
+Node: Section 5.3190428
+Node: Section 5.4190670
+Node: Section 5.5191332
+Node: Section 5.6191810
+Node: Section 5.7192582
+Node: Section 5.8193039
+Node: Chapter 6193441
+Node: Section 6.1193860
+Node: Section 6.2194547
+Node: Chapter 7195378
+Node: Section 7.1195881
+Node: Section 7.2221195
 
 End Tag Table
 

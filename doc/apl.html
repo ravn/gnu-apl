@@ -243,7 +243,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>March 30, 2021
+<p>April 6, 2021
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -482,6 +482,23 @@ copy the input line (after editing) to stdout. For creating session logs.
 
 <p>do not echo stdin to stdout. Almost a must for scripting (unless you
 troubleshoot a script).
+</p>
+</li><li> <samp>--to_COUT</samp>
+
+<p>normally GNU APL writes its output to stderr (i.e. file descriptor 2) so that,
+when GNU APL is started in a script, the output of the script appears on stdout
+(i.e. file descriptor 1) while the output of GNU APL appears on stderr.
+</p>
+<p>This option redirects the stderr output of GNU APL to stdout. The same effect
+can be achieved with the option &quot;OUTPUT-TO-COUT   Yes&quot; in a preferences file.
+</p>
+</li><li> <samp>--tcp_port PORT</samp>
+
+<p>this option starts GNU APL as server that listens on TCP port PORT.
+Every TCP connection accepted by the server forks a new GNU APL instance
+which has its stdin, stdout, and stderr redirected to the TCP connection.
+</p>
+<p>WARNING: This option is dangerous if PORT is directly exposed to the internet!
 </p>
 </li><li> <samp>--noCONT</samp>
 

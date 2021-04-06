@@ -84,13 +84,15 @@ UserPreferences::usage(const char * prog)
 #endif // WINDOWS
 "    --cfg                show ./configure options used and exit\n"
 "    --noCIN              do not echo input (for scripting)\n"
-"    --CPU_limit_secs sec set CPU time limit to sec seconds\n"
+"    --CPU_limit_secs sec set CPU time limit to 'sec' seconds\n"
 "    --echoCIN            echo (final) input to COUT\n"
 "    --rawCIN             do not emit escape sequences\n"
+"    --to_COUT            redirect CERR to COUT (like 2>&1 in bash)\n"
+"    --tcp_port port      redirect CIN/COUT/CERR to/from TCP port 'port')\n"
 "    --[no]Color          start with ]XTERM ON [OFF])\n"
 "    --noCONT             do not )LOAD CONTINUE or SETUP workspace on startup\n"
 "    --emacs              run in (classical) emacs mode\n"
-"    --emacs_arg arg      run in emacs mode with argument arg\n"
+"    --emacs_arg arg      run in emacs mode with argument 'arg'\n"
 "    --eval expr          evaluate APL line expr and exit\n"
 "    --gpl                show license (GPL) and exit\n"
 "    -L wsname            )LOAD wsname (and not SETUP or CONTINUE) on startup\n"
@@ -490,6 +492,12 @@ UserPreferences::parse_argv_2(bool logit)
               continue;
             }
 
+         if (!strcmp(opt, "--to_COUT"))
+            {
+              output_to_cout = false;
+              continue;
+            }
+
          if (!strcmp(opt, "--noColor"))
             {
               do_Color = false;
@@ -638,7 +646,7 @@ UserPreferences::parse_argv_2(bool logit)
               IO_Files::need_total = true;
               for (; a < expanded_argv.size(); ++a)   // inner for
                   {
-                    if (!strcmp(expanded_argv[a], "--"))  // end of -T arguments
+                    if (!strcmp(expanded_argv[a], "--"))  // end of -T args
                        {
                          ++a;   // skip --
                          break;           // inner for
@@ -676,16 +684,39 @@ UserPreferences::parse_argv_2(bool logit)
               IO_Files::test_mode = IO_Files::TestMode(mode);
               continue;
             }
+
          if (!strcmp(opt, "--TR"))
             {
               randomize_testfiles = true;
               continue;
             }
+
          if (!strcmp(opt, "--TS"))
             {
               append_summary = true;
               continue;
             }
+
+         if (!strcmp(opt, "--tcp_port"))
+            {
+              ++a;
+              if (!val)
+                 {
+                   CERR << "--tcp_port without port number (>0)" << endl;
+                   exit(a);
+                 }
+              tcp_port = atoi(val);
+              user_do_svars = system_do_svars = false;   // aka. --noSV
+              do_not_echo = true;                        // aka. --noCIN
+              continue;
+            }
+
+         if (!strcmp(opt, "--tcp_websocket"))
+            {
+              tcp_websocket = true;
+              continue;
+            }
+
          if (!strcmp(opt, "-v") || !strcmp(opt, "--version"))
             {
               show_version(cout);
@@ -1384,6 +1415,11 @@ int file_profile = 0;   // the current profile in the preferences file
          else if (!strcasecmp(opt, "DISCARD-INDENTATION"))
             {
               discard_indentation = yes;
+            }
+
+         else if (!strcasecmp(opt, "OUTPUT-TO-COUT"))
+            {
+              output_to_cout = yes;
             }
 
          // security facilities...

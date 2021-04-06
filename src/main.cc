@@ -31,6 +31,7 @@
 #include <string.h>
 #include <termios.h>
 
+#include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
@@ -265,6 +266,100 @@ const int left_pad = (80 - len)/2;
        }
 }
 //-----------------------------------------------------------------------------
+void
+remap_stdio()
+{
+   if (uprefs.tcp_port <= 0)   return;
+
+const int listen_socket = socket(AF_INET, SOCK_STREAM, 0);
+   if (listen_socket == -1)
+      {
+        perror("socket() failed");
+        exit(1);
+      }
+
+sockaddr_in local;
+   memset(&local, 0, sizeof(local));
+   local.sin_family = AF_INET;
+   local.sin_addr.s_addr = htonl(0x7F000001);   // localhost (127.0.0.1)
+   local.sin_port = htons(uprefs.tcp_port);
+
+   // fix bind() error when listening socket is openend too quickly
+   {
+     const int yes = 1;
+     if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR,
+                     &yes, sizeof(yes)) < 0)
+        {
+          perror("setsockopt(SO_REUSEADDR) failed");
+        }
+
+      // continue, since a failed setsockopt() is sort of OK here.
+   }
+
+   if (bind(listen_socket, (const sockaddr *)&local, sizeof(local)))
+      {
+        perror("bind() failed");
+        exit(1);
+      }
+
+   if (listen(listen_socket, 10))
+      {
+        perror("listen() failed");
+        exit(1);
+      }
+
+   0 && CERR << "The GNU APL server is listening on TCP port "
+             << uprefs.tcp_port << endl;
+
+   for (;;)   // connection server loop
+       {
+         sockaddr_in remote;
+         socklen_t remote_len = sizeof(remote);
+         const int connection = accept(listen_socket,
+                                       reinterpret_cast<sockaddr *>(&remote),
+                                       &remote_len);
+         if (connection == -1)
+            {
+              perror("accept() failed");
+              exit(1);
+            }
+
+         0 && CERR << "GNU APL server got TCP connction from "
+                   << (ntohl(remote.sin_addr.s_addr) >> 24 & 0xFF) << "."
+                   << (ntohl(remote.sin_addr.s_addr) >> 16 & 0xFF) << "."
+                   << (ntohl(remote.sin_addr.s_addr) >>  8 & 0xFF) << "."
+                   << (ntohl(remote.sin_addr.s_addr) >>  0 & 0xFF) << " port "
+                   << ntohs(remote.sin_port)                       << endl;
+
+         // fork() and let the client return while the server remains in this
+         // server loop for the next connection.
+         //
+         const pid_t fork_result = fork();
+         if (fork_result == -1)   // fork() failed
+            {
+              close(connection);
+              perror("fork() failed");
+              exit(1);
+            }
+
+         if (fork_result)   // parent (server)
+            {
+              close(connection);
+              continue;
+            }
+
+         // child (client)
+         //
+         close(listen_socket);
+         dup2(connection, STDIN_FILENO);
+         dup2(connection, STDOUT_FILENO);
+         dup2(connection, STDERR_FILENO);
+         close(connection);
+         return;
+       }
+
+}
+//-----------------------------------------------------------------------------
 /// initialize the interpreter
 int
 init_apl(int argc, const char * argv[])
@@ -290,8 +385,9 @@ const bool log_startup = uprefs.parse_argv_1();
    uprefs.read_threshold_file(true,  log_startup);  // dito parallel_thresholds
    uprefs.read_threshold_file(false, log_startup);  // dito parallel_thresholds
 
-   // struct sigaction differs between GNU/Linux and other systems, which causes
-   // compile errors for direct curly bracket assignment on some systems
+   // NOTE: struct sigaction differs between GNU/Linux and other systems,
+   // which causes compile errors for direct curly bracket assignment on
+   // some systems.
    //
    // We therefore memset everything to 0 and then set the handler (which
    // should compile on GNU/Linux and also on other systems.
@@ -315,6 +411,7 @@ const bool log_startup = uprefs.parse_argv_1();
    sigaction(SIGSEGV,  &new_SEGV_action,      &old_SEGV_action);
    sigaction(SIGTERM,  &new_TERM_action,      &old_TERM_action);
    sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
+   signal(SIGCHLD, SIG_IGN);   // do not create zombies
    if (uprefs.WINCH_sets_pw)
       {
         sigaction(SIGWINCH, &new_WINCH_action, &old_WINCH_action);
@@ -332,6 +429,11 @@ const bool log_startup = uprefs.parse_argv_1();
 #endif
 
    uprefs.parse_argv_2(log_startup);
+
+   // maybe use TCP connection instead of stdin/stderr. This function blocks
+   // until a TCP connections was received.
+   //
+   remap_stdio();
 
    if (uprefs.CPU_limit_secs)
       {
