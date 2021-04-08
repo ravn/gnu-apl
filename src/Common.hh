@@ -47,6 +47,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>   // for gettimeofday()
 
 #ifndef RLIM_INFINITY   // Raspberry
 #define RLIM_INFINITY (~rlim_t(0))
