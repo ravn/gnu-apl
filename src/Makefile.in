@@ -118,8 +118,8 @@ host_triplet = @host@
 @POSTGRES_TRUE@	sql/PostgresConnection.hh \
 @POSTGRES_TRUE@	sql/PostgresProvider.cc sql/PostgresProvider.hh
 @WANT_LIBAPL_TRUE@am__append_11 = libapl.la
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
@@ -325,9 +325,8 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-ValueHistory.lo lib_gnu_apl_la-Workspace.lo \
 	lib_gnu_apl_la-static_Objects.lo $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(am__objects_6) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS = $(am__objects_6) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
 lib_gnu_apl_la_OBJECTS = $(am_lib_gnu_apl_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -337,8 +336,8 @@ lib_gnu_apl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) \
 	$(lib_gnu_apl_la_LDFLAGS) $(LDFLAGS) -o $@
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_rpath = -rpath \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(pkglibdir)
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_rpath = -rpath \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(pkglibdir)
 libapl_la_LIBADD =
 am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	../config.h APL_Float_as_class.hh APL_types.hh Archive.cc \
@@ -634,9 +633,8 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
 	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
 	$(am__objects_17)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@am_apl_OBJECTS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	apl-main.$(OBJEXT) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(am__objects_18)
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@am_apl_OBJECTS = apl-main.$(OBJEXT) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(am__objects_18)
 am__EXTRA_apl_SOURCES_DIST = Plot_gtk.cc Plot_xcb.cc
 apl_OBJECTS = $(am_apl_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -1007,6 +1005,7 @@ common_SOURCES = $(plot_SOURCES) ../buildtag.hh ../config.h \
 	$(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
+@WANT_ERLANG_TRUE@@WANT_LIBAPL_FALSE@pkginclude_HEADERS = libapl.h Error.def
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 @WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version
@@ -1016,29 +1015,29 @@ pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
 @WANT_LIBAPL_TRUE@libapl_la_CXXFLAGS = $(common_CXXFLAGS) \
 @WANT_LIBAPL_TRUE@	$(GCOV_WANTED) $(GPROF_WANTED) \
 @WANT_LIBAPL_TRUE@	$(CXX_RDYNAMIC)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_SOURCES = $(common_SOURCES) python_apl.cc
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_LDFLAGS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(common_LDFLAGS) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-avoid-version
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_CXXFLAGS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(common_CXXFLAGS) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GCOV_WANTED) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GPROF_WANTED) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(CXX_RDYNAMIC) -DNDEBUG \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-D_FORTIFY_SOURCE=2 \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fwrapv -fPIC \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fstack-protector \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	--param=ssp-buffer-size=4 \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.5m \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.6m \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	# server68
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_SOURCES = main.cc $(common_SOURCES)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_CXXFLAGS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(common_CXXFLAGS) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GCOV_WANTED) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GPROF_WANTED) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(CXX_RDYNAMIC)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_SOURCES = $(common_SOURCES) python_apl.cc
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_LDFLAGS = $(common_LDFLAGS) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-avoid-version
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_CXXFLAGS = $(common_CXXFLAGS) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GCOV_WANTED) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GPROF_WANTED) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(CXX_RDYNAMIC) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-DNDEBUG \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-D_FORTIFY_SOURCE=2 \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fwrapv \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fPIC \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fstack-protector \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	--param=ssp-buffer-size=4 \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.5m \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.6m \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	# \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	server68
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_SOURCES = main.cc $(common_SOURCES)
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_CXXFLAGS = $(common_CXXFLAGS) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GCOV_WANTED) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GPROF_WANTED) \
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(CXX_RDYNAMIC)
+@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
 apl_LDADD = $(LIBS)
 all: all-recursive
 

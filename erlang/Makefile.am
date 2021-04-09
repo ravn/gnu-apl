@@ -8,7 +8,7 @@ endif
 pkglib_LTLIBRARIES = liberlang_APL_nif.la
 liberlang_APL_nif_la_SOURCES = erlang_APL_nif.c README apl_example.erl
 EXTRA_liberlang_APL_nif_la_SOURCES = apl.erl apl_example.erl
-liberlang_APL_nif_la_CFLAGS = $(AM_CFLAGS) -fpic  -shared
+liberlang_APL_nif_la_CFLAGS = $(AM_CFLAGS) -I $(abs_top_srcdir) -fpic  -shared
 liberlang_APL_nif_la_LDFLAGS = -avoid-version -export-dynamic -E
 
 # for some reason, using libtool causes Erlang to try to load the file

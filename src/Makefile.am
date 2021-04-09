@@ -205,6 +205,10 @@ libapl_la_CXXFLAGS = $(common_CXXFLAGS)
 libapl_la_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
 
 else
+if WANT_ERLANG
+pkginclude_HEADERS = libapl.h Error.def
+else
+
 if WANT_PYTHON
 
 pkglib_LTLIBRARIES += lib_gnu_apl.la
@@ -230,6 +234,7 @@ apl_CXXFLAGS = $(common_CXXFLAGS)
 apl_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
 apl_LDFLAGS = $(common_LDFLAGS)
 
+endif
 endif
 endif
 
