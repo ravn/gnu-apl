@@ -20,7 +20,7 @@ FILES = apl.beam apl_example.beam
 
 CLEANFILES = ${FILES}
 
-all: apl.beam apl_example.beam erlang_APL_nif.so
+all: apl.beam apl_example.beam .libs/erlang_APL_nif.so
 .erl.beam:
 	erlc $<
 
