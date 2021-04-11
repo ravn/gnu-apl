@@ -136,7 +136,7 @@ struct UserPreferences
    bool daemon;
 
 #define sec_def(X) \
-   bool X;   ///< true if X is disabled dor security reasons
+   bool X;   ///< true if X is disabled for security reasons
 #include "Security.def"
 
    /// load workspace CONTINUE on start-up

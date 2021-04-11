@@ -32,16 +32,16 @@ all: makefile.h
 makefile.h: Makefile
 
 buildtag.hh: Makefile buildtag.sh
-	source ${top_srcdir}/buildtag.sh
+	. ${top_srcdir}/buildtag.sh
 	touch $@
 
-# doxygen documentation
+# produce doxygen documentation
 #
 .PHONY:	DOXY
 DOXY:
 	doxygen
 
-# source and binary RPMs
+# build source and binary RPMs
 #
 .PHONY:	RPM
 RPM:	DIST all
@@ -51,7 +51,7 @@ RPM:	DIST all
 	cp rpm/SRPMS/$(PACKAGE)-$(PACKAGE_VERSION)-0.src.rpm  ftp-upload/
 	cp rpm/RPMS/*/$(PACKAGE)-$(PACKAGE_VERSION)-0.*.rpm   ftp-upload/
 
-# source and binary Debian packages
+# build source and binary Debian packages
 #
 .PHONY:	DEB
 DEB:	DIST
@@ -96,7 +96,7 @@ EXPO:
 	tools/check_src
 	svn -m "auto-commit by make EXPO, local SVN: `svnversion`" commit
 	svn update
-	source ./buildtag.sh
+	. ./buildtag.sh
 	svn -m "auto-commit by make EXPO" commit
 	./configure --disable-maintainer-mode
 	make all
@@ -109,7 +109,7 @@ EXPO:
 .PHONY:	EXPO1
 EXPO1:
 	tools/check_src
-	source buildtag.sh
+	. buildtag.sh
 	./configure --disable-maintainer-mode
 	make
 	make dist

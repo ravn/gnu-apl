@@ -707,7 +707,8 @@ UserPreferences::parse_argv_2(bool logit)
                  }
               tcp_port = atoi(val);
               user_do_svars = system_do_svars = false;   // aka. --noSV
-              do_not_echo = true;                        // aka. --noCIN
+              raw_cin = true;                            // aka. --rawCIN
+         //   do_not_echo = true;                        // aka. --noCIN
               continue;
             }
 

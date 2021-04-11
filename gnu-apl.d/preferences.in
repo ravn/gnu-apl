@@ -433,6 +433,7 @@ Profile 1
   disable_native_functions  yes    # disable A ⎕FX B (native fnctions)
   disable_Quad_PLOT         yes    # disable ⎕PLOT
   disable_Quad_SQL          yes    # disable ⎕SQL
+  disable_SAVE_command      yes    # disable )SAVE and )DUMP ws
 
 # a profile suitable for the web sockets stuff shipped with GNU APL
 Profile 2
@@ -444,4 +445,11 @@ UERR-SEQUENCE          E2 91 A1   // ② like CERR
 RESET-SEQUENCE         //
 CLEAR-EOL-SEQUENCE     //
 CLEAR-EOS-SEQUENCE     //
+
+  disable_Quad_GTK          yes    # disable ⎕cwGTK
+  disable_Quad_FIO          no     # do not disable ⎕FIO
+  disable_native_functions  yes    # disable A ⎕FX B (native fnctions)
+  disable_Quad_PLOT         yes    # disable ⎕PLOT
+  disable_Quad_SQL          yes    # disable ⎕SQL
+  disable_SAVE_command      yes    # disable )SAVE and )DUMP ws
 
