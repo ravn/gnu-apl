@@ -42,6 +42,7 @@
 #include "Prefix.hh"
 #include "Quad_FX.hh"
 #include "Quad_TF.hh"
+#include "Security.hh"
 #include "StateIndicator.hh"
 #include "Svar_DB.hh"
 #include "Symbol.hh"
@@ -912,6 +913,8 @@ void
 Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
                   bool html, bool silent)
 {
+   CHECK_SECURITY(disable_SAVE_command);
+
    // Command is:
    //
    // )DUMP
@@ -1914,6 +1917,8 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
 void
 Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
 {
+   CHECK_SECURITY(disable_SAVE_command);
+
    // )SAVE
    // )SAVE workspace
    // )SAVE lib workspace
