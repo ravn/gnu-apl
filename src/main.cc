@@ -297,7 +297,7 @@ sockaddr_in local;
       // continue, since a failed setsockopt() is sort of OK here.
    }
 
-   if (bind(listen_socket, (const sockaddr *)&local, sizeof(local)))
+   if (::bind(listen_socket, (const sockaddr *)&local, sizeof(local)))
       {
         perror("bind() failed");
         exit(1);
@@ -316,7 +316,7 @@ sockaddr_in local;
        {
          sockaddr_in remote;
          socklen_t remote_len = sizeof(remote);
-         const int connection = accept(listen_socket,
+         const int connection = ::accept(listen_socket,
                                        reinterpret_cast<sockaddr *>(&remote),
                                        &remote_len);
          if (connection == -1)

@@ -713,7 +713,7 @@ do
    if test -f "$f/buildtag.sh"
    then
       apl_top="$f"
-      source "$f/buildtag.sh"
+      . "$f/buildtag.sh"
       abs_apl_top=$(readlink -f "$apl_top")
    fi
 done
