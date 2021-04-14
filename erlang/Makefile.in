@@ -713,7 +713,7 @@ uninstall-am: uninstall-pkglibLTLIBRARIES
 .PRECIOUS: Makefile
 
 
-@WANT_ERLANG_TRUE@all: apl.beam apl_example.beam erlang_APL_nif.so
+@WANT_ERLANG_TRUE@all: apl.beam apl_example.beam
 @WANT_ERLANG_TRUE@.erl.beam:
 @WANT_ERLANG_TRUE@	erlc $<
 
