@@ -2,11 +2,12 @@
 
 # this script builds different GNU APL variants and tests some of them
 
-# figure and normalize some directory names:
+# First of all, figure and normalize some directory names:
 #
 # START_dir:
 #    the current directory from which this script was called.
-#    Used to cd back when all is done.
+#    Used to cd back when all is done. In a nightly build, START_dir is
+#    probably /etc/cron.daily.
 #
 # TOP_BUILD_dir:
 #    the top-level directory that contains this script. The different
@@ -27,10 +28,11 @@
 #    configuration. For example: the VSRC_dir for configuration "standard" is:
 #    $TOP_BUILD_dir/build/builddir_standard/src
 #
-START_dir=$(pwd)
+START_dir=$(pwd)      # e.g. /etc/cron.daily
 
-cd $(dirname $0)
+cd $(dirname $0)      # e.g. /root/apl-1.8
 TOP_BUILD_dir=$(pwd)
+SVN_VERSION=$(svnversion)
 
 # NOTE: -j8 fails with out of memory on small hosts (as used for nightly builds)
 J8="-j8"
@@ -97,6 +99,8 @@ build_one()
      ../../configure $2
      set +o xtrace
    } > "$Logfile" 2>&1
+
+   cp ../../buildtag.hh .
 
    Logfile="$TOP_LOG_dir/build-$1.log"
    echo "running make $J8 all for configuration \"$1\"..."
@@ -286,8 +290,8 @@ cat "$TOP_LOG_dir/summary.log"
 <body>
   <H1><center>Nightly Build Results for GNU APL</center></H1>
   <HR>
-  Date: $(date)<br><br>
-  SVN: $(svnversion)<br><br>
+  Build date:  $(date)<br><br>
+  SVN version: $SVN_VERSION<br><br>
   $build_errors build errors<br>
   $missing_files missing files (build results)<br>
   $configs_bad configurations failed: $bad_configs<br>

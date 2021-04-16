@@ -453,17 +453,13 @@ END-OF-HELP
  ⍝⍝ the main program
  ⍝
 
- ⍝ we need fgetc() from the FILE-IO native function to get user-keystrokes
- ⍝
- →('F'=↑'lib_file_io.so' ⎕FX 'FILE_IO')/1+↑⎕LC ◊ '⋆⋆⋆ ⎕FX FILE_IO failed' ◊ →0
-
  State←27 3⍴'-' ◊ ⊣{ ((face ⍵) ⌷ State) ←'YOBRGW'[⍵] } ¨⍳6
  ∆Initial_State←State  ⍝ the unscrambled state
  ∆3D←1                 ⍝ initial view: 3D
  ∆TCNT←0               ⍝ turn counter
 
 LOOP: ∆3D show_cube State
-LP1:  Cmd←⎕UCS FILE_IO[9] 0  ⍝ FIO∆fgetc
+LP1:  Cmd←⎕UCS (⎕FIO.fgetc 0)
       →(Cmd∈'UuDdLlRrFfBb')/MOVE
       →(Cmd='Hh?Qq P',⎕UCS 10)/HELP HELP HELP 0 0 LP1 PRO STAT
       →(Cmd='03MmpSs')/CLR V3D Q1 Q6 PROE SETUP SETUP
