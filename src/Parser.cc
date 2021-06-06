@@ -239,7 +239,7 @@ Parser::collect_constants(Token_string & tos)
               // In contrast, the binding rules stated in IBM's apl2lrm.pdf
               // would give 3[2] ↔ RANK ERROR.
               // 
-              // We follow apl2lrm; to enable IBM behavior write #if 0 above.
+              // We follow apl2lrm; to enable ISO behavior write #if 0 above.
               // 
 
               // if tos[to + 1] is [ then [ binds stronger than
@@ -769,8 +769,9 @@ Value_P vector(count, LOC);
 
             case TOK_APL_VALUE1:
             case TOK_APL_VALUE3:
-                 new (addr) PointerCell(tok.get_apl_val().get(),
-                                        vector.getref());
+                 addr->init_from_value(tok.get_apl_val().get(),
+                                       vector.getref(), LOC);
+
                  tok.clear(LOC);   // invalidate token
                  break;
 
