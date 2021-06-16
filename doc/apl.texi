@@ -679,34 +679,35 @@ in a 'preferences' file still follow the library root scheme.
 * Section 2.7::   Direct Functions (Lambdas)
 * Section 2.8::   ]DOXY Command
 * Section 2.9::   )DUMP and DUMP-HTML Commands
-* Section 2.10::  History and TAB completion
-* Section 2.11::  Logging Facilities
-* Section 2.12::  Rational Numbers
-* Section 2.13::  Hex Numbers
-* Section 2.14::  User-defined Commands
-* Section 2.15::  Structured Variables and Associative Arrays
-* Section 2.16::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
-* Section 2.17::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
-* Section 2.18::  Generalized ⍳
-* Section 2.19::  ⌹[X] - QR Factorization
-* Section 2.20::  Dyadic ⎕CR
-* Section 2.21::  Dyadic ⎕FX (Native Functions)
-* Section 2.22::  ⎕ARG  - Interpreter command line arguments
-* Section 2.23::  ⎕DLX  - Knuth's Dancing Links Algorithm
-* Section 2.24::  ⎕ENV  - Environment Variable
-* Section 2.25::  ⎕FIO  - File I/O Functions
-* Section 2.26::  ⎕FFT  - Fast Fourier Transform
-* Section 2.27::  ⎕GTK  - GTK Interface
-* Section 2.28::  ⎕JSON - JSON Parsing
-* Section 2.29::  ⎕MAP  - Map Value
-* Section 2.30::  ⎕PLOT - Plot Data
-* Section 2.31::  ⎕PS   - Print Style
-* Section 2.32::  ⎕RE   - Regular Expressions
-* Section 2.33::  ⎕RVAL - Random APL value
-* Section 2.34::  ⎕SQL  - SQL Database Interface
-* Section 2.35::  ⎕SI   - State Indicator
-* Section 2.36::  ⎕SYL  - System limits
-* Section 2.37::  ⎕XML - XML Parsing
+* Section 2.10::  ]NEXTFILE and ]PUSHFILE Commands
+* Section 2.11::  History and TAB completion
+* Section 2.12::  Logging Facilities
+* Section 2.13::  Rational Numbers
+* Section 2.14::  Hex Numbers
+* Section 2.15::  User-defined Commands
+* Section 2.16::  Structured Variables and Associative Arrays
+* Section 2.17::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
+* Section 2.18::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
+* Section 2.19::  Generalized ⍳
+* Section 2.20::  ⌹[X] - QR Factorization
+* Section 2.21::  Dyadic ⎕CR
+* Section 2.22::  Dyadic ⎕FX (Native Functions)
+* Section 2.23::  ⎕ARG  - Interpreter command line arguments
+* Section 2.24::  ⎕DLX  - Knuth's Dancing Links Algorithm
+* Section 2.25::  ⎕ENV  - Environment Variable
+* Section 2.26::  ⎕FIO  - File I/O Functions
+* Section 2.27::  ⎕FFT  - Fast Fourier Transform
+* Section 2.28::  ⎕GTK  - GTK Interface
+* Section 2.29::  ⎕JSON - JSON Parsing
+* Section 2.30::  ⎕MAP  - Map Value
+* Section 2.31::  ⎕PLOT - Plot Data
+* Section 2.32::  ⎕PS   - Print Style
+* Section 2.33::  ⎕RE   - Regular Expressions
+* Section 2.34::  ⎕RVAL - Random APL value
+* Section 2.35::  ⎕SQL  - SQL Database Interface
+* Section 2.36::  ⎕SI   - State Indicator
+* Section 2.37::  ⎕SYL  - System limits
+* Section 2.38::  ⎕XML - XML Parsing
 @end menu
 
 There are a few hopefully useful features in GNU APL:
@@ -1593,6 +1594,48 @@ is silently being ignored. This speeds up the )COPYing of libraries that
 occur in several )DUMPed or )SAVEd workspace.
 
 @node    Section 2.10
+@section ]NEXTFILE and ]PUSHFILE Commands
+
+@subsection ]NEXTFILE
+
+The debug command ]NEXTFILE, when used in an APL script file, terminates
+the processing of that file and continues processing in the next script file
+(if any) or else enters immediate execution mode. Unlike )OFF (which terminates
+the interpreter), ]NEXTFILE does not terminate the interpreter but only changes
+its input source to the next script file (if there is one remaining) and enters
+immediate execution only if all scripts were processed.
+
+The user may, for example, want to use the space near the end of the script
+to add longer comments (as to what the script does, how it works, how it is
+used, etc.) without the need to prepend every line with ⍝ or #.
+
+For example:
+
+@verbatim
+#/usr/local/bin/apl
+
+⍝ see documentation at the end of this file
+
+<APL CODE...>
+
+]NEXTFILE
+
+This workspace does the following...
+
+@end verbatim
+
+
+@subsection ]PUSHFILE
+
+The debug command ]PUSHFILE is similar to ]NEXTFILE in that it terminates the
+processing of the current script file. Unlike ]NEXTFILE, ]PUSHFILE does
+not proceed to the next script file but enters a new immediate execution
+context in which the user can interact with the interpreter. This context
+can be processes input until a ]NEXTFILE command is given. After the
+]NEXTFILE that leaves the immediat execution context processing proceeds
+at the next line after the ]PUSHFILE command.
+
+@node    Section 2.11
 @section History and TAB completion
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user
@@ -1634,7 +1677,7 @@ recalling function lines (and which are not fully supported in GNU APL).
     function or variable name.
 
 
-@node    Section 2.11
+@node    Section 2.12
 @section Logging Facilities
 
 The APL interpreter has over 30 logging facilities. Each logging facility
@@ -1683,7 +1726,7 @@ state. The command
 toggles the state of logging facility N from OFF to ON and back.
 
 
-@node    Section 2.12
+@node    Section 2.13
 @section Rational Numbers
 
 GNU APL has limited support for rational numbers. Instead of dividing integers
@@ -1703,7 +1746,7 @@ For that reason support for rational numbers is disabled by default and must
 be enabled via ./configure (see README-2-configure).
 
 
-@node    Section 2.13
+@node    Section 2.14
 @section Hex Numbers
 
 GNU APL supports sedecimal numbers. They start with $ and can be uppercase or
@@ -1718,7 +1761,7 @@ lowercase:
 
 @end verbatim
 
-@node    Section 2.14
+@node    Section 2.15
 @section User-defined Commands
 
 There is a simple mechanism to define additional APL commands. This mechanism
@@ -1753,9 +1796,8 @@ be deleted like this:
       ]USERCMD REMOVE-ALL
 @end verbatim
 
-XXXXXX
 @c ----------------------------------------------------------------------------
-@node    Section 2.15
+@node    Section 2.16
 @section Structured Variables and Associative Arrays
 
 GNU APL has implemented two features that are closely related because, under the
@@ -2041,8 +2083,7 @@ returns all keys (= members) of ASSOC_ARRAY, therefore the number of members
 is ⍴ASSOC_ARRAY[;1] and the capacity is ↑⍴ASSOC_ARRAY.
 
 
-XXXXXX
-@node    Section 2.16
+@node    Section 2.17
 @section Monadic ⊢ and ⊣, dyadic ⊢ with Axis
 
 Monadic ⊢ is the identity function. It returns its (committed or non-committed)
@@ -2108,7 +2149,7 @@ a*c
 @end verbatim
 
 
-@node    Section 2.17
+@node    Section 2.18
 @section Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, T≠, and T=
 
 The APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate primarily on
@@ -2283,7 +2324,7 @@ BE
 255 255 255 190
 @end verbatim
 
-@node    Section 2.18
+@node    Section 2.19
 @section Generalized ⍳
 
 @subsection Generalized monadic ⍳
@@ -2312,7 +2353,7 @@ Each item of the result Z is then either a nested integer vector (if the item
 was found) or @b{- different from the standard case (!) -} the empty vector ⍬
 if the item was not found).
 
-@node    Section 2.19
+@node    Section 2.20
 @section ⌹[X] - QR Factorization
 
 Z←⌹[X] B computes a QR factorization of the real or complex matrix B. The axis
@@ -2438,7 +2479,7 @@ Example 2 (complex over-determined B)
 Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
 
-@node    Section 2.20
+@node    Section 2.21
 @section Dyadic ⎕CR
 
 The ⎕CR function has an optional left argument that selects one of several
@@ -2562,7 +2603,7 @@ positive char in C/C++). Real, Complex, or rational numbers are never proper
 byte values even if their value is close to an integer. Nor are nested APL
 values or values being assigned.
 
-@node    Section 2.21
+@node    Section 2.22
 @section  Dyadic ⎕FX (Native Functions)
 
 A Native Function is a function that can be called in APL like a normal user
@@ -2638,14 +2679,14 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 )CLEAR workspace command will close all open files. 
 
 
-@node    Section 2.22
+@node    Section 2.23
 @section ⎕ARG - Interpreter command line arguments
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
 @xref{Section 2.1}.
 
 
-@node    Section 2.23
+@node    Section 2.24
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
@@ -2880,14 +2921,14 @@ a little more complicated, but the principle is the same. GNU APL is shipped
 with two workspaces: sudoku.apl (which solves sudokus without using ⎕DLX) and
 sudoku_DLX.apl (which solves sudokus using ⎕DLX).
 
-@node    Section 2.24
+@node    Section 2.25
 @section ⎕ENV - Environment Variables
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. @xref{Section 2.1}.
 
 
-@node    Section 2.25
+@node    Section 2.26
 @section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -3032,7 +3073,7 @@ Z F¨Z←⎕FIO[49] 'filename'
 @end smallexample
 
 
-@node    Section 2.26
+@node    Section 2.27
 @section ⎕FFT - Fast Fourier Transform
 
 For those interested in signal processing and the like, GNU APL provides ⎕FFT:
@@ -3087,7 +3128,7 @@ if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom will take a
 few hours, though, so that creating it will not pay off for most mortals.
 
-@node    Section 2.27
+@node    Section 2.28
 @section ⎕GTK - GTK Interface
 
 GTK (Gimp Toolkit) is a rather powerful library for creating graphical user
@@ -3101,7 +3142,7 @@ and has therefore been put into a separate document.
 See: @b{HOWTOs/Quad-GTK.html}.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.28
+@node    Section 2.29
 @section ⎕JSON - JSON Parsing
 
 GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
@@ -3144,7 +3185,7 @@ it could help troubleshooting when Z is displayed and the number of keys in Z
 is large.
 @end itemize
 
-@node    Section 2.29
+@node    Section 2.30
 @section ⎕MAP  - Map Value
 
 ⎕MAP changes the ravel items of its right argument according to a mapping
@@ -3228,7 +3269,7 @@ shown in the examples below.
 
 @end verbatim
 
-@node    Section 2.30
+@node    Section 2.31
 @section ⎕PLOT - Plot Data
 
 ⎕PLOT is a function for visualizing numerical APL values. The values to be
@@ -3422,7 +3463,7 @@ thread until it is being closed. A plot window can be closed in different ways:
   A ⎕PLOT B with plot attributes A
 @end itemize
 
-@node    Section 2.31
+@node    Section 2.32
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
@@ -3447,7 +3488,7 @@ Note: For compatibility with older workspaces, assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-@node    Section 2.32
+@node    Section 2.33
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -3747,7 +3788,7 @@ The same for the pos+len output format:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 @end verbatim
 
-@node    Section 2.33
+@node    Section 2.34
 @section ⎕RVAL - Random APL value
 
 The standard way to produce random numbers is the primitive function ?
@@ -4037,7 +4078,7 @@ Examples:
 @end verbatim
 
 
-@node    Section 2.34
+@node    Section 2.35
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -4157,7 +4198,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 2.35
+@node    Section 2.36
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -4221,7 +4262,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 2.36
+@node    Section 2.37
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -4323,7 +4364,7 @@ is printed instead of VALUE. The shape SH is computed like this:
 @end verbatim
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.37
+@node    Section 2.38
 @section ⎕XML - XML Parsing
 
 @subsection Purpose

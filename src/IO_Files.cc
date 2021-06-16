@@ -318,7 +318,15 @@ IO_Files::open_next_file()
 
    if (InputFile::current_file()->file)
       {
-        CERR << "IO_Files::open_next_file(): already open" << endl;
+        if (InputFile::current_file()->is_pushed_pending())
+           {
+             InputFile::current_file()->set_pushed_pending(false);
+             CERR << "*** Leaving the pushed immediate execution context" << endl;
+           }
+        else
+           {
+             CERR << "IO_Files::open_next_file(): already open" << endl;
+           }
         return;
       }
 

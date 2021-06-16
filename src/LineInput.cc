@@ -681,8 +681,11 @@ InputMux::get_line(LineInputMode mode, const UCS_string & prompt,
    // check if we have input from a file. We do NOT use the file if the input
    // is for ⍞ unless we are in a .tc testcase file.
    //
-   if (InputFile::is_validating() ||
-       (mode != LIM_Quad_Quad && (mode != LIM_Quote_Quad)))
+bool interactive = (mode == LIM_Quote_Quad) || (mode == LIM_Quad_Quad);
+   if (InputFile::is_validating())   interactive = false;
+   if (InputFile::pushed_file())     interactive = true;
+
+   if (!interactive)
       {
         UTF8_string file_line;
         bool file_eof = false;

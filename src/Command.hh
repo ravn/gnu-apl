@@ -68,6 +68,9 @@ public:
    /// clean-up and exit from APL interpreter
    static void cmd_OFF(int exit_val);
 
+   /// clean-up and exit from APL interpreter
+   static void cmd_PUSHFILE();
+
    /// return the current boxing format
    static int get_boxing_format()
       { return boxing_format; }

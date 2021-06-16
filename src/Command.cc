@@ -31,9 +31,10 @@
 #include "Doxy.hh"
 #include "Executable.hh"
 #include "FloatCell.hh"
-#include "IndexExpr.hh"
-#include "IntCell.hh"
 #include "IO_Files.hh"
+#include "IndexExpr.hh"
+#include "InputFile.hh"
+#include "IntCell.hh"
 #include "LineInput.hh"
 #include "Nabla.hh"
 #include "NativeFunction.hh"
@@ -1840,6 +1841,21 @@ rlimit rl;
    setrlimit(RLIMIT_AS, &rl);
 
    exit(exit_val);
+}
+//-----------------------------------------------------------------------------
+void
+Command::cmd_PUSHFILE()
+{
+   CERR <<
+"*** Pushing an immediate execution context (leave it with ]NEXTFILE)"
+        << endl;
+
+   if (InputFile::files_todo.size())
+      InputFile::files_todo[0].set_pushed_pending(true);
+
+InputFile fam("stdin", stdin, false, true, true, no_LX);
+   fam.set_pushed_IE();
+   InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
 }
 //-----------------------------------------------------------------------------
 void
