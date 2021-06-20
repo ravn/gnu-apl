@@ -103,7 +103,7 @@ yFEATURES←HTML∆Ul yFEATURES
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 ⍝ Installation instructios
 ⍝
-∇yZ←INSTALL;I1;I2;I3;I4
+∇yZ←INSTALL;I1;I2;I3;I4;I5
 I1←      'Visit one of the ', xMIRRORS HTML∆A 'GNU mirrors'
 I1←  I1, ' and download the tar file <B>', xTARFILE,'</B> in directory'
 I1←⊂ I1, ' <B>apl</B>.'
@@ -111,7 +111,11 @@ I2←⊂     'Unpack the tar file: <B>tar xzf ', xTARFILE, '</B>'
 I3←⊂     'Change to the newly created directory: <B>cd ', xAPL_VERSION, '</B>'
 I4←      'Read (and follow) the instructions in files <B>INSTALL</B>'
 I4←⊂ I4, ' and <B>README-*</B>'
-yZ←⊃ HTML∆Ol I1, I2, I3, I4
+I5←      '<B>Caveat:</B> GNU APL creates full releases only every 1-2 years. Therefore an interpreter'
+I5←I5,   ' downloaded from a GNU mirror is inevitably outdated and likely contains errors that were fixed already.'
+I5←⊂I5,  ' Consider using <B>git</B> or <B>SVN</B> (see below) instead.'
+
+yZ←⊃ HTML∆Ol I1, I2, I3, I4, I5
 ∇
 
       ⍝ ⎕INP acts like a HERE document in bash. The monadic form ⎕INP B
@@ -175,8 +179,8 @@ GNU APL should be available on every
 (in directory <B>apl</B>) and at
 <?apl  xFTP_APL HTML∆A xFTP_GNU ?>.
 
-<?apl HTML∆H4[''] 'Normal Installation of GNU APL' ?>
-The normal (and fully supported) way to install GNU APL is this:
+<?apl HTML∆H4[''] 'Simple Installation of GNU APL' ?>
+The <B>simplest</B> (though not necessarily best) way to install GNU APL is this:
 
 <?apl ⊃ INSTALL ?>
 
@@ -197,7 +201,7 @@ an installer for an APL keyboard layout.
 
 <?apl HTML∆H4[''] 'Subversion (SVN) and Git repositories for GNU APL' ?>
 
-You can also check out the latest version of GNU APL from its subversion
+The best supported way of installing GNU APL is to check out its latest version from either its Subversion (preferred)
 or Git repository on Savannah. The subversion command to do that is:
 <BR>
 <BR>
@@ -234,19 +238,19 @@ distribution with a different package manager.
 
 <?apl HTML∆H4[''] 'GNU APL Binary' ?>
 
-If you just want to quickly give GNU APL a try, and if you are very lucky
+If you just want to quickly give GNU APL a try, and if you are very lucky,
 then you may be able to start the compiled
-GNU APL binary <B>apl</B> in the directory <B>apl</B> rather than 
+GNU APL binary <B>apl</B> in the directory <B>apl</B> rather than
 installing the entire packet . The binary MAY run on a 32-bit i686 Ubuntu.
 Chances are, however, that it does NOT work, Please DO NOT report any
-problems if the binary does not run on your machine. Instead use the standard
-installation method above.
+problems if the binary does not run on your machine. Instead please use a better
+supported installation method above.
 <BR><BR>
-<B>Note:</B> The program <B>APnnn</B> (a support program for shared variables)
-is not provided in binary form, so you should start the <B>apl</B> binary with
-command line option --noSV. Note as well that the binary <B>apl</B> will not
-be updated with every GNU APL release. Therefore it will contain errors that
-have been corrected already.
+<B>Note:</B> The programs <B>APxxx</B> and <B>APserver</B> (support programs for
+shared APL variables) are not provided in binary form. Therefore you should
+start the <B>apl</B> binary with command line option <B>--noSV</B>. Note as
+well that the binary <B>apl</B> will not be updated with every GNU APL release.
+Therefore it will contain errors that have been corrected already.
 
 <?apl HTML∆H4[''] 'GNU APL Online' ?>
 

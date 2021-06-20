@@ -448,22 +448,19 @@ PrintBuffer::print_interruptible(ostream & out, Rank rank, int quad_PW)
 const int total_width = get_width(0);
 const int max_breaks = 2 + total_width/quad_PW;   // an upper limit
 
-ShapeItem * del = 0;
-size_t chunk_len = 0;
-ShapeItem __chunk_lengths[PB_MAX_CHUNKS];
-ShapeItem * chunk_lengths = __chunk_lengths;
-   if (max_breaks >= PB_MAX_CHUNKS)
-      chunk_lengths = del = new ShapeItem[max_breaks];
-ShapeItem bp_len = 0;
+vector<ShapeItem> chunk_lengths;
+   chunk_lengths.reserve(max_breaks + 1);
 
    // initialize chunk_lengths, based on the first row of the PrintBuffer.
    // All subsequent rows are aligned to the first row, therefore the first
    // row can be taken as a prototype for all rows.
    //
-   for (int col = 0; col < total_width; col += chunk_len)
+   for (int col = 0; col < total_width;)
        {
-         chunk_len = get_line(0).compute_chunk_length(quad_PW, col);
-         chunk_lengths[bp_len++] = chunk_len;
+         const size_t chunk_len =
+                      get_line(0).compute_chunk_length(quad_PW, col);
+         chunk_lengths.push_back(chunk_len);
+         col += chunk_len;
        }
 
    // print rows, breaking each row at chunk_lengths
@@ -472,11 +469,11 @@ ShapeItem bp_len = 0;
        {
          int brk_idx = 0;   // chunk_lengths index
 
-         for (int col = 0; col < total_width; col += chunk_len)
+         for (int col = 0; col < total_width;)
             {
               if (col)   out << endl << "      ";
 
-              chunk_len = chunk_lengths[brk_idx++];
+              const size_t chunk_len = chunk_lengths[brk_idx++];
               UCS_string trow(get_line(row), col, chunk_len);
               trow.remove_trailing_padchars();
 
@@ -493,15 +490,12 @@ ShapeItem bp_len = 0;
                    out << endl << "INTERRUPT" << endl;
                    clear_attention_raised(LOC);
                    clear_interrupt_raised(LOC);
-                   delete del;
                    return;
                  }
             }
 
          out << endl;   // end of row
        }
-
-   delete del;
 }
 //-----------------------------------------------------------------------------
 void
