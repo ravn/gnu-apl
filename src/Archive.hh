@@ -464,18 +464,20 @@ protected:
    /// an existing fid must have its new_fun == 0 (forward declaration).
    void add_fid_function(Fid fid, Function_P new_fun, const char * loc);
 
+   /// properties of a derived function
    struct _derived_todo
       {
-        Function * cache;     ///< the new ()-address of the function
-        Function_P* symptr;   ///< the address of a function * to be set
-        Fid fid;              ///< the address of \b this derived function
-        Fid LO_fid;           ///< the address of \b LO of this function
-        Fid OPER_fid;         ///< the address of \b OPER of this function
-        Fid RO_fid;           ///< the address of \b RO of this function
-        Vid AXIS_vid;         ///< the AXIS of \b this function
-        const char * loc;     ///< where \b this was initialized
+        Function * cache;      ///< the new()-address of the function
+        Function_P * symptr;   ///< the address of a function * to be set
+        Fid fid;               ///< the address of \b this derived function
+        Fid LO_fid;            ///< the address of \b LO of this function
+        Fid OPER_fid;          ///< the address of \b OPER of this function
+        Fid RO_fid;            ///< the address of \b RO of this function
+        Vid AXIS_vid;          ///< the AXIS of \b this function
+        const char * loc;      ///< where \b this was initialized
       };
 
+      /// derived functions that need to be instantiated
       vector<_derived_todo> derived_todos;
 
    /// instantiate the derived functions in \b derived_todos

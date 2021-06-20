@@ -232,6 +232,7 @@ public:
    /// The name of \b this \b Symbol
    virtual UCS_string get_name() const   { return name; }
 
+   /// overloaded NamedObject::get_name_ptr()
    const UCS_string * get_name_ptr() const   { return &name; }
 
    /// overloaded NamedObject::get_function()

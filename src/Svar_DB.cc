@@ -77,10 +77,8 @@ Svar_DB::start_APserver(const char * server_sockname,
    //
 char APserver_path[APL_PATH_MAX + 1];
 const int slen = snprintf(APserver_path, APL_PATH_MAX, "%s/APserver", bin_dir);
-   if (slen >= APL_PATH_MAX)   APserver_path[APL_PATH_MAX] = 0;
-
    APserver_path[APL_PATH_MAX] = 0;
-   if (access(APserver_path, X_OK) != 0)   // no APserver
+   if (access(APserver_path, X_OK) != 0)   // no APserver in bin_dir
       {
         logit && get_CERR() << "    Executable " << APserver_path
                  << " not found (this is OK when apl was started\n"
@@ -92,7 +90,7 @@ const int slen = snprintf(APserver_path, APL_PATH_MAX, "%s/APserver", bin_dir);
         if (access(APserver_path, X_OK) != 0)   // no APs/APserver either
            {
              get_CERR() << "Executable " << APserver_path << " not found.\n"
-"This could means that 'apl' was not installed ('make install') or that it\n"
+"This could mean that 'apl' was not installed ('make install') or that it\n"
 "was started in a non-standard way. The expected location of APserver is \n"
 "either the same directory as the binary 'apl' or the subdirectory 'APs' of\n"
 "that directory (the directory should also be in $PATH)." << endl;
@@ -135,7 +133,7 @@ FILE * fp = popen(popen_args, "r");
 const int APserver_result = pclose(fp);
    if (APserver_result)
       {
-         get_CERR() << "pclose(APserver) returned error:"
+         get_CERR() << "pclose(APserver) returned error: "
                     << strerror(errno) << endl;
       }
 

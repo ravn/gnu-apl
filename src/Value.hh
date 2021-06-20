@@ -289,7 +289,7 @@ public:
    /// create a new member and return the Cell containing the data for it
    Cell * get_new_member(const UCS_string & new_member);
 
-   // double the ravel length of \b this value (by appending integer 0s).
+   /// double the ravel length of \b this value (by appending integer 0s).
    void double_ravel(const char * loc);
 
    /// return the idx'th element of the ravel.

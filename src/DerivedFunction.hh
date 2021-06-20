@@ -62,23 +62,27 @@ public:
    virtual bool is_derived() const
       { return true; }
 
-  Function_P get_LO() const
+   /// return the left operand of this derived function
+   Function_P get_LO() const
       { return left_arg.get_function(); }
 
-   // return the value (if any) bound to an operator (that allows it)
+   /// return the value (if any) bound to an operator (that allows it)
    Value_P get_bound_LO_value() const
       {
         return left_arg.is_apl_val() ? left_arg.get_apl_val() : Value_P();
       }
 
+   /// return the operator of this derived function
    Function_P get_OPER() const
       { return oper; }
 
+   /// return the right operand (or 0) of this derived function
    Function_P get_RO() const
       {
         return right_fun.get_tag() == TOK_VOID ? 0 : right_fun.get_function();
       }
 
+   /// return the axis (or 0) of this derived function
    const Value * get_AXIS() const
       { return axis.get(); }
 
@@ -145,12 +149,14 @@ public:
    /// destructor
    ~DerivedFunctionCache();
 
+   /// return the i'th derived function
    const DerivedFunction * at(size_t i) const
       {
         return reinterpret_cast<const DerivedFunction *>
                                (cache + i*sizeof(DerivedFunction));
       }
 
+   /// return the i'th derived function
    const DerivedFunction & operator [](size_t i) const
       {
         Assert(i < idx);

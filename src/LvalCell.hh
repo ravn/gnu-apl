@@ -51,7 +51,7 @@ public:
    Value * get_cell_owner() const
       { return value.pval.owner; }
 
-   // make sure that owner (if any) owns this Cell
+   /// make sure that owner (if any) owns this Cell
    void check_consistency() const;
 
 protected:

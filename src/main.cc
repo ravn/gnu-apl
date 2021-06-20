@@ -267,6 +267,8 @@ const int left_pad = (80 - len)/2;
        }
 }
 //-----------------------------------------------------------------------------
+/// maybe remap stdin, stdout, and stderr to an incoming TCP connection to
+/// port uprefs.tcp_port on localhost
 void
 remap_stdio()
 {
