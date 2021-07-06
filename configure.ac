@@ -363,6 +363,25 @@ echo
 echo "   *** decisions made by the user ... ***"
 echo
 
+AC_MSG_CHECKING([if user wants ctrl-d to be del-char (moving EOT to ctrl-z)])
+user_wants_ctrld_del=no
+AC_ARG_WITH( [ctrld_del],
+             [AS_HELP_STRING([--with-ctrld_del],
+                             [enable to use ctrl-d as del-char, ctrl-z as EOT])],
+             [user_wants_ctrld_del=yes])
+
+if test "x$user_wants_ctrld_del" = xyes ; then
+    AC_DEFINE([WANT_CTRLD_DEL], [1], [Define if ctrl-d should act as del-char and ctrl-z should be EOT])
+fi
+
+AM_CONDITIONAL(WANT_CTRLD_DEL, test "x$user_wants_ctrld_del" = xyes)
+AC_MSG_RESULT([$user_wants_ctrld_del])
++
+ # check if the user wants to build the python extension gnu_apl.so
+ #
+ AC_MSG_CHECKING([if we want to build libpython_apl.so])
+
+
 # check if the user compiles for ANDROID
 #
 AC_MSG_CHECKING([if we are compiling for Android])

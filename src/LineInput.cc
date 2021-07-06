@@ -907,10 +907,22 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
                    control_C(SIGINT);
                    break;
 
+
+#ifdef WANT_CTRLD_DEL
+              case UNI_SUB:   // ^Z
+                   CERR << "^Z";
+                   eof = true;
+                   break;
+
+              case UNI_EOT:   // ^D
+                   lec.delete_char();
+                   continue;
+#else
               case UNI_EOT:   // ^D
                    CERR << "^D";
                    eof = true;
                    break;
+#endif
 
               case UNI_BS:    // ^H (backspace)
                    lec.backspc();
@@ -1082,17 +1094,21 @@ const int b0 = safe_fgetc();
            {
              case UNI_SOH: return UNI_CursorHome;    // ^A
              case UNI_STX: return UNI_CursorLeft;    // ^B
-             case UNI_ETX: return UNI_ETX;     // ^C
-             case UNI_EOT: return UNI_EOT;     // ^D
+             case UNI_ETX: return UNI_ETX;           // ^C
+             case UNI_EOT: return UNI_EOT;           // ^D
              case UNI_ENQ: return UNI_CursorEnd;     // ^E
              case UNI_ACK: return UNI_CursorRight;   // ^F
-             case UNI_BS:  return UNI_BS;      // ^H
-             case UNI_HT:  return UNI_HT;      // ^I
-             case UNI_LF:  return UNI_LF;      // ^J
-             case UNI_VT:  return UNI_VT;      // ^K
+             case UNI_BS:  return UNI_BS;            // ^H
+             case UNI_HT:  return UNI_HT;            // ^I
+             case UNI_LF:  return UNI_LF;            // ^J
+             case UNI_VT:  return UNI_VT;            // ^K
              case UNI_SO:  return UNI_CursorDown;    // ^N
              case UNI_DLE: return UNI_CursorUp;      // ^P
-             case UNI_EM:  return UNI_EM;      // ^Y
+             case UNI_EM:  return UNI_EM;            // ^Y
+#ifdef WANT_CTRLD_DEL
+             case UNI_SUB: return UNI_SUB;     // ^Z (as alt EOT, allowing ^D as delete-char)
+#endif
+
              default: goto again;
            }
       }

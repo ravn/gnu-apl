@@ -314,6 +314,9 @@
 /* Define if compiling for Android */
 /* #undef WANT_ANDROID */
 
+/* Define if ctrl-d should act as del-char and ctrl-z should be EOT */
+/* #undef WANT_CTRLD_DEL */
+
 /* Define if building the Erlang interface */
 /* #undef WANT_ERLANG */
 
