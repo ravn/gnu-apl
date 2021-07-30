@@ -77,7 +77,8 @@ Svar_DB::start_APserver(const char * server_sockname,
    //
 char APserver_path[APL_PATH_MAX + 1];
 const int slen = snprintf(APserver_path, APL_PATH_MAX, "%s/APserver", bin_dir);
-   APserver_path[APL_PATH_MAX] = 0;
+   if (slen >= APL_PATH_MAX)   APserver_path[APL_PATH_MAX] = 0;
+   else APserver_path[slen] = 0;
    if (access(APserver_path, X_OK) != 0)   // no APserver in bin_dir
       {
         logit && get_CERR() << "    Executable " << APserver_path
@@ -87,6 +88,7 @@ const int slen = snprintf(APserver_path, APL_PATH_MAX, "%s/APserver", bin_dir);
         const int slen = snprintf(APserver_path, APL_PATH_MAX,
                                   "%s/APs/APserver", bin_dir);
         if (slen >= APL_PATH_MAX)   APserver_path[APL_PATH_MAX] = 0;
+        else APserver_path[slen] = 0;
         if (access(APserver_path, X_OK) != 0)   // no APs/APserver either
            {
              get_CERR() << "Executable " << APserver_path << " not found.\n"
@@ -683,10 +685,14 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 void
 Svar_DB::print(ostream & out)
 {
+Q(LOC)
 const TCP_socket tcp = Svar_DB::get_DB_tcp();
+Q(tcp)
    if (tcp == NO_TCP_SOCKET)   return;
 
+Q(LOC)
 PRINT_SVAR_DB_c request(tcp);
+Q(LOC)
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 4000];
@@ -696,9 +702,11 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    if (response)
       {
+Q(LOC)
         out << response->get__SVAR_DB_PRINTED__printout();
         delete response;
       }
+Q(LOC)
 }
 //-----------------------------------------------------------------------------
 

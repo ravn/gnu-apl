@@ -660,15 +660,19 @@ public:
 protected:
 
    /// send this signal on TCP (or AF_UNIX) socket tcp_sock
-   int send_TCP(int tcp_sock) const
+   ssize_t send_TCP(int tcp_sock) const
        {
          string buffer;
          store(buffer);
 
-         uint32_t ll = htonl(buffer.size());
-         send(tcp_sock, reinterpret_cast<const char *>(&ll), 4, 0);
-         ssize_t sent = send(tcp_sock, buffer.data(), buffer.size(), 0);
-         return sent;
+         const uint32_t ll = htonl(buffer.size());
+         const char * ccp_ll = reinterpret_cast<const char *>(&ll);
+         if (sizeof(ll) == send(tcp_sock, ccp_ll, sizeof(ll), MSG_MORE))
+            {
+              return send(tcp_sock, buffer.data(), buffer.size(), 0);
+            }
+         cerr << "*** send_TCP() : " << errno << strerror(errno) << endl;
+         return -errno;
        }
 };
 

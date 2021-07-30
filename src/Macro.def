@@ -88,7 +88,8 @@ mac_def(  Z__vA_LO_EACH_sB,
 //
 mac_def(  Z__vA_LO_EACH_vB, 
  "Z←A (LO Z__vA_LO_EACH_vB) B;rho_Z;N;N_max\n"
- "rho_Z←⍴B ◊ N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
+ "→((⍴A)≡⍴B)⍴SHAPES_MATCH ◊ ⎕ES 5,2+(⍴⍴A)=⍴⍴B\n"
+ "SHAPES_MATCH: rho_Z←⍴B ◊ N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
  "(N⊃Z)←(N⊃A) LO N⊃B ◊ 0 → N_max>N←N+1\n"
  "Z←rho_Z⍴Z\n")
 

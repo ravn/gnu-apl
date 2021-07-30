@@ -21,6 +21,8 @@
 #ifndef __QUAD_FIO_HH_DEFINED__
 #define __QUAD_FIO_HH_DEFINED__
 
+#include <signal.h>
+
 #include <vector>
 
 #include "Error_macros.hh"
@@ -198,6 +200,7 @@ protected:
 
    /// the open files
    static std::vector<file_entry> open_files;
+   static std::vector<sighandler_t> popen_signals;
 };
 //-----------------------------------------------------------------------------
 #endif //  __QUAD_FIO_HH_DEFINED__

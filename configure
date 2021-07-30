@@ -1540,7 +1540,7 @@ Optional Packages:
   --with-pcre[=prefix]    enable ⎕RE (needs libpcre2)
   --with-gtk3             enable ⎕GTK (interface to GTK+ version 3; needs
                           libgtk-3 and more)
-  --with-ctrld_del        enable to use ctrl-d as del-char, ctrl-z as EOT
+  --with-ctrld_del        enable to use ^D as del-char, ^Z as EOT
   --with-android          enable when compiling for Android
   --with-erlang           enable to build the Erlang interface
   --with-libapl           enable to build libapl.so
@@ -19878,7 +19878,7 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_ctrld_del" >&5
 $as_echo "$user_wants_ctrld_del" >&6; }
-+
+
  # check if the user wants to build the python extension gnu_apl.so
  #
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build libpython_apl.so" >&5

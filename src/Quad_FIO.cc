@@ -49,6 +49,7 @@ extern uint64_t top_of_memory();
 uint64_t Quad_FIO::benchmark_cycles_from = 0;
 
 std::vector<Quad_FIO::file_entry> Quad_FIO::open_files;
+std::vector<sighandler_t> Quad_FIO::popen_signals;
 
 Quad_FIO  Quad_FIO::_fun;
 Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
@@ -1489,6 +1490,7 @@ int function_number = -1;
                 file_entry fe(f, fileno(f));
                 fe.fe_may_read = true;
                 open_files.push_back(fe);
+                popen_signals.push_back(signal(SIGCHLD, SIG_DFL));
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd,LOC));
               }
 
@@ -1498,6 +1500,11 @@ int function_number = -1;
                 file_entry & fe = get_file_entry(*B.get());
                 int err = EBADF;   /* Bad file number */
                 if (fe.fe_FILE)   err = pclose(fe.fe_FILE);
+                if (popen_signals.size())
+                   {
+                       signal(SIGCHLD, popen_signals.back());
+                       popen_signals.pop_back();
+                   }
 
                 fe = open_files.back();       // move last file to fe
                 open_files.pop_back();        // erase last file
@@ -2372,6 +2379,7 @@ int function_number = -1;
                      return Token(TOK_APL_VALUE1, IntScalar(-1, LOC));
                    }
 
+                popen_signals.push_back(signal(SIGCHLD, SIG_DFL));
                 file_entry fe(f, fileno(f));
                 fe.fe_may_read = read;
                 fe.fe_may_write = write;

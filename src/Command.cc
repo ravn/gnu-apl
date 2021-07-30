@@ -44,6 +44,7 @@
 #include "Quad_FX.hh"
 #include "Quad_TF.hh"
 #include "Security.hh"
+#include <signal.h>
 #include "StateIndicator.hh"
 #include "Svar_DB.hh"
 #include "Symbol.hh"
@@ -1315,6 +1316,9 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
         return;
       }
 
+   // reset SIGCHLD to its default so that pclose() works as expected
+   //
+const sighandler_t old_child = signal(SIGCHLD, SIG_DFL);
    for (;;)
        {
          const int cc = fgetc(pipe);
@@ -1322,13 +1326,15 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
          out << char(cc);
        }
 
+   errno = 0;
 int result = pclose(pipe);
    Log(LOG_verbose_error)
       {
-        if (result)   CERR << "pclose(" << arg << ") says: "
-                           << strerror(errno) << endl;
+        if (result)   CERR << "NOTE: pclose(" << arg << ") says: errno="
+                           << errno << " (" << strerror(errno) << ")" << endl;
       }
    out << endl << IntCell(result) << endl;
+   signal(SIGCHLD, old_child);
 }
 //-----------------------------------------------------------------------------
 void
