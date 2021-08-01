@@ -77,6 +77,15 @@ public:
    /// move to next newer entry
    const UCS_string * down();
 
+   /// update history search substring
+   const void clear_search(void);
+
+   /// update search substring (called when current line is edited)
+   const void update_search(UCS_string &cur_line);
+
+   /// find entries like current line in history
+   const UCS_string * search(UCS_string &cur_line);
+
    /// print relevant indices
    ostream &  info(ostream & out) const
       { return out << "   CUR=" << current_line
@@ -107,6 +116,12 @@ protected:
 
    /// the max. history size
    const int max_lines;
+
+   /// the current searched-for substring
+   UCS_string cur_search_substr;
+
+   /// the last searched-for line match
+   int last_search_line;
 
    /// the history
    UCS_string_vector hist_lines;
@@ -152,6 +167,10 @@ public:
    /// move the cursor
    void move_idx(int new_idx)
       { uidx = new_idx;   set_cursor(); }
+
+   /// get current cursor column
+   int get_idx(void)
+      { return uidx; }
 
    /// set the cursor (writing the appropriate ESC sequence to CIN)
    void set_cursor()
@@ -202,11 +221,19 @@ public:
    /// tab expansion
    void tab_expansion(LineInputMode mode);
 
+   /// reset search substring
+   void cursor_CLEAR_SEARCH();
+
    /// move backwards in history
    void cursor_UP();
 
    /// move forward in history
    void cursor_DOWN();
+
+   void update_SEARCH();
+
+   /// search line history
+   void cursor_SEARCH();
 
    /// return current user input
    const UCS_string & get_user_line() const
@@ -240,7 +267,7 @@ protected:
    /// true if history was entered
    bool history_entered;
 
-   /// dito
+   /// ditto
    UCS_string user_line_before_history;
 
    /// a buffer for ^K/^Y

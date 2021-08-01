@@ -126,7 +126,9 @@ return;
 LineHistory::LineHistory(int maxl)
    : current_line(0),
      put(0),
-     max_lines(maxl)
+     max_lines(maxl),
+     cur_search_substr( "" ),
+     last_search_line(0)
 {
    UCS_string u("xxx");
    add_line(u);
@@ -135,7 +137,9 @@ LineHistory::LineHistory(int maxl)
 LineHistory::LineHistory(const Nabla & nabla)
    : current_line(0),
      put(0),
-     max_lines(1000)
+     max_lines(1000),
+     cur_search_substr( "" ),
+     last_search_line(0)
 {
    UCS_string u("xxx");
    add_line(u);
@@ -307,6 +311,56 @@ int new_current_line = current_line + 1;
    if (current_line == put)   return 0;
 
    return &hist_lines[current_line];
+}
+//-----------------------------------------------------------------------------
+const void
+LineHistory::clear_search(void)
+{
+    cur_search_substr = "";
+}
+//-----------------------------------------------------------------------------
+const void
+LineHistory::update_search(UCS_string &cur_line)
+{
+    cur_search_substr = cur_line;
+}
+//-----------------------------------------------------------------------------
+const UCS_string *
+LineHistory::search(UCS_string &cur_line)
+{
+    if( hist_lines.size() == 0 ) return 0;  // no history
+
+    // For now, a simple substring search of hist_lines[]
+    int search_start_line = last_search_line - 1;
+    if( search_start_line < 0) {
+        search_start_line = hist_lines.size()-1;
+    }
+    int idx = search_start_line;
+    bool found = false;
+    do {
+        if( hist_lines[idx].substr_pos(cur_search_substr) >= 0 ) {
+            current_line = idx;
+            found = true;
+            continue;
+        }
+
+        idx--;
+        if( idx < 0 ) {
+            idx = hist_lines.size()-1;
+        }
+        if( idx == search_start_line ) {
+            break;
+        }
+    } while(!found);
+
+    if( !found ) {
+        idx = hist_lines.size()-1;
+    }
+
+    last_search_line = idx;
+    if( idx == 0 ) return 0;
+
+    return &hist_lines[current_line];
 }
 //=============================================================================
 LineEditContext::LineEditContext(LineInputMode mode, int rows, int cols,
@@ -550,6 +604,13 @@ const ExpandResult expand_result = tab_exp.expand_tab(line);
 }
 //-----------------------------------------------------------------------------
 void
+LineEditContext::cursor_CLEAR_SEARCH()
+{
+   Log(LOG_get_line)   history.info(CERR << "cursor_CLEAR_SEARCH()") << endl;
+   history.clear_search();
+}
+//-----------------------------------------------------------------------------
+void
 LineEditContext::cursor_UP()
 {
    Log(LOG_get_line)   history.info(CERR << "cursor_UP()") << endl;
@@ -607,6 +668,35 @@ refresh:
    refresh_from_cursor();
    move_idx(user_line.size());
    Log(LOG_get_line)   history.info(CERR << "cursor_DOWN() done" << endl);
+}
+//-----------------------------------------------------------------------------
+void
+LineEditContext::update_SEARCH(void)
+{
+    history.update_search(user_line);
+}
+//-----------------------------------------------------------------------------
+void
+LineEditContext::cursor_SEARCH()
+{
+    user_line_before_history = user_line;
+    history_entered = true;
+
+    const UCS_string * ucs = history.search(user_line_before_history);
+    if (ucs == 0)   // no line above
+    {
+        Log(LOG_get_line)   CERR << "hit top of history()" << endl;
+        Log(LOG_get_line)   history.info(CERR << "cursor_SEARCH() done" << endl);
+        return;
+    }
+
+    adjust_allocated_height();
+
+    uidx = 0;
+    user_line = *ucs;
+    refresh_from_cursor();
+    move_idx(user_line.size());
+    Log(LOG_get_line)   history.info(CERR << "cursor_SEARCH() done" << endl);
 }
 //=============================================================================
 LineInput::LineInput(bool do_read_history)
@@ -794,7 +884,7 @@ const APL_time_us from = now();
               COUT << "      ^D or end-of-input detected ("
                    << control_D_count << "). Use )OFF to leave APL!"
                    << endl;
-           } 
+           }
 
          eof = true;
 
@@ -898,6 +988,10 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
                    lec.cursor_UP();
                    continue;
 
+              case UNI_DC2:  // ^R - search line history
+                   lec.cursor_SEARCH();
+                   continue;
+
               case UNI_EOF:  // end of file
                    eof = user_line.size() == 0;
                    break;
@@ -916,6 +1010,7 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
 
               case UNI_EOT:   // ^D
                    lec.delete_char();
+                   lec.update_SEARCH();
                    continue;
 #else
               case UNI_EOT:   // ^D
@@ -926,28 +1021,34 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
 
               case UNI_BS:    // ^H (backspace)
                    lec.backspc();
+                   lec.update_SEARCH();
                    continue;
 
               case UNI_HT:    // ^I (tab)
                    lec.tab_expansion(mode);
+                   lec.update_SEARCH();
                    continue;
 
               case UNI_VT:    // ^K
                    lec.cut_to_EOL();
+                   lec.update_SEARCH();
                    continue;
 
               case UNI_DELETE:
                    lec.delete_char();
+                   lec.update_SEARCH();
                    continue;
 
               case UNI_CR:   // '\r' : ignore
                    continue;
 
               case UNI_LF:   // '\n': done
+                   lec.cursor_CLEAR_SEARCH();
                    break;
 
               case UNI_EM:    // ^Y
                    lec.paste();
+                   lec.update_SEARCH();
                    continue;
 
               case Invalid_Unicode:
@@ -955,6 +1056,7 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
 
               default:  // regular APL character
                    lec.insert_char(uni);
+                   lec.update_SEARCH();
                    continue;
             }
 
@@ -1104,6 +1206,7 @@ const int b0 = safe_fgetc();
              case UNI_VT:  return UNI_VT;            // ^K
              case UNI_SO:  return UNI_CursorDown;    // ^N
              case UNI_DLE: return UNI_CursorUp;      // ^P
+             case UNI_DC2: return UNI_DC2;           // ^R
              case UNI_EM:  return UNI_EM;            // ^Y
 #ifdef WANT_CTRLD_DEL
              case UNI_SUB: return UNI_SUB;     // ^Z (as alt EOT, allowing ^D as delete-char)
