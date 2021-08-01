@@ -200,7 +200,6 @@ protected:
 
    /// the open files
    static std::vector<file_entry> open_files;
-   static std::vector<sighandler_t> popen_signals;
 };
 //-----------------------------------------------------------------------------
 #endif //  __QUAD_FIO_HH_DEFINED__
