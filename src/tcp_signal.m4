@@ -328,6 +328,11 @@ protected:
 
          const uint32_t ll = htonl(buffer.size());
          const char * ccp_ll = reinterpret_cast<const char *>(&ll);
+
+// MAC OS has no MSG_MORE
+#ifndef MSG_MORE
+# define MSG_MORE 0
+#endif
          if (sizeof(ll) == send(tcp_sock, ccp_ll, sizeof(ll), MSG_MORE))
             {
               return send(tcp_sock, buffer.data(), buffer.size(), 0);

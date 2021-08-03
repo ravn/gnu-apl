@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-June 16, 2021
+August 3, 2021
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -2100,7 +2100,7 @@ ABBADEAD
 ----------------------------------------
 
 The dyadic forms of ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ are simply the bit-wise variants
-of their Boolean companions:
+of their Boolean counterparts:
 
       A ⊤∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
       A ⊤∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B      ⍝ aka. OR
@@ -2112,8 +2112,8 @@ of their Boolean companions:
 2.18.2 Monadic ⊤∨ and ⊤⍱
 ------------------------
 
-⊤∧ and ⊤⍲ have no monadic form, but ⊤∧, ⊤∨, and ⊤⍱ do.  Formally monadic
-⊤∨ resp, ⊤⍱ are dyadic ⊤∨ resp, ⊤⍱ with a left argument of 0:
+⊤∧ and ⊤⍲ do not have a monadic form, but ⊤∧, ⊤∨, and ⊤⍱ do.  Formally
+monadic ⊤∨ resp, ⊤⍱ are dyadic ⊤∨ resp, ⊤⍱ with a left argument of 0:
 
       ⊤∨ B    ←→    0 ⊤∨ B      ⍝ real B to nearby integer
       ⊤⍱ B    ←→    0 ⊤⍱ B      ⍝ bit-wise Not
@@ -6202,63 +6202,63 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11435
-Node: Chapter 220779
-Node: Section 2.122674
-Node: Section 2.238834
-Node: Section 2.339593
-Node: Section 2.440880
-Node: Section 2.545245
-Node: Section 2.645418
-Node: Section 2.746048
-Node: Section 2.850001
-Node: Section 2.951536
-Node: Section 2.1053629
-Node: Section 2.1155182
-Node: Section 2.1256967
-Node: Section 2.1358907
-Node: Section 2.1459848
-Node: Section 2.1560100
-Node: Section 2.1661496
-Node: Section 2.1771641
-Node: Section 2.1874159
-Node: Section 2.1980858
-Node: Section 2.2082303
-Node: Section 2.2187964
-Node: Section 2.2292998
-Node: Section 2.2396279
-Node: Section 2.2496570
-Node: Section 2.25107145
-Node: Section 2.26107417
-Node: Section 2.27113995
-Node: Section 2.28116452
-Node: Section 2.29117121
-Node: Section 2.30118780
-Node: Section 2.31121903
-Node: Section 2.32129763
-Node: Section 2.33130710
-Node: Section 2.34144272
-Node: Section 2.35154269
-Node: Section 2.36157373
-Node: Section 2.37159362
-Node: Section 2.38163787
-Node: Chapter 3185205
-Node: Chapter 4187708
-Node: Chapter 5188834
-Node: Section 5.1190371
-Node: Section 5.2191651
-Node: Section 5.3192011
-Node: Section 5.4192253
-Node: Section 5.5192915
-Node: Section 5.6193393
-Node: Section 5.7194165
-Node: Section 5.8194622
-Node: Chapter 6195024
-Node: Section 6.1195443
-Node: Section 6.2196130
-Node: Chapter 7196961
-Node: Section 7.1197464
-Node: Section 7.2222778
+Node: Chapter 11436
+Node: Chapter 220780
+Node: Section 2.122675
+Node: Section 2.238835
+Node: Section 2.339594
+Node: Section 2.440881
+Node: Section 2.545246
+Node: Section 2.645419
+Node: Section 2.746049
+Node: Section 2.850002
+Node: Section 2.951537
+Node: Section 2.1053630
+Node: Section 2.1155183
+Node: Section 2.1256968
+Node: Section 2.1358908
+Node: Section 2.1459849
+Node: Section 2.1560101
+Node: Section 2.1661497
+Node: Section 2.1771642
+Node: Section 2.1874160
+Node: Section 2.1980867
+Node: Section 2.2082312
+Node: Section 2.2187973
+Node: Section 2.2293007
+Node: Section 2.2396288
+Node: Section 2.2496579
+Node: Section 2.25107154
+Node: Section 2.26107426
+Node: Section 2.27114004
+Node: Section 2.28116461
+Node: Section 2.29117130
+Node: Section 2.30118789
+Node: Section 2.31121912
+Node: Section 2.32129772
+Node: Section 2.33130719
+Node: Section 2.34144281
+Node: Section 2.35154278
+Node: Section 2.36157382
+Node: Section 2.37159371
+Node: Section 2.38163796
+Node: Chapter 3185214
+Node: Chapter 4187717
+Node: Chapter 5188843
+Node: Section 5.1190380
+Node: Section 5.2191660
+Node: Section 5.3192020
+Node: Section 5.4192262
+Node: Section 5.5192924
+Node: Section 5.6193402
+Node: Section 5.7194174
+Node: Section 5.8194631
+Node: Chapter 6195033
+Node: Section 6.1195452
+Node: Section 6.2196139
+Node: Chapter 7196970
+Node: Section 7.1197473
+Node: Section 7.2222787
 
 End Tag Table
 

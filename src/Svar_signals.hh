@@ -2,7 +2,7 @@
    This file is part of GNU APL, a free implementation of the
    ISO/IEC Standard 13751, "Programming Language APL, Extended"
  
-   Copyright (C) 2008-2014  Dr. Jürgen Sauermann
+   Copyright (C) 2008-2021  Dr. Jürgen Sauermann
  
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -667,6 +667,11 @@ protected:
 
          const uint32_t ll = htonl(buffer.size());
          const char * ccp_ll = reinterpret_cast<const char *>(&ll);
+
+// MAC OS has no MSG_MORE
+#ifndef MSG_MORE
+# define MSG_MORE 0
+#endif
          if (sizeof(ll) == send(tcp_sock, ccp_ll, sizeof(ll), MSG_MORE))
             {
               return send(tcp_sock, buffer.data(), buffer.size(), 0);

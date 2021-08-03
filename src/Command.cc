@@ -1206,7 +1206,8 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
         return;
       }
 
-   if (arg.size() == 1)   // help for an APL primitive
+   if (arg.size() == 1 ||               // standard (1-character) APL primitive
+       (arg.size() == 2 && arg[0] == UNI_DOWN_TACK))  // ⊤∧ and friends
       {
         UTF8_string arg_utf(arg);
         const char * arg_cp = arg_utf.c_str();

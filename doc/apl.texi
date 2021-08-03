@@ -2208,7 +2208,7 @@ ABBADEAD
 @subsection Dyadic ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤=, and ⊤≠
 
 The dyadic forms of @b{⊤∧}, @b{⊤∨}, @b{⊤⍲}, and @b{⊤⍱} are simply the bit-wise
-variants of their Boolean companions:
+variants of their Boolean counterparts:
 
 @verbatim
       A ⊤∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
@@ -2221,7 +2221,7 @@ variants of their Boolean companions:
 
 @subsection Monadic ⊤∨ and ⊤⍱
 
-@b{⊤∧} and @b{⊤⍲}  have no monadic form, but @b{⊤∧}, @b{⊤∨}, and @b{⊤⍱} do.
+@b{⊤∧} and @b{⊤⍲} do not have a monadic form, but @b{⊤∧}, @b{⊤∨}, and @b{⊤⍱} do.
 Formally monadic @b{⊤∨} resp, @b{⊤⍱} are dyadic @b{⊤∨} resp, @b{⊤⍱} with
 a left argument of 0:
 

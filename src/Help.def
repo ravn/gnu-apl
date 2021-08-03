@@ -142,9 +142,10 @@ help_def(1, "⌊", "Floor",                     "Greatest integer less than or e
 help_def(2, "⌊", "Minimum",                   "The smaller value of A or B",                                                                     "")
 help_def(1, "∣", "Absolute value",            "Magnitude of B",                                                                                  "")
 // Note: ASCII | versus APL ∣
-help_def(1, "∣", "Absolute value",            "Magnitude of B",                                                                                  "")
-help_def(2, "∣", "Modulo",                    "R modulo A",                                                                                      "")
-help_def(2, "|", "Modulo",                    "R modulo A",                                                                                      "")
+help_def(1, "∣", "Absolute value",            "Magnitude of B",                                                                                  "")   // APL
+help_def(1, "|", "Absolute value",            "Magnitude of B",                                                                                  "")   // ASCII
+help_def(2, "∣", "Modulo",                    "B modulo A",                                                                                      "")   // APL ∣
+help_def(2, "|", "Modulo",                    "B modulo A",                                                                                      "")   // ASCII |
 // Note: ASCII ~ is not APL ∼
 help_def(1, "∼", "Not",                       "Boolean inverse: Z[i] is 1 - B[i], all B[i] must be 0 or 1",                                      "")
 help_def(1, "~", "Not",                       "Boolean inverse: Z[i] is 1 - B[i], all B[i] must be 0 or 1",                                      "")
@@ -239,6 +240,23 @@ help_def(1, "≢", "Tally",                     "Returns the number of elements 
 help_def(2, "≢", "Not match",                 "Returns 1 if A has not the same shape and ravel as B.",                                           "")
 help_def(2, "⊥", "Decode",                    "Z is the values of array B evaluated in a number system with radices A",                          "")
 help_def(2, "⊤", "Encode",                    "Z is the representation of B in the number system whose radices are A",                           "")
+help_def(2, "⊤∧", "Bitwise AND",              "Z is the result of a bitwise AND of B with A (GNU APL extension)",
+                                              "     A  ⊤∧  B   ←→  2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B\n"
+                                              "    'A' ⊤∧ 'B'  ←→  ⎕AV [2⊥ ((32⍴2)⊤⎕AV⍳'A') ∧ (32⍴2)⊤⎕AV⍳'B']\n")
+help_def(1, "⊤∨", "Real B to Nearby Integer", "Z is the nearest integer to B after conversion from Real (GNU APL extension)",                    "")
+help_def(2, "⊤∨", "Bitwise OR",               "Z is the result of a bitwise OR of B with A (GNU APL extension)",
+                                              "     A  ⊤∨  B   ←→  2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B\n"
+                                              "    'A' ⊤∨ 'B'  ←→  ⎕AV [2⊥ ((32⍴2)⊤⎕AV⍳'A') ∨ (32⍴2)⊤⎕AV⍳'B']\n")
+help_def(2, "⊤⍲", "Bitwise NAND",             "Z is the result of a bitwise NAND of B with A (GNU APL extension)",
+                                              "    A ⊤⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B\n")
+help_def(1, "⊤⍱", "Bitwise NOT",              "Z is the bitwise negation of B (B can be int or char) (GNU APL extension)",                       "")
+help_def(2, "⊤⍱", "Bitwise NOR",              "Z is the result of a bitwise NOR of B with A (GNU APL extension)",
+                                              "    A ⊤⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B")
+help_def(2, "⊤≠", "Bitwise XOR",              "Z is the result of a bitwise XOR of B with A (GNU APL extension)",
+                                              "    A ⊤≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B")
+help_def(2, "⊤=", "Bitwise XNOR",             "Z is the result of a bitwise XNOR of B with A (GNU APL extension)",
+                                              "    A ⊤= B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B")
+
 help_def(1, "⊢", "Identity",                  "Return B as non-committed value",                                                                 "")
 help_def(2, "⊢", "Right",                     "Return B.",                                                                                       "")
 help_def(1, "⊣", "Hide",                      "Return committed 0 (as to prevent printing of B)",                                                "")
