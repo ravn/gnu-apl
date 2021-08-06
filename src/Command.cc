@@ -1319,7 +1319,7 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
 
    // reset SIGCHLD to its default so that pclose() works as expected
    //
-const sighandler_t old_child = signal(SIGCHLD, SIG_DFL);
+   signal(SIGCHLD, SIG_DFL);
    for (;;)
        {
          const int cc = fgetc(pipe);
@@ -1335,7 +1335,7 @@ int result = pclose(pipe);
                            << errno << " (" << strerror(errno) << ")" << endl;
       }
    out << endl << IntCell(result) << endl;
-   signal(SIGCHLD, old_child);
+   signal(SIGCHLD, SIG_IGN);
 }
 //-----------------------------------------------------------------------------
 void
