@@ -685,14 +685,14 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 void
 Svar_DB::print(ostream & out)
 {
-Q(LOC)
+Q1(LOC)
 const TCP_socket tcp = Svar_DB::get_DB_tcp();
-Q(tcp)
+Q1(tcp)
    if (tcp == NO_TCP_SOCKET)   return;
 
-Q(LOC)
+Q1(LOC)
 PRINT_SVAR_DB_c request(tcp);
-Q(LOC)
+Q1(LOC)
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + 4000];
@@ -702,11 +702,11 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    if (response)
       {
-Q(LOC)
+Q1(LOC)
         out << response->get__SVAR_DB_PRINTED__printout();
         delete response;
       }
-Q(LOC)
+Q1(LOC)
 }
 //-----------------------------------------------------------------------------
 

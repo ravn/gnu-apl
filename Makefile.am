@@ -31,6 +31,10 @@ include Makefile.incl
 all: makefile.h
 makefile.h: Makefile
 
+.PHONY: check_sources
+check_sources: tools/check_src
+	tools/check_src
+
 buildtag.hh: Makefile buildtag.sh
 	. ${top_srcdir}/buildtag.sh
 	touch $@
@@ -138,6 +142,8 @@ DIST:	dist Makefile.dist
 	cp -f ../Makefile.dist apl-$(VERSION)/Makefile;		\
 	tar czf ../apl-$(VERSION).tar.gz apl-$(VERSION)
 	rm -Rf tmp
+
+DIST: check_sources
 
 am--refresh:
 	echo "making am--refresh"

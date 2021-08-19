@@ -50,25 +50,25 @@ enum Unicode
 
    /// internal pad characters - will be removed before printout
 #ifdef VISIBLE_MARKERS_WANTED
-   UNI_iPAD_U2    = UNI_PAD_U2,
-   UNI_iPAD_U3    = UNI_PAD_U3,
-   UNI_iPAD_U1    = UNI_PAD_U1,
+   UNI_iPAD_U2    = UNI_PAD_U2,   // blank on the right after notchar column
+   UNI_iPAD_U3    = UNI_PAD_U3,   // blank on the left before notchar column
+   UNI_iPAD_U1    = UNI_PAD_U1,   // not (yet) a pad char
 
-   UNI_iPAD_U0    = UNI_PAD_U0,
-   UNI_iPAD_U4    = UNI_PAD_U4,
-   UNI_iPAD_U5    = UNI_PAD_U5,
-   UNI_iPAD_U6    = UNI_PAD_U6,
-   UNI_iPAD_U7    = UNI_PAD_U7,
-   UNI_iPAD_U8    = UNI_PAD_U8,
-   UNI_iPAD_U9    = UNI_PAD_U9,
+   UNI_iPAD_U0    = UNI_PAD_U0,   // not (yet) a pad char
+   UNI_iPAD_U4    = UNI_PAD_U4,   // blank on the left to separate values
+   UNI_iPAD_U5    = UNI_PAD_U5,   // blank on the right to separate values
+   UNI_iPAD_U6    = UNI_PAD_U6,   // empty line below to reach max_row_height
+   UNI_iPAD_U7    = UNI_PAD_U7,   // pad to the right to achieve max_spacing
+   UNI_iPAD_U8    = UNI_PAD_U8,   // blank on the left to indicate depth
+   UNI_iPAD_U9    = UNI_PAD_U9,   // blank on the right to indicate depth
 
-   UNI_iPAD_L0    = UNI_PAD_L0,
-   UNI_iPAD_L1    = UNI_PAD_L1,
-   UNI_iPAD_L2    = UNI_PAD_L2,
-   UNI_iPAD_L3    = UNI_PAD_L3,
-   UNI_iPAD_L4    = UNI_PAD_L4,
-   UNI_iPAD_L5    = UNI_PAD_L5,
-   UNI_iPAD_L9    = UNI_PAD_L9,
+   UNI_iPAD_L0    = UNI_PAD_L0,   // dimension separator row (rank > 2)
+   UNI_iPAD_L1    = UNI_PAD_L1,   // new line padding to achieve column width
+   UNI_iPAD_L2    = UNI_PAD_L2,   // old lines padding to achieve column width
+   UNI_iPAD_L3    = UNI_PAD_L3,   // blanks on the left to pad integer part
+   UNI_iPAD_L4    = UNI_PAD_L4,   // blanks on the right to pad fract part
+   UNI_iPAD_L5    = UNI_PAD_L5,   // blanks on the left to pad strings
+   UNI_iPAD_L9    = UNI_PAD_L9,   // not (yet) a pad char
 #else
    UNI_iPAD_U2    = 0xEEEE,
    UNI_iPAD_U3    = 0xEEEF,

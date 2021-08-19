@@ -367,9 +367,10 @@ using namespace std;
 
 /// return true iff \b uni is a padding character (used internally).
 inline bool is_iPAD_char(Unicode uni)
-   { return ((uni >= UNI_iPAD_U2) && (uni <= UNI_iPAD_U1)) ||
-            ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9)); }
-
+{
+   return ((uni >= UNI_iPAD_U2) && (uni <= UNI_iPAD_U1))    // ² ³ ¹
+       || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
+}
 //-----------------------------------------------------------------------------
 
 /// Stringify x.
@@ -383,8 +384,8 @@ extern std::ostream & get_CERR();
 /// print x and its source code location
 #define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
 
-/// same as Q1 (for printouts guarded by Log macros). Unlike Q() which MUST
-/// NOT REMAIN IN THE CODE, Q1 should remain in the code.
+/// same as Q1 (for printouts guarded by Log macros). Unlike Q () which MUST
+/// NOT REMAIN IN THE CODE, Q1() SHOULD remain in the code.
 #define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
 
 //-----------------------------------------------------------------------------

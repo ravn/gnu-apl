@@ -513,29 +513,43 @@ UCS_string::remove_trailing_padchars()
    // but leave other pad chars intact.
    // But only if the line has no frame (vert).
    //
+again:
+   if (size() > 2 && contains(UNI_iPAD_L0))
+      {
+        Unicode first = Unicode_0;
+        if (back() == UNI_iPAD_U9)        first = UNI_iPAD_U8;
+        else if (back() == UNI_iPAD_U5)   first = UNI_iPAD_U4;
+
+        if (first && at(size() - 2) == UNI_iPAD_L0)
+           {
+        // last column is a nested dimension separator row
+        //
+        ShapeItem len = size() - 2;
+        while (len && (at(len - 1) == UNI_iPAD_L0 ||
+                       at(len - 1) == UNI_iPAD_U0 ||
+                       at(len - 1) == UNI_iPAD_U2 ||
+                       at(len - 1) == UNI_iPAD_U6 ||
+                       at(len - 1) == UNI_iPAD_U7))   --len;
+             if (len && at(len - 1) == first)
+                {
+                  resize(len - 1);
+                  goto again;
+                }
+           }
+      }
 
    // If the line contains UNI_iPAD_L0 (higher dimension separator)
    // then discard all chars (unless the line is framed)..
    //
-   loop(u, size())
-       {
-         if (at(u) == UNI_LINE_VERT)    break;   // │   (framed)
-         if (at(u) == UNI_LINE_VERT2)   break;   // ║   (framed)
-         if (at(u) == UNI_iPAD_L0)
-            {
-              clear();
-              return;
-            }
-       }
-
    while (size())
       {
         const Unicode last = back();
-        if (last == UNI_iPAD_L0 ||   // ₀: Block separator
+        if (last == UNI_iPAD_L0 ||   // ₀: higher dimension separator
             last == UNI_iPAD_L1 ||   // ₁: pad line to PrintBuffer width
             last == UNI_iPAD_L2 ||   // ₂: pad PrintBuffer width to line
             last == UNI_iPAD_L3 ||   // ₃: pad integer part to the left
             last == UNI_iPAD_L4 ||   // ₄: pad fractional part to the right
+            last == UNI_iPAD_U2 ||   // ²  column separator (after notchar)
             last == UNI_iPAD_U2 ||   // ²  column separator (after notchar)
             last == UNI_iPAD_U7)     // ⁷  pad final to the right
             pop_back();

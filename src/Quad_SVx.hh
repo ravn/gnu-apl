@@ -116,7 +116,7 @@ class Quad_SVQ : public QuadFunction, Quad_SVx
 {
 public:
    /// Constructor.
-   Quad_SVQ() : QuadFunction(TOK_Quad_SVQ) {}
+   Quad_SVQ () : QuadFunction(TOK_Quad_SVQ) {}
 
    static Quad_SVQ * fun;         ///< Built-in function.
    static Quad_SVQ _fun;         ///< Built-in function.

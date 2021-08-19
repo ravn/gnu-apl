@@ -350,7 +350,7 @@ const bool nested = !value.is_simple();
              {
                if (last_notchar)
                   {
-                    // the previous column was 'notchar' so we add one pad
+                    // the previous column was 'notchar' so we append one pad
                     // char to it.
                     //
                     pcols[x - 1].pad_r(UNI_iPAD_U2, 1);
@@ -358,7 +358,7 @@ const bool nested = !value.is_simple();
                   }
                else if (not_char)
                   {
-                    // the current column is 'notchar' so we add one pad
+                    // the current column is 'notchar' so we prepend one pad
                     // char to it.
                     //
                     dest.pad_l(UNI_iPAD_U3, 1);
@@ -941,7 +941,7 @@ PrintBuffer::append_ucs(const UCS_string & ucs)
       {
         buffer.push_back(ucs);
       }
-   else if (ucs.size() < get_width(0))  // new line is shoter: pad it)
+   else if (ucs.size() < get_width(0))  // new line is shorter: pad it)
       {
         UCS_string ucs1(ucs);
         UCS_string pad(get_width(0) - ucs.size(), UNI_iPAD_L1);

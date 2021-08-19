@@ -173,7 +173,7 @@ char_def(CHI               , 0x03C7 , SYMBOL       , SYMBOL   ,  A2) /* χ */
 char_df1(AV_MAX            , 0x0461 , END          , NO_SPACE ,  --) /* ѡ */
 char_df1(SINGLE_QUOTE1     , 0x2018 , QUOTE1       , NONE     ,  --) /* ⁰ */
 char_df1(SINGLE_QUOTE2     , 0x2019 , QUOTE1       , NONE     ,  --) /* ‘ */
-char_df1(PAD_U0            , 0x2070 , END          , NO_SPACE ,  --) /* ’ */
+char_df1(PAD_U0            , 0x2070 , END          , NO_SPACE ,  --) /* ⁰ */
 char_df1(PAD_U4            , 0x2074 , END          , NO_SPACE ,  --) /* ⁴ */
 char_df1(PAD_U5            , 0x2075 , END          , NO_SPACE ,  --) /* ⁵ */
 char_df1(PAD_U6            , 0x2076 , END          , NO_SPACE ,  --) /* ⁶ */
