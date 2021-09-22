@@ -101,12 +101,17 @@ public:
      has_overtake(false),
      done(false)
       {
+        // increase ⍴⍴B if necessary
+        //
+        ref_B.expand_rank(sh_A.get_rank());
+
         ShapeItem _weight = 1;
         loop(r, sh_A.get_rank())
             {
               const ShapeItem sA = sh_A.get_rank() == 0
                                  ? 1 : sh_A.get_transposed_shape_item(r);
-              const ShapeItem sB = sh_B.get_rank() == 0
+              const ShapeItem sB = (sh_B.get_rank() == 0 ||
+                                    r >= sh_B.get_rank())
                                  ? 1 : sh_B.get_transposed_shape_item(r);
 
               ShapeItem _from, _to;
@@ -206,7 +211,7 @@ public:
 
 protected:
    /// shape of the source array
-   const Shape & ref_B;
+   Shape ref_B;
 
    /// from / to / weight / current
    struct _ftwc ftwc[MAX_RANK];

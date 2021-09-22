@@ -324,10 +324,10 @@ const bool nested = !value.is_simple();
 
                 // insert separator row(s)
                 //
-                const ShapeItem srows = separator_rows(y, value, nested,
-                                                       max_row_ranks[y],
-                                                  y ? max_row_ranks[y - 1] : 0);
-                if (srows)   // unless first row
+                if (const ShapeItem srows =
+                                    separator_rows(y, value, nested,
+                                                   max_row_ranks[y],
+                                                  y ? max_row_ranks[y - 1] : 0))
                    {
                     const UCS_string sepa_row(dest.get_width(0), UNI_iPAD_L0);
                     loop(r, srows)   dest.append_ucs(sepa_row);

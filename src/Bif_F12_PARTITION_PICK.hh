@@ -94,7 +94,7 @@ public:
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const
-      { return disclose(B, false); }
+      { return disclose(B, true); }
 
    /// ⊃B
    static Token disclose(Value_P B, bool rank_tolerant);
