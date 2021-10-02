@@ -24,7 +24,7 @@ dist_doc_DATA = README				\
 
 nobase_dist_sysconf_DATA = gnu-apl.d/preferences
 
-dist_noinst_DATA = Doxyfile Makefile.incl buildtag.hh config.h makefile.h
+dist_noinst_DATA = Doxyfile Makefile.incl buildtag.hh config.h
 
 include Makefile.incl
 
