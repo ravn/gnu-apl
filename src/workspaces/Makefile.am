@@ -5,5 +5,6 @@
 #
 dist_noinst_DATA =		\
 	Performance.apl		\
-	Performance.gnuplot
+	Performance.gnuplot	\
+	qq111.atf		# used by ZZ36_Regression.tc
 
