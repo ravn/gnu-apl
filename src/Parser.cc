@@ -47,8 +47,7 @@ Token_string tos1;
 
    {
      Tokenizer tokenizer(pmode, LOC, macro);
-     ErrorCode ec = tokenizer.tokenize(input, tos1);
-     if (ec != E_NO_ERROR)   return ec;
+     if (const ErrorCode ec = tokenizer.tokenize(input, tos1))   return ec;
    }
 
    // special case: single token (to speed up ⍎)

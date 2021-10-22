@@ -230,6 +230,8 @@ public:
    /// move forward in history
    void cursor_DOWN();
 
+   /// shortcut calling update_search() of member \b history with argument
+   /// \b user_line
    void update_SEARCH();
 
    /// search line history

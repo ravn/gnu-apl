@@ -86,9 +86,6 @@ xMAIL_WEB←'bug-apl@gnu.org'
 xMAIL_APL←'bug-apl@gnu.org'
 xMAIL_APL_ARCHIVE←'http://lists.gnu.org/archive/html/bug-apl/'
 xMAIL_APL_SUBSCRIBE←'https://lists.gnu.org/mailman/listinfo/bug-apl'
-xTRY_GNU_APL←'http://juergen-sauermann.de/try-GNU-APL'
-xDocker_GNU_APL←'https://hub.docker.com/r/juergensauermann/gnu-apl'
-xDocker_GNU_APL_18←'https://hub.docker.com/r/juergensauermann/gnu-apl-1.8'
 xSVN_APL←'https://savannah.gnu.org/svn/?group=apl'
 xGIT_APL←'https://savannah.gnu.org/git/?group=apl'
 
@@ -251,23 +248,8 @@ shared APL variables) are not provided in binary form. Therefore you should
 start the <B>apl</B> binary with command line option <B>--noSV</B>. Note as
 well that the binary <B>apl</B> will not be updated with every GNU APL release.
 Therefore it will contain errors that have been corrected already.
-
-<?apl HTML∆H4[''] 'GNU APL Online' ?>
-
-As of recently, there is an (experimental) online version of GNU APL. It is
-intended to give you an idea of how GNU APL will look like if you install it
-on your computer. See
-<?apl HTML∆x2y xTRY_GNU_APL HTML∆A, "<B>", xTRY_GNU_APL, "</B>" ?>.
-
-<?apl HTML∆H4[''] 'GNU APL on Docker' ?>
-
-For those who live in the cloud there is a small Docker container with Alpine
-GNU/Linux, GNU APL, and the optional libraries (SQLite, Postgres, FFT). See
-<?apl HTML∆x2y xDocker_GNU_APL HTML∆A, "<B>", xDocker_GNU_APL, "</B>" ?>.
-A larger container with GNU APL 1.8 is:
-<?apl HTML∆x2y xDocker_GNU_APL_18 HTML∆A, "<B>", xDocker_GNU_APL_18, "</B>" ?>.
-
 </DIV>
+
 <DIV class="c4">
 <?apl HTML∆H2[''] 'Reporting Bugs' ?>
 

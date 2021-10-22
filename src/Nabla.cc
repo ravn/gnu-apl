@@ -279,7 +279,14 @@ UCS_string::iterator c(first_command.begin());
       }
 
 UserFunction_header hdr(fun_header, false);
-   if (hdr.get_error())   return "Bad function header";
+   if (hdr.get_error())
+      {
+         static char cc[200];
+         snprintf(cc, sizeof(cc), "Bad function header (%s)",
+                  hdr.get_error_info());
+         cc[sizeof(cc) - 1] = 0;
+         return cc;
+      }
 
    fun_symbol = Workspace::lookup_symbol(hdr.get_name());
    Assert(fun_symbol);

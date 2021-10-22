@@ -35,7 +35,7 @@
 class UserFunction_header
 {
 public:
-   /// constructor from first line in \b txt (for normal defined functions)
+   /// constructor from first line in \b txt (for proper defined functions)
    UserFunction_header(const UCS_string & txt, bool macro);
 
    /// constructor from signature (for lambdas)
@@ -109,7 +109,8 @@ public:
    void print_properties(ostream & out, int indent) const;
 
    /// add a local variable
-   void add_local_var(Symbol * sym);
+   void add_local_var(Symbol * sym)
+      { local_vars.push_back(sym); }
 
    /// pop all local vars, labels, and parameters
    void pop_local_vars() const;
@@ -145,6 +146,15 @@ public:
       { return local_vars[idx]; }
 
 protected:
+   /// init the signature from text
+   const char * init_signature(const UCS_string & text, bool macro);
+
+   /// init the local variables from text
+   const char * init_local_vars(const UCS_string & text, bool macro);
+
+   /// return true iff bitmap \b sig is a valid funvtion signature
+   static bool signature_is_valid(Fun_signature sig);
+
    /// remove \b sym from local_vars if it occurs at pos or above
    void remove_duplicate_local_var(const Symbol * sym, size_t pos);
 
@@ -154,7 +164,8 @@ protected:
    /// source location where error was detected
    const char * error_info;
 
-   /// the name of this function
+   /// the name of this function. In most cases
+   /// function_name is sym_FUN->get_name(), but for  lambdas it is not.
    UCS_string function_name;
 
    /// optional result
