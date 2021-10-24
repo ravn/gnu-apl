@@ -335,7 +335,11 @@ public:
    : Symbol(ID_LAMBDA)
    {}
 
-   /// destroy variable
+   /// overloaded Symbol::assign(), suppressing assignment if not localized
+   virtual void assign(Value_P value, bool clone, const char * loc)
+      { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
+
+   /// destroy variable (don't)
    void destroy_var() {}
 };
 //-----------------------------------------------------------------------------
@@ -348,7 +352,11 @@ public:
    : Symbol(ID_ALPHA)
    {}
 
-   /// destroy variable
+   /// overloaded Symbol::assign(), suppressing assignment if not localized
+   virtual void assign(Value_P value, bool clone, const char * loc)
+      { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
+
+   /// destroy variable (don't)
    void destroy_var() {}
 };
 //-----------------------------------------------------------------------------
@@ -361,7 +369,11 @@ public:
    : Symbol(ID_ALPHA_U)
    {}
 
-   /// destroy variable
+   /// overloaded Symbol::assign(), suppressing assignment if not localized
+   virtual void assign(Value_P value, bool clone, const char * loc)
+      { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
+
+   /// destroy variable (don't)
    void destroy_var() {}
 };
 //-----------------------------------------------------------------------------
@@ -374,7 +386,11 @@ public:
    : Symbol(ID_CHI)
    {}
 
-   /// destroy variable
+   /// overloaded Symbol::assign(), suppressing assignment if not localized
+   virtual void assign(Value_P value, bool clone, const char * loc)
+      { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
+
+   /// destroy variable (don't)
    void destroy_var() {}
 };
 //-----------------------------------------------------------------------------
@@ -387,7 +403,11 @@ public:
    : Symbol(ID_OMEGA)
    {}
 
-   /// destroy variable
+   /// overloaded Symbol::assign(), suppressing assignment if not localized
+   virtual void assign(Value_P value, bool clone, const char * loc)
+      { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
+
+   /// destroy variable (don't)
    void destroy_var() {}
 };
 //-----------------------------------------------------------------------------
@@ -400,7 +420,11 @@ public:
    : Symbol(ID_OMEGA_U)
    {}
 
-   /// destroy variable
+   /// overloaded Symbol::assign(), suppressing assignment if not localized
+   virtual void assign(Value_P value, bool clone, const char * loc)
+      { if (value_stack_size() > 1)   Symbol::assign(value, clone, loc); }
+
+   /// destroy variable (don't)
    void destroy_var() {}
 };
 //-----------------------------------------------------------------------------

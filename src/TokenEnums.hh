@@ -157,8 +157,6 @@ enum TokenTag
 
    TOK_FUN1 = TOK_FUN2,
    TOK_NONE = -1,         // invalid tag
-   TCV_MASK = TC_MASK | TV_MASK   // mask and value (i.e. all but ID)
-
 };
 
 inline void
