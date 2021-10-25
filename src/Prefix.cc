@@ -228,6 +228,12 @@ Prefix::vector_ass_count() const
 {
 int count = 0;
 
+   // TOKEN ... TOKEN VAR ) ←   (reversed)
+   //             ↑
+   //             PC
+   //
+   // return the number of TOKEN (not including VAR)
+   //
    for (Function_PC pc = PC; pc < Function_PC(body.size()); ++pc)
        {
          if (body[pc].get_tag() != TOK_LSYMB2)   break;
@@ -1874,6 +1880,7 @@ Token result;
    set_action(result);
 }
 //-----------------------------------------------------------------------------
+/// pattern V ) ← B
 void
 Prefix::reduce_V_RPAR_ASS_B()
 {
@@ -1881,18 +1888,56 @@ Prefix::reduce_V_RPAR_ASS_B()
 
 const int count = vector_ass_count();
 
+   if (count == 0)
+      {
+        // count == 0 normally indicates a selective specification. However,
+        // an incorrect vector assignment such as (A 1 C) ← would also lead
+        // to count == 0 (because Parser.cc would set is_vector_spec to
+        // false around line 820 in Parser.cc). We fix this case here.
+        //
+        TokenClass tc = body[PC].get_Class();
+        if (tc != TC_FUN12 && tc != TC_OPER1 && tc != TC_OPER2)
+           {
+             // this case is rather rare, so we can afford a little time
+             // to verify that we have at least one function in the supposed
+             // selective specification
+             bool selective_spec = false;
+             for (int pc = PC + 1;;)
+                 {
+                   tc = body[pc++].get_Class();
+                   if (tc == TC_FUN12 || tc == TC_OPER1 || tc == TC_OPER2)
+                      {
+                        selective_spec = true;
+                        break;
+                      }
+                   else if (tc == TC_L_PARENT)   // most likely end of (...)←
+                      {
+                        break;
+                      }
+                 }
+
+             if (!selective_spec)
+                {
+                  MORE_ERROR() <<
+                  "Malformed selective specification or vector specification";
+                  LEFT_SYNTAX_ERROR;
+                }
+           }
+      }
+
    // vector assignment also matches selective specification, but count
    // distinguishes them, e.g.
    //
-   // (T U V) ← value        count = 2	    vector assignment
-   //   (U V) ← value        count = 1	    vector assignment
-   // (2 ↑ V) ← value        count = 0	    selective specification
+   // (T U V) ← value        count = 2      vector assignment
+   //   (U V) ← value        count = 1      vector assignment
+   // (2 ↑ V) ← value        count = 0      selective specification
    //
    if (count < 1)
       {
         // selective specification. Convert variable V into a (left-) value
         //
         Symbol * V = at0().get_sym_ptr();
+        Assert1(V);
         Token result = V->resolve_lv(LOC);
         set_assign_state(ASS_var_seen);
         at0().move_1(result, LOC);
@@ -1906,9 +1951,9 @@ std::vector<Symbol *> symbols;
    symbols.push_back(at0().get_sym_ptr());
    loop(c, count)
       {
-        Token_loc tl = lookahead();
-        Assert1(tl.tok.get_tag() == TOK_LSYMB2);   // by vector_ass_count()
-        Symbol * V = tl.tok.get_sym_ptr();
+        const Token tok = lookahead().tok;
+        Assert1(tok.get_tag() == TOK_LSYMB2);   // by vector_ass_count()
+        Symbol * V = tok.get_sym_ptr();
         Assert(V);
         symbols.push_back(V);
       }

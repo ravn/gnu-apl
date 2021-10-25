@@ -790,6 +790,7 @@ Token tok(TOK_APL_VALUE3, vector);
       }
 }
 //-----------------------------------------------------------------------------
+/// in tos, (re-) mark the symbols left of ← as left symbols
 void
 Parser::mark_lsymb(Token_string & tos)
 {
@@ -797,11 +798,11 @@ Parser::mark_lsymb(Token_string & tos)
       {
         if (tos[ass].get_Class() != TC_ASSIGN)   continue;
 
-        // found ←. move backwards. Before that we handle the special case of
-        // vector specification, i.e. (SYM SYM ... SYM) ← value
+        // found ← in VAR VAR)← move backwards. Before that we handle the special
+        // case of vector specification, i.e. (SYM SYM ... SYM) ← value
         //
         if (ass >= 3 && tos[ass - 1].get_Class() == TC_R_PARENT &&
-                        tos[ass - 2].get_Class() == TC_SYMBOL &&
+                        tos[ass - 2].get_Class() == TC_SYMBOL   &&
                         tos[ass - 3].get_Class() == TC_SYMBOL)
            {
              // first make sure that this is really a vector specification.
@@ -809,17 +810,36 @@ Parser::mark_lsymb(Token_string & tos)
              const int syms_to = ass - 2;
              int syms_from = ass - 3;
              bool is_vector_spec = true;
+             bool is_selective_spec = false;
              for (int a1 = ass - 4; a1 >= 0; --a1)
                  {
-                   if (tos[a1].get_Class() == TC_L_PARENT)
+                   const TokenClass tc = tos[a1].get_Class();
+                   if (tc == TC_L_PARENT)   // end of (...)←
                       {
                         syms_from = a1 + 1;
                         break;
                       }
-                   if (tos[a1].get_Class() == TC_SYMBOL)     continue; 
+                   if (tc == TC_SYMBOL)     continue; 
+                   if (tc == TC_FUN12 || tc == TC_OPER1 || tc == TC_OPER2)
+                      {
+                        is_selective_spec = true;
+                        is_vector_spec = false;
+                        break;
+                      }
+
+                   // something else
+                   //
                    is_vector_spec = false;
                    break;
                  }
+
+             if (is_selective_spec == is_vector_spec)   // none or both
+                {
+                  MORE_ERROR() <<
+                      "Left of )← seems to be neither a vector "
+                      "specification nor a selective specvification";
+                  LEFT_SYNTAX_ERROR;
+                }
 
              // if this is a vector specification, then mark all symbols
              // inside ( ... ) as TOK_LSYMB2.

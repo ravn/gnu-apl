@@ -763,18 +763,17 @@ Symbol::resolve_lv(const char * loc)
 
    Assert(value_stack.size());
 
-   // if this is not a variable, then re-use the error handling of resolve().
-   if (value_stack.back().name_class != NC_VARIABLE)
+   if (value_stack.back().name_class == NC_VARIABLE)
       {
-        CERR << "Symbol '" << get_name()
-             << "' has changed type from variable to name class "
-             << value_stack.back().name_class << endl
-             << " while executing an assignment" << endl;
-        throw_apl_error(E_LEFT_SYNTAX_ERROR, loc);
+        Value_P val = value_stack.back().apl_val;
+        return Token(TOK_APL_VALUE1, val->get_cellrefs(loc));
       }
 
-Value_P val = value_stack.back().apl_val;
-   return Token(TOK_APL_VALUE1, val->get_cellrefs(loc));
+   MORE_ERROR() << "Symbol '" << get_name()
+                << "' has changed type from variable to name class "
+                << value_stack.back().name_class
+                << "\nwhile executing an assignment\n";
+   throw_apl_error(E_LEFT_SYNTAX_ERROR, loc);
 }
 //-----------------------------------------------------------------------------
 TokenClass
