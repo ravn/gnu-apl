@@ -569,7 +569,7 @@ UCS_string ucs;
                 ucs.append(UNI_SEMICOLON);
              else
                 Assert(0);
-                break;
+             break;
 
         case TC_R_BRACK:
              ucs.append(UNI_R_BRACK);
