@@ -787,7 +787,8 @@ Unicode lookahead = input.get_next();
              if (!suppress)
                 {
                   Value_P ZZ(ucs, LOC);
-                  new (&Z->get_ravel(z++))   PointerCell(ZZ.get(), Z.getref());
+                  new (&Z->get_ravel(z++))
+                      PointerCell(ZZ.get(), Z.getref());
                 }
            }
         else if (conv == UNI_n)  // characters consumed thus far
@@ -869,7 +870,8 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "\n"
 "   Ze ←    ⎕FIO[ 4] Bh    fclose(Bh)\n"
 "   Ze ←    ⎕FIO[ 5] Bh    errno (of the last call using Bh)\n"
-"   Zb ←    ⎕FIO[ 6] Bh    fread(Zi, 1, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
+"   Zb ←    ⎕FIO[ 6] Bh    fread(Zi, 1, " << SMALL_BUF
+                                          << ", Bh) 1 byte per Zb\n"
 "   Zb ← Ai ⎕FIO[ 6] Bh    fread(Zi, 1, Ai, Bh) 1 byte per Zb\n"
 "   Zi ← Ab ⎕FIO[ 7] Bh    fwrite(Ab, 1, ⍴Ai, Bh) 1 byte per Ai\n"
 "   Zb ←    ⎕FIO[ 8] Bh    fgets(Zb, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
