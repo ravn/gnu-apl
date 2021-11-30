@@ -48,8 +48,11 @@ Thread_context::Thread_context()
 //-----------------------------------------------------------------------------
 Thread_context::~Thread_context()
 {
-   // CERR << "\n*** DELETING Thread_context #" << N << endl;
-   if (thread)   pthread_kill(thread, SIGKILL);
+   // PRINT_LOCKED(CERR << "\n*** DELETING Thread_context #" << N << endl)
+
+   // if (thread && N)   pthread_kill(thread, SIGKILL);   prints "Killed"
+
+   if (thread && N)   pthread_cancel(thread);
    thread = 0;
 }
 //-----------------------------------------------------------------------------
