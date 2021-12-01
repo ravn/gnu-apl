@@ -83,6 +83,7 @@ size_t diff_pos = 0;
 
    aplout.clear();
    PERFORMANCE_END(fs_COUT_B, cout_perf, 1)
+   cout << flush;
    return 0;
 }
 //-----------------------------------------------------------------------------
