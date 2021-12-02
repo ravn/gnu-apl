@@ -85,8 +85,8 @@ SVNUP:
 SYNC:	DIST
 	rm -Rf apl-$(VERSION)
 	tar xvzf apl-$(VERSION).tar.gz
-	rm -f apl-$(VERSION)/src/makefile.h
-	rm -f apl-$(VERSION)/src/buildtag.hh
+	rm -f apl-$(VERSION)/makefile.h
+	rm -f apl-$(VERSION)/buildtag.hh
 	cp -a apl-$(VERSION)/* ../savannah-repo-apl/trunk/
 	echo "exported from SVN version " `svnversion` > \
     ../savannah-repo-apl/trunk/exported_from

@@ -1820,7 +1820,6 @@ Command::cmd_MORE(ostream & out)
 void
 Command::cmd_OFF(int exit_val)
 {
-   cleanup(true);
    COUT << endl;
    if (!uprefs.silent)
       {
@@ -1835,6 +1834,8 @@ Command::cmd_OFF(int exit_val)
              << " seconds " << endl;
 
       }
+
+   cleanup(true);
 
    // restore the initial memory rlimit
    //
