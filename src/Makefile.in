@@ -100,7 +100,7 @@ host_triplet = @host@
 # but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
 #
 @HAVE_GTK3_TRUE@am__append_2 = Gtk
-@HAVE_LIBPCRE2_32_TRUE@am__append_3 = Regexp.cc					Regexp.hh
+@HAVE_LIBPCRE2_32_TRUE@am__append_3 = Regexp.cc                                     Regexp.hh
 @SQLITE3_TRUE@am__append_4 = $(SQLITE3_CFLAGS)
 @SQLITE3_TRUE@am__append_5 = $(SQLITE3_LDFLAGS)
 @SQLITE3_TRUE@am__append_6 = sql/SqliteArgListBuilder.cc \
@@ -5299,7 +5299,7 @@ all: ../makefile.h
 # but what if m4 is missing? So we explicitly 'make update-svar_signals'
 # when Svar_signals.def or tcp_signal.m4 have changed (which rarely happens)
 #
-.PHONY:	update-svar_signals
+.PHONY: update-svar_signals
 update-svar_signals:
 	m4 -D protocol=Svar_signals tcp_signal.m4 > Svar_signals.hh
 
@@ -5322,17 +5322,17 @@ testAP: all
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt
 
-.PHONY:	patch
+.PHONY: patch
 patch:
 	mkdir -p patches
 	svn diff > patches/`date +patch_%F-%R.diff`
 
-.PHONY:	git-pull
+.PHONY: git-pull
 git-pull:
 	make -C emacs_mode $@
 	make -C sql $@
 
-.PHONY:	help
+.PHONY: help
 help:
 	@echo ""
 	@echo ""
