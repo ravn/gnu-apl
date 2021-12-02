@@ -23,7 +23,7 @@
 
 // NOTE: the path to config.h and makefile.h is set as -I $(pwd) in ./configure
 //
-#include "../config.h"   // for xxx_WANTED and other macros from ./configure
+#include "config.h"   // for xxx_WANTED and other macros from ./configure
 
 // makefile.h uses STR(), so define it before
 #define STR(x) #x

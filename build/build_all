@@ -273,7 +273,7 @@ build_develop()
   echo
   echo  "$build_errors build errors"
   echo "$missing_files missing files (build results)"
-  [ ! -z $bad_configs ] && echo "$configs_bad configurations failed: $bad_configs"
+  [ ! -z "$bad_configs" ] && echo "$configs_bad configurations failed: $bad_configs"
   echo  "$configs_good configurations succeeded"
   echo   "$test_errors testcases failed"
 } >> "$TOP_LOG_dir/summary.log"
