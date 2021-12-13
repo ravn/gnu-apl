@@ -1774,8 +1774,11 @@ const ShapeItem ec_z = Z->element_count();
 Value_P
 Value::index(Value_P X) const
 {
+   if (!X)   return clone(LOC);   // [ ] (1-item elided index)
+
    if (is_member())
       {
+
         const UCS_string name(X.getref());
 
         if (const Cell * data = get_member_data(name))   // member exists
@@ -1791,13 +1794,16 @@ Value::index(Value_P X) const
            }
 
         UCS_string & more = MORE_ERROR() << "member access: member " << name
-                                    << " was not found. The valid members are:";
+                                << " was not found. The valid members are:";
         const ShapeItem rows = get_rows();
         loop(r, rows)
             {
               const Cell & cell_r = get_ravel(2*r);
-              if (cell_r.is_pointer_cell())   more << "\n      "
-                               << UCS_string(cell_r.get_pointer_value().getref());
+              if (cell_r.is_pointer_cell())
+                 {
+                   more << "\n      "
+                        << UCS_string(cell_r.get_pointer_value().getref());
+                 }
             }
         INDEX_ERROR;
       }
@@ -1820,8 +1826,6 @@ const APL_Integer qio = Workspace::get_IO();
       }
 
    if (get_rank() != 1)   RANK_ERROR;
-
-   if (!X)   return clone(LOC);   // elided index
 
 const Shape shape_Z(X->get_shape());
 Value_P Z(shape_Z, LOC);
