@@ -19858,7 +19858,7 @@ user_wants_ctrld_del=no
 
 # Check whether --with-ctrld_del was given.
 if test "${with_ctrld_del+set}" = set; then :
-  withval=$with_ctrld_del; user_wants_ctrld_del=yes
+  withval=$with_ctrld_del; user_wants_ctrld_del=$withval
 fi
 
 
@@ -19893,7 +19893,7 @@ user_wants_android=no
 
 # Check whether --with-android was given.
 if test "${with_android+set}" = set; then :
-  withval=$with_android; user_wants_android=yes
+  withval=$with_android; user_wants_android=$withval
 fi
 
 
@@ -19922,7 +19922,7 @@ user_wants_erlang=no
 
 # Check whether --with-erlang was given.
 if test "${with_erlang+set}" = set; then :
-  withval=$with_erlang; user_wants_erlang=yes
+  withval=$with_erlang; user_wants_erlang=$withval
 fi
 
 
@@ -19951,7 +19951,7 @@ user_wants_libapl=$user_wants_erlang   # Erlang needs libapl
 
 # Check whether --with-libapl was given.
 if test "${with_libapl+set}" = set; then :
-  withval=$with_libapl; user_wants_libapl=yes
+  withval=$with_libapl; user_wants_libapl=$withval
 fi
 
 
@@ -19982,7 +19982,7 @@ PYTHON_CFLAGS=
 
 # Check whether --with-python was given.
 if test "${with_python+set}" = set; then :
-  withval=$with_python; user_wants_python=yes
+  withval=$with_python; user_wants_python=$withval
 fi
 
 

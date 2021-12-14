@@ -368,7 +368,7 @@ user_wants_ctrld_del=no
 AC_ARG_WITH( [ctrld_del],
              [AS_HELP_STRING([--with-ctrld_del],
                              [enable to use ^D as del-char, ^Z as EOT])],
-             [user_wants_ctrld_del=yes])
+             [user_wants_ctrld_del=$withval])
 
 if test "x$user_wants_ctrld_del" = xyes ; then
     AC_DEFINE([WANT_CTRLD_DEL], [1],
@@ -390,7 +390,7 @@ user_wants_android=no
 AC_ARG_WITH( [android],
              [AS_HELP_STRING([--with-android],
                              [enable when compiling for Android])],
-             [user_wants_android=yes])
+             [user_wants_android=$withval])
 
 if test "x$user_wants_android" = xyes ; then
    AC_DEFINE([WANT_ANDROID], [1], [Define if compiling for Android])
@@ -406,7 +406,7 @@ user_wants_erlang=no
 AC_ARG_WITH( [erlang],
              [AS_HELP_STRING([--with-erlang],
                              [enable to build the Erlang interface])],
-             [user_wants_erlang=yes])
+             [user_wants_erlang=$withval])
 
 if test "x$user_wants_libapl" = xyes ; then
    AC_DEFINE([WANT_ERLANG], [1], [Define if building the Erlang interface])
@@ -422,7 +422,7 @@ user_wants_libapl=$user_wants_erlang   # Erlang needs libapl
 AC_ARG_WITH( [libapl],
              [AS_HELP_STRING([--with-libapl],
                              [enable to build libapl.so])],
-             [user_wants_libapl=yes])
+             [user_wants_libapl=$withval])
 
 if test "x$user_wants_libapl" = xyes ; then
    AC_DEFINE([WANT_LIBAPL], [1], [Define if building libapl.so])
@@ -440,7 +440,7 @@ PYTHON_CFLAGS=
 AC_ARG_WITH( [python],
              [AS_HELP_STRING([--with-python],
              [enable to build python extension lib_gnu_apl.so])],
-             [user_wants_python=yes])
+             [user_wants_python=$withval])
 
 if test "$user_wants_python" = yes ; then
    AC_DEFINE([WANT_PYTHON], [1], [Define if building lib_gnu_apl.so])
