@@ -248,7 +248,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>August 3, 2021
+<p>January 3, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -476,9 +476,52 @@ to identify share partners.
 </li><li> <samp>-l num</samp>
 
 <p>turn logging facility <strong>num</strong> ON (provided that dynamic logging was
-configured). The logging facility 37 (start-up messages) is of particular
-importance for troubleshooting and works even if even if dynamic logging
-was not configured.
+./configure&rsquo;d). The logging facility 37 (start-up messages) is of particular
+importance for troubleshooting and it works even if dynamic logging
+was not ./configure&rsquo;d.
+</p>
+</li><li> <samp>--mem [memory-limit]</samp>
+
+<p>tell the interpreter to not use more than memory-limit bytes of RAM. By
+using this option, the user is fully responsible for ensuring that the
+specified amount of memory will always be available. The following rules
+should be observed.
+</p>
+<p>The intepreter will exit at start-up if <samp>--mem</samp> is used and:
+</p>
+<ul>
+<li> the platform on which the interpreter runs has no /proc/meminfo, or
+</li><li> the platform has no /proc/sys/vm/overcommit_memory, or
+</li><li> /proc/sys/vm/overcommit_memory is not 2 (aka. &rsquo;never overcommit&rsquo;)
+</li></ul>
+
+<p>On GNU/Linux systems these conditions are normally satisfied, but the root
+user has to set /proc/sys/vm/overcommit_memory to 2 which differs from the
+default value 0 (aka. overcommit allowed).
+</p>
+<p>If no memory-limit is given, then a memory-limit of 50% is used.
+</p>
+<p>If a memory-limit is provided then it must have a unit of %, kB, MB, or GB.
+If the unit is % then the limit is computed as that percentage (between 5%
+and 95%) of parameter &rsquo;MemFree:&rsquo; in /proc/meminfo. Otherwise the limit
+is the given amount in kB, MB, or GB.
+</p>
+<p>For example:
+</p>
+<ul>
+<li> <samp>--mem</samp>      (50% of MemFree: in /proc/meminfo are guaranteed)
+</li><li> <samp>--mem 80%</samp>  (80% of MemFree: in /proc/meminfo are guaranteed)
+</li><li> <samp>--mem 5G</samp>   (5 GB are guaranteed)
+</li></ul>
+
+<p>WARNING: The memory-limit is checked against parameter &rsquo;MemFree&rsquo; in
+/proc/meminfo when GNU APL starts, but this does not protect against
+other processes consuming the free memory at a later point in time.
+</p>
+<p>If that happens (and according to the rules above the user has the
+responsibility to prevent it), then ⎕WA becomes unreliable and the
+interpreter may crash badly (i.e. without a WS FULL error, and without
+any chance to )SAVE the workspace) when the available memory is exhausted.
 </p>
 </li><li> <samp>--echoCIN</samp>
 copy the input line (after editing) to stdout. For creating session logs.
@@ -3353,7 +3396,7 @@ multiplies B with a window function and then computes the FFT:
 
 <p>⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The
 implementation of ⎕FFT uses libfftw3, aka. &quot;The fastest Fourier Transform in
-the West&quot;. GNU APL checks the presence of libfftw3 when it is ./configured.
+the West&quot;. GNU APL checks the presence of libfftw3 when it is ./configure&rsquo;d.
 If libfftw3 is present then ⎕FFT will hopefully return the expected result;
 if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 </p>
@@ -3720,7 +3763,7 @@ The default value of ⎕PS is 0 0. ⎕PS is a session variable which survives
 </p>
 <p>⎕PS[1] = 1: print rational quotients as A÷B
 </p>
-<p>Note: ⎕PS[1] has only an effect if rational numbers were ./configured.
+<p>Note: ⎕PS[1] has only an effect if rational numbers were ./configure&rsquo;d.
 </p>
 <p>⎕PS[2] = 0: no &quot;boxing&quot; of APL values
 </p>

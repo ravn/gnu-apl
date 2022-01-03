@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-August 3, 2021
+January 3, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -237,9 +237,53 @@ GNU APL understands the following command line options:
    • ‘-l num’
 
      turn logging facility *num* ON (provided that dynamic logging was
-     configured).  The logging facility 37 (start-up messages) is of
-     particular importance for troubleshooting and works even if even if
-     dynamic logging was not configured.
+     ./configure’d).  The logging facility 37 (start-up messages) is of
+     particular importance for troubleshooting and it works even if
+     dynamic logging was not ./configure’d.
+
+   • ‘--mem [memory-limit]’
+
+     tell the interpreter to not use more than memory-limit bytes of
+     RAM. By using this option, the user is fully responsible for
+     ensuring that the specified amount of memory will always be
+     available.  The following rules should be observed.
+
+     The intepreter will exit at start-up if ‘--mem’ is used and:
+
+        • the platform on which the interpreter runs has no
+          /proc/meminfo, or
+        • the platform has no /proc/sys/vm/overcommit_memory, or
+        • /proc/sys/vm/overcommit_memory is not 2 (aka.  ’never
+          overcommit’)
+
+     On GNU/Linux systems these conditions are normally satisfied, but
+     the root user has to set /proc/sys/vm/overcommit_memory to 2 which
+     differs from the default value 0 (aka.  overcommit allowed).
+
+     If no memory-limit is given, then a memory-limit of 50% is used.
+
+     If a memory-limit is provided then it must have a unit of %, kB,
+     MB, or GB. If the unit is % then the limit is computed as that
+     percentage (between 5% and 95%) of parameter ’MemFree:’ in
+     /proc/meminfo.  Otherwise the limit is the given amount in kB, MB,
+     or GB.
+
+     For example:
+
+        • ‘--mem’ (50% of MemFree: in /proc/meminfo are guaranteed)
+        • ‘--mem 80%’ (80% of MemFree: in /proc/meminfo are guaranteed)
+        • ‘--mem 5G’ (5 GB are guaranteed)
+
+     WARNING: The memory-limit is checked against parameter ’MemFree’ in
+     /proc/meminfo when GNU APL starts, but this does not protect
+     against other processes consuming the free memory at a later point
+     in time.
+
+     If that happens (and according to the rules above the user has the
+     responsibility to prevent it), then ⎕WA becomes unreliable and the
+     interpreter may crash badly (i.e.  without a WS FULL error, and
+     without any chance to )SAVE the workspace) when the available
+     memory is exhausted.
 
    • ‘--echoCIN’ copy the input line (after editing) to stdout.  For
      creating session logs.
@@ -3009,9 +3053,9 @@ first multiplies B with a window function and then computes the FFT:
    ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more.
 The implementation of ⎕FFT uses libfftw3, aka.  "The fastest Fourier
 Transform in the West".  GNU APL checks the presence of libfftw3 when it
-is ./configured.  If libfftw3 is present then ⎕FFT will hopefully return
-the expected result; if not then a DOMAIN ERROR will be raised when ⎕FFT
-is being used.
+is ./configure’d.  If libfftw3 is present then ⎕FFT will hopefully
+return the expected result; if not then a DOMAIN ERROR will be raised
+when ⎕FFT is being used.
 
    ⎕FFT honors the presence of /etc/fftw/wisdom (see man fftw-wisdom) to
 speed up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom
@@ -3361,7 +3405,7 @@ which survives )LOADing of workspaces
    ⎕PS[1] = 1: print rational quotients as A÷B
 
    Note: ⎕PS[1] has only an effect if rational numbers were
-./configured.
+./configure’d.
 
    ⎕PS[2] = 0: no "boxing" of APL values
 
@@ -6202,63 +6246,63 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11436
-Node: Chapter 220780
-Node: Section 2.122675
-Node: Section 2.238835
-Node: Section 2.339594
-Node: Section 2.440881
-Node: Section 2.545246
-Node: Section 2.645419
-Node: Section 2.746049
-Node: Section 2.850002
-Node: Section 2.951537
-Node: Section 2.1053630
-Node: Section 2.1155183
-Node: Section 2.1256968
-Node: Section 2.1358908
-Node: Section 2.1459849
-Node: Section 2.1560101
-Node: Section 2.1661497
-Node: Section 2.1771642
-Node: Section 2.1874160
-Node: Section 2.1980867
-Node: Section 2.2082312
-Node: Section 2.2187973
-Node: Section 2.2293007
-Node: Section 2.2396288
-Node: Section 2.2496579
-Node: Section 2.25107154
-Node: Section 2.26107426
-Node: Section 2.27114004
-Node: Section 2.28116461
-Node: Section 2.29117130
-Node: Section 2.30118789
-Node: Section 2.31121912
-Node: Section 2.32129772
-Node: Section 2.33130719
-Node: Section 2.34144281
-Node: Section 2.35154278
-Node: Section 2.36157382
-Node: Section 2.37159371
-Node: Section 2.38163796
-Node: Chapter 3185214
-Node: Chapter 4187717
-Node: Chapter 5188843
-Node: Section 5.1190380
-Node: Section 5.2191660
-Node: Section 5.3192020
-Node: Section 5.4192262
-Node: Section 5.5192924
-Node: Section 5.6193402
-Node: Section 5.7194174
-Node: Section 5.8194631
-Node: Chapter 6195033
-Node: Section 6.1195452
-Node: Section 6.2196139
-Node: Chapter 7196970
-Node: Section 7.1197473
-Node: Section 7.2222787
+Node: Chapter 11437
+Node: Chapter 222733
+Node: Section 2.124628
+Node: Section 2.240788
+Node: Section 2.341547
+Node: Section 2.442834
+Node: Section 2.547199
+Node: Section 2.647372
+Node: Section 2.748002
+Node: Section 2.851955
+Node: Section 2.953490
+Node: Section 2.1055583
+Node: Section 2.1157136
+Node: Section 2.1258921
+Node: Section 2.1360861
+Node: Section 2.1461802
+Node: Section 2.1562054
+Node: Section 2.1663450
+Node: Section 2.1773595
+Node: Section 2.1876113
+Node: Section 2.1982820
+Node: Section 2.2084265
+Node: Section 2.2189926
+Node: Section 2.2294960
+Node: Section 2.2398241
+Node: Section 2.2498532
+Node: Section 2.25109107
+Node: Section 2.26109379
+Node: Section 2.27115957
+Node: Section 2.28118417
+Node: Section 2.29119086
+Node: Section 2.30120745
+Node: Section 2.31123868
+Node: Section 2.32131728
+Node: Section 2.33132678
+Node: Section 2.34146240
+Node: Section 2.35156237
+Node: Section 2.36159341
+Node: Section 2.37161330
+Node: Section 2.38165755
+Node: Chapter 3187173
+Node: Chapter 4189676
+Node: Chapter 5190802
+Node: Section 5.1192339
+Node: Section 5.2193619
+Node: Section 5.3193979
+Node: Section 5.4194221
+Node: Section 5.5194883
+Node: Section 5.6195361
+Node: Section 5.7196133
+Node: Section 5.8196590
+Node: Chapter 6196992
+Node: Section 6.1197411
+Node: Section 6.2198098
+Node: Chapter 7198929
+Node: Section 7.1199432
+Node: Section 7.2224746
 
 End Tag Table
 

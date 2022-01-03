@@ -281,9 +281,53 @@ to identify share partners.
 @option{-l num}
 
 turn logging facility @strong{num} ON (provided that dynamic logging was
-configured). The logging facility 37 (start-up messages) is of particular
-importance for troubleshooting and works even if even if dynamic logging
-was not configured.
+./configure'd). The logging facility 37 (start-up messages) is of particular
+importance for troubleshooting and it works even if dynamic logging
+was not ./configure'd.
+
+@item
+@option{--mem [memory-limit]}
+
+tell the interpreter to not use more than memory-limit bytes of RAM. By
+using this option, the user is fully responsible for ensuring that the
+specified amount of memory will always be available. The following rules
+should be observed.
+
+The intepreter will exit at start-up if @option{--mem} is used and:
+
+@itemize
+@item the platform on which the interpreter runs has no /proc/meminfo, or
+@item the platform has no /proc/sys/vm/overcommit_memory, or
+@item /proc/sys/vm/overcommit_memory is not 2 (aka. 'never overcommit')
+@end itemize
+
+On GNU/Linux systems these conditions are normally satisfied, but the root
+user has to set /proc/sys/vm/overcommit_memory to 2 which differs from the
+default value 0 (aka. overcommit allowed).
+
+If no memory-limit is given, then a memory-limit of 50% is used.
+
+If a memory-limit is provided then it must have a unit of %, kB, MB, or GB.
+If the unit is % then the limit is computed as that percentage (between 5%
+and 95%) of parameter 'MemFree:' in /proc/meminfo. Otherwise the limit
+is the given amount in kB, MB, or GB.
+
+For example:
+
+@itemize
+@item @option{--mem}      (50% of MemFree: in /proc/meminfo are guaranteed)
+@item @option{--mem 80%}  (80% of MemFree: in /proc/meminfo are guaranteed)
+@item @option{--mem 5G}   (5 GB are guaranteed)
+@end itemize
+
+WARNING: The memory-limit is checked against parameter 'MemFree' in
+/proc/meminfo when GNU APL starts, but this does not protect against
+other processes consuming the free memory at a later point in time.
+
+If that happens (and according to the rules above the user has the
+responsibility to prevent it), then ⎕WA becomes unreliable and the
+interpreter may crash badly (i.e. without a WS FULL error, and without
+any chance to )SAVE the workspace) when the available memory is exhausted.
 
 @item
 @option{--echoCIN}
@@ -3120,7 +3164,7 @@ multiplies B with a window function and then computes the FFT:
 
 ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The
 implementation of ⎕FFT uses libfftw3, aka. "The fastest Fourier Transform in
-the West". GNU APL checks the presence of libfftw3 when it is ./configured.
+the West". GNU APL checks the presence of libfftw3 when it is ./configure'd.
 If libfftw3 is present then ⎕FFT will hopefully return the expected result;
 if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 
@@ -3475,7 +3519,7 @@ The default value of ⎕PS is 0 0. ⎕PS is a session variable which survives
 
 ⎕PS[1] = 1: print rational quotients as A÷B
 
-Note: ⎕PS[1] has only an effect if rational numbers were ./configured.
+Note: ⎕PS[1] has only an effect if rational numbers were ./configure'd.
 
 ⎕PS[2] = 0: no "boxing" of APL values
 

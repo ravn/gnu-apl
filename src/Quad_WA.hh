@@ -39,6 +39,8 @@ public:
    /// initialize total_memory
    static void init(bool log_startup);
 
+   static void parse_mem(bool log_startup);
+
    /// the estimated (!) the amount of free memory
    static uint64_t total_memory;
 
@@ -55,6 +57,25 @@ public:
    static unsigned long long initial_sbrk;
 
 protected:
+   /// some relevant values in /proc/meminfo
+   static struct _mem_info
+      {
+        _mem_info()
+        : Available(0),   ///< bytes available
+          Cached(0),      ///< bytes cached
+          MemFree(0)      ///< bytes free
+          {}
+
+        uint64_t Available;   ///< kilobytes available
+        uint64_t Cached;      ///< kilobytes cached
+        uint64_t MemFree;     ///< kilobytes free
+      } meminfo;
+
+   /// read /proc/meminfo, return the number of items found
+   static int read_meminfo();
+
+   static int64_t read_procfile(const char * filename);
+
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
    /// estimate (!) the amount of free memory

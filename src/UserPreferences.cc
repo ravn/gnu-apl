@@ -95,6 +95,7 @@ UserPreferences::usage(const char * prog)
 "    --emacs_arg arg      run in emacs mode with argument 'arg'\n"
 "    --eval expr          evaluate APL line expr and exit\n"
 "    --gpl                show license (GPL) and exit\n"
+"    --huge [arg]         memory management\n"
 "    -L wsname            )LOAD wsname (and not SETUP or CONTINUE) on startup\n"
 "    --LX expr            execute APL expression expr first\n"
 "    --OFF                automatically )OFF after last input file\n"
@@ -425,6 +426,19 @@ UserPreferences::parse_argv_2(bool logit)
             {
               usage(expanded_argv[0]);
               exit(0);
+            }
+
+         if (!strcmp(opt, "--mem"))
+            {
+              mem_arg = "";   // assume no value
+              if (val)   // --huge with user-supplied value
+                 {
+                   ++a;   // skip val
+                   mem_arg = val;
+                 }
+
+              Quad_WA::parse_mem(logit);
+              continue;
             }
 
          if (!strcmp(opt, "--id"))
@@ -1035,7 +1049,7 @@ UserPreferences::open_user_file(const char * fname, char * filename,
         // check that $HOME/.gnu-apl/preferences exist and fall back to
         // $HOME/.config gnu-apl/preferences if not
         //
-        if (access(filename, F_OK) != 0)   // file does not exit
+        if (access(filename, F_OK) != 0)   // file does not exist
            {
              snprintf(filename, APL_PATH_MAX,
                       "%s/.config/gnu-apl/%s", HOME, fname);
@@ -1133,7 +1147,7 @@ int file_profile = 0;   // the current profile in the preferences file
          // the user while Profile N > 0 in the file requires the same
          // profile requested by the user.
          //
-         if (!strcasecmp(opt, "Profile"))   // Never ignore Profile entries
+         if (!strcasecmp(opt, "PROFILE"))   // Never ignore Profile entries
             {
               file_profile = atoi(arg);
               continue;
@@ -1175,9 +1189,9 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          sargs[sargs_idx] = "NUL";              // terminating 0
 
-         if (!strcasecmp(opt, "Color"))
+         if (!strcasecmp(opt, "COLOR"))
             {
-              if (yes_no)   // user said "Yes" or "No"
+              if (yes_no)   // user said "YES" or "NO"
                  {
                    // if the user said "Yes" (which is an obsolete setting)
                    // then use_curses is cleared because at the time when
@@ -1195,20 +1209,20 @@ int file_profile = 0;   // the current profile in the preferences file
                    do_Color = true;
                  }
             }
-         else if (!strcasecmp(opt, "Keyboard"))
+         else if (!strcasecmp(opt, "KEYBOARD"))
             {
               // obsolete
             }
-         else if (yes_no && !strcasecmp(opt, "Welcome"))
+         else if (yes_no && !strcasecmp(opt, "WELCOME"))
             {
               silent = no;
             }
-         else if (yes_no && !strcasecmp(opt, "SharedVars"))
+         else if (yes_no && !strcasecmp(opt, "SHAREDVARS"))
             {
               user_do_svars = yes;
               system_do_svars = yes;
             }
-         else if (!strcasecmp(opt, "Logging"))
+         else if (!strcasecmp(opt, "LOGGING"))
             {
               d[0] = strtoll(arg, 0, 10);   // decimal!
               Log_control(LogId(d[0]), true);
@@ -1363,11 +1377,15 @@ int file_profile = 0;   // the current profile in the preferences file
                  }
               else line_history_path = UTF8_string(arg);
             }
+         else if (!strcasecmp(opt, "MEMORY"))
+            {
+              mem_arg = strdup(arg);
+            }
          else if (!strcasecmp(opt, "NABLA-TO-HISTORY"))
             {
-              if      (!strcasecmp(arg, "Never"))      nabla_to_history = 0;
-              else if (!strcasecmp(arg, "Modified"))   nabla_to_history = 1;
-              else if (!strcasecmp(arg, "Always"))     nabla_to_history = 2;
+              if      (!strcasecmp(arg, "NEVER"))      nabla_to_history = 0;
+              else if (!strcasecmp(arg, "MODIFIED"))   nabla_to_history = 1;
+              else if (!strcasecmp(arg, "ALWAYS"))     nabla_to_history = 2;
               else   CERR << "bad value " << arg << " for NABLA-TO-HISTORY"
                         << " at line " << line << " of config file "
                         << filename << " (ignored)" << endl;
@@ -1392,16 +1410,16 @@ int file_profile = 0;   // the current profile in the preferences file
                  CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
                       << endl;
             }
-         else if (!strcasecmp(opt, "Multi-Line-Strings"))
+         else if (!strcasecmp(opt, "MULTI-LINE-STRINGS"))
             {
               multi_line_strings = yes;
               multi_line_strings_3 = yes;
             }
-         else if (!strcasecmp(opt, "New-Multi-Line-Strings"))
+         else if (!strcasecmp(opt, "NEW-MULTI-LINE-STRINGS"))
             {
               multi_line_strings_3 = yes;
             }
-         else if (!strcasecmp(opt, "Old-Multi-Line-Strings"))
+         else if (!strcasecmp(opt, "OLD-MULTI-LINE-STRINGS"))
             {
               multi_line_strings = yes;
             }
