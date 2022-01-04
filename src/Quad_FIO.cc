@@ -505,7 +505,7 @@ public:
    /// get the next character
    Unicode get_next()
       {
-        if (next != Invalid_Unicode)   // there is a unget'ed char
+        if (next != Invalid_Unicode)   // there is an ungotten char
            {
              const Unicode ret = next;
              next = Invalid_Unicode;
@@ -528,18 +528,21 @@ public:
             }
       }
 
-   /// unget uni
+   /// unget uni. At most one Unicode (= lookahead char) can be ungotten.
    void unget(Unicode uni)
       {
         Assert(next == Invalid_Unicode);
         next = uni;
       }
 
-   /// scan a long long in string or file
+   /// scan a long long in a string or in a file
    int scanf_long_long(const char * fmt, long long * val)
       {
          if (file)
             {
+              // if we have read the next character from a file, then we
+              // need to push it back so that fscanf() will get it.
+              //
               if (next != Invalid_Unicode)
                  {
                    ungetc(next, file);
@@ -617,7 +620,7 @@ public:
       }
 
 protected:
-   /// UTF8-ecnoded source
+   /// UTF8-encoded source
    FILE * file;
 
    /// UCS_string source
@@ -634,7 +637,8 @@ protected:
 };
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::do_scanf(File_or_String & input, const UCS_string & format)
+Quad_FIO::do_scanf(File_or_String & input, const UCS_string & format,
+                   int function_number)
 {
 ShapeItem count = 0;
    if (format.size() == 0)   LENGTH_ERROR;
@@ -709,10 +713,10 @@ Unicode lookahead = input.get_next();
                   continue;
                 }
 
-             if (strchr("cdDfFeginousxX", cc))
+             if (strchr("cdDfFeginousxX[", cc))
                 {
                   conv = cc;
-                   break; // conversion
+                  break; // conversion
                 }
            }
 
@@ -793,13 +797,113 @@ Unicode lookahead = input.get_next();
            }
         else if (conv == UNI_n)  // characters consumed thus far
            {
-             if (!suppress)   new (&Z->get_ravel(z++))
-                                  IntCell(input.get_count());
+             if (!suppress)
+                new (&Z->get_ravel(z++)) IntCell(input.get_count());
+           }
+        else if (conv == UNI_L_BRACK)   // character range
+           {
+             ++f;   // skip [
+
+             // 1. read the pattern range [...]
+             //
+
+             // if the first char is ^ or ∧ then the characters in the range
+             // shall be excluded rather than included. The range itself is
+             // not affected, though.
+             //
+             if (f == format.size())   LENGTH_ERROR;
+             const bool excluding = format[f] == UNI_CIRCUMFLEX   // ^
+                                 || format[f] == UNI_AND;
+            if (excluding)   ++f;   // skip ^ or ∧
+
+             UCS_string range;   // the character range to be in- or excluded
+             range.reserve(format.size());
+
+             // if the next char is ] then it shall belong to the range,
+             // otherwise it terminates the range than ending it.
+             if (f == format.size())   LENGTH_ERROR;
+             if (format[f] == UNI_R_BRACK)   range += format[f++];
+
+            // the characters of the range, terminated by ]
+            //
+            for (;;)
+                {
+                 if (f == format.size())   // end of format string
+                    {
+                      MORE_ERROR() << "No ] in character range A of A ⎕FIO["
+                                   << function_number << "] B";
+                      DOMAIN_ERROR;
+                    }
+
+                  Unicode funi = format[f];
+                  if ( funi == UNI_MINUS            // maybe a character range
+                    && format[f+1] != UNI_R_BRACK   // otherwise its not
+                    && range.size())                // otherwise its not
+                     {
+                           // the minus belongs to a range A-B. With Unicode
+                           // the range could become ridiculously large and
+                           // we throw a length error if that happens.
+                           //
+                           const Unicode from = range.back();
+                           const Unicode to   = format[++f];
+                           if (from == to)   {}   // 1-character range
+                           else if (from > to)
+                              {
+                                MORE_ERROR() << "Invalid character range '"
+                                             << from << "'-'" << to << "'\n";
+                                DOMAIN_ERROR;
+                              }
+
+                           if ((to - from) >= 96)   // more than visible ASCII
+                              {
+                                MORE_ERROR() << "character range '" << from
+                                             << "'-'" << to << "' too large.\n";
+                                LENGTH_ERROR;
+                              }
+
+                       // at this point the A-B construct is valid. Insert
+                       // the characters into range...
+                       //
+                       for (int u = from + 1; u <= to;)   range += Unicode(u++);
+                     }
+                  if (funi == UNI_R_BRACK)   break;   // end of range
+                  ++f;
+                  range += funi;
+                }
+
+             // 2. create the APL result
+             //
+             UCS_string ucs;
+             ucs.reserve(format.size());
+             for (;;)
+                 {
+                   if (lookahead == UNI_EOF)                 break;
+                   if (conv_len && ucs.size() >= conv_len)   break;
+
+                   if (range.contains(lookahead) == excluding)
+                      {
+                        // lookahead is the first character after the range
+                        break;
+                      }
+                   ucs.append(lookahead);
+
+                   lookahead = input.get_next();
+                 }
+
+             // ] shall only match a nonempty sequence of characters
+             //
+             if (ucs.size() == 0)   goto out;   // empty sequence
+
+             if (!suppress)
+                {
+                  Value_P ZZ(ucs, LOC);
+                  new (&Z->get_ravel(z++))   PointerCell(ZZ.get(), Z.getref());
+                }
            }
       }
 
 out:
-   // shorten Z to the actual number of converted items
+   // shrink Z to the actual number of converted items
    //
 Shape sh_Z(z);
    Z->set_shape(sh_Z);
@@ -2603,7 +2707,7 @@ int function_number = -1;
                 const UCS_string format(*A.get());
                 File_or_String fos(file);
                 errno = 0;
-                return do_scanf(fos, format);
+                return do_scanf(fos, format, function_number);
               }
 
          case 55:   // sscanf(Bh, A_format)
@@ -2612,7 +2716,7 @@ int function_number = -1;
                 const UCS_string data(*B.get());
                 File_or_String fos(&data);
                 errno = 0;
-                return do_scanf(fos, format);
+                return do_scanf(fos, format, function_number);
               }
 
          case 56:   // write nested lines As to file Bs

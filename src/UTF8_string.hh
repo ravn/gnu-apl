@@ -79,7 +79,7 @@ public:
         return true;
       }
 
-   /// return \b this string as a 0-termionated C string
+   /// return \b this string as a 0-terminated C string
    const char * c_str() const
       { return reinterpret_cast<const char *>
                                (std::basic_string<UTF8>::c_str()); }
@@ -108,7 +108,7 @@ public:
    /// display bytes in this UTF string
    ostream & dump_hex(ostream & out, int max_bytes) const;
 
-   /// return true iff string ends with ext (usually a file name extennsion)
+   /// return true iff string ends with ext (usually a file name extension)
    bool ends_with(const char * ext) const;
 
    /// return true iff string starts with path (usually a file path)

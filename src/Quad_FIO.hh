@@ -190,7 +190,8 @@ protected:
                    const Value * B, int B_start);
 
    /// perform an fscanf() from file
-   static Token do_scanf(File_or_String & input, const UCS_string & format);
+   static Token do_scanf(File_or_String & input, const UCS_string & format,
+                         int function_number);
 
    /// compare two axis strings (function names)
    static int axis_compare(const void * key, const void * sf);

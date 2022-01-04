@@ -277,6 +277,13 @@ World!
       FMT ⎕FIO['sscanf'] DATA   ⍝ dyadic with axis string
  22 3.14 C DEFGH st⍴ing 57 
 
+      FMT←"Hello %[Hal]" ◊ DATA←"Hello Halloween"
+      FMT FIO∆sscanf DATA
+ Hall 
+      FMT←"Hello %[^wen]" ◊ DATA←"Hello Halloween"
+      FMT FIO∆sscanf DATA
+ Hallo 
+
       ⍝ execve
       ⍝
       ⍝Filename←'/usr/local/lib/apl/TLV_server'  ⍝ whereever TLV_server lives
