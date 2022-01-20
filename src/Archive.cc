@@ -181,7 +181,7 @@ const Vid parent_vid = values[vid]._par;
    do_indent();
    out << "<Value flg=\"" << HEX(v.get_flags()) << "\" "
                  "vid=\"" << vid                << "\" "
-                 "parent=\"" << parent_vid      << "\"1637 "
+                 "parent=\"" << parent_vid      << "\" "
                  "rk=\"" << v.get_rank()        << "\"";
 
    loop (r, v.get_rank())
