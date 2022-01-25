@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -263,7 +263,7 @@ Value_P Z(len_Z, LOC);
        {
          const UCS_string & entity = *entities[e];
          const ShapeItem len = entity.size();
-         loop(l, len)   new (Z->next_ravel()) CharCell(entity[l]);
+         loop(l, len)   Z->next_ravel_Char(entity[l]);
          delete entities[e];
        }
 
@@ -290,12 +290,12 @@ bool tag_open = false;
          ShapeItem member_pos;     // the position in the XML file
          Unicode category;
          UCS_string name;
-         const Value & member_name = B.get_ravel(2*member_indices[m])
+         const Value & member_name = B.get_cravel(2*member_indices[m])
                                       .get_pointer_value().getref();
 
          split_name(&category, &member_pos, &name, member_name);
 
-         const Value & member_data = B.get_ravel(2*member_indices[m] + 1)
+         const Value & member_data = B.get_cravel(2*member_indices[m] + 1)
                                       .get_pointer_value().getref();
 
          // one tag; the member_indices items occur in the following
@@ -395,7 +395,7 @@ UCS_string string_B(len_B, UNI_NUL);
 ShapeItem dest_B = 0;
    loop(src_B, len_B)
       {
-        const Unicode uni = B.get_ravel(src_B).get_char_value();
+        const Unicode uni = B.get_cravel(src_B).get_char_value();
         if (uni == UNI_CR)   // CR
            {
              // see XML standard "2.11 End-of-Line Handling"
@@ -406,7 +406,7 @@ ShapeItem dest_B = 0;
                   continue;
                 }
 
-             const Unicode uni_1 = B.get_ravel(src_B + 1).get_char_value();
+             const Unicode uni_1 = B.get_cravel(src_B + 1).get_char_value();
              if (string_B[uni_1] == UNI_LF)   // CR/LF
                 {
                   continue;   // discard CR (don't ++dest_B)
@@ -451,7 +451,7 @@ bool error = true;
    //
    loop(b, len_B)
        {
-         const Unicode uni_b = B.get_ravel(b).get_char_value();
+         const Unicode uni_b = B.get_cravel(b).get_char_value();
          if (uni_b == '<')
             {
               if (text_start != b)   // some text before the '<'
@@ -1165,7 +1165,7 @@ Quad_XML::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
 
-const int function_number = A->get_ravel(0).get_int_value();
+const int function_number = A->get_cfirst().get_int_value();
    switch(function_number)
       {
          case 0:   // same as monadic ⎕XML
@@ -1349,7 +1349,7 @@ ShapeItem from = 0;
             {
               if (p == from)
                  {
-                   while (Cell * cell = Z->next_ravel())   new (cell) IntCell(0);
+                   while (Z->more())  Z->next_ravel_Int(0);
                    Z->check_value(LOC);
                    MORE_ERROR() << "Empty member name in 2 ⎕XML";
                    LENGTH_ERROR;
@@ -1357,7 +1357,7 @@ ShapeItem from = 0;
 
               const UCS_string member(path, from, p - from);
               Value_P Zp(member, LOC);
-              new (Z->next_ravel())   PointerCell(Zp.get(), Z.getref());
+              Z->next_ravel_Pointer(Zp.get());
               from = p + 1;
             }
        }
@@ -1366,7 +1366,7 @@ ShapeItem from = 0;
       {
         const UCS_string member(path, from, len_Z - from);
         Value_P Zp(member, LOC);
-        new (Z->next_ravel())   PointerCell(Zp.get(), Z.getref());
+        Z->next_ravel_Pointer(Zp.get());
       }
 
 
@@ -1386,11 +1386,11 @@ UCS_string name;
    split_name(&category, &member_pos, &name, B);
 
 Value_P Z(3, LOC);
-   new(Z->next_ravel())   CharCell(category);
-   new (Z->next_ravel())  IntCell(member_pos);
+   Z->next_ravel_Char(category);
+   Z->next_ravel_Int(member_pos);
 
 Value_P Z3(name, LOC);
-   new (Z->next_ravel()) PointerCell(Z3.get(), Z.getref());
+   Z->next_ravel_Pointer(Z3.get());
    Z->check_value(LOC);
    return Z;
 }
@@ -1401,9 +1401,9 @@ Quad_XML::name_unsplit(const Value & B)
    if (B.get_rank() != 1)        RANK_ERROR;
    if (B.element_count() != 3)   LENGTH_ERROR;
 
-const Cell & b0 =  B.get_ravel(0);
-const Cell & b1 =  B.get_ravel(1);
-const Cell & b2 =  B.get_ravel(2);
+const Cell & b0 =  B.get_cfirst();
+const Cell & b1 =  B.get_cravel(1);
+const Cell & b2 =  B.get_cravel(2);
 
 const APL_Integer position = b1.get_int_value();
    if (position < Workspace::get_IO())
@@ -1431,7 +1431,7 @@ UCS_string UCS_Z;
            }
 
          const ShapeItem len_B2 = B2->element_count();
-         loop(bb, len_B2)   UCS_Z += B2->get_ravel(bb).get_char_value();
+         loop(bb, len_B2)   UCS_Z += B2->get_cravel(bb).get_char_value();
       }
 
 Value_P Z(UCS_Z, LOC);
@@ -1467,7 +1467,7 @@ Quad_XML::split_name(Unicode * category, ShapeItem * position,
 
 const ShapeItem len = value.element_count();
    Assert(len >= 1);
-const Cell * src = &value.get_ravel(0);
+const Cell * src = &value.get_cfirst();
 const Cell * end = src + len;
 
    // decode the category...
@@ -1530,7 +1530,7 @@ std::vector<const Cell *>member_values;
 
    loop(m, member_indices.size())
       {
-        const Cell * cB = &B.get_ravel(2*member_indices[m]);
+        const Cell * cB = &B.get_cravel(2*member_indices[m]);
         Assert(cB->is_pointer_cell());
         if (flags & tf_with_pos)
            member_names.push_back(cB->get_pointer_value()->get_UCS_ravel());
@@ -1623,7 +1623,7 @@ Value_P Z(result.size(), LOC);
    loop(r, result.size())
        {
           Value_P Zr(result[r], LOC);
-          new (Z->next_ravel())   PointerCell(Zr.get(), Z.getref());
+          Z->next_ravel_Pointer(Zr.get());
        }
 
    Z->check_value(LOC);
@@ -1648,7 +1648,7 @@ std::vector<UCS_string>member_names;
 std::vector<const Cell *>member_values;
    loop(m, member_indices.size())
       {
-        const Cell & cB = B.get_ravel(2*member_indices[m]);
+        const Cell & cB = B.get_cravel(2*member_indices[m]);
         Assert(cB.is_pointer_cell());
         const UCS_string member_name = cB.get_pointer_value()->get_UCS_ravel();
         member_names.push_back(member_name);
@@ -1721,7 +1721,7 @@ const ShapeItem B_total = B.get_all_members_count();
         LENGTH_ERROR; 
       }
 
-const Value & A1 = *A.get_ravel(1).get_pointer_value();
+const Value & A1 = *A.get_cravel(1).get_pointer_value();
    if (A1.element_count() == 0)
       {
         // an empty A1 shall return the smallest element
@@ -1729,7 +1729,7 @@ const Value & A1 = *A.get_ravel(1).get_pointer_value();
         std::vector<ShapeItem> member_indices;
         B.sorted_members(member_indices, /* filters */ 0);
 
-        const Cell & cell = B.get_ravel(2*member_indices[0]);
+        const Cell & cell = B.get_cravel(2*member_indices[0]);
         const Value & name =  cell.get_pointer_value().getref();
         return Token(TOK_APL_VALUE1, name.clone(LOC));
       }
@@ -1749,7 +1749,7 @@ const ShapeItem path_length = path->element_count();
 const Value * container = &B;
    for (size_t path_idx = 0; path_idx < size_t(path_length - 1); ++path_idx)
        {
-         const UCS_string member(path->get_ravel(path_idx));
+         const UCS_string member(path->get_cravel(path_idx));
          const Cell * data_cell = container->get_member_data(member);
          if (data_cell == 0)
             {
@@ -1770,7 +1770,7 @@ const Value * container = &B;
        }
 const Value & last_path_item = path_length == 1
                              ? A1
-                             : path->get_ravel(path_length - 1)
+                             : path->get_cravel(path_length - 1)
                                     .get_pointer_value().getref();
 ShapeItem leaf_position;
    {
@@ -1783,7 +1783,7 @@ std::vector<ShapeItem> member_indices;
 
    loop(m, member_indices.size())
       {
-        const Cell & cell = container->get_ravel(2*member_indices[m]);
+        const Cell & cell = container->get_cravel(2*member_indices[m]);
         Assert(cell.is_pointer_cell());
 
         const Value & name_m =  cell.get_pointer_value().getref();

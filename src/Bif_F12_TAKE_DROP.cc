@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,13 +37,13 @@ Bif_F12_DROP      * Bif_F12_DROP     ::fun = &Bif_F12_DROP     ::_fun;
 Value_P
 Bif_F12_TAKE::first(Value_P B)
 {
-const Cell & first_B = B->get_ravel(0);
+const Cell & first_B = B->get_cfirst();
    if (B->element_count() == 0)   // empty value: return prototype
       {
         if (first_B.is_lval_cell())   // (↑...)←V
             {
               Value_P Z(LOC);
-              Z->next_ravel()->init(first_B, B.getref(), LOC);
+              Z->next_ravel_Cell(first_B);
               return Z;
             }
 
@@ -57,7 +57,7 @@ const Cell & first_B = B->get_ravel(0);
    if (!first_B.is_pointer_cell())   // simple cell
       {
         Value_P Z(LOC);
-        Z->get_ravel(0).init(first_B, Z.getref(), LOC);
+        Z->get_wscalar().init(first_B, Z.getref(), LOC);
         Z->check_value(LOC);
         return Z;
       }
@@ -67,10 +67,11 @@ Value * v1_owner = v1->get_lval_cellowner();
    if (v1_owner)   // B is a left value
       {
         Value_P B1(LOC);
-        new (&B1->get_ravel(0))   PointerCell(v1.get(), B1.getref());
+        B1->next_ravel_Pointer(v1.get());
+        B1->check_value(LOC);
 
         Value_P Z(LOC);
-        new (&Z->get_ravel(0))   LvalCell(&B1->get_ravel(0), v1_owner);
+        Z->next_ravel_Lval(&B1->get_wscalar(), v1_owner);
 
         Z->check_value(LOC);
         return Z;
@@ -79,9 +80,9 @@ Value * v1_owner = v1->get_lval_cellowner();
       {
         const ShapeItem ec = v1->element_count();
         Value_P Z(v1->get_shape(), LOC);
-        if (ec == 0)   Z->get_ravel(0).init(v1->get_ravel(0), Z.getref(), LOC);
+        if (ec == 0)   Z->get_wproto().init(v1->get_cproto(), Z.getref(), LOC);
 
-        loop(e, ec)   Z->next_ravel()->init(v1->get_ravel(e), Z.getref(), LOC);
+        loop(e, ec)   Z->next_ravel_Cell(v1->get_cravel(e));
 
         Z->check_value(LOC);
         return Z;
@@ -136,27 +137,26 @@ Bif_F12_TAKE::do_take(const Shape & ravel_A1, Value_P B)
 Value_P Z(ravel_A1.abs(), LOC);
 
    if (ravel_A1.is_empty())
-      Z->get_ravel(0).init_type(B->get_ravel(0), Z.getref(), LOC);
-   else 
-      fill(ravel_A1, &Z->get_ravel(0), Z.getref(), B);
+      Z->get_wproto().init_type(B->get_cfirst(), Z.getref(), LOC);
+   else
+      fill(ravel_A1, Z.getref(), B.getref());
    Z->check_value(LOC);
    return Z;
 }
 //-----------------------------------------------------------------------------
 void
-Bif_F12_TAKE::fill(const Shape & shape_Zi, Cell * cZ, Value & Z_owner,
-                   Value_P B)
+Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z, const Value & B)
 {
-   for (TakeDropIterator i(true, shape_Zi, B->get_shape()); i.more(); ++i)
+   for (TakeDropIterator i(true, shape_Zi, B.get_shape()); i.more(); ++i)
        {
          const ShapeItem offset = i();
-         if (offset != -1)                          // valid cell
+         if (offset == -1)                          // invalid cell
             {
-              cZ++->init(B->get_ravel(offset), Z_owner, LOC);
+              Z.next_ravel_Proto(B.get_cproto());
             }
-         else                                       // invalid other Cell
+         else                                       // valid Cell
             {
-              cZ++->init_type(B->get_ravel(0), Z_owner, LOC);
+              Z.next_ravel_Cell(B.get_cravel(offset));
             }
        }
 }
@@ -164,11 +164,16 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Cell * cZ, Value & Z_owner,
 Token
 Bif_F12_DROP::eval_AB(Value_P A, Value_P B) const
 {
-Shape ravel_A(A.get(), /* ⎕IO */ 0);
+const Shape ravel_A(A.get(), /* ⎕IO */ 0);
    if (A->get_rank() > 1)   RANK_ERROR;
 
    if (B->is_scalar())
       {
+        /* Z←A↓B with scalar B has an element count() of 1 (if all items of A
+           are are 0 thus nothing is dropped) or else 1.
+
+           ⍴⍴Z is ⍴⍴A and ⍴Z[j] ←→  A[j] = 0
+         */
         Shape shape_Z;
         loop(r, ravel_A.get_rank())
             {
@@ -180,16 +185,10 @@ Shape ravel_A(A.get(), /* ⎕IO */ 0);
 
         Value_P Z(shape_Z, LOC);
 
-        Z->get_ravel(0).init(B->get_ravel(0), Z.getref(), LOC);
+        Z->set_ravel_Cell(0, B->get_cfirst());
         if (shape_Z.get_volume() == 0)   Z->to_proto();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
-      }
-
-   if (ravel_A.get_rank() == 0)   // ''↓B
-      {
-        if (!B->is_scalar())   LENGTH_ERROR;
-        ravel_A.add_shape_item(1);   // A = ,A
       }
 
    if (ravel_A.get_rank() != B->get_rank())   LENGTH_ERROR;
@@ -216,7 +215,7 @@ Value_P Z(sh_Z, LOC);
    for (TakeDropIterator i(false, ravel_A, B->get_shape()); i.more(); ++i)
       {
         const ShapeItem offset = i();
-        Z->next_ravel()->init(B->get_ravel(offset), Z.getref(), LOC);
+        Z->next_ravel_Cell(B->get_cravel(offset));
       }
 
    Z->check_value(LOC);
@@ -253,8 +252,8 @@ bool seen[MAX_RANK];
 
    loop(r, len_X)
        {
-         const APL_Integer a = A->get_ravel(r).get_near_int();
-         const APL_Integer x = X->get_ravel(r).get_near_int() - qio;
+         const APL_Integer a = A->get_cravel(r).get_near_int();
+         const APL_Integer x = X->get_cravel(r).get_near_int() - qio;
 
          if (x >= B->get_rank())   INDEX_ERROR;
          if (seen[x])              INDEX_ERROR;

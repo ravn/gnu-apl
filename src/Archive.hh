@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,9 +44,34 @@ class ValueStackItem;
 
 using namespace std;
 
+/// class for )SAVEing and )LOADing APL Workspaces in an XML file format
+class XML_Archive
+{
+protected:
+   /* archive syntax version, hopefully stepped up after Archive.hh or
+      Archive.cc were changed:
+
+      ASX_OTHER: increment to indicate change in Archive.hh/cc that DOES NOT
+                 change the XML file format,
+
+      ASX_MINOR: increment to indicate a backward-compatible change in the XML
+                 file format, i.e. older Archive.hh/hh versions can still read
+                 it but may not benefit from the change,
+
+      ASX_MAJOR: increment to indicate an incompatible change in the XML file
+                 format
+    */
+   enum ArchiveSyntax
+      {
+        ASX_MAJOR = 1,   ///< XML file format change incompatible
+        ASX_MINOR = 1,   ///< XML file format change backward compatible
+        ASX_OTHER = 1,   ///< XML file format not changed
+      };
+};
+
 //-----------------------------------------------------------------------------
 /// a helper class for saving an APL workspace
-class XML_Saving_Archive
+class XML_Saving_Archive: public XML_Archive
 {
 public:
    /// constructor: remember output stream and  workspace
@@ -209,7 +234,7 @@ const XML_Saving_Archive::_val_par tmp = vp1;   vp1 = vp2;   vp2 = tmp;
 }
 //-----------------------------------------------------------------------------
 /// a helper class for loading an APL workspace
-class XML_Loading_Archive
+class XML_Loading_Archive: public XML_Archive
 {
 public:
    /// constructor: remember file name and workspace
@@ -223,6 +248,10 @@ public:
 
    /// read an entire workspace, throw DOMAIN_ERROR on failure
    void read_Workspace(bool silent);
+
+   /// check compatibility information in the workspace and maybe warn the
+   /// user
+   void check_compatibility();
 
    /// set copying and maybe set protection
    void set_protection(bool prot, const UCS_string_vector & allowed)
@@ -254,12 +283,15 @@ protected:
    /// read next Value element
    void read_Value();
 
-   /// read cell(s) starting at \b cell from string starting at \b first
-   /// to number of cells read
-   void read_Cells(Cell * & cell, Value & cell_owner, const UTF8 * & first);
+   /// read one or more Cell(s) from input into the ravel of Z;
+   /// return the  UTF8 * after the cells.
+   const UTF8 * read_Cells(Value & Z, const UTF8 * input);
 
-   /// read characters tagged with INI_PAD_U1 and INI_PAD_U2, until end of line
-   void read_chars(UCS_string & ucs, const UTF8 * & first);
+   /// input is a UTF8-encoded sequence of bytes, terminated with ".
+   /// UTF8-decode the sequence, thereby removing the escape tagging
+   /// with ⁰ (aka. UNI_PAD_U0), ¹ (UNI_PAD_U1), ²(UNI_PAD_U2), and \n.
+   /// return the  UTF8 * pointing to the terminating ".
+   const UTF8 * read_XML_string(UCS_string & ucs, const UTF8 * input);
 
    /// read next Ravel element
    void read_Ravel();
@@ -352,8 +384,19 @@ protected:
    /// print current tag
    void print_tag(ostream & out) const;
 
-   /// find attribute \b att_name and return a pointer to its value if found)
+   /// find attribute \b att_name and return: a pointer to its value if found,
+   /// 0 if optional is true, and throw DOMAIN ERROR if optional is false.
    const UTF8 * find_attr(const char * att_name, bool optional);
+
+   /// find mandatory attribute \b att_name. Return a pointer to its value
+   ///  if found and throw DOMAIN ERROR if not.
+   const UTF8 * find_mandatory_attr(const char * att_name)
+      { return find_attr(att_name, false); }
+
+   /// find optional attribute \b att_name. Return a pointer to its value
+   /// if found and 0 if not.
+   const UTF8 * find_optional_attr(const char * att_name)
+      { return find_attr(att_name, true); }
 
    /// return integer value of attribute \b att_name
    int64_t find_int_attr(const char * att_name, bool optional, int base);

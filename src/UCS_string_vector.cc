@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ const ShapeItem name_len = val.get_cols();
         UCS_string name;
         loop(n, name_len)
            {
-             const Unicode uni = val.get_ravel(nidx++).get_char_value();
+             const Unicode uni = val.get_cravel(nidx++).get_char_value();
 
              if (n == 0 && Avec::is_quad(uni))   // leading ⎕
                 {
@@ -71,7 +71,7 @@ const ShapeItem name_len = val.get_cols();
              // skip spaces from nidx and subsequent spaces
              //
              while (nidx < end &&
-                    val.get_ravel(nidx).get_char_value() == UNI_SPACE)
+                    val.get_cravel(nidx).get_char_value() == UNI_SPACE)
                    ++nidx;
 
 
@@ -91,7 +91,7 @@ const ShapeItem name_len = val.get_cols();
              surrogate = false;
              while (nidx < end)
                 {
-                  const Unicode uni = val.get_ravel(nidx++).get_char_value();
+                  const Unicode uni = val.get_cravel(nidx++).get_char_value();
                   if (Avec::is_symbol_char(uni))   // valid symbol char
                      {
                        name.append(uni);

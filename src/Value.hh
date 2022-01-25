@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #define __VALUE_HH_DEFINED__
 
 #include "CharCell.hh"
+#include "ComplexCell.hh"
 #include "DynamicObject.hh"
 #include "FloatCell.hh"
 #include "IntCell.hh"
@@ -75,6 +76,9 @@ protected:
    /// constructor: a general array with shape \b sh
    Value(const Shape & sh, const char * loc);
 
+   /// constructor: a packed array with shape \b sh
+   Value(const Shape & sh, uint8_t * bits, const char * loc);
+
    /// constructor: a simple character vector from a UCS string.
    /// Rank is always 1, so that is_char_vector() will be true.
    Value(const UCS_string & ucs, const char * loc);
@@ -102,7 +106,7 @@ public:
    /// return \b true iff \b this value is a simple (i.e. depth 0) scalar.
    bool is_simple_scalar() const
       { return is_scalar() &&
-              !(get_ravel(0).is_pointer_cell() || get_lval_cellowner()); }
+              !(get_cfirst().is_pointer_cell() || get_lval_cellowner()); }
 
    /// return \b true iff \b this value is empty (some dimension is 0).
    bool is_empty() const
@@ -110,11 +114,11 @@ public:
 
    /// return \b true iff \b this value is a numeric scalar.
    bool is_numeric_scalar() const
-      { return  is_scalar() && get_ravel(0).is_numeric(); }
+      { return  is_scalar() && get_cfirst().is_numeric(); }
 
    /// return \b true iff \b this value is a character scalar
    bool is_character_scalar() const
-      { return  is_scalar() && get_ravel(0).is_character_cell(); }
+      { return  is_scalar() && get_cfirst().is_character_cell(); }
 
    /// return \b true iff \b this value is a scalar or vector
    bool is_scalar_or_vector() const
@@ -154,11 +158,11 @@ public:
 
    /// return \b true iff \b this value is a simple character scalar.
    bool is_char_scalar() const
-      { return get_rank() == 0 && get_ravel(0).is_character_cell(); }
+      { return get_rank() == 0 && get_cfirst().is_character_cell(); }
 
    /// return \b true iff \b this value is a simple integer scalar.
    bool is_int_scalar() const
-      { return get_rank() == 0 && get_ravel(0).is_near_int(); }
+      { return get_rank() == 0 && get_cfirst().is_near_int(); }
 
    /// return the number of elements (the product of the shapes).
    ShapeItem element_count() const
@@ -166,7 +170,7 @@ public:
 
    /// return the number of elements, but at least 1 (for the prototype).
    ShapeItem nz_element_count() const
-      { return shape.get_volume() ? shape.get_volume() : 1; }
+      { return shape.get_nz_volume(); }
 
    /// return the rank of \b this value
    uRank get_rank() const
@@ -196,13 +200,22 @@ public:
    void set_shape_item(Rank r, ShapeItem sh)
       { shape.set_shape_item(r, sh); }
 
-   /// reshape this value in place. The element count must not increase
-   void set_shape(const Shape & sh)
-      { Assert(sh.get_volume() <= shape.get_volume());   shape = sh; }
+   /** reshape this value in place. This is generally dangerous and only
+       permitted if:
+
+       1. this value has been initialized completely, and
+       2. the new shape has not more items than this value.
+
+       If this value is empty, then (due to its prototype) reshaping
+       it to volume 1 is permitted.
+   **/
+   void set_shape(const Shape & new_shape)
+      { Assert(new_shape.get_volume() <= nz_element_count() && is_complete());
+        shape = new_shape; }
 
    /// return the position of cell in the ravel of \b this value.
    ShapeItem get_offset(const Cell * cell) const
-      { return cell - &get_ravel(0); }
+      { return cell - &get_cfirst(); }
 
    /// return the next byte after the ravel
    const Cell * get_ravel_end() const
@@ -210,7 +223,7 @@ public:
 
    /// return the integer of a value that is supposed to have (exactly) one
    APL_Integer get_sole_integer() const
-      { if (element_count() == 1)   return get_ravel(0).get_near_int();
+      { if (element_count() == 1)   return get_cfirst().get_near_int();
         if (get_rank() > 1)   RANK_ERROR;
         else                  LENGTH_ERROR;
       }
@@ -292,21 +305,49 @@ public:
    /// double the ravel length of \b this value (by appending integer 0s).
    void double_ravel(const char * loc);
 
-   /// return the idx'th element of the ravel.
-   Cell & get_ravel(ShapeItem idx)
-      { Assert1(idx < nz_element_count());   return ravel[idx]; }
+   /// return the (constant) idx'th element of the ravel.
+   const Cell & get_cravel(ShapeItem idx) const
+      {
+        Assert1(idx < nz_element_count());
+        if (!is_packed())   return ravel[idx];
+        const uint8_t * bits = reinterpret_cast<const uint8_t *>(ravel);
+        return bits[idx >> 3] & 1 << (idx & 7) ? boolean_TRUE : boolean_FALSE;
+      }
 
-   /// return the idx'th element of the ravel.
-   const Cell & get_ravel(ShapeItem idx) const
+   /// return the first element of the ravel (which is always present).
+   /// same as get_cproto(), but named differently to indicate its context.
+   const Cell & get_cfirst() const
+      { return get_cravel(0); }
+
+   /// return the first element of the ravel (which is always present)
+   /// same as get_first(), but named differently to indicate its context.
+   const Cell & get_cproto() const
+      { return get_cravel(0); }
+
+   /// return the first element of the ravel of a scalar
+   /// same as get_cfirst(), but named differently to indicate its context.
+   const Cell & get_cscalar() const
+      { return get_cravel(0); }
+
+   /// return the (writable) idx'th element of the ravel.
+   Cell & get_wravel(ShapeItem idx)
       { Assert1(idx < nz_element_count());   return ravel[idx]; }
 
    /// return the first element of the ravel (which is always present)
-   Cell & get_proto()
-      { return ravel[0]; }
+   /// Same as get_wproto() and get_wscalar(), but named differently
+   /// to indicate its context.
+   Cell & get_wfirst()
+      { return get_wravel(0); }
+
+   /// return the first element of the ravel of a scalar value.
+   /// Same as get_wfirst(), but named differently to indicate its context.
+   Cell & get_wscalar()
+      { return get_wravel(0); }
 
    /// return the first element of the ravel (which is always present)
-   const Cell & get_proto() const
-      { return ravel[0]; }
+   /// same as wfirst(), but named differently to indicate its context.
+   Cell & get_wproto()
+      { return get_wravel(0); }
 
    /// set the prototype (according to B) if this value is empty.
    inline void set_default(const Value & B, const char * loc);
@@ -327,10 +368,10 @@ public:
    APL_types::Depth compute_depth() const;
 
    /// store the scalars in this (left-)value into dest...
-   void enlist_left(Cell * & dest, Value & dest_owner) const;
+   void enlist_left(Value & Z) const;
 
    /// store the scalars in this value into dest...
-   void enlist_right(Cell * & dest, Value & dest_owner) const;
+   void enlist_right(Value & Z) const;
 
    /// compute the cell types contained in the top level of \b this value
    CellType flat_cell_types() const;
@@ -366,7 +407,7 @@ public:
    Value_P index(const IndexExpr & IDX) const;
 
    /// return \b this indexed by (one-dimensional) \b IDX.
-   Value_P index(Value_P IDX) const;
+   Value_P index(const Value * X) const;
 
    /// If this value is a single axis between ⎕IO and ⎕IO + max_axis then
    /// return that axis. Otherwise throw AXIS_ERROR.
@@ -408,10 +449,9 @@ public:
    bool more() const
       { return valid_ravel_items < element_count(); }
 
-   /// return the next ravel cell to be initialized (excluding prototype)
-   Cell * next_ravel()
-      { return more() ? ravel + valid_ravel_items++ : 0; }
-
+   /// return the number of (so far) initialized items
+   ShapeItem get_valid_item_count()
+      { return valid_ravel_items; }
    /// return the current ravel cell to be initialized (excluding prototype)
    Cell * current_ravel()
       { return more() ? ravel + valid_ravel_items : 0; }
@@ -419,21 +459,70 @@ public:
    /// initialize the next ravel cell with a character value
    inline void next_ravel_Char(Unicode u);
 
+   /// initialize the next ravel cell with a floating point value
+   inline void next_ravel_Float(APL_Float f);
+
+#ifdef RATIONAL_NUMBERS_WANTED
+   /// initialize the next ravel cell with a floating point value
+   inline void next_ravel_Float(APL_Integer numer, APL_Integer denom);
+#endif // RATIONAL_NUMBERS_WANTED
+
+   /// initialize the next ravel cell from another Cell
+   inline void next_ravel_Cell(const Cell & other);
+
+   /// initialize the next ravel cell from the type of another Cell
+   inline void next_ravel_Proto(const Cell & other);
+
+   /// initialize the next ravel cell with a floating point value
+   inline void next_ravel_Complex(APL_Complex cpx);
+
+   /// initialize the next ravel cell with a floating point value
+   inline void next_ravel_Complex(APL_Float real, APL_Float imag);
+
    /// initialize the next ravel cell with an integer value
    inline void next_ravel_Int(APL_Integer i);
 
+   /// initialize the next ravel position with \b byte. NOTE that in this
+   /// case ravel is a uint8_t * and not a Cell * !!!
+   inline void next_ravel_Byte(uint8_t byte);
+
+   /// initialize the next ravel cell with a pointer to another Cell
+   inline void next_ravel_Lval(Cell * target, Value * target_owner);
+
    /// initialize the next ravel cell with an APL sub-value
    inline void next_ravel_Pointer(Value * val);
+
+   /// initialize the next ravel cell from either a APL scalar (if val is one)
+   /// or from a non-scalar (producing as PointerCell
+   inline void next_ravel_Value(Value * val);
+
+   /// set ravel[offset] to \b uni
+   inline void set_ravel_Char(ShapeItem offset, Unicode uni);
+
+   /// set ravel[offset] to \b aint
+   inline void set_ravel_Int(ShapeItem offset, APL_Integer aint);
+
+   /// set ravel[offset] to \b flt
+   inline void set_ravel_Float(ShapeItem offset, APL_Float flt);
+
+   /// set ravel[offset] to \b Complex(real, imag)
+   inline void set_ravel_Complex(ShapeItem offset, APL_Float real,
+                                                   APL_Float imag);
+
+   /// set ravel[offset] to \b cell.
+   inline void set_ravel_Cell(ShapeItem offset, const Cell & cell);
+
+   /// set ravel[offset] to b \b PointerCell(val), where val ≠ simple scalar.
+   inline void set_ravel_Pointer(ShapeItem offset, Value * val);
+
+   /// set ravel[offset] to \b value
+   inline void set_ravel_Value(ShapeItem offset, Value * value);
 
    /// return the NOTCHAR property of the value. NOTCHAR is false for simple
    /// char arrays and true if any element is numeric or nested. The NOTCHAR
    /// property of empty arrays is the NOTCHAR property of its prototype.
    /// see also lrm p. 138.
    bool NOTCHAR() const;
-
-   /// convert chars to ints and ints to chars (recursively).
-   /// return the number of cells that are neither char nor int.
-   int toggle_UCS();
 
    /// return \b true iff \b this value has the same rank as \b other.
    bool same_rank(const Value & other) const
@@ -491,6 +580,23 @@ public:
    bool is_member() const      { return (flags & VF_member) != 0; }
 
 # define set_member() SET_member(_LOC)
+
+   /// set the Value flag \b packed
+   void SET_packed(_loc_type _loc) const
+      { FLAG_TRACE(packed, true)   flags |=  VF_packed;
+        ADD_EVENT(this, VHE_SetFlag, VF_packed, _loc); }
+
+   /// clear the Value flag \b packed
+   void CLEAR_packed(_loc_type _loc) const
+      { FLAG_TRACE(packed, false)   flags &=  ~VF_packed;
+        ADD_EVENT(this, VHE_ClearFlag, VF_packed, _loc); }
+
+   /// true if Value flag \b packed is set
+   bool is_packed() const
+      { return (flags & VF_packed) != 0; }
+
+# define set_packed()   SET_packed(_LOC)
+# define clear_packed() CLEAR_packed(_LOC)
 
    /// set the Value flag \b complete
    void SET_complete(_loc_type _loc) const
@@ -573,9 +679,6 @@ public:
    /// erase stale values
    static int erase_stale(const char * loc);
 
-   /// re-initialize incomplete values
-   static int finish_incomplete(const char * loc);
-
    /// erase all values (clean-up after )CLEAR)
    static void erase_all(ostream & out);
 
@@ -598,8 +701,8 @@ public:
    /// print info related to a stale value
    void print_stale_info(ostream & out, const DynamicObject * dob) const;
 
-   /// number of Value_P objects pointing to this value
-   int owner_count;
+   /// expand packed Booleans (in place)
+   void explode();
 
    /// print incomplete Values, and return the number of incomplete Values.
    static int print_incomplete(ostream & out);
@@ -654,9 +757,92 @@ public:
               }
          }
 
+   /// initialize Z to Unicode u
+   static ErrorCode zU(Cell * Z, Unicode u)
+      { new (Z) CharCell(u);   return E_NO_ERROR; }
+
+   /// initialize Z to integer 0
+   static ErrorCode z0(Cell * Z)
+      { new (Z) IntCell(0);   return E_NO_ERROR; }
+
+   /// initialize Z to integer 1
+   static ErrorCode z1(Cell * Z)
+      { new (Z) IntCell(1);   return E_NO_ERROR; }
+
+   /// initialize Z to integer -1
+   static ErrorCode z_1(Cell * Z)
+      { new (Z) IntCell(-1);   return E_NO_ERROR; }
+
+   /// initialize Z to uint8_t byte
+   static void zB(uint8_t * Z, bool byte)
+      { *Z = byte; }
+
+   /// initialize Z to APL_Integer v
+   static ErrorCode zI(Cell * Z, APL_Integer aint)
+      { new (Z) IntCell(aint);   return E_NO_ERROR; }
+
+   /// initialize Z to APL_Float f
+   static ErrorCode zF(Cell * Z, APL_Float flt)
+      { new (Z) FloatCell(flt);   return E_NO_ERROR; }
+
+   /// initialize Z to the smallest possible Celltype
+   ///
+   static ErrorCode zv(Cell * Z, APL_Float flt)
+      {
+        return Cell::is_near_int64_t(flt) ? zI(Z, flt) : zF(Z, flt);
+      }
+
+   static ErrorCode zv(Cell * Z, APL_Complex cpx)
+      {
+        return Cell::is_near_zero(cpx.imag()) ? zv(Z, cpx.real()) : zC(Z, cpx);
+      }
+
+   /// init the next ravel element to 0
+   ErrorCode z0()                   { return z0(next_ravel());        }
+
+
+   /// init the next ravel element to 1
+   ErrorCode z1()                   { return z1(next_ravel());        }
+
+   /// init the next ravel element to auni
+   ErrorCode zU(Unicode auni)       { return zU(next_ravel(), auni);  }
+
+   /// init the next ravel element to aint
+   ErrorCode zI(APL_Integer aint)   { return zI(next_ravel(), aint);  }
+
+   /// init the next ravel element to aflt
+   ErrorCode zF(APL_Float aflt)     { return zF(next_ravel(), aflt);  }
+
+   /// init the next ravel element to acpx
+   ErrorCode zC(APL_Complex acpx)   { return zC(next_ravel(), acpx);  }
+
+   /// init the next ravel element to rJi
+   ErrorCode zC(APL_Float r,
+                APL_Float i)        { return zC(next_ravel(), r, i);  }
+
+   /// init the next ravel element to aflt
+   ErrorCode zv(APL_Float aflt)     { return zv(next_ravel(), aflt);  }
+
+   /// init the next ravel element to acpx
+   ErrorCode zv(APL_Complex acpx)    { return zv(next_ravel(), acpx); }
+
    /// check if WS is FULL after allocating value with \b cell_count items
    static bool check_WS_FULL(const char * args, ShapeItem cell_count,
                              const char * loc);
+
+#ifdef RATIONAL_NUMBERS_WANTED
+   /// initialize Z to quotient numer÷denom
+   static ErrorCode zR(Cell * Z, APL_Integer numer, APL_Integer denom)
+      { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }
+#endif // RATIONAL_NUMBERS_WANTED
+
+   /// initialize Z to complex cpx
+   static ErrorCode zC(Cell * Z, APL_Complex cpx)
+      { new (Z) ComplexCell(cpx);   return E_NO_ERROR; }
+
+   /// initialize Z to complex r + ij
+   static ErrorCode zC(Cell * Z, APL_Float r, APL_Float j)
+      { new (Z) ComplexCell(r, j);   return E_NO_ERROR; }
 
    /// handler for catch(Error) in init_ravel() (never called)
    static void catch_Error(const Error & error, const char * args,
@@ -677,11 +863,26 @@ public:
    static uint64_t slow_new;
 
 protected:
+   /// return the next ravel cell to be initialized (excluding prototype)
+   Cell * next_ravel()
+      { return more() ? ravel + valid_ravel_items++ : 0; }
+
+   /// return the next (packed) byte position
+   uint8_t * next_ravel_byte()
+      {
+        Assert(is_packed());
+        if (!more())   return 0;   // no more valid items
+        return reinterpret_cast<uint8_t *>(ravel) + (valid_ravel_items++ >> 3);
+      }
+
    /// init the ravel of an APL value, return the ravel length
    inline void init_ravel();
 
    /// the shape of \b this value (only the first \b rank values are valid.
    Shape shape;
+
+   /// number of Value_P objects pointing to this value
+   int owner_count;
 
    /// the value that has a PointerCell pointing to \b this value (if any)
    ShapeItem pointer_cell_count;
@@ -700,6 +901,12 @@ protected:
 
    /// the cells of a short (i.e. ⍴,value ≤ SHORT_VALUE_LENGTH_WANTED) value
    Cell short_value[SHORT_VALUE_LENGTH_WANTED];
+
+   /// \b false returned for packed Cells
+   static const IntCell boolean_FALSE;
+
+   /// \b true returned for packed Cells
+   static const IntCell boolean_TRUE;
 
    /// a linked list of values that have been deleted
    static _deleted_value * deleted_values;
@@ -775,8 +982,9 @@ Value_P FloatScalar(APL_Float val, const char * loc);
 /// character scalar
 Value_P CharScalar(Unicode uni, const char * loc);
 
-/// complex scalar
+/// complex scalars
 Value_P ComplexScalar(APL_Complex cpx, const char * loc);
+Value_P ComplexScalar(APL_Float real, APL_Float imag, const char * loc);
 
 /// ⍳0 (aka. ⍬)
 Value_P Idx0(const char * loc);

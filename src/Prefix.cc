@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -981,7 +981,7 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
 
              Workspace::pop_SI(LOC);   // discard ⎕EA/⎕EB context
 
-             const Cell & QES_arg2 = result.get_apl_val()->get_ravel(2);
+             const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
              Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
              Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
              if (QES_arg2.is_pointer_cell())
@@ -992,7 +992,7 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
              else
                 {
                   Value_P scalar(LOC);
-                  scalar->next_ravel()->init(QES_arg2, scalar.getref(),LOC);
+                  scalar->next_ravel_Cell(QES_arg2);
                   scalar->check_value(LOC);
                   new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
                 }
@@ -1023,7 +1023,7 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
 
              Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
 
-             const Cell & QES_arg2 = result.get_apl_val()->get_ravel(2);
+             const Cell & QES_arg2 = result.get_apl_val()->get_cravel(2);
              const APL_Integer line = QES_arg2.get_int_value();
 
              Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
@@ -1048,7 +1048,7 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
              Token & si_pushed = top->get_prefix().at0();
              Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
 
-             const Cell * QES_arg = &result.get_apl_val()->get_ravel(0);
+             const Cell * QES_arg = &result.get_apl_val()->get_cfirst();
              UCS_string statement_A(   QES_arg[2].get_pointer_value().getref());
              const APL_Integer major = QES_arg[3].get_int_value();
              const APL_Integer minor = QES_arg[4].get_int_value();
@@ -1463,7 +1463,7 @@ Cell * member_cell = toplevel_val->get_member(members, member_owner,
         Value_P B = at3().get_apl_val();
         if (B->is_simple_scalar())
            {
-             member_cell->init(B->get_ravel(0), *member_owner, LOC);
+             member_cell->init(B->get_cfirst(), *member_owner, LOC);
            }
         else
            {
@@ -1500,7 +1500,7 @@ Cell * member_cell = toplevel_val->get_member(members, member_owner,
         else
            {
              Value_P Z(LOC);
-             Z->next_ravel()->init(*member_cell, Z.getref(), LOC);
+             Z->next_ravel_Cell(*member_cell);
              Z->check_value(LOC);
              pop_args_push_result(Token(TOK_APL_VALUE1, Z));
            }
@@ -1598,7 +1598,7 @@ Value_P Z;
 
    if (at1().get_tag() == TOK_AXIS)
       {
-        Z = A->index(at1().get_apl_val());
+        Z = A->index(at1().get_apl_val().get());
       }
    else
       {
@@ -2037,7 +2037,7 @@ const Value * B = at3().get_apl_val().get();   // the condition
         else                     LENGTH_ERROR;
       }
 
-const APL_Integer condition = B->get_ravel(0).get_near_bool();
+const APL_Integer condition = B->get_cfirst().get_near_bool();
    if (!condition)
       {
         pop_and_discard();   // B
@@ -2049,7 +2049,7 @@ const APL_Integer condition = B->get_ravel(0).get_near_bool();
       }
 
 const Value * A = at1().get_apl_val().get();   // the condition
-const APL_Integer line_no = A->get_ravel(0).get_near_int();
+const APL_Integer line_no = A->get_cfirst().get_near_int();
 APL_Integer real_line_no = line_no;
 
    if (const UserFunction * ufun = si.get_executable()->get_ufun())

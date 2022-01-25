@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ PointerCell::release(const char * loc)
    value.pval.owner->add_subcount(-get_pointer_value()->nz_element_count());
 
    value.pval.valp.reset();
-   new (this) IntCell(0);
+   Value::z0(this);
 }
 //-----------------------------------------------------------------------------
 bool
@@ -88,7 +88,7 @@ Value_P B = other.get_pointer_value();
 
 const ShapeItem count = A->nz_element_count();
    loop(c, count)
-       if (!A->get_ravel(c).equal(B->get_ravel(c), qct))   return false;
+       if (!A->get_cravel(c).equal(B->get_cravel(c), qct))   return false;
 
    return true;
 }
@@ -131,8 +131,8 @@ Value_P v2 = other.get_pointer_value();
 
    // same rank and shape, compare ravel
    //
-const Cell * C1 = &v1->get_ravel(0);
-const Cell * C2 = &v2->get_ravel(0);
+const Cell * C1 = &v1->get_cfirst();
+const Cell * C2 = &v2->get_cfirst();
    loop(e, v1->nz_element_count())
       {
         if (const Comp_result comp = C1++->compare(*C2++))   return  comp;
@@ -191,7 +191,7 @@ Value_P val = get_pointer_value();
              ucs.append(UNI_SINGLE_QUOTE);
              loop(e, ec)
                 {
-                  const Unicode uni = val->get_ravel(e).get_char_value();
+                  const Unicode uni = val->get_cravel(e).get_char_value();
                   ucs.append(uni);
                   if (uni == UNI_SINGLE_QUOTE)   ucs.append(uni);   // ' -> ''
                 }
@@ -202,7 +202,7 @@ Value_P val = get_pointer_value();
              ucs.append(UNI_L_PARENT);
              loop(e, ec)
                 {
-                  PrintBuffer pb = val->get_ravel(e).
+                  PrintBuffer pb = val->get_cravel(e).
                         character_representation(pctx);
                   ucs.append(UCS_string(pb, 0, Workspace::get_PW()));
 
@@ -248,56 +248,32 @@ PrintBuffer ret(*val, pctx, 0);
                    if (sh.get_shape_item(r) == 0)   sh.set_shape_item(r, 1);
                  }
 
-             if (sh.get_volume() == 111)   // one prototype
-                {
-                  ret = PrintBuffer(*proto, pctx, 0);
-                  ret.add_frame(PrintStyle(style), proto->get_shape(),
-                                proto->compute_depth());
-                }
-             else                           // several prototypes
-                {
-                  Value_P proto_reshaped(sh, LOC);
-                  Cell * c = &proto_reshaped->get_ravel(0);
-                  const ShapeItem len = proto_reshaped->nz_element_count();
+             Value_P proto_reshaped(sh, LOC);
+             const ShapeItem len = proto_reshaped->nz_element_count();
 
-                  // store proto in the first ravel item, and copies of proto in
-                  // the subsequent ravel items
-                  //
-                  loop(rv, len)
-                      if (proto->is_simple_scalar())
-                         c++->init(proto->get_ravel(0),
-                                   proto_reshaped.getref(), LOC);
-                      else
-                         new (c++) PointerCell(proto->clone(LOC).get(),
-                                               proto_reshaped.getref());
+             // store proto in the first ravel item, and copies of proto in
+             // the subsequent ravel items
+             //
+             loop(rv, len)   proto_reshaped->next_ravel_Value(proto.get());
 
-                  proto_reshaped->check_value(LOC);
-                  ret = PrintBuffer(*proto_reshaped, pctx, 0);
-                  ret.add_frame(PrintStyle(style), proto_reshaped->get_shape(),
-                                proto_reshaped->compute_depth());
-                }
+             proto_reshaped->check_value(LOC);
+             ret = PrintBuffer(*proto_reshaped, pctx, 0);
+             ret.add_frame(PrintStyle(style), proto_reshaped->get_shape(),
+                           proto_reshaped->compute_depth());
            }
        else
            {
-   if (!(pctx.get_style() & PST_QUOTE_CHARS && val->is_char_array()))
-             ret.add_frame(pctx.get_style(), val->get_shape(),
-                           val->compute_depth());
+             if (!(pctx.get_style() & PST_QUOTE_CHARS && val->is_char_array()))
+                {
+                  ret.add_frame(pctx.get_style(), val->get_shape(),
+                                val->compute_depth());
+                }
            }
       }
 
    ret.get_info().int_len  = ret.get_width(0);
    ret.get_info().real_len = ret.get_width(0);
    return ret;
-}
-//-----------------------------------------------------------------------------
-void
-PointerCell::to_type()
-{
-Value * sub = get_pointer_value().get();
-   Assert(sub);
-const ShapeItem len = sub->nz_element_count();
-Cell * ravel = &sub->get_ravel(0);
-   loop(l, len)   ravel++->to_type();
 }
 //-----------------------------------------------------------------------------
 

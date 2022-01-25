@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -431,7 +431,7 @@ UCS_string::UCS_string(const Value & value)
 const ShapeItem ec = value.element_count();
    reserve(ec);
 
-   loop(e, ec)   append(value.get_ravel(e).get_char_value());
+   loop(e, ec)   append(value.get_cravel(e).get_char_value());
 }
 //-----------------------------------------------------------------------------
 /// constructor
@@ -458,7 +458,7 @@ const Value & value = *cell.get_pointer_value().get();
 const ShapeItem ec = value.element_count();
    reserve(ec);
 
-   loop(e, ec)   append(value.get_ravel(e).get_char_value());
+   loop(e, ec)   append(value.get_cravel(e).get_char_value());
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(istream & in)

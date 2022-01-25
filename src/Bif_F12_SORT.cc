@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ CollatingCache::CollatingCache(const Value & A, const Cell * base,
 const ShapeItem ec_A = A.element_count();
 UCS_string UA;
    UA.reserve(ec_A);
-   loop(a, ec_A)   UA.append(A.get_ravel(a).get_char_value());
+   loop(a, ec_A)   UA.append(A.get_cravel(a).get_char_value());
 
 UCS_string UA1 = UA.unique();
 
@@ -62,7 +62,7 @@ UCS_string UA1 = UA.unique();
    //
    loop(a, ec_A)
       {
-        const Unicode uni = A.get_ravel(a).get_char_value();
+        const Unicode uni = A.get_cravel(a).get_char_value();
         CollatingCacheEntry & entry = at(find_entry(uni));
 
         ShapeItem aq = a;
@@ -157,14 +157,14 @@ const ShapeItem len_BZ = B->get_shape_item(0);
    if (len_BZ == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));
 const ShapeItem comp_len = B->element_count()/len_BZ;
 
-const ShapeItem * indices = Cell::sorted_indices(&B->get_ravel(0),
+const ShapeItem * indices = Cell::sorted_indices(&B->get_cfirst(),
                                                  len_BZ, order, comp_len);
    if (indices == 0)   WS_FULL;
 
 Value_P Z(len_BZ, LOC);
 const int qio = Workspace::get_IO();
 
-   loop(a, len_BZ)   new (Z->next_ravel())   IntCell(indices[a] + qio);
+   loop(a, len_BZ)   Z->next_ravel_Int(indices[a] + qio);
    delete[] indices;
 
    Z->check_value(LOC);
@@ -187,7 +187,7 @@ const ShapeItem len_BZ = B->get_shape_item(0);
    // first set Z←⍳len_BZ
    //
 Value_P Z(len_BZ, LOC);
-   loop(l, len_BZ)   new (Z->next_ravel())   IntCell(l + qio);
+   loop(l, len_BZ)   Z->next_ravel_Int(l + qio);
    Z->check_value(LOC);
    if (len_BZ == 1)   return Token(TOK_APL_VALUE1, Z);
 
@@ -199,23 +199,23 @@ const ShapeItem comp_len = ec_B/len_BZ;
    // index for each character in B.
    //
 Value_P B1(B->get_shape(), LOC);
-const Cell * base_B1 = &B1->get_ravel(0) - qio*comp_len;
+const Cell * base_B1 = &B1->get_cfirst() - qio*comp_len;
 CollatingCache cache(A.getref(), base_B1, comp_len);
    loop(b, ec_B)
       {
-        const Unicode uni = B->get_ravel(b).get_char_value();
+        const Unicode uni = B->get_cravel(b).get_char_value();
         const APL_Integer b1 = cache.find_entry(uni);
-        new (B1->next_ravel()) IntCell(b1);
+        B1->next_ravel_Int(b1);
       }
    B1->check_value(LOC);
 
    // then sort Z (actually re-arrange Z so that B[Z] is sorted)
    //
-IntCell * z0 = &Z->get_ravel(0).vIntCell();
+IntCell * Z0 = &Z->get_wfirst().vIntCell();
    if (order == SORT_ASCENDING)
-      Heapsort<IntCell>::sort(z0, len_BZ, &cache, &CollatingCache::greater_vec);
+      Heapsort<IntCell>::sort(Z0, len_BZ, &cache, &CollatingCache::greater_vec);
    else
-      Heapsort<IntCell>::sort(z0, len_BZ, &cache, &CollatingCache::smaller_vec);
+      Heapsort<IntCell>::sort(Z0, len_BZ, &cache, &CollatingCache::smaller_vec);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);

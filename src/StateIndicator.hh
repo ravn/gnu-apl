@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -178,9 +178,12 @@ public:
    const Prefix & get_prefix() const
       { return current_stack; }
 
-   /// return the SI that has called this one
+   /// return the SI that has called \b this one
    StateIndicator * get_parent() const
       { return parent; }
+
+   /// return the child SI (if any) that \b parent has called
+   static const StateIndicator * find_child(const StateIndicator * parent);
 
    /// return the level at which sym is pushed for the nth. time
    SI_level nth_push(const Symbol * sym, int from_tos) const;

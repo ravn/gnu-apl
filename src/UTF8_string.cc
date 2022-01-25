@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ UTF8_string::UTF8_string(const Value & value)
 {
    loop(v, value.element_count())
        {
-         *this += value.get_ravel(v).get_char_value() & 0xFF;
+         *this += value.get_cravel(v).get_char_value() & 0xFF;
        }
 }
 //-----------------------------------------------------------------------------

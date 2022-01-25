@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -80,8 +80,8 @@ Function_P RO = _RO.get_function();   Assert(RO);
          Assert(result_RO.get_Class() == TC_VALUE);
          Value_P condition = result_RO.get_apl_val();
          if (condition->is_scalar_extensible() &&
-             condition->get_ravel(0).is_near_bool() &&
-             condition->get_ravel(0).get_near_int() == 1)
+             condition->get_cfirst().is_near_bool() &&
+             condition->get_cfirst().get_near_int() == 1)
             return Token(TOK_APL_VALUE1, LO_Z);
 
          if (interrupt_is_raised())
@@ -111,8 +111,8 @@ Function_P LO = _LO.get_function();
         else                     LENGTH_ERROR;
       }
 
-   if (!N->get_ravel(0).is_near_int())   DOMAIN_ERROR;
-ShapeItem repeat_cnt = N->get_ravel(0).get_checked_near_int();
+   if (!N->get_cfirst().is_near_int())   DOMAIN_ERROR;
+ShapeItem repeat_cnt = N->get_cfirst().get_checked_near_int();
 
    // special cases: 0, negative, and 1
    //

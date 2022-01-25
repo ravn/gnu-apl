@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -655,7 +655,7 @@ const void * Bv = reinterpret_cast<const val_val *>(B)->child;
 void
 Command::cmd_CHECK(ostream & out)
 {
-   // erase stale functions from failed ⎕EX
+   // 1. erase stale functions from failed ⎕EX
    //
    {
      bool erased = false;
@@ -668,6 +668,8 @@ Command::cmd_CHECK(ostream & out)
      else out << "OK      - no stale functions" << endl;
    }
 
+   // 2. print stale values (if any)
+   //
    {
      const int stale = Value::print_stale(CERR);
      if (stale)
@@ -677,6 +679,8 @@ Command::cmd_CHECK(ostream & out)
         }
      else out << "OK      - no stale values" << endl;
    }
+
+   // 3. print stale index expressions (if any)
    {
      const int stale = IndexExpr::print_stale(CERR);
      if (stale)
@@ -687,70 +691,80 @@ Command::cmd_CHECK(ostream & out)
      else out << "OK      - no stale indices" << endl;
    }
 
-   // discover duplicate parents
+   // 3. discover duplicate parents
    //
-std::vector<val_val> values;
-ShapeItem duplicate_parents = 0;
-   for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
+   {
+     // 3a. create a { parent = 0, value } vector<val_val> of all values
+     //
+     std::vector<val_val> values;
+     ShapeItem duplicate_parents = 0;
+     for (const DynamicObject * obj =
+                DynamicObject::get_all_values()->get_next();
         obj != DynamicObject::get_all_values(); obj = obj->get_next())
-       {
-         const Value * val = static_cast<const Value *>(obj);
+         {
+           const Value * val = static_cast<const Value *>(obj);
 
-         val_val vv = { 0, val };   // no parent
-         values.push_back(vv);
-       }
+           val_val vv = { 0, val };   // no parent
+           values.push_back(vv);
+         }
 
-   Heapsort<val_val>::sort(&values[0], values.size(), 0,
-                           &val_val::compare_val_val);
-   loop(v, (values.size() - 1))
-       Assert(&values[v].child < &values[v + 1].child);
+     // 3b. sort vector<val_val> values by address so we can bsearch it.
+     //
+     Heapsort<val_val>::sort(&values[0], values.size(), 0,
+                             &val_val::compare_val_val);
+     loop(v, (values.size() - 1))
+         Assert(&values[v].child < &values[v + 1].child);
 
-   /// set parents
-   loop(v, values.size())   // for every .child (acting as parent here)
-      {
-        const Value * val = values[v].child;
-        const ShapeItem ec = val->nz_element_count();
-        loop(e, ec)   // for every ravel cell of the (parent-) value
-            {
-              const Cell & cP = val->get_ravel(e);
-              if (!cP.is_pointer_cell())   continue;   // not a parent
+      // 3c. set parents of pointer cells
+      //
+      loop(v, values.size())   // for every .child (acting as parent here)
+          {
+            const Value * val = values[v].child;
+            const ShapeItem ec = val->nz_element_count();
+            loop(e, ec)   // for every ravel cell of the (parent-) value
+                {
+                  const Cell & cP = val->get_cravel(e);
+                  if (!cP.is_pointer_cell())   continue;   // not a parent
 
-              const Value * sub = cP.get_pointer_value().get();
-              Assert1(sub);
+                  const Value * sub = cP.get_pointer_value().get();
+                  Assert1(sub);
 
-              val_val * vvp = reinterpret_cast<val_val *>
-                    (bsearch(sub, &values[0], values.size(), sizeof(val_val),
-                            val_val::compare_val_val1));
-              Assert(vvp);
-              if (vvp->parent == 0)   // child has no parent
-                 {
-                   vvp->parent = val;
-                 }
-              else
-                 {
-                   ++duplicate_parents;
-                   out << "Value * vvp=" << voidP(vvp) << " already has parent "
-                       << voidP(vvp->parent) << " when checking Value * val="
-                       << voidP(vvp) << endl;
+                  val_val * vvp = reinterpret_cast<val_val *>
+                       (bsearch(sub, &values[0], values.size(), sizeof(val_val),
+                                val_val::compare_val_val1));
+                  Assert(vvp);
+                  if (vvp->parent == 0)   // child has no parent (OK)
+                     {
+                       vvp->parent = val;
+                       continue;
+                     }
 
-                   out << "History of the child:" << endl;
-                   VH_entry::print_history(out, vvp->child, LOC);
-                   out << "History of the first parent:" << endl;
-                   VH_entry::print_history(out, vvp->parent, LOC);
-                   out << "History of the second parent:" << endl;
-                   VH_entry::print_history(out, val, LOC);
-                   out << endl;
-                 }
-           }
-      }
+                  // the child already has a parent (which is bad).
+                  // print its history to help figuring why.
+                  //
+                  ++duplicate_parents;
+                  out << "Value * vvp=" << voidP(vvp) << " already has parent "
+                      << voidP(vvp->parent) << " when checking Value * val="
+                      << voidP(vvp) << endl;
 
-   if (duplicate_parents)
-        {
-          out << "ERROR   - " << duplicate_parents
-              << " duplicate parents" << endl;
-          IO_Files::apl_error(LOC);
-        }
-   else out << "OK      - no duplicate parents" << endl;
+                  out << "History of the child:" << endl;
+                  VH_entry::print_history(out, vvp->child, LOC);
+                  out << "History of the first parent:" << endl;
+                  VH_entry::print_history(out, vvp->parent, LOC);
+                  out << "History of the second parent:" << endl;
+                  VH_entry::print_history(out, val, LOC);
+                  out << endl;
+               }
+          }
+
+     if (duplicate_parents)
+          {
+            out << "ERROR   - " << duplicate_parents
+                << " duplicate parents" << endl;
+            IO_Files::apl_error(LOC);
+          }
+     else out << "OK      - no duplicate parents" << endl;
+   }
 }
 //-----------------------------------------------------------------------------
 void
@@ -1328,13 +1342,14 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
        }
 
    errno = 0;
-int result = pclose(pipe);
+const int result = pclose(pipe);
    Log(LOG_verbose_error)
       {
         if (result)   CERR << "NOTE: pclose(" << arg << ") says: errno="
                            << errno << " (" << strerror(errno) << ")" << endl;
       }
-   out << endl << IntCell(result) << endl;
+
+   out << endl << result << ' ' << endl;
    signal(SIGCHLD, SIG_IGN);
 }
 //-----------------------------------------------------------------------------
@@ -2390,26 +2405,24 @@ Token_string tos;
  
    if (tos.size() != size_t(shape.get_volume()))   return;
 
-Value_P val(shape, LOC);
-   new (&val->get_ravel(0)) IntCell(0);   // prototype
+Value_P Z(shape, LOC);
+   Value::z0(&Z->get_wproto());   // prototype
 
-const ShapeItem ec = val->element_count();
+const ShapeItem ec = Z->element_count();
    loop(e, ec)
       {
-        const TokenTag tag = tos[e].get_tag();
-        Cell * C = val->next_ravel();
-        if      (tag == TOK_INTEGER)  new (C) IntCell(tos[e].get_int_val());
-        else if (tag == TOK_REAL)     new (C) FloatCell(tos[e].get_flt_val());
-        else if (tag == TOK_COMPLEX)  new (C)
-                                          ComplexCell(tos[e].get_cpx_real(),
-                                                      tos[e].get_cpx_imag());
+        const Token & tok = tos[e];
+        const TokenTag tag = tok.get_tag();
+        if      (tag == TOK_INTEGER)  Z->next_ravel_Int(tok.get_int_val());
+        else if (tag == TOK_REAL)     Z->next_ravel_Float(tok.get_flt_val());
+        else if (tag == TOK_COMPLEX)  Z->next_ravel_Complex(tok.get_cpx_real(),
+                                                            tok.get_cpx_imag());
         else FIXME;
       }
-
-   val->check_value(LOC);
+   Z->check_value(LOC);
 
    Assert(sym);
-   sym->assign(val, false, LOC);
+   sym->assign(Z, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -2434,7 +2447,7 @@ Symbol * sym = 0;
         sym = Workspace::lookup_symbol(var_name);
         Assert(sym);
       }
-   
+
    Log(LOG_command_IN)
       {
         CERR << endl << var_name << " shape " << shape << " IS: '";
@@ -2442,9 +2455,9 @@ Symbol * sym = 0;
         CERR << "'" << endl;
       }
 
-Value_P val(shape, LOC);
-const ShapeItem ec = val->element_count();
-   new (&val->get_ravel(0)) CharCell(UNI_SPACE);   // prototype
+Value_P Z(shape, LOC);
+const ShapeItem ec = Z->element_count();
+   Value::zU(&Z->get_wproto(), UNI_SPACE);   // prototype
 
 ShapeItem padded = 0;
    loop(e, ec)
@@ -2452,7 +2465,7 @@ ShapeItem padded = 0;
         Unicode uni = UNI_SPACE;
         if (e < (data.size() - idx))   uni = data[e + idx];
         else                           ++padded;
-         new (&val->get_ravel(e)) CharCell(uni);
+        Z->next_ravel_Char(uni);
       }
 
    if (padded)
@@ -2461,10 +2474,10 @@ ShapeItem padded = 0;
              << padded << " spaces added)" << endl;
       }
 
-   val->check_value(LOC);
+   Z->check_value(LOC);
 
    Assert(sym);
-   sym->assign(val, false, LOC);
+   sym->assign(Z, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -2494,7 +2507,7 @@ UCS_string var_or_fun;
 
    if (var_or_fun.size() == 0)
       {
-        CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << ";" << endl;
+        CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << "'" << endl;
       }
 }
 //-----------------------------------------------------------------------------

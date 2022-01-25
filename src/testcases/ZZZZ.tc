@@ -27,7 +27,5 @@ CLEAR WS
           ⍝⍝                               ⍝⍝
            ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 
-)HOST killall APserver
-
-³
+⊣ ⍎ ')HOST killall APserver'
 

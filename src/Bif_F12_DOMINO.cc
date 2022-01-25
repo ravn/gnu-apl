@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #include "ComplexCell.hh"
 #include "Value.hh"
 #include "Workspace.hh"
-extern void divide_matrix(Cell * cZ, bool need_complex,
+extern void divide_matrix(Value & Z, bool need_complex,
                           ShapeItem rows, ShapeItem cols_A, const Cell * cA,
                           ShapeItem cols_B, const Cell * cB);
 
@@ -47,7 +47,9 @@ Bif_F12_DOMINO::eval_B(Value_P B) const
       {
         Value_P Z(LOC);
 
-        B->get_ravel(0).bif_reciprocal(Z->next_ravel());
+        Cell cZ;
+        B->get_cfirst().bif_reciprocal(&cZ);
+        Z->next_ravel_Cell(cZ);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -59,7 +61,7 @@ Bif_F12_DOMINO::eval_B(Value_P B) const
         APL_Complex r2(0.0);
         loop(l, len)
             {
-              const APL_Complex b = B->get_ravel(l).get_complex_value();
+              const APL_Complex b = B->get_cravel(l).get_complex_value();
               r2 += b*b;
             }
 
@@ -73,16 +75,16 @@ Bif_F12_DOMINO::eval_B(Value_P B) const
            {
              loop(l, len)
                  {
-                   const APL_Float b = B->get_ravel(l).get_real_value();
-                   new (Z->next_ravel())   FloatCell(b / r2.real());
+                   const APL_Float b = B->get_cravel(l).get_real_value();
+                   Z->next_ravel_Float(b / r2.real());
                  }
            }
         else                                       // complex result
            {
              loop(l, len)
                  {
-                   const APL_Complex b = B->get_ravel(l).get_complex_value();
-                   new (Z->next_ravel())   ComplexCell(b / r2);
+                   const APL_Complex b = B->get_cravel(l).get_complex_value();
+                   Z->next_ravel_Complex(b / r2);
                  }
            }
 
@@ -103,8 +105,7 @@ const Shape shape_I(rows, rows);
 Value_P I(shape_I, LOC);
 
    loop(y, rows)
-   loop(x, rows)
-       new (I->next_ravel()) FloatCell((y == x) ? 1.0 : 0.0);
+   loop(x, rows)   I->next_ravel_Float(y == x ? 1.0 : 0.0);
 
 Token result = eval_AB(I, B);
    return result;
@@ -114,7 +115,7 @@ Token
 Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
 {
    if (!X->is_scalar())   RANK_ERROR;
-const double EPS = X->get_ravel(0).get_real_value();
+const double EPS = X->get_cfirst().get_real_value();
 
    if (B->get_rank() != 2)        RANK_ERROR;
 
@@ -129,7 +130,7 @@ const ShapeItem cols_B = B->get_cols();
 
 const bool need_complex = B->is_complex(true);
 Value_P Z(3, LOC);
-   QR_factorization(Z, need_complex, rows_B, cols_B, &B->get_ravel(0), EPS);
+   QR_factorization(Z, need_complex, rows_B, cols_B, &B->get_cfirst(), EPS);
 
    Z->set_default(*B.get(), LOC);   // not needed
    Z->check_value(LOC);
@@ -184,9 +185,8 @@ ShapeItem cols_B = 1;
 
 const bool need_complex = A->is_complex(true) || B->is_complex(true);
 Value_P Z(shape_Z, LOC);
-   divide_matrix(&Z->get_ravel(0), need_complex,
-                 rows_A, cols_A, &A->get_ravel(0),
-                 cols_B, &B->get_ravel(0));
+   divide_matrix(Z.getref(), need_complex, rows_A, cols_A, &A->get_cfirst(),
+                                                   cols_B, &B->get_cfirst());
 
    Z->set_default(*B.get(), LOC);
 
@@ -208,7 +208,7 @@ Shape shape_Z;
    loop(r, B->get_rank() - 1)  shape_Z.add_shape_item(B->get_shape_item(r + 1));
 
 Value_P Z(shape_Z, LOC);
-   while (Z->more())   new (Z->next_ravel())   IntCell(0);
+   while (Z->more())   Z->next_ravel_Int(0);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -228,12 +228,12 @@ const Shape shape_B(M, N);
 Value_P B(shape_B, LOC);
 
    loop(y, M)
-   loop(x, N)   new (B->next_ravel())   FloatCell(real(y, x));
+   loop(x, N)   B->next_ravel_Float(real(y, x));
    B->check_value(LOC);
 
-Value_P A(2, LOC);
-   new (A->next_ravel())   IntCell(0);
-   new (A->next_ravel())   IntCell(4);   // number of fractional digits
+Value_P A(2, LOC);   // A←0 4
+   A->next_ravel_Int(0);
+   A->next_ravel_Int(4);   // number of fractional digits
    A->check_value(LOC);
 
 Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
@@ -251,12 +251,12 @@ const Shape shape_B(M, N);
 Value_P B(shape_B, LOC);
 
    loop(y, M)
-   loop(x, N)   new (B->next_ravel())   ComplexCell(real(y, x), imag(y, x));
+   loop(x, N)   B->next_ravel_Complex(real(y, x), imag(y, x));
    B->check_value(LOC);
 
 Value_P A(2, LOC);
-   new (A->next_ravel())   IntCell(0);
-   new (A->next_ravel())   IntCell(4);   // number of fractional digits
+   A->next_ravel_Int(0);
+   A->next_ravel_Int(4);   // number of fractional digits
    A->check_value(LOC);
 
 Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
@@ -334,7 +334,7 @@ Value_P INV(shape_INV, LOC);
              {
                const double flt = (x < N) ? AUG.real(y, x) : 0.0;
                if (!isfinite(flt))   DOMAIN_ERROR;
-               new (INV->next_ravel())   FloatCell(flt);
+               INV->next_ravel_Float(flt);
              }
        }
 
@@ -415,11 +415,11 @@ Value_P INV(shape_INV, LOC);
                     const double re = AUG.real(y, x);
                     const double im = AUG.imag(y, x);
                     if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
-                    new (INV->next_ravel())   ComplexCell(re, im);
+                    INV->next_ravel_Complex(re, im);
                   }
                else   // below diagonal
                   {
-                    new (INV->next_ravel())   ComplexCell(0.0, 0.0);
+                    INV->next_ravel_Complex(0.0, 0.0);
                   }
              }
        }
@@ -520,7 +520,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
                 const double re = data[base_Q + 2*q];
                 const double im = data[base_Q + 2*q + 1];
                 if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
-                new (Qv->next_ravel()) ComplexCell(re, im);
+                Qv->next_ravel_Complex(re, im);
               }
         }
      else
@@ -529,11 +529,11 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
               {
                 const double re = data[base_Q + q];
                 if (!isfinite(re))   DOMAIN_ERROR;
-                new (Qv->next_ravel()) FloatCell(re);
+                Qv->next_ravel_Float(re);
               }
         }
      Qv->check_value(LOC);
-     new (Z->next_ravel()) PointerCell(Qv.get(), Z.getref());
+     Z->next_ravel_Pointer(Qv.get());
    }
    {
      const Shape shape_R(rows, cols);
@@ -545,7 +545,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
                 const double re = data[base_R + 2*r];
                 const double im = data[base_R + 2*r + 1];
                 if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
-                new (vR->next_ravel()) ComplexCell(re, im);
+                vR->next_ravel_Complex(re, im);
               }
         }
      else
@@ -554,25 +554,25 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
               {
                 const double re = data[base_R + r];
                 if (!isfinite(re))   DOMAIN_ERROR;
-                new (vR->next_ravel()) FloatCell(re);
+                vR->next_ravel_Float(re);
               }
         }
      vR->check_value(LOC);
-     new (Z->next_ravel()) PointerCell(vR.get(), Z.getref());
+     Z->next_ravel_Pointer(vR.get());
 
       if (need_complex)
          {
            Value_P INV = invert_upper_triangle_matrix<true>(rows, cols,
                                                             data + base_R,
                                                             data + base_Q);
-           new (Z->next_ravel()) PointerCell(INV.get(), Z.getref());
+           Z->next_ravel_Pointer(INV.get());
          }
       else
          {
            Value_P INV = invert_upper_triangle_matrix<false>(rows, cols,
                                                              data + base_R,
                                                              data + base_Q);
-           new (Z->next_ravel()) PointerCell(INV.get(), Z.getref());
+           Z->next_ravel_Pointer(INV.get());
          }
    }
 

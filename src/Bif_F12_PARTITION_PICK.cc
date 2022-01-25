@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ Bif_F12_PARTITION::do_eval_B(Value_P B)
    if (B->is_simple_scalar())   return B;
 
 Value_P Z(LOC);
-   new (Z->next_ravel()) PointerCell(B->clone(LOC).get(), Z.getref());
+   Z->next_ravel_Pointer(B->clone(LOC).get());
    Z->check_value(LOC);
    return Z;
 }
@@ -120,11 +120,11 @@ Value_P Z(shape_Z, LOC);
         const ShapeItem off_Z = it_Z.multiply(weight_Z);   // offset in Z
 
         Value_P vZ(item_shape, LOC);
-        new (Z->next_ravel()) PointerCell(vZ.get(), Z.getref());
+        Z->next_ravel_Pointer(vZ.get());
 
         if (item_shape.is_empty())
            {
-             vZ->get_ravel(0).init(B->get_ravel(0), vZ.getref(), LOC);
+             vZ->get_wproto().init(B->get_cfirst(), vZ.getref(), LOC);
            }
         else
            {
@@ -132,8 +132,7 @@ Value_P Z(shape_Z, LOC);
                  {
                    const ShapeItem off_B =  // offset in B
                          it_it.multiply(it_weight);
-                   vZ->next_ravel()->init(B->get_ravel(off_Z + off_B),
-                                                       vZ.getref(), LOC);
+                   vZ->next_ravel_Cell(B->get_cravel(off_Z + off_B));
                  }
            }
         vZ->check_value(LOC);
@@ -146,41 +145,77 @@ Value_P Z(shape_Z, LOC);
 Token
 Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis) const
 {
+   // A must be a scalar or vector (of non-negative integers)
+   //
    if (A->get_rank() > 1)    RANK_ERROR;
    if (B->get_rank() == 0)   RANK_ERROR;
 
+   // construct a vector of breakpoints from A
+   //
+const ShapeItem len_A = A->get_shape_item(0);
+   if (len_A != B->get_shape_item(axis))   LENGTH_ERROR;
+
+vector<ShapeItem> breakpoints;   // start position of a partition (including)
+vector<ShapeItem> breakends;     // end position of a partition (excluding)
+
+   // A is scalar-extended as needed. The case where A is a scalar is, however
+   // identical to the case where all items in A are equal, and in both cases
+   // there is only one breakpoint (at B[0])
+   //
+ShapeItem len_Zm = 0;
+
    if (A->is_scalar())
       {
-        APL_Integer val = A->get_ravel(0).get_near_int();
-        if (val == 0)
-           {
-             return Token(TOK_APL_VALUE1, Idx0(LOC));
-           }
+        breakpoints.push_back(0);
+        breakends.push_back(len_A);
+      }
+   else
+      {
+        ShapeItem prev_A = 0;
+        bool in_partition = false;
+        loop(apos, len_A)
+            {
+              const APL_Integer aval = A->get_cravel(apos).get_near_int();
+              if (aval < 0)             DOMAIN_ERROR;
 
-        return Token(TOK_APL_VALUE1, do_eval_B(B));
+              if (aval > prev_A)   // new partition starting at apos
+                 {
+                   breakpoints.push_back(apos);
+                   if (in_partition)   breakends.push_back(apos);
+                   in_partition = true;
+                   ++len_Zm;
+                 }
+              else if (in_partition && aval == 0)
+                 {
+                   breakends.push_back(apos);
+                   in_partition = false;
+                 }
+              prev_A = aval;
+            }
+
+        if (in_partition)   breakends.push_back(len_A);
+
+        Assert(breakpoints.size() == breakends.size());
       }
 
-   if (A->get_shape_item(0) != B->get_shape_item(axis))   LENGTH_ERROR;
+   if (len_Zm == 1)   // single partition
+      {
+        if (A->get_cfirst().get_near_int())   // non-zero A0
+           {
+             Value_P ZZ = B->clone(LOC);
+             Value_P Z(LOC);
+             Z->next_ravel_Pointer(ZZ.get());
+             return Token(TOK_APL_VALUE1, Z);
+           }
 
-   // determine the length of the partitioned dimension...
-   //
-ShapeItem len_Z = 0;
-   {
-     ShapeItem prev = 0;
-     loop(l, A->get_shape_item(0))
-        {
-           const APL_Integer am = A->get_ravel(l).get_near_int();
-           if (am < 0)   DOMAIN_ERROR;
-           if (am  > prev)   ++len_Z;
-           prev = am;
-        }
-   }
+        // 0 ⊂ B is empty
+        return Token(TOK_APL_VALUE1, Idx0(LOC));
+      }
 
 Shape shape_Z(B->get_shape());
-   shape_Z.set_shape_item(axis, len_Z);
+   shape_Z.set_shape_item(axis, len_Zm);
 
 Value_P Z(shape_Z, LOC);
-
 
    if (Z->is_empty())
       {
@@ -191,79 +226,29 @@ Value_P Z(shape_Z, LOC);
       }
 
 const Shape3 shape_B3(B->get_shape(), axis);
-Cell * cZ;
 
    loop(h, shape_B3.h())
+   loop(m, len_Zm)
    loop(l, shape_B3.l())
        {
-         ShapeItem from = -1;
-         ShapeItem prev_am = 0;
-         ShapeItem zm = 0;
-         cZ = &Z->get_ravel(h*len_Z*shape_B3.l() + l);
+         const Cell * src_B = &B->get_cravel(l + shape_B3.l() *
+                                    (breakpoints[m] + h * shape_B3.m()));
 
-         loop(m, shape_B3.m())
+         const ShapeItem partition_len = breakends[m] - breakpoints[m];
+
+         Value_P ZZ(partition_len, LOC);
+         loop(p, partition_len)
              {
-               const APL_Integer am = A->get_ravel(m).get_near_int();
-               Assert(am >= 0);   // already verified above.
-
-               if (am == 0)   // skip element m (and following)
-                  {
-                    if (from != -1)   // an old segment is pending
-                       {
-                         copy_segment(cZ + zm, Z.getref(), h,
-                                      from, m, shape_B3.m(),
-                                      l, shape_B3.l(), B);
-                         zm += shape_B3.l();
-                       }
-                    from = -1;
-                  }
-               else if (am > prev_am)   // new segment
-                  {
-                    if (from != -1)   // an old segment is pending
-                       {
-                         copy_segment(cZ + zm, Z.getref(), h, from, m,
-                                      shape_B3.m(), l, shape_B3.l(), B);
-                         zm += shape_B3.l();
-                       }
-                    from = m;
-                  }
-               prev_am = am;
+               ZZ->next_ravel_Cell(*src_B);
+               src_B += shape_B3.l();
              }
+         ZZ->check_value(LOC);
 
-         if (from != -1)   // an old segment is pending
-            {
-              copy_segment(cZ + zm, Z.getref(), h, from, shape_B3.m(),
-                           shape_B3.m(), l, shape_B3.l(), B);
-
-              // zm += shape_B3.l();   not needed since we are done.
-            }
+         Z->next_ravel_Pointer(ZZ.get());
        }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
-}
-//-----------------------------------------------------------------------------
-void
-Bif_F12_PARTITION::copy_segment(Cell * dest, Value & dest_owner,
-                                ShapeItem h, ShapeItem m_from,
-                                ShapeItem m_to, ShapeItem m_len,
-                                ShapeItem l, ShapeItem l_len, Value_P B)
-{
-   Assert(m_from < m_to);
-   Assert(m_to <= m_len);
-   Assert(l < l_len);
-
-Value_P V(m_to - m_from, LOC);
-
-Cell * vv = &V->get_ravel(0);
-   for (ShapeItem m = m_from; m < m_to; ++m)
-       {
-         const Cell & cb = B->get_ravel(l + (m + h*m_len)*l_len);
-         vv++->init(cb, V.getref(), LOC);
-       }
-
-   V->check_value(LOC);
-   new (dest) PointerCell(V.get(), dest_owner);
 }
 //=============================================================================
 Token
@@ -279,7 +264,7 @@ const ShapeItem ec_A = A->element_count();
 
 const APL_Integer qio = Workspace::get_IO();
 
-Value_P Z = pick(&A->get_ravel(0), 0, ec_A, B, qio);
+Value_P Z = pick(&A->get_cfirst(), 0, ec_A, B, qio);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -288,7 +273,12 @@ Value_P Z = pick(&A->get_ravel(0), 0, ec_A, B, qio);
 Token
 Bif_F12_PICK::disclose(Value_P B, bool rank_tolerant)
 {
+   // for simple scalars B: B ≡ ⊂ B and therefore B ≡ ⊃ B
+   //
    if (B->is_simple_scalar())   return Token(TOK_APL_VALUE1, B);
+
+   // compute item_shape, which is the smallest shape into which each
+   // item of B fits, and then ⍴Z ←→ (⍴B), item_shape
 
 const Shape item_shape = compute_item_shape(B, rank_tolerant);
 const Shape shape_Z = B->get_shape() + item_shape;
@@ -305,68 +295,109 @@ const ShapeItem len_B = B->element_count();
 
 Value_P Z(shape_Z, LOC);
 
-const ShapeItem llen = item_shape.get_volume();
+const ShapeItem item_len = item_shape.get_volume();
 
-   if (llen == 0)   // empty enclosed value
+   if (item_len == 0)   // empty enclosed value
       {
-        const Cell & B0 = B->get_ravel(0);
+        const Cell & B0 = B->get_cproto();
         if (B0.is_pointer_cell())
            {
              Value_P vB = B0.get_pointer_value();
              Value_P B_proto = vB->prototype(LOC);
-             Z->get_ravel(0).init(B_proto->get_ravel(0), Z.getref(), LOC);
+             Z->get_wproto().init(B_proto->get_cproto(), Z.getref(), LOC);
            }
         else
            {
-             Z->get_ravel(0).init(B0, Z.getref(), LOC);
+             Z->get_wproto().init(B0, Z.getref(), LOC);
            }
 
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   loop(h, len_B)
+   loop(b, len_B)   // for all items in B...
        {
-         const Cell & B_item = B->get_ravel(h);
-         Cell * Z_from = &Z->get_ravel(h*llen);
-         if (B_item.is_pointer_cell())
-            {
-              Value_P vB = B_item.get_pointer_value();
-              Bif_F12_TAKE::fill(item_shape, Z_from, Z.getref(), vB);
-            }
-         else if (B_item.is_lval_cell())
-            {
-              const Cell * pointee = B_item.get_lval_value();
-               if (pointee && pointee->is_pointer_cell())   // pointer to nested
-                  {
-                    Value_P vB = pointee->get_pointer_value();
-                    Value_P ref_B = vB->get_cellrefs(LOC);
-                    Bif_F12_TAKE::fill(item_shape, Z_from, Z.getref(), ref_B);
-                  }
-               else                             // pointer to simple scalar
-                  {
-                    Z_from->init(B_item, Z.getref(), LOC);
-                    for (ShapeItem c = 1; c < llen; ++c)
-                        new (Z_from + c) LvalCell(0, 0);
-                  }
-            }
-         else if (B_item.is_character_cell())   // simple char scalar
-            {
-              Z_from->init(B_item, Z.getref(), LOC);
-              for (ShapeItem c = 1; c < llen; ++c)
-                  new (Z_from + c)   CharCell(UNI_SPACE);
-            }
-         else                                   // simple numeric scalar
-            {
-              Z->get_ravel(h*llen).init(B_item, Z.getref(), LOC);
-              for (ShapeItem c = 1; c < llen; ++c)
-                  new (Z_from + c) IntCell(0);
-            }
+         const Cell & B_item = B->get_cravel(b);
+         disclose_item(Z.getref(), b, item_shape, item_len, B_item);
        }
 
    Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
+}
+//-----------------------------------------------------------------------------
+void
+Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
+                            const Shape & item_shape, ShapeItem item_len,
+                             const Cell & B_item)
+{
+   if (B_item.is_pointer_cell())
+      {
+         // B_item points to a nested APL value. Take that value, expand
+         // it to item_shape, and store it in Z.
+         //
+        const Value & vB = B_item.get_pointer_value().getref();
+        Bif_F12_TAKE::fill(item_shape, Z, vB);
+      }
+   else if (B_item.is_lval_cell())
+      {
+        /* B_item is a left-value Cell (pointing to a Cell (target) that
+           shall be assigned at a later point in time. This is a litte
+           tricky since there are 3 cases:
+
+           1. target == 0, which means that target was padded at an earlier
+              point in time (and then nothing shall be done), or
+
+           2. target is a right-value (even though it is left of →. The
+              convention for cellrefs has it, that left hand PointerCells are
+              not expanded when their parents are (because they are subject to
+              be deleted by other primitives, and then the early conversion to
+              left-values would not pay of). We expand the target now, expand
+              it to item_shape, and store it in Z.
+
+           3. target is a simple Cell, so B_item points a simple Cell. We
+              expand B_item to item_shape using LvalCells that point nowhere.
+
+           In all 3 cases, since we are left of ←, the expansion needs to be
+           made with LvalCell(0, 0) pointing nowhere rather than with UNI_SPACE
+           or with 0.
+        */
+        Cell * target = B_item.get_lval_value();
+        if (target == 0)                           // case 1.
+           {
+             loop(c, item_len)   Z.next_ravel_Lval(0, 0);
+           }
+        else if (target->is_pointer_cell())        // case 2.
+           {
+             Value_P vB = target->get_pointer_value();
+             const Value & cellref_B = vB->get_cellrefs(LOC).getref();
+             Bif_F12_TAKE::fill(item_shape, Z, cellref_B);
+           }
+        else                                       // case 3.
+           {
+             Z.next_ravel_Cell(B_item);
+             for (ShapeItem c = 1; c < item_len; ++c)
+             Z.next_ravel_Lval(0, 0);
+           }
+      }
+   else if (B_item.is_character_cell())   // simple char scalar
+      {
+        // B_item is a character, so expand it to item_shape with UNI_SPACE,
+        //  and store it in Z
+        //
+        Z.next_ravel_Cell(B_item);
+        for (ShapeItem c = 1; c < item_len; ++c)   // the remaining items.
+            Z.next_ravel_Char(UNI_SPACE);
+      }
+   else                                   // simple numeric scalar
+      {
+        // B_item is a number, so expand it to item_shape with 0, and store
+        //  it in Z
+        //
+        Z.next_ravel_Cell(B_item);
+        for (ShapeItem c = 1; c < item_len; ++c)
+            Z.next_ravel_Int(0);
+      }
 }
 //-----------------------------------------------------------------------------
 Token
@@ -444,23 +475,23 @@ PermutedArrayIterator it_Z(shape_Z, perm);
 
    for (ArrayIterator it_B(B->get_shape()); it_B.more(); ++it_B)
       {
-        const Cell & B_item = B->get_ravel(it_B());
+        const Cell & B_item = B->get_cravel(it_B());
         if (B_item.is_pointer_cell())
            {
-             Value_P vB = B_item.get_pointer_value();
-             ArrayIterator vB_it(vB->get_shape());
-             for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
+             const Value & vB = B_item.get_pointer_value().getref();
+             ArrayIterator vB_it(vB.get_shape());
+             for (ArrayIterator item_it(item_shape); item_it.more(); ++item_it)
                  {
-                   Cell * dest = &Z->get_ravel(it_Z());
-                   if (vB->get_shape().contains(it_it.get_offsets()))
+                   Cell * dest = &Z->get_wravel(it_Z());
+                   if (vB.get_shape().contains(item_it.get_offsets()))
                       {
-                        dest->init(vB->get_ravel(vB_it()), Z.getref(), LOC);
+                        dest->init(vB.get_cravel(vB_it()), Z.getref(), LOC);
                         ++vB_it;
                       }
-                   else if (vB->get_ravel(0).is_character_cell())  // char
-                      new (dest) CharCell(UNI_SPACE);
+                   else if (vB.get_cproto().is_character_cell())  // char
+                      Value::zU(dest, UNI_SPACE);
                    else                                   // simple numeric
-                      new (dest) IntCell(0);
+                      Value::z0(dest);
 
                    ++it_Z;
                  }
@@ -469,13 +500,17 @@ PermutedArrayIterator it_Z(shape_Z, perm);
            {
              for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
-                   Cell * dest = &Z->get_ravel(it_Z());
-                   if (it_it() == 0)   // first element: use B_item
-                      dest->init(B_item, Z.getref(), LOC);
-                   else if (B_item.is_character_cell())   // simple char scalar
-                      new (dest) CharCell(UNI_SPACE);
-                   else                                // simple numeric scalar
-                      new (dest) IntCell(0);
+                   if (const ShapeItem pos = it_it())   // subsequent cell
+                      {
+                        if (B_item.is_character_cell())   // fill with ' '
+                           Z->set_ravel_Char(pos, UNI_SPACE);
+                        else                              // fll with 0
+                           Z->set_ravel_Int(pos, 0);
+                      }
+                   else                    // first Cell: use B_item
+                      {
+                        Z->set_ravel_Cell(0, B_item);
+                      }
                    ++it_Z;
                  }
             }
@@ -502,7 +537,7 @@ Shape ret;   // of the first non-scalar in B
        {
          Value_P v;
          {
-           const Cell & cB = B->get_ravel(b);
+           const Cell & cB = B->get_cravel(b);
            if (cB.is_pointer_cell())
               {
                 v = cB.get_pointer_value();
@@ -585,7 +620,7 @@ const Cell & cA = A0[idx_A];
              members.push_back(&top_level);   // dummy, must be last
              Value * val_B = B.get();
              Cell * Bsub = B->get_member(members, val_B, false, true);
-             return Bsub - &B->get_ravel(0);
+             return Bsub - &B->get_cfirst();
            }
         else                  // case ii. (normal B)
            {
@@ -643,7 +678,7 @@ Bif_F12_PICK::pick(const Cell * const A0, ShapeItem idx_A, ShapeItem len_A,
    // the current index of B.
    //
 const ShapeItem offset = pick_offset(A0, idx_A, len_A, B, qio);
-const Cell * cB = &B->get_ravel(offset);
+const Cell * cB = &B->get_cravel(offset);
 
    if (len_A > 1)   // more levels coming.
       {
@@ -700,15 +735,16 @@ const Cell * cB = &B->get_ravel(offset);
              Value_P Z = sub->get_cellrefs(LOC);
              return Z;
            }
+
         Value_P Z(LOC);
         Value * cell_owner = B->get_lval_cellowner();
-        new (Z->next_ravel())   LvalCell(target, cell_owner);
+        Z->next_ravel_Lval(target, cell_owner);
         return Z;
       }
    else   // simple cell
       {
         Value_P Z(LOC);
-        Z->next_ravel()->init(*cB, Z.getref(), LOC);
+        Z->next_ravel_Cell(*cB);
         return Z;
       }
 }

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ Quad_JSON::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 0)   RANK_ERROR;
 
-const int function_number = A->get_ravel(0).get_int_value();
+const int function_number = A->get_cfirst().get_int_value();
    switch(function_number)
       {
         case 0:   // same as monadic ⎕JSON
@@ -183,13 +183,13 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
    // at this point the cell should end up as char vector. Determint its depth.
    //
 const Value * Z = cell.get_pointer_value().get();
-   if (!(Z->get_ravel(0).is_pointer_cell() && Z->is_scalar()))
+   if (!(Z->get_cfirst().is_pointer_cell() && Z->is_scalar()))
       {
         APL_to_JSON_string(result, *Z, level, sorted);
         return;
       }
 
-   Z = Z->get_ravel(0).get_pointer_value().get();
+   Z = Z->get_cfirst().get_pointer_value().get();
    if (!Z->is_char_vector())
       {
 FIXME;
@@ -215,7 +215,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
 {
    if (B.is_scalar())   // number or literal
       {
-        APL_to_JSON_string(result, B.get_ravel(0), level, sorted);
+        APL_to_JSON_string(result, B.get_cfirst(), level, sorted);
         return;
       }
 
@@ -265,7 +265,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
                    array = UCS_string(2*level + 2, UNI_SPACE);
                  }
 
-              APL_to_JSON_string(array, B.get_ravel(e), level + 1, sorted);
+              APL_to_JSON_string(array, B.get_cravel(e), level + 1, sorted);
               if (array.size() == 0)   // error in APL_to_JSON_string()
                  {
                    result.clear();   // indicate error
@@ -284,8 +284,8 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
 
         loop(m, member_indices.size())
            {
-             const Cell & member_name = B.get_ravel(2*member_indices[m]);
-             const Cell & member_data = B.get_ravel(2*member_indices[m] + 1);
+             const Cell & member_name = B.get_cravel(2*member_indices[m]);
+             const Cell & member_data = B.get_cravel(2*member_indices[m] + 1);
 
              result.append(UCS_string(2*level, UNI_SPACE));   // level indent
              if (m)   result.append_UTF8("  \"");
@@ -413,7 +413,7 @@ const ShapeItem len_B = B.element_count();
 
 UCS_string ucs_B;
    ucs_B.reserve(len_B + 1);
-   loop(b, len_B)   ucs_B += B.get_ravel(b).get_char_value();
+   loop(b, len_B)   ucs_B += B.get_cravel(b).get_char_value();
    ucs_B += Unicode_0;   // 0-terminate ucs_B to avoid too many length checks
 
    // tokenize ucs_B
@@ -477,13 +477,13 @@ size_t token0 = 0;
 
    if (Z->is_simple_scalar())
       {
-        Assert(Z->get_ravel(0).is_numeric());
+        Assert(Z->get_cfirst().is_numeric());
         return Z;   // number
       }
 
    Assert(Z->is_scalar());
-   Assert(Z->get_ravel(0).is_pointer_cell());
-   return Z->get_ravel(0).get_pointer_value();
+   Assert(Z->get_cfirst().is_pointer_cell());
+   return Z->get_cfirst().get_pointer_value();
 }
 //-----------------------------------------------------------------------------
 void
@@ -548,7 +548,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
            {
              // CERR << "empty ARRAY" << std::endl;
              Value_P Zsub = Idx0(LOC);
-             new (Z.next_ravel()) PointerCell(Zsub.get(), Z);
+             Z.next_ravel_Pointer(Zsub.get());
            }
         else
            {
@@ -556,7 +556,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
              Value_P Zsub(1, LOC);
              parse_value(Zsub.getref(), ucs_B, tokens_B, token_from);
              Zsub->check_value(LOC);
-             Z.next_ravel()->init_from_value(Zsub.get(), Z, LOC);
+             Z.next_ravel_Value(Zsub.get());
            }
         ++token_from;   // skip ]
       }
@@ -581,7 +581,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
                  }
             }
         Zsub->check_value(LOC);
-        Z.next_ravel()->init_from_value(Zsub.get(), Z, LOC);
+        Z.next_ravel_Value(Zsub.get());
       }
 
    ++token0;   // skip final ]
@@ -600,7 +600,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
    Assert(ucs_B[tokens_B[token0]] == UNI_R_CURLY);   // always }
 
 Value_P assoc_array = EmptyStruct(LOC);
-   new (Z.next_ravel()) PointerCell(assoc_array.get(), Z);
+   Z.next_ravel_Pointer(assoc_array.get());
 
    ++token_from;   // skip {
    if (commas == 0)   // { } or { 'name' : value }
@@ -697,7 +697,7 @@ UCS_string member_name;
      Zsub->check_value(LOC);
 
      Cell * member_data = Z.get_new_member(member_name);
-     member_data->init(Zsub->get_ravel(0), Z, LOC);
+     member_data->init(Zsub->get_cfirst(), Z, LOC);
    }
 
    // check member-seperator (or end of object).
@@ -778,19 +778,19 @@ double dval = 0;
 
    if (need_fract)
       {
-        new (Z.next_ravel())   FloatCell(dval);
+        Z.next_ravel_Float(dval);
         return;
       }
    else if (have_expo)   // so strtoll wont work
       {
-        if (dval < 0)   new (Z.next_ravel())   IntCell(dval - 0.5);
-        else            new (Z.next_ravel())   IntCell(dval + 0.5);
+        if (dval < 0)   Z.next_ravel_Int(dval - 0.5);   // round negative → 0
+        else            Z.next_ravel_Int(dval + 0.5);   // round positive → 0
         return;
       }
    else
       {
-        const long long int ival =strtoll(cc, 0, 10);
-        new (Z.next_ravel())   IntCell(ival);
+        const long long int ival = strtoll(cc, 0, 10);
+        Z.next_ravel_Int(ival);
         return;
       }
 
@@ -851,11 +851,11 @@ Value_P Zsub(content_len, LOC);
                  }
             }
 
-         new (Zsub->next_ravel()) CharCell(uni);
+         Zsub->next_ravel_Char(uni);
        }
 
    Zsub->check_value(LOC);
-   new (Z.next_ravel())   PointerCell(Zsub.get(), Z);
+   Z.next_ravel_Pointer(Zsub.get());
 }
 //-----------------------------------------------------------------------------
 Unicode
@@ -892,14 +892,14 @@ const size_t len = strlen(expected_literal);
 
 Value_P Zsubsub(len, LOC);
    loop(l, len)
-       new (Zsubsub->next_ravel()) CharCell(Unicode(expected_literal[l]));
+       Zsubsub->next_ravel_Char(Unicode(expected_literal[l]));
    Zsubsub->check_value(LOC);
 
 Value_P Zsub(LOC);
-   new (Zsub->next_ravel()) PointerCell(Zsubsub.get(), Zsub.getref());
+   Zsub->next_ravel_Pointer(Zsubsub.get());
    Zsub->check_value(LOC);
 
-   new (Z.next_ravel())   PointerCell(Zsub.get(), Z);
+   Z.next_ravel_Pointer(Zsub.get());
 }
 //-----------------------------------------------------------------------------
 size_t

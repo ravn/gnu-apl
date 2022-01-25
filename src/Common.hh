@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ extern ostream UERR;
 class UCS_string;
 extern UCS_string & MORE_ERROR();   // in Workspace.cc
 
-#define loop(v, e) for (ShapeItem v = 0; v < ShapeItem(e); ++v)
+#define loop(v, e) for (ShapeItem v = 0, __end__ = e; v < __end__; ++v)
 
 // #define TROUBLESHOOT_NEW_DELETE
 

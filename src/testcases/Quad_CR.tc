@@ -385,15 +385,22 @@ foo
  2 
   3
 
+     ⍴38 ⎕CR 50
+64 2
+
+      QP←40 ⎕CR Q ← Q←40⍴0 1
+
+      Q ≡ 40 ⎕CR QP
+1
 
       )erase foo
 
       ⍝ trigger a domain error if new left arguments are implemented
-      ⍝ without adding a testcase
+      ⍝ without adding a testcase above
       ⍝
-      40 ⎕CR A
+      42 ⎕CR A
 DOMAIN ERROR+
-      40 ⎕CR A
+      42 ⎕CR A
       ^      ^
 
       )MORE

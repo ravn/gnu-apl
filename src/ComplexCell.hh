@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -155,18 +155,6 @@ public:
    static APL_Float mag2(APL_Complex A)
       { return A.real() * A.real() + A.imag() * A.imag(); }
 
-   /// initialize Z to real r
-   static ErrorCode zv(Cell * Z, APL_Float r)
-      { new (Z) ComplexCell(r, 0.0);   return E_NO_ERROR; }
-
-   /// initialize Z to complex r + ij
-   static ErrorCode zv(Cell * Z, APL_Float r, APL_Float j)
-      { new (Z) ComplexCell(r, j);   return E_NO_ERROR; }
-
-   /// initialize Z to APL_Complex v
-   static ErrorCode zv(Cell * Z, APL_Complex v)
-      { new (Z) ComplexCell(v.real(), v.imag());   return E_NO_ERROR; }
-
    /// the lanczos approximation for gamma(x + iy)
    static APL_Complex gamma(APL_Float x, const APL_Float & y);
 
@@ -238,11 +226,8 @@ protected:
    virtual const char * get_classname() const   { return "ComplexCell"; }
 
    /// overloaded Cell::CDR_size()
-   virtual int CDR_size() const { return 16; }
-
-   /// overloaded Cell::to_type()
-   virtual void to_type()
-      { new(this)   IntCell(0); }
+   virtual int CDR_size() const
+      { return 16; }
 };
 //=============================================================================
 

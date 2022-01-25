@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,12 +71,6 @@ protected:
 
    /// Partition B according to A
    Token partition(Value_P A, Value_P B, Axis axis) const;
-
-   /// Copy one partition to dest
-   static void copy_segment(Cell * dest, Value & dest_owner, ShapeItem h,
-                            ShapeItem from, ShapeItem to,
-                            ShapeItem m_len, ShapeItem l, ShapeItem len_l,
-                            Value_P B);
 };
 //=============================================================================
 /** primitive functions pick and disclose */
@@ -98,6 +92,12 @@ public:
 
    /// ⊃B
    static Token disclose(Value_P B, bool rank_tolerant);
+
+   // create a copy of B_item, pad as needed to have item_shape, and
+   // store it in Z, starteding at Z_start.
+   static void disclose_item(Value & Z, ShapeItem b,
+                             const Shape & item_shape, ShapeItem item_len,
+                             const Cell & B_item);
 
    /// overloaded Function::eval_XB()
    virtual Token eval_XB(Value_P X, Value_P B) const

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,9 +77,8 @@ protected:
                                prim_f2 fun) const;
 
    /// Apply a function to a nested sub array.
-   void expand_pointers(Cell * cell_Z, Value & Z_owner,
-                        const Cell * cell_A, const Cell * cell_B,
-                        prim_f2 fun) const;
+   void expand_pointers(Value_P Z, Value & Z_owner, const Cell * cell_A,
+                        const Cell * cell_B, prim_f2 fun) const;
 
    /// A helper function for eval_scalar_AXB().
    Value_P eval_scalar_AXB(Value_P A, bool * axis_present,

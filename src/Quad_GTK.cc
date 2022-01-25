@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,18 +60,18 @@ Quad_GTK::eval_AB(Value_P A, Value_P B) const
         DOMAIN_ERROR;
       }
 
-const int function = B->get_ravel(0).get_int_value();
+const int function = B->get_cfirst().get_int_value();
 int fd = -1;
    switch(function)
       {
         case 0: // close window/GUI
              if (!A->is_int_scalar())   goto bad_fd;
-             fd = A->get_ravel(0).get_int_value();
+             fd = A->get_cfirst().get_int_value();
              return Token(TOK_APL_VALUE1, close_window(fd));
 
         case 3: // increase verbosity
              if (!A->is_int_scalar())   goto bad_fd;
-             fd = A->get_ravel(0).get_int_value();
+             fd = A->get_cfirst().get_int_value();
              if (write_TL0(fd, 7))
                 {
                   CERR << "write(Tag 7) failed in Ah ⎕GTK 3" << endl;
@@ -81,7 +81,7 @@ int fd = -1;
 
         case 4: // decrease verbosity
              if (!A->is_int_scalar())   goto bad_fd;
-             fd = A->get_ravel(0).get_int_value();
+             fd = A->get_cfirst().get_int_value();
              if (write_TL0(fd, 8))
                 {
                   CERR << "write(Tag 8) failed in Ah ⎕GTK 4" << endl;
@@ -123,7 +123,7 @@ Quad_GTK::eval_B(Value_P B) const
         DOMAIN_ERROR;
       }
 
-const int function = B->get_ravel(0).get_int_value();
+const int function = B->get_cfirst().get_int_value();
    switch(function)
       {
         case 0:   // list of open fds
@@ -173,11 +173,11 @@ const int function = B->get_ravel(0).get_int_value();
                args.push_back(arg);
 
                Value_P Z(1 + args.size(), LOC);
-               new (Z->next_ravel()) IntCell(HWF[0]);
+               Z->next_ravel_Char(HWF[0]);
                loop(a, args.size())
                    {
                      Value_P Za(args[a], LOC);
-                     new (Z->next_ravel())   PointerCell(Za.get(), Z.getref());
+                     Z->next_ravel_Pointer(Za.get());
                    }
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
@@ -204,7 +204,7 @@ const int fd = resolve_window(X.get(), window_id);
    write_TLV(fd, 6, window_id);   // select wodget
 
 int fun = FNUM_INVALID;
-   if (B->is_int_scalar())         fun = B->get_ravel(0).get_int_value();
+   if (B->is_int_scalar())         fun = B->get_cfirst().get_int_value();
    else if (B->is_char_string())   fun = resolve_fun_name(window_id, B.get());
    else
       {
@@ -245,7 +245,7 @@ UCS_string ucs_A;
       {
         loop(a, A->element_count())
             {
-              const Cell & cell = A->get_ravel(a);
+              const Cell & cell = A->get_cravel(a);
               if (!cell.is_pointer_cell())
                  {
                     MORE_ERROR() << "A ⎕GTK " << fun
@@ -285,7 +285,7 @@ const int fd = resolve_window(X.get(), window_id);
    write_TLV(fd, 6, window_id);   // select wodget
 
 int fun = FNUM_INVALID;
-   if (B->is_int_scalar())         fun = B->get_ravel(0).get_int_value();
+   if (B->is_int_scalar())         fun = B->get_cfirst().get_int_value();
    else if (B->is_char_string())   fun = resolve_fun_name(window_id, B.get());
    else                            DOMAIN_ERROR;
 
@@ -388,8 +388,8 @@ UTF8_string utf;
    UCS_string ucs(utf);
 
 Value_P Z(1 + ucs.size(), LOC);
-   new (Z->next_ravel())   IntCell(TLV_tag - Response_0);
-   loop(u, ucs.size())   new (Z->next_ravel())   CharCell(ucs[u]);
+   Z->next_ravel_Int(TLV_tag - Response_0);
+   loop(u, ucs.size())   Z->next_ravel_Char(ucs[u]);
    Z->check_value(LOC);
    return  Z;
 }
@@ -466,7 +466,7 @@ Value_P Z(open_windows.size(), LOC);
    loop(w, open_windows.size())
       {
         const APL_Integer fd = open_windows[w].fd;
-        new (Z->next_ravel()) IntCell(fd);
+        Z->next_ravel_Int(fd);
       }
 
    Z->set_default_Int();
@@ -478,7 +478,7 @@ int
 Quad_GTK::resolve_window(const Value * X, UTF8_string & window_id)
 {
    if (X->get_rank() > 1)   RANK_ERROR;
-const int fd = X->get_ravel(0).get_int_value();
+const int fd = X->get_cfirst().get_int_value();
 
    // verify that ↑X is an open window...
    //
@@ -501,7 +501,7 @@ bool window_valid = false;
 
    loop(i, X->element_count())
        {
-         if (i)   window_id += X->get_ravel(i).get_char_value();
+         if (i)   window_id += X->get_cravel(i).get_char_value();
        }
 
    return fd;

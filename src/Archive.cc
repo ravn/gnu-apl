@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -199,22 +199,40 @@ XML_Saving_Archive::save_Ravel(Vid vid)
    Log(LOG_archive)   CERR << "save_Ravel(Vid " << vid << ")" << endl;
 
 const Value & v = *values[vid]._val;
+const ShapeItem len = v.nz_element_count();
+const Cell * C = &v.get_cfirst();
 
 int space = do_indent();
+char cc[80];   // output line buffer
+   if (v.is_packed())   // Value has a packed (non-Cell) ravel
+      {
+        const uint8_t * bytes = reinterpret_cast<const uint8_t *>(C);
+        const ShapeItem byte_count = (len + 7)/8;
 
-char cc[80];
-   snprintf(cc, sizeof(cc), "<Ravel vid=\"%d\" cells=\"", vid);
-   out << decr(space, cc);
+        snprintf(cc, sizeof(cc), "<Ravel vid=\"%d\" bytes=\"", vid);
+        out << cc << uhex;
 
-   ++indent;
-const ShapeItem len = v.nz_element_count();
-const Cell * C = &v.get_ravel(0);
-   loop(l, len)   emit_cell(*C++, space);
+        loop(b, byte_count)   // print with max. 64 bytes per line
+            {
+              if ((b & 0x3F) == 0)   out << "\n    " << UNI_PAD_U9;
+              out << (bytes[b] & 0xFF);
+            }
+        out << nohex << "\"/>" << endl;
+      }
+   else
+      {
+        snprintf(cc, sizeof(cc), "<Ravel vid=\"%d\" cells=\"", vid);
+        out << decr(space, cc);
 
-   space -= leave_char_mode();
-   out<< "\"/>" << endl;
-   space -= 2;
-   --indent;
+        ++indent;
+        loop(l, len)   emit_cell(*C++, space);
+
+        space -= leave_char_mode();
+        space -= 2;
+
+        out << "\"/>" << endl;
+        --indent;
+      }
 
    return *this;
 }
@@ -820,6 +838,7 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "    <!ATTLIST Workspace  second     CDATA #REQUIRED>\n"
 "    <!ATTLIST Workspace  timezone   CDATA #REQUIRED>\n"
 "    <!ATTLIST Workspace  saving_SVN CDATA #REQUIRED>\n"
+"    <!ATTLIST Workspace  syntax     CDATA #IMPLIED>\n"
 "\n"
 "        <!ELEMENT Value (#PCDATA)>\n"
 "        <!ATTLIST Value flg    CDATA #REQUIRED>\n"
@@ -837,7 +856,8 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "\n"
 "        <!ELEMENT Ravel (#PCDATA)>\n"
 "        <!ATTLIST Ravel vid    CDATA #REQUIRED>\n"
-"        <!ATTLIST Ravel cells  CDATA #REQUIRED>\n"
+"        <!ATTLIST Ravel bytes  CDATA #IMPLIED>\n"
+"        <!ATTLIST Ravel cells  CDATA #IMPLIED>\n"
 "\n"
 "        <!ELEMENT SymbolTable (Symbol*)>\n"
 "        <!ATTLIST SymbolTable size CDATA #REQUIRED>\n"
@@ -927,16 +947,18 @@ const int offset = Workspace::get_v_Quad_TZ().get_offset();   // timezone offset
 "         timezone is offset to UTC in seconds.\n"
 "         local time is UTC + offset -->\n"
 "\n"
-"<Workspace wsid=\""     << Workspace::get_WS_name()
-     << "\" year=\""     << (t->tm_year + 1900)
-     << "\" month=\""    << (t->tm_mon  + 1)
-     << "\" day=\""      <<  t->tm_mday << "\"" << endl <<
-"           hour=\""     <<  t->tm_hour
-     << "\" minute=\""   <<  t->tm_min
-     << "\" second=\""   <<  t->tm_sec
-     << "\" timezone=\"" << offset << "\"" << endl <<
+"<Workspace wsid=\""       << Workspace::get_WS_name()
+     << "\" year=\""       << (t->tm_year + 1900)
+     << "\" month=\""      << (t->tm_mon  + 1)
+     << "\" day=\""        <<  t->tm_mday << "\"" << endl <<
+"           hour=\""       <<  t->tm_hour
+     << "\" minute=\""     <<  t->tm_min
+     << "\" second=\""     <<  t->tm_sec
+     << "\" timezone=\""   << offset << "\"" << endl <<
 "           saving_SVN=\"" << ARCHIVE_SVN
-     << "\">\n" << endl;
+     << "\" syntax=\"" << ASX_MAJOR << "."
+                       << ASX_MINOR << "."
+                       << ASX_OTHER << "\">\n" << endl;
 
    ++indent;
 
@@ -1013,7 +1035,7 @@ ShapeItem idx = 0;
         const ShapeItem ec = parent.nz_element_count();
         loop(e, ec)   // for every ravel cell of the (parent-) value
             {
-              const Cell & cP = parent.get_ravel(e);
+              const Cell & cP = parent.get_cravel(e);
               if (cP.is_pointer_cell())
                  {
                    const Value * sub = cP.get_pointer_value().get();
@@ -1351,7 +1373,7 @@ const int64_t val = strtoll(charP(value), 0, base);
 APL_Float
 XML_Loading_Archive::find_float_attr(const char * attrib)
 {
-const UTF8 * value = find_attr(attrib, false);
+const UTF8 * value = find_mandatory_attr(attrib);
 const APL_Float val = strtod(charP(value), 0);
    return val;
 }
@@ -1432,7 +1454,7 @@ XML_Loading_Archive::read_Workspace(bool silent)
    expect_tag("Workspace", LOC);
 
 const int offset   = find_int_attr("timezone", false, 10);
-const UTF8 * wsid  = find_attr("wsid",         false);
+const UTF8 * wsid  = find_mandatory_attr("wsid");
 
 int year  = find_int_attr("year",     false, 10);
 int mon   = find_int_attr("month",    false, 10);
@@ -1441,36 +1463,7 @@ int hour  = find_int_attr("hour",     false, 10);
 int min   = find_int_attr("minute",   false, 10);
 int sec   = find_int_attr("second",   false, 10);
 
-UCS_string saving_SVN;
-UCS_string current_SVN(ARCHIVE_SVN);
-   {
-     const UTF8 * saving = find_attr("saving_SVN", true);
-     while (saving && *saving != '"')   saving_SVN.append(Unicode(*saving++));
-   }
-bool mismatch = false;
-
-   if (saving_SVN.size() == 0)   // saved with very old version
-      {
-        mismatch = true;
-        CERR << "WARNING: this workspace was )SAVEd with a VERY "
-             << "old SVN version of GNU APL." << endl;
-      }
-   else if (saving_SVN != current_SVN)   // saved with different version
-      {
-        mismatch = true;
-        CERR << "WARNING: this workspace was )SAVEd with SVN version "
-             << saving_SVN << endl <<
-        "          but is now being )LOADed with a SVN version "
-             << current_SVN << " or greater" << endl;
-      }
-
-   if (mismatch)
-      {
-        CERR << "Expect problems, in particular when the )SI was not clear.\n";
-        if (!copying)
-           CERR << "In case of problems, please try )COPY instead of )LOAD."
-                << endl;
-      }
+   check_compatibility();
 
    sec  += offset          % 60;
    min  += (offset /   60) % 60;
@@ -1631,16 +1624,75 @@ const char * tz_sign = (offset < 0) ? "" : "+";
 }
 //-----------------------------------------------------------------------------
 void
+XML_Loading_Archive::check_compatibility()
+{
+   // new compatibility mechanism?
+   //
+   if (const char * syntax = charP(find_optional_attr("syntax")))   // yes
+      {
+        unsigned int major = 0;
+        unsigned int minor = 0;
+        unsigned int other  = 0;
+        sscanf(syntax, "%u.%u.%u", &major, &minor, &other);
+        if (major == ASX_MAJOR && minor == ASX_MINOR)   return;
+        if (major == ASX_MAJOR)
+           {
+              CERR << "NOTE: this workspaces was )SAVEd with syntax version "
+                   << major << "." << minor << "." << other << endl
+                   << "but is now )LOADed with a newer version " << ASX_MAJOR
+                   << "." << ASX_MINOR << "." << ASX_OTHER << "." << endl
+                   << "That should be OK, but new features introduced by the"
+                   << " newer version will not be supported." << endl;
+           }
+        return;
+      }
+
+bool mismatch = false;
+
+   // old (SVN-version based) compatibility mechanism
+
+UCS_string saving_SVN;
+UCS_string current_SVN(ARCHIVE_SVN);
+   {
+     const UTF8 * saving = find_optional_attr("saving_SVN");
+     while (saving && *saving != '"')   saving_SVN.append(Unicode(*saving++));
+   }
+
+   if (saving_SVN.size() == 0)   // saved with very old version
+      {
+        mismatch = true;
+        CERR << "WARNING: this workspace was )SAVEd with a VERY "
+             << "old SVN version of GNU APL." << endl;
+      }
+   else if (saving_SVN != current_SVN)   // saved with different version
+      {
+        mismatch = true;
+        CERR << "WARNING: this workspace was )SAVEd with SVN version "
+             << saving_SVN << endl <<
+        "          but is now being )LOADed with a SVN version "
+             << current_SVN << " or greater" << endl;
+      }
+
+   if (mismatch)
+      {
+        CERR << "Expect problems, in particular when the )SI was not clear.\n";
+        if (!copying)
+           CERR << "In case of problems, please try )COPY instead of )LOAD."
+                << endl;
+      }
+}
+//-----------------------------------------------------------------------------
+void
 XML_Loading_Archive::read_Value()
 {
    expect_tag("Value", LOC);
 
    // read all mandatory attributes even if they are no used in this pass
    //
-const Vid  vid    = find_Vid_attr("vid",    false, 10);
-const int  flg    = find_int_attr("flg",    false, 16);
-const Vid  parent = find_Vid_attr("parent", false, 10);
-const int  rk     = find_int_attr("rk",     false, 10);
+const Vid vid    = find_Vid_attr("vid",    false, 10);
+const int flags  = find_int_attr("flg",    false, 16);
+const Vid parent = find_Vid_attr("parent", false, 10);
+const int rk     = find_int_attr("rk",     false, 10);
 
    Log(LOG_archive)   CERR << "  read_Value() vid=" << vid << endl;
 
@@ -1655,14 +1707,19 @@ Shape sh_value;
       {
         char sh[20];
         snprintf(sh, sizeof(sh), "sh-%d", int(r));
-        const UTF8 * sh_r = find_attr(sh, false);
+        const UTF8 * sh_r = find_mandatory_attr(sh);
         sh_value.add_shape_item(atoll(charP(sh_r)));
       }
 
-   // if we do )COPY or )PCOPY and vid is not in vids_COPY list, then we
-   // push 0 (so that indexing with vid still works) and ignore such
-   // values in read_Ravel.
-   //
+   /* if:
+
+      1. we do )COPY or )PCOPY, and
+      2. vid is not in vids_COPY list,
+
+      then we push 0 (so that indexing with vid still works) and ignore such
+      values in read_Ravel.
+    */
+
 bool no_copy = false;   // assume the value is needed
    if (copying)
       {
@@ -1694,170 +1751,202 @@ bool no_copy = false;   // assume the value is needed
    else
       {
         Assert(vid == int(values.size()));
-
-        Value_P val(sh_value, LOC);
-        if (flg & VF_member)   val->set_member();
-        values.push_back(val);
+        if (flags & VF_packed)
+           {
+             Value_P val(sh_value, /* constructor allocates */ 0, LOC);
+             values.push_back(val);
+            }
+        else
+           {
+             Value_P val(sh_value, LOC);
+             if (flags & VF_member)   val->set_member();
+             values.push_back(val);
+           }
       }
 }
 //-----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_Cells(Cell * & C, Value & C_owner,
-                                const UTF8 * & first)
+const UTF8 *
+XML_Loading_Archive::read_Cells(Value & Z, const UTF8 * input)
 {
-   while (*first <= ' ')   ++first;
+   // skip leading whitespace
+   while (*input <= ' ')   ++input;
 
-int len;
-const Unicode type = UTF8_string::toUni(first, len, true);
+int type_len = 0;
+const Unicode type = UTF8_string::toUni(input, type_len, true);
+   input += type_len;   // skip type in input
+
+   // result pointer for strtoll()
+UTF8 * end = 0;
+char **pend = reinterpret_cast<char **>(&end);
 
    switch (type)
       {
         case UNI_PAD_U0: // end of UNI_PAD_U2
         case '\n':       // end of UNI_PAD_U2 (fix old bug)
-             first += len;
-             break;
+             return input;;
 
         case UNI_PAD_U1: // hex Unicode
         case UNI_PAD_U2: // printable ASCII
              {
+               // read_XML_string() needs type, so we restore it.
+               input -= type_len;
+
                UCS_string ucs;
-               read_chars(ucs, first);
-               loop(u, ucs.size())   new (C++) CharCell(ucs[u]);
+               input = read_XML_string(ucs, input);
+               loop(u, ucs.size())
+                   {
+                     Z.next_ravel_Char(ucs[u]);
+                   }
              }
-             break;
+             return input;
 
         case UNI_PAD_U3: // integer
-             first += len;
              {
-               char * end = 0;
-               const APL_Integer val = strtoll(charP(first), &end, 10);
-               new (C++) IntCell(val);
-               first = utf8P(end);
+               const APL_Integer val = strtoll(charP(input), pend, 10);
+               Z.next_ravel_Int(val);
+               input = end;
              }
-             break;
+             return input;
 
         case UNI_PAD_U4: // real
-             first += len;
              {
-               char * end = 0;
-               const APL_Float val = strtod(charP(first), &end);
-               new (C++) FloatCell(val);
-               first = utf8P(end);
+               const APL_Float val = strtod(charP(input), pend);
+               Z.next_ravel_Float(val);
+               input = end;
              }
-             break;
+             return input;
 
         case UNI_PAD_U5: // complex
-             first += len;
              {
-               char * end = 0;
-               const APL_Float real = strtod(charP(first), &end);
-               first = utf8P(end);
+               const APL_Float real = strtod(charP(input), pend);
+               input = utf8P(end);
                Assert(*end == 'J');
                ++end;
-               const APL_Float imag = strtod(end, &end);
-               new (C++) ComplexCell(real, imag);
-               first = utf8P(end);
+               const APL_Float imag = strtod(*pend, pend);
+               Z.next_ravel_Complex(real, imag);
+               input = end;
              }
-             break;
+             return input;
 
         case UNI_PAD_U6: // pointer
-             first += len;
              {
-               char * end = 0;
-               const int vid = strtoll(charP(first), &end, 10);
+               const int vid = strtoll(charP(input), pend, 10);
                Assert(vid >= 0);
                Assert(vid < int(values.size()));
-               C++->init_from_value(values[vid].get(), C_owner, LOC);
-               first = utf8P(end);
+               Z.next_ravel_Value(values[vid].get());
+               input = end;
              }
-             break;
+             return input;
 
         case UNI_PAD_U7: // cellref
-             first += len;
-             if (first[0] == '0')    // 0-cell-pointer
+             if (input[0] == '0')    // 0-cell-pointer
                 {
-                  new (C++) LvalCell(0, 0);
-                  first++;
+                  Z.next_ravel_Lval(0, 0);
+                  input++;
                 }
              else
                 {
-                  char * end = 0;
-                  const int vid = strtoll(charP(first), &end, 16);
+                  const int vid = strtoll(charP(input), pend, 16);
                   Assert(vid >= 0);
                   Assert(vid < int(values.size()));
                   Assert(*end == '[');   ++end;
-                  const ShapeItem offset = strtoll(end, &end, 16);
+                  const ShapeItem offset = strtoll(*pend, pend, 16);
                   Assert(*end == ']');   ++end;
-                  new (C++) LvalCell(&values[vid]->get_ravel(offset),
-                                     values[vid].get());
-                  first = utf8P(end);
+                  Value * target = values[vid].get();
+                  Z.next_ravel_Lval(&target->get_wravel(offset), target);
+                  input = end;
                 }
-             break;
+             return input;
 
         case UNI_PAD_U8: // rational quotient
              //
              // we should understand rational quotients even if we are
-             // not ./configured for them..
+             // not ./configured for them.
              //
-             first += len;
              {
-               char * end = 0;
-               const uint64_t numer = strtoll(charP(first), &end, 10);
-               first = utf8P(end);
+               const uint64_t numer = strtoll(charP(input), pend, 10);
+               input = utf8P(end);
 
                // skip ÷ (which is is C3 B7 in UTF8)
                Assert((*end++ & 0xFF) == 0xC3);
                Assert((*end++ & 0xFF) == 0xB7);
-               const uint64_t denom = strtoll(end, &end, 10);
+               const uint64_t denom = strtoll(*pend, pend, 10);
                Assert(denom > 0);
 #ifdef RATIONAL_NUMBERS_WANTED
-               new (C++) FloatCell(numer, denom);
+               Z.next_ravel_Float(numer, denom);
 #else
-               new (C++) FloatCell((1.0*(numer))/denom);
+               Z.next_ravel_Float((1.0*numer)/denom);
 #endif
-               first = utf8P(end);
+               input = end;
              }
-             break;
+             return input;
 
+        case UNI_PAD_U9: // packed boolean
+             Assert(Z.is_packed());
+             for (;;)
+                 {
+                   const uint8_t c0 = input[0];
+                   const uint8_t c1 = input[1];
+                   if (c0 <= ' ')    { ++input;   continue; }   // whitespace
+                   if (c0 == '"')   return input + 1;   // end of ravel
+
+                   const char cc[3] = { char(c0), char(c1), 0 };
+                   char * end = 0;
+                   const uint8_t byte = strtoll(cc, &end, 16);
+                   input += end - cc;
+
+                   const int converted = end - cc;
+                   if (converted == 0)   return input;   // nothing converted
+                   Z.next_ravel_Byte(byte);              // > 0 bytes converted
+                   if (converted == 1)   return input + 1;
+                 }
 
         default: Q1(type) Q1(line_no) DOMAIN_ERROR;
       }
 }
 //-----------------------------------------------------------------------------
-void
-XML_Loading_Archive::read_chars(UCS_string & ucs, const UTF8 * & utf)
+const UTF8 *
+XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
 {
+   /* argument 'utf' is the source for a sequence of characters.
+      'utf' comes from find_attr() and is therefore NOT 0-terminated but
+      instead terminated by '"'.
+
+      The Unicodes read from 'utf' are stored in result 'ucs'.
+
+      On return, 'utf' points to the terminating '"'.
+    */
+
    while (*utf <= ' ')   ++utf;   // skip leading whitespace
 
    // char mode is controlled by delimiters:
    // ² (UNI_PAD_U2 = start of char mode),
    // ¹ (UNI_PAD_U1 = start of hex mode = implicit end of char mode), and
-   // ⁰ (UNI_PAD_U0 = end of char mode.
+   // ⁰ (UNI_PAD_U0 = end of char mode).
    //
-   for (bool char_mode = false;;)
+
+   for (bool char_mode = false; *utf != '"';)
        {
-         if (*utf == '"')   break;   // end of attribute value
-
-         int len;
+         // get next Unicode and advance utf
+         //
+         int len = 0;
          const Unicode uni = UTF8_string::toUni(utf, len, true);
+         utf += len;
 
-          if (char_mode && *utf != '\n' && uni != UNI_PAD_U0)
+          if (char_mode && uni != '\n' && uni != UNI_PAD_U0)
              {
                ucs.append(uni);
-               utf += len;
                continue;
              }
 
          if (uni == UNI_PAD_U2)   // start of char_mode
             {
-              utf += len;   // skip UNI_PAD_U2
               char_mode = true;
               continue;
             }
 
          if (uni == UNI_PAD_U1)   // start of hex mode
             {
-              utf += len;   // skip UNI_PAD_U1
               char_mode = false;
               char * end = 0;
               const int hex = strtoll(charP(utf), &end, 16);
@@ -1868,7 +1957,6 @@ XML_Loading_Archive::read_chars(UCS_string & ucs, const UTF8 * & utf)
 
          if (uni == UNI_PAD_U0)   // end of char_mode
             {
-              utf += len;   // skip UNI_PAD_U0
               char_mode = false;
               continue;
             }
@@ -1880,15 +1968,19 @@ XML_Loading_Archive::read_chars(UCS_string & ucs, const UTF8 * & utf)
               // end of the line so that workspaces save with that fault can
               // be read.
               //
-              utf += len;   // skip UNI_PAD_U0
               char_mode = false;
               continue;
             }
 
-         break;
+         if (uni == ' ')   // indentation
+            {
+              continue;
+            }
+
+         FIXME   // not reached
        }
 
-   while (*utf <= ' ')   ++utf;   // skip trailing whitespace
+   return utf;
 }
 //-----------------------------------------------------------------------------
 void
@@ -1897,41 +1989,38 @@ XML_Loading_Archive::read_Ravel()
    if (reading_vids)   return;
 
 const int vid = find_int_attr("vid", false, 10);
-const UTF8 * cells = find_attr("cells", false);
+const UTF8 * cells_utf = find_optional_attr("cells");
+   if (!cells_utf)   cells_utf = find_mandatory_attr("bytes");
 
    Log(LOG_archive)   CERR << "    read_Ravel() vid=" << vid << endl;
 
    Assert(vid < int(values.size()));
-Value_P val = values[vid];
+Value_P Z = values[vid];
 
-   if (!val)   // )COPY with vids_COPY or static value
+   if (Z->is_packed())   // so it can't be short and ravel is a utf8_t *
       {
+        read_Cells(Z.getref(), cells_utf);
         return;
       }
 
-const ShapeItem count = val->nz_element_count();
-Cell * C = &val->get_ravel(0);
-Cell * end = C + count;
 
-   while (C < end)
+   if (!Z)   return;   // )COPY with vids_COPY or static value
+
+   if (Z->element_count() == 0)   // then Z->more() is 0
       {
-        read_Cells(C, val.getref(), cells);
-        while (*cells <= ' ')   ++cells;   // skip trailing whitespace
+        Value_P Z0(LOC);   // a scalar to read the prototype
+        cells_utf = read_Cells(Z0.getref(), cells_utf);   // prototype
+        Z->get_wproto().init_type(Z0->get_cproto(), Z.getref(), LOC);
       }
-
-   if (C != end)   // unless all cells read
+   else
       {
-        CERR << "vid=" << vid << endl;
-        FIXME;
-      }
-
-   {
-     int len = 0;
-     const Unicode next = UTF8_string::toUni(cells, len, true);
-     Assert(next == '"');
-   }
-
-   val->check_value(LOC);
+        while (Z->more())
+            {
+              cells_utf = read_Cells(Z.getref(), cells_utf);
+           // while (*cells_utf <= ' ')   ++cells_utf;   // trailing whitespace
+            }
+         }
+   Z->check_value(LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -2045,7 +2134,7 @@ const Fid LO_fid = find_Fid_attr("LO-fid", true, 16);
         return;
       }
 
-   if (find_attr("ref", true))   // function pointer
+   if (find_optional_attr("ref"))   // function pointer
       {
         Function_P fun = find_function(fid);
         Assert(fun);
@@ -2057,7 +2146,7 @@ const int native                = find_int_attr("native", true, 10);
 const APL_time_us creation_time = find_int_attr("creation-time", true, 10);
 int eprops[4] = { 0, 0, 0, 0 };
 
-   if (const UTF8 * ep = find_attr("exec-properties", true))
+   if (const UTF8 * ep = find_optional_attr("exec-properties"))
       {
         sscanf(charP(ep), "%d,%d,%d,%d",
                eprops, eprops + 1, eprops + 2, eprops+ 3);
@@ -2069,12 +2158,12 @@ int eprops[4] = { 0, 0, 0, 0 };
 
    next_tag(LOC);
    expect_tag("UCS", LOC);
-const UTF8 * uni = find_attr("uni", false);
+const UTF8 * utf = find_mandatory_attr("uni");
    next_tag(LOC);
    expect_tag("/Function", LOC);
 
 UCS_string text;
-   while (*uni != '"')   read_chars(text, uni);
+    read_XML_string(text, utf);
 
    if (native == 1)
       {
@@ -2136,7 +2225,7 @@ XML_Loading_Archive::read_Derived(StateIndicator & si, int lev)
 {
    Log(LOG_archive)   CERR << "  read_Derived()" << endl;
 
-const Fid fid = find_Fid_attr("fid", false, 16);   // fid in the )SAVEing WS
+const Fid fid      = find_Fid_attr("fid", false, 16);   // in the )SAVEing WS
 const Fid LO_fid   = find_Fid_attr("LO-fid",   false, 16);
 const Fid OPER_fid = find_Fid_attr("OPER-fid", false, 16);
 const Fid RO_fid   = find_Fid_attr("RO-fid",   true,  16);
@@ -2190,7 +2279,7 @@ XML_Loading_Archive::read_Symbol()
 {
    expect_tag("Symbol", LOC);
 
-const UTF8 * name = find_attr("name",  false);
+const UTF8 * name = find_mandatory_attr("name");
 const UTF8 * name_end = name;
    while (*name_end != '"')   ++name_end;
 
@@ -2371,13 +2460,13 @@ XML_Loading_Archive::read_Command()
 {
    expect_tag("Command", LOC);
 
-const UTF8 * name = find_attr("name",  false);
+const UTF8 * name = find_mandatory_attr("name");
 const UTF8 * name_end = name;
    while (*name_end != '"')   ++name_end;
 UTF8_string name_UTF(name, name_end - name);
 UCS_string  name_UCS(name_UTF);
 
-const UTF8 * fun = find_attr("fun",  false);
+const UTF8 * fun = find_mandatory_attr("fun");
 const UTF8 * fun_end = fun;
    while (*fun_end != '"')   ++fun_end;
 UTF8_string fun_UTF(fun, fun_end - fun);
@@ -2475,9 +2564,9 @@ XML_Loading_Archive::read_Execute()
    next_tag(LOC);
    expect_tag("UCS", LOC);
 
-const UTF8 * uni = find_attr("uni", false);
+const UTF8 * utf = find_mandatory_attr("uni");
 UCS_string text;
-   while (*uni != '"')   read_chars(text, uni);
+   read_XML_string(text, utf);
    next_tag(LOC);
    expect_tag("/Execute", LOC);
 
@@ -2491,9 +2580,9 @@ XML_Loading_Archive::read_Statement()
 {
    next_tag(LOC);
    expect_tag("UCS", LOC);
-const UTF8 * uni = find_attr("uni", false);
+const UTF8 * utf = find_mandatory_attr("uni");
 UCS_string text;
-   while (*uni != '"')   read_chars(text, uni);
+   read_XML_string(text, utf);
 
    next_tag(LOC);
    expect_tag("/Statements", LOC);
@@ -2510,11 +2599,11 @@ const int macro_num = find_int_attr("macro-num", true, 10);
    if (macro_num != -1)
       return Macro::get_macro(Macro::Macro_num(macro_num));
 
-const UTF8 * lambda_name = find_attr("lambda-name", true);
+const UTF8 * lambda_name = find_optional_attr("lambda-name");
    if (lambda_name)   return read_lambda(lambda_name);
 
 const int level     = find_int_attr("symbol-level", false, 10);
-const UTF8 * name   = find_attr("ufun-name", false);
+const UTF8 * name   = find_mandatory_attr("ufun-name");
 const UTF8 * n  = name;
    while (*n != '"')   ++n;
 UTF8_string name_UTF(name, n - name);
@@ -2553,9 +2642,9 @@ UCS_string
 XML_Loading_Archive::read_UCS()
 {
    skip_to_tag("UCS");
-const UTF8 * uni = find_attr("uni", false);
+const UTF8 * utf = find_mandatory_attr("uni");
 UCS_string text;
-   while (*uni != '"')   read_chars(text, uni);
+   read_XML_string(text, utf);
    return text;
 }
 //-----------------------------------------------------------------------------
@@ -2661,7 +2750,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 
         case TV_SYM:   
              {
-               const UTF8 * sym_name = find_attr("sym", false);
+               const UTF8 * sym_name = find_mandatory_attr("sym");
                const UTF8 * end = sym_name;
                while (*end != '"')   ++end;
                UTF8_string name_UTF(sym_name, end - sym_name);
@@ -2691,7 +2780,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 
         case TV_INDEX: 
              {
-               const UTF8 * vids = find_attr("index", false);
+               const UTF8 * vids = find_mandatory_attr("index");
                IndexExpr & idx = *new IndexExpr(ASS_none, LOC);
                while (*vids != '"')
                   {
@@ -2734,7 +2823,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 Function_P
 XML_Loading_Archive::read_Function_name()
 {
-const UTF8 * fun_name = find_attr("ufun-name", true);
+const UTF8 * fun_name = find_optional_attr("ufun-name");
 
    if (fun_name)   // user defined function
       {

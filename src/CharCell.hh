@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,10 +58,6 @@ public:
    /// the Quad_CR representation of this cell
    virtual PrintBuffer character_representation(const PrintContext &pctx) const;
 
-   /// initialize Z to character v
-   static ErrorCode zv(Cell * Z, Unicode av)
-      { new (Z) CharCell(av);   return E_NO_ERROR; }
-
 protected:
    /// overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const
@@ -96,10 +92,6 @@ protected:
 
    /// overloaded Cell::bif_not_equal_bitwise()
    virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const;
-
-   /// overloaded Cell::to_type()
-   virtual void to_type()
-      { value.aval = UNI_SPACE; }
 };
 //-----------------------------------------------------------------------------
 

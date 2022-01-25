@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -425,7 +425,7 @@ Token::print_value(ostream & out) const
                       }
 
                    const PrintContext pctx(PR_APL, 2, 80);
-                   out << UCS_string(v->get_ravel(e)
+                   out << UCS_string(v->get_cravel(e)
                                        .character_representation(pctx), 0, 80)
                        << " ";
                  }
@@ -517,7 +517,7 @@ const Value & val = *get_apl_val();
    else if (val.get_rank() == 1)   // vector
       {
         if (val.element_count() == 0 &&   // empty vector
-            val.get_ravel(0).is_simple_cell())
+            val.get_cfirst().is_simple_cell())
            {
              out << endl;
              return;

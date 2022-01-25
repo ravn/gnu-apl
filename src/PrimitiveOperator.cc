@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ Token tok = fun->eval_fill_AB(Fill_A, Fill_B);
 
 Value * Z = tok.get_apl_val().get();
 Value_P Z1(shape_Z, LOC);   // shape_Z is empty
-   Z1->get_ravel(0).  init_from_value(Z, Z1.getref(), loc);
+   Z1->get_wproto().init_from_value(Z, Z1.getref(), loc);
 
    Z1->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z1);

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ std::vector<ShapeItem> rep_counts;
    if (len_A == 1)   // single a -> a a ... a (len_B times)
       {
         len_A = len_B;
-        APL_Integer rep_A = A->get_ravel(0).get_near_int();
+        APL_Integer rep_A = A->get_cfirst().get_near_int();
         loop(a, len_A)   rep_counts.push_back(rep_A);
         if (rep_A > 0)        len_Z =  rep_A*len_B;
         else if (rep_A < 0)   len_Z = -rep_A*len_B;
@@ -65,7 +65,7 @@ std::vector<ShapeItem> rep_counts;
         ShapeItem geq_A = 0;   // number of items >= 0 in A
         loop(a, len_A)
            {
-             APL_Integer rep_A = A->get_ravel(a).get_near_int();
+             APL_Integer rep_A = A->get_cravel(a).get_near_int();
              rep_counts.push_back(rep_A);
              if (rep_A > 0)        { len_Z += rep_A;   ++geq_A; }
              else if (rep_A < 0)   len_Z -= rep_A;
@@ -95,7 +95,7 @@ const Shape3 shape_B3(shape_B, axis);
                   loop(l, shape_B3.l())
                      {
                        const ShapeItem src = shape_B3.hml(h, bm, l);
-                       Z->next_ravel()->init(B->get_ravel(src), Z.getref(),LOC);
+                       Z->next_ravel_Cell(B->get_cravel(src));
                      }
                   if (shape_B3.m() > 1)   ++bm;
                 }
@@ -105,8 +105,7 @@ const Shape3 shape_B3(shape_B, axis);
                   loop(l, shape_B3.l())
                      {
                        const ShapeItem src = shape_B3.hml(h, 0, l);
-                       Z->next_ravel()
-                        ->init_type(B->get_ravel(src), Z.getref(), LOC);
+                       Z->next_ravel_Proto(B->get_cravel(src));
                      }
 
                   // cB is not incremented when fill item is used.
@@ -168,13 +167,13 @@ const Shape3 B3(B->get_shape(), axis);
    if (LO->may_push_SI())   // user defined LO
       {
         Value_P X4(4, LOC);
-        new (X4->next_ravel())   IntCell(axis + Workspace::get_IO());
-        new (X4->next_ravel())   IntCell(B3.h());
-        new (X4->next_ravel())   IntCell(B3.m());
-        new (X4->next_ravel())   IntCell(B3.l());
+        X4->next_ravel_Int(axis + Workspace::get_IO());
+        X4->next_ravel_Int(B3.h());
+        X4->next_ravel_Int(B3.m());
+        X4->next_ravel_Int(B3.l());
         X4->check_value(LOC);
         return Macro::get_macro(Macro::MAC_Z__LO_REDUCE_X4_B)
-                    ->eval_LXB(tok_LO, X4, B);
+                                ->eval_LXB(tok_LO, X4, B);
       }
 
    if (shape_Z.is_empty())   return LO->eval_identity_fun(B, axis);
@@ -210,7 +209,7 @@ Function_P LO = tok_LO.get_function();
       }
 
    if (A->element_count() != 1)   LENGTH_ERROR;
-const APL_Integer A0 = A->get_ravel(0).get_int_value();
+const APL_Integer A0 = A->get_cfirst().get_int_value();
 const int n_wise = A0 < 0 ? -A0 : A0;   // the number of items (= M1 in iso)
 
    if (B->is_scalar())
@@ -219,12 +218,10 @@ const int n_wise = A0 < 0 ? -A0 : A0;   // the number of items (= M1 in iso)
         if (n_wise == 0)
            {
               Token ident = LO->eval_identity_fun(B, axis);
-              Value_P val(2, LOC);
-              val->next_ravel()->init(ident.get_apl_val()->get_ravel(0),
-                                      val.getref(), LOC);
-              val->next_ravel()->init(ident.get_apl_val()->get_ravel(0),
-                                      val.getref(), LOC);
-              return Token(TOK_APL_VALUE1, val);
+              Value_P Z(2, LOC);
+              Z->next_ravel_Cell(ident.get_apl_val()->get_cfirst());
+              Z->next_ravel_Cell(ident.get_apl_val()->get_cfirst());
+              return Token(TOK_APL_VALUE1, Z);
            }
 
         // n_wise is 1 or 2: return (2 - n_wise) ⍴ B
@@ -249,7 +246,7 @@ const int n_wise = A0 < 0 ? -A0 : A0;   // the number of items (= M1 in iso)
         Shape shape_B1 = B->get_shape().insert_axis(axis, 0);
         shape_B1.increment_shape_item(axis + 1);
         Value_P val(shape_B1, LOC);
-        val->get_ravel(0).init(B->get_ravel(0), val.getref(), LOC); // prototype
+        val->set_ravel_Cell(0, B->get_cproto()); // prototype
 
         Token result = LO->eval_identity_fun(val, axis);
         return result;
@@ -265,7 +262,7 @@ const int n_wise = A0 < 0 ? -A0 : A0;   // the number of items (= M1 in iso)
         Shape shape_Z = B->get_shape();
         shape_Z.set_shape_item(axis, 0);
         Value_P Z(shape_Z, LOC);
-        Z->get_ravel(0).init(B->get_ravel(0), Z.getref(), LOC);
+        Z->set_ravel_Cell(0, B->get_cproto()); // prototype
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -285,15 +282,15 @@ const Shape3 B3(B->get_shape(), axis);
         Value_P vsh_Z3(LOC, &Z3);
         Value_P vsh_B3(LOC, &B3);
         Value_P X4(4, LOC);
-        new (X4->next_ravel())   IntCell(axis + Workspace::get_IO());    // X
-        new (X4->next_ravel())   PointerCell(vsh_Z.get(),  X4.getref()); // ⍴Z
-        new (X4->next_ravel())   PointerCell(vsh_Z3.get(), X4.getref()); // ⍴Z3
-        new (X4->next_ravel())   PointerCell(vsh_B3.get(), X4.getref()); // ⍴B3
+        X4->next_ravel_Int(axis + Workspace::get_IO());   // X
+        X4->next_ravel_Pointer(vsh_Z.get());              // ⍴Z
+        X4->next_ravel_Pointer(vsh_Z3.get());             // ⍴Z3
+        X4->next_ravel_Pointer(vsh_B3.get());             // ⍴B3
         X4->check_value(LOC);
         if (A0 < 0)   return Macro::get_macro(Macro::MAC_Z__nA_LO_REDUCE_X4_B)
-                                  ->eval_ALXB(A1, tok_LO, X4, B);
-        else        return Macro::get_macro(Macro::MAC_Z__pA_LO_REDUCE_X4_B)
-                                ->eval_ALXB(A1, tok_LO, X4, B);
+                                              ->eval_ALXB(A1, tok_LO, X4, B);
+        else         return Macro::get_macro(Macro::MAC_Z__pA_LO_REDUCE_X4_B)
+                                              ->eval_ALXB(A1, tok_LO, X4, B);
       }
 
    return do_reduce(shape_Z, Z3, A0, LO, B, B->get_shape_item(axis));
@@ -338,10 +335,10 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
         if (nwise < -1)    b += (nwise + 1) * len_L;
         if (nwise != -1)   b += z_M * len_L; // start of beam
 
-        // Z[z] = B[b]
+        // Z[z] = B[b]. We use Z[z] as accumulator for the reduction
         //
-        Cell * cZ = Z->next_ravel();
-        cZ->init(B->get_ravel(b), Z.getref(), LOC);
+        Cell * const accu = &Z->get_wravel(z);
+        accu->init(B->get_cravel(b), Z.getref(), LOC);
 
         loop(lo, LO_count)
            {
@@ -350,25 +347,25 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
 
              // one reduction step (one call of LO)
              //
-             const Cell & cB = B->get_ravel(b);
-             if (scalar_LO && cZ->is_simple_cell() && cB.is_simple_cell())
+             const Cell & cB = B->get_cravel(b);
+             if (scalar_LO && accu->is_simple_cell() && cB.is_simple_cell())
                 {
-                  ErrorCode ec = (cZ->*scalar_LO)(cZ, &cB);
+                  const ErrorCode ec = (accu->*scalar_LO)(accu, &cB);
                   if (ec)   throw_apl_error(ec, LOC);
                 }
              else
                 {
                   Value_P LO_A = cB.to_value(LOC);
-                  Value_P LO_B = cZ->to_value(LOC);
+                  Value_P LO_B = accu->to_value(LOC);
                   Token result = LO->eval_AB(LO_A, LO_B);
-                  cZ->release(LOC);
+                  accu->release(LOC);
 
                   if (result.get_tag() == TOK_ERROR)
                     throw_apl_error(result.get_ErrorCode(), LOC);
 
                   Assert(result.get_Class() == TC_VALUE);
                   Value_P ZZ = result.get_apl_val();
-                  cZ->init_from_value(ZZ.get(), Z.getref(), LOC);
+                  accu->init_from_value(ZZ.get(), Z.getref(), LOC);
                 }
            }
       }

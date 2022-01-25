@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ IndexExpr::check_range(const Shape & shape) const
         const ShapeItem max_idx = shape.get_shape_item(r) + quad_io;
         loop(i, ival->element_count())
            {
-             const APL_Integer idx = ival->get_ravel(i).get_near_int();
+             const APL_Integer idx = ival->get_cravel(i).get_near_int();
              if (idx < quad_io)    return true;
              if (idx >= max_idx)   return true;
            }
@@ -89,12 +89,12 @@ const APL_Integer qio = Workspace::get_IO();
 Value_P I = values[0];
    if (!I->is_scalar_or_len1_vector())     INDEX_ERROR;
 
-   if (!I->get_ravel(0).is_near_int())   INDEX_ERROR;
+   if (!I->get_cfirst().is_near_int())   INDEX_ERROR;
 
    // if axis becomes (signed) negative then it will be (unsigned) too big.
    // Therefore we need not test for < 0.
    //
-Rank axis = I->get_ravel(0).get_near_int() - qio;
+Rank axis = I->get_cfirst().get_near_int() - qio;
    if (axis >= max_axis)   INDEX_ERROR;
 
    return axis;
@@ -124,7 +124,7 @@ const APL_Integer qio = Workspace::get_IO();
  
 Shape shape;
      loop(x, xlen)
-        shape.add_shape_item(vx->get_ravel(x).get_near_int() - qio);
+        shape.add_shape_item(vx->get_cravel(x).get_near_int() - qio);
 
    return shape;
 }

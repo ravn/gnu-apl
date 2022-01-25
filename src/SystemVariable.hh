@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 
 #include "Id.hh"
 #include "Parallel.hh"
+class RavelIterator;
 #include "Symbol.hh"
 
 #include <sys/time.h>
@@ -54,7 +55,7 @@ public:
    virtual void assign_indexed(Value_P X, Value_P value);
 
    /// overloaded Symbol::get_attributes().
-   virtual void get_attributes(int mode, Cell * dest) const;
+   virtual void get_attributes(int mode, Value & Z) const;
 
    /// system vars cannot be expunged.
    virtual int expunge() { return 0; }
@@ -659,7 +660,7 @@ protected:
    virtual void pop()
       {
         Symbol::pop();
-        offset_seconds = 3600 * get_apl_value()->get_ravel(0).get_int_value();
+        offset_seconds = 3600 * get_apl_value()->get_cravel(0).get_int_value();
       }
 
    /// the offset from GMT of the current timezone (in seconds)

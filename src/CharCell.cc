@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -193,51 +193,54 @@ const Unicode uni = get_char_value();
 ErrorCode
 CharCell::bif_not_bitwise(Cell * Z) const
 {
-   return zv(Z, Unicode(get_char_value() ^ 0xFFFFFFFF));
+   return Value::zU(Z, Unicode(get_char_value() ^ 0xFFFFFFFF));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 CharCell::bif_and_bitwise(Cell * Z, const Cell * A) const
 {
    if (A->is_character_cell())
-     return zv(Z, Unicode(value.aval & A->get_char_value()));
-   else if (A->is_numeric())
-      return zv(Z, Unicode(value.aval & A->get_int_value()));
-   else
-      return E_DOMAIN_ERROR;
+     return Value::zU(Z, Unicode(value.aval & A->get_char_value()));
+
+   if (A->is_numeric())
+      return Value::zU(Z, Unicode(value.aval & A->get_int_value()));
+
+   return E_DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 CharCell::bif_or_bitwise(Cell * Z, const Cell * A) const
 {
    if (A->is_character_cell())
-     return zv(Z, Unicode(value.aval | A->get_char_value()));
-   else if (A->is_numeric())
-      return zv(Z, Unicode(value.aval | A->get_int_value()));
-   else
-      return E_DOMAIN_ERROR;
+     return Value::zU(Z, Unicode(value.aval | A->get_char_value()));
+
+   if (A->is_numeric())
+      return Value::zU(Z, Unicode(value.aval | A->get_int_value()));
+
+   return E_DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 CharCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
 {
    if (A->is_character_cell())
-     return zv(Z, Unicode(0xFFFFFFFF & (value.aval ^ A->get_char_value())));
-   else if (A->is_numeric())
-      return zv(Z, Unicode(0xFFFFFFFF & (value.aval ^ A->get_int_value())));
-   else
-      return E_DOMAIN_ERROR;
+     return Value::zU(Z, Unicode(0xFFFFFFFF & (value.aval ^ A->get_char_value())));
+
+   if (A->is_numeric())
+      return Value::zU(Z, Unicode(0xFFFFFFFF & (value.aval ^ A->get_int_value())));
+   return E_DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 CharCell::bif_not_equal_bitwise(Cell * Z, const Cell * A) const
 {
    if (A->is_character_cell())
-     return zv(Z, Unicode(value.aval ^ A->get_char_value()));
-   else if (A->is_numeric())
-      return zv(Z, Unicode(value.aval ^ A->get_int_value()));
-   else
-      return E_DOMAIN_ERROR;
+     return Value::zU(Z, Unicode(value.aval ^ A->get_char_value()));
+
+   if (A->is_numeric())
+      return Value::zU(Z, Unicode(value.aval ^ A->get_int_value()));
+
+   return E_DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 

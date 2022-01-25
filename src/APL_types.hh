@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -174,6 +174,7 @@ enum ValueFlags
   VF_marked   = 0x0800,   ///< marked to detect stale
   VF_temp     = 0x1000,   ///< computed value
   VF_member   = 0x2000,   ///< used for member access
+  VF_packed   = 0x4000,   ///< packed homogenious ravel
 };
 
 extern ostream & print_flags(ostream & out, ValueFlags flags);

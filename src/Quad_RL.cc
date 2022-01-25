@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,14 +30,14 @@ uint64_t Quad_RL::state = 0;
 Quad_RL::Quad_RL()
    : SystemVariable(ID_Quad_RL)
 {
-Value_P value(LOC);
+Value_P Z(LOC);
 
 const unsigned int seed = reset_seed();
 
-   new (value->next_ravel()) IntCell(seed);
-   value->check_value(LOC);
+   Z->next_ravel_Int(seed);
+   Z->check_value(LOC);
 
-   Symbol::assign(value, false, LOC);
+   Symbol::assign(Z, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -49,7 +49,7 @@ Quad_RL::assign(Value_P value, bool clone, const char * loc)
         else                         LENGTH_ERROR;
       }
 
-const Cell & cell = value->get_ravel(0);
+const Cell & cell = value->get_cfirst();
 const APL_Integer val = cell.get_near_int();
 
    state = val;
@@ -65,7 +65,7 @@ Quad_RL::get_random()
    Assert(value_stack.size());
    if (value_stack.back().get_nc() != NC_VARIABLE)   VALUE_ERROR;
 
-   new (&value_stack.back().apl_val->get_ravel(0))   IntCell(state);
+   value_stack.back().apl_val->set_ravel_Int(0, state);
    return state;
 }
 //-----------------------------------------------------------------------------
@@ -81,6 +81,6 @@ void
 Quad_RL::pop()
 {
    Symbol::pop();
-   state = value_stack.back().apl_val->get_ravel(0).get_near_int();
+   state = value_stack.back().apl_val->get_cfirst().get_near_int();
 }
 //=============================================================================

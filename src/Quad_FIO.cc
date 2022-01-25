@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -233,7 +233,7 @@ Value_P Z(ShapeItem(fd_count), LOC);
    if (fds)
       {
         for (int m = 0; m < max_fd; ++m)
-            if (FD_ISSET(m, fds))   new (Z->next_ravel())   IntCell(m);
+            if (FD_ISSET(m, fds))   Z->next_ravel_Int(m);
       }
 
    return Z;
@@ -247,7 +247,7 @@ Quad_FIO::do_printf(FILE * outf, Value_P A)
    // number of characters (not bytes!) printed.
    //
 UCS_string UZ;
-const Value & A1 = *A->get_ravel(0).get_pointer_value();
+const Value & A1 = *A->get_cfirst().get_pointer_value();
 UCS_string A_format(A1);
    do_sprintf(UZ, A_format, A.get(), 1);
 UTF8_string utf(UZ);
@@ -336,7 +336,7 @@ char numbuf[50];
                      case 'd':   case 'i':   case 'o':
                      case 'u':   case 'x':   case 'X':   case 'p':
                           {
-                            const Cell & cell = B->get_ravel(b++);
+                            const Cell & cell = B->get_cravel(b++);
                             APL_Integer iv;
                             if (cell.is_integer_cell())
                                {
@@ -358,7 +358,7 @@ char numbuf[50];
                      case 'g':   case 'G':   case 'a':   case 'A':
                           {
                             const APL_Float fv =
-                                            B->get_ravel(b++).get_real_value();
+                                            B->get_cravel(b++).get_real_value();
                             fmt[fm++] = un1;   fmt[fm] = 0;
                             sprintf(numbuf, fmt, fv);
                             UZ.append_UTF8(numbuf);
@@ -366,10 +366,10 @@ char numbuf[50];
                           goto field_done;
 
                      case 's':   // string or char
-                          if (B->get_ravel(b).is_character_cell())   goto cval;
+                          if (B->get_cravel(b).is_character_cell())   goto cval;
                               {
                                 Value_P str =
-                                        B->get_ravel(b++).get_pointer_value();
+                                        B->get_cravel(b++).get_pointer_value();
                                 UCS_string ucs(*str.get());
                                 UZ.append(ucs);
                               }
@@ -377,7 +377,7 @@ char numbuf[50];
 
                      case 'c':   // single char
                      cval:
-                          UZ.append(B->get_ravel(b++).get_char_value());
+                          UZ.append(B->get_cravel(b++).get_char_value());
                           goto field_done;
 
                      case 'm':
@@ -435,7 +435,7 @@ const ssize_t bytes = read(device, buffer, len);
    else if (mode == 1)   // byte vector result
       {
         Value_P Z(len, LOC);
-        loop(l, len)   new (Z->next_ravel())   IntCell(buffer[l] & 0xFF);
+        loop(l, len)   Z->next_ravel_Int(buffer[l] & 0xFF);
          return Z;
       }
 
@@ -640,19 +640,19 @@ Token
 Quad_FIO::do_scanf(File_or_String & input, const UCS_string & format,
                    int function_number)
 {
-ShapeItem count = 0;
    if (format.size() == 0)   LENGTH_ERROR;
 
-   // we take the total number of % as an upper bound fir the number of items
+   // we take the total number of % as an upper bound for the number of items.
+   // the real count may be lower due to %% and assugnment suppression. We fix
+   // that after label out: below
    //
+ShapeItem count = 0;
    loop(f, format.size() - 1)
       {
         if (format[f] == UNI_PERCENT)   ++count;
       }
 
 Value_P Z(count, LOC);
-   loop(z, count)   new (Z->next_ravel())   IntCell(0);
-ShapeItem z = 0;
 
 Unicode lookahead = input.get_next();
    if (lookahead == UNI_EOF)   goto out;
@@ -687,13 +687,14 @@ Unicode lookahead = input.get_next();
         const Unicode fmt_ch1 = format[f];
         if (fmt_ch1 == UNI_PERCENT)   goto match;   // double % is %
 
-        Unicode conv = Unicode_0;
+        Unicode conv = Unicode_0;   // no conversion specifier
         int conv_len = 0;
         bool suppress = false;
         for (;f < format.size(); ++f)
            {
              const Unicode cc = format[f];
-             if (cc == UNI_ASTERISK)   // assignment suppression
+             if (cc == UNI_ASTERISK ||      // *: assignment character
+                 cc == UNI_STAR_OPERATOR)   // ⋆: assignment character
                 {
                   suppress = true;
                   continue;
@@ -702,8 +703,8 @@ Unicode lookahead = input.get_next();
              if (strchr("hjlLmqtz", cc))   // type modifier
                 {
                   // we provide our own conversion modifiers and ignore
-                  // conversion modifiers given by the user
-                  //
+                  // the conversion modifiers given by the user (that only
+                  // make sense in the C/C++ context).
                   continue;
                 }
 
@@ -720,7 +721,7 @@ Unicode lookahead = input.get_next();
                 }
            }
 
-        if (conv == Unicode_0)
+        if (conv == Unicode_0)   // no conversion specifier
            {
              MORE_ERROR() << "expecting conversion character "
                              "%, c, d, f, i, n, o, u, s, or x after %";
@@ -737,7 +738,7 @@ Unicode lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
              if (count != 1)   goto out;
 
-             if (!suppress)   new (&Z->get_ravel(z++))   IntCell(val);
+             if (!suppress)   Z->next_ravel_Int(val);
            }
         else if (strchr("fFeg", conv))  // float conversion
            {
@@ -749,13 +750,13 @@ Unicode lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
              if (count != 1)   goto out;
 
-             if (!suppress)   new (&Z->get_ravel(z++))   FloatCell(val);
+             if (!suppress)   Z->next_ravel_Float(val);
            }
         else if (conv == UNI_c)  // char(s)
            {
              if (conv_len == 0)   // default: single char
                 {
-                  if (!suppress)   new (&Z->get_ravel(z++)) CharCell(lookahead);
+                  if (!suppress)   Z->next_ravel_Char(lookahead);
                   lookahead = input.get_next();
                   if (lookahead == UNI_EOF)   goto out;
                 }
@@ -772,8 +773,7 @@ Unicode lookahead = input.get_next();
                   if (!suppress)
                      {
                        Value_P ZZ(ucs, LOC);
-                       new (&Z->get_ravel(z++))
-                           PointerCell(ZZ.get(), Z.getref());
+                       Z->next_ravel_Pointer(ZZ.get());
                      }
                 }
            }
@@ -791,14 +791,12 @@ Unicode lookahead = input.get_next();
              if (!suppress)
                 {
                   Value_P ZZ(ucs, LOC);
-                  new (&Z->get_ravel(z++))
-                      PointerCell(ZZ.get(), Z.getref());
+                  Z->next_ravel_Pointer(ZZ.get());
                 }
            }
         else if (conv == UNI_n)  // characters consumed thus far
            {
-             if (!suppress)
-                new (&Z->get_ravel(z++)) IntCell(input.get_count());
+             if (!suppress)   Z->next_ravel_Int(input.get_count());
            }
         else if (conv == UNI_L_BRACK)   // character range
            {
@@ -897,7 +895,7 @@ Unicode lookahead = input.get_next();
              if (!suppress)
                 {
                   Value_P ZZ(ucs, LOC);
-                  new (&Z->get_ravel(z++))   PointerCell(ZZ.get(), Z.getref());
+                  Z->next_ravel_Pointer(ZZ.get());
                 }
            }
       }
@@ -905,9 +903,10 @@ Unicode lookahead = input.get_next();
 out:
    // shrink Z to the actual number of converted items
    //
-Shape sh_Z(z);
-   Z->set_shape(sh_Z);
+const Shape sh_Z(Z->get_valid_item_count());
+   while (Z->more())   Z->next_ravel_Int(0);
    Z->check_value(LOC);
+   Z->set_shape(sh_Z);
 
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1066,13 +1065,13 @@ Quad_FIO::eval_B(Value_P B) const
 
    if (B->element_count() == 0)   // '' or ⍬
       {
-        if (B->get_ravel(0).is_character_cell())
+        if (B->get_cfirst().is_character_cell())
            return list_functions(CERR, true);
-        if (B->get_ravel(0).is_integer_cell())
+        if (B->get_cfirst().is_integer_cell())
            return list_functions(CERR, false);
       }
 
-const APL_Integer function_number = B->get_ravel(0).get_int_value();
+const APL_Integer function_number = B->get_cfirst().get_int_value();
    switch(function_number)
       {
         // function_numbers < 0 refer to "hacker functions" that should not be
@@ -1086,11 +1085,11 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 #define perfo_4(id, b, name, thr) perfo_1(id, b, name, thr)
 #define perfo_3(id, b, name, thr) perfo_1(id, b, name, thr)
 #define perfo_2(id, b, name, thr) perfo_1(id, b, name, thr)
-#define perfo_1(id, ab, name, _thr)                     \
-   { new (Z->next_ravel())   IntCell(PFS_ ## id ## ab); \
-     UCS_string ucs(#id #ab);                           \
-     Value_P uZ(ucs, LOC);                              \
-     new (Z->next_ravel())   PointerCell(uZ.get(), Z.getref()); }
+#define perfo_1(id, ab, name, _thr)         \
+   { Z->next_ravel_Int(PFS_ ## id ## ab);   \
+     UCS_string ucs(#id #ab);               \
+     Value_P uZ(ucs, LOC);                  \
+     Z->next_ravel_Pointer(uZ.get());       }
 #include "Performance.def"
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
@@ -1156,7 +1155,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
              {
                Value_P Z(256, LOC);
                const Unicode * ibm = Avec::IBM_quad_AV();
-               loop(c, 256)   new (Z->next_ravel()) CharCell(ibm[c]);
+               loop(c, 256)   Z->next_ravel_Char(ibm[c]);
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
              }
@@ -1193,7 +1192,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
                Value_P Z(open_files.size(), LOC);
                loop(z, open_files.size())
                    {
-                     new (Z->next_ravel())   IntCell(open_files[z].fe_fd);
+                     Z->next_ravel_Int(open_files[z].fe_fd);
                    }
                Z->set_default_Int();
                Z->check_value(LOC);
@@ -1237,18 +1236,18 @@ Quad_FIO::eval_AB(Value_P A, Value_P B) const
 
    if (B->element_count() == 0)   // '' or ⍬
       {
-        if (B->get_ravel(0).is_character_cell())
+        if (B->get_cfirst().is_character_cell())
            return list_functions(CERR, true);
-        if (B->get_ravel(0).is_integer_cell())
+        if (B->get_cfirst().is_integer_cell())
            return list_functions(CERR, false);
       }
 
-const APL_Integer function_number = B->get_ravel(0).get_int_value();
+const APL_Integer function_number = B->get_cfirst().get_int_value();
    switch(function_number)
       {
         case -3: // read probe A and clear it
              {
-               APL_Integer probe = A->get_ravel(0).get_int_value();
+               APL_Integer probe = A->get_cfirst().get_int_value();
 
                // negative numbers mean take from end (like ↑ and ↓)
                // convention ins that 0, 1, 2, ... are a probe vector (such as
@@ -1264,7 +1263,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 
                 Value_P Z(len, LOC);
                 loop(m, len)
-                    new (Z->next_ravel())   IntCell(Probe::get_time(probe, m));
+                    Z->next_ravel_Int(Probe::get_time(probe, m));
 
                 Probe::init(probe);
                 Z->check_value(LOC);
@@ -1280,7 +1279,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 Token
 Quad_FIO::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
-const ShapeItem function_number = X->get_ravel(0).get_int_value();
+const ShapeItem function_number = X->get_cfirst().get_int_value();
    switch (function_number)
       {
         case -1:   // benchmark monadic LO with argument B
@@ -1333,7 +1332,7 @@ Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B) const
          return result;
       }
 
-const ShapeItem function_number = X->get_ravel(0).get_int_value();
+const ShapeItem function_number = X->get_cfirst().get_int_value();
    switch (function_number)
       {
         case -1:   // benchmark monadic LO with argument B
@@ -1396,7 +1395,7 @@ int function_number = -1;
       }
    else
       {
-        function_number = X->get_ravel(0).get_near_int();
+        function_number = X->get_cfirst().get_near_int();
       }
 
    switch(function_number)
@@ -1409,13 +1408,12 @@ int function_number = -1;
 
          case 2:   // return strerror(B)
               {
-                int b = B->get_ravel(0).get_near_int();
+                int b = B->get_cfirst().get_near_int();
                 if (b < 0)   b = -b;
                 const char * text = strerror(b);
                 const int len = strlen(text);
                 Value_P Z(len, LOC);
-                loop(t, len)   new (Z->next_ravel())
-                               CharCell(Unicode(text[t]));
+                loop(t, len)   Z->next_ravel_Char(Unicode(text[t]));
 
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -1470,7 +1468,7 @@ int function_number = -1;
                 if (len == 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1486,7 +1484,7 @@ int function_number = -1;
                 const char * s = fgets(buffer, SMALL_BUF, file);
                 const int len = s ? strlen(s) : 0;
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1540,19 +1538,19 @@ int function_number = -1;
                 if (result)   goto out_errno;   // fstat failed
 
                 Value_P Z(Value_P(13, LOC));
-                new (Z->next_ravel())   IntCell(s.st_dev);
-                new (Z->next_ravel())   IntCell(s.st_ino);
-                new (Z->next_ravel())   IntCell(s.st_mode);
-                new (Z->next_ravel())   IntCell(s.st_nlink);
-                new (Z->next_ravel())   IntCell(s.st_uid);
-                new (Z->next_ravel())   IntCell(s.st_gid);
-                new (Z->next_ravel())   IntCell(s.st_rdev);
-                new (Z->next_ravel())   IntCell(s.st_size);
-                new (Z->next_ravel())   IntCell(s.st_blksize);
-                new (Z->next_ravel())   IntCell(s.st_blocks);
-                new (Z->next_ravel())   IntCell(s.st_atime);
-                new (Z->next_ravel())   IntCell(s.st_mtime);
-                new (Z->next_ravel())   IntCell(s.st_ctime);
+                Z->next_ravel_Int(s.st_dev);
+                Z->next_ravel_Int(s.st_ino);
+                Z->next_ravel_Int(s.st_mode);
+                Z->next_ravel_Int(s.st_nlink);
+                Z->next_ravel_Int(s.st_uid);
+                Z->next_ravel_Int(s.st_gid);
+                Z->next_ravel_Int(s.st_rdev);
+                Z->next_ravel_Int(s.st_size);
+                Z->next_ravel_Int(s.st_blksize);
+                Z->next_ravel_Int(s.st_blocks);
+                Z->next_ravel_Int(s.st_atime);
+                Z->next_ravel_Int(s.st_mtime);
+                Z->next_ravel_Int(s.st_ctime);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1646,8 +1644,7 @@ int function_number = -1;
 
                 Value_P Z(len, LOC);
                 Z->set_proto_Spc();
-                loop(z, len) new (Z->next_ravel())
-                             CharCell(Unicode(data[z]));
+                loop(z, len)   Z->next_ravel_Char(Unicode(data[z]));
                 munmap(data, len);
 
                 Z->set_default_Spc();
@@ -1698,34 +1695,33 @@ int function_number = -1;
                         {
                           // all platforms support inode number
                           //
-                          new (Z->next_ravel())   IntCell(dent.d_ino);
+                          Z->next_ravel_Int(dent.d_ino);
 
 
 #ifdef _DIRENT_HAVE_D_OFF
-                          new (Z->next_ravel())   IntCell(dent.d_off);
+                          Z->next_ravel_Int(dent.d_off);
 #else
-                          new (Z->next_ravel())   IntCell(-1);
+                          Z->next_ravel_Int(1);
 #endif
 
 
 #ifdef _DIRENT_HAVE_D_RECLEN
-                          new (Z->next_ravel())   IntCell(dent.d_reclen);
+                          Z->next_ravel_Int(dent.d_reclen);
 #else
-                          new (Z->next_ravel())   IntCell(-1);
+                          Z->next_ravel_Int(1);
 #endif
 
 
 #ifdef _DIRENT_HAVE_D_TYPE
-                         new (Z->next_ravel())   IntCell(dent.d_type);
+                         Z->next_ravel_Int(dent.d_type);
 #else
-                          new (Z->next_ravel())   IntCell(-1);
+                          Z->next_ravel_Int(1);
 #endif
                         }   // function_number == 28
 
                      UCS_string filename(dent.d_name);
                      Value_P Z_name(filename, LOC);
-                     new (Z->next_ravel())
-                         PointerCell(Z_name.get(), Z.getref());
+                     Z->next_ravel_Pointer(Z_name.get());
                    }
 
                 Z->set_default_Spc();
@@ -1741,11 +1737,11 @@ int function_number = -1;
                 APL_Integer type = SOCK_STREAM;
                 APL_Integer protocol = 0;
                 if (B->element_count() > 0)
-                   domain = B->get_ravel(0).get_int_value();
+                   domain = B->get_cfirst().get_int_value();
                 if (B->element_count() > 1)
-                   type = B->get_ravel(1).get_int_value();
+                   type = B->get_cravel(1).get_int_value();
                 if (B->element_count() > 2)
-                   protocol = B->get_ravel(2).get_int_value();
+                   protocol = B->get_cravel(2).get_int_value();
                 const int sock = socket(domain, type, protocol);
                 if (sock == -1)   goto out_errno;
 
@@ -1777,10 +1773,10 @@ int function_number = -1;
                 open_files.push_back(nfe);
 
                 Value_P Z(4, LOC);
-                new (Z->next_ravel()) IntCell(nfe.fe_fd);
-                new (Z->next_ravel()) IntCell(addr.inet.sin_family);
-                new (Z->next_ravel()) IntCell(ntohl(addr.inet.sin_addr.s_addr));
-                new (Z->next_ravel())   IntCell(ntohs(addr.inet.sin_port));
+                Z->next_ravel_Int(nfe.fe_fd);
+                Z->next_ravel_Int(addr.inet.sin_family);
+                Z->next_ravel_Int(ntohl(addr.inet.sin_addr.s_addr));
+                Z->next_ravel_Int(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1796,7 +1792,7 @@ int function_number = -1;
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1818,7 +1814,7 @@ int function_number = -1;
 
                 if (B->element_count() >= 4)
                    {
-                     const APL_Integer milli = B->get_ravel(3).get_int_value();
+                     const APL_Integer milli = B->get_cravel(3).get_int_value();
                      if (milli < 0)   DOMAIN_ERROR;
 
                      timeout.tv_sec = milli / 1000;
@@ -1827,10 +1823,10 @@ int function_number = -1;
 
                 if (B->element_count() >= 3)
                    {
-                      Value_P vex = B->get_ravel(2).get_pointer_value();
+                      Value_P vex = B->get_cravel(2).get_pointer_value();
                       loop(l, vex->element_count())
                           {
-                            const int fd(vex->get_ravel(l).get_int_value());
+                            const int fd(vex->get_cravel(l).get_int_value());
                             if (fd < 0)                       DOMAIN_ERROR;
                             if (fd > 8*int(sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &exceptfds);
@@ -1841,11 +1837,11 @@ int function_number = -1;
 
                 if (B->element_count() >= 2)
                    {
-                      Value_P vwr = B->get_ravel(1).get_pointer_value();
+                      Value_P vwr = B->get_cravel(1).get_pointer_value();
                       loop(l, vwr->element_count())
                           {
                             const APL_Integer fd =
-                                  vwr->get_ravel(l).get_int_value();
+                                  vwr->get_cravel(l).get_int_value();
                             if (fd < 0)                       DOMAIN_ERROR;
                             if (fd > 8*int(sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &writefds);
@@ -1856,11 +1852,11 @@ int function_number = -1;
 
                 if (B->element_count() >= 1)
                    {
-                      Value_P vrd = B->get_ravel(0).get_pointer_value();
+                      Value_P vrd = B->get_cfirst().get_pointer_value();
                       loop(l, vrd->element_count())
                           {
                             const APL_Integer fd =
-                                  vrd->get_ravel(l).get_int_value();
+                                  vrd->get_cravel(l).get_int_value();
                             if (fd < 0)                         DOMAIN_ERROR;
                             if (fd > (8*int(sizeof(fd_set))))   DOMAIN_ERROR;
                             FD_SET(fd, &readfds);
@@ -1873,15 +1869,13 @@ int function_number = -1;
                 if (count < 0)   goto out_errno;
 
                 Value_P Z(5, LOC);
-                new (Z->next_ravel())   IntCell(count);
-                new (Z->next_ravel())
-                    PointerCell(fds_to_val(rd, max_fd).get(), Z.getref());
-                new (Z->next_ravel())
-                    PointerCell(fds_to_val(wr, max_fd).get(), Z.getref());
-                new (Z->next_ravel())
-                    PointerCell(fds_to_val(ex, max_fd).get(), Z.getref());
-                new (Z->next_ravel())
-                    IntCell(timeout.tv_sec*1000 + timeout.tv_usec/1000);
+                const APL_Integer milli_seconds = timeout.tv_sec*1000
+                                                + timeout.tv_usec/1000;
+                Z->next_ravel_Int(count);
+                Z->next_ravel_Pointer(fds_to_val(rd, max_fd).get());
+                Z->next_ravel_Pointer(fds_to_val(wr, max_fd).get());
+                Z->next_ravel_Pointer(fds_to_val(ex, max_fd).get());
+                Z->next_ravel_Int(milli_seconds);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1897,7 +1891,7 @@ int function_number = -1;
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 Z->set_default_Int();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -1913,9 +1907,9 @@ int function_number = -1;
                 if (ret == -1)   goto out_errno;
 
                 Value_P Z(3, LOC);
-                new (Z->next_ravel())   IntCell(addr.inet.sin_family);
-                new (Z->next_ravel())   IntCell(ntohl(addr.inet.sin_addr.s_addr));
-                new (Z->next_ravel())   IntCell(ntohs(addr.inet.sin_port));
+                Z->next_ravel_Int(addr.inet.sin_family);
+                Z->next_ravel_Int(ntohl(addr.inet.sin_addr.s_addr));
+                Z->next_ravel_Int(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1930,9 +1924,9 @@ int function_number = -1;
                 if (ret == -1)   goto out_errno;
 
                 Value_P Z(3, LOC);
-                new (Z->next_ravel()) IntCell(addr.inet.sin_family);
-                new (Z->next_ravel()) IntCell(ntohl(addr.inet.sin_addr.s_addr));
-                new (Z->next_ravel()) IntCell(ntohs(addr.inet.sin_port));
+                Z->next_ravel_Int(addr.inet.sin_family);
+                Z->next_ravel_Int(ntohl(addr.inet.sin_addr.s_addr));
+                Z->next_ravel_Int(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1989,7 +1983,7 @@ int function_number = -1;
                       UTF8_string utf(from, end - from);
                       UCS_string ucs(utf);
                       Value_P ZZ(ucs, LOC);
-                      new (Z->next_ravel())  PointerCell(ZZ.get(), Z.getref());
+                      Z->next_ravel_Pointer(ZZ.get());
                       from = data + l + 1;
                     }
 
@@ -2000,7 +1994,7 @@ int function_number = -1;
                       UTF8_string utf(from, end - from);
                       UCS_string ucs(utf);
                       Value_P ZZ(ucs, LOC);
-                      new (Z->next_ravel())  PointerCell(ZZ.get(), Z.getref());
+                      Z->next_ravel_Pointer(ZZ.get());
                    }
 
                 munmap(data, len);
@@ -2012,7 +2006,7 @@ int function_number = -1;
 
          case 50:   // gettimeofday
               {
-                const APL_Integer unit = B->get_ravel(0).get_near_int();
+                const APL_Integer unit = B->get_cfirst().get_near_int();
                 timeval tv;
                 gettimeofday(&tv, 0);
                 int64_t usec = tv.tv_sec;
@@ -2037,14 +2031,14 @@ int function_number = -1;
                    LENGTH_ERROR;
 
                 tm t;
-                t.tm_year = B->get_ravel(0).get_int_value() - 1900;
-                t.tm_mon  = B->get_ravel(1).get_int_value() - 1;
-                t.tm_mday = B->get_ravel(2).get_int_value();
-                t.tm_hour = B->get_ravel(3).get_int_value();
-                t.tm_min  = B->get_ravel(4).get_int_value();
-                t.tm_sec  = B->get_ravel(5).get_int_value();
+                t.tm_year = B->get_cfirst().get_int_value() - 1900;
+                t.tm_mon  = B->get_cravel(1).get_int_value() - 1;
+                t.tm_mday = B->get_cravel(2).get_int_value();
+                t.tm_hour = B->get_cravel(3).get_int_value();
+                t.tm_min  = B->get_cravel(4).get_int_value();
+                t.tm_sec  = B->get_cravel(5).get_int_value();
                 if (B->element_count() > 6)   // dst provided
-                   t.tm_isdst = B->get_ravel(6).get_int_value();
+                   t.tm_isdst = B->get_cravel(6).get_int_value();
                 else
                    t.tm_isdst = -1;
 
@@ -2052,10 +2046,10 @@ int function_number = -1;
                if (seconds == time_t(-1))   DOMAIN_ERROR;
 
                 Value_P Z(4, LOC);
-                new (Z->next_ravel()) IntCell(seconds);
-                new (Z->next_ravel()) IntCell(t.tm_wday);
-                new (Z->next_ravel()) IntCell(t.tm_yday);
-                new (Z->next_ravel()) IntCell(t.tm_isdst);
+                Z->next_ravel_Int(seconds);
+                Z->next_ravel_Int(t.tm_wday);
+                Z->next_ravel_Int(t.tm_yday);
+                Z->next_ravel_Int(t.tm_isdst);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -2064,21 +2058,21 @@ int function_number = -1;
          case 53:   // gmtime
               {
                 if (B->element_count() != 1)   LENGTH_ERROR;
-                const time_t t = B->get_ravel(0).get_int_value();
+                const time_t t = B->get_cfirst().get_int_value();
                 const tm * tmp = (function_number == 52) ? localtime(&t)
                                                          : gmtime(&t);
                 if (tmp == 0)   DOMAIN_ERROR;
 
                 Value_P Z(9, LOC);
-                new (Z->next_ravel()) IntCell(tmp->tm_year + 1900);
-                new (Z->next_ravel()) IntCell(tmp->tm_mon + 1);
-                new (Z->next_ravel()) IntCell(tmp->tm_mday);
-                new (Z->next_ravel()) IntCell(tmp->tm_hour);
-                new (Z->next_ravel()) IntCell(tmp->tm_min);
-                new (Z->next_ravel()) IntCell(tmp->tm_sec);
-                new (Z->next_ravel()) IntCell(tmp->tm_wday);
-                new (Z->next_ravel()) IntCell(tmp->tm_yday);
-                new (Z->next_ravel()) IntCell(tmp->tm_isdst);
+                Z->next_ravel_Int(tmp->tm_year + 1900);
+                Z->next_ravel_Int(tmp->tm_mon + 1);
+                Z->next_ravel_Int(tmp->tm_mday);
+                Z->next_ravel_Int(tmp->tm_hour);
+                Z->next_ravel_Int(tmp->tm_min);
+                Z->next_ravel_Int(tmp->tm_sec);
+                Z->next_ravel_Int(tmp->tm_wday);
+                Z->next_ravel_Int(tmp->tm_yday);
+                Z->next_ravel_Int(tmp->tm_isdst);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -2101,7 +2095,7 @@ int function_number = -1;
          case 60:   // random value
               {
                  if (!B->is_scalar())   RANK_ERROR;
-                 const APL_Integer len = B->get_ravel(0).get_int_value();
+                 const APL_Integer len = B->get_cfirst().get_int_value();
                  if (len < 1)   LENGTH_ERROR;
                  if (len > 8)   LENGTH_ERROR;
                  Value_P Z = get_random(0, len);
@@ -2111,7 +2105,7 @@ int function_number = -1;
          case 200:   // clear statistics Bi
          case 201:   // get statistics Bi
               {
-                const Pfstat_ID b = Pfstat_ID(B->get_ravel(0).get_int_value());
+                const Pfstat_ID b = Pfstat_ID(B->get_cfirst().get_int_value());
                 Statistics * stat = Performance::get_statistics(b);
                 if (stat == 0)   DOMAIN_ERROR;   // bad statistics ID
 
@@ -2125,20 +2119,20 @@ int function_number = -1;
                 //
                  const int t = Performance::get_statistics_type(b);
                  UCS_string stat_name(stat->get_name());
-                 Value_P Z1(stat_name, LOC);
+                 Value_P Zsub(stat_name, LOC);
                  if (t <= 2)   // cell function statistics
                     {
                       const Statistics_record * r1 = stat->get_first_record();
                       const Statistics_record * rN = stat->get_record();
                       Value_P Z(8, LOC);
-                      new (Z->next_ravel())   IntCell(t);
-                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
-                      new (Z->next_ravel())   IntCell(r1->get_count());
-                      new (Z->next_ravel())   IntCell(r1->get_sum());
-                      new (Z->next_ravel())   FloatCell(r1->get_sum2());
-                      new (Z->next_ravel())   IntCell(rN->get_count());
-                      new (Z->next_ravel())   IntCell(rN->get_sum());
-                      new (Z->next_ravel())   FloatCell(rN->get_sum2());
+                      Z->next_ravel_Int(t);
+                      Z->next_ravel_Pointer(Zsub.get());
+                      Z->next_ravel_Int(r1->get_count());
+                      Z->next_ravel_Int(r1->get_sum());
+                      Z->next_ravel_Float(r1->get_sum2());
+                      Z->next_ravel_Int(rN->get_count());
+                      Z->next_ravel_Int(rN->get_sum());
+                      Z->next_ravel_Float(rN->get_sum2());
                       Z->check_value(LOC);
                       return Token(TOK_APL_VALUE1, Z);
                     }
@@ -2146,11 +2140,11 @@ int function_number = -1;
                     {
                       const Statistics_record * r = stat->get_record();
                       Value_P Z(5, LOC);
-                      new (Z->next_ravel())   IntCell(t);
-                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
-                      new (Z->next_ravel())   IntCell(r->get_count());
-                      new (Z->next_ravel())   IntCell(r->get_sum());
-                      new (Z->next_ravel())   FloatCell(r->get_sum2());
+                      Z->next_ravel_Int(t);
+                      Z->next_ravel_Pointer(Zsub.get());
+                      Z->next_ravel_Int(r->get_count());
+                      Z->next_ravel_Int(r->get_sum());
+                      Z->next_ravel_Float(r->get_sum2());
                       Z->check_value(LOC);
                       return Token(TOK_APL_VALUE1, Z);
                     }
@@ -2162,8 +2156,8 @@ int function_number = -1;
                 const Function * fun = 0;
                 if (B->element_count() == 3)   // dyadic operator
                    {
-                     const Unicode lfun = B->get_ravel(0).get_char_value();
-                     const Unicode oper = B->get_ravel(1).get_char_value();
+                     const Unicode lfun = B->get_cfirst().get_char_value();
+                     const Unicode oper = B->get_cravel(1).get_char_value();
                      if (oper == UNI_FULLSTOP)
                         {
                           if (lfun == UNI_RING_OPERATOR)   // ∘.g
@@ -2174,7 +2168,7 @@ int function_number = -1;
                    }
                 else
                    {
-                     const Unicode prim = B->get_ravel(0).get_char_value();
+                     const Unicode prim = B->get_cfirst().get_char_value();
                      const Token tok = Tokenizer::tokenize_function(prim);
                      if (!tok.is_function())   DOMAIN_ERROR;
                      fun = tok.get_function();
@@ -2307,7 +2301,7 @@ int function_number = -1;
       }
    else
       {
-        function_number = X->get_ravel(0).get_near_int();
+        function_number = X->get_cfirst().get_near_int();
       }
 
    switch(function_number)
@@ -2346,7 +2340,7 @@ int function_number = -1;
          case 6:   // fread(Zi, 1, Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
-                const size_t bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_cfirst().get_near_int();
                 FILE * file = get_FILE(*B.get());
                 clearerr(file);
 
@@ -2360,7 +2354,7 @@ int function_number = -1;
                 if (len == 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -2378,7 +2372,7 @@ int function_number = -1;
                 if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
-                loop(z, bytes)   buffer[z] = A->get_ravel(z).get_near_int();
+                loop(z, bytes)   buffer[z] = A->get_cravel(z).get_near_int();
 
                 const size_t len = fwrite(buffer, 1, bytes, file);
                 delete [] del;
@@ -2389,7 +2383,7 @@ int function_number = -1;
          case 8:   // fgets(Zi, Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
-                const size_t bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_cfirst().get_near_int();
                 FILE * file = get_FILE(*B.get());
                 clearerr(file);
 
@@ -2402,7 +2396,7 @@ int function_number = -1;
                 const char * s = fgets(buffer, bytes, file);
                 const int len = s ? strlen(s) : 0;
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -2412,7 +2406,7 @@ int function_number = -1;
               {
                 errno = 0;
                 FILE * file = get_FILE(*B.get());
-                const APL_Integer pos = A->get_ravel(0).get_near_int();
+                const APL_Integer pos = A->get_cfirst().get_near_int();
                 fseek(file, pos, SEEK_SET);
               }
               goto out_errno;
@@ -2421,7 +2415,7 @@ int function_number = -1;
               {
                 errno = 0;
                 FILE * file = get_FILE(*B.get());
-                const APL_Integer pos = A->get_ravel(0).get_near_int();
+                const APL_Integer pos = A->get_cfirst().get_near_int();
                 fseek(file, pos, SEEK_CUR);
               }
               goto out_errno;
@@ -2430,7 +2424,7 @@ int function_number = -1;
               {
                 errno = 0;
                 FILE * file = get_FILE(*B.get());
-                const APL_Integer pos = A->get_ravel(0).get_near_int();
+                const APL_Integer pos = A->get_cfirst().get_near_int();
                 fseek(file, pos, SEEK_END);
               }
               goto out_errno;
@@ -2438,7 +2432,7 @@ int function_number = -1;
          case 20:   // mkdir(Bc, Ai)
               {
                 errno = 0;
-                const int mask = A->get_ravel(0).get_near_int();
+                const int mask = A->get_cfirst().get_near_int();
                 UTF8_string path(*B.get());
                 mkdir(path.c_str(), mask);
               }
@@ -2532,10 +2526,10 @@ int function_number = -1;
                 const int fd = get_fd(*B.get());
                 SockAddr addr;
                 memset(&addr, 0, sizeof(addr.inet));
-                addr.inet.sin_family = A->get_ravel(0).get_int_value();
-                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1)
+                addr.inet.sin_family = A->get_cfirst().get_int_value();
+                addr.inet.sin_addr.s_addr = htonl(A->get_cravel(1)
                                                     .get_int_value());
-                addr.inet.sin_port = htons(A->get_ravel(2).get_int_value());
+                addr.inet.sin_port = htons(A->get_cravel(2).get_int_value());
                 errno = 0;
                 bind(fd, &addr.addr, sizeof(addr.inet));
                 goto out_errno;
@@ -2546,7 +2540,7 @@ int function_number = -1;
                 const int fd = get_fd(*B.get());
                 APL_Integer backlog = 10;
                 if (A->element_count() > 0)
-                   backlog = A->get_ravel(0).get_int_value();
+                   backlog = A->get_cfirst().get_int_value();
 
                 errno = 0;
                 listen(fd, backlog);
@@ -2559,10 +2553,10 @@ int function_number = -1;
                 errno = 0;
                 SockAddr addr;
                 memset(&addr, 0, sizeof(addr.inet));
-                addr.inet.sin_family = A->get_ravel(0).get_int_value();
-                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1)
+                addr.inet.sin_family = A->get_cfirst().get_int_value();
+                addr.inet.sin_addr.s_addr = htonl(A->get_cravel(1)
                                                     .get_int_value());
-                addr.inet.sin_port = htons(A->get_ravel(2).get_int_value());
+                addr.inet.sin_port = htons(A->get_cravel(2).get_int_value());
                 errno = 0;
                 connect(fd, &addr.addr, sizeof(addr));
                 goto out_errno;
@@ -2570,7 +2564,7 @@ int function_number = -1;
 
          case 37:   // recv(Bh, Zi, Ai, 0) 1 byte per Zi
               {
-                const size_t bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_cfirst().get_near_int();
                 const int fd = get_fd(*B.get());
 
                 char small_buffer[SMALL_BUF];
@@ -2584,7 +2578,7 @@ int function_number = -1;
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -2602,7 +2596,7 @@ int function_number = -1;
                 if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
-                loop(z, bytes)   buffer[z] = A->get_ravel(z).get_near_int();
+                loop(z, bytes)   buffer[z] = A->get_cravel(z).get_near_int();
 
                 const ssize_t len = send(fd, buffer, bytes, 0);
                 if (len < 0)   goto out_errno;
@@ -2625,7 +2619,7 @@ int function_number = -1;
 
          case 41:   // read(Bh, Zi, Ai) 1 byte per Zi
               {
-                const size_t bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_cfirst().get_near_int();
                 const int fd = get_fd(*B.get());
 
                 char small_buffer[SMALL_BUF];
@@ -2639,7 +2633,7 @@ int function_number = -1;
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -2656,7 +2650,7 @@ int function_number = -1;
                 if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
-                loop(z, bytes)   buffer[z] = A->get_ravel(z).get_byte_value();
+                loop(z, bytes)   buffer[z] = A->get_cravel(z).get_byte_value();
 
                 errno = 0;
                 const ssize_t len = write(fd, buffer, bytes);
@@ -2679,8 +2673,8 @@ int function_number = -1;
 
          case 46:   // getsockopt(Bh, A_level, A_optname, Zi)
               {
-                const APL_Integer level = A->get_ravel(0).get_int_value();
-                const APL_Integer optname = A->get_ravel(1).get_int_value();
+                const APL_Integer level = A->get_cfirst().get_int_value();
+                const APL_Integer optname = A->get_cravel(1).get_int_value();
                 const int fd = get_fd(*B.get());
                 int optval = 0;
                 socklen_t olen = sizeof(optval);
@@ -2692,9 +2686,9 @@ int function_number = -1;
 
          case 47:   // setsockopt(Bh, A_level, A_optname, A_optval)
               {
-                const APL_Integer level = A->get_ravel(0).get_int_value();
-                const APL_Integer optname = A->get_ravel(1).get_int_value();
-                const int optval =  A->get_ravel(2).get_int_value();
+                const APL_Integer level = A->get_cfirst().get_int_value();
+                const APL_Integer optname = A->get_cravel(1).get_int_value();
+                const int optval =  A->get_cravel(2).get_int_value();
                 const int fd = get_fd(*B.get());
                 errno = 0;
                 setsockopt(fd, level, optname, &optval, sizeof(optval));
@@ -2730,7 +2724,7 @@ int function_number = -1;
                 const ShapeItem line_count = A->element_count();
                 loop(a, line_count)
                     {
-                      const Cell & cA = A->get_ravel(a);
+                      const Cell & cA = A->get_cravel(a);
                       if (!cA.is_pointer_cell())
                          {
                             MORE_ERROR() <<
@@ -2755,7 +2749,7 @@ int function_number = -1;
 
                 loop(a, line_count)
                     {
-                      const Cell & cA = A->get_ravel(a);
+                      const Cell & cA = A->get_cravel(a);
                       const Value & Ai = cA.get_pointer_value().getref();
                       UCS_string line_ucs(Ai);
                       UTF8_string line_utf(line_ucs);
@@ -2783,7 +2777,7 @@ int function_number = -1;
                 const int fd = get_fd(*B.get());
                 errno = 0;
                 int result = -1;
-                const Cell * cA = &A->get_ravel(0);
+                const Cell * cA = &A->get_cfirst();
                 switch(A->element_count())
                    {
                       case 1: result = fcntl(fd, cA[0].get_int_value());
@@ -2805,8 +2799,8 @@ int function_number = -1;
                 errno = 0;
                 if (!A->is_scalar())   RANK_ERROR;
                 if (!B->is_scalar())   RANK_ERROR;
-                const APL_Integer mode = A->get_ravel(0).get_int_value();
-                const APL_Integer len  = B->get_ravel(0).get_int_value();
+                const APL_Integer mode = A->get_cfirst().get_int_value();
+                const APL_Integer len  = B->get_cfirst().get_int_value();
                 if (len < 1)    LENGTH_ERROR;
                 if (len > 32)   LENGTH_ERROR;
                 Value_P Z = get_random(mode, len);
@@ -2816,17 +2810,17 @@ int function_number = -1;
          case 202:   // set monadic parallel threshold
          case 203:   // set dyadicadic parallel threshold
               {
-                const APL_Integer threshold = A->get_ravel(0).get_int_value();
+                const APL_Integer threshold = A->get_cfirst().get_int_value();
                 Function_P fun = 0;
                 if (B->element_count() == 3)   // dyadic operator
                    {
-                     const Unicode oper = B->get_ravel(1).get_char_value();
+                     const Unicode oper = B->get_cravel(1).get_char_value();
                      if (oper != UNI_FULLSTOP)   DOMAIN_ERROR;
                      fun = Bif_OPER2_INNER::fun;
                    }
                 else
                    {
-                     const Unicode prim = B->get_ravel(0).get_char_value();
+                     const Unicode prim = B->get_cfirst().get_char_value();
                      const Token tok = Tokenizer::tokenize_function(prim);
                      if (!tok.is_function())   DOMAIN_ERROR;
                      fun = tok.get_function();

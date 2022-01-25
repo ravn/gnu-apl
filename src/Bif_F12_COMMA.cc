@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ Value_P Z(new_shape, LOC);
 const ShapeItem count = B->element_count();
    Assert(count == Z->element_count());
 
-   loop(c, count)   Z->next_ravel()->init(B->get_ravel(c), Z.getref(), LOC);
+   loop(c, count)   Z->next_ravel_Cell(B->get_cravel(c));
 
    Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
@@ -53,12 +53,11 @@ Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B)
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
            {
-              Z->get_ravel(0).init(cell_A, Z.getref(), LOC);   // prototype
+              Z->get_wproto().init(cell_A, Z.getref(), LOC);   // prototype
            }
         else
            {
-             loop(z, Z->element_count())
-                 Z->next_ravel()->init(cell_A, Z.getref(), LOC);
+             loop(z, Z->element_count())   Z->next_ravel_Cell(cell_A);
            }
         return Z;
       }
@@ -66,8 +65,8 @@ Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B)
    if (B->is_scalar())
       {
         Value_P Z(2, LOC);
-        Z->next_ravel()->init(cell_A, Z.getref(), LOC);
-        Z->next_ravel()->init(B->get_ravel(0), Z.getref(), LOC);
+        Z->next_ravel_Cell(cell_A);
+        Z->next_ravel_Cell(B->get_cfirst());
         Z->check_value(LOC);
         return Z;
       }
@@ -83,11 +82,11 @@ const Shape3 shape_B3(B->get_shape(), axis);
    const ShapeItem slice_a = shape_B3.l();
    const ShapeItem slice_b = shape_B3.l() * B->get_shape_item(axis);
 
-const Cell * cB = &B->get_ravel(0);
+const Cell * cB = &B->get_cfirst();
 
    loop(hz, shape_B3.h())
        {
-         loop(lz, slice_a)   Z->next_ravel()->init(cell_A, Z.getref(), LOC);
+         loop(lz, slice_a)   Z->next_ravel_Cell(cell_A);
 
          Cell::copy(*Z.get(), cB, slice_b);
        }
@@ -106,12 +105,11 @@ Bif_COMMA::append_scalar(Value_P A, uAxis axis, const Cell & cell_B)
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
            {
-              Z->get_ravel(0).init(cell_B, Z.getref(), LOC);   // prototype
+              Z->get_wproto().init(cell_B, Z.getref(), LOC);   // prototype
            }
         else
            {
-             loop(z, Z->element_count())
-                 Z->next_ravel()->init(cell_B, Z.getref(), LOC);
+             loop(z, Z->element_count())   Z->next_ravel_Cell(cell_B);
            }
         return Z;
       }
@@ -128,12 +126,12 @@ const Shape3 shape_A3(A->get_shape(), axis);
 const ShapeItem slice_a = shape_A3.l() * A->get_shape_item(axis);
 const ShapeItem slice_b = shape_A3.l();
 
-const Cell * cA = &A->get_ravel(0);
+const Cell * cA = &A->get_cfirst();
 
    loop(hz, shape_A3.h())
        {
          Cell::copy(*Z.get(), cA, slice_a);
-         loop(lz, slice_b)   Z->next_ravel()->init(cell_B, Z.getref(), LOC);
+         loop(lz, slice_b)   Z->next_ravel_Cell(cell_B);
        }
 
    Z->check_value(LOC);
@@ -148,7 +146,7 @@ Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
 
    if (A->is_scalar())
       {
-        const Cell & cell_A = A->get_ravel(0);
+        const Cell & cell_A = A->get_cfirst();
         Value_P Z = prepend_scalar(cell_A, axis, B);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -156,7 +154,7 @@ Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
 
    if (B->is_scalar())
       {
-        const Cell & cell_B = B->get_ravel(0);
+        const Cell & cell_B = B->get_cfirst();
         Value_P Z = append_scalar(A, axis, cell_B);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -195,8 +193,8 @@ Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
         const ShapeItem slice_a = shape_B3.l();
         const ShapeItem slice_b = shape_B3.l() * B->get_shape_item(axis);
 
-        const Cell * cA = &A->get_ravel(0);
-        const Cell * cB = &B->get_ravel(0);
+        const Cell * cA = &A->get_cfirst();
+        const Cell * cB = &B->get_cfirst();
 
         loop(hz, shape_B3.h())
             {
@@ -244,8 +242,8 @@ Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
         const ShapeItem slice_a = shape_A3.l() * A->get_shape_item(axis);
         const ShapeItem slice_b = shape_A3.l();
 
-        const Cell * cA = &A->get_ravel(0);
-        const Cell * cB = &B->get_ravel(0);
+        const Cell * cA = &A->get_cfirst();
+        const Cell * cB = &B->get_cfirst();
 
         loop (hz, shape_A3.h())
             {
@@ -283,8 +281,8 @@ Shape shape_Z;
 
 const Shape3 shape_A3(A->get_shape(), axis);
 
-const Cell * cA = &A->get_ravel(0);
-const Cell * cB = &B->get_ravel(0);
+const Cell * cA = &A->get_cfirst();
+const Cell * cB = &B->get_cfirst();
 const ShapeItem slice_a = shape_A3.l() * A->get_shape_item(axis);
 const ShapeItem slice_b = shape_A3.l() * B->get_shape_item(axis);
 
@@ -317,21 +315,21 @@ Value_P Z(shape_Z, LOC);
 const Shape3 shape_Z3(shape_Z, axis);
    if (shape_Z3.m() != 2)   AXIS_ERROR;
 
-const Cell * cA = &A->get_ravel(0);
-const Cell * cB = &B->get_ravel(0);
+const Cell * cA = &A->get_cfirst();
+const Cell * cB = &B->get_cfirst();
    if (A->is_scalar())
       {
         if (B->is_scalar())
            {
-             Z->next_ravel()->init(*cA, Z.getref(), LOC);
-             Z->next_ravel()->init(*cB, Z.getref(), LOC);
+             Z->next_ravel_Cell(*cA);
+             Z->next_ravel_Cell(*cB);
            }
         else
            {
              loop(h, shape_Z3.h())
                  {
                    loop(l, shape_Z3.l())
-                       Z->next_ravel()->init(*cA, Z.getref(), LOC);
+                       Z->next_ravel_Cell(*cA);
                    Cell::copy(*Z.get(), cB, shape_Z3.l());
                 }
            }
@@ -343,8 +341,7 @@ const Cell * cB = &B->get_ravel(0);
              loop(h, shape_Z3.h())
                  {
                    Cell::copy(*Z.get(), cA, shape_Z3.l());
-                   loop(l, shape_Z3.l())
-                       Z->next_ravel()->init(*cB, Z.getref(), LOC);
+                   loop(l, shape_Z3.l())   Z->next_ravel_Cell(*cB);
                 }
            }
         else
@@ -393,11 +390,11 @@ const APL_Integer qio = Workspace::get_IO();
 
    // case 2:   ,[x.y]B : insert axis before axis x+1
    //
-   if (!X->get_ravel(0).is_near_int())  // fraction: insert an axis
+   if (!X->get_cfirst().is_near_int())  // fraction: insert an axis
       {
         if (B->get_rank() == MAX_RANK)   INDEX_ERROR;
 
-        const APL_Float new_axis = X->get_ravel(0).get_real_value() - qio;
+        const APL_Float new_axis = X->get_cfirst().get_real_value() - qio;
         Axis axis = new_axis;   if (new_axis < 0.0)   axis = -1;
         const Shape shape_Z = B->get_shape().insert_axis(axis + 1, 1);
         return ravel(shape_Z, B);
@@ -464,8 +461,8 @@ Bif_F12_COMMA::eval_AB(Value_P A, Value_P B) const
   if (A->is_scalar() && B->is_scalar())
      {
        Value_P Z(2, LOC);
-       Z->next_ravel()->init(A->get_ravel(0), Z.getref(), LOC);
-       Z->next_ravel()->init(B->get_ravel(0), Z.getref(), LOC);
+       Z->next_ravel_Cell(A->get_cfirst());
+       Z->next_ravel_Cell(B->get_cfirst());
        Z->check_value(LOC);
        return Token(TOK_APL_VALUE1, Z);
      }
@@ -484,7 +481,7 @@ Bif_F12_COMMA::eval_AXB(Value_P A, Value_P X, Value_P B) const
    //
    if (!X->is_scalar_or_len1_vector())   AXIS_ERROR;
 
-const Cell & cX = X->get_ravel(0);
+const Cell & cX = X->get_cfirst();
 const APL_Integer qio = Workspace::get_IO();
 
    if (cX.is_near_int())   // catenate along existing axis
@@ -535,8 +532,8 @@ Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B) const
   if (A->is_scalar() && B->is_scalar())
      {
        Value_P Z(2, LOC);
-       Z->next_ravel()->init(A->get_ravel(0), Z.getref(), LOC);
-       Z->next_ravel()->init(B->get_ravel(0), Z.getref(), LOC);
+       Z->next_ravel_Cell(A->get_cfirst());
+       Z->next_ravel_Cell(B->get_cfirst());
        Z->check_value(LOC);
        return Token(TOK_APL_VALUE1, Z);
      }

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,9 +34,13 @@
 class IntCell : public RealCell
 {
 public:
+   /// Construct an integer cell with value \b 0
+   IntCell()
+      { value.ival = 0;  }
+
    /// Construct an integer cell with value \b i
    IntCell(APL_Integer i)
-      { value.ival = i; }
+      { value.ival = i;  }
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
@@ -47,12 +51,10 @@ public:
       { return true; }
 
    /// overloaded Cell::bif_near_int64_t()
-   virtual ErrorCode bif_near_int64_t(Cell * Z) const
-      { return zv(Z, value.ival); }
+   virtual ErrorCode bif_near_int64_t(Cell * Z) const;
 
    /// overloaded Cell::bif_within_quad_CT()
-   virtual ErrorCode bif_within_quad_CT(Cell * Z) const
-      { return zv(Z, value.ival); }
+   virtual ErrorCode bif_within_quad_CT(Cell * Z) const;
 
    /// overloaded Cell::greater()
    virtual bool greater(const Cell & other) const;
@@ -150,22 +152,6 @@ public:
    /// overloaded Cell::bif_multiply_inverse()
    virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const;
 
-   /// initialize Z to integer 0
-   static ErrorCode z0(Cell * Z)
-      { new (Z) IntCell(0);   return E_NO_ERROR; }
-
-   /// initialize Z to integer 1
-   static ErrorCode z1(Cell * Z)
-      { new (Z) IntCell(1);   return E_NO_ERROR; }
-
-   /// initialize Z to integer ¯1
-   static ErrorCode z_1(Cell * Z)
-      { new (Z) IntCell(-1);   return E_NO_ERROR; }
-
-   /// initialize Z to integer v
-   static ErrorCode zv(Cell * Z, APL_Integer v)
-      { new (Z) IntCell(v);   return E_NO_ERROR; }
-
    /// swap \b this Intcell and \b other (for Heapsort<IntCell> )
    void Hswap(IntCell & other)
       {
@@ -176,6 +162,10 @@ public:
 
    /// overloaded Cell::get_int_value()
    virtual APL_Integer get_int_value()  const   { return value.ival; }
+
+   // set the integer value of this IntCell
+   void set_int_value(APL_Integer val)
+     { value.ival = val; }
 
    /// overloaded Cell::get_byte_value()
    virtual int get_byte_value() const;
@@ -195,10 +185,12 @@ protected:
    virtual CellType get_cell_subtype() const;
 
    /// overloaded Cell::get_real_value()
-   virtual APL_Float get_real_value() const   { return APL_Float(value.ival);  }
+   virtual APL_Float get_real_value() const
+      { return APL_Float(value.ival);  }
 
    /// overloaded Cell::get_imag_value()
-   virtual APL_Float get_imag_value() const   { return 0.0;  }
+   virtual APL_Float get_imag_value() const
+      { return 0.0;  }
 
    /// overloaded Cell::get_complex_value()
    virtual APL_Complex get_complex_value() const
@@ -243,10 +235,6 @@ protected:
 
    /// overloaded Cell::CDR_size()
    virtual int CDR_size() const;
-
-   /// overloaded Cell::to_type()
-   virtual void to_type()
-      { value.ival = 0; }
 };
 //-----------------------------------------------------------------------------
 inline void

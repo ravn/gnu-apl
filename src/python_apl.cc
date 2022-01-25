@@ -81,7 +81,7 @@ const ShapeItem ravel_len = value->nz_element_count();
 PyObject * ravel = PyList_New(ravel_len);
    loop(i, ravel_len)
        {
-         const Cell & cell = value->get_ravel(i);
+         const Cell & cell = value->get_cravel(i);
          if (cell.is_integer_cell())
             PyList_SetItem(ravel, i, PyLong_FromLong(cell.get_int_value()));
          else if (cell.is_float_cell())
@@ -270,7 +270,7 @@ PyObject * result = PyList_New(len);
 
    loop(l, len)
       {
-        const Cell & cell = value->get_ravel(l);
+        const Cell & cell = value->get_cravel(l);
         PyObject * item = Py_None;
         if (cell.is_integer_cell())
            {
@@ -361,17 +361,17 @@ const ShapeItem len_Z = Z->nz_element_count();
       {
         const double real = PyComplex_RealAsDouble(ravel);
         const double imag = PyComplex_ImagAsDouble(ravel);
-        loop(z, len_Z)   new (Z->next_ravel())   ComplexCell(real, imag);
+        loop(z, len_Z)   Z->next_ravel_Complex(real, imag);
       }
    else if (PyFloat_Check(ravel))   // ravel is a floating point scalar
       {
         const double real = PyFloat_AsDouble(ravel);
-        loop(z, len_Z)   new (Z->next_ravel())   FloatCell(real);
+        loop(z, len_Z)   Z->next_ravel_Float(real);
       }
    else if (PyLong_Check(ravel))   // ravel is an integer scalar
       {
         const APL_Integer ival = PyLong_AsLong(ravel);
-        loop(z, len_Z)   new (Z->next_ravel())   IntCell(ival);
+        loop(z, len_Z)   Z->next_ravel_Int(ival);
       }
    else if (PyUnicode_Check(ravel))   // ravel is a char scalar or a string
       {
@@ -380,15 +380,14 @@ const ShapeItem len_Z = Z->nz_element_count();
                                 (PyUnicode_AsUTF8AndSize(ravel, &len));
         UTF8_string utf(data, len);
         UCS_string ucs(utf);
-        loop(z, len_Z)   new (Z->next_ravel())   CharCell(ucs[z % ucs.size()]);
+        loop(z, len_Z)   Z->next_ravel_Char(ucs[z % ucs.size()]);
       }
    else if (PyTuple_Check(ravel))   // item is a tuple (val, shape)
       {
         PyObject * sub_shape = PyTuple_GetItem(ravel, 1);
         PyObject * sub_ravel = PyTuple_GetItem(ravel, 0);
         Value_P sub = python_to_apl(sub_ravel, sub_shape);
-        loop(z, len_Z)
-            new (Z->next_ravel()) PointerCell(sub.get(), Z.getref());
+        loop(z, len_Z)   Z->next_ravel_Pointer(sub.get());
       }
    else if (PyList_Check(ravel))   // ravel is a list
       {
@@ -397,7 +396,7 @@ const ShapeItem len_Z = Z->nz_element_count();
             {
               PyObject * src = PyList_GetItem(ravel, z % src_len);
               Value_P sub = python_to_apl(src, 0);
-              Z->next_ravel()->init_from_value(sub.get(), Z.getref(), LOC);
+              Z->next_ravel_Value(sub.get());
             }
       }
    else
@@ -605,9 +604,9 @@ const char * DESCR_fix_function =
 ;
 
 const char * DESCR_get_ravel =
-"gnu_apl.get_ravel() : get the ravel of an APL variable.\n"
+"gnu_apl.get_cravel() : get the ravel of an APL variable.\n"
 "\n"
-"Synopsis: Result = gnu_apl.get_ravel(text)\n"
+"Synopsis: Result = gnu_apl.get_cravel(text)\n"
 "    varname is a string containing the name of an APL variable.\n"
 "\n"
 "Result:\n"
@@ -626,7 +625,7 @@ const char * DESCR_get_ravel =
 "Example:\n"
 "    gnu_apl.exec('Var←4 4⍴⍳16')\n"
 "(2, ([4, 4], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]))\n"
-"    gnu_apl.get_ravel('Var')\n"
+"    gnu_apl.get_cravel('Var')\n"
 "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]\n"
 ;
 
@@ -656,7 +655,7 @@ const char * DESCR_get_value =
 "    varname is a string containing the name of an APL variable.\n"
 "\n"
 "Result:\n"
-"    on sucess:   tuple( get_ravel(varname), get_shape(varname) )\n"
+"    on sucess:   tuple( get_cravel(varname), get_shape(varname) )\n"
 "    otherwise:   int(error_code)\n"
 "\n"
 "Example:\n"

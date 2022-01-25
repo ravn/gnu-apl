@@ -1,6 +1,27 @@
 ⍝ Partition.tc
 ⍝ ----------------------------------
 
+      4 ⎕CR 1 1 2⊂'ABC'   ⍝ partition a string
+┏→━━━━━━━┓
+┃┏→━┓ ┏→┓┃
+┃┃AB┃ ┃C┃┃
+┃┗━━┛ ┗━┛┃
+┗∊━━━━━━━┛
+
+      4 ⎕CR 1 0 1⊂'ABC'   ⍝ partition and delete
+┏→━━━━━━┓
+┃┏→┓ ┏→┓┃
+┃┃A┃ ┃C┃┃
+┃┗━┛ ┗━┛┃
+┗∊━━━━━━┛
+
+      1 0 1⊂'ABCD'   ⍝ mismatch of argument lengths
+LENGTH ERROR
+      1 0 1⊂'ABCD'
+      ^    ^
+
+      →
+
       4⎕CR 1 1 2⊂'ABC'
 ┏→━━━━━━━┓
 ┃┏→━┓ ┏→┓┃
@@ -22,7 +43,6 @@ LENGTH ERROR
       ^    ^
 
       →
-
 
       4⎕CR 2 1 2⊂10 20 30
 ┏→━━━━━━━━━━━┓
@@ -97,4 +117,12 @@ LENGTH ERROR
 ┗∊━━━━━━━━━━━━━━━━━┛
 
 ⍝ ==================================
+
+      )SI
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
 

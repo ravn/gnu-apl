@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -154,6 +154,12 @@ protected:
 
    /// compute \b 39 ⎕CR \b B
    static Value_P do_CR39(const Value & B);
+
+   /// compute \b 40 ⎕CR \b B
+   static Value_P do_CR40(const Value & B);
+
+   /// compute \b 41 ⎕CR \b B
+   static Value_P do_CR41(const Value & B);
 
    /// the left argument of Pick (⊃) which selects a sub-item of a variable
    /// being constructed

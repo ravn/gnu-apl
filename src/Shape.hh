@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -183,9 +183,15 @@ public:
         return ret;
       }
 
-   /// return the number of elements (1 for scalars, else product of shapes)
+   /// return the number of ravel elements (1 for scalars,i
+   ///  else product of shapes)
    ShapeItem get_volume() const
       { return volume; }
+
+   /// return the number of ravel elements, but at least 1 (for empty values
+   /// and scalars) else product of shapes)
+   ShapeItem get_nz_volume() const
+      { return volume ? volume : 1; }
 
    /// return true iff one of the shape elements is (axis) \b axis
    bool contains_axis(const Rank ax) const

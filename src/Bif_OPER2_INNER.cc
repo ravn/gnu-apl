@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -109,11 +109,11 @@ Value_P Z(shape_A1 + shape_B1, LOC);
    //
         if (len_A != len_B && job.incA && job.incB)   LENGTH_ERROR;
 
-        job.cZ     = &Z->get_ravel(0);
-        job.cA     = &A->get_ravel(0);
+        job.cZ     = &Z->get_wfirst();
+        job.cA     = &A->get_cfirst();
         job.ZAh    = items_A;
         job.LO_len = A->is_scalar() ? len_B : len_A;
-        job.cB     = &B->get_ravel(0);
+        job.cB     = &B->get_cfirst();
         job.ZBl    = items_B;
         job.ec     = E_NO_ERROR;
 
@@ -149,10 +149,10 @@ const bool B_enclosed = B->get_rank() > 1;
    loop (b, items_B)
       {
         Value_P RO_A(A, LOC);
-        if (A_enclosed)   RO_A = A->get_ravel(a).get_pointer_value();
+        if (A_enclosed)   RO_A = A->get_cravel(a).get_pointer_value();
 
         Value_P RO_B(B, LOC);
-        if (B_enclosed)   RO_B = B->get_ravel(b).get_pointer_value();
+        if (B_enclosed)   RO_B = B->get_cravel(b).get_pointer_value();
 
         const Token T1 = RO->eval_AB(RO_A, RO_B);
 
@@ -160,22 +160,22 @@ const bool B_enclosed = B->get_rank() > 1;
 
         Value_P A_RO_B = T1.get_apl_val();
 
-        Cell * cZ = Z->next_ravel();
         if (A_RO_B->is_simple_scalar())   // A_RO_B is A RO B
            {
              // A RO B has returned a scalar, so LO/A_RO_B is A_RO_B
              //
-             cZ->init(A_RO_B->get_ravel(0), Z.getref(), LOC);
+             Z->next_ravel_Cell(A_RO_B->get_cfirst());
            }
         else
            {
              // A RO B has returned a vector, so compute LO/A_RO_B
              //
-          //    new (cZ) PointerCell(A_RO_B.get(), Z.getref());
-
-            const Token T2 = Bif_OPER1_REDUCE::fun->eval_LB(_LO, A_RO_B);
+             const Token T2 = Bif_OPER1_REDUCE::fun->eval_LB(_LO, A_RO_B);
              if (T2.get_tag() == TOK_ERROR)   return T2;
-             cZ->init_from_value(T2.get_apl_val().get(), Z.getref(), LOC);
+
+             Value_P V2 = T2.get_apl_val();
+             if (V2->is_simple_scalar())   Z->next_ravel_Cell(V2->get_cfirst());
+             else                          Z->next_ravel_Pointer(V2.get());
            }
       }
 

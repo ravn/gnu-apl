@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -97,16 +97,13 @@ protected:
    /// simplify tos by removing UCS nnn etc.
    static void tf2_reduce(Token_string & tos);
 
-   /// replace ⎕UCS n... with the corresponding Unicodes,
-   static void tf2_reduce_UCS(Token_string & tos);
+   /// replace pattern ⊂ B  in \b tos with the single token (⊂B);
+   /// return true iff done so.
+   static bool tf2_reduce_ENCLOSE(Token_string & tos);
 
    /// replace pattern A ⍴ B in \b tos with the single token (A⍴B);
    /// return true iff done so.
    static bool tf2_reduce_RHO(Token_string & tos);
-
-   /// replace pattern ⊂ B  in \b tos with the single token (⊂B);
-   /// return true iff done so.
-   static bool tf2_reduce_ENCLOSE(Token_string & tos);
 
    /// replace pattern N - ⎕IO - ⍳ K  in \b tos with N N+1 ... N+K-1;
    /// return true iff done so.
@@ -135,6 +132,12 @@ protected:
 
    /// replace pattern ⊂ B in tos with the single token (⊂B)
    static bool tf2_reduce_ENCLOSE1(Token_string & tos);
+
+   /// replace ⎕UCS n... with the corresponding Unicodes,
+   static void tf2_reduce_UCS(Token_string & tos);
+
+   /// in-place exchange of IntCells and CharCells
+   static ShapeItem tf2_toggle_UCS(Value & val);
 };
 //-----------------------------------------------------------------------------
 #endif // __QUAD_TF_HH_DEFINED__

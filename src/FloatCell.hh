@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,20 +76,6 @@ public:
         return value.fval.u1.flt;
       }
 
-   /// initialize Z to quotient numer÷denom
-   static ErrorCode zv(Cell * Z, APL_Integer numer, APL_Integer denom)
-      { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }
-
-   /// initialize Z with the value of \b this FloatCell
-   ErrorCode zv(Cell * Z) const
-      {
-        if (const APL_Integer denom = get_denominator())
-           new (Z) FloatCell(get_numerator(), denom);
-        else
-           new (Z) FloatCell(dfval());
-        return E_NO_ERROR;
-      }
-
 # if APL_Float_is_class
    /// overloaded Cell::release()
    virtual void release(const char * loc)
@@ -108,12 +94,6 @@ public:
    /// rational)
    APL_Float dfval() const
       { return value.fval.u1.flt; }
-
-   /// construct a new FloatCell a address Z
-   ErrorCode zv(Cell * Z) const
-      {
-        new (Z) FloatCell(dfval());   return E_NO_ERROR;
-      }
 
 # if APL_Float_is_class
    /// overloaded Cell::release()
@@ -225,10 +205,6 @@ public:
    /// replace normal chars by special chars specified in ⎕FC
    static void map_FC(UCS_string & ucs);
 
-   /// initialize Z to APL_Float v
-   static ErrorCode zv(Cell * Z, APL_Float v)
-      { new (Z) FloatCell(v);   return E_NO_ERROR; }
-
    /// greatest common divisor, Knuth Vol. 1 p. 14
    static APL_Integer gcd(APL_Integer m, APL_Integer n)
       {
@@ -292,7 +268,7 @@ protected:
    virtual APL_Integer get_checked_near_int()  const
       { 
         if (dfval() < 0.0)   return APL_Integer(dfval() - 0.3);
-        else                return APL_Integer(dfval() + 0.3);
+        else                 return APL_Integer(dfval() + 0.3);
       }
 
    /// Overloaded Cell::is_near_int().
@@ -329,17 +305,11 @@ protected:
    /// Overloaded Cell::CDR_size()
    virtual int CDR_size() const { return 8; }
 
-   /// overloaded Cell::to_type()
-   virtual void to_type()
-      { new(this)   IntCell(0); }
-
    /// downcast to const FloatCell
    virtual const FloatCell & cFloatCell() const   { return *this; }
 
    /// downcast to FloatCell
    virtual FloatCell & vFloatCell()   { return *this; }
-
-
 };
 //=============================================================================
 

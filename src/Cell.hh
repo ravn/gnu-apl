@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@
 #include "PrintBuffer.hh"
 #include "Value_P.hh"
 
-class Value;
 class CharCell;
 class ComplexCell;
 class FloatCell;
@@ -55,12 +54,12 @@ public:
    /// Construct an un-initialized Cell
    Cell() {}
 
-   /// deep copy of cell \b other into \b this cell
-   void init(const Cell & other, Value & cell_owner, const char * loc)
-      { other.init_other(this, cell_owner, loc); }
+   /// init \b this Cell from a (possibly deep) copy of \b other
+   void init(const Cell & other, Value & this_owner, const char * loc)
+      { other.init_other(this, this_owner, loc); }
 
-   /// init \b other from \b this cell
-   virtual void init_other(void * other, Value & cell_owner,
+   /// init (uninitialized) Cell \b other from \b this initialized cell
+   virtual void init_other(void * other, Value & other_owner,
                            const char * loc) const
       { Assert(0 && "Cell::init_other() called on base class"); }
 
@@ -231,10 +230,6 @@ public:
    virtual bool is_member_anchor() const
       { return false; }
 
-   /// convert this cell to its type
-   virtual void to_type()
-      { DOMAIN_ERROR; }
-
    /// A union containing all possible cell values for the different Cell types
    union SomeValue
       {
@@ -242,6 +237,7 @@ public:
         APL_Float_Base cval[2];   ///< for ComplexCell
         ErrorCode      eval;      ///< an error code
         APL_Integer    ival;      ///< for IntCell
+
         struct _fval              ///< for FloatCell
            {
              /// either a floating point value, or the denominator of a quotient

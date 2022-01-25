@@ -169,8 +169,8 @@ ul.no-bullet {list-style: none}
       <li><a name="toc-The-String_0028s_0029-B-Being-Matched" href="#The-String_0028s_0029-B-Being-Matched">2.33.4 The String(s) B Being Matched</a></li>
       <li><a name="toc-The-Flags-X" href="#The-Flags-X">2.33.5 The Flags X</a>
       <ul class="no-bullet">
-        <li><a name="toc-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x" href="#libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x">2.33.5.1 libpcre2 flags: i, m, s, and x</a></li>
-        <li><a name="toc-The-APL-output-format-flags-_007c_002c-_005b_003f_005d_002c-and-_002f" href="#The-APL-output-format-flags-_007c_002c-_005b_003f_005d_002c-and-_002f">2.33.5.2 The APL output format flags ↓, ⊂, and /</a></li>
+        <li><a name="toc-The-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x" href="#The-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x">2.33.5.1 The libpcre2 flags: i, m, s, and x</a></li>
+        <li><a name="toc-The-_005b_003f_005dRE-_0028APL-output-format_0029-flags-_007c_002c-_005b_003f_005d_002c-and-_002f" href="#The-_005b_003f_005dRE-_0028APL-output-format_0029-flags-_007c_002c-_005b_003f_005d_002c-and-_002f">2.33.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /</a></li>
         <li><a name="toc-the-_005b_003f_005dRE-global-flag-g" href="#the-_005b_003f_005dRE-global-flag-g">2.33.5.3 the ⎕RE global flag g</a></li>
         <li><a name="toc-the-_005b_003f_005dRE-error-flag-E" href="#the-_005b_003f_005dRE-error-flag-E">2.33.5.4 the ⎕RE error flag E</a></li>
       </ul></li>
@@ -248,7 +248,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>January 3, 2022
+<p>January 17, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -3043,10 +3043,21 @@ probably every programmer has programmed at some point in time):
       ⍝     rows   cols   diag1    diag2
       Q8←⊃{(R⌽RC),(C⌽RC),((C-R)⌽D),((¯7-R+C)⌽D)⊣(R C)←-8 8⊤⍵-⎕IO} ¨ ⍳64
       Z←¯1 ⎕DLX Q8
-      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1 2 3 92] ⍝ solutions 1, 2, and 92
+      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1 2 3 92] ⍝ solutions 1, 2, 3, and 92
+ A1 B5 C8 D6 G2 E3 F7 H4 
  A1 B6 C8 D3 E7 F4 G2 H5 
- A1 C5 F4 H3 D8 G6 B7 E2 
- A8 D6 H4 G7 C1 F5 B3 E2 
+ A1 B7 C4 E8 D6 G5 F2 H3 
+ A8 B4 C1 D3 G7 E6 F2 H5 
+
+      8 8⍴(&quot;+&quot; &quot;Q&quot;)[⎕IO+(⍳64)∈⊃Z[1]]   ⍝ visualize solution Z[1]
+Q + + + + + + + 
+ + + + + Q + + + 
+ + + + + + + + Q 
+ + + + + + Q + + 
+ + + Q + + + + + 
+ + + + + + + Q + 
+ + Q + + + + + + 
+ + + + Q + + + + 
 
 </pre>
 <p>Obviously Z contains solutions for the 8 Queens problem; the total number of
@@ -3827,32 +3838,35 @@ In fact, regular expressions are a language of their own, and it is impossible
 to describe them here. The user of ⎕RE is referred to the description that
 comes with libpcre2.
 </p>
-<p>See in particular:
-</p>
-<p>man pcre2pattern
+<p>See in particular: <strong>man pcre2pattern</strong>
 </p>
 <a name="The-String_0028s_0029-B-Being-Matched"></a>
 <h4 class="subsection">2.33.4 The String(s) B Being Matched</h4>
 
-<p>B is either (1) a simple character vector (which is then also passed unmodified
-to libpcre2) or (2) a (nested) APL array containing only simple character
-vectors.
+<p>B is either:
 </p>
-<p>In the case (2) the result of ⎕RE is conceptually the same as if the EACH
-operator had been applied to ⎕RE:
+<ol>
+<li> a simple character vector (which is then also passed unmodified
+to libpcre2), or
+
+</li><li> a (nested) APL array consisting of simple character vectors.
+</li></ol>
+
+<p>In the second case above, the result of ⎕RE is conceptually the same as if
+the EACH operator had been applied to ⎕RE:
 </p>
 <pre class="verbatim">    A ⎕RE B   ←→   A ⎕RE ¨ B
 </pre>
 <p>The libpcre2 first compiles A into an internal representation that improves
-the matching (of B) speed. As a consequence, if several strings are matched
+the matching (of B) speed. As a consequence, if several strings shall be matched
 with the same regular expression A, then it is (sometimes considerably) faster
-to call ⎕RE once with several nested than to call calling ⎕RE multiple times
-with the same A but different Bs. This is in particular the case when longer
-text files with many lines is being matched.
+to A ⎕RE B once with several items of a nested B, than to A ⎕RE B multiple
+times with the same A but different Bs. This is in particular the case when
+longer text files with many lines shall be matched.
 </p>
 <p>If multiple (nested) strings B are used then A is compiled once and after that
 the different ⊃B[i] in B are passed unmodified to libpcre2. In that
-case the result is nested and (⍴B) ≡ (⍴A ⎕RE[X] B). We can therefore limit
+case the result Z is nested and (⍴B) ≡ (⍴Z←A ⎕RE[X] B). We can therefore limit
 the description to the case where B is a simple character vector.
 </p>
 <p>Any string B that is passed to libpcre2 is called &quot;Subject&quot; in the
@@ -3861,70 +3875,77 @@ libpcre2 documentation.
 <a name="The-Flags-X"></a>
 <h4 class="subsection">2.33.5 The Flags X</h4>
 
-<p>Without any flags (or with an empty flag string X) ⎕RE returns the first
-match of the regular expression A in the string B. The flags will change
-this behavior in order to adapt various aspects of the matching to satisfy
-different requirements that the user of ⎕RE may have. The X argument of
-⎕RE is a character vector where each character is a flag. The different flag
-characters are either flags understood by (and then passed unmodified to)
-libpcre2 or flags understood by ⎕RE itself (and then not passed to libpcre2).
+<p>By default, i.e. without an axis argument X or - equivalently - with an empty
+string X←<strong>&quot;&quot;</strong> as axis argument, ⎕RE returns the first match of the regular
+expression A in the string B as an APL string.
 </p>
-<a name="libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x"></a>
-<h4 class="subsubsection">2.33.5.1 libpcre2 flags: i, m, s, and x</h4>
+<p>By means of the optional axis argument <strong>X ≢ &quot;&quot;</strong> (in the following called
+flags) one can change the default behavior in order to adapt various aspects
+of the matching to satisfy the requirements that the user of ⎕RE may have.
+</p>
+<p>The X argument of <strong>A⎕RE[X] B</strong> is a character vector where each character
+is a flag. Each flag is either understood by (and then passed unmodified to)
+libpcre2 or else understood by ⎕RE itself (and then not passed to libpcre2).
+</p>
+<a name="The-libpcre2-flags_003a-i_002c-m_002c-s_002c-and-x"></a>
+<h4 class="subsubsection">2.33.5.1 The libpcre2 flags: i, m, s, and x</h4>
 
 <p>The libpcre2 flags accepted by ⎕RE are: i, m, s, and x. They correspond to the
 following libpcre2 flags:
 </p>
 <ul>
-<li> i: PCRE2_CASELESS   (case insensitive matching)
-</li><li> m: PCRE2_MULTILINE  (matching across multiple lines)
-</li><li> s: PCRE2_DOTALL     (dot (.) also matches CR/LF)
+<li> i: PCRE2_CASELESS   (perform case insensitive matching)
+</li><li> m: PCRE2_MULTILINE  (perform matching across multiple lines)
+</li><li> s: PCRE2_DOTALL     (dot (.) in A also matches CR/LF)
 </li><li> x: PCRE2_EXTENDED   (see &rsquo;man pcre2pattern&rsquo;)
 </li></ul>
 
-<p>Please also consult the libpcre2 documentation for a description of these flags.
+<p>Please consult the libpcre2 documentation for a more detailed description
+of these flags.
 </p>
-<a name="The-APL-output-format-flags-_007c_002c-_005b_003f_005d_002c-and-_002f"></a>
-<h4 class="subsubsection">2.33.5.2 The APL output format flags ↓, ⊂, and /</h4>
+<a name="The-_005b_003f_005dRE-_0028APL-output-format_0029-flags-_007c_002c-_005b_003f_005d_002c-and-_002f"></a>
+<h4 class="subsubsection">2.33.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /</h4>
 
 <p>⎕RE provides different output formats, some of which are tailored to different
-APL functions. There are currently 4 different output formats:
+APL functions, so that these other APL functions can use the result of ⎕RE
+without major conversions . There are currently 4 different output formats:
 </p>
 <ul>
-<li> no flag: ⎕RE returns the matching sub-string of B
+<li> no ⎕RE flag: ⎕RE returns the matching sub-string(s) of B.
 
-</li><li> ↓ flag:  ⎕RE returns the position and the length of the matched sub-string of B,
-The result does not depend on ⎕IO and can be used by ↓ and ↑ to cut out the
-matched pieces.
+</li><li> ↓ flag:  ⎕RE returns the position(s) and the length(s) of the matched
+sub-string of B, Like other left arguments of ↑ or ↓, the string position(s)
+in the result start at 0 (i.e. not at ⎕IO) and can therefore be used directly
+by dyadic ↓ and ↑. For instance to  cut out the matched pieces.
 
 </li><li> ⊂ flag:  ⎕RE returns an integer vector suitable as the left argument of 
-   partition (⊂)
+   partition (dyadic ⊂).
 
 </li><li> / flag:  ⎕RE returns an Boolean vector suitable as the left argument of 
-   compress (/)
+   compress (dyadic /).
 </li></ul>
 
 <p>The following examples may better explain the nature of the output flags:
 </p>
-<pre class="verbatim">      ⍝ return matched string
+<pre class="verbatim">      ⍝ return (first) matched string
       4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
 ┏→━━┓
 ┃foo┃
 ┗━━━┛
 
-      ⍝ return possition and length
+      ⍝ return (first) pair (position, length)
       4 ⎕CR 'f..' ⎕RE['↓'] '__foo___fun____fox'
 ┏→━━┓
 ┃2 3┃
 ┗━━━┛
 
-      ⍝ return left argument of ⊂
+      ⍝ return left argument A of A ⊂ B
       4 ⎕CR 'f..' ⎕RE['⊂'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-      ⍝ return left argument of /
+      ⍝ return left argument A of A / B
       4 ⎕CR 'f..' ⎕RE['/'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
@@ -3936,24 +3957,30 @@ matched pieces.
 <a name="the-_005b_003f_005dRE-global-flag-g"></a>
 <h4 class="subsubsection">2.33.5.3 the ⎕RE global flag g</h4>
 
-<p>The default behavior of ⎕RE is to return only the first match in B.
-The &rsquo;g&rsquo; flag causes ⎕RE to return all matches. For example:
+<p>The default behavior of ⎕RE is to return only the first match of A in B.
+The &rsquo;g&rsquo; flag causes ⎕RE to return all matches instead. For example:
 </p>
-<pre class="verbatim">      4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
+<pre class="verbatim">      ⍝ return first match as string
+      4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
 ┏→━━┓
 ┃foo┃
 ┗━━━┛
+
+      ⍝ return all matches as strings
       4 ⎕CR 'f..' ⎕RE['g'] '__foo___fun____fox'
-┏→━━━━━━━━━━━━━━━━┓
+┏→━━━━━k━━━━━━━━━━━┓
 ┃┏→━━┓ ┏→━━┓ ┏→━━┓┃
 ┃┃foo┃ ┃fun┃ ┃fox┃┃
 ┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━┛
 
+      ⍝ return first match as pair (position, length)
       4 ⎕CR 'f..' ⎕RE['↓'] '__foo___fun____fox'
 ┏→━━┓
 ┃2 3┃
 ┗━━━┛
+
+      ⍝ return all matches as pair (position, length)
       4 ⎕CR 'f..' ⎕RE['↓g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━┓
 ┃┏→━━┓ ┏→━━┓ ┏→━━━┓┃
@@ -3961,28 +3988,39 @@ The &rsquo;g&rsquo; flag causes ⎕RE to return all matches. For example:
 ┃┗━━━┛ ┗━━━┛ ┗━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━┛
 
+      ⍝ return first match as left argument of ⊂ (aka. partition)
       4 ⎕CR 'f..' ⎕RE['⊂'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ return all matches as left argument of ⊂ (aka. partition)
       4 ⎕CR 'f..' ⎕RE['⊂g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 2 2 2 0 0 0 0 3 3 3┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+      ⍝ return first match as left argument of / (aka. compress)
       4 ⎕CR 'f..' ⎕RE['/'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ return all matches as left argument of / (aka. compress)
       4 ⎕CR 'f..' ⎕RE['/g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 1 1 1 0 0 0 0 1 1 1┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 </pre>
 <p>Please note that the &rsquo;g&rsquo; flag increments the depth of the result of the output
-formats string and position/length, but not of the result of output formats
-partition and compress.
+formats &rsquo;string&rsquo; and &rsquo;position/length&rsquo;, but not of the result of output formats
+&rsquo;partition&rsquo; and &rsquo;compress&rsquo;.
 </p>
+<p>The output formats ⊂ and / are related like this:
+</p>
+<pre class="verbatim">      A ⌷RE['/'] B   ←→   0 ≠ A  A ⌷RE['⊂'] B
+</pre>
+
 <a name="the-_005b_003f_005dRE-error-flag-E"></a>
 <h4 class="subsubsection">2.33.5.4 the ⎕RE error flag E</h4>
 
@@ -4004,7 +4042,10 @@ No match
 <p>The &rsquo;E&rsquo; flag has no effect if the &rsquo;g&rsquo; flag is also given because in that case
 it is natural to check the length of the result:
 </p>
-<pre class="verbatim">       'g..' ⎕RE['Eg'] '__foo___fun____fox'
+<pre class="verbatim">      4 ⎕CR 'g..' ⎕RE['Eg'] '__foo___fun____fox'
+┏⊖┓
+┃0┃
+┗━┛
 
 </pre>
 <a name="Complex-Matches"></a>

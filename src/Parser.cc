@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -680,7 +680,7 @@ Parser::create_scalar_value(Token & output)
              {
                Value_P scalar(LOC);
 
-               new (scalar->next_ravel())  CharCell(output.get_char_val());
+               scalar->next_ravel_Char(output.get_char_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
                output.move_1(tok, LOC);
@@ -689,34 +689,23 @@ Parser::create_scalar_value(Token & output)
 
         case TOK_INTEGER:
              {
-               Value_P scalar(LOC);
-
-               new (scalar->next_ravel())   IntCell(output.get_int_val());
-               scalar->check_value(LOC);
-               Token tok(TOK_APL_VALUE3, scalar);
+               Token tok(TOK_APL_VALUE3, IntScalar(output.get_int_val(), LOC));
                output.move_1(tok, LOC);
              }
              return;
 
         case TOK_REAL:
              {
-               Value_P scalar(LOC);
-
-               new (scalar->next_ravel())  FloatCell(output.get_flt_val());
-               scalar->check_value(LOC);
-               Token tok(TOK_APL_VALUE3, scalar);
+               Token tok(TOK_APL_VALUE3, FloatScalar(output.get_flt_val(), LOC));
                output.move_1(tok, LOC);
              }
              return;
 
         case TOK_COMPLEX:
              {
-               Value_P scalar(LOC);
-
-               new (scalar->next_ravel())   ComplexCell(output.get_cpx_real(),
-                                                        output.get_cpx_imag());
-               scalar->check_value(LOC);
-               Token tok(TOK_APL_VALUE3, scalar);
+               Token tok(TOK_APL_VALUE3,
+                         ComplexScalar(output.get_cpx_real(),
+                                       output.get_cpx_imag(), LOC));
                output.move_1(tok, LOC);
              }
              return;
@@ -733,44 +722,40 @@ Parser::create_scalar_value(Token & output)
 }
 //-----------------------------------------------------------------------------
 void
-Parser::create_vector_value(Token_string & tos,
-                            int pos, int count)
+Parser::create_vector_value(Token_string & tos, int pos, int count)
 {
-Value_P vector(count, LOC);
+Value_P Z(count, LOC);
 
    loop(l, count)
        {
-         Cell * addr = &vector->get_ravel(l);
          Token & tok = tos[pos + l];
 
          switch(tok.get_tag())
             {
               case TOK_CHARACTER:
-                   new (addr) CharCell(tok.get_char_val());
+                   Z->next_ravel_Char(tok.get_char_val());
                    tok.clear(LOC);   // invalidate token
                    break;
 
               case TOK_INTEGER:
-                   new (addr) IntCell(tok.get_int_val());
+                   Z->next_ravel_Int(tok.get_int_val());
                    tok.clear(LOC);   // invalidate token
                    break;
 
               case TOK_REAL:
-                   new (addr) FloatCell(tok.get_flt_val());
+                   Z->next_ravel_Float(tok.get_flt_val());
                    tok.clear(LOC);   // invalidate token
                    break;
 
               case TOK_COMPLEX:
-                   new (addr) ComplexCell(tok.get_cpx_real(),
-                                          tok.get_cpx_imag());
+                   Z->next_ravel_Complex(tok.get_cpx_real(),
+                                         tok.get_cpx_imag());
                    tok.clear(LOC);   // invalidate token
                    break;
 
             case TOK_APL_VALUE1:
             case TOK_APL_VALUE3:
-                 addr->init_from_value(tok.get_apl_val().get(),
-                                       vector.getref(), LOC);
-
+                 Z->next_ravel_Value(tok.get_apl_val().get());
                  tok.clear(LOC);   // invalidate token
                  break;
 
@@ -778,8 +763,8 @@ Value_P vector(count, LOC);
             }
        }
 
-   vector->check_value(LOC);
-Token tok(TOK_APL_VALUE3, vector);
+   Z->check_value(LOC);
+Token tok(TOK_APL_VALUE3, Z);
 
    tos[pos].move_1(tok, LOC);
 

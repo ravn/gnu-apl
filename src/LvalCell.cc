@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ LvalCell::check_consistency() const
 {
   if (value.lval)                      // valid owner
      {
-        const Cell * C0 = &value.pval.owner->get_ravel(0);
+        const Cell * C0 = &value.pval.owner->get_cfirst();
         const Cell * CN = C0 + value.pval.owner->nz_element_count();
        if (value.lval < C0 || value.lval >= CN)   // wrong owner
           {

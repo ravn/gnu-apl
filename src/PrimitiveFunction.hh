@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,8 +31,9 @@
 
 class ArrayIterator;
 class CharCell;
-class IntCell;
 class CollatingCache;
+class ConstRavel_P;
+class IntCell;
 
 //-----------------------------------------------------------------------------
 /**
@@ -247,18 +248,22 @@ public:
 
    static Bif_F12_ENCODE * fun;   ///< Built-in function
    static Bif_F12_ENCODE  _fun;   ///< Built-in function
+
 protected:
-   /// encode b according to A (integer A and b)
-   static void encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
-                      const Cell * cA, APL_Integer b);
+   /// encode *ib() according to A (integer A and b)
+   static void encode_Int(Value & Z, ShapeItem aH, ShapeItem aL,
+                          const ConstRavel_P & iA,
+                          const ConstRavel_P & iB);
 
-   /// encode b according to A
-   static void encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
-                      const Cell * cA, APL_Float b, double qct);
+   /// encode *ib() according to A
+   static void encode_Flt(Value & Z, ShapeItem ah, ShapeItem al,
+                          const ConstRavel_P & iA, const ConstRavel_P & iB,
+                         double qct);
 
-   /// encode B according to A
-   static void encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
-                      const Cell * cA, APL_Complex b, double qct);
+   /// encode *ib() according to A
+   static void encode_Cpx(Value & Z, ShapeItem aH, ShapeItem aL,
+                          const ConstRavel_P & iA, const ConstRavel_P & iB,
+                          double qct);
 };
 //-----------------------------------------------------------------------------
 /** System function decode */
@@ -278,16 +283,16 @@ public:
    static Bif_F12_DECODE  _fun;   ///< Built-in function
 protected:
    /// decode B according to len_A and cA (integer A, B and Z)
-   static bool decode_int(Cell * cZ, ShapeItem len_A, const Cell * cA,
+   static bool decode_int(Value & Z, ShapeItem len_A, const Cell * cA,
                           ShapeItem len_B, const Cell * cB, ShapeItem dB);
 
    /// decode B according to len_A and cA (real A and B)
-   static void decode_real(Cell * cZ, ShapeItem len_A, const Cell * cA,
+   static void decode_real(Value & Z, ShapeItem len_A, const Cell * cA,
                            ShapeItem len_B, const Cell * cB, ShapeItem dB,
                            double qct);
 
    /// decode B according to len_A and cA (complex A or B)
-   static void decode_complex(Cell * cZ, ShapeItem len_A, const Cell * cA,
+   static void decode_complex(Value & Z, ShapeItem len_A, const Cell * cA,
                               ShapeItem len_B, const Cell * cB, ShapeItem dB,
                               double qct);
 };

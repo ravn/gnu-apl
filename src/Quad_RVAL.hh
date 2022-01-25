@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,20 +70,19 @@ protected:
    static int choose_integer(const vector<int> & dist);
 
    /// initialize \b cell with a random character
-   static void random_character(Cell * cell);
+   static void random_character(Value & Z);
 
    /// initialize \b cell with a random integer
-   static void random_integer(Cell * cell);
+   static void random_integer(Value & Z);
 
    /// initialize \b cell with a random float
-   static void random_float(Cell * cell);
+   static void random_float(Value & Z);
 
    /// initialize \b cell with a random complex number
-   static void random_complex(Cell * cell);
+   static void random_complex(Value & Z);
 
    /// initialize \b cell with a random nested value
-   static void random_nested(Cell * cell, Value & cell_owner,
-                             const Value & B, int depth);
+   static void random_nested(Value & Z, const Value & B, int depth);
 
    /// return a 17-bit random number
    // of random_r()

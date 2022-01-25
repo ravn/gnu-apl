@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -448,6 +448,18 @@ const Value_P * X = current_stack.locate_X();
    if (X)   *const_cast<Value_P *>(X) = new_value;
 }
 //-----------------------------------------------------------------------------
+const StateIndicator *
+StateIndicator::find_child(const StateIndicator * parent)
+{
+   for (const StateIndicator * si = Workspace::SI_top();
+        si; si = si->get_parent())
+       {
+         if (parent == si->get_parent())   return si;   // found child si
+       }
+
+   return 0;   // si is Workspace::SI_top()
+}
+//-----------------------------------------------------------------------------
 int
 StateIndicator::nth_push(const Symbol * sym, int from_tos) const
 {
@@ -472,7 +484,7 @@ std::vector<const StateIndicator *> stack;
          if (0 == --from_tos)   return si->get_level();
        }
 
-   FIXME;
+   FIXME;   // mot reached
 }
 //-----------------------------------------------------------------------------
 Function_Line

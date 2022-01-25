@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ class PrimitiveFunction;
 
 #include <vector>
 
+#include "ConstCell_P.hh"
 #include "PrimitiveFunction.hh"
 
 /**
@@ -48,7 +49,6 @@ public:
      error(E_NO_ERROR),
      fun(0),
      fun1(0),
-     cB(0),
      cZ(0)
    {}
 
@@ -60,7 +60,7 @@ public:
         error = other.error;
         fun = other.fun;
         fun1 = other.fun1;
-        cB = other.cB;
+        new (&cB) ConstCell_P(other.cB);
         cZ = other.cZ;
       }
 
@@ -71,8 +71,8 @@ public:
      error(E_NO_ERROR),
      fun(0),
      fun1(0),
-     cB(&B.get_ravel(0)),
-     cZ(&Z->get_ravel(0))
+     cB(B, 1),
+     cZ(&Z->get_wravel(0))
    {}
 
    /// the value being computed
@@ -100,7 +100,7 @@ public:
 
 protected:
    /// ravel of the right argument
-   const Cell * cB;
+   ConstCell_P cB;
 
    /// ravel of the result
    Cell * cZ;
@@ -119,8 +119,6 @@ public:
      error(E_NO_ERROR),
      fun(0),
      fun2(0),
-     cA(0),
-     cB(0),
      cZ(0)
    {}
 
@@ -134,24 +132,52 @@ public:
         error   = other.error;
         fun     = other.fun;
         fun2    = other.fun2;
-        cA      = other.cA;
-        cB      = other.cB;
+        new (&cA) ConstCell_P(other.cA);
+        new (&cB) ConstCell_P(other.cB);
         cZ      = other.cZ;
-        Assert(cB);
       }
 
-   /// constructor
-   PJob_scalar_AB(Value * Z, const Cell * _cA, int iA, const Cell * _cB, int iB)
+   /// constructor: A and B nested
+   PJob_scalar_AB(Value * Z, const Value & _A, int _inc_A,
+                             const Value & _B, int _inc_B)
    : value_Z(Z),
      len_Z(Z->nz_element_count()),
-     inc_A(iA),
-     inc_B(iB),
+     inc_A(_inc_A),
+     inc_B(_inc_B),
      error(E_NO_ERROR),
      fun(0),
      fun2(0),
-     cA(_cA),
-     cB(_cB),
-     cZ(&Z->get_ravel(0))
+     cA(_A, _inc_A),
+     cB(_B, _inc_B),
+     cZ(&Z->get_wravel(0))
+   {}
+
+   /// constructor: A nested, B simple
+   PJob_scalar_AB(Value * Z, const Value & _A, int _inc_A, const Cell & cell_B)
+   : value_Z(Z),
+     len_Z(Z->nz_element_count()),
+     inc_A(_inc_A),
+     inc_B(0),
+     error(E_NO_ERROR),
+     fun(0),
+     fun2(0),
+     cA(_A, _inc_A),
+     cB(cell_B),
+     cZ(&Z->get_wravel(0))
+   {}
+
+   /// constructor: A simple, B nested
+   PJob_scalar_AB(Value * Z, const Cell & cell_A, const Value & _B, int _inc_B)
+   : value_Z(Z),
+     len_Z(Z->nz_element_count()),
+     inc_A(0),
+     inc_B(_inc_B),
+     error(E_NO_ERROR),
+     fun(0),
+     fun2(0),
+     cA(cell_A),
+     cB(_B, _inc_B),
+     cZ(&Z->get_wravel(0))
    {}
 
    /// A value (e.g parallel ~Value())
@@ -189,10 +215,10 @@ public:
 
 protected:
    /// ravel of the left argument
-   const Cell * cA;
+   ConstCell_P cA;
 
    /// ravel of the right argument
-   const Cell * cB;
+   ConstCell_P cB;
 
    /// ravel of the result
    Cell * cZ;

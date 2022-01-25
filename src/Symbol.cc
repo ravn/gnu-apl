@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -146,7 +146,8 @@ ValueStackItem & vs = value_stack.back();
              return;
 
         case NC_LABEL:
-             MORE_ERROR() << "attempt to assign a value to label " << get_name();
+             MORE_ERROR() << "attempt to assign a value to label "
+                          << get_name();
         case NC_VARIABLE:
              if (vs.apl_val == new_value)   return;   // X←X
 
@@ -168,46 +169,52 @@ ValueStackItem & vs = value_stack.back();
 void
 Symbol::assign_indexed(Value_P X, Value_P B)   // A[X] ← B
 {
-   // this function is called for A[X}←B when X is one-dimensional, i.e.
-   // an index with no semicolons. If X contains semicolons, then
-   // assign_indexed(IndexExpr IX, ...) is called instead.
+   // this function is only called for A[X}←B when X is one-dimensional,
+   // i.e. an index with no semicolons. If X contains semicolons, then
+   // Symbol::assign_indexed(IndexExpr IX, ...) is called instead.
    // 
 const APL_Integer qio = Workspace::get_IO();
 
-Value_P A = get_apl_value();
+Value_P A = get_apl_value();  // the current APL value of this Symbol
 
    if (A->is_member())
       {
+        // A is indexed with a member name, e.g. A['member'] ← 42
         const UCS_string name(X.getref());
         Cell * data = A->get_member_data(name);
         if (data)   // member exists
            {
-             if (data->is_pointer_cell() && data->get_pointer_value()->is_member())
+             if (data->is_pointer_cell() &&
+                 data->get_pointer_value()->is_member())
                 {
-                  MORE_ERROR() << "member access: cannot override non-leaf member "
-                               << name << " of variable " << get_name()
-                               << ".\n      )ERASE or ⎕EX that member first.";
+                  MORE_ERROR()
+                     << "member access: cannot override non-leaf member "
+                     << name << " of variable " << get_name()
+                     << ".\n      )ERASE or ⎕EX that member first.";
                   DOMAIN_ERROR;
                 }
            }
-        else                                       // new member
+        else        // new member
            {
              data = A->get_new_member(name);
            }
-        data->release(LOC);
+        data->release(LOC);   // release old content
         data->init_from_value(B.get(), A.getref(), LOC);
         return;
       }
 
 const ShapeItem max_idx = A->element_count();
-   if (+X && X->is_scalar() && B->is_scalar() && A->get_rank() == 1)
+   if (+X             &&     // X exists,      and
+       X->is_scalar() &&     // X is a scalar, and
+       B->is_scalar() &&     // B is a scalar, and
+       A->get_rank() == 1)   // A is a vector
       {
-        const APL_Integer idx = X->get_ravel(0).get_near_int() - qio;
-        if (idx >= 0 && idx < max_idx)
+        const APL_Integer idx = X->get_cfirst().get_near_int() - qio;
+        if (idx >= 0 && idx < max_idx)   // idx is a valid index of A
            {
-             Cell & cell = A->get_ravel(idx);
-             cell.release(LOC);
-             cell.init(B->get_ravel(0), A.getref(), LOC);
+             Cell & cell = A->get_wravel(idx);
+             cell.release(LOC);   // release the old value if A[X]
+             cell.init(B->get_cfirst(), A.getref(), LOC);   // A[X] ← ↑B
              return;
            }
       }
@@ -216,10 +223,11 @@ const ShapeItem max_idx = A->element_count();
 
    if (!X)   // X[] ← B
       {
-        const Cell & src = B->get_ravel(0);
+        // scalar B is scalar extended according to ⍴A
+        const Cell & src = B->get_cfirst();
         loop(a, max_idx)
             {
-              Cell & dest = A->get_ravel(a);
+              Cell & dest = A->get_wravel(a);
               dest.release(LOC);   // free sub-values etc (if any)
               dest.init(src, A.getref(), LOC);
             }
@@ -230,8 +238,8 @@ const ShapeItem max_idx = A->element_count();
 const ShapeItem ec_B = B->element_count();
 const ShapeItem ec_X = X->element_count();
 const int incr_B = (ec_B == 1) ? 0 : 1;   // maybe scalar extend B
-const Cell * cX = &X->get_ravel(0);
-const Cell * cB = &B->get_ravel(0);
+const Cell * cX = &X->get_cfirst();
+const Cell * cB = &B->get_cfirst();
 
    if (ec_B != 1 && ec_B != ec_X)   LENGTH_ERROR;
 
@@ -240,7 +248,7 @@ const Cell * cB = &B->get_ravel(0);
         const ShapeItem idx = cX++->get_near_int() - qio;
         if (idx < 0)          INDEX_ERROR;
         if (idx >= max_idx)   INDEX_ERROR;
-        Cell & dest = A->get_ravel(idx);
+        Cell & dest = A->get_wravel(idx);
         dest.release(LOC);   // free sub-values etc (if any)
         dest.init(*cB, A.getref(), LOC);
 
@@ -317,7 +325,7 @@ Value_P A = get_apl_value();
 MultiIndexIterator mult(A->get_shape(), IX);
 
 const ShapeItem ec_B = B->element_count();
-const Cell * cB = &B->get_ravel(0);
+const Cell * cB = &B->get_cfirst();
 const int incr_B = (ec_B == 1) ? 0 : 1;
 
    while (mult.more())
@@ -325,7 +333,7 @@ const int incr_B = (ec_B == 1) ? 0 : 1;
         const ShapeItem offset_A = mult++;
         if (offset_A < 0)                     INDEX_ERROR;
         if (offset_A >= A->element_count())   INDEX_ERROR;
-        Cell & dest = A->get_ravel(offset_A);
+        Cell & dest = A->get_wravel(offset_A);
         dest.release(LOC);   // free sub-values etc (if any)
         dest.init(*cB, A.getref(), LOC);
         cB += incr_B;
@@ -550,7 +558,7 @@ Symbol::get_first_cell() const
 {
    Assert(value_stack.size() > 0);
    if (value_stack.back().name_class != NC_VARIABLE)   return 0;
-   return &value_stack.back().apl_val->get_ravel(0);
+   return &value_stack.back().apl_val->get_cfirst();
 }
 //-----------------------------------------------------------------------------
 bool
@@ -606,36 +614,22 @@ const ValueStackItem & vs = value_stack.back();
 }
 //-----------------------------------------------------------------------------
 void
-Symbol::get_attributes(int mode, Cell * dest) const
+Symbol::get_attributes(int mode, Value & Z) const
 {
 const ValueStackItem & vs = value_stack.back();
-bool has_result = false;
-int fun_valence = 0;
-int oper_valence = 0;
-double created = 0.0;
-static int exec_prop[] = { 0, 0, 0, 0 };
-const int * exec_properties = exec_prop;
+int has_result = 0;   // no result
 
    switch(vs.name_class)
       {
         case NC_LABEL:
         case NC_VARIABLE:
-             has_result = true;
+             has_result = 1;
              break;
 
         case NC_FUNCTION:
-             has_result = vs.sym_val.function->has_result();
-             fun_valence = vs.sym_val.function->get_fun_valence();
-             created = vs.sym_val.function->get_creation_time();
-             exec_properties = vs.sym_val.function->get_exec_properties();
-             break;
-
         case NC_OPERATOR:
-             fun_valence = vs.sym_val.function->get_fun_valence();
-             oper_valence = vs.sym_val.function->get_oper_valence();
-             created = vs.sym_val.function->get_creation_time();
-             exec_properties = vs.sym_val.function->get_exec_properties();
-             break;
+             vs.sym_val.function->get_attributes(mode, Z);
+             return;
 
         default: break;
       }
@@ -643,43 +637,14 @@ const int * exec_properties = exec_prop;
    switch(mode)
       {
         case 1: // valences
-                new (dest + 0) IntCell(has_result ? 1 : 0);
-                new (dest + 1) IntCell(fun_valence);
-                new (dest + 2) IntCell(oper_valence);
+                Z.next_ravel_Int(has_result);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
                 break;
 
         case 2: // creation time
-                if (created == 0.0)   // system function
-                   {
-                     new (dest + 0) IntCell(0);
-                     new (dest + 1) IntCell(0);
-                     new (dest + 2) IntCell(0);
-                     new (dest + 3) IntCell(0);
-                     new (dest + 4) IntCell(0);
-                     new (dest + 5) IntCell(0);
-                     new (dest + 6) IntCell(0);
-                   }
-                else                       // user define function
-                   {
-                     tm tc;
-                     const time_t time = created;
-                     localtime_r(&time, &tc);
-
-                     new (dest + 0) IntCell(1900 + tc.tm_year);
-                     new (dest + 1) IntCell(   1 + tc.tm_mon );
-                     new (dest + 2) IntCell(       tc.tm_mday);
-                     new (dest + 3) IntCell(       tc.tm_hour);
-                     new (dest + 4) IntCell(       tc.tm_min);
-                     new (dest + 5) IntCell(       tc.tm_sec);
-                     new (dest + 6) IntCell((created - time) / 1000);
-                   }
-                break;
-
         case 3: // execution properties
-                new (dest + 0) IntCell(exec_properties[0]);
-                new (dest + 1) IntCell(exec_properties[1]);
-                new (dest + 2) IntCell(exec_properties[2]);
-                new (dest + 3) IntCell(exec_properties[3]);
+                loop(j, Z.element_count())   Z.next_ravel_Int(0);
                 break;
 
         case 4: {
@@ -688,8 +653,8 @@ const int * exec_properties = exec_prop;
                   const int brutto = val->total_size_brutto(cdr_type);
                   const int data = val->data_size(cdr_type);
 
-                  new (dest + 0) IntCell(brutto);
-                  new (dest + 1) IntCell(data);
+                  Z.next_ravel_Int(brutto);
+                  Z.next_ravel_Int(data);
                 }
                 break;
 
@@ -966,17 +931,18 @@ const NameClass nc = value_stack.back().name_class;
 void
 Symbol::write_OUT(FILE * out, uint64_t & seq) const
 {
-const NameClass nc = value_stack[0].name_class;
-
 char buffer[128];   // a little bigger than needed - don't use sizeof(buffer)
 UCS_string data;
 
+const NameClass nc = value_stack[0].name_class;
    switch(nc)
       {
         case NC_VARIABLE:
              {
                data.append(UNI_A);
-               Quad_TF::tf2_var(get_name(), value_stack[0].apl_val);
+               Token tok = Quad_TF::tf2_var(get_name(), value_stack[0].apl_val);
+               const UCS_string ucs(*tok.get_apl_val());
+               data.append(ucs);
              }
              break;
 
@@ -1107,7 +1073,7 @@ Symbol::vector_assignment(std::vector<Symbol *> & symbols, Value_P values)
        size_t(values->element_count()) != symbols.size())   LENGTH_ERROR;
 
 const int incr = values->is_scalar() ? 0 : 1;
-const Cell * cV = &values->get_ravel(0);
+const Cell * cV = &values->get_cfirst();
    loop(s, symbols.size())
       {
         Symbol * sym = symbols[symbols.size() - s - 1];
@@ -1118,7 +1084,7 @@ const Cell * cV = &values->get_ravel(0);
         else
            {
              Value_P val(LOC);
-             val->next_ravel()->init(*cV, val.getref(), LOC);
+             val->next_ravel_Cell(*cV);
              val->check_value(LOC);
              sym->assign(val, true, LOC);
            }

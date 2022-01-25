@@ -162,18 +162,20 @@ static Connection *value_to_db_id( Value_P value )
         throw_illegal_db_id();
     }
 
-    int db_id = value->get_ravel( 0 ).get_int_value();
-    return db_id_to_connection( db_id );
+    const int db_id = value->get_cfirst().get_int_value();
+    return db_id_to_connection(db_id);
  }
 //-----------------------------------------------------------------------------
 static Token close_database( Value_P B )
 {
-    if (!B->is_int_scalar( ) ) {
-        MORE_ERROR() << "Close database command requires database id as argument";
+    if (!B->is_int_scalar())
+       {
+         MORE_ERROR() <<
+         "Close database command requires database id as argument";
         DOMAIN_ERROR;
-    }
+       }
 
-    int db_id = B->get_ravel(0).get_int_value();
+    int db_id = B->get_cfirst().get_int_value();
     if (db_id < 0 || db_id >= connections.size())
        {
          throw_illegal_db_id();
@@ -196,7 +198,7 @@ run_generic_one_query(ArgListBuilder *arg_list, Value_P B, int start,
                       int num_args, bool ignore_result )
 {
     for( int i = 0 ; i < num_args ; i++ ) {
-        const Cell &cell = B->get_ravel( start + i );
+        const Cell &cell = B->get_cravel( start + i );
         if( cell.is_integer_cell() ) {
             arg_list->append_long( cell.get_int_value(), i );
         }
@@ -315,10 +317,10 @@ static Token show_tables( Value_P B )
     else {
         Shape shape( tables.size () );
         value = Value_P( shape, LOC );
-        for( vector<string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
-            new (value->next_ravel()) PointerCell( make_string_cell( *i, LOC ).get(),
-               value.getref() );
-        }
+        for (vector<string>::iterator i = tables.begin();i != tables.end(); i++)
+            {
+              value->next_ravel_Pointer(make_string_cell(*i, LOC).get());
+            }
     }
 
     value->check_value( LOC );
@@ -331,39 +333,39 @@ show_cols(Value_P A, Value_P B)
 Connection * conn = value_to_db_id(A);
 vector<ColumnDescriptor> cols;
 
-    if( !B->is_apl_char_vector() ) {
+   if (!B->is_apl_char_vector())
+      {
         MORE_ERROR() << "Illegal table name";
         VALUE_ERROR;
-    }
+      }
 
 string name = to_string(B->get_UCS_ravel());
-    conn->fill_cols(name, cols);
+   conn->fill_cols(name, cols);
 
-Value_P value;
-    if( cols.size() == 0 ) {
-        value = Idx0( LOC );
-    }
-    else {
-        Shape shape(cols.size(), 2);
-        value = Value_P(shape, LOC);
-        for( vector<ColumnDescriptor>::iterator i = cols.begin() ; i != cols.end() ; i++ ) {
-            new (value->next_ravel())
-                PointerCell(make_string_cell(i->get_name(), LOC ).get(),
-                            value.getref());
+   if (cols.size() == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));
 
-            Value_P type;
-            if( i->get_type().size() == 0 ) {
-                type = Str0( LOC );
+Shape shape(cols.size(), 2);
+Value_P Z(shape, LOC);
+
+   for (vector<ColumnDescriptor>::iterator i = cols.begin();
+        i != cols.end(); i++)
+       {
+         Z->next_ravel_Pointer(make_string_cell(i->get_name(), LOC).get());
+
+         if (i->get_type().size() == 0)
+            {
+              Value_P type = Str0(LOC);
+              Z->next_ravel_Pointer(type.get());
             }
-            else {
-                type = make_string_cell( i->get_type(), LOC );
+         else
+            {
+              Value_P type = make_string_cell( i->get_type(), LOC );
+              Z->next_ravel_Pointer(type.get());
             }
-            new (value->next_ravel()) PointerCell( type.get(), value.getref() );
-        }
-    }
+       }
 
-    value->check_value( LOC );
-    return Token( TOK_APL_VALUE1, value );
+    Z->check_value( LOC );
+    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
 Token
@@ -385,31 +387,20 @@ Quad_SQL::eval_XB(Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
 
-const int function_number = X->get_ravel( 0 ).get_near_int( );
+const int function_number = X->get_cfirst().get_near_int( );
 
-    switch( function_number ) {
-    case 0:
-        return list_functions( CERR );
+    switch(function_number)
+       {
+         case 0: return list_functions(CERR);
+         case 2: return close_database(B);
+         case 5: return run_transaction_begin(B);
+         case 6: return run_transaction_commit(B);
+         case 7: return run_transaction_rollback(B);
+         case 8: return show_tables(B);
 
-    case 2:
-        return close_database( B );
-
-    case 5:
-        return run_transaction_begin( B );
-
-    case 6:
-        return run_transaction_commit( B );
-
-    case 7:
-        return run_transaction_rollback( B );
-
-    case 8:
-        return show_tables( B );
-
-    default:
-        MORE_ERROR() << "Illegal function number";
-        DOMAIN_ERROR;
-    }
+         default: MORE_ERROR() << "Illegal function number " << function_number;
+                  DOMAIN_ERROR;
+       }
 }
 //-----------------------------------------------------------------------------
 static Connection *param_to_db( Value_P X )
@@ -419,7 +410,7 @@ static Connection *param_to_db( Value_P X )
         MORE_ERROR() << "Database id missing from axis parameter";
         RANK_ERROR;
     }
-    return db_id_to_connection( X->get_ravel( 1 ).get_near_int( ) );
+    return db_id_to_connection( X->get_cravel( 1 ).get_near_int( ) );
 }
 //-----------------------------------------------------------------------------
 Token
@@ -427,7 +418,7 @@ Quad_SQL::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
 
-    const int function_number = X->get_ravel( 0 ).get_near_int( );
+    const int function_number = X->get_cravel( 0 ).get_near_int( );
 
     switch( function_number ) {
     case 0:
@@ -467,7 +458,7 @@ make_string_cell( const std::string &string, const char *loc )
     Shape shape( s.size() );
     Value_P cell( shape, loc );
     for( int i = 0 ; i < s.size() ; i++ ) {
-        new (cell->next_ravel()) CharCell( s[i] );
+        cell->next_ravel_Char( s[i] );
     }
     cell->check_value( loc );
     return cell;

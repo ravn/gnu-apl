@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,16 +60,19 @@ Bif_F12_FORMAT::eval_B(Value_P B) const
             {
               UCS_string row = pb.get_line(y);
               row.map_pad();
-              loop(x, cols)   new (Z->next_ravel()) CharCell(row[x]);
+              loop(x, cols)   Z->next_ravel_Char(row[x]);
             }
 
+        Z->check_value(LOC);
+
+        // turn 1-line matrices into vectors
+        //
         if (Z->get_rank() == 2 && Z->get_shape().get_shape_item(0) == 1)
            {
              Shape sh(Z->get_shape().get_shape_item(1));
              Z->set_shape(sh);
            }
 
-        Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
@@ -194,8 +197,8 @@ Value_P Z;
    loop(w, width)
       {
         const Unicode uni = pb.get_char(w, h);
-        if (is_iPAD_char(uni))  new (Z->next_ravel()) CharCell(UNI_SPACE);
-        else                    new (Z->next_ravel()) CharCell(uni);
+        if (is_iPAD_char(uni))  Z->next_ravel_Char(UNI_SPACE);
+        else                    Z->next_ravel_Char(uni);
       }
 
    Z->check_value(LOC);
@@ -274,7 +277,7 @@ Value_P Z(shape_Z, LOC);
              UCS_string row;
              loop(c, cols)
                 {
-                  const Cell & cB = B->get_ravel(c + r*cols);
+                  const Cell & cB = B->get_cravel(c + r*cols);
                   if (!cB.is_real_cell())   DOMAIN_ERROR;
 
                   const APL_Float value = cB.get_real_value();
@@ -288,7 +291,7 @@ Value_P Z(shape_Z, LOC);
 
              Assert(row.size() == all_formats.size());
              loop(c, row.size())
-                new (&Z->get_ravel(r*all_formats.size() + c)) CharCell(row[c]);
+                Z->set_ravel_Char(r*all_formats.size() + c, row[c]);
            }
       }
    catch (Error err)
@@ -929,8 +932,8 @@ const ShapeItem len_A = A->element_count();
         ShapeItem W = 0;
         loop(c, cols_B)
            {
-             if (len_A <= 2)   W += A->get_ravel(0).get_near_int();
-             else              W += A->get_ravel(2*c).get_near_int();
+             if (len_A <= 2)   W += A->get_cfirst().get_near_int();
+             else              W += A->get_cravel(2*c).get_near_int();
            }
 
         Shape shape_Z = shape_B.without_axis(shape_B.get_rank() - 1);
@@ -938,7 +941,7 @@ const ShapeItem len_A = A->element_count();
         const ShapeItem ec_Z = shape_Z.get_volume();
 
         Value_P Z(shape_Z, LOC);
-        loop(z, ec_Z)   new (Z->next_ravel()) CharCell(UNI_SPACE);
+        loop(z, ec_Z)   Z->next_ravel_Char(UNI_SPACE);
 
         Z->set_default_Spc();
         return Z;
@@ -954,21 +957,21 @@ PrintBuffer pb;
          if (len_A == 1)
             {
               col_width = 0;
-              precision = A->get_ravel(0).get_near_int();
+              precision = A->get_cfirst().get_near_int();
             }
          else if (len_A == 2)
             {
-              col_width = A->get_ravel(0).get_near_int();
-              precision = A->get_ravel(1).get_near_int();
+              col_width = A->get_cfirst().get_near_int();
+              precision = A->get_cravel(1).get_near_int();
             }
          else
             {
-              col_width = A->get_ravel(2*col)    .get_near_int();
-              precision = A->get_ravel(2*col + 1).get_near_int();
+              col_width = A->get_cravel(2*col)    .get_near_int();
+              precision = A->get_cravel(2*col + 1).get_near_int();
             }
 
          PrintBuffer pb_col(format_one_col_by_spec(col_width, precision,
-                                         &B->get_ravel(col), cols_B, rows_B));
+                                         &B->get_cravel(col), cols_B, rows_B));
 
          if (col_width == 0)   pb_col.pad_l(UNI_SPACE, 1);
 
@@ -984,7 +987,7 @@ Shape shape_Z(shape_B);
 Value_P Z(shape_Z, LOC);
 
    loop(h, pb_h)
-   loop(w, pb_w)   new (Z->next_ravel()) CharCell(pb.get_char(w, h));
+   loop(w, pb_w)   Z->next_ravel_Char(pb.get_char(w, h));
 
    return Z;
 }
@@ -1014,7 +1017,7 @@ bool has_complex = false;
 
    if (has_complex)
       {
-         // split cB into real and imag parts...
+         // split cB into vectors real and imag...
          Value_P real(rows, LOC);
          Value_P imag(rows, LOC);
          loop(r, rows)
@@ -1022,21 +1025,21 @@ bool has_complex = false;
               const Cell & cell = cB[r*cols];
               if (cell.is_complex_cell())
                  {
-                   new (real->next_ravel()) FloatCell(cell.get_real_value());
-                   new (imag->next_ravel()) FloatCell(cell.get_imag_value());
+                   real->next_ravel_Float(cell.get_real_value());
+                   imag->next_ravel_Float(cell.get_imag_value());
                  }
               else
                  {
-                   real->next_ravel()->init(cell, real.getref(), LOC);
-                   new (imag->next_ravel()) CharCell(UNI_SPACE);
+                   real->next_ravel_Cell(cell);
+                   imag->next_ravel_Char(UNI_SPACE);
                  }
             }
 
          PrintBuffer pb_real = format_one_col_by_spec(width, precision,
-                                                      &real->get_ravel(0), 1,
+                                                      &real->get_cfirst(), 1,
                                                       rows);
          PrintBuffer pb_imag = format_one_col_by_spec(width, precision,
-                                                      &imag->get_ravel(0), 1,
+                                                      &imag->get_cfirst(), 1,
                                                       rows);
 
          PrintBuffer pb_real_imag;

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -403,7 +403,7 @@ void
 Workspace::write_OUT(FILE * out, uint64_t & seq, const UCS_string_vector
                      & objects)
 {
-   // if objects is empty then write all user define objects and some system
+   // if objects is empty then write all user defined objects and some system
    // variables
    //
    if (objects.size() == 0)   // all objects plus some system variables

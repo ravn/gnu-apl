@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "CharCell.hh"
 #include "ComplexCell.hh"
 #include "Command.hh"
+#include "ConstCell_P.hh"
 #include "FloatCell.hh"
 #include "Id.hh"
 #include "IndexExpr.hh"
@@ -126,7 +127,7 @@ Bif_F12_RHO::eval_B(Value_P B) const
 {
 Value_P Z(B->get_rank(), LOC);
 
-   loop(r, B->get_rank())   new (Z->next_ravel()) IntCell(B->get_shape_item(r));
+   loop(r, B->get_rank())   Z->next_ravel_Int(B->get_shape_item(r));
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -150,37 +151,49 @@ const Shape shape_Z(A.get(), 0);
 
 const ShapeItem len_Z = shape_Z.get_volume();
 
-   if (len_Z <= B->element_count()   &&
-       B->get_owner_count() == 2 && 
+   if (len_Z <= B->element_count() &&   // Z is not longer than B
+       B->get_owner_count() == 2   &&   // B is a temporary value
        this == Workspace::SI_top()->get_prefix().get_dyadic_fun())
       {
-        // at this point Z is not greater than B and B has only 2 owners:
-        // the prefix (who will discard it after we return) and our Value_P B
-        //
-        // Since we will give up our ownership) and prefix will
-        //  pop_args_push_result() in reduce_A_F_B_(), B is no longer used
-        // and we can reshape it in place instead of copying B into a new Z.
-        //
+        /* Optimization of Z←B. At this point:
+
+          1. Z is not longer than B, and
+          2. B has only 2 owners:
+             2a. the prefix (who will discard it after we return), and
+             2b. our Value_P B.
+          3. A⍴B was called from a reduction rule (Prefix::reduce_A_F_B())
+
+           We will give up our ownership 2a. on return ret; below, and
+           Prefix::reduce_A_F_B prefix will Prefix::pop_args_push_result()
+           and hence give up its ownership 2b, causeing B to be erased.
+
+           That means that B will no longer be used and that, instead of
+           of copying B into a new Z and then erasing B, we can reshape B
+           in place and return the reshaped B.
+
+           return Token(TOK_APL_VALUE1, B); below will take ownership of B
+           so that Prefix::reduce_A_F_B() won't erase B.
+         */
         Log(LOG_optimization) CERR << "optimizing A⍴B" << endl;
 
-        // release unused cells
+        // release the no longer used cells of B after shape_Z.
         //
         const ShapeItem len_B = B->element_count();
         ShapeItem rest = len_Z;
-        if (rest == 0)
+        if (rest == 0)   // Z is empty
            {
              rest = 1;
-             if (B->get_ravel(0).is_pointer_cell())
+             if (B->get_cproto().is_pointer_cell())
                 {
-                  B->get_ravel(0).get_pointer_value()->to_proto();
+                  B->get_cproto().get_pointer_value()->to_proto();
                 }
              else
                 {
-                   B->get_ravel(0).init_type(B->get_ravel(0), B.getref(), LOC);
+                   B->get_wproto().init_type(B->get_cproto(), B.getref(), LOC);
                 }
            }
 
-        while (rest < len_B)   B->get_ravel(rest++).release(LOC);
+        while (rest < len_B)   B->get_wravel(rest++).release(LOC);
 
         B->set_shape(shape_Z);
 
@@ -212,15 +225,13 @@ const ShapeItem len_Z = shape_Z.get_volume();
 
 Value_P Z(shape_Z, LOC);
 
-   if (len_B == 0)   // empty B: use prototype
+   if (len_B == 0)   // empty B: use prototype of B for all cells of Z
       {
-        loop(z, len_Z)
-            Z->next_ravel()->init_type(B.get_ravel(0), Z.getref(), LOC);
+        loop(z, len_Z)   Z->next_ravel_Proto(B.get_cproto());
       }
    else
       {
-        loop(z, len_Z)
-            B.get_ravel(z % len_B).init_other(Z->next_ravel(), Z.getref(), LOC);
+        loop(z, len_Z)   Z->next_ravel_Cell(B.get_cravel(z % len_B));
       }
 
    Z->set_default(B, LOC);
@@ -242,14 +253,20 @@ const Shape3 shape_B3(B->get_shape(), axis);
 Value_P Z(B->get_shape(), LOC);
 
    loop(h, shape_B3.h())
-   loop(l, shape_B3.l())
        {
-         const ShapeItem hl = h * shape_B3.m() * shape_B3.l() + l;
-         const Cell * cB = &B->get_ravel(hl);
-         Cell * cZ = &Z->get_ravel(hl);
+         // plane h is the first element in B[h;;]
+         //
+         const ShapeItem plane_h = h * shape_B3.m() * shape_B3.l();
          loop(m, shape_B3.m())
-            cZ[m*shape_B3.l()]
-               .init(cB[(shape_B3.m() - m - 1)*shape_B3.l()], Z.getref(), LOC);
+             {
+               // col_m is the source column in B for Z[h;m;0]
+               const ShapeItem col_m = plane_h
+                                     + (shape_B3.l() * (shape_B3.m() - m - 1));
+               loop(l, shape_B3.l())
+                   {
+                     Z->next_ravel_Cell(B->get_cravel(col_m + l));
+                   }
+             }
        }
 
    Z->set_default(*B.get(), LOC);
@@ -267,7 +284,7 @@ const Shape shape_A2(shape_B3.h(), shape_B3.l());
 
    if (A->is_scalar_or_len1_vector())
       {
-        gsh = A->get_ravel(0).get_near_int();
+        gsh = A->get_cfirst().get_near_int();
         if (gsh == 0)   // nothing to do.
            {
              Token result(TOK_APL_VALUE1, B->clone(LOC));
@@ -288,12 +305,11 @@ Value_P Z(B->get_shape(), LOC);
    loop(l, shape_B3.l())
        {
          ShapeItem src = gsh;
-         if (!src)   src = A->get_ravel(l + h*shape_B3.l()).get_near_int();
+         if (!src)   src = A->get_cravel(l + h*shape_B3.l()).get_near_int();
          src += shape_B3.m() + m;
          while (src < 0)               src += shape_B3.m();
          while (src >= shape_B3.m())   src -= shape_B3.m();
-         Z->next_ravel()
-          ->init(B->get_ravel(shape_B3.hml(h, src, l)), Z.getref(), LOC);
+         Z->next_ravel_Cell(B->get_cravel(shape_B3.hml(h, src, l)));
        }
 
    Z->set_default(*B.get(), LOC);
@@ -366,7 +382,7 @@ const Shape shape_A(A.get(), Workspace::get_IO());
    // the elements in A shall be valid axes of B->
    loop(r, A->get_rank())
       {
-        if (shape_A.get_shape_item(r) < 0)               DOMAIN_ERROR;
+        if (shape_A.get_shape_item(r) < 0)                DOMAIN_ERROR;
         if (shape_A.get_shape_item(r) >= B->get_rank())   DOMAIN_ERROR;
       }
 
@@ -391,13 +407,13 @@ Value_P Z(shape_Z, LOC);
          return Z;
       }
 
-const Cell * cB = &B->get_ravel(0);
+const Cell * cB = &B->get_cfirst();
 
-   for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
+   for (ArrayIterator z(shape_Z); z.more(); ++z)
        {
-         const Shape idx_B = permute(it_Z.get_offsets(), A);
+         const Shape idx_B = permute(z.get_offsets(), A);
          const ShapeItem b = B->get_shape().ravel_pos(idx_B);
-         Z->next_ravel()->init(cB[b], Z.getref(), LOC);
+         Z->next_ravel_Cell(cB[b]);
        }
 
    return Z;
@@ -451,13 +467,13 @@ Value_P Z(shape_Z, LOC);
         return Z;
       }
 
-const Cell * cB = &B->get_ravel(0);
+const Cell * cB = &B->get_cfirst();
 
-   for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
+   for (ArrayIterator z(shape_Z); z.more(); ++z)
        {
-         const Shape idx_B = permute(it_Z.get_offsets(), A);
+         const Shape idx_B = permute(z.get_offsets(), A);
          const ShapeItem b = B->get_shape().ravel_pos(idx_B);
-         Z->next_ravel()->init(cB[b], Z.getref(), LOC);
+         Z->next_ravel_Cell(cB[b]);
        }
 
    return Z;
@@ -558,7 +574,7 @@ const Shape shape_Z = shape_A1 + shape_B1;
 
 Value_P Z(shape_Z, LOC);
 
-const Cell * cA = &A->get_ravel(0);
+const Cell * cA = &A->get_cfirst();
 
    loop(h, h_len_A)
        {
@@ -586,22 +602,21 @@ const Cell * cA = &A->get_ravel(0);
                 bool integer_B = true;
                 loop(bb, h_len_B)
                     {
-                      if (!B->get_ravel(l + bb*l_len_B).is_near_real())
+                      if (!B->get_cravel(l + bb*l_len_B).is_near_real())
                          {
                            complex_B = true;
                            integer_B = false;
                            break;
                          }
 
-                      if (!B->get_ravel(l + bb*l_len_B).is_near_int())
+                      if (!B->get_cravel(l + bb*l_len_B).is_near_int())
                          integer_B = false;
                     }
 
-               const Cell * cB = &B->get_ravel(l);
-               Cell * cZ = Z->next_ravel();
+               const Cell * cB = &B->get_cravel(l);
                if (integer_A && integer_B)
                   {
-                    const bool overflow = decode_int(cZ, l_len_A, cA,
+                    const bool overflow = decode_int(Z.getref(), l_len_A, cA,
                                                      h_len_B, cB, l_len_B);
                      if (!overflow)   continue;
 
@@ -609,9 +624,11 @@ const Cell * cA = &A->get_ravel(0);
                   }
 
                if (complex_A || complex_B)
-                  decode_complex(cZ, l_len_A, cA, h_len_B, cB, l_len_B, qct);
+                  decode_complex(Z.getref(), l_len_A, cA,
+                                             h_len_B, cB, l_len_B, qct);
                else
-                  decode_real(cZ, l_len_A, cA, h_len_B, cB, l_len_B, qct);
+                  decode_real(Z.getref(), l_len_A, cA,
+                                          h_len_B, cB, l_len_B, qct);
              }
          cA += l_len_A;
        }
@@ -622,7 +639,7 @@ const Cell * cA = &A->get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 bool
-Bif_F12_DECODE::decode_int(Cell * cZ, ShapeItem len_A, const Cell * cA,
+Bif_F12_DECODE::decode_int(Value & Z, ShapeItem len_A, const Cell * cA,
                        ShapeItem len_B, const Cell * cB, ShapeItem dB)
 {
 APL_Integer value = 0;
@@ -651,13 +668,13 @@ const ShapeItem len = (len_A == 1) ? len_B : len_A;
         if (len_B != 1)   cB -= dB;
       }
 
-   new (cZ)   IntCell(value);
+   Z.next_ravel_Int(value);
 
    return false;   // no overflow
 }
 //-----------------------------------------------------------------------------
 void
-Bif_F12_DECODE::decode_real(Cell * cZ, ShapeItem len_A, const Cell * cA,
+Bif_F12_DECODE::decode_real(Value & Z, ShapeItem len_A, const Cell * cA,
                        ShapeItem len_B, const Cell * cB, ShapeItem dB,
                        double qct)
 {
@@ -675,16 +692,12 @@ const ShapeItem len = (len_A == 1) ? len_B : len_A;
         if (len_B != 1)   cB -= dB;
       }
 
-   if (value < LARGE_INT &&
-       value > SMALL_INT &&
-       Cell::is_near_int(value))
-      new (cZ)   IntCell(Cell::near_int(value));
-   else
-      new (cZ)   FloatCell(value);
+   if (Cell::is_near_int64_t(value))   Z.next_ravel_Int(Cell::near_int(value));
+   else                                Z.next_ravel_Float(value);
 }
 //-----------------------------------------------------------------------------
 void
-Bif_F12_DECODE::decode_complex(Cell * cZ, ShapeItem len_A, const Cell * cA,
+Bif_F12_DECODE::decode_complex(Value & Z, ShapeItem len_A, const Cell * cA,
                        ShapeItem len_B, const Cell * cB, ShapeItem dB,
                        double qct)
 {
@@ -702,78 +715,72 @@ const ShapeItem len = (len_A == 1) ? len_B : len_A;
         if (len_B != 1)   cB -= dB;
       }
 
-   if (value.imag() > qct)
-      new (cZ)   ComplexCell(value);
-   else if (value.imag() < -qct)
-      new (cZ)   ComplexCell(value);
+   if (value.imag() > qct || value.imag() < -qct)   Z.next_ravel_Complex(value);
    else if (value.real() < LARGE_INT
          && value.real() > SMALL_INT
-         && Cell::is_near_int(value.real()))
-      new (cZ)   IntCell(value.real());
-   else
-      new (cZ)   FloatCell(value.real());
+         && Cell::is_near_int(value.real()))   Z.next_ravel_Int(value.real());
+   else                                        Z.next_ravel_Float(value.real());
 }
 //-----------------------------------------------------------------------------
 Token
 Bif_F12_ENCODE::eval_AB(Value_P A, Value_P B) const
 {
+   // A⊤B: every number in B is represented in a number system with
+   // radix A. ⍴Z ←→ (⍴A, ⍴B) and Z[...;...b...] = A⊤B[...b...]
+
    if (A->is_scalar())   return Bif_F12_STILE::fun->eval_AB(A, B);
 
 const ShapeItem ec_A = A->element_count();
 const ShapeItem ec_B = B->element_count();
+const Shape shape_Z = A->get_shape() + B->get_shape();
+Value_P Z(shape_Z, LOC);
+
    if (ec_A == 0 || ec_B == 0)   // empty A or B
       {
-        const Shape shape_Z(A->get_shape() + B->get_shape());
-        Value_P Z(shape_Z, LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-const ShapeItem ah = A->get_shape_item(0);    // first dimension
-const ShapeItem al = A->element_count()/ah;   // remaining dimensions
+const ShapeItem aL = A->get_shape_item(0);    // first (LSB) dimension of A
+const ShapeItem aH = ec_A/aL;                 // remaining (MSB) dimensions
 
 const double qct = Workspace::get_CT();
 
-const Shape shape_Z = A->get_shape() + B->get_shape();
-const ShapeItem dZ = shape_Z.get_volume()/shape_Z.get_shape_item(0);
-
-Value_P Z(shape_Z, LOC);
-
-   loop(a1, al)
+ConstRavel_P iA(A, true);
+   loop(a, aH)
       {
-        const Cell * cB = &B->get_ravel(0);
+        const Cell * cB = &B->get_cfirst();
 
-        // find largest Celltype in a1...
+        // find largest Celltype in A, starting with CT_INT and maybe
+        // "increasing" it to CT_FLOAT or CT_COMPLEX as needed.
         //
-        CellType ct_a1 = CT_INT;
-        loop(h, ah)
+        CellType ct_a = CT_INT;
+        loop(h, aL)
             {
-              const CellType ct = A->get_ravel(a1 + h*al).get_cell_type();
+              const CellType ct = A->get_cravel(a + h*aH).get_cell_type();
               if (ct == CT_INT)            ;
-              else if (ct == CT_FLOAT)     { if (ct_a1 == CT_INT)  ct_a1 = ct; }
-              else if (ct == CT_COMPLEX)   ct_a1 = CT_COMPLEX;
+              else if (ct == CT_FLOAT)     { if (ct_a == CT_INT)  ct_a = ct; }
+              else if (ct == CT_COMPLEX)   ct_a = CT_COMPLEX;
               else                         DOMAIN_ERROR;
             }
 
-        loop(b, ec_B)
+        for (ConstRavel_P iB(B, true); +iB; ++iB)
             {
-              CellType ct = ct_a1;
+              CellType ct = ct_a;
               const CellType ct_b = cB->get_cell_type();
               if (ct_b == CT_INT)            ;
               else if (ct_b == CT_FLOAT)     { if (ct == CT_INT)  ct = ct_b; }
               else if (ct_b == CT_COMPLEX)   ct = CT_COMPLEX;
               else                           DOMAIN_ERROR;
 
-              if (ct == CT_INT)   // both cells are integer
-                 encode(dZ, Z->next_ravel(), ah, al,
-                        &A->get_ravel(a1), cB++->get_int_value());
-              else if (ct == CT_FLOAT)
-                 encode(dZ, Z->next_ravel(), ah, al,
-                        &A->get_ravel(a1), cB++->get_real_value(), qct);
-              else
-                 encode(dZ, Z->next_ravel(), ah, al,
-                        &A->get_ravel(a1), cB++->get_complex_value(), qct);
+              if (ct == CT_INT)          // A and B are both integer
+                 encode_Int(Z.getref(), aL, aH, iA, iB);
+              else if (ct == CT_FLOAT)   // A and B are not APL_Complex
+                 encode_Flt(Z.getref(), aL, aH, iA, iB, qct);
+              else                       // A or B contain APL_Complex
+                 encode_Cpx(Z.getref(), aL, aH, iA, iB, qct);
             }
+         ++iA;
        }
 
    Z->set_default(*B.get(), LOC);
@@ -783,88 +790,122 @@ Value_P Z(shape_Z, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Bif_F12_ENCODE::encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
-                       const Cell * cA, APL_Integer b)
+Bif_F12_ENCODE::encode_Int(Value & Z, ShapeItem aL, ShapeItem aH,
+                           const ConstRavel_P & iA, const ConstRavel_P & iB)
 {
-   // we work downwards from the higher indices...
-   //
-   cA += ah*al;   // the end of A
-   cZ += ah*dZ;   // the end of Z
+const ShapeItem dZ = aH*iB.get_length();
+Cell * cZ = &Z.get_wravel(iB()
+          + iA()*iB.get_length())   // = the current Z (near bottom)
+          + aL*dZ;                  // + the size of Z (above top)
 
-   loop(l, ah)
+const Cell * cA = &*iA + iA.get_length();      // the end of A (+aH)
+
+   /* unfortunately the less significant weights of the number system base A
+      are located at higher indices of A. We therefore work downwards from
+      the higher indices of A resp. Z...
+
+            ←     ← ... ← .. ← cA   // pre-decremented by aH
+                           ↓
+        ┌────┬────┬─────┬────┐
+        │ a0 │ a1 │ ... │ aN │ // number base (MSB...LSB)
+        └────┴────┴─────┴────┘
+           ↓    ↓    ↓     ↓
+          bi ← bi ← ... ← bi   // divided by ai
+           ↓    ↓          ↓
+        ┌────┬────┬─────┬────┐
+        │ z0 │ z1 │ ... │ zN │ // remainders
+        └────┴────┴─────┴────┘
+           ↑    ↑    ↑     ↑
+            ←     ← ... ← .. ← cZ   // pre-decremented by dZ
+    */
+
+APL_Integer bi = iB->get_int_value();   // the value being decoded
+   loop(a, aL)
        {
-         cA -= al;
+         cA -= aH;
          cZ -= dZ;
 
-        const IntCell cC(b);
+        const IntCell cC(bi);
         cC.bif_residue(cZ, cA);
 
         if (cA->get_int_value() == 0)
            {
-             b = 0;
+             bi = 0;
            }
          else
            {
-             b -= cZ->get_int_value();
-             b /= cA->get_int_value();
+             bi -= cZ->get_int_value();
+             bi /= cA->get_int_value();
            }
        }
 }
 //-----------------------------------------------------------------------------
 void
-Bif_F12_ENCODE::encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
-                       const Cell * cA, APL_Float b, double qct)
+Bif_F12_ENCODE::encode_Flt(Value & Z, ShapeItem aL, ShapeItem aH,
+                           const ConstRavel_P & iA,
+                           const ConstRavel_P & iB, double qct)
 {
-   // we work downwards from the higher indices...
-   //
-   cA += ah*al;   // the end of A
-   cZ += ah*dZ;   // the end of Z
+const ShapeItem dZ = aH*iB.get_length();
+Cell * cZ = &Z.get_wravel(iB()
+          + iA()*iB.get_length())   // = the current Z
+          + aL*dZ;                  // + the size of Z
 
-   loop(l, ah)
+const Cell * cA = &*iA + iA.get_length();      // the end of A (+1)
+
+   // work downwards from the higher indices (see encode_Int())...
+   //
+APL_Float bf = iB->get_real_value();   // the value being decoded
+   loop(a, aL)
        {
-         cA -= al;
+         cA -= aH;
          cZ -= dZ;
 
-        const FloatCell cC(b);
+        const FloatCell cC(bf);
         cC.bif_residue(cZ, cA);
 
         if (cA->is_near_zero())
            {
-             b = 0.0;
+             bf = 0.0;
            }
          else
            {
-             b -= cZ->get_real_value();
-             b /= cA->get_real_value();
+             bf -= cZ->get_real_value();
+             bf /= cA->get_real_value();
            }
        }
 }
 //-----------------------------------------------------------------------------
 void
-Bif_F12_ENCODE::encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
-                       const Cell * cA, APL_Complex b, double qct)
+Bif_F12_ENCODE::encode_Cpx(Value & Z, ShapeItem aL, ShapeItem aH,
+                           const ConstRavel_P & iA,
+                           const ConstRavel_P & iB, double qct)
 {
-   // we work downwards from the higher indices...
-   //
-   cA += ah*al;   // the end of A
-   cZ += ah*dZ;   // the end of Z
+const ShapeItem dZ = aH*iB.get_length();
+Cell * cZ = &Z.get_wravel(iB()
+          + iA()*iB.get_length())   // = the current Z
+          + aL*dZ;                  // + the size of Z
 
-   loop(l, ah)
+   // work downwards from the higher indices (see encode_Int())...
+   //
+const Cell * cA = &*iA + iA.get_length();      // the end of A (+1)
+
+APL_Complex bc = iB->get_complex_value();   // the value being decoded
+   loop(a, aL)
        {
-         cA -= al;
+         cA -= aH;
          cZ -= dZ;
 
-        const ComplexCell cC(b);
+        const ComplexCell cC(bc);
         cC.bif_residue(cZ, cA);
 
         if (cA->is_near_zero())
            {
-             b = APL_Complex(0, 0);
+             bc = APL_Complex(0, 0);
            }
          else
            {
-             b -= cZ->get_complex_value();
-             b /= cA->get_complex_value();
+             bc -= cZ->get_complex_value();
+             bc /= cA->get_complex_value();
            }
        }
 }
@@ -876,15 +917,14 @@ Bif_F12_ELEMENT::eval_B(Value_P B) const
    //
    if (B->element_count() == 0)   // empty argument
       {
-        ShapeItem N = 0;
-        Value_P Z(N, LOC);   // empty vector with prototype ' ' or '0'
-        const Cell * C = &B->get_ravel(0);
+        Value_P Z(ShapeItem(0), LOC);   // empty vector with proto ' ' or '0'
+        const Cell * C = &B->get_cfirst();
         bool left = false;
         for (;;)
             {
               if (C->is_pointer_cell())
                  {
-                   C = &C->get_pointer_value()->get_ravel(0);
+                   C = &C->get_pointer_value()->get_cfirst();
                    continue;
                  }
 
@@ -898,12 +938,12 @@ Bif_F12_ELEMENT::eval_B(Value_P B) const
                       }
                    else if (C->is_pointer_cell())
                       {
-                        C = &C->get_pointer_value()->get_ravel(0);
+                        C = &C->get_pointer_value()->get_cfirst();
                       }
                    else
                       {
                         Value * owner = C->cLvalCell().get_cell_owner();
-                        new (&Z->get_ravel(0))
+                        new (&Z->get_wproto())
                             LvalCell(C->get_lval_value(), owner);
                         break;
                       }
@@ -911,13 +951,13 @@ Bif_F12_ELEMENT::eval_B(Value_P B) const
 
               if (C->is_numeric())
                  {
-                   new (&Z->get_ravel(0)) CharCell(UNI_0);
+                   Z->set_ravel_Int(0, 0);
                    break;
                  }
 
               if (C->is_character_cell())
                  {
-                   new (&Z->get_ravel(0)) CharCell(UNI_SPACE);
+                   Z->set_ravel_Char(0, UNI_SPACE);
                    break;
                  }
 
@@ -940,9 +980,8 @@ Bif_F12_ELEMENT::eval_B(Value_P B) const
 const ShapeItem len_Z = B->get_enlist_count();
 Value_P Z(len_Z, LOC);
 
-Cell * z = &Z->get_ravel(0);
-   if (B->get_lval_cellowner())   B->enlist_left(z, Z.getref());
-   else                           B->enlist_right(z, Z.getref());
+   if (B->get_lval_cellowner())   B->enlist_left(Z.getref());
+   else                           B->enlist_right(Z.getref());
 
    Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
@@ -952,24 +991,23 @@ Cell * z = &Z->get_ravel(0);
 Token
 Bif_F12_ELEMENT::eval_AB(Value_P A, Value_P B) const
 {
-   // member
+   // return Z←A ∈ B. Z[i] is 1 iff A[i] = B[j] for some j
    //
 const double qct = Workspace::get_CT();
-const ShapeItem len_Z = A->element_count();
-const ShapeItem len_B = B->element_count();
 Value_P Z(A->get_shape(), LOC);
 
-   loop(z, len_Z)
+   for (ConstRavel_P a(A, true); +a; ++a)
        {
-         const Cell & cell_A = A->get_ravel(z);
-         APL_Integer same = 0;
-         loop(b, len_B)
-             if (cell_A.equal(B->get_ravel(b), qct))
-                {
-                  same = 1;
-                  break;
-                }
-         new (Z->next_ravel())   IntCell(same);
+         APL_Integer found_a_in_B = 0;
+         for (ConstRavel_P b(B, true); +b; ++b)
+             {
+               if (a->equal(*b, qct))
+                  {
+                    found_a_in_B = 1;
+                    break;
+                  }
+             }
+         Z->next_ravel_Int(found_a_in_B);
        }
 
    Z->check_value(LOC);
@@ -989,23 +1027,19 @@ const ShapeItem ec_A = A->element_count();
 IndexExpr index_expr(ASS_none, LOC);
    loop(a, ec_A)
       {
-         const Cell & cell = A->get_ravel(ec_A - a - 1);
-         Value_P val;
+         const Cell & cell = A->get_cravel(ec_A - a - 1);
          if (cell.is_pointer_cell())
             {
-              val = cell.get_pointer_value()->clone(LOC);
+              Value_P val = cell.get_pointer_value()->clone(LOC);
               if (val->compute_depth() > 1)   DOMAIN_ERROR;
+              index_expr.add(val);
             }
         else
             {
-              const APL_Integer i = cell.get_near_int();
-              val = Value_P(LOC);
-              if (i < 0)   DOMAIN_ERROR;
-
-              new (&val->get_ravel(0))   IntCell(i);
+              const APL_Integer I = cell.get_near_int();
+              if (I < 0)   DOMAIN_ERROR;
+              index_expr.add(IntScalar(I, LOC));
             }
-
-        index_expr.add(val);
       }
 
    // the index() do set_default() and check_value(), so we return immediately
@@ -1015,7 +1049,7 @@ IndexExpr index_expr(ASS_none, LOC);
    if (index_expr.value_count() == 1)   // one-dimensional index
       {
         Value_P single_index = index_expr.extract_value(0);
-        Value_P Z = B->index(single_index);
+        Value_P Z = B->index(single_index.get());
         return Token(TOK_APL_VALUE1, Z);
       }
    else
@@ -1047,29 +1081,26 @@ IndexExpr index_expr(ASS_none, LOC);
       {
          const Rank axis = axes_present.get_shape_item(a);
 
-         const Cell & cell = A->get_ravel(a);
-         Value_P val;
+         const Cell & cell = A->get_cravel(a);
          if (cell.is_pointer_cell())
             {
-              val = cell.get_pointer_value()->clone(LOC);
+              Value_P val = cell.get_pointer_value()->clone(LOC);
               if (val->compute_depth() > 1)   DOMAIN_ERROR;
+              index_expr.set_value(axis, val);
             }
         else
             {
-              const APL_Integer i = cell.get_near_int();
-              val = Value_P(LOC);
-              if (i < 0)   DOMAIN_ERROR;
-
-              new (&val->get_ravel(0))   IntCell(i);
+              const APL_Integer I = cell.get_near_int();
+              if (I < 0)   DOMAIN_ERROR;
+              Value_P val = IntScalar(I, LOC);
+              index_expr.set_value(axis, val);
             }
-
-        index_expr.set_value(axis, val);
       }
 
    if (index_expr.value_count() == 1)
       {
         Value_P single_index = index_expr.extract_value(0);
-        Value_P Z = B->index(single_index);
+        Value_P Z = B->index(single_index.get());
 
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -1086,11 +1117,9 @@ IndexExpr index_expr(ASS_none, LOC);
 Token
 Bif_F12_EQUIV::eval_B(Value_P B) const
 {
-const APL_types::Depth depth = B->compute_depth();
+const APL_Integer depth = B->compute_depth();
 
-Value_P Z(LOC);
-   new (Z->next_ravel()) IntCell(depth);
-   Z->check_value(LOC);
+Value_P Z = IntScalar(depth, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
@@ -1101,14 +1130,13 @@ Bif_F12_EQUIV::eval_AB(Value_P A, Value_P B) const
    //
 
 const double qct = Workspace::get_CT();
-const ShapeItem count = A->nz_element_count();  // compare at least prototype
 
    if (!A->same_shape(*B))   //shape mismatch
       return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
-   loop(c, count)
+   for (ConstRavel_P a(A, true), b(B, true); +a; ++a, ++b)
        {
-         if (!A->get_ravel(c).equal(B->get_ravel(c), qct))
+         if (!a->equal(*b, qct))
             {
               return Token(TOK_APL_VALUE1, IntScalar(0, LOC));   // no match
             }
@@ -1130,19 +1158,20 @@ const ShapeItem len = B->is_scalar() ? 1 : B->get_shape().get_shape_item(0);
 Token
 Bif_F12_NEQUIV::eval_AB(Value_P A, Value_P B) const
 {
-   // match
+   // A ≢ B aka.  ∼A ≡ B
    //
-
 const double qct = Workspace::get_CT();
-const ShapeItem count = A->nz_element_count();  // compare at least prototype
 
-   if (!A->same_shape(*B))   return Token(TOK_APL_VALUE1, IntScalar(1, LOC));   // no match
+   if (!A->same_shape(*B))   // shape mismatch
+      return Token(TOK_APL_VALUE1, IntScalar(1, LOC));
 
-   loop(c, count)
-       if (!A->get_ravel(c).equal(B->get_ravel(c), qct))
-          {
-            return Token(TOK_APL_VALUE1, IntScalar(1, LOC));   // no match
-          }
+   for (ConstRavel_P a(A, true), b(B, true); +a; ++a, ++b)
+       {
+         if (!a->equal(*b, qct))
+            {
+              return Token(TOK_APL_VALUE1, IntScalar(1, LOC));   // no match
+            }
+       }
 
    return Token(TOK_APL_VALUE1, IntScalar(0, LOC));   // match
 }
@@ -1254,7 +1283,7 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
         UTF8_string line_utf8(&result_utf8[line_starts[l]], len);
         UCS_string line_ucs(line_utf8);
         Value_P ZZ(line_ucs, LOC);
-        new (Z->next_ravel())   PointerCell(ZZ.get(), Z.getref());
+        Z->next_ravel_Pointer(ZZ.get());
       }
 
    Z->check_value(LOC);
@@ -1376,9 +1405,10 @@ Bif_F12_UNION::eval_B(Value_P B) const
 {
    if (B->get_rank() > 1)   RANK_ERROR;
 
-const double qct = Workspace::get_CT();
 const ShapeItem len_B = B->element_count();
    if (len_B <= 1)   return Token(TOK_APL_VALUE1, B->clone(LOC));
+
+const double qct = Workspace::get_CT();
 
    // 1. construct a vector of Cell pointers and sort it so that the
    //    cells being pointed to are sorted ascendingly.
@@ -1393,7 +1423,7 @@ const Cell ** cells_B = new const Cell *[2*len_B];
 const Cell ** cells_Z = cells_B + len_B;
 ShapeItem len_Z = 0;
 
-   loop(b, len_B)   cells_B[b] = &B->get_ravel(b);
+   for (ConstRavel_P b(B, true); +b; ++b)   cells_B[b()] = &*b;
    Heapsort<const Cell*>::sort(cells_B, len_B, 0, Cell::A_greater_B);
 
    // 2. divide the cells into zones. A zone is a sequence of cells
@@ -1406,20 +1436,21 @@ ShapeItem from = 0;
 Zone_list from_to;
    for (ShapeItem b = 1; b < len_B; ++b)
        {
-           if (cells_B[b]->equal(*cells_B[b-1], qct))
-              {
-                // cells_B[b] belongs to the zone
-                //
-                continue;
-              }
+         if (cells_B[b]->equal(*cells_B[b-1], qct))
+            {
+              // cells_B[b] belongs to the zone
+              //
+              continue;
+            }
 
-           const Zone ft0(from, b);
-           from_to.push_back(ft0);
-           len_Z += append_zone(cells_Z + len_Z, cells_B, from_to, qct);
-           Assert(from_to.size() == 0);
-           from = b;
-           continue;   // next b (in the next zone)
+         const Zone ft0(from, b);
+         from_to.push_back(ft0);
+         len_Z += append_zone(cells_Z + len_Z, cells_B, from_to, qct);
+         Assert(from_to.size() == 0);
+         from = b;
+         continue;   // next b (in the next zone)
        }
+
    if (from < len_B)   // the rest
       {
         const Zone ft0(from, len_B);
@@ -1437,7 +1468,7 @@ Zone_list from_to;
    // 4. construct the result.
    //
 Value_P Z(len_Z, LOC);
-   loop(z, len_Z)   Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
+   loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
    delete[] cells_B;   // also deletes cells_Z
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -1462,8 +1493,8 @@ const double qct = Workspace::get_CT();
         const Cell ** cells_Z = cells_A + len_A;
         const Cell ** cells_B = cells_A + 2*len_A;
 
-        loop(a, len_A)   cells_A[a] = &A->get_ravel(a);
-        loop(b, len_B)   cells_B[b] = &B->get_ravel(b);
+        loop(a, len_A)   cells_A[a] = &A->get_cravel(a);
+        loop(b, len_B)   cells_B[b] = &B->get_cravel(b);
 
         Heapsort<const Cell *>::sort(cells_A, len_A, 0, Cell::compare_stable);
         Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
@@ -1493,7 +1524,7 @@ const double qct = Workspace::get_CT();
         //
         Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
         Value_P Z(len_Z, LOC);
-        loop(z, len_Z)   Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
+        loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
 
         Z->set_default(*B, LOC);
         Z->check_value(LOC);
@@ -1502,23 +1533,23 @@ const double qct = Workspace::get_CT();
       }
     else
       {
-        // small A and B: use quadratic algorithm.
+        // small A and B: use quadratic time algorithm.
         //
         const Cell ** cells_Z = new const Cell *[len_A];
         ShapeItem len_Z = 0;
 
-        loop(a, len_A)
-        loop(b, len_B)
+        for (ConstRavel_P a(A, true); +a; ++a)
+        for (ConstRavel_P b(B, true); +b; ++b)
             {
-              if (A->get_ravel(a).equal(B->get_ravel(b), qct))
+              if (a->equal(*b, qct))
                  {
-                   cells_Z[len_Z++] = &A->get_ravel(a);
+                   cells_Z[len_Z++] = &*a;
                    break;   // loop(b)
                  }
             }
+
         Value_P Z(len_Z, LOC);
-        loop(z, len_Z)
-            Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
+        loop(z, len_Z)   Z->next_ravel_Cell(*cells_Z[z]);
 
         Z->set_default(*B, LOC);
         Z->check_value(LOC);
@@ -1541,8 +1572,8 @@ const ShapeItem len_A = A->element_count();
 const ShapeItem len_B = BwoA.get_apl_val()->element_count();
 Value_P Z(len_A + len_B, LOC);
 
-   loop(a, len_A)   Z->next_ravel()->init(A->get_ravel(a), Z.getref(), LOC);
-   loop(b, len_B)   Z->next_ravel()->init(B->get_ravel(b), Z.getref(), LOC);
+   loop(a, len_A)   Z->next_ravel_Cell(A->get_cravel(a));
+   loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
    Z->set_default(*B, LOC);
    Z->check_value(LOC);
    return Bif_F12_COMMA::fun->eval_AB(A, BwoA.get_apl_val());
@@ -1551,8 +1582,8 @@ Value_P Z(len_A + len_B, LOC);
 Token
 Bif_F2_RIGHT::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-   // select corresponding items of A or B according to X. A, B, and X
-   // must have matching shapes
+   // Z ← A ⊢[X] B: select corresponding items of A or B according to X.
+   //  A, B, and X must have matching shapes
    //
 const int inc_A = A->is_scalar_extensible() ? 0 : 1;
 const int inc_B = B->is_scalar_extensible() ? 0 : 1;
@@ -1560,7 +1591,7 @@ const int inc_X = X->is_scalar_extensible() ? 0 : 1;
 
    if (inc_X == 0)   // single item X: pick entire A or B according to X
       {
-        const APL_Integer x0 = X->get_ravel(0).get_int_value();
+        const APL_Integer x0 = X->get_cfirst().get_int_value();
         if (x0 == 0)   return Token(TOK_APL_VALUE1, A->clone(LOC));
         if (x0 == 1)   return Token(TOK_APL_VALUE1, B->clone(LOC));
         DOMAIN_ERROR;
@@ -1583,11 +1614,16 @@ const int inc_X = X->is_scalar_extensible() ? 0 : 1;
 Value_P Z(X->get_shape(), LOC);
    loop(z, Z->nz_element_count())
        {
-        const APL_Integer xz = X->get_ravel(z).get_int_value();
-        Cell * cZ = Z->next_ravel();
-        if      (xz == 0)   cZ->init(A->get_ravel(z*inc_A), Z.getref(), LOC);
-        else if (xz == 1)   cZ->init(B->get_ravel(z*inc_B), Z.getref(), LOC);
-        else                DOMAIN_ERROR;
+        const APL_Integer xz = X->get_cravel(z).get_int_value();   // X[z]
+        if (xz == 0)        // take A[z]
+           Z->next_ravel_Cell(A->get_cravel(z*inc_A));
+        else if (xz == 1)   // take B[z]
+           Z->next_ravel_Cell(B->get_cravel(z*inc_B));
+        else
+           {
+             MORE_ERROR() << "X not boolean in A⊢[X]B";
+             DOMAIN_ERROR;
+           }
        }
 
    Z->check_value(LOC);

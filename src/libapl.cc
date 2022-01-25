@@ -47,7 +47,7 @@ APL_value
 int_scalar(int64_t val, const char * loc)
 {
 Value_P Z(loc);
-   new (Z->next_ravel()) IntCell(val);
+   Z->next_ravel_Int(val);
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
@@ -57,7 +57,7 @@ APL_value
 double_scalar(APL_Float val, const char * loc)
 {
 Value_P Z(loc);
-   new (Z->next_ravel()) FloatCell(val);
+   Z->next_ravel_Float(val);
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
@@ -67,7 +67,7 @@ APL_value
 complex_scalar(APL_Float real, APL_Float imag, const char * loc)
 {
 Value_P Z(loc);
-   new (Z->next_ravel()) ComplexCell(real, imag);
+   Z->next_ravel_Complex(real, imag);
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
@@ -77,7 +77,7 @@ APL_value
 char_scalar(int uni, const char * loc)
 {
 Value_P Z(loc);
-   new (Z->next_ravel()) CharCell(Unicode(uni));
+   Z->next_ravel_Char(Unicode(uni));
    Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
@@ -91,7 +91,7 @@ apl_value(int rank, const int64_t * shape, const char * loc)
 const Shape sh(rank, shape);
 Value_P Z(sh, loc);
 
-   while (Cell * cell = Z->next_ravel())   new (cell)   IntCell(0);
+   loop(z, Z->nz_element_count())   Z->next_ravel_Int(0);
 
    Z->check_value(LOC);
    Z.get()->increment_owner_count(loc);   // keep value
@@ -156,7 +156,7 @@ int
 get_type(const APL_value val, uint64_t idx)
 {
    if (idx >= uint64_t(val->nz_element_count()))   return 0;
-   return val->get_ravel(idx).get_cell_type();
+   return val->get_cravel(idx).get_cell_type();
 }
 //-----------------------------------------------------------------------------
 /// return non-0 if val is a simple character vector.
@@ -171,7 +171,7 @@ is_string(const APL_value val)
 int
 get_char(const APL_value val, uint64_t idx)
 {
-   return val->get_ravel(idx).get_char_value();
+   return val->get_cravel(idx).get_char_value();
 }
 //-----------------------------------------------------------------------------
 
@@ -179,7 +179,7 @@ get_char(const APL_value val, uint64_t idx)
 int64_t
 get_int(const APL_value val, uint64_t idx)
 {
-   return val->get_ravel(idx).get_int_value();
+   return val->get_cravel(idx).get_int_value();
 }
 //-----------------------------------------------------------------------------
 
@@ -187,7 +187,7 @@ get_int(const APL_value val, uint64_t idx)
 APL_Float
 get_real(const APL_value val, uint64_t idx)
 {
-   return val->get_ravel(idx).get_real_value();
+   return val->get_cravel(idx).get_real_value();
 }
 //-----------------------------------------------------------------------------
 
@@ -195,7 +195,7 @@ get_real(const APL_value val, uint64_t idx)
 APL_Float
 get_imag(const APL_value val, uint64_t idx)
 {
-   return val->get_ravel(idx).get_imag_value();
+   return val->get_cravel(idx).get_imag_value();
 }
 //-----------------------------------------------------------------------------
 
@@ -205,7 +205,7 @@ get_imag(const APL_value val, uint64_t idx)
 APL_value
 get_value(const APL_value val, uint64_t idx)
 {
-Value_P sub = val->get_ravel(idx).get_pointer_value();
+Value_P sub = val->get_cravel(idx).get_pointer_value();
    sub.get()->increment_owner_count(LOC);   // keep value
    return sub.get();
 }
@@ -221,7 +221,7 @@ Shape sh;
    loop(r, rank)   sh.add_shape_item(*shape++);  
 
 Value_P Z(sh, LOC);
-   loop(z, Z->nz_element_count())   new (Z->next_ravel())   IntCell(0);
+   loop(z, Z->nz_element_count())   Z->next_ravel_Int(0);
    Z->check_value(LOC);
 
    if (var_name_ucs == 0)
@@ -264,14 +264,14 @@ Symbol * symbol = Workspace::lookup_symbol(var_name);
 void
 set_char(int new_char, APL_value val, uint64_t idx)
 {
-Cell * cell = &val->get_ravel(idx);
+Cell * cell = &val->get_wravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
         v->decrement_owner_count(LOC);
       }
 
-   new (cell)   CharCell(Unicode(new_char));
+   Value::zU(cell, Unicode(new_char));
 }
 //-----------------------------------------------------------------------------
 
@@ -279,14 +279,14 @@ Cell * cell = &val->get_ravel(idx);
 void
 set_int(int64_t new_int, APL_value val, uint64_t idx)
 {
-Cell * cell = &val->get_ravel(idx);
+Cell * cell = &val->get_wravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
         v->decrement_owner_count(LOC);
       }
 
-   new (cell)   IntCell(new_int);
+   Value::zI(cell, new_int);
 }
 //-----------------------------------------------------------------------------
 
@@ -294,14 +294,14 @@ Cell * cell = &val->get_ravel(idx);
 void
 set_double(APL_Float new_double, APL_value val, uint64_t idx)
 {
-Cell * cell = &val->get_ravel(idx);
+Cell * cell = &val->get_wravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
         v->decrement_owner_count(LOC);
       }
 
-   new (cell)   FloatCell(new_double);
+   Value::zF(cell, new_double);
 }
 //-----------------------------------------------------------------------------
 
@@ -309,20 +309,20 @@ Cell * cell = &val->get_ravel(idx);
 void
 set_complex(APL_Float new_real, APL_Float new_imag, APL_value val, uint64_t idx)
 {
-Cell * cell = &val->get_ravel(idx);
+Cell * cell = &val->get_wravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
         v->decrement_owner_count(LOC);
       }
 
-   new (cell)   ComplexCell(new_real, new_imag);
+   Value::zC(cell, new_real, new_imag);
 }
 //-----------------------------------------------------------------------------
 void
 set_value(APL_value new_value, APL_value val, uint64_t idx)
 {
-Cell * cell = &val->get_ravel(idx);
+Cell * cell = &val->get_wravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
@@ -331,11 +331,11 @@ Cell * cell = &val->get_ravel(idx);
 
    if (new_value->is_simple_scalar())   // e.g. ⊂5 is 5
       {
-        cell->init(new_value->get_ravel(0), *val, LOC);
+        cell->init(new_value->get_cfirst(), *val, LOC);
       }
    else if (new_value->is_scalar())     // e.g. ⊂⊂5 is ⊂5
       {
-        const Cell & src = new_value->get_ravel(0);
+        const Cell & src = new_value->get_cfirst();
         if (!src.is_pointer_cell())   DOMAIN_ERROR;
         Value_P sub = src.get_pointer_value()->clone(LOC);
         new (cell)   PointerCell(sub.get(), *val);

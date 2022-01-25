@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "Svar_DB.hh"
 
 class IndexExpr;
+class RavelIterator;
 class UserFunction;
 
 //-----------------------------------------------------------------------------
@@ -252,8 +253,8 @@ public:
    virtual const Symbol * get_symbol() const
       { return this; }
 
-   /// store the attributes (as per ⎕AT) of symbol at dest...
-   virtual void get_attributes(int mode, Cell * dest) const;
+   /// store the attributes (as per ⎕AT) of symbol in Z...
+   virtual void get_attributes(int mode, Value & Z) const;
 
    /// return the size of the value stack
    const int value_stack_size() const

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,31 +82,31 @@ SystemVariable::print(ostream & out) const
 }
 //-----------------------------------------------------------------------------
 void
-SystemVariable::get_attributes(int mode, Cell * dest) const
+SystemVariable::get_attributes(int mode, Value & Z) const
 {
    switch(mode)
       {
         case 1: // valences (always 1 0 0 for variables)
-                new (dest + 0) IntCell(1);
-                new (dest + 1) IntCell(0);
-                new (dest + 2) IntCell(0);
+                Z.next_ravel_Int(1);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
                 break;
 
         case 2: // creation time (always 7⍴0 for variables)
-                new (dest + 0) IntCell(0);
-                new (dest + 1) IntCell(0);
-                new (dest + 2) IntCell(0);
-                new (dest + 3) IntCell(0);
-                new (dest + 4) IntCell(0);
-                new (dest + 5) IntCell(0);
-                new (dest + 6) IntCell(0);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
                 break;
 
         case 3: // execution properties (always 4⍴0 for variables)
-                new (dest + 0) IntCell(0);
-                new (dest + 1) IntCell(0);
-                new (dest + 2) IntCell(0);
-                new (dest + 3) IntCell(0);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
                 break;
 
         case 4: {
@@ -115,8 +115,8 @@ SystemVariable::get_attributes(int mode, Cell * dest) const
                   const int brutto = val->total_size_brutto(cdr_type);
                   const int data = val->data_size(cdr_type);
 
-                  new (dest + 0) IntCell(brutto);
-                  new (dest + 1) IntCell(data);
+                  Z.next_ravel_Int(brutto);
+                  Z.next_ravel_Int(data);
                 }
                 break;
 
@@ -129,15 +129,23 @@ Quad_AV::Quad_AV()
    : RO_SystemVariable(ID_Quad_AV)
 {
    Assert1(MAX_AV == 256);
+
 Value_P AV(MAX_AV, LOC);
+
+   // Avec::character_table is sorted by ascending Unicodes, while ⎕AV
+   // is not. We construct qav (which is sorted by ⎕AV position) from
+   // Avec::character_table and assign it to ⎕AV.
+   //
    loop(cti, MAX_AV)
        {
          const int av_pos = Avec::get_av_pos(CHT_Index(cti));
          const Unicode uni = Avec::unicode(CHT_Index(cti));
 
          qav[av_pos] = uni;   // remember unicode for indexed_at()
-         new (&AV->get_ravel(av_pos))  CharCell(uni);
        }
+
+   loop(av, MAX_AV)  AV->next_ravel_Char(qav[av]);
+
    AV->check_value(LOC);
 
    Symbol::assign(AV, false, LOC);
@@ -164,15 +172,15 @@ Quad_AI::get_apl_value() const
 const int total_ms = (now() - session_start)/1000;
 const int user_ms  = user_wait/1000;
 
-Value_P ret(5, LOC);
-   new (ret->next_ravel())   IntCell(ProcessorID::get_own_ID());
-   new (ret->next_ravel())   IntCell(total_ms - user_ms);
-   new (ret->next_ravel())   IntCell(total_ms);
-   new (ret->next_ravel())   IntCell(user_ms);
-   new (ret->next_ravel())   IntCell(Command::get_APL_expression_count());
+Value_P Z(5, LOC);
+   Z->next_ravel_Int(ProcessorID::get_own_ID());
+   Z->next_ravel_Int(total_ms - user_ms);
+   Z->next_ravel_Int(total_ms);
+   Z->next_ravel_Int(user_ms);
+   Z->next_ravel_Int(Command::get_APL_expression_count());
 
-   ret->check_value(LOC);
-   return ret;
+   Z->check_value(LOC);
+   return Z;
 }
 //=============================================================================
 Quad_ARG::Quad_ARG()
@@ -192,7 +200,7 @@ Value_P Z(argc, LOC);
         UTF8_string utf(arg);
         UCS_string ucs(utf);
         Value_P sub(ucs, LOC);
-        new (Z->next_ravel())   PointerCell(sub.get(), Z.getref());
+        Z->next_ravel_Pointer(sub.get());
       }
 
    Z->check_value(LOC);
@@ -214,7 +222,7 @@ Quad_CT::assign(Value_P value, bool clone, const char * loc)
         else                         LENGTH_ERROR;
       }
 
-const Cell & cell = value->get_ravel(0);
+const Cell & cell = value->get_cfirst();
    if (!cell.is_numeric())             DOMAIN_ERROR;
    if (cell.get_imag_value() != 0.0)   DOMAIN_ERROR;
 
@@ -281,16 +289,16 @@ ErrorCode ec = E_NO_ERROR;
          ec = StateIndicator::get_error(si).get_error_code();
          if (ec != E_NO_ERROR)
             {
-              new (Z->next_ravel()) IntCell(Error::error_major(ec));
-              new (Z->next_ravel()) IntCell(Error::error_minor(ec));
+              Z->next_ravel_Int(Error::error_major(ec));
+              Z->next_ravel_Int(Error::error_minor(ec));
               goto done;
             }
 
          if (si->get_parse_mode() == PM_FUNCTION)   break;
        }
 
-   new (Z->next_ravel()) IntCell(Error::error_major(E_NO_ERROR));
-   new (Z->next_ravel()) IntCell(Error::error_minor(E_NO_ERROR));
+   Z->next_ravel_Int(Error::error_major(E_NO_ERROR));
+   Z->next_ravel_Int(Error::error_minor(E_NO_ERROR));
 
 done:
    Z->check_value(LOC);
@@ -299,16 +307,16 @@ done:
 //=============================================================================
 Quad_FC::Quad_FC() : SystemVariable(ID_Quad_FC)
 {
-Value_P QFC(6, LOC);
-   new (QFC->next_ravel()) CharCell(UNI_FULLSTOP);
-   new (QFC->next_ravel()) CharCell(UNI_COMMA);
-   new (QFC->next_ravel()) CharCell(UNI_STAR_OPERATOR);
-   new (QFC->next_ravel()) CharCell(UNI_0);
-   new (QFC->next_ravel()) CharCell(UNI_UNDERSCORE);
-   new (QFC->next_ravel()) CharCell(UNI_OVERBAR);
-   QFC->check_value(LOC);
+Value_P Z(6, LOC);
+   Z->next_ravel_Char(UNI_FULLSTOP);
+   Z->next_ravel_Char(UNI_COMMA);
+   Z->next_ravel_Char(UNI_STAR_OPERATOR);
+   Z->next_ravel_Char(UNI_0);
+   Z->next_ravel_Char(UNI_UNDERSCORE);
+   Z->next_ravel_Char(UNI_OVERBAR);
+   Z->check_value(LOC);
 
-   Symbol::assign(QFC, false, LOC);
+   Symbol::assign(Z, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -317,12 +325,12 @@ Quad_FC::push()
    Symbol::push();
 
 Value_P QFC(6, LOC);
-   new (QFC->next_ravel()) CharCell(UNI_FULLSTOP);
-   new (QFC->next_ravel()) CharCell(UNI_COMMA);
-   new (QFC->next_ravel()) CharCell(UNI_STAR_OPERATOR);
-   new (QFC->next_ravel()) CharCell(UNI_0);
-   new (QFC->next_ravel()) CharCell(UNI_UNDERSCORE);
-   new (QFC->next_ravel()) CharCell(UNI_OVERBAR);
+   QFC->next_ravel_Char(UNI_FULLSTOP);
+   QFC->next_ravel_Char(UNI_COMMA);
+   QFC->next_ravel_Char(UNI_STAR_OPERATOR);
+   QFC->next_ravel_Char(UNI_0);
+   QFC->next_ravel_Char(UNI_UNDERSCORE);
+   QFC->next_ravel_Char(UNI_OVERBAR);
    QFC->check_value(LOC);
 
    Symbol::assign(QFC, false, LOC);
@@ -337,16 +345,16 @@ ShapeItem value_len = value->element_count();
    if (value_len > 6)   value_len = 6;
 
    loop(c, value_len)
-       if (!value->get_ravel(c).is_character_cell())   DOMAIN_ERROR;
+       if (!value->get_cravel(c).is_character_cell())   DOMAIN_ERROR;
 
    // new value is correct. 
    //
 Unicode fc[6] = { UNI_FULLSTOP, UNI_COMMA,      UNI_STAR_OPERATOR,
                   UNI_0,        UNI_UNDERSCORE, UNI_OVERBAR };
-                  
+
    loop(c, 6)   if (c < value_len)
-         fc[c] = value->get_ravel(c).get_char_value();
-                  
+         fc[c] = value->get_cravel(c).get_char_value();
+
    // 0123456789,. are forbidden for ⎕FC[4 + ⎕IO]
    //
    if (Bif_F12_FORMAT::is_control_char(fc[4]))
@@ -386,16 +394,16 @@ const APL_Integer qio = Workspace::get_IO();
 Unicode fc[6];
    {
      Value_P old = get_apl_value();
-     loop(e, 6)   fc[e] = old->get_ravel(e).get_char_value();
+     loop(e, 6)   fc[e] = old->get_cravel(e).get_char_value();
    }
 
    loop(e, ec)
       {
-        const APL_Integer idx = X->get_ravel(e).get_near_int() - qio;
+        const APL_Integer idx = X->get_cravel(e).get_near_int() - qio;
         if (idx < 0)   continue;
         if (idx > 5)   continue;
 
-        fc[idx] = value->get_ravel(e).get_char_value();
+        fc[idx] = value->get_cravel(e).get_char_value();
       }
 
    // 0123456789,. are forbidden for ⎕FC[4 + ⎕IO]
@@ -423,7 +431,7 @@ Quad_IO::assign(Value_P value, bool clone, const char * loc)
         else                         LENGTH_ERROR;
       }
 
-   if (value->get_ravel(0).get_near_bool())
+   if (value->get_cfirst().get_near_bool())
       Symbol::assign(IntScalar(1, LOC), false, LOC);
    else
       Symbol::assign(IntScalar(0, LOC), false, LOC);
@@ -486,7 +494,7 @@ Value_P Z(len, LOC);
         si; si = si->get_parent())
        {
          if (si->get_parse_mode() == PM_FUNCTION)
-            new (Z->next_ravel())   IntCell(si->get_line());
+            Z->next_ravel_Int(si->get_line());
        }
 
    Z->check_value(LOC);
@@ -511,12 +519,8 @@ Quad_LX::assign(Value_P value, bool clone, const char * loc)
 Quad_PP::Quad_PP()
    : SystemVariable(ID_Quad_PP)
 {
-Value_P value(LOC);
-
-   new (&value->get_ravel(0)) IntCell(DEFAULT_Quad_PP);
-
-   value->check_value(LOC);
-   Symbol::assign(value, false, LOC);
+Value_P Qpp = IntScalar(DEFAULT_Quad_PP, LOC);
+   Symbol::assign(Qpp, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -550,11 +554,11 @@ Quad_PS::Quad_PS()
      print_quotients(false),
      style(Command::boxing_format)
 {
-Value_P val(2, LOC);
-   new (val->next_ravel())   IntCell(print_quotients);
-   new (val->next_ravel())   IntCell(style);
-   val->check_value(LOC);
-   Symbol::assign(val, false, LOC);
+Value_P Z(2, LOC);
+   Z->next_ravel_Int(print_quotients);
+   Z->next_ravel_Int(style);
+   Z->check_value(LOC);
+   Symbol::assign(Z, false, LOC);
 }
 //-----------------------------------------------------------------------------
 void
@@ -568,7 +572,7 @@ APL_Integer B_style = 0;
    if (B->element_count() < 1)   LENGTH_ERROR;
    if (B->element_count() > 2)   LENGTH_ERROR;
 
-   if (!B->get_ravel(0).is_near_bool())
+   if (!B->get_cfirst().is_near_bool())
       {
         MORE_ERROR() << "Bad quot in ⎕PS←quot style: quot is not near bool";
         DOMAIN_ERROR;
@@ -578,12 +582,12 @@ APL_Integer B_style = 0;
       {
         // for compatibility with old workspaces
         //
-        B_style = B->get_ravel(0).get_near_int();
+        B_style = B->get_cfirst().get_near_int();
       }
    else
       {
-        B_quot  = B->get_ravel(0).get_near_bool();
-        B_style = B->get_ravel(1).get_near_int();
+        B_quot  = B->get_cfirst().get_near_bool();
+        B_style = B->get_cravel(1).get_near_int();
       }
 
    switch(B_style) // boxing format
@@ -613,8 +617,8 @@ APL_Integer B_style = 0;
    style = B_style;
 
 Value_P B2(2, LOC);
-   new (B2->next_ravel())   IntCell(B_quot);
-   new (B2->next_ravel())   IntCell(B_style);
+   B2->next_ravel_Int(B_quot);
+   B2->next_ravel_Int(B_style);
    B2->check_value(LOC);
 
    Symbol::assign(B2, false, LOC);
@@ -635,8 +639,8 @@ APL_Integer Z_quot = print_quotients;
 APL_Integer Z_style = style;
    loop(e, ec)
       {
-        const APL_Integer x = X->get_ravel(e).get_near_int() - qio;
-        const APL_Integer b = B->get_ravel(e).get_near_int();
+        const APL_Integer x = X->get_cravel(e).get_near_int() - qio;
+        const APL_Integer b = B->get_cravel(e).get_near_int();
 
         if (x == 0)   // display quotients
            {
@@ -672,8 +676,8 @@ APL_Integer Z_style = style;
       }
 
 Value_P Z(2, LOC);
-   new (Z->next_ravel())   IntCell(Z_quot);
-   new (Z->next_ravel())   IntCell(Z_style);
+   Z->next_ravel_Int(Z_quot);
+   Z->next_ravel_Int(Z_style);
    Z->check_value(LOC);
    Symbol::assign(Z, false, LOC);
 }
@@ -888,8 +892,8 @@ const APL_Integer qio = Workspace::get_IO();
 
    if (!X2)                                          INDEX_ERROR;
    if (X2->element_count() != 1)                     INDEX_ERROR;
-   if (!X2->get_ravel(0).is_near_int())              INDEX_ERROR;
-   if (X2->get_ravel(0).get_near_int() != qio + 1)   INDEX_ERROR;
+   if (!X2->get_cfirst().is_near_int())              INDEX_ERROR;
+   if (X2->get_cfirst().get_near_int() != qio + 1)   INDEX_ERROR;
 
 Value_P X1 = IDX.extract_value(1);
 
@@ -910,8 +914,8 @@ const APL_Integer qio = Workspace::get_IO();
 
    loop(e, ec)
       {
-        const APL_Integer x = X->get_ravel(e).get_near_int() - qio;
-        const APL_Integer b = B->get_ravel(e).get_near_int();
+        const APL_Integer x = X->get_cravel(e).get_near_int() - qio;
+        const APL_Integer b = B->get_cravel(e).get_near_int();
 
         if (x == SYL_SI_DEPTH_LIMIT)   // SI depth limit
            {
@@ -979,10 +983,9 @@ Value_P Z(sh, LOC);
 
 #define syl2(n, e, v) syl1(n, e, v)
 #define syl3(n, e, v) syl1(n, e, v)
-#define syl1(n, _e, v) \
-  new (Z->next_ravel()) \
-      PointerCell(Value_P(UCS_string(UTF8_string(n)), LOC).get(), Z.getref()); \
-  new (Z->next_ravel()) IntCell(v);
+#define syl1(n, _e, v)                                                   \
+  Z->next_ravel_Pointer(Value_P(UCS_string(UTF8_string(n)), LOC).get()); \
+  Z->next_ravel_Int(v);
 #include "SystemLimits.def"
 
    Z->check_value(LOC);
@@ -992,13 +995,13 @@ Value_P Z(sh, LOC);
 Quad_TC::Quad_TC()
    : RO_SystemVariable(ID_Quad_TC)
 {
-Value_P QCT(3, LOC);
-   new (QCT->next_ravel()) CharCell(UNI_BS);
-   new (QCT->next_ravel()) CharCell(UNI_CR);
-   new (QCT->next_ravel()) CharCell(UNI_LF);
-   QCT->check_value(LOC);
+Value_P Z(3, LOC);
+   Z->next_ravel_Char(UNI_BS);
+   Z->next_ravel_Char(UNI_CR);
+   Z->next_ravel_Char(UNI_LF);
+   Z->check_value(LOC);
 
-   Symbol::assign(QCT, false, LOC);
+   Symbol::assign(Z, false, LOC);
 }
 //=============================================================================
 Quad_TS::Quad_TS()
@@ -1014,13 +1017,13 @@ const APL_time_us offset_us = 1000000 * Workspace::get_v_Quad_TZ().get_offset();
 const YMDhmsu time(now() + offset_us);
 
 Value_P Z(7, LOC);
-   new (Z->next_ravel()) IntCell(time.year);
-   new (Z->next_ravel()) IntCell(time.month);
-   new (Z->next_ravel()) IntCell(time.day);
-   new (Z->next_ravel()) IntCell(time.hour);
-   new (Z->next_ravel()) IntCell(time.minute);
-   new (Z->next_ravel()) IntCell(time.second);
-   new (Z->next_ravel()) IntCell(time.micro / 1000);
+   Z->next_ravel_Int(time.year);
+   Z->next_ravel_Int(time.month);
+   Z->next_ravel_Int(time.day);
+   Z->next_ravel_Int(time.hour);
+   Z->next_ravel_Int(time.minute);
+   Z->next_ravel_Int(time.second);
+   Z->next_ravel_Int(time.micro / 1000);
 
    Z->check_value(LOC);
    return Z;
@@ -1097,7 +1100,7 @@ Quad_TZ::assign(Value_P value, bool clone, const char * loc)
 
    // ignore values outside [-12 ... 14], DOMAIN ERROR for bad types.
 
-Cell & cell = value->get_ravel(0);
+const Cell & cell = value->get_cfirst();
    if (cell.is_integer_cell())
       {
         const APL_Integer ival = cell.get_near_int();
@@ -1149,7 +1152,7 @@ int user_count = 0;
 #endif
 
 Value_P Z(LOC);
-   new (Z->next_ravel())   IntCell(user_count);
+   Z->next_ravel_Int(user_count);
    Z->check_value(LOC);
    return Z;
 }

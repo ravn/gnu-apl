@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,39 +34,39 @@
 
 //-----------------------------------------------------------------------------
 void
-Function::get_attributes(int mode, Cell * dest) const
+Function::get_attributes(int mode, Value & Z) const
 {
    switch(mode)
       {
         case 1: // valences
-                new (dest + 0) IntCell(has_result() ? 1 : 0);
-                new (dest + 1) IntCell(get_fun_valence());
-                new (dest + 2) IntCell(get_oper_valence());
+                Z.next_ravel_Int(has_result() ? 1 : 0);
+                Z.next_ravel_Int(get_fun_valence());
+                Z.next_ravel_Int(get_oper_valence());
                 return;
 
         case 2: // creation time (7⍴0 for system functions)
                 {
                   const YMDhmsu created(get_creation_time());
-                  new (dest + 0) IntCell(created.year);
-                  new (dest + 1) IntCell(created.month);
-                  new (dest + 2) IntCell(created.day);
-                  new (dest + 3) IntCell(created.hour);
-                  new (dest + 4) IntCell(created.minute);
-                  new (dest + 5) IntCell(created.second);
-                  new (dest + 6) IntCell(created.micro/1000);
+                  Z.next_ravel_Int(created.year);
+                  Z.next_ravel_Int(created.month);
+                  Z.next_ravel_Int(created.day);
+                  Z.next_ravel_Int(created.hour);
+                  Z.next_ravel_Int(created.minute);
+                  Z.next_ravel_Int(created.second);
+                  Z.next_ravel_Int(created.micro/1000);
                 }
                 return;
 
         case 3: // execution properties
-                new (dest + 0) IntCell(get_exec_properties()[0]);
-                new (dest + 1) IntCell(get_exec_properties()[1]);
-                new (dest + 2) IntCell(get_exec_properties()[2]);
-                new (dest + 3) IntCell(get_exec_properties()[3]);
+                Z.next_ravel_Int(get_exec_properties()[0]);
+                Z.next_ravel_Int(get_exec_properties()[1]);
+                Z.next_ravel_Int(get_exec_properties()[2]);
+                Z.next_ravel_Int(get_exec_properties()[3]);
                 return;
 
-        case 4: // 4 ⎕DR functions is always 0 0
-                new (dest + 0) IntCell(0);
-                new (dest + 1) IntCell(0);
+        case 4: // 4 ⎕DR for functions is always 0 0
+                Z.next_ravel_Int(0);
+                Z.next_ravel_Int(0);
                 return;
       }
 

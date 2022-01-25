@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ const ShapeItem ec = value.element_count();
    if (value.is_scalar())
       {
         PERFORMANCE_START(start_1)
-        const Cell & cell = value.get_ravel(0);
+        const Cell & cell = value.get_cfirst();
         PrintContext pctx1(pctx);
         if (cell.need_scaling(pctx))   pctx1.set_scaled();
 
@@ -103,7 +103,7 @@ const ShapeItem ec = value.element_count();
            {
              UCS_string ucs;
              ucs.append(UNI_DOUBLE_QUOTE);
-             loop(v, ec)   ucs.append(value.get_ravel(v).get_char_value());
+             loop(v, ec)   ucs.append(value.get_cravel(v).get_char_value());
              ucs.append(UNI_DOUBLE_QUOTE);
              append_ucs(ucs);
              update_info();
@@ -198,7 +198,7 @@ const bool nested = !value.is_simple();
            loop(y, rows)
                {
                  if (huge && (ii_count != interrupt_count))   goto interrupted;
-                 if (value.get_ravel(x + y*cols).need_scaling(pctx))
+                 if (value.get_cravel(x + y*cols).need_scaling(pctx))
                     {
                       need_scaling = true;
                       break;
@@ -226,7 +226,7 @@ const bool nested = !value.is_simple();
                 PrintBuffer & item = item_matrix[y*cols + x];
                 PrintContext pctx1 = pctx;
                 if (scaling[x])   pctx1.set_scaled();
-                const Cell & cell = value.get_ravel(x + y*cols);
+                const Cell & cell = value.get_cravel(x + y*cols);
                 item = cell.character_representation(pctx1);
                 if (!item.get_height())
                    {
@@ -506,7 +506,7 @@ PrintBuffer::pb_empty(const Value & value, PrintContext pctx,
       {
         if (pctx.get_style() == PR_APL_FUN)
            {
-             if (value.get_ravel(0).is_character_cell())   // ''
+             if (value.get_cfirst().is_character_cell())   // ''
                 {
                   UCS_string ucs("''");
                   ColInfo ci;
@@ -515,7 +515,7 @@ PrintBuffer::pb_empty(const Value & value, PrintContext pctx,
                   return;
                 }
 
-             if (value.get_ravel(0).is_numeric())   // ⍬
+             if (value.get_cfirst().is_numeric())   // ⍬
                 {
                   UTF8_string utf("⍬");
                   UCS_string ucs(utf);
@@ -561,7 +561,7 @@ UCS_string ucs;
         ucs.append(UNI_SINGLE_QUOTE);
         loop(e, ec)
            {
-             const Unicode uni = value.get_ravel(e).get_char_value();
+             const Unicode uni = value.get_cravel(e).get_char_value();
              ucs.append(uni);
              if (uni == UNI_SINGLE_QUOTE)   ucs.append(uni);   // ' -> ''
            }
@@ -571,7 +571,7 @@ UCS_string ucs;
       {
         loop(e, ec)
            {
-             PrintBuffer pb = value.get_ravel(e)
+             PrintBuffer pb = value.get_cravel(e)
                                           .character_representation(pctx);
              if (e)   ucs.append(UNI_SPACE);
              ucs.append(UCS_string(pb, 0, pctx.get_PW()));

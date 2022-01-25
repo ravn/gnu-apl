@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,10 +35,10 @@ bool recursive = false;
 
    // a nested scalar A indicates recursive ⎕MAP
    //
-   if (A->get_rank() == 0 && A->get_ravel(0).is_pointer_cell())
+   if (A->get_rank() == 0 && A->get_cfirst().is_pointer_cell())
       {
          recursive = true;
-         A = A->get_ravel(0).get_pointer_value();
+         A = A->get_cfirst().get_pointer_value();
       }
 
    if (A->get_rank() != 2)   RANK_ERROR;
@@ -51,7 +51,7 @@ ShapeItem * indices = new ShapeItem[map_len];
 
    loop(m, map_len)   indices[m] = m;
 
-const ravel_comp_len ctx = { &A->get_ravel(0), 1};
+const ravel_comp_len ctx = { &A->get_cfirst(), 1};
    Heapsort<ShapeItem>::sort(indices, map_len, &ctx, &Quad_MAP::greater_map);
 
    // complain about duplicated keys
@@ -59,8 +59,8 @@ const ravel_comp_len ctx = { &A->get_ravel(0), 1};
 const double qct = Workspace::get_CT();
    for (ShapeItem m = 1; m < map_len; ++m)
        {
-          const Cell & cm1 = A->get_ravel(2*indices[m - 1]);
-          const Cell & cm  = A->get_ravel(2*indices[m    ]);
+          const Cell & cm1 = A->get_cravel(2*indices[m - 1]);
+          const Cell & cm  = A->get_cravel(2*indices[m    ]);
           if (cm1.equal(cm, qct))
              {
                const int qio = Workspace::get_IO();
@@ -72,7 +72,7 @@ const double qct = Workspace::get_CT();
              }
        }
 
-Value_P Z = do_map(&A->get_ravel(0), map_len, indices, B.get(), recursive);
+Value_P Z = do_map(&A->get_cfirst(), map_len, indices, B.get(), recursive);
    delete[] indices;
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -111,7 +111,7 @@ const ravel_comp_len ctx = { ravel_A, 1};
 const ShapeItem len_B = B->element_count();
    if (len_B == 0)   // empty value
       {
-         const Cell & cell_B = B->get_ravel(0);
+         const Cell & cell_B = B->get_cfirst();
          if (const ShapeItem * map =
                    Heapsort<ShapeItem>::search<const Cell &>
                                               (cell_B,
@@ -120,33 +120,28 @@ const ShapeItem len_B = B->element_count();
                                                compare_MAP,
                                                &ctx))
             {
-              Cell & cell_Z0 = Z->get_ravel(0);
+              Cell & cell_Z0 = Z->get_wproto();
               cell_Z0.init(ravel_A[*map*2 + 1], Z.getref(), LOC);
               if (cell_Z0.is_pointer_cell())
                  cell_Z0.get_pointer_value()->to_proto();
-        else if (cell_Z0.is_character_cell())
-                 new (&cell_Z0) CharCell(UNI_SPACE);
-        else
-                 new (&cell_Z0) IntCell(0);
+              else if (cell_Z0.is_character_cell())
+                 Value::zU(&cell_Z0, UNI_NUL);
+              else
+                 Value::z0(&cell_Z0);
             }
          else   // not mapped, simple
             {
-              Z->get_ravel(0).init(cell_B, Z.getref(), LOC);
+              Z->get_wproto().init(cell_B, Z.getref(), LOC);
             }
       }
 
    loop(b, len_B)
        {
-         const Cell & cell_B = B->get_ravel(b);
-         if (const ShapeItem * map =
-                   Heapsort<ShapeItem>::search<const Cell &>
-                                              (cell_B,
-                                               sorted_indices_A,
-                                               len_A,
-                                               compare_MAP,
-                                               &ctx))
+         const Cell & cell_B = B->get_cravel(b);
+         if (const ShapeItem * map = Heapsort<ShapeItem>::search<const Cell &>
+                          (cell_B, sorted_indices_A, len_A, compare_MAP, &ctx))
             {
-             Z->next_ravel()->init(ravel_A[*map*2 + 1], Z.getref(), LOC);
+             Z->next_ravel_Cell(ravel_A[*map*2 + 1]);
             }
          else   // cell_B shall not be mapped
             {
@@ -155,11 +150,11 @@ const ShapeItem len_B = B->element_count();
                    Value_P sub_B = cell_B.get_pointer_value();
                    Value_P sub_Z = do_map(ravel_A, len_A, sorted_indices_A,
                                           sub_B.get(), true);
-                   new (Z->next_ravel())  PointerCell(sub_Z.get(), Z.getref());
+                   Z->next_ravel_Pointer(sub_Z.get());
                  }
               else   // not mapped, simple
                  {
-                  Z->next_ravel()->init(cell_B, Z.getref(), LOC);
+                  Z->next_ravel_Cell(cell_B);
                  }
             }
        }

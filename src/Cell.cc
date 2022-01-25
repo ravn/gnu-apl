@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ Cell::init_from_value(Value * value, Value & cell_owner, const char * loc)
 {
    if (value->is_simple_scalar())
       {
-        value->get_ravel(0).init_other(this, cell_owner, loc);
+        value->get_cfirst().init_other(this, cell_owner, loc);
       }
    else
       {
@@ -58,13 +58,13 @@ Cell::to_value(const char * loc) const
 {
    if (is_pointer_cell())
       {
-        Value_P ret = get_pointer_value();//->clone(LOC);
+        Value_P ret = get_pointer_value();   //->clone(LOC);
         return ret;
       }
    else
       {
         Value_P ret(loc);
-        init_other(&ret->get_ravel(0), ret.getref(), loc);
+        ret->set_ravel_Cell(0, *this);
         ret->check_value(LOC);
         return ret;
       }
@@ -80,18 +80,9 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
         sub->to_proto();
         new (this) PointerCell(sub.get(), cell_owner);
       }
-   else if (other.is_lval_cell())
-      {
-        new (this) LvalCell(0, 0);
-      }
-   else if (other.is_character_cell())
-      {
-        new (this) CharCell(UNI_SPACE);
-      }
-   else // numeric
-      {
-        new (this) IntCell(0);
-      }
+   else if (other.is_lval_cell())      new (this) LvalCell(0, 0);
+   else if (other.is_character_cell()) new (this) CharCell(UNI_SPACE);
+   else                                new (this) IntCell(0);
 }
 //-----------------------------------------------------------------------------
 void
@@ -100,7 +91,7 @@ Cell::copy(Value & val, const Cell * & src, ShapeItem count)
    loop(c, count)
       {
         Assert1(val.more());
-        src++->init_other(val.next_ravel(), val, LOC);
+        val.next_ravel_Cell(*src++);
       }
 }
 //-----------------------------------------------------------------------------
@@ -165,6 +156,10 @@ Cell::get_pointer_value() const
 bool
 Cell::is_near_int(APL_Float value)
 {
+   // all large values are considered int because their fractional part
+   // has been rounded off. However, they may not fit into an int64_t,
+   // and if that is the concern then use is_near_int64_t() below.
+
    if (value > LARGE_INT)   return true;
    if (value < SMALL_INT)   return true;
 
@@ -250,7 +245,7 @@ operator <<(ostream & out, const Cell & cell)
 {
 PrintBuffer pb = cell.character_representation(PR_BOXED_GRAPHIC);
 UCS_string ucs(pb, 0, Workspace::get_PW());
-   return out << ucs << " ";
+   return out << ucs << ' ';
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -258,9 +253,9 @@ Cell::bif_equal(Cell * Z, const Cell * A) const
 {
    // incompatible types ?
    //
-   if (is_character_cell() != A->is_character_cell())   return IntCell::z0(Z);
+   if (is_character_cell() != A->is_character_cell())   return Value::z0(Z);
 
-   return IntCell::zv(Z, equal(*A, Workspace::get_CT()));
+   return Value::zI(Z, equal(*A, Workspace::get_CT()));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -268,33 +263,33 @@ Cell::bif_not_equal(Cell * Z, const Cell * A) const
 {
    // incompatible types ?
    //
-   if (is_character_cell() != A->is_character_cell())   return IntCell::z1(Z);
+   if (is_character_cell() != A->is_character_cell())   return Value::z1(Z);
 
-   return IntCell::zv(Z, !equal(*A, Workspace::get_CT()));
+   return Value::zI(Z, !equal(*A, Workspace::get_CT()));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_greater_than(Cell * Z, const Cell * A) const
 {
-   return IntCell::zv(Z, (A->compare(*this) == COMP_GT) ? 1 : 0);
+   return Value::zI(Z, (A->compare(*this) == COMP_GT) ? 1 : 0);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_less_eq(Cell * Z, const Cell * A) const
 {
-   return IntCell::zv(Z, (A->compare(*this) != COMP_GT) ? 1 : 0);
+   return Value::zI(Z, (A->compare(*this) != COMP_GT) ? 1 : 0);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_less_than(Cell * Z, const Cell * A) const
 {
-   return IntCell::zv(Z, (A->compare(*this) == COMP_LT) ? 1 : 0);
+   return Value::zI(Z, (A->compare(*this) == COMP_LT) ? 1 : 0);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_greater_eq(Cell * Z, const Cell * A) const
 {
-   return IntCell::zv(Z, (A->compare(*this) != COMP_LT) ? 1 : 0);
+   return Value::zI(Z, (A->compare(*this) != COMP_LT) ? 1 : 0);
 }
 //-----------------------------------------------------------------------------
 ShapeItem *

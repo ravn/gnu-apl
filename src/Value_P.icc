@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -235,6 +235,15 @@ const char * args = "const Shape & shape, const char * loc";
    catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
+   value_p->increment_owner_count(loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const Shape & shape, uint8_t * bits, const char * loc)
+{
+   // cannot WS_FULL since bits were allocated beforehand
+   //
+   value_p = new Value(shape, bits, loc);
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }

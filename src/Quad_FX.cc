@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,13 +69,13 @@ UTF8_string creator("⎕FX");
       {
         case 2:   // format 2b.
              {
-               const Value & C = *A->get_ravel(1).get_pointer_value().get();
+               const Value & C = *A->get_cravel(1).get_pointer_value().get();
                UCS_string creator_ucs(C);
                creator = UTF8_string(creator_ucs);
              }
              /* no break */
         case 1:   // format 2a.
-             eprops[0] = A->get_ravel(0).get_int_value();
+             eprops[0] = A->get_cfirst().get_int_value();
              if (eprops[0] < 0)   DOMAIN_ERROR;
              if (eprops[0] > 1)   DOMAIN_ERROR;
              eprops[3] = eprops[2] = eprops[1] = eprops[0];
@@ -83,7 +83,7 @@ UTF8_string creator("⎕FX");
 
         case 5:   // format 2d.
              {
-               const Value & C = *A->get_ravel(4).get_pointer_value().get();
+               const Value & C = *A->get_cravel(4).get_pointer_value().get();
                UCS_string creator_ucs(C);
                creator = UTF8_string(creator_ucs);
              }
@@ -91,7 +91,7 @@ UTF8_string creator("⎕FX");
         case 4:   // format 2c.
              loop(e, 4)
                 {
-                  eprops[e] = A->get_ravel(e).get_int_value();
+                  eprops[e] = A->get_cravel(e).get_int_value();
                   if (eprops[e] < 0)   DOMAIN_ERROR;
                   if (eprops[e] > 1)   DOMAIN_ERROR;
                 }
@@ -138,7 +138,7 @@ UCS_string text;
         const ShapeItem rows = B->element_count();
         loop(row, rows)
            {
-             const Cell & cell = B->get_ravel(row);
+             const Cell & cell = B->get_cravel(row);
              if (cell.is_character_cell())   /// a line with a single char.
                 {
                   const Unicode uni = cell.get_char_value();
@@ -169,7 +169,7 @@ UCS_string text;
                   bool skipping = false;
                   loop(l, line_len)
                      {
-                       const Cell & c = line->get_ravel(l);
+                       const Cell & c = line->get_cravel(l);
                        if (!c.is_character_cell())
                           {
                             MORE_ERROR() << "non-char in line at " LOC;
@@ -184,7 +184,7 @@ UCS_string text;
                 }
              else if (line->is_scalar())
                 {
-                  const Cell & c1 = line->get_ravel(0);
+                  const Cell & c1 = line->get_cfirst();
                   if (!c1.is_character_cell())
                      {
                        MORE_ERROR() << "non-char in line at " LOC;
@@ -207,7 +207,7 @@ UCS_string text;
       {
         const ShapeItem rows = B->get_rows();
         const ShapeItem cols = B->get_cols();
-        const Cell * cB = &B->get_ravel(0);
+        const Cell * cB = &B->get_cfirst();
 
         loop(row, rows)
            {
@@ -236,7 +236,7 @@ UserFunction * fun = UserFunction::fix(text, error_line, false, LOC, creator,
    if (fun == 0)
       {
         Value_P Z(LOC);
-        new (Z->next_ravel())   IntCell(error_line + Workspace::get_IO());
+        Z->next_ravel_Int(error_line + Workspace::get_IO());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }

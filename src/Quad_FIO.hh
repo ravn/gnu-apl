@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -152,11 +152,11 @@ protected:
 
    /// return the open file for (APL integer) \b handle
    static file_entry & get_file_entry(const Value & handle)
-      { return get_file_entry(handle.get_ravel(0).get_near_int()); }
+      { return get_file_entry(handle.get_cravel(0).get_near_int()); }
 
    /// return the open FILE * (APL integer) \b handle
    static FILE * get_FILE(const Value & handle)
-      { return get_FILE(handle.get_ravel(0).get_near_int()); }
+      { return get_FILE(handle.get_cravel(0).get_near_int()); }
 
    /// return the open file descriptor for (APL integer) \b handle
    static int get_fd(const Value & value)

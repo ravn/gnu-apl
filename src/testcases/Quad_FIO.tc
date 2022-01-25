@@ -278,10 +278,10 @@ World!
  22 3.14 C DEFGH st⍴ing 57 
 
       FMT←"Hello %[Hal]" ◊ DATA←"Hello Halloween"
-      FMT FIO∆sscanf DATA
+      FMT ⎕FIO['sscanf'] DATA
  Hall 
       FMT←"Hello %[^wen]" ◊ DATA←"Hello Halloween"
-      FMT FIO∆sscanf DATA
+      FMT ⎕FIO['sscanf'] DATA
  Hallo 
 
       ⍝ execve
