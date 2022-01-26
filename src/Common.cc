@@ -122,7 +122,7 @@ rlimit rl;
    rl.rlim_cur = RLIM_INFINITY;
    setrlimit(RLIMIT_NPROC, &rl);
 
-   // limit the virtual memory size to avoid new() problem with large values
+   // limit the virtual memory size to avoid new() problems with large values
    //
 #endif
 

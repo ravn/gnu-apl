@@ -27,6 +27,7 @@
 #include "FloatCell.hh"
 #include "IntCell.hh"
 #include "LvalCell.hh"
+#include "NumericCell.hh"
 #include "PointerCell.hh"
 #include "Shape.hh"
 
@@ -311,7 +312,8 @@ public:
         Assert1(idx < nz_element_count());
         if (!is_packed())   return ravel[idx];
         const uint8_t * bits = reinterpret_cast<const uint8_t *>(ravel);
-        return bits[idx >> 3] & 1 << (idx & 7) ? boolean_TRUE : boolean_FALSE;
+        return bits[idx >> 3] & 1 << (idx & 7) ? IntCell::boolean_TRUE
+                                               : IntCell::boolean_FALSE;
       }
 
    /// return the first element of the ravel (which is always present).
@@ -738,111 +740,65 @@ public:
       /// increment the number of (smart-) pointers to this value
    void increment_owner_count(const char * loc)
       {
-        Assert1(reinterpret_cast<void *>(this) != 0);
-        if (check_ptr == charP(this) + 7)
-           ++owner_count;
+        const char * cp_this = charP(this);
+        Assert1(cp_this);
+        Assert1(check_ptr == (cp_this + 7));
+        ++owner_count;
       }
 
       /// decrement the number of (smart-) pointers to this value and delete
       /// this value if no more pointers exist
       void decrement_owner_count(const char * loc)
          {
-           Assert1(reinterpret_cast<void *>(this) != 0);
-           if (check_ptr == charP(this) + 7)
-              {
-                Assert1(owner_count > 0);
-                --owner_count;
+           const char * cp_this = charP(this);
+           Assert1(cp_this);
+           Assert1(check_ptr == (cp_this + 7));
+           Assert1(owner_count > 0);
 
-                if (owner_count == 0) delete this;
-              }
+           // NOTE: the desctructor (triggered by 'delete this' below) will
+           // check check_ptr and then set check_ptr = 0, o on't do it here.
+           //
+           if (--owner_count == 0)   delete this;
          }
-
-   /// initialize Z to Unicode u
-   static ErrorCode zU(Cell * Z, Unicode u)
-      { new (Z) CharCell(u);   return E_NO_ERROR; }
-
-   /// initialize Z to integer 0
-   static ErrorCode z0(Cell * Z)
-      { new (Z) IntCell(0);   return E_NO_ERROR; }
-
-   /// initialize Z to integer 1
-   static ErrorCode z1(Cell * Z)
-      { new (Z) IntCell(1);   return E_NO_ERROR; }
-
-   /// initialize Z to integer -1
-   static ErrorCode z_1(Cell * Z)
-      { new (Z) IntCell(-1);   return E_NO_ERROR; }
 
    /// initialize Z to uint8_t byte
    static void zB(uint8_t * Z, bool byte)
       { *Z = byte; }
 
-   /// initialize Z to APL_Integer v
-   static ErrorCode zI(Cell * Z, APL_Integer aint)
-      { new (Z) IntCell(aint);   return E_NO_ERROR; }
-
-   /// initialize Z to APL_Float f
-   static ErrorCode zF(Cell * Z, APL_Float flt)
-      { new (Z) FloatCell(flt);   return E_NO_ERROR; }
-
-   /// initialize Z to the smallest possible Celltype
-   ///
-   static ErrorCode zv(Cell * Z, APL_Float flt)
-      {
-        return Cell::is_near_int64_t(flt) ? zI(Z, flt) : zF(Z, flt);
-      }
-
-   static ErrorCode zv(Cell * Z, APL_Complex cpx)
-      {
-        return Cell::is_near_zero(cpx.imag()) ? zv(Z, cpx.real()) : zC(Z, cpx);
-      }
-
    /// init the next ravel element to 0
-   ErrorCode z0()                   { return z0(next_ravel());        }
+   void z0()   { IntCell::z0(next_ravel()); }
 
 
    /// init the next ravel element to 1
-   ErrorCode z1()                   { return z1(next_ravel());        }
+   void z1()   { IntCell::z1(next_ravel()); }
 
-   /// init the next ravel element to auni
-   ErrorCode zU(Unicode auni)       { return zU(next_ravel(), auni);  }
+   /// init the next ravel element to ¯1
+   void z_1()   { IntCell::z_1(next_ravel()); }
 
    /// init the next ravel element to aint
-   ErrorCode zI(APL_Integer aint)   { return zI(next_ravel(), aint);  }
+   void zI(APL_Integer aint)   { IntCell::zI(next_ravel(), aint);  }
+
+   /// init the next ravel element to auni
+   void zU(Unicode auni)   { CharCell::zU(next_ravel(), auni); }
 
    /// init the next ravel element to aflt
-   ErrorCode zF(APL_Float aflt)     { return zF(next_ravel(), aflt);  }
+   void zF(APL_Float aflt)   { FloatCell::zF(next_ravel(), aflt);  }
 
    /// init the next ravel element to acpx
-   ErrorCode zC(APL_Complex acpx)   { return zC(next_ravel(), acpx);  }
+   void zC(APL_Complex acpx)   { ComplexCell::zC(next_ravel(), acpx); }
 
    /// init the next ravel element to rJi
-   ErrorCode zC(APL_Float r,
-                APL_Float i)        { return zC(next_ravel(), r, i);  }
+   void zC(APL_Float r, APL_Float i)   { ComplexCell::zC(next_ravel(), r, i); }
 
    /// init the next ravel element to aflt
-   ErrorCode zv(APL_Float aflt)     { return zv(next_ravel(), aflt);  }
+   void zV(APL_Float aflt)   { NumericCell::zV(next_ravel(), aflt);  }
 
    /// init the next ravel element to acpx
-   ErrorCode zv(APL_Complex acpx)    { return zv(next_ravel(), acpx); }
+   void zV(APL_Complex acpx)   { NumericCell::zV(next_ravel(), acpx); }
 
    /// check if WS is FULL after allocating value with \b cell_count items
    static bool check_WS_FULL(const char * args, ShapeItem cell_count,
                              const char * loc);
-
-#ifdef RATIONAL_NUMBERS_WANTED
-   /// initialize Z to quotient numer÷denom
-   static ErrorCode zR(Cell * Z, APL_Integer numer, APL_Integer denom)
-      { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }
-#endif // RATIONAL_NUMBERS_WANTED
-
-   /// initialize Z to complex cpx
-   static ErrorCode zC(Cell * Z, APL_Complex cpx)
-      { new (Z) ComplexCell(cpx);   return E_NO_ERROR; }
-
-   /// initialize Z to complex r + ij
-   static ErrorCode zC(Cell * Z, APL_Float r, APL_Float j)
-      { new (Z) ComplexCell(r, j);   return E_NO_ERROR; }
 
    /// handler for catch(Error) in init_ravel() (never called)
    static void catch_Error(const Error & error, const char * args,
@@ -857,10 +813,10 @@ public:
                          const char * loc);
 
    /// the number of fast (recycled) new() calls
-   static uint64_t fast_new;
+   static uint64_t fast_new_count;
 
    /// the number of slow (malloc() based) new() calls
-   static uint64_t slow_new;
+   static uint64_t slow_new_count;
 
 protected:
    /// return the next ravel cell to be initialized (excluding prototype)
@@ -902,12 +858,6 @@ protected:
    /// the cells of a short (i.e. ⍴,value ≤ SHORT_VALUE_LENGTH_WANTED) value
    Cell short_value[SHORT_VALUE_LENGTH_WANTED];
 
-   /// \b false returned for packed Cells
-   static const IntCell boolean_FALSE;
-
-   /// \b true returned for packed Cells
-   static const IntCell boolean_TRUE;
-
    /// a linked list of values that have been deleted
    static _deleted_value * deleted_values;
 
@@ -932,11 +882,11 @@ protected:
              --deleted_values_count;
              void * ret = deleted_values;
              deleted_values = deleted_values->next;
-             ++fast_new;
+             ++fast_new_count;
              return ret;
            }
 
-        ++slow_new;
+        ++slow_new_count;
         return ::operator new(sz);
       }
 

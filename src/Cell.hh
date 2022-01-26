@@ -466,42 +466,6 @@ public:
    virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
-   /// downcast to const CharCell
-   virtual const CharCell & cCharCell() const  { DOMAIN_ERROR; }
-
-   /// downcast to CharCell
-   virtual CharCell & vCharCell()         { DOMAIN_ERROR; }
-
-   /// downcast to const ComplexCell
-   virtual const ComplexCell & cComplexCell()   { DOMAIN_ERROR; }
-
-   /// downcast to ComplexCell
-   virtual ComplexCell & vComplexCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to const FloatCell
-   virtual const FloatCell & cFloatCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to FloatCell
-   virtual FloatCell & vFloatCell()   { DOMAIN_ERROR; }
-
-   /// downcast to const IntCell
-   virtual const IntCell & cIntCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to IntCell
-   virtual IntCell & vIntCell()   { DOMAIN_ERROR; }
-
-   /// downcast to const LvalCell
-   virtual const LvalCell & cLvalCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to LvalCell
-   virtual LvalCell & vLvalCell()   { DOMAIN_ERROR; }
-
-   /// downcast to const PointerCell
-   virtual const PointerCell & cPointerCell() const   { DOMAIN_ERROR; }
-
-   /// downcast to PointerCell
-   virtual PointerCell & vPointerCell()   { DOMAIN_ERROR; }
-
    /// return \b true if z = a + b had an overflow.
    static bool sum_overflow(APL_Integer z, APL_Integer a, APL_Integer b)
       {

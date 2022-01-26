@@ -942,9 +942,11 @@ Bif_F12_ELEMENT::eval_B(Value_P B) const
                       }
                    else
                       {
-                        Value * owner = C->cLvalCell().get_cell_owner();
+                        const LvalCell & C_lval =
+                              reinterpret_cast<LvalCell &>(C);
+                        Value * owner = C_lval.get_cell_owner();
                         new (&Z->get_wproto())
-                            LvalCell(C->get_lval_value(), owner);
+                            LvalCell(C_lval.get_lval_value(), owner);
                         break;
                       }
                  }
@@ -963,7 +965,8 @@ Bif_F12_ELEMENT::eval_B(Value_P B) const
 
               if (C->is_lval_cell())
                  {
-                   left = C->cLvalCell().get_cell_owner();
+                   const LvalCell & C_lval = reinterpret_cast<LvalCell &>(C);
+                   left = C_lval.get_cell_owner() != 0;
                    C = C->get_lval_value();
                    continue;
                  }

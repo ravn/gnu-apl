@@ -81,7 +81,7 @@ const Shape shape_Z = B->get_shape().high_shape(B->get_rank() - rank_chunk_B);
 const Shape shape_B = B->get_shape().low_shape(rank_chunk_B);
 
 Value_P vsh_B(shape_B.get_rank(), LOC);
-   Value::z0(&vsh_B->get_wproto());   // prototype
+   IntCell::z0(&vsh_B->get_wproto());   // prototype
    loop(sh, shape_B.get_rank())
        vsh_B->next_ravel_Int(shape_B.get_shape_item(sh));
    vsh_B->check_value(LOC);

@@ -211,7 +211,7 @@ CollatingCache cache(A.getref(), base_B1, comp_len);
 
    // then sort Z (actually re-arrange Z so that B[Z] is sorted)
    //
-IntCell * Z0 = &Z->get_wfirst().vIntCell();
+IntCell * Z0 = reinterpret_cast<IntCell *>(&Z->get_wfirst());
    if (order == SORT_ASCENDING)
       Heapsort<IntCell>::sort(Z0, len_BZ, &cache, &CollatingCache::greater_vec);
    else

@@ -2406,7 +2406,7 @@ Token_string tos;
    if (tos.size() != size_t(shape.get_volume()))   return;
 
 Value_P Z(shape, LOC);
-   Value::z0(&Z->get_wproto());   // prototype
+   IntCell::z0(&Z->get_wproto());   // prototype
 
 const ShapeItem ec = Z->element_count();
    loop(e, ec)
@@ -2457,7 +2457,7 @@ Symbol * sym = 0;
 
 Value_P Z(shape, LOC);
 const ShapeItem ec = Z->element_count();
-   Value::zU(&Z->get_wproto(), UNI_SPACE);   // prototype
+   CharCell::zU(&Z->get_wproto(), UNI_SPACE);   // prototype
 
 ShapeItem padded = 0;
    loop(e, ec)

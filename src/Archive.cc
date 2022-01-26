@@ -203,27 +203,41 @@ const ShapeItem len = v.nz_element_count();
 const Cell * C = &v.get_cfirst();
 
 int space = do_indent();
-char cc[80];   // output line buffer
    if (v.is_packed())   // Value has a packed (non-Cell) ravel
       {
         const uint8_t * bytes = reinterpret_cast<const uint8_t *>(C);
         const ShapeItem byte_count = (len + 7)/8;
 
-        snprintf(cc, sizeof(cc), "<Ravel vid=\"%d\" bytes=\"", vid);
-        out << cc << uhex;
+        // print the start of the XML element
+        {
+          char cc[80];   // output line buffer
+          snprintf(cc, sizeof(cc), "<Ravel vid=\"%d\" bytes=\"", vid);
+          out << cc;
+        }
+
+        // print the data of the bytes attribute
+        ++indent;
+        out << uhex << UNI_PAD_U9;   // emit the following bytes in hex
+        if (space < byte_count)   out << endl;
 
         loop(b, byte_count)   // print with max. 64 bytes per line
             {
-              if ((b & 0x3F) == 0)   out << "\n    " << UNI_PAD_U9;
+              if (b && (b & 0x3F) == 0)   out << "\n    " << UNI_PAD_U9;
               out << (bytes[b] & 0xFF);
             }
         out << nohex << "\"/>" << endl;
+        --indent;
       }
    else
       {
-        snprintf(cc, sizeof(cc), "<Ravel vid=\"%d\" cells=\"", vid);
-        out << decr(space, cc);
+        // print the start of the XML element
+        {
+          char cc[80];   // output line buffer
+          snprintf(cc, sizeof(cc), "<Ravel vid=\"%d\" cells=\"", vid);
+          out << decr(space, cc);
+        }
 
+        // print the data of the 'cells' attribute
         ++indent;
         loop(l, len)   emit_cell(*C++, space);
 
@@ -243,75 +257,78 @@ XML_Saving_Archive::emit_cell(const Cell & cell, int & space)
 char cc[80];
    switch(cell.get_cell_type())
       {
-            case CT_CHAR:   // uses UNI_PAD_U0, UNI_PAD_U1, and UNI_PAD_U2
-                 emit_unicode(cell.get_char_value(), space);
-                 break;
+        case CT_CHAR:   // uses UNI_PAD_U0, UNI_PAD_U1, and UNI_PAD_U2
+             emit_unicode(cell.get_char_value(), space);
+             break;
 
-            case CT_INT:   // uses UNI_PAD_U3
-                 space -= leave_char_mode();
-                 snprintf(cc, sizeof(cc), "%lld",
-                          long_long(cell.get_int_value()));
-                 NEED(1 + strlen(cc)) << UNI_PAD_U3 << decr(--space, cc);
-                 break;
+        case CT_INT:   // uses UNI_PAD_U3
+             space -= leave_char_mode();
+             snprintf(cc, sizeof(cc), "%lld",
+                      long_long(cell.get_int_value()));
+             NEED(1 + strlen(cc)) << UNI_PAD_U3 << decr(--space, cc);
+             break;
 
-            case CT_FLOAT:   // uses UNI_PAD_U4 or UNI_PAD_U8
-                 space -= leave_char_mode();
+        case CT_FLOAT:   // uses UNI_PAD_U4 or UNI_PAD_U8
+             space -= leave_char_mode();
 #ifdef RATIONAL_NUMBERS_WANTED
-                 {
-                 const FloatCell & flt = cell.cFloatCell();
-                 if (const APL_Integer denom = flt.get_denominator())
-                    {
-                      const APL_Integer numer = flt.get_numerator();
-                      snprintf(cc, sizeof(cc), "%lld÷%lld", long_long(numer),
-                               long_long(denom));
-                      NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
-                      break;
-                    }
-                 }
+             {
+               const FloatCell & flt =
+                                 reinterpret_cast<const FloatCell &>(cell);
+               if (const APL_Integer denom = flt.get_denominator())
+                  {
+                    // a non-zero denominator indicates a rational quotient)
+                    //
+                    const APL_Integer numer = flt.get_numerator();
+                    snprintf(cc, sizeof(cc), "%lld÷%lld", long_long(numer),
+                                                          long_long(denom));
+                    NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
+                    break;
+                  }
+             }
 #endif
-                 snprintf(cc, sizeof(cc), "%.17g",
-                          double(cell.get_real_value()));
-                 NEED(1 + strlen(cc)) << UNI_PAD_U4 << decr(--space, cc);
-                 break;
+             snprintf(cc, sizeof(cc), "%.17g",
+                      double(cell.get_real_value()));
+             NEED(1 + strlen(cc)) << UNI_PAD_U4 << decr(--space, cc);
+             break;
 
-            case CT_COMPLEX:   // uses UNI_PAD_U5
-                 space -= leave_char_mode();
-                 snprintf(cc, sizeof(cc), "%17gJ%17g",
-                          double(cell.get_real_value()),
-                          double(cell.get_imag_value()));
-                 NEED(1 + strlen(cc)) << UNI_PAD_U5 << decr(--space, cc);
-                 break;
+        case CT_COMPLEX:   // uses UNI_PAD_U5
+             space -= leave_char_mode();
+             snprintf(cc, sizeof(cc), "%17gJ%17g",
+                      double(cell.get_real_value()),
+                      double(cell.get_imag_value()));
+             NEED(1 + strlen(cc)) << UNI_PAD_U5 << decr(--space, cc);
+             break;
 
-            case CT_POINTER:   // uses UNI_PAD_U6
-                 space -= leave_char_mode();
-                 {
-                   const Vid vid = find_vid(cell.get_pointer_value().get());
-                   snprintf(cc, sizeof(cc), "%d", vid);
-                   NEED(1 + strlen(cc)) << UNI_PAD_U6 << decr(--space, cc);
-                 }
-                 break;
+        case CT_POINTER:   // uses UNI_PAD_U6
+             space -= leave_char_mode();
+             {
+               const Vid vid = find_vid(cell.get_pointer_value().get());
+               snprintf(cc, sizeof(cc), "%d", vid);
+               NEED(1 + strlen(cc)) << UNI_PAD_U6 << decr(--space, cc);
+             }
+             break;
 
-            case CT_CELLREF:   // uses UNI_PAD_U7
-                 space -= leave_char_mode();
-                 {
-                   const Cell * cp = cell.get_lval_value();
-                   if (cp)   // valid Cell *
-                      {
-                        const Value * owner = cell.cLvalCell().get_cell_owner();
-                        const long long offset = owner->get_offset(cp);
-                        const Vid vid = find_vid(owner);
-                        snprintf(cc, sizeof(cc), "%d[%lld]", vid, offset);
-                        NEED(1 + strlen(cc)) << UNI_PAD_U7 << decr(--space, cc);
-                      }
-                   else     // 0-cell-pointer
-                      {
-                        snprintf(cc, sizeof(cc), "0");
-                        NEED(2) << UNI_PAD_U7 << "0" << decr(--space, cc);
-                      }
-                 }
-                 break;
+        case CT_CELLREF:   // uses UNI_PAD_U7
+             {
+             space -= leave_char_mode();
+             const LvalCell & lv = reinterpret_cast<const LvalCell &>(cell);
+             if (lv.get_lval_value())   // lv has a valid target
+                {
+                  const Value * owner = lv.get_cell_owner();
+                  const long long offset = owner->get_offset(&lv);
+                  const Vid vid = find_vid(owner);
+                  snprintf(cc, sizeof(cc), "%d[%lld]", vid, offset);
+                  NEED(1 + strlen(cc)) << UNI_PAD_U7 << decr(--space, cc);
+                }
+             else     // 0-cell-pointer (from selective assignment)
+                {
+                  snprintf(cc, sizeof(cc), "0");
+                  NEED(2) << UNI_PAD_U7 << "0" << decr(--space, cc);
+                }
+             }
+             break;
 
-            default: Assert(0);
+        default: Assert(0);
       }
 }
 //-----------------------------------------------------------------------------

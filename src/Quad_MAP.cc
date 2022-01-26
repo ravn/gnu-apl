@@ -125,9 +125,9 @@ const ShapeItem len_B = B->element_count();
               if (cell_Z0.is_pointer_cell())
                  cell_Z0.get_pointer_value()->to_proto();
               else if (cell_Z0.is_character_cell())
-                 Value::zU(&cell_Z0, UNI_NUL);
+                 CharCell::zU(&cell_Z0, UNI_NUL);
               else
-                 Value::z0(&cell_Z0);
+                 IntCell::z0(&cell_Z0);
             }
          else   // not mapped, simple
             {

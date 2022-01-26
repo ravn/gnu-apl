@@ -271,7 +271,7 @@ Cell * cell = &val->get_wravel(idx);
         v->decrement_owner_count(LOC);
       }
 
-   Value::zU(cell, Unicode(new_char));
+   CharCell::zU(cell, Unicode(new_char));
 }
 //-----------------------------------------------------------------------------
 
@@ -286,7 +286,7 @@ Cell * cell = &val->get_wravel(idx);
         v->decrement_owner_count(LOC);
       }
 
-   Value::zI(cell, new_int);
+   IntCell::zI(cell, new_int);
 }
 //-----------------------------------------------------------------------------
 
@@ -301,7 +301,7 @@ Cell * cell = &val->get_wravel(idx);
         v->decrement_owner_count(LOC);
       }
 
-   Value::zF(cell, new_double);
+   FloatCell::zF(cell, new_double);
 }
 //-----------------------------------------------------------------------------
 
@@ -316,7 +316,7 @@ Cell * cell = &val->get_wravel(idx);
         v->decrement_owner_count(LOC);
       }
 
-   Value::zC(cell, new_real, new_imag);
+   ComplexCell::zC(cell, new_real, new_imag);
 }
 //-----------------------------------------------------------------------------
 void

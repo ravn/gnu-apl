@@ -253,9 +253,9 @@ Cell::bif_equal(Cell * Z, const Cell * A) const
 {
    // incompatible types ?
    //
-   if (is_character_cell() != A->is_character_cell())   return Value::z0(Z);
+   if (is_character_cell() != A->is_character_cell())   return IntCell::z0(Z);
 
-   return Value::zI(Z, equal(*A, Workspace::get_CT()));
+   return IntCell::zI(Z, equal(*A, Workspace::get_CT()));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -263,33 +263,33 @@ Cell::bif_not_equal(Cell * Z, const Cell * A) const
 {
    // incompatible types ?
    //
-   if (is_character_cell() != A->is_character_cell())   return Value::z1(Z);
+   if (is_character_cell() != A->is_character_cell())   return IntCell::z1(Z);
 
-   return Value::zI(Z, !equal(*A, Workspace::get_CT()));
+   return IntCell::zI(Z, !equal(*A, Workspace::get_CT()));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_greater_than(Cell * Z, const Cell * A) const
 {
-   return Value::zI(Z, (A->compare(*this) == COMP_GT) ? 1 : 0);
+   return IntCell::zI(Z, (A->compare(*this) == COMP_GT) ? 1 : 0);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_less_eq(Cell * Z, const Cell * A) const
 {
-   return Value::zI(Z, (A->compare(*this) != COMP_GT) ? 1 : 0);
+   return IntCell::zI(Z, (A->compare(*this) != COMP_GT) ? 1 : 0);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_less_than(Cell * Z, const Cell * A) const
 {
-   return Value::zI(Z, (A->compare(*this) == COMP_LT) ? 1 : 0);
+   return IntCell::zI(Z, (A->compare(*this) == COMP_LT) ? 1 : 0);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_greater_eq(Cell * Z, const Cell * A) const
 {
-   return Value::zI(Z, (A->compare(*this) != COMP_LT) ? 1 : 0);
+   return IntCell::zI(Z, (A->compare(*this) != COMP_LT) ? 1 : 0);
 }
 //-----------------------------------------------------------------------------
 ShapeItem *

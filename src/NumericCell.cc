@@ -35,8 +35,8 @@ NumericCell::bif_not(Cell * Z) const
 {
    if (!is_near_bool())   return E_DOMAIN_ERROR;
 
-   if (get_near_bool())   Value::z0(Z);
-   else                   Value::z1(Z);
+   if (get_near_bool())   IntCell::z0(Z);
+   else                   IntCell::z1(Z);
    return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ NumericCell::bif_not_bitwise(Cell * Z) const
 {
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
 
-   return Value::zI(Z, ~get_near_int());
+   return IntCell::zI(Z, ~get_near_int());
 }
 //-----------------------------------------------------------------------------
 
@@ -1197,10 +1197,10 @@ NumericCell::K33_binomial(Cell * Z, APL_Integer N, APL_Integer K, bool negate)
    if (K <= 7)
       {
         if (K == 0)                             // N over 0 is 1 (0! ÷ 0!)
-           return Value::zI(Z, negate ? -1 : 1);
+           return IntCell::zI(Z, negate ? -1 : 1);
 
         if (K == 1)                             // N over 1 is N (N  ÷ 1)
-           return Value::zI(Z, negate ? -N : N);
+           return IntCell::zI(Z, negate ? -N : N);
 
         {
            // max_N is the maximum N for which N!K is so large that it
@@ -1242,7 +1242,7 @@ Assert(found);
         APL_Integer z = 1;
         loop(n, K)   z *= numer[n];
         if (negate)   z = -z;
-        return Value::zI(Z, z);
+        return IntCell::zI(Z, z);
       }
 
    // at this point, K >= 8. If K ≤ 33 then we try a table lookup.
@@ -1258,8 +1258,8 @@ Assert(found);
         if (uint64_t(N) <= table_K[0])
            {
              const APL_Integer z = table_K[1 + (N - K)];
-             if (negate)   Value::zI(Z, -z);
-             else          Value::zI(Z,  z);
+             if (negate)   IntCell::zI(Z, -z);
+             else          IntCell::zI(Z,  z);
              return E_NO_ERROR;
            }
       }
@@ -1301,7 +1301,7 @@ const int row = (r_A < 0   ? 4 : 0)
    //
 const char * how = "-0?-0?-0";   // '?' means case cannot occur
 const char chow = how[row];
-   if (chow == '0')   return Value::z0(Z);   // cases 1, 4, and 7
+   if (chow == '0')   return IntCell::z0(Z);   // cases 1, 4, and 7
    Assert(chow == '-');                        // cases 0, 3, and 6
 
    if (!   is_near_int())   return real_binomial(Z, A);
@@ -1337,7 +1337,7 @@ const APL_Complex gam_1_a    = ComplexCell::gamma(r_A +    1.0, i_A);
 const APL_Complex gam_1_b    = ComplexCell::gamma(r_B +    1.0, i_B);
 const APL_Complex gam_1_b__a = ComplexCell::gamma(r_B__A + 1.0, i_B__A);
 
-   return Value::zC(Z, gam_1_b / (gam_1_a * gam_1_b__a));
+   return ComplexCell::zC(Z, gam_1_b / (gam_1_a * gam_1_b__a));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1363,7 +1363,7 @@ const APL_Float gam_r_1_B__A = tgamma(r_1_B__A);
 const APL_Float z = (gam_r_1_B / gam_r_1_A) / gam_r_1_B__A;
    if (!isfinite(z))   return E_DOMAIN_ERROR;
 
-   return Value::zF(Z, z);
+   return FloatCell::zF(Z, z);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1372,10 +1372,10 @@ NumericCell::integer_binomial(Cell * Z, APL_Integer N, APL_Integer K,
 {
    // N over K is 0 for all K > N
    //
-   if (K > N)   return Value::z0(Z);
+   if (K > N)   return IntCell::z0(Z);
 
    // N over N is 1
-   if (K == N)   return Value::zI(Z, negate ? -1 : 1);
+   if (K == N)   return IntCell::zI(Z, negate ? -1 : 1);
 
    // symmetry: N over K == N over (N-K). We want K to be as small
    // as possible, therefore:
@@ -1404,8 +1404,8 @@ APL_Float Q = 1.0;
        }
 
    if (negate)   Q = -Q;
-   if (is_near_int64_t(Q))   return Value::zI(Z, near_int(Q));
-   else                      return Value::zF(Z, Q);
+   if (is_near_int64_t(Q))   return IntCell::zI(Z, near_int(Q));
+   else                      return FloatCell::zF(Z, Q);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1415,11 +1415,11 @@ const double qct = Workspace::get_CT();
 
    // if either value is 0 then return 0
    //
-   if (A->is_near_zero() || is_near_zero())   return Value::z0(Z);
+   if (A->is_near_zero() || is_near_zero())   return IntCell::z0(Z);
 
    // if both args are 1 then return the classical A ∧ B
    //
-   if (A->is_near_one() && is_near_one())   return Value::z1(Z);
+   if (A->is_near_one() && is_near_one())   return IntCell::z1(Z);
 
    // handle the complex case before the int case because
    // is_near_int() can be true for complex numbers.
@@ -1433,7 +1433,7 @@ const double qct = Workspace::get_CT();
                                            get_complex_value(), qct);
         if (err)   return err;
 
-        return Value::zC(Z, A->get_complex_value() * (get_complex_value()/gcd));
+        return ComplexCell::zC(Z, A->get_complex_value() * (get_complex_value()/gcd));
       }
 
    // if both args are int then return the least common multiple of them
@@ -1451,9 +1451,9 @@ const double qct = Workspace::get_CT();
         const APL_Float lcm_double = 1.0 * a * b / gcd;
         if (lcm_double > LARGE_INT || lcm_double < SMALL_INT)
            {
-             return Value::zF(Z, lcm_double);
+             return FloatCell::zF(Z, lcm_double);
            }
-        return Value::zI(Z, a * (b / gcd));
+        return IntCell::zI(Z, a * (b / gcd));
       }
 
    // if both args are real then return the (real) least common multiple of them
@@ -1466,7 +1466,7 @@ const double qct = Workspace::get_CT();
         const ErrorCode err = flt_gcd(gcd, a, b, qct);
         if (err)   return err;
         const APL_Float b_gcd = b / gcd;
-        return Value::zF(Z, a * b_gcd);
+        return FloatCell::zF(Z, a * b_gcd);
       }
 
    return E_DOMAIN_ERROR;   // char ?
@@ -1478,7 +1478,7 @@ NumericCell::bif_and_bitwise(Cell * Z, const Cell * A) const
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   return Value::zI(Z, A->get_near_int() & get_near_int());
+   return IntCell::zI(Z, A->get_near_int() & get_near_int());
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1487,7 +1487,7 @@ NumericCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   return Value::zI(Z, ~(A->get_near_int() ^ get_near_int()));
+   return IntCell::zI(Z, ~(A->get_near_int() ^ get_near_int()));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1496,7 +1496,7 @@ NumericCell::bif_not_equal_bitwise(Cell * Z, const Cell * A) const
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   return Value::zI(Z, A->get_near_int() ^ get_near_int());
+   return IntCell::zI(Z, A->get_near_int() ^ get_near_int());
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1505,8 +1505,8 @@ NumericCell::bif_nand(Cell * Z, const Cell * A) const
    if (!is_near_bool())      return E_DOMAIN_ERROR;
    if (!A->is_near_bool())   return E_DOMAIN_ERROR;
 
-   if (A->get_near_bool() && get_near_bool())   return Value::z0(Z);
-   else                                         return Value::z1(Z);
+   if (A->get_near_bool() && get_near_bool())   return IntCell::z0(Z);
+   else                                         return IntCell::z1(Z);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1515,7 +1515,7 @@ NumericCell::bif_nand_bitwise(Cell * Z, const Cell * A) const
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   return Value::zI(Z, ~(A->get_near_int() & get_near_int()));
+   return IntCell::zI(Z, ~(A->get_near_int() & get_near_int()));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1524,8 +1524,8 @@ NumericCell::bif_nor(Cell * Z, const Cell * A) const
    if (!is_near_bool())      return E_DOMAIN_ERROR;
    if (!A->is_near_bool())   return E_DOMAIN_ERROR;
 
-   if (A->get_near_bool() || get_near_bool())   return Value::z0(Z);
-   else                                         return Value::z1(Z);
+   if (A->get_near_bool() || get_near_bool())   return IntCell::z0(Z);
+   else                                         return IntCell::z1(Z);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1534,7 +1534,7 @@ NumericCell::bif_nor_bitwise(Cell * Z, const Cell * A) const
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   return Value::zI(Z, ~(A->get_near_int() | get_near_int()));
+   return IntCell::zI(Z, ~(A->get_near_int() | get_near_int()));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -1546,20 +1546,20 @@ const double qct = Workspace::get_CT();
    //
    if (A->is_near_bool() && is_near_bool())
       {
-        if ( A->get_near_bool() || get_near_bool())   return Value::z1(Z);
-        else                                          return Value::z0(Z);
+        if ( A->get_near_bool() || get_near_bool())   return IntCell::z1(Z);
+        else                                          return IntCell::z0(Z);
       }
 
    if (!A->is_near_real() || !is_near_real())   // complex
       {
         if (A->is_near_zero())
            {
-             return Value::zC(Z, get_complex_value());
+             return ComplexCell::zC(Z, get_complex_value());
            }
 
         if (is_near_zero())
            {
-             return Value::zC(Z, A->get_complex_value());
+             return ComplexCell::zC(Z, A->get_complex_value());
            }
 
         // a or b is complex; we assume (require) Gaussian integers.
@@ -1568,7 +1568,7 @@ const double qct = Workspace::get_CT();
         const ErrorCode err = cpx_gcd(gcd, A->get_complex_value(),
                                            get_complex_value(), qct);
         if (err)   return err;
-        return Value::zC(Z, gcd);
+        return ComplexCell::zC(Z, gcd);
       }
 
    // if both args are int then return the greatest common divisor of them
@@ -1580,7 +1580,7 @@ const double qct = Workspace::get_CT();
         APL_Integer gcd;
         const ErrorCode err = int_gcd(gcd, a, b);
         if (err)   return err;
-        return Value::zI(Z, gcd);
+        return IntCell::zI(Z, gcd);
       }
 
    // if both args are real then return the (real) greatest common divisor
@@ -1591,7 +1591,7 @@ const double qct = Workspace::get_CT();
         const APL_Float b =    get_real_value();
         APL_Float gcd;
         if (const ErrorCode err = flt_gcd(gcd, a, b, qct))   return err;
-        return Value::zF(Z, gcd);
+        return FloatCell::zF(Z, gcd);
       }
 
    return E_DOMAIN_ERROR;   // char ?
@@ -1603,7 +1603,7 @@ NumericCell::bif_or_bitwise(Cell * Z, const Cell * A) const
    if (!is_near_int64_t())       return E_DOMAIN_ERROR;
    if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
 
-   Value::zI(Z, A->get_near_int() | get_near_int());
+   IntCell::zI(Z, A->get_near_int() | get_near_int());
    return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------

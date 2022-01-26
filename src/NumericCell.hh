@@ -31,6 +31,19 @@
 /// Base class for RealCell and ComplexCell
 class NumericCell : public Cell
 {
+public:
+   /// initialize the (un-initialized) Cell *Z to (if possible) an IntCell
+   /// or else to a FloatCell with value flt.
+   static ErrorCode zV(Cell * Z, APL_Float flt);
+
+   /// initialize the (un-initialized) Cell *Z to (if possible) an IntCell,
+   /// a FloatCell, or a ComplexCell with value cpx.
+   static ErrorCode zV(Cell * Z, APL_Complex cpx);
+
+   /// initialize the (un-initialized) Cell *Z to (if possible) an IntCell,
+   /// a FloatCell, or a ComplexCell with value cpx.
+   static ErrorCode zV(Cell * Z, APL_Float real, APL_Float imag);
+
 protected:
    /// overloaded Cell::is_numeric()
    virtual bool is_numeric() const

@@ -61,12 +61,14 @@ extern void do_Assert(const char * cond, const char * fun,
 
 #elif ASSERT_LEVEL_WANTED == 0
 
-#define Assert1(x)
-#define Assert(x)
+// use 'if (x) {}' below to suppress 'uninitialized' compiler warnings
+
+#define Assert1(x) if (x) {}
+#define Assert(x)  if (x) {}
 
 #elif ASSERT_LEVEL_WANTED == 1
 
-#define Assert1(x)
+#define Assert1(x) if (x) {}
 #define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 
 #elif ASSERT_LEVEL_WANTED == 2

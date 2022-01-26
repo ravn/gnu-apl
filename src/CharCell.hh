@@ -35,6 +35,10 @@ public:
    CharCell(Unicode av)
       { value.aval = av; }
 
+   /// initialize the (un-initialized) Cell *Z to Unicode uni
+  static ErrorCode zU(Cell * Z, Unicode uni)
+      { new (Z) CharCell(uni);   return E_NO_ERROR; }
+
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
        const { new (other)   CharCell(value.aval); }

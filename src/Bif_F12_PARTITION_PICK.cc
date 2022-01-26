@@ -489,9 +489,9 @@ PermutedArrayIterator it_Z(shape_Z, perm);
                         ++vB_it;
                       }
                    else if (vB.get_cproto().is_character_cell())  // char
-                      Value::zU(dest, UNI_SPACE);
+                      CharCell::zU(dest, UNI_SPACE);
                    else                                   // simple numeric
-                      Value::z0(dest);
+                      IntCell::z0(dest);
 
                    ++it_Z;
                  }

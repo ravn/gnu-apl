@@ -199,25 +199,26 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc \
 	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
 	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
 	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
-	Performance.cc Performance.def Performance.hh PointerCell.cc \
-	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
-	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
-	Plot_data.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
-	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.icc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
+	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
+	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -369,25 +370,26 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
 	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
 	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
-	Performance.cc Performance.def Performance.hh PointerCell.cc \
-	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
-	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
-	Plot_data.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
-	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.icc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
+	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
+	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -519,25 +521,26 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
 	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
 	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
-	Performance.cc Performance.def Performance.hh PointerCell.cc \
-	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
-	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
-	Plot_data.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
-	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.icc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
+	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
+	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -968,25 +971,25 @@ common_SOURCES = $(plot_SOURCES) ../buildtag.hh ../config.h \
 	Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc Macro.def Macro.hh \
 	Missing_Libraries.cc NamedObject.cc NamedObject.hh \
 	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parallel.cc Parallel.hh Parser.cc Parser.hh Performance.cc \
-	Performance.def Performance.hh PointerCell.cc PointerCell.hh \
-	Prefix.cc Prefix.def Prefix.hh Plot_line_properties.cc \
-	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
-	Plot_window_properties.cc Plot_window_properties.hh \
-	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
-	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
-	PrintContext.hh PrintOperator.hh QuadFunction.cc \
-	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
-	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
-	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
-	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
-	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
-	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
-	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
-	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
-	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	NumericCell.cc NumericCell.icc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
+	Performance.cc Performance.def Performance.hh PointerCell.cc \
+	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
+	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
+	Plot_data.hh Plot_window_properties.cc \
+	Plot_window_properties.hh PrimitiveFunction.cc \
+	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
+	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
+	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
+	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
+	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
+	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
+	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
+	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
+	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
+	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \

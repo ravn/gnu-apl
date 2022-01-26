@@ -42,6 +42,22 @@ public:
    IntCell(APL_Integer i)
       { value.ival = i;  }
 
+   /// initialize the (un-initialized) Cell *Z to integer 0
+   static ErrorCode z0(Cell * Z)
+      { new (Z) IntCell(0);   return E_NO_ERROR; }
+
+   /// initialize the (un-initialized) Cell *Z to integer 1
+   static ErrorCode z1(Cell * Z)
+      { new (Z) IntCell(1);   return E_NO_ERROR; }
+
+   /// initialize the (un-initialized) Cell *Z to integer ¯1
+   static ErrorCode z_1(Cell * Z)
+      { new (Z) IntCell(-1);   return E_NO_ERROR; }
+
+   /// initialize Z to APL_Integer v
+   static ErrorCode zI(Cell * Z, APL_Integer aint)
+      { new (Z) IntCell(aint);   return E_NO_ERROR; }
+
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
       const { new (other)   IntCell(value.ival); }
@@ -167,14 +183,20 @@ public:
    void set_int_value(APL_Integer val)
      { value.ival = val; }
 
-   /// overloaded Cell::get_byte_value()
-   virtual int get_byte_value() const;
-
    /// downcast to const IntCell
    virtual const IntCell & cIntlCell() const   { return *this; }
 
    /// downcast to IntCell
-   virtual IntCell & vIntCell()   { return *this; }
+   virtual IntCell & wIntCell()   { return *this; }
+
+   /// overloaded Cell::get_byte_value()
+   virtual int get_byte_value() const;
+
+   /// \b false returned for packed Cells
+   static const IntCell boolean_FALSE;
+
+   /// \b true returned for packed Cells
+   static const IntCell boolean_TRUE;
 
 protected:
    /// overloaded Cell::get_cell_type()

@@ -73,7 +73,7 @@ PointerCell::release(const char * loc)
    value.pval.owner->add_subcount(-get_pointer_value()->nz_element_count());
 
    value.pval.valp.reset();
-   Value::z0(this);
+   IntCell::z0(this);
 }
 //-----------------------------------------------------------------------------
 bool

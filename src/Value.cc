@@ -57,14 +57,11 @@ _deleted_value * Value::deleted_values = 0;
 
 int Value::deleted_values_count = 0;
 
-uint64_t Value::fast_new = 0;
+uint64_t Value::fast_new_count = 0;
 
-uint64_t Value::slow_new = 0;
+uint64_t Value::slow_new_count = 0;
 
 uint64_t Value::alloc_size = 0;
-
-const IntCell Value::boolean_FALSE(0);
-const IntCell Value::boolean_TRUE(1);
 
 //-----------------------------------------------------------------------------
 void
@@ -74,7 +71,7 @@ Value::init_ravel()
    pointer_cell_count = 0;
    nz_subcell_count = 0;
    check_ptr = 0;
-   Value::z0(short_value);
+   IntCell::z0(short_value);
    ravel = short_value;
 
    ++value_count;
@@ -118,7 +115,7 @@ const ShapeItem length = shape.get_volume();
         //
         new (&shape) Shape();
         ravel = short_value;
-        Value::zI(ravel, 42);
+        IntCell::zI(ravel, 42);
 
         MORE_ERROR() <<
 "the system limit on the total ravel size (as set in ⎕SYL) was reached\n"
@@ -180,7 +177,7 @@ const ShapeItem length = shape.get_volume();
    // init the first ravel element to (prototype) 0 so that we can avoid
    // many empty checks all over the place
    //
-   Value::z0(&get_wproto());
+   IntCell::z0(&get_wproto());
    check_ptr = charP(this) + 7;
    total_ravel_count += length;
 }
@@ -325,7 +322,7 @@ Value::Value(const UCS_string & ucs, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   Value::zU(&get_wproto(), UNI_SPACE);   // prototype
+   CharCell::zU(&get_wproto(), UNI_SPACE);   // prototype
    loop(l, ucs.size())   next_ravel_Char(ucs[l]);
    set_complete();
 }
@@ -339,7 +336,7 @@ Value::Value(const UTF8_string & utf, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   Value::zU(&get_wproto(), UNI_SPACE);   // prototype
+   CharCell::zU(&get_wproto(), UNI_SPACE);   // prototype
    loop(l, utf.size())   next_ravel_Char(Unicode(utf[l] & 0xFF));
    set_complete();
 }
@@ -353,7 +350,7 @@ Value::Value(const CDR_string & ui8, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   Value::zU(&get_wproto(), UNI_SPACE);   // prototype
+   CharCell::zU(&get_wproto(), UNI_SPACE);   // prototype
    loop(l, ui8.size())   next_ravel_Char(Unicode(ui8[l]));
    set_complete();
 }
@@ -367,7 +364,7 @@ Value::Value(const PrintBuffer & pb, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   Value::zU(&get_wproto(), UNI_SPACE);   // prototype
+   CharCell::zU(&get_wproto(), UNI_SPACE);   // prototype
 
 const ShapeItem height = pb.get_height();
 const ShapeItem width = pb.get_width(0);
@@ -387,7 +384,7 @@ Value::Value(const char * loc, const Shape * sh)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   Value::z0(&get_wproto());   // prototype
+   IntCell::z0(&get_wproto());   // prototype
 
    loop(r, sh->get_rank())   next_ravel_Int(sh->get_shape_item(r));
 
@@ -997,7 +994,7 @@ const ShapeItem new_rows  = 2*old_rows;
 const ShapeItem new_cells = 2*new_rows;
 
 Cell * doubled = new Cell[new_cells];
-   loop(n, new_cells)   Value::z0(doubled + n);
+   loop(n, new_cells)   IntCell::z0(doubled + n);
    valid_ravel_items = new_cells;
    shape.set_shape_item(0, new_rows);
    ravel = doubled;
@@ -1035,13 +1032,16 @@ const ShapeItem ec = nz_element_count();
       {
         const Cell & cell = get_cravel(e);
         if (cell.is_lval_cell())
-           return cell.cLvalCell().get_cell_owner();
+           {
+             const LvalCell & lval = reinterpret_cast<const LvalCell &>(cell);
+             return lval.get_cell_owner();
+           }
 
         if (cell.is_pointer_cell())
            return  cell.get_pointer_value()->get_lval_cellowner();
       }
 
-   return 0;
+   return 0;   // not found (this is most likely not a left value)
 }
 //-----------------------------------------------------------------------------
 bool
@@ -2278,7 +2278,7 @@ const size_t indent = member_prefix.size() + longest_name + 3;
                        {
                          Cell & cell = sub1->get_wravel(c);
                          cell.release(LOC);
-                         Value::z0(&cell);
+                         IntCell::z0(&cell);
                        }
                  }
 

@@ -33,19 +33,19 @@
 void
 Value::set_proto_Spc()
 {
-  if (is_empty())   Value::zU(&get_wproto(), UNI_SPACE);
+  if (is_empty())   CharCell::zU(&get_wproto(), UNI_SPACE);
 }
 //-----------------------------------------------------------------------------
 void
 Value::set_default_Int()
 {
-  if (is_empty())   Value::z0(&get_wproto());
+  if (is_empty())   IntCell::z0(&get_wproto());
 }
 //-----------------------------------------------------------------------------
 void
 Value::set_default_Spc()
 {
-  if (is_empty())   Value::zU(&get_wproto(), UNI_SPACE);
+  if (is_empty())   CharCell::zU(&get_wproto(), UNI_SPACE);
 }
 //-----------------------------------------------------------------------------
 void
@@ -63,7 +63,7 @@ Value::set_default(const Value & B, const char * loc)
 void
 Value::next_ravel_Char(Unicode u)
 {
-  Value::zU(next_ravel(), u);
+  CharCell::zU(next_ravel(), u);
 }
 //-----------------------------------------------------------------------------
 void
@@ -75,33 +75,33 @@ Value::next_ravel_Byte(uint8_t byte)
 void
 Value::next_ravel_Int(APL_Integer i)
 {
-  Value::zI(next_ravel(), i);
+  IntCell::zI(next_ravel(), i);
 }
 //-----------------------------------------------------------------------------
 void
 Value::next_ravel_Float(APL_Float f)
 {
-  Value::zF(next_ravel(), f);
+  FloatCell::zF(next_ravel(), f);
 }
 //-----------------------------------------------------------------------------
 #ifdef RATIONAL_NUMBERS_WANTED
 void
 Value::next_ravel_Float(APL_Integer numer, APL_Integer denom)
 {
-  Value::zR(next_ravel(), numer, denom);
+  FloatCell::zR(next_ravel(), numer, denom);
 }
 #endif // RATIONAL_NUMBERS_WANTED
 //-----------------------------------------------------------------------------
 void
 Value::next_ravel_Complex(APL_Complex cpx)
 {
-  Value::zC(next_ravel(), cpx);
+  ComplexCell::zC(next_ravel(), cpx);
 }
 //-----------------------------------------------------------------------------
 void
 Value::next_ravel_Complex(APL_Float real, APL_Float imag)
 {
-  Value::zC(next_ravel(), real, imag);
+  ComplexCell::zC(next_ravel(), real, imag);
 }
 //-----------------------------------------------------------------------------
 void

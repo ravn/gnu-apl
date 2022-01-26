@@ -1260,14 +1260,24 @@ Value_P Z(len, LOC);
               else   // additional value
                  {
                    if (cB.get_cell_type() == CT_COMPLEX)
-                      memcpy(&data, cB.get_u1(), sizeof(data));
+                      {
+                        memcpy(&data, cB.get_u1(), sizeof(data));
+                      }
                    else if (cB.get_cell_type() == CT_CELLREF)
-                      data = APL_Integer(cB.cLvalCell().get_cell_owner());
+                      {
+                        const LvalCell & cB_lval =
+                                       reinterpret_cast<const LvalCell &>(cB);
+                        data = APL_Integer(cB_lval.get_cell_owner());
+                      }
 #ifdef RATIONAL_NUMBERS_WANTED
                    else if (cB.get_cell_type() == CT_FLOAT)
-                      memcpy(&data, cB.get_u1(), sizeof(data));
+                      {
+                        memcpy(&data, cB.get_u1(), sizeof(data));
+                      }
                    else if (cB.get_cell_type() == CT_INT)
-                      data = 1;
+                      {
+                        data = 1;
+                      }
 #endif
                  }
 

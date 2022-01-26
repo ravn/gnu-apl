@@ -1110,9 +1110,9 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
         case -12: // sbrk()
              return Token(TOK_APL_VALUE1, IntScalar(top_of_memory(), LOC));
         case -11: // fast new
-             return Token(TOK_APL_VALUE1, IntScalar(Value::fast_new, LOC));
+             return Token(TOK_APL_VALUE1, IntScalar(Value::fast_new_count, LOC));
         case -10: // slow new
-             return Token(TOK_APL_VALUE1, IntScalar(Value::slow_new, LOC));
+             return Token(TOK_APL_VALUE1, IntScalar(Value::slow_new_count, LOC));
         case -9: // screen height
              {
                struct winsize ws;

@@ -43,11 +43,23 @@ public:
    FloatCell(APL_Float r)
       { value.fval.u1.flt = r;   value.fval.denominator = 0; }
 
+   /// initialize the (un-initialized) Cell *Z to APL_Float flt
+   static ErrorCode zF(Cell * Z, APL_Float flt)
+      { new (Z) FloatCell(flt);   return E_NO_ERROR; }
+
 #ifdef RATIONAL_NUMBERS_WANTED
    /// Construct an floating point cell from a quotient of integers. The caller
-   /// must ensure that denom > 0 and common divisors have been removed!
+   /// must ensure that denom > 0 and that common divisors have been removed!
    FloatCell(APL_Integer numer, APL_Integer denom)
-      { value.fval.u1.num = numer;   value.fval.denominator = denom; }
+      {
+        Assert1(denom > 0);
+        value.fval.u1.num = numer;
+        value.fval.denominator = denom;
+      }
+
+   /// initialize the (un-initialized) Cell *Z to APL_Float numer ÷ denom)
+   static ErrorCode zR(Cell * Z, APL_Integer numer, APL_Integer denom)
+      { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner,

@@ -702,8 +702,8 @@ Symbol * symbol = Workspace::lookup_existing_symbol(*members.back());
      Value * owner = 0;   // not used
      if (Cell * cell = toplevel_val->get_member(members, owner, false, false))
         {
-          cell->release(LOC);   Value::z0(cell--);   // member value
-          cell->release(LOC);   Value::z0(cell);     // member name
+          cell->release(LOC);   IntCell::z0(cell--);   // member value
+          cell->release(LOC);   IntCell::z0(cell);     // member name
           ret = 1;   // ⎕EX success
         }
    }
@@ -1408,9 +1408,9 @@ const ShapeItem ec = B->element_count();
    if (ec == 0)   // prototype
       {
         if (B->get_cfirst().is_character_cell())   // char to Unicode
-           Value::z0(&Z->get_wproto());
+           IntCell::z0(&Z->get_wproto());
         else
-           Value::zU(&Z->get_wproto(), UNI_SPACE);
+           CharCell::zU(&Z->get_wproto(), UNI_SPACE);
       }
 
    loop(v, ec)
