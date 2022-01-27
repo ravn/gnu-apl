@@ -111,7 +111,7 @@ mac_def(  Z__A_LO_INNER_RO_B,
  "z←(↑⍴B)⍴0 ◊ M_max←⎕IO+⍴z\n"
  "(IA IB)←⊃I[N] ◊ M←⎕IO\n"
  "z[M]←⊂(⊃A[IA;M]) RO ⊃B[M;IB] ◊ 0  → M_max>M←M+1\n"
- "       Z[N]←LO/z             ◊ ¯2 → N_max>N←N+1\n"
+ "       Z[N]←LO⌿⊃z            ◊ ¯2 → N_max>N←N+1\n"
  "Z←rho_Z⍴Z\n")
 
 /// monadic power with repeat count and no result
