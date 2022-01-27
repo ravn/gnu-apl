@@ -2014,14 +2014,13 @@ const UTF8 * cells_utf = find_optional_attr("cells");
    Assert(vid < int(values.size()));
 Value_P Z = values[vid];
 
+   if (!Z)   return;   // )COPY with vids_COPY or static value
+
    if (Z->is_packed())   // so it can't be short and ravel is a utf8_t *
       {
         read_Cells(Z.getref(), cells_utf);
         return;
       }
-
-
-   if (!Z)   return;   // )COPY with vids_COPY or static value
 
    if (Z->element_count() == 0)   // then Z->more() is 0
       {
