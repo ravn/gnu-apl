@@ -398,7 +398,7 @@ const Cell * cB = &B.get_cfirst();
          Z->next_ravel_Char(Unicode(l));
        }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
@@ -419,7 +419,7 @@ Value_P Z(ucs_vec.size(), LOC);
          Z->next_ravel_Pointer(Z_line.get());
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
@@ -959,7 +959,7 @@ Value_P Z(len, LOC);
    loop(l, len)
        Z->next_ravel_Char(Unicode(0xFF & cdr[l]));
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
@@ -1016,7 +1016,7 @@ Value_P Z(2*len, LOC);
          Z->next_ravel_Char(uh);
          Z->next_ravel_Char(ul);
        }
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
@@ -1114,7 +1114,7 @@ const Cell * cB = &B.get_cfirst();
                 break;
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
@@ -1175,7 +1175,7 @@ const Cell * cB = &B.get_cfirst();
             }
        }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }

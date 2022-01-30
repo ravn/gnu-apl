@@ -161,6 +161,7 @@ public:
         return ret;
       }
 
+   /// return the offsets of the axis_iterators as a shape
    Shape get_shape_offsets()
       {
         Shape ret;

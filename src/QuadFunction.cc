@@ -496,7 +496,7 @@ Value_P Z(sh_Z, LOC);
         Z->next_ravel_Pointer(varval.get());
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -709,8 +709,8 @@ Symbol * symbol = Workspace::lookup_existing_symbol(*members.back());
    }
 
 cleanup:
-        loop(m, members.size())   delete members[m];
-        return ret;
+   loop(m, members.size())   delete members[m];
+   return ret;
 }
 //=============================================================================
 UCS_string Quad_INP::esc1;
@@ -1232,7 +1232,7 @@ Value_P Z(shZ, LOC);
         names[smallest] = names[count - 1];
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1407,10 +1407,10 @@ const ShapeItem ec = B->element_count();
 
    if (ec == 0)   // prototype
       {
-        if (B->get_cfirst().is_character_cell())   // char to Unicode
-           IntCell::z0(&Z->get_wproto());
+        if (B->get_cfirst().is_character_cell())   // char to integer Unicode
+           Z->set_proto_Int();
         else
-           CharCell::zU(&Z->get_wproto(), UNI_SPACE);
+           Z->set_proto_Spc();
       }
 
    loop(v, ec)

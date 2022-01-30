@@ -87,14 +87,14 @@ const uRank rank = B->get_rank();
                            const ShapeItem sh_r = sh_b.get_shape_item(r);
                            ZZ->next_ravel_Int(sh_r);
                          }
-                     ZZ->set_default_Int();
+                     ZZ->set_proto_Int();
                      ZZ->check_value(LOC);
                      Z->next_ravel_Pointer(ZZ.get());
                   }
              }
        }
 
-   Z->set_default_Int();
+   Z->set_proto_Int();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -140,7 +140,7 @@ const APL_Integer qio = Workspace::get_IO();
         Z->next_ravel_Int(z + qio);
       }
 
-   Z->set_default_Int();
+   Z->set_proto_Int();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }

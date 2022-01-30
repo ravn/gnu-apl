@@ -30,14 +30,14 @@
 /// A Cell containing a single Unicode character
 class CharCell : public Cell
 {
+   friend class Value;       // for zU()
+   class APL_value;
+   friend void set_char(int, APL_value, uint64_t);   // for zU() in libapl.cc
+
 public:
    /// Construct a character cell containing \b av
    CharCell(Unicode av)
       { value.aval = av; }
-
-   /// initialize the (un-initialized) Cell *Z to Unicode uni
-  static ErrorCode zU(Cell * Z, Unicode uni)
-      { new (Z) CharCell(uni);   return E_NO_ERROR; }
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
@@ -61,6 +61,14 @@ public:
 
    /// the Quad_CR representation of this cell
    virtual PrintBuffer character_representation(const PrintContext &pctx) const;
+
+#ifndef __LIBAPL__
+ protected:   // public: in libapl.cc
+#endif // __LIBAPL__
+
+   /// initialize the (un-initialized) Cell *Z to Unicode uni
+  static ErrorCode zU(Cell * Z, Unicode uni)
+      { new (Z) CharCell(uni);   return E_NO_ERROR; }
 
 protected:
    /// overloaded Cell::get_cell_type()

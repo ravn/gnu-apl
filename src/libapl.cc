@@ -22,6 +22,8 @@
 #include <sstream>
 #include <ostream>
 
+#define __LIBAPL__ 1
+
 #include <Command.hh>
 #include <ComplexCell.hh>
 #include <DiffOut.hh>
@@ -307,7 +309,8 @@ Cell * cell = &val->get_wravel(idx);
 
 /// val[idx]←new_complex
 void
-set_complex(APL_Float new_real, APL_Float new_imag, APL_value val, uint64_t idx)
+set_complex(APL_Float new_real, APL_Float new_imag, APL_value val,
+            uint64_t idx)
 {
 Cell * cell = &val->get_wravel(idx);
    if (cell->is_pointer_cell())

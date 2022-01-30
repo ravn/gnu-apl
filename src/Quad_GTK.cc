@@ -469,7 +469,7 @@ Value_P Z(open_windows.size(), LOC);
         Z->next_ravel_Int(fd);
       }
 
-   Z->set_default_Int();
+   Z->set_proto_Int();
    Z->check_value(LOC);
    return Z;
 }

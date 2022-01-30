@@ -39,6 +39,7 @@ public:
    /// initialize total_memory
    static void init(bool log_startup);
 
+   /// parse a -mem command line option
    static void parse_mem(bool log_startup);
 
    /// the estimated (!) the amount of free memory
@@ -69,11 +70,12 @@ protected:
         uint64_t Available;   ///< kilobytes available
         uint64_t Cached;      ///< kilobytes cached
         uint64_t MemFree;     ///< kilobytes free
-      } meminfo;
+      } meminfo;              ///< values read from /proc/meminfo
 
    /// read /proc/meminfo, return the number of items found
    static int read_meminfo();
 
+   /// read a (supposedly short) file in /proc
    static int64_t read_procfile(const char * filename);
 
    /// overloaded Symbol::get_apl_value().

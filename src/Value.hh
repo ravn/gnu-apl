@@ -357,14 +357,11 @@ public:
    /// set the prototype (according to B) if this value is empty.
    inline void set_default(const Value & B, const char * loc);
 
-   /// set the prototype to ' '
+   /// set the prototype to ' ' if this value is empty.
    inline void set_proto_Spc();
 
-   /// set the prototype to ' ' if this value is empty.
-   inline void set_default_Spc();
-
    /// set the prototype to 0 if this value is empty.
-   inline void set_default_Int();
+   inline void set_proto_Int();
 
    /// Return the number of scalars in this value (enlist).
    ShapeItem get_enlist_count() const;
@@ -470,7 +467,29 @@ public:
 #ifdef RATIONAL_NUMBERS_WANTED
    /// initialize the next ravel cell with a floating point value
    inline void next_ravel_Float(APL_Integer numer, APL_Integer denom);
+
+   /// initialize the next ravel cell with a floating point value, converting
+   /// it to integer if possible
+   inline void next_ravel_Number(APL_Integer numer, APL_Integer denom)
+      {
+         if      (denom == 1)    next_ravel_Int(numer);
+         else if (denom == -1 && uint64_t(numer) != 0x8000000000000000)
+                                 next_ravel_Int(-numer);
+         else                    next_ravel_Float(numer, denom);
+      }
 #endif // RATIONAL_NUMBERS_WANTED
+
+   /// initialize the next ravel cell with a floating point value, converting
+   /// it to integer if possible
+   inline void next_ravel_Number(APL_Float f);
+
+   /// initialize the next ravel cell with a complex value if needed,
+   ///  or with (near-real) floating point value if possible.
+   inline void next_ravel_Number(APL_Float real, APL_Float imag);
+
+   /// initialize the next ravel cell with a complex value if needed,
+   ///  or with (near-real) floating point value if possible.
+   inline void next_ravel_Number(APL_Complex cpx);
 
    /// initialize the next ravel cell from another Cell
    inline void next_ravel_Cell(const Cell & other);
@@ -763,41 +782,6 @@ public:
            //
            if (--owner_count == 0)   delete this;
          }
-
-   /// initialize Z to uint8_t byte
-   static void zB(uint8_t * Z, bool byte)
-      { *Z = byte; }
-
-   /// init the next ravel element to 0
-   void z0()   { IntCell::z0(next_ravel()); }
-
-
-   /// init the next ravel element to 1
-   void z1()   { IntCell::z1(next_ravel()); }
-
-   /// init the next ravel element to ¯1
-   void z_1()   { IntCell::z_1(next_ravel()); }
-
-   /// init the next ravel element to aint
-   void zI(APL_Integer aint)   { IntCell::zI(next_ravel(), aint);  }
-
-   /// init the next ravel element to auni
-   void zU(Unicode auni)   { CharCell::zU(next_ravel(), auni); }
-
-   /// init the next ravel element to aflt
-   void zF(APL_Float aflt)   { FloatCell::zF(next_ravel(), aflt);  }
-
-   /// init the next ravel element to acpx
-   void zC(APL_Complex acpx)   { ComplexCell::zC(next_ravel(), acpx); }
-
-   /// init the next ravel element to rJi
-   void zC(APL_Float r, APL_Float i)   { ComplexCell::zC(next_ravel(), r, i); }
-
-   /// init the next ravel element to aflt
-   void zV(APL_Float aflt)   { NumericCell::zV(next_ravel(), aflt);  }
-
-   /// init the next ravel element to acpx
-   void zV(APL_Complex acpx)   { NumericCell::zV(next_ravel(), acpx); }
 
    /// check if WS is FULL after allocating value with \b cell_count items
    static bool check_WS_FULL(const char * args, ShapeItem cell_count,

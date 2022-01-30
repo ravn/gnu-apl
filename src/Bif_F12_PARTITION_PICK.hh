@@ -96,8 +96,8 @@ public:
    /// ⊃B
    static Value_P disclose(Value_P B, bool rank_tolerant);
 
-   // create a copy of B_item, pad as needed to have item_shape, and
-   // store it in Z, starteding at Z_start.
+   /// create a copy of B_item, pad as needed to have item_shape, and
+   /// store it in Z, starteding at Z_start.
    static void disclose_item(Value & Z, ShapeItem b,
                              const Shape & item_shape, ShapeItem item_len,
                              const Cell & B_item);

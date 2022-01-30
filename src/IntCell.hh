@@ -33,6 +33,16 @@
 /// A cell containing a single Integer value
 class IntCell : public RealCell
 {
+   friend class Cell;          // for zI() and friends
+   friend class ComplexCell;   // for zI() and friends
+   friend class FloatCell;     // for zI() and friends
+   friend class NumericCell;   // for zI() and friends
+   friend class PointerCell;   // for zI() and friends
+   friend class RealCell;      // for zI() and friends
+   friend class Quad_EX;       // for zI() and friends
+   friend class Value;         // for zI() and friends
+   typedef Value * APL_value;  // for zI() and friends
+
 public:
    /// Construct an integer cell with value \b 0
    IntCell()
@@ -41,22 +51,6 @@ public:
    /// Construct an integer cell with value \b i
    IntCell(APL_Integer i)
       { value.ival = i;  }
-
-   /// initialize the (un-initialized) Cell *Z to integer 0
-   static ErrorCode z0(Cell * Z)
-      { new (Z) IntCell(0);   return E_NO_ERROR; }
-
-   /// initialize the (un-initialized) Cell *Z to integer 1
-   static ErrorCode z1(Cell * Z)
-      { new (Z) IntCell(1);   return E_NO_ERROR; }
-
-   /// initialize the (un-initialized) Cell *Z to integer ¯1
-   static ErrorCode z_1(Cell * Z)
-      { new (Z) IntCell(-1);   return E_NO_ERROR; }
-
-   /// initialize Z to APL_Integer v
-   static ErrorCode zI(Cell * Z, APL_Integer aint)
-      { new (Z) IntCell(aint);   return E_NO_ERROR; }
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
@@ -179,7 +173,7 @@ public:
    /// overloaded Cell::get_int_value()
    virtual APL_Integer get_int_value()  const   { return value.ival; }
 
-   // set the integer value of this IntCell
+   /// set the integer value of this IntCell
    void set_int_value(APL_Integer val)
      { value.ival = val; }
 
@@ -198,7 +192,27 @@ public:
    /// \b true returned for packed Cells
    static const IntCell boolean_TRUE;
 
+#ifndef __LIBAPL__
+ protected:   // public: in libapl.cc
+#endif // __LIBAPL__
+
+   /// initialize Z to APL_Integer v
+   static ErrorCode zI(Cell * Z, APL_Integer aint)
+      { new (Z) IntCell(aint);   return E_NO_ERROR; }
+
 protected:
+   /// initialize the (un-initialized) Cell *Z to integer 0
+   static ErrorCode z0(Cell * Z)
+      { new (Z) IntCell(0);   return E_NO_ERROR; }
+
+   /// initialize the (un-initialized) Cell *Z to integer 1
+   static ErrorCode z1(Cell * Z)
+      { new (Z) IntCell(1);   return E_NO_ERROR; }
+
+   /// initialize the (un-initialized) Cell *Z to integer ¯1
+   static ErrorCode z_1(Cell * Z)
+      { new (Z) IntCell(-1);   return E_NO_ERROR; }
+
    /// overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const
       { return CT_INT; }

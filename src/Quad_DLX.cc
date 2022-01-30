@@ -133,7 +133,7 @@ public:
    /// link to the next node on the right
    DLX_Node * right;
 
-   // true if ths node is a header node (containing no data)
+   /// true if ths node is a header node (containing no data)
    const bool is_header;
 };
 //=============================================================================
@@ -254,7 +254,7 @@ public:
        c.check();
      }
 
-   // return the (decreasing) number of columns
+   /// return the (decreasing) number of columns
    ShapeItem get_column_count() const;
 
    /// display the matrix

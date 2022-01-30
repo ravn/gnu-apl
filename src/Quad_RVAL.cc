@@ -185,7 +185,7 @@ const ShapeItem ec = Z->element_count();
         desired_maxdepth = old_desired_maxdepth;
       }
 
-   if (ec == 0)   IntCell::z0(&Z->get_wproto());
+   if (ec == 0)   Z->set_proto_Int();
 
    Z->check_value(LOC);
    return Z;

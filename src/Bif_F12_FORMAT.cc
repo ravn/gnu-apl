@@ -167,7 +167,7 @@ Value_P Z;
         DOMAIN_ERROR;
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -943,7 +943,7 @@ const ShapeItem len_A = A->element_count();
         Value_P Z(shape_Z, LOC);
         loop(z, ec_Z)   Z->next_ravel_Char(UNI_SPACE);
 
-        Z->set_default_Spc();
+        Z->set_proto_Spc();
         return Z;
       }
 

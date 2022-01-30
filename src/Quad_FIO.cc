@@ -1194,7 +1194,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
                    {
                      Z->next_ravel_Int(open_files[z].fe_fd);
                    }
-               Z->set_default_Int();
+               Z->set_proto_Int();
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
              }
@@ -1210,7 +1210,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
                UCS_string cwd(buffer);
 
                Value_P Z(cwd, LOC);
-               Z->set_default_Spc();
+               Z->set_proto_Spc();
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
              }
@@ -1647,7 +1647,7 @@ int function_number = -1;
                 loop(z, len)   Z->next_ravel_Char(Unicode(data[z]));
                 munmap(data, len);
 
-                Z->set_default_Spc();
+                Z->set_proto_Spc();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1724,7 +1724,7 @@ int function_number = -1;
                      Z->next_ravel_Pointer(Z_name.get());
                    }
 
-                Z->set_default_Spc();
+                Z->set_proto_Spc();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1892,7 +1892,7 @@ int function_number = -1;
 
                 Value_P Z(len, LOC);
                 loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
-                Z->set_default_Int();
+                Z->set_proto_Int();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1999,7 +1999,7 @@ int function_number = -1;
 
                 munmap(data, len);
 
-                Z->set_default_Spc();
+                Z->set_proto_Spc();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }

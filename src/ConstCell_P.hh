@@ -102,10 +102,17 @@ public:
       { return end; }
 
 protected:
+   /// the first Cell of the ravel (aka. cfirst() in class Value)
    const Cell * base;
+
+   /// the first Cell after  the ravel
    const Cell_offset end;
+
+   /// the current offset
    Cell_offset offset;
-   const bool increment;   // ++ shall/shall not increment offset
+
+   /// whether operator ++() shall increment \b offset
+   const bool increment;
 };
 //-----------------------------------------------------------------------------
 /// a "smart" Cell *, remembering its owner and allowing only a subset
@@ -159,9 +166,16 @@ public:
       { return owner; }
 
 protected:
+   /// the owner of the ravel
    const Value & owner;
+
+   /// position of the first Cell after the ravel
    const Cell_offset end;
+
+   /// the current offset
    Cell_offset offset;
+
+   /// whether operator ++() shall increment \b offset
    const bool increment;   // ++ shall/shall not increment offset
 };
 //-----------------------------------------------------------------------------

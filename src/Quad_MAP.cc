@@ -106,7 +106,9 @@ Quad_MAP::do_map(const Cell * ravel_A, ShapeItem len_A,
                  bool recursive)
 {
 Value_P Z(B->get_shape(), LOC);
-const ravel_comp_len ctx = { ravel_A, 1};
+const ravel_comp_len ctx = { ravel_A,   // start of the ravel
+                             1          // number of characters to compare
+                           };
 
 const ShapeItem len_B = B->element_count();
    if (len_B == 0)   // empty value
@@ -120,14 +122,19 @@ const ShapeItem len_B = B->element_count();
                                                compare_MAP,
                                                &ctx))
             {
-              Cell & cell_Z0 = Z->get_wproto();
-              cell_Z0.init(ravel_A[*map*2 + 1], Z.getref(), LOC);
-              if (cell_Z0.is_pointer_cell())
-                 cell_Z0.get_pointer_value()->to_proto();
-              else if (cell_Z0.is_character_cell())
-                 CharCell::zU(&cell_Z0, UNI_NUL);
+              const Cell & cell_A = ravel_A[*map*2 + 1];
+              if (cell_A.is_pointer_cell())
+                 {
+                   Cell & cell_Z0 = Z->get_wproto();
+                   cell_Z0.init(cell_A, Z.getref(), LOC);
+                   cell_Z0.get_pointer_value()->to_proto();
+                 }
+              else if (cell_A.is_character_cell())
+                 Z->set_proto_Spc();
+              else if (cell_A.is_numeric())
+                 Z->set_proto_Int();
               else
-                 IntCell::z0(&cell_Z0);
+                 DOMAIN_ERROR;
             }
          else   // not mapped, simple
             {

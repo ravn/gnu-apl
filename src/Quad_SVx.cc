@@ -665,7 +665,7 @@ int v = 0;
            }
       }
 
-   Z->set_default_Spc();   // prototype: character
+   Z->set_proto_Spc();   // prototype: character
    return Z;
 }
 //=============================================================================

@@ -30,23 +30,21 @@
  overloads certain functions in class Cell with complex number specific
  implementations.
  */
-/// A celkl containing one complex numbver
+/// A cell containing one complex number
 class ComplexCell : public NumericCell
 {
+   friend class IntCell;       // for zC()
+   friend class FloatCell;     // for zC()
+   friend class NumericCell;   // for zC()
+   friend class RealCell;      // for zC()
+   friend class Value;         // for zC()
+
 public:
    /// Construct an complex number cell from a complex number
    ComplexCell(APL_Complex c);
 
    /// Construct an complex number cell from real part \b r and imag part \b i.
    ComplexCell(APL_Float r, APL_Float i);
-
-   /// initialize the (un-initialized) Cell *Z to complex cpx
-   static ErrorCode zC(Cell * Z, APL_Complex cpx)
-      { new (Z) ComplexCell(cpx);   return E_NO_ERROR; }
-
-   /// initialize the (un-initialized) Cell *Z to complex r + ij
-   static ErrorCode zC(Cell * Z, APL_Float r, APL_Float j)
-      { new (Z) ComplexCell(r, j);   return E_NO_ERROR; }
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
@@ -169,7 +167,19 @@ public:
    /// compute circle function \b fun
    static ErrorCode do_bif_circle_fun(Cell * Z, int fun, APL_Complex b);
 
+#ifndef __LIBAPL__
+ protected:   // public: in libapl.cc
+#endif // __LIBAPL__
+
+   /// initialize the (un-initialized) Cell *Z to complex r + ij
+   static ErrorCode zC(Cell * Z, APL_Float r, APL_Float j)
+      { new (Z) ComplexCell(r, j);   return E_NO_ERROR; }
+
 protected:
+   /// initialize the (un-initialized) Cell *Z to complex cpx
+   static ErrorCode zC(Cell * Z, APL_Complex cpx)
+      { new (Z) ComplexCell(cpx);   return E_NO_ERROR; }
+
    /// return the complex value of \b this cell
    APL_Complex cval() const
       { return APL_Complex(value.cval[0], value.cval[1]); }

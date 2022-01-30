@@ -48,7 +48,7 @@ using namespace std;
 class XML_Archive
 {
 protected:
-   /* archive syntax version, hopefully stepped up after Archive.hh or
+   /** archive syntax version, hopefully stepped up after Archive.hh or
       Archive.cc were changed:
 
       ASX_OTHER: increment to indicate change in Archive.hh/cc that DOES NOT
@@ -60,7 +60,7 @@ protected:
 
       ASX_MAJOR: increment to indicate an incompatible change in the XML file
                  format
-    */
+    **/
    enum ArchiveSyntax
       {
         ASX_MAJOR = 1,   ///< XML file format change incompatible

@@ -322,7 +322,7 @@ Value::Value(const UCS_string & ucs, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   CharCell::zU(&get_wproto(), UNI_SPACE);   // prototype
+   set_proto_Spc();                          // prototype
    loop(l, ucs.size())   next_ravel_Char(ucs[l]);
    set_complete();
 }
@@ -336,7 +336,7 @@ Value::Value(const UTF8_string & utf, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   CharCell::zU(&get_wproto(), UNI_SPACE);   // prototype
+   set_proto_Spc();                          // prototype
    loop(l, utf.size())   next_ravel_Char(Unicode(utf[l] & 0xFF));
    set_complete();
 }
@@ -350,7 +350,7 @@ Value::Value(const CDR_string & ui8, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   CharCell::zU(&get_wproto(), UNI_SPACE);   // prototype
+   set_proto_Spc();                          // prototype
    loop(l, ui8.size())   next_ravel_Char(Unicode(ui8[l]));
    set_complete();
 }
@@ -364,7 +364,7 @@ Value::Value(const PrintBuffer & pb, const char * loc)
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
-   CharCell::zU(&get_wproto(), UNI_SPACE);   // prototype
+   set_proto_Spc();                          // prototype
 
 const ShapeItem height = pb.get_height();
 const ShapeItem width = pb.get_width(0);
