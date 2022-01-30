@@ -1,0 +1,71 @@
+<map id="Tokenizer::do_tokenize" name="Tokenizer::do_tokenize">
+<area shape="rect" id="node2" href="$classError.html#a9dbfb665cecfad231189862c5f414c48" title="return a string describing the error " alt="" coords="935,123,1057,150"/>
+<area shape="rect" id="node3" href="$classToken.html#aaeae570a5fa2e6a83ca2b824c6013ef9" title="return the Unicode value of this token " alt="" coords="241,1014,381,1041"/>
+<area shape="rect" id="node5" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token. " alt="" coords="249,1065,374,1091"/>
+<area shape="rect" id="node6" href="$classToken.html#af36d5b92b8e2f75af0bdc4d1d6bdd1c8" title="return the Id of this token. " alt="" coords="260,1115,363,1142"/>
+<area shape="rect" id="node7" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token " alt="" coords="487,1217,597,1243"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a04a668922bc9c899a92ab14873493199" title="Workspace::get_v_ALPHA" alt="" coords="222,1385,401,1411"/>
+<area shape="rect" id="node9" href="$classWorkspace.html#ad7fbbc3aa92594aa2af21f27d4297e39" title="Workspace::get_v_ALPHA_U" alt="" coords="213,1435,409,1462"/>
+<area shape="rect" id="node10" href="$classWorkspace.html#a441d5cd1b3abd5a455093e10c1ff966d" title="Workspace::get_v_CHI" alt="" coords="232,1486,391,1513"/>
+<area shape="rect" id="node11" href="$classWorkspace.html#a3192783e589c4ba7b79e3b85c1593ca4" title="Workspace::get_v_LAMBDA" alt="" coords="216,1537,407,1563"/>
+<area shape="rect" id="node12" href="$classWorkspace.html#acfbfb5e8411b77e43b090b4c27d1263f" title="Workspace::get_v_OMEGA" alt="" coords="219,1587,403,1614"/>
+<area shape="rect" id="node13" href="$classWorkspace.html#ada85ae535d16883c90ff907fac7a2b2c" title="Workspace::get_v_OMEGA_U" alt="" coords="211,1638,412,1665"/>
+<area shape="rect" id="node14" href="$classWorkspace.html#a8e71401ac22b2a735d66e9820390f399" title="Workspace::get_v_Quad\l_QUOTE" alt="" coords="228,1689,395,1731"/>
+<area shape="rect" id="node15" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9) " alt="" coords="945,22,1047,49"/>
+<area shape="rect" id="node16" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯) " alt="" coords="711,1323,817,1350"/>
+<area shape="rect" id="node29" href="$classUnicode__source.html#a0ab44079b7c3f68a88993cb917479f22" title="return the number of remaining items " alt="" coords="691,443,837,470"/>
+<area shape="rect" id="node30" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="1531,697,1654,723"/>
+<area shape="rect" id="node31" href="$classToken.html#a0db6e2536fe0054ee330b9763a22d3de" title="the tag in readable form (TOK_...) " alt="" coords="250,1217,373,1243"/>
+<area shape="rect" id="node32" href="$classError.html#a9b063bbb799ab949fd0f6ed2b6ad2709" title="throw a error with a parser location " alt="" coords="699,377,829,419"/>
+<area shape="rect" id="node33" href="$classTokenizer.html#a1416dfa21301d3cf8abd209e79e2c0ed" title="tokenize a primitive (1&#45;character) function " alt="" coords="243,1268,379,1309"/>
+<area shape="rect" id="node34" href="$classAvec.html#a9adba9efe915ef9eae7c9e969aa9ceb6" title="Return a token containing av. " alt="" coords="475,1305,609,1331"/>
+<area shape="rect" id="node35" href="$classTokenizer.html#aa5b5fd6f253e7318f319d1419023e5bf" title="tokenize a number (integer, floating point, or complex). " alt="" coords="243,352,379,393"/>
+<area shape="rect" id="node44" href="$classTokenizer.html#a675447bc15638963f65fc8e5bea848e1" title="tokenize a Quad function or variable " alt="" coords="226,811,397,838"/>
+<area shape="rect" id="node66" href="$classTokenizer.html#a0682563437325fa3d9f6330a971e7a36" title="tokenize a single quoted string " alt="" coords="474,655,610,696"/>
+<area shape="rect" id="node68" href="$classTokenizer.html#a56f335a801b4c3c1855e19549c7579c0" title="tokenize a double quoted string " alt="" coords="474,537,610,579"/>
+<area shape="rect" id="node69" href="$classTokenizer.html#afc540b601fb7d49f3d9b1bc88fc5cb3a" title="tokenize a symbol " alt="" coords="474,720,610,761"/>
+<area shape="rect" id="node4" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token. " alt="" coords="465,1039,619,1066"/>
+<area shape="rect" id="node17" href="$classAvec.html#af9d230b25c7dab2ce52b4f12e7ceb886" title="return the value (0..9 if decimal, or 0..15 if hex) for uni, or &#45;1 if uni is not a decimal or hex dig..." alt="" coords="935,1353,1057,1379"/>
+<area shape="rect" id="node18" href="$classAvec.html#aec63ac86774c2cd648cd2d7df094eba2" title="return true if unicode uni needs ⎕UCS in 2 ⎕TF or )OUT " alt="" coords="934,1403,1058,1430"/>
+<area shape="rect" id="node19" href="$classAvec.html#a07575efd64c4dda554ccde848d2debd3" title="return true iff a token printed after av never needs a space " alt="" coords="921,1454,1071,1481"/>
+<area shape="rect" id="node20" href="$classAvec.html#af087e9a2ea710680225e809ac2f8e654" title="return true iff a token printed before av never needs a space " alt="" coords="917,1505,1075,1531"/>
+<area shape="rect" id="node21" href="$classAvec.html#a853a006d231bce379ea5cb88eec5a216" title="return the subscript char for digit i (i = 0..9) " alt="" coords="939,1555,1053,1582"/>
+<area shape="rect" id="node22" href="$classAvec.html#aa1d4c24515f876ab1eb51158349e0a71" title="return the superscript char for digit i (i = 0..9) " alt="" coords="934,1606,1058,1633"/>
+<area shape="rect" id="node23" href="$classAvec.html#af37308ba6e99635253c4d487d4bf87fb" title="Find av in character_table. Return AV position if found or MAX_AV. " alt="" coords="931,1657,1061,1683"/>
+<area shape="rect" id="node24" href="$classAvec.html#a844e2fc3a73ef90f42e63a9c268f36b8" title="Find av in character_table. Return position or Invalid_CHT. " alt="" coords="939,1083,1053,1110"/>
+<area shape="rect" id="node25" href="$classAvec.html#a0641640e6b1cc18a1e4c525dcf5e83a4" title="Find return position of alt_av, or Invalid_AV if not found. " alt="" coords="904,1134,1088,1161"/>
+<area shape="rect" id="node26" href="$classAvec.html#a15bfa417923b425ec3c2baf973d2a5f9" title="a pointer to 256 Unicode characters that are exactly the APL2 character set (⎕AV) shown in lrm Appen..." alt="" coords="924,1185,1068,1211"/>
+<area shape="rect" id="node27" href="$classAvec.html#a24bf275107eb974d9a47ba0732153edc" title="search uni in inverse_ibm_av and return its position in the IBM ⎕AV (= its code in ..." alt="" coords="924,1235,1068,1262"/>
+<area shape="rect" id="node28" href="$classAvec.html#ae3911626674255ce3f75abd5cd4ca3be" title="recompute inverse_ibm_av from ibm_av and print it " alt="" coords="929,1287,1063,1328"/>
+<area shape="rect" id="node36" href="$classTokenizer.html#a866fc216ee57f7072f3c61d3615b1742" title="tokenize a real number (integer or floating point). " alt="" coords="460,229,624,255"/>
+<area shape="rect" id="node37" href="$classUnicode__source.html#aa1e6d0503065a5cd4c12908b02e2bfb8" title="get next item " alt="" coords="693,494,835,521"/>
+<area shape="rect" id="node38" href="$classAvec.html#a66092df90d68797a7c980b609b9b66e2" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9) " alt="" coords="699,73,829,99"/>
+<area shape="rect" id="node39" href="$classUTF8__string.html#aa50b9387ce82e49d133df6a77bfe007c" title="return the last byte in this string " alt="" coords="931,199,1061,226"/>
+<area shape="rect" id="node40" href="$classUTF8__string.html#aa8e2ee7b64f5efb0c8372bf951fb0704" title="discard the last byte in this string " alt="" coords="917,301,1075,327"/>
+<area shape="rect" id="node41" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix " alt="" coords="672,275,856,302"/>
+<area shape="rect" id="node42" href="$classUTF8__string.html#a7b07ddeb39d90c41cf03575d8d23dc37" title="prevent basic_string::erase() with its dangerous default value for the number of erased character..." alt="" coords="697,123,831,150"/>
+<area shape="rect" id="node43" href="$classUTF8__string.html#a000b976e22f0ff0ed798682f37e5c817" title="round a digit string is the fractional part of a number between 0.0... and 0.9... up or down accordin..." alt="" coords="683,225,845,251"/>
+<area shape="rect" id="node45" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="694,747,834,774"/>
+<area shape="rect" id="node46" href="$classWorkspace.html#acb39e0420fcef7558220b9576b809e97" title="return a token for system function or variable ucs " alt="" coords="467,837,617,863"/>
+<area shape="rect" id="node65" href="$classUnicode__source.html#a2a0cea4ffde785bb804c95d786aac1d8" title="skip count elements " alt="" coords="468,887,616,914"/>
+<area shape="rect" id="node47" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol. " alt="" coords="689,798,839,825"/>
+<area shape="rect" id="node48" href="$classSymbolTableBase.html#ab5f0eafde48f782a598fa846dcc30013" title="return a Symbol with name name in this SymbolTable. " alt="" coords="677,1068,851,1109"/>
+<area shape="rect" id="node49" href="$classSystemName.html#ae53c8cad7f3af9aa17285dba76048466" title="return the variable (if any) that this name represents " alt="" coords="674,1134,854,1161"/>
+<area shape="rect" id="node50" href="$classSystemVariable.html#adfd61017d46f4b022af485637a768c76" title="return the TokenTag for this system variable " alt="" coords="694,900,834,941"/>
+<area shape="rect" id="node63" href="$classSystemName.html#a97147bd65b14a32d43daa39ae90a4d3f" title="return the function (if any) that this name represents " alt="" coords="673,966,855,993"/>
+<area shape="rect" id="node64" href="$classFunction.html#a74163ba976576a5bb03a060d42fd96e5" title="return a Token for this function. " alt="" coords="695,1017,833,1043"/>
+<area shape="rect" id="node51" href="$classID.html#a4e45a9557dbd8b94bcdf0ecbe280a386" title="return the TokenTag for id " alt="" coords="933,915,1059,942"/>
+<area shape="rect" id="node52" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects) " alt="" coords="1140,919,1287,946"/>
+<area shape="rect" id="node53" href="$classSystemVariable.html#ae2a278e296590661ee7e18354495546f" title="overloaded Symbol::print(). " alt="" coords="923,814,1069,841"/>
+<area shape="rect" id="node54" href="$classSystemVariable.html#a3f8c2a5ec36993edfc031c8122f30a51" title="overloaded Symbol::assign(). " alt="" coords="916,865,1076,891"/>
+<area shape="rect" id="node55" href="$classSystemVariable.html#a641b6af97217d6864f8ceb7f68d6ab91" title="overloaded Symbol::assign_indexed(). " alt="" coords="916,967,1076,1008"/>
+<area shape="rect" id="node56" href="$classSystemVariable.html#aab4fab0cb66063a3f649c73962d72144" title="overloaded Symbol::get_attributes(). " alt="" coords="926,748,1066,789"/>
+<area shape="rect" id="node57" href="$classValue.html#ab3a0d3914977f611bfddf54178edd477" title="initialize the next ravel cell with an integer value " alt="" coords="1141,806,1286,833"/>
+<area shape="rect" id="node58" href="$classSymbol.html#a8f6dd744b09b0629eca34fc2231bf2a9" title="return the current APL value (or throw a VALUE_ERROR) " alt="" coords="1136,755,1291,782"/>
+<area shape="rect" id="node59" href="$classError.html#af47d2ce6f771f8d502d4d1cd05d6f81d" title="throw an Error related to Symbol symbol " alt="" coords="1339,1759,1477,1800"/>
+<area shape="rect" id="node62" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol. " alt="" coords="1343,755,1473,782"/>
+<area shape="rect" id="node60" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;terminated C string " alt="" coords="1527,1791,1658,1818"/>
+<area shape="rect" id="node61" href="$classWorkspace.html#a057e0d77702810d071560c7b72c2f8d6" title="the top of the SI stack (the SI pushed last) " alt="" coords="1525,1741,1660,1767"/>
+<area shape="rect" id="node67" href="$classAvec.html#a45e64bd4305c106314a395fb35addb39" title="return true iff av is one of the single quote characters &#39; ‘ or ’ " alt="" coords="689,545,839,571"/>
+<area shape="rect" id="node70" href="$classWorkspace.html#ab0188eca4a9e7dd492e042f87ea69ba7" title="lookup an existing user defined symbol. If not found, create one (unless this would be a quad symbol)..." alt="" coords="673,697,855,723"/>
+</map>

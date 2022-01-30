@@ -1,0 +1,11 @@
+<map id="UCS_string::UCS_string" name="UCS_string::UCS_string">
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="227,5,367,32"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors " alt="" coords="230,56,365,83"/>
+<area shape="rect" id="node4" href="$classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="230,107,365,133"/>
+<area shape="rect" id="node5" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell. " alt="" coords="227,208,368,235"/>
+<area shape="rect" id="node8" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="220,157,375,184"/>
+<area shape="rect" id="node9" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell. " alt="" coords="222,259,373,285"/>
+<area shape="rect" id="node10" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="229,309,365,336"/>
+<area shape="rect" id="node6" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell " alt="" coords="442,157,573,184"/>
+<area shape="rect" id="node7" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct " alt="" coords="423,208,592,235"/>
+</map>
