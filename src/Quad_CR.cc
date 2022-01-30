@@ -1738,10 +1738,10 @@ Quad_CR::do_CR40(const Value & B)
    // pack boolean B
    //
 const ShapeItem B_len = B.element_count() ;
-   if (B_len <= SHORT_VALUE_LENGTH_WANTED)
+   if (B_len <= Value::PACKED_MINIMUM_LENGHT)
       {
         MORE_ERROR() << "Only Boolean Arrays with more than "
-                     << SHORT_VALUE_LENGTH_WANTED << " items can be packed";
+                     << Value::PACKED_MINIMUM_LENGHT << " items can be packed";
         LENGTH_ERROR;
       }
 

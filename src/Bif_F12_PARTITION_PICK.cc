@@ -50,22 +50,14 @@ Value_P Z(LOC);
 }
 //-----------------------------------------------------------------------------
 Value_P
-Bif_F12_PARTITION::do_eval_XB(Value_P X, Value_P B)
-{
-const Shape shape_X = Value::to_shape(X.get());
-
-   return enclose_with_axes(shape_X, B);
-}
-//-----------------------------------------------------------------------------
-Value_P
 Bif_F12_PARTITION::enclose_with_axes(const Shape & shape_X, Value_P B)
 {
 Shape item_shape;
-Shape it_weight;
+Shape it_weights;
 Shape shape_Z;
-Shape weight_Z;
+Shape weights_Z;
 
-const Shape weight_B = B->get_shape().reverse_scan();
+const Shape weights_B = B->get_shape().get_weights();
 
    // put the dimensions mentioned in X into item_shape and the
    // others into shape_Z
@@ -76,7 +68,7 @@ const Shape weight_B = B->get_shape().reverse_scan();
          if (!shape_X.contains_axis(r))
             {
               shape_Z.add_shape_item(B->get_shape_item(r));
-              weight_Z.add_shape_item(weight_B.get_shape_item(r));
+              weights_Z.add_shape_item(weights_B.get_shape_item(r));
             }
        }
 
@@ -97,7 +89,7 @@ int X_axes_used = 0;
          X_axes_used |= 1 << x_r;
 
          item_shape.add_shape_item(B->get_shape_item(x_r));
-         it_weight.add_shape_item(weight_B.get_shape_item(x_r));
+         it_weights.add_shape_item(weights_B.get_shape_item(x_r));
        }
 
    if (item_shape.get_rank() == 0)   // empty axes
@@ -117,7 +109,7 @@ Value_P Z(shape_Z, LOC);
 
    for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
       {
-        const ShapeItem off_Z = it_Z.multiply(weight_Z);   // offset in Z
+        const ShapeItem off_Z = it_Z.multiply(weights_Z);   // offset in Z
 
         Value_P vZ(item_shape, LOC);
         Z->next_ravel_Pointer(vZ.get());
@@ -131,7 +123,7 @@ Value_P Z(shape_Z, LOC);
              for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
                    const ShapeItem off_B =  // offset in B
-                         it_it.multiply(it_weight);
+                         it_it.multiply(it_weights);
                    vZ->next_ravel_Cell(B->get_cravel(off_Z + off_B));
                  }
            }
@@ -270,12 +262,12 @@ Value_P Z = pick(&A->get_cfirst(), 0, ec_A, B, qio);
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
-Token
+Value_P
 Bif_F12_PICK::disclose(Value_P B, bool rank_tolerant)
 {
    // for simple scalars B: B ≡ ⊂ B and therefore B ≡ ⊃ B
    //
-   if (B->is_simple_scalar())   return Token(TOK_APL_VALUE1, B);
+   if (B->is_simple_scalar())   return B;
 
    // compute item_shape, which is the smallest shape into which each
    // item of B fits, and then ⍴Z ←→ (⍴B), item_shape
@@ -287,9 +279,8 @@ const ShapeItem len_B = B->element_count();
    if (len_B == 0)
       {
          Value_P first = Bif_F12_TAKE::first(B);
-         Token result = disclose(first, rank_tolerant);
-         if (result.get_Class() == TC_VALUE)   // success
-            result.get_apl_val()->set_shape(shape_Z);
+         Value_P result = disclose(first, rank_tolerant);
+         result->set_shape(shape_Z);
          return result;
       }
 
@@ -312,7 +303,7 @@ const ShapeItem item_len = item_shape.get_volume();
            }
 
         Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
+        return Z;
       }
 
    loop(b, len_B)   // for all items in B...
@@ -323,7 +314,7 @@ const ShapeItem item_len = item_shape.get_volume();
 
    Z->set_default(*B.get(), LOC);
    Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   return Z;
 }
 //-----------------------------------------------------------------------------
 void
@@ -400,190 +391,138 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
       }
 }
 //-----------------------------------------------------------------------------
-Token
-Bif_F12_PICK::disclose_with_axis(const Shape & axes_X, Value_P B,
-                                 bool rank_tolerant)
+Value_P
+Bif_F12_PICK::disclose_with_axis(const Shape & axes_X, Value_P B)
 {
-   // disclose with axis
+   // disclose with axis: Z←⊃[Z] B
+   // implemented as: cB ← ⊃ B ◊ cX ← ((⍳⍴⍴cB)∼X),X ◊ Z←cX ⍉ B
 
-   // all items of B must have the same rank. item_shape is the smallest
-   // shape that can contain each item of B.
-   //
-const Shape item_shape = compute_item_shape(B, rank_tolerant);
+   // Note: axes_X is already normalized to ⎕IO←0
 
-   // the number of items in X must be the number of axes in item_shape
-   if (item_shape.get_rank() != axes_X.get_rank())   AXIS_ERROR;
+Value_P cB = disclose(B, true);   // cB ← ⊃ B
 
-   // distribute shape_B and item_shape into 2 shapes perm and shape_Z.
-   // if a dimension is mentioned in axes_X then it goes into shape_Z and
-   // otherwise into perm.
-   //
-Shape perm;
-Shape shape_Z;
-   {
-     ShapeItem B_idx = 0;
-     //
-     loop(z, B->get_rank() + item_shape.get_rank())
-        {
-          // check if z is in X, remembering its position if so.
-          //
-          bool z_in_X = false;
-          ShapeItem x_pos = -1;
-          loop(x, axes_X.get_rank())
-              {
-                if (axes_X.get_shape_item(x) == z)
-                   {
-                     z_in_X = true;
-                     x_pos = x;
-                     break;
-                   }
-              }
+ShapeItem bmX = 0;   // axes in axes_X with ⎕IO←0
 
-          if (z_in_X)   // z is an item dimension: put it in shape_Z
+   loop(x, axes_X.get_rank())
+       {
+          const ShapeItem ax = axes_X.get_shape_item(x);
+          if (bmX & 1 << ax)
              {
-               shape_Z.add_shape_item(item_shape.get_shape_item(x_pos));
+               MORE_ERROR() << "In ⊃[X]B: duplicated axis "
+                            << (ax + Workspace::get_IO())
+                            << " in X";
+                AXIS_ERROR;
              }
-         else          // z is a B dimension: put it in perm
-             {
-               if (B_idx >= B->get_rank())   INDEX_ERROR;
-               perm.add_shape_item(z);
-               shape_Z.add_shape_item(B->get_shape_item(B_idx++));
-             }
-        }
+          bmX |= 1 << ax;
+       }
 
-     // append X to perm with each X item reduced by the B items before it.
-     loop(x, axes_X.get_rank())
-        {
-          Rank before_x = 0;   // items before X that are not in X
-          loop(x1, x - 1)
-             if (!axes_X.contains_axis(x1))   ++before_x;
+   /* ⍴Z is the axes of B that are not in X, followed by those which are.
+      That is, shape_Z is a permutation of ⍳⍴⍴B defined by X.
 
-          perm.add_shape_item(axes_X.get_shape_item(x) + before_x);
-        }
-   }
+      We prepend the permutation axes_X (of each disclosed item) with the
+      axes not in X to obtain the entire permutation perm_cB of cB.
+  */
+Shape perm_cB;   // perm_cB is the permutation of cB, constructed from X
+   loop(x, cB->get_rank())      // axes not in X
+       {
+         if (bmX & 1 << x)   continue;   // axis x is in X
+         perm_cB.add_shape_item(x);       //  axis x is not in X
+       }
 
-Value_P Z(shape_Z, LOC);
-   if (Z->is_empty())
-      {
-         Z->set_default(*B.get(), LOC);
-         return Token(TOK_APL_VALUE1, Z);
-      }
+   loop(x, axes_X.get_rank())   // axes in X
+       {
+         perm_cB.add_shape_item(axes_X.get_shape_item(x));
+       }
 
-   // loop over sources and place them in the result.
-   //
-PermutedArrayIterator it_Z(shape_Z, perm);
+   Assert(perm_cB.get_rank() == cB->get_rank());
 
-   for (ArrayIterator it_B(B->get_shape()); it_B.more(); ++it_B)
-      {
-        const Cell & B_item = B->get_cravel(it_B());
-        if (B_item.is_pointer_cell())
-           {
-             const Value & vB = B_item.get_pointer_value().getref();
-             ArrayIterator vB_it(vB.get_shape());
-             for (ArrayIterator item_it(item_shape); item_it.more(); ++item_it)
-                 {
-                   Cell * dest = &Z->get_wravel(it_Z());
-                   if (vB.get_shape().contains(item_it.get_offsets()))
-                      {
-                        dest->init(vB.get_cravel(vB_it()), Z.getref(), LOC);
-                        ++vB_it;
-                      }
-                   else if (vB.get_cproto().is_character_cell())  // char
-                      CharCell::zU(dest, UNI_SPACE);
-                   else                                   // simple numeric
-                      IntCell::z0(dest);
-
-                   ++it_Z;
-                 }
-           }
-        else
-           {
-             for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
-                 {
-                   if (const ShapeItem pos = it_it())   // subsequent cell
-                      {
-                        if (B_item.is_character_cell())   // fill with ' '
-                           Z->set_ravel_Char(pos, UNI_SPACE);
-                        else                              // fll with 0
-                           Z->set_ravel_Int(pos, 0);
-                      }
-                   else                    // first Cell: use B_item
-                      {
-                        Z->set_ravel_Cell(0, B_item);
-                      }
-                   ++it_Z;
-                 }
-            }
-      }
-
-   Z->set_default(*B.get(), LOC);
-
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   return Bif_F12_TRANSPOSE::transpose(perm_cB, cB);
 }
 //-----------------------------------------------------------------------------
 Shape
 Bif_F12_PICK::compute_item_shape(Value_P B, bool rank_tolerant)
 {
-   // all items of B are scalars or (nested) arrays of the same rank R.
-   // return the shape with rank R and the (per-dimension) max. of
-   // each shape item
+   /* The ravel cells of B are either simple or else PointerCells of nested
+      values with possibly different shapes.
+
+      Return the smallest shape that is large enough to contain each value.
+
+      If rank_tolerant is false, then all nested values have the same rank
+      (which is also the rank of the result). Otherwise: RANK_ERROR.
+
+      If rank_tolerant is true, then the smaller ranks are extended to the
+      largest rank of all shapes by prepending 1s.
+    */
+
+   // we use ret_rank and ret[MAX_RANK] instead of Shape to avoid unnecessary
+   // volume recomputations in class Shape.
    //
-const ShapeItem len_B = B->nz_element_count();
+ShapeItem ret_rank = 0;
+ShapeItem ret[MAX_RANK];
+   loop(r, MAX_RANK)   ret[r] = 0;
 
-Shape ret;   // of the first non-scalar in B
-
-   loop(b, len_B)
+   loop(b, B->nz_element_count())
        {
-         Value_P v;
+         const Value * val;
          {
            const Cell & cB = B->get_cravel(b);
            if (cB.is_pointer_cell())
               {
-                v = cB.get_pointer_value();
+                val = cB.get_pointer_value().get();
               }
            else if (cB.is_lval_cell())
               {
-                const Cell * pointee = cB.get_lval_value();
-                if (!pointee)   continue;   // ⊃ NOOP element
-                if (!pointee->is_pointer_cell())   continue;  // ptr to scalar
-                v = pointee->get_pointer_value();
+                const Cell * target = cB.get_lval_value();
+
+                /* pointee was created by a selective assignment and
+                   there are 3 cases:
+
+                   1. pointee == 0 (e.g from over-take): do nothing
+                   2. pointee is simple.                 do nothing
+                   3. pointee is sub-value:              use its value
+                 */
+                if (!target)   continue;                      // case 1.
+                if (!target->is_pointer_cell())   continue;   // case 2.
+                val = target->get_pointer_value().get();      // case 3.
               }
            else
               {
-                continue;   // simple scalar
+                continue;   // cB is simple, so it fits anywhere.
               }
          }
 
-         if (ret.get_rank() == 0)   // first non-scalar
+         // at this point val is a non-scalar value.
+         //
+         const Rank val_rank = val->get_rank();
+         if (ret_rank == 0)   // val is the first non-scalar
             {
-              ret = v->get_shape();
+              ret_rank = val_rank;
+              loop(r, ret_rank)   ret[r] = val->get_shape_item(r);
               continue;
             }
 
          // the items of B must have the same rank, unless we are rank_tolerant
          //
-         if (ret.get_rank() != v->get_rank())
+         if (ret_rank != val_rank)
             {
               if (!rank_tolerant)   RANK_ERROR;
 
-              if (ret.get_rank() < v->get_rank())
-                 ret.expand_rank(v->get_rank());
+              if (ret_rank < val_rank)   ret_rank = val_rank;
 
-              // if ret.get_rank() > v->get_rank() then we are OK because
+              // if ret_rank() > v->get_rank() then we are OK because
               // only the dimensions present in v are expanded below.
             }
 
-         loop(r, v->get_rank())
+         loop(r, val_rank)
              {
-               if (ret.get_shape_item(r) < v->get_shape_item(r))
+               if (ret[r] < val->get_shape_item(r))
                   {
-                    ret.set_shape_item(r, v->get_shape_item(r));
+                    ret[r] = val->get_shape_item(r);
                   }
              }
        }
 
-   return ret;
+   return Shape(ret_rank, ret);
 }
 //-----------------------------------------------------------------------------
 ShapeItem
@@ -641,7 +580,7 @@ const Cell & cA = A0[idx_A];
                   RANK_ERROR;
                 }
 
-             const Shape weight = B->get_shape().reverse_scan();
+             const Shape weights_B = B->get_shape().get_weights();
              const Shape A_as_shape(A, qio);
              ShapeItem offset = 0;
 
@@ -650,7 +589,7 @@ const Cell & cA = A0[idx_A];
                    const ShapeItem ar = A_as_shape.get_shape_item(r);
                    if (ar < 0)                       INDEX_ERROR;
                    if (ar >= B->get_shape_item(r))   INDEX_ERROR;
-                   offset += weight.get_shape_item(r) * ar;
+                   offset += weights_B.get_shape_item(r) * ar;
                  }
              return offset;
            }

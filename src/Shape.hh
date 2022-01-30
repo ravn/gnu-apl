@@ -131,6 +131,7 @@ public:
    /// return the product of all but the the last dimension, or 1 for scalars
    ShapeItem get_rows() const
       { if (rho_rho == 0)   return 1;   // scalar
+        if (const ShapeItem cols = rho[rho_rho - 1])   return volume / cols;
         ShapeItem count = 1;
         loop(r, rho_rho - 1)   count *= rho[r];
         return count; }
@@ -159,15 +160,13 @@ public:
         rho[rho_rho++] = len;   volume *= len; }
 
    /// possibly increase rank by prepending axes of length 1
-   void expand_rank(uRank new_rk)
-      { if (rho_rho < new_rk)
-            {
-              const int diff = new_rk - rho_rho;
-              loop(r, rho_rho)   rho[new_rk - r - 1] = rho[rho_rho - r - 1];
-              loop(r, diff)      rho[r] = 1;
-              rho_rho = new_rk;
-            }
-       }
+   void expand_rank(uRank new_rank)
+      { if (rho_rho >= new_rank)   return;   // no need to expand
+        const int diff = new_rank - rho_rho;
+        for (Rank r = rho_rho - 1; r >= 0; --r)   rho[r + diff] = rho[r];
+        loop(r, diff)      rho[r] = 1;
+        rho_rho = new_rank;
+      }
 
    /// possibly expand rank and increase axes so that B fits into this shape
    void expand(const Shape & B);
@@ -193,8 +192,8 @@ public:
    ShapeItem get_nz_volume() const
       { return volume ? volume : 1; }
 
-   /// return true iff one of the shape elements is (axis) \b axis
-   bool contains_axis(const Rank ax) const
+   /// return true iff one of the shape elements is (axis) \b ax
+   bool contains_axis(const Axis ax) const
       { loop(r, rho_rho)   if (rho[r] == ax)   return true;   return false; }
 
    /// return true iff the items of value are at most the items of \b this
@@ -203,14 +202,19 @@ public:
         loop(r, rho_rho)   if (value.rho[r] >= rho[r])   return false;
         return true; }
 
-   /// return scan of the shapes, beginning at the end (!)
-   Shape reverse_scan() const
+   /// return ⌽ ×\ ⍴ ⌽ this
+   Shape get_weights() const
       { Shape ret;   ret.rho_rho = rho_rho;
-        ShapeItem prod = 1;
+        ShapeItem weight = 1;
         ret.volume = 1;
         for (Rank r = rho_rho - 1; r >= 0; --r)
-           { ret.rho[r] = prod;   ret.volume *= prod;   prod *= rho[r]; }
-        return ret; }
+           {
+             ret.rho[r] = weight;
+             ret.volume *= weight;
+             weight *= rho[r];
+           }
+        return ret;
+      }
 
    /// throw an APL error if this shapes differs from shape B
    void check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,

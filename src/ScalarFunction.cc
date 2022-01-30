@@ -894,7 +894,7 @@ ScalarFunction::eval_scalar_AXB(Value_P A, bool * axis_in_X, Value_P B,
          }
    }
 
-Shape weight_A = A->get_shape().reverse_scan();
+Shape weights_A = A->get_shape().get_weights();
 
 Value_P Z(B->get_shape(), LOC);
 
@@ -902,18 +902,18 @@ const Cell * cB = &B->get_cfirst();
 
    for (ArrayIterator it(B->get_shape()); it.more(); ++it)
        {
-         ShapeItem a = 0;
+         ShapeItem wA = 0;   // weigth of the A axes in X
          Rank rA = 0;
          loop(rB, B->get_rank())
              {
                if (axis_in_X[rB])
                   {
-                    a += weight_A.get_shape_item(rA++)
-                       * it.get_offset(rB);
+                    wA += weights_A.get_shape_item(rA++)
+                       * it.get_shape_offset(rB);
                   }
              }
 
-         const Cell * cA = &A->get_cravel(a);
+         const Cell * cA = &A->get_cravel(wA);
          if (reversed)   expand_pointers(Z, Z.getref(), cB++, cA, fun);
          else            expand_pointers(Z, Z.getref(), cA, cB++, fun);
        }
@@ -963,7 +963,7 @@ const ShapeItem len_Z = Z->element_count();
    for (ArrayIterator zi(B->get_shape()); zi.more(); ++zi)
        {
 PERFORMANCE_START(start_2)
-         if (contained(shape_A, &A->get_cfirst(), B, zi.get_offsets(), qct))
+         if (contained(shape_A, &A->get_cfirst(), B, zi.get_shape_offsets(), qct))
             Z->next_ravel_Int(1);
          else
             Z->next_ravel_Int(0);
@@ -982,23 +982,31 @@ bool
 Bif_F2_FIND::contained(const Shape & shape_A, const Cell * cA,
                        Value_P B, const Shape & idx_B, double qct)
 {
+   /* quick check (along each  axis): before comparing any ravel elements,
+      we check that A, when offset by idx_B, fits into B:
+
+       ├─── IDX B ───┤├────── A ──────┤
+       ├───────────────── B ─────────────────┤
+
+
+    */
    loop(r, B->get_rank())
        {
          if ((idx_B.get_shape_item(r) + shape_A.get_shape_item(r))
              > B->get_shape_item(r))    return false;
        }
 
-const Shape weight = B->get_shape().reverse_scan();
+const Shape weights_B = B->get_shape().get_weights();
 
    for (ArrayIterator ai(shape_A); ai.more(); ++ai)
        {
-         const Shape & pos_A = ai.get_offsets();
+         const Shape & pos_A = ai.get_shape_offsets();
          ShapeItem pos_B = 0;
-         loop(r, B->get_rank())   pos_B += weight.get_shape_item(r)
+         loop(r, B->get_rank())   pos_B += weights_B.get_shape_item(r)
                                          * (idx_B.get_shape_item(r)
                                          + pos_A.get_shape_item(r));
 
-         if (!cA[ai()].equal(B->get_cravel(pos_B), qct))
+         if (!cA[ai.get_ravel_offset()].equal(B->get_cravel(pos_B), qct))
             return false;
        }
 

@@ -48,7 +48,10 @@ public:
 
    /// overloaded Function::eval_XB()
    virtual Token eval_XB(Value_P X, Value_P B) const
-      { return Token(TOK_APL_VALUE1, do_eval_XB(X, B)); }
+      {
+        const Shape shape_X = Value::to_shape(X.get());
+        return Token(TOK_APL_VALUE1, enclose_with_axes(shape_X, B));
+      }
 
    /// implementation of eval_XB()
    static Value_P do_eval_XB(Value_P X, Value_P B);
@@ -88,10 +91,10 @@ public:
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const
-      { return disclose(B, true); }
+      { return Token(TOK_APL_VALUE1, disclose(B, true)); }
 
    /// ⊃B
-   static Token disclose(Value_P B, bool rank_tolerant);
+   static Value_P disclose(Value_P B, bool rank_tolerant);
 
    // create a copy of B_item, pad as needed to have item_shape, and
    // store it in Z, starteding at Z_start.
@@ -102,11 +105,10 @@ public:
    /// overloaded Function::eval_XB()
    virtual Token eval_XB(Value_P X, Value_P B) const
       { const Shape axes_X = Value::to_shape(X.get());
-        return disclose_with_axis(axes_X, B, false); }
+        return Token(TOK_APL_VALUE1, disclose_with_axis(axes_X, B)); }
 
    /// ⊃[X]B
-   static Token disclose_with_axis(const Shape & axes_X, Value_P B,
-                                   bool rank_tolerant);
+   static Value_P disclose_with_axis(const Shape & axes_X, Value_P B);
 
    static Bif_F12_PICK * fun;   ///< Built-in function
    static Bif_F12_PICK  _fun;   ///< Built-in function

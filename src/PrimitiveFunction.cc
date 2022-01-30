@@ -398,7 +398,50 @@ Value_P Z = (shape_A.get_rank() == B->get_rank() && is_permutation(shape_A))
 Value_P
 Bif_F12_TRANSPOSE::transpose(const Shape & A, Value_P B)
 {
-const Shape shape_Z = permute(B->get_shape(), inverse_permutation(A));
+   // some simple to optimize cases beforehand...
+   //
+   if (A.get_rank() <= 2)
+      {
+        if (A.get_rank() <= 1)   // scalar or vector B:
+           {
+              return B->clone(LOC);
+           }
+
+        // 2-dimensional matrix
+        //
+        if (A.get_shape_item(0) == 0 &&
+            A.get_shape_item(1) == 1)   return B->clone(LOC);   // identity
+
+        const ShapeItem rows_B = B->get_shape_item(0);
+        const ShapeItem cols_B = B->get_shape_item(1);
+        const Shape shape_Z(cols_B, rows_B);
+        Value_P Z(shape_Z, LOC);
+        loop(rZ, cols_B)   // the rows of B are columns of Z
+        loop(cZ, rows_B)   // the columns of B are rows of Z
+            Z->next_ravel_Cell(B->get_cravel(rZ + cZ*cols_B));
+        Z->check_value(LOC);
+        return Z;
+      }
+
+   /*
+      A specifies an axis permutation in the "forward" direction, i.e.
+
+      B[i] → Z[A[i]]
+
+      For our next_ravel_XXX() mechanism we need the "backward" direction:
+
+      Z[i] ← B[A⁻¹[i]]
+
+      We therefore use the inverse permutation for A, which exchanges
+      source and destination
+
+      A is already normalized to ⎕IO←0 so its axes are 0, 1, ... in some order
+    */
+
+const Shape shape_inv_A = inverse_permutation(A);
+const Shape & shape_B = B->get_shape();
+const Shape shape_Z = permute(shape_B, shape_inv_A);
+const Shape weights_Z = permute(shape_B.get_weights(), shape_inv_A);
 Value_P Z(shape_Z, LOC);
 
    if (shape_Z.is_empty())
@@ -407,15 +450,12 @@ Value_P Z(shape_Z, LOC);
          return Z;
       }
 
-const Cell * cB = &B->get_cfirst();
-
    for (ArrayIterator z(shape_Z); z.more(); ++z)
        {
-         const Shape idx_B = permute(z.get_offsets(), A);
-         const ShapeItem b = B->get_shape().ravel_pos(idx_B);
-         Z->next_ravel_Cell(cB[b]);
+         Z->next_ravel_Cell(B->get_cravel(z.multiply(weights_Z)));
        }
 
+   Z->check_value(LOC);
    return Z;
 }
 //-----------------------------------------------------------------------------
@@ -471,41 +511,89 @@ const Cell * cB = &B->get_cfirst();
 
    for (ArrayIterator z(shape_Z); z.more(); ++z)
        {
-         const Shape idx_B = permute(z.get_offsets(), A);
+         const Shape idx_B = permute(z.get_shape_offsets(), A);
          const ShapeItem b = B->get_shape().ravel_pos(idx_B);
          Z->next_ravel_Cell(cB[b]);
        }
 
+   Z->check_value(LOC);
    return Z;
 }
 //-----------------------------------------------------------------------------
 Shape
-Bif_F12_TRANSPOSE::inverse_permutation(const Shape & sh)
+Bif_F12_TRANSPOSE::inverse_permutation(const Shape & perm)
 {
+   // perm is a permutation of ⎕IO + 0, 1, ...
+   // return the inverse permutaion of perm.
+
 ShapeItem rho[MAX_RANK];
 
-   // first, set all items to -1.
+   // 1. set all items to -1.
    //
-   loop(r, sh.get_rank())   rho[r] = -1;
+   loop(r, perm.get_rank())   rho[r] = -1;
 
-   // then, set all items to the shape items of sh
+   // 2. set all items to the shape items of perm
    //
-   loop(r, sh.get_rank())
+   loop(a, perm.get_rank())
        {
-         const ShapeItem rx = sh.get_shape_item(r);
-         if (rx < 0)                 DOMAIN_ERROR;
-         if (rx >= sh.get_rank())    DOMAIN_ERROR;
-         if (rho[rx] != -1)          DOMAIN_ERROR;
+         const ShapeItem ax = perm.get_shape_item(a);
+         if (ax < 0)
+            {
+              UCS_string & more = MORE_ERROR();
+              more << "Axis " << ax << " is < ⎕IO (="
+                   << Workspace::get_IO() << ") in permutation";
+              loop(a, perm.get_rank())
+                  more << " " << (Workspace::get_IO() + perm.get_shape_item(a));
+              MORE_ERROR() = more;
+              AXIS_ERROR;
+            }
 
-         rho[rx] = r;
+         if (ax >= perm.get_rank())
+            {
+              UCS_string & more = MORE_ERROR();
+              more << "Axis " << ax << " exceeds rank "
+                   << perm.get_rank() << " of shape in permutation";
+              loop(a, perm.get_rank())
+                  more << " " << (Workspace::get_IO() + perm.get_shape_item(a));
+              MORE_ERROR() = more;
+              AXIS_ERROR;
+            }
+         if (rho[ax] != -1)
+            {
+              UCS_string & more = MORE_ERROR();
+              more << "Duplictate Axis " << ax << " in permutation";
+              loop(a, perm.get_rank())
+                  more << " " << (Workspace::get_IO() + perm.get_shape_item(a));
+              MORE_ERROR() = more;
+              AXIS_ERROR;
+            }
+
+         // everything OK
+         //
+         rho[ax] = a;
        }
 
-   return Shape(sh.get_rank(), rho);
+   return Shape(perm.get_rank(), rho);
 }
 //-----------------------------------------------------------------------------
 Shape
 Bif_F12_TRANSPOSE::permute(const Shape & sh, const Shape & perm)
 {
+   /* permute sh according to perm.
+
+      perm is a shape specifying a permutation like this:
+
+      0 → perm[0]
+      1 → perm[1]
+      ...
+
+      the result ret is the permuted shape sh:
+
+     ret[0] = sh[perm[0]]
+     ret[1] = sh[perm[1]]
+     ...
+
+    */
 Shape ret;
 
    loop(r, perm.get_rank())

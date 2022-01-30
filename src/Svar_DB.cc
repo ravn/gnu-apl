@@ -125,14 +125,19 @@ FILE * fp = popen(popen_args, "r");
         return true;   // error
       }
 
+   // wait until the parent process (= this process) in APserver returns.
+   // APserver does not really output anything (and we would see if it would),
+   // but the interesting part is the EOF of the parent process in APserfver.
+   //
    for (int cc; (cc = getc(fp)) != EOF;)
        {
          logit && get_CERR() << char(cc);
        }
 
+const int APserver_result = pclose(fp);
+
    logit && get_CERR() << endl;
 
-const int APserver_result = pclose(fp);
    if (APserver_result)
       {
          get_CERR() << "pclose(APserver) returned error: "

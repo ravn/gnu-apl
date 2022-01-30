@@ -27,8 +27,8 @@
 typedef uint64_t Cell_offset;
 
 //-----------------------------------------------------------------------------
-/// a "smart" Cell *, allowing only a subset
-/// of what a normal Cell * is capable of.
+/// a "smart" Cell *, allowing only a subset of what a normal Cell *
+/// is capable of. MUST NOT BE USED FOR RAVELs OF PACKED VALUES
 class ConstCell_P
 {
 public:
@@ -54,7 +54,7 @@ public:
      end(owner.element_count()),
      offset(0),
      increment(_inc)
-   {}
+   { Assert(!owner.is_packed()); }
 
    /// constructor from pointer to the owner of the Cell
    ConstCell_P(Value_P owner, bool _inc)
@@ -62,7 +62,7 @@ public:
      end(owner->element_count()),
      offset(0),
      increment(_inc)
-   {}
+   { Assert(!owner->is_packed()); }
 
    /// constructor: from a single Cell (of a scalar)
    ConstCell_P(const Cell & cell)

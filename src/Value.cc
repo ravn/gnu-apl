@@ -2264,8 +2264,7 @@ const size_t indent = member_prefix.size() + longest_name + 3;
               else if (sub->is_char_vector())   // maybe multi-line with \n
                  {
                    Value_P sub1 = Quad_CR::do_CR35(sub.getref());
-                   Value_P sub2 = Bif_F12_PICK::disclose(sub1, false)
-                                                        .get_apl_val();
+                   Value_P sub2 = Bif_F12_PICK::disclose(sub1, false);
                    if (sub2->get_rows() > 1)
                       {
                         sub2->print_boxed(out, indent);

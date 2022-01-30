@@ -100,8 +100,9 @@ Bif_F12_TAKE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 
    // A↑[X]B ←→ ⊃[X](⊂A)↑¨⊂[X]B
    //
-Value_P cA = Bif_F12_PARTITION::fun->do_eval_B(A);        // ⊂A
-Value_P cB = Bif_F12_PARTITION::fun->do_eval_XB(X, B);    // ⊂[X]B
+const Shape shape_X = Value::to_shape(X.get());
+Value_P cA = Bif_F12_PARTITION::do_eval_B(A);                    // ⊂A
+Value_P cB = Bif_F12_PARTITION::enclose_with_axes(shape_X, B);   // ⊂[X]B
 Token take(TOK_FUN2, Bif_F12_TAKE::fun);
 Token cT = Bif_OPER1_EACH::fun->eval_ALB(cA, take, cB);   // cA↑¨cB
 

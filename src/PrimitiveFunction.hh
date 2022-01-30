@@ -392,11 +392,11 @@ public:
    static Bif_F12_TRANSPOSE * fun;   ///< Built-in function
    static Bif_F12_TRANSPOSE  _fun;   ///< Built-in function
 
-protected:
-   /// Transpose B according to A (without diagonals)
+   /// Transpose B according to axes A (without diagonals)
    static Value_P transpose(const Shape & A, Value_P B);
 
-   /// Transpose B according to A (with diagonals)
+protected:
+   /// Transpose B according to axes A (with diagonals)
    static Value_P transpose_diag(const Shape & A, Value_P B);
 
    /// for \b sh being a permutation of 0, 1, ... rank - 1,

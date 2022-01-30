@@ -100,6 +100,9 @@ public:
    /// destructor
    virtual ~Value();
 
+   /// packing makes no sense for short booleans
+   enum { PACKED_MINIMUM_LENGHT = SHORT_VALUE_LENGTH_WANTED };
+
    /// return \b true iff \b this value is a scalar.
    bool is_scalar() const
       { return shape.get_rank() == 0; }
@@ -415,7 +418,7 @@ public:
    /// return that axis. Otherwise throw AXIS_ERROR.
    static Rank get_single_axis(const Value * val, Rank max_axis);
 
-   /// convert the ravel of \b val to a shape
+   /// convert the ravel of Value \b val to a shape (normalized to ⎕IO←0)
    static Shape to_shape(const Value * val);
 
    /// glue two values.
