@@ -33,8 +33,6 @@ class UTF8_string;
 class UCS_string;
 class PrintBuffer;
 
-#define ptr_clear(p, l) p.reset()
-
 //-----------------------------------------------------------------------------
 /// A Value smart * and access functions (except constructors)
 class Value_P_Base

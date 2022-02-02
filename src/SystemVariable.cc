@@ -68,7 +68,7 @@ SystemVariable::assign(Value_P value, bool clone, const char * loc)
 }
 //-----------------------------------------------------------------------------
 void
-SystemVariable::assign_indexed(Value_P X, Value_P value)
+SystemVariable::assign_indexed(const Value * X, Value_P value)
 {
    CERR << "SystemVariable::assign_indexed() not (yet) implemented for "
         << get_Id() << endl;
@@ -366,9 +366,9 @@ Value_P new_val(ucs, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_FC::assign_indexed(IndexExpr & IX, Value_P value)
+Quad_FC::assign_indexed(const IndexExpr & IX, Value_P value)
 {
-   if (IX.value_count() != 1)   INDEX_ERROR;
+   if (!IX.is_axis())   INDEX_ERROR;
 
    // at this point we have a one dimensional index. It it were non-empty,
    // then assign_indexed(Value) would have been called instead. Therefore
@@ -379,7 +379,7 @@ Quad_FC::assign_indexed(IndexExpr & IX, Value_P value)
 }
 //-----------------------------------------------------------------------------
 void
-Quad_FC::assign_indexed(Value_P X, Value_P value)
+Quad_FC::assign_indexed(const Value * X, Value_P value)
 {
    // we don't do scalar extension but require indices to match the value.
    //
@@ -626,7 +626,7 @@ Value_P B2(2, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_PS::assign_indexed(Value_P X, Value_P B)
+Quad_PS::assign_indexed(const Value * X, Value_P B)
 {
    if (!(X->is_int_scalar() || X->is_int_vector()))   INDEX_ERROR;
    if (!(B->is_int_scalar() || B->is_int_vector()))   DOMAIN_ERROR;
@@ -878,15 +878,16 @@ Quad_SYL::assign(Value_P value, bool clone, const char * loc)
 }
 //-----------------------------------------------------------------------------
 void
-Quad_SYL::assign_indexed(IndexExpr & IDX, Value_P value)
+Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P value)
 {
    //  must be an array index of the form [something; 2]
    //
-   if (IDX.value_count() != 2)   INDEX_ERROR;
+   if (IDX.get_rank() != 2)   INDEX_ERROR;
 
-   // IDX is in reverse order: ⎕SYL[X1;X2]
+   // The only point of getting X2 is to check that it is not elided
+   // but quasi-scalar qio + 1
    //
-Value_P X2 = IDX.extract_value(0);
+const Value * X2 = IDX.get_axis_value(1);
 
 const APL_Integer qio = Workspace::get_IO();
 
@@ -895,13 +896,13 @@ const APL_Integer qio = Workspace::get_IO();
    if (!X2->get_cfirst().is_near_int())              INDEX_ERROR;
    if (X2->get_cfirst().get_near_int() != qio + 1)   INDEX_ERROR;
 
-Value_P X1 = IDX.extract_value(1);
+const Value * X1 = IDX.get_axis_value(0);
 
    assign_indexed(X1, value);
 }
 //-----------------------------------------------------------------------------
 void
-Quad_SYL::assign_indexed(Value_P X, Value_P B)
+Quad_SYL::assign_indexed(const Value * X, Value_P B)
 {
    // try to assign ⎕SYL[X;2]
    //

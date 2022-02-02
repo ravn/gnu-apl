@@ -823,7 +823,7 @@ const APL_Integer qio = Workspace::get_IO();
 Value_P Z(root.get_solution_count(), LOC);
    if (root.get_solution_count() == 0)   // empty result
       {
-        Value_P Z1 = Idx0(LOC);   // Z1 is ⍬
+        Value_P Z1 = Idx0(LOC);   // Z1 ← ⍬
         new (&Z->get_wproto())   PointerCell(Z1.get(), Z.getref());
       }
    else

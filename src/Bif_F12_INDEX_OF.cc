@@ -87,10 +87,11 @@ const Rank rk_Z = Z->get_rank();
 
    if (Z->element_count() == 0)   // empty result
       {
-        Value_P ZZ(rk_Z, LOC);
+        Value_P ZZ(rk_Z, LOC);   // ZZ←(⍴⍴Z)⍴0...
         while (ZZ->more())   ZZ->next_ravel_Int(0);
         ZZ->check_value(LOC);
-        new (&Z->get_wproto())   PointerCell(ZZ.get(), Z.getref()); // prototype
+
+        new (&Z->get_wproto())   PointerCell(ZZ.get(), Z.getref()); // ⊂(⍴⍴Z)⍴0
       }
 
    Z->check_value(LOC);

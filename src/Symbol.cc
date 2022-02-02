@@ -167,7 +167,7 @@ ValueStackItem & vs = value_stack.back();
 }
 //-----------------------------------------------------------------------------
 void
-Symbol::assign_indexed(Value_P X, Value_P B)   // A[X] ← B
+Symbol::assign_indexed(const Value * X, Value_P B)   // A[X] ← B
 {
    // this function is only called for A[X}←B when X is one-dimensional,
    // i.e. an index with no semicolons. If X contains semicolons, then
@@ -180,7 +180,7 @@ Value_P A = get_apl_value();  // the current APL value of this Symbol
    if (A->is_member())
       {
         // A is indexed with a member name, e.g. A['member'] ← 42
-        const UCS_string name(X.getref());
+        const UCS_string name(*X);
         Cell * data = A->get_member_data(name);
         if (data)   // member exists
            {
@@ -204,7 +204,7 @@ Value_P A = get_apl_value();  // the current APL value of this Symbol
       }
 
 const ShapeItem max_idx = A->element_count();
-   if (+X             &&     // X exists,      and
+   if (X              &&     // X exists,      and
        X->is_scalar() &&     // X is a scalar, and
        B->is_scalar() &&     // B is a scalar, and
        A->get_rank() == 1)   // A is a vector
@@ -259,11 +259,11 @@ const Cell * cB = &B->get_cfirst();
 }
 //-----------------------------------------------------------------------------
 void
-Symbol::assign_indexed(IndexExpr & IX, Value_P B)   // A[IX;...] ← B
+Symbol::assign_indexed(const IndexExpr & IX, Value_P B)   // A[IX;...] ← B
 {
-   if (IX.value_count() == 1 && +IX.values[0])   // one-dimensional index
+   if (IX.is_axis() && +IX.values[0])   // one-dimensional index, not elided
       {
-         assign_indexed(IX.values[0], B);
+         assign_indexed(IX.values[0].get(), B);
         return;
       }
 
@@ -271,32 +271,32 @@ Symbol::assign_indexed(IndexExpr & IX, Value_P B)   // A[IX;...] ← B
 
 Value_P A = get_apl_value();
 
-   if (A->get_rank() != IX.value_count())   RANK_ERROR;   // ISO p. 159
+   if (A->get_rank() != IX.get_rank())   RANK_ERROR;   // ISO p. 159
 
    // B must either be a scalar (and is then scalar extended to the size
    // of the updated area, or else have the shape of the concatenated index
-   // items for example:
+   // items. For example:
    //
    //  X:   X1    ; X2    ; X3
    //  ⍴B:  b1 b2   b3 b4   b5 b6
    //
-   if (1 && !B->is_scalar())
+   if (!B->is_scalar())
       {
         // remove dimensions with len 1 from the shapes of X and B...
         // if we see an empty Xn then we return.
         //
-        Shape B1;
+        Shape B1;   // shape B with axes of length 1 removed
         loop(b, B->get_rank())
            {
-             const ShapeItem sb = B->get_shape_item(b);
-             if (sb != 1)   B1.add_shape_item(sb);
+             const ShapeItem sh_b = B->get_shape_item(b);
+             if (sh_b != 1)   B1.add_shape_item(sh_b);
            }
 
         Shape IX1;
-        for (ShapeItem ix = IX.value_count() - 1; ix >= 0; --ix)
+        for (ShapeItem ix = IX.get_rank() - 1; ix >= 0; --ix)
             {
               const Value * ix_val = IX.values[ix].get();
-              if (ix_val)   // normal index
+              if (ix_val)   // non-elided index
                  {
                    if (ix_val->element_count() == 0)   return;   // empty index
                    loop(xx, ix_val->get_rank())
@@ -305,7 +305,7 @@ Value_P A = get_apl_value();
                         if (sxx != 1)   IX1.add_shape_item(sxx);
                       }
                  }
-               else     // elided index: add corresponding B dimenssion
+               else         // elided index: add corresponding B dimenssion
                  {
                    if (ix >= A->get_rank())   RANK_ERROR;
                    const ShapeItem sbx =
@@ -318,7 +318,7 @@ Value_P A = get_apl_value();
         if (B1 != IX1)
            {
              if (B1.get_rank() != IX1.get_rank())   RANK_ERROR;
-             LENGTH_ERROR;
+             else                                   LENGTH_ERROR;
            }
       }
 
@@ -782,7 +782,7 @@ ValueStackItem & vs = value_stack.back();
 
    if (vs.name_class == NC_VARIABLE)
       {
-        ptr_clear(vs.apl_val, LOC);
+        vs.apl_val.reset();   // delete the value owned by this var
       }
    else if (vs.name_class == NC_FUNCTION || vs.name_class == NC_OPERATOR)
       {
@@ -1238,8 +1238,8 @@ ValueStackItem & tos = value_stack[0];
              break;
 
         case NC_VARIABLE:
+             tos.apl_val.reset();   // delete the value owned by this var
              tos.name_class = NC_UNUSED_USER_NAME;
-             ptr_clear(tos.apl_val, LOC);
              break;
 
         case NC_UNUSED_USER_NAME:

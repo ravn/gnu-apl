@@ -55,6 +55,14 @@ Value::set_default(const Value & B, const char * loc)
 }
 //-----------------------------------------------------------------------------
 void
+Value::set_default(const Cell & cB, const char * loc)
+{
+   Assert1(this->get_cproto().is_integer_cell());   // by constructor
+   if (cB.is_lval_cell())   new (&get_wproto()) LvalCell(0, 0);
+   else                     get_wproto().init_type(cB, *this, loc);
+}
+//-----------------------------------------------------------------------------
+void
 Value::next_ravel_Char(Unicode u)
 {
   CharCell::zU(next_ravel(), u);

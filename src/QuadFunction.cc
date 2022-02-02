@@ -322,18 +322,18 @@ ExecuteList * fun = 0;
 Token
 Quad_EC::eval_fill_B(Value_P B) const
 {
-Value_P Z2(2, LOC);
+Value_P Z2(2, LOC);                             // Z2←0 0 0
    Z2->next_ravel_Int(0);
    Z2->next_ravel_Int(0);
    Z2->check_value(LOC);
 
-Value_P Zsub(3, LOC);
-   Zsub->next_ravel_Int(3);   // statement without result
-   Zsub->next_ravel_Pointer(Z2.get());
-   Zsub->next_ravel_Pointer(Idx0(LOC).get());
+Value_P Zsub(3, LOC);                           // Zsub ← 3 (⊂Z2) (⊂⍬)...
+   Zsub->next_ravel_Int(3);                     // Zsub[1] ← 3
+   Zsub->next_ravel_Pointer(Z2.get());          // Zsub[2] ← ⊂ 0 0 0
+   Zsub->next_ravel_Pointer(Idx0(LOC).get());   // Zsub[3] ← ⊂⍬
    Zsub->check_value(LOC);
 
-Value_P Z(ShapeItem(0), LOC);
+Value_P Z(ShapeItem(0), LOC);                   // Z ← 0 ⍴ ⊂Zsub
   new (&Z->get_wproto())   PointerCell(Zsub.get(), Z.getref());
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);

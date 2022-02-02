@@ -53,7 +53,7 @@ Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B)
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
            {
-              Z->get_wproto().init(cell_A, Z.getref(), LOC);   // prototype
+              Z->set_default(cell_A, LOC);   // prototype
            }
         else
            {
@@ -105,7 +105,7 @@ Bif_COMMA::append_scalar(Value_P A, uAxis axis, const Cell & cell_B)
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
            {
-              Z->get_wproto().init(cell_B, Z.getref(), LOC);   // prototype
+              Z->set_default(cell_B, LOC);   // prototype
            }
         else
            {

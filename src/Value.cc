@@ -465,7 +465,6 @@ Value_P Z(get_shape(), loc);
    else   // prototype
       {
         Z->set_ravel_Cell(0, LvalCell(&get_wproto(), this));
-
       }
 
    Z->check_value(LOC);
@@ -1636,7 +1635,7 @@ Value::index(const IndexExpr & IX) const
          // for a structured variable VAR, we only allow VAR[1;] to obtain
          // the valid member names...
          //
-         if (IX.value_count() != 2)                RANK_ERROR;
+         if (IX.get_rank() != 2)   RANK_ERROR;
          if (+(IX.values[1]))   // not elided
             {
               MORE_ERROR() << "member access: second index is not elided";
@@ -1675,9 +1674,9 @@ Value::index(const IndexExpr & IX) const
          return Z;
       }
 
-   Assert(IX.value_count() != 1);   // should have called index(Value_P X)
+   Assert(!IX.is_axis());   // should have called index(Value_P X)
 
-   if (get_rank() != IX.value_count())   RANK_ERROR;   // ISO p. 158
+   if (get_rank() != IX.get_rank())   RANK_ERROR;   // ISO p. 158
 
    // Notes:
    //
@@ -1718,7 +1717,7 @@ Shape shape_Z;
 
    // check that all indices are valid
    //
-   if (IX.check_range(get_shape()))   INDEX_ERROR;
+   IX.check_index_range(get_shape());
 
 MultiIndexIterator mult(get_shape(), IX);
 

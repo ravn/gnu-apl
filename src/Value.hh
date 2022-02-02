@@ -357,6 +357,9 @@ public:
    /// set the prototype (according to B) if this value is empty.
    inline void set_default(const Value & B, const char * loc);
 
+   /// set the prototype (according to B) if this value is empty.
+   inline void set_default(const Cell & cB, const char * loc);
+
    /// set the prototype to ' ' if this value is empty.
    inline void set_proto_Spc();
 

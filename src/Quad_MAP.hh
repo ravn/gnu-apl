@@ -45,9 +45,8 @@ protected:
                            const void * cells);
 
    /// compute ⎕MAP with (indices of) sorted A
-   static Value_P do_map(const Cell * ravel_A, ShapeItem len_A,
-                  const ShapeItem * sorted_indices_A, const Value * B,
-                  bool recursive);
+   static Value_P do_map(const Value & A, const ShapeItem * sorted_indices_A,
+                         const Value * B, bool recursive);
 };
 //-----------------------------------------------------------------------------
 

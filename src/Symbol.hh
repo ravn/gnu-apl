@@ -173,10 +173,10 @@ public:
    void assign_shared_variable(Value_P value, const char * loc);
 
    /// Indexed (multi-dimensional) assign \b value to \b this \b Symbol
-   virtual void assign_indexed(IndexExpr & index, Value_P value);
+   virtual void assign_indexed(const IndexExpr & index, Value_P value);
 
    /// Indexed (one-dimensional) assign \b value to \b this \b Symbol
-   virtual void assign_indexed(Value_P index, Value_P value);
+   virtual void assign_indexed(const Value * X, Value_P value);
 
    /// assign lambda, eg. V←{ ... }
    virtual bool assign_named_lambda(Function_P lambda, const char * loc);

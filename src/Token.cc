@@ -40,37 +40,46 @@ Token::Token(const Token & other, const char * loc)
    copy_1(other, loc);
 }
 //-----------------------------------------------------------------------------
-Token::Token(TokenTag tg, IndexExpr & idx)
+Token::Token(TokenTag t, IndexExpr & idx)
 {
-   if (tg == TOK_PINDEX)
+   /* construct a token for an index expressions. There are 3 cases which
+      differ by tag and by value type:
+
+      1. t indicates a partial index. Partial indices are used after the
+         trailing ] but before the leading [ was parsed (remember that we
+         parse right to left). Tag is TOK_PINDEX / TV_INDEX
+
+      2. t indicates a complete token (after parsing [). There are 2 sub-cases:
+
+      2a. idx has rank 1: [ axis ]. IndexExpr is converted to a (single) value,
+          possibly 0 to indicate an elided index []. Tag is TOK_AXIS / TV_VAL
+
+      2b. idx is [i1;i2...]: Tag is TOK_INDEX / TV_INDEX.
+
+      In case 1. and 2b. the tag == t; only in case 2a. is the caller's
+      t == TOK_INDEX replaced with tok == TOK_AXIS.
+    */
+
+   if (t == TOK_PINDEX)   // case 1. (partial index   ...] )
       {
         // this token is a partial index in the prefix parser.
         // use it as is.
         //
         tag = TOK_PINDEX;
-        value.index_val = &idx;
+        value.index_val = &idx;        // type is TV_INDEX
       }
-   else
+   else                   // case 2. (complete index [ ... ] )
       {
-        // this token is a complete index
-        //
-        Assert(tg == TOK_INDEX);
-        if (idx.value_count() < 2)   // [idx] or []
+        Assert(t == TOK_INDEX);
+        if (idx.get_rank() < 2)   // case 2a. [idx] or []
            {
              tag = TOK_AXIS;
-             if (idx.value_count() == 0)   // []
-                {
-                  new (&value.apl_val) Value_P;
-                }
-             else                          // [x]
-                {
-                  new (&value.apl_val)   Value_P(idx.extract_value(0));
-                }
+             value.apl_val = idx.extract_axis();   // type is TV_VAL
            }
-        else                         // [idx; ...]
+        else                           // [idx; ...]
            {
              tag = TOK_INDEX;
-             value.index_val = &idx;
+             value.index_val = &idx;   // type is TV_INDEX
            }
       }
 }

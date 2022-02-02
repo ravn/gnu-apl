@@ -742,7 +742,7 @@ XML_Saving_Archive::emit_token_val(const Token & tok)
                          Log(LOG_archive)
                             CERR << "Saving TV_INDEX Token" << endl;
                          const IndexExpr & idx = tok.get_index_val();
-                         const int rank = idx.value_count();
+                         const int rank = idx.get_rank();
                          out << " index=\"";
                          loop(i, rank)
                              {
@@ -2022,11 +2022,11 @@ Value_P Z = values[vid];
         return;
       }
 
-   if (Z->element_count() == 0)   // then Z->more() is 0
+   if (Z->element_count() == 0)   // then Z->more() is 0 and can't be used
       {
         Value_P Z0(LOC);   // a scalar to read the prototype
-        cells_utf = read_Cells(Z0.getref(), cells_utf);   // prototype
-        Z->get_wproto().init_type(Z0->get_cproto(), Z.getref(), LOC);
+        read_Cells(Z0.getref(), cells_utf);   // prototype
+        Z->set_default(Z0.getref(), LOC);
       }
    else
       {
@@ -2803,7 +2803,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
                     if (*vids == ',')   ++vids;
                     if (*vids == '-')   // elided index
                        {
-                         idx.add(Value_P());
+                         idx.add_index(Value_P());
                        }
                     else                // value
                        {
@@ -2814,7 +2814,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
                          Assert1(*vids == '_');   ++vids;
                          const int vid = strtoll(charP(vids), &end, 10);
                          Assert(vid < int(values.size()));
-                         idx.add(values[vid]);
+                         idx.add_index(values[vid]);
                          vids = utf8P(end);
                        }
                   }

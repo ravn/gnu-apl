@@ -41,9 +41,8 @@ bool recursive = false;
          A = A->get_cfirst().get_pointer_value();
       }
 
-   if (A->get_rank() != 2)   RANK_ERROR;
-   if (A->get_cols() != 2)   LENGTH_ERROR;
 const ShapeItem map_len = A->get_rows();
+   if (A->get_rank() != 2)   RANK_ERROR;
    if (map_len == 0)   LENGTH_ERROR;
 
 ShapeItem * indices = new ShapeItem[map_len];
@@ -72,7 +71,7 @@ const double qct = Workspace::get_CT();
              }
        }
 
-Value_P Z = do_map(&A->get_cfirst(), map_len, indices, B.get(), recursive);
+Value_P Z = do_map(A.getref(), indices, B.get(), recursive);
    delete[] indices;
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -101,13 +100,13 @@ const Cell * cells_A = rcl->ravel;
 //-----------------------------------------------------------------------------
 
 Value_P
-Quad_MAP::do_map(const Cell * ravel_A, ShapeItem len_A,
-                 const ShapeItem * sorted_indices_A, const Value * B,
-                 bool recursive)
+Quad_MAP::do_map(const Value & A, const ShapeItem * sorted_indices_A,
+                 const Value * B, bool recursive)
 {
-Value_P Z(B->get_shape(), LOC);
-const ravel_comp_len ctx = { ravel_A,   // start of the ravel
-                             1          // number of characters to compare
+Value_P Z(B->get_shape(), LOC);         // the result, ⍴Z ←→ ⍴B
+
+const ravel_comp_len ctx = { &A.get_cfirst(),   // start of the ravel
+                             1                  // number of chars to compare
                            };
 
 const ShapeItem len_B = B->element_count();
@@ -118,11 +117,11 @@ const ShapeItem len_B = B->element_count();
                    Heapsort<ShapeItem>::search<const Cell &>
                                               (cell_B,
                                                sorted_indices_A,
-                                               len_A,
+                                               A.get_rows(),
                                                compare_MAP,
                                                &ctx))
             {
-              const Cell & cell_A = ravel_A[*map*2 + 1];
+              const Cell & cell_A = A.get_cravel(*map*2 + 1);
               if (cell_A.is_pointer_cell())
                  {
                    Cell & cell_Z0 = Z->get_wproto();
@@ -138,7 +137,7 @@ const ShapeItem len_B = B->element_count();
             }
          else   // not mapped, simple
             {
-              Z->get_wproto().init(cell_B, Z.getref(), LOC);
+              Z->set_default(cell_B, LOC);
             }
       }
 
@@ -146,16 +145,16 @@ const ShapeItem len_B = B->element_count();
        {
          const Cell & cell_B = B->get_cravel(b);
          if (const ShapeItem * map = Heapsort<ShapeItem>::search<const Cell &>
-                          (cell_B, sorted_indices_A, len_A, compare_MAP, &ctx))
+                   (cell_B, sorted_indices_A, A.get_rows(), compare_MAP, &ctx))
             {
-             Z->next_ravel_Cell(ravel_A[*map*2 + 1]);
+             Z->next_ravel_Cell(A.get_cravel(*map*2 + 1));
             }
          else   // cell_B shall not be mapped
             {
               if (recursive && cell_B.is_pointer_cell())   // nested: recursive
                  {
                    Value_P sub_B = cell_B.get_pointer_value();
-                   Value_P sub_Z = do_map(ravel_A, len_A, sorted_indices_A,
+                   Value_P sub_Z = do_map(A, sorted_indices_A,
                                           sub_B.get(), true);
                    Z->next_ravel_Pointer(sub_Z.get());
                  }

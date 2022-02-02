@@ -361,7 +361,7 @@ bool extra_frame = false;
    if (extra_frame && !B->is_simple_scalar())
       {
         Value_P Z(LOC);
-        new (&Z->get_wproto()) PointerCell(B->clone(LOC).get(), Z.getref());
+        new (&Z->get_wscalar()) PointerCell(B->clone(LOC).get(), Z.getref());
         Z->check_value(LOC);
         PrintBuffer pb(*Z, pctx, 0);
         return Value_P(pb, LOC);
@@ -1537,9 +1537,9 @@ Quad_CR::do_CR35(const Value & B)
 const ShapeItem len_B = B.element_count();
    if (len_B == 0)
       {
-        Value_P Z1 = Str0(LOC);
+        Value_P Z1 = Str0(LOC);   // Z1←''
         Value_P Z(1, LOC);
-        new (&Z->get_wproto()) PointerCell(Z1.get(), Z.getref());
+        Z->next_ravel_Pointer(Z1.get());
         Z->check_value(LOC);
         return Z;
       }

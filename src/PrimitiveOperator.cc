@@ -28,6 +28,12 @@ Token
 PrimitiveOperator::fill(const Shape shape_Z, Value_P A, Function_P fun,
                         Value_P B, const char * loc)
 {
+   // this function is called from A f.g B when A fun B is called with an
+   // empty A or B. In this case shape_Z is empty since A->get_shape() or
+   // B->get_shape() (or both) contain axes of length 0.
+   //
+   // FIXME: move to class Bif_OPER2_INNER.
+
 Value_P Fill_A;   // argument A of the fill function
 Value_P Fill_B;   // argument B of the fill function
 
@@ -42,6 +48,7 @@ Token tok = fun->eval_fill_AB(Fill_A, Fill_B);
    if (tok.get_Class() != TC_VALUE)   return tok;
 
 Value * Z = tok.get_apl_val().get();
+
 Value_P Z1(shape_Z, LOC);   // shape_Z is empty
    Z1->get_wproto().init_from_value(Z, Z1.getref(), loc);
 

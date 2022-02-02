@@ -80,7 +80,7 @@ Value * v1_owner = v1->get_lval_cellowner();
       {
         const ShapeItem ec = v1->element_count();
         Value_P Z(v1->get_shape(), LOC);
-        if (ec == 0)   Z->get_wproto().init(v1->get_cproto(), Z.getref(), LOC);
+        if (ec == 0)   Z->set_default(v1.getref(), LOC);
 
         loop(e, ec)   Z->next_ravel_Cell(v1->get_cravel(e));
 
@@ -137,10 +137,8 @@ Bif_F12_TAKE::do_take(const Shape & ravel_A1, Value_P B)
    //
 Value_P Z(ravel_A1.abs(), LOC);
 
-   if (ravel_A1.is_empty())
-      Z->get_wproto().init_type(B->get_cfirst(), Z.getref(), LOC);
-   else
-      fill(ravel_A1, Z.getref(), B.getref());
+   if (ravel_A1.is_empty())   Z->set_default(B.getref(), LOC);
+   else                       fill(ravel_A1, Z.getref(), B.getref());
    Z->check_value(LOC);
    return Z;
 }

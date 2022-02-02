@@ -438,10 +438,10 @@ Bif_F12_TRANSPOSE::transpose(const Shape & A, Value_P B)
       A is already normalized to ⎕IO←0 so its axes are 0, 1, ... in some order
     */
 
-const Shape shape_inv_A = inverse_permutation(A);
-const Shape & shape_B = B->get_shape();
-const Shape shape_Z = permute(shape_B, shape_inv_A);
-const Shape weights_Z = permute(shape_B.get_weights(), shape_inv_A);
+const Shape   shape_inv_A = inverse_permutation(A);
+const Shape & shape_B     = B->get_shape();
+const Shape   shape_Z     = permute(shape_B, shape_inv_A);
+
 Value_P Z(shape_Z, LOC);
 
    if (shape_Z.is_empty())
@@ -450,9 +450,9 @@ Value_P Z(shape_Z, LOC);
          return Z;
       }
 
-   for (ArrayIterator z(shape_Z); z.more(); ++z)
+   for (ArrayIterator b(shape_Z, A); b.more(); ++b)
        {
-         Z->next_ravel_Cell(B->get_cravel(z.multiply(weights_Z)));
+         Z->next_ravel_Cell(B->get_cravel(b.get_ravel_offset()));
        }
 
    Z->check_value(LOC);
@@ -1123,23 +1123,24 @@ IndexExpr index_expr(ASS_none, LOC);
             {
               Value_P val = cell.get_pointer_value()->clone(LOC);
               if (val->compute_depth() > 1)   DOMAIN_ERROR;
-              index_expr.add(val);
+              index_expr.add_index(val);
             }
         else
             {
               const APL_Integer I = cell.get_near_int();
               if (I < 0)   DOMAIN_ERROR;
-              index_expr.add(IntScalar(I, LOC));
+              index_expr.add_index(IntScalar(I, LOC));
             }
       }
 
-   // the index() do set_default() and check_value(), so we return immediately
+   // the index() functions do set_default() and check_value(),
+   // so we return immediately without doint it again.
    //
    index_expr.quad_io = Workspace::get_IO();
 
-   if (index_expr.value_count() == 1)   // one-dimensional index
+   if (index_expr.is_axis())   // [ ] or [ axis ]
       {
-        Value_P single_index = index_expr.extract_value(0);
+        Value_P single_index = index_expr.extract_axis();
         Value_P Z = B->index(single_index.get());
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -1155,51 +1156,64 @@ Bif_F2_INDEX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
 
-const Shape axes_present = Value::to_shape(X.get());
+const Shape axes_present = Value::to_shape(X.get());   // normalized to ←IO←0
+
+ShapeItem bmX = 0;
+   loop(x, axes_present.get_rank())
+       {
+         const ShapeItem xx = axes_present.get_shape_item(x);
+         if (xx < 0)                AXIS_ERROR;
+         if (xx >= B->get_rank())   AXIS_ERROR;
+         bmX |= 1 << xx;
+       }
 
 const ShapeItem ec_A = A->element_count();
    if (ec_A != axes_present.get_rank())   RANK_ERROR;
    if (ec_A > B->get_rank())              RANK_ERROR;
 
-   // index_expr is in reverse order!
+   // construct an IndexExpr in index (= parse-) order (i.e. the index_expr[0]
+   // corresponds to the lasr axis ¯1↑⍴B of B). We therefore move backwards
+   // from the end of A resp. X.
    //
-const APL_Integer qio = Workspace::get_IO();
-IndexExpr index_expr(ASS_none, LOC);
-   loop(rb, B->get_rank())   index_expr.add(Value_P());
-   index_expr.quad_io = qio;
+IndexExpr index_expr(ASS_none, LOC);   // start with an empty IndexExpr
+   index_expr.quad_io = Workspace::get_IO();
 
-   loop(a, ec_A)
-      {
-         const Rank axis = axes_present.get_shape_item(a);
-
-         const Cell & cell = A->get_cravel(a);
-         if (cell.is_pointer_cell())
+ShapeItem a = ec_A;   // index_expr[0] ←→  B[;;;b]
+   for (Axis b = B->get_rank() - 1; b >= 0; --b)
+       {
+         if (!(bmX & 1 << b))   // Axis  b was not in X: elided idx
             {
-              Value_P val = cell.get_pointer_value()->clone(LOC);
-              if (val->compute_depth() > 1)   DOMAIN_ERROR;
-              index_expr.set_value(axis, val);
+              index_expr.add_index(Value_P());   // add elided index
+              continue;
             }
-        else
-            {
-              const APL_Integer I = cell.get_near_int();
-              if (I < 0)   DOMAIN_ERROR;
-              Value_P val = IntScalar(I, LOC);
-              index_expr.set_value(axis, val);
-            }
-      }
 
-   if (index_expr.value_count() == 1)
+         const Cell & cell_A = A->get_cravel(--a);
+          if (cell_A.is_pointer_cell())
+             {
+               Value_P val = cell_A.get_pointer_value()->clone(LOC);
+               if (val->compute_depth() > 1)   DOMAIN_ERROR;
+              index_expr.add_index(val);
+             }
+         else   // single index
+             {
+               const APL_Integer I = cell_A.get_near_int();
+               if (I < 0)   DOMAIN_ERROR;
+               Value_P val = IntScalar(I, LOC);
+              index_expr.add_index(val);
+             }
+       }
+
+   if (index_expr.is_axis())   // Z←B[x] or Z←B[]
       {
-        Value_P single_index = index_expr.extract_value(0);
+        Value_P single_index = index_expr.extract_axis();
         Value_P Z = B->index(single_index.get());
 
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
-   else
+   else                        // Z←B[x;...]
       {
         Value_P Z = B->index(index_expr);
-
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }

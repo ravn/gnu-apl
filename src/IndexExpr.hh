@@ -46,14 +46,16 @@ public:
    Value_P values[MAX_RANK];
 
    /// append a value.
-   void add(Value_P val)
+   void add_index(Value_P val)
       {
-       if (rank < MAX_RANK)   values[rank++] = val;
-       else                   RANK_ERROR;
+       if (rank >= MAX_RANK)    RANK_ERROR;
+       values[rank++] = val;
+       if (+val)   ++value_count;
       }
 
-   /// return the number of values (= number of semicolons + 1)
-   uRank value_count() const   { return rank; }
+   /// return the number of values (= number of semicolons + 1),
+   /// including elided indices
+   uRank get_rank() const   { return rank; }
 
    /// return true iff the number of dimensions is 1 (i.e. no ; and non-empty)
    bool is_axis() const   { return rank == 1; }
@@ -61,25 +63,20 @@ public:
    /// Return an axis (from an IndexExpr of rank 1.
    Rank get_axis(Rank max_axis) const;
 
-   /// set axis \b axis to \b val
-   void set_value(uAxis axis, Value_P val);
-
    /// return true iff this index is part of indexed assignment ( A[]← )
    Assign_state get_assign_state() const
       { return assign_state; }
 
-   /// Return a set of axes as shape. This is used to convert a number of
-   /// axes (like in [2 3]) into a shape (like 2 3).
-   Shape to_shape() const;
+   /// return the single axis value and clear it in \b this IndexExpr.
+   Value_P extract_axis();
 
-   /// return one axis value and clear it in \b this IndexExpr
-   Value_P extract_value(uAxis rk);
+   /// check that all indices indices of \b this IndexExpr are valid indices
+   /// for \b shape, raise INDEX_ERROR if not.
+   void check_index_range(const Shape & shape) const;
 
-   /// clear all axis values
-   void extract_all();
-
-   /// check that all indices are valid, return true if not.
-   bool check_range(const Shape & shape) const;
+   /// return axis rk (rk in shape order as opposed to index order)
+   const Value * get_axis_value(uAxis ax) const
+      { return values[rank - ax - 1].get(); }
 
    /// print stale IndexExprs, and return the number of stale IndexExprs.
    static int print_stale(ostream & out);
@@ -88,8 +85,11 @@ public:
    static void erase_stale(const char * loc);
 
 protected:
-   /// the number of dimensions
+   /// the number of dimensions (including elided)
    uRank rank;
+
+   /// the number of values (excluding elided)
+   uRank value_count;
 
    /// true iff this index is part of indexed assignment ( A[]← )
    const Assign_state assign_state;

@@ -97,14 +97,14 @@ MultiIndexIterator::MultiIndexIterator(const Shape & shape,
    // ---------------
    //
 
-   if (shape.get_rank() != uRank(IDX.value_count()))
+   if (shape.get_rank() != IDX.get_rank())
       {
         Log(LOG_error_throw)
            {
              Q1(shape.get_rank())
              Q1(shape)
              Q1(IDX)
-             Q1(IDX.value_count())
+             Q1(IDX.get_rank())
            }
         INDEX_ERROR;
       }

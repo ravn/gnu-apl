@@ -50,7 +50,7 @@ Value_P Z(LOC);
 }
 //-----------------------------------------------------------------------------
 Value_P
-Bif_F12_PARTITION::enclose_with_axes(const Shape & shape_X, Value_P B)
+Bif_F12_PARTITION::enclose_with_axes(const Shape & axes_X, Value_P B)
 {
 Shape item_shape;
 Shape it_weights;
@@ -59,37 +59,52 @@ Shape weights_Z;
 
 const Shape weights_B = B->get_shape().get_weights();
 
-   // put the dimensions mentioned in X into item_shape and the
-   // others into shape_Z
-   //
-
-   loop(r, B->get_rank())        // the axes not in shape_X
+int bmX = 0;   // axes in axes_X with ⎕IO←0
+   loop(r, axes_X.get_rank())   // the axes in axes_X
        {
-         if (!shape_X.contains_axis(r))
-            {
-              shape_Z.add_shape_item(B->get_shape_item(r));
-              weights_Z.add_shape_item(weights_B.get_shape_item(r));
-            }
-       }
-
-int X_axes_used = 0;
-   loop(r, shape_X.get_rank())   // the axes in shape_X
-       {
-         const ShapeItem x_r = shape_X.get_shape_item(r);
+         const ShapeItem ax = axes_X.get_shape_item(r);
 
          // check that X∈⍳⍴⍴B
          //
-         if (x_r < 0)                  AXIS_ERROR;
-         if (x_r >= B->get_rank())     AXIS_ERROR;
-         if (X_axes_used & 1 << x_r)
+         if (ax < 0)
             {
-              MORE_ERROR() = "Duplicate axis";
+              const APL_Integer qio = Workspace::get_IO();
+              MORE_ERROR() << "In A of A⊂[X]B: axis " << (ax + qio)
+                           << " < ⎕IO";
               AXIS_ERROR;
             }
-         X_axes_used |= 1 << x_r;
 
-         item_shape.add_shape_item(B->get_shape_item(x_r));
-         it_weights.add_shape_item(weights_B.get_shape_item(x_r));
+         if (ax >= B->get_rank())
+            {
+              const APL_Integer qio = Workspace::get_IO();
+              MORE_ERROR() << "In A of A⊂[X]B: axis " << (ax + qio)
+                           << " > ⎕IO+⍴B";
+              AXIS_ERROR;
+            }
+
+         if (bmX & 1 << ax)
+            {
+              const APL_Integer qio = Workspace::get_IO();
+              MORE_ERROR() << "In A of A⊂[X]B: duplicate axis " << (ax + qio);
+              AXIS_ERROR;
+            }
+
+         // ax is OK.
+         bmX |= 1 << ax;
+
+         item_shape.add_shape_item(B->get_shape_item(ax));
+         it_weights.add_shape_item(weights_B.get_shape_item(ax));
+       }
+
+   // put the dimensions mentioned in X into item_shape and the
+   // others into shape_Z
+   //
+   loop(ax, B->get_rank())        // the axes not in axes_X
+       {
+         if (bmX & 1 << ax)   continue;   // ax is in X
+
+         shape_Z.add_shape_item(B->get_shape_item(ax));
+         weights_Z.add_shape_item(weights_B.get_shape_item(ax));
        }
 
    if (item_shape.get_rank() == 0)   // empty axes
@@ -109,21 +124,28 @@ Value_P Z(shape_Z, LOC);
 
    for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
       {
-        const ShapeItem off_Z = it_Z.multiply(weights_Z);   // offset in Z
+        const Shape it_Z_sh = it_Z.get_shape_offsets();
+        ShapeItem off_Z = 0;
+        loop(z, it_Z_sh.get_rank())
+            off_Z += it_Z_sh.get_shape_item(z)
+                   * weights_Z.get_shape_item(z);
 
         Value_P vZ(item_shape, LOC);
         Z->next_ravel_Pointer(vZ.get());
 
         if (item_shape.is_empty())
            {
-             vZ->get_wproto().init(B->get_cfirst(), vZ.getref(), LOC);
+             vZ->set_default(B.getref(), LOC);
            }
         else
            {
              for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
-                   const ShapeItem off_B =  // offset in B
-                         it_it.multiply(it_weights);
+                    const Shape it_sh = it_it.get_shape_offsets();
+                    ShapeItem off_B = 0;
+                    loop(i, item_shape.get_rank())
+                        off_B += it_sh.get_shape_item(i)
+                               * it_weights.get_shape_item(i);
                    vZ->next_ravel_Cell(B->get_cravel(off_Z + off_B));
                  }
            }
@@ -293,13 +315,13 @@ const ShapeItem item_len = item_shape.get_volume();
         const Cell & B0 = B->get_cproto();
         if (B0.is_pointer_cell())
            {
-             Value_P vB = B0.get_pointer_value();
-             Value_P B_proto = vB->prototype(LOC);
+             Value_P vB = B0.get_pointer_value();    // some nested value
+             Value_P B_proto = vB->prototype(LOC);   // its prototype
              Z->get_wproto().init(B_proto->get_cproto(), Z.getref(), LOC);
            }
         else
            {
-             Z->get_wproto().init(B0, Z.getref(), LOC);
+             Z->set_default(B0, LOC);
            }
 
         Z->check_value(LOC);

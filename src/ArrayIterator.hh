@@ -43,23 +43,22 @@ public:
      wrap(_wrap)
    {}
 
-   /** increment the offsets and return:
+   /** increment the offset(s) and return:
 
        true  (= "carry")       if the end of the axis was reached, or else
        false (= no more items) if the end was NOT reached
     **/
-
    bool next()
       {
         ravel_offset += axis_weight;
 
         // NOTE: increment of scalar shape_offset needed for more() below.
-        if (++shape_offset < axis_length || is_scalar_iterator())  return false;
+        if (++shape_offset < axis_length || is_scalar_iterator()) return false;
 
         // carry has occurred.
         if (wrap)   shape_offset = ravel_offset = 0;
         return true;   // carry: increment next (if any) iterator
-     }
+      }
 
    /// true if more items coming
    bool more() const
@@ -73,6 +72,14 @@ public:
    /// return the current ravel offset (weighted)
    ShapeItem get_ravel_offset() const
       { return ravel_offset; }
+
+   /// return the weight (ravel increment for one next() call of this iterator
+   ShapeItem get_weight() const
+      { return axis_weight; }
+
+   /// return the total weight (ravel increment for \b axis_length next() calls
+   ShapeItem get_total_weight() const
+      { return axis_weight * axis_length; }
 
    /// true if \b this is an iterator for a scalar value.
    bool is_scalar_iterator() const
@@ -103,35 +110,63 @@ protected:
 class ArrayIterator
 {
 public:
-   /// constructor
+   /// constructor from Shape
    ArrayIterator(const Shape & shape)
-   : rank(shape.get_rank())
+   : rank(shape.get_rank()),
+     total_ravel_offset(0)
       {
-        ShapeItem weight = 1;
-        for (Axis a = rank - 1; a > 0; --a)
-            {
-              // axis_iterators[pos == 0] is the one with the highest weight
-              const ShapeItem len = shape.get_shape_item(a);
-              new (axis_iterators + a) AxisIterator(len, weight, true);
-              weight *= len;
-            }
-
         if (rank == 0)   // scalar
            {
-             new (axis_iterators) AxisIterator(1, 0, false);
+             new (&get_iterator(0)) AxisIterator(1, 0, false);
+             return;
            }
-        else
-           {
-             // the final iterator (which shall not wrap.)
-             const ShapeItem len = shape.get_shape_item(0);
-             new (axis_iterators) AxisIterator(len, weight, false);
-           }
+
+        ShapeItem weight = 1;
+        for (Axis a = rank - 1; a >= 0; --a)
+            {
+              // axis_iterators[0] is the one with the highest weight, and
+              // axis_iterators[rank - 1 the one with the lowest weight (1).
+              // 
+              const ShapeItem len = shape.get_shape_item(a);
+              new (&get_iterator(a)) AxisIterator(len, weight, a > 0);
+              weight *= len;
+            }
       }
 
+   /// constructor from Shape and axis permutation
+   ArrayIterator(const Shape & shape,  const Shape & perm)
+   : rank(shape.get_rank()),
+     total_ravel_offset(0)
+      {
+        if (rank == 0)   // scalar
+           {
+             new (&get_iterator(0)) AxisIterator(1, 0, false);
+             return;
+           }
+
+        ShapeItem weight = 1;
+        for (Axis a = rank - 1; a >= 0; --a)
+            {
+              const Axis perm_a = perm.get_shape_item(a);
+
+              // axis_iterators[0] is the one with the highest weight, and
+              // axis_iterators[rank - 1 the one with the lowest weight (1).
+              // 
+              const ShapeItem len = shape.get_shape_item(perm_a);
+              new (&get_iterator(perm_a)) AxisIterator(len, weight, perm_a);
+              weight *= len;
+            }
+      }
+
+   // Note: The axis_iterators[a] for a > 0 wrap at the end and therefore
+   // axis_iterators[a].more() is always true for a > 0.
+   // As a consequence we only need to check axis_iterators[0].more() to see
+   // if the entire iteration is done.
+   //
    /// return true iff this iterator has more items to come.
    bool more() const
       {
-        return axis_iterators[0].more();
+        return get_iterator(0).more();
       }
 
    /// the work-horse of this iterator.
@@ -139,51 +174,47 @@ public:
       {
         if (rank == 0)   // scalar
            {
-             axis_iterators->next();
+             get_iterator(0).next();
              return;
            }
 
         for (Axis a = rank - 1; a >= 0; --a)
             {
-              if (!axis_iterators[a].next())   break;   // axis_iterators[0]
+              AxisIterator & iterator = get_iterator(a);
+              total_ravel_offset += iterator.get_weight();
+              if (!iterator.next())   break;   // if no carry
+              total_ravel_offset -= iterator.get_total_weight();
             }
       }
 
    /// Get the current offset for axis r
    ShapeItem get_shape_offset(Axis a) const
-      { return axis_iterators[a].get_shape_offset(); }
+      { return get_iterator(a).get_shape_offset(); }
 
    /// Get the current total offset
    ShapeItem get_ravel_offset() const
-      {
-        ShapeItem ret = 0;
-        loop(a, rank)   ret += axis_iterators[a].get_ravel_offset();
-        return ret;
-      }
+      { return total_ravel_offset; }
 
    /// return the offsets of the axis_iterators as a shape
    Shape get_shape_offsets()
       {
         Shape ret;
         loop(r, rank)
-            ret.add_shape_item(axis_iterators[r].get_shape_offset());
-        return ret;
-      }
-
-   /// multiply and cumulate the current ravel offsets
-   ShapeItem multiply(const Shape & weights) const
-      {
-        Assert1(rank == weights.get_rank());
-        ShapeItem ret = 0;
-        for (Axis a = rank - 1; a >= 0; --a)
-            ret += axis_iterators[a].get_shape_offset()
-                 * weights.get_shape_item(a);
+            ret.add_shape_item(get_iterator(r).get_shape_offset());
         return ret;
       }
 
 protected:
+   /// return the iterator for axis a
+   const AxisIterator & get_iterator(Axis a) const
+      { return axis_iterators[a]; }
+
+   /// return the iterator for axis a
+   AxisIterator & get_iterator(Axis a)
+      { return axis_iterators[a]; }
+
    /// the number of valid axes (= iterators).
-   uRank rank;
+   const uRank rank;
 
    /** axis iterators.                   Shape:  ⊏sh0:sh1:...⊐
                                                     │   │
@@ -191,6 +222,7 @@ protected:
        axis_iterators[1] ←→ get_shape_item(1), ─────────┘ ...
     **/
 
+   ShapeItem total_ravel_offset;
    AxisIterator axis_iterators[MAX_RANK];
 };
 //=============================================================================

@@ -60,7 +60,7 @@ Prefix::clean_up()
            }
         else if (tok.get_ValueType() == TV_INDEX)
            {
-             tok.get_index_val().extract_all();
+             tok.get_index_val().~IndexExpr();
            }
       }
 
@@ -1108,8 +1108,8 @@ Prefix::reduce_MISC_F_C_B()
         IndexExpr * idx = &at1().get_index_val();
         Log(LOG_delete)   CERR << "delete " << voidP(idx) << " at " LOC << endl;
         delete idx;
-         at1().clear(LOC);
-         SYNTAX_ERROR;
+        at1().clear(LOC);
+        SYNTAX_ERROR;
       }
    if (!at1().get_apl_val())              SYNTAX_ERROR;
 
@@ -1646,7 +1646,7 @@ Value_P B = at3().get_apl_val();
 
    if (at1().get_tag() == TOK_AXIS)   // [] or [x]
       {
-        Value_P v_idx = at1().get_axes();
+        const Value * v_idx = at1().get_axes().get();
 
         try
            {
@@ -1795,7 +1795,7 @@ Prefix::reduce_LBRA_I__()
 IndexExpr & idx = at1().get_index_val();
 const bool last_index = (at0().get_tag() == TOK_L_BRACK);
 
-   if (idx.value_count() == 0 && last_index)   // special case: [ ]
+   if (idx.get_rank() == 0 && last_index)   // special case: [ ]
       {
         assign_state = idx.get_assign_state();
         Token result = Token(TOK_INDEX, idx);
@@ -1810,7 +1810,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);
    // add elided index to partial index list
    //
 Token result = at1();
-   result.get_index_val().add(Value_P());
+   result.get_index_val().add_index(Value_P());
 
    if (last_index)   // [ seen
       {
@@ -1836,7 +1836,7 @@ Prefix::reduce_LBRA_B_I_()
    // [ B I or ; B I   (normal index)
    //
 Token I = at2();
-   I.get_index_val().add(at1().get_apl_val());
+   I.get_index_val().add_index(at1().get_apl_val());
 
 const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
 
@@ -1845,10 +1845,10 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
         IndexExpr & idx = I.get_index_val();
         assign_state = idx.get_assign_state();
 
-        if (idx.is_axis())
+        if (idx.is_axis())   // [] or [ axis ]
            {
-             Value_P X = idx.extract_value(0);
-             Assert1(+X);
+             Value_P X = idx.extract_axis();
+             Assert1(+X);   // not [ ]
              I.move_2(Token(TOK_AXIS, X), LOC);
              Log(LOG_delete)
                 CERR << "delete " << voidP(&idx) << " at " LOC << endl;

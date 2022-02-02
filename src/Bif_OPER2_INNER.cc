@@ -82,7 +82,7 @@ const ShapeItem items_B = shape_B1.get_volume();
 
    if (LO->may_push_SI() || RO->may_push_SI())   // user defined LO or RO
       {
-        // iso: if A1 and B1 are both vectors, return f/A1 g B1.
+        // ISO: if A1 and B1 are both vectors, return f/A1 g B1.
         //
         if (A->get_rank() <= 1 && B->get_rank() <= 1)
            return Macro::get_macro(Macro::MAC_Z__vA_LO_INNER_RO_vB)
