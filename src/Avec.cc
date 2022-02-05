@@ -244,8 +244,8 @@ int h = sizeof(character_table)/sizeof(*character_table) - 1;
 CHT_Index
 Avec::map_alternative_char(Unicode alt_av)
 {
-   // map characters that look similar to characters used in GNU APL
-   // to the GNU APL character.
+   // map characters that look similar to characters used in GNU APL's ⎕AV
+   // to the corresponding character in GNU APL's ⎕AV.
    //
    switch(int(alt_av))
       {
@@ -257,14 +257,16 @@ Avec::map_alternative_char(Unicode alt_av)
         case 0x03B9: return AV_IOTA;             //  map ι to ⍳
         case 0x03C1: return AV_RHO;              //  map ρ to ⍴
         case 0x03C9: return AV_OMEGA;            //  map ω to ⍵
+        case 0x03F5: return AV_ELEMENT;          //  map ϵ to ∈
         case 0x2018: return AV_SINGLE_QUOTE;     //  map ‘ to '
         case 0x2019: return AV_SINGLE_QUOTE;     //  map ’ to '
-        case 0x220A: return AV_ELEMENT;          //  map ∊ to ∈
+        case 0x2208: return AV_ELEMENT;          //  map ∈ to ϵ
+        case 0x220A: return AV_ELEMENT;          //  map ∊ to ϵ
         case 0x2212: return AV_MINUS;            //  map − to -
         case 0x22BC: return AV_NAND;             //  map ⊼ to ⍲
         case 0x22BD: return AV_NOR;              //  map ⊽ to ⍱
         case 0x22C4: return AV_DIAMOND;          //  map ⋄ to ◊
-        case 0x2377: return AV_EPSILON_UBAR;     //  map ⍷ to ⋸
+        case 0x22F8: return AV_EPSILON_UNDERBAR; //  map ⋸ to ⍷
         case 0x25AF: return AV_Quad_Quad;        //  map ▯ to ⎕
         case 0x25E6: return AV_RING_OPERATOR;    //  map ◦ to ∘
         case 0x2662: return AV_DIAMOND;          //  map ♢ to ◊
@@ -274,10 +276,9 @@ Avec::map_alternative_char(Unicode alt_av)
         case 0x2B25: return AV_DIAMOND;          //  map ⬥ to ◊
         case 0x2B26: return AV_DIAMOND;          //  map ⬦ to ◊
         case 0x2B27: return AV_DIAMOND;          //  map ⬧ to ◊
-        default:     break;
-      }
 
-   return Invalid_CHT;
+        default:     return Invalid_CHT;         // unknown alt_av
+      }
 }
 //-----------------------------------------------------------------------------
 bool
@@ -397,8 +398,28 @@ Avec::superscript(uint32_t i)
 /* the IBM APL2 character set shown in lrm figure 68 on page 470
 
    The table is indexed with an 8-bit position in IBM's ⎕AV and returns
-   the Unicode for that position. In addition CTRL-K is mapped to ⍬ for
-   compatibility with Dyalog-APL
+   the Unicode (in GNU APL) for that position. In addition CTRL-K is
+   mapped to ⍬ for compatibility with Dyalog-APL.
+
+          ┌─────────────────────────────────┐
+          │ 0 1 2 3 4 5 6 7 8 9 A B C D E F │
+   ┌──────┼─────────────────────────────────┤
+   │ 0x20 │   ! " # $ % & ' ( ) * + , - . / │
+   │ 0x30 │ 0 1 2 3 4 5 6 7 8 9 : ; < = > ? │
+   │ 0x40 │ @ A B C D E F G H I J K L M N O │
+   │ 0x50 │ P Q R S T U V W X Y Z [ \ ] ^ _ │
+   │ 0x60 │ ` a b c d e f g h i j k l m n o │
+   │ 0x70 │ p q r s t u v w x y z { | } ~   │
+   │ 0x80 │ Ç ü é â ä à å ç ê ë è ï î ì Ä Å │
+   │ 0x90 │ ⎕ ⍞ ⌹ ô ö ò û ù ⊤ Ö Ü ø £ ⊥ ⍶ ⌶ │
+   │ 0xA0 │ á í ó ú ñ Ñ ª º ¿ ⌈ ¬ ½ ∪ ¡ ⍕ ⍎ │
+   │ 0xB0 │ ░ ▒ ▓ │ ┤ ⍟ ∆ ∇ → ╣ ║ ╗ ╝ ← ⌊ ┐ │
+   │ 0xC0 │ └ ┴ ┬ ├ ─ ┼ ↑ ↓ ╚ ╔ ╩ ╦ ╠ ═ ╬ ≡ │
+   │ 0xD0 │ ⍸ ⋸ ∵ ⌷ ⍂ ⌻ ⊢ ⊣ ◊ ┘ ┌ █ ▄ ¦ Ì ▀ │
+   │ 0xE0 │ ⍺ ⍹ ⊂ ⊃ ⍝ ⍲ ⍴ ⍱ ⌽ ⊖ ○ ∨ ⍳ ⍉ ϵ ∩ │
+   │ 0xF0 │ ⌿ ⍀ ≥ ≤ ≠ × ÷ ⍙ ∘ ⍵ ⍫ ⍋ ⍒ ¯ ¨   │
+   └──────┴─────────────────────────────────┘
+
  */
 static const int ibm_av[] =
 {
@@ -431,7 +452,7 @@ static const int ibm_av[] =
   0x2378, 0x22F8, 0x2235, 0x2337, 0x2342, 0x233B, 0x22A2, 0x22A3,
   0x25CA, 0x2518, 0x250C, 0x2588, 0x2584, 0x00A6, 0x00CC, 0x2580,
   0x237A, 0x2379, 0x2282, 0x2283, 0x235D, 0x2372, 0x2374, 0x2371,
-  0x233D, 0x2296, 0x25CB, 0x2228, 0x2373, 0x2349, 0x2208, 0x2229,
+  0x233D, 0x2296, 0x25CB, 0x2228, 0x2373, 0x2349, 0x03F5, 0x2229,
   0x233F, 0x2340, 0x2265, 0x2264, 0x2260, 0x00D7, 0x00F7, 0x2359,
   0x2218, 0x2375, 0x236B, 0x234B, 0x2352, 0x00AF, 0x00A8, 0x00A0
 };
@@ -444,31 +465,31 @@ Avec::IBM_quad_AV()
 //-----------------------------------------------------------------------------
 Avec::Unicode_to_IBM_codepoint Avec::inverse_ibm_av[256] =
 {
-  { 0x0000,   0 }, { 0x0001,   1 }, { 0x0002,   2 }, { 0x0003,   3 },
-  { 0x0004,   4 }, { 0x0005,   5 }, { 0x0006,   6 }, { 0x0007,   7 },
-  { 0x0008,   8 }, { 0x0009,   9 }, { 0x000A,  10 }, { 0x000C,  12 },
-  { 0x000D,  13 }, { 0x000E,  14 }, { 0x000F,  15 }, { 0x0010,  16 },
-  { 0x0011,  17 }, { 0x0012,  18 }, { 0x0013,  19 }, { 0x0014,  20 },
-  { 0x0015,  21 }, { 0x0016,  22 }, { 0x0017,  23 }, { 0x0018,  24 },
-  { 0x0019,  25 }, { 0x001A,  26 }, { 0x001B,  27 }, { 0x001C,  28 },
-  { 0x001D,  29 }, { 0x001E,  30 }, { 0x001F,  31 }, { 0x0020,  32 },
-  { 0x0021,  33 }, { 0x0022,  34 }, { 0x0023,  35 }, { 0x0024,  36 },
-  { 0x0025,  37 }, { 0x0026,  38 }, { 0x0027,  39 }, { 0x0028,  40 },
-  { 0x0029,  41 }, { 0x002A,  42 }, { 0x002B,  43 }, { 0x002C,  44 },
-  { 0x002D,  45 }, { 0x002E,  46 }, { 0x002F,  47 }, { 0x0030,  48 },
-  { 0x0031,  49 }, { 0x0032,  50 }, { 0x0033,  51 }, { 0x0034,  52 },
-  { 0x0035,  53 }, { 0x0036,  54 }, { 0x0037,  55 }, { 0x0038,  56 },
-  { 0x0039,  57 }, { 0x003A,  58 }, { 0x003B,  59 }, { 0x003C,  60 },
-  { 0x003D,  61 }, { 0x003E,  62 }, { 0x003F,  63 }, { 0x0040,  64 },
-  { 0x0041,  65 }, { 0x0042,  66 }, { 0x0043,  67 }, { 0x0044,  68 },
-  { 0x0045,  69 }, { 0x0046,  70 }, { 0x0047,  71 }, { 0x0048,  72 },
-  { 0x0049,  73 }, { 0x004A,  74 }, { 0x004B,  75 }, { 0x004C,  76 },
-  { 0x004D,  77 }, { 0x004E,  78 }, { 0x004F,  79 }, { 0x0050,  80 },
-  { 0x0051,  81 }, { 0x0052,  82 }, { 0x0053,  83 }, { 0x0054,  84 },
-  { 0x0055,  85 }, { 0x0056,  86 }, { 0x0057,  87 }, { 0x0058,  88 },
-  { 0x0059,  89 }, { 0x005A,  90 }, { 0x005B,  91 }, { 0x005C,  92 },
-  { 0x005D,  93 }, { 0x005E,  94 }, { 0x005F,  95 }, { 0x0060,  96 },
-  { 0x0061,  97 }, { 0x0062,  98 }, { 0x0063,  99 }, { 0x0064, 100 },
+  { 0x0000, 0   }, { 0x0001, 1   }, { 0x0002, 2   }, { 0x0003, 3   },
+  { 0x0004, 4   }, { 0x0005, 5   }, { 0x0006, 6   }, { 0x0007, 7   },
+  { 0x0008, 8   }, { 0x0009, 9   }, { 0x000A, 10  }, { 0x000C, 12  },
+  { 0x000D, 13  }, { 0x000E, 14  }, { 0x000F, 15  }, { 0x0010, 16  },
+  { 0x0011, 17  }, { 0x0012, 18  }, { 0x0013, 19  }, { 0x0014, 20  },
+  { 0x0015, 21  }, { 0x0016, 22  }, { 0x0017, 23  }, { 0x0018, 24  },
+  { 0x0019, 25  }, { 0x001A, 26  }, { 0x001B, 27  }, { 0x001C, 28  },
+  { 0x001D, 29  }, { 0x001E, 30  }, { 0x001F, 31  }, { 0x0020, 32  },
+  { 0x0021, 33  }, { 0x0022, 34  }, { 0x0023, 35  }, { 0x0024, 36  },
+  { 0x0025, 37  }, { 0x0026, 38  }, { 0x0027, 39  }, { 0x0028, 40  },
+  { 0x0029, 41  }, { 0x002A, 42  }, { 0x002B, 43  }, { 0x002C, 44  },
+  { 0x002D, 45  }, { 0x002E, 46  }, { 0x002F, 47  }, { 0x0030, 48  },
+  { 0x0031, 49  }, { 0x0032, 50  }, { 0x0033, 51  }, { 0x0034, 52  },
+  { 0x0035, 53  }, { 0x0036, 54  }, { 0x0037, 55  }, { 0x0038, 56  },
+  { 0x0039, 57  }, { 0x003A, 58  }, { 0x003B, 59  }, { 0x003C, 60  },
+  { 0x003D, 61  }, { 0x003E, 62  }, { 0x003F, 63  }, { 0x0040, 64  },
+  { 0x0041, 65  }, { 0x0042, 66  }, { 0x0043, 67  }, { 0x0044, 68  },
+  { 0x0045, 69  }, { 0x0046, 70  }, { 0x0047, 71  }, { 0x0048, 72  },
+  { 0x0049, 73  }, { 0x004A, 74  }, { 0x004B, 75  }, { 0x004C, 76  },
+  { 0x004D, 77  }, { 0x004E, 78  }, { 0x004F, 79  }, { 0x0050, 80  },
+  { 0x0051, 81  }, { 0x0052, 82  }, { 0x0053, 83  }, { 0x0054, 84  },
+  { 0x0055, 85  }, { 0x0056, 86  }, { 0x0057, 87  }, { 0x0058, 88  },
+  { 0x0059, 89  }, { 0x005A, 90  }, { 0x005B, 91  }, { 0x005C, 92  },
+  { 0x005D, 93  }, { 0x005E, 94  }, { 0x005F, 95  }, { 0x0060, 96  },
+  { 0x0061, 97  }, { 0x0062, 98  }, { 0x0063, 99  }, { 0x0064, 100 },
   { 0x0065, 101 }, { 0x0066, 102 }, { 0x0067, 103 }, { 0x0068, 104 },
   { 0x0069, 105 }, { 0x006A, 106 }, { 0x006B, 107 }, { 0x006C, 108 },
   { 0x006D, 109 }, { 0x006E, 110 }, { 0x006F, 111 }, { 0x0070, 112 },
@@ -486,9 +507,9 @@ Avec::Unicode_to_IBM_codepoint Avec::inverse_ibm_av[256] =
   { 0x00EC, 141 }, { 0x00ED, 161 }, { 0x00EE, 140 }, { 0x00EF, 139 },
   { 0x00F1, 164 }, { 0x00F2, 149 }, { 0x00F3, 162 }, { 0x00F4, 147 },
   { 0x00F6, 148 }, { 0x00F7, 246 }, { 0x00F8, 155 }, { 0x00F9, 151 },
-  { 0x00FA, 163 }, { 0x00FB, 150 }, { 0x00FC, 129 }, { 0x2190, 189 },
-  { 0x2191, 198 }, { 0x2192, 184 }, { 0x2193, 199 }, { 0x2206, 182 },
-  { 0x2207, 183 }, { 0x2208, 238 }, { 0x2218, 248 }, { 0x2228, 235 },
+  { 0x00FA, 163 }, { 0x00FB, 150 }, { 0x00FC, 129 }, { 0x03F5, 238 },
+  { 0x2190, 189 }, { 0x2191, 198 }, { 0x2192, 184 }, { 0x2193, 199 },
+  { 0x2206, 182 }, { 0x2207, 183 }, { 0x2218, 248 }, { 0x2228, 235 },
   { 0x2229, 239 }, { 0x222A, 172 }, { 0x2235, 210 }, { 0x2260, 244 },
   { 0x2261, 207 }, { 0x2264, 243 }, { 0x2265, 242 }, { 0x2282, 226 },
   { 0x2283, 227 }, { 0x2296, 233 }, { 0x22A2, 214 }, { 0x22A3, 215 },
@@ -497,7 +518,7 @@ Avec::Unicode_to_IBM_codepoint Avec::inverse_ibm_av[256] =
   { 0x233B, 213 }, { 0x233D, 232 }, { 0x233F, 240 }, { 0x2340, 241 },
   { 0x2342, 212 }, { 0x2349, 237 }, { 0x234B, 251 }, { 0x234E, 175 },
   { 0x2352, 252 }, { 0x2355, 174 }, { 0x2359, 247 }, { 0x235D, 228 },
-  { 0x235E, 145 }, { 0x235F, 181 }, { 0x236B, 250 }, { 0x236C,  11 },
+  { 0x235E, 145 }, { 0x235F, 181 }, { 0x236B, 250 }, { 0x236C, 11  },
   { 0x2371, 231 }, { 0x2372, 229 }, { 0x2373, 236 }, { 0x2374, 230 },
   { 0x2375, 249 }, { 0x2376, 158 }, { 0x2378, 208 }, { 0x2379, 225 },
   { 0x237A, 224 }, { 0x2395, 144 }, { 0x2500, 196 }, { 0x2502, 179 },
@@ -515,8 +536,9 @@ Avec::print_inverse_IBM_quad_AV()
 {
    // a helper function that sorts ibm_av by Unicode and prints it on CERR
    //
-   // To use it change #if 0 to #if 1 in Command.cc:1707
-   // recompile and start apl, and then )IN <file> or so.
+   // To use it change #if 0 to #if 1 in Command.cc function
+   // transfer_context::add(), recompile and start apl, and then
+   // )IN <file> or so.
    //
    loop(c, 256)
       {
@@ -542,6 +564,15 @@ Unicode_to_IBM_codepoint * map = inverse_ibm_av;
         map->cp  = next_idx;
         ++map;
       }
+
+   // print the IBM ⎕AV...
+   //
+   for (int row = 0x20; row < 0x100; row += 0x10)
+       {
+         CERR << HEX2(row) << " ";
+         loop(col, 0x10)   CERR << " " << Unicode(ibm_av[row + col]);
+         CERR << endl;
+       }
 
    loop(row, 64)
       {

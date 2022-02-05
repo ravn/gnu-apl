@@ -618,10 +618,10 @@ extern void init_2(bool log_startup);
 void
 init_libapl(const char * progname, int log_startup)
 {
-   uprefs.safe_mode = true;
-   uprefs.user_do_svars = false;
+   uprefs.safe_mode       = true;
+   uprefs.user_do_svars   = false;
    uprefs.system_do_svars = false;
-   uprefs.requested_id = 2000;
+   uprefs.requested_id    = 2000;
 
    init_1(progname, log_startup);
 

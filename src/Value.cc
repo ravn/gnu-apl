@@ -357,7 +357,7 @@ Value::Value(const CDR_string & ui8, const char * loc)
 //-----------------------------------------------------------------------------
 Value::Value(const PrintBuffer & pb, const char * loc)
    : DynamicObject(loc, &all_values),
-     shape(pb.get_height(), pb.get_width(0)),
+     shape(pb.get_row_count(), pb.get_column_count()),
      flags(VF_NONE),
      valid_ravel_items(0)
 {
@@ -366,8 +366,8 @@ Value::Value(const PrintBuffer & pb, const char * loc)
 
    set_proto_Spc();                          // prototype
 
-const ShapeItem height = pb.get_height();
-const ShapeItem width = pb.get_width(0);
+const ShapeItem height = pb.get_row_count();
+const ShapeItem width = pb.get_column_count();
 
    loop(y, height)
    loop(x, width)   next_ravel_Char(pb.get_char(x, y));

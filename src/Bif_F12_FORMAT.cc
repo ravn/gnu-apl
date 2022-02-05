@@ -52,8 +52,8 @@ Bif_F12_FORMAT::eval_B(Value_P B) const
       {
         PrintBuffer pb(*B, Workspace::get_PrintContext(PR_APL), 0);
         Assert(pb.is_rectangular());
-        const ShapeItem cols = pb.get_width(0);
-        const ShapeItem rows = pb.get_height();
+        const ShapeItem cols = pb.get_column_count();
+        const ShapeItem rows = pb.get_row_count();
         Shape shape_Z(rows, cols);
         Value_P Z(shape_Z, LOC);
         loop(y, rows)
@@ -182,8 +182,8 @@ const PrintContext pctx = Workspace::get_PrintContext(style);
 
 const PrintBuffer pb(*B, pctx, 0);
 
-const ShapeItem width  = pb.get_width(0);
-const ShapeItem height = pb.get_height();
+const ShapeItem width  = pb.get_column_count();
+const ShapeItem height = pb.get_row_count();
 
    // monadic_format() returns the Value with rank 1 or 2 which may be changed
    // in Bif_F12_FORMAT::eval_B() later on to match the rather arbitrary rules
@@ -979,8 +979,8 @@ PrintBuffer pb;
          else       pb = pb_col;
        }
 
-const ShapeItem pb_w = pb.get_width(0);
-const ShapeItem pb_h = pb.get_height();
+const ShapeItem pb_w = pb.get_column_count();
+const ShapeItem pb_h = pb.get_row_count();
 Shape shape_Z(shape_B);
    shape_Z.set_last_shape_item(pb_w);
 
@@ -1118,8 +1118,8 @@ bool has_complex = false;
           }
       }
 
-   if (width && ret.get_width(0) < width)
-      ret.pad_l(UNI_SPACE, width - ret.get_width(0));
+   if (width && ret.get_column_count() < width)
+      ret.pad_l(UNI_SPACE, width - ret.get_column_count());
 
    return ret;
 }
@@ -1138,14 +1138,14 @@ Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
       }
    else if (!has_num)    // only chars: align left
       {
-        const int d = ret.get_width(0) - data.size();
+        const int d = ret.get_column_count() - data.size();
         if      (d < 0)   ret.pad_r(UNI_SPACE, -d);
         else if (d > 0)   data.append(UCS_string(d, UNI_SPACE));
         ret.append_ucs(data);
       }
    else                 // chars and numbers: align right
       {
-        const int d = ret.get_width(0) - data.size();
+        const int d = ret.get_column_count() - data.size();
         if      (d < 0)   ret.pad_l(UNI_SPACE, -d);
         else if (d > 0)   data = UCS_string(d, UNI_SPACE) + data;
         ret.append_ucs(data);

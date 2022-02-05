@@ -74,10 +74,13 @@ size_t rest_2 = 0;
    return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------
-/** convert \b UCS_string input into a Token_string tos.
+/** convert \b UCS_string input into a Token_string tos. The tokenization
+    stops at the end of input (= end of line), or when a comment (⍝ or #)
+    is detected.
 */
 void
-Tokenizer::do_tokenize(const UCS_string & input, Token_string & tos,
+Tokenizer::do_tokenize(const UCS_string & input,
+                       Token_string & tos,
                        size_t & rest_2) const
 {
    Log(LOG_tokenize)
@@ -88,7 +91,7 @@ Unicode_source src(input);
    while ((rest_2 = src.rest()) != 0)
       {
         Unicode uni = *src;
-        if (uni == UNI_COMMENT)             break;   // ⍝ comment
+        if (uni == UNI_COMMENT)       break;   // ⍝ comment
         if (uni == UNI_NUMBER_SIGN)   break;   // # comment
 
         const Token tok = Avec::uni_to_token(uni, LOC);

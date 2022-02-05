@@ -789,10 +789,7 @@ const ShapeItem ec = value.nz_element_count();
 
    if (use_UCS)
       {
-        ucs.append(UNI_Quad_Quad);
-        ucs.append(UNI_U);
-        ucs.append(UNI_C);
-        ucs.append(UNI_S);
+        ucs.append_UTF8("⎕UCS");
         loop(e, ec)
             {
               ucs.append(UNI_SPACE);

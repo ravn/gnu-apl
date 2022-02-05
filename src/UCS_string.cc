@@ -379,9 +379,9 @@ UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
 {
    create(LOC);
 
-   if (pb.get_height() == 0)   return;      // empty PrintBuffer
+   if (pb.get_row_count() == 0)   return;      // empty PrintBuffer
 
-const int total_width = pb.get_width(0);
+const int total_width = pb.get_column_count();
 
    // initialize chunk_lengths, based on the first row of the PrintBuffer.
    // All subsequent rows are aligned to the first row, therefore the first
@@ -397,7 +397,7 @@ std::vector<int> chunk_lengths;
 
    // print rows, breaking at chunk_lengths
    //
-   loop(row, pb.get_height())
+   loop(row, pb.get_row_count())
        {
          if (row)   append(UNI_LF);   // end previous row
          int brk_idx = 0;

@@ -103,10 +103,9 @@ Plot_window_properties::update(int verbosity)
    //
    // 2. when the user resizes the plot window.
    //
-   // In both cases the caller has changed (at least) pa_width and pa_height,
+   // In both cases the caller has most likely changed pa_width or pa_height,
    // and this function recomputes all variables that depend on them.
    //
-
    window_width  = pa_border_L + origin_X + pa_width  + pa_border_R;
    window_height = pa_border_T + origin_Y + pa_height + pa_border_B;
 
@@ -117,7 +116,10 @@ Plot_window_properties::update(int verbosity)
    min_Z = plot_data.get_min_Z();
    max_Z = plot_data.get_max_Z();
 
-   // the user may override the range derived from the data
+   // at this point the plot variables were computed from ionly the plot data
+   // (aka. auto-scaled). Now override them with user preferences from the plot
+   // attributes A (of A ⎕PLOT B). The XXX_valid() functions tell us whether
+   // or not an attribute was provided in A.
    //
    if (rangeX_min_valid())   min_X = rangeX_min;
    if (rangeX_max_valid())   max_X = rangeX_max;

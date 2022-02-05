@@ -213,8 +213,8 @@ Value_P val = get_pointer_value();
 
         ColInfo ci;
         PrintBuffer ret(ucs, ci);
-        ret.get_info().int_len  = ret.get_width(0);
-        ret.get_info().real_len = ret.get_width(0);
+        ret.get_info().int_len  = ret.get_column_count();
+        ret.get_info().real_len = ret.get_column_count();
         return ret;
       }
 
@@ -271,8 +271,8 @@ PrintBuffer ret(*val, pctx, 0);
            }
       }
 
-   ret.get_info().int_len  = ret.get_width(0);
-   ret.get_info().real_len = ret.get_width(0);
+   ret.get_info().int_len  = ret.get_column_count();
+   ret.get_info().real_len = ret.get_column_count();
    return ret;
 }
 //-----------------------------------------------------------------------------

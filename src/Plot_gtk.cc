@@ -590,9 +590,11 @@ const Pixel_Y py0 = w_props.valY2pixel(0);
 const double dv = w_props.get_max_Y() - w_props.get_min_Y();
 const Pixel_Y py1 = w_props.valY2pixel(dv);
 const int grid_style = w_props.get_gridX_style();
+
    for (int ix = 0; ix <= w_props.get_gridX_last(); ++ix)
        {
-         const double v = w_props.get_min_X() + ix*w_props.get_value_per_tile_X();
+         const double v = w_props.get_min_X()
+                        + ix*w_props.get_value_per_tile_X();
          const int px0 = w_props.valX2pixel(v - w_props.get_min_X())
                        + w_props.get_origin_X();
 
@@ -649,7 +651,8 @@ const Pixel_X px1 = w_props.valX2pixel(dv) + w_props.get_origin_X();
 const int grid_style = w_props.get_gridY_style();
    for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
        {
-         const double v = w_props.get_min_Y() + iy*w_props.get_value_per_tile_Y();
+         const double v = w_props.get_min_Y()
+                        + iy*w_props.get_value_per_tile_Y();
          const Pixel_Y py0 = w_props.valY2pixel(v - w_props.get_min_Y());
          if (iy == 0 || iy == w_props.get_gridY_last())
             {
@@ -723,11 +726,12 @@ const Pixel_XY orig = w_props.valXYZ2pixelXY(w_props.get_min_X(),
 const Pixel_X len_X = w_props.valX2pixel(w_props.get_max_X())
                     - w_props.valX2pixel(w_props.get_min_X());
 
-   // NOTE: in cairo (other than in xcb) the Y-coordinates increase when moving
-   // down the screen. Therefore larger Y values correspond to smsller Y
-   // coordinates and we must subtract w_props.valY2pixel(w_props.get_max_Y())
-   // from w_props.valY2pixel(w_props.get_min_Y()) and not the other way around.
-   //
+   /* NOTE: in cairo (other than in xcb) the Y-coordinates increase when moving
+      down the screen. Therefore larger Y values correspond to smsller Y
+      coordinates and we must subtract w_props.valY2pixel(w_props.get_max_Y())
+      from w_props.valY2pixel(w_props.get_min_Y()) and not the other way
+      around.
+    */
 const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_min_Y())
                     - w_props.valY2pixel(w_props.get_max_Y());
 
@@ -755,7 +759,8 @@ int grid_style = w_props.get_gridZ_style();
               draw_line(cr, grid_color, grid_style, line_width, PZ, PY);
             }
 
-         const double v = w_props.get_min_Z() + iz*w_props.get_value_per_tile_Z();
+         const double v = w_props.get_min_Z()
+                        + iz*w_props.get_value_per_tile_Z();
          const char * cc = format_tick(v);
          double cc_width, cc_height;
          cairo_string_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);

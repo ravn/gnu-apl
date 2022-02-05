@@ -21,12 +21,12 @@
 /** The Unicode characters used in the interpreter.
     Characters defined with char_def( , xxx) are contained in ⎕AV
     Characters defined with char_def( , 0xx) are in ⎕AV without APL relevance
-    Characters defined with char_df1() are known in the source code but are 
+    Characters defined with char_df1() may be used in the source code but are 
     not contained in ⎕AV.
 **/
 
-//       Name                Unicode  Token          Flags     Pos
-//-------------------------------------------------------------------
+//      (Name                Unicode  Token          Flags      Pos)
+//------------------------------------------------------------------
 char_def(NUL               , 0x00   , END          , NONE     ,  00)
 char_def(SOH               , 0x01   , END          , NONE     ,  01)
 char_def(STX               , 0x02   , END          , NONE     ,  02)
@@ -170,6 +170,7 @@ char_def(DIVIDE            , 0x00F7 , F12_DIVIDE   , NO_SPACE ,  F6) /* ÷ */
 char_def(LAMBDA            , 0x03BB , SYMBOL       , SYMBOL   ,  99) /* λ */
 char_def(MUE               , 0x03BC , END          , SYMBOL   ,  8B) /* μ */
 char_def(CHI               , 0x03C7 , SYMBOL       , SYMBOL   ,  A2) /* χ */
+char_def(ELEMENT           , 0x03F5 , F12_ELEMENT  , NO_SPACE ,  EE) /* ϵ */
 char_df1(AV_MAX            , 0x0461 , END          , NO_SPACE ,  --) /* ѡ */
 char_df1(SINGLE_QUOTE1     , 0x2018 , QUOTE1       , NONE     ,  --) /* ⁰ */
 char_df1(SINGLE_QUOTE2     , 0x2019 , QUOTE1       , NONE     ,  --) /* ‘ */
@@ -200,8 +201,8 @@ char_def(RIGHT_LEFT_ARROW  , 0x21C4 , END          , NO_SPACE , 082) /* ⇄ */
 char_df1(DOUBLE_ARROW_L    , 0x21E8 , END          , NO_SPACE ,  --) /* ⇨ */
 char_def(DELTA             , 0x2206 , SYMBOL       , SYMBOL   ,  B6) /* ∆ */
 char_def(NABLA             , 0x2207 , END          , NO_SPACE ,  B7) /* ∇ */
-char_def(ELEMENT           , 0x2208 , F12_ELEMENT  , NO_SPACE ,  EE) /* ∈ */
-char_df1(ELEMENT1          , 0x220A , END          , NO_SPACE ,  --) /* ∊ */
+char_df1(ELEMENT1          , 0x2208 , F12_ELEMENT  , NO_SPACE ,  --) /* ∈ */
+char_df1(ELEMENT2          , 0x220A , F12_ELEMENT  , NO_SPACE ,  --) /* ∊ */
 char_def(RING_OPERATOR     , 0x2218 , JOT          , NO_SPACE ,  F8) /* ∘ */
 char_df1(INFINITY          , 0x221E , END          , NO_SPACE ,  --) /* ∞ */
 char_def(DIVIDES           , 0x2223 , F12_STILE    , NO_SPACE ,  B2) /* ∣ */
@@ -331,6 +332,7 @@ char_df1(Quad_Quad1        , 0x25AF , END          , NO_SPACE ,  --) /* ▯ */
 char_def(RIGHT_HALF_BLOCK  , 0x2590 , END          , NO_SPACE ,  DE) /* ▐ */
 char_def(DIAMOND           , 0x25CA , DIAMOND      , NO_SPACE ,  D8) /* ◊ */
 char_def(CIRCLE            , 0x25CB , F12_CIRCLE   , NO_SPACE ,  EA) /* ○ */
+//------------------------------------------------------------------
 
 #undef char_def
 #undef char_df1

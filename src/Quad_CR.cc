@@ -346,7 +346,7 @@ bool extra_frame = false;
         case 34: return do_CR34(*B);             // TLV byte vector to TV
         case 35: return do_CR35(*B);             // lines to nested strings
         case 36: return do_CR36(*B);             // nested strings to lines
-        case 37: return do_CR37(*B);             // ⎕CR B with extra spaces kept
+        case 37: return do_CR37(*B);             // ⎕CR B but extra spaces kept
         case 38: return do_CR38(*B);             // plain →  structure
         case 39: return do_CR39(*B);             // structure → plain
         case 40: return do_CR40(*B);             // boolean → packed
@@ -1383,14 +1383,14 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
             {
               Value_P item = row->get_cravel(col).get_pointer_value();
               PrintBuffer pb_item(*item, pctx, 0);
-              pb.pad_height(UNI_SPACE, pb_item.get_height());
+              pb.pad_height(UNI_SPACE, pb_item.get_row_count());
               if (align_bottom)
-                 pb_item.pad_height_above(UNI_SPACE, pb.get_height());
+                 pb_item.pad_height_above(UNI_SPACE, pb.get_row_count());
               else
-                 pb_item.pad_height(UNI_SPACE, pb.get_height());
+                 pb_item.pad_height(UNI_SPACE, pb.get_row_count());
               pb.add_column(UNI_SPACE, 0, pb_item);
             }
-        if (pb.get_height() == 1)
+        if (pb.get_row_count() == 1)
            {
              Value_P Zrow(pb.l1(), LOC);
              Z->next_ravel_Pointer(Zrow.get());

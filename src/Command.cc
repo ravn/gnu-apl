@@ -2560,7 +2560,8 @@ Command::transfer_context::add(const UTF8 * str, int len)
 {
 
 #if 0
-   // helper to print the uni_to_cp_map when given a cp_to_uni_map.
+   // helper function to print the uni_to_cp_map table when given the inverse
+   // cp_to_uni_map. Before that the IBM ⎕AV is printed
    //
    Avec::print_inverse_IBM_quad_AV();
    DOMAIN_ERROR;

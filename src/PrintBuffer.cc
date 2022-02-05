@@ -228,7 +228,7 @@ const bool nested = !value.is_simple();
                 if (scaling[x])   pctx1.set_scaled();
                 const Cell & cell = value.get_cravel(x + y*cols);
                 item = cell.character_representation(pctx1);
-                if (!item.get_height())
+                if (!item.get_row_count())
                    {
                      UCS_string empty;
                      item.append_ucs(empty);
@@ -242,8 +242,8 @@ const bool nested = !value.is_simple();
                         max_row_ranks.back() = sub_rank;
                    }
 
-                if (max_row_height < item.get_height())
-                   max_row_height = item.get_height();
+                if (max_row_height < item.get_row_count())
+                   max_row_height = item.get_row_count();
 
                 Assert1(item.is_rectangular());
               }
@@ -311,7 +311,7 @@ const bool nested = !value.is_simple();
                  const ShapeItem srows = separator_rows(y, value, nested,
                                                         max_row_ranks[y],
                                                         Rk_y_1);
-                 const ShapeItem irows = item_matrix[y*cols + x].get_height();
+                 const ShapeItem irows = item_matrix[y*cols + x].get_row_count();
                  Assert(irows);
                  dest_height += srows + irows;
                }
@@ -329,7 +329,8 @@ const bool nested = !value.is_simple();
                                                    max_row_ranks[y],
                                                   y ? max_row_ranks[y - 1] : 0))
                    {
-                    const UCS_string sepa_row(dest.get_width(0), UNI_iPAD_L0);
+                    const UCS_string sepa_row(dest.get_column_count(),
+                                              UNI_iPAD_L0);
                     loop(r, srows)   dest.append_ucs(sepa_row);
                    }
 
@@ -398,9 +399,11 @@ const bool nested = !value.is_simple();
 
      if (!is_rectangular())   // should not happen
         {
-          Q1(get_height())
-          loop(h, get_height())   CERR << "w=" << get_width(h) << "*" << endl;
-          loop(h, get_height())   CERR << "*"  << get_line(h) << "*" << endl;
+          Q1(get_row_count())
+          loop(h, get_row_count())   CERR << "w=" << get_column_count(h)
+                                          << "*" << endl;
+          loop(h, get_row_count())   CERR << "*"  << get_line(h)
+                                          << "*" << endl;
         }
 
      Assert(is_rectangular());
@@ -438,14 +441,14 @@ interrupted:
 void
 PrintBuffer::print_interruptible(ostream & out, Rank rank, int quad_PW)
 {
-   if (get_height() == 0)   return;      // empty PrintBuffer
+   if (get_row_count() == 0)   return;      // empty PrintBuffer
 
    // lines may be (very) long (compared to ⎕PW) and if they are then they
    // need to be broken into 2 or more chunks. A chunk is smaller than ⎕PW;
    // the first chunk is printed un-indented, while subsequent chunk are
    // indented by 6 blanks.
    //
-const int total_width = get_width(0);
+const int total_width = get_column_count();
 const int max_breaks = 2 + total_width/quad_PW;   // an upper limit
 
 vector<ShapeItem> chunk_lengths;
@@ -465,7 +468,7 @@ vector<ShapeItem> chunk_lengths;
 
    // print rows, breaking each row at chunk_lengths
    //
-   loop(row, get_height())
+   loop(row, get_row_count())
        {
          int brk_idx = 0;   // chunk_lengths index
 
@@ -630,12 +633,12 @@ PrintBuffer::pad_l(Unicode pad, ShapeItem count)
 {
    if (count == 1)
       {
-        loop(y, get_height())   buffer[y].prepend(pad);
+        loop(y, get_row_count())   buffer[y].prepend(pad);
       }
    else
       {
         UCS_string pads(count, pad);
-        loop(y, get_height())   buffer[y] = pads + buffer[y];
+        loop(y, get_row_count())   buffer[y] = pads + buffer[y];
       }
 }
 //-----------------------------------------------------------------------------
@@ -643,34 +646,34 @@ void
 PrintBuffer::pad_r(Unicode pad, ShapeItem count)
 {
 UCS_string ucs(count, pad);
-   loop(y, get_height())   buffer[y].append(ucs);
+   loop(y, get_row_count())   buffer[y].append(ucs);
 }
 //-----------------------------------------------------------------------------
 void
 PrintBuffer::pad_height(Unicode pad, ShapeItem height)
 {
-   if (height > get_height())
+   if (height > get_row_count())
       {
-        UCS_string ucs(get_width(0), pad);
-        while (height > get_height())   buffer.push_back(ucs);
+        UCS_string ucs(get_column_count(), pad);
+        while (height > get_row_count())   buffer.push_back(ucs);
       }
 }
 //-----------------------------------------------------------------------------
 void
 PrintBuffer::pad_to_spaces()
 {
-   loop(y, get_height())
-   loop(x, get_width(y))
+   loop(y, get_row_count())
+   loop(x, get_column_count(y))
       if (is_iPAD_char(get_char(x, y)))   set_char(x, y, UNI_SPACE);
 }
 //-----------------------------------------------------------------------------
 void
 PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
 {
-   if (height > get_height())
+   if (height > get_row_count())
       {
-        UCS_string ucs(get_width(0), pad);
-        while (height > get_height())   buffer.insert(0, ucs);
+        UCS_string ucs(get_column_count(), pad);
+        while (height > get_row_count())   buffer.insert(0, ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -737,7 +740,7 @@ PrintBuffer::add_frame(PrintStyle style, const Shape & shape, int depth)
 Unicode HORI, VERT, NW, NE, SE, SW;
    get_frame_chars(style, HORI, VERT, NW, NE, SE, SW);
 
-   if (get_height() == 0)   // empty
+   if (get_row_count() == 0)   // empty
       {
         UCS_string upper;
         upper.append(NE);
@@ -753,9 +756,9 @@ Unicode HORI, VERT, NW, NE, SE, SW;
         return;
       }
 
-   // draw | left and right
+   // draw │ left and right
    //
-   loop(y, get_height())
+   loop(y, get_row_count())
       {
         buffer[y].prepend(VERT);
         buffer[y].append(VERT);
@@ -767,37 +770,38 @@ Unicode HORI, VERT, NW, NE, SE, SW;
 
       }
 
-   // draw - on top and bottom.
+   // draw ─ on top and bottom.
    //
-UCS_string hori(get_width(0), HORI);
+UCS_string hori(get_column_count(), HORI);
 
    buffer.insert(0, hori);
    buffer.push_back(hori);
 
-   // draw the corners
+   // draw the corners ┌, └, ┐, and ┘
    //
-   set_char(0,                0,                NE);
-   set_char(0,                get_height() - 1, SE);
-   set_char(get_width(0) - 1, 0,                NW);
-   set_char(get_width(0) - 1, get_height() - 1, SW);
+   set_char(0,                      0,                   NE);   // e.g. ╔
+   set_char(0,                      get_row_count() - 1, SE);   // e.g. ╚
+   set_char(get_column_count() - 1, 0,                   NW);   // e.g. ╗
+   set_char(get_column_count() - 1, get_row_count() - 1, SW);   // e.g. ╝
 
    // draw other decorators
    //
-   if (shape.get_rank() > 0)
+   if (shape.get_rank() > 0)               // → on top frame line
       {
         set_char(1, 0, UNI_RIGHT_ARROW);
-        if (style & PST_NARS)
+
+        if (style & PST_NARS)   // numbers indicating axis lengths
            {
              UCS_string ucs;
              ucs.append_number(shape.get_last_shape_item());
-             if (ucs.size() < (get_width(0) - 2))
+             if (ucs.size() < (get_column_count() - 2))
                 {
                   loop(u, ucs.size())   set_char(u + 1, 0, ucs[u]);
                 }
            }
       }
 
-   if (shape.get_rank() > 1)
+   if (shape.get_rank() > 1)               // ↓ on lefyt frame line
       {
         set_char(0, 1, UNI_DOWN_ARROW);
         if (style & PST_NARS)
@@ -808,18 +812,18 @@ UCS_string hori(get_width(0), HORI);
                   if (r)   ucs.append(VERT);
                   ucs.append_number(shape.get_shape_item(r));
                 }
-             if (ucs.size() < (get_height() - 2))
+             if (ucs.size() < (get_row_count() - 2))
                 {
                   loop(u, ucs.size())   set_char(0, u + 1, ucs[u]);
                 }
            }
       }
 
-   if (depth)
+   if (depth)                      // ϵ on bottom frame line
       {
         loop(d, depth - 1)
-            if (d + 1 < get_width(0) - 1)
-               set_char(1 + d, get_height() - 1, UNI_ELEMENT1);
+            if (d + 1 < get_column_count() - 1)
+               set_char(1 + d, get_row_count() - 1, UNI_ELEMENT);
       }
 
    if (style & PST_EMPTY_LAST)   // last (X-) dimension is empty
@@ -844,7 +848,7 @@ PrintBuffer::add_outer_frame(PrintStyle style)
 Unicode HORI, VERT, NW, NE, SE, SW;
    get_frame_chars(style, HORI, VERT, NW, NE, SE, SW);
 
-   if (get_height() == 0)   // empty
+   if (get_row_count() == 0)   // empty
       {
         UCS_string upper;
         upper.append(NE);
@@ -862,7 +866,7 @@ Unicode HORI, VERT, NW, NE, SE, SW;
 
    // draw a bar left and right
    //
-   loop(y, get_height())
+   loop(y, get_row_count())
       {
         buffer[y].prepend(VERT);
         buffer[y].append(VERT);
@@ -875,17 +879,17 @@ Unicode HORI, VERT, NW, NE, SE, SW;
 
    // draw a bar on top and bottom.
    //
-UCS_string hori(get_width(0), HORI);
+UCS_string hori(get_column_count(), HORI);
 
    buffer.insert(0, hori);
    buffer.push_back(hori);
 
    // draw the corners
    //
-   set_char(0,                0,                NE);
-   set_char(0,                get_height() - 1, SE);
-   set_char(get_width(0) - 1, 0,                NW);
-   set_char(get_width(0) - 1, get_height() - 1, SW);
+   set_char(0,                       0,                   NE);
+   set_char(0,                       get_row_count() - 1, SE);
+   set_char(get_column_count() - 1, 0,                   NW);
+   set_char(get_column_count() - 1, get_row_count() - 1, SW);
 
    Assert(is_rectangular());
 }
@@ -895,7 +899,7 @@ PrintBuffer::debug(ostream & out, const char * title) const
 {
    if (title)   out << title << endl;
 
-   if (get_height() == 0)
+   if (get_row_count() == 0)
       {
         out << UNI_LINE_DOWN_RIGHT << UNI_LINE_DOWN_LEFT << endl
             << UNI_LINE_UP_RIGHT   << UNI_LINE_UP_LEFT
@@ -907,14 +911,14 @@ PrintBuffer::debug(ostream & out, const char * title) const
       }
 
    out << UNI_LINE_DOWN_RIGHT;
-   loop(w, get_width(0))   out << UNI_LINE_HORI;
+   loop(w, get_column_count())   out << UNI_LINE_HORI;
    out << UNI_LINE_DOWN_LEFT << endl;
 
-   loop(y, get_height())
+   loop(y, get_row_count())
    out << UNI_LINE_VERT << buffer[y] << UNI_LINE_VERT << endl;
 
    out << UNI_LINE_UP_RIGHT;
-   loop(w, get_width(0))   out << UNI_LINE_HORI;
+   loop(w, get_column_count())   out << UNI_LINE_HORI;
    out << UNI_LINE_UP_LEFT
        << " flg=" << HEX(col_info.flags)
        << " il="  << col_info.int_len
@@ -929,9 +933,9 @@ PrintBuffer::debug(ostream & out, const char * title) const
 void
 PrintBuffer::append_col(const PrintBuffer & pb1)
 {
-   Assert(get_height() == pb1.get_height());
+   Assert(get_row_count() == pb1.get_row_count());
 
-   loop(h, get_height())   buffer[h].append(pb1.buffer[h]);
+   loop(h, get_row_count())   buffer[h].append(pb1.buffer[h]);
 }
 //-----------------------------------------------------------------------------
 void
@@ -941,17 +945,17 @@ PrintBuffer::append_ucs(const UCS_string & ucs)
       {
         buffer.push_back(ucs);
       }
-   else if (ucs.size() < get_width(0))  // new line is shorter: pad it)
+   else if (ucs.size() < get_column_count())  // new line is shorter: pad it)
       {
         UCS_string ucs1(ucs);
-        UCS_string pad(get_width(0) - ucs.size(), UNI_iPAD_L1);
+        UCS_string pad(get_column_count() - ucs.size(), UNI_iPAD_L1);
         ucs1.append(pad);
         buffer.push_back(ucs1);
       }
-   else if (ucs.size() > get_width(0))   // new line is longer: pad PrintBufer
+   else if (ucs.size() > get_column_count())   // new line is longer: pad PrintBufer
       {
-        UCS_string pad(ucs.size() - get_width(0), UNI_iPAD_L2);
-        loop(h, get_height())   buffer[h].append(pad);
+        UCS_string pad(ucs.size() - get_column_count(), UNI_iPAD_L2);
+        loop(h, get_row_count())   buffer[h].append(pad);
         buffer.push_back(ucs);
       }
    else
@@ -991,7 +995,7 @@ int this_pos = -1;
       }
 
 const int ucs_w = ucs.size();
-const int this_w = get_width(0);
+const int this_w = get_column_count();
 
 int ucs_l = 0;    // padding left of ucs
 int ucs_r = 0;    // padding right of ucs
@@ -1066,27 +1070,27 @@ UCS_string ucs1;
 void
 PrintBuffer::add_column(Unicode pad, int32_t pad_count, const PrintBuffer & pb)
 {
-   if (get_height() != pb.get_height())
+   if (get_row_count() != pb.get_row_count())
       {
          debug(CERR, "this");
          pb.debug(CERR, "pb");
       }
 
-   Assert(get_height() == pb.get_height());
+   Assert(get_row_count() == pb.get_row_count());
 
    if (pad_count)
       {
         UCS_string ucs(pad_count, pad);
-        loop(y, get_height())   buffer[y].append(ucs);
+        loop(y, get_row_count())   buffer[y].append(ucs);
       }
 
-   loop(y, get_height())   buffer[y].append(pb.buffer[y]);
+   loop(y, get_row_count())   buffer[y].append(pb.buffer[y]);
 }
 //-----------------------------------------------------------------------------
 void PrintBuffer::add_row(const PrintBuffer & pb)
 {
-   buffer.reserve(buffer.size() + pb.get_height());
-   loop(h, pb.get_height())   buffer.push_back(pb.buffer[h]);
+   buffer.reserve(buffer.size() + pb.get_row_count());
+   loop(h, pb.get_row_count())   buffer.push_back(pb.buffer[h]);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1310,9 +1314,9 @@ UCS_string new_buf(buffer[0], 0, col_info.int_len);
 
    // if buffer is multi-len then pad remaining line to new length
    //
-   for (ShapeItem h = 1; h < get_height(); ++h)
+   for (ShapeItem h = 1; h < get_row_count(); ++h)
       {
-        const int diff = new_buf.size() - get_width(h);
+        const int diff = new_buf.size() - get_column_count(h);
         if (diff > 0)
            {
              const UCS_string ucs(diff, UNI_iPAD_L4);
@@ -1352,12 +1356,12 @@ const size_t diff = COL_INFO.int_len - col_info.int_len;
 bool
 PrintBuffer::is_rectangular() const
 {
-   if (get_height())
+   if (get_row_count())
       {
-        const ShapeItem w = get_width(0);
-        loop(h, get_height())
+        const ShapeItem w = get_column_count();
+        loop(h, get_row_count())
            {
-             if (get_width(h) != w)    return false;
+             if (get_column_count(h) != w)    return false;
            }
       }
 

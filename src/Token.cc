@@ -161,8 +161,8 @@ operator << (ostream & out, const Token & token)
 
         const PrintContext pctx(PR_APL);
         PrintBuffer pb(*value, pctx, 0);
-        bool more = pb.get_height() > 1;
-        if (pb.get_height() > 0)
+        bool more = pb.get_row_count() > 1;
+        if (pb.get_row_count() > 0)
            {
              UCS_string ucs = pb.get_line(0).no_pad();
              if (ucs.size() > 20)
@@ -541,13 +541,13 @@ const Value & val = *get_apl_val();
 
 PrintBuffer pb(val, pctx, 0);
 const UCS_string indent(fn.size(), UNI_SPACE);
-   loop(l, pb.get_height())
+   loop(l, pb.get_row_count())
       {
         if (l)   out << indent;
         out << pb.get_line(l).no_pad() << endl;
       }
 
-   if (pb.get_height() == 0)   out << endl;
+   if (pb.get_row_count() == 0)   out << endl;
 }
 //-----------------------------------------------------------------------------
 ostream &
@@ -597,7 +597,7 @@ UCS_string ucs;
              {
                PrintContext pctx(style, DEFAULT_Quad_PP, DEFAULT_Quad_PW);
                PrintBuffer pbuf(*get_apl_val(), pctx, 0);
-               if (pbuf.get_height() == 0)   return ucs;
+               if (pbuf.get_row_count() == 0)   return ucs;
                return pbuf.l1();
              }
 

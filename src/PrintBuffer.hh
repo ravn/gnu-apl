@@ -111,24 +111,28 @@ public:
                         PrintStyle outer_style);
 
    /// return the number of rows
-   int get_height() const
+   int get_row_count() const
       { return buffer.size(); }
 
    /// return the first (and only) line
    UCS_string l1() const
-      { Assert(get_height() == 1);   return buffer[0]; }
+      { Assert(get_row_count() == 1);   return buffer[0]; }
 
    /// return line y
    UCS_string get_line(int y) const
-      { Assert(y < get_height());   return buffer[y]; }
+      { Assert(y < get_row_count());   return buffer[y]; }
 
    /// print this buffer, interruptible with ^C
    void print_interruptible(ostream & out, Rank rank, int quad_pw);
 
-   /// return the number of columns.
-   int get_width(int y) const
-      { if (get_height() == 0)   return 0;
-        Assert(y < get_height());   return buffer[y].size(); }
+   /// return the number of columns
+   int get_column_count() const
+      { return get_column_count(0); }
+
+   /// return the number of columns in row y
+   int get_column_count(int y) const
+      { if (get_row_count() == 0)   return 0;   // no rows
+        Assert(y < get_row_count());   return buffer[y].size(); }
 
    /// Set the char in column x and row y to uc.
    void set_char(int x, int y, Unicode uc);

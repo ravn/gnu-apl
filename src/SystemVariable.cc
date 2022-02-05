@@ -769,16 +769,16 @@ Quad_QUOTE::assign(Value_P value, bool clone, const char * loc)
 
 PrintContext pctx(PR_QUOTE_Quad);
 PrintBuffer pb(*value, pctx, 0);
-   if (pb.get_height() > 1)   // multi line output: flush and restart corking
+   if (pb.get_row_count() > 1)  // multi line output: flush and restart corking
       {
-        loop(y, pb.get_height())
+        loop(y, pb.get_row_count())
            {
              done(true, LOC);
              prompt = pb.get_line(y).no_pad();
              COUT << prompt;
            }
       }
-   else if (pb.get_height() > 0)
+   else if (pb.get_row_count() > 0)
       {
         COUT << pb.l1().no_pad() << flush;
         prompt.append(pb.l1());
