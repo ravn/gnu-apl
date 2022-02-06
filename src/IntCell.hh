@@ -41,7 +41,6 @@ class IntCell : public RealCell
    friend class RealCell;      // for zI() and friends
    friend class Quad_EX;       // for zI() and friends
    friend class Value;         // for zI() and friends
-   typedef Value * APL_value;  // for zI() and friends
 
 public:
    /// Construct an integer cell with value \b 0
@@ -203,7 +202,7 @@ public:
 protected:
    /// initialize the (un-initialized) Cell *Z to integer 0
    static ErrorCode z0(Cell * Z)
-      { new (Z) IntCell(0);   return E_NO_ERROR; }
+      { new (Z) IntCell();   return E_NO_ERROR; }
 
    /// initialize the (un-initialized) Cell *Z to integer 1
    static ErrorCode z1(Cell * Z)

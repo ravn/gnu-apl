@@ -41,29 +41,29 @@ const unsigned int seed = reset_seed();
 }
 //-----------------------------------------------------------------------------
 void
-Quad_RL::assign(Value_P value, bool clone, const char * loc)
+Quad_RL::assign(Value_P B, bool /* clone */, const char * loc)
 {
-   if (!value->is_scalar_or_len1_vector())
+   if (!B->is_scalar_or_len1_vector())
       {
-        if (value->get_rank() > 1)   RANK_ERROR;
-        else                         LENGTH_ERROR;
+        if (B->get_rank() > 1)   RANK_ERROR;
+        else                     LENGTH_ERROR;
       }
 
-const Cell & cell = value->get_cfirst();
+const Cell & cell = B->get_cscalar();
 const APL_Integer val = cell.get_near_int();
 
    state = val;
-   Symbol::assign(IntScalar(val, LOC), false, LOC);
+   Symbol::assign(IntScalar(state, loc), false, LOC);
 }
 //-----------------------------------------------------------------------------
 uint64_t
 Quad_RL::get_random()
 {
+   Assert(value_stack.size());   // by Quad_RL::assign()
+   if (value_stack.back().get_nc() != NC_VARIABLE)   VALUE_ERROR;  // localized
+
    state *= Knuth_a;
    state += Knuth_c;
-
-   Assert(value_stack.size());
-   if (value_stack.back().get_nc() != NC_VARIABLE)   VALUE_ERROR;
 
    value_stack.back().apl_val->set_ravel_Int(0, state);
    return state;

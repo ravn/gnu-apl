@@ -103,7 +103,7 @@ Value_P Z(B->get_shape(), LOC);
             {
               const Unicode uni = cell_B.get_char_value();
               int32_t pos = Avec::find_av_pos(uni);
-              if (pos < 0)   Z->next_ravel_Int(MAX_AV);
+              if (pos < 0)   Z->next_ravel_Int(Avec::MAX_AV);
               else           Z->next_ravel_Int(pos);
               continue;
             }

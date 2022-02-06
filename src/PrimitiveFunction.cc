@@ -1041,13 +1041,13 @@ Bif_F12_ELEMENT::eval_B(Value_P B) const
 
               if (C->is_numeric())
                  {
-                   Z->set_ravel_Int(0, 0);
+                   Z->set_proto_Int();
                    break;
                  }
 
               if (C->is_character_cell())
                  {
-                   Z->set_ravel_Char(0, UNI_SPACE);
+                   Z->set_proto_Spc();
                    break;
                  }
 

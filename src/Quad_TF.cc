@@ -872,7 +872,7 @@ ShapeItem error_count = 0;
 
    loop(e, val.nz_element_count())
        {
-        Cell & cell = val.get_wravel(e);
+        const Cell & cell = val.get_cravel(e);
         if (cell.is_character_cell())       // char → integer
            {
              val.set_ravel_Int(e, cell.get_char_value());

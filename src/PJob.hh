@@ -72,7 +72,7 @@ public:
      fun(0),
      fun1(0),
      cB(B, 1),
-     cZ(&Z->get_wravel(0))
+     cZ(&Z->get_wfirst())
    {}
 
    /// the value being computed
@@ -149,7 +149,7 @@ public:
      fun2(0),
      cA(_A, _inc_A),
      cB(_B, _inc_B),
-     cZ(&Z->get_wravel(0))
+     cZ(&Z->get_wfirst())
    {}
 
    /// constructor: A nested, B simple
@@ -163,7 +163,7 @@ public:
      fun2(0),
      cA(_A, _inc_A),
      cB(cell_B),
-     cZ(&Z->get_wravel(0))
+     cZ(&Z->get_wfirst())
    {}
 
    /// constructor: A simple, B nested
@@ -177,7 +177,7 @@ public:
      fun2(0),
      cA(cell_A),
      cB(_B, _inc_B),
-     cZ(&Z->get_wravel(0))
+     cZ(&Z->get_wfirst())
    {}
 
    /// A value (e.g parallel ~Value())

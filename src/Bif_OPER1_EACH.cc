@@ -127,12 +127,12 @@ Function_P LO = _LO.get_function();
            {
              if (extend_B && !B->is_scalar())   // 1-element non-scalar B
                 {
-                  Value_P A1(LOC);
-                  A1->get_wscalar().init(A->get_cfirst(), A1.getref(), LOC);
+                  Value_P A1(LOC);   // A1 ← , A
+                  A1->get_wscalar().init(A->get_cscalar(), A1.getref(), LOC);
                   A1->check_value(LOC);
 
-                  Value_P B1(LOC);
-                  B1->get_wscalar().init(B->get_cfirst(), B1.getref(), LOC);
+                  Value_P B1(LOC);   // B1 ← , B
+                  B1->get_wscalar().init(B->get_cscalar(), B1.getref(), LOC);
                   B1->check_value(LOC);
 
                   return macro->eval_ALB(A1, _LO, B1);

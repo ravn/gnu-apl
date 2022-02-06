@@ -43,6 +43,12 @@ Value::set_proto_Int()
 }
 //-----------------------------------------------------------------------------
 void
+Value::release(ShapeItem offset, const char * loc)
+{
+   get_wravel(offset).release(loc);
+}
+//-----------------------------------------------------------------------------
+void
 Value::set_default(const Value & B, const char * loc)
 {
   if (is_empty())

@@ -25,40 +25,27 @@
 
 class Token;
 
-
-/// The valid indices the Atomic Vector of the APL interpreter
-enum CHT_Index
-{
-   Invalid_CHT = -1,
-#define char_def( n, _u, _t, _f, _p) AV_ ## n,
-#define char_df1(_n, _u, _t, _f, _p)
-#include "Avec.def"
-   MAX_AV,
-};
-
-///  Some flags helping to classify characters
-enum CharacterFlag
-{
-   FLG_NONE            = 0x0000,   ///< no flag
-   FLG_SYMBOL          = 0x0001,   ///< valid char in a user defined name
-   FLG_DIGIT           = 0x0002,   ///< 0-9
-   FLG_NO_SPACE_AFTER  = 0x0004,   ///< never need a space after this char
-   FLG_NO_SPACE_BEFORE = 0x0008,   ///< never need a space before this char
-
-   FLG_NO_SPACE        = FLG_NO_SPACE_AFTER | FLG_NO_SPACE_BEFORE,
-   FLG_NUMERIC         = FLG_DIGIT | FLG_SYMBOL,   ///< 0-9, A-Z, a-z, ∆, ⍙
-};
-
 /**
     class Avec is a collection of static functions related to the Atomic
     Vector of the APL interpreter
  */
-/// Static helper  functions related to ⎕AV
+/// Static helper  functions related to ⎕AV, character clasification, etc.
 class Avec
 {
 public:
-   /// init the static tables of this class and check them
+   /// initialize the static tables of this class and check them
    static void init();
+
+   /// The valid indices in the Atomic Vector of the APL interpreter. Only
+   /// char_def() entries are used, char_df1() entries are ignored entirely.
+   enum CHT_Index
+      {
+         Invalid_CHT = -1,
+#define char_def( name, _u, _t, _f, _p) AV_ ## name,
+#define char_df1(_n, _u, _t, _f, _p)
+#include "Avec.def"
+         MAX_AV,
+      };
 
    /// Return the UNICODE of char table entry \b av
    static Unicode unicode(CHT_Index av);
@@ -165,12 +152,33 @@ public:
    static void print_inverse_IBM_quad_AV();
 
 protected:
+   ///  Some flags helping to classify characters
+   enum CharacterFlag
+   {
+      FLG_NONE            = 0x0000,   ///< no flag
+      FLG_SYMBOL          = 0x0001,   ///< valid char in a user defined name
+      FLG_DIGIT           = 0x0002,   ///< 0-9
+      FLG_NO_SPACE_AFTER  = 0x0004,   ///< never need a space after this char
+      FLG_NO_SPACE_BEFORE = 0x0008,   ///< never need a space before this char
+
+      FLG_NO_SPACE        = FLG_NO_SPACE_AFTER | FLG_NO_SPACE_BEFORE,
+      FLG_NUMERIC         = FLG_DIGIT | FLG_SYMBOL,   ///< 0-9, A-Z, a-z, ∆, ⍙
+   };
+
    /// a Unicode and its position in the ⎕AV of IBM APL2
    struct Unicode_to_IBM_codepoint
       {
          uint32_t uni;   ///< the Unicode
          uint32_t cp;    ///< the IBM char for uni
       };
+
+   /// Various character attributes.
+   struct Character_definition;
+
+   /// a table defining the properties of every character in ⎕AV. Only
+   /// characters defined with char_def() (i.e. not those defined with
+   /// char_df1()) are in this table.
+   static const Character_definition character_table[MAX_AV];
 
    /// Unicode_to_IBM_codepoint table sorted by Unicode (for bsearch())
    static Unicode_to_IBM_codepoint inverse_ibm_av[];

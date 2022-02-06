@@ -169,7 +169,7 @@ protected:
 };
 //-----------------------------------------------------------------------------
 /** primitive functions member and enlist */
-/// The class implementing ∈
+/// The class implementing ϵ
 class Bif_F12_ELEMENT : public NonscalarFunction
 {
 public:

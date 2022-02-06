@@ -32,26 +32,23 @@
 
 using namespace std;
 
-// See RFC 3629 for UTF-8
-
 /// Various character attributes.
-struct Character_definition
+struct Avec::Character_definition
 {
-   CHT_Index     av_val;      ///< Atomic vector enum of the char.
    Unicode       unicode;     ///< Unicode of the char.
    const char *  char_name;   ///< Name of the char.
-   int           def_line;    ///< Line where the char is defined.
+   int           def_line;    ///< Line in Avec.def that defines the char
    TokenTag      token_tag;   ///< Token tag for the char.
    CharacterFlag flags;       ///< Character class.
    int           av_pos;      ///< position in ⎕AV (== ⎕AF unicode)
 };
-
 //-----------------------------------------------------------------------------
-#define char_def(n, _u, t, f, p) \
-   { AV_ ## n, UNI_ ## n, # n, __LINE__, TOK_ ## t, FLG_ ## f, 0x ## p },
-#define char_df1(_n, _u, _t, _f, _p)
-const Character_definition character_table[MAX_AV] =
+const Avec::Character_definition
+Avec::character_table[MAX_AV] =
 {
+#define char_def(name, _uni, tag, flags, av_pos)  \
+   { UNI_ ## name, #name, __LINE__, TOK_ ## tag, FLG_ ## flags, 0x ## av_pos },
+#define char_df1(_name, _uni, _tag, _flags, _av_pos)
 #include "Avec.def"
 };
 //-----------------------------------------------------------------------------
@@ -190,19 +187,22 @@ Avec::get_av_pos(CHT_Index av)
 Token
 Avec::uni_to_token(Unicode & uni, const char * loc)
 {
-CHT_Index idx = find_char(uni);
-   if (idx != Invalid_CHT)   return Token(character_table[idx].token_tag, uni);
+   {
+     const CHT_Index idx = find_char(uni);   // search uni in character_table
+     if (idx != Invalid_CHT)  return Token(character_table[idx].token_tag, uni);
+   }
 
    // not found: try alternative characters.
    //
-   idx = map_alternative_char(uni);
+const CHT_Index idx = map_alternative_char(uni);
    if (idx != Invalid_CHT)
       {
         uni = character_table[idx].unicode;
-        return Token(character_table[idx].token_tag,
-                     character_table[idx].unicode);
+        return Token(character_table[idx].token_tag, uni);
       }
 
+   // uni was neither the standard character nor an alternative character
+   // for a token.
    Log(LOG_verbose_error)
       {
         CERR << endl << "Avec::uni_to_token() : Char " << UNI(uni)
@@ -211,6 +211,7 @@ CHT_Index idx = find_char(uni);
 
          BACKTRACE
       }
+
    return Token();
 }
 //-----------------------------------------------------------------------------
@@ -223,7 +224,7 @@ const CHT_Index pos = find_char(av);
    return character_table[pos].av_pos;
 }
 //-----------------------------------------------------------------------------
-CHT_Index
+Avec::CHT_Index
 Avec::find_char(Unicode av)
 {
 int l = 0;
@@ -241,10 +242,10 @@ int h = sizeof(character_table)/sizeof(*character_table) - 1;
        }
 }
 //-----------------------------------------------------------------------------
-CHT_Index
+Avec::CHT_Index
 Avec::map_alternative_char(Unicode alt_av)
 {
-   // map characters that look similar to characters used in GNU APL's ⎕AV
+   // map Unicodes that look similar to characters used in GNU APL's ⎕AV
    // to the corresponding character in GNU APL's ⎕AV.
    //
    switch(int(alt_av))
@@ -253,7 +254,7 @@ Avec::map_alternative_char(Unicode alt_av)
         case 0x007C: return AV_DIVIDES;          //  map | to ∣
         case 0x007E: return AV_TILDE_OPERATOR;   //  map ~ to ∼
         case 0x03B1: return AV_ALPHA;            //  map α to ⍺
-        case 0x03B5: return AV_ELEMENT;          //  map ε to ∈
+        case 0x03B5: return AV_ELEMENT;          //  map ϵ to itself
         case 0x03B9: return AV_IOTA;             //  map ι to ⍳
         case 0x03C1: return AV_RHO;              //  map ρ to ⍴
         case 0x03C9: return AV_OMEGA;            //  map ω to ⍵
@@ -284,10 +285,12 @@ Avec::map_alternative_char(Unicode alt_av)
 bool
 Avec::is_known_char(Unicode av)
 {
+   // a "known" character is either a standard APL character or an alternative
+   // (= similar looking) character.
    switch(av)
       {
-#define char_def(_n, u, _t, _f, _p)  case u: 
-#define char_df1(_n, u, _t, _f, _p)  case u: 
+#define char_def(_name, uni, _tag, _flags, _av_pos)  case uni:
+#define char_df1(_name, uni, _tag, _flags, _av_pos)  case uni:
 #include "Avec.def"
           return true;
 

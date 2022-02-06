@@ -100,8 +100,8 @@ XML_Saving_Archive::xml_allowed(Unicode uni)
         // characters except our own type markers (⁰¹²...)
         //
         if (is_iPAD_char(uni))   return false;
-        if (Avec::find_char(uni) != Invalid_CHT)              return true;
-        if (Avec::map_alternative_char(uni) != Invalid_CHT)   return true;
+        if (Avec::find_char(uni) != Avec::Invalid_CHT)              return true;
+        if (Avec::map_alternative_char(uni) != Avec::Invalid_CHT)   return true;
         return false;    // allowed, but may
       }
    return true;

@@ -216,13 +216,14 @@ protected:
    /// the number of valid axes (= iterators).
    const uRank rank;
 
-   /** axis iterators.                   Shape:  ⊏sh0:sh1:...⊐
-                                                    │   │
-       axis_iterators[0] ←→ get_shape_item(0), ─────┘   │       largest weight
+   /// the sum of the ravel offsets of all iterators
+   ShapeItem total_ravel_offset;
+
+   /** axis iterators.                   Shape:  ⊏sh0:sh1:..:shN⊐
+                                                    │   │      │
+       axis_iterators[0] ←→ get_shape_item(0), ─────┘   │      └── weight 1
        axis_iterators[1] ←→ get_shape_item(1), ─────────┘ ...
     **/
-
-   ShapeItem total_ravel_offset;
    AxisIterator axis_iterators[MAX_RANK];
 };
 //=============================================================================

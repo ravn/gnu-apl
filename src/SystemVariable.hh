@@ -176,7 +176,7 @@ public:
    static Unicode indexed_at(uint32_t pos);
 
    /// a static ⎕AV
-   static Unicode qav[MAX_AV];
+   static Unicode qav[Avec::MAX_AV];
 };
 //-----------------------------------------------------------------------------
 /**

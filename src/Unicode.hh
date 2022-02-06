@@ -30,8 +30,8 @@
 /// One Unicode character
 enum Unicode
 {
-#define char_def(n, u, t, f, p) UNI_ ## n = u,
-#define char_df1(n, u, t, f, p) UNI_ ## n = u,
+#define char_def(name, uni, _tag, _flags, _av_pos) UNI_ ## name = uni,
+#define char_df1(name, uni, _tag, _flags, _av_pos) UNI_ ## name = uni,
 #include "Avec.def"
 
    Unicode_0       = 0,            ///< End of unicode string

@@ -1397,8 +1397,10 @@ Value::is_apl_char_vector() const
         if (!get_cravel(c).is_character_cell())   return false;
 
         const Unicode uni = get_cravel(c).get_char_value();
-        if (Avec::find_char(uni) == Invalid_CHT)   return false;   // not in ⎕AV
+        if (Avec::find_char(uni) == Avec::Invalid_CHT)   // not in ⎕AV
+           return false;
       }
+
    return true;
 }
 //-----------------------------------------------------------------------------

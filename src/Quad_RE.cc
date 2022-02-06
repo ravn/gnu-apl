@@ -178,9 +178,9 @@ Value_P Z(SHORT_VALUE_LENGTH_WANTED, LOC);
               Value_P Z2(2*ec_Z, LOC);
               loop(z, ec_Z)
                   {
-                    Cell & cell = Z->get_wravel(z);
+                    const Cell & cell = Z->get_cravel(z);
                     Z2->next_ravel_Pointer(cell.get_pointer_value().get());
-                    cell.release(LOC);
+                    Z->release(z, LOC);
                   }
               Z = Z2;
             }

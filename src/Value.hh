@@ -366,6 +366,9 @@ public:
    /// set the prototype to 0 if this value is empty.
    inline void set_proto_Int();
 
+   /// release ravel Cell z
+   inline void release(ShapeItem offset, const char * loc);
+
    /// Return the number of scalars in this value (enlist).
    ShapeItem get_enlist_count() const;
 

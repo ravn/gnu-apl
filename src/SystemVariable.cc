@@ -56,7 +56,7 @@ ShapeItem Quad_SYL::value_count_limit = 0;
 ShapeItem Quad_SYL::ravel_count_limit = 0;
 ShapeItem Quad_SYL::print_length_limit = 0;
 
-Unicode Quad_AV::qav[MAX_AV];
+Unicode Quad_AV::qav[Avec::MAX_AV];
 
 //=============================================================================
 void
@@ -128,23 +128,23 @@ SystemVariable::get_attributes(int mode, Value & Z) const
 Quad_AV::Quad_AV()
    : RO_SystemVariable(ID_Quad_AV)
 {
-   Assert1(MAX_AV == 256);
+   Assert1(Avec::MAX_AV == 256);
 
-Value_P AV(MAX_AV, LOC);
+Value_P AV(Avec::MAX_AV, LOC);
 
    // Avec::character_table is sorted by ascending Unicodes, while ⎕AV
    // is not. We construct qav (which is sorted by ⎕AV position) from
    // Avec::character_table and assign it to ⎕AV.
    //
-   loop(cti, MAX_AV)
+   loop(cti, Avec::MAX_AV)
        {
-         const int av_pos = Avec::get_av_pos(CHT_Index(cti));
-         const Unicode uni = Avec::unicode(CHT_Index(cti));
+         const int av_pos = Avec::get_av_pos(Avec::CHT_Index(cti));
+         const Unicode uni = Avec::unicode(Avec::CHT_Index(cti));
 
          qav[av_pos] = uni;   // remember unicode for indexed_at()
        }
 
-   loop(av, MAX_AV)  AV->next_ravel_Char(qav[av]);
+   loop(av, Avec::MAX_AV)  AV->next_ravel_Char(qav[av]);
 
    AV->check_value(LOC);
 
@@ -154,7 +154,7 @@ Value_P AV(MAX_AV, LOC);
 Unicode
 Quad_AV::indexed_at(uint32_t pos)
 {
-   if (pos < MAX_AV)   return qav[pos];
+   if (pos < Avec::MAX_AV)   return qav[pos];
    return UNI_AV_MAX;
 }
 //=============================================================================

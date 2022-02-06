@@ -175,13 +175,13 @@ Symbol::assign_indexed(const Value * X, Value_P B)   // A[X] ← B
    // 
 const APL_Integer qio = Workspace::get_IO();
 
-Value_P A = get_apl_value();  // the current APL value of this Symbol
+Value_P Z = get_apl_value();  // the current APL value of this Symbol
 
-   if (A->is_member())
+   if (Z->is_member())
       {
-        // A is indexed with a member name, e.g. A['member'] ← 42
+        // Z is indexed with a member name, e.g. Z['member'] ← 42
         const UCS_string name(*X);
-        Cell * data = A->get_member_data(name);
+        Cell * data = Z->get_member_data(name);
         if (data)   // member exists
            {
              if (data->is_pointer_cell() &&
@@ -196,40 +196,40 @@ Value_P A = get_apl_value();  // the current APL value of this Symbol
            }
         else        // new member
            {
-             data = A->get_new_member(name);
+             data = Z->get_new_member(name);
            }
         data->release(LOC);   // release old content
-        data->init_from_value(B.get(), A.getref(), LOC);
+        data->init_from_value(B.get(), Z.getref(), LOC);
         return;
       }
 
-const ShapeItem max_idx = A->element_count();
+const ShapeItem max_idx = Z->element_count();
    if (X              &&     // X exists,      and
        X->is_scalar() &&     // X is a scalar, and
        B->is_scalar() &&     // B is a scalar, and
-       A->get_rank() == 1)   // A is a vector
+       Z->get_rank() == 1)   // Z is a vector
       {
         const APL_Integer idx = X->get_cfirst().get_near_int() - qio;
-        if (idx >= 0 && idx < max_idx)   // idx is a valid index of A
+        if (idx >= 0 && idx < max_idx)   // idx is a valid index of Z
            {
-             Cell & cell = A->get_wravel(idx);
-             cell.release(LOC);   // release the old value if A[X]
-             cell.init(B->get_cfirst(), A.getref(), LOC);   // A[X] ← ↑B
+             Cell & cell = Z->get_wravel(idx);
+             cell.release(LOC);   // release the old value if Z[X]
+             cell.init(B->get_cfirst(), Z.getref(), LOC);   // Z[X] ← ↑B
              return;
            }
       }
 
-   if (A->get_rank() != 1)   RANK_ERROR;
+   if (Z->get_rank() != 1)   RANK_ERROR;
 
    if (!X)   // X[] ← B
       {
-        // scalar B is scalar extended according to ⍴A
+        // scalar B is scalar extended according to ⍴Z
         const Cell & src = B->get_cfirst();
         loop(a, max_idx)
             {
-              Cell & dest = A->get_wravel(a);
+              Cell & dest = Z->get_wravel(a);
               dest.release(LOC);   // free sub-values etc (if any)
-              dest.init(src, A.getref(), LOC);
+              dest.init(src, Z.getref(), LOC);
             }
         if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
         return;
@@ -248,9 +248,9 @@ const Cell * cB = &B->get_cfirst();
         const ShapeItem idx = cX++->get_near_int() - qio;
         if (idx < 0)          INDEX_ERROR;
         if (idx >= max_idx)   INDEX_ERROR;
-        Cell & dest = A->get_wravel(idx);
+        Cell & dest = Z->get_wravel(idx);
         dest.release(LOC);   // free sub-values etc (if any)
-        dest.init(*cB, A.getref(), LOC);
+        dest.init(*cB, Z.getref(), LOC);
 
          cB += incr_B;
       }
