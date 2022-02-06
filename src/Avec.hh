@@ -37,12 +37,12 @@ public:
    static void init();
 
    /// The valid indices in the Atomic Vector of the APL interpreter. Only
-   /// char_def() entries are used, char_df1() entries are ignored entirely.
+   /// char_def() entries are used, char_uni() entries are ignored entirely.
    enum CHT_Index
       {
          Invalid_CHT = -1,
 #define char_def( name, _u, _t, _f, _p) AV_ ## name,
-#define char_df1(_n, _u, _t, _f, _p)
+#define char_uni(_n, _u, _t, _f)
 #include "Avec.def"
          MAX_AV,
       };
@@ -103,7 +103,7 @@ public:
    static bool is_number(Unicode uni)
       { return is_digit(uni) || (uni == UNI_OVERBAR); }
 
-   /// return true if unicode \b is defined by a char_def() or char_df1() macro
+   /// return true if unicode \b is defined by a char_def() or char_uni() macro
    static bool is_known_char(Unicode uni);
 
    /// return true if unicode \b uni is a quad (⎕ or ▯)
@@ -177,7 +177,7 @@ protected:
 
    /// a table defining the properties of every character in ⎕AV. Only
    /// characters defined with char_def() (i.e. not those defined with
-   /// char_df1()) are in this table.
+   /// char_uni()) are in this table.
    static const Character_definition character_table[MAX_AV];
 
    /// Unicode_to_IBM_codepoint table sorted by Unicode (for bsearch())
@@ -190,7 +190,7 @@ protected:
    static void check_av_table();
 
    /// check that all characters in the UTF-8 encoded file are known
-   /// (through char_def() or char_df1() macros)
+   /// (through char_def() or char_uni() macros)
    static void check_file(const char * filename);
 
    /// compare the unicodes of two entries ua and u2 in \b inverse_IBM_quad_AV

@@ -53,7 +53,7 @@
 Bif_F0_ZILDE      Bif_F0_ZILDE     ::_fun;    // ⍬
 Bif_F1_EXECUTE    Bif_F1_EXECUTE   ::_fun;    // ⍎
 Bif_F2_INDEX      Bif_F2_INDEX     ::_fun;    // ⌷
-Bif_F12_ELEMENT   Bif_F12_ELEMENT  ::_fun;    // ∈
+Bif_F12_ELEMENT   Bif_F12_ELEMENT  ::_fun;    // ϵ
 Bif_F12_EQUIV     Bif_F12_EQUIV    ::_fun;    // ≡
 Bif_F12_NEQUIV    Bif_F12_NEQUIV   ::_fun;    // ≢
 Bif_F12_ENCODE    Bif_F12_ENCODE   ::_fun;    // ⊤
@@ -462,7 +462,7 @@ Value_P Z(shape_Z, LOC);
 Value_P
 Bif_F12_TRANSPOSE::transpose_diag(const Shape & A, Value_P B)
 {
-   // check that: ∧/(⍳⌈/0,A)∈A
+   // check that: ∧/(⍳⌈/0,A)ϵA
    //
    // I.e. 0, 1, ... max_A are in A
    // we search sequentially, since A is small.
@@ -1082,7 +1082,7 @@ Value_P Z(len_Z, LOC);
 Token
 Bif_F12_ELEMENT::eval_AB(Value_P A, Value_P B) const
 {
-   // return Z←A ∈ B. Z[i] is 1 iff A[i] = B[j] for some j
+   // return Z←A ϵ B. Z[i] is 1 iff A[i] = B[j] for some j
    //
 const double qct = Workspace::get_CT();
 Value_P Z(A->get_shape(), LOC);

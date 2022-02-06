@@ -48,7 +48,7 @@ Avec::character_table[MAX_AV] =
 {
 #define char_def(name, _uni, tag, flags, av_pos)  \
    { UNI_ ## name, #name, __LINE__, TOK_ ## tag, FLG_ ## flags, 0x ## av_pos },
-#define char_df1(_name, _uni, _tag, _flags, _av_pos)
+#define char_uni(_name, _uni, _tag, _flags)
 #include "Avec.def"
 };
 //-----------------------------------------------------------------------------
@@ -110,7 +110,6 @@ Avec::check_av_table()
    if (MAX_AV != 256)
       {
         CERR << "AV has " << MAX_AV << " entries (should be 256)" << endl;
-        return;
       }
 
    Assert(sizeof(character_table) / sizeof(*character_table) == MAX_AV);
@@ -126,34 +125,39 @@ Avec::check_av_table()
    loop(i, 0x80)   show_error_pos(i, __LINE__, character_table[i].def_line,
                                   character_table[i].unicode == i);
 
-   // display holes and duplicate AV positions in character_table
+   // check for holes and duplicate AV positions
    {
-     int holes = 0;
-     loop(pos, MAX_AV)
-        {
-          int count = 0;
-          loop(i, MAX_AV)
+     int count = 0;
+     int positions[MAX_AV];
+     loop(p, MAX_AV)   positions[p] = 0;
+
+#define char_def(_name, _uni, _tag, _flags, av_pos)  \
+   ++count; ++positions[0x ## av_pos];
+#define char_uni(_name, _uni, _tag, _flags)
+#include "Avec.def"
+
+     CERR << "checking ⎕AV" << endl;
+     loop(p, MAX_AV)
+         {
+           if (positions[p] > 1)   // duplicate
               {
-                if (character_table[i].av_pos == pos)   ++count;
+                CERR << "In Avec.def: duplicate av_pos " << HEX2(p)
+                     << " (" << positions[p] << " entries)" << endl;
               }
-
-          if (count == 0)
-             {
-               ++holes;
-               CERR << "AV position " << HEX(pos) << " unused" << endl;
-             }
-
-          if (count > 1)
-             CERR << "duplicate AV position " << HEX(pos) << endl;
-        }
-
-     if (holes)   CERR << holes << " unused positions in ⎕AV" << endl;
+           if (positions[p] < 1)   // hole
+              {
+                CERR << "In Avec.def: no av_pos " << HEX2(p) << endl;
+              }
+         }
    }
 
    // check that find_char() works
    //
-   loop(i, MAX_AV)   show_error_pos(i, __LINE__, character_table[i].def_line,
-                                    i == find_char(character_table[i].unicode));
+   loop(i, MAX_AV)
+       {
+         show_error_pos(i, __LINE__, character_table[i].def_line,
+                        i == find_char(character_table[i].unicode));
+       }
 
    Log(LOG_SHOW_AV)
       {
@@ -258,7 +262,7 @@ Avec::map_alternative_char(Unicode alt_av)
         case 0x03B9: return AV_IOTA;             //  map ι to ⍳
         case 0x03C1: return AV_RHO;              //  map ρ to ⍴
         case 0x03C9: return AV_OMEGA;            //  map ω to ⍵
-        case 0x03F5: return AV_ELEMENT;          //  map ϵ to ∈
+        case 0x03F5: return AV_ELEMENT;          //  map ϵ to ϵ
         case 0x2018: return AV_SINGLE_QUOTE;     //  map ‘ to '
         case 0x2019: return AV_SINGLE_QUOTE;     //  map ’ to '
         case 0x2208: return AV_ELEMENT;          //  map ∈ to ϵ
@@ -290,7 +294,7 @@ Avec::is_known_char(Unicode av)
    switch(av)
       {
 #define char_def(_name, uni, _tag, _flags, _av_pos)  case uni:
-#define char_df1(_name, uni, _tag, _flags, _av_pos)  case uni:
+#define char_uni(_name, uni, _tag, _flags)           case uni:
 #include "Avec.def"
           return true;
 

@@ -64,7 +64,7 @@ int bmX = 0;   // axes in axes_X with ⎕IO←0
        {
          const ShapeItem ax = axes_X.get_shape_item(r);
 
-         // check that X∈⍳⍴⍴B
+         // check that Xϵ⍳⍴⍴B
          //
          if (ax < 0)
             {

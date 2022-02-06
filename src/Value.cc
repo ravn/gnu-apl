@@ -1370,8 +1370,8 @@ Value::enlist_left(Value & Z) const
 
                  test with:
 
-                 A←'ZIPPITY' 'DOO' 'DAH' ◊ (∊A[2])←0 ◊ A
-                 A←(10 20 30) 'AB'       ◊ (∈A)←⍳5   ◊ A
+                 A←'ZIPPITY' 'DOO' 'DAH' ◊ (ϵA[2])←0 ◊ A
+                 A←(10 20 30) 'AB'       ◊ (ϵA)←⍳5   ◊ A
                  A←''                    ◊ (↑A)←33   ◊ ↑A
 
 

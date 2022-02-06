@@ -670,7 +670,7 @@ Q1(L.norm2_imag)
         const bool significant = mCOL1.significant(BMAX, EPS);
 
    // [5]  IMBED → L2=0
-   // [6]  IMBED → ∼0∈0=(1↓COL1) CMP_TOL EPS BMAX
+   // [6]  IMBED → ∼0ϵ0=(1↓COL1) CMP_TOL EPS BMAX
 
         if (significant || (L.norm2_real + L.norm2_imag) > qct2)
            {

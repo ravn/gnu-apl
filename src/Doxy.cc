@@ -373,7 +373,7 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
 "      <TH>⍴"                                                              CRLF
 "      <TH>≡"                                                              CRLF
 "      <TH>Type"                                                           CRLF
-"      <TH>↑∈"                                                             CRLF;
+"      <TH>↑ϵ"                                                             CRLF;
    loop(v, variables.size())
       {
         const Symbol & var_sym = *variables[v];

@@ -1005,7 +1005,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "   Zd ←    ⎕FIO[28] Bs    return content of directory Bs\n"
 "   Zn ←    ⎕FIO[29] Bs    return file names in directory Bs\n"
 "   Zs ←    ⎕FIO 30        getcwd()\n"
-"   Zn ← As ⎕FIO[31] Bs    access(As, Bs) As ∈ 'RWXF'\n"
+"   Zn ← As ⎕FIO[31] Bs    access(As, Bs) As ϵ 'RWXF'\n"
 "   Zh ←    ⎕FIO[32] Bi    socket(Bi=AF_INET, SOCK_STREAM, 0)\n"
 "   Ze ← Aa ⎕FIO[33] Bh    bind(Bh, Aa)\n"
 "   Ze ←    ⎕FIO[34] Bh    listen(Bh, 10)\n"
