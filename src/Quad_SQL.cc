@@ -49,7 +49,7 @@ Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
 # include "sql/PostgresProvider.hh"
 #endif
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 init_provider_map()
 {
@@ -72,18 +72,18 @@ init_provider_map()
 # endif
 #endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_SQL::Quad_SQL()
    : QuadFunction(TOK_Quad_SQL)
 {
    init_provider_map();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_SQL::~Quad_SQL()
 {
    loop(p, providers.size())   delete providers[p];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Token list_functions( ostream &out )
 {
     out << "Available function numbers:" << endl
@@ -99,7 +99,7 @@ static Token list_functions( ostream &out )
 << "ref   ⎕SQL[9] table     - list columns for table" << endl;
     return Token(TOK_APL_VALUE1, Str0( LOC ) );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static int find_free_connection( void )
 {
     for ( int i = 0 ; i < connections.size(); ++i)
@@ -110,7 +110,7 @@ static int find_free_connection( void )
     connections.push_back(0);
     return connections.size() - 1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token open_database(Value_P A, Value_P B)
 {
     if(!A->is_apl_char_vector() ){
@@ -132,13 +132,13 @@ string type = to_string(A->get_UCS_ravel());
    MORE_ERROR() << "Unknown database type: " << type.c_str();
    VALUE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static void throw_illegal_db_id( void )
 {
     MORE_ERROR() << "Illegal database id";
     DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Connection *
 db_id_to_connection(int db_id)
 {
@@ -155,7 +155,7 @@ Connection * conn = connections[db_id];
 
     return conn;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Connection *value_to_db_id( Value_P value )
 {
     if( !value->is_int_scalar( ) ) {
@@ -165,7 +165,7 @@ static Connection *value_to_db_id( Value_P value )
     const int db_id = value->get_cfirst().get_int_value();
     return db_id_to_connection(db_id);
  }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Token close_database( Value_P B )
 {
     if (!B->is_int_scalar())
@@ -192,7 +192,7 @@ Connection *conn = connections[db_id];
 
     return Token( TOK_APL_VALUE1, Str0( LOC ) );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Value_P
 run_generic_one_query(ArgListBuilder *arg_list, Value_P B, int start,
                       int num_args, bool ignore_result )
@@ -223,7 +223,7 @@ run_generic_one_query(ArgListBuilder *arg_list, Value_P B, int start,
 
     return arg_list->run_query( ignore_result );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Value_P
 run_generic(Connection *conn, Value_P A, Value_P B, bool query)
 {
@@ -272,38 +272,38 @@ const Shape &shape = B->get_shape();
    MORE_ERROR() << "Bind params have illegal rank";
    RANK_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Token run_query( Connection *conn, Value_P A, Value_P B )
 {
     return Token( TOK_APL_VALUE1, run_generic( conn, A, B, true ) );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Token run_update( Connection *conn, Value_P A, Value_P B )
 {
     return Token( TOK_APL_VALUE1, run_generic( conn, A, B, false ) );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Token run_transaction_begin( Value_P B )
 {
     Connection *conn = value_to_db_id( B );
     conn->transaction_begin();
     return Token( TOK_APL_VALUE1, Idx0( LOC ) );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Token run_transaction_commit( Value_P B )
 {
     Connection *conn = value_to_db_id( B );
     conn->transaction_commit();
     return Token( TOK_APL_VALUE1, Idx0( LOC ) );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Token run_transaction_rollback( Value_P B )
 {
     Connection *conn = value_to_db_id( B );
     conn->transaction_rollback();
     return Token( TOK_APL_VALUE1, Idx0( LOC ) );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Token show_tables( Value_P B )
 {
     Connection *conn = value_to_db_id( B );
@@ -326,7 +326,7 @@ static Token show_tables( Value_P B )
     value->check_value( LOC );
     return Token( TOK_APL_VALUE1, value );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Token
 show_cols(Value_P A, Value_P B)
 {
@@ -367,21 +367,21 @@ Value_P Z(shape, LOC);
     Z->check_value( LOC );
     return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_SQL::eval_B(Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
    return list_functions(COUT);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_SQL::eval_AB(Value_P A, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
    return list_functions(COUT);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_SQL::eval_XB(Value_P X, Value_P B) const
 {
@@ -402,7 +402,7 @@ const int function_number = X->get_cfirst().get_near_int( );
                   DOMAIN_ERROR;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Connection *param_to_db( Value_P X )
 {
     const Shape &shape = X->get_shape();
@@ -412,7 +412,7 @@ static Connection *param_to_db( Value_P X )
     }
     return db_id_to_connection( X->get_cravel( 1 ).get_near_int( ) );
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_SQL::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
@@ -441,7 +441,7 @@ Quad_SQL::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
         DOMAIN_ERROR;
     }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static const UCS_string
 ucs_string_from_string( const std::string &string )
 {
@@ -450,7 +450,7 @@ const char * buf = string.c_str();
 UTF8_string utf(utf8P(buf), length);
     return UCS_string(utf);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 make_string_cell( const std::string &string, const char *loc )
 {
@@ -463,4 +463,4 @@ make_string_cell( const std::string &string, const char *loc )
     cell->check_value( loc );
     return cell;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

@@ -79,14 +79,14 @@ Quad_FIO::_sub_fun Quad_FIO::sub_functions[] =
 #define fiodef(N, name)   { N, #name },
 #include "Quad_FIO.def"
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_FIO::axis_compare(const void * key, const void * sf)
 {
    return strcasecmp(reinterpret_cast<const char *>(key),
                      reinterpret_cast<const _sub_fun *>(sf)->key);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_FIO::function_name_to_int(const char * function_name)
 {
@@ -111,14 +111,14 @@ Quad_FIO::function_name_to_int(const char * function_name)
 
   return -1;    // not found
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Quad_FIO::string_to_int(const UCS_string & name) const
 {
 UTF8_string name_utf(name);
    return function_name_to_int(name_utf.c_str());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_FIO::Quad_FIO()
    : QuadFunction(TOK_Quad_FIO)
 {
@@ -141,7 +141,7 @@ file_entry f2(stderr, STDERR_FILENO);
         open_files.push_back(f3);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FIO::clear()
 {
@@ -157,7 +157,7 @@ Quad_FIO::clear()
         open_files.pop_back();
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_FIO::file_entry &
 Quad_FIO::get_file_entry(int handle)
 {
@@ -170,7 +170,7 @@ Quad_FIO::get_file_entry(int handle)
                 << " is not an open file handle managed by ⎕FIO, see ⎕FIO 0.";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_FIO::close_handle(int fd)
 {
@@ -197,7 +197,7 @@ Quad_FIO::close_handle(int fd)
    MORE_ERROR() << "Invalid ⎕FIO handle " << fd;
    return -EBADF;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 FILE *
 Quad_FIO::get_FILE(int handle)
 {
@@ -219,7 +219,7 @@ file_entry & fe = get_file_entry(handle);
 
    return fe.fe_FILE;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_FIO::fds_to_val(fd_set * fds, int max_fd)
 {
@@ -238,7 +238,7 @@ Value_P Z(ShapeItem(fd_count), LOC);
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::do_printf(FILE * outf, Value_P A)
 {
@@ -254,7 +254,7 @@ UTF8_string utf(UZ);
    fwrite(utf.c_str(), 1, utf.size(), outf);
    return Token(TOK_APL_VALUE1, IntScalar(UZ.size(), LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FIO::do_sprintf(UCS_string & UZ, const UCS_string & A_format,
                     const Value * B, int b)
@@ -403,7 +403,7 @@ char numbuf[50];
          field_done: ;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_FIO::get_random(APL_Integer mode, APL_Integer len)
 {
@@ -442,7 +442,7 @@ const ssize_t bytes = read(device, buffer, len);
    MORE_ERROR() << "Invalid mode A in A ⎕FIO[60] B";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 Quad_FIO::fget_utf8(FILE * file, ShapeItem & fget_count)
 {
@@ -473,7 +473,7 @@ uint32_t uni = 0;
 
    return Unicode(bx | uni);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a Unicode source from either a file or a UCS_string
 class File_or_String
 {
@@ -635,7 +635,7 @@ protected:
    /// number of chars consumed thus far
    ShapeItem out_len;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::do_scanf(File_or_String & input, const UCS_string & format,
                    int function_number)
@@ -904,13 +904,13 @@ out:
    // shrink Z to the actual number of converted items
    //
 const Shape sh_Z(Z->get_valid_item_count());
-   while (Z->more())   Z->next_ravel_Int(0);
+   while (Z->more())   Z->next_ravel_0();
    Z->check_value(LOC);
    Z->set_shape(sh_Z);
 
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::list_functions(ostream & out, bool mapping)
 {
@@ -1054,7 +1054,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 
    return Token(TOK_APL_VALUE1, Str0(LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_B(Value_P B) const
 {
@@ -1225,7 +1225,7 @@ out_errno:
               << "] B failed: " << strerror(errno);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_AB(Value_P A, Value_P B) const
 {
@@ -1275,7 +1275,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
 
    return list_functions(COUT, false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
@@ -1312,7 +1312,7 @@ const ShapeItem function_number = X->get_cfirst().get_int_value();
    MORE_ERROR() << "Bad function number (axis X) in operator A LO ⎕FIO[X] B";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
@@ -1371,7 +1371,7 @@ const ShapeItem function_number = X->get_cfirst().get_int_value();
 "case use (⎕FIO[X]) or H←⎕FIO[X]\n";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_XB(Value_P X, Value_P B) const
 {
@@ -1701,21 +1701,21 @@ int function_number = -1;
 #ifdef _DIRENT_HAVE_D_OFF
                           Z->next_ravel_Int(dent.d_off);
 #else
-                          Z->next_ravel_Int(1);
+                          Z->next_ravel_1();
 #endif
 
 
 #ifdef _DIRENT_HAVE_D_RECLEN
                           Z->next_ravel_Int(dent.d_reclen);
 #else
-                          Z->next_ravel_Int(1);
+                          Z->next_ravel_1();
 #endif
 
 
 #ifdef _DIRENT_HAVE_D_TYPE
                          Z->next_ravel_Int(dent.d_type);
 #else
-                          Z->next_ravel_Int(1);
+                          Z->next_ravel_1();
 #endif
                         }   // function_number == 28
 
@@ -2199,7 +2199,7 @@ int function_number = -1;
 out_errno:
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_FIO::do_FIO_57(const UCS_string & B, char * const * envp)
 {
@@ -2276,7 +2276,7 @@ char * from = filename;
    CERR << "*** execve() failed in 57 ⎕CR: " << strerror(errno);
    exit(-1);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
@@ -2857,5 +2857,5 @@ out_errno:
               << "] B failed: " << strerror(errno);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

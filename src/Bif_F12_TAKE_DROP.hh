@@ -24,7 +24,7 @@
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 
-//=============================================================================
+//============================================================================
 /** primitive functions Take and First */
 /// The class implementing ↑
 class Bif_F12_TAKE : public NonscalarFunction
@@ -61,7 +61,7 @@ protected:
    /// Take A from B
    Token take(Value_P A, Value_P B);
 };
-//=============================================================================
+//============================================================================
 /** primitive function drop */
 /// The class implementing ↓
 class Bif_F12_DROP : public NonscalarFunction
@@ -84,7 +84,7 @@ public:
 protected:
 
 };
-//=============================================================================
+//============================================================================
 /** A helper class for Bif_F12_TAKE and Bif_F12_DROP. It implements an iterator
     that iterates over the indices (as dictated by left argument A) of the
     right argument B of A↑B or A↓B,
@@ -227,5 +227,5 @@ protected:
    /// true iff this interator has reached its final item
    bool done;
 };
-//=============================================================================
+//============================================================================
 #endif // __BIF_F12_TAKE_DROP_HH_DEFINED__

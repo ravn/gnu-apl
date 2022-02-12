@@ -23,7 +23,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator inner product.
  */
 /// The class implementing f.g
@@ -70,6 +70,6 @@ protected:
    /// the main loop for an inner product with scalar functions
    static void PF_scalar_inner_product(Thread_context & tctx);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_OPER2_INNER_HH_DEFINED__

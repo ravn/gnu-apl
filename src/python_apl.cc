@@ -18,7 +18,7 @@ using namespace std;
 
 static int display_mode = 1;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // initialization...
 
 extern void init_1(const char * argv0, bool log_startup);
@@ -48,7 +48,7 @@ init_if_necessary()
 static bool init_done = false;
    if (!init_done) { do_init(); init_done = true; }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_command(PyObject * self, PyObject * args)
 {
@@ -69,7 +69,7 @@ ostringstream out;
 
   return PyUnicode_DecodeUTF8(out.str().data(), out.str().size(), 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_to_python(const Value * value)
 {
@@ -111,7 +111,7 @@ PyObject * ravel = PyList_New(ravel_len);
 
    return PyTuple_Pack(2, shape, ravel);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject * exec_result = 0;
 
 bool
@@ -159,7 +159,7 @@ bool do_display = false;
 
    return do_display;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_exec(PyObject * self, PyObject * args)
 {
@@ -211,7 +211,7 @@ PyObject * ret = exec_result;
    exec_result = 0;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static const Value *
 apl_get_var_value(PyObject * args)
 {
@@ -242,7 +242,7 @@ const ValueStackItem * top = sym->top_of_stack();
 
    return top->get_apl_value_ptr();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 make_shape(const Shape & shape)
 {
@@ -252,7 +252,7 @@ PyObject * result = PyList_New(shape.get_rank());
 
    return result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_get_shape(PyObject * self, PyObject * args)
 {
@@ -261,7 +261,7 @@ const Value * value = apl_get_var_value(args);
 
    return make_shape(value->get_shape());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 make_ravel(const Value * value)
 {
@@ -289,7 +289,7 @@ PyObject * result = PyList_New(len);
 
    return result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_get_ravel(PyObject * self, PyObject * args)
 {
@@ -297,7 +297,7 @@ const Value * value = apl_get_var_value(args);
    if (value == 0)   return 0;
    return make_ravel(value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_get_value(PyObject * self, PyObject * args)
 {
@@ -308,7 +308,7 @@ PyObject * shape = make_shape(value->get_shape());
 PyObject * ravel = make_ravel(value);
    return PyTuple_Pack(2, shape, ravel);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Shape
 list_to_shape(PyObject * shape)
 {
@@ -327,7 +327,7 @@ const Rank rank = PyList_Size(shape);
        }
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape
 shape_for_item(PyObject * item)
 {
@@ -348,7 +348,7 @@ shape_for_item(PyObject * item)
 PyObject * shape = PyTuple_GetItem(item, 1);
    return list_to_shape(shape);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Value_P python_to_apl(PyObject * ravel, PyObject * shape);
 
 static Value_P
@@ -408,14 +408,14 @@ const ShapeItem len_Z = Z->nz_element_count();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Value_P
 python_to_apl(PyObject * ravel, PyObject * shape)
 {
    if (shape)   return python_to_apl(ravel, list_to_shape(shape));
    else         return python_to_apl(ravel, shape_for_item(ravel));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_set_value(PyObject * self, PyObject * args)
 {
@@ -478,7 +478,7 @@ Value_P value = python_to_apl(ravel, shape);
    sym->assign(value, true, LOC);
    return Py_None;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_fix_function(PyObject * self, PyObject * args)
 {
@@ -506,7 +506,7 @@ UserFunction * fun = UserFunction::fix(text_ucs, error_line, false, LOC,
 
    return PyLong_FromLong(error_line);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyObject *
 apl_set_display(PyObject * self, PyObject * args)
 {
@@ -528,7 +528,7 @@ const int oldmode = display_mode;
    display_mode = mode;
    return PyLong_FromLong(oldmode);
 }
-//=============================================================================
+//============================================================================
 const char * DESCR_help =
 "gnu_apl.help() : print help for a topic.\n"
 "\n"
@@ -736,7 +736,7 @@ const char * DESCR_set_value =
 "    gnu_apl.set_value('Var', [1, [2, 3], 4])    # Var ← 1 (2 3) 4\n"
 ;
 
-//=============================================================================
+//============================================================================
 static PyObject *
 apl_help(PyObject * self, PyObject * args)
 {
@@ -787,7 +787,7 @@ const char * topic = 0;
 
    return Py_None;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static PyMethodDef AplMethods[] =
 {
   { "help",         apl_help,         METH_VARARGS, DESCR_help         },
@@ -801,7 +801,7 @@ static PyMethodDef AplMethods[] =
   { "set_display",  apl_set_display,  METH_VARARGS, DESCR_set_display  },
   { NULL,           0,                0,            0 }   /* Sentinel */
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static struct PyModuleDef apl_module =
 {
   PyModuleDef_HEAD_INIT,
@@ -811,10 +811,10 @@ static struct PyModuleDef apl_module =
                   -1 if the module keeps state in global variables. */
   AplMethods
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PyMODINIT_FUNC
 PyInit_gnu_apl(void)
 {
     return PyModule_Create(&apl_module);
 }
-//=============================================================================
+//============================================================================

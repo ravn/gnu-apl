@@ -43,7 +43,7 @@ class RavelIterator;
 
    default implementation for axis function: ignore axis
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** The base class for all functions (user defined or system functions).  */
 /// Base class for all APL functions and operators (system or defined)
 class Function : public NamedObject
@@ -85,6 +85,40 @@ public:
    /// return \b true iff \b this function is a derived function
    virtual bool is_derived() const
       { return false; }
+
+   /// a monadic Cell function that returns bool
+   typedef bool (*bool_f1)(const Cell & B);
+
+   /// a dyadic Cell function that returns bool
+   typedef bool (*bool_f2)(const Cell & A, const Cell & B);
+
+   /// a monadic function that returns packed bool for packed A
+   typedef uint64_t (*bool_f1_bool)(uint64_t A);
+
+   /// a dyadic function that returns packed bool for packed A and packed B
+   typedef uint64_t (*bool_f2_bool)(uint64_t A, uint64_t B);
+
+   /// return \b a bool_f1() (if any), otherwise 0.
+   virtual bool_f1 get_bool_f1() const
+      { return 0; }
+
+   /// return \b a bool_f2() (if any), otherwise 0.
+   virtual bool_f2 get_bool_f2() const
+      { return 0; }
+
+   /// return \b a bool_f1() (if any), otherwise 0.
+   virtual bool_f1_bool get_bool_f1_bool() const
+      { return 0; }
+
+   /// return \b a bool_f2() (if any), otherwise 0.
+   virtual bool_f2_bool get_bool_f2_bool() const
+      { return 0; }
+
+   /// return \b true iff \b this function returns a (possibly nested)
+   /// boolean result and takes (only) boolean arguments.
+   /// For example: ∧, ∨, ∼, ...
+   virtual bool is_bool_bool() const
+      { return 0; }
 
    /// return \b true if \b eval_XXX may push the SI. True for ⍎, user defined
    /// functions, and operators derived from user defined functions
@@ -272,6 +306,6 @@ protected:
    /// the thresholds for parallel execution
    ShapeItem parallel_thresholds[2];
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __FUNCTION_HH_DEFINED__

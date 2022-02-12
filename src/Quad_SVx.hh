@@ -24,7 +24,7 @@
 #include "QuadFunction.hh"
 #include "SystemVariable.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** some helper functions to start auxiliary processors */
 /// Base class for ⎕SVC, ⎕SVE, ⎕SVO, ⎕SVQ, ⎕SVR, and ⎕SVS
 class Quad_SVx
@@ -40,7 +40,7 @@ protected:
    /// disconnect from auxiliary processor proc if connected.
    static void disconnect(AP_num proc);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕SVC (Shared Variable Control).
  */
@@ -61,7 +61,7 @@ protected:
    /// Overloaded Function::eval_AB().
    virtual Token eval_B(Value_P B) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system variable ⎕SVE (Shared Variable Event).
  */
@@ -82,7 +82,7 @@ protected:
    /// when the current ⎕SVE timer expires (as float)
    static APL_time_us timer_end;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function Quad-SVO (Shared Variable Offer).
  */
@@ -107,7 +107,7 @@ protected:
    static SV_key share_one_variable(AP_num proc, const uint32_t * vname,
                                     SV_Coupling & coupling);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function Quad-SVQ (Shared Variable Query).
  */
@@ -131,7 +131,7 @@ protected:
    /// return variables offered by processor proc
    static Value_P get_variables(AP_num proc);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕SVR (shared Variable Retraction).
  */
@@ -149,7 +149,7 @@ protected:
    /// Overloaded Function::eval_AB().
    virtual Token eval_B(Value_P B) const;
 };
-//=============================================================================
+//============================================================================
 /**
    The system function ⎕SVS (Shared Variable State).
  */
@@ -167,6 +167,6 @@ protected:
    /// Overloaded Function::eval_AB().
    virtual Token eval_B(Value_P B) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __SHARED_VARIABLES_HH_DEFINED__

@@ -47,7 +47,7 @@ struct _deleted_value
   _deleted_value * next;
 };
 
-//=============================================================================
+//===========================================================================
 /**
     An APL value. It consists of a fixed header (rank, shape) and
     and a ravel (a sequence of cells). If the ravel is short, then it
@@ -77,8 +77,9 @@ protected:
    /// constructor: a general array with shape \b sh
    Value(const Shape & sh, const char * loc);
 
-   /// constructor: a packed array with shape \b sh
-   Value(const Shape & sh, uint8_t * bits, const char * loc);
+   /// constructor: a packed array with shape \b sh. The caller has allocated
+   /// the ravel (bits)
+   Value(const Shape & sh, uint64_t * bits, const char * loc);
 
    /// constructor: a simple character vector from a UCS string.
    /// Rank is always 1, so that is_char_vector() will be true.
@@ -145,7 +146,8 @@ public:
    int get_increment() const
       { return element_count() == 1 ? 0 : 1; }
 
-   /// return \b true iff \b this value is a simple character scalar or vector.
+   /// return \b true iff \b this value is a simple character scalar
+   /// or vector.
    bool is_char_string() const
       { return get_rank() <= 1 && is_char_array(); }
 
@@ -188,7 +190,11 @@ public:
    ShapeItem get_shape_item(Rank r) const
       { return shape.get_shape_item(r); }
 
-   /// return the length of the last dimension of \b this value
+   /// return the length of the last dimension of \b this value, i.e. ↑⍴this
+   ShapeItem get_first_shape_item() const
+      { return shape.get_first_shape_item(); }
+
+   /// return the length of the last dimension of \b this value, i.e. ¯1↑⍴this
    ShapeItem get_last_shape_item() const
       { return shape.get_last_shape_item(); }
 
@@ -277,10 +283,11 @@ public:
    void check_lval_consistency() const;
 
    /// return member of this value, defined by \b members. The first name in
-   /// members ist the deepest, while the last name is the name of the variable
-   /// containing the members (and is only used in error printouts).
-   Cell * get_member(const vector<const UCS_string *> & members,
-                     Value * & owner, bool create_if_needed, bool throw_error);
+   /// members is the deepest, while the last name is the name of the
+   /// variable containing the members (and is only used in error printouts).
+   Cell * get_member(const std::vector<const UCS_string *> & members,
+                     Value * & owner, bool create_if_needed,
+                     bool throw_error);
 
    /// return the Cell (if any) containing the data of structured value member
    /// \b member, or 0 if member not found.
@@ -313,10 +320,7 @@ public:
    const Cell & get_cravel(ShapeItem idx) const
       {
         Assert1(idx < nz_element_count());
-        if (!is_packed())   return ravel[idx];
-        const uint8_t * bits = reinterpret_cast<const uint8_t *>(ravel);
-        return bits[idx >> 3] & 1 << (idx & 7) ? IntCell::boolean_TRUE
-                                               : IntCell::boolean_FALSE;
+        return fetcher(idx, ravel);
       }
 
    /// return the first element of the ravel (which is always present).
@@ -422,7 +426,19 @@ public:
    static Rank get_single_axis(const Value * val, Rank max_axis);
 
    /// convert the ravel of Value \b val to a shape (normalized to ⎕IO←0)
+   /// An elided index, for example B[], throws an INDEX_ERROR.
    static Shape to_shape(const Value * val);
+
+   /// return the offset'th ravel cell (of an unpack'ed ravel)
+   static const Cell & cell_fetcher(ShapeItem offset, const Cell * ravel)
+      { return ravel[offset]; }
+
+   /// return the offset'th ravel cell (of an pack'ed ravel)
+   static const Cell & packed_fetcher(ShapeItem offset, const Cell * ravel)
+      { return 1 << (offset & 7) &
+               reinterpret_cast<const uint8_t *>(ravel)[offset >> 3]
+             ? IntCell::boolean_TRUE : IntCell::boolean_FALSE;
+      }
 
    /// glue two values.
    static void glue(Token & token, Token & token_A, Token & token_B,
@@ -512,6 +528,12 @@ public:
    /// initialize the next ravel cell with an integer value
    inline void next_ravel_Int(APL_Integer i);
 
+   /// initialize the next ravel cell with integer 0
+   inline void next_ravel_0();
+
+   /// initialize the next ravel cell with integer 1
+   inline void next_ravel_1();
+
    /// initialize the next ravel position with \b byte. NOTE that in this
    /// case ravel is a uint8_t * and not a Cell * !!!
    inline void next_ravel_Byte(uint8_t byte);
@@ -521,6 +543,9 @@ public:
 
    /// initialize the next ravel cell with an APL sub-value
    inline void next_ravel_Pointer(Value * val);
+
+   /// initialize the next ravel cell with an APL sub-value
+   inline void next_ravel_Pointer(Value * val, uint32_t magic);
 
    /// initialize the next ravel cell from either a APL scalar (if val is one)
    /// or from a non-scalar (producing as PointerCell
@@ -575,7 +600,7 @@ public:
       }
 
    /// returen true if \b sub == \b val or sub is contained in \b val
-   static bool is_or_contains(const Value * val, const Value & sub);
+   static bool is_or_contains(const Value * val, const Value * sub);
 
    /// print debug info about setting or clearing of flags to CERR
    void flag_info(const char * loc, ValueFlags flag, const char * flag_name,
@@ -585,7 +610,7 @@ public:
    static void init();
 
 /// maybe enable LOC for set/clear of flags
-#if defined(VF_TRACING_WANTED) || defined(VALUE_HISTORY_WANTED)   // enable LOC
+#if defined(VF_TRACING_WANTED) || defined(VALUE_HISTORY_WANTED)  // enable LOC
 # define _LOC LOC
 # define _loc loc
 # define _loc_type const char *
@@ -688,7 +713,8 @@ public:
    /// list a value
    ostream & list_one(ostream & out, bool show_owners) const;
 
-   /// check \b that this value is completely initialized, and set complete flag
+   /// check \b that this value was completely initialized, and set
+   /// VF_complete if so.
    void check_value(const char * loc);
 
    /// return the total CDR size (header + data + padding) for \b this value.
@@ -731,8 +757,12 @@ public:
    /// print info related to a stale value
    void print_stale_info(ostream & out, const DynamicObject * dob) const;
 
-   /// expand packed Booleans (in place)
+   /// expand this (packed) Boolean value (in place)
    void explode();
+
+   /// try to implode (pack) this unpacked value. Return 0 on success or
+   /// reason on error;
+   const char * try_implode();
 
    /// print incomplete Values, and return the number of incomplete Values.
    static int print_incomplete(ostream & out);
@@ -821,7 +851,8 @@ protected:
       {
         Assert(is_packed());
         if (!more())   return 0;   // no more valid items
-        return reinterpret_cast<uint8_t *>(ravel) + (valid_ravel_items++ >> 3);
+        return reinterpret_cast<uint8_t *>
+                               (ravel) + (valid_ravel_items++ >> 3);
       }
 
    /// init the ravel of an APL value, return the ravel length
@@ -829,6 +860,9 @@ protected:
 
    /// the shape of \b this value (only the first \b rank values are valid.
    Shape shape;
+
+   /// mux between packed and non-packed ravel cells
+   const Cell & (*fetcher)(ShapeItem offset, const Cell * ravel);
 
    /// number of Value_P objects pointing to this value
    int owner_count;
@@ -910,7 +944,7 @@ private:
    /// restrict use of & (which is frequently a mistake)
    Value * operator &()   { return this; }
 };
-// ----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 extern void print_history(ostream & out, const Value * val, const char * loc);
 
@@ -944,7 +978,7 @@ Value_P Idx0_0(const char * loc);
 /// empty struct
 Value_P EmptyStruct(const char * loc);
 
-// ----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 // NOTE: there exist cross-dependencies between Value.hh and Value_P.hh on
 // one hand and Value.icc and Value_P.icc on the other. It is therefore

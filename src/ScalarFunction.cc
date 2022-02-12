@@ -112,23 +112,20 @@ static volatile _Atomic_word parallel_jobs_lock = 0;
 PJob_scalar_AB * job_AB = 0;
 PJob_scalar_B  * job_B  = 0;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_scalar_B(Value_P B, prim_f1 fun) const
+ScalarFunction::eval_scalar_B(const Value & B, prim_f1 fun) const
 {
-   if (B->get_flags() & VF_packed)   B->explode();
-
-const ShapeItem len_Z = B->element_count();
+const ShapeItem len_Z = B.element_count();
    if (len_Z == 0)   return eval_fill_B(B);
 
 PERFORMANCE_START(start)
 
 ErrorCode ec = E_NO_ERROR;
-Value_P Z = do_scalar_B(ec, B, fun);
+Value_P Z = do_scalar_B(ec, B, fun);   // sets ec
    if (ec != E_NO_ERROR)
       {
-        loop(a, Thread_context::get_active_core_count())
-            Thread_context::get_context(CoreNumber(a))->joblist_B.cancel_jobs();
+        Thread_context::cancel_all_monadic_jobs();
         throw_apl_error(ec, LOC);
       }
 
@@ -140,17 +137,18 @@ PERFORMANCE_END(fs_SCALAR_B, start, Z->nz_element_count());
 
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-ScalarFunction::do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun) const
+ScalarFunction::do_scalar_B(ErrorCode & ec, const Value & B, prim_f1 fun) const
 {
-Value_P Z(B->get_shape(), LOC);
+Value_P Z(B.get_shape(), LOC);
 
-   // create a worklist with one item that computes Z. If nested values are
-   // detected while computing Z then jobs for them are added to the worklist.
+   // create a worklist with one item job_B that computes Z.
+   // If nested values are detected while computing Z, then new jobs for
+   // them are added to the worklist.
    //
    {
-     PJob_scalar_B job_B(Z.get(), B.getref());
+     PJob_scalar_B job_B(Z.get(), B);
      Thread_context::get_master().joblist_B.start(job_B, LOC);
    }
 
@@ -170,7 +168,7 @@ const bool maybe_parallel = Parallel::run_parallel &&
          if (job_B == 0)   break;   // all jobs done
 
 #if PARALLEL_ENABLED
-         if (maybe_parallel && job_B->len_Z > get_monadic_threshold())
+         if (maybe_parallel && job_B.len_Z > get_monadic_threshold())
             {
               // parallel execution...
               //
@@ -198,7 +196,7 @@ PERFORMANCE_END(fs_M_join_B, start_M_join, 1);
                    const Cell & cell_B = job_B->B_at(z);
                    Cell & cell_Z       = job_B->Z_at(z);
 
-                   if (cell_B.is_pointer_cell())
+                   if (cell_B.is_pointer_cell())   // nested B-item
                       {
                         Value_P B1 = cell_B.get_pointer_value();
                         Value_P Z1(B1->get_shape(), LOC);
@@ -207,7 +205,7 @@ PERFORMANCE_END(fs_M_join_B, start_M_join, 1);
                         PJob_scalar_B j1(Z1.get(), B1.getref());
                         Thread_context::get_master().joblist_B.add_job(j1);
                       }
-                   else
+                   else                            // simple B-item
                       {
 PERFORMANCE_START(start_2)
                         ec = (cell_B.*fun)(&cell_Z);
@@ -223,7 +221,7 @@ CELL_PERFORMANCE_END(get_statistics_B(), start_2, z)
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 ScalarFunction::PF_scalar_B(Thread_context & tctx)
 {
@@ -275,64 +273,62 @@ CELL_PERFORMANCE_END(job_B->fun->get_statistics_B(), start_2, z)
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-ScalarFunction::expand_pointers(Value_P Z, Value & Z_owner,
-                                const Cell * cell_A, const Cell * cell_B,
-                                prim_f2 fun) const
+ScalarFunction::expand_nested(Value * Z, const Cell * cell_A,
+                                         const Cell * cell_B, prim_f2 fun) const
 {
    if (cell_A->is_pointer_cell())
       {
-        if (cell_B->is_pointer_cell())   // A and B are both pointers
+        if (cell_B->is_pointer_cell())   // nested A and nested B
            {
-             Value_P value_A = cell_A->get_pointer_value();
-             Value_P value_B = cell_B->get_pointer_value();
+             const Value & value_A = cell_A->get_pointer_value().getref();
+             const Value & value_B = cell_B->get_pointer_value().getref();
              POOL_LOCK(parallel_jobs_lock,
                        Token token = eval_scalar_AB(value_A, value_B, fun))
              Z->next_ravel_Pointer(token.get_apl_val().get());
            }
-        else                             // A is pointer, B is simple
+        else                             // nested A and simple B
            {
-             Value_P value_A = cell_A->get_pointer_value();
+             const Value & value_A = cell_A->get_pointer_value().getref();
              Value_P scalar_B(*cell_B, LOC);
              POOL_LOCK(parallel_jobs_lock,
-                       Token token = eval_scalar_AB(value_A, scalar_B, fun))
+                       Token token = eval_scalar_AB(value_A,
+                                                    scalar_B.getref(), fun))
              Z->next_ravel_Pointer(token.get_apl_val().get());
            }
       }
    else                                  // A is simple
       {
-        if (cell_B->is_pointer_cell())   // A is simple, B is pointer
+        if (cell_B->is_pointer_cell())   // simple A and nested B
            {
              Value_P scalar_A(*cell_A, LOC);
-             Value_P value_B = cell_B->get_pointer_value();
+             const Value & value_B = cell_B->get_pointer_value().getref();
              POOL_LOCK(parallel_jobs_lock,
-                       Token token = eval_scalar_AB(scalar_A, value_B, fun))
+                       Token token = eval_scalar_AB(scalar_A.getref(),
+                                                    value_B, fun))
              Z->next_ravel_Pointer(token.get_apl_val().get());
            }
-   else                                  // A and B are both plain
-         {
-           const ShapeItem pos = Z->get_valid_item_count();
-           Z->next_ravel_Int(0);   // pre-init with 0
-           Cell * cell_Z = &Z->get_wravel(pos);
-           (cell_B->*fun)(cell_Z, cell_A);
-         }
+        else                             // simple A and simple B
+          {
+            const ShapeItem pos = Z->get_valid_item_count();
+            Z->next_ravel_0();   // pre-init with 0
+            (cell_B->*fun)(&Z->get_wravel(pos), cell_A);
+          }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_scalar_AB(Value_P A, Value_P B, prim_f2 fun) const
+ScalarFunction::eval_scalar_AB(const Value & A,
+                               const Value & B, prim_f2 fun) const
 {
 PERFORMANCE_START(start)
-   if (A->get_flags() & VF_packed)   A->explode();
-   if (B->get_flags() & VF_packed)   B->explode();
 
 ErrorCode ec = E_NO_ERROR;
 Value_P Z = do_scalar_AB(ec, A, B, fun);
    if (ec != E_NO_ERROR)
       {
-        loop(a, Thread_context::get_active_core_count())
-           Thread_context::get_context(CoreNumber(a))->joblist_AB.cancel_jobs();
+        Thread_context::cancel_all_dyadic_jobs();
         throw_apl_error(ec, LOC);
       }
 
@@ -344,24 +340,24 @@ PERFORMANCE_END(fs_SCALAR_AB, start, Z->nz_element_count());
 
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-ScalarFunction::do_scalar_AB(ErrorCode & ec, Value_P A, Value_P B,
+ScalarFunction::do_scalar_AB(ErrorCode & ec, const Value & A, const Value & B,
                              prim_f2 fun) const
 {
-const int inc_A = A->get_increment();
-const int inc_B = B->get_increment();
+const int inc_A = A.get_increment();
+const int inc_B = B.get_increment();
 
 const Shape * shape_Z = 0;
-   if      (A->is_scalar())      shape_Z = &B->get_shape();
-   else if (B->is_scalar())      shape_Z = &A->get_shape();
-   else if (inc_A == 0)          shape_Z = &B->get_shape();
-   else if (inc_B == 0)          shape_Z = &A->get_shape();
-   else if (A->same_shape(*B))   shape_Z = &B->get_shape();
+   if      (A.is_scalar())       shape_Z = &B.get_shape();
+   else if (B.is_scalar())       shape_Z = &A.get_shape();
+   else if (inc_A == 0)          shape_Z = &B.get_shape();
+   else if (inc_B == 0)          shape_Z = &A.get_shape();
+   else if (A.same_shape(B))     shape_Z = &B.get_shape();
    else 
       {
-        if (!A->same_rank(*B))   ec = E_RANK_ERROR;
-        else                     ec = E_LENGTH_ERROR;
+        if (A.same_rank(B))   ec = E_LENGTH_ERROR;
+        else                  ec = E_RANK_ERROR;
         return Value_P();
       }
 
@@ -374,7 +370,7 @@ Value_P Z(*shape_Z, LOC);
    // detected while computing Z then jobs for them are added to the worklist.
    //
    {
-     PJob_scalar_AB job_AB(Z.get(), A.getref(), inc_A, B.getref(), inc_B);
+     PJob_scalar_AB job_AB(Z.get(), A, inc_A, B, inc_B);
      Thread_context::get_master().joblist_AB.start(job_AB, LOC);
    }
 
@@ -425,29 +421,29 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                          {
                            // both A and B are nested
                            //
-                           Value_P A1 = cell_A.get_pointer_value();
-                           Value_P B1 = cell_B.get_pointer_value();
-                           const int inc_A1 = A1->get_increment();
-                           const int inc_B1 = B1->get_increment();
-                           const Shape * sh_Z1 = &B1->get_shape();
-                           if      (A1->is_scalar())  sh_Z1 = &B1->get_shape();
-                           else if (B1->is_scalar())  sh_Z1 = &A1->get_shape();
-                           else if (inc_B1 == 0)      sh_Z1 = &A1->get_shape();
+                           const Value & A1 =
+                                    cell_A.get_pointer_value().getref();
+                           const Value & B1 =
+                                    cell_B.get_pointer_value().getref();
+                           const int inc_A1 = A1.get_increment();
+                           const int inc_B1 = B1.get_increment();
+                           const Shape * sh_Z1 = &B1.get_shape();
+                           if      (A1.is_scalar())  sh_Z1 = &B1.get_shape();
+                           else if (B1.is_scalar())  sh_Z1 = &A1.get_shape();
+                           else if (inc_B1 == 0)      sh_Z1 = &A1.get_shape();
 
-                           if (inc_A1 && inc_B1 && !A1->same_shape(*B1))
+                           if (inc_A1 && inc_B1 && !A1.same_shape(B1))
                               {
-                                if (!A1->same_rank(*B1))   ec = E_RANK_ERROR;
-                                else                       ec = E_LENGTH_ERROR;
+                                if (A1.same_rank(B1))   ec = E_LENGTH_ERROR;
+                                else                     ec = E_RANK_ERROR;
                                 return Value_P();
                               }
 
                            const ShapeItem len_Z1 = sh_Z1->get_volume();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1 =
-                                        eval_fill_AB(A1, B1).get_apl_val();
-                                new (&cell_Z) PointerCell(Z1.get(),
-                                                          *job_AB->value_Z);
+                                Value_P Z1 = eval_fill_AB(A1, B1).get_apl_val();
+                                job_AB->value_Z->next_ravel_Pointer(Z1.get());
                                 continue;
                               }
 
@@ -456,9 +452,7 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                                PointerCell(Z1.get(), *job_AB->value_Z,
                                            0x6B616769);
 
-                           PJob_scalar_AB j1(Z1.get(),
-                                             A1.getref(), inc_A1,
-                                             B1.getref(), inc_B1);
+                           PJob_scalar_AB j1(Z1.get(), A1, inc_A1, B1, inc_B1);
                            Thread_context::get_master()
                                           .joblist_AB.add_job(j1);
                          }
@@ -466,10 +460,11 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                          {
                            // A is nested, B is simple
                            //
-                           Value_P A1 = cell_A.get_pointer_value();
-                           const int inc_A1 = A1->get_increment();
+                           const Value & A1 =
+                                    cell_A.get_pointer_value().getref();
+                           const int inc_A1 = A1.get_increment();
 
-                           const ShapeItem len_Z1 = A1->element_count();
+                           const ShapeItem len_Z1 = A1.element_count();
                            if (len_Z1 == 0)
                               {
                                 Value_P Z1 = eval_fill_AB(A1, B).get_apl_val();
@@ -478,14 +473,13 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                               }
                            else
                               {
-                                 Value_P Z1(A1->get_shape(), LOC);
+                                 Value_P Z1(A1.get_shape(), LOC);
                                  if (!Z1)   WS_FULL;
                                  new (&cell_Z)
                                      PointerCell(Z1.get(),*job_AB->value_Z,
                                                  0x6B616769);
 
-                                 PJob_scalar_AB j1(Z1.get(),
-                                                   A1.getref(), inc_A1,
+                                 PJob_scalar_AB j1(Z1.get(), A1, inc_A1,
                                                    cell_B);
                                  Thread_context::get_master().joblist_AB
                                                              .add_job(j1);
@@ -496,10 +490,11 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                          {
                            // B is nested, A is not
                            //
-                           Value_P B1 = cell_B.get_pointer_value();
-                           const int inc_B1 = B1->get_increment();
+                           const Value & B1 =
+                                    cell_B.get_pointer_value().getref();
+                           const int inc_B1 = B1.get_increment();
 
-                           const ShapeItem len_Z1 = B1->element_count();
+                           const ShapeItem len_Z1 = B1.element_count();
                            if (len_Z1 == 0)
                               {
                                 Value_P Z1 = eval_fill_AB(A, B1).get_apl_val();
@@ -508,15 +503,13 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                               }
                            else
                               {
-                                Value_P Z1(B1->get_shape(), LOC);
+                                Value_P Z1(B1.get_shape(), LOC);
 
                                 new (&cell_Z)
                                     PointerCell(Z1.get(), *job_AB->value_Z,
                                                 0x6B616769);
 
-                                PJob_scalar_AB j1(Z1.get(),
-                                                  cell_A,
-                                                  B1.getref(), inc_B1);
+                                PJob_scalar_AB j1(Z1.get(), cell_A, B1, inc_B1);
                                 Thread_context::get_master()
                                                .joblist_AB.add_job(j1);
                              }
@@ -536,12 +529,12 @@ CELL_PERFORMANCE_END(get_statistics_AB(), start_2, z)
         job_AB->value_Z->check_value(LOC);
       }
 
-   Z->set_default(*B.get(), LOC);
+   Z->set_default(B, LOC);
    Z->check_value(LOC);
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 ScalarFunction::PF_scalar_AB(Thread_context & tctx)
 {
@@ -673,38 +666,38 @@ CELL_PERFORMANCE_END(job_AB->fun->get_statistics_AB(), start_2, z)
                    }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_fill_AB(Value_P A, Value_P B) const
+ScalarFunction::eval_fill_AB(const Value & A, const Value & B) const
 {
    // eval_fill_AB() is called when A or B (or both) are empty.
    //
-   if (B->element_count() == 0)   // B is empty
+   if (B.element_count() == 0)   // B is empty
       {
-        if (B->get_cfirst().is_numeric() ||
-            B->get_cfirst().is_character_cell())
+        if (B.get_cfirst().is_numeric() ||
+            B.get_cfirst().is_character_cell())
            {
-             Value_P Z(B->get_shape(), LOC);
+             Value_P Z(B.get_shape(), LOC);
              Z->check_value(LOC);
              return Token(TOK_APL_VALUE1, Z);
            }
 
-        Value_P Z = B->clone(LOC);
+        Value_P Z = B.clone(LOC);
         Z->to_proto();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   if (A->element_count() == 0)   // A is empty
+   if (A.element_count() == 0)   // A is empty
       {
-        if (A->get_cfirst().is_numeric() ||
-            A->get_cfirst().is_character_cell())
+        if (A.get_cfirst().is_numeric() ||
+            A.get_cfirst().is_character_cell())
            {
-             Value_P Z(A->get_shape(), LOC);
+             Value_P Z(A.get_shape(), LOC);
              Z->check_value(LOC);
              return Token(TOK_APL_VALUE1, Z);
            }
-        Value_P Z = A->clone(LOC);
+        Value_P Z = A.clone(LOC);
         Z->to_proto();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -712,44 +705,43 @@ ScalarFunction::eval_fill_AB(Value_P A, Value_P B) const
 
    // both A and B are empty
    //
-   if (A->get_rank() != A->get_rank())   RANK_ERROR;
-   if (!A->same_shape(*B))               LENGTH_ERROR;
+   if (A.get_rank() != B.get_rank())   RANK_ERROR;
+   if (!A.same_shape(B))               LENGTH_ERROR;
 
    // Value::prototype() does not work here, so we clone() and to_proto()
    //
-Value_P Z = B->clone(LOC);
+Value_P Z = B.clone(LOC);
    Z->to_proto();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 
 //   return Bif_F2_UNEQU::fun.eval_AB(A, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_fill_B(Value_P B) const
+ScalarFunction::eval_fill_B(const Value & B) const
 {
    // eval_fill_B() is called when a scalar function with empty B is called
    //
    // lrm p. 56: When the prototypes of the empty arguments are simple
    //            scalars, return a zero prototype
    //
-   if (B->get_cfirst().is_numeric() ||
-       B->get_cfirst().is_character_cell())
+   if (B.get_cfirst().is_numeric() || B.get_cfirst().is_character_cell())
       {
-        Value_P Z(B->get_shape(), LOC);
+        Value_P Z(B.get_shape(), LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
    // Value::prototype() does not work here, so we clone() and to_proto()
    //
-Value_P Z = B->clone(LOC);
+Value_P Z = B.clone(LOC);
    Z->to_proto();
    Z->check_value(LOC);
 
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 ScalarFunction::eval_scalar_identity_fun(Value_P B, Axis axis, Value_P FI0)
 {
@@ -784,8 +776,7 @@ const Cell & cell_FI0 = FI0->get_cfirst();
         loop(s, len_sub)   sub->next_ravel_Cell(cell_FI0);
         sub->check_value(LOC);
 
-        while (Z->more())
-           Z->next_ravel_Pointer(sub->clone(LOC).get());
+        while (Z->more())   Z->next_ravel_Pointer(sub->clone(LOC).get());
       }
    else
       {
@@ -796,21 +787,17 @@ const Cell & cell_FI0 = FI0->get_cfirst();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_scalar_AXB(Value_P A, Value_P X, Value_P B,
-                                prim_f2 fun) const
+ScalarFunction::eval_scalar_AXB(const Value & A, const Value & X,
+                                const Value & B, prim_f2 fun) const
 {
-   if (A->get_flags() & VF_packed)   A->explode();
-   if (B->get_flags() & VF_packed)   B->explode();
-   if (X->get_flags() & VF_packed)   B->explode();
-
 PERFORMANCE_START(start_1)
 
    {
      int sec = 0;
-     if (A->is_scalar_extensible())   ++sec;
-     if (B->is_scalar_extensible())   ++sec;
+     if (A.is_scalar_extensible())   ++sec;
+     if (B.is_scalar_extensible())   ++sec;
 
      /* avoid a conflict between scalar extension and axis of 1-element
         values with different ranks, e.g.
@@ -819,30 +806,31 @@ PERFORMANCE_START(start_1)
 
          which could lead to the wrong (smaller rank) shape of the result
       */
-     if (!X || sec == 1 ||
-         (sec == 2 && A->same_rank(*B))   // ← conflict if ranks differ
+     if (sec == 1 ||
+         (sec == 2 && A.same_rank(B))   // ← conflict if ranks differ
         ) return eval_scalar_AB(A, B, fun);
    }
 
-   if (X->get_rank() > 1)   AXIS_ERROR;
+   if (X.get_rank() > 1)   AXIS_ERROR;
 
 const APL_Integer qio = Workspace::get_IO();
-const Rank rank_A = A->get_rank();
-const Rank rank_B = B->get_rank();
-bool axis_in_X[MAX_RANK];
-   loop(r, MAX_RANK)   axis_in_X[r] = false;
-
-const ShapeItem len_X = X->element_count();
+const Rank rank_A = A.get_rank();
+const Rank rank_B = B.get_rank();
+ShapeItem axes_in_X = 0;   // bitmap of axes mentioned in X
+const ShapeItem len_X = X.element_count();
 
    loop(iX, len_X)
        {
-         APL_Integer i = X->get_cravel(iX).get_near_int() - qio;
-         if (i < 0)                        AXIS_ERROR;   // too small
-         if (i >= rank_A && i >= rank_B)   AXIS_ERROR;   // too large
-         if (axis_in_X[i])                 AXIS_ERROR;   // twice
-         axis_in_X[i] = true;
+         APL_Integer i = X.get_cravel(iX).get_near_int() - qio;
+         if (i < 0)                        AXIS_ERROR;   // axis i too small
+         if (i >= rank_A && i >= rank_B)   AXIS_ERROR;   // axis i too large
+         if (axes_in_X & 1 << i)           AXIS_ERROR;   // axis i used twice
+         axes_in_X |= 1 << i;
        }
 
+   // if A and B have the same rank, then all axes must be in and A f[X} B
+   // is the same as A f B.
+   //
    if (rank_A == rank_B)
       {
         if (rank_A != len_X)   AXIS_ERROR;
@@ -853,7 +841,7 @@ const ShapeItem len_X = X->element_count();
       {
         if (rank_A != len_X)   AXIS_ERROR;
 
-        Value_P Z = eval_scalar_AXB(A, axis_in_X, B, fun, false);
+        Value_P Z = eval_scalar_AXB(A, axes_in_X, B, fun, false);
 PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count())
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -861,69 +849,74 @@ PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count())
       {
         if (rank_B != len_X)   AXIS_ERROR;
 
-        Value_P Z = eval_scalar_AXB(B, axis_in_X, A, fun, true);
+        Value_P Z = eval_scalar_AXB(B, axes_in_X, A, fun, true);
 PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count())
         return Token(TOK_APL_VALUE1, Z);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-ScalarFunction::eval_scalar_AXB(Value_P A, bool * axis_in_X, Value_P B,
-                                prim_f2 fun, bool reversed) const
+ScalarFunction::eval_scalar_AXB(const Value & A, ShapeItem axes_in_X,
+                                const Value & B, prim_f2 fun,
+                                bool reversed) const
 {
-   // A is the value with the smaller rank.
-   // B the value with the larger rank.
+   // A is the value with the smaller rank (possibly a scalar).
+   // B the value with the larger rank (neve a scalar).
    //
    // If (reversed) then A and B have changed roles (in order to
-   /// make A the value with the smaller rank).
+   // make A the value with the smaller rank).
 
-   // check that A and B agree on the axes in X
+   // 1. check that A and B agree on the axes in X (common axes of A and B
+   // nust have the same length).
    //
    {
      Rank rA = 0;
-     loop(rB, B->get_rank())
+     loop(rB, B.get_rank())
          {
-            if (axis_in_X[rB])
+            if (axes_in_X & 1 << rB)
                {
                  // if the axis is in X then the corresponding shape items in
                  // A and B must agree.
                  //
-                 if (B->get_shape_item(rB) != A->get_shape_item(rA++))
+                 if (B.get_shape_item(rB) != A.get_shape_item(rA++))
                     LENGTH_ERROR;
                }
          }
    }
 
-Shape weights_A = A->get_shape().get_weights();
+Shape weights_A = A.get_shape().get_weights();
 
-Value_P Z(B->get_shape(), LOC);
+Value_P Z(B.get_shape(), LOC);
 
-const Cell * cB = &B->get_cfirst();
+const Cell * cB = &B.get_cfirst();
 
-   for (ArrayIterator it(B->get_shape()); it.more(); ++it)
+   for (ArrayIterator it_B(B.get_shape()); it_B.more(); ++it_B)
        {
          ShapeItem wA = 0;   // weigth of the A axes in X
          Rank rA = 0;
-         loop(rB, B->get_rank())
+         loop(rB, B.get_rank())
              {
-               if (axis_in_X[rB])
+               if (axes_in_X & 1 << rB)
                   {
                     wA += weights_A.get_shape_item(rA++)
-                       * it.get_shape_offset(rB);
+                       * it_B.get_shape_offset(rB);
                   }
              }
 
-         const Cell * cA = &A->get_cravel(wA);
-         if (reversed)   expand_pointers(Z, Z.getref(), cB++, cA, fun);
-         else            expand_pointers(Z, Z.getref(), cA, cB++, fun);
+         const Cell * cA = &A.get_cravel(wA);
+
+         // restore the original order of A and B
+         //
+         if (reversed)   expand_nested(Z.get(), cB++, cA, fun);
+         else            expand_nested(Z.get(), cA, cB++, fun);
        }
 
-   Z->set_default(*B.get(), LOC);
+   Z->set_default(B, LOC);
 
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F2_FIND::eval_AB(Value_P A, Value_P B) const
 {
@@ -937,7 +930,7 @@ const ShapeItem len_Z = Z->element_count();
 
    if (A->get_rank() > B->get_rank())   // then Z is all zeros.
       {
-        loop(z, len_Z)   Z->next_ravel_Int(0);
+        loop(z, len_Z)   Z->next_ravel_0();
         goto done;
       }
 
@@ -955,7 +948,7 @@ const ShapeItem len_Z = Z->element_count();
        {
          if (shape_A.get_shape_item(r) > B->get_shape_item(r))
             {
-              loop(z, len_Z)   Z->next_ravel_Int(0);
+              loop(z, len_Z)   Z->next_ravel_0();
               goto done;
             }
        }
@@ -964,9 +957,9 @@ const ShapeItem len_Z = Z->element_count();
        {
 PERFORMANCE_START(start_2)
          if (contained(shape_A, &A->get_cfirst(), B, zi.get_shape_offsets(), qct))
-            Z->next_ravel_Int(1);
+            Z->next_ravel_1();
          else
-            Z->next_ravel_Int(0);
+            Z->next_ravel_0();
 
 CELL_PERFORMANCE_END(get_statistics_AB(), start_2, B->get_shape().get_volume())
        }
@@ -977,7 +970,7 @@ done:
 PERFORMANCE_END(fs_SCALAR_AB, start_1, len_Z);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 bool
 Bif_F2_FIND::contained(const Shape & shape_A, const Cell * cA,
                        Value_P B, const Shape & idx_B, double qct)
@@ -985,7 +978,7 @@ Bif_F2_FIND::contained(const Shape & shape_A, const Cell * cA,
    /* quick check (along each  axis): before comparing any ravel elements,
       we check that A, when offset by idx_B, fits into B:
 
-       ├─── IDX B ───┤├────── A ──────┤
+       ├─── idx B ───┤├────── A ──────┤
        ├───────────────── B ─────────────────┤
 
 
@@ -1012,7 +1005,7 @@ const Shape weights_B = B->get_shape().get_weights();
 
    return true;
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_ROLL::eval_AB(Value_P A, Value_P B) const
 {
@@ -1054,18 +1047,18 @@ uint8_t * used = new uint8_t[(set_size + 7)/8];
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_ROLL::eval_B(Value_P B) const
 {
    // the standard wants ? to be atomic. We therefore check beforehand
    // that all elements of B are proper, and throw an error if not
    //
-   if (check_B(*B, Workspace::get_CT()))   DOMAIN_ERROR;
+   if (check_B(B.getref(), Workspace::get_CT()))   DOMAIN_ERROR;
 
-   return eval_scalar_B(B, &Cell::bif_roll);
+   return eval_scalar_B(B.getref(), &Cell::bif_roll);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Bif_F12_ROLL::check_B(const Value & B, const double qct)
 {
@@ -1089,7 +1082,7 @@ const Cell * C = &B.get_cfirst();
 
    return false;
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_WITHOUT::eval_AB(Value_P A, Value_P B) const
 {
@@ -1136,7 +1129,7 @@ ShapeItem len_Z = 0;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_WITHOUT::large_eval_AB(const Value * A, const Value * B)
 {
@@ -1198,88 +1191,88 @@ Value_P Z(len_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 // Inverse functions...
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_POWER::get_monadic_inverse() const
 {
    return Bif_F12_LOGA::fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_POWER::get_dyadic_inverse() const
 {
    return Bif_F12_LOGA::fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_LOGA::get_monadic_inverse() const
 {
    return Bif_F12_POWER::fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_LOGA::get_dyadic_inverse() const
 {
    return Bif_F12_POWER::fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_TIMES::get_dyadic_inverse() const
 {
    if (this == fun)   return fun_inverse;
    else               return fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_DIVIDE::get_monadic_inverse() const
 {
    // ÷ is self-inverse: B = ÷÷B
    return Bif_F12_DIVIDE::fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_DIVIDE::get_dyadic_inverse() const
 {
    // ÷ is self-inverse: B = (A÷(A÷B))
    return Bif_F12_DIVIDE::fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_PLUS::get_dyadic_inverse() const
 {
    if (this == fun)   return fun_inverse;
    else               return fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_MINUS::get_monadic_inverse() const
 {
    // - is self-inverse: B = --B
    return Bif_F12_PLUS::fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_MINUS::get_dyadic_inverse() const
 {
    // - is self-inverse: B = (A-(A-B))
    return Bif_F12_PLUS::fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_CIRCLE::get_monadic_inverse() const
 {
    if (this == fun)   return fun_inverse;
    else               return fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Bif_F12_CIRCLE::get_dyadic_inverse() const
 {
    if (this == fun)   return fun_inverse;
    else               return fun;
 }
-//=============================================================================
+//============================================================================
 

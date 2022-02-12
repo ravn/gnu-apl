@@ -247,7 +247,7 @@ protected:
    /// print item separator
    static void item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif //__Quad_CR_HH_DEFINED__
 

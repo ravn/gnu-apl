@@ -30,7 +30,7 @@
 
 class Nabla;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// kind of input
 enum LineInputMode
 {
@@ -40,7 +40,7 @@ enum LineInputMode
    LIM_Quad_INP,
    LIM_Nabla,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the lines that the user has previously entered
 class LineHistory
 {
@@ -126,7 +126,7 @@ protected:
    /// the history
    UCS_string_vector hist_lines;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a context for one user-input line
 class LineEditContext
 {
@@ -275,7 +275,7 @@ protected:
    /// a buffer for ^K/^Y
    static UCS_string cut_buffer;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a callback function to be called instead of get_line()
 typedef void get_line_cb(LineInputMode mode, const UCS_string & prompt,
                          UCS_string & line, bool & eof, LineHistory & hist);
@@ -304,7 +304,7 @@ protected:
    /// It will be called instead of \b get_line() if non-0
    static get_line_cb * get_line_callback;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a class for obtaining one line of input from the user (editable)
 class LineInput
 {
@@ -380,7 +380,7 @@ protected:
    /// single LineInput instance that restores stdin termios on destruction
    static LineInput * the_line_input;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** A mapping from ESC sequences to (internal) pseudo-Unicodes such as
     UNI_CursorUp and friends
  */
@@ -411,6 +411,6 @@ struct ESCmap
    /// a mapping from keyboard escape sequences to Unicodes
    static ESCmap the_ESCmap[];
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __LINEINPUT_HH_DEFINED__

@@ -91,7 +91,7 @@ struct Plot_context
    xcb_gcontext_t     text;       ///< the curren text style
    xcb_font_t         font;       ///< the curren font
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the supposed width and the height of a string (in pixels)
 struct string_width_height
 {
@@ -104,7 +104,7 @@ struct string_width_height
    /// the height of the string (pixels)
    Pixel_Y height;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 string_width_height::string_width_height(const Plot_context & pctx,
                                          const char * string)
 {
@@ -135,7 +135,7 @@ const xcb_query_text_extents_cookie_t cookie =
         height = 13;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
            const char * errMessage)
@@ -148,7 +148,7 @@ xcb_generic_error_t * error = xcb_request_check(conn, cookie);
         exit (-1);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 xcb_gcontext_t
 setup_font_gc(Plot_context & pctx, const char * font_name, Color canvas_color)
 {
@@ -165,7 +165,7 @@ uint32_t values[3] = { 0x00FFFFFF & ~canvas_color, canvas_color, pctx.font };
               pctx.conn, "can't create font gc");
    return gc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 # define XFT   0   /* draw text with Xdt */
 # define PANGO 0   /* draw text with pango */
 # if XFT
@@ -236,7 +236,7 @@ xcb_void_cookie_t textCookie = xcb_image_text_8_checked(pctx.conn,
               "xcb_image_text_8_checked() failed.");
 # endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 char *
 format_tick(double val)
 {
@@ -287,7 +287,7 @@ const char * unit = 0;
    else                  snprintf(cp, sizeof(cc) - 1, "%.0f%s", val, unit);
    return cc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 draw_line(const Plot_context & pctx, xcb_gcontext_t gc,
           const Pixel_XY & P0, const Pixel_XY & P1)
@@ -295,14 +295,14 @@ draw_line(const Plot_context & pctx, xcb_gcontext_t gc,
 const xcb_segment_t segment = { I1616(P0.x, P0.y), I1616(P1.x, P1.y) };
    xcb_poly_segment(pctx.conn, pctx.window, gc, 1, &segment);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
 {
 const double   Y = Y0;   Y0 = Y1;   Y1 = Y;
 const Pixel_XY P = P0;   P0 = P1;   P1 = P;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline double
 intersection(double Ax, double Ay, double Bx, double By,
              double Cx, double Cy, double Dx, double Dy)
@@ -365,26 +365,26 @@ const double denom = ((-Bx)*(Dy-Ay) - (-By)*(Dx-Ax));     // right factor
 
    return /* beta == */ numer/denom;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 set_GC_attr(const Plot_context & pctx, xcb_gcontext_t gc,
             xcb_gc_t mask, uint32_t value)
 {
    xcb_change_gc(pctx.conn, gc, mask, &value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 set_GC_foreground(const Plot_context & pctx, xcb_gcontext_t gc, Color color)
 {
    set_GC_attr(pctx, gc, XCB_GC_FOREGROUND, color);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 set_GC_line_width(const Plot_context & pctx, xcb_gcontext_t gc, int width)
 {
    set_GC_attr(pctx, gc, XCB_GC_LINE_WIDTH, width);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 draw_triangle(const Plot_context & pctx, int verbosity,
               Pixel_XY P0, double H0, Pixel_XY P1, Pixel_XY P2, double H12)
@@ -417,7 +417,7 @@ const double dH = (H12 - H0) / steps;
          draw_line(pctx, pctx.fill, P0_P1, P0_P2);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 draw_triangle(const Plot_context & pctx, int verbosity, Pixel_XY P0, double H0,
               Pixel_XY P1, double H1, Pixel_XY P2, double H2)
@@ -463,7 +463,7 @@ draw_triangle(const Plot_context & pctx, int verbosity, Pixel_XY P0, double H0,
         draw_triangle(pctx, verbosity, P2, H2, P1, P, H1);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 draw_point(const Plot_context & pctx, const Pixel_XY & xy, Color canvas_color,
            const Plot_line_properties & l_props)
@@ -603,7 +603,7 @@ const Color point_color = l_props.get_point_color();
 
    // otherwise: draw no point
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// draw the legend
 void
 draw_legend(const Plot_context & pctx, const Plot_window_properties & w_props)
@@ -663,7 +663,7 @@ const int dy = w_props.get_legend_dY();
        }
      xcb_flush(pctx.conn);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// draw the grid lines that start at the X axis
 void
 draw_X_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
@@ -711,7 +711,7 @@ const Pixel_Y py1 = w_props.valY2pixel(dy);
            }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// draw the grid lines that start at the Y axis
 void
 draw_Y_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
@@ -761,7 +761,7 @@ const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
 
    if (!surface)   return;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// draw the grid lines that start at the Z axis
 void
 draw_Z_grid(const Plot_context & pctx, const Plot_window_properties & w_props)
@@ -797,7 +797,7 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_max_Y())
         draw_text(pctx, cc, Pixel_XY(px1 + 10, py0 + wh.height/2 - 1));
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// draw the plot lines
 void
 draw_plot_lines(const Plot_context & pctx,
@@ -839,7 +839,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// draw the surface plot lines
 void
 draw_surface_lines(const Plot_context & pctx,
@@ -1012,7 +1012,7 @@ const int verbosity = w_props.get_verbosity();
          draw_point(pctx, P0, canvas_color, *l_props[0]);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 do_plot(const Plot_context & pctx,
         const Plot_window_properties & w_props, const Plot_data & data)
@@ -1044,7 +1044,7 @@ const bool surface = data.is_surface_plot();   // 2D or 3D plot ?
    //
    draw_legend(pctx, w_props);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 xcb_atom_t
 get_atom_ID(xcb_connection_t * conn, int only_existing, const char * name)
 {
@@ -1053,7 +1053,7 @@ xcb_intern_atom_cookie_t cookie = xcb_intern_atom(conn, only_existing,
 xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
    return reply.atom;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 save_file(const char * outfile, Display * dpy, int window,
           const Plot_context & pctx)
@@ -1211,7 +1211,7 @@ const Colormap cmap = XDefaultColormap(dpy, screen);
    fclose(bmp);
    CERR << "output file " << outfile_utf8 << " written" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void *
 plot_main(void * vp_props)
 {

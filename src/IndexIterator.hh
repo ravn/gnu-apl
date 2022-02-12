@@ -21,7 +21,7 @@
 #include "Shape.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    An iterator for one dimension of indices. When the iterator reached its
    end, it wraps around and increments its upper IndexIterator (if any).
@@ -79,7 +79,7 @@ protected:
    /// The current value.
    ShapeItem pos;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Iterator for an elided index (= ⍳(⍴B)[N] for some N)
 class ElidedIndexIterator : public IndexIterator
 {
@@ -96,7 +96,7 @@ public:
    virtual ShapeItem get_pos(ShapeItem i) const
       { Assert(i < count);   return i; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// an IndexIterator for a true (i.e. non-elided) index array
 class TrueIndexIterator : public IndexIterator
 {
@@ -121,7 +121,7 @@ protected:
    /// the indices
    ShapeItem * indices;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     a multi-dimensional index iterator, consisting of several
    one-dimensional iterators.
@@ -153,5 +153,5 @@ protected:
    /// true if one of the iterators has length 0
    bool empty;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

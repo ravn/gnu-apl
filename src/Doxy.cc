@@ -35,14 +35,14 @@ using namespace std;
 #define BRLF "<BR>\r\n"
 #define CRLF "\r\n"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a helper for sorting Symbol * by symbol name
 static bool
 symcomp(const Symbol * const & s1, const Symbol * const & s2, const void *)
 {
    return s2->get_name().compare(s1->get_name()) == COMP_LT;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
    : out(cout),
      root_dir(dest_dir),
@@ -82,7 +82,7 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
       }
    write_css();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::write_css()
 {
@@ -118,7 +118,7 @@ ofstream css(css_filename.c_str());
 
    css.close();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::gen()
 {
@@ -227,7 +227,7 @@ const UCS_string alias = "all_functions";
 "</HTML>"                                                                  CRLF;
    page.close();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::functions_table(const std::vector<const Symbol *> & functions,
                       ofstream & page)
@@ -355,7 +355,7 @@ int total_lines = 0;
         << total_lines <<                                                  CRLF
 "   </TABLE>"                                                              CRLF;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::variables_table(const std::vector<const Symbol *> & variables,
                        ofstream & page)
@@ -426,7 +426,7 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
    page <<
 "   </TABLE>"                                                              CRLF;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::SI_table(ofstream & page)
 {
@@ -529,7 +529,7 @@ std::vector<const StateIndicator *> stack;
    page <<
 "   </TABLE>"                                                              CRLF;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::function_page(const UserFunction * ufun, const UCS_string & alias)
 {
@@ -647,7 +647,7 @@ ofstream page(fun_filename.c_str());
 
    page.close();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::bold_name(ostream & of, const UserFunction * ufun) const
 {
@@ -669,7 +669,7 @@ const char * bold = "<span style='font-weight: bold'>";
 
    if (header.B())   of << " " << header.B()->get_name();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::make_call_graph(const std::vector<const Symbol *> & all_fns)
 {
@@ -689,7 +689,7 @@ Doxy::make_call_graph(const std::vector<const Symbol *> & all_fns)
             }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::add_fun_to_call_graph(const Symbol * caller_sym,
                             const UserFunction * ufun)
@@ -755,7 +755,7 @@ const Token_string & body = ufun->get_body();
             }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::set_call_graph_root(const UserFunction * ufun)
 {
@@ -866,7 +866,7 @@ bool progress = true;
             << " alias: " << aliases[n] << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Doxy::write_call_graph(const UserFunction * ufun, const UCS_string & alias,
                        bool caller)
@@ -948,7 +948,7 @@ int ret = gv_to_png(cg_filename.c_str(), png_filename.c_str(), false);
       ret = gv_to_png(cg_filename.c_str(), cmapx_filename.c_str(), true);
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int Doxy::node_ID(const UserFunction * ufun)
 {
    loop(n, nodes.size())
@@ -956,7 +956,7 @@ int Doxy::node_ID(const UserFunction * ufun)
 
    return -1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Doxy::swap_caller_calee()
 {
@@ -969,7 +969,7 @@ Doxy::swap_caller_calee()
          call_graph[cg].callee_name = edge.caller_name;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Doxy::gv_to_png(const char * gv_filename, const char * out_filename, bool cmapx)
 {
@@ -1014,7 +1014,7 @@ char buffer[1000];
       }
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Doxy::fun_anchor(const UCS_string & name)
 {

@@ -23,7 +23,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function index of (⍳) */
 /// The class implementing ⍳
 class Bif_F12_INDEX_OF : public NonscalarFunction
@@ -62,7 +62,7 @@ protected:
    /// compare function for Heapsort<ShapeItem>::search<const Cell &>
    static int bs_cmp(const Cell & cell, const ShapeItem & A, const void * ctx);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __Bif_F12_INDEX_OF_HH_DEFINED__
 

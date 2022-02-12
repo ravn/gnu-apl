@@ -32,7 +32,7 @@
 
 class File_or_String;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /**
    The system function Quad-FIO (File I/O)
@@ -152,11 +152,11 @@ protected:
 
    /// return the open file for (APL integer) \b handle
    static file_entry & get_file_entry(const Value & handle)
-      { return get_file_entry(handle.get_cravel(0).get_near_int()); }
+      { return get_file_entry(handle.get_cscalar().get_near_int()); }
 
    /// return the open FILE * (APL integer) \b handle
    static FILE * get_FILE(const Value & handle)
-      { return get_FILE(handle.get_cravel(0).get_near_int()); }
+      { return get_FILE(handle.get_cscalar().get_near_int()); }
 
    /// return the open file descriptor for (APL integer) \b handle
    static int get_fd(const Value & value)
@@ -202,6 +202,6 @@ protected:
    /// the open files
    static std::vector<file_entry> open_files;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif //  __QUAD_FIO_HH_DEFINED__
 

@@ -26,20 +26,20 @@
 #include "Symbol.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_CR::_sub_fun Quad_CR::sub_functions[] =
 {
 #define crdef(N, name)   { N, #name },
 #include "Quad_CR.def"
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_CR::fun_compare(const void * key, const void * sf)
 {
    return strcasecmp(reinterpret_cast<const char *>(key),
                      reinterpret_cast<const _sub_fun *>(sf)->key);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_CR::list_functions(ostream & out, bool mapping)
 {
@@ -124,7 +124,7 @@ Quad_CR::list_functions(ostream & out, bool mapping)
       }
   return Token(TOK_APL_VALUE1, Str0(LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_CR::eval_B(Value_P B) const
 {
@@ -138,7 +138,7 @@ Quad_CR::eval_B(Value_P B) const
 
    return do_eval_B(B.getref(), true);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_CR::do_eval_B(const Value & B, bool remove_extra_spaces)
 {
@@ -215,7 +215,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_CR::eval_AB(Value_P A, Value_P B) const
 {
@@ -246,7 +246,7 @@ Value_P Z = do_CR(function_number, B.get(), pctx);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Quad_CR::string_to_int(const UCS_string & name) const
 {
@@ -263,7 +263,7 @@ const char * function_name = name_utf.c_str();
   return -1;    // not found
 
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
 {
@@ -372,7 +372,7 @@ bool extra_frame = false;
          return Value_P(pb, LOC);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR5_6(const char * alpha, const Value & B)
 {
@@ -402,7 +402,7 @@ const Cell * cB = &B.get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR10(const Value & B)
 {
@@ -423,7 +423,7 @@ Value_P Z(ucs_vec.size(), LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::do_CR10(UCS_string_vector & result, const Value & B)
 {
@@ -498,7 +498,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
         default: DOMAIN_ERROR;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::do_CR10_variable(UCS_string_vector & result, const UCS_string & var_name,
                      const Value & value)
@@ -521,7 +521,7 @@ not_structured:
 Picker picker(var_name);
    do_CR10_value(result, value, picker, -99);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::do_CR10_value(UCS_string_vector & result, const Value & value, 
                      Picker & picker, ShapeItem pidx)
@@ -670,7 +670,7 @@ UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);
 
    picker.pop();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Quad_CR::do_CR10_structured(UCS_string_vector & result, const UCS_string & var_name,
                             const Value & value)
@@ -715,7 +715,7 @@ Quad_CR::do_CR10_structured(UCS_string_vector & result, const UCS_string & var_n
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_CR::short_ravel(UCS_string_vector & result, bool & nested,
                      const Value & value, const Picker & picker,
@@ -774,7 +774,7 @@ V_mode mode = Vm_NONE;
    result.push_back(line);
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Quad_CR::compute_prolog(int pick_level, const UCS_string & left,
                         const Value & value)
@@ -796,7 +796,7 @@ const bool default_is_int = figure_default(value, default_char, default_int);
 
    return prolog;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_CR::figure_default(const Value & value, Unicode & default_char,
                         APL_Integer & default_int)
@@ -818,7 +818,7 @@ ShapeItem blanks = 0;
 
    return zeroes >= blanks;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::Picker::get(UCS_string & result)
 {
@@ -854,7 +854,7 @@ const int level = shapes.size();
    result.append(var_name);
    result.append_UTF8(")");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::Picker::get_indexed(UCS_string & result, ShapeItem pos, ShapeItem len)
 {
@@ -881,7 +881,7 @@ const bool need_comma = shapes.back().get_rank() != 1;
    result.append_number(len);
    result.append_UTF8("]");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_CR::V_mode
 Quad_CR::do_CR10_item(UCS_string & item, const Cell & cell, V_mode mode,
                       bool may_quote)
@@ -947,7 +947,7 @@ Quad_CR::do_CR10_item(UCS_string & item, const Cell & cell, V_mode mode,
    DOMAIN_ERROR;
    return mode;   // not reached
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR11(const Value & B)
 {
@@ -963,7 +963,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR12(const Value & B)
 {
@@ -974,7 +974,7 @@ CDR_string cdr;
 Value_P Z = CDR::from_CDR(cdr, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR13(const Value & B)
 {
@@ -999,7 +999,7 @@ const Cell * cB = &B.get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR14(const Value & B)
 {
@@ -1020,7 +1020,7 @@ Value_P Z(2*len, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR15(const Value & B)
 {
@@ -1040,7 +1040,7 @@ const Cell * cB = &B.get_cfirst();
    Value_P Z = CDR::from_CDR(cdr, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR16(const Value & B)
 {
@@ -1118,7 +1118,7 @@ const Cell * cB = &B.get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR17(const Value & B)
 {
@@ -1179,7 +1179,7 @@ const Cell * cB = &B.get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR18(const Value & B)
 {
@@ -1188,7 +1188,7 @@ UTF8_string utf(ucs);
 Value_P Z(utf, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR19(const Value & B)
 {
@@ -1206,7 +1206,7 @@ UCS_string ucs(utf);
 Value_P Z(ucs, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR26(const Value & B)
 {
@@ -1230,7 +1230,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR27_28(bool primary, const Value & B)
 {
@@ -1288,7 +1288,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR30(const Value & B)
 {
@@ -1348,14 +1348,14 @@ Value_P Z(shape_Z, LOC);
         else   // simple scalar
            {
              Z->next_ravel_Cell(cB);
-             loop(zz, (conformed_len - 1))   Z->next_ravel_Int(0);
+             loop(zz, (conformed_len - 1))   Z->next_ravel_0();
            }
       }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR31_32(bool align_bottom, const Value & B)
 {
@@ -1405,7 +1405,7 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_CR::use_quote(V_mode mode, const Value & value, ShapeItem pos)
 {
@@ -1435,14 +1435,14 @@ int ascii_len = 0;
    //
    return (char_len == ascii_len);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::close_mode(UCS_string & rhs, V_mode mode)
 {
    if      (mode == Vm_QUOT)   rhs.append_UTF8("'");
    else if (mode == Vm_UCS)    rhs.append_UTF8(")");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode)
 {
@@ -1460,7 +1460,7 @@ Quad_CR::item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode)
         else if (to_mode == Vm_QUOT)   line.append_UTF8("'");
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR33(const Value & B)
 {
@@ -1490,7 +1490,7 @@ const APL_Integer tag = B.get_cfirst().get_int_value();
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR34(const Value & B)
 {
@@ -1524,7 +1524,7 @@ Value_P Z(len_B - 7, LOC);
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR35(const Value & B)
 {
@@ -1579,7 +1579,7 @@ UCS_string line;
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR36(const Value & B)
 {
@@ -1607,7 +1607,7 @@ UCS_string UZ;
 Value_P Z(UZ, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR38(const Value & B)
 {
@@ -1634,8 +1634,8 @@ Quad_CR::do_CR38(const Value & B)
         Value_P Z(shape_Z, LOC);
         loop(c, capacity)
             {
-              Z->next_ravel_Int(0);
-              Z->next_ravel_Int(0);
+              Z->next_ravel_0();
+              Z->next_ravel_0();
             }
 
         Z->check_value(LOC);
@@ -1661,8 +1661,8 @@ Value_P Z(shape_Z, LOC);
    // fill with unused
    loop(c, capacity)
        {
-         Z->next_ravel_Int(0);
-         Z->next_ravel_Int(0);
+         Z->next_ravel_0();
+         Z->next_ravel_0();
        }
 
    loop(r, rows_B)
@@ -1686,7 +1686,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR39(const Value & B)
 {
@@ -1731,11 +1731,11 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR40(const Value & B)
 {
-   // pack boolean B
+   // return boolean B as packed boolean Z
    //
 const ShapeItem B_len = B.element_count() ;
    if (B_len <= Value::PACKED_MINIMUM_LENGHT)
@@ -1745,36 +1745,38 @@ const ShapeItem B_len = B.element_count() ;
         LENGTH_ERROR;
       }
 
-const ShapeItem Z_len = (B_len + 7) >> 3;
-uint8_t * bits = new uint8_t[Z_len];
+   // round B_len up to the next multiple of 64
+   //
+const ShapeItem Z_len = (B_len + 63) >> 6;   // length in units of uint64_t
+uint64_t * bits = new uint64_t[Z_len];
    if (bits == 0)   WS_FULL;
 
-   // set all bits to 0, then some to 1.
+   // set all bits to 0, then some to 1...
    //
-   memset(bits, 0, Z_len);
+   loop(z, Z_len)   bits[z] = 0;
 
-uint8_t byte = 0;
-uint8_t bit  = 1;
+uint64_t chunk = 0;
+uint64_t bit  = 1;
    loop(b, B_len)
        {
          const Cell & cell_B = B.get_cravel(b);
          if (!cell_B.is_near_bool())   DOMAIN_ERROR;
-         if (const APL_Integer bi = cell_B.get_near_int())   byte |= bit;
+         if (const APL_Integer bi = cell_B.get_near_int())   chunk |= bit;
          bit += bit;
-         if (bit == 0)
+         if (bit == 0)   // uint64_t bit complete
             {
-              bits[b >> 3] = byte;
-              byte = 0;
+              bits[b >> 6] = chunk;
+              chunk = 0;
               bit = 1;
             }
        }
 
-    if (byte)   bits[B_len] = byte;   // rest bits
+    if (chunk)   bits[Z_len - 1] = chunk;   // rest bits
 
 Value_P Z(B.get_shape(), bits, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR41(const Value & B)
 {
@@ -1789,9 +1791,9 @@ Value_P Z(B.get_shape(), LOC);
 const ShapeItem B_len = B.element_count();
 const uint8_t * bits = reinterpret_cast<const uint8_t *>(&B.get_cfirst());
 
-   loop(b, B_len)   Z->next_ravel_Int((bits[b >> 3] & 1 << (b & 7)) ? 1 : 0);
+   loop(b, B_len)   Z->next_ravel_Int((bits[b >> 3] & 1ULL << (b & 7)) ? 1 : 0);
 
    return Idx0(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

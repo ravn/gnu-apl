@@ -40,7 +40,7 @@
 #include "ValueHistory.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Symbol::Symbol(Id id)
    : NamedObject(id),
      next(0),
@@ -49,7 +49,7 @@ Symbol::Symbol(Id id)
 {
    push();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Symbol::Symbol(const UCS_string & ucs, Id id)
    : NamedObject(id),
      next(0),
@@ -58,13 +58,13 @@ Symbol::Symbol(const UCS_string & ucs, Id id)
 {
    push();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Symbol::print(ostream & out) const
 {
    return out << name;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Symbol::print_verbose(ostream & out) const
 {
@@ -118,7 +118,7 @@ Symbol::print_verbose(ostream & out) const
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::assign(Value_P new_value, bool clone, const char * loc)
 {
@@ -165,7 +165,7 @@ ValueStackItem & vs = value_stack.back();
         default: SYNTAX_ERROR;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::assign_indexed(const Value * X, Value_P B)   // A[X] ← B
 {
@@ -182,7 +182,7 @@ Value_P Z = get_apl_value();  // the current APL value of this Symbol
         // Z is indexed with a member name, e.g. Z['member'] ← 42
         const UCS_string name(*X);
         Cell * data = Z->get_member_data(name);
-        if (data)   // member exists
+        if (data)   // existing member
            {
              if (data->is_pointer_cell() &&
                  data->get_pointer_value()->is_member())
@@ -193,12 +193,12 @@ Value_P Z = get_apl_value();  // the current APL value of this Symbol
                      << ".\n      )ERASE or ⎕EX that member first.";
                   DOMAIN_ERROR;
                 }
+             data->release(LOC);   // release old content
            }
         else        // new member
            {
              data = Z->get_new_member(name);
            }
-        data->release(LOC);   // release old content
         data->init_from_value(B.get(), Z.getref(), LOC);
         return;
       }
@@ -257,7 +257,7 @@ const Cell * cB = &B->get_cfirst();
 
    if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::assign_indexed(const IndexExpr & IX, Value_P B)   // A[IX;...] ← B
 {
@@ -341,7 +341,7 @@ const int incr_B = (ec_B == 1) ? 0 : 1;
 
    if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Symbol::assign_named_lambda(Function_P lambda, const char * loc)
 {
@@ -393,7 +393,7 @@ const Executable * uexec = ufun;
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::pop()
 {
@@ -432,7 +432,7 @@ const ValueStackItem & vs = value_stack.back();
         if (monitor_callback)   monitor_callback(*this, SEV_POPED);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::push()
 {
@@ -446,7 +446,7 @@ Symbol::push()
    value_stack.push_back(ValueStackItem());
    if (monitor_callback)   monitor_callback(*this, SEV_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::push_label(Function_Line label)
 {
@@ -460,7 +460,7 @@ Symbol::push_label(Function_Line label)
    value_stack.push_back(ValueStackItem(label));
    if (monitor_callback)   monitor_callback(*this, SEV_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::push_function(Function_P function)
 {
@@ -478,7 +478,7 @@ ValueStackItem vs;
    value_stack.push_back(vs);
    if (monitor_callback)   monitor_callback(*this, SEV_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::push_value(Value_P value)
 {
@@ -495,7 +495,7 @@ ValueStackItem vs;
         CERR << " addr " << voidP(get_value().get()) << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Symbol::get_ufun_depth(const UserFunction * ufun)
 {
@@ -517,7 +517,7 @@ const int sym_stack_size = value_stack_size();
    // not found: return -1
    return -1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Symbol::get_value()
 {
@@ -529,7 +529,7 @@ Symbol::get_value()
 
    return Value_P();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Symbol::cant_be_defined() const
 {
@@ -542,7 +542,7 @@ Symbol::cant_be_defined() const
    if (value_stack.back().name_class == NC_OPERATOR)           return 0;   // OK
    return "bad name class";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Symbol::get_apl_value() const
 {
@@ -552,7 +552,7 @@ Symbol::get_apl_value() const
 
    return value_stack.back().apl_val;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const Cell *
 Symbol::get_first_cell() const
 {
@@ -560,7 +560,7 @@ Symbol::get_first_cell() const
    if (value_stack.back().name_class != NC_VARIABLE)   return 0;
    return &value_stack.back().apl_val->get_cfirst();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Symbol::can_be_assigned() const
 {
@@ -572,7 +572,7 @@ Symbol::can_be_assigned() const
         default:            return false;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 SV_key
 Symbol::get_SV_key() const
 {
@@ -582,14 +582,14 @@ Symbol::get_SV_key() const
 
    return value_stack.back().sym_val.sv_key;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::set_SV_key(SV_key key)
 {
    value_stack.back().name_class = NC_SHARED_VAR;
    value_stack.back().sym_val.sv_key = key;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const Function *
 Symbol::get_function() const
 {
@@ -601,7 +601,7 @@ Symbol::get_function() const
         default:          return 0;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 Symbol::get_function()
 {
@@ -612,7 +612,7 @@ const ValueStackItem & vs = value_stack.back();
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::get_attributes(int mode, Value & Z) const
 {
@@ -638,13 +638,13 @@ int has_result = 0;   // no result
       {
         case 1: // valences
                 Z.next_ravel_Int(has_result);
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
+                Z.next_ravel_0();
+                Z.next_ravel_0();
                 break;
 
         case 2: // creation time
         case 3: // execution properties
-                loop(j, Z.element_count())   Z.next_ravel_Int(0);
+                loop(j, Z.element_count())   Z.next_ravel_0();
                 break;
 
         case 4: {
@@ -661,7 +661,7 @@ int has_result = 0;   // no result
         default:  Assert(0 && "bad mode");
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::resolve(Token & tok, bool left_sym)
 {
@@ -719,7 +719,7 @@ const ValueStackItem & vs = value_stack.back();
              SYNTAX_ERROR;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Symbol::resolve_lv(const char * loc)
 {
@@ -740,7 +740,7 @@ Symbol::resolve_lv(const char * loc)
                 << "\nwhile executing an assignment\n";
    throw_apl_error(E_LEFT_SYNTAX_ERROR, loc);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 TokenClass
 Symbol::resolve_class(bool left)
 {
@@ -772,7 +772,7 @@ Symbol::resolve_class(bool left)
         default: return TC_SYMBOL;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Symbol::expunge()
 {
@@ -823,7 +823,7 @@ ValueStackItem & vs = value_stack.back();
    call_monitor_callback(SEV_ERASED);
    return 1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::set_nc(NameClass nc)
 {
@@ -837,7 +837,7 @@ ValueStackItem & vs = value_stack.back();
 
    DEFN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::share_var(SV_key key)
 {
@@ -869,7 +869,7 @@ ValueStackItem & vs = value_stack.back();
 
    DEFN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 SV_Coupling
 Symbol::unshare_var()
 {
@@ -888,7 +888,7 @@ const SV_Coupling old_coupling = Svar_DB::get_coupling(key);
 
    return old_coupling;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::set_nc(NameClass nc, Function_P fun)
 {
@@ -905,7 +905,7 @@ const bool can_set = (vs.name_class == NC_FUNCTION) ||
    if (fun)   vs.name_class = nc;
    else       vs.name_class = NC_UNUSED_USER_NAME;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Symbol::list(ostream & out)
 {
@@ -927,7 +927,7 @@ const NameClass nc = value_stack.back().name_class;
 
    return out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::write_OUT(FILE * out, uint64_t & seq) const
 {
@@ -991,7 +991,7 @@ const NameClass nc = value_stack[0].name_class;
         fwrite(buffer, 1, 82, out);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::unmark_all_values() const
 {
@@ -1022,7 +1022,7 @@ Symbol::unmark_all_values() const
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Symbol::show_owners(ostream & out, const Value & value) const
 {
@@ -1034,7 +1034,7 @@ int count = 0;
          switch(item.name_class)
             {
               case NC_VARIABLE:
-                   if (Value::is_or_contains(item.apl_val.get(), value))
+                   if (Value::is_or_contains(item.apl_val.get(), &value))
                       {
                          out << "    Variable[vs=" << v << "] "
                             << get_name() << endl;
@@ -1064,7 +1064,7 @@ int count = 0;
 
    return count;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::vector_assignment(std::vector<Symbol *> & symbols, Value_P values)
 {
@@ -1092,7 +1092,7 @@ const Cell * cV = &values->get_cfirst();
         cV += incr;   // scalar extend values
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::dump(ostream & out) const
 {
@@ -1191,7 +1191,7 @@ const ValueStackItem & vs = value_stack[0];
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Symbol::get_SI_level(const Function * fun) const
 {
@@ -1205,7 +1205,7 @@ Symbol::get_SI_level(const Function * fun) const
 
    FIXME;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Symbol::get_SI_level(const Value * val) const
 {
@@ -1219,7 +1219,7 @@ Symbol::get_SI_level(const Value * val) const
 
    FIXME;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::clear_vs()
 {
@@ -1254,13 +1254,13 @@ ValueStackItem & tos = value_stack[0];
         default: break;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator <<(ostream & out, const Symbol & sym)
 {
    return sym.print(out);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::assign_shared_variable(Value_P new_value, const char * loc)
 {
@@ -1360,7 +1360,7 @@ const ErrorCode ec = ErrorCode(response->get__SVAR_ASSIGNED__error());
    delete response;
    if (del)   delete del;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Symbol::resolve_shared_variable(Token & tok)
 {
@@ -1490,4 +1490,4 @@ Value_P value = CDR::from_CDR(cdr, LOC);
    value->check_value(LOC);
    new (&tok) Token(TOK_APL_VALUE1, value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

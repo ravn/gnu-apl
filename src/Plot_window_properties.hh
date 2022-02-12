@@ -24,7 +24,7 @@
 
 class Plot_line_properties;
 
-//=============================================================================
+//============================================================================
 /// properties of the entire plot window
 class Plot_window_properties
 {
@@ -287,7 +287,7 @@ protected:
    /// round val up to the next higher 1/2/5×10^N
    static double round_up_125(double val);
 };
-//=============================================================================
+//============================================================================
 
 #endif // __PLOT_WINDOW_PROPERTIES_HH_DEFINED__
 

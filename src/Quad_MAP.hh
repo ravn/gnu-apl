@@ -23,7 +23,7 @@
 
 #include "QuadFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The implementation of ⎕MAP
 class Quad_MAP : public QuadFunction
 {
@@ -48,7 +48,7 @@ protected:
    static Value_P do_map(const Value & A, const ShapeItem * sorted_indices_A,
                          const Value * B, bool recursive);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __Quad_MAP_DEFINED__
 

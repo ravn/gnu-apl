@@ -26,7 +26,7 @@
 Bif_OPER2_POWER   Bif_OPER2_POWER::_fun;
 Bif_OPER2_POWER * Bif_OPER2_POWER::fun = &Bif_OPER2_POWER::_fun;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
@@ -35,7 +35,7 @@ Bif_OPER2_POWER::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
    else
       return eval_form_2(A, LO, RO, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
@@ -44,7 +44,7 @@ Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B) const
    else
       return eval_form_2(Value_P(), LO, RO, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // the eval_form_2() function is for LO ⍣ N B and A LO ⍣ N B variants
 // (with condition function RO and worker function LO)
 Token
@@ -95,7 +95,7 @@ Function_P RO = _RO.get_function();   Assert(RO);
         LO_Z.clear(LOC);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // the eval_form_1() function is for LO ⍣ N B and A LO ⍣ N B variants
 // (with numeric RO and worker function LO)
 Token
@@ -165,4 +165,4 @@ ShapeItem repeat_cnt = N->get_cfirst().get_checked_near_int();
          B = result.get_apl_val();
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

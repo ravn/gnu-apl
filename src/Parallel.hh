@@ -171,7 +171,7 @@ inline void atomic_add(volatile _Atomic_word & counter, int increment)
 
 using namespace std;
 
-//=============================================================================
+//============================================================================
 /**
   Multi-core GNU APL uses a pool of threads numbered 0, 1, ... core_count()-1
 
@@ -205,7 +205,7 @@ using namespace std;
   sufficiently long).
 
  **/
-//=============================================================================
+//============================================================================
 /**
   The set of CPUs (= hyper-threads) over which the computational load is
   being distrinuted.
@@ -248,7 +248,7 @@ protected:
    /// the CPU numbers that can be used
    static std::vector<CPU_Number> the_CPUs;
 };
-//=============================================================================
+//============================================================================
 /**
   a class coordinating the different cores working in parallel
 **/
@@ -311,6 +311,6 @@ protected:
    /// true after init() has been called
    static bool init_done;
 };
-//=============================================================================
+//============================================================================
 
 #endif // __PARALLEL_HH_DEFINED__

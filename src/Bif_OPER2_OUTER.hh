@@ -23,7 +23,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    A dummy function for the product operator.
  **/
@@ -46,7 +46,7 @@ protected:
 
 
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator outer product.
  */
 /// The class implementing ∘.g
@@ -87,6 +87,6 @@ protected:
    /// the main loop for an outer product with scalar functions
    static void PF_scalar_outer_product(Thread_context & tctx);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_OPER2_OUTER_HH_DEFINED__

@@ -31,7 +31,7 @@
 #include "UserFunction.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 StateIndicator::StateIndicator(const Executable * exec, StateIndicator * _par)
    : executable(exec),
      safe_execution_count(_par ? _par->safe_execution_count : 0),
@@ -41,7 +41,7 @@ StateIndicator::StateIndicator(const Executable * exec, StateIndicator * _par)
      parent(_par)
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 StateIndicator::~StateIndicator()
 {
    // flush the FIFO. Do that before delete executable so that values
@@ -65,7 +65,7 @@ StateIndicator::~StateIndicator()
          executable = 0;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::goon(Function_Line new_line, const char * loc)
 {
@@ -91,14 +91,14 @@ const Function_PC pc = get_executable()->get_ufun()->pc_for_line(new_line);
 
    current_stack.reset(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::retry(const char * loc)
 {
    Log(LOG_StateIndicator__push_pop || LOG_prefix_parser)
       CERR << endl << "RETRY " << loc << ")" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 StateIndicator::uses_function(const UserFunction * ufun) const
 {
@@ -132,7 +132,7 @@ const Executable * uexec = ufun;
        }
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 StateIndicator::function_name() const
 {
@@ -161,7 +161,7 @@ StateIndicator::function_name() const
    FIXME;
    return UCS_string();
 } 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::print(ostream & out) const
 {
@@ -206,7 +206,7 @@ StateIndicator::print(ostream & out) const
 
    out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::list(ostream & out, SI_mode mode) const
 {
@@ -290,7 +290,7 @@ StateIndicator::list(ostream & out, SI_mode mode) const
 
    out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 StateIndicator::indent(ostream & out) const
 {
@@ -309,7 +309,7 @@ StateIndicator::indent(ostream & out) const
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 StateIndicator::jump(Value_P value)
 {
@@ -345,12 +345,12 @@ const UserFunction * ufun = get_executable()->get_ufun();
    //
    return Token(TOK_BRANCH, int64_t(line < 0 ? Function_Line_0 : line));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::escape()
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 StateIndicator::run()
 {
@@ -361,7 +361,7 @@ Token result = current_stack.reduce_statements();
            << result << " in StateIndicator::run()" << endl;
    return result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::unmark_all_values() const
 {
@@ -371,7 +371,7 @@ StateIndicator::unmark_all_values() const
    current_stack.unmark_all_values();   // values in the parsers
    fun_oper_cache.unmark_all_values();   // values in the derived function cache
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 StateIndicator::show_owners(ostream & out, const Value & value) const
 {
@@ -387,7 +387,7 @@ char cc[100];
 
    return count;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::info(ostream & out, const char * loc) const
 {
@@ -396,7 +396,7 @@ StateIndicator::info(ostream & out, const char * loc) const
        << executable->get_text(0) << " creator: " << executable->get_loc()
        << "   seen at: " << loc << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 StateIndicator::get_L()
 {
@@ -404,7 +404,7 @@ Token * tok_L = current_stack.locate_L();
    if (tok_L)   return tok_L->get_apl_val();
    return Value_P();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 StateIndicator::get_R()
 {
@@ -412,7 +412,7 @@ Token * tok_R = current_stack.locate_R();
    if (tok_R)   return tok_R->get_apl_val();
    return Value_P();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 StateIndicator::get_X()
 {
@@ -420,7 +420,7 @@ StateIndicator::get_X()
       return *const_cast<Value_P *>(X);
    return Value_P();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::set_L(Value_P new_value)
 {
@@ -430,7 +430,7 @@ Token * tok_L = current_stack.locate_L();
 Value_P old_value = tok_L->get_apl_val();   // so that 
    tok_L->move_2(Token(tok_L->get_tag(), new_value), LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::set_R(Value_P new_value)
 {
@@ -440,14 +440,14 @@ Token * tok_R = current_stack.locate_R();
 Value_P old_value = tok_R->get_apl_val();   // so that 
    tok_R->move_2(Token(tok_R->get_tag(), new_value), LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 StateIndicator::set_X(Value_P new_value)
 {
 const Value_P * X = current_stack.locate_X();
    if (X)   *const_cast<Value_P *>(X) = new_value;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const StateIndicator *
 StateIndicator::find_child(const StateIndicator * parent)
 {
@@ -459,7 +459,7 @@ StateIndicator::find_child(const StateIndicator * parent)
 
    return 0;   // si is Workspace::SI_top()
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 StateIndicator::nth_push(const Symbol * sym, int from_tos) const
 {
@@ -486,7 +486,7 @@ std::vector<const StateIndicator *> stack;
 
    FIXME;   // mot reached
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_Line
 StateIndicator::get_line() const
 {
@@ -494,7 +494,7 @@ int pc = get_PC();
    if (pc)   --pc;
    return executable->get_line(Function_PC(pc));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #ifdef WANT_LIBAPL
 typedef int (*result_callback)(const Value * result, int committed);
 extern "C" result_callback res_callback;
@@ -616,7 +616,7 @@ const int boxing_format = Command::get_boxing_format();
         B1->print(COUT);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 StateIndicator::get_parse_mode_name() const
 {
@@ -631,5 +631,5 @@ StateIndicator::get_parse_mode_name() const
    FIXME;
    return Invalid_Unicode;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

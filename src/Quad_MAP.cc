@@ -24,7 +24,7 @@
 Quad_MAP  Quad_MAP::_fun;
 Quad_MAP * Quad_MAP::fun = &Quad_MAP::_fun;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*
     8 ⎕CR A←5 2⍴'eEwWaAzZ92' ◊ 8 ⎕CR B←'Halloween' ◊ A ⎕MAP B
  */
@@ -75,7 +75,7 @@ Value_P Z = do_map(A.getref(), indices, B.get(), recursive);
    delete[] indices;
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_MAP::greater_map(const ShapeItem & a, const ShapeItem & b,
                       const void * ctx)
@@ -88,7 +88,7 @@ const Cell * cells = rcl->ravel;
 
    return a > b;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 compare_MAP(const Cell & key, const ShapeItem & item, const void * ctx)
 {
@@ -97,7 +97,7 @@ const Cell * cells_A = rcl->ravel;
 
    return key.compare(cells_A[2*item]);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 Value_P
 Quad_MAP::do_map(const Value & A, const ShapeItem * sorted_indices_A,
@@ -168,4 +168,4 @@ const ShapeItem len_B = B->element_count();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

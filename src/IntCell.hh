@@ -24,7 +24,7 @@
 #include "Common.hh"   // for RATIONAL_NUMBERS_WANTED
 #include "RealCell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*!
     A cell containing a single APL integer.  This class essentially
     overloads certain functions in class Cell with integer specific
@@ -271,12 +271,12 @@ protected:
    /// overloaded Cell::CDR_size()
    virtual int CDR_size() const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 Hswap(IntCell & c1, IntCell & c2)
 {
    c1.Hswap(c2);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __INTCELL_HH_DEFINED__

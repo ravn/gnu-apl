@@ -33,13 +33,13 @@
 
 #include "Cell.icc"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void *
 Cell::operator new(std::size_t s, void * pos)
 {
    return pos;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Cell::init_from_value(Value * value, Value & cell_owner, const char * loc)
 {
@@ -52,7 +52,7 @@ Cell::init_from_value(Value * value, Value & cell_owner, const char * loc)
         new (this) PointerCell(value, cell_owner);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Cell::to_value(const char * loc) const
 {
@@ -69,7 +69,7 @@ Cell::to_value(const char * loc) const
         return ret;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
 {
@@ -84,7 +84,7 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
    else if (other.is_character_cell()) new (this) CharCell(UNI_SPACE);
    else                                new (this) IntCell(0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Cell::copy(Value & val, const Cell * & src, ShapeItem count)
 {
@@ -94,7 +94,7 @@ Cell::copy(Value & val, const Cell * & src, ShapeItem count)
         val.next_ravel_Cell(*src++);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Cell::greater(const Cell & other) const
 {
@@ -103,7 +103,7 @@ Cell::greater(const Cell & other) const
                 << other.get_classname();
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Cell::equal(const Cell & other, double qct) const
 {
@@ -112,14 +112,14 @@ Cell::equal(const Cell & other, double qct) const
                 << other.get_classname();
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Cell::A_greater_B(const Cell * const & A, const Cell * const & B,
                   const void * /* comp_arg not used */)
 {
    return A->greater(*B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Cell::compare_stable(const Cell * const & A, const Cell * const & B,
                   const void * unused_comp_arg)
@@ -127,14 +127,14 @@ Cell::compare_stable(const Cell * const & A, const Cell * const & B,
    if (const Comp_result cr = A->compare(*B))   return cr == COMP_GT;
    return A > B;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Cell::compare_ptr(const Cell * const & A, const Cell * const & B,
                   const void * unused_comp_arg)
 {
    return A > B;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 Cell::get_char_value() const
 {
@@ -143,7 +143,7 @@ Cell::get_char_value() const
                 << " when expecting a CHARACTER cell";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Cell::get_pointer_value() const
 {
@@ -152,7 +152,7 @@ Cell::get_pointer_value() const
                 << " when expecting a nested cell";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Cell::is_near_int(APL_Float value)
 {
@@ -170,7 +170,7 @@ const APL_Float diff = value - result;
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Cell::is_near_int64_t(APL_Float value)
 {
@@ -184,7 +184,7 @@ const APL_Float diff = value - result;
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_Integer
 Cell::near_int(APL_Float value)
 {
@@ -199,7 +199,7 @@ const APL_Float diff = value - result;
    if (result > 0.0)   return   APL_Integer(0.3 + result);
    else                return - APL_Integer(0.3 - result);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Cell::greater_cp(const ShapeItem &  A, const ShapeItem & B, const void * ctx)
 {
@@ -219,7 +219,7 @@ const Cell * cell_B = cells + B * comp_len;
    //
    return A > B;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Cell::smaller_cp(const ShapeItem &  A, const ShapeItem & B, const void * ctx)
 {
@@ -239,7 +239,7 @@ const Cell * cell_B = cells + B * comp_len;
    //
    return A > B;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator <<(ostream & out, const Cell & cell)
 {
@@ -247,7 +247,7 @@ PrintBuffer pb = cell.character_representation(PR_BOXED_GRAPHIC);
 UCS_string ucs(pb, 0, Workspace::get_PW());
    return out << ucs << ' ';
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_equal(Cell * Z, const Cell * A) const
 {
@@ -257,7 +257,7 @@ Cell::bif_equal(Cell * Z, const Cell * A) const
 
    return IntCell::zI(Z, equal(*A, Workspace::get_CT()));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_not_equal(Cell * Z, const Cell * A) const
 {
@@ -267,31 +267,31 @@ Cell::bif_not_equal(Cell * Z, const Cell * A) const
 
    return IntCell::zI(Z, !equal(*A, Workspace::get_CT()));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_greater_than(Cell * Z, const Cell * A) const
 {
    return IntCell::zI(Z, (A->compare(*this) == COMP_GT) ? 1 : 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_less_eq(Cell * Z, const Cell * A) const
 {
    return IntCell::zI(Z, (A->compare(*this) != COMP_GT) ? 1 : 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_less_than(Cell * Z, const Cell * A) const
 {
    return IntCell::zI(Z, (A->compare(*this) == COMP_LT) ? 1 : 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Cell::bif_greater_eq(Cell * Z, const Cell * A) const
 {
    return IntCell::zI(Z, (A->compare(*this) != COMP_LT) ? 1 : 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem *
 Cell::sorted_indices(const Cell * ravel, ShapeItem length, Sort_order order,
                      ShapeItem comp_len)
@@ -309,7 +309,7 @@ const ravel_comp_len ctx = { ravel, comp_len};
       Heapsort<ShapeItem>::sort(indices, length, &ctx, &Cell::smaller_cp);
    return indices;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Cell::get_cell_type_name(CellType ct)
 {
@@ -327,4 +327,4 @@ Cell::get_cell_type_name(CellType ct)
 
    return "UNKNOWN";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

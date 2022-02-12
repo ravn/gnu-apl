@@ -30,14 +30,14 @@ Bif_F12_PICK      Bif_F12_PICK     ::_fun;    // ⊃
 Bif_F12_PARTITION * Bif_F12_PARTITION::fun = &Bif_F12_PARTITION::_fun;
 Bif_F12_PICK      * Bif_F12_PICK     ::fun = &Bif_F12_PICK     ::_fun;
 
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_PARTITION::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return partition(A, B, axis);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_PARTITION::do_eval_B(Value_P B)
 {
@@ -48,7 +48,7 @@ Value_P Z(LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_PARTITION::enclose_with_axes(const Shape & axes_X, Value_P B)
 {
@@ -155,7 +155,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis) const
 {
@@ -264,7 +264,7 @@ const Shape3 shape_B3(B->get_shape(), axis);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_PICK::eval_AB(Value_P A, Value_P B) const
 {
@@ -283,7 +283,7 @@ Value_P Z = pick(&A->get_cfirst(), 0, ec_A, B, qio);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_PICK::disclose(Value_P B, bool rank_tolerant)
 {
@@ -338,7 +338,7 @@ const ShapeItem item_len = item_shape.get_volume();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
                             const Shape & item_shape, ShapeItem item_len,
@@ -409,10 +409,10 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
         //
         Z.next_ravel_Cell(B_item);
         for (ShapeItem c = 1; c < item_len; ++c)
-            Z.next_ravel_Int(0);
+            Z.next_ravel_0();
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_PICK::disclose_with_axis(const Shape & axes_X, Value_P B)
 {
@@ -460,7 +460,7 @@ Shape perm_cB;   // perm_cB is the permutation of cB, constructed from X
 
    return Bif_F12_TRANSPOSE::transpose(perm_cB, cB);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape
 Bif_F12_PICK::compute_item_shape(Value_P B, bool rank_tolerant)
 {
@@ -546,7 +546,7 @@ ShapeItem ret[MAX_RANK];
 
    return Shape(ret_rank, ret);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Bif_F12_PICK::pick_offset(const Cell * const A0, ShapeItem idx_A,
                           ShapeItem len_A, Value_P B, APL_Integer qio)
@@ -630,7 +630,7 @@ const Cell & cA = A0[idx_A];
         return a;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_PICK::pick(const Cell * const A0, ShapeItem idx_A, ShapeItem len_A,
                    Value_P B, APL_Integer qio)
@@ -709,7 +709,7 @@ const Cell * cB = &B->get_cravel(offset);
         return Z;
       }
 }
-//=============================================================================
+//============================================================================
 
 
 

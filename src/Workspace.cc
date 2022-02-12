@@ -47,7 +47,7 @@ using namespace std;
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Workspace::Workspace()
    : WS_name("CLEAR WS"),
 //   prompt("-----> "),
@@ -75,7 +75,7 @@ Workspace::Workspace()
    new (&Quad_EC::_fun)   Quad_EC;   Quad_EC::fun = &Quad_EC ::_fun;
    new (&Quad_ES::_fun)   Quad_ES;   Quad_ES::fun = &Quad_ES ::_fun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::push_SI(const Executable * fun, const char * loc)
 {
@@ -144,7 +144,7 @@ Workspace::push_SI(const Executable * fun, const char * loc)
              << " at " << loc << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::pop_SI(const char * loc)
 {
@@ -170,7 +170,7 @@ StateIndicator * del = SI_top();
    the_workspace.top_SI = del->get_parent();
    delete del;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 uint64_t
 Workspace::get_RL(uint64_t mod)
 {
@@ -187,7 +187,7 @@ uint64_t rand = the_workspace.v_Quad_RL.get_random();
 
    return rand % mod;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::clear_error(const char * loc)
 {
@@ -199,7 +199,7 @@ Workspace::clear_error(const char * loc)
          if (si->get_parse_mode() == PM_FUNCTION)   break;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 StateIndicator *
 Workspace::SI_top_fun()
 {
@@ -210,7 +210,7 @@ Workspace::SI_top_fun()
 
    return 0;   // no context wirh parse mode PM_FUNCTION
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 StateIndicator *
 Workspace::SI_top_error()
 {
@@ -222,7 +222,7 @@ Workspace::SI_top_error()
 
    return 0;   // no context with an error
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Workspace::immediate_execution(bool exit_on_error)
 {
@@ -271,7 +271,7 @@ Workspace::immediate_execution(bool exit_on_error)
 
    return Token(TOK_ESCAPE);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const NamedObject *
 Workspace::lookup_existing_name(const UCS_string & name)
 {
@@ -305,7 +305,7 @@ Symbol * sym = the_workspace.symbol_table.lookup_existing_symbol(name);
         default:          return 0;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Symbol *
 Workspace::lookup_existing_symbol(const UCS_string & symbol_name)
 {
@@ -323,7 +323,7 @@ Workspace::lookup_existing_symbol(const UCS_string & symbol_name)
 
    return the_workspace.symbol_table.lookup_existing_symbol(symbol_name);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Workspace::get_quad(const UCS_string & ucs, int & len)
 {
@@ -360,7 +360,7 @@ SystemName * longest = 0;
    if (longest->get_variable())   return longest->get_variable()->get_token();
    else                           return longest->get_function()->get_token();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 StateIndicator *
 Workspace::oldest_exec(const Executable * exec)
 {
@@ -371,7 +371,7 @@ StateIndicator * ret = 0;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Workspace::is_called(const UCS_string & funname)
 {
@@ -398,7 +398,7 @@ const UserFunction * ufun = fun->get_ufun1();
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::write_OUT(FILE * out, uint64_t & seq, const UCS_string_vector
                      & objects)
@@ -451,7 +451,7 @@ Workspace::write_OUT(FILE * out, uint64_t & seq, const UCS_string_vector
             }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::unmark_all_values()
 {
@@ -477,7 +477,7 @@ Workspace::unmark_all_values()
    loop(f, the_workspace.expunged_functions.size())
       the_workspace.expunged_functions[f]->unmark_all_values();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Workspace::show_owners(ostream & out, const Value & value)
 {
@@ -509,7 +509,7 @@ int count = 0;
 
    return count;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Workspace::cleanup_expunged(ostream & out, bool & erased)
 {
@@ -535,13 +535,16 @@ const int ret = the_workspace.expunged_functions.size();
    erased = true;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::clear_WS(ostream & out, bool silent)
 {
    // remove user-defined commands
    //
    get_user_commands().clear();
+
+   // clear the )COPY_ONCE table
+   Command::clear_copy_once_table();
 
    // clear the SI (pops all localized symbols)
    //
@@ -589,7 +592,7 @@ const int tz = the_workspace.v_Quad_TZ.get_offset();
    set_WS_name(UCS_string("CLEAR WS"));
    if (!silent)   out << "CLEAR WS" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::clear_SI(ostream & out)
 {
@@ -600,7 +603,7 @@ Workspace::clear_SI(ostream & out)
         pop_SI(LOC);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::list_SI(ostream & out, SI_mode mode)
 {
@@ -609,7 +612,7 @@ Workspace::list_SI(ostream & out, SI_mode mode)
 
    if (mode & SIM_debug)   out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::save_WS(ostream & out, LibRef libref, const UCS_string & wsname,
                    bool name_from_WSID)
@@ -667,7 +670,7 @@ XML_Saving_Archive ar(outf);
    if (name_from_WSID)   out << " " << the_workspace.WS_name;
    out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Workspace::backup_existing_file(const char * filename)
 {
@@ -717,7 +720,7 @@ const int err = rename(filename, backup_filename.c_str());
 
    return false; // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::load_DUMP(ostream & out, const UTF8_string & filename, int fd,
                      LX_mode with_LX, bool silent,
@@ -758,7 +761,7 @@ InputFile fam(filename, file, false, false, true, with_LX);
       }
    InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a streambuf that escapes certain HTML characters
 class HTML_streambuf : public streambuf
 {
@@ -797,7 +800,7 @@ public:
    : ostream(html_out)
    {}
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::dump_WS(ostream & out, LibRef libref, const UCS_string & wsname,
                    bool html, bool silent)
@@ -932,7 +935,7 @@ int variable_count = 0;
             << " VARIABLES)" << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::dump_commands(ostream & out)
 {
@@ -945,7 +948,7 @@ vector<Command::user_command> & cmds = get_user_commands();
 
    if (cmds.size())   out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // )LOAD WS, set ⎕LX of loaded WS on success
 void
 Workspace::load_WS(ostream & out, LibRef libref, const UCS_string & wsname,
@@ -1023,7 +1026,7 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 
    if (Workspace::get_LX().size())  quad_lx = Workspace::get_LX();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::copy_WS(ostream & out, LibRef libref, const UCS_string & wsname,
                    UCS_string_vector & lib_ws_objects, bool protection)
@@ -1059,7 +1062,7 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
    in.read_vids();
    in.read_Workspace(false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
 {
@@ -1102,12 +1105,12 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
       }
    the_workspace.WS_name = arg;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string &
 MORE_ERROR()
 {
    Workspace::more_error().clear();
    return Workspace::more_error();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

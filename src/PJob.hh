@@ -37,7 +37,7 @@ class PrimitiveFunction;
  ravels of the result Z, the right argument B, and possibly (for dyadic Cell
  functions) the left argument A.
  **/
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// one monadic scalar job
 class PJob_scalar_B
 {
@@ -48,8 +48,7 @@ public:
      len_Z(0),
      error(E_NO_ERROR),
      fun(0),
-     fun1(0),
-     cZ(0)
+     fun1(0)
    {}
 
    /// assign \b other to \b this
@@ -61,7 +60,6 @@ public:
         fun = other.fun;
         fun1 = other.fun1;
         new (&cB) ConstCell_P(other.cB);
-        cZ = other.cZ;
       }
 
    /// constructor
@@ -71,8 +69,7 @@ public:
      error(E_NO_ERROR),
      fun(0),
      fun1(0),
-     cB(B, 1),
-     cZ(&Z->get_wfirst())
+     cB(B, 1)
    {}
 
    /// the value being computed
@@ -96,16 +93,13 @@ public:
 
    /// return Z[z]
    Cell & Z_at(ShapeItem z) const
-      { return cZ[z]; }
+      { return value_Z->get_wravel(z); }
 
 protected:
    /// ravel of the right argument
    ConstCell_P cB;
-
-   /// ravel of the result
-   Cell * cZ;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// one dyadic scalar job
 class PJob_scalar_AB
 {
@@ -118,8 +112,7 @@ public:
      inc_B(0),
      error(E_NO_ERROR),
      fun(0),
-     fun2(0),
-     cZ(0)
+     fun2(0)
    {}
 
    /// assign \b other to \b this
@@ -134,7 +127,6 @@ public:
         fun2    = other.fun2;
         new (&cA) ConstCell_P(other.cA);
         new (&cB) ConstCell_P(other.cB);
-        cZ      = other.cZ;
       }
 
    /// constructor: A and B nested
@@ -148,8 +140,7 @@ public:
      fun(0),
      fun2(0),
      cA(_A, _inc_A),
-     cB(_B, _inc_B),
-     cZ(&Z->get_wfirst())
+     cB(_B, _inc_B)
    {}
 
    /// constructor: A nested, B simple
@@ -162,8 +153,7 @@ public:
      fun(0),
      fun2(0),
      cA(_A, _inc_A),
-     cB(cell_B),
-     cZ(&Z->get_wfirst())
+     cB(cell_B)
    {}
 
    /// constructor: A simple, B nested
@@ -176,8 +166,7 @@ public:
      fun(0),
      fun2(0),
      cA(cell_A),
-     cB(_B, _inc_B),
-     cZ(&Z->get_wfirst())
+     cB(_B, _inc_B)
    {}
 
    /// A value (e.g parallel ~Value())
@@ -211,7 +200,7 @@ public:
 
    /// return Z[z]
    Cell & Z_at(ShapeItem z) const
-      { return cZ[z]; }
+      { return value_Z->get_wravel(z); }
 
 protected:
    /// ravel of the left argument
@@ -219,9 +208,6 @@ protected:
 
    /// ravel of the right argument
    ConstCell_P cB;
-
-   /// ravel of the result
-   Cell * cZ;
 };
 // ============================================================================
 /// a number of jobs, where each job can be executed in parallel
@@ -314,5 +300,5 @@ protected:
    /// the currently executed worklist item
    T current_job;
 };
-//=============================================================================
+//============================================================================
 #endif // PJOB_HH_DEFINED

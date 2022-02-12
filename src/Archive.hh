@@ -69,7 +69,7 @@ protected:
       };
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a helper class for saving an APL workspace
 class XML_Saving_Archive: public XML_Archive
 {
@@ -226,13 +226,13 @@ protected:
    /// return true iff (the definition of) \b fun was already saved.
    bool is_saved(const Function * fun) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void Hswap(XML_Saving_Archive::_val_par & vp1,
                   XML_Saving_Archive::_val_par & vp2)
 {
 const XML_Saving_Archive::_val_par tmp = vp1;   vp1 = vp2;   vp2 = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a helper class for loading an APL workspace
 class XML_Loading_Archive: public XML_Archive
 {
@@ -526,5 +526,5 @@ protected:
    /// instantiate the derived functions in \b derived_todos
    void instantiate_derived_functions(bool allocate);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

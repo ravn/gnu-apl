@@ -58,7 +58,7 @@ ShapeItem Quad_SYL::print_length_limit = 0;
 
 Unicode Quad_AV::qav[Avec::MAX_AV];
 
-//=============================================================================
+//============================================================================
 void
 SystemVariable::assign(Value_P value, bool clone, const char * loc)
 {
@@ -66,7 +66,7 @@ SystemVariable::assign(Value_P value, bool clone, const char * loc)
         << get_Id() << endl;
    FIXME;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SystemVariable::assign_indexed(const Value * X, Value_P value)
 {
@@ -74,39 +74,39 @@ SystemVariable::assign_indexed(const Value * X, Value_P value)
         << get_Id() << endl;
    FIXME;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 SystemVariable::print(ostream & out) const
 {
    return out << get_Id();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SystemVariable::get_attributes(int mode, Value & Z) const
 {
    switch(mode)
       {
         case 1: // valences (always 1 0 0 for variables)
-                Z.next_ravel_Int(1);
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
+                Z.next_ravel_1();
+                Z.next_ravel_0();
+                Z.next_ravel_0();
                 break;
 
         case 2: // creation time (always 7⍴0 for variables)
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
+                Z.next_ravel_0();
+                Z.next_ravel_0();
+                Z.next_ravel_0();
+                Z.next_ravel_0();
+                Z.next_ravel_0();
+                Z.next_ravel_0();
+                Z.next_ravel_0();
                 break;
 
         case 3: // execution properties (always 4⍴0 for variables)
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
+                Z.next_ravel_0();
+                Z.next_ravel_0();
+                Z.next_ravel_0();
+                Z.next_ravel_0();
                 break;
 
         case 4: {
@@ -124,7 +124,7 @@ SystemVariable::get_attributes(int mode, Value & Z) const
       }
 
 }
-//=============================================================================
+//============================================================================
 Quad_AV::Quad_AV()
    : RO_SystemVariable(ID_Quad_AV)
 {
@@ -150,14 +150,14 @@ Value_P AV(Avec::MAX_AV, LOC);
 
    Symbol::assign(AV, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 Quad_AV::indexed_at(uint32_t pos)
 {
    if (pos < Avec::MAX_AV)   return qav[pos];
    return UNI_AV_MAX;
 }
-//=============================================================================
+//============================================================================
 Quad_AI::Quad_AI()
    : RO_SystemVariable(ID_Quad_AI),
      session_start(now()),
@@ -165,7 +165,7 @@ Quad_AI::Quad_AI()
 {
    Symbol::assign(get_apl_value(), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_AI::get_apl_value() const
 {
@@ -182,12 +182,12 @@ Value_P Z(5, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Quad_ARG::Quad_ARG()
    : RO_SystemVariable(ID_Quad_ARG)
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_ARG::get_apl_value() const
 {
@@ -206,13 +206,13 @@ Value_P Z(argc, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Quad_CT::Quad_CT()
    : SystemVariable(ID_Quad_CT)
 {
    Symbol::assign(FloatScalar(DEFAULT_Quad_CT, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CT::assign(Value_P value, bool clone, const char * loc)
 {
@@ -241,7 +241,7 @@ APL_Float val = cell.get_real_value();
         Symbol::assign(value, clone, LOC);
       }
 }
-//=============================================================================
+//============================================================================
 Value_P
 Quad_EM::get_apl_value() const
 {
@@ -277,7 +277,7 @@ Value_P Z(pb, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Value_P
 Quad_ET::get_apl_value() const
 {
@@ -304,7 +304,7 @@ done:
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Quad_FC::Quad_FC() : SystemVariable(ID_Quad_FC)
 {
 Value_P Z(6, LOC);
@@ -318,7 +318,7 @@ Value_P Z(6, LOC);
 
    Symbol::assign(Z, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FC::push()
 {
@@ -335,7 +335,7 @@ Value_P QFC(6, LOC);
 
    Symbol::assign(QFC, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FC::assign(Value_P value, bool clone, const char * loc)
 {
@@ -364,7 +364,7 @@ UCS_string ucs(fc, 6);
 Value_P new_val(ucs, LOC);
    Symbol::assign(new_val, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FC::assign_indexed(const IndexExpr & IX, Value_P value)
 {
@@ -377,7 +377,7 @@ Quad_FC::assign_indexed(const IndexExpr & IX, Value_P value)
    Assert1(!IX.values[0]);
    assign(value, true, LOC);   // ⎕FC[]←value
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FC::assign_indexed(const Value * X, Value_P value)
 {
@@ -415,13 +415,13 @@ UCS_string ucs(fc, 6);
 Value_P new_val(ucs, LOC);
    Symbol::assign(new_val, false, LOC);
 }
-//=============================================================================
+//============================================================================
 Quad_IO::Quad_IO()
    : SystemVariable(ID_Quad_IO)
 {
    Symbol::assign(IntScalar(1, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_IO::assign(Value_P value, bool clone, const char * loc)
 {
@@ -436,13 +436,13 @@ Quad_IO::assign(Value_P value, bool clone, const char * loc)
    else
       Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//=============================================================================
+//============================================================================
 Quad_L::Quad_L()
  : NL_SystemVariable(ID_Quad_L)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_L::assign(Value_P value, bool clone, const char * loc)
 {
@@ -455,7 +455,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 
    si->set_L(value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_L::get_apl_value() const
 {
@@ -468,13 +468,13 @@ StateIndicator * si = Workspace::SI_top_error();
 
    VALUE_ERROR;
 }
-//=============================================================================
+//============================================================================
 Quad_LC::Quad_LC()
    : RO_SystemVariable(ID_Quad_LC)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_LC::get_apl_value() const
 {
@@ -500,13 +500,13 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Quad_LX::Quad_LX()
    : NL_SystemVariable(ID_Quad_LX)
 {
    Symbol::assign(Str0(LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_LX::assign(Value_P value, bool clone, const char * loc)
 {
@@ -515,14 +515,14 @@ Quad_LX::assign(Value_P value, bool clone, const char * loc)
 
    Symbol::assign(value, clone, LOC);
 }
-//=============================================================================
+//============================================================================
 Quad_PP::Quad_PP()
    : SystemVariable(ID_Quad_PP)
 {
 Value_P Qpp = IntScalar(DEFAULT_Quad_PP, LOC);
    Symbol::assign(Qpp, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_PP::assign(Value_P value, bool clone, const char * loc)
 {
@@ -532,13 +532,13 @@ APL_Integer pp = value->get_sole_integer();
 
    Symbol::assign(IntScalar(pp, LOC), false, LOC);
 }
-//=============================================================================
+//============================================================================
 Quad_PR::Quad_PR()
    : SystemVariable(ID_Quad_PR)
 {
    Symbol::assign(CharScalar(UNI_SPACE, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_PR::assign(Value_P value, bool clone, const char * loc)
 {
@@ -548,7 +548,7 @@ UCS_string ucs = value->get_UCS_ravel();
 
    Symbol::assign(value, clone, LOC);
 }
-//=============================================================================
+//============================================================================
 Quad_PS::Quad_PS()
    : SystemVariable(ID_Quad_PS),
      print_quotients(false),
@@ -560,7 +560,7 @@ Value_P Z(2, LOC);
    Z->check_value(LOC);
    Symbol::assign(Z, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_PS::assign(Value_P B, bool clone, const char * loc)
 {
@@ -624,7 +624,7 @@ Value_P B2(2, LOC);
    Symbol::assign(B2, false, LOC);
    return;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_PS::assign_indexed(const Value * X, Value_P B)
 {
@@ -681,13 +681,13 @@ Value_P Z(2, LOC);
    Z->check_value(LOC);
    Symbol::assign(Z, false, LOC);
 }
-//=============================================================================
+//============================================================================
 Quad_PW::Quad_PW()
    : SystemVariable(ID_Quad_PW)
 {
    Symbol::assign(IntScalar(uprefs.initial_pw, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_PW::assign(Value_P value, bool clone, const char * loc)
 {
@@ -701,12 +701,12 @@ const APL_Integer pw = value->get_sole_integer();
 
    Symbol::assign(IntScalar(pw, LOC), false, LOC);
 }
-//=============================================================================
+//============================================================================
 Quad_Quad::Quad_Quad()
  : SystemVariable(ID_Quad_Quad)
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_Quad::assign(Value_P value, bool clone, const char * loc)
 {
@@ -715,7 +715,7 @@ Quad_Quad::assign(Value_P value, bool clone, const char * loc)
 
    value->print(COUT);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_Quad::resolve(Token & token, bool left)
 {
@@ -735,7 +735,7 @@ UCS_string line;
 
    token.move_2(Bif_F1_EXECUTE::execute_statement(line), LOC);
 }
-//=============================================================================
+//============================================================================
 Quad_QUOTE::Quad_QUOTE()
  : SystemVariable(ID_QUOTE_Quad)
 {
@@ -745,7 +745,7 @@ Value_P dummy(UCS_string(LOC), LOC);
    dummy->set_complete();
    Symbol::assign(dummy, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_QUOTE::done(bool with_LF, const char * loc)
 {
@@ -759,7 +759,7 @@ Quad_QUOTE::done(bool with_LF, const char * loc)
         prompt.clear();
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_QUOTE::assign(Value_P value, bool clone, const char * loc)
 {
@@ -794,7 +794,7 @@ PrintBuffer pb(*value, pctx, 0);
       CERR << "Quad_QUOTE::assign() done, buffer = ["
            << prompt << "]" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_QUOTE::get_apl_value() const
 {
@@ -830,13 +830,13 @@ Value_P Z(line, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Quad_R::Quad_R()
  : NL_SystemVariable(ID_Quad_R)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_R::assign(Value_P value, bool clone, const char * loc)
 {
@@ -849,7 +849,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 
    si->set_R(value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_R::get_apl_value() const
 {
@@ -862,7 +862,7 @@ StateIndicator * si = Workspace::SI_top_error();
 
    VALUE_ERROR;
 }
-//=============================================================================
+//============================================================================
 void
 Quad_SYL::assign(Value_P value, bool clone, const char * loc)
 {
@@ -876,7 +876,7 @@ Quad_SYL::assign(Value_P value, bool clone, const char * loc)
    //
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P value)
 {
@@ -900,7 +900,7 @@ const Value * X1 = IDX.get_axis_value(0);
 
    assign_indexed(X1, value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_SYL::assign_indexed(const Value * X, Value_P B)
 {
@@ -975,7 +975,7 @@ const APL_Integer qio = Workspace::get_IO();
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_SYL::get_apl_value() const
 {
@@ -992,7 +992,7 @@ Value_P Z(sh, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Quad_TC::Quad_TC()
    : RO_SystemVariable(ID_Quad_TC)
 {
@@ -1004,13 +1004,13 @@ Value_P Z(3, LOC);
 
    Symbol::assign(Z, false, LOC);
 }
-//=============================================================================
+//============================================================================
 Quad_TS::Quad_TS()
    : RO_SystemVariable(ID_Quad_TS)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_TS::get_apl_value() const
 {
@@ -1029,7 +1029,7 @@ Value_P Z(7, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Quad_TZ::Quad_TZ()
    : SystemVariable(ID_Quad_TZ)
 {
@@ -1042,7 +1042,7 @@ Quad_TZ::Quad_TZ()
    else
       Symbol::assign(FloatScalar(offset_seconds/3600, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_TZ::compute_offset()
 {
@@ -1072,7 +1072,7 @@ int diff_minutes = local_minutes - gm_minutes;
 
    return 60*diff_minutes;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Quad_TZ::print_timestamp(ostream & out, APL_time_us when) const
 {
@@ -1093,7 +1093,7 @@ ostringstream os;
 
    return out << os.str();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_TZ::assign(Value_P value, bool clone, const char * loc)
 {
@@ -1124,13 +1124,13 @@ const Cell & cell = value->get_cfirst();
 
    DOMAIN_ERROR;
 }
-//=============================================================================
+//============================================================================
 Quad_UL::Quad_UL()
    : RO_SystemVariable(ID_Quad_UL)
 {
    Symbol::assign(get_apl_value(), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_UL::get_apl_value() const
 {
@@ -1157,13 +1157,13 @@ Value_P Z(LOC);
    Z->check_value(LOC);
    return Z;
 }
-//=============================================================================
+//============================================================================
 Quad_X::Quad_X()
  : NL_SystemVariable(ID_Quad_X)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_X::assign(Value_P value, bool clone, const char * loc)
 {
@@ -1176,7 +1176,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 
    si->set_X(value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_X::get_apl_value() const
 {
@@ -1189,4 +1189,4 @@ StateIndicator * si = Workspace::SI_top_error();
 
    VALUE_ERROR;
 }
-//=============================================================================
+//============================================================================

@@ -32,25 +32,25 @@ using namespace std;
 class UCS_string;
 class Value;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// one byte of a UTF8 encoded Unicode (RFC 3629) string
 typedef uint8_t UTF8;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// frequently used cast to const UTF8 *
 inline const UTF8 *
 utf8P(const void * vp)
 {
   return reinterpret_cast<const UTF8 *>(vp);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// frequently used cast to UTF8 *
 inline UTF8 *
 utf8P(char * cp)
 {
   return reinterpret_cast<UTF8 *>(cp);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// an UTF8 encoded Unicode (RFC 3629) string
 class UTF8_string : public std::basic_string<UTF8>
 {
@@ -136,7 +136,7 @@ public:
    /// return the next UTF8 encoded char from an input file
    static Unicode getc(istream & in);
 };
-//=============================================================================
+//============================================================================
 /// A UTF8 string to be used as filebuf in UTF8_ostream
 class UTF8_filebuf : public filebuf
 {
@@ -152,7 +152,7 @@ protected:
    /// the data in this filebuf
    UTF8_string data;
 };
-//=============================================================================
+//============================================================================
 /// a UTF8 string that can be used as ostream
 class UTF8_ostream : public ostream
 {
@@ -170,6 +170,6 @@ protected:
    /// the filebuf of this ostream
    UTF8_filebuf utf8_filebuf;
 };
-//=============================================================================
+//============================================================================
 
 #endif // __UTF8_STRING_HH_DEFINED__

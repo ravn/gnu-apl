@@ -80,7 +80,7 @@ struct Format_sub
    /// Fill buf at position x,y with data according to fmt
    UCS_string insert_fract_commas(const UCS_string & data) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function format
  */
 /// The class implementing ⍕
@@ -180,6 +180,6 @@ protected:
    /// format value with \b precision mantissa digits (floating format)
    static UCS_string format_spec_float(APL_Float value, int precision);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_F12_FORMAT_HH_DEFINED__

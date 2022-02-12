@@ -49,6 +49,6 @@ protected:
    /// overloaded Cell::get_classname().
    virtual const char * get_classname() const   { return "RealCell"; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __REALCELL_HH_DEFINED__

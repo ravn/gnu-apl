@@ -31,7 +31,7 @@
 #include "UserFunction_header.hh"
 #include "UTF8_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// One user-defined function
 class UserFunction : public Function, public Executable
 {
@@ -220,7 +220,8 @@ public:
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const;
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X,
+                            Value_P B) const;
 
    /// Quad_CR of this function
    virtual UCS_string canonical(bool with_lines) const;
@@ -337,6 +338,6 @@ protected:
    /// information about an error (if any)
    const char * error_info;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __USERFUNCTION_HH_DEFINED__

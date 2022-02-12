@@ -39,7 +39,7 @@ Bif_F12_DOMINO * Bif_F12_DOMINO::fun = &Bif_F12_DOMINO::_fun;
 # define Q1(x)
 #endif
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_DOMINO::eval_B(Value_P B) const
 {
@@ -110,7 +110,7 @@ Value_P I(shape_I, LOC);
 Token result = eval_AB(I, B);
    return result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
 {
@@ -136,7 +136,7 @@ Value_P Z(3, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_DOMINO::eval_AB(Value_P A, Value_P B) const
 {
@@ -193,13 +193,13 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_DOMINO::eval_fill_B(Value_P B) const
 {
    return Bif_F12_TRANSPOSE::fun->eval_B(B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_DOMINO::eval_fill_AB(Value_P A, Value_P B) const
 {
@@ -208,17 +208,17 @@ Shape shape_Z;
    loop(r, B->get_rank() - 1)  shape_Z.add_shape_item(B->get_shape_item(r + 1));
 
 Value_P Z(shape_Z, LOC);
-   while (Z->more())   Z->next_ravel_Int(0);
+   while (Z->more())   Z->next_ravel_0();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    TODO;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// print debug infos for \b this real matrix
 template<>
 void Bif_F12_DOMINO::Matrix<false>::debug(const char * name) const
@@ -232,7 +232,7 @@ Value_P B(shape_B, LOC);
    B->check_value(LOC);
 
 Value_P A(2, LOC);   // A←0 4
-   A->next_ravel_Int(0);
+   A->next_ravel_0();
    A->next_ravel_Int(4);   // number of fractional digits
    A->check_value(LOC);
 
@@ -241,7 +241,7 @@ Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// print debug infos for \b this complex matrix
 template<>
 void Bif_F12_DOMINO::Matrix<true>::debug(const char * name) const
@@ -255,7 +255,7 @@ Value_P B(shape_B, LOC);
    B->check_value(LOC);
 
 Value_P A(2, LOC);
-   A->next_ravel_Int(0);
+   A->next_ravel_0();
    A->next_ravel_Int(4);   // number of fractional digits
    A->check_value(LOC);
 
@@ -341,7 +341,7 @@ Value_P INV(shape_INV, LOC);
    INV->check_value(LOC);
    return INV;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// inver a complex upper-triangle matrix
 template<>
 Value_P Bif_F12_DOMINO::invert_upper_triangle_matrix<true>(ShapeItem M,
@@ -427,7 +427,7 @@ Value_P INV(shape_INV, LOC);
    INV->check_value(LOC);
    return INV;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_DOMINO::QR_factorization(Value_P Z, bool need_complex, ShapeItem rows,
                                  ShapeItem cols, const Cell * cB, double EPS)
@@ -578,7 +578,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
 
    delete[] data;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_DOMINO::setup_complex_B(const Cell * cB, double * D, ShapeItem count)
 {
@@ -594,7 +594,7 @@ Bif_F12_DOMINO::setup_complex_B(const Cell * cB, double * D, ShapeItem count)
         else   DOMAIN_ERROR;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_DOMINO::setup_real_B(const Cell * cB, double * D, ShapeItem count)
 {
@@ -606,7 +606,7 @@ Bif_F12_DOMINO::setup_real_B(const Cell * cB, double * D, ShapeItem count)
         else                               DOMAIN_ERROR;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 template<bool cplx>
 double *
 Bif_F12_DOMINO::householder(double * pB, ShapeItem rows, ShapeItem cols,
@@ -763,5 +763,5 @@ mB.debug("[13] B");
          --rows;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

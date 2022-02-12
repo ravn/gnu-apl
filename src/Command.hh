@@ -30,7 +30,7 @@
 class Workspace;
 struct dirent;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*!
     Some command related functions, including the main input loop
     of the APL interpreter.
@@ -109,6 +109,9 @@ public:
 
    /// return true if entry is a directory
    static bool is_directory(dirent * entry, const UTF8_string & path);
+
+   /// clear the copy_once_table.
+   static void clear_copy_once_table();
 
    /// format for ]BOXING
    static int boxing_format;
@@ -224,7 +227,8 @@ protected:
                             const char * args);
 
    /// resolve an optional lib followed by a WS name
-   static bool resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
+   static bool resolve_lib_wsname(ostream & out,
+                                  const UCS_string_vector & args,
                                   LibRef &lib, UCS_string & wsname);
 
    /// a helper struct for the )IN command
@@ -291,10 +295,10 @@ protected:
    /// workspaces that shall not be copied twice
    static UCS_string_vector copy_once_table;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void Hswap(Command::val_val & vp1, Command::val_val & vp2)
 {
 const Command::val_val tmp = vp1;   vp1 = vp2;   vp2 = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __COMMAND_HH_DEFINED__

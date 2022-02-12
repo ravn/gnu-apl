@@ -36,7 +36,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Symbol *
 SymbolTable::lookup_symbol(const UCS_string & sym_name)
 {
@@ -83,7 +83,7 @@ Symbol * sym = new Symbol(sym_name, ID_USER_SYMBOL);
    add_symbol(sym);
    return sym;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 SymbolTable::find_lambda_name(const UserFunction * lambda)
 {
@@ -98,7 +98,7 @@ SymbolTable::find_lambda_name(const UserFunction * lambda)
 
    return UCS_string();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 SymbolTable::list_symbol(ostream & out, const UCS_string & buf1) const
 {
@@ -125,7 +125,7 @@ const Symbol * sym = Workspace::lookup_existing_symbol(buf);
 
    return out << "no symbol '" << buf1 << "'" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::list(ostream & out, ListCategory which, UCS_string from_to) const
 {
@@ -243,7 +243,7 @@ std::vector<int> col_widths;
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::unmark_all_values() const
 {
@@ -255,7 +255,7 @@ SymbolTable::unmark_all_values() const
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 SymbolTable::show_owners(ostream & out, const Value & value) const
 {
@@ -269,7 +269,7 @@ int count = 0;
        }
    return count;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
 {
@@ -281,7 +281,7 @@ SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::erase_symbols(ostream & out, const UCS_string_vector & symbols)
 {
@@ -300,7 +300,7 @@ int error_count = 0;
 
    if (error_count)   out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::clear(ostream & out)
 {
@@ -310,7 +310,7 @@ SymbolTable::clear(ostream & out)
 
    loop(hash, max_symbol_count)   clear_slot(out, hash);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::clear_slot(ostream & out, int hash)
 {
@@ -338,7 +338,7 @@ Symbol * next;   // the symbol after sym
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 SymbolTable::erase_one_symbol(const UCS_string & sym)
 {
@@ -437,7 +437,7 @@ ValueStackItem & tos = symbol->value_stack[0];
     Assert(0 && "Bad name_class in SymbolTable::erase_one_symbol()");
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 std::vector<const Symbol *>
 SymbolTable::get_all_symbols() const
 {
@@ -454,7 +454,7 @@ std::vector<const Symbol *> ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
 {
@@ -503,7 +503,7 @@ std::vector<const Symbol *> symbols;
         if (vs.get_nc() == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
       }
 }
-//=============================================================================
+//============================================================================
 void
 SystemSymTab::clear(ostream & out)
 {
@@ -513,7 +513,7 @@ SystemSymTab::clear(ostream & out)
 
    loop(hash, max_symbol_count)   clear_slot(out, hash);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SystemSymTab::clear_slot(ostream & out, int hash)
 {
@@ -530,7 +530,7 @@ SystemName * sym = symbol_table[hash];
          sym = next;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 SystemSymTab::add_fun_or_var(const UCS_string & name, Id id,
                        QuadFunction * function, SystemVariable * variable)
@@ -546,4 +546,4 @@ SystemName * dist_name = new SystemName(name, id, function, variable);
    add_symbol(dist_name);
    if (max_name_len < name.size())   max_name_len = name.size();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

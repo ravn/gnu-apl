@@ -62,7 +62,7 @@ union SockAddr
   ///  an AF_UNIX socket address
   sockaddr_un uNix;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Svar_DB::start_APserver(const char * server_sockname,
                         const char * bin_dir, bool logit)
@@ -146,7 +146,7 @@ const int APserver_result = pclose(fp);
 
    return false;   // success
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 TCP_socket
 Svar_DB::connect_to_APserver(const char * bin_dir, const char * prog,
                                       int retry_max, bool logit)
@@ -301,7 +301,7 @@ char peer[100];
 
    return TCP_socket(sock);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_DB::DB_tcp_error(const char * op, int got, int expected)
 {
@@ -316,7 +316,7 @@ Svar_DB::DB_tcp_error(const char * op, int got, int expected)
 
    ::close(DB_tcp);
 }
-//=============================================================================
+//============================================================================
 
 Svar_record_P::Svar_record_P(SV_key key)
 {
@@ -345,7 +345,7 @@ Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
    else   get_CERR() << "Svar_record_P() failed at " << LOC << endl;
    if (del)   delete del;
 }
-//=============================================================================
+//============================================================================
 void
 Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
               bool logit, bool do_svars)
@@ -364,7 +364,7 @@ Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
         if (logit)   get_CERR() << "using Svar_DB on APserver!" << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 SV_key
 Svar_DB::match_or_make(const uint32_t * UCS_varname, const AP_num3 & to,
                        const Svar_partner & from)
@@ -402,7 +402,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    else            return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 SV_key
 Svar_DB::get_events(Svar_event & events, AP_num3 id)
 {
@@ -434,7 +434,7 @@ Signal_base * response =
         return 0;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Svar_event
 Svar_DB::clear_all_events(AP_num3 id)
 {
@@ -463,7 +463,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
         return SVE_NO_EVENTS;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_DB::set_control(SV_key key, Svar_Control ctl)
 {
@@ -472,7 +472,7 @@ const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
 
 SET_CONTROL_c request(tcp, key, ctl);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_DB::set_state(SV_key key, bool used, const char * loc)
 {
@@ -482,7 +482,7 @@ const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
 string sloc(loc);
 SET_STATE_c request(tcp, key, used, sloc);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Svar_DB::may_set(SV_key key, int attempt)
 {
@@ -506,7 +506,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Svar_DB::may_use(SV_key key, int attempt)
 {
@@ -529,7 +529,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
      }
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_DB::add_event(SV_key key, AP_num3 id, Svar_event event)
 {
@@ -538,7 +538,7 @@ const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
 
 ADD_EVENT_c request(tcp, key, id.proc, id.parent, id.grand, event);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_DB::retract_var(SV_key key)
 {
@@ -547,7 +547,7 @@ const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
 
 RETRACT_VAR_c request(tcp, key);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 AP_num3
 Svar_DB::find_offering_id(SV_key key)
 {
@@ -573,7 +573,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    return offering_id;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_DB::get_offering_processors(AP_num to_proc,
                                  std::vector<AP_num> & processors)
@@ -599,7 +599,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
         delete response; 
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_DB::get_offered_variables(AP_num to_proc, AP_num from_proc,
                                std::vector<uint32_t> & varnames)
@@ -625,7 +625,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
         delete response; 
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Svar_DB::is_registered_id(const AP_num3 & id)
 {
@@ -649,7 +649,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 TCP_socket
 Svar_DB::get_Svar_DB_tcp(const char * calling_function)
 {
@@ -662,7 +662,7 @@ const TCP_socket tcp = Svar_DB::get_DB_tcp();
 
    return tcp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 SV_key
 Svar_DB::find_pairing_key(SV_key key)
 {
@@ -686,7 +686,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Svar_DB::print(ostream & out)
 {
@@ -713,5 +713,5 @@ Q1(LOC)
       }
 Q1(LOC)
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

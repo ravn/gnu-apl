@@ -23,7 +23,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator ⍤ (rank)
  */
 /// The class implementing ⍤
@@ -69,6 +69,6 @@ protected:
    /// convert 1- 2- or 3-element vector y123 to chunk-ranks of A and B
    static void y123_to_AB(Value_P y123, Rank & rk_A, Rank & rk_B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_OPER2_RANK_HH_DEFINED__

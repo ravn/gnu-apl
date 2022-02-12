@@ -23,7 +23,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Comma related functions (catenate, laminate, and ravel.) */
 /// Base class for , and ⍪
 class Bif_COMMA : public NonscalarFunction
@@ -51,7 +51,7 @@ public:
    /// Prepend scalar cell_B to A along axis
    static Value_P append_scalar(Value_P A, uAxis axis, const Cell & cell_B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions catenate, laminate, and ravel along last axis */
 /// The class implementing ,
 class Bif_F12_COMMA : public Bif_COMMA
@@ -80,7 +80,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions catenate and laminate along first axis, table */
 /// The class implementing ⍪
 class Bif_F12_COMMA1 : public Bif_COMMA
@@ -108,7 +108,7 @@ public:
    static Bif_F12_COMMA1  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_COMMA_HH_DEFINED__
 

@@ -65,7 +65,7 @@
 /// when this file  was built
 static const char * build_tag[] = { BUILDTAG, 0 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// old sigaction argument for ^C
 static struct sigaction old_control_C_action;
@@ -73,7 +73,7 @@ static struct sigaction old_control_C_action;
 /// new sigaction argument for ^C
 static struct sigaction new_control_C_action;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for segfaults
 static struct sigaction old_SEGV_action;
 
@@ -101,7 +101,7 @@ signal_SEGV_handler(int)
 
    Command::cmd_OFF(3);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGWINCH
 static struct sigaction old_WINCH_action;
 
@@ -128,7 +128,7 @@ struct winsize wsize;
    Workspace::set_PW(wsize.ws_col, LOC);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGUSR1
 static struct sigaction old_USR1_action;
 
@@ -141,7 +141,7 @@ signal_USR1_handler(int)
 {
    CERR << "Got signal USR1" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGTERM
 static struct sigaction old_TERM_action;
 
@@ -156,7 +156,7 @@ signal_TERM_handler(int)
    sigaction(SIGTERM, &old_TERM_action, 0);
    raise(SIGTERM);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #if PARALLEL_ENABLED
 /// old sigaction argument for ^\,
 static struct sigaction old_control_BSL_action;
@@ -172,7 +172,7 @@ control_BSL(int sig)
    Thread_context::print_all(CERR);
 }
 #endif // PARALLEL_ENABLED
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGHUP
 static struct sigaction old_HUP_action;
 
@@ -187,7 +187,7 @@ signal_HUP_handler(int)
    sigaction(SIGHUP, &old_HUP_action, 0);
    raise(SIGHUP);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// print argc and argv[]
 static void
 show_argv(int argc, const char ** argv)
@@ -209,7 +209,7 @@ show_argv(int argc, const char ** argv)
    else
       CERR << "fd 3 is:  OPEN" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// print a welcome message (copyright notice)
 static void
 show_welcome(ostream & out, const char * argv0)
@@ -266,7 +266,7 @@ const int left_pad = (80 - len)/2;
          out<< endl;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// maybe remap stdin, stdout, and stderr to an incoming TCP connection to
 /// port uprefs.tcp_port on localhost
 void
@@ -362,7 +362,7 @@ sockaddr_in local;
        }
 
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// initialize the interpreter
 int
 init_apl(int argc, const char * argv[])
@@ -590,7 +590,7 @@ const bool log_startup = uprefs.parse_argv_1();
    Quad_TZ::compute_offset();
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// dito.
 int
 main(int argc, const char *argv[])
@@ -623,4 +623,4 @@ main(int argc, const char *argv[])
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

@@ -25,7 +25,7 @@
 #include "Function.hh"
 #include "Output.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** an operator bound to its left and (in the case of a dyadic operator) to
    its right operand.
  **/
@@ -138,7 +138,7 @@ private:
    ~DerivedFunction();
 
 };
-//=============================================================================
+//============================================================================
 /// a small cache for storing a few DerivedFunction objects
 class DerivedFunctionCache
 {
@@ -185,5 +185,5 @@ protected:
    /// the number of elements in \b cache
    size_t idx;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __DERIVED_FUNCTION__DEFINED__

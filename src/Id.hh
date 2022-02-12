@@ -32,7 +32,7 @@ class Function;
 class Symbol;
 class UCS_string;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  An Identifier for each internal object (primitives, Quad-symbols, and more).
  The ID can be derived in different ways:
@@ -73,7 +73,7 @@ public:
    /// release UCS_strings with ID names
    static void cleanup();
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #include "TokenEnums.hh"
 

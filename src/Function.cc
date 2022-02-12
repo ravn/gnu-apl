@@ -32,7 +32,7 @@
 #include "Symbol.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Function::get_attributes(int mode, Value & Z) const
 {
@@ -65,14 +65,14 @@ Function::get_attributes(int mode, Value & Z) const
                 return;
 
         case 4: // 4 ⎕DR for functions is always 0 0
-                Z.next_ravel_Int(0);
-                Z.next_ravel_Int(0);
+                Z.next_ravel_0();
+                Z.next_ravel_0();
                 return;
       }
 
    Assert(0 && "Not reached");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_() const
 {
@@ -80,7 +80,7 @@ Function::eval_() const
         << "() called (overloaded variant not yet implemented?)" << endl;
    FIXME;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_B(Value_P B) const
 {
@@ -88,7 +88,7 @@ Function::eval_B(Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_AB(Value_P A, Value_P B) const
 {
@@ -96,7 +96,7 @@ Function::eval_AB(Value_P A, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_LB(Token & LO, Value_P B) const
 {
@@ -104,7 +104,7 @@ Function::eval_LB(Token & LO, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
@@ -112,7 +112,7 @@ Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
@@ -120,7 +120,7 @@ Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
@@ -128,7 +128,7 @@ Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Fun_signature
 Function::get_signature() const
 {
@@ -144,12 +144,12 @@ int sig = SIG_FUN;
 
    return Fun_signature(sig);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, const Function & fun)
 {
    fun.print(out);
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

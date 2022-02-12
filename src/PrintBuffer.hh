@@ -33,7 +33,7 @@
 class Value;
 class Cell;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// some information about a column to be printed.
 class ColInfo
@@ -81,7 +81,7 @@ public:
    /// the length of the denominator (for rational numbers)
    int denom_len;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A two-dimensional Unicode character buffer
 class PrintBuffer
 {

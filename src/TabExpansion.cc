@@ -24,12 +24,12 @@
 #include "TabExpansion.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 TabExpansion::TabExpansion(UCS_string & line)
    : have_trailing_blank(line.size() && line.back() == ' ')
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_tab(UCS_string & user)
 {
@@ -48,7 +48,7 @@ TabExpansion::expand_tab(UCS_string & user)
 
    return expand_distinguished_name(user);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_user_name(UCS_string & user)
 {
@@ -86,7 +86,7 @@ UCS_string_vector matches;
 
    return ER_IGNORE;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_APL_command(UCS_string & user)
 {
@@ -167,7 +167,7 @@ UCS_string arg;
 
    return expand_command_arg(user, ehint, shint, matches[0], arg);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_command_arg(UCS_string & user, 
                             ExpandHint ehint, const char * shint,
@@ -196,7 +196,7 @@ TabExpansion::expand_command_arg(UCS_string & user,
              return ER_AGAIN;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_help_topics(UCS_string & user)
 {
@@ -244,7 +244,7 @@ UCS_string_vector matches;
    user = help + matches[0];
    return ER_REPLACE;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_help_topics()
 {
@@ -317,7 +317,7 @@ int c1 = col;
    CERR << endl;
    return ER_AGAIN;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 ExpandResult
 TabExpansion::expand_distinguished_name(UCS_string & user)
@@ -399,7 +399,7 @@ int qpos = -1;
 
    return ER_IGNORE;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_filename(UCS_string & user,
                               ExpandHint ehint, const char * shint,
@@ -538,7 +538,7 @@ nothing:
    CERR << cmd << " " << shint << endl;
    return ER_AGAIN;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_wsname(UCS_string & user, const UCS_string cmd,
                        LibRef lib, const UCS_string filename)
@@ -599,7 +599,7 @@ nothing:
    CERR << cmd << " " << lib << " '" << filename << "'" << endl;
    return ER_AGAIN;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 TabExpansion::compute_common_length(int len, const UCS_string_vector & matches)
 {
@@ -614,7 +614,7 @@ TabExpansion::compute_common_length(int len, const UCS_string_vector & matches)
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 TabExpansion::read_matching_filenames(DIR * dir, UTF8_string dirname,
                                  UTF8_string prefix, ExpandHint ehint,
@@ -652,7 +652,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
           matches.push_back(name);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::show_alternatives(UCS_string & user, int prefix_len,
                            UCS_string_vector & matches)
@@ -683,7 +683,7 @@ const int common_len = compute_common_length(prefix_len, matches);
         return ER_REPLACE;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 
 

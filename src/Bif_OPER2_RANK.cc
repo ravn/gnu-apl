@@ -32,7 +32,7 @@ Bif_OPER2_RANK * Bif_OPER2_RANK::fun = &Bif_OPER2_RANK::_fun;
  * confusion with the rank of a value
  */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_RANK::eval_LRB(Token & LO, Token & y, Value_P B) const
 {
@@ -44,7 +44,7 @@ Rank rank_chunk_B = B->get_rank();
 
    return do_LyXB(LO, Value_P(), B, rank_chunk_B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_RANK::eval_LRXB(Token & LO, Token & y, Value_P X, Value_P B) const
 {
@@ -57,7 +57,7 @@ Rank rank_chunk_B = B->get_rank();
 
    return do_LyXB(LO, X, B, rank_chunk_B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_RANK::do_LyXB(Token & _LO, Value_P X, Value_P B, Rank rank_chunk_B)
 {
@@ -103,7 +103,7 @@ Value_P X5(5, LOC);
 
    return Macro::get_macro(Macro::MAC_Z__LO_RANK_X5_B)->eval_LXB(_LO, X5, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_RANK::eval_ALRB(Value_P A, Token & LO, Token & y, Value_P B) const
 {
@@ -116,7 +116,7 @@ Rank rank_chunk_B = B->get_rank();
 
    return do_ALyXB(A, rank_chunk_A, LO, Value_P(), B, rank_chunk_B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_RANK::eval_ALRXB(Value_P A, Token & LO, Token & y, Value_P X, Value_P B) const
 {
@@ -130,7 +130,7 @@ Rank rank_chunk_B = B->get_rank();
 
    return do_ALyXB(A, rank_chunk_A, LO, X, B, rank_chunk_B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_RANK::do_ALyXB(Value_P A, Rank rank_chunk_A, Token & _LO,
                          Value_P X, Value_P B, Rank rank_chunk_B)
@@ -200,7 +200,7 @@ Value_P X7(7, LOC);
    return Macro::get_macro(Macro::MAC_Z__A_LO_RANK_X7_B)
                            ->eval_ALXB(A, _LO, X7, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_RANK::y123_to_B(Value_P y123, Rank & rank_B)
 {
@@ -248,7 +248,7 @@ const Rank rk_B = rank_B;
    if (rank_B < 0)      rank_B += rk_B;
    if (rank_B < 0)      rank_B = 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_RANK::y123_to_AB(Value_P y123, Rank & rank_A, Rank & rank_B)
 {
@@ -303,7 +303,7 @@ const Rank rk_B = rank_B;
    if (rank_B < 0)      rank_B += rk_B;
    if (rank_B < 0)      rank_B = 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_RANK::split_y123_B(Value_P y123_B, Value_P & y123, Value_P & B)
 {
@@ -413,4 +413,4 @@ const ShapeItem B_len = length - y123_len;
    loop(bb, B_len)   B->next_ravel_Cell(y123_B->get_cravel(bb + y123_len));
    B->check_value(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

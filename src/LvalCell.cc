@@ -24,26 +24,26 @@
 #include "UTF8_string.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 LvalCell::LvalCell(Cell * cell, Value * cell_owner)
 {
    value.lval = cell;
    value.pval.owner = cell_owner;
    check_consistency();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LvalCell::init_other(void * other, Value &, const char * loc) const
 {
    new (other)  LvalCell(get_lval_value(), get_cell_owner());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Cell *
 LvalCell::get_lval_value()  const
 {
   return value.lval;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PrintBuffer
 LvalCell::character_representation(const PrintContext & pctx) const
 {
@@ -61,7 +61,7 @@ PrintBuffer pb = value.lval->character_representation(pctx);
    pb.pad_r(Unicode('='), 1);
    return pb;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LvalCell::check_consistency() const
 {
@@ -81,5 +81,5 @@ LvalCell::check_consistency() const
   else Assert(value.pval.owner == 0);   // no owner
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

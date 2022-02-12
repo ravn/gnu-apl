@@ -23,7 +23,7 @@
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Plot_window_properties::Plot_window_properties(const Plot_data * data,
                                                int verbosity)
    : line_count(data->get_row_count()),
@@ -71,7 +71,7 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
 
    update(verbosity);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Plot_window_properties::~Plot_window_properties()
 
 {
@@ -80,7 +80,7 @@ Plot_window_properties::~Plot_window_properties()
 
    delete &plot_data;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
 {
@@ -90,7 +90,7 @@ Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
    pa_height = height - pa_border_T - origin_Y - pa_border_B;
    update(0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 bool
 Plot_window_properties::update(int verbosity)
@@ -230,7 +230,7 @@ const int max_Zi = ceil(max_Z / tile_Z);
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Plot_window_properties::print(ostream & out) const
 {
@@ -254,7 +254,7 @@ Plot_window_properties::print(ostream & out) const
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Plot_window_properties::set_attribute(const char * att_and_val)
 {
@@ -354,7 +354,7 @@ const char * minus = strchr(att_and_val, '-');
 
    return "Bad or unknown window attribute";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 double
 Plot_window_properties::round_up_125(double val)
 {
@@ -382,7 +382,7 @@ int expo = 0;
         return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 uint32_t
 Plot_window_properties::get_color(double alpha) const
 {
@@ -428,7 +428,7 @@ Plot_window_properties::get_color(double alpha) const
    //
    return gradient.back().rgb;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Pixel_XY
 Plot_window_properties::valXYZ2pixelXY(double X, double Y, double Z) const
 {
@@ -439,7 +439,7 @@ const Pixel_X py = valY2pixel(Y - get_min_Y())                  + pz*sin(phi);
 
    return Pixel_XY(px, py);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 
 

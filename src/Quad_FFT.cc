@@ -32,13 +32,13 @@ bool Quad_FFT::system_wisdom_loaded = false;
 #include <fftw3.h>
 #include "ComplexCell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::eval_B(Value_P B) const
 {
    return do_fft(FFTW_FORWARD, B, 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FFT::init_in(void * _in, Value_P B, window_function win)
 {
@@ -82,7 +82,7 @@ const APL_Integer N = B->element_count();
         delete [] wp;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::do_fft(int dir, Value_P B, window_function win)
 {
@@ -181,7 +181,7 @@ const double norm = sqrt(N);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::do_window(Value_P B, window_function win)
 {
@@ -228,7 +228,7 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::eval_AB(Value_P A, Value_P B) const
 {
@@ -277,7 +277,7 @@ const APL_Integer what = A->get_cfirst().get_int_value();
 
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FFT::fill_window(double * result, const Shape & shape, window_function win)
 {
@@ -301,7 +301,7 @@ ShapeItem rlen = 1;
        }
 
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H)
 

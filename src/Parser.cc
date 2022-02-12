@@ -37,7 +37,7 @@
 #include "Tokenizer.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::parse(const UCS_string & input, Token_string & tos) const
 {
@@ -61,7 +61,7 @@ Token_string tos1;
 
    return parse(tos1, tos);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::parse(const Token_string & input, Token_string & tos) const
 {
@@ -118,7 +118,7 @@ std::vector<Token_string *> statements;
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::parse_statement(Token_string & tos)
 {
@@ -200,7 +200,7 @@ Parser::parse_statement(Token_string & tos)
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::collect_constants(Token_string & tos)
 {
@@ -270,7 +270,7 @@ Parser::collect_constants(Token_string & tos)
         tos.print(CERR, true);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Parser::collect_groups(Token_string & tos)
 {
@@ -329,7 +329,7 @@ int opening = -1;
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_closing_bracket(const Token_string & tos, int pos)
 {
@@ -352,7 +352,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_opening_bracket(const Token_string & tos, int pos)
 {
@@ -375,7 +375,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_closing_parent(const Token_string & tos, int pos)
 {
@@ -398,7 +398,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_opening_parent(const Token_string & tos, int pos)
 {
@@ -421,7 +421,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::remove_nongrouping_parantheses(Token_string & tos)
 {
@@ -482,7 +482,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::replace_bitwise_functions(Token_string & tos)
 {
@@ -529,7 +529,7 @@ Parser::replace_bitwise_functions(Token_string & tos)
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Parser::check_if_value(const Token_string & tos, int pos)
 {
@@ -575,7 +575,7 @@ Parser::check_if_value(const Token_string & tos, int pos)
 
    return false;   // tos[pos] is at the end of a function
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::remove_void_token(Token_string & tos)
 {
@@ -590,7 +590,7 @@ size_t dst = 0;
 
    tos.resize(dst);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::match_par_bra(Token_string & tos, bool backwards)
 {
@@ -649,7 +649,7 @@ std::vector<ShapeItem> stack;
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::create_value(Token_string & tos, int pos, int count)
 {
@@ -670,7 +670,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
         tos.print(CERR, true);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::create_scalar_value(Token & output)
 {
@@ -720,7 +720,7 @@ Parser::create_scalar_value(Token & output)
    CERR << "Unexpected token " << output.get_tag() << ": " << output << endl;
    Assert(0 && "Unexpected token");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::create_vector_value(Token_string & tos, int pos, int count)
 {
@@ -774,7 +774,7 @@ Token tok(TOK_APL_VALUE3, Z);
         tos.print(CERR, true);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// in tos, (re-) mark the symbols left of ← as left symbols
 void
 Parser::mark_lsymb(Token_string & tos)
@@ -865,4 +865,4 @@ Parser::mark_lsymb(Token_string & tos)
             }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

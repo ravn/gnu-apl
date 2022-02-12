@@ -25,7 +25,7 @@ Bif_F12_INDEX_OF Bif_F12_INDEX_OF ::_fun;    // ⍳
 
 Bif_F12_INDEX_OF * Bif_F12_INDEX_OF ::fun = &Bif_F12_INDEX_OF ::_fun;
 
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_INDEX_OF::eval_B(Value_P B) const
 {
@@ -88,7 +88,7 @@ const Rank rk_Z = Z->get_rank();
    if (Z->element_count() == 0)   // empty result
       {
         Value_P ZZ(rk_Z, LOC);   // ZZ←(⍴⍴Z)⍴0...
-        while (ZZ->more())   ZZ->next_ravel_Int(0);
+        while (ZZ->more())   ZZ->next_ravel_0();
         ZZ->check_value(LOC);
 
         new (&Z->get_wproto())   PointerCell(ZZ.get(), Z.getref()); // ⊂(⍴⍴Z)⍴0
@@ -97,7 +97,7 @@ const Rank rk_Z = Z->get_rank();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// search elements of B in A. ⍴Z is ⍴B, and elements of Z are indices of A.
 Token
 Bif_F12_INDEX_OF::eval_AB(Value_P A, Value_P B) const
@@ -175,7 +175,7 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Bif_F12_INDEX_OF::bs_cmp(const Cell & cell, const ShapeItem & A,
                          const void * ctx)
@@ -188,7 +188,7 @@ const Cell & cell_A = cells_A[A];
 const int ret = cell.compare(cell_A);
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Bif_F12_INDEX_OF::find_B_in_sorted_A(const Cell * ravel_A, ShapeItem len_A,
                                      const ShapeItem * Idx_A,
@@ -223,5 +223,5 @@ ShapeItem ret = pos;
 
    return ret;
 }
-//=============================================================================
+//============================================================================
 

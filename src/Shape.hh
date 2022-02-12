@@ -113,18 +113,22 @@ public:
    { return rho_rho; }
 
    /// return the length of dimension \b r
-   ShapeItem get_shape_item(uAxis r) const
+   ShapeItem get_shape_item(Axis r) const
    { Assert(r < rho_rho);   return rho[r]; }
 
    /// return the length of dimension \b r
-   ShapeItem get_transposed_shape_item(uAxis r) const
+   ShapeItem get_transposed_shape_item(Axis r) const
    { Assert(r < rho_rho);   return rho[rho_rho - r - 1]; }
 
-   /// return the length of the last dimension
-   ShapeItem get_last_shape_item() const
-   { Assert(rho_rho > 0);   return rho[rho_rho - 1]; }
+   /// return the length of the first axis, or 1 for scalars
+   ShapeItem get_first_shape_item() const
+   { return rho_rho ? rho[0] : 1; }
 
-   /// return the length of the last dimension, or 1 for scalars
+   /// return the length of the last axis, or 1 for scalars
+   ShapeItem get_last_shape_item() const
+   { return rho_rho ? rho[rho_rho - 1] : 1; }
+
+   /// return the length of the last axis, or 1 for scalars
    ShapeItem get_cols() const
    { return rho_rho ?  rho[rho_rho - 1] : 1; }
 
@@ -137,7 +141,7 @@ public:
         return count; }
 
    /// modify dimension \b r
-   void set_shape_item(uAxis r, ShapeItem sh)
+   void set_shape_item(Axis r, ShapeItem sh)
       { Assert(r < rho_rho);
         if (rho[r])   { volume /= rho[r];  rho[r] = sh;  volume *= rho[r]; }
         else          { rho[r] = sh;   recompute_volume();                 } }
@@ -160,7 +164,7 @@ public:
         rho[rho_rho++] = len;   volume *= len; }
 
    /// possibly increase rank by prepending axes of length 1
-   void expand_rank(uRank new_rank)
+   void expand_rank(Rank new_rank)
       { if (rho_rho >= new_rank)   return;   // no need to expand
         const int diff = new_rank - rho_rho;
         for (Rank r = rho_rho - 1; r >= 0; --r)   rho[r + diff] = rho[r];
@@ -175,10 +179,24 @@ public:
    /// inserted so that Shape[axis] == len in the returned shape.
    Shape insert_axis(Axis axis, ShapeItem len) const;
 
-   /// return a shape like \b this, but with an axis removed
+   /// return a shape like \b this, but with axis \b axis removed
    Shape without_axis(Axis axis) const
       { Shape ret;
         loop(r, rho_rho)   if (r != axis)  ret.add_shape_item(rho[r]);
+        return ret;
+      }
+
+   /// return a shape like \b this, but with the first axis (↑⍴) removed
+   Shape without_first_axis() const
+      { Shape ret;   // start with a scalar
+        for (Rank r = 1; r < rho_rho;)   ret.add_shape_item(rho[r++]);
+        return ret;
+      }
+
+   /// return a shape like \b this, but with the last axis (¯1↑⍴) removed
+   Shape without_last_axis() const
+      { Shape ret;   // start with a scalar
+        for (Rank r = 0; r < (rho_rho - 1);)  ret.add_shape_item(rho[r++]);
         return ret;
       }
 
@@ -216,13 +234,16 @@ public:
         return ret;
       }
 
-   /// throw an APL error if this shapes differs from shape B
+   /// throw an APL error if \b this shape differs from shape B
    void check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
                    const char * loc) const;
 
    /// return \b true iff \b this shape is empty (some dimension is 0).
    bool is_empty() const
       { loop(r, rho_rho)   if (rho[r] == 0)   return true;   return false; }
+
+   /// return \b reue iff this shape is a permutation of 0, 1, ... rank-1
+   bool is_permutation() const;
 
    /// return the position of \b idx in the ravel.
    ShapeItem ravel_pos(const Shape & idx) const;
@@ -232,7 +253,7 @@ public:
 
 protected:
    /// the rank (number of valid shape items)
-   uRank rho_rho;
+   Rank rho_rho;
 
    /// the shape
    ShapeItem rho[MAX_RANK];

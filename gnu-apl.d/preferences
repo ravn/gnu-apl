@@ -299,15 +299,26 @@
 READLINE_HISTORY_LEN  500
 READLINE_HISTORY_PATH .apl.history
 
-# The history can serve two purposes: to recall lines that were previously
-# and to list what was done (with command )HISTORY). For the latter purpose
-# it is normally convenient to show the new ⎕CR of a function that was edited
-# instead of the command that started the editor. The following parameter
-# controls whether the editor command (like ∇foo ) or the new ⎕CR of the
-# function shall be inserted into the history.
-# 
-# The default (modified) shows the editor command if the function was opened
-# but not changed and the new ⎕CR if the function was changed.
+# The history can serve two purposes:
+#
+# 1. to recall lines that were previously entered, or
+# 2. to list what was done (with command )HISTORY).
+#
+# For purpose 2. it is normally more convenient to show the entire ⎕CR
+# of a function that was edited instead of only the command that started
+# the ∇-editor. For purpose 1, however, recalling the lines of entire
+# functions can become annoying if the functions are long.
+#
+# The following parameter controls whether the history shall contain:
+#
+# A. only the editor command (like ∇foo) that has started the ∇-editor, but
+#    not the entire ⎕CR of the function that was edited, or else
+#
+# B. the entire new ⎕CR of the function that was edited.
+#
+# The default (modified) is a compromise that inserts only the editor
+# command if the function was opened but not changed (e.g. ∇FOO[⎕]∇ )
+# and the entire new ⎕CR if the function was changed or (newly created).
 #
 # NABLA-TO-HISTORY  Never
   NABLA-TO-HISTORY  Modified (default)

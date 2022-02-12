@@ -30,7 +30,7 @@
 
 class Cell;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** one item of a CollatingCache. Every character in A (of A⍋B or A⍒B gets
    one CollatingCacheEntry; if the same character occurs multiple times in A,
    then the first one (in row-major order) creates the entry and the remaining
@@ -79,13 +79,13 @@ struct CollatingCacheEntry
                             const void * unused_ctx)
       { return key - entry.ce_char; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline ostream &
 operator << (ostream & out, const CollatingCacheEntry & entry)
 {
    return out << "CC-entry(" << entry.ce_char << ")";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** A collating cache which is the internal representation of the left
     argument A of dydic A⍋B or A⍒B
  */
@@ -126,7 +126,7 @@ protected:
    /// the number of items to compare
    const ShapeItem comp_len;
 };
-//=============================================================================
+//============================================================================
 /** primitive functions grade up and grade down
  */
 /// Base class for ⍋ and ⍒
@@ -156,7 +156,7 @@ protected:
    static ShapeItem find_collating_cache_entry(Unicode uni,
                                                CollatingCache & cache);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function grade up ⍋
  */
 /// The class implementing ⍋
@@ -183,7 +183,7 @@ public:
    static Bif_F12_SORT_ASC  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function grade down ⍒
  */
 /// The class implementing ⍒
@@ -210,7 +210,7 @@ public:
    static Bif_F12_SORT_DES  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 
 #endif // __COLLATING_CACHE_HH_DEFINED__

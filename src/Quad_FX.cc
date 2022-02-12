@@ -33,14 +33,14 @@
 Quad_FX  Quad_FX::_fun;
 Quad_FX * Quad_FX::fun = &Quad_FX::_fun;
 
-//=============================================================================
+//============================================================================
 Token
 Quad_FX::eval_B(Value_P B) const
 {
 static const int eprops[] = { 0, 0, 0, 0 };
    return do_quad_FX(eprops, B, UTF8_string("⎕FX"), false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FX::eval_AB(Value_P A, Value_P B) const
 {
@@ -102,7 +102,7 @@ UTF8_string creator("⎕FX");
 
    return do_quad_FX(eprops, B, creator, false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -115,7 +115,7 @@ Quad_FX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 const Axis axis = Value::get_single_axis(X.get(), 10);
    return do_native_FX(A, axis, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FX::do_quad_FX(const int * exec_props, Value_P B,
                     const UTF8_string & creator, bool tolerant)
@@ -225,7 +225,7 @@ UCS_string text;
 
    return do_quad_FX(exec_props, text, creator, tolerant);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FX::do_quad_FX(const int * exec_props, const UCS_string & text,
                     const UTF8_string & creator, bool tolerant)
@@ -249,7 +249,7 @@ Value_P Z(fun_name, LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FX::do_native_FX(Value_P A, Axis axis, Value_P B)
 {
@@ -268,4 +268,4 @@ Value_P Z = B;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================

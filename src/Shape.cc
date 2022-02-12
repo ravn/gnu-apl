@@ -21,7 +21,7 @@
 #include "Shape.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape::Shape(const Value * A, int qio_A)
    : rho_rho(0),
      volume(1)
@@ -37,7 +37,7 @@ const ShapeItem Alen = A->element_count();
         add_shape_item(A->get_cravel(r).get_near_int() - qio_A);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape Shape::abs() const
 {
 Shape ret;
@@ -50,7 +50,7 @@ Shape ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Shape::operator ==(const Shape & other) const
 {
@@ -61,7 +61,7 @@ Shape::operator ==(const Shape & other) const
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Shape::expand(const Shape & B)
 {
@@ -78,7 +78,7 @@ Shape::expand(const Shape & B)
         volume *= rho[r];
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape
 Shape::insert_axis(Axis axis, ShapeItem len) const
 {
@@ -105,7 +105,7 @@ Shape ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Shape::ravel_pos(const Shape & idx) const
 {
@@ -120,7 +120,7 @@ ShapeItem w = 1;
 
    return p;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape
 Shape::offset_to_index(ShapeItem offset, int quad_io) const
 {
@@ -142,21 +142,37 @@ Shape ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Shape::check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
                   const char * loc) const
 {
-   if (get_rank() != B.get_rank())
-      throw_apl_error(rank_err, loc);
+   if (get_rank() != B.get_rank())   throw_apl_error(rank_err, loc);
 
    loop(r, get_rank())
       {
-        if (get_shape_item(r) != B.get_shape_item(r))
-           throw_apl_error(len_err, loc);
+        if (get_shape_item(r) == B.get_shape_item(r))   continue;
+        throw_apl_error(len_err, loc);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+bool
+Shape::is_permutation() const
+{
+ShapeItem axes = 0;   // a bitmap of axes
+
+   loop(r, get_rank())
+       {
+         const ShapeItem ax = get_shape_item(r);
+         if (ax < 0)                return false;
+         if (ax >= get_rank())      return false;
+         if (axes & 1 << ax)        return false;
+          axes |= 1 << ax;
+       }
+
+   return true;
+}
+//----------------------------------------------------------------------------
 ostream &
 operator <<(ostream & out, const Shape & shape)
 {
@@ -169,4 +185,4 @@ operator <<(ostream & out, const Shape & shape)
    out << "⊐";
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

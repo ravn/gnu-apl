@@ -35,7 +35,7 @@ class CollatingCache;
 class ConstRavel_P;
 class IntCell;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     Base class for the APL system functions (Quad functions and primitives
     like +, -, ...) and operators
@@ -85,7 +85,7 @@ protected:
    /// performance statistics for dyadic calls
    CellFunctionStatistics * statistics_B;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Base class for all internal non-scalar functions of the interpreter
 class NonscalarFunction : public PrimitiveFunction
 {
@@ -95,7 +95,7 @@ public:
    : PrimitiveFunction(tag)
    {}
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function zilde (⍬) */
 /// The class implementing ⍬ (the empty numeric vector)
 class Bif_F0_ZILDE : public NonscalarFunction
@@ -116,7 +116,7 @@ protected:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return false; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function execute */
 /// The class implementing ⍎
 class Bif_F1_EXECUTE : public NonscalarFunction
@@ -146,7 +146,7 @@ protected:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return true; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function index (⌷) */
 /// The class implementing ⌷
 class Bif_F2_INDEX : public NonscalarFunction
@@ -167,7 +167,7 @@ public:
    static Bif_F2_INDEX  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions member and enlist */
 /// The class implementing ϵ
 class Bif_F12_ELEMENT : public NonscalarFunction
@@ -188,7 +188,7 @@ public:
    static Bif_F12_ELEMENT  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions match and depth */
 /// The class implementing ≡
 class Bif_F12_EQUIV : public NonscalarFunction
@@ -212,7 +212,7 @@ protected:
    /// return the depth of B
    Token depth(Value_P B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive function natch (≢) */
 /// The class implementing ≡
 class Bif_F12_NEQUIV : public NonscalarFunction
@@ -232,7 +232,7 @@ public:
    static Bif_F12_NEQUIV * fun;   ///< Built-in function
    static Bif_F12_NEQUIV  _fun;   ///< Built-in function
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function encode */
 /// The class implementing ⊤
 class Bif_F12_ENCODE : public NonscalarFunction
@@ -265,7 +265,7 @@ protected:
                           const ConstRavel_P & iA, const ConstRavel_P & iB,
                           double qct);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function decode */
 /// The class implementing ⊥
 class Bif_F12_DECODE : public NonscalarFunction
@@ -288,15 +288,13 @@ protected:
 
    /// decode B according to len_A and cA (real A and B)
    static void decode_real(Value & Z, ShapeItem len_A, const Cell * cA,
-                           ShapeItem len_B, const Cell * cB, ShapeItem dB,
-                           double qct);
+                           ShapeItem len_B, const Cell * cB, ShapeItem dB);
 
    /// decode B according to len_A and cA (complex A or B)
    static void decode_complex(Value & Z, ShapeItem len_A, const Cell * cA,
-                              ShapeItem len_B, const Cell * cB, ShapeItem dB,
-                              double qct);
+                              ShapeItem len_B, const Cell * cB, ShapeItem dB);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions rotate and reverse */
 /// Base class for implementing ⌽ and ⊖
 class Bif_ROTATE : public NonscalarFunction
@@ -314,7 +312,7 @@ protected:
    /// Reverse B along axis
    static Token reverse(Value_P B, Axis axis);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions rotate and reverse along last axis */
 /// The class implementing ⌽
 class Bif_F12_ROTATE : public Bif_ROTATE
@@ -343,7 +341,7 @@ public:
    static Bif_F12_ROTATE  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions rotate and reverse along first axis */
 /// The class implementing ⊖
 class Bif_F12_ROTATE1 : public Bif_ROTATE
@@ -372,7 +370,7 @@ public:
    static Bif_F12_ROTATE1  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function transpose */
 /// The class implementing ⍉
 class Bif_F12_TRANSPOSE : public NonscalarFunction
@@ -405,11 +403,8 @@ protected:
 
    /// return sh permuted according to permutation perm
    static Shape permute(const Shape & sh, const Shape & perm);
-
-   /// return true iff sh is a permutation
-   static bool is_permutation(const Shape & sh);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions reshape and shape */
 /// The class implementing ⍴
 class Bif_F12_RHO : public NonscalarFunction
@@ -433,7 +428,7 @@ public:
    static Bif_F12_RHO  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function ∪ (unique/union) */
 /// The class implementing ∪
 class Bif_F12_UNION : public NonscalarFunction
@@ -486,7 +481,7 @@ protected:
    static ShapeItem append_zone(const Cell ** cells_Z, const Cell ** cells_B,
                                 Zone_list & B_from_to, double qct);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function ∩ (intersection) */
 /// The class implementing ∩
 class Bif_F2_INTER : public NonscalarFunction
@@ -505,7 +500,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function left (⊣) */
 /// The class implementing ⊣
 class Bif_F2_LEFT : public NonscalarFunction
@@ -528,7 +523,7 @@ public:
    static Bif_F2_LEFT  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function right (⊢) */
 /// The class implementing ⊢
 class Bif_F2_RIGHT : public NonscalarFunction
@@ -554,6 +549,6 @@ public:
    static Bif_F2_RIGHT  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __PRIMITIVE_FUNCTION_HH_DEFINED__

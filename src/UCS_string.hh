@@ -42,7 +42,7 @@ class UCS_string_vector;
 /// track construction and destruction of UCS_strings
 #define UCS_tracking 0
 
-//=============================================================================
+//============================================================================
 /// A string of Unicode characters (32-bit)
 class UCS_string : public std::basic_string<Unicode>
 {
@@ -259,8 +259,9 @@ public:
    void append(const UCS_string & other)
       {  basic_string<Unicode>::append(other); }
 
-   /// append 0-terminated ASCII string \b str to this string. str is NOT
-   /// interpreted as UTF8 string (use append_UTF8() if such interpretation        /// is desired)
+   /// append 0-terminated ASCII string \b str to this string.
+   /// \b str is NOT interpreted as UTF8 string (use append_UTF8() instead of
+   /// append_ASCII() if such interpretation is desired)
    void append_ASCII(const char * ascii)
       { while (*ascii)   *this += Unicode(*ascii++); }
 
@@ -383,7 +384,8 @@ public:
       {  basic_string<Unicode>::erase(pos, 1); }
 
    /// helper function for Heapsort<Unicode>::sort()
-   static bool greater_uni(const Unicode & u1, const Unicode & u2, const void *)
+   static bool greater_uni(const Unicode & u1, const Unicode & u2,
+                            const void *)
       { return u1 > u2; }
 
    /// convert a signed integer value to an UCS_string (like sprintf())
@@ -445,13 +447,13 @@ private:
    /// in basic_strng::erase(pos, len = npos)
     basic_string<Unicode> & erase(size_type pos, size_type len);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 Hswap(const UCS_string * & u1, const UCS_string * & u2)
 {
 const UCS_string * tmp = u1;   u1 = u2;   u2 = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 Hswap(UCS_string & u1, UCS_string & u2)
 {
@@ -459,7 +461,7 @@ UCS_string  u = u1;
            u1 = u2;
            u2 = u;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __UCS_STRING_HH_DEFINED__
 

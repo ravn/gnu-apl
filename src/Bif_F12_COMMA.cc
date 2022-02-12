@@ -27,7 +27,7 @@ Bif_F12_COMMA1 Bif_F12_COMMA1::_fun;    // ⍪
 Bif_F12_COMMA  * Bif_F12_COMMA ::fun = &Bif_F12_COMMA    ::_fun;
 Bif_F12_COMMA1 * Bif_F12_COMMA1::fun = &Bif_F12_COMMA1   ::_fun;
 
-//=============================================================================
+//============================================================================
 Token
 Bif_COMMA::ravel(const Shape & new_shape, Value_P B)
 {
@@ -42,7 +42,7 @@ const ShapeItem count = B->element_count();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B)
 {
@@ -94,7 +94,7 @@ const Cell * cB = &B->get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_COMMA::append_scalar(Value_P A, uAxis axis, const Cell & cell_B)
 {
@@ -137,7 +137,7 @@ const Cell * cA = &A->get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
 {
@@ -297,7 +297,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_COMMA::laminate(Value_P A, Axis axis, Value_P B)
 {
@@ -359,7 +359,7 @@ const Cell * cB = &B->get_cfirst();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_COMMA::ravel_axis(Value_P X, Value_P B, uAxis axis)
 {
@@ -411,7 +411,7 @@ const APL_Integer qio = Workspace::get_IO();
    //
 const Shape axes(X.get(), qio);
 
-const ShapeItem from = axes.get_shape_item(0);
+const ShapeItem from = axes.get_first_shape_item();
    if (from < 0)   AXIS_ERROR;
 
 const ShapeItem to   = axes.get_last_shape_item();
@@ -435,7 +435,7 @@ Shape shape_Z;
 
    return ravel(shape_Z, B);
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_COMMA::eval_B(Value_P B) const
 {
@@ -454,7 +454,7 @@ const Shape shape_Z(B->element_count());
 
    return ravel(shape_Z, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_COMMA::eval_AB(Value_P A, Value_P B) const
 {
@@ -471,7 +471,7 @@ uRank max_rank = A->get_rank();
    if (max_rank < B->get_rank())  max_rank = B->get_rank();
    return catenate(A, max_rank - 1, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_COMMA::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -499,7 +499,7 @@ const APL_Float axis = cX.get_real_value() - qio;
        axis >= (B->get_rank() + 1.0))   AXIS_ERROR;
    return laminate(A, Axis(axis + 1.0), B);
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_COMMA1::eval_B(Value_P B) const
 {
@@ -525,7 +525,7 @@ Shape shape_Z(c1, c2);
       }
    return ravel(shape_Z, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B) const
 {
@@ -540,11 +540,11 @@ Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B) const
 
    return catenate(A, 0, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_COMMA1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    return Bif_F12_COMMA::fun->eval_AXB(A, X, B);
 }
-//=============================================================================
+//============================================================================
 

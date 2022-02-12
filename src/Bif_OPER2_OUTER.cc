@@ -32,7 +32,7 @@ Bif_OPER2_OUTER * Bif_OPER2_OUTER::fun = &Bif_OPER2_OUTER::_fun;
 
 Bif_OPER2_OUTER::PJob_product Bif_OPER2_OUTER::job;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_OUTER::eval_ALRB(Value_P A, Token & LO, Token & _RO, Value_P B) const
 {
@@ -139,7 +139,7 @@ Value_P RO_B;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_OUTER::scalar_outer_product() const
 {
@@ -175,7 +175,7 @@ const uint64_t end_1 = cycle_counter();
                                              job.ZAh * job.ZBl);
 #endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_OUTER::PF_scalar_outer_product(Thread_context & tctx)
 {
@@ -194,4 +194,4 @@ ShapeItem end_z = z + slice_len;
         if (job.ec != E_NO_ERROR)   return;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

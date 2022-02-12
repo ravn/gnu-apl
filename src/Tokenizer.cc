@@ -50,10 +50,10 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline ostream & operator << (ostream & out, const Unicode_source & src)
    { loop(s, src.rest())   out << src[s];   return out; }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** convert \b UCS_string input into a Token_string tos.
 */
 ErrorCode
@@ -73,7 +73,7 @@ size_t rest_2 = 0;
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** convert \b UCS_string input into a Token_string tos. The tokenization
     stops at the end of input (= end of line), or when a comment (⍝ or #)
     is detected.
@@ -340,7 +340,7 @@ Unicode_source src(input);
    Log(LOG_tokenize)
       CERR << "tokenize() done (no error)" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Tokenizer::tokenize_function(Unicode_source & src, Token_string & tos) const
 {
@@ -350,7 +350,7 @@ const Unicode uni = src.get();
 const Token tok = tokenize_function(uni);
    tos.push_back(tok);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Tokenizer::tokenize_function(Unicode uni)
 {
@@ -449,7 +449,7 @@ const Token tok = Avec::uni_to_token(uni, LOC);
 #undef sys
    return tok;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Tokenizer::tokenize_quad(Unicode_source & src, Token_string & tos) const
 {
@@ -471,7 +471,7 @@ const Token t = Workspace::get_quad(ucs, len);
    src.skip(len - 1);
    tos.push_back(t);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** tokenize a single quoted string.
  ** If the string is a single character, then we
  **  return a TOK_CHARACTER. Otherwise we return TOK_APL_VALUE1.
@@ -532,7 +532,7 @@ bool got_end = false;
         tos.push_back(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** tokenize a double quoted string.
  ** If the string is a single character, then we
  **  return a TOK_CHARACTER. Otherwise we return TOK_APL_VALUE1.
@@ -605,7 +605,7 @@ bool got_end = false;
         tos.push_back(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Tokenizer::tokenize_number(Unicode_source & src, Token_string & tos,
                            size_t & rest_2) const
@@ -770,7 +770,7 @@ done:
            Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 enum { MAX_TOKENIZE_DIGITS_1 = 20,                       // incl. rounding digit
        MAX_TOKENIZE_DIGITS = MAX_TOKENIZE_DIGITS_1 - 1   // excl. rounding digit
@@ -1006,7 +1006,7 @@ UTF8_string digits = int_digits;
         return true;   // OK
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Tokenizer::tokenize_symbol(Unicode_source & src, Token_string & tos) const
 {
@@ -1052,9 +1052,9 @@ UCS_string symbol;
         else
            {
              Log(LOG_tokenize)
-                CERR << "Stop/Trace referenved: " << symbol1 << endl;
+                CERR << "Stop/Trace referenced: " << symbol1 << endl;
              tos.push_back(Token(TOK_FUN2, ST));
-             tos.push_back(Token(TOK_APL_VALUE1, AB));   // right argument of ST
+             tos.push_back(Token(TOK_APL_VALUE1, AB));   // right arg of ST
            }
 
         return;
@@ -1064,5 +1064,5 @@ Symbol * sym = Workspace::lookup_symbol(symbol);
    Assert(sym);
    tos.push_back(Token(TOK_SYMBOL, sym));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

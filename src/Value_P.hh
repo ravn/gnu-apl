@@ -33,7 +33,7 @@ class UTF8_string;
 class UCS_string;
 class PrintBuffer;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A Value smart * and access functions (except constructors)
 class Value_P_Base
 {
@@ -93,19 +93,19 @@ public:
    /// clear the pointer (and possibly add an event)
    inline void clear_pointer(const char * loc);
 
-   /// decrement the owner count of \b val. The function bidy requires Value.hh
-   /// and is therefore implemented in Value.icc.
+   /// decrement the owner count of \b val. The function body of this function
+   /// requires Value.hh and is therefore implemented in Value.icc.
    static inline void decrement_owner_count(Value * & val, const char * loc);
 
-   /// increment the owner count of \b val. The function body requires Value.hh
-   /// and is therefore implemented in Value.icc.
+   /// increment the owner count of \b val. The function body of this function
+   /// requires Value.hh and is therefore implemented in Value.icc.
    static inline void increment_owner_count(Value * val, const char * loc);
 
 protected:
    /// pointer to the value
    Value * value_p;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A Value smart * (constructors)
 class Value_P : public Value_P_Base
 {
@@ -127,7 +127,7 @@ public:
    inline Value_P(const Shape & sh, const char * loc);
 
    /// constructor: a packed array with shape \b sh
-   inline Value_P(const Shape & sh, uint8_t * bits, const char * loc);
+   inline Value_P(const Shape & sh, uint64_t * bits, const char * loc);
 
    /// a new vector value from a UCS string
    inline Value_P(const UCS_string & ucs, const char * loc);
@@ -159,6 +159,6 @@ public:
    /// Destructor
    inline ~Value_P();
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __SHARED_VALUE_POINTER_HH_DEFINED__

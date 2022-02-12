@@ -52,7 +52,7 @@ UCS_string LineEditContext::cut_buffer;
 
 get_line_cb * InputMux::get_line_callback = 0;
 
-//=============================================================================
+//============================================================================
 
 ESCmap ESCmap::the_ESCmap[] =
 {
@@ -79,7 +79,7 @@ ESCmap ESCmap::the_ESCmap[] =
 
 enum { ESCmap_entry_count = sizeof(ESCmap::the_ESCmap) / sizeof(ESCmap) };
 
-//=============================================================================
+//============================================================================
 bool
 ESCmap::need_more(const char * seq, int len)
 {
@@ -90,7 +90,7 @@ ESCmap::need_more(const char * seq, int len)
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 ESCmap::has_prefix(const char * seq, int seq_len) const
 {
@@ -102,7 +102,7 @@ ESCmap::has_prefix(const char * seq, int seq_len) const
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 ESCmap::is_equal(const char * seq, int seq_len) const
 {
@@ -114,7 +114,7 @@ ESCmap::is_equal(const char * seq, int seq_len) const
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 ESCmap::refresh_lengths()
 {
@@ -122,7 +122,7 @@ return;
    loop(e, ESCmap_entry_count)
      the_ESCmap[e].len = strlen(the_ESCmap[e].seqence);
 }
-//=============================================================================
+//============================================================================
 LineHistory::LineHistory(int maxl)
    : current_line(0),
      put(0),
@@ -133,7 +133,7 @@ LineHistory::LineHistory(int maxl)
    UCS_string u("xxx");
    add_line(u);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 LineHistory::LineHistory(const Nabla & nabla)
    : current_line(0),
      put(0),
@@ -154,7 +154,7 @@ int cl = -1;
 
    if (cl != -1)   current_line = cl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineHistory::read_history(const char * filename)
 {
@@ -186,7 +186,7 @@ int count = 0;
 
    next();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineHistory::save_history(const char * filename)
 {
@@ -215,7 +215,7 @@ int count = 0;
    Log(LOG_get_line)
       cerr << count << " history lines written to " << filename << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineHistory::clear_history(ostream & out)
 {
@@ -225,7 +225,7 @@ LineHistory::clear_history(ostream & out)
 UCS_string u("xxx");
    add_line(u);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineHistory::print_history(ostream & out)
 {
@@ -238,7 +238,7 @@ LineHistory::print_history(ostream & out)
         out << "      " << hist_lines[p] << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineHistory::add_line(const UCS_string & line)
 {
@@ -278,14 +278,14 @@ UCS_string line1;
 
    next();   // update current_line
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineHistory::replace_line(const UCS_string & line)
 {
    if (put > 0)   hist_lines[put - 1] = line;
    else           hist_lines.back() = line;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const UCS_string *
 LineHistory::up()
 {
@@ -297,7 +297,7 @@ int new_current_line = current_line - 1;
 
    return &hist_lines[current_line = new_current_line];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const UCS_string *
 LineHistory::down()
 {
@@ -312,19 +312,19 @@ int new_current_line = current_line + 1;
 
    return &hist_lines[current_line];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const void
 LineHistory::clear_search(void)
 {
     cur_search_substr = "";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const void
 LineHistory::update_search(UCS_string &cur_line)
 {
     cur_search_substr = cur_line;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const UCS_string *
 LineHistory::search(UCS_string &cur_line)
 {
@@ -362,7 +362,7 @@ LineHistory::search(UCS_string &cur_line)
 
     return &hist_lines[current_line];
 }
-//=============================================================================
+//============================================================================
 LineEditContext::LineEditContext(LineInputMode mode, int rows, int cols,
                                  LineHistory & hist, const UCS_string & prmt)
    : screen_rows(rows),
@@ -388,14 +388,14 @@ LineEditContext::LineEditContext(LineInputMode mode, int rows, int cols,
 
    refresh_all();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 LineEditContext::~LineEditContext()
 {
    // restore block cursor
    //
    if (!ins_mode)   CIN << "\x1B[1 q" << flush;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::adjust_allocated_height()
 {
@@ -428,7 +428,7 @@ const int rows = 1 + get_total_length() / screen_cols;
 
    refresh_all();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::refresh_from_cursor()
 {
@@ -464,7 +464,7 @@ const int saved_uidx = uidx;
 
    move_idx(saved_uidx);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::refresh_all()
 {
@@ -476,7 +476,7 @@ const int saved_uidx = uidx;
    refresh_from_cursor();
    move_idx(saved_uidx);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::delete_char()
 {
@@ -493,7 +493,7 @@ LineEditContext::delete_char()
 
    if (get_total_length() >= screen_cols)   set_cursor();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::insert_char(Unicode uni)
 {
@@ -521,7 +521,7 @@ LineEditContext::insert_char(Unicode uni)
 
    move_idx(uidx + 1);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::cut_to_EOL()
 {
@@ -531,7 +531,7 @@ LineEditContext::cut_to_EOL()
    user_line.resize(uidx);
    refresh_from_cursor();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::paste()
 {
@@ -552,7 +552,7 @@ LineEditContext::paste()
    refresh_from_cursor();
    move_idx(uidx + cut_buffer.size());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::toggle_ins_mode()
 {
@@ -569,7 +569,7 @@ LineEditContext::toggle_ins_mode()
    if (ins_mode)   CIN << "\x1B[0 q" << flush;
    else            CIN << "\x1B[3 q" << flush;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::tab_expansion(LineInputMode mode)
 {
@@ -602,14 +602,14 @@ const ExpandResult expand_result = tab_exp.expand_tab(line);
         default: FIXME;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::cursor_CLEAR_SEARCH()
 {
    Log(LOG_get_line)   history.info(CERR << "cursor_CLEAR_SEARCH()") << endl;
    history.clear_search();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::cursor_UP()
 {
@@ -637,7 +637,7 @@ const UCS_string * ucs = history.up();
    move_idx(user_line.size());
    Log(LOG_get_line)   history.info(CERR << "cursor_UP() done" << endl);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::cursor_DOWN()
 {
@@ -669,13 +669,13 @@ refresh:
    move_idx(user_line.size());
    Log(LOG_get_line)   history.info(CERR << "cursor_DOWN() done" << endl);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::update_SEARCH(void)
 {
     history.update_search(user_line);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineEditContext::cursor_SEARCH()
 {
@@ -698,7 +698,7 @@ LineEditContext::cursor_SEARCH()
     move_idx(user_line.size());
     Log(LOG_get_line)   history.info(CERR << "cursor_SEARCH() done" << endl);
 }
-//=============================================================================
+//============================================================================
 LineInput::LineInput(bool do_read_history)
    : history(uprefs.line_history_len),
      write_history(false)
@@ -734,7 +734,7 @@ LineInput::LineInput(bool do_read_history)
 # endif // WANT_PYTHON
 #endif // WANT_LIBAPL
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 LineInput::~LineInput()
 {
    if (initial_termios_errno)   return;
@@ -747,13 +747,13 @@ LineInput::~LineInput()
 # endif // WANT_PYTHON
 #endif // WANT_LIBAPL
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineInput::init(bool do_read_history)
 {
    the_line_input = new LineInput(do_read_history);
 }
-//=============================================================================
+//============================================================================
 void
 InputMux::get_line(LineInputMode mode, const UCS_string & prompt,
                    UCS_string & line, bool & eof, LineHistory & hist)
@@ -914,7 +914,7 @@ const APL_time_us from = now();
 
    if (uprefs.echo_CIN)   COUT << prompt << line << endl;
 }
-//=============================================================================
+//============================================================================
 void
 LineInput::get_terminal_line(LineInputMode mode, const UCS_string & prompt,
                              UCS_string & line, bool & eof,
@@ -941,7 +941,7 @@ LineInput::get_terminal_line(LineInputMode mode, const UCS_string & prompt,
 
    Assert(0 && "Bad LineInputMode");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineInput::edit_line(LineInputMode mode, const UCS_string & prompt,
                      UCS_string & user_line, bool & eof, LineHistory & hist)
@@ -1100,7 +1100,7 @@ bool add_hist = false;
 
    CIN << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 LineInput::safe_fgetc()
 {
@@ -1119,7 +1119,7 @@ LineInput::safe_fgetc()
          return EOF;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 LineInput::get_uni()
 {
@@ -1219,4 +1219,4 @@ const int b0 = safe_fgetc();
 
    return Unicode(b0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

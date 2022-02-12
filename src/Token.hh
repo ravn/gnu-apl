@@ -315,7 +315,7 @@ protected:
    /// helper function to print Quad-function (system function or variable).
    ostream & print_quad(ostream & out) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A sequence of Token
 class Token_string : public  std::vector<Token>
 {
@@ -341,7 +341,7 @@ private:
    /// prevent accidental copying
    Token_string & operator =(const Token_string & other);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** a token with its location information. For token copied from a function
     body: low = high = PC. For token from a reduction low is the low location
     of the first token and high is the high of the last token of the token
@@ -380,6 +380,6 @@ struct Token_loc
    /// the PC of the leftmost (highest PC) token
    Function_PC pc;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __TOKEN_HH_DEFINED__

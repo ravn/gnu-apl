@@ -88,25 +88,25 @@ Bif_F2_RIGHT      * Bif_F2_RIGHT     ::fun = &Bif_F2_RIGHT     ::_fun;
 
 int Bif_F1_EXECUTE::copy_pending = 0;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 PrimitiveFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
    return eval_AB(A, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 PrimitiveFunction::eval_fill_B(Value_P B) const
 {
    return eval_B(B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 PrimitiveFunction::print(ostream & out) const
 {
    return out << get_Id();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 PrimitiveFunction::print_properties(ostream & out, int indent) const
 {
@@ -115,13 +115,13 @@ UCS_string ind(indent, UNI_SPACE);
    print(out);
    out << endl;
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F0_ZILDE::eval_() const
 {
    return Token(TOK_APL_VALUE1, Idx0(LOC));
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_RHO::eval_B(Value_P B) const
 {
@@ -132,7 +132,7 @@ Value_P Z(B->get_rank(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_RHO::eval_AB(Value_P A, Value_P B) const
 {
@@ -193,7 +193,7 @@ const ShapeItem len_Z = shape_Z.get_volume();
                 }
            }
 
-        while (rest < len_B)   B->get_wravel(rest++).release(LOC);
+        while (rest < len_B)   B->release(rest++, LOC);
 
         B->set_shape(shape_Z);
 
@@ -216,7 +216,7 @@ const uint64_t end_1 = cycle_counter();
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_RHO::do_reshape(const Shape & shape_Z, const Value & B)
 {
@@ -238,7 +238,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_ROTATE::reverse(Value_P B, Axis axis)
 {
@@ -273,7 +273,7 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_ROTATE::rotate(Value_P A, Value_P B, Axis axis)
 {
@@ -291,7 +291,7 @@ const Shape shape_A2(shape_B3.h(), shape_B3.l());
              return result;
            }
       }
-   else   // otherwise shape A must be shape B with axis removed.
+   else   // otherwise shape A must be shape B with 'axis' removed.
       {
         A->get_shape().check_same(B->get_shape().without_axis(axis),
                                  E_RANK_ERROR, E_LENGTH_ERROR, LOC);
@@ -317,35 +317,35 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_ROTATE::eval_XB(Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return reverse(B, axis);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_ROTATE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return rotate(A, B, axis);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_ROTATE1::eval_XB(Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return reverse(B, axis);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_ROTATE1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return rotate(A, B, axis);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_TRANSPOSE::eval_B(Value_P B) const
 {
@@ -360,7 +360,7 @@ Value_P Z = transpose(shape_A, B);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B) const
 {
@@ -386,15 +386,16 @@ const Shape shape_A(A.get(), Workspace::get_IO());
         if (shape_A.get_shape_item(r) >= B->get_rank())   DOMAIN_ERROR;
       }
 
-Value_P Z = (shape_A.get_rank() == B->get_rank() && is_permutation(shape_A))
-          ? transpose(shape_A, B) : transpose_diag(shape_A, B);
+Value_P Z = (shape_A.get_rank() == B->get_rank() && shape_A.is_permutation())
+          ? transpose(shape_A, B)
+          : transpose_diag(shape_A, B);
 
    Z->set_default(*B.get(), LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_TRANSPOSE::transpose(const Shape & A, Value_P B)
 {
@@ -458,7 +459,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_TRANSPOSE::transpose_diag(const Shape & A, Value_P B)
 {
@@ -519,7 +520,7 @@ const Cell * cB = &B->get_cfirst();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape
 Bif_F12_TRANSPOSE::inverse_permutation(const Shape & perm)
 {
@@ -575,7 +576,7 @@ ShapeItem rho[MAX_RANK];
 
    return Shape(perm.get_rank(), rho);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape
 Bif_F12_TRANSPOSE::permute(const Shape & sh, const Shape & perm)
 {
@@ -603,42 +604,15 @@ Shape ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
-bool
-Bif_F12_TRANSPOSE::is_permutation(const Shape & sh)
-{
-ShapeItem rho[MAX_RANK];
-
-   // first, set all items to -1.
-   //
-   loop(r, sh.get_rank())   rho[r] = -1;
-
-   // then, set all items to the shape items of sh
-   //
-   loop(r, sh.get_rank())
-       {
-         const ShapeItem rx = sh.get_shape_item(r);
-         if (rx < 0)                return false;
-         if (rx >= sh.get_rank())   return false;
-         if (rho[rx] != -1)         return false;
-          rho[rx] = r;
-       }
-
-   return true;
-}
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_DECODE::eval_AB(Value_P A, Value_P B) const
 {
    // ρZ  is: (¯1↓ρA),1↓ρB
    // ρρZ is: (0⌈¯1+ρρA) + (0⌈¯1+ρρB)
    //
-Shape shape_A1;
-   if (!A->is_scalar())
-      shape_A1 = A->get_shape().without_axis(A->get_rank() - 1);
-
-Shape shape_B1(B->get_shape());
-   if (shape_B1.get_rank() > 0)   shape_B1 = B->get_shape().without_axis(0);
+const Shape shape_A1 = A->get_shape().without_last_axis();
+const Shape shape_B1 = B->get_shape().without_first_axis();
 
 const ShapeItem l_len_A = A->get_rank() ? A->get_last_shape_item() : 1;
 const ShapeItem h_len_B = B->get_rank() ? B->get_shape_item(0)     : 1;
@@ -654,9 +628,10 @@ const ShapeItem l_len_B = shape_B1.get_volume();
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   if ((l_len_A != 1) && (h_len_B != 1) && (l_len_A != h_len_B))   LENGTH_ERROR;
-
-const double qct = Workspace::get_CT();
+   if ((l_len_A != 1) &&       // cannot scalar-extend A, and
+       (h_len_B != 1) &&       // cannot scalar-extend B, and
+       (l_len_A != h_len_B))   // the lengths of A and B differ
+       LENGTH_ERROR;
 
 const Shape shape_Z = shape_A1 + shape_B1;
 
@@ -713,10 +688,10 @@ const Cell * cA = &A->get_cfirst();
 
                if (complex_A || complex_B)
                   decode_complex(Z.getref(), l_len_A, cA,
-                                             h_len_B, cB, l_len_B, qct);
+                                             h_len_B, cB, l_len_B);
                else
                   decode_real(Z.getref(), l_len_A, cA,
-                                          h_len_B, cB, l_len_B, qct);
+                                          h_len_B, cB, l_len_B);
              }
          cA += l_len_A;
        }
@@ -725,22 +700,34 @@ const Cell * cA = &A->get_cfirst();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Bif_F12_DECODE::decode_int(Value & Z, ShapeItem len_A, const Cell * cA,
                        ShapeItem len_B, const Cell * cB, ShapeItem dB)
 {
+   // decode_int() can easily produce an integer overflow. We keep track
+   // of that by also computing the final result as double and return
+   // true if an integer overflow occurs. The caller shall then call
+   // decode_real() instead.
+   //
+const ShapeItem dec_A = len_A == 1 ? 0 : 1;
+const ShapeItem dec_B = len_B == 1 ? 0 : dB;
+const ShapeItem len = dec_A ? len_A : len_B;
+
+   cA += dec_A*len_A;    // let cA point past the lowest weight item in A
+   cB += dec_B*len_B;    // let cB point past the lowest weight item in B
+
 APL_Integer value = 0;
 APL_Float value_f = 0.0;
 
 APL_Integer weight = 1;
 APL_Float weight_f = 1.0;
-const ShapeItem len = (len_A == 1) ? len_B : len_A;
 
-   cA += len_A - 1;         // cA points to the lowest item in A
-   cB += dB*(len_B - 1);    // cB points to the lowest item in B
    loop(l, len)
       {
+        cA -= dec_A;
+        cB -= dec_B;
+
         if (weight_f > LARGE_INT)   return true;
         if (weight_f < SMALL_INT)   return true;
 
@@ -752,64 +739,61 @@ const ShapeItem len = (len_A == 1) ? len_B : len_A;
 
         weight   = weight   * cA[0].get_near_int();
         weight_f = weight_f * cA[0].get_near_int();
-        if (len_A != 1)   --cA;
-        if (len_B != 1)   cB -= dB;
       }
 
    Z.next_ravel_Int(value);
 
    return false;   // no overflow
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_DECODE::decode_real(Value & Z, ShapeItem len_A, const Cell * cA,
-                       ShapeItem len_B, const Cell * cB, ShapeItem dB,
-                       double qct)
+                       ShapeItem len_B, const Cell * cB, ShapeItem dB)
 {
-APL_Float value = 0.0;
-APL_Float weight = 1.0;
-const ShapeItem len = (len_A == 1) ? len_B : len_A;
+const ShapeItem dec_A = len_A == 1 ? 0 : 1;
+const ShapeItem dec_B = len_B == 1 ? 0 : dB;
+const ShapeItem len = dec_A ? len_A : len_B;
 
-   cA += len_A - 1;         // cA points to the lowest item in A
-   cB += dB*(len_B - 1);    // cB points to the lowest item in B
+   cA += dec_A*len_A;    // let cA point past the lowest weight item in A
+   cB += dec_B*len_B;    // let cB point past the lowest weight item in B
+
+APL_Float accu   = 0.0;
+APL_Float weight = 1.0;
    loop(l, len)
       {
-        value += weight*cB[0].get_real_value();
-        weight *= cA[0].get_real_value();
-        if (len_A != 1)   --cA;
-        if (len_B != 1)   cB -= dB;
+        cA -= dec_A;
+        cB -= dec_B;
+        accu += weight * cB->get_real_value();
+        weight *= cA->get_real_value();
       }
 
-   if (Cell::is_near_int64_t(value))   Z.next_ravel_Int(Cell::near_int(value));
-   else                                Z.next_ravel_Float(value);
+   Z.next_ravel_Number(accu);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_DECODE::decode_complex(Value & Z, ShapeItem len_A, const Cell * cA,
-                       ShapeItem len_B, const Cell * cB, ShapeItem dB,
-                       double qct)
+                       ShapeItem len_B, const Cell * cB, ShapeItem dB)
 {
-APL_Complex value(0.0, 0.0);
-APL_Complex weight(1.0, 0.0);
-const ShapeItem len = (len_A == 1) ? len_B : len_A;
+const ShapeItem dec_A = len_A == 1 ? 0 : 1;
+const ShapeItem dec_B = len_B == 1 ? 0 : dB;
+const ShapeItem len = dec_A ? len_A : len_B;
 
-   cA += len_A - 1;         // cA points to the lowest item in A
-   cB += dB*(len_B - 1);    // cB points to the lowest item in B
+   cA += dec_A*len_A;    // let cA point past the lowest weight item in A
+   cB += dec_B*len_B;    // let cB point past the lowest weight item in B
+
+APL_Complex accu(0.0, 0.0);
+APL_Complex weight(1.0, 0.0);
    loop(l, len)
       {
-        value += weight*cB[0].get_complex_value();
-        weight *= cA[0].get_complex_value();
-        if (len_A != 1)   --cA;
-        if (len_B != 1)   cB -= dB;
+        cA -= dec_A;
+        cB -= dec_B;
+        accu += weight*cB->get_complex_value();
+        weight *= cA->get_complex_value();
       }
 
-   if (value.imag() > qct || value.imag() < -qct)   Z.next_ravel_Complex(value);
-   else if (value.real() < LARGE_INT
-         && value.real() > SMALL_INT
-         && Cell::is_near_int(value.real()))   Z.next_ravel_Int(value.real());
-   else                                        Z.next_ravel_Float(value.real());
+   Z.next_ravel_Number(accu);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_ENCODE::eval_AB(Value_P A, Value_P B) const
 {
@@ -876,7 +860,7 @@ ConstRavel_P iA(A, true);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_ENCODE::encode_Int(Value & Z, ShapeItem aL, ShapeItem aH,
                            const ConstRavel_P & iA, const ConstRavel_P & iB)
@@ -927,7 +911,7 @@ APL_Integer bi = iB->get_int_value();   // the value being decoded
            }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_ENCODE::encode_Flt(Value & Z, ShapeItem aL, ShapeItem aH,
                            const ConstRavel_P & iA,
@@ -962,7 +946,7 @@ APL_Float bf = iB->get_real_value();   // the value being decoded
            }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_ENCODE::encode_Cpx(Value & Z, ShapeItem aL, ShapeItem aH,
                            const ConstRavel_P & iA,
@@ -997,7 +981,7 @@ APL_Complex bc = iB->get_complex_value();   // the value being decoded
            }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_ELEMENT::eval_B(Value_P B) const
 {
@@ -1078,7 +1062,7 @@ Value_P Z(len_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_ELEMENT::eval_AB(Value_P A, Value_P B) const
 {
@@ -1104,7 +1088,7 @@ Value_P Z(A->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F2_INDEX::eval_AB(Value_P A, Value_P B) const
 {
@@ -1150,7 +1134,7 @@ IndexExpr index_expr(ASS_none, LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F2_INDEX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -1218,7 +1202,7 @@ ShapeItem a = ec_A;   // index_expr[0] ←→  B[;;;b]
         return Token(TOK_APL_VALUE1, Z);
       }
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_EQUIV::eval_B(Value_P B) const
 {
@@ -1227,7 +1211,7 @@ const APL_Integer depth = B->compute_depth();
 Value_P Z = IntScalar(depth, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_EQUIV::eval_AB(Value_P A, Value_P B) const
 {
@@ -1249,7 +1233,7 @@ const double qct = Workspace::get_CT();
 
    return Token(TOK_APL_VALUE1, IntScalar(1, LOC));   // match
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_NEQUIV::eval_B(Value_P B) const
 {
@@ -1259,7 +1243,7 @@ const ShapeItem len = B->is_scalar() ? 1 : B->get_shape().get_shape_item(0);
 
    return Token(TOK_APL_VALUE1, IntScalar(len, LOC));   // match
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_NEQUIV::eval_AB(Value_P A, Value_P B) const
 {
@@ -1280,7 +1264,7 @@ const double qct = Workspace::get_CT();
 
    return Token(TOK_APL_VALUE1, IntScalar(0, LOC));   // match
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F1_EXECUTE::eval_B(Value_P B) const
 {
@@ -1292,7 +1276,7 @@ UCS_string statement(*B.get());
 
    return execute_statement(statement);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F1_EXECUTE::execute_statement(UCS_string & statement)
 {
@@ -1328,7 +1312,7 @@ ExecuteList * fun = ExecuteList::fix(statement.no_pad(), LOC);
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F1_EXECUTE::execute_command(UCS_string & command)
 {
@@ -1394,7 +1378,7 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Bif_F12_UNION::append_zone(const Cell ** cells_Z, const Cell ** cells_B,
                Zone_list & B_from_to, double qct)
@@ -1504,7 +1488,7 @@ const Cell ** Z0 = cells_Z;
 
    return cells_Z - Z0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_UNION::eval_B(Value_P B) const
 {
@@ -1578,7 +1562,7 @@ Value_P Z(len_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F2_INTER::eval_AB(Value_P A, Value_P B) const
 {
@@ -1662,7 +1646,7 @@ const double qct = Workspace::get_CT();
         return Token(TOK_APL_VALUE1, Z);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_UNION::eval_AB(Value_P A, Value_P B) const
 {
@@ -1683,7 +1667,7 @@ Value_P Z(len_A + len_B, LOC);
    Z->check_value(LOC);
    return Bif_F12_COMMA::fun->eval_AB(A, BwoA.get_apl_val());
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F2_RIGHT::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -1734,5 +1718,5 @@ Value_P Z(X->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 

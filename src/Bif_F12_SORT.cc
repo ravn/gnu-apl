@@ -32,7 +32,7 @@ Bif_F12_SORT_DES  Bif_F12_SORT_DES::_fun;     // ⍒
 Bif_F12_SORT_ASC * Bif_F12_SORT_ASC::fun = &Bif_F12_SORT_ASC::_fun;
 Bif_F12_SORT_DES * Bif_F12_SORT_DES::fun = &Bif_F12_SORT_DES::_fun;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 CollatingCache::CollatingCache(const Value & A, const Cell * base,
                                ShapeItem clen)
    : rank(A.get_rank()),
@@ -82,7 +82,7 @@ UCS_string UA1 = UA.unique();
 CollatingCacheEntry others(Invalid_Unicode, A.get_shape());
    push_back(others);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 CollatingCache::greater_vec(const IntCell & Za, const IntCell & Zb,
                             const void * comp_arg)
@@ -108,7 +108,7 @@ const Rank rank = cache.get_rank();
 
    return ca > cb;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 CollatingCache::smaller_vec(const IntCell & Za, const IntCell & Zb,
                             const void * comp_arg)
@@ -133,7 +133,7 @@ const Rank rank = cache.get_rank();
 
    return ca > cb;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 CollatingCache::find_entry(Unicode uni) const
 {
@@ -146,7 +146,7 @@ const CollatingCacheEntry * entry =
    if (entry)   return entry - entries;
    return size() - 1;   // the entry for characters not in A
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_SORT::sort(Value_P B, Sort_order order)
 {
@@ -170,7 +170,7 @@ const int qio = Workspace::get_IO();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_SORT::sort_collating(Value_P A, Value_P B, Sort_order order)
 {
@@ -220,5 +220,5 @@ IntCell * Z0 = reinterpret_cast<IntCell *>(&Z->get_wfirst());
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

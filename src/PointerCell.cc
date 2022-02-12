@@ -24,7 +24,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PointerCell::PointerCell(Value * sub_val, Value & cell_owner)
 {
    Assert(!sub_val->is_simple_scalar());
@@ -36,7 +36,7 @@ PointerCell::PointerCell(Value * sub_val, Value & cell_owner)
    cell_owner.increment_pointer_cell_count();
    cell_owner.add_subcount(sub_val->nz_element_count());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PointerCell::PointerCell(Value * sub_val, Value & cell_owner, uint32_t magic)
 {
    // DO NOT: Assert(!sub_val->is_simple_scalar()); This is a special
@@ -52,7 +52,7 @@ PointerCell::PointerCell(Value * sub_val, Value & cell_owner, uint32_t magic)
    cell_owner.increment_pointer_cell_count();
    cell_owner.add_subcount(sub_val->nz_element_count());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 PointerCell::init_other(void * other, Value & cell_owner,
                             const char * loc) const
@@ -65,17 +65,27 @@ Value_P sub;   // instantiate beforehand so that sub is 0 if clone() fails
    Assert(+sub);
    new (other) PointerCell(sub.get(), cell_owner);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 PointerCell::release(const char * loc)
 {
+   // 1. update the PointerCell related counters in the owner of this
+   //    PointerCell (since this Cell is no longer a PointerCell).
+   //
    value.pval.owner->decrement_pointer_cell_count();
    value.pval.owner->add_subcount(-get_pointer_value()->nz_element_count());
 
+   // 2. decrement the owner_count of our sub-value via reset() (since this
+   //    PointerCell releases the ownership of the sub-value.
+   //
    value.pval.valp.reset();
+
+   // 3. not needed but to be on the safe side: make this Cell an IntCell
+   //    (in case someone still points to it).
+   //
    IntCell::z0(this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 PointerCell::equal(const Cell & other, double qct) const
 {
@@ -92,7 +102,7 @@ const ShapeItem count = A->nz_element_count();
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 PointerCell::greater(const Cell & other) const
 {
@@ -100,7 +110,7 @@ PointerCell::greater(const Cell & other) const
    if (compare(other) == COMP_LT)   return false;
    return this > &other;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Comp_result
 PointerCell::compare(const Cell & other) const
 {
@@ -142,7 +152,7 @@ const Cell * C2 = &v2->get_cfirst();
    //
    return COMP_EQ;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 PointerCell::get_pointer_value() const
 {
@@ -150,26 +160,26 @@ Value * vp = const_cast<Value *>(value.pval.valp.get());
 Value_P ret(vp, LOC);   // Value_P constructor increments owner_count
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 PointerCell::is_member_anchor() const
 {
    return value.pval.valp.value_p &&
           value.pval.valp.value_p->is_member();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 CellType
 PointerCell::deep_cell_types() const
 {
    return CellType(CT_POINTER | get_pointer_value()->deep_cell_types());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 CellType
 PointerCell::deep_cell_subtypes() const
 {
    return CellType(CT_POINTER | get_pointer_value()->deep_cell_subtypes());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PrintBuffer
 PointerCell::character_representation(const PrintContext & pctx) const
 {
@@ -275,5 +285,5 @@ PrintBuffer ret(*val, pctx, 0);
    ret.get_info().real_len = ret.get_column_count();
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

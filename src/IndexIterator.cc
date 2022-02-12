@@ -24,7 +24,7 @@
 #include "Output.hh"
 #include "PrintOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IndexIterator::operator ++()
 {
@@ -44,7 +44,7 @@ IndexIterator::operator ++()
 
    // print(CERR);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 IndexIterator::print(ostream & out) const
 {
@@ -57,7 +57,7 @@ IndexIterator::print(ostream & out) const
 
    return out << endl;
 }
-//=============================================================================
+//============================================================================
 TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
                                      uint32_t qio, ShapeItem max_idx)
    : IndexIterator(w, value->element_count())
@@ -77,7 +77,7 @@ TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
         indices[v] = idx * w;
       }
 }
-//=============================================================================
+//============================================================================
 MultiIndexIterator::MultiIndexIterator(const Shape & shape,
                                        const IndexExpr & IDX)
    : highest_it(0),
@@ -137,7 +137,7 @@ ShapeItem weight = 1;
          highest_it = new_it;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 MultiIndexIterator::~MultiIndexIterator()
 {
    for (IndexIterator * it = lowest_it; it;)
@@ -150,7 +150,7 @@ MultiIndexIterator::~MultiIndexIterator()
          delete del;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 MultiIndexIterator::operator ++(int)
 {
@@ -163,5 +163,5 @@ ShapeItem ret = 0;
    if (lowest_it)   ++*lowest_it;
    return ret;
 }
-//=============================================================================
+//============================================================================
 

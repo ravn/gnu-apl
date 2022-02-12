@@ -88,7 +88,7 @@ Quad_UCS   * Quad_UCS  ::fun = &Quad_UCS  ::_fun;
 Quad_STOP  * Quad_STOP ::fun = &Quad_STOP ::_fun;
 Quad_TRACE * Quad_TRACE::fun = &Quad_TRACE::_fun;
 
-//=============================================================================
+//============================================================================
 Token
 Quad_AF::eval_B(Value_P B) const
 {
@@ -121,7 +121,7 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_AT::eval_AB(Value_P A, Value_P B) const
 {
@@ -208,7 +208,7 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_DL::eval_B(Value_P B) const
 {
@@ -240,7 +240,7 @@ const APL_time_us end = start + 1000000 * B->get_cfirst().get_real_value();
    //
    return Token(TOK_APL_VALUE1, FloatScalar(0.000001*(now() - start), LOC));
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_EA::eval_AB(Value_P A, Value_P B) const
 {
@@ -258,7 +258,7 @@ Quad_EA::eval_AB(Value_P A, Value_P B) const
 
    return Macro::get_macro(Macro::MAC_Z__A_Quad_EA_B)->eval_AB(A, B);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_EB::eval_AB(Value_P A, Value_P B) const
 {
@@ -276,7 +276,7 @@ Quad_EB::eval_AB(Value_P A, Value_P B) const
 
    return Macro::get_macro(Macro::MAC_Z__A_Quad_EB_B)->eval_AB(A, B);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_EC::eval_B(Value_P B) const
 {
@@ -301,7 +301,7 @@ ExecuteList * fun = 0;
         UCS_string Z3_ucs(Z3_utf);
         Value_P Z3(Z3_ucs, LOC);
         Value_P Z(3, LOC);
-        Z->next_ravel_Int(0);              // return code = error
+        Z->next_ravel_0();              // return code = error
         Z->next_ravel_Pointer(Z2.get());   // ⎕ET value
         Z->next_ravel_Pointer(Z3.get());   // ⎕EM
 
@@ -318,13 +318,13 @@ ExecuteList * fun = 0;
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_EC::eval_fill_B(Value_P B) const
 {
 Value_P Z2(2, LOC);                             // Z2←0 0 0
-   Z2->next_ravel_Int(0);
-   Z2->next_ravel_Int(0);
+   Z2->next_ravel_0();
+   Z2->next_ravel_0();
    Z2->check_value(LOC);
 
 Value_P Zsub(3, LOC);                           // Zsub ← 3 (⊂Z2) (⊂⍬)...
@@ -338,7 +338,7 @@ Value_P Z(ShapeItem(0), LOC);                   // Z ← 0 ⍴ ⊂Zsub
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_EC::eoc(Token & result)
 {
@@ -384,7 +384,7 @@ Value_P Z(3, LOC);
 
         Value_P Z3(pb, LOC);   // 3 line message like ⎕EM
 
-        Z->next_ravel_Int(0);
+        Z->next_ravel_0();
         Z->next_ravel_Pointer(Z2.get());
         Z->next_ravel_Pointer(Z3.get());
 
@@ -396,15 +396,15 @@ Value_P Z(3, LOC);
    // all other cases have Z2 = 0 0
    //
 Value_P Z2(2, LOC);
-   Z2->next_ravel_Int(0);
-   Z2->next_ravel_Int(0);
+   Z2->next_ravel_0();
+   Z2->next_ravel_0();
    Z2->check_value(LOC);
 
    switch(result.get_tag())
       {
         case TOK_APL_VALUE1:
         case TOK_APL_VALUE3:
-             Z->next_ravel_Int(1);
+             Z->next_ravel_1();
              Z->next_ravel_Pointer(Z2.get());
              Z->next_ravel_Value(result.get_apl_val().get());
              break;
@@ -442,7 +442,7 @@ Value_P Z2(2, LOC);
    Z->check_value(LOC);
    result.move_2(Token(TOK_APL_VALUE1, Z), LOC);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_ENV::eval_B(Value_P B) const
 {
@@ -500,7 +500,7 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_ES::eval_AB(Value_P A, Value_P B) const
 {
@@ -511,7 +511,7 @@ const Token ret = event_simulate(&ucs, B, error);
 
    throw error;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_ES::eval_B(Value_P B) const
 {
@@ -522,7 +522,7 @@ const Token ret = event_simulate(0, B, error);
 
    throw error;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_ES::event_simulate(const UCS_string * A, Value_P B, Error & error)
 {
@@ -602,7 +602,7 @@ const ErrorCode ec = get_error_code(B);
    error.update_error_info(Workspace::SI_top());
    return Token();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Quad_ES::get_error_code(Value_P B)
 {
@@ -640,7 +640,7 @@ const APL_Integer err = (B->get_cfirst().get_near_int() << 16)
 
    return ErrorCode(err);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_EX::eval_B(Value_P B) const
 {
@@ -658,7 +658,7 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_EX::expunge(const UCS_string & name)
 {
@@ -712,7 +712,7 @@ cleanup:
    loop(m, members.size())   delete members[m];
    return ret;
 }
-//=============================================================================
+//============================================================================
 UCS_string Quad_INP::esc1;
 UCS_string Quad_INP::esc2;
 UCS_string Quad_INP::end_marker;
@@ -795,12 +795,12 @@ Value_P BB(line_count, LOC);
 Token ret = Macro::get_macro(Macro::MAC_Z__Quad_INP_B)->eval_B(BB);
    Assert1(ret.get_tag() == TOK_SI_PUSHED);
 
-// loop(l, line_count)   BB->get_wravel(l).release(LOC);
+// loop(l, line_count)   BB->release(l, LOC);
 
    Quad_INP_running = false;
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_INP::eval_B(Value_P B) const
 {
@@ -831,7 +831,7 @@ Value_P Z(raw_lines.size(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_INP::eval_XB(Value_P X, Value_P B) const
 {
@@ -923,7 +923,7 @@ Value_P Z(lines.size(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_INP::get_esc(Value_P A, UCS_string & esc1, UCS_string & esc2)
 {
@@ -960,7 +960,7 @@ Quad_INP::get_esc(Value_P A, UCS_string & esc1, UCS_string & esc2)
         esc2 = esc1;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_INP::read_strings()
 {
@@ -988,7 +988,7 @@ Quad_INP::read_strings()
         if (eof)   break;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_INP::split_strings()
 {
@@ -1042,7 +1042,7 @@ UCS_string empty;
    Assert(prefixes.size() == escapes.size());
    Assert(prefixes.size() == suffixes.size());
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_NC::eval_B(Value_P B) const
 {
@@ -1065,7 +1065,7 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_Integer
 Quad_NC::get_NC(const UCS_string ucs)
 {
@@ -1121,7 +1121,7 @@ Symbol * symbol = 0;
         default:              return nc & NC_case_mask;
       }
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_NL::do_quad_NL(Value_P A, Value_P B)
 {
@@ -1236,7 +1236,7 @@ Value_P Z(shZ, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_SI::eval_AB(Value_P A, Value_P B) const
 {
@@ -1319,7 +1319,7 @@ const APL_Integer b = B->get_cfirst().get_near_int();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_SI::eval_B(Value_P B) const
 {
@@ -1398,7 +1398,7 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_UCS::eval_B(Value_P B) const
 {
@@ -1464,7 +1464,7 @@ const ShapeItem ec = B->element_count();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 const UserFunction *
 Stop_Trace::locate_fun(const Value & fun_name)
 {
@@ -1497,7 +1497,7 @@ const UserFunction * ufun = fun->get_ufun1();
 
    return ufun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Stop_Trace::reference(const std::vector<Function_Line> & lines, bool assigned)
 {
@@ -1508,7 +1508,7 @@ Value_P Z(lines.size(), LOC);
    if (assigned)   return Token(TOK_APL_VALUE2, Z);
    else            return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
 {
@@ -1524,7 +1524,7 @@ std::vector<Function_Line> lines;
 
    ufun->set_trace_stop(lines, stop);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_STOP::eval_AB(Value_P A, Value_P B) const
 {
@@ -1548,7 +1548,7 @@ const UserFunction * ufun = locate_fun(*A);
    assign(const_cast<UserFunction *>(ufun), *A, true);
    return reference(ufun->get_stop_lines(), true);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_STOP::eval_B(Value_P B) const
 {
@@ -1557,7 +1557,7 @@ const UserFunction * ufun = locate_fun(*B);
 
    return reference(ufun->get_stop_lines(), false);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_TRACE::eval_AB(Value_P A, Value_P B) const
 {
@@ -1581,7 +1581,7 @@ const UserFunction * ufun = locate_fun(*A);
    assign(const_cast<UserFunction *>(ufun), *A, false);
    return reference(ufun->get_trace_lines(), true);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_TRACE::eval_B(Value_P B) const
 {
@@ -1590,5 +1590,5 @@ const UserFunction * ufun = locate_fun(*B);
 
    return reference(ufun->get_trace_lines(), false);
 }
-//=============================================================================
+//============================================================================
 

@@ -362,7 +362,7 @@ Token_string tos;
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction_header::pop_local_vars() const
 {
@@ -377,7 +377,7 @@ UserFunction_header::pop_local_vars() const
    if (sym_A)    sym_A ->pop();
    if (sym_Z)    sym_Z ->pop();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction_header::print_local_vars(ostream & out) const
 {
@@ -389,7 +389,7 @@ UserFunction_header::print_local_vars(ostream & out) const
 
    loop(l, local_vars.size())   out << " " << *local_vars[l];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction_header::reverse_local_vars()
 {
@@ -401,7 +401,7 @@ const ShapeItem half = local_vars.size() / 2;   // = rounded down!
         local_vars[local_vars.size() - v - 1] = tmp;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction_header::remove_duplicate_local_variables()
 {
@@ -422,7 +422,7 @@ UserFunction_header::remove_duplicate_local_variables()
    loop(l, local_vars.size())
       remove_duplicate_local_var(local_vars[l], l + 1);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction_header::remove_duplicate_local_var(const Symbol * sym, size_t pos)
 {
@@ -442,7 +442,7 @@ UserFunction_header::remove_duplicate_local_var(const Symbol * sym, size_t pos)
          ++pos;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UserFunction_header::lambda_header(Fun_signature sig, int lambda_num)
 {
@@ -461,7 +461,7 @@ UCS_string u;
 
    return u;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UserFunction_header::localizes(const Symbol * sym) const
 {
@@ -477,7 +477,7 @@ UserFunction_header::localizes(const Symbol * sym) const
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction_header::print_properties(ostream & out, int indent) const
 {
@@ -510,7 +510,7 @@ UCS_string ind(indent, UNI_SPACE);
         out << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserFunction_header::eval_common() const
 {
@@ -525,4 +525,4 @@ UserFunction_header::eval_common() const
    loop(l, label_values.size())
        label_values[l].sym->push_label(label_values[l].line);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

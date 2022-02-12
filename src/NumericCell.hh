@@ -23,7 +23,7 @@
 
 #include "Cell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*! A cell that is either an integer cell, a floating point cell, or a
     complex number cell. This class contains all cell functions for which
     the detailed type makes no difference.
@@ -119,6 +119,6 @@ protected:
    /// multiply \b a by 1, -1, i, or -i so that a.real is maximal
    static APL_Complex cpx_max_real(APL_Complex a);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __NUMERICCELL_HH_DEFINED__

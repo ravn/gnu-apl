@@ -34,7 +34,7 @@ using namespace std;
 // the implementation of gelsy<T>
 #include "LApack.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 divide_matrix(Value & Z, bool need_complex,
               ShapeItem rows, ShapeItem cols_A, const Cell * cA,
@@ -137,4 +137,4 @@ divide_matrix(Value & Z, bool need_complex,
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

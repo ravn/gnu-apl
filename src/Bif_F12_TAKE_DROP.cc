@@ -33,7 +33,7 @@ Bif_F12_DROP      Bif_F12_DROP     ::_fun;    // ↓
 Bif_F12_TAKE      * Bif_F12_TAKE     ::fun = &Bif_F12_TAKE     ::_fun;
 Bif_F12_DROP      * Bif_F12_DROP     ::fun = &Bif_F12_DROP     ::_fun;
 
-//=============================================================================
+//============================================================================
 Value_P
 Bif_F12_TAKE::first(Value_P B)
 {
@@ -88,7 +88,7 @@ Value * v1_owner = v1->get_lval_cellowner();
         return Z;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_TAKE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -109,7 +109,7 @@ Token cT = Bif_OPER1_EACH::fun->eval_ALB(cA, take, cB);   // cA↑¨cB
 Token result = Bif_F12_PICK::fun->eval_XB(X, cT.get_apl_val());
    return result;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_TAKE::eval_AB(Value_P A, Value_P B) const
 {
@@ -129,7 +129,7 @@ Shape ravel_A1(A.get(), /* ⎕IO */ 0);   // checks that 1 ≤ ⍴⍴A and ⍴A 
         return Token(TOK_APL_VALUE1, do_take(ravel_A1, B));
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_TAKE::do_take(const Shape & ravel_A1, Value_P B)
 {
@@ -142,7 +142,7 @@ Value_P Z(ravel_A1.abs(), LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z, const Value & B)
 {
@@ -159,7 +159,7 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z, const Value & B)
             }
        }
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_DROP::eval_AB(Value_P A, Value_P B) const
 {
@@ -220,7 +220,7 @@ Value_P Z(sh_Z, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_DROP::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -267,5 +267,5 @@ bool seen[MAX_RANK];
 
    return Token(TOK_APL_VALUE1, Bif_F12_TAKE::do_take(ravel_A, B));
 }
-//=============================================================================
+//============================================================================
 

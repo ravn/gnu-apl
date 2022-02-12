@@ -26,7 +26,7 @@
 
 class BeamIterator;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Base class for all primitive APL operators
 class PrimitiveOperator : public PrimitiveFunction
 {
@@ -49,6 +49,6 @@ public:
    static Token fill(const Shape shape_Z, Value_P A, Function_P fun,
                      Value_P B, const char * loc);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __PRIMITIVE_OPERATOR_HH_DEFINED__

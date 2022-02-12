@@ -25,7 +25,7 @@
 #include "Shape.hh"
 #include "SystemLimits.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// An iterator counting 0, 1, 2, ... ⍴[N-1] along one axis of length N
 class AxisIterator
 {
@@ -105,7 +105,7 @@ protected:
    /// when iterating over entire array is done.
    bool wrap;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// An iterator counting along all axes of \b shape
 class ArrayIterator
 {
@@ -226,6 +226,6 @@ protected:
     **/
    AxisIterator axis_iterators[MAX_RANK];
 };
-//=============================================================================
+//============================================================================
 
 #endif // __ARRAY_ITERATOR_HH_DEFINED__

@@ -42,7 +42,7 @@ struct Avec::Character_definition
    CharacterFlag flags;       ///< Character class.
    int           av_pos;      ///< position in ⎕AV (== ⎕AF unicode)
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const Avec::Character_definition
 Avec::character_table[MAX_AV] =
 {
@@ -51,8 +51,8 @@ Avec::character_table[MAX_AV] =
 #define char_uni(_name, _uni, _tag, _flags)
 #include "Avec.def"
 };
-//-----------------------------------------------------------------------------
-void
+//----------------------------------------------------------------------------
+int
 Avec::show_error_pos(int i, int line, bool cond, int def_line)
 {
    if (!cond)
@@ -60,10 +60,13 @@ Avec::show_error_pos(int i, int line, bool cond, int def_line)
         CERR << "Error index (line " << line << ", Avec.def line "
              << def_line << ") = " << i << " = " << HEX(i) << endl;
         Assert(0);
+        return 1;
       }
+
+   return 0;   // OK
 }
-//-----------------------------------------------------------------------------
-#if 0
+//----------------------------------------------------------------------------
+#ifdef DEVELOP_WANTED
 
 void
 Avec::check_file(const char * filename)
@@ -96,34 +99,45 @@ UCS_string ucs(utf);
 
    close(fd);
 }
-#endif
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Avec::init()
 {
    check_av_table();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Avec::check_av_table()
 {
+int errors = 0;
+
    if (MAX_AV != 256)
       {
         CERR << "AV has " << MAX_AV << " entries (should be 256)" << endl;
+        ++errors;
       }
 
    Assert(sizeof(character_table) / sizeof(*character_table) == MAX_AV);
 
+
    // check that character_table.unicode is sorted by increasing UNICODE
    //
    for (int i = 1; i < MAX_AV; ++i)
-       show_error_pos(i, __LINE__, character_table[i].def_line,
-          character_table[i].unicode > character_table[i - 1].unicode);
+       {
+         errors += show_error_pos(i, __LINE__,
+                                   character_table[i].def_line,
+                                   character_table[i].unicode >
+                                   character_table[i - 1].unicode);
+       }
 
    // check that ASCII chars map to themselves.
    //
-   loop(i, 0x80)   show_error_pos(i, __LINE__, character_table[i].def_line,
+   loop(i, 0x80)
+       {
+         errors += show_error_pos(i, __LINE__,
+                                  character_table[i].def_line,
                                   character_table[i].unicode == i);
+       }
 
    // check for holes and duplicate AV positions
    {
@@ -141,11 +155,13 @@ Avec::check_av_table()
          {
            if (positions[p] > 1)   // duplicate
               {
+                ++errors;
                 CERR << "In Avec.def: duplicate av_pos " << HEX2(p)
                      << " (" << positions[p] << " entries)" << endl;
               }
            if (positions[p] < 1)   // hole
               {
+                ++errors;
                 CERR << "In Avec.def: no av_pos " << HEX2(p) << endl;
               }
          }
@@ -155,8 +171,8 @@ Avec::check_av_table()
    //
    loop(i, MAX_AV)
        {
-         show_error_pos(i, __LINE__, character_table[i].def_line,
-                        i == find_char(character_table[i].unicode));
+         errors += show_error_pos(i, __LINE__, character_table[i].def_line,
+                                   i == find_char(character_table[i].unicode));
        }
 
    Log(LOG_SHOW_AV)
@@ -170,8 +186,16 @@ Avec::check_av_table()
 
 // check_file("../keyboard");
 // check_file("../keyboard1");
+
+   if (errors)   exit(1);
 }
-//-----------------------------------------------------------------------------
+#else  // ! DEVELOP_WANTED
+
+void
+Avec::init() { }
+
+#endif // DEVELOP_WANTED
+//----------------------------------------------------------------------------
 Unicode
 Avec::unicode(CHT_Index av)
 {
@@ -179,7 +203,7 @@ Avec::unicode(CHT_Index av)
    if (av >= MAX_AV)   return UNI_AV_MAX;
    return character_table[av].unicode;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 uint32_t
 Avec::get_av_pos(CHT_Index av)
 {
@@ -187,7 +211,7 @@ Avec::get_av_pos(CHT_Index av)
    if (av >= MAX_AV)   return UNI_AV_MAX;
    return character_table[av].av_pos;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Avec::uni_to_token(Unicode & uni, const char * loc)
 {
@@ -218,7 +242,7 @@ const CHT_Index idx = map_alternative_char(uni);
 
    return Token();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 uint32_t Avec::find_av_pos(Unicode av)
 {
 const CHT_Index pos = find_char(av);
@@ -227,7 +251,7 @@ const CHT_Index pos = find_char(av);
 
    return character_table[pos].av_pos;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Avec::CHT_Index
 Avec::find_char(Unicode av)
 {
@@ -245,7 +269,7 @@ int h = sizeof(character_table)/sizeof(*character_table) - 1;
          else                return CHT_Index(m);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Avec::CHT_Index
 Avec::map_alternative_char(Unicode alt_av)
 {
@@ -285,7 +309,7 @@ Avec::map_alternative_char(Unicode alt_av)
         default:     return Invalid_CHT;         // unknown alt_av
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Avec::is_known_char(Unicode av)
 {
@@ -303,7 +327,7 @@ Avec::is_known_char(Unicode av)
 
    return false;   // not found
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Avec::digit_value(Unicode uni, bool hex)
 {
@@ -318,7 +342,7 @@ Avec::digit_value(Unicode uni, bool hex)
       }
    return -1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Avec::need_UCS(Unicode uni)
 {
@@ -331,7 +355,7 @@ const CHT_Index idx = find_char(uni);
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Avec::is_symbol_char(Unicode av)
 {
@@ -339,13 +363,13 @@ const int32_t idx = find_char(av);
    if (idx == -1)   return false;
    return (character_table[idx].flags & FLG_SYMBOL) != 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Avec::is_first_symbol_char(Unicode av)
 {
    return is_symbol_char(av) && ! is_digit(av);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Avec::no_space_after(Unicode av)
 {
@@ -353,7 +377,7 @@ const int32_t idx = find_char(av);
    if (idx == -1)   return false;
    return (character_table[idx].flags & FLG_NO_SPACE_AFTER) != 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Avec::no_space_before(Unicode av)
 {
@@ -361,7 +385,7 @@ const int32_t idx = find_char(av);
    if (idx == -1)   return false;
    return (character_table[idx].flags & FLG_NO_SPACE_BEFORE) != 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 Avec::subscript(uint32_t i)
 {
@@ -381,7 +405,7 @@ Avec::subscript(uint32_t i)
 
    return Unicode(0x2093);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 Avec::superscript(uint32_t i)
 {
@@ -401,7 +425,7 @@ Avec::superscript(uint32_t i)
 
    return Unicode(0x207A);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /* the IBM APL2 character set shown in lrm figure 68 on page 470
 
    The table is indexed with an 8-bit position in IBM's ⎕AV and returns
@@ -469,7 +493,7 @@ Avec::IBM_quad_AV()
 {
    return reinterpret_cast<const Unicode *>(ibm_av);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Avec::Unicode_to_IBM_codepoint Avec::inverse_ibm_av[256] =
 {
   { 0x0000, 0   }, { 0x0001, 1   }, { 0x0002, 2   }, { 0x0003, 3   },
@@ -594,7 +618,7 @@ Unicode_to_IBM_codepoint * map = inverse_ibm_av;
         CERR << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// compare the unicodes of two chars in the IBM ⎕AV
 int
 Avec::compare_uni(const void * key, const void * entry)
@@ -602,7 +626,7 @@ Avec::compare_uni(const void * key, const void * entry)
    return *reinterpret_cast<const Unicode *>(key) -
            reinterpret_cast<const Unicode_to_IBM_codepoint *>(entry)->uni;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 unsigned char
 Avec::unicode_to_cp(Unicode uni)
 {
@@ -627,5 +651,5 @@ const void * where = bsearch(&uni, inverse_ibm_av, 256,
    Assert(where);
    return reinterpret_cast<const Unicode_to_IBM_codepoint *>(where)->cp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

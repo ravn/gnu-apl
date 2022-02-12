@@ -1,23 +1,22 @@
 /*
    This file is part of GNU APL, a free implementation of the
    ISO/IEC Standard 13751, "Programming Language APL, Extended"
- 
-   Copyright (C) 2008-2021  Dr. Jürgen Sauermann
- 
+
+   Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
- 
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 
 /********
 
@@ -85,7 +84,7 @@ and then:
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// an integer signal item of size \b bytes
 template<typename T, int bytes>
 class Sig_item_int
@@ -130,7 +129,7 @@ public:
    /// the value of the item
    T value;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a hexadecimal integer signal item of size \b bytes
 template<typename T, int bytes>
 class Sig_item_xint : public Sig_item_int<T, bytes>
@@ -150,7 +149,7 @@ public:
                    << setfill(' ') << dec;
       }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 typedef Sig_item_int < int16_t, 1> Sig_item_i8;   ///<   8-bit signed integer
 typedef Sig_item_int <uint16_t, 1> Sig_item_u8;   ///<   8-bit unsigned integer
 typedef Sig_item_xint<uint16_t, 1> Sig_item_x8;   ///<   8-bit hex integer
@@ -223,7 +222,7 @@ protected:
    /// the value of the item
    string value;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 /// a number identifying the signal
 enum Signal_id
@@ -3012,7 +3011,7 @@ Signal_base * ret = 0;
         case sid_FIND_OFFERING_ID: ret = new FIND_OFFERING_ID_c(b);   break;
 
 /// APserver result for: find processor ID that offers \b key
-        case sid_OFFERING_ID_IS: ret = new OFFERING_ID_IS_c(b);   break;
+        case sid_OFFERING_ID_IS: ret = new OFFERING_ID_IS_c(b);       break;
 
 /// APserver request: get offering processors  (⎕SVQ)
         case sid_GET_OFFERING_PROCS: ret = new GET_OFFERING_PROCS_c(b);   break;

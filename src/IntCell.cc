@@ -42,7 +42,7 @@ const IntCell IntCell::boolean_TRUE(1);
    INT ≤ FLOAT  --> FLOAT ≥ INT   (≤ is the opposite of ≥)
 
  */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 CellType
 IntCell::get_cell_subtype() const
 {
@@ -109,7 +109,7 @@ IntCell::get_cell_subtype() const
 
    return CellType(CT_INT | CTS_U64);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 IntCell::equal(const Cell & other, double qct) const
 {
@@ -117,9 +117,9 @@ IntCell::equal(const Cell & other, double qct) const
    if (other.is_numeric())         return other.equal(*this, qct);
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // monadic built-in functions...
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 const APL_Integer int_factorials[] =
 {
@@ -350,13 +350,13 @@ const APL_Integer iv = value.ival;
 
    return E_DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_conjugate(Cell * Z) const
 {
    return IntCell::zI(Z, value.ival);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_negative(Cell * Z) const
 {
@@ -364,7 +364,7 @@ IntCell::bif_negative(Cell * Z) const
       return IntCell::zI(Z, - value.ival);
    return  IntCell::zI(Z, - value.ival);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_direction(Cell * Z) const
 {
@@ -373,7 +373,7 @@ APL_Integer result = 0;
    else if (value.ival < 0)   result = -1;
    return IntCell::zI(Z, result);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_magnitude(Cell * Z) const
 {
@@ -381,7 +381,7 @@ IntCell::bif_magnitude(Cell * Z) const
    else                   bif_negative(Z);
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_reciprocal(Cell * Z) const
 {
@@ -401,7 +401,7 @@ IntCell::bif_reciprocal(Cell * Z) const
 
    return FloatCell::zF(Z, 1.0/value.ival);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_roll(Cell * Z) const
 {
@@ -412,31 +412,31 @@ const APL_Integer set_size = value.ival;
 const uint64_t rnd = Workspace::get_RL(set_size);
    return IntCell::zI(Z, qio + (rnd % set_size));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_pi_times(Cell * Z) const
 {
    return FloatCell::zF(Z, M_PI * value.ival);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_pi_times_inverse(Cell * Z) const
 {
    return FloatCell::zF(Z, value.ival / M_PI);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_ceiling(Cell * Z) const
 {
    return IntCell::zI(Z, value.ival);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_floor(Cell * Z) const
 {
    return IntCell::zI(Z, value.ival);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_exponential(Cell * Z) const
 {
@@ -444,7 +444,7 @@ IntCell::bif_exponential(Cell * Z) const
    //
    return FloatCell::zF(Z, exp(APL_Float(value.ival)));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_nat_log(Cell * Z) const
 {
@@ -458,14 +458,14 @@ IntCell::bif_nat_log(Cell * Z) const
 const APL_Complex bb(value.ival, 0);
    return ComplexCell::zC(Z, log(bb));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // dyadic built-in functions...
 //
 // where possible a function with non-int A is delegated to the corresponding
 // member function of A. For numeric cells that is the FloatCell or ComplexCell
 // function and otherwise the default function (that returns E_DOMAIN_ERROR.
 //
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_add(Cell * Z, const Cell * A) const
 {
@@ -486,13 +486,13 @@ IntCell::bif_add(Cell * Z, const Cell * A) const
    //
    return A->bif_add(Z, this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_add_inverse(Cell * Z, const Cell * A) const
 {
    return A->bif_subtract(Z, this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_subtract(Cell * Z, const Cell * A) const
 {
@@ -515,7 +515,7 @@ IntCell::bif_subtract(Cell * Z, const Cell * A) const
    this->bif_negative(Z);   // Z = -B
    return A->bif_add(Z, Z);        // Z = A + Z = A + -B
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_divide(Cell * Z, const Cell * A) const
 {
@@ -560,7 +560,7 @@ const bool A_zero = A->is_near_zero();
 const ErrorCode ec = this->bif_reciprocal(Z);   // Z = ÷B
    return ec ? ec : A->bif_multiply(Z, Z);      // Z = A × Z = A × ÷B
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_multiply(Cell * Z, const Cell * A) const
 {
@@ -582,13 +582,13 @@ IntCell::bif_multiply(Cell * Z, const Cell * A) const
    //
    return A->bif_multiply(Z, this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_multiply_inverse(Cell * Z, const Cell * A) const
 {
    return A->bif_divide(Z, this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_power(Cell * Z, const Cell * A) const
 {
@@ -717,7 +717,7 @@ const bool invert_Z = b < 0;
      return ComplexCell::zC(Z, z.real() / denom, - z.imag() / denom);
    }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_residue(Cell * Z, const Cell * A) const
 {
@@ -788,7 +788,7 @@ APL_Float z = value.ival - a * qf;
 
    return FloatCell::zF(Z, z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_maximum(Cell * Z, const Cell * A) const
 {
@@ -803,7 +803,7 @@ IntCell::bif_maximum(Cell * Z, const Cell * A) const
    //
    return A->bif_maximum(Z, this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 IntCell::bif_minimum(Cell * Z, const Cell * A) const
 {
@@ -818,7 +818,7 @@ IntCell::bif_minimum(Cell * Z, const Cell * A) const
    //
    return A->bif_minimum(Z, this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// overloaded Cell::bif_near_int64_t()
 ErrorCode
 IntCell::bif_near_int64_t(Cell * Z) const
@@ -826,21 +826,21 @@ IntCell::bif_near_int64_t(Cell * Z) const
    return IntCell::zI(Z, value.ival);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// overloaded Cell::bif_within_quad_CT()
 ErrorCode
 IntCell::bif_within_quad_CT(Cell * Z) const
 {
    return IntCell::zI(Z, value.ival);
 }
-//=============================================================================
+//============================================================================
 // throw/nothrow boundary. Functions above MUST NOT (directly or indirectly)
 // throw while funcions below MAY throw.
-//=============================================================================
+//============================================================================
 
 #include "Error.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Comp_result
 IntCell::compare(const Cell & other) const
 {
@@ -859,7 +859,7 @@ IntCell::compare(const Cell & other) const
    if (other.is_pointer_cell())     return COMP_LT;   // numeric < nested
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 IntCell::greater(const Cell & other) const
 {
@@ -892,7 +892,7 @@ const Comp_result comp = compare(other);
    if (comp == COMP_EQ)   return this > &other;
    return (comp == COMP_GT);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PrintBuffer
 IntCell::character_representation(const PrintContext & pctx) const
 {
@@ -920,7 +920,7 @@ ColInfo info;
    
    return PrintBuffer(ucs, info);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 IntCell::get_byte_value() const
 {
@@ -940,7 +940,7 @@ IntCell::get_byte_value() const
 
    return value.ival;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 IntCell::CDR_size() const
 {
@@ -952,4 +952,4 @@ const APL_Integer val = get_int_value();
    if (val == 0xFFFFFFFF)     return 4;
    return 8;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

@@ -33,7 +33,7 @@ struct ReduceArg;
 /// the max. number of token in one reduction
 enum { MAX_REDUCTION_LEN = 6 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// how to continue after return from a reduce_XXX() function
 enum R_action
 {
@@ -52,7 +52,7 @@ enum R_action
    /// internal error: action was not set by reduce_XXX() function
    RA_FIXME  = 4,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a class for reducing all statements of an Executable
 class Prefix
 {
@@ -331,6 +331,6 @@ protected:
    /// a generator for unique identifiers
    static uint64_t instance_counter;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __PREFIX_HH_DEFINED__

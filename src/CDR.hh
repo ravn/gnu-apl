@@ -29,7 +29,7 @@ class Value;
 /** a class for creating the Common Data Representation of an APL value.
  **/
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The class implementing CDR (IBM's Common Data Representation)
 class CDR
 {
@@ -63,6 +63,6 @@ protected:
    /// fill result with the bytes of the CDR of \b value
    static void fill(CDR_string & result, int type, int len, const Value & val);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __CDR_HH_DEFINED__

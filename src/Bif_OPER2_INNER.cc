@@ -30,7 +30,7 @@ Bif_OPER2_INNER * Bif_OPER2_INNER::fun = &Bif_OPER2_INNER::_fun;
 
 Bif_OPER2_INNER::PJob_product Bif_OPER2_INNER::job;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_INNER::eval_ALRB(Value_P A, Token & _LO, Token & _RO, Value_P B) const
 {
@@ -49,29 +49,19 @@ Function_P RO = _RO.get_function();
        A->get_shape().get_last_shape_item() !=
        B->get_shape().get_shape_item(0))   LENGTH_ERROR;
 
-Shape shape_A1;
-ShapeItem len_A = 1;
-   if (!A->is_scalar())
-      {
-        len_A = A->get_last_shape_item();
-        shape_A1 = A->get_shape().without_axis(A->get_rank() - 1);
-      }
+const Shape shape_A1 =A->get_shape().without_last_axis();
+const ShapeItem len_A = A->get_last_shape_item();
 
-Shape shape_B1;
-ShapeItem len_B = 1;
-   if (!B->is_scalar())
-      {
-        len_B = B->get_shape_item(0);
-        shape_B1 = B->get_shape().without_axis(0);
-      }
+const Shape shape_B1 = B->get_shape().without_first_axis();
+const ShapeItem len_B = B->get_first_shape_item();
 
    // we do not check len_A == len_B here, since a non-scalar LO may
    // accept different lengths of its left and right arguments
 
-const ShapeItem items_A = shape_A1.get_volume();
-const ShapeItem items_B = shape_B1.get_volume();
+const ShapeItem items_A1 = shape_A1.get_volume();
+const ShapeItem items_B1 = shape_B1.get_volume();
 
-   if (items_A == 0 || items_B == 0)   // empty result
+   if (items_A1 == 0 || items_B1 == 0)   // empty result
       {
         // the outer product portion of LO.RO is empty.
         // Apply the fill function of RO
@@ -111,10 +101,10 @@ Value_P Z(shape_A1 + shape_B1, LOC);
 
         job.cZ     = &Z->get_wfirst();
         job.cA     = &A->get_cfirst();
-        job.ZAh    = items_A;
+        job.ZAh    = items_A1;
         job.LO_len = A->is_scalar() ? len_B : len_A;
         job.cB     = &B->get_cfirst();
-        job.ZBl    = items_B;
+        job.ZBl    = items_B1;
         job.ec     = E_NO_ERROR;
 
         scalar_inner_product();
@@ -145,8 +135,8 @@ const bool B_enclosed = B->get_rank() > 1;
         B = Bif_F12_PARTITION::enclose_with_axes(first_axis, B);
       }
 
-   loop (a, items_A)
-   loop (b, items_B)
+   loop (a, items_A1)
+   loop (b, items_B1)
       {
         Value_P RO_A(A, LOC);
         if (A_enclosed)   RO_A = A->get_cravel(a).get_pointer_value();
@@ -183,7 +173,7 @@ const bool B_enclosed = B->get_rank() > 1;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_INNER::scalar_inner_product() const
 {
@@ -218,7 +208,7 @@ const uint64_t end_1 = cycle_counter();
    Performance::fs_OPER2_INNER_AB.add_sample(end_1-start_1, job.ZAh * job.ZBl);
 #endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_INNER::PF_scalar_inner_product(Thread_context & tctx)
 {
@@ -264,4 +254,4 @@ ShapeItem end_z = z + slice_len;
            }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

@@ -157,7 +157,7 @@ timeval tv;
 #define cycle_counter() 0
 #endif // HAVE_RDTSC
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #if HAVE_SEM_INIT
 
 # define __sem_destroy(sem) sem_destroy(sem)
@@ -179,7 +179,7 @@ char sname[100];                                           \
    sem = sem_open(sname, O_CREAT, mode, value);            \
 }
 #endif // HAVE_SEM_INIT
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
   Software probes. A probe is a measurement of CPU cycles executed between two
   points P1 and P2 in the source code.
@@ -329,7 +329,7 @@ protected:
    /// all probes
    static Probe probes[];
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Year, Month, Day, hour, minute, second, millisecond
 struct YMDhmsu
 {
@@ -347,14 +347,14 @@ struct YMDhmsu
    int second;   ///< second 0-59
    int micro;    ///< microseconds 0-999999
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// whether ⎕LX shall be executed at the end of the file
 enum LX_mode
 {
    no_LX = 0,     ///< no
    do_LX = 1      ///< yes
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #ifdef TROUBLESHOOT_NEW_DELETE
 inline void * operator new(size_t size)   { return common_new(size); }
@@ -363,7 +363,7 @@ inline void   operator delete(void * p)   { common_delete(p); }
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// return true iff \b uni is a padding character (used internally).
 inline bool is_iPAD_char(Unicode uni)
@@ -371,7 +371,7 @@ inline bool is_iPAD_char(Unicode uni)
    return ((uni >= UNI_iPAD_U2) && (uni <= UNI_iPAD_U1))    // ² ³ ¹
        || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// Stringify x.
 /// The current location in the source file.
@@ -388,7 +388,7 @@ extern std::ostream & get_CERR();
 /// NOT REMAIN IN THE CODE, Q1() SHOULD remain in the code.
 #define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #ifdef VALUE_HISTORY_WANTED
 
@@ -404,7 +404,7 @@ extern std::ostream & get_CERR();
 
 #endif
 
-//=============================================================================
+//============================================================================
 /// Function_Line ++ (post increment)
 inline int operator ++(Function_Line & fl, int)
 {
@@ -412,24 +412,24 @@ Function_Line ret = fl;
    fl = Function_Line(fl + 1);
    return ret;
 }
-//=============================================================================
+//============================================================================
 inline void skip_spaces(const char * & p)
 {
    while (*p && *p <= ' ')   ++p;
 }
-//=============================================================================
+//============================================================================
 inline Function_PC
 operator +(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) + offset);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline Function_PC
 operator -(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) - offset);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Function_PC ++ (post increment)
 inline Function_PC
 operator ++(Function_PC & pc, int)
@@ -438,7 +438,7 @@ const Function_PC before = pc;
    pc = pc + 1;
    return before;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Function_PC ++ (pre increment)
 inline Function_PC &
 operator ++(Function_PC & pc)
@@ -446,7 +446,7 @@ operator ++(Function_PC & pc)
    pc = pc + 1;
    return pc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Function_PC -- (pre decrement)
 inline Function_PC &
 operator --(Function_PC & pc)
@@ -454,14 +454,14 @@ operator --(Function_PC & pc)
    pc = pc - 1;
    return pc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// frequently used cast to const char *
 inline const char *
 charP(const void * vp)
 {
   return reinterpret_cast<const char *>(vp);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #define uhex  std::hex << uppercase << setfill('0')
 #define lhex  std::hex << nouppercase << setfill('0')

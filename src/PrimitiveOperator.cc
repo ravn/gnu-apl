@@ -23,7 +23,7 @@
 #include "PrimitiveOperator.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 PrimitiveOperator::fill(const Shape shape_Z, Value_P A, Function_P fun,
                         Value_P B, const char * loc)
@@ -55,4 +55,4 @@ Value_P Z1(shape_Z, LOC);   // shape_Z is empty
    Z1->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z1);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

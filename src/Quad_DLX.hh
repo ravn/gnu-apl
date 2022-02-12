@@ -24,7 +24,7 @@
 #include "QuadFunction.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕DLX aka. Dancing Links or Algorithm X by D. Knuth 2000
  */
@@ -48,7 +48,7 @@ protected:
    /// common part of eval_AB() and eval_B()
    static Token do_DLX(ShapeItem result_count, const Value & B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __Quad_DLX_HH_DEFINED__
 

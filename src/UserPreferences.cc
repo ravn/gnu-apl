@@ -48,7 +48,7 @@ UserPreferences uprefs;
 #undef _B
 #endif
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::usage(const char * prog)
 {
@@ -130,7 +130,7 @@ UserPreferences::usage(const char * prog)
 "\n"
 "Please report problems to: bug-apl@gnu.org\n" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::show_GPL(ostream & out)
 {
@@ -159,7 +159,7 @@ UserPreferences::show_GPL(ostream & out)
 "---------------------------------------------------------------------------\n"
 "\n";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UserPreferences::is_APL_script(const char * filename)
 {
@@ -185,7 +185,7 @@ const size_t len = read(fd, buf, sizeof(buf));
    if (buf[1] != '!')   return false;
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UserPreferences::parse_argv_1()
 {
@@ -271,7 +271,7 @@ bool log_startup = false;
 
    return log_startup;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::parse_argv_2(bool logit)
 {
@@ -781,7 +781,7 @@ UserPreferences::parse_argv_2(bool logit)
    //
    IO_Files::testcase_count = InputFile::testcase_file_count();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     GNU APL can be started in a number of ways:
 
@@ -892,7 +892,7 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::show_version(ostream & out)
 {
@@ -916,7 +916,7 @@ UserPreferences::show_version(ostream & out)
 
    Output::set_color_mode(Output::COLM_OUTPUT);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::show_configure_options()
 {
@@ -1023,7 +1023,7 @@ UserPreferences::show_configure_options()
 
    show_version(CERR);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 FILE *
 UserPreferences::open_user_file(const char * fname, char * filename,
                                 bool sys, bool log_startup)
@@ -1072,7 +1072,7 @@ FILE * f = fopen(filename, "r");
 
    return f;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::read_config_file(bool sys, bool log_startup)
 {
@@ -1455,7 +1455,7 @@ int file_profile = 0;   // the current profile in the preferences file
 
    fclose(f);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 UserPreferences::decode_ASCII(const char * strg)
 {
@@ -1497,7 +1497,7 @@ UserPreferences::decode_ASCII(const char * strg)
    CERR << "invalid parameter " << strg << " in preferences file" << endl;
    return -1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::read_threshold_file(bool sys, bool log_startup)
 {
@@ -1577,7 +1577,7 @@ int line = 0;
                  << " line " << line << endl;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::set_threshold(Function_P fun, int ab, int i_ab,
                                ShapeItem threshold)
@@ -1588,5 +1588,5 @@ UserPreferences::set_threshold(Function_P fun, int ab, int i_ab,
    if (ab == 1)   const_cast<Function *>(fun)->set_monadic_threshold(threshold);
    else           const_cast<Function *>(fun)->set_dyadic_threshold(threshold);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

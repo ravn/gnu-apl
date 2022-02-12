@@ -23,7 +23,7 @@
 
 #include "Cell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*!
     A cell containing a single Unicode (most likely an APL character)
  */
@@ -105,6 +105,6 @@ protected:
    /// overloaded Cell::bif_not_equal_bitwise()
    virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __CHARCELL_HH_DEFINED__

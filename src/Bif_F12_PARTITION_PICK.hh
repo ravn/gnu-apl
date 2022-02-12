@@ -24,7 +24,7 @@
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 
-//=============================================================================
+//============================================================================
 /** primitive functions partition and enclose */
 /// The class implementing ⊂
 class Bif_F12_PARTITION : public NonscalarFunction
@@ -75,7 +75,7 @@ protected:
    /// Partition B according to A
    Token partition(Value_P A, Value_P B, Axis axis) const;
 };
-//=============================================================================
+//============================================================================
 /** primitive functions pick and disclose */
 /// The class implementing ⊃
 class Bif_F12_PICK : public NonscalarFunction
@@ -126,7 +126,7 @@ protected:
    static Value_P pick(const Cell * const A0, ShapeItem idx_A, ShapeItem len_A,
                        Value_P B, APL_Integer qio);
 };
-//=============================================================================
+//============================================================================
 
 #endif // __Bif_F12_PARTITION_PICK_HH_DEFINED__
 

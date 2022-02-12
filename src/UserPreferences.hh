@@ -182,7 +182,8 @@ struct UserPreferences
    /// argument of --mem (if any: 0 if not given, "" if given but empty)
    const char * mem_arg;
 
-   /// true if old-style multi-line strings are allowed (in ∇-defined functions)
+   /// true if old-style multi-line strings are allowed (in ∇-defined
+   /// functions)
    bool multi_line_strings;
 
    /// true if new-style multi-line strings are allowed

@@ -184,7 +184,7 @@ protected:
    static Unicode_to_IBM_codepoint inverse_ibm_av[];
 
    /// print an error position on cerr, and then Assert(0);
-   static void show_error_pos(int i, int line, bool cond, int def_line);
+   static int show_error_pos(int i, int line, bool cond, int def_line);
 
    /// check that the character table that is used in this class is correct
    static void check_av_table();
