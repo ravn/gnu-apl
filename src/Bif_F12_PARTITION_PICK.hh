@@ -66,10 +66,7 @@ public:
    static Value_P enclose_with_axes(const Shape & shape_X, Value_P B);
 
 protected:
-   /// enclose B
-   static Token enclose(Value_P B);
-
-   /// enclose B
+   /// enclose B with axis
    static Token enclose_with_axis(Value_P B, Value_P X);
 
    /// Partition B according to A

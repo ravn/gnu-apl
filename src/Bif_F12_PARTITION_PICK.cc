@@ -164,9 +164,39 @@ Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis) const
    if (A->get_rank() > 1)    RANK_ERROR;
    if (B->get_rank() == 0)   RANK_ERROR;
 
+   if (A->element_count() == 1)
+      {
+        /* lrm p. 188:
+
+           The length of the left argument and the size of the last axis of
+           the right argument must match, unless the left argument is a
+           scalar or one-item vector, in which case it is extended.
+
+           We generalize "one-item vector" to mean "one-item array".
+         */
+
+         // a non-zero scalar A extends to A A A ... A, i.e. a single partition
+         //
+         if (const APL_Integer a = A->get_cscalar().get_near_int())
+            {
+              return Token(TOK_APL_VALUE1, do_eval_B(B));
+            }
+
+         // A is 0 which extends to 0 0 0 ... 0, i.e. an empty A ⊂ B.
+         if (B->get_cfirst().is_numeric())
+            {
+              return Token(TOK_APL_VALUE1, Idx0(LOC));
+            }
+         if (B->get_cfirst().is_character_cell())
+            {
+              return Token(TOK_APL_VALUE1, Str0(LOC));
+            }
+         DOMAIN_ERROR;
+      }
+
+const ShapeItem len_A = A->get_shape_item(0);
    // construct a vector of breakpoints from A
    //
-const ShapeItem len_A = A->get_shape_item(0);
    if (len_A != B->get_shape_item(axis))   LENGTH_ERROR;
 
 vector<ShapeItem> breakpoints;   // start position of a partition (including)
@@ -216,9 +246,9 @@ ShapeItem len_Zm = 0;
       {
         if (A->get_cfirst().get_near_int())   // non-zero A0
            {
-             Value_P ZZ = B->clone(LOC);
              Value_P Z(LOC);
-             Z->next_ravel_Pointer(ZZ.get());
+             Z->next_ravel_Pointer(B->clone(LOC).get());
+             Z->check_value(LOC);
              return Token(TOK_APL_VALUE1, Z);
            }
 
