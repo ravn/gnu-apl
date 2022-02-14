@@ -168,7 +168,7 @@ const bool maybe_parallel = Parallel::run_parallel &&
          if (job_B == 0)   break;   // all jobs done
 
 #if PARALLEL_ENABLED
-         if (maybe_parallel && job_B.len_Z > get_monadic_threshold())
+         if (maybe_parallel && job_B->len_Z > get_monadic_threshold())
             {
               // parallel execution...
               //
