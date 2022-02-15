@@ -904,7 +904,8 @@ Value_P Zsub(LOC);
 //----------------------------------------------------------------------------
 size_t
 Quad_JSON::comma_count(const UCS_string & ucs_B,
-                       const std::vector<ShapeItem> & tokens_B, size_t & token0)
+                       const std::vector<ShapeItem> & tokens_B,
+                       size_t & token0)
 {
 const Unicode start = ucs_B[tokens_B[token0]];
 Unicode end;
@@ -922,12 +923,12 @@ bool expect_colon = true;
          const Unicode uni = ucs_B[tokens_B[token0]];
          switch(uni)
                {
-                 case UNI_L_BRACK:
-                      stack += UNI_R_BRACK;
+                 case UNI_L_BRACK:            // [
+                      stack += UNI_R_BRACK;   // push ]
                       continue;
 
-                 case UNI_L_CURLY:
-                      stack += UNI_R_CURLY;
+                 case UNI_L_CURLY:            //      {
+                      stack += UNI_R_CURLY;   // push }
                       continue;
 
                  case UNI_COMMA:
@@ -975,6 +976,7 @@ bool expect_colon = true;
                          }
                       stack.pop_back();
                       if (stack.size() == 0)   return commas;
+                      expect_comma = true;
                       continue;
 
                  case UNI_R_CURLY:
@@ -988,6 +990,7 @@ bool expect_colon = true;
                          }
                       stack.pop_back();
                       if (stack.size() == 0)   return commas;
+                      expect_comma = true;
                       continue;
 
                  default:

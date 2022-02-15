@@ -186,6 +186,21 @@ a𝄞b
   "b": 2,      
   "a": 1 }     
 
+      ⍝ regression
+      ⍝
+      8 ⎕CR A ← (1 2) (3 4)
+┌→──────────┐
+│┌→──┐ ┌→──┐│
+││1 2│ │3 4││
+│└───┘ └───┘│
+└ϵ──────────┘
+
+      A ≡ ⎕JSON 2 ⎕JSON A
+1
+
+
+      ⎕JSON 2 ⎕JSON A
+
       )SIC
       )CHECK
 OK      - no stale functions
