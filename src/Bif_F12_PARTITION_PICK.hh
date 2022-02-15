@@ -44,7 +44,7 @@ public:
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return partition(A, B, B->get_rank() - 1); }
+      { return Token(TOK_APL_VALUE1, partition(A, B, B->get_rank() - 1)); }
 
    /// overloaded Function::eval_XB()
    virtual Token eval_XB(Value_P X, Value_P B) const
@@ -70,7 +70,7 @@ protected:
    static Token enclose_with_axis(Value_P B, Value_P X);
 
    /// Partition B according to A
-   Token partition(Value_P A, Value_P B, Axis axis) const;
+   static Value_P partition(Value_P A, Value_P B, Axis axis);
 };
 //============================================================================
 /** primitive functions pick and disclose */

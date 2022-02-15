@@ -54,7 +54,7 @@ PointerCell::PointerCell(Value * sub_val, Value & cell_owner, uint32_t magic)
 }
 //----------------------------------------------------------------------------
 void
-PointerCell::init_other(void * other, Value & cell_owner,
+PointerCell::init_other(void * other, Value & other_owner,
                             const char * loc) const
 {
    Assert(other);   // the new PointerCell to be created
@@ -63,7 +63,7 @@ Value_P sub;   // instantiate beforehand so that sub is 0 if clone() fails
 
    sub = get_pointer_value()->clone(loc);
    Assert(+sub);
-   new (other) PointerCell(sub.get(), cell_owner);
+   new (other) PointerCell(sub.get(), other_owner);
 }
 //----------------------------------------------------------------------------
 void

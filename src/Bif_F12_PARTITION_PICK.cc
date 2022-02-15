@@ -35,7 +35,7 @@ Token
 Bif_F12_PARTITION::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
 const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
-   return partition(A, B, axis);
+   return Token(TOK_APL_VALUE1, partition(A, B, axis));
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -156,8 +156,8 @@ Value_P Z(shape_Z, LOC);
    return Z;
 }
 //----------------------------------------------------------------------------
-Token
-Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis) const
+Value_P
+Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis)
 {
    // A must be a scalar or vector (of non-negative integers)
    //
@@ -175,45 +175,47 @@ Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis) const
            We generalize "one-item vector" to mean "one-item array".
          */
 
-         // a non-zero scalar A extends to A A A ... A, i.e. a single partition
+         // a non-zero scalar A extends to A A A ... A, i.e. Z ← ⊂ B
          //
          if (const APL_Integer a = A->get_cscalar().get_near_int())
             {
-              return Token(TOK_APL_VALUE1, do_eval_B(B));
+              return do_eval_B(B);
             }
 
-         // A is 0 which extends to 0 0 0 ... 0, i.e. an empty A ⊂ B.
-         if (B->get_cfirst().is_numeric())
-            {
-              return Token(TOK_APL_VALUE1, Idx0(LOC));
-            }
-         if (B->get_cfirst().is_character_cell())
-            {
-              return Token(TOK_APL_VALUE1, Str0(LOC));
-            }
+         // a zero scalar A extends to 0 0 0 ... 0, i.e. Z ← '' or Z ← ⍬
+         //
+         if (B->get_cfirst().is_numeric())          return Idx0(LOC);
+         if (B->get_cfirst().is_character_cell())   return Str0(LOC);
          DOMAIN_ERROR;
       }
 
+   // the length of A shall be then length of the B-axis along which the
+   // partitioning is performed.
+   //
 const ShapeItem len_A = A->get_shape_item(0);
-   // construct a vector of breakpoints from A
-   //
-   if (len_A != B->get_shape_item(axis))   LENGTH_ERROR;
-
-vector<ShapeItem> breakpoints;   // start position of a partition (including)
-vector<ShapeItem> breakends;     // end position of a partition (excluding)
-
-   // A is scalar-extended as needed. The case where A is a scalar is, however
-   // identical to the case where all items in A are equal, and in both cases
-   // there is only one breakpoint (at B[0])
-   //
-ShapeItem len_Zm = 0;
-
-   if (A->is_scalar())
+   if (len_A != B->get_shape_item(axis))
       {
-        breakpoints.push_back(0);
-        breakends.push_back(len_A);
+        MORE_ERROR() << "In A ⊂ B: partition length ⍴A is " << len_A
+                     << ", B axis length is " << B->get_shape_item(axis);
+        LENGTH_ERROR;
       }
-   else
+
+   // construct a vector of (non-0) partitions from A...
+
+   /// one partition along the B-axis
+struct partition
+   {
+     ShapeItem start;   ///< start position on the B-axis (oncluding)
+     ShapeItem end;     ///< end position on the B-axis (excluding)
+
+     /// the number of items in \b this partition
+     ShapeItem length() const    { return end - start; }
+   };
+
+vector<partition> partitions;   // all partions on the B-axis
+
+ShapeItem zm = 0;   // number of non-0 partitions
+
       {
         ShapeItem prev_A = 0;
         bool in_partition = false;
@@ -224,75 +226,75 @@ ShapeItem len_Zm = 0;
 
               if (aval > prev_A)   // new partition starting at apos
                  {
-                   breakpoints.push_back(apos);
-                   if (in_partition)   breakends.push_back(apos);
+                   if (in_partition)   partitions.back().end = apos;
+                   const partition part = { apos, -1 };
+                   partitions.push_back(part);
                    in_partition = true;
-                   ++len_Zm;
+                   ++zm;
                  }
               else if (in_partition && aval == 0)
                  {
-                   breakends.push_back(apos);
+                   partitions.back().end = apos;
                    in_partition = false;
                  }
               prev_A = aval;
             }
 
-        if (in_partition)   breakends.push_back(len_A);
-
-        Assert(breakpoints.size() == breakends.size());
+        if (in_partition)   partitions.back().end = len_A;
       }
 
-   if (len_Zm == 1)   // single partition
+   if (zm == 1)   // single partition
       {
-        if (A->get_cfirst().get_near_int())   // non-zero A0
+        if (partitions[0].start == 0)   // non-zero ↑A: Z ← ⊂ B
            {
              Value_P Z(LOC);
              Z->next_ravel_Pointer(B->clone(LOC).get());
              Z->check_value(LOC);
-             return Token(TOK_APL_VALUE1, Z);
+             return Z;
            }
 
         // 0 ⊂ B is empty
-        return Token(TOK_APL_VALUE1, Idx0(LOC));
+        return Idx0(LOC);
       }
 
 Shape shape_Z(B->get_shape());
-   shape_Z.set_shape_item(axis, len_Zm);
+   shape_Z.set_shape_item(axis, zm);
 
 Value_P Z(shape_Z, LOC);
 
    if (Z->is_empty())
       {
         Z->set_default(*B.get(), LOC);
-
         Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
+        return Z;
       }
 
 const Shape3 shape_B3(B->get_shape(), axis);
 
    loop(h, shape_B3.h())
-   loop(m, len_Zm)
-   loop(l, shape_B3.l())
+   loop(m, zm)
        {
-         const Cell * src_B = &B->get_cravel(l + shape_B3.l() *
-                                    (breakpoints[m] + h * shape_B3.m()));
-
-         const ShapeItem partition_len = breakends[m] - breakpoints[m];
-
-         Value_P ZZ(partition_len, LOC);
-         loop(p, partition_len)
+         const ShapeItem start_B = shape_B3.l() *
+                              (partitions[m].start + h * shape_B3.m());
+         loop(l, shape_B3.l())
              {
-               ZZ->next_ravel_Cell(*src_B);
-               src_B += shape_B3.l();
-             }
-         ZZ->check_value(LOC);
+               const Cell * src_B = &B->get_cravel(l + start_B);
 
-         Z->next_ravel_Pointer(ZZ.get());
+               const ShapeItem partition_len = partitions[m].length();
+
+               Value_P ZZ(partition_len, LOC);
+               loop(p, partition_len)
+                   {
+                     ZZ->next_ravel_Cell(*src_B);
+                     src_B += shape_B3.l();
+                   }
+               ZZ->check_value(LOC);
+               Z->next_ravel_Pointer(ZZ.get());
+             }
        }
 
    Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   return Z;
 }
 //============================================================================
 Token
@@ -696,14 +698,15 @@ const Cell * cB = &B->get_cravel(offset);
              return pick(A0, idx_A + 1, len_A - 1, subrefs, qio);
            }
 
-        // simple cell. This means that the depth of B does not suffice to pick
-        // the item selected by A or, in other words, A is too long).
+        // simple cell. This means that the depth of B does not suffice to
+        // pick the item selected by A or, in other words, A is too long).
         //
-        RANK_ERROR;   // ISO p.166 wants rank-error. LENGTH ERROR would be correct.
+        RANK_ERROR;   // ISO p.166 wants a RANK ERROR here, event though LENGTH
+                      // ERROR would be more intuitive since A is too long.
       }
 
-   // len_A == 1, i.e. the end of the recursion over A has been reached,
-   // cB is the cell in B that was pick'ed by A->
+   // len_A == 1, i.e. the end of the itesation over A has been reached,
+   // and cB is the cell in B that was pick'ed by A⊃B.
    //
    if (cB->is_pointer_cell())
       {
@@ -718,9 +721,10 @@ const Cell * cB = &B->get_cravel(offset);
 
         if (target->is_pointer_cell())
            {
-             // cB was created by get_cellrefs(), which is flat (non-recursive).
-             // That means that PointerCell points to a right-hand value that
-             // needs to be converted to a left-hand value here.
+             // cB was created by get_cellrefs() which is flat (non-recursive).
+             // That means that the required conversion to a left-side
+             // PointerCell (which does not exist) was deferred until this
+             // point in time and needs to be done now.
              //
              Value_P sub = target->get_pointer_value();
              Value_P Z = sub->get_cellrefs(LOC);
