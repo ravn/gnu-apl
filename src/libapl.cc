@@ -527,7 +527,7 @@ UTF8_string var_name_utf8(var_name);
 UCS_string var_name_ucs(var_name_utf8);
 Symbol * symbol = Workspace::lookup_existing_symbol(var_name_ucs);
    if (symbol == 0)                       return 0;   // unknown name
-   if (symbol->get_nc() != NC_VARIABLE)   return 0;   // name is not a variable
+   if (symbol->get_NC() != NC_VARIABLE)   return 0;   // name is not a variable
 
 Value_P Z = symbol->get_value();
    if (!Z)                              return 0;
@@ -558,8 +558,8 @@ Symbol * symbol = Workspace::lookup_symbol(var_name_ucs);
 
    if (new_value == 0)   return 0;   // only test var_name
 
-  if (symbol->get_nc() != NC_VARIABLE &&
-      symbol->get_nc() != NC_UNUSED_USER_NAME)   return 4;
+  if (symbol->get_NC() != NC_VARIABLE &&
+      symbol->get_NC() != NC_UNUSED_USER_NAME)   return 4;
 
 Value_P B(new_value, loc);
    symbol->assign(B, true, loc); 

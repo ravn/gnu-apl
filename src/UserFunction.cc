@@ -1116,8 +1116,8 @@ Function_P old_function = symbol->get_function();
 
    // bind function to symbol
    //
-   if (ufun->header.LO())   ufun->header.FUN()->set_nc(NC_OPERATOR, ufun);
-   else                     ufun->header.FUN()->set_nc(NC_FUNCTION, ufun);
+   if (ufun->header.LO())   ufun->header.FUN()->set_NC(NC_OPERATOR, ufun);
+   else                     ufun->header.FUN()->set_NC(NC_FUNCTION, ufun);
 
    Log(LOG_UserFunction__fix)
       {

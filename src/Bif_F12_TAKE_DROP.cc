@@ -92,22 +92,92 @@ Value * v1_owner = v1->get_lval_cellowner();
 Token
 Bif_F12_TAKE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-   if (X->element_count() == 0)   // no axes
+   if (A->get_rank() > 1)   RANK_ERROR;
+   if (X->get_rank() > 1)   RANK_ERROR;
+
+const ShapeItem len_A = A->element_count();
+const ShapeItem len_X = X->element_count();
+   if (len_A != len_X)   LENGTH_ERROR;
+
+   if (len_X == 0)   // no axes
       {
         Token result(TOK_APL_VALUE1, B->clone(LOC));
         return result;
       }
 
-   // A↑[X]B ←→ ⊃[X](⊂A)↑¨⊂[X]B
+   // construct the left argument of Bif_F12_TAKE::fill().
+   //  Start with ⍴B and then replace its shape items with the shape items
+   // A[X[i]]. Reject duplicate items in X.
    //
-const Shape shape_X = Value::to_shape(X.get());
-Value_P cA = Bif_F12_PARTITION::do_eval_B(A);                    // ⊂A
-Value_P cB = Bif_F12_PARTITION::enclose_with_axes(shape_X, B);   // ⊂[X]B
-Token take(TOK_FUN2, Bif_F12_TAKE::fun);
-Token cT = Bif_OPER1_EACH::fun->eval_ALB(cA, take, cB);   // cA↑¨cB
+const APL_Integer qio = Workspace::get_IO();
+ShapeItem axes_X = 0;
+Shape sh_take = B->get_shape();
+   loop(x, len_X)
+      {
+        const APL_Integer axis = X->get_cravel(x).get_near_int() - qio;
+         if (axis < 0)
+           {
+             MORE_ERROR() << "axis " << axis << " too small in X of ↑[X]B";
+             AXIS_ERROR;
+           }
 
-Token result = Bif_F12_PICK::fun->eval_XB(X, cT.get_apl_val());
-   return result;
+         if (axis >= B->get_rank())
+           {
+             MORE_ERROR() << "axis " << axis << " too large in X of A ↑[X]B";
+             AXIS_ERROR;
+           }
+
+        if (axes_X & 1 << axis)   // duplicate axis
+           {
+             MORE_ERROR() << "duplicate axis " << axis << " in X of A ↑[X]B";
+             AXIS_ERROR;
+           }
+
+        axes_X |= 1 << axis;   // remember axis to detect duplicates
+
+        const APL_Integer alen = A->get_cravel(x).get_near_int();
+        sh_take.set_shape_item(axis, alen);
+      }
+
+   return Token(TOK_APL_VALUE1, do_take(sh_take, B.getref(), true));
+}
+//----------------------------------------------------------------------------
+Token
+Bif_F12_TAKE::eval_XB(Value_P X, Value_P B) const
+{
+   // ↑[X] B    ←→ ((⍴X)⍴1)↑[X] B   (GNU APL only)
+   if (X->get_rank() > 1)   AXIS_ERROR;
+
+const APL_Integer qio = Workspace::get_IO();
+ShapeItem axes_X = 0;
+Shape sh_take = B->get_shape();
+   loop(x, X->element_count())
+       {
+        const APL_Integer axis = X->get_cravel(x).get_near_int() - qio;
+         if (axis < 0)
+           {
+             MORE_ERROR() << "axis " << axis << " too small in X of ↑[X]B";
+             AXIS_ERROR;
+           }
+
+         if (axis >= B->get_rank())
+           {
+             MORE_ERROR() << "axis " << axis << " too large in X of ↑[X]B";
+             AXIS_ERROR;
+           }
+
+        if (axes_X & 1 << axis)   // duplicate axis
+           {
+             MORE_ERROR() << "duplicate axis " << axis << " in X of ↑[X]B";
+             AXIS_ERROR;
+           }
+
+        axes_X |= 1 << axis;   // remember axis to detect duplicates
+
+        sh_take.set_shape_item(axis, 1);
+       }
+
+   return Token(TOK_APL_VALUE1, do_take(sh_take, B.getref(), true));
 }
 //----------------------------------------------------------------------------
 Token
@@ -119,43 +189,49 @@ Shape ravel_A1(A.get(), /* ⎕IO */ 0);   // checks that 1 ≤ ⍴⍴A and ⍴A 
       {
         Shape shape_B1;
         loop(a, ravel_A1.get_rank())   shape_B1.add_shape_item(1);
-        Value_P B1 = B->clone(LOC);
+        Value_P B1 = B->clone(LOC);   // so that we can set_shape()
         B1->set_shape(shape_B1);
-        return Token(TOK_APL_VALUE1, do_take(ravel_A1, B1));
+        return Token(TOK_APL_VALUE1, do_take(ravel_A1, B1.getref(), false));
       }
    else
       {
         if (ravel_A1.get_rank() != B->get_rank())   LENGTH_ERROR;
-        return Token(TOK_APL_VALUE1, do_take(ravel_A1, B));
+        return Token(TOK_APL_VALUE1, do_take(ravel_A1, B.getref(), false));
       }
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_TAKE::do_take(const Shape & ravel_A1, Value_P B)
+Bif_F12_TAKE::do_take(const Shape & ravel_A1, const Value &  B,  bool axes)
 {
    // ravel_A1 can have negative items (for take from the end).
    //
 Value_P Z(ravel_A1.abs(), LOC);
 
-   if (ravel_A1.is_empty())   Z->set_default(B.getref(), LOC);
-   else                       fill(ravel_A1, Z.getref(), B.getref());
+   if (ravel_A1.is_empty())   Z->set_default(B, LOC);
+   else                       fill(ravel_A1, Z.getref(), B, axes);
    Z->check_value(LOC);
    return Z;
 }
 //----------------------------------------------------------------------------
 void
-Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z, const Value & B)
+Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z,
+                   const Value & B, bool axes)
 {
    for (TakeDropIterator i(true, shape_Zi, B.get_shape()); i.more(); ++i)
        {
          const ShapeItem offset = i();
-         if (offset == -1)                          // invalid cell
-            {
-              Z.next_ravel_Proto(B.get_cproto());
-            }
-         else                                       // valid Cell
+         if (offset != -1)                          // valid cell
             {
               Z.next_ravel_Cell(B.get_cravel(offset));
+            }
+         else if (axes)                             // overtake from axis
+            {
+              const ShapeItem offset = i.axis_proto();
+              Z.next_ravel_Proto(B.get_cravel(offset));
+            }
+         else                                       // overtake from ↑B
+            {
+              Z.next_ravel_Proto(B.get_cproto());
             }
        }
 }
@@ -265,7 +341,29 @@ bool seen[MAX_RANK];
          else                  ravel_A.set_shape_item(x, 0);
        }
 
-   return Token(TOK_APL_VALUE1, Bif_F12_TAKE::do_take(ravel_A, B));
+   return Token(TOK_APL_VALUE1,
+                Bif_F12_TAKE::do_take(ravel_A, B.getref(), false));
+}
+//============================================================================
+ShapeItem
+TakeDropIterator::axis_proto() const
+{
+   // compute the offset for the prototype of current_offset. The APL2
+   // language reference is a little vague as to how to to it. We assume
+   // that the axis prototype is current_offset but with all axis offsets
+   // outsode B set to 0.
+   //
+ShapeItem ret = 0;
+   loop(r, ref_B.get_rank())
+      {
+        const _ftwc & ftwc_r = ftwc[r];
+        const ShapeItem current_r = ftwc_r.current;
+        if (current_r < 0)                                     continue;
+        if (current_r >= ref_B.get_transposed_shape_item(r))   continue;
+        ret += current_r * ftwc_r.weight;
+      }
+
+   return ret;
 }
 //============================================================================
 

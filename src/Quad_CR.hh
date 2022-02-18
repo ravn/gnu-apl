@@ -45,8 +45,8 @@ public:
    virtual Token eval_XB(Value_P X, Value_P B) const
       { return eval_AB(X, B); }
 
-   /// overloaded Function::string_to_int()
-   virtual ShapeItem string_to_int(const UCS_string & name) const;
+   /// overloaded Function::subfun_to_axis()
+   virtual Axis subfun_to_axis(const UCS_string & name) const;
 
    /// compute \b a ⎕CR \b B
    static Value_P do_CR(APL_Integer a, const Value * B, PrintContext pctx);

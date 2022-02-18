@@ -318,7 +318,7 @@ const NamedObject * sym_or_fun = Workspace::lookup_existing_name(name);
    if (sym_or_fun)   // existing name
       {
         symbol = sym_or_fun->get_symbol();
-        nc = sym_or_fun->get_nc();
+        nc = sym_or_fun->get_NC();
         if (symbol && symbol->is_readonly())
            {
              MORE_ERROR() << "symbol cannot be modified in 1 ⎕TF record";

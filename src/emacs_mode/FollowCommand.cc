@@ -114,7 +114,7 @@ void FollowCommand::run_command( NetworkConnection &conn, const std::vector<std:
         conn.send_reply( "undefined" );
         return;
     }
-    if( symbol->get_nc() != NC_VARIABLE ) {
+    if( symbol->get_NC() != NC_VARIABLE ) {
         conn.send_reply( "wrong type" );
         return;
     }

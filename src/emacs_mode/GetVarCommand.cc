@@ -151,10 +151,11 @@ void GetVarCommand::run_command( NetworkConnection &conn, const std::vector<std:
         send_reply( conn, "undefined" );
         return;
     }
-    if( symbol->get_nc() != NC_VARIABLE ) {
-        send_reply( conn, "wrong type" );
-        return;
-    }
+    if (symbol->get_NC() != NC_VARIABLE)
+       {
+         send_reply( conn, "wrong type" );
+         return;
+       }
 
     Value_P value = symbol->get_value();
     try {

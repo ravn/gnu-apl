@@ -382,7 +382,7 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
          // it to item_shape, and store it in Z.
          //
         const Value & vB = B_item.get_pointer_value().getref();
-        Bif_F12_TAKE::fill(item_shape, Z, vB);
+        Bif_F12_TAKE::fill(item_shape, Z, vB, false);
       }
    else if (B_item.is_lval_cell())
       {
@@ -416,7 +416,7 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
            {
              Value_P vB = target->get_pointer_value();
              const Value & cellref_B = vB->get_cellrefs(LOC).getref();
-             Bif_F12_TAKE::fill(item_shape, Z, cellref_B);
+             Bif_F12_TAKE::fill(item_shape, Z, cellref_B, false);
            }
         else                                       // case 3.
            {

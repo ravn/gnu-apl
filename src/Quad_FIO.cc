@@ -112,8 +112,8 @@ Quad_FIO::function_name_to_int(const char * function_name)
   return -1;    // not found
 }
 //----------------------------------------------------------------------------
-ShapeItem
-Quad_FIO::string_to_int(const UCS_string & name) const
+Axis
+Quad_FIO::subfun_to_axis(const UCS_string & name) const
 {
 UTF8_string name_utf(name);
    return function_name_to_int(name_utf.c_str());

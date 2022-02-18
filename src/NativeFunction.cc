@@ -143,8 +143,8 @@ const char * why = sym->cant_be_defined();
    else if (signature & SIG_B )   tag = TOK_FUN2;
    else                           tag = TOK_FUN0;
 
-   if (is_operator())   sym->set_nc(NC_OPERATOR, this);
-   else                 sym->set_nc(NC_FUNCTION, this);
+   if (is_operator())   sym->set_NC(NC_OPERATOR, this);
+   else                 sym->set_NC(NC_FUNCTION, this);
 
    Workspace::more_error().clear();
    valid = true;
@@ -376,8 +376,8 @@ NativeFunction::fix(const UCS_string & so_name,
                   return 0;
                 }
 
-             if (fun->is_operator())   sym->set_nc(NC_OPERATOR, fun);
-             else                      sym->set_nc(NC_FUNCTION, fun);
+             if (fun->is_operator())   sym->set_NC(NC_OPERATOR, fun);
+             else                      sym->set_NC(NC_FUNCTION, fun);
              return fun;
            }
       }

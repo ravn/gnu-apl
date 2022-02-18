@@ -93,8 +93,8 @@ protected:
    /// overloaded Function::eval_LXB().
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
-   /// overloaded Function::string_to_int
-   virtual ShapeItem string_to_int(const UCS_string & name) const;
+   /// overloaded Function::subfun_to_axis
+   virtual Axis subfun_to_axis(const UCS_string & name) const;
 
    /// return one or more random values
    static Value_P get_random(APL_Integer mode, APL_Integer len);

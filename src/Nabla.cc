@@ -309,7 +309,7 @@ UserFunction_header hdr(fun_header, false);
         if (loc)   return loc;   // error
       }
 
-   switch(fun_symbol->get_nc())
+   switch(fun_symbol->get_NC())
       {
         case NC_UNUSED_USER_NAME:   // open a new function
              function_existed = false;
@@ -835,7 +835,7 @@ const UCS_string & new_name = header.get_name();
         //
         Symbol * sym = Workspace::lookup_symbol(new_name);   // create if needed
         Assert(sym);
-        if (sym->get_nc() != NC_UNUSED_USER_NAME)
+        if (sym->get_NC() != NC_UNUSED_USER_NAME)
            {
              CERR << "BAD FUNCTION HEADER";
              COUT << endl;

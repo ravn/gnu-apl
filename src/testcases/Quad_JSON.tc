@@ -199,8 +199,6 @@ a𝄞b
 1
 
 
-      ⎕JSON 2 ⎕JSON A
-
       )SIC
       )CHECK
 OK      - no stale functions

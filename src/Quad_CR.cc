@@ -226,7 +226,7 @@ int function_number = -1;
       {
         UCS_string ucs_A(A.getref());
         UTF8_string utf_A(ucs_A);
-        function_number = string_to_int(utf_A.c_str());
+        function_number = subfun_to_axis(utf_A.c_str());
         if (function_number == -1)
            {
              MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
@@ -247,8 +247,8 @@ Value_P Z = do_CR(function_number, B.get(), pctx);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-ShapeItem
-Quad_CR::string_to_int(const UCS_string & name) const
+Axis
+Quad_CR::subfun_to_axis(const UCS_string & name) const
 {
 UTF8_string name_utf(name);
 const char * function_name = name_utf.c_str();
@@ -431,7 +431,7 @@ const UCS_string symbol_name(B);
 const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
    if (symbol == 0)   DOMAIN_ERROR;
 
-   switch(symbol->get_nc())
+   switch(symbol->get_NC())
       {
         case NC_VARIABLE:
              {
@@ -1342,7 +1342,8 @@ Value_P Z(shape_Z, LOC);
              sh_sub.expand_rank(conformed.get_rank());
              B_sub->set_shape(sh_sub);
 
-             Value_P ZZ = Bif_F12_TAKE::do_take(conformed, B_sub);
+             Value_P ZZ = Bif_F12_TAKE::do_take(conformed,
+                                                B_sub.getref(), false);
              loop(zz, conformed_len)   Z->next_ravel_Cell(ZZ->get_cravel(zz));
            }
         else   // simple scalar

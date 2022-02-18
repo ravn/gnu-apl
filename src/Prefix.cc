@@ -156,7 +156,7 @@ TokenClass next = body[pc].get_Class();
    if (next == TC_SYMBOL)   // resolve symbol if necessary
       {
         const Symbol * sym = body[pc].get_sym_ptr();
-        const NameClass nc = sym->get_nc();
+        const NameClass nc = sym->get_NC();
 
         if (nc == NC_FUNCTION)   return false;
         if (nc == NC_OPERATOR)   return false;
@@ -348,7 +348,7 @@ Prefix::value_expected()
                case TC_SYMBOL:
                     {
                       const Symbol * sym = tok.get_sym_ptr();
-                      const NameClass nc = sym->get_nc();
+                      const NameClass nc = sym->get_NC();
 
                       if (nc == NC_FUNCTION)   return false;
                       if (nc == NC_OPERATOR)   return false;
@@ -479,7 +479,7 @@ grow:
              }
           else
              {
-               const NameClass  nc = sym->get_nc();
+               const NameClass  nc = sym->get_NC();
                if (size_t(PC) < body.size() &&
                    body[PC + 1].get_tag() == TOK_OPER2_INNER)
                   {
@@ -1105,13 +1105,18 @@ Prefix::reduce_MISC_F_C_B()
 
    if (at1().get_ValueType() != TV_VAL)   // [i1;i2...] instead of [axis]
       {
+        // the user has mistakenly used a bracket index instead of a
+        // function axis. We must delete the current IndexExpr before
+        // throwing the syntax error.
+        //
         IndexExpr * idx = &at1().get_index_val();
-        Log(LOG_delete)   CERR << "delete " << voidP(idx) << " at " LOC << endl;
+        Log(LOG_delete)   CERR << "delete " << voidP(idx) << " at " LOC
+                               << endl;
         delete idx;
         at1().clear(LOC);
         SYNTAX_ERROR;
       }
-   if (!at1().get_apl_val())              SYNTAX_ERROR;
+   if (!at1().get_apl_val())   SYNTAX_ERROR;
 
    if (at0().get_tag() == TOK_Quad_FIO &&
        saved_lookahead.tok.get_Class() == TC_FUN12)
@@ -1406,8 +1411,17 @@ Symbol * top_sym = 0;
               {
                 if (members.size() == 1 && body[PC].get_Class() == TC_FUN12)
                    {
+                     /* arive here for e.g. ⎕FIO.subfun B. The sub-function
+                        subfun of ⎕FIO is members[0]. subfun may or may not
+                        be a valud sub-function name and we raise
+                        SYNTAX ERROR if not.
+
+                        If the sub-function name is valid (i.e. axis != -1
+                        below) then we replace e.g. ⎕FIO.subfun with the
+                        corresponding axis function ⎕FIO[axis];
+                      */
                      Function_P fun = body[PC].get_function();
-                     const ShapeItem axis = fun->string_to_int(*members[0]);
+                     const Axis axis = fun->subfun_to_axis(*members[0]);
                      if (axis == -1)   syntax_error(LOC);
 
                      pop_args_push_result(Token(TOK_AXIS,
@@ -1423,7 +1437,7 @@ Symbol * top_sym = 0;
 
 
 Value_P toplevel_val = top_sym->get_value();
-   if (!toplevel_val)   // top_sym is not a variable (-name). Maybe creeate one.
+   if (!toplevel_val)   // top_sym is not a variable (-name). Maybe create one.
       {
         if (direct_assign)
            {
@@ -1493,7 +1507,8 @@ Cell * member_cell = toplevel_val->get_member(members, member_owner,
                  }
               else
                  {
-                   Value_P Z(member_cell->get_pointer_value()->clone(LOC), LOC);
+                   Value_P Z(member_cell->get_pointer_value()
+                                        ->clone(LOC), LOC);
                    pop_args_push_result(Token(TOK_APL_VALUE1, Z));
                  }
             }

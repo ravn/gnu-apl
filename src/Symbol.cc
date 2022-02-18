@@ -157,7 +157,7 @@ ValueStackItem & vs = value_stack.back();
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
              return;
 
-        case NC_SHARED_VAR:
+        case NC_SYSTEM_VAR:
              assign_shared_variable(new_value, loc);
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
              return;
@@ -568,7 +568,7 @@ Symbol::can_be_assigned() const
       {
         case NC_UNUSED_USER_NAME:
         case NC_VARIABLE:
-        case NC_SHARED_VAR: return true;
+        case NC_SYSTEM_VAR: return true;
         default:            return false;
       }
 }
@@ -578,7 +578,7 @@ Symbol::get_SV_key() const
 {
    Assert(value_stack.size() > 0);
 
-   if (value_stack.back().name_class != NC_SHARED_VAR)   return SV_key(0);
+   if (value_stack.back().name_class != NC_SYSTEM_VAR)   return SV_key(0);
 
    return value_stack.back().sym_val.sv_key;
 }
@@ -586,7 +586,7 @@ Symbol::get_SV_key() const
 void
 Symbol::set_SV_key(SV_key key)
 {
-   value_stack.back().name_class = NC_SHARED_VAR;
+   value_stack.back().name_class = NC_SYSTEM_VAR;
    value_stack.back().sym_val.sv_key = key;
 }
 //----------------------------------------------------------------------------
@@ -709,7 +709,7 @@ const ValueStackItem & vs = value_stack.back();
              tok.move_2(vs.sym_val.function->get_token(), LOC);
              return;
 
-        case NC_SHARED_VAR:
+        case NC_SYSTEM_VAR:
              if (left_sym)   return;   // leave symbol as is
              resolve_shared_variable(tok);
              return;
@@ -750,7 +750,7 @@ Symbol::resolve_class(bool left)
       {
         case NC_LABEL:
         case NC_VARIABLE:
-        case NC_SHARED_VAR:
+        case NC_SYSTEM_VAR:
              return (left) ? TC_SYMBOL : TC_VALUE;
 
         case NC_FUNCTION:
@@ -825,7 +825,7 @@ ValueStackItem & vs = value_stack.back();
 }
 //----------------------------------------------------------------------------
 void
-Symbol::set_nc(NameClass nc)
+Symbol::set_NC(NameClass nc)
 {
 ValueStackItem & vs = value_stack.back();
 
@@ -845,7 +845,7 @@ ValueStackItem & vs = value_stack.back();
 
    if (vs.name_class == NC_UNUSED_USER_NAME)   // new shared variable
       {
-        vs.name_class = NC_SHARED_VAR;
+        vs.name_class = NC_SYSTEM_VAR;
         set_SV_key(key);
         return;
       }
@@ -858,7 +858,7 @@ ValueStackItem & vs = value_stack.back();
 
         // change name class and store AP number
         //
-        vs.name_class = NC_SHARED_VAR;
+        vs.name_class = NC_SYSTEM_VAR;
         set_SV_key(key);
 
         // assign old value to shared variable
@@ -876,7 +876,7 @@ Symbol::unshare_var()
    if (value_stack.size() == 0)   return NO_COUPLING;
 
 ValueStackItem & vs = value_stack.back();
-   if (vs.name_class != NC_SHARED_VAR)   return NO_COUPLING;
+   if (vs.name_class != NC_SYSTEM_VAR)   return NO_COUPLING;
 
 const SV_key key = get_SV_key();
 const SV_Coupling old_coupling = Svar_DB::get_coupling(key);
@@ -890,7 +890,7 @@ const SV_Coupling old_coupling = Svar_DB::get_coupling(key);
 }
 //----------------------------------------------------------------------------
 void
-Symbol::set_nc(NameClass nc, Function_P fun)
+Symbol::set_NC(NameClass nc, Function_P fun)
 {
 ValueStackItem & vs = value_stack.back();
 

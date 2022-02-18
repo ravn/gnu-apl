@@ -1154,7 +1154,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
              return;
            }
 
-        switch(vs->get_nc())
+        switch(vs->get_NC())
            {
              case NC_INVALID:
                   CERR << "has no valid name class" << endl;
@@ -1220,7 +1220,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                   }
                   return;
 
-             case NC_SHARED_VAR:
+             case NC_SYSTEM_VAR:
                   CERR << "is a shared variable" << endl;
                   return;
 

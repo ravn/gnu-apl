@@ -37,14 +37,15 @@ enum NameClass
   NC_UNUSED_USER_NAME =  0x0200,   ///< unused user name, not yet assigned
   NC_LABEL            =  0x0401,   ///< Label.
   NC_VARIABLE         =  0x0802,   ///< (assigned) variable.
-  NC_FUNCTION         =  0x1003,   ///< (user defined) function.
-  NC_OPERATOR         =  0x2004,   ///< (user defined) operator.
-  NC_SHARED_VAR       =  0x4005,   ///< shared variable.
+  NC_FUNCTION         =  0x1003,   ///< (defined) function.
+  NC_OPERATOR         =  0x2004,   ///< (defined) operator.
+  NC_SYSTEM_VAR       =  0x4005,   ///< system variable.
+  NC_SYSTEM_FUN       =  0x8006,   ///< system function.
   NC_case_mask        =  0x00FF,   ///< almost ⎕NC
   NC_bool_mask        =  0xFF00,   ///< for fast selection
   NC_left             = (NC_VARIABLE         |
                          NC_UNUSED_USER_NAME |
-                         NC_SHARED_VAR       |
+                         NC_SYSTEM_VAR       |
                          NC_INVALID          //  ⎕, ⍞, ⎕xx
                         ) & NC_bool_mask
 };
@@ -100,7 +101,7 @@ public:
       { return id == ID_USER_SYMBOL; }
 
    /// Get current \b NameClass of \b this name.
-   NameClass get_nc() const;
+   NameClass get_NC() const;
 
    /// the object's id
    const Id id;

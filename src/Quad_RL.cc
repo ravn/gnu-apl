@@ -60,7 +60,7 @@ uint64_t
 Quad_RL::get_random()
 {
    Assert(value_stack.size());   // by Quad_RL::assign()
-   if (value_stack.back().get_nc() != NC_VARIABLE)   VALUE_ERROR;  // localized
+   if (value_stack.back().get_NC() != NC_VARIABLE)   VALUE_ERROR;  // localized
 
    state *= Knuth_a;
    state += Knuth_c;

@@ -588,7 +588,7 @@ const int boxing_format = Command::get_boxing_format();
                   sh.set_shape_item(longest, sh.get_shape_item(longest) / 2);
                 }
 
-             Value_P B1 = Bif_F12_TAKE::do_take(sh, B);
+             Value_P B1 = Bif_F12_TAKE::do_take(sh, B.getref(), false);
              B1->print(COUT);
 
              CERR << "      *** display of value was truncated (limit "

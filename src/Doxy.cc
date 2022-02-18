@@ -137,7 +137,7 @@ std::vector<const Symbol *> variables;
         bool is_variable = false;
         loop(si, sym->value_stack_size())
             {
-              switch((*sym)[si].get_nc())
+              switch((*sym)[si].get_NC())
                  {
                    case NC_VARIABLE: is_variable = true;   break;
                    case NC_FUNCTION: is_function = true;   break;

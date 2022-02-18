@@ -775,8 +775,8 @@ void
 XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 {
    Log(LOG_archive)   CERR << "    save_vstack_item(name_class "
-                           << vsi.get_nc() << ")" << endl;
-   switch(vsi.get_nc())
+                           << vsi.get_NC() << ")" << endl;
+   switch(vsi.get_NC())
       {
         case NC_UNUSED_USER_NAME:
              do_indent();
@@ -799,7 +799,7 @@ XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
              save_Function(*vsi.sym_val.function);
              break;
 
-        case NC_SHARED_VAR:
+        case NC_SYSTEM_VAR:
              do_indent();
              out << "<Shared-Variable key=\"" << vsi.sym_val.sv_key
                  << "\"/>" << endl;
@@ -2630,7 +2630,7 @@ Symbol * symbol = Workspace::lookup_symbol(name_UCS);
    Assert(level >= 0);
    Assert(level < symbol->value_stack_size());
 ValueStackItem & vsi = (*symbol)[level];
-   Assert(vsi.get_nc() == NC_FUNCTION || vsi.get_nc() == NC_OPERATOR);
+   Assert(vsi.get_NC() == NC_FUNCTION || vsi.get_NC() == NC_OPERATOR);
 Function_P fun = vsi.sym_val.function;
    Assert(fun);
 const UserFunction * ufun = fun->get_ufun1();
@@ -2859,7 +2859,7 @@ const UTF8 * fun_name = find_optional_attr("ufun-name");
         Assert(level >= 0);
         Assert(level < symbol.value_stack_size());
         const ValueStackItem & vsi = symbol[level];
-        Assert(vsi.get_nc() == NC_FUNCTION);
+        Assert(vsi.get_NC() == NC_FUNCTION);
         Function_P fun = vsi.sym_val.function;
         Assert(fun);
         return fun;
@@ -3012,8 +3012,8 @@ const Token_string & body = exec.get_body();
              loop(v, sym->value_stack_size())
                 {
                   const ValueStackItem & vs = (*sym)[v];
-                  if (vs.get_nc() == NC_FUNCTION ||
-                      vs.get_nc() == NC_OPERATOR)
+                  if (vs.get_NC() == NC_FUNCTION ||
+                      vs.get_NC() == NC_OPERATOR)
                      {
                        if (vs.sym_val.function->get_name() == lambda)
                           {

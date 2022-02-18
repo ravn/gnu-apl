@@ -533,7 +533,8 @@ const ShapeItem b = tokens_B.at(token0);
 //----------------------------------------------------------------------------
 void
 Quad_JSON::parse_array(Value & Z, const UCS_string & ucs_B,
-                       const std::vector<ShapeItem> & tokens_B, size_t & token0)
+                       const std::vector<ShapeItem> & tokens_B,
+                       size_t & token0)
 {
 size_t token_from = token0;
    Assert(ucs_B[tokens_B[token_from]] == UNI_L_BRACK);   // [
@@ -907,14 +908,19 @@ Quad_JSON::comma_count(const UCS_string & ucs_B,
                        const std::vector<ShapeItem> & tokens_B,
                        size_t & token0)
 {
-const Unicode start = ucs_B[tokens_B[token0]];
+   // ucs_B is the JSON text string being parsed,
+   // tokens_B are the start positions (in ucs_B) of the tokenized ucs_B,
+   // token0 is the current token in tokens_B which is either [ (start of a
+   // JSON array) or { (start of a JSON object).
+   //
+const Unicode start = ucs_B[tokens_B[token0]];   // either [ or {/
 Unicode end;
    if      (start == UNI_L_BRACK)   end = UNI_R_BRACK;
    else if (start == UNI_L_CURLY)   end = UNI_R_CURLY;
    else FIXME;
 
-UCS_string stack(end);
-size_t commas = 0;
+UCS_string stack(end);   // a stack of ] amd } to track nested [...] and {...}
+size_t commas = 0;       // the numebr of (top-level-) commas
 bool expect_comma = false;
 bool expect_colon = true;
 

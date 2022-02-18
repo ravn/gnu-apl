@@ -573,7 +573,8 @@ const ErrorCode ec = get_error_code(B);
       {
         char cc[58];
         snprintf(cc, sizeof(cc), "Unkown error (major %d, minor %d) in ⎕ES B",
-                 error.get_error_code() >> 16, error.get_error_code() & 0xFFFF);
+                 error.get_error_code() >> 16,
+                 error.get_error_code() & 0xFFFF);
         error.set_error_line_1(cc);
       }
 
@@ -1059,7 +1060,7 @@ Value_P Z(sh_Z, LOC);
        {
          const int nc = get_NC(vars[v]);
          if (nc == NC_INVALID)   Z->next_ravel_Int(-1);
-         else                    Z->next_ravel_Int(nc);
+         else                    Z->next_ravel_Int(nc & NC_case_mask);
        }
 
    Z->check_value(LOC);
@@ -1069,55 +1070,67 @@ Value_P Z(sh_Z, LOC);
 APL_Integer
 Quad_NC::get_NC(const UCS_string ucs)
 {
-   if (ucs.size() == 0)   return -1;   // invalid name
+   if (ucs.size() == 0)   return NC_INVALID;   // invalid name
 
 const Unicode uni = ucs[0];
-Symbol * symbol = 0;
-   if      (uni == UNI_ALPHA)            symbol = &Workspace::get_v_ALPHA();
-   else if (uni == UNI_LAMBDA)           symbol = &Workspace::get_v_LAMBDA();
-   else if (uni == UNI_CHI)              symbol = &Workspace::get_v_CHI();
-   else if (uni == UNI_OMEGA)            symbol = &Workspace::get_v_OMEGA();
-   else if (uni == UNI_ALPHA_UNDERBAR)   symbol = &Workspace::get_v_OMEGA_U();
-   else if (uni == UNI_OMEGA_UNDERBAR)   symbol = &Workspace::get_v_OMEGA_U();
-   if (ucs.size() != 1)   symbol = 0;    // unless more than one char
 
-   if (Avec::is_quad(uni))   // distinguished name
-      {
-        int len = 0;
-        const Token t = Workspace::get_quad(ucs, len);
-        if (len < 2)                      return 5;    // ⎕ : quad variable
-        if (t.get_Class() == TC_VOID)     return -1;   // invalid
-        if (t.get_Class() == TC_SYMBOL)   symbol = t.get_sym_ptr();
-        else                              return  6;   // quad function
-      }
+   // system name ?
+   {
+     const Symbol * sys = 0;
 
-   if (symbol)   // system variable (⎕xx, ⍺, ⍶, ⍵, ⍹, λ, or χ
-      {
-        const NameClass nc = symbol->get_nc();
-        if (nc == NC_UNUSED_USER_NAME)   return 0;
-        return nc + 3;
-      }
+     // ⍺, ⍶, ⍵, and ⍹ are local variables of lambdas and may change their
+     // NC at runtime. We will therefore consult their symbol later on.
+     //
+     if      (uni == UNI_ALPHA)           sys = &Workspace::get_v_ALPHA();
+     else if (uni == UNI_LAMBDA)          sys = &Workspace::get_v_LAMBDA();
+     else if (uni == UNI_CHI)             sys = &Workspace::get_v_CHI();
+     else if (uni == UNI_OMEGA)           sys = &Workspace::get_v_OMEGA();
+     else if (uni == UNI_ALPHA_UNDERBAR)  sys = &Workspace::get_v_OMEGA_U();
+     else if (uni == UNI_OMEGA_UNDERBAR)  sys = &Workspace::get_v_OMEGA_U();
+
+     // the caller may ask for e.g. ⍺123 but we accept ⍺ and friends only if
+     // their lengths is 1.
+     //
+     if (ucs.size() != 1)   sys = 0;    // more than one char
+
+     if (Avec::is_quad(uni))   // distinguished name
+        {
+          int len = 0;
+          const Token t = Workspace::get_quad(ucs, len);
+          if (len < 2)                      return NC_SYSTEM_VAR;   // ⎕ or ⍞
+          if (t.get_Class() == TC_VOID)     return NC_INVALID;
+          if (t.get_Class() == TC_SYMBOL)   sys = t.get_sym_ptr();
+          else                              return  NC_SYSTEM_FUN;
+        }
+    
+     if (sys)   // system variable (⎕xx, ⍺, ⍶, ⍵, ⍹, λ, or χ
+        {
+          const NameClass nc = sys->get_NC();
+          if (nc == NC_UNUSED_USER_NAME)   return NC_SYSTEM_FUN;
+          return nc + 3;
+        }
+     }
 
    // user-defined name
    //
-   symbol = Workspace::lookup_existing_symbol(ucs);
+const Symbol * user_sym = Workspace::lookup_existing_symbol(ucs);
 
-   if (!symbol)
+   if (!user_sym)
       {
-        // symbol not found. Distinguish between invalid and unused names
+        // user_sym not found. Distinguish between invalid and unused names
         //
-        if (!Avec::is_first_symbol_char(ucs[0]))   return -1;   // invalid
+        if (!Avec::is_first_symbol_char(ucs[0]))   return NC_INVALID;
         loop (u, ucs.size())
            {
-             if (!Avec::is_symbol_char(ucs[u]))   return -1;   // invalid
+             if (!Avec::is_symbol_char(ucs[u]))   return NC_INVALID;
            }
         return 0;   // unused
       }
 
-   switch(const NameClass nc = symbol->get_nc())
+   switch(const NameClass nc = user_sym->get_NC())
       {
-        case NC_INVALID:      return -1;
-        case NC_SHARED_VAR:   return NC_VARIABLE;
+        case NC_INVALID:      return NC_INVALID;
+        case NC_SYSTEM_VAR:   return NC_VARIABLE;
         default:              return nc & NC_case_mask;
       }
 }
@@ -1159,8 +1172,8 @@ UCS_string_vector names;
           const Symbol * symbol = symbols[s];
           if (symbol->is_erased())   continue;
 
-          NameClass nc = symbol->get_nc();
-          if (nc == NC_SHARED_VAR)   nc = NC_VARIABLE;
+          NameClass nc = symbol->get_NC();
+          if (nc == NC_SYSTEM_VAR)   nc = NC_VARIABLE;
 
           if (!(requested_NCs & 1 << nc))   continue;   // name class not in B
 
@@ -1180,12 +1193,12 @@ UCS_string_vector names;
       {
 #define ro_sv_def(x, _str, _txt)                                   \
    { Symbol * symbol = &Workspace::get_v_ ## x();           \
-     if ((requested_NCs & 1 << 5) && symbol->get_nc() != 0) \
+     if ((requested_NCs & 1 << 5) && symbol->get_NC() != 0) \
         names.push_back(symbol->get_name()); }
 
 #define rw_sv_def(x, _str, _txt)                                   \
    { Symbol * symbol = &Workspace::get_v_ ## x();           \
-     if ((requested_NCs & 1 << 5) && symbol->get_nc() != 0) \
+     if ((requested_NCs & 1 << 5) && symbol->get_NC() != 0) \
         names.push_back(symbol->get_name()); }
 
 #define sf_def(x, _str, _txt)                                      \

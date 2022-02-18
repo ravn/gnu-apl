@@ -296,7 +296,7 @@ Workspace::lookup_existing_name(const UCS_string & name)
 Symbol * sym = the_workspace.symbol_table.lookup_existing_symbol(name);
    if (sym == 0)   return 0;
 
-   switch(sym->get_nc())
+   switch(sym->get_NC())
       {
         case NC_VARIABLE: return sym;
 
@@ -382,7 +382,7 @@ Symbol * current_referent = lookup_existing_symbol(funname);
 
    Assert(current_referent->get_Id() == ID_USER_SYMBOL);
 
-const NameClass nc = current_referent->get_nc();
+const NameClass nc = current_referent->get_NC();
    if (nc != NC_FUNCTION && nc != NC_OPERATOR)   return false;
 
 const Function * fun = current_referent->get_function();

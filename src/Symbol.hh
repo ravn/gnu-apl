@@ -52,7 +52,7 @@ public:
    friend class XML_Saving_Archive;
 
    /// return the name class for \b this ValueStackItem
-   NameClass get_nc() const
+   NameClass get_NC() const
       { return name_class; }
 
    /// return the name class for \b this ValueStackItem, or 0 if it has none
@@ -75,7 +75,7 @@ protected:
    {}
 
    /// constructor: ValueStackItem for a shared variable
-   ValueStackItem(SV_key key) : name_class(NC_SHARED_VAR)
+   ValueStackItem(SV_key key) : name_class(NC_SYSTEM_VAR)
       { sym_val.sv_key = key; }
 
    /// reset \b this ValueStackItem to being unused
@@ -144,10 +144,10 @@ public:
    virtual int expunge();
 
    /// Set current NameClass of this Symbol to \b nc
-   void set_nc(NameClass nc);
+   void set_NC(NameClass nc);
 
    /// Set current NameClass of this Symbol to \b nc and function fun
-   void set_nc(NameClass nc, Function_P fun);
+   void set_NC(NameClass nc, Function_P fun);
 
    /// share variable with \b proc
    void share_var(SV_key key);

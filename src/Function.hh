@@ -272,8 +272,8 @@ public:
    virtual const Value_P * locate_X() const
       { return 0; }
 
-   /// return a (pseudo-) axis for \b name
-   virtual ShapeItem string_to_int(const UCS_string & name) const
+   /// return a (pseudo-) axis number for subfunction \b name
+   virtual Axis subfun_to_axis(const UCS_string & name) const
       { return -1; }
 
    /// return the signature of this function (currently only valid

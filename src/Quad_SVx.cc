@@ -359,13 +359,13 @@ Value_P Z(sh_Z, LOC);
         ValueStackItem * vsp = sym->top_of_stack();
         Assert(vsp);
 
-        switch(sym->get_nc())
+        switch(sym->get_NC())
            {
              case NC_UNUSED_USER_NAME:
              case NC_VARIABLE:
                   break;
 
-             case NC_SHARED_VAR:
+             case NC_SYSTEM_VAR:
                   {
                     // CERR << "Shared variable " << apl_vars[z]
                     //      << " is already shared" << endl;
@@ -376,7 +376,7 @@ Value_P Z(sh_Z, LOC);
                   continue;   // next z
 
              default: // function etc.
-                  Q1(sym->get_nc())   DOMAIN_ERROR;
+                  Q1(sym->get_NC())   DOMAIN_ERROR;
            }
 
         SV_Coupling coupling = NO_COUPLING;
@@ -472,7 +472,7 @@ Value_P Z(sh_Z, LOC);
 
         // the coupling of a non-shared variables has coupling 0
         //
-        if (sym->get_nc() != NC_SHARED_VAR)
+        if (sym->get_NC() != NC_SYSTEM_VAR)
            {
              Z->next_ravel_0();
              continue;

@@ -176,7 +176,7 @@ int symbol_count = 0;
 
                if (sym->is_erased() && !(which & LIST_ERASED))   continue;
 
-               const NameClass nc = sym->value_stack.back().get_nc();
+               const NameClass nc = sym->value_stack.back().get_NC();
                if (((nc == NC_VARIABLE)         && (which & LIST_VARS))    ||
                    ((nc == NC_FUNCTION)         && (which & LIST_FUNS))    ||
                    ((nc == NC_OPERATOR)         && (which & LIST_OPERS))   ||
@@ -210,7 +210,7 @@ UCS_string_vector names;
         if (which == LIST_NAMES)   // append .NC
            {
              name.append(UNI_FULLSTOP);
-             name.append_number(list[l]->value_stack.back().get_nc());
+             name.append_number(list[l]->value_stack.back().get_NC());
            }
         names.push_back(name);
       }
@@ -387,7 +387,7 @@ Symbol * symbol = lookup_existing_symbol(sym);
 
 ValueStackItem & tos = symbol->value_stack[0];
 
-   switch(tos.get_nc())
+   switch(tos.get_NC())
       {
         case NC_LABEL:
              Assert(0 && "should not happen since stack height == 1");
@@ -490,8 +490,8 @@ std::vector<const Symbol *> symbols;
       {
         const Symbol & sym = *symbols[s];
         const ValueStackItem & vs = sym[0];
-         if      (vs.get_nc() == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
-         else if (vs.get_nc() == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
+         if      (vs.get_NC() == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
+         else if (vs.get_NC() == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
       }
 
    // pass 2: variables
@@ -500,7 +500,7 @@ std::vector<const Symbol *> symbols;
       {
         const Symbol & sym = *symbols[s];
         const ValueStackItem & vs = sym[0];
-        if (vs.get_nc() == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
+        if (vs.get_NC() == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
       }
 }
 //============================================================================

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 NameClass
-NamedObject::get_nc() const
+NamedObject::get_NC() const
 {
    if (id == ID_USER_SYMBOL ||   // this named object is a user defined object
        id == ID_ALPHA       ||   // ⍺
@@ -39,7 +39,7 @@ NamedObject::get_nc() const
         if (const Symbol * sym = get_symbol())
            {
              if (const ValueStackItem * tos = sym->top_of_stack())
-                return tos->get_nc();
+                return tos->get_NC();
            }
 
         return NC_UNUSED_USER_NAME;
