@@ -41,9 +41,9 @@ public:
    static Token ravel(const Shape & new_shape, Value_P B);
 
    /// Catenate A and B
-   static Token catenate(Value_P A, Axis axis, Value_P B);
+   static Token catenate(Value_P A, sAxis axis, Value_P B);
    /// Laminate A and B
-   static Token laminate(Value_P A, Axis axis, Value_P B);
+   static Token laminate(Value_P A, sAxis axis, Value_P B);
 
    /// Prepend scalar cell_A to B along axis
    static Value_P prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B);

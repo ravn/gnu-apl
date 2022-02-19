@@ -375,7 +375,7 @@ const Unicode last = digits.back();
    FloatCell::map_FC(*this);
 }
 //----------------------------------------------------------------------------
-UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
+UCS_string::UCS_string(const PrintBuffer & pb, sRank rank, int quad_PW)
 {
    create(LOC);
 

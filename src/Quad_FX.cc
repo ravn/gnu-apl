@@ -112,7 +112,7 @@ Quad_FX::eval_AXB(Value_P A, Value_P X, Value_P B) const
    if (A->get_rank() > 1)                RANK_ERROR;
    if (!A->is_char_string())             DOMAIN_ERROR;
 
-const Axis axis = Value::get_single_axis(X.get(), 10);
+const sAxis axis = Value::get_single_axis(X.get(), 10);
    return do_native_FX(A, axis, B);
 }
 //----------------------------------------------------------------------------
@@ -251,7 +251,7 @@ Value_P Z(fun_name, LOC);
 }
 //----------------------------------------------------------------------------
 Token
-Quad_FX::do_native_FX(Value_P A, Axis axis, Value_P B)
+Quad_FX::do_native_FX(Value_P A, sAxis axis, Value_P B)
 {
    if (uprefs.safe_mode)   DOMAIN_ERROR;
 

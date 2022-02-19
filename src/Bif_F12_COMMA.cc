@@ -139,7 +139,7 @@ const Cell * cA = &A->get_cfirst();
 }
 //----------------------------------------------------------------------------
 Token
-Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
+Bif_COMMA::catenate(Value_P A, sAxis axis, Value_P B)
 {
    // NOTE: the case A->is_scalar() && B->is_scalar() was supposedly ruled out
    //       before calling catenate()
@@ -299,7 +299,7 @@ Value_P Z(shape_Z, LOC);
 }
 //----------------------------------------------------------------------------
 Token
-Bif_COMMA::laminate(Value_P A, Axis axis, Value_P B)
+Bif_COMMA::laminate(Value_P A, sAxis axis, Value_P B)
 {
    // shapes of A and B must be the same, unless one of them is a scalar.
    //
@@ -395,7 +395,7 @@ const APL_Integer qio = Workspace::get_IO();
         if (B->get_rank() == MAX_RANK)   INDEX_ERROR;
 
         const APL_Float new_axis = X->get_cfirst().get_real_value() - qio;
-        Axis axis = new_axis;   if (new_axis < 0.0)   axis = -1;
+        sAxis axis = new_axis;   if (new_axis < 0.0)   axis = -1;
         const Shape shape_Z = B->get_shape().insert_axis(axis + 1, 1);
         return ravel(shape_Z, B);
       }
@@ -486,7 +486,7 @@ const APL_Integer qio = Workspace::get_IO();
 
    if (cX.is_near_int())   // catenate along existing axis
       {
-        const Axis axis = cX.get_checked_near_int() - qio;
+        const sAxis axis = cX.get_checked_near_int() - qio;
         if (axis < 0)                                         AXIS_ERROR;
         if (uAxis(axis) >= A->get_rank() && uAxis(axis) >= B->get_rank())
            AXIS_ERROR;
@@ -497,7 +497,7 @@ const APL_Float axis = cX.get_real_value() - qio;
    if (axis <= -1.0)   AXIS_ERROR;
    if (axis >= (A->get_rank() + 1.0) &&
        axis >= (B->get_rank() + 1.0))   AXIS_ERROR;
-   return laminate(A, Axis(axis + 1.0), B);
+   return laminate(A, sAxis(axis + 1.0), B);
 }
 //============================================================================
 Token

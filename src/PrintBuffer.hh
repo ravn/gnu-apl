@@ -123,7 +123,7 @@ public:
       { Assert(y < get_row_count());   return buffer[y]; }
 
    /// print this buffer, interruptible with ^C
-   void print_interruptible(ostream & out, Rank rank, int quad_pw);
+   void print_interruptible(ostream & out, sRank rank, int quad_pw);
 
    /// return the number of columns
    int get_column_count() const
@@ -220,7 +220,7 @@ protected:
    /// return the number of separator rows before row \b y in a value with
    /// shape \b shape
    static ShapeItem separator_rows(ShapeItem y, const Value & value,
-                                   bool nested, Rank rk1, Rank rk2);
+                                   bool nested, sRank rk1, sRank rk2);
 
    /// the character buffer.
    UCS_string_vector buffer;

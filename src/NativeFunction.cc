@@ -133,7 +133,7 @@ const char * why = sym->cant_be_defined();
 
    ev(eval_fill_B  , (                          Vr B, Th));
    ev(eval_fill_AB , (Vr A,                     Vr B, Th));
-   ev(eval_ident_Bx, (Vr B,             Axis x,       Th));
+   ev(eval_ident_Bx, (Vr B,            sAxis x,       Th));
 #undef ev
 
    // compute function tag based on the signature
@@ -609,7 +609,7 @@ NativeFunction::eval_fill_AB(Value_P A, Value_P B) const
 }
 //----------------------------------------------------------------------------
 Token
-NativeFunction::eval_identity_fun(Value_P B, Axis axis) const
+NativeFunction::eval_identity_fun(Value_P B, sAxis axis) const
 {
    if (f_eval_ident_Bx)   return (*f_eval_ident_Bx)(B, axis, this);
 

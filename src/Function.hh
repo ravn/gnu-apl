@@ -258,7 +258,7 @@ public:
       { DOMAIN_ERROR; }
 
    /// Evaluate \b the identity function.
-   virtual Token eval_identity_fun(Value_P B, Axis axis) const
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const
       {  DOMAIN_ERROR; }
 
    /// Delete this function (do nothing, overloaded by UserFunction).
@@ -272,8 +272,13 @@ public:
    virtual const Value_P * locate_X() const
       { return 0; }
 
+   /// return true if this function has (named) sub-functions, i.e.
+   /// this function is either ⎕FIO or ⎕CR.
+   virtual bool has_subfuns() const
+      { return false; }
+
    /// return a (pseudo-) axis number for subfunction \b name
-   virtual Axis subfun_to_axis(const UCS_string & name) const
+   virtual sAxis subfun_to_axis(const UCS_string & name) const
       { return -1; }
 
    /// return the signature of this function (currently only valid

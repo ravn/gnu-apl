@@ -105,41 +105,20 @@ const ShapeItem len_X = X->element_count();
         return result;
       }
 
-   // construct the left argument of Bif_F12_TAKE::fill().
-   //  Start with ⍴B and then replace its shape items with the shape items
-   // A[X[i]]. Reject duplicate items in X.
+   // construct the left argument of Bif_F12_TAKE::fill(). Start with ⍴B and
+   // then replace corresponding shape items with A[X[x]].
    //
 const APL_Integer qio = Workspace::get_IO();
-ShapeItem axes_X = 0;
-Shape sh_take = B->get_shape();
-   loop(x, len_X)
+const AxesBitmap axes_X = X->to_bitmap("A ↑[X] B", B->get_rank());
+Shape sh_take = B->get_shape();   // start with ⍴B
+   loop(x, len_X)                 // for exery axis X[x] in X
       {
         const APL_Integer axis = X->get_cravel(x).get_near_int() - qio;
-         if (axis < 0)
-           {
-             MORE_ERROR() << "axis " << axis << " too small in X of ↑[X]B";
-             AXIS_ERROR;
-           }
-
-         if (axis >= B->get_rank())
-           {
-             MORE_ERROR() << "axis " << axis << " too large in X of A ↑[X]B";
-             AXIS_ERROR;
-           }
-
-        if (axes_X & 1 << axis)   // duplicate axis
-           {
-             MORE_ERROR() << "duplicate axis " << axis << " in X of A ↑[X]B";
-             AXIS_ERROR;
-           }
-
-        axes_X |= 1 << axis;   // remember axis to detect duplicates
-
         const APL_Integer alen = A->get_cravel(x).get_near_int();
         sh_take.set_shape_item(axis, alen);
       }
 
-   return Token(TOK_APL_VALUE1, do_take(sh_take, B.getref(), true));
+   return Token(TOK_APL_VALUE1, do_take(sh_take, B.getref(), axes_X));
 }
 //----------------------------------------------------------------------------
 Token
@@ -148,36 +127,18 @@ Bif_F12_TAKE::eval_XB(Value_P X, Value_P B) const
    // ↑[X] B    ←→ ((⍴X)⍴1)↑[X] B   (GNU APL only)
    if (X->get_rank() > 1)   AXIS_ERROR;
 
-const APL_Integer qio = Workspace::get_IO();
-ShapeItem axes_X = 0;
-Shape sh_take = B->get_shape();
-   loop(x, X->element_count())
+const AxesBitmap axes_X = X->to_bitmap("↑[X] B", B->get_rank());
+
+   // construct the left argument of Bif_F12_TAKE::fill(). Start with ⍴B and
+   // then replace corresponding shape items with 1.
+   //
+Shape sh_take = B->get_shape();   // start with ⍴B
+   loop(b, B->get_rank())         // for exery axis X[x] in X
        {
-        const APL_Integer axis = X->get_cravel(x).get_near_int() - qio;
-         if (axis < 0)
-           {
-             MORE_ERROR() << "axis " << axis << " too small in X of ↑[X]B";
-             AXIS_ERROR;
-           }
-
-         if (axis >= B->get_rank())
-           {
-             MORE_ERROR() << "axis " << axis << " too large in X of ↑[X]B";
-             AXIS_ERROR;
-           }
-
-        if (axes_X & 1 << axis)   // duplicate axis
-           {
-             MORE_ERROR() << "duplicate axis " << axis << " in X of ↑[X]B";
-             AXIS_ERROR;
-           }
-
-        axes_X |= 1 << axis;   // remember axis to detect duplicates
-
-        sh_take.set_shape_item(axis, 1);
+         if (axes_X & 1 << b) sh_take.set_shape_item(b, 1);
        }
 
-   return Token(TOK_APL_VALUE1, do_take(sh_take, B.getref(), true));
+   return Token(TOK_APL_VALUE1, do_take(sh_take, B.getref(), axes_X));
 }
 //----------------------------------------------------------------------------
 Token
@@ -201,7 +162,8 @@ Shape ravel_A1(A.get(), /* ⎕IO */ 0);   // checks that 1 ≤ ⍴⍴A and ⍴A 
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_TAKE::do_take(const Shape & ravel_A1, const Value &  B,  bool axes)
+Bif_F12_TAKE::do_take(const Shape & ravel_A1, const Value &  B,
+                      AxesBitmap axes)
 {
    // ravel_A1 can have negative items (for take from the end).
    //
@@ -215,7 +177,7 @@ Value_P Z(ravel_A1.abs(), LOC);
 //----------------------------------------------------------------------------
 void
 Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z,
-                   const Value & B, bool axes)
+                   const Value & B, AxesBitmap axes)
 {
    for (TakeDropIterator i(true, shape_Zi, B.get_shape()); i.more(); ++i)
        {
@@ -226,7 +188,7 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z,
             }
          else if (axes)                             // overtake from axis
             {
-              const ShapeItem offset = i.axis_proto();
+              const ShapeItem offset = i.axis_proto(axes);
               Z.next_ravel_Proto(B.get_cravel(offset));
             }
          else                                       // overtake from ↑B
@@ -342,25 +304,31 @@ bool seen[MAX_RANK];
        }
 
    return Token(TOK_APL_VALUE1,
-                Bif_F12_TAKE::do_take(ravel_A, B.getref(), false));
+                Bif_F12_TAKE::do_take(ravel_A, B.getref(), 0));
 }
 //============================================================================
 ShapeItem
-TakeDropIterator::axis_proto() const
+TakeDropIterator::axis_proto(AxesBitmap axes) const
 {
-   // compute the offset for the prototype of current_offset. The APL2
-   // language reference is a little vague as to how to to it. We assume
-   // that the axis prototype is current_offset but with all axis offsets
-   // outsode B set to 0.
-   //
+   /* compute the offset for the prototype of current_offset. The APL2
+      language reference somehow suggests that for A↑[X] B the axes of B
+      shall be enclosed (to give ⊂[X] B) and then the prototype of the
+      enclosed sub-array shall be used as the fill item for overtake.
+
+      This would mean that the offsets of the prototype is the sum of the
+      weighted offsets of the axes in X. Interestingly we get the output
+      shown in the language reference only if we use the sum of the weighted
+      offsets of the axes NOT in X.
+      0
+    */
 ShapeItem ret = 0;
-   loop(r, ref_B.get_rank())
+   loop(a, ref_B.get_rank())
       {
-        const _ftwc & ftwc_r = ftwc[r];
-        const ShapeItem current_r = ftwc_r.current;
-        if (current_r < 0)                                     continue;
-        if (current_r >= ref_B.get_transposed_shape_item(r))   continue;
-        ret += current_r * ftwc_r.weight;
+        if (axes & 1 << a)   // axis a in X
+           {
+             const _ftwc & ftwc_a = ftwc[a];
+             ret += ftwc_a.current * ftwc_a.weight;
+           }
       }
 
    return ret;

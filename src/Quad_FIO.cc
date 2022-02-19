@@ -112,7 +112,7 @@ Quad_FIO::function_name_to_int(const char * function_name)
   return -1;    // not found
 }
 //----------------------------------------------------------------------------
-Axis
+sAxis
 Quad_FIO::subfun_to_axis(const UCS_string & name) const
 {
 UTF8_string name_utf(name);

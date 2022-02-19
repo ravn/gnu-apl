@@ -112,7 +112,7 @@ MultiIndexIterator::MultiIndexIterator(const Shape & shape,
 ShapeItem weight = 1;
    loop(idx_r, shape.get_rank())
        {
-         const Rank val_r = shape.get_rank() - idx_r - 1;  // see comment above.
+         const sRank val_r = shape.get_rank() - idx_r - 1;  // see comment above.
          const ShapeItem  sh_r = shape.get_shape_item(val_r);
          Value_P I = IDX.values[idx_r];
          IndexIterator * new_it;

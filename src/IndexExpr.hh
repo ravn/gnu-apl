@@ -61,7 +61,7 @@ public:
    bool is_axis() const   { return rank == 1; }
 
    /// Return an axis (from an IndexExpr of rank 1.
-   Rank get_axis(Rank max_axis) const;
+   sAxis get_axis(sRank max_axis) const;
 
    /// return true iff this index is part of indexed assignment ( A[]← )
    Assign_state get_assign_state() const

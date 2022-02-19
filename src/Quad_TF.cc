@@ -269,7 +269,7 @@ ShapeItem idx = 2;
       }
 
 ShapeItem idx0 = idx;
-Rank rank = 0;
+sRank rank = 0;
    while (idx < len && Avec::is_digit(ravel[idx]))
       rank = 10 * rank + ravel[idx++] - UNI_0;
 

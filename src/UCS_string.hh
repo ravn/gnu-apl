@@ -73,7 +73,7 @@ public:
    UCS_string(const char * cstring);
 
    /// constructor: UCS_string from print buffer
-   UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW);
+   UCS_string(const PrintBuffer & pb, sRank rank, int quad_PW);
 
    /// constructor: UCS_string from a double with quad_pp valid digits.
    /// (eg. 3.33 has 3 digits), In standard APL format.

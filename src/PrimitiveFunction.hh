@@ -307,10 +307,10 @@ public:
 
 protected:
    /// Rotate B according to A along axis
-   static Token rotate(Value_P A, Value_P B, Axis axis);
+   static Token rotate(Value_P A, Value_P B, sAxis axis);
 
    /// Reverse B along axis
-   static Token reverse(Value_P B, Axis axis);
+   static Token reverse(Value_P B, sAxis axis);
 };
 //----------------------------------------------------------------------------
 /** primitive functions rotate and reverse along last axis */

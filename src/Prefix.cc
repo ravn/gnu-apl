@@ -1367,32 +1367,57 @@ Token result = Token(TOK_FUN2, derived);
 void
 Prefix::reduce_D_V__()
 {
-   // end of an A.B.C...Z chain. at0() is the final member Z and at1() is
-   // the '.' before Z. Collect members until no more '.' token are found.
-   //
-bool direct_assign;
-   if (prefix_len == 2)        // member reference
+   /* end of an A.B.C...Z chain. at0() is the final member Z and at1() is
+      the '.' before Z. Collect members until no more '.' token are found.
+
+      Prefix::reduce_D_V__() is called from two places:
+
+      1. from reduce_statements() with prefix_len == 2, or
+      2. from reduce_D_V_ASS_B() with prefix_len == 4.
+
+      The processing of member variables is somewhat lengthy and almost the
+      same for member reference and for member assignment. We therefore do
+      both here instead of duplicating the work in reduce_D_V__() (i.e. here)
+      and in reduce_D_V_ASS_B().
+    */
+
+const bool member_assign = prefix_len == 4;   // assume member reference
+   if (prefix_len == 2)        // case 1: member reference
       {
-        direct_assign = false;
       }
-   else if (prefix_len == 4)   // member assignment
+   else if (member_assign)     // case 2: member assignment
       {
-        direct_assign = true;
         Assert(get_assign_state() == ASS_var_seen);   // by reduce_D_V_ASS_B
       }
-   else
+   else                        // something unexected
       {
-        direct_assign = false;   // to avoid warnings
         Assert(0 && "Bad prefix length in Prefix::reduce_D_V__()");
         return;
       }
 
+   /*
+      construct members which is a vector of member names in reverse order.
+
+      For e.g. A.B.C.D ← 42 members would be { "D", "C", "B", "A" }
+
+      The prefix parser has so far seen Token '.' 'D' or '.' 'D' '←' 42 and
+      we now collect 'C' '.' 'B' '.' 'A' in the while() loop below.
+
+      The top-level variable A may or may not already exist and is created
+      if not and if this is a member assignment.
+
+      ⎕CR.subfun and ⎕FIO.subfun are a special case in the while() loop below.
+      They parse like a member variable access A.subfun but are not since
+      A is not a variable but a function. If this special case is detected
+      then e.g. ⎕CR.subfun is replaced with ⎕CR[fun] where fun is the function
+      number corresponding for the subfunction name subfun. Dito for ⎕FIO.
+    */
 vector<const UCS_string *>members;
 Symbol * top_sym = 0;
    members.push_back(at1().get_sym_ptr()->get_name_ptr());
-   while (size_t(PC) < (body.size() - 1))
+   while (size_t(PC) < (body.size() - 1))   // at least 2 more token
          {
-           if (body[PC].get_Class() == TC_SYMBOL)
+           if (body[PC].get_Class() == TC_SYMBOL)   // the normal case
               {
                 Symbol * symbol = body[PC].get_sym_ptr();
                 members.push_back(symbol->get_name_ptr());
@@ -1407,22 +1432,31 @@ Symbol * top_sym = 0;
                     break;
                   }
               }
-           else
+           else   // body[PC] is not a symbol: the special ⎕CR/⎕FIO case
               {
-                if (members.size() == 1 && body[PC].get_Class() == TC_FUN12)
+                if (members.size() == 1 &&
+                    body[PC].get_Class() == TC_FUN12 &&
+                    body[PC].get_function()->has_subfuns())
                    {
-                     /* arive here for e.g. ⎕FIO.subfun B. The sub-function
-                        subfun of ⎕FIO is members[0]. subfun may or may not
-                        be a valud sub-function name and we raise
-                        SYNTAX ERROR if not.
+                     /* at this point we have ⎕CR.subfun B or ⎕FIO.subfun B.
+                        The sub-function subfun of ⎕FIO is members[0].
+                        subfun may or may not be a valid sub-function name
+                        and we raise SYNTAX ERROR if not.
 
                         If the sub-function name is valid (i.e. axis != -1
                         below) then we replace e.g. ⎕FIO.subfun with the
                         corresponding axis function ⎕FIO[axis];
                       */
                      Function_P fun = body[PC].get_function();
-                     const Axis axis = fun->subfun_to_axis(*members[0]);
-                     if (axis == -1)   syntax_error(LOC);
+                     const sAxis axis = fun->subfun_to_axis(*members[0]);
+                     if (axis == -1)   // no sub0function with that name
+                        {
+                          MORE_ERROR() << "'" << *members[0]
+                             << "' is not a sub-function of "
+                             << fun->get_name() << ".\nTry " << fun->get_name()
+                             << " '' for a list of valid sub-function names.";
+                          syntax_error(LOC);
+                        }
 
                      pop_args_push_result(Token(TOK_AXIS,
                                                 IntScalar(axis, LOC)));
@@ -1435,11 +1469,10 @@ Symbol * top_sym = 0;
               }
          }
 
-
 Value_P toplevel_val = top_sym->get_value();
    if (!toplevel_val)   // top_sym is not a variable (-name). Maybe create one.
       {
-        if (direct_assign)
+        if (member_assign)
            {
              toplevel_val = EmptyStruct(LOC);
              top_sym->assign(toplevel_val, false, LOC);
@@ -1458,10 +1491,10 @@ Value_P toplevel_val = top_sym->get_value();
 
 Value * member_owner = 0;
 Cell * member_cell = toplevel_val->get_member(members, member_owner,
-                                              direct_assign, true);
+                                              member_assign, true);
    Assert(member_owner);
 
-   if (direct_assign)   // (direct) member assignment
+   if (member_assign)   // (direct) member assignment
       {
         if (member_cell->is_member_anchor())
            {

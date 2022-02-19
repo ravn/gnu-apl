@@ -578,7 +578,7 @@ const int boxing_format = Command::get_boxing_format();
              Shape sh(B->get_shape());
              while (sh.get_volume() >= Quad_SYL::print_length_limit)
                 {
-                  Rank longest = 0;
+                  sRank longest = 0;
                   loop(r, sh.get_rank())
                      {
                        if (sh.get_shape_item(r) > sh.get_shape_item(longest))

@@ -86,8 +86,8 @@ IndexExpr::check_index_range(const Shape & shape) const
       }
 }
 //----------------------------------------------------------------------------
-Rank
-IndexExpr::get_axis(Rank max_axis) const
+sRank
+IndexExpr::get_axis(sRank max_axis) const
 {
    if (rank != 1)   INDEX_ERROR;
 
@@ -101,7 +101,7 @@ Value_P I = values[0];
    // if axis becomes (signed) negative then it will be (unsigned) too big.
    // Therefore we need not test for < 0.
    //
-Rank axis = I->get_cfirst().get_near_int() - qio;
+sRank axis = I->get_cfirst().get_near_int() - qio;
    if (axis >= max_axis)   INDEX_ERROR;
 
    return axis;

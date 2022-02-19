@@ -326,7 +326,7 @@ const uint8_t * data = cdr.get_items();
 
 const uint32_t nelm = get_4_be(data + 8);
 const CDR_type vtype = CDR_type(data[12]);
-const Rank rank = data[13];
+const sRank rank = data[13];
 Shape shape;
    loop(r, rank)
       {
@@ -400,7 +400,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
                          *reinterpret_cast<const uint32_t *>(ravel + 4*n);
               const uint8_t * sub_data = data + offset;
               const uint32_t sub_vtype = sub_data[12];
-              const Rank sub_rank = sub_data[13];
+              const sRank sub_rank = sub_data[13];
               const uint8_t * sub_ravel = sub_data + 16 + 4*sub_rank;
 
               // if the sub-item is a non-nested scalar then we append it to

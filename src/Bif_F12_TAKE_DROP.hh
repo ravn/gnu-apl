@@ -49,11 +49,12 @@ public:
    virtual Token eval_XB(Value_P X, Value_P B) const;
 
    /// Take from B according to ravel_A
-   static Value_P do_take(const Shape & shape_Zi, const Value & B, bool axes);
+   static Value_P do_take(const Shape & shape_Zi, const Value & B,
+                          AxesBitmap axes);
 
    /// Fill Z with B, pad as necessary
    static void fill(const Shape & shape_Zi, Value & Z_owner,
-                    const Value & B, bool axes);
+                    const Value & B, AxesBitmap axes);
 
    static Bif_F12_TAKE * fun;   ///< Built-in function
    static Bif_F12_TAKE  _fun;   ///< Built-in function
@@ -206,7 +207,7 @@ public:
       }
 
    /// return the prototype for an axis
-   ShapeItem axis_proto() const;
+   ShapeItem axis_proto(AxesBitmap axes) const;
 
    /// return true iff this inerator has more items to come.
    bool more() const   { return !done; }

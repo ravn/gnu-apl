@@ -743,7 +743,7 @@ Value_P Z = B.clone(LOC);
 }
 //----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_scalar_identity_fun(Value_P B, Axis axis, Value_P FI0)
+ScalarFunction::eval_scalar_identity_fun(Value_P B, sAxis axis, Value_P FI0)
 {
    // for scalar functions the result of the identity function for scalar
    // function F is defined as follows (lrm p. 210)
@@ -814,9 +814,9 @@ PERFORMANCE_START(start_1)
    if (X.get_rank() > 1)   AXIS_ERROR;
 
 const APL_Integer qio = Workspace::get_IO();
-const Rank rank_A = A.get_rank();
-const Rank rank_B = B.get_rank();
-ShapeItem axes_in_X = 0;   // bitmap of axes mentioned in X
+const sRank rank_A = A.get_rank();
+const sRank rank_B = B.get_rank();
+AxesBitmap axes_X = 0;   // bitmap of axes in X
 const ShapeItem len_X = X.element_count();
 
    loop(iX, len_X)
@@ -824,8 +824,8 @@ const ShapeItem len_X = X.element_count();
          APL_Integer i = X.get_cravel(iX).get_near_int() - qio;
          if (i < 0)                        AXIS_ERROR;   // axis i too small
          if (i >= rank_A && i >= rank_B)   AXIS_ERROR;   // axis i too large
-         if (axes_in_X & 1 << i)           AXIS_ERROR;   // axis i used twice
-         axes_in_X |= 1 << i;
+         if (axes_X & 1 << i)           AXIS_ERROR;   // axis i used twice
+         axes_X |= 1 << i;
        }
 
    // if A and B have the same rank, then all axes must be in and A f[X} B
@@ -841,7 +841,7 @@ const ShapeItem len_X = X.element_count();
       {
         if (rank_A != len_X)   AXIS_ERROR;
 
-        Value_P Z = eval_scalar_AXB(A, axes_in_X, B, fun, false);
+        Value_P Z = eval_scalar_AXB(A, axes_X, B, fun, false);
 PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count())
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -849,14 +849,14 @@ PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count())
       {
         if (rank_B != len_X)   AXIS_ERROR;
 
-        Value_P Z = eval_scalar_AXB(B, axes_in_X, A, fun, true);
+        Value_P Z = eval_scalar_AXB(B, axes_X, A, fun, true);
 PERFORMANCE_END(fs_SCALAR_AB, start_1, Z->nz_element_count())
         return Token(TOK_APL_VALUE1, Z);
       }
 }
 //----------------------------------------------------------------------------
 Value_P
-ScalarFunction::eval_scalar_AXB(const Value & A, ShapeItem axes_in_X,
+ScalarFunction::eval_scalar_AXB(const Value & A, AxesBitmap axes_X,
                                 const Value & B, prim_f2 fun,
                                 bool reversed) const
 {
@@ -870,10 +870,10 @@ ScalarFunction::eval_scalar_AXB(const Value & A, ShapeItem axes_in_X,
    // nust have the same length).
    //
    {
-     Rank rA = 0;
+     sRank rA = 0;
      loop(rB, B.get_rank())
          {
-            if (axes_in_X & 1 << rB)
+            if (axes_X & 1 << rB)
                {
                  // if the axis is in X then the corresponding shape items in
                  // A and B must agree.
@@ -893,10 +893,10 @@ const Cell * cB = &B.get_cfirst();
    for (ArrayIterator it_B(B.get_shape()); it_B.more(); ++it_B)
        {
          ShapeItem wA = 0;   // weigth of the A axes in X
-         Rank rA = 0;
+         sRank rA = 0;
          loop(rB, B.get_rank())
              {
-               if (axes_in_X & 1 << rB)
+               if (axes_X & 1 << rB)
                   {
                     wA += weights_A.get_shape_item(rA++)
                        * it_B.get_shape_offset(rB);
@@ -937,7 +937,7 @@ const ShapeItem len_Z = Z->element_count();
    // Reshape A to match rank B if necessary...
    //
    {
-     const Rank rank_diff = B->get_rank() - A->get_rank();
+     const sRank rank_diff = B->get_rank() - A->get_rank();
      loop(d, rank_diff)       shape_A.add_shape_item(1);
      loop(r, A->get_rank())   shape_A.add_shape_item(A->get_shape_item(r));
    }

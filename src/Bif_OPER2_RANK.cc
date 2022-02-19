@@ -39,7 +39,7 @@ Bif_OPER2_RANK::eval_LRB(Token & LO, Token & y, Value_P B) const
    if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
       B = B->get_cfirst().get_pointer_value();
 
-Rank rank_chunk_B = B->get_rank();
+sRank rank_chunk_B = B->get_rank();
    y123_to_B(y.get_apl_val(), rank_chunk_B);
 
    return do_LyXB(LO, Value_P(), B, rank_chunk_B);
@@ -51,7 +51,7 @@ Bif_OPER2_RANK::eval_LRXB(Token & LO, Token & y, Value_P X, Value_P B) const
    if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
       B = B->get_cfirst().get_pointer_value();
 
-Rank rank_chunk_B = B->get_rank();
+sRank rank_chunk_B = B->get_rank();
 
    y123_to_B(y.get_apl_val(), rank_chunk_B);
 
@@ -59,7 +59,7 @@ Rank rank_chunk_B = B->get_rank();
 }
 //----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::do_LyXB(Token & _LO, Value_P X, Value_P B, Rank rank_chunk_B)
+Bif_OPER2_RANK::do_LyXB(Token & _LO, Value_P X, Value_P B, sRank rank_chunk_B)
 {
 Function_P LO = _LO.get_function();
    Assert(LO);
@@ -110,21 +110,22 @@ Bif_OPER2_RANK::eval_ALRB(Value_P A, Token & LO, Token & y, Value_P B) const
    if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
       B = B->get_cfirst().get_pointer_value();
 
-Rank rank_chunk_A = A->get_rank();
-Rank rank_chunk_B = B->get_rank();
+sRank rank_chunk_A = A->get_rank();
+sRank rank_chunk_B = B->get_rank();
    y123_to_AB(y.get_apl_val(), rank_chunk_A, rank_chunk_B);
 
    return do_ALyXB(A, rank_chunk_A, LO, Value_P(), B, rank_chunk_B);
 }
 //----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::eval_ALRXB(Value_P A, Token & LO, Token & y, Value_P X, Value_P B) const
+Bif_OPER2_RANK::eval_ALRXB(Value_P A, Token & LO, Token & y,
+                           Value_P X, Value_P B) const
 {
    if (B->element_count() == 1 && B->get_cfirst().is_pointer_cell())
       B = B->get_cfirst().get_pointer_value();
 
-Rank rank_chunk_A = A->get_rank();
-Rank rank_chunk_B = B->get_rank();
+sRank rank_chunk_A = A->get_rank();
+sRank rank_chunk_B = B->get_rank();
 
    y123_to_AB(y.get_apl_val(), rank_chunk_A, rank_chunk_B);
 
@@ -132,15 +133,15 @@ Rank rank_chunk_B = B->get_rank();
 }
 //----------------------------------------------------------------------------
 Token
-Bif_OPER2_RANK::do_ALyXB(Value_P A, Rank rank_chunk_A, Token & _LO,
-                         Value_P X, Value_P B, Rank rank_chunk_B)
+Bif_OPER2_RANK::do_ALyXB(Value_P A, sRank rank_chunk_A, Token & _LO,
+                         Value_P X, Value_P B, sRank rank_chunk_B)
 {
 Function_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())   DOMAIN_ERROR;
 
-Rank rk_A_frame = A->get_rank() - rank_chunk_A;   // rk_A_frame is y8
-Rank rk_B_frame = B->get_rank() - rank_chunk_B;   // rk_B_frame is y9
+sRank rk_A_frame = A->get_rank() - rank_chunk_A;   // rk_A_frame is y8
+sRank rk_B_frame = B->get_rank() - rank_chunk_B;   // rk_B_frame is y9
 
    // if both high-ranks are 0, then return A LO B.
    //
@@ -202,7 +203,7 @@ Value_P X7(7, LOC);
 }
 //----------------------------------------------------------------------------
 void
-Bif_OPER2_RANK::y123_to_B(Value_P y123, Rank & rank_B)
+Bif_OPER2_RANK::y123_to_B(Value_P y123, sRank & rank_B)
 {
    // y123_to_AB() splits the ranks of A and B into a (higher-dimensions)
    // "frame" and a (lower-dimensions) "chunk" as specified by y123.
@@ -212,7 +213,7 @@ Bif_OPER2_RANK::y123_to_B(Value_P y123, Rank & rank_B)
    //    Remember the rank of B to limit rank_B
    //    if values in y123 should exceed them.
    //
-const Rank rk_B = rank_B;
+const sRank rk_B = rank_B;
 
    if (!y123)                   VALUE_ERROR;
    if ( y123->get_rank() > 1)   DOMAIN_ERROR;
@@ -250,7 +251,7 @@ const Rank rk_B = rank_B;
 }
 //----------------------------------------------------------------------------
 void
-Bif_OPER2_RANK::y123_to_AB(Value_P y123, Rank & rank_A, Rank & rank_B)
+Bif_OPER2_RANK::y123_to_AB(Value_P y123, sRank & rank_A, sRank & rank_B)
 {
    // y123_to_AB() splits the ranks of A and B into a (higher-dimensions)
    // "frame" and a (lower-dimensions) "chunk" as specified by y123.
@@ -260,8 +261,8 @@ Bif_OPER2_RANK::y123_to_AB(Value_P y123, Rank & rank_A, Rank & rank_B)
    //    Remember the ranks of A and B to limit rank_A and rank_B
    //    if values in y123 should exceed them.
    //
-const Rank rk_A = rank_A;
-const Rank rk_B = rank_B;
+const sRank rk_A = rank_A;
+const sRank rk_B = rank_B;
 
    if (!y123)                   VALUE_ERROR;
    if ( y123->get_rank() > 1)   DOMAIN_ERROR;

@@ -147,11 +147,11 @@ bool need_restore = false;
         throw;
       }
 
-const Rank rank = choose_integer(desired_ranks);
+const sRank rank = choose_integer(desired_ranks);
 Shape shape;
 
 
-   for (Rank r = MAX_RANK - rank; r < MAX_RANK; ++r)
+   for (sRank r = MAX_RANK - rank; r < MAX_RANK; ++r)
        {
          vector<int> vsh_r;   vsh_r.push_back(desired_shape.get_shape_item(r));
          const int sh_r = choose_integer(vsh_r);

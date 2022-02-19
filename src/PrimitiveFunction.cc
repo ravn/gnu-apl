@@ -240,7 +240,7 @@ Value_P Z(shape_Z, LOC);
 }
 //============================================================================
 Token
-Bif_ROTATE::reverse(Value_P B, Axis axis)
+Bif_ROTATE::reverse(Value_P B, sAxis axis)
 {
    if (B->is_scalar())
       {
@@ -275,7 +275,7 @@ Value_P Z(B->get_shape(), LOC);
 }
 //----------------------------------------------------------------------------
 Token
-Bif_ROTATE::rotate(Value_P A, Value_P B, Axis axis)
+Bif_ROTATE::rotate(Value_P A, Value_P B, sAxis axis)
 {
 int32_t gsh = 0;   // global shift (scalar A); 0 means local shift (A) used.
 
@@ -321,28 +321,28 @@ Value_P Z(B->get_shape(), LOC);
 Token
 Bif_F12_ROTATE::eval_XB(Value_P X, Value_P B) const
 {
-const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return reverse(B, axis);
 }
 //----------------------------------------------------------------------------
 Token
 Bif_F12_ROTATE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return rotate(A, B, axis);
 }
 //----------------------------------------------------------------------------
 Token
 Bif_F12_ROTATE1::eval_XB(Value_P X, Value_P B) const
 {
-const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return reverse(B, axis);
 }
 //----------------------------------------------------------------------------
 Token
 Bif_F12_ROTATE1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return rotate(A, B, axis);
 }
 //----------------------------------------------------------------------------
@@ -1140,19 +1140,10 @@ Bif_F2_INDEX::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
 
-const Shape axes_present = Value::to_shape(X.get());   // normalized to ←IO←0
-
-ShapeItem bmX = 0;
-   loop(x, axes_present.get_rank())
-       {
-         const ShapeItem xx = axes_present.get_shape_item(x);
-         if (xx < 0)                AXIS_ERROR;
-         if (xx >= B->get_rank())   AXIS_ERROR;
-         bmX |= 1 << xx;
-       }
+const AxesBitmap axes_X = X->to_bitmap("⌷[X] B", B->get_rank());
 
 const ShapeItem ec_A = A->element_count();
-   if (ec_A != axes_present.get_rank())   RANK_ERROR;
+   if (ec_A != X->element_count())   RANK_ERROR;
    if (ec_A > B->get_rank())              RANK_ERROR;
 
    // construct an IndexExpr in index (= parse-) order (i.e. the index_expr[0]
@@ -1163,9 +1154,9 @@ IndexExpr index_expr(ASS_none, LOC);   // start with an empty IndexExpr
    index_expr.quad_io = Workspace::get_IO();
 
 ShapeItem a = ec_A;   // index_expr[0] ←→  B[;;;b]
-   for (Axis b = B->get_rank() - 1; b >= 0; --b)
+   for (sAxis b = B->get_rank() - 1; b >= 0; --b)
        {
-         if (!(bmX & 1 << b))   // Axis  b was not in X: elided idx
+         if (!(axes_X & 1 << b))   // Axis  b was not in X: elided idx
             {
               index_expr.add_index(Value_P());   // add elided index
               continue;

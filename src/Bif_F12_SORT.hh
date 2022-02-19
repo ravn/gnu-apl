@@ -67,7 +67,7 @@ struct CollatingCacheEntry
       { new (this)   CollatingCacheEntry(other); }
 
    /// compare this entry with \b other at \b axis
-   int compare_axis(const CollatingCacheEntry & other, Rank axis) const
+   int compare_axis(const CollatingCacheEntry & other, sAxis axis) const
       {
         return ce_shape.get_shape_item(axis)
              - other.ce_shape.get_shape_item(axis);
@@ -97,7 +97,7 @@ public:
    CollatingCache(const Value & A, const Cell * base, ShapeItem clen);
 
    /// return the number of dimensions of the collating sequence
-   Rank get_rank() const { return rank; }
+   sRank get_rank() const { return rank; }
 
    /// return the number of items to compare
    ShapeItem get_comp_len() const { return comp_len; }
@@ -117,7 +117,7 @@ public:
 
 protected:
    /// the rank of the collating sequence
-   const Rank rank;
+   const sRank rank;
 
    
    /// start of B.s ravel, ⎕IO adjusted

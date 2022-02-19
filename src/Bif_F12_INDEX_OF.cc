@@ -66,7 +66,7 @@ Shape sh_Z(B.get(), 0);
    // at this point sh is correct and ⍳ cannot fail.
    //
 Value_P Z(sh_Z, LOC);
-const Rank rk_Z = Z->get_rank();
+const sRank rk_Z = Z->get_rank();
    loop(z, Z->element_count())
       {
         Value_P ZZ(rk_Z, LOC);

@@ -56,7 +56,7 @@ protected:
                            const UTF8_string & creator, bool tolerant);
 
    /// ⎕FX with native function and optional library reference
-   static Token do_native_FX(Value_P A, Axis axis, Value_P B);
+   static Token do_native_FX(Value_P A, sAxis axis, Value_P B);
 };
 //----------------------------------------------------------------------------
 #endif //  __QUAD_FX_HH_DEFINED__

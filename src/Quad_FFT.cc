@@ -284,7 +284,7 @@ Quad_FFT::fill_window(double * result, const Shape & shape, window_function win)
 ShapeItem rlen = 1;
    result[0] = 1.0;
 
-   for (Rank r = shape.get_rank() - 1; r >= 0; --r)
+   for (sRank r = shape.get_rank() - 1; r >= 0; --r)
        {
          const ShapeItem axis_len = shape.get_shape_item(r);
          double * e = result + rlen * axis_len;

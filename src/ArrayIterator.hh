@@ -122,7 +122,7 @@ public:
            }
 
         ShapeItem weight = 1;
-        for (Axis a = rank - 1; a >= 0; --a)
+        for (sAxis a = rank - 1; a >= 0; --a)
             {
               // axis_iterators[0] is the one with the highest weight, and
               // axis_iterators[rank - 1 the one with the lowest weight (1).
@@ -145,9 +145,9 @@ public:
            }
 
         ShapeItem weight = 1;
-        for (Axis a = rank - 1; a >= 0; --a)
+        for (sAxis a = rank - 1; a >= 0; --a)
             {
-              const Axis perm_a = perm.get_shape_item(a);
+              const sAxis perm_a = perm.get_shape_item(a);
 
               // axis_iterators[0] is the one with the highest weight, and
               // axis_iterators[rank - 1 the one with the lowest weight (1).
@@ -178,7 +178,7 @@ public:
              return;
            }
 
-        for (Axis a = rank - 1; a >= 0; --a)
+        for (sAxis a = rank - 1; a >= 0; --a)
             {
               AxisIterator & iterator = get_iterator(a);
               total_ravel_offset += iterator.get_weight();
@@ -188,7 +188,7 @@ public:
       }
 
    /// Get the current offset for axis r
-   ShapeItem get_shape_offset(Axis a) const
+   ShapeItem get_shape_offset(sAxis a) const
       { return get_iterator(a).get_shape_offset(); }
 
    /// Get the current total offset
@@ -206,11 +206,11 @@ public:
 
 protected:
    /// return the iterator for axis a
-   const AxisIterator & get_iterator(Axis a) const
+   const AxisIterator & get_iterator(sAxis a) const
       { return axis_iterators[a]; }
 
    /// return the iterator for axis a
-   AxisIterator & get_iterator(Axis a)
+   AxisIterator & get_iterator(sAxis a)
       { return axis_iterators[a]; }
 
    /// the number of valid axes (= iterators).

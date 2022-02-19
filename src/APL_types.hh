@@ -42,14 +42,18 @@ using namespace std;
 // A. typedefs                                              //
 //////////////////////////////////////////////////////////////
 
-/// The rank of an APL value.
-typedef int32_t Rank;
-typedef Rank Axis;
+/// The (signed) rank of an APL value.
+typedef int16_t sRank;
+typedef sRank sAxis;
 
+/// The (unsigned) rank of an APL value.
 typedef uint32_t uRank;
 typedef uRank uAxis;
 
-/// The dimensions of an APL value.
+/// A bitmap for axes (in fun[X] arguments) normalized to ⎕IO←0.
+typedef uint16_t AxesBitmap;
+
+/// One dimension length (axis length) of an APL shape.
 typedef int64_t ShapeItem;
 
 /// The SI level, 0 = global (oldest), caller at level N called function at N+1

@@ -113,11 +113,11 @@ public:
    { return rho_rho; }
 
    /// return the length of dimension \b r
-   ShapeItem get_shape_item(Axis r) const
+   ShapeItem get_shape_item(sAxis r) const
    { Assert(r < rho_rho);   return rho[r]; }
 
    /// return the length of dimension \b r
-   ShapeItem get_transposed_shape_item(Axis r) const
+   ShapeItem get_transposed_shape_item(sAxis r) const
    { Assert(r < rho_rho);   return rho[rho_rho - r - 1]; }
 
    /// return the length of the first axis, or 1 for scalars
@@ -141,7 +141,7 @@ public:
         return count; }
 
    /// modify dimension \b r
-   void set_shape_item(Axis r, ShapeItem sh)
+   void set_shape_item(sAxis r, ShapeItem sh)
       { Assert(r < rho_rho);
         if (rho[r])   { volume /= rho[r];  rho[r] = sh;  volume *= rho[r]; }
         else          { rho[r] = sh;   recompute_volume();                 } }
@@ -151,7 +151,7 @@ public:
       { volume = 1;   loop(r, rho_rho)  volume *= rho[r]; }
 
    /// increment length of axis \b r by 1
-   void increment_shape_item(Rank r)
+   void increment_shape_item(sRank r)
       { set_shape_item(r, rho[r] + 1); }
 
    /// set last dimension to \b sh
@@ -164,10 +164,10 @@ public:
         rho[rho_rho++] = len;   volume *= len; }
 
    /// possibly increase rank by prepending axes of length 1
-   void expand_rank(Rank new_rank)
+   void expand_rank(sRank new_rank)
       { if (rho_rho >= new_rank)   return;   // no need to expand
         const int diff = new_rank - rho_rho;
-        for (Rank r = rho_rho - 1; r >= 0; --r)   rho[r + diff] = rho[r];
+        for (sRank r = rho_rho - 1; r >= 0; --r)   rho[r + diff] = rho[r];
         loop(r, diff)      rho[r] = 1;
         rho_rho = new_rank;
       }
@@ -177,10 +177,10 @@ public:
 
    /// return a shape like \b this, but with a new dimension of length len
    /// inserted so that Shape[axis] == len in the returned shape.
-   Shape insert_axis(Axis axis, ShapeItem len) const;
+   Shape insert_axis(sAxis axis, ShapeItem len) const;
 
    /// return a shape like \b this, but with axis \b axis removed
-   Shape without_axis(Axis axis) const
+   Shape without_axis(sAxis axis) const
       { Shape ret;
         loop(r, rho_rho)   if (r != axis)  ret.add_shape_item(rho[r]);
         return ret;
@@ -189,14 +189,14 @@ public:
    /// return a shape like \b this, but with the first axis (↑⍴) removed
    Shape without_first_axis() const
       { Shape ret;   // start with a scalar
-        for (Rank r = 1; r < rho_rho;)   ret.add_shape_item(rho[r++]);
+        for (sRank r = 1; r < rho_rho;)   ret.add_shape_item(rho[r++]);
         return ret;
       }
 
    /// return a shape like \b this, but with the last axis (¯1↑⍴) removed
    Shape without_last_axis() const
       { Shape ret;   // start with a scalar
-        for (Rank r = 0; r < (rho_rho - 1);)  ret.add_shape_item(rho[r++]);
+        for (sRank r = 0; r < (rho_rho - 1);)  ret.add_shape_item(rho[r++]);
         return ret;
       }
 
@@ -211,7 +211,7 @@ public:
       { return volume ? volume : 1; }
 
    /// return true iff one of the shape elements is (axis) \b ax
-   bool contains_axis(const Axis ax) const
+   bool contains_axis(sAxis ax) const
       { loop(r, rho_rho)   if (rho[r] == ax)   return true;   return false; }
 
    /// return true iff the items of value are at most the items of \b this
@@ -225,7 +225,7 @@ public:
       { Shape ret;   ret.rho_rho = rho_rho;
         ShapeItem weight = 1;
         ret.volume = 1;
-        for (Rank r = rho_rho - 1; r >= 0; --r)
+        for (sRank r = rho_rho - 1; r >= 0; --r)
            {
              ret.rho[r] = weight;
              ret.volume *= weight;
@@ -253,7 +253,7 @@ public:
 
 protected:
    /// the rank (number of valid shape items)
-   Rank rho_rho;
+   sRank rho_rho;
 
    /// the shape
    ShapeItem rho[MAX_RANK];

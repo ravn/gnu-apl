@@ -49,6 +49,7 @@ public:
    /// overloaded Function::eval_XB()
    virtual Token eval_XB(Value_P X, Value_P B) const
       {
+        X->to_bitmap("⊂[X] B", B->get_rank());   // check X
         const Shape shape_X = Value::to_shape(X.get());
         return Token(TOK_APL_VALUE1, enclose_with_axes(shape_X, B));
       }
@@ -70,7 +71,7 @@ protected:
    static Token enclose_with_axis(Value_P B, Value_P X);
 
    /// Partition B according to A
-   static Value_P partition(Value_P A, Value_P B, Axis axis);
+   static Value_P partition(Value_P A, Value_P B, sAxis axis);
 };
 //============================================================================
 /** primitive functions pick and disclose */
@@ -101,8 +102,10 @@ public:
 
    /// overloaded Function::eval_XB()
    virtual Token eval_XB(Value_P X, Value_P B) const
-      { const Shape axes_X = Value::to_shape(X.get());
-        return Token(TOK_APL_VALUE1, disclose_with_axis(axes_X, B)); }
+      {
+        const Shape sh_X = Value::to_shape(X.get());
+        return Token(TOK_APL_VALUE1, disclose_with_axis(sh_X, B));
+      }
 
    /// ⊃[X]B
    static Value_P disclose_with_axis(const Shape & axes_X, Value_P B);

@@ -187,7 +187,7 @@ public:
      { return shape; }
 
    /// return the r'th shape element of \b this value
-   ShapeItem get_shape_item(Rank r) const
+   ShapeItem get_shape_item(sRank r) const
       { return shape.get_shape_item(r); }
 
    /// return the length of the last dimension of \b this value, i.e. ↑⍴this
@@ -207,7 +207,7 @@ public:
       { return shape.get_rows(); }
 
    /// set the length of dimension \b r to \b sh.
-   void set_shape_item(Rank r, ShapeItem sh)
+   void set_shape_item(sRank r, ShapeItem sh)
       { shape.set_shape_item(r, sh); }
 
    /** reshape this value in place. This is generally dangerous and only
@@ -418,17 +418,19 @@ public:
    /// return \b this indexed by (multi-dimensional) \b IDX.
    Value_P index(const IndexExpr & IDX) const;
 
+   /// return a bitmap of integers in \b this value. Normalized to ⎕IO←0.
+   AxesBitmap to_bitmap(const char * where, uRank rank_B) const;
+
    /// return \b this indexed by (one-dimensional) \b IDX.
    Value_P index(const Value * X) const;
 
    /// If this value is a single axis between ⎕IO and ⎕IO + max_axis then
    /// return that axis. Otherwise throw AXIS_ERROR.
-   static Rank get_single_axis(const Value * val, Rank max_axis);
+   static sRank get_single_axis(const Value * val, sRank max_axis);
 
    /// convert the ravel of Value \b val to a shape (normalized to ⎕IO←0)
    /// An elided index, for example B[], throws an INDEX_ERROR.
    static Shape to_shape(const Value * val);
-
    /// return the offset'th ravel cell (of an unpack'ed ravel)
    static const Cell & cell_fetcher(ShapeItem offset, const Cell * ravel)
       { return ravel[offset]; }

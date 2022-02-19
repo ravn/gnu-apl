@@ -1840,8 +1840,8 @@ const Cell * cI = &X->get_cfirst();
    return Z;
 }
 //----------------------------------------------------------------------------
-Rank
-Value::get_single_axis(const Value * val, Rank max_axis)
+sRank
+Value::get_single_axis(const Value * val, sRank max_axis)
 {
    if (val == 0)   AXIS_ERROR;
 
@@ -1863,7 +1863,7 @@ Value::to_shape(const Value * val)
 {
    if (val == 0)
       {
-        MORE_ERROR() << "iillegal elided index [].";
+        MORE_ERROR() << "illegal elided index [].";
         INDEX_ERROR;   // elided index ?
       }
 
@@ -1875,6 +1875,62 @@ Shape shape;
         shape.add_shape_item(val->get_cravel(x).get_near_int() - qio);
 
    return shape;
+}
+//----------------------------------------------------------------------------
+AxesBitmap
+Value::to_bitmap(const char * where, uRank rank_B) const
+{
+const APL_Integer qio = Workspace::get_IO();
+AxesBitmap ret = 0;
+
+   if (get_rank() > 1)
+      {
+         MORE_ERROR() << "In " << where
+                      << ": invalid ⍴⍴X ( = " << get_rank() << ")";
+         AXIS_ERROR;
+      }
+
+   // note: length error on X will either produce a range error or a
+   // duplicte error below.
+   //
+   loop(e, element_count())
+       {
+         const Cell & cX = get_cravel(e);
+         if (!cX.is_near_int())
+            {
+              MORE_ERROR() << "In " << where << ": X[" << (e + qio)
+                           << "] is not integral.";
+              AXIS_ERROR;
+            }
+
+         const APL_Integer axis = cX.get_near_int() - qio;
+         if (axis < 0)
+            {
+              MORE_ERROR() << "In " << where << " : X[" << (e + qio)
+                           << "] = " << (axis + qio)
+                           << " is too small (note: ⎕IO is " << qio << ").";
+              AXIS_ERROR;
+            }
+
+         if (axis >= rank_B)
+            {
+              MORE_ERROR() << "In " << where << " : X[" << (e + qio)
+                           << "] = " << (axis + qio)
+                           << " is too large (note: ⍴⍴B is " << rank_B << ").";
+              AXIS_ERROR;
+            }
+
+         if (ret & 1 << axis)   // aready set
+            {
+              MORE_ERROR() << "In " << where << " : duplicate axis X["
+                           << (e + qio) << "] = " << (axis + qio);
+              AXIS_ERROR;
+            }
+
+         ret |= 1 << axis;
+       }
+
+   return ret;
 }
 //----------------------------------------------------------------------------
 void

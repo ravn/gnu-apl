@@ -247,7 +247,7 @@ Value_P Z = do_CR(function_number, B.get(), pctx);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-Axis
+sAxis
 Quad_CR::subfun_to_axis(const UCS_string & name) const
 {
 UTF8_string name_utf(name);
@@ -1307,7 +1307,7 @@ const ShapeItem len = B.element_count();
 
 ShapeItem max_shape[MAX_RANK];   // in reverse order
    loop(r, MAX_RANK)   max_shape[r] = 0;
-Rank max_rank = 0;
+sRank max_rank = 0;
 
    loop(b, len)
       {
@@ -1316,7 +1316,7 @@ Rank max_rank = 0;
         if (!cB.is_pointer_cell())   continue;   // simple scalar
 
         const Shape sh = cB.get_pointer_value()->get_shape();
-        const Rank rk = sh.get_rank();
+        const sRank rk = sh.get_rank();
         if (max_rank < rk)   max_rank = rk;
         loop(s, rk)
            {

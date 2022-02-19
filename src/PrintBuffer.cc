@@ -212,7 +212,7 @@ const bool nested = !value.is_simple();
      //    therefore we have (⍴,value) items. Items are rectangular.
      //
      PERFORMANCE_START(start_2)
-     vector<Rank> max_row_ranks;
+     vector<sRank> max_row_ranks;
      max_row_ranks.reserve(rows);
      loop(y, rows)
         {
@@ -237,7 +237,7 @@ const bool nested = !value.is_simple();
                 if (cell.is_pointer_cell())
                    {
                      Value_P sub_val = cell.get_pointer_value();
-                     const Rank sub_rank = sub_val->get_rank();
+                     const sRank sub_rank = sub_val->get_rank();
                      if (max_row_ranks.back() < sub_rank)
                         max_row_ranks.back() = sub_rank;
                    }
@@ -307,7 +307,7 @@ const bool nested = !value.is_simple();
             ShapeItem dest_height = 0;
             loop(y, rows)
                {
-                 const Rank Rk_y_1 = y ? max_row_ranks[y - 1] : 0;
+                 const sRank Rk_y_1 = y ? max_row_ranks[y - 1] : 0;
                  const ShapeItem srows = separator_rows(y, value, nested,
                                                         max_row_ranks[y],
                                                         Rk_y_1);
@@ -439,7 +439,7 @@ interrupted:
 }
 //----------------------------------------------------------------------------
 void
-PrintBuffer::print_interruptible(ostream & out, Rank rank, int quad_PW)
+PrintBuffer::print_interruptible(ostream & out, sRank rank, int quad_PW)
 {
    if (get_row_count() == 0)   return;      // empty PrintBuffer
 
@@ -588,7 +588,7 @@ ColInfo ci;
 //----------------------------------------------------------------------------
 ShapeItem
 PrintBuffer::separator_rows(ShapeItem y, const Value & value, bool nested,
-                            Rank rk1, Rank rk2)
+                            sRank rk1, sRank rk2)
 {
    if (y == 0)   return 0;
 

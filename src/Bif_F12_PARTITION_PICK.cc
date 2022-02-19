@@ -34,7 +34,7 @@ Bif_F12_PICK      * Bif_F12_PICK     ::fun = &Bif_F12_PICK     ::_fun;
 Token
 Bif_F12_PARTITION::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return Token(TOK_APL_VALUE1, partition(A, B, axis));
 }
 //----------------------------------------------------------------------------
@@ -50,58 +50,35 @@ Value_P Z(LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_PARTITION::enclose_with_axes(const Shape & axes_X, Value_P B)
+Bif_F12_PARTITION::enclose_with_axes(const Shape & sh_X, Value_P B)
 {
+   // Note: the caller has checked that sh_X contains only valid
+   // axes of B, so we do not need to check it again here.
+
 Shape item_shape;
 Shape it_weights;
 Shape shape_Z;
 Shape weights_Z;
 
+   // split ⍴B into two shapes: shape_Z and item_shape. Axes of B that are
+   // contained in X go into item_shape (and their order in X matters) while
+   // the other axes go into shape_Z.
+   //
 const Shape weights_B = B->get_shape().get_weights();
 
-int bmX = 0;   // axes in axes_X with ⎕IO←0
-   loop(r, axes_X.get_rank())   // the axes in axes_X
+AxesBitmap axes_X = 0;   // axes in axes_X with ⎕IO←0
+   loop(r, sh_X.get_rank())   // the axes in axes_X
        {
-         const ShapeItem ax = axes_X.get_shape_item(r);
-
-         // check that Xϵ⍳⍴⍴B
-         //
-         if (ax < 0)
-            {
-              const APL_Integer qio = Workspace::get_IO();
-              MORE_ERROR() << "In A of A⊂[X]B: axis " << (ax + qio)
-                           << " < ⎕IO";
-              AXIS_ERROR;
-            }
-
-         if (ax >= B->get_rank())
-            {
-              const APL_Integer qio = Workspace::get_IO();
-              MORE_ERROR() << "In A of A⊂[X]B: axis " << (ax + qio)
-                           << " > ⎕IO+⍴B";
-              AXIS_ERROR;
-            }
-
-         if (bmX & 1 << ax)
-            {
-              const APL_Integer qio = Workspace::get_IO();
-              MORE_ERROR() << "In A of A⊂[X]B: duplicate axis " << (ax + qio);
-              AXIS_ERROR;
-            }
-
-         // ax is OK.
-         bmX |= 1 << ax;
+         const ShapeItem ax = sh_X.get_shape_item(r);
+         axes_X |= 1 << ax;
 
          item_shape.add_shape_item(B->get_shape_item(ax));
          it_weights.add_shape_item(weights_B.get_shape_item(ax));
        }
 
-   // put the dimensions mentioned in X into item_shape and the
-   // others into shape_Z
-   //
    loop(ax, B->get_rank())        // the axes not in axes_X
        {
-         if (bmX & 1 << ax)   continue;   // ax is in X
+         if (axes_X & 1 << ax)   continue;   // ax is in X
 
          shape_Z.add_shape_item(B->get_shape_item(ax));
          weights_Z.add_shape_item(weights_B.get_shape_item(ax));
@@ -157,7 +134,7 @@ Value_P Z(shape_Z, LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_PARTITION::partition(Value_P A, Value_P B, Axis axis)
+Bif_F12_PARTITION::partition(Value_P A, Value_P B, sAxis axis)
 {
    // A must be a scalar or vector (of non-negative integers)
    //
@@ -446,7 +423,7 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_PICK::disclose_with_axis(const Shape & axes_X, Value_P B)
+Bif_F12_PICK::disclose_with_axis(const Shape & sh_X, Value_P B)
 {
    // disclose with axis: Z←⊃[Z] B
    // implemented as: cB ← ⊃ B ◊ cX ← ((⍳⍴⍴cB)∼X),X ◊ Z←cX ⍉ B
@@ -455,19 +432,19 @@ Bif_F12_PICK::disclose_with_axis(const Shape & axes_X, Value_P B)
 
 Value_P cB = disclose(B, true);   // cB ← ⊃ B
 
-ShapeItem bmX = 0;   // axes in axes_X with ⎕IO←0
+AxesBitmap axes_X = 0;   // axes in axes_X with ⎕IO←0
 
-   loop(x, axes_X.get_rank())
+   loop(x, sh_X.get_rank())
        {
-          const ShapeItem ax = axes_X.get_shape_item(x);
-          if (bmX & 1 << ax)
+          const ShapeItem ax = sh_X.get_shape_item(x);
+          if (axes_X & 1 << ax)
              {
                MORE_ERROR() << "In ⊃[X]B: duplicated axis "
                             << (ax + Workspace::get_IO())
                             << " in X";
                 AXIS_ERROR;
              }
-          bmX |= 1 << ax;
+          axes_X |= 1 << ax;
        }
 
    /* ⍴Z is the axes of B that are not in X, followed by those which are.
@@ -479,13 +456,13 @@ ShapeItem bmX = 0;   // axes in axes_X with ⎕IO←0
 Shape perm_cB;   // perm_cB is the permutation of cB, constructed from X
    loop(x, cB->get_rank())      // axes not in X
        {
-         if (bmX & 1 << x)   continue;   // axis x is in X
+         if (axes_X & 1 << x)   continue;   // axis x is in X
          perm_cB.add_shape_item(x);       //  axis x is not in X
        }
 
-   loop(x, axes_X.get_rank())   // axes in X
+   loop(x, sh_X.get_rank())   // axes in X
        {
-         perm_cB.add_shape_item(axes_X.get_shape_item(x));
+         perm_cB.add_shape_item(sh_X.get_shape_item(x));
        }
 
    Assert(perm_cB.get_rank() == cB->get_rank());
@@ -547,7 +524,7 @@ ShapeItem ret[MAX_RANK];
 
          // at this point val is a non-scalar value.
          //
-         const Rank val_rank = val->get_rank();
+         const sRank val_rank = val->get_rank();
          if (ret_rank == 0)   // val is the first non-scalar
             {
               ret_rank = val_rank;

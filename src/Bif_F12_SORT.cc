@@ -68,7 +68,7 @@ UCS_string UA1 = UA.unique();
         ShapeItem aq = a;
         loop(r, A.get_rank())
            {
-             const Rank axis = entry.ce_shape.get_rank() - r - 1;
+             const sAxis axis = entry.ce_shape.get_rank() - r - 1;
              const ShapeItem ar = aq % A.get_shape_item(axis);
              Assert(ar <= A.get_shape_item(axis));
              if (entry.ce_shape.get_shape_item(axis) > ar)
@@ -92,7 +92,7 @@ const CollatingCache & cache =
 const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
 const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
 
-const Rank rank = cache.get_rank();
+const sRank rank = cache.get_rank();
 
    loop(r, rank)
       {
@@ -117,7 +117,7 @@ const CollatingCache & cache =
                       *reinterpret_cast<const CollatingCache *>(comp_arg);
 const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
 const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
-const Rank rank = cache.get_rank();
+const sRank rank = cache.get_rank();
 
    loop(r, rank)
       {

@@ -143,7 +143,7 @@ protected:
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_identity_fun()
-   virtual Token eval_identity_fun(Value_P B, Axis axis) const;
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
 
    /// Overloaded Function::destroy()
    virtual void destroy();
@@ -225,7 +225,7 @@ protected:
    Token (*f_eval_fill_AB) (Vr A,                     Vr B, Th);
 
    /// pointer to function eval_identity_fun() in shared library
-   Token (*f_eval_ident_Bx)(Vr B,                   Axis x, Th);
+   Token (*f_eval_ident_Bx)(Vr B,                  sAxis x, Th);
 #undef Th
 
    /// callback before library is closed

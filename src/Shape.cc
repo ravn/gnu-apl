@@ -80,7 +80,7 @@ Shape::expand(const Shape & B)
 }
 //----------------------------------------------------------------------------
 Shape
-Shape::insert_axis(Axis axis, ShapeItem len) const
+Shape::insert_axis(sAxis axis, ShapeItem len) const
 {
    if (get_rank() >= MAX_RANK)   LIMIT_ERROR_RANK;
 
@@ -112,7 +112,7 @@ Shape::ravel_pos(const Shape & idx) const
 ShapeItem p = 0;
 ShapeItem w = 1;
 
-   for (Rank r = get_rank(); r-- > 0;)
+   for (sRank r = get_rank(); r-- > 0;)
       {
         p += w*idx.get_shape_item(r);
         w *= get_shape_item(r);
