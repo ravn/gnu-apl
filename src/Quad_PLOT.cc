@@ -234,22 +234,59 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
    // from here on 'data' is owned by 'w_props' (whose destructor
    // will delete it).
    //
-   if (A->get_rank() > 1)   { delete w_props;   RANK_ERROR; }
+   if (const ErrorCode ec = parse_attributes(A.getref(), w_props))
+      {
+        delete w_props;
+        throw_apl_error(ec, LOC);
+      }
+   if (w_props->update(verbosity))   { delete w_props;   DOMAIN_ERROR; }
 
-const ShapeItem len_A = A->element_count();
-   if (len_A < 1)   { delete w_props;   LENGTH_ERROR; }
+   // do_plot_data takes ownership of w_props and will delete w_props
+   //
+   return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Quad_PLOT::parse_attributes(const Value & A, Plot_window_properties * w_props)
+{
+   if (A.is_member())   // new-style attributes
+      {
+        loop(row, A.get_rows())
+            {
+              const Cell & att_name = A.get_cravel(2*row);
+              if (att_name.is_pointer_cell())   // used entry in A
+                 {
+                   const UCS_string ucs = att_name.get_pointer_value()
+                                                 ->get_UCS_ravel();
+                   if (const char * error = w_props->set_attribute(ucs,
+                                                  A.get_cravel(2*row + 1)))
+                      {
+                        MORE_ERROR() << error << " in ⎕PLOT attribute ."
+                                     << ucs;
+                        return E_DOMAIN_ERROR;
+                      }
+                 }
+            }
+        return E_NO_ERROR;
+      }
+
+   // old-style attributes
+   //
+   if (A.get_rank() > 1)   { delete w_props;   RANK_ERROR; }
+
+const ShapeItem len_A = A.element_count();
+   if (len_A < 1)   return E_LENGTH_ERROR;
 
 const APL_Integer qio = Workspace::get_IO();
 
    loop(a, len_A)
        {
-         const Cell & cell_A = A->get_cravel(a);
+         const Cell & cell_A = A.get_cravel(a);
          if (!cell_A.is_pointer_cell())
             {
                MORE_ERROR() << "A[" << (a + qio)
                             << "] is not a string in A ⎕PLOT B";
-               delete w_props;
-               DOMAIN_ERROR;
+               return E_DOMAIN_ERROR;
             }
 
          const Value * attr = cell_A.get_pointer_value().get();
@@ -257,29 +294,22 @@ const APL_Integer qio = Workspace::get_IO();
             {
                MORE_ERROR() << "A[" << (a + qio)
                             << "] is not a string in A ⎕PLOT B";
-               delete w_props;
-               DOMAIN_ERROR;
+               return E_DOMAIN_ERROR;
             }
 
          UCS_string ucs = attr->get_UCS_ravel();
          ucs.remove_leading_and_trailing_whitespaces();
-         if (ucs.size() == 0)         continue;
+         if (ucs.size() == 0)               continue;
          if (Avec::is_comment(ucs[0]))      continue;
          UTF8_string utf(ucs);
-         const char * error = w_props->set_attribute(utf.c_str());
-         if (error)
+         if (const char * error = w_props->set_attribute(utf.c_str()))
             {
               MORE_ERROR() << error << " in ⎕PLOT attribute '" << ucs << "'";
-              delete w_props;
-              DOMAIN_ERROR;
+              return E_DOMAIN_ERROR;
             }
        }
 
-   if (w_props->update(verbosity))   { delete w_props;   DOMAIN_ERROR; }
-
-   // do_plot_data takes ownership of w_props and will delete w_props
-   //
-   return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
+   return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------
 Token
@@ -289,7 +319,7 @@ Quad_PLOT::eval_B(Value_P B) const
 
    if (B->get_rank() == 0 && !B->get_cfirst().is_pointer_cell())
       {
-        // scalar argument: plot window control
+        // scalar (integer) argument: plot window control
         union
            {
              APL_Integer B0;                           // APL

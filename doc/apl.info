@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-January 26, 2022
+February 20, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3247,8 +3247,8 @@ However, all colors used, all diameters of points, and all thicknesses
 of the lines can be controlled by overriding the default values (dyadic
 A ⎕PLOT B).
 
-2.31.1.1 Complex Plot Data
-..........................
+2.31.1.1 Complex Plot Data B
+............................
 
 If a data item B[N] or B[row;N] is complex, say B[N] = x + iy.  then it
 is placed (after some scaling) at position (x, y) of the plot.  The
@@ -3270,8 +3270,8 @@ document; in text mode see file doc/PLOT_circle.png):
 
  [image src="PLOT_circle.png" ]
 
-2.31.1.2 Real Plot Data
-.......................
+2.31.1.2 Real Plot Data B
+.........................
 
 On the other hand, if a data item B[N] or B[row;N] is real, then it is
 placed at position (N, x) of the plot.  The X-range is then [⎕IO ...
@@ -3300,10 +3300,11 @@ part 0.
 2.31.2 The Plot Attributes A
 ----------------------------
 
-As can be displayed with ⎕PLOT ” there are a number of attributes that
-control how the resulting plot will look like:
+There are a number of attributes like colors, point sizes, line widths,
+etc.  that control how the resulting plot will look like.
 
-   Example:
+   A list of these attributes can be displayed with ⎕PLOT ”, for
+example:
 
       ⎕PLOT ''
 
@@ -3353,21 +3354,35 @@ legend_name-N:                     (the name of plot line N in the legend)
 
    There are 2 kinds of attributes: global attributes that affect the
 entire plot, and local (per-line) attributes that affect one of the plot
-lines (which corresponds to one row of B). The most convenient way to
-specify multiple attributes in one go is to use multi-line strings.
+lines (which corresponds to one row of B). One way to specify multiple
+attributes in one go is to use multi-line strings.
 
    For example (plot 2 lines of 10 random numbers each, named "random
 row 1" and "random row 2"):
 
       Data ← ?2 10⍴10   ⍝ two rows of random data
       Attributes  ← """
-legend_name-0: Random Row 1
-legend_name-1: Random Row 2
+legend_name-1: Random Row 1
+legend_name-2: Random Row 2
                     """
       Attributes ⎕PLOT Data
 
+   While specifying the plot attributes A in one place is most
+convenient for a single plot window or when the attributes are read from
+some external test file, its is somretimes simpler to specify the plot
+attributes individually.  This can be done by using a structured APL
+variable as left argument A:
+
+Attributes.legend_name_1 ← "Random Row 1"
+Attributes.legend_name_2 ← "Random Row 2"
+      Attributes ⎕PLOT Data
+
+   Note that (for syntactical reasons) the separation between the line
+attribute and the line number is _ (underscore) if A is specified as a
+strutural variable and / (minus) if A is specified as a string of lines.
+
    If the global attribute "filename" is given, then the plot is not
-only being displayed in an X window on the screen but also written to a
+only being displayed in an X window on the screen, but also written to a
 file with the name provided as attribute value.  The file format is
 bitmap (typical file extension: .bmp) which can then eaily converted to
 other graphic formats such as .png or .jpg with tools like ’convert’
@@ -3381,6 +3396,10 @@ from package imagemagick.
 ⎕PLOT with attribute filename overrides existing files without a
 warning.  Lack of permissions to write the file raises a DOMAIN ERROR
 with )MORE providing details.
+
+   Some line attributes like line widths or point sizes are frequently
+the same for several or all plot lines.  In that case one can use the
+line attribute without a -N or _N suffix.
 
 2.31.3 Plot Window Handling
 ---------------------------
@@ -6285,63 +6304,63 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11438
-Node: Chapter 222734
-Node: Section 2.124629
-Node: Section 2.240789
-Node: Section 2.341548
-Node: Section 2.442835
-Node: Section 2.547200
-Node: Section 2.647373
-Node: Section 2.748003
-Node: Section 2.851956
-Node: Section 2.953491
-Node: Section 2.1055584
-Node: Section 2.1157137
-Node: Section 2.1258922
-Node: Section 2.1360862
-Node: Section 2.1461803
-Node: Section 2.1562055
-Node: Section 2.1663451
-Node: Section 2.1773596
-Node: Section 2.1876114
-Node: Section 2.1982821
-Node: Section 2.2084266
-Node: Section 2.2189927
-Node: Section 2.2294961
-Node: Section 2.2398242
-Node: Section 2.2498533
-Node: Section 2.25109358
-Node: Section 2.26109630
-Node: Section 2.27116208
-Node: Section 2.28118668
-Node: Section 2.29119337
-Node: Section 2.30120996
-Node: Section 2.31124119
-Node: Section 2.32131979
-Node: Section 2.33132929
-Node: Section 2.34147653
-Node: Section 2.35157650
-Node: Section 2.36160754
-Node: Section 2.37162743
-Node: Section 2.38167168
-Node: Chapter 3188586
-Node: Chapter 4191089
-Node: Chapter 5192215
-Node: Section 5.1193752
-Node: Section 5.2195032
-Node: Section 5.3195392
-Node: Section 5.4195634
-Node: Section 5.5196296
-Node: Section 5.6196774
-Node: Section 5.7197546
-Node: Section 5.8198003
-Node: Chapter 6198405
-Node: Section 6.1198824
-Node: Section 6.2199511
-Node: Chapter 7200342
-Node: Section 7.1200845
-Node: Section 7.2226159
+Node: Chapter 11439
+Node: Chapter 222735
+Node: Section 2.124630
+Node: Section 2.240790
+Node: Section 2.341549
+Node: Section 2.442836
+Node: Section 2.547201
+Node: Section 2.647374
+Node: Section 2.748004
+Node: Section 2.851957
+Node: Section 2.953492
+Node: Section 2.1055585
+Node: Section 2.1157138
+Node: Section 2.1258923
+Node: Section 2.1360863
+Node: Section 2.1461804
+Node: Section 2.1562056
+Node: Section 2.1663452
+Node: Section 2.1773597
+Node: Section 2.1876115
+Node: Section 2.1982822
+Node: Section 2.2084267
+Node: Section 2.2189928
+Node: Section 2.2294962
+Node: Section 2.2398243
+Node: Section 2.2498534
+Node: Section 2.25109359
+Node: Section 2.26109631
+Node: Section 2.27116209
+Node: Section 2.28118669
+Node: Section 2.29119338
+Node: Section 2.30120997
+Node: Section 2.31124120
+Node: Section 2.32132872
+Node: Section 2.33133822
+Node: Section 2.34148546
+Node: Section 2.35158543
+Node: Section 2.36161647
+Node: Section 2.37163636
+Node: Section 2.38168061
+Node: Chapter 3189479
+Node: Chapter 4191982
+Node: Chapter 5193108
+Node: Section 5.1194645
+Node: Section 5.2195925
+Node: Section 5.3196285
+Node: Section 5.4196527
+Node: Section 5.5197189
+Node: Section 5.6197667
+Node: Section 5.7198439
+Node: Section 5.8198896
+Node: Chapter 6199298
+Node: Section 6.1199717
+Node: Section 6.2200404
+Node: Chapter 7201235
+Node: Section 7.1201738
+Node: Section 7.2227052
 
 End Tag Table
 

@@ -62,7 +62,8 @@ public:
    /// constructor: copy of another UCS_string
    UCS_string(const UCS_string & ucs);
 
-   /// constructor: copy of another UCS_string
+   /// constructor: copy of another UCS_string \b ucs, starting at \b pos
+   /// in \b ucs and length \b len
    UCS_string(const UCS_string & ucs, size_t pos, size_t len);
 
    /// constructor: UCS_string from UTF8_string

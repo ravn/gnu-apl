@@ -3356,7 +3356,7 @@ connecting them have the same color. However, all colors used, all diameters
 of points, and all thicknesses of the lines can be controlled by overriding
 the default values (dyadic A ⎕PLOT B).
 
-@subsubsection Complex Plot Data
+@subsubsection Complex Plot Data B
 
 If a data item B[N] or B[row;N] is @b{complex}, say B[N] = x + iy. then it is
 placed (after some scaling) at position (x, y) of the plot. The X-range
@@ -3382,7 +3382,7 @@ in text mode see file @b{doc/PLOT_circle.png}):
 
 @image{PLOT_circle}
 
-@subsubsection Real Plot Data
+@subsubsection Real Plot Data B
 
 On the other hand, if a data item B[N] or B[row;N] is @b{real}, then it is
 placed at position (N, x) of the plot. The X-range is then
@@ -3413,10 +3413,11 @@ all real items in B are taken as complex with imaginary part 0.
 
 @subsection The Plot Attributes A
 
-As can be displayed with ⎕PLOT '' there are a number of attributes that
-control how the resulting plot will look like:
+There are a number of attributes like colors, point sizes, line widths,
+etc. that control how the resulting plot will look like.
 
-Example:
+A list of these attributes can be displayed with ⎕PLOT '',
+for example:
 
 @verbatim
       ⎕PLOT ''
@@ -3466,11 +3467,10 @@ legend_name-N:                     (the name of plot line N in the legend)
 
 @end verbatim
 
-There are 2 kinds of attributes: global attributes that affect the entire plot,
-and local (per-line) attributes that affect one of the plot lines (which
-corresponds to one row of B). The most convenient way to specify multiple
-attributes in one go is to use multi-line strings.
-
+There are 2 kinds of attributes: global attributes that affect the entire
+plot, and local (per-line) attributes that affect one of the plot lines
+(which corresponds to one row of B). One way to specify
+multiple attributes in one go is to use multi-line strings.
 
 For example (plot 2 lines of 10 random numbers each, named "random row 1" and
 "random row 2"):
@@ -3478,14 +3478,30 @@ For example (plot 2 lines of 10 random numbers each, named "random row 1" and
 @verbatim
       Data ← ?2 10⍴10   ⍝ two rows of random data
       Attributes  ← """
-legend_name-0: Random Row 1
-legend_name-1: Random Row 2
+legend_name-1: Random Row 1
+legend_name-2: Random Row 2
                     """
       Attributes ⎕PLOT Data
 @end verbatim
 
+While specifying the plot attributes A in one place is most convenient for
+a single plot window or when the attributes are read from some external
+test file, its is somretimes simpler to specify the plot attributes
+individually. This can be done by using a structured APL variable as left
+argument A:
+
+@verbatim
+Attributes.legend_name_1 ← "Random Row 1"
+Attributes.legend_name_2 ← "Random Row 2"
+      Attributes ⎕PLOT Data
+@end verbatim
+
+Note that (for syntactical reasons) the separation between the line attribute
+and the line number is _ (underscore) if A is specified as a strutural
+variable and / (minus) if A is specified as a string of lines.
+
 If the global attribute "filename" is given, then the plot is not only being
-displayed in an X window on the screen but also written to a file with the
+displayed in an X window on the screen, but also written to a file with the
 name provided as attribute value. The file format is bitmap (typical file
 extension: .bmp) which can then eaily converted to other graphic formats
 such as .png or .jpg with tools like 'convert' from package imagemagick.
@@ -3500,6 +3516,10 @@ writes the plot of a a zigzag curve to file /tmp/bitmap.bmp (note: ⎕PLOT
 with attribute filename overrides existing files without a warning. Lack
 of permissions to write the file raises a DOMAIN ERROR with )MORE providing
 details.
+
+Some line attributes like line widths or point sizes are frequently the same
+for several or all plot lines. In that case one can use the line attribute
+without a -N or _N suffix.
 
 @subsection Plot Window Handling
 

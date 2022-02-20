@@ -319,7 +319,7 @@ Shape ret;
         return ret;
       }
 
-const Rank rank = PyList_Size(shape);
+const uRank rank = PyList_Size(shape);
    loop(r, rank)
        {
          PyObject * axis = PyList_GetItem(shape, r);

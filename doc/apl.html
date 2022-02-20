@@ -154,8 +154,8 @@ ul.no-bullet {list-style: none}
     <ul class="no-bullet">
       <li><a name="toc-The-Plot-Data-B" href="#The-Plot-Data-B">2.31.1 The Plot Data B</a>
       <ul class="no-bullet">
-        <li><a name="toc-Complex-Plot-Data" href="#Complex-Plot-Data">2.31.1.1 Complex Plot Data</a></li>
-        <li><a name="toc-Real-Plot-Data" href="#Real-Plot-Data">2.31.1.2 Real Plot Data</a></li>
+        <li><a name="toc-Complex-Plot-Data-B" href="#Complex-Plot-Data-B">2.31.1.1 Complex Plot Data B</a></li>
+        <li><a name="toc-Real-Plot-Data-B" href="#Real-Plot-Data-B">2.31.1.2 Real Plot Data B</a></li>
       </ul></li>
       <li><a name="toc-The-Plot-Attributes-A" href="#The-Plot-Attributes-A">2.31.2 The Plot Attributes A</a></li>
       <li><a name="toc-Plot-Window-Handling" href="#Plot-Window-Handling">2.31.3 Plot Window Handling</a></li>
@@ -248,7 +248,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>January 26, 2022
+<p>February 20, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -3604,8 +3604,8 @@ connecting them have the same color. However, all colors used, all diameters
 of points, and all thicknesses of the lines can be controlled by overriding
 the default values (dyadic A ⎕PLOT B).
 </p>
-<a name="Complex-Plot-Data"></a>
-<h4 class="subsubsection">2.31.1.1 Complex Plot Data</h4>
+<a name="Complex-Plot-Data-B"></a>
+<h4 class="subsubsection">2.31.1.1 Complex Plot Data B</h4>
 
 <p>If a data item B[N] or B[row;N] is <b>complex</b>, say B[N] = x + iy. then it is
 placed (after some scaling) at position (x, y) of the plot. The X-range
@@ -3627,8 +3627,8 @@ in text mode see file <b>doc/PLOT_circle.png</b>):
 </p>
 <img src="PLOT_circle.png" alt="PLOT_circle">
 
-<a name="Real-Plot-Data"></a>
-<h4 class="subsubsection">2.31.1.2 Real Plot Data</h4>
+<a name="Real-Plot-Data-B"></a>
+<h4 class="subsubsection">2.31.1.2 Real Plot Data B</h4>
 
 <p>On the other hand, if a data item B[N] or B[row;N] is <b>real</b>, then it is
 placed at position (N, x) of the plot. The X-range is then
@@ -3656,10 +3656,11 @@ all real items in B are taken as complex with imaginary part 0.
 <a name="The-Plot-Attributes-A"></a>
 <h4 class="subsection">2.31.2 The Plot Attributes A</h4>
 
-<p>As can be displayed with ⎕PLOT &rdquo; there are a number of attributes that
-control how the resulting plot will look like:
+<p>There are a number of attributes like colors, point sizes, line widths,
+etc. that control how the resulting plot will look like.
 </p>
-<p>Example:
+<p>A list of these attributes can be displayed with ⎕PLOT &rdquo;,
+for example:
 </p>
 <pre class="verbatim">      ⎕PLOT ''
 
@@ -3707,24 +3708,37 @@ point_size-N:       8 pixel        (the diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
 
 </pre>
-<p>There are 2 kinds of attributes: global attributes that affect the entire plot,
-and local (per-line) attributes that affect one of the plot lines (which
-corresponds to one row of B). The most convenient way to specify multiple
-attributes in one go is to use multi-line strings.
+<p>There are 2 kinds of attributes: global attributes that affect the entire
+plot, and local (per-line) attributes that affect one of the plot lines
+(which corresponds to one row of B). One way to specify
+multiple attributes in one go is to use multi-line strings.
 </p>
-
 <p>For example (plot 2 lines of 10 random numbers each, named &quot;random row 1&quot; and
 &quot;random row 2&quot;):
 </p>
 <pre class="verbatim">      Data ← ?2 10⍴10   ⍝ two rows of random data
       Attributes  ← &quot;&quot;&quot;
-legend_name-0: Random Row 1
-legend_name-1: Random Row 2
+legend_name-1: Random Row 1
+legend_name-2: Random Row 2
                     &quot;&quot;&quot;
       Attributes ⎕PLOT Data
 </pre>
+<p>While specifying the plot attributes A in one place is most convenient for
+a single plot window or when the attributes are read from some external
+test file, its is somretimes simpler to specify the plot attributes
+individually. This can be done by using a structured APL variable as left
+argument A:
+</p>
+<pre class="verbatim">Attributes.legend_name_1 ← &quot;Random Row 1&quot;
+Attributes.legend_name_2 ← &quot;Random Row 2&quot;
+      Attributes ⎕PLOT Data
+</pre>
+<p>Note that (for syntactical reasons) the separation between the line attribute
+and the line number is _ (underscore) if A is specified as a strutural
+variable and / (minus) if A is specified as a string of lines.
+</p>
 <p>If the global attribute &quot;filename&quot; is given, then the plot is not only being
-displayed in an X window on the screen but also written to a file with the
+displayed in an X window on the screen, but also written to a file with the
 name provided as attribute value. The file format is bitmap (typical file
 extension: .bmp) which can then eaily converted to other graphic formats
 such as .png or .jpg with tools like &rsquo;convert&rsquo; from package imagemagick.
@@ -3737,6 +3751,10 @@ such as .png or .jpg with tools like &rsquo;convert&rsquo; from package imagemag
 with attribute filename overrides existing files without a warning. Lack
 of permissions to write the file raises a DOMAIN ERROR with )MORE providing
 details.
+</p>
+<p>Some line attributes like line widths or point sizes are frequently the same
+for several or all plot lines. In that case one can use the line attribute
+without a -N or _N suffix.
 </p>
 <a name="Plot-Window-Handling"></a>
 <h4 class="subsection">2.31.3 Plot Window Handling</h4>
