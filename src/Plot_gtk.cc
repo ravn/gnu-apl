@@ -421,10 +421,15 @@ const Color canvas_color = w_props.get_canvas_color();
 
   /*
                              ┌────────────────────────┐
-   every legend looks like:  │  ---o---  legend_name  │  -- y0
+   every legend looks like:  │  ───o───  legend_name  │──── y0
                              └────────────────────────┘
-                                |  |  |  |
+                                │  │  │  │
                                x0 x1 x2 xt
+                                │  │  │  │
+                                │  │  │  └──── start of legend text
+                                │  │  └─────── end of legend line
+                                │  └────────── point of legend line
+                                └───────────── start of legend line
   */
 
 const Pixel_XY origin = w_props.get_origin(surface_plot);

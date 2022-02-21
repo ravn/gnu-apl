@@ -44,12 +44,12 @@ TOP_LOG_dir="$TOP_BUILD_dir"   # where to store longer build logs
 ROOT_dir=$(dirname $TOP_BUILD_dir)
 
 # some counters for what happens
-declare -i build_errors=0
+declare -i build_errors= 0
 declare -i missing_files=0
-declare -i configs_bad=0
-declare -i configs_good=0
-declare -i test_errors=0
-bad_configs=""
+declare -i configs_bad=  0
+declare -i configs_good= 0
+declare -i test_errors=  0
+bad_configs=             ""
 
 # remove old build results and start a fresh summary file
 #

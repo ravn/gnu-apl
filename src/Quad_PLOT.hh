@@ -53,6 +53,13 @@ public:
    /// a semaphore blocking until the plot window has been EXPOSED
    static sem_t * plot_window_sema;
 
+   /// a semaphore protecting plot_threads
+   static sem_t * plot_threads_sema;
+
+   /// an array of threads (one per plot window) handling X events from the
+   /// window
+   static std::vector<pthread_t> plot_threads;
+
 protected:
    /// Denstructor.
    ~Quad_PLOT();
@@ -85,13 +92,6 @@ protected:
    /// parse the (all-optional) attributes in A
    static ErrorCode parse_attributes(const Value & A,
                                      Plot_window_properties * w_props);
-
-   /// an array of threads (one per plot window) handling X events from the
-   /// window
-   static std::vector<pthread_t> plot_threads;
-
-   /// a semaphore protecting plot_threads
-   static sem_t * plot_threads_sema;
 
    /// whether to print some debug info during plotting
    static int verbosity;
