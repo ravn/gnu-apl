@@ -915,7 +915,7 @@ protected:
       { return 0; }
 
    /// eval_AB for large A and/or B
-   static Value_P large_eval_AB(const Value * A, const Value * B);
+   static Value_P large_eval_AB(const Value & A, const Value & B);
 };
 //----------------------------------------------------------------------------
 /** Scalar functions times and direction.

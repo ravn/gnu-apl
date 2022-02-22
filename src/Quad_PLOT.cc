@@ -218,7 +218,7 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 
    // plot window with default attributes
    //
-Plot_data * data = setup_data(B.get());
+Plot_data * data = setup_data(B.getref());
    if (data == 0)   DOMAIN_ERROR;
 
 Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
@@ -399,7 +399,7 @@ Quad_PLOT::eval_B(Value_P B) const
 
    // plot window with default attributes
    //
-Plot_data * data = setup_data(B.get());
+Plot_data * data = setup_data(B.getref());
    if (data == 0)   DOMAIN_ERROR;
 
 Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
@@ -413,7 +413,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
 }
 //----------------------------------------------------------------------------
 Plot_data *
-Quad_PLOT::setup_data(const Value * B)
+Quad_PLOT::setup_data(const Value & B)
 {
    /** check data. We expect B to be either:
 
@@ -424,19 +424,20 @@ Quad_PLOT::setup_data(const Value * B)
        3.  a 3-dimensional real vector for surface plots
     **/
 
-   if (B->is_scalar())   // case 2a. → 1a. by disclosing scalar B
+const Value * pB = &B;
+   if (B.is_scalar())   // case 2a. → 1a. by disclosing scalar B
       {
-        if (!B->get_cfirst().is_pointer_cell())   DOMAIN_ERROR;
-        B = B->get_cfirst().get_pointer_value().get();   // B ← ⊃ B
+        if (!B.get_cfirst().is_pointer_cell())   DOMAIN_ERROR;
+        pB = B.get_cfirst().get_pointer_value().get();   // B ← ⊃ B
       }
 
-   if (B->get_rank() == 3)                   return setup_data_3D(B);
-   if (!B->get_cfirst().is_pointer_cell())   return setup_data_2D(B);
-   return setup_data_2D_2b(B);
+   if (pB->get_rank() == 3)                   return setup_data_3D(*pB);
+   if (!pB->get_cfirst().is_pointer_cell())   return setup_data_2D(*pB);
+   return setup_data_2D_2b(*pB);
 }
 //----------------------------------------------------------------------------
 Plot_data *
-Quad_PLOT::setup_data_2D(const Value * B)
+Quad_PLOT::setup_data_2D(const Value & B)
 {
    /** initialize the data for a 2D plot. B is the right argument
        of ⎕PLOT B or A ⎕PLOT B and contains the plot coordinates of
@@ -450,14 +451,14 @@ Quad_PLOT::setup_data_2D(const Value * B)
        The third dimension Z is set to Y although not used.
     **/
 
-const ShapeItem cols_B = B->get_cols();
-const ShapeItem rows_B = B->get_rows();
+const ShapeItem cols_B = B.get_cols();
+const ShapeItem rows_B = B.get_rows();
 const ShapeItem len_B = rows_B * cols_B;
 
    // all items of B shall be simple numbers (integer, real, or complex).
    loop(b, len_B)
        {
-         if (!B->get_cravel(b).is_numeric())   return 0;
+         if (!B.get_cravel(b).is_numeric())   return 0;
        }
 
    // split B into X=real B, Y=imag Y
@@ -470,7 +471,7 @@ double * Z = Y + len_B;
 const APL_Integer qio = Workspace::get_IO();
    loop(b, len_B)
        {
-         const Cell & cB = B->get_cravel(b);
+         const Cell & cB = B.get_cravel(b);
          if (cB.is_complex_cell())   // (x, y)
             {
               X[b] = cB.get_real_value();
@@ -497,7 +498,7 @@ Plot_data * data = new Plot_data(rows_B);
 }
 //----------------------------------------------------------------------------
 Plot_data *
-Quad_PLOT::setup_data_2D_2b(const Value * B)
+Quad_PLOT::setup_data_2D_2b(const Value & B)
 {
    /** initialize the data for a 2D plot. B is the right argument
        of ⎕PLOT B or A ⎕PLOT B and contains the plot lines as nested
@@ -507,11 +508,11 @@ Quad_PLOT::setup_data_2D_2b(const Value * B)
     **/
 
 ShapeItem data_points = 0;
-   if (B->get_rank() > 1)   RANK_ERROR;
-const ShapeItem rows = B->element_count();   // number of plot rows
+   if (B.get_rank() > 1)   RANK_ERROR;
+const ShapeItem rows = B.element_count();   // number of plot rows
    loop(r, rows)
        {
-         const Value * vrow = B->get_cravel(r).get_pointer_value().get();
+         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
          if (vrow->get_rank() > 1)   RANK_ERROR;
          const ShapeItem row_len = vrow->element_count();
          data_points += row_len;
@@ -531,7 +532,7 @@ const APL_Integer qio = Workspace::get_IO();
 
    loop(r, rows)
        {
-         const Value * vrow = B->get_cravel(r).get_pointer_value().get();
+         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
          loop(v, vrow->element_count())
              {
                const Cell & cB = vrow->get_cravel(v);
@@ -556,7 +557,7 @@ Plot_data * data = new Plot_data(rows);
          const double * pX = X + idx;
          const double * pY = Y + idx;
          const double * pZ = Z + idx;
-         const Value * vrow = B->get_cravel(r).get_pointer_value().get();
+         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
          const ShapeItem row_len = vrow->element_count();
          const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r,
                                                             row_len);
@@ -568,7 +569,7 @@ Plot_data * data = new Plot_data(rows);
 }
 //----------------------------------------------------------------------------
 Plot_data *
-Quad_PLOT::setup_data_3D(const Value * B)
+Quad_PLOT::setup_data_3D(const Value & B)
 {
    /** initialize the data for a 3D (surface-) plot. B is the right argument
        of ⎕PLOT B or A ⎕PLOT B and can be:
@@ -614,9 +615,9 @@ Quad_PLOT::setup_data_3D(const Value * B)
 
     **/
 
-const ShapeItem planes = B->get_shape_item(0);   // (X), Y, and (Z)
-const ShapeItem rows   = B->get_shape_item(1);
-const ShapeItem cols   = B->get_shape_item(2);
+const ShapeItem planes = B.get_shape_item(0);   // (X), Y, and (Z)
+const ShapeItem rows   = B.get_shape_item(1);
+const ShapeItem cols   = B.get_shape_item(2);
 
    if (planes < 1 || planes > 3)    LENGTH_ERROR;
    if (rows < 1)                    LENGTH_ERROR;
@@ -639,16 +640,16 @@ const ShapeItem data_points = rows * cols;
               loop(c, cols)
                   {
                     const ShapeItem p = c + r*cols;
-                    const Cell & cX = B->get_cravel(p);
-                    const Cell & cY = B->get_cravel(p +   data_points);
-                    const Cell & cZ = B->get_cravel(p + 2*data_points);
+                    const Cell & cX = B.get_cravel(p);
+                    const Cell & cY = B.get_cravel(p +   data_points);
+                    const Cell & cZ = B.get_cravel(p + 2*data_points);
 
                     if (!(cX.is_integer_cell() ||
-                               cX.is_real_cell()))   DOMAIN_ERROR;
+                          cX.is_real_cell()))   DOMAIN_ERROR;
                     if (!(cY.is_integer_cell() ||
-                               cY.is_real_cell()))   DOMAIN_ERROR;
+                          cY.is_real_cell()))   DOMAIN_ERROR;
                     if (!(cZ.is_integer_cell() ||
-                               cZ.is_real_cell()))   DOMAIN_ERROR;
+                          cZ.is_real_cell()))   DOMAIN_ERROR;
 
                     X[p] = cX.get_real_value();
                     Y[p] = cY.get_real_value();
@@ -674,8 +675,8 @@ const ShapeItem data_points = rows * cols;
               loop(c, cols)
                   {
                     const ShapeItem p = c + r*cols;
-                    const Cell & cX = B->get_cravel(p);
-                    const Cell & cY = B->get_cravel(p + data_points);
+                    const Cell & cX = B.get_cravel(p);
+                    const Cell & cY = B.get_cravel(p + data_points);
 
                     if (!(cX.is_integer_cell() ||
                     cX.is_real_cell()))   DOMAIN_ERROR;
@@ -702,7 +703,7 @@ const ShapeItem data_points = rows * cols;
               loop(c, cols)
                   {
                     const ShapeItem p = c + r*cols;
-                    const Cell & cY = B->get_cravel(p);
+                    const Cell & cY = B.get_cravel(p);
 
                     if (!(cY.is_integer_cell() ||
                           cY.is_real_cell()))   DOMAIN_ERROR;

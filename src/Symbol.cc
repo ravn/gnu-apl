@@ -129,7 +129,7 @@ Symbol::assign(Value_P new_value, bool clone, const char * loc)
       {
         CERR << "Incomplete value at " LOC << endl;
         new_value->print_properties(CERR, 0, false);
-        VH_entry::print_history(CERR, new_value.get(), LOC);
+        VH_entry::print_history(CERR, new_value.getref(), LOC);
         Assert(0);
       }
 
@@ -1207,13 +1207,13 @@ Symbol::get_SI_level(const Function * fun) const
 }
 //----------------------------------------------------------------------------
 int
-Symbol::get_SI_level(const Value * val) const
+Symbol::get_SI_level(const Value & val) const
 {
    loop(v, value_stack.size())
        {
          const ShapeItem from_tos = value_stack.size() - v - 1;
          const ValueStackItem & item = value_stack[from_tos];
-         if (item.apl_val.get() == val)
+         if (item.apl_val.get() == &val)
             return Workspace::SI_top()->nth_push(this, from_tos);
        }
 

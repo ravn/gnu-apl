@@ -1096,7 +1096,7 @@ const ShapeItem len_B = B->element_count();
    // large_eval_AB() becomes faster than plain eval_AB() is N=61.
    //
    if (len_A*len_B > 60*60)
-      return Token(TOK_APL_VALUE1, large_eval_AB(A.get(), B.get()));
+      return Token(TOK_APL_VALUE1, large_eval_AB(A.getref(), B.getref()));
 
 const double qct = Workspace::get_CT();
 Value_P Z(len_A, LOC);
@@ -1131,10 +1131,10 @@ ShapeItem len_Z = 0;
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_WITHOUT::large_eval_AB(const Value * A, const Value * B)
+Bif_F12_WITHOUT::large_eval_AB(const Value & A, const Value & B)
 {
-const ShapeItem len_A = A->element_count();
-const ShapeItem len_B = B->element_count();
+const ShapeItem len_A = A.element_count();
+const ShapeItem len_B = B.element_count();
 
    /* pack pointers to the cells of the arguments A and B and of the
       result Z into one big array:
@@ -1148,8 +1148,8 @@ const Cell ** cells_A = new const Cell *[2*len_A + len_B];
 const Cell ** cells_Z = cells_A + len_A;
 const Cell ** cells_B = cells_A + 2*len_A;
 
-   loop(a, len_A)   cells_A[a] = &A->get_cravel(a);
-   loop(b, len_B)   cells_B[b] = &B->get_cravel(b);
+   loop(a, len_A)   cells_A[a] = &A.get_cravel(a);
+   loop(b, len_B)   cells_B[b] = &B.get_cravel(b);
 
    // sort the A-cells and the B-cells ascendingly
    //

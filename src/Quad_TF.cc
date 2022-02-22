@@ -919,7 +919,7 @@ ShapeItem skipped = 0;
 
         Shape sh;
         {
-          const Value * aval = tos[s].get_apl_val().get();
+          const Value & aval = tos[s].get_apl_val().getref();
           sh = Shape(aval, /* ⎕IO */ 0);
           tos[s].extract_apl_val(LOC);
         }

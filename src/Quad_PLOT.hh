@@ -78,16 +78,16 @@ protected:
                                const Plot_data * data);
 
    /// initialize the data to be plotted
-   static Plot_data * setup_data(const Value * B);
+   static Plot_data * setup_data(const Value & B);
 
    /// initialize the data to be plotted for a 3D plot
-   static Plot_data * setup_data_3D(const Value * B);
+   static Plot_data * setup_data_3D(const Value & B);
 
    /// initialize the data to be plotted for a 2D plot (except case 2b.)
-   static Plot_data * setup_data_2D(const Value * B);
+   static Plot_data * setup_data_2D(const Value & B);
 
    /// initialize the data to be plotted for a 2D plot (case 2b.)
-   static Plot_data * setup_data_2D_2b(const Value * B);
+   static Plot_data * setup_data_2D_2b(const Value & B);
 
    /// parse the (all-optional) attributes in A
    static ErrorCode parse_attributes(const Value & A,

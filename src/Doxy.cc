@@ -383,7 +383,7 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
 
               Assert(+var_sym[si].apl_val);
               Value_P value = var_sym[si].apl_val;
-              const int si_level = var_sym.get_SI_level(value.get());
+              const int si_level = var_sym.get_SI_level(value.getref());
               const Token elem = Bif_F12_ELEMENT::fun->eval_B(value);
               Value_P first = Bif_F12_TAKE::first(elem.get_apl_val());
               page <<

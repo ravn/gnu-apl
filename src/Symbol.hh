@@ -55,27 +55,49 @@ public:
    NameClass get_NC() const
       { return name_class; }
 
-   /// return the name class for \b this ValueStackItem, or 0 if it has none
+   /// return the name class of \b this ValueStackItem, or 0 if it has none
    const Value * get_apl_value_ptr() const
       { return apl_val.get(); }
 
+   /// flags of this ValueStackItem
+   enum VS_flags
+      {
+        VSF_NONE = 0,      ///< no flags
+        VSF_COW  = 0x01,   ///< Clone On Write
+      };
+
+   /// return the flags of \b this ValueStackItem
+   VS_flags get_vs_flags() const
+      { return flags; }
+
+   /// set the flags of \b this ValueStackItem
+   void set_vs_flags(VS_flags flg)
+      { flags = flg; }
+
 protected:
    /// constructor: ValueStackItem for an unused symbol
-   ValueStackItem() : name_class(NC_UNUSED_USER_NAME)
+   ValueStackItem()
+   : name_class(NC_UNUSED_USER_NAME),
+     flags(VSF_NONE)
       { memset(&sym_val, 0, sizeof(sym_val)); }
 
    /// constructor: ValueStackItem for a label (function line)
-   ValueStackItem(Function_Line lab) : name_class(NC_LABEL)
+   ValueStackItem(Function_Line lab)
+   : name_class(NC_LABEL),
+     flags(VSF_NONE)
       { sym_val.label = lab; }
 
    /// constructor: ValueStackItem for a variable
    ValueStackItem(Value_P val)
    : apl_val(val),
-     name_class(NC_VARIABLE)
+     name_class(NC_VARIABLE),
+     flags(VSF_NONE)
    {}
 
    /// constructor: ValueStackItem for a shared variable
-   ValueStackItem(SV_key key) : name_class(NC_SYSTEM_VAR)
+   ValueStackItem(SV_key key)
+   : name_class(NC_SYSTEM_VAR),
+     flags(VSF_NONE)
       { sym_val.sv_key = key; }
 
    /// reset \b this ValueStackItem to being unused
@@ -85,6 +107,7 @@ protected:
         memset(&sym_val, 0, sizeof(sym_val));
         if (!!apl_val)   apl_val.reset();
         name_class = NC_UNUSED_USER_NAME;
+         flags = VSF_NONE;
       }
 
    /// the possible values of a symbol
@@ -103,6 +126,8 @@ protected:
 
    /// the (current) name class (like ⎕NC, unless shared variable)
    NameClass name_class;
+
+   VS_flags flags;
 };
 //----------------------------------------------------------------------------
 /// Base class for variables, defined functions, and distinguished names
@@ -303,10 +328,10 @@ public:
       { return (name.compare(ucs) == COMP_EQ); }
 
    /// return the level of fun on the stack of \b this Symbol) on the SI stack
-   int get_SI_level(const Function * fun) const;
+   int get_SI_level(Function_P fun) const;
 
    /// return the SI stack level of val on the stack of \b this Symbol)
-   int get_SI_level(const Value * val) const;
+   int get_SI_level(const Value & val) const;
 
    /// The next Symbol with the same hash value as \b this \b Symbol
    Symbol * next;

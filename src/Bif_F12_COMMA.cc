@@ -409,7 +409,7 @@ const APL_Integer qio = Workspace::get_IO();
 
    // case 3b: ,[n1 ... nk]B : combine axes.
    //
-const Shape axes(X.get(), qio);
+const Shape axes(X.getref(), qio);
 
 const ShapeItem from = axes.get_first_shape_item();
    if (from < 0)   AXIS_ERROR;

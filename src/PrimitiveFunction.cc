@@ -140,7 +140,7 @@ Bif_F12_RHO::eval_AB(Value_P A, Value_P B) const
 const uint64_t start_1 = cycle_counter();
 #endif
 
-const Shape shape_Z(A.get(), 0);
+const Shape shape_Z(A.getref(), 0);
 
    // check that shape_Z is positive
    //
@@ -376,7 +376,7 @@ Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B) const
         return Token(TOK_APL_VALUE1, Z);
       }
 
-const Shape shape_A(A.get(), Workspace::get_IO());
+const Shape shape_A(A.getref(), Workspace::get_IO());
    if (shape_A.get_rank() != B->get_rank())   LENGTH_ERROR;
 
    // the elements in A shall be valid axes of B->

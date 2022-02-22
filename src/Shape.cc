@@ -22,19 +22,19 @@
 #include "Value.hh"
 
 //----------------------------------------------------------------------------
-Shape::Shape(const Value * A, int qio_A)
+Shape::Shape(const Value & A, int qio_A)
    : rho_rho(0),
      volume(1)
 {
    // check that A is a shape value, like the left argument of A⍴B
    //
-   if (A->get_rank() > 1)               RANK_ERROR;
-const ShapeItem Alen = A->element_count();
-   if (Alen > MAX_RANK)   LIMIT_ERROR_RANK;   // of A
+   if (A.get_rank() > 1)   RANK_ERROR;
+const ShapeItem len_A = A.element_count();
+   if (len_A > MAX_RANK)   LIMIT_ERROR_RANK;   // of A
 
-   loop(r, A->element_count())
+   loop(a, len_A)
       {
-        add_shape_item(A->get_cravel(r).get_near_int() - qio_A);
+        add_shape_item(A.get_cravel(a).get_near_int() - qio_A);
       }
 }
 //----------------------------------------------------------------------------

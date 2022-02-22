@@ -60,7 +60,7 @@ const ShapeItem ec = B->element_count();
         return Token(TOK_APL_VALUE1, Z);
       }
 
-Shape sh_Z(B.get(), 0);
+Shape sh_Z(B.getref(), 0);
    loop(b, ec)   if (sh_Z.get_shape_item(b) < 0)   DOMAIN_ERROR;
 
    // at this point sh is correct and ⍳ cannot fail.

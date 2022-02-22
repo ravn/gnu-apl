@@ -730,8 +730,8 @@ Command::cmd_CHECK(ostream & out)
                   Assert1(sub);
 
                   val_val * vvp = reinterpret_cast<val_val *>
-                       (bsearch(sub, &values[0], values.size(), sizeof(val_val),
-                                val_val::compare_val_val1));
+                       (bsearch(sub, &values[0], values.size(),
+                                sizeof(val_val), val_val::compare_val_val1));
                   Assert(vvp);
                   if (vvp->parent == 0)   // child has no parent (OK)
                      {
@@ -748,11 +748,11 @@ Command::cmd_CHECK(ostream & out)
                       << voidP(vvp) << endl;
 
                   out << "History of the child:" << endl;
-                  VH_entry::print_history(out, vvp->child, LOC);
+                  VH_entry::print_history(out, *vvp->child, LOC);
                   out << "History of the first parent:" << endl;
-                  VH_entry::print_history(out, vvp->parent, LOC);
+                  VH_entry::print_history(out, *vvp->parent, LOC);
                   out << "History of the second parent:" << endl;
-                  VH_entry::print_history(out, val, LOC);
+                  VH_entry::print_history(out, *val, LOC);
                   out << endl;
                }
           }
@@ -763,7 +763,10 @@ Command::cmd_CHECK(ostream & out)
                 << " duplicate parents" << endl;
             IO_Files::apl_error(LOC);
           }
-     else out << "OK      - no duplicate parents" << endl;
+     else
+          {
+            out << "OK      - no duplicate parents" << endl;
+          }
    }
 }
 //----------------------------------------------------------------------------
@@ -1318,7 +1321,7 @@ bool left_col = true;
 void
 Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
 {
-   if (arg.size() == 0)                  LineInput::print_history(out);
+   if      (arg.size() == 0)             LineInput::print_history(out);
    else if (arg.starts_iwith("CLEAR"))   LineInput::clear_history(out);
    else                                  out << "BAD COMMAND" << endl;
 }

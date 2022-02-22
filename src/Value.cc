@@ -1148,7 +1148,7 @@ Value::mark_all_dynamic_values()
    for (DynamicObject * dob = DynamicObject::all_values.get_prev();
         dob != &all_values; dob = dob->get_prev())
        {
-         dob->pValue()->set_marked();
+         dob->rValue().set_marked();
        }
 }
 //----------------------------------------------------------------------------
@@ -1186,11 +1186,11 @@ Value::erase_all(ostream & out)
    for (const DynamicObject * dob = DynamicObject::all_values.get_next();
         dob != &DynamicObject::all_values; dob = dob->get_next())
        {
-         const Value * v = dob->pValue();
-         out << "erase_all sees Value:" << endl
-             << "  Allocated by " << v->where_allocated() << endl
+         const Value & value = dob->rValue();
+         out << "erase_all() sees Value:" << endl
+             << "  Allocated by " << value.where_allocated() << endl
              << "  ";
-         v->list_one(CERR, false);
+         value.list_one(CERR, false);
        }
 }
 //----------------------------------------------------------------------------
@@ -1205,7 +1205,7 @@ int count = 0;
    for (DynamicObject * dob = all_values.get_next();
         dob != &all_values; dob = dob->get_next())
        {
-         Value * v = dob->pValue();
+         Value & v = dob->rValue();
          if (dob == dob->get_next())   // a loop
             {
               CERR << "A loop in DynamicObject::all_values (detected in "
@@ -1214,23 +1214,25 @@ int count = 0;
               all_values.print_chain(CERR);
               CERR << endl;
 
+              // use separate CERR << in case this crashes
+              //
               CERR << " DynamicObject: " << dob << endl;
               CERR << " Value:         " << v   << endl;
-              CERR << *v                        << endl;
+              CERR << v                         << endl;
             }
 
          Assert(dob != dob->get_next());
-         if (v->owner_count)   continue;
+         if (v.owner_count)   continue;
 
-         ADD_EVENT(v, VHE_Stale, v->owner_count, loc);
+         ADD_EVENT(&v, VHE_Stale, v.owner_count, loc);
 
          Log(LOG_Value__erase_stale)
             {
               CERR << "Erasing stale Value "
                    << voidP(dob) << ":" << endl
-                   << "  Allocated by " << v->where_allocated() << endl
+                   << "  Allocated by " << v.where_allocated() << endl
                    << "  ";
-              v->list_one(CERR, false);
+              v.list_one(CERR, false);
             }
 
          // count it unless we know it is dirty
@@ -1289,7 +1291,7 @@ int num = 0;
         dob != &all_values; dob = dob->get_prev())
        {
          out << "Value #" << num++ << ":";
-         dob->pValue()->list_one(out, show_owners);
+         dob->rValue().list_one(out, show_owners);
        }
 
    return out << endl;
@@ -2442,7 +2444,7 @@ Value::print_boxed(ostream & out, int indent) const
 {
 const PrintContext pctx(PST_NONE);
 
-Value_P Z = Quad_CR::do_CR(8, this, pctx);
+Value_P Z = Quad_CR::do_CR(8, *this, pctx);
    Assert(Z->get_rank() == 2);
 const ShapeItem rows = Z->get_rows();
 const ShapeItem cols = Z->get_cols();
@@ -2620,13 +2622,13 @@ bool goon = true;
    for (const DynamicObject * dob = all_values.get_prev();
         goon && (dob != &all_values); dob = dob->get_prev())
        {
-         const Value * val = dob->pValue();
+         const Value & value = dob->rValue();
          goon = (dob != dob->get_prev());
 
-         if (val->is_complete())   continue;
+         if (value.is_complete())   continue;
 
-         out << "incomplete value at " << voidP(val) << endl;
-         incomplete.push_back(val);
+         out << "incomplete value at " << voidP(&value) << endl;
+         incomplete.push_back(&value);
 
          if (!goon)
             {
@@ -2665,13 +2667,13 @@ int count = 0;
    for (const DynamicObject * dob = all_values.get_prev();
         goon && (dob != &all_values); dob = dob->get_prev())
        {
-         const Value * val = dob->pValue();
+         const Value & value = dob->rValue();
          goon = (dob == dob->get_prev());
 
-         if (val->owner_count)   continue;
+         if (value.owner_count)   continue;
 
-         out << "stale value at " << voidP(val) << endl;
-         stale_vals.push_back(val);
+         out << "stale value at " << voidP(&value) << endl;
+         stale_vals.push_back(&value);
          stale_dobs.push_back(dob);
 
          if (!goon)
@@ -2707,14 +2709,14 @@ int count = 0;
    for (const DynamicObject * dob = all_values.get_prev();
         dob != &all_values; dob = dob->get_prev())
        {
-         const Value * val = dob->pValue();
+         const Value & value = dob->rValue();
 
          // don't print values found in the previous round.
          //
          bool known_stale = false;
          loop(s, stale_vals.size())
             {
-              if (val == stale_vals[s])
+              if (&value == stale_vals[s])
                  {
                    known_stale = true;
                    break;
@@ -2722,13 +2724,13 @@ int count = 0;
             }
          if (known_stale)   continue;
 
-         if (val->is_marked())
+         if (value.is_marked())
             {
               ++count;
-              if (count < 20)   val->print_stale_info(out, dob);
+              if (count < 20)   value.print_stale_info(out, dob);
               else if (count == 20)
               CERR << endl << " ... (more stale values)..." << endl;
-              val->unmark();
+              value.unmark();
             }
        }
 
@@ -2741,13 +2743,13 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob) const
    out << "print_stale_info():   alloc(" << dob->where_allocated()
        << ") flags(" << get_flags() << ")" << endl;
 
-   VH_entry::print_history(out, dob->pValue(), LOC);
+   VH_entry::print_history(out, dob->rValue(), LOC);
 
    try
       {
         print_structure(out, 0, 0);
         const PrintContext pctx(PST_NONE);
-        Value_P Z = Quad_CR::do_CR(7, this, pctx);
+        Value_P Z = Quad_CR::do_CR(7, *this, pctx);
         Z->print(out);
         out << endl;
       }

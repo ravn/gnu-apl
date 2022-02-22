@@ -603,7 +603,7 @@ const int boxing_format = Command::get_boxing_format();
    else if (boxing_format < 0)
       {
         const PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
-        Value_P B1 = Quad_CR::do_CR(-boxing_format, B.get(), pctx);
+        Value_P B1 = Quad_CR::do_CR(-boxing_format, B.getref(), pctx);
         if (B1->get_cols() >= Workspace::get_PW())   // too large
            B->print(COUT);   // don't box
         else
@@ -612,7 +612,7 @@ const int boxing_format = Command::get_boxing_format();
    else
       {
         const PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
-        Value_P B1 = Quad_CR::do_CR(boxing_format, B.get(), pctx);
+        Value_P B1 = Quad_CR::do_CR(boxing_format, B.getref(), pctx);
         B1->print(COUT);
       }
 }

@@ -67,19 +67,27 @@ DynamicObject::print(ostream & out) const
 }
 //----------------------------------------------------------------------------
 /// cast DynamicObject to derived class Value.
-// This only works properly after #include Value.hh !
-Value *
-DynamicObject::pValue()
+/// This only works properly after #include Value.hh !
+Value &
+DynamicObject::rValue()
 {
-   return static_cast<Value *>(this);
+   /* static_cast<> is inherently unsafe, but we cannot used dynamic_cast<>()
+      because DynamicObject is non-virtual. The caller must therefore be
+      careful and we allow only class Value to use pValue().
+    */
+   return *static_cast<Value *>(this);
 }
 //----------------------------------------------------------------------------
 /// cast DynamicObject to derived class Value.
-// This only works properly after #include Value.hh !
-const Value *
-DynamicObject::pValue() const
+/// This only works properly after #include Value.hh !
+const Value &
+DynamicObject::rValue() const
 {
-  return static_cast<const Value *>(this);
+   /* static_cast<> is inherently unsafe, but we cannot used dynamic_cast<>()
+      because DynamicObject is non-virtual. The caller must therefore be
+      careful and we allow only class Value to use pValue().
+    */
+  return *static_cast<const Value *>(this);
 }
 //----------------------------------------------------------------------------
 /// cast DynamicObject to derived class IndexExpr.

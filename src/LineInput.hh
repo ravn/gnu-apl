@@ -61,12 +61,12 @@ public:
    void clear_history(ostream & out);
 
    /// print history to \b out
-   void print_history(ostream & out);
+   void print_history(ostream & out) const;
 
    /// start a new up/down sequence
    void next()
       { current_line = put;
-        if (current_line < 0)   current_line += hist_lines.size();       // wrap
+        if (current_line < 0)   current_line += hist_lines.size();   // wrap
         if (current_line >= int(hist_lines.size()))
            current_line = 0;  // wrap
       }

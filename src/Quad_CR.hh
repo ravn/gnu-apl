@@ -53,7 +53,7 @@ public:
    virtual sAxis subfun_to_axis(const UCS_string & name) const;
 
    /// compute \b a ⎕CR \b B
-   static Value_P do_CR(APL_Integer a, const Value * B, PrintContext pctx);
+   static Value_P do_CR(APL_Integer a, const Value & B, PrintContext pctx);
 
    /// compute a good default type and value for the top-level ⍴ og 10 ⎕CR.
    /// Return true for INT and false for CHAR.

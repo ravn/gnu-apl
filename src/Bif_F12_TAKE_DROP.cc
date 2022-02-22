@@ -144,7 +144,7 @@ Shape sh_take = B->get_shape();   // start with ⍴B
 Token
 Bif_F12_TAKE::eval_AB(Value_P A, Value_P B) const
 {
-Shape ravel_A1(A.get(), /* ⎕IO */ 0);   // checks that 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RANK
+Shape ravel_A1(A.getref(), /* ⎕IO */ 0);   // checks 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RANK
 
    if (B->is_scalar())
       {
@@ -201,7 +201,7 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z,
 Token
 Bif_F12_DROP::eval_AB(Value_P A, Value_P B) const
 {
-const Shape ravel_A(A.get(), /* ⎕IO */ 0);
+const Shape ravel_A(A.getref(), /* ⎕IO */ 0);
    if (A->get_rank() > 1)   RANK_ERROR;
 
    if (B->is_scalar())

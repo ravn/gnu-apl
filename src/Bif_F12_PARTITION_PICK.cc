@@ -572,11 +572,11 @@ const Cell & cA = A0[idx_A];
            case ii.   (⊂1 1) ⊃ A←3 3⍴⍳9               (normal A)
          */
 
-        const Value * A = cA.get_pointer_value().get();
+        const Value & A = cA.get_pointer_value().getref();
 
         if (B->is_member())   // case i. (structured B)
            {
-             if (!A->is_char_string())
+             if (!A.is_char_string())
                 {
                   MORE_ERROR() << "member name expected for A⊃B (nested A["
                                << (idx_A + qio) << "])";
@@ -584,7 +584,7 @@ const Cell & cA = A0[idx_A];
                 }
 
              const UCS_string top_level("B");
-             const UCS_string member(*A);
+             const UCS_string member(A);
              vector<const UCS_string *> members;
              members.push_back(&member);
              members.push_back(&top_level);   // dummy, must be last
@@ -594,14 +594,14 @@ const Cell & cA = A0[idx_A];
            }
         else                  // case ii. (normal B)
            {
-             if (A->get_rank() > 1)
+             if (A.get_rank() > 1)
                 {
                   MORE_ERROR() << "rank A ≤ 1 expected for A⊃B (nested A["
                                << (idx_A + qio) << "])";
                   RANK_ERROR;
                 }
 
-             const ShapeItem len_A = A->element_count();
+             const ShapeItem len_A = A.element_count();
              if (B->get_rank() != len_A)
                 {
                   MORE_ERROR() << "⍴⍴B (" << B->get_rank()
@@ -615,7 +615,7 @@ const Cell & cA = A0[idx_A];
              const Shape A_as_shape(A, qio);
              ShapeItem offset = 0;
 
-             loop(r, A->element_count())
+             loop(r, A.element_count())
                  {
                    const ShapeItem ar = A_as_shape.get_shape_item(r);
                    if (ar < 0)                       INDEX_ERROR;

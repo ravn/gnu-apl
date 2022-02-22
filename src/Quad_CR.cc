@@ -242,7 +242,7 @@ int function_number = -1;
 
 PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
 
-Value_P Z = do_CR(function_number, B.get(), pctx);
+Value_P Z = do_CR(function_number, B.getref(), pctx);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -265,7 +265,7 @@ const char * function_name = name_utf.c_str();
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
+Quad_CR::do_CR(APL_Integer a, const Value & B, PrintContext pctx)
 {
    // some functions a have an inverse (which has its own number, but can
    // also be specified as -a
@@ -314,43 +314,43 @@ bool extra_frame = false;
         case  2: pctx.set_style(PR_BOXED_CHAR);        break;
         case  3: pctx.set_style(PR_BOXED_GRAPHIC);     break;
         case  4: pctx.set_style(PR_BOXED_GRAPHIC);     break;
-        case  5: return do_CR5_6("0123456789ABCDEF", *B);   // byte-vector → HEX
-        case  6: return do_CR5_6("0123456789abcdef", *B);   // byte-vector → hex
+        case  5: return do_CR5_6("0123456789ABCDEF", B);   // byte-vector → HEX
+        case  6: return do_CR5_6("0123456789abcdef", B);   // byte-vector → hex
         case  7: pctx.set_style(PR_BOXED_GRAPHIC1);    break;
         case  8: pctx.set_style(PR_BOXED_GRAPHIC1);    break;
         case  9: pctx.set_style(PR_BOXED_GRAPHIC2);    break;
-        case 10: return do_CR10(*B);
-        case 11: return do_CR11(*B);    // Value → CDR conversion
-        case 12: return do_CR12(*B);    // CDR → Value conversion
-        case 13: return do_CR13(*B);    // hex → byte-vector
-        case 14: return do_CR14(*B);    // Value → CDR → hex conversion
-        case 15: return do_CR15(*B);    // hex → CDR → Value conversion
-        case 16: return do_CR16(*B);    // byte vector → base64 (RFC 4648)
-        case 17: return do_CR17(*B);    // base64 → byte vector (RFC 4648)
-        case 18: return do_CR18(*B);    // UCS → UTF8 byte vector
-        case 19: return do_CR19(*B);    // UTF8 byte vector → UCS string
+        case 10: return do_CR10(B);
+        case 11: return do_CR11(B);    // Value → CDR conversion
+        case 12: return do_CR12(B);    // CDR → Value conversion
+        case 13: return do_CR13(B);    // hex → byte-vector
+        case 14: return do_CR14(B);    // Value → CDR → hex conversion
+        case 15: return do_CR15(B);    // hex → CDR → Value conversion
+        case 16: return do_CR16(B);    // byte vector → base64 (RFC 4648)
+        case 17: return do_CR17(B);    // base64 → byte vector (RFC 4648)
+        case 18: return do_CR18(B);    // UCS → UTF8 byte vector
+        case 19: return do_CR19(B);    // UTF8 byte vector → UCS string
         case 20: pctx.set_style(PR_NARS);              break;
         case 21: pctx.set_style(PR_NARS1);             break;
         case 22: pctx.set_style(PR_NARS2);             break;
         case 23: pctx.set_style(PR_NARS);              break;
         case 24: pctx.set_style(PR_NARS1);             break;
         case 25: pctx.set_style(PR_NARS2);             break;
-        case 26: return do_CR26(*B);             // Cell types
-        case 27: return do_CR27_28(true,  *B);   // value as int
-        case 28: return do_CR27_28(false, *B);   // value2 as int
+        case 26: return do_CR26(B);             // Cell types
+        case 27: return do_CR27_28(true,  B);   // value as int
+        case 28: return do_CR27_28(false, B);   // value2 as int
         case 29: pctx.set_style(PR_BOXED_GRAPHIC3);    break;
-        case 30: return do_CR30(*B);             // conform B (for ⍤ macro)
-        case 31: return do_CR31_32(true, *B);    // ⎕INP helper
-        case 32: return do_CR31_32(false, *B);   // ⎕INP helper
-        case 33: return do_CR33(*B);             // TV to TLV byte vector
-        case 34: return do_CR34(*B);             // TLV byte vector to TV
-        case 35: return do_CR35(*B);             // lines to nested strings
-        case 36: return do_CR36(*B);             // nested strings to lines
-        case 37: return do_CR37(*B);             // ⎕CR B but extra spaces kept
-        case 38: return do_CR38(*B);             // plain →  structure
-        case 39: return do_CR39(*B);             // structure → plain
-        case 40: return do_CR40(*B);             // boolean → packed
-        case 41: return do_CR41(*B);             // packed → boolean
+        case 30: return do_CR30(B);             // conform B (for ⍤ macro)
+        case 31: return do_CR31_32(true, B);    // ⎕INP helper
+        case 32: return do_CR31_32(false, B);   // ⎕INP helper
+        case 33: return do_CR33(B);             // TV to TLV byte vector
+        case 34: return do_CR34(B);             // TLV byte vector to TV
+        case 35: return do_CR35(B);             // lines to nested strings
+        case 36: return do_CR36(B);             // nested strings to lines
+        case 37: return do_CR37(B);             // ⎕CR B but extra spaces kept
+        case 38: return do_CR38(B);             // plain →  structure
+        case 39: return do_CR39(B);             // structure → plain
+        case 40: return do_CR40(B);             // boolean → packed
+        case 41: return do_CR41(B);             // packed → boolean
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A";
                  DOMAIN_ERROR;
@@ -358,17 +358,17 @@ bool extra_frame = false;
 
    // common code for ⎕CR variants that only differ by print style...
    //
-   if (extra_frame && !B->is_simple_scalar())
+   if (extra_frame && !B.is_simple_scalar())
       {
         Value_P Z(LOC);
-        new (&Z->get_wscalar()) PointerCell(B->clone(LOC).get(), Z.getref());
+        new (&Z->get_wscalar()) PointerCell(B.clone(LOC).get(), Z.getref());
         Z->check_value(LOC);
         PrintBuffer pb(*Z, pctx, 0);
         return Value_P(pb, LOC);
       }
    else   // no frame
       {
-         PrintBuffer pb(*B, pctx, 0);
+         PrintBuffer pb(B, pctx, 0);
          return Value_P(pb, LOC);
       }
 }

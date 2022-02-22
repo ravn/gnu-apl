@@ -30,7 +30,7 @@ class Value;
 class IndexExpr;
 
 /*
- A base class for dynamically allocated objects. It remembers where an object
+ The base class for dynamically allocated objects. It remembers where an object
  was allocated and maintains a doubly linked ring of all allocated objects.
 
  The doubly linked list has a statically allocated anchor that must not
@@ -40,6 +40,8 @@ class IndexExpr;
 /// A Value or an IndexExpr
 class DynamicObject
 {
+   friend class Value;   // for rValue()
+
 public:
    /// constructor: a DynamicObject allocated at source location \b loc
    DynamicObject(const char * loc, DynamicObject * anchor)
@@ -85,12 +87,6 @@ public:
         next = this;
       }
 
-   /// cast to const Value *. Caller must check that this cast is valid.
-   const Value * pValue() const;
-
-   /// cast to Value *. Caller must check that this cast is valid.
-   Value * pValue();
-
    /// cast to IndexExpr *. Caller must check that this cast is valid.
    const IndexExpr * pIndexExpr() const;
 
@@ -117,6 +113,12 @@ public:
       { return &all_values; }
 
 protected:
+   /// downcast to const Value &. Caller must check that this cast is valid.
+   const Value & rValue() const;
+
+   /// down cast to Value &. Caller must check that this cast is valid.
+   Value & rValue();
+
    /// where this value was allocated or deleted.
    const char * alloc_loc;
 

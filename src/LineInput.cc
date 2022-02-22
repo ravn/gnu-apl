@@ -227,7 +227,7 @@ UCS_string u("xxx");
 }
 //----------------------------------------------------------------------------
 void
-LineHistory::print_history(ostream & out)
+LineHistory::print_history(ostream & out) const
 {
    for (size_t p = put + 1; p < hist_lines.size(); ++p)
       {

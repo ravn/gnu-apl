@@ -93,7 +93,7 @@ public:
    /// a helper for finding sub-values with two parents
    struct val_val
       {
-        /// the parent (0 unless child is a sub-value
+        /// the parent (0 unless \b this is a sub-value
         const Value * parent;
 
         /// the value (always valid)
@@ -101,7 +101,7 @@ public:
 
         /// compare function for Heapsort::sort()
         static bool compare_val_val(const val_val & A, const val_val & B,
-                                     const void *);
+                                    const void * /* not used */);
 
         /// compare function for bsearch()
         static int compare_val_val1(const void * key, const void * B);

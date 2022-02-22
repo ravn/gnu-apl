@@ -82,7 +82,7 @@ public:
         return right_fun.get_tag() == TOK_VOID ? 0 : right_fun.get_function();
       }
 
-   /// return the axis (or 0) of this derived function
+   /// return the axis argument (or 0 if none) of this derived function
    const Value * get_AXIS() const
       { return axis.get(); }
 
