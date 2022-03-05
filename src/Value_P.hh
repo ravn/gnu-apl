@@ -151,9 +151,6 @@ public:
    /// Destructor
    inline ~Value_P();
 };
-
-typedef Value_P FunArg;
-
 //----------------------------------------------------------------------------
 
 #endif // __SHARED_VALUE_POINTER_HH_DEFINED__
