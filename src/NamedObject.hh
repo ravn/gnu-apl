@@ -43,6 +43,8 @@ enum NameClass
   NC_SYSTEM_FUN       =  0x8006,   ///< system function.
   NC_case_mask        =  0x00FF,   ///< almost ⎕NC
   NC_bool_mask        =  0xFF00,   ///< for fast selection
+
+  NC_FUN_OPER         = (NC_FUNCTION | NC_OPERATOR) & NC_bool_mask,
   NC_left             = (NC_VARIABLE         |
                          NC_UNUSED_USER_NAME |
                          NC_SYSTEM_VAR       |
@@ -79,10 +81,6 @@ public:
    /// return the function for this Id (if any) or 0 if this Id does
    /// (currently) represent a function.
    virtual const Function * get_function() const  { return 0; }
-
-   /// return the variable value for this Id (if any) or 0 if this Id does
-   /// not (currently) represent a variable.
-   virtual Value_P get_value()     { return Value_P(); }
 
    /// return the symbol for this user defined symbol (if any) or 0 if this Id
    /// refers to a system name

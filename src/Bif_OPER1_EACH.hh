@@ -34,13 +34,17 @@ public:
    Bif_OPER1_EACH() : PrimitiveOperator(TOK_OPER1_EACH) {}
 
    /// Overloaded Function::eval_LB().
-   virtual Token eval_LB(Token & LO, Value_P B) const;
+   virtual Token eval_LB(Token & LO, Value_P B) const
+      { return do_eval_LB(LO, B); }
 
    /// Overloaded Function::eval_ALB().
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
 
    static Bif_OPER1_EACH * fun;      ///< Built-in function.
    static Bif_OPER1_EACH  _fun;      ///< Built-in function.
+
+   /// implementation of eval_LB()
+   static Token do_eval_LB(Token & LO, Value_P B);
 
 protected:
    /// overloaded Function::may_push_SI()

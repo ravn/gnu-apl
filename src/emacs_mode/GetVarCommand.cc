@@ -157,7 +157,7 @@ void GetVarCommand::run_command( NetworkConnection &conn, const std::vector<std:
          return;
        }
 
-    Value_P value = symbol->get_value();
+    Value_P value = symbol->get_apl_value();
     try {
         stringstream out;
         out.precision( 20 );

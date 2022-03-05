@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include "ErrorCode.hh"
+#include "Function.hh"
 #include "NamedObject.hh"
 #include "Parser.hh"
 #include "SystemLimits.hh"
@@ -41,22 +42,71 @@ class UserFunction;
 /// One entry in the value stack of a Symbol
 class ValueStackItem
 {
-public:
-   friend class Command;
-   friend class Doxy;
-   friend class Quad_RL;
    friend class Symbol;
-   friend class SymbolTable;
-   friend class Workspace;
-   friend class XML_Loading_Archive;
-   friend class XML_Saving_Archive;
 
+public:
    /// return the name class for \b this ValueStackItem
    NameClass get_NC() const
       { return name_class; }
 
-   /// return the name class of \b this ValueStackItem, or 0 if it has none
-   const Value * get_apl_value_ptr() const
+   /// set the name class for \b this ValueStackItem
+   void set_NC(NameClass nc)
+      { name_class = nc; }
+
+   /// set \b this ValueStackItem to APL value new_value
+   void set_apl_value(Value_P new_value)
+      {
+        name_class = NC_VARIABLE;
+        apl_val = new_value;
+      }
+
+   /// reset (clear) the APL value in \b this ValueStackItem
+   void reset_apl_value()
+      { apl_val.reset(); }
+
+   /// return the line number of a label (caller must have checked NC_LABEL)
+   const Function_Line get_label() const
+      { return sym_val.label; }
+
+   /// return the function (caller must have checked NC_FUNOPER).
+   Function_P get_function() const
+      { return sym_val.function; }
+
+   /// set function to \b fun
+   void set_function(Function_P fun)
+      {
+        name_class = fun->is_operator() ? NC_OPERATOR : NC_FUNCTION;
+        sym_val.function = fun;
+      }
+
+   /// delete the function
+   void clear_function()
+      {
+        sym_val.function = 0;
+        name_class = NC_UNUSED_USER_NAME;
+      }
+
+   /// return the address of function (caller must have checked NC_FUNOPER).
+   Function_P * get_function_P()
+      { return & sym_val.function; }
+
+   /// return the shared variable key (caller must have checked NC_SYSTEM_VAR).
+   SV_key get_key() const
+      { return sym_val.sv_key; }
+
+   /// set the shared variable key
+   void set_key(SV_key key)
+      { name_class = NC_SYSTEM_VAR;   sym_val.sv_key = key; }
+
+   /// return the APL value of \b this ValueStackItem, or 0 if it has none.
+   /// Only used to iterate over the ValueStack in Doxy.cc and in Quad_RL to
+   /// quickly access the current ⎕RL
+   const Value * get_val_cptr() const
+      { return apl_val.get(); }
+
+   /// return the APL value  of \b this ValueStackItem, or 0 if it has none
+   /// Only used in ⎕RL for quick in-place uopdate of the current ⎕RL.
+   Value * get_val_wptr()
       { return apl_val.get(); }
 
    /// flags of this ValueStackItem
@@ -110,7 +160,7 @@ protected:
          flags = VSF_NONE;
       }
 
-   /// the possible values of a symbol
+   /// the possible "values" of a symbol
    union _sym_val
       {
         Function_P    function;   ///< if \b Symbol is a function
@@ -127,6 +177,7 @@ protected:
    /// the (current) name class (like ⎕NC, unless shared variable)
    NameClass name_class;
 
+   /// flags of \b this ValueStackItem
    VS_flags flags;
 };
 //----------------------------------------------------------------------------
@@ -147,9 +198,9 @@ public:
       { clear_vs(); }
 
    /// List \b this \b Symbol ( for )VARS, )FNS )
-   ostream & list(ostream & out);
+   ostream & list(ostream & out) const;
 
-   /// write this symbol in )OUT format to file \b out
+   /// write \b this symbol in )OUT format to file \b out
    void write_OUT(FILE * out, uint64_t & seq) const;
 
    /// set \b token according to the current NC/sym_val of \b this \b Symbol
@@ -229,7 +280,7 @@ public:
 
    /// return the depth (global == 0) of \b ufun on the stack. Use the largest
    /// depth if ufun is pushed multiple times
-   int get_ufun_depth(const UserFunction * ufun);
+   int get_exec_ufun_depth(const UserFunction * ufun);
 
    /// return the current APL value (or throw a VALUE_ERROR)
    virtual Value_P get_apl_value() const;
@@ -250,10 +301,13 @@ public:
    bool is_erased() const
    { return value_stack_size() == 0 ||
             (value_stack_size() == 1 &&
-             value_stack[0].name_class == NC_UNUSED_USER_NAME); }
+             value_stack[0].get_NC() == NC_UNUSED_USER_NAME); }
 
    /// Return the current function (or throw a VALUE_ERROR)
    virtual const Function * get_function() const;
+
+   /// Return the function at SI level si, or 0 if none.
+   Function_P get_function(unsigned int si) const;
 
    /// The name of \b this \b Symbol
    virtual UCS_string get_name() const   { return name; }
@@ -266,6 +320,14 @@ public:
 
    /// overloaded NamedObject::get_value()
    virtual Value_P get_value();
+
+   /// return a const pointer to the current APL value
+   const Value * get_val_cptr() const
+      { return value_stack.back().get_val_cptr(); }
+
+   /// return a pointer to the current APL value
+   Value * get_val_wptr()
+      { return value_stack.back().get_val_wptr(); }
 
    /// return a reason why this symbol cant become a defined function
    const char * cant_be_defined() const;

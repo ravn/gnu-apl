@@ -70,8 +70,8 @@ Value_P Z(A->get_shape() + B->get_shape(), LOC);
 
    if (Z->is_empty())
       {
-        Value_P Fill_A = Bif_F12_TAKE::first(A);
-        Value_P Fill_B = Bif_F12_TAKE::first(B);
+        Value_P Fill_A = Bif_F12_TAKE::first(A.getref());
+        Value_P Fill_B = Bif_F12_TAKE::first(B.getref());
 
         Value_P Z1 = RO->eval_fill_AB(Fill_A, Fill_B).get_apl_val();
         Z->set_ravel_Cell(0, Z1->get_cfirst());

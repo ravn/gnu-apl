@@ -1,22 +1,23 @@
 /*
    This file is part of GNU APL, a free implementation of the
    ISO/IEC Standard 13751, "Programming Language APL, Extended"
-
-   Copyright (C) 2008-2022  Dr. Jürgen Sauermann
-
+ 
+   Copyright (C) 2008-2021  Dr. Jürgen Sauermann
+ 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-
+ 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+ 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 
 /********
 
@@ -84,7 +85,7 @@ and then:
 
 using namespace std;
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /// an integer signal item of size \b bytes
 template<typename T, int bytes>
 class Sig_item_int
@@ -105,7 +106,7 @@ public:
       }
 
    /// return the value of the item
-   T get_value() const   { return value; }
+   T get_svalue() const   { return value; }
 
    /// store (aka. serialize) this item into a string
    void store(string & buffer) const
@@ -129,7 +130,7 @@ public:
    /// the value of the item
    T value;
 };
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /// a hexadecimal integer signal item of size \b bytes
 template<typename T, int bytes>
 class Sig_item_xint : public Sig_item_int<T, bytes>
@@ -149,7 +150,7 @@ public:
                    << setfill(' ') << dec;
       }
 };
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 typedef Sig_item_int < int16_t, 1> Sig_item_i8;   ///<   8-bit signed integer
 typedef Sig_item_int <uint16_t, 1> Sig_item_u8;   ///<   8-bit unsigned integer
 typedef Sig_item_xint<uint16_t, 1> Sig_item_x8;   ///<   8-bit hex integer
@@ -182,12 +183,12 @@ public:
    Sig_item_string(const uint8_t * & buffer)
       {
         Sig_item_u16 len (buffer);
-        value.reserve(len.get_value() + 2);
-        for (int b = 0; b < len.get_value(); ++b)   value += *buffer++;
+        value.reserve(len.get_svalue() + 2);
+        for (int b = 0; b < len.get_svalue(); ++b)   value += *buffer++;
       }
 
    /// return the value of the item
-   const string get_value() const   { return value; }
+   const string get_svalue() const   { return value; }
 
    /// store (aka. serialize) this item into a buffer
    void store(string & buffer) const
@@ -222,7 +223,7 @@ protected:
    /// the value of the item
    string value;
 };
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 /// a number identifying the signal
 enum Signal_id
@@ -726,7 +727,7 @@ public:
    virtual const char * get_sigName() const   { return "MAKE_OFFER"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__MAKE_OFFER__key() const { return key.get_value(); }
+   virtual uint64_t get__MAKE_OFFER__key() const { return key.get_svalue(); }
 
 
 protected:
@@ -774,7 +775,7 @@ public:
    virtual const char * get_sigName() const   { return "RETRACT_OFFER"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__RETRACT_OFFER__key() const { return key.get_value(); }
+   virtual uint64_t get__RETRACT_OFFER__key() const { return key.get_svalue(); }
 
 
 protected:
@@ -822,7 +823,7 @@ public:
    virtual const char * get_sigName() const   { return "RETRACT_VAR"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__RETRACT_VAR__key() const { return key.get_value(); }
+   virtual uint64_t get__RETRACT_VAR__key() const { return key.get_svalue(); }
 
 
 protected:
@@ -881,13 +882,13 @@ public:
    virtual const char * get_sigName() const   { return "SET_STATE"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__SET_STATE__key() const { return key.get_value(); }
+   virtual uint64_t get__SET_STATE__key() const { return key.get_svalue(); }
 
   /// return item new_state of this signal 
-   virtual uint8_t get__SET_STATE__new_state() const { return new_state.get_value(); }
+   virtual uint8_t get__SET_STATE__new_state() const { return new_state.get_svalue(); }
 
   /// return item sloc of this signal 
-   virtual string get__SET_STATE__sloc() const { return sloc.get_value(); }
+   virtual string get__SET_STATE__sloc() const { return sloc.get_svalue(); }
 
 
 protected:
@@ -943,10 +944,10 @@ public:
    virtual const char * get_sigName() const   { return "SET_CONTROL"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__SET_CONTROL__key() const { return key.get_value(); }
+   virtual uint64_t get__SET_CONTROL__key() const { return key.get_svalue(); }
 
   /// return item new_control of this signal 
-   virtual uint8_t get__SET_CONTROL__new_control() const { return new_control.get_value(); }
+   virtual uint8_t get__SET_CONTROL__new_control() const { return new_control.get_svalue(); }
 
 
 protected:
@@ -996,7 +997,7 @@ public:
    virtual const char * get_sigName() const   { return "GET_VALUE"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__GET_VALUE__key() const { return key.get_value(); }
+   virtual uint64_t get__GET_VALUE__key() const { return key.get_svalue(); }
 
 
 protected:
@@ -1060,16 +1061,16 @@ public:
    virtual const char * get_sigName() const   { return "VALUE_IS"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__VALUE_IS__key() const { return key.get_value(); }
+   virtual uint64_t get__VALUE_IS__key() const { return key.get_svalue(); }
 
   /// return item error of this signal 
-   virtual uint32_t get__VALUE_IS__error() const { return error.get_value(); }
+   virtual uint32_t get__VALUE_IS__error() const { return error.get_svalue(); }
 
   /// return item error_loc of this signal 
-   virtual string get__VALUE_IS__error_loc() const { return error_loc.get_value(); }
+   virtual string get__VALUE_IS__error_loc() const { return error_loc.get_svalue(); }
 
   /// return item cdr_value of this signal 
-   virtual string get__VALUE_IS__cdr_value() const { return cdr_value.get_value(); }
+   virtual string get__VALUE_IS__cdr_value() const { return cdr_value.get_svalue(); }
 
 
 protected:
@@ -1126,10 +1127,10 @@ public:
    virtual const char * get_sigName() const   { return "ASSIGN_VALUE"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__ASSIGN_VALUE__key() const { return key.get_value(); }
+   virtual uint64_t get__ASSIGN_VALUE__key() const { return key.get_svalue(); }
 
   /// return item cdr_value of this signal 
-   virtual string get__ASSIGN_VALUE__cdr_value() const { return cdr_value.get_value(); }
+   virtual string get__ASSIGN_VALUE__cdr_value() const { return cdr_value.get_svalue(); }
 
 
 protected:
@@ -1188,13 +1189,13 @@ public:
    virtual const char * get_sigName() const   { return "SVAR_ASSIGNED"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__SVAR_ASSIGNED__key() const { return key.get_value(); }
+   virtual uint64_t get__SVAR_ASSIGNED__key() const { return key.get_svalue(); }
 
   /// return item error of this signal 
-   virtual uint32_t get__SVAR_ASSIGNED__error() const { return error.get_value(); }
+   virtual uint32_t get__SVAR_ASSIGNED__error() const { return error.get_svalue(); }
 
   /// return item error_loc of this signal 
-   virtual string get__SVAR_ASSIGNED__error_loc() const { return error_loc.get_value(); }
+   virtual string get__SVAR_ASSIGNED__error_loc() const { return error_loc.get_svalue(); }
 
 
 protected:
@@ -1250,10 +1251,10 @@ public:
    virtual const char * get_sigName() const   { return "MAY_USE"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__MAY_USE__key() const { return key.get_value(); }
+   virtual uint64_t get__MAY_USE__key() const { return key.get_svalue(); }
 
   /// return item attempt of this signal 
-   virtual int32_t get__MAY_USE__attempt() const { return attempt.get_value(); }
+   virtual int32_t get__MAY_USE__attempt() const { return attempt.get_svalue(); }
 
 
 protected:
@@ -1308,10 +1309,10 @@ public:
    virtual const char * get_sigName() const   { return "MAY_SET"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__MAY_SET__key() const { return key.get_value(); }
+   virtual uint64_t get__MAY_SET__key() const { return key.get_svalue(); }
 
   /// return item attempt of this signal 
-   virtual int32_t get__MAY_SET__attempt() const { return attempt.get_value(); }
+   virtual int32_t get__MAY_SET__attempt() const { return attempt.get_svalue(); }
 
 
 protected:
@@ -1365,7 +1366,7 @@ public:
    virtual const char * get_sigName() const   { return "READ_SVAR_RECORD"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__READ_SVAR_RECORD__key() const { return key.get_value(); }
+   virtual uint64_t get__READ_SVAR_RECORD__key() const { return key.get_svalue(); }
 
 
 protected:
@@ -1413,7 +1414,7 @@ public:
    virtual const char * get_sigName() const   { return "SVAR_RECORD_IS"; }
 
   /// return item record of this signal 
-   virtual string get__SVAR_RECORD_IS__record() const { return record.get_value(); }
+   virtual string get__SVAR_RECORD_IS__record() const { return record.get_svalue(); }
 
 
 protected:
@@ -1472,13 +1473,13 @@ public:
    virtual const char * get_sigName() const   { return "IS_REGISTERED_ID"; }
 
   /// return item proc of this signal 
-   virtual uint32_t get__IS_REGISTERED_ID__proc() const { return proc.get_value(); }
+   virtual uint32_t get__IS_REGISTERED_ID__proc() const { return proc.get_svalue(); }
 
   /// return item parent of this signal 
-   virtual uint32_t get__IS_REGISTERED_ID__parent() const { return parent.get_value(); }
+   virtual uint32_t get__IS_REGISTERED_ID__parent() const { return parent.get_svalue(); }
 
   /// return item grand of this signal 
-   virtual uint32_t get__IS_REGISTERED_ID__grand() const { return grand.get_value(); }
+   virtual uint32_t get__IS_REGISTERED_ID__grand() const { return grand.get_svalue(); }
 
 
 protected:
@@ -1529,7 +1530,7 @@ public:
    virtual const char * get_sigName() const   { return "YES_NO"; }
 
   /// return item yes of this signal 
-   virtual uint8_t get__YES_NO__yes() const { return yes.get_value(); }
+   virtual uint8_t get__YES_NO__yes() const { return yes.get_svalue(); }
 
 
 protected:
@@ -1598,19 +1599,19 @@ public:
    virtual const char * get_sigName() const   { return "REGISTER_PROCESSOR"; }
 
   /// return item proc of this signal 
-   virtual uint32_t get__REGISTER_PROCESSOR__proc() const { return proc.get_value(); }
+   virtual uint32_t get__REGISTER_PROCESSOR__proc() const { return proc.get_svalue(); }
 
   /// return item parent of this signal 
-   virtual uint32_t get__REGISTER_PROCESSOR__parent() const { return parent.get_value(); }
+   virtual uint32_t get__REGISTER_PROCESSOR__parent() const { return parent.get_svalue(); }
 
   /// return item grand of this signal 
-   virtual uint32_t get__REGISTER_PROCESSOR__grand() const { return grand.get_value(); }
+   virtual uint32_t get__REGISTER_PROCESSOR__grand() const { return grand.get_svalue(); }
 
   /// return item evconn of this signal 
-   virtual uint8_t get__REGISTER_PROCESSOR__evconn() const { return evconn.get_value(); }
+   virtual uint8_t get__REGISTER_PROCESSOR__evconn() const { return evconn.get_svalue(); }
 
   /// return item progname of this signal 
-   virtual string get__REGISTER_PROCESSOR__progname() const { return progname.get_value(); }
+   virtual string get__REGISTER_PROCESSOR__progname() const { return progname.get_svalue(); }
 
 
 protected:
@@ -1693,25 +1694,25 @@ public:
    virtual const char * get_sigName() const   { return "MATCH_OR_MAKE"; }
 
   /// return item varname of this signal 
-   virtual string get__MATCH_OR_MAKE__varname() const { return varname.get_value(); }
+   virtual string get__MATCH_OR_MAKE__varname() const { return varname.get_svalue(); }
 
   /// return item to_proc of this signal 
-   virtual uint32_t get__MATCH_OR_MAKE__to_proc() const { return to_proc.get_value(); }
+   virtual uint32_t get__MATCH_OR_MAKE__to_proc() const { return to_proc.get_svalue(); }
 
   /// return item to_parent of this signal 
-   virtual uint32_t get__MATCH_OR_MAKE__to_parent() const { return to_parent.get_value(); }
+   virtual uint32_t get__MATCH_OR_MAKE__to_parent() const { return to_parent.get_svalue(); }
 
   /// return item to_grand of this signal 
-   virtual uint32_t get__MATCH_OR_MAKE__to_grand() const { return to_grand.get_value(); }
+   virtual uint32_t get__MATCH_OR_MAKE__to_grand() const { return to_grand.get_svalue(); }
 
   /// return item from_proc of this signal 
-   virtual uint32_t get__MATCH_OR_MAKE__from_proc() const { return from_proc.get_value(); }
+   virtual uint32_t get__MATCH_OR_MAKE__from_proc() const { return from_proc.get_svalue(); }
 
   /// return item from_parent of this signal 
-   virtual uint32_t get__MATCH_OR_MAKE__from_parent() const { return from_parent.get_value(); }
+   virtual uint32_t get__MATCH_OR_MAKE__from_parent() const { return from_parent.get_svalue(); }
 
   /// return item from_grand of this signal 
-   virtual uint32_t get__MATCH_OR_MAKE__from_grand() const { return from_grand.get_value(); }
+   virtual uint32_t get__MATCH_OR_MAKE__from_grand() const { return from_grand.get_svalue(); }
 
 
 protected:
@@ -1766,7 +1767,7 @@ public:
    virtual const char * get_sigName() const   { return "MATCH_OR_MAKE_RESULT"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__MATCH_OR_MAKE_RESULT__key() const { return key.get_value(); }
+   virtual uint64_t get__MATCH_OR_MAKE_RESULT__key() const { return key.get_svalue(); }
 
 
 protected:
@@ -1816,7 +1817,7 @@ public:
    virtual const char * get_sigName() const   { return "FIND_OFFERING_ID"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__FIND_OFFERING_ID__key() const { return key.get_value(); }
+   virtual uint64_t get__FIND_OFFERING_ID__key() const { return key.get_svalue(); }
 
 
 protected:
@@ -1875,13 +1876,13 @@ public:
    virtual const char * get_sigName() const   { return "OFFERING_ID_IS"; }
 
   /// return item proc of this signal 
-   virtual uint32_t get__OFFERING_ID_IS__proc() const { return proc.get_value(); }
+   virtual uint32_t get__OFFERING_ID_IS__proc() const { return proc.get_svalue(); }
 
   /// return item parent of this signal 
-   virtual uint32_t get__OFFERING_ID_IS__parent() const { return parent.get_value(); }
+   virtual uint32_t get__OFFERING_ID_IS__parent() const { return parent.get_svalue(); }
 
   /// return item grand of this signal 
-   virtual uint32_t get__OFFERING_ID_IS__grand() const { return grand.get_value(); }
+   virtual uint32_t get__OFFERING_ID_IS__grand() const { return grand.get_svalue(); }
 
 
 protected:
@@ -1932,7 +1933,7 @@ public:
    virtual const char * get_sigName() const   { return "GET_OFFERING_PROCS"; }
 
   /// return item offered_to_proc of this signal 
-   virtual uint32_t get__GET_OFFERING_PROCS__offered_to_proc() const { return offered_to_proc.get_value(); }
+   virtual uint32_t get__GET_OFFERING_PROCS__offered_to_proc() const { return offered_to_proc.get_svalue(); }
 
 
 protected:
@@ -1981,7 +1982,7 @@ public:
    virtual const char * get_sigName() const   { return "OFFERING_PROCS_ARE"; }
 
   /// return item offering_procs of this signal 
-   virtual string get__OFFERING_PROCS_ARE__offering_procs() const { return offering_procs.get_value(); }
+   virtual string get__OFFERING_PROCS_ARE__offering_procs() const { return offering_procs.get_svalue(); }
 
 
 protected:
@@ -2035,10 +2036,10 @@ public:
    virtual const char * get_sigName() const   { return "GET_OFFERED_VARS"; }
 
   /// return item offered_to_proc of this signal 
-   virtual uint32_t get__GET_OFFERED_VARS__offered_to_proc() const { return offered_to_proc.get_value(); }
+   virtual uint32_t get__GET_OFFERED_VARS__offered_to_proc() const { return offered_to_proc.get_svalue(); }
 
   /// return item accepted_by_proc of this signal 
-   virtual uint32_t get__GET_OFFERED_VARS__accepted_by_proc() const { return accepted_by_proc.get_value(); }
+   virtual uint32_t get__GET_OFFERED_VARS__accepted_by_proc() const { return accepted_by_proc.get_svalue(); }
 
 
 protected:
@@ -2088,7 +2089,7 @@ public:
    virtual const char * get_sigName() const   { return "OFFERED_VARS_ARE"; }
 
   /// return item offered_vars of this signal 
-   virtual string get__OFFERED_VARS_ARE__offered_vars() const { return offered_vars.get_value(); }
+   virtual string get__OFFERED_VARS_ARE__offered_vars() const { return offered_vars.get_svalue(); }
 
 
 protected:
@@ -2137,7 +2138,7 @@ public:
    virtual const char * get_sigName() const   { return "FIND_PAIRING_KEY"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__FIND_PAIRING_KEY__key() const { return key.get_value(); }
+   virtual uint64_t get__FIND_PAIRING_KEY__key() const { return key.get_svalue(); }
 
 
 protected:
@@ -2186,7 +2187,7 @@ public:
    virtual const char * get_sigName() const   { return "PAIRING_KEY_IS"; }
 
   /// return item pairing_key of this signal 
-   virtual uint64_t get__PAIRING_KEY_IS__pairing_key() const { return pairing_key.get_value(); }
+   virtual uint64_t get__PAIRING_KEY_IS__pairing_key() const { return pairing_key.get_svalue(); }
 
 
 protected:
@@ -2246,13 +2247,13 @@ public:
    virtual const char * get_sigName() const   { return "GET_EVENTS"; }
 
   /// return item proc of this signal 
-   virtual uint32_t get__GET_EVENTS__proc() const { return proc.get_value(); }
+   virtual uint32_t get__GET_EVENTS__proc() const { return proc.get_svalue(); }
 
   /// return item parent of this signal 
-   virtual uint32_t get__GET_EVENTS__parent() const { return parent.get_value(); }
+   virtual uint32_t get__GET_EVENTS__parent() const { return parent.get_svalue(); }
 
   /// return item grand of this signal 
-   virtual uint32_t get__GET_EVENTS__grand() const { return grand.get_value(); }
+   virtual uint32_t get__GET_EVENTS__grand() const { return grand.get_svalue(); }
 
 
 protected:
@@ -2313,13 +2314,13 @@ public:
    virtual const char * get_sigName() const   { return "CLEAR_ALL_EVENTS"; }
 
   /// return item proc of this signal 
-   virtual uint32_t get__CLEAR_ALL_EVENTS__proc() const { return proc.get_value(); }
+   virtual uint32_t get__CLEAR_ALL_EVENTS__proc() const { return proc.get_svalue(); }
 
   /// return item parent of this signal 
-   virtual uint32_t get__CLEAR_ALL_EVENTS__parent() const { return parent.get_value(); }
+   virtual uint32_t get__CLEAR_ALL_EVENTS__parent() const { return parent.get_svalue(); }
 
   /// return item grand of this signal 
-   virtual uint32_t get__CLEAR_ALL_EVENTS__grand() const { return grand.get_value(); }
+   virtual uint32_t get__CLEAR_ALL_EVENTS__grand() const { return grand.get_svalue(); }
 
 
 protected:
@@ -2376,10 +2377,10 @@ public:
    virtual const char * get_sigName() const   { return "EVENTS_ARE"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__EVENTS_ARE__key() const { return key.get_value(); }
+   virtual uint64_t get__EVENTS_ARE__key() const { return key.get_svalue(); }
 
   /// return item events of this signal 
-   virtual uint32_t get__EVENTS_ARE__events() const { return events.get_value(); }
+   virtual uint32_t get__EVENTS_ARE__events() const { return events.get_svalue(); }
 
 
 protected:
@@ -2449,19 +2450,19 @@ public:
    virtual const char * get_sigName() const   { return "ADD_EVENT"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__ADD_EVENT__key() const { return key.get_value(); }
+   virtual uint64_t get__ADD_EVENT__key() const { return key.get_svalue(); }
 
   /// return item proc of this signal 
-   virtual uint32_t get__ADD_EVENT__proc() const { return proc.get_value(); }
+   virtual uint32_t get__ADD_EVENT__proc() const { return proc.get_svalue(); }
 
   /// return item parent of this signal 
-   virtual uint32_t get__ADD_EVENT__parent() const { return parent.get_value(); }
+   virtual uint32_t get__ADD_EVENT__parent() const { return parent.get_svalue(); }
 
   /// return item grand of this signal 
-   virtual uint32_t get__ADD_EVENT__grand() const { return grand.get_value(); }
+   virtual uint32_t get__ADD_EVENT__grand() const { return grand.get_svalue(); }
 
   /// return item event of this signal 
-   virtual uint32_t get__ADD_EVENT__event() const { return event.get_value(); }
+   virtual uint32_t get__ADD_EVENT__event() const { return event.get_svalue(); }
 
 
 protected:
@@ -2519,10 +2520,10 @@ public:
    virtual const char * get_sigName() const   { return "ASSIGN_WSWS_VAR"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__ASSIGN_WSWS_VAR__key() const { return key.get_value(); }
+   virtual uint64_t get__ASSIGN_WSWS_VAR__key() const { return key.get_svalue(); }
 
   /// return item cdr_value of this signal 
-   virtual string get__ASSIGN_WSWS_VAR__cdr_value() const { return cdr_value.get_value(); }
+   virtual string get__ASSIGN_WSWS_VAR__cdr_value() const { return cdr_value.get_svalue(); }
 
 
 protected:
@@ -2571,7 +2572,7 @@ public:
    virtual const char * get_sigName() const   { return "READ_WSWS_VAR"; }
 
   /// return item key of this signal 
-   virtual uint64_t get__READ_WSWS_VAR__key() const { return key.get_value(); }
+   virtual uint64_t get__READ_WSWS_VAR__key() const { return key.get_svalue(); }
 
 
 protected:
@@ -2619,7 +2620,7 @@ public:
    virtual const char * get_sigName() const   { return "WSWS_VALUE_IS"; }
 
   /// return item cdr_value of this signal 
-   virtual string get__WSWS_VALUE_IS__cdr_value() const { return cdr_value.get_value(); }
+   virtual string get__WSWS_VALUE_IS__cdr_value() const { return cdr_value.get_svalue(); }
 
 
 protected:
@@ -2708,7 +2709,7 @@ public:
    virtual const char * get_sigName() const   { return "SVAR_DB_PRINTED"; }
 
   /// return item printout of this signal 
-   virtual string get__SVAR_DB_PRINTED__printout() const { return printout.get_value(); }
+   virtual string get__SVAR_DB_PRINTED__printout() const { return printout.get_svalue(); }
 
 
 protected:
@@ -2945,7 +2946,7 @@ const uint8_t * b = reinterpret_cast<const uint8_t *>(rx_buf);
 Sig_item_u16 signal_id(b);
 
 Signal_base * ret = 0;
-   switch(signal_id.get_value())
+   switch(signal_id.get_svalue())
       {
 
 /*
@@ -3011,7 +3012,7 @@ Signal_base * ret = 0;
         case sid_FIND_OFFERING_ID: ret = new FIND_OFFERING_ID_c(b);   break;
 
 /// APserver result for: find processor ID that offers \b key
-        case sid_OFFERING_ID_IS: ret = new OFFERING_ID_IS_c(b);       break;
+        case sid_OFFERING_ID_IS: ret = new OFFERING_ID_IS_c(b);   break;
 
 /// APserver request: get offering processors  (⎕SVQ)
         case sid_GET_OFFERING_PROCS: ret = new GET_OFFERING_PROCS_c(b);   break;
@@ -3058,7 +3059,7 @@ Signal_base * ret = 0;
         case sid_SVAR_DB_PRINTED: ret = new SVAR_DB_PRINTED_c(b);   break;
 
         default: cerr << "Signal_base::recv_TCP() failed: unknown signal id "
-                      << signal_id.get_value() << endl;
+                      << signal_id.get_svalue() << endl;
                  errno = EINVAL;
                  *loc = LOC;
                  return 0;

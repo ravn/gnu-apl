@@ -55,20 +55,16 @@ public:
    virtual int get_macnum() const
       { return -1; }
 
-   /// overloaded Executable::get_ufun()
-   virtual const UserFunction * get_ufun() const
+   /// overloaded Executable::get_exec_ufun()
+   virtual const UserFunction * get_exec_ufun() const
       { return this; }
 
-   /// overloaded Function::get_ufun1()
-   virtual UserFunction * get_ufun1()
+   /// overloaded Function::get_func_ufun()
+   virtual const UserFunction * get_func_ufun() const
    { return this; }
 
-   /// overloaded Function::get_ufun1()
-   virtual const UserFunction * get_ufun1() const
-   { return this; }
-
-   /// overloaded Executable::get_ufun()
-   virtual UserFunction * get_ufun()
+   /// overloaded Executable::get_exec_ufun()
+   virtual UserFunction * get_exec_ufun()
    { return this; }
 
    /// overloaded Function::get_fun_valence()

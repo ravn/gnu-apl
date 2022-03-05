@@ -1120,7 +1120,7 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
 }
 //----------------------------------------------------------------------------
 
-/// return the lengt differece between a UCS_string and its UTF8 encoding
+/// return the length differece between a UCS_string and its UTF8 encoding
 static inline int
 len_diff(const char * txt)
 {
@@ -1168,14 +1168,14 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                   return;
 
              case NC_LABEL:
-                  CERR << "is a label (line " << vs->sym_val.label
+                  CERR << "is a label (line " << vs->get_label()
                        << ")" << endl;
                   return;
 
              case NC_VARIABLE:
                   {
                     CERR << "is a variable:" << endl;
-                    Value_P val = sym->get_value();
+                    Value_P val = sym->get_apl_value();
                     if (+val)   val->print_properties(CERR, 4, true);
                   }
                   CERR << endl;
@@ -1202,7 +1202,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                     else                                    CERR << "niladic";
                     CERR << " defined function:" << endl;
 
-                    const UserFunction * ufun = fun->get_ufun1();
+                    const UserFunction * ufun = fun->get_func_ufun();
                     Assert(ufun);
                     ufun->help(CERR);
                   }
@@ -1217,7 +1217,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                     else                                CERR << "monadic";
                     CERR << " defined operator:" << endl;
 
-                    const UserFunction * ufun = fun->get_ufun1();
+                    const UserFunction * ufun = fun->get_func_ufun();
                     Assert(ufun);
                     ufun->help(CERR);
                   }

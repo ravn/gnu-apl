@@ -119,7 +119,7 @@ const Shape3 shape_B3(shape_B, axis);
 }
 //----------------------------------------------------------------------------
 Token
-Bif_REDUCE::reduce(Token & tok_LO, Value_P B, uAxis axis) const
+Bif_REDUCE::reduce(Token & tok_LO, Value_P B, uAxis axis)
 {
    // if B is a scalar, then Z is B.
    //
@@ -127,8 +127,8 @@ Bif_REDUCE::reduce(Token & tok_LO, Value_P B, uAxis axis) const
 
    if (!tok_LO.is_function())
       {
-        MORE_ERROR() << "The left argument of operator "
-                     << get_name() << " is not a function";
+        MORE_ERROR()
+        << "The left argument of operator / resp. ⌿ is not a function";
         DOMAIN_ERROR;
       }
 
@@ -136,15 +136,15 @@ Function_P LO = tok_LO.get_function();
    Assert1(LO);
    if (!LO->has_result())
       {
-        MORE_ERROR() << "The left argument of operator "
-                     << get_name() << " is a function that returns no result";
+        MORE_ERROR() << "The left argument of operator / resp. ⌿"
+                        " is a function that returns no result";
         DOMAIN_ERROR;
       }
 
    if (LO->get_fun_valence() != 2)
       {
-        MORE_ERROR() << "The left argument of operator "
-                     << get_name() << " is a function that is not dyadic";
+        MORE_ERROR() << "The left argument of operator / resp. ⌿"
+                     << " is a function that is not dyadic";
         SYNTAX_ERROR;
       }
 
@@ -183,28 +183,27 @@ const Shape3 Z3(B3.h(), 1, B3.l());
 }
 //----------------------------------------------------------------------------
 Token
-Bif_REDUCE::reduce_n_wise(Value_P A, Token & tok_LO, Value_P B,
-                          uAxis axis) const
+Bif_REDUCE::reduce_n_wise(Value_P A, Token & tok_LO, Value_P B, uAxis axis)
 {
    if (!tok_LO.is_function())
       {
-        MORE_ERROR() << "The left argument of operator A /"
-                     << get_name() << " is not a function";
+        MORE_ERROR() << "The left argument of operator A / res. A ⌿"
+                        " is not a function";
         DOMAIN_ERROR;
       }
 
 Function_P LO = tok_LO.get_function();
    if (!LO->has_result())
       {
-        MORE_ERROR() << "The left argument of operator "
-                     << get_name() << " is a function that returns no result";
+        MORE_ERROR() << "The left argument of operator A ⌿ resp. A ⌿"
+                        " is a function that returns no result";
         DOMAIN_ERROR;
       }
 
    if (LO->get_fun_valence() != 2)
       {
-        MORE_ERROR() << "The left argument of operator "
-                     << get_name() << " is a function that is not dyadic";
+        MORE_ERROR() << "The left argument of operator A ⌿ resp. A ⌿"
+                        " is a function that is not dyadic";
         SYNTAX_ERROR;
       }
 

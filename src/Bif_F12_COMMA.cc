@@ -44,11 +44,11 @@ const ShapeItem count = B->element_count();
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B)
+Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, const Value & B)
 {
-   if (B->is_empty())
+   if (B.is_empty())
       {
-        Shape shape_Z = B->get_shape();
+        Shape shape_Z = B.get_shape();
         shape_Z.set_shape_item(axis, shape_Z.get_shape_item(axis) + 1);
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
@@ -62,27 +62,27 @@ Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B)
         return Z;
       }
 
-   if (B->is_scalar())
+   if (B.is_scalar())
       {
         Value_P Z(2, LOC);
         Z->next_ravel_Cell(cell_A);
-        Z->next_ravel_Cell(B->get_cfirst());
+        Z->next_ravel_Cell(B.get_cfirst());
         Z->check_value(LOC);
         return Z;
       }
 
-   if (axis >= B->get_rank())   INDEX_ERROR;
+   if (axis >= B.get_rank())   INDEX_ERROR;
 
-Shape shape_Z(B->get_shape());
+Shape shape_Z(B.get_shape());
    shape_Z.set_shape_item(axis, shape_Z.get_shape_item(axis) + 1);
 
 Value_P Z(shape_Z, LOC);
 
-const Shape3 shape_B3(B->get_shape(), axis);
+const Shape3 shape_B3(B.get_shape(), axis);
    const ShapeItem slice_a = shape_B3.l();
-   const ShapeItem slice_b = shape_B3.l() * B->get_shape_item(axis);
+   const ShapeItem slice_b = shape_B3.l() * B.get_shape_item(axis);
 
-const Cell * cB = &B->get_cfirst();
+const Cell * cB = &B.get_cfirst();
 
    loop(hz, shape_B3.h())
        {
@@ -96,11 +96,11 @@ const Cell * cB = &B->get_cfirst();
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_COMMA::append_scalar(Value_P A, uAxis axis, const Cell & cell_B)
+Bif_COMMA::append_scalar(const Value & A, uAxis axis, const Cell & cell_B)
 {
-   if (A->is_empty())
+   if (A.is_empty())
       {
-        Shape shape_Z = A->get_shape();
+        Shape shape_Z = A.get_shape();
         shape_Z.set_shape_item(axis, shape_Z.get_shape_item(axis) + 1);
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
@@ -113,20 +113,20 @@ Bif_COMMA::append_scalar(Value_P A, uAxis axis, const Cell & cell_B)
            }
         return Z;
       }
-   // A->is_scalar() is handled by prepend_scalar()
+   // A.is_scalar() is handled by prepend_scalar()
 
-   if (axis >= A->get_rank())   INDEX_ERROR;
+   if (axis >= A.get_rank())   INDEX_ERROR;
 
-Shape shape_Z(A->get_shape());
+Shape shape_Z(A.get_shape());
    shape_Z.set_shape_item(axis, shape_Z.get_shape_item(axis) + 1);
 
 Value_P Z(shape_Z, LOC);
 
-const Shape3 shape_A3(A->get_shape(), axis);
-const ShapeItem slice_a = shape_A3.l() * A->get_shape_item(axis);
+const Shape3 shape_A3(A.get_shape(), axis);
+const ShapeItem slice_a = shape_A3.l() * A.get_shape_item(axis);
 const ShapeItem slice_b = shape_A3.l();
 
-const Cell * cA = &A->get_cfirst();
+const Cell * cA = &A.get_cfirst();
 
    loop(hz, shape_A3.h())
        {
@@ -138,41 +138,41 @@ const Cell * cA = &A->get_cfirst();
    return Z;
 }
 //----------------------------------------------------------------------------
-Token
-Bif_COMMA::catenate(Value_P A, sAxis axis, Value_P B)
+Value_P
+Bif_COMMA::catenate(const Value & A, sAxis axis, const Value & B)
 {
-   // NOTE: the case A->is_scalar() && B->is_scalar() was supposedly ruled out
+   // NOTE: the case A.is_scalar() && B.is_scalar() was supposedly ruled out
    //       before calling catenate()
 
-   if (A->is_scalar())
+   if (A.is_scalar())
       {
-        const Cell & cell_A = A->get_cfirst();
+        const Cell & cell_A = A.get_cfirst();
         Value_P Z = prepend_scalar(cell_A, axis, B);
         Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
+        return Z;
       }
 
-   if (B->is_scalar())
+   if (B.is_scalar())
       {
-        const Cell & cell_B = B->get_cfirst();
+        const Cell & cell_B = B.get_cfirst();
         Value_P Z = append_scalar(A, axis, cell_B);
         Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
+        return Z;
       }
 
-   if ((A->get_rank() + 1) == B->get_rank())
+   if ((A.get_rank() + 1) == B.get_rank())
       {
         Shape shape_Z;
 
         // check shape conformance.
         {
           ShapeItem ra = 0;
-          loop(rb, B->get_rank())
+          loop(rb, B.get_rank())
              {
                if (rb != axis)
                   {
-                    shape_Z.add_shape_item(B->get_shape_item(rb));
-                    if (A->get_shape_item(ra) != B->get_shape_item(rb))
+                    shape_Z.add_shape_item(B.get_shape_item(rb));
+                    if (A.get_shape_item(ra) != B.get_shape_item(rb))
                        {
                          LENGTH_ERROR;
                        }
@@ -180,21 +180,21 @@ Bif_COMMA::catenate(Value_P A, sAxis axis, Value_P B)
                   }
                else
                   {
-                    shape_Z.add_shape_item(B->get_shape_item(rb) + 1);
+                    shape_Z.add_shape_item(B.get_shape_item(rb) + 1);
                   }
              }
         }
 
         Value_P Z(shape_Z, LOC);
 
-        Z->set_default(*B.get(), LOC);
+        Z->set_default(B, LOC);
 
-        const Shape3 shape_B3(B->get_shape(), axis);
+        const Shape3 shape_B3(B.get_shape(), axis);
         const ShapeItem slice_a = shape_B3.l();
-        const ShapeItem slice_b = shape_B3.l() * B->get_shape_item(axis);
+        const ShapeItem slice_b = shape_B3.l() * B.get_shape_item(axis);
 
-        const Cell * cA = &A->get_cfirst();
-        const Cell * cB = &B->get_cfirst();
+        const Cell * cA = &A.get_cfirst();
+        const Cell * cB = &B.get_cfirst();
 
         loop(hz, shape_B3.h())
             {
@@ -203,10 +203,10 @@ Bif_COMMA::catenate(Value_P A, sAxis axis, Value_P B)
             }
 
         Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
+        return Z;
       }
 
-   if (A->get_rank() == (B->get_rank() + 1))
+   if (A.get_rank() == (B.get_rank() + 1))
       {
         // e.g.»        ∆∆∆ , 3
         //              ∆∆∆   4
@@ -217,33 +217,33 @@ Bif_COMMA::catenate(Value_P A, sAxis axis, Value_P B)
         // axis where only ra is incremented.
         {
           uint32_t rb = 0;
-          loop(ra, A->get_rank())
+          loop(ra, A.get_rank())
              {
                if (ra != axis)
                   {
-                    if (A->get_shape_item(ra) != B->get_shape_item(rb))
+                    if (A.get_shape_item(ra) != B.get_shape_item(rb))
                        LENGTH_ERROR;
 
-                    shape_Z.add_shape_item(A->get_shape_item(ra));
+                    shape_Z.add_shape_item(A.get_shape_item(ra));
                     ++rb;
                   }
                else
                   {
-                    shape_Z.add_shape_item(A->get_shape_item(ra) + 1);
+                    shape_Z.add_shape_item(A.get_shape_item(ra) + 1);
                   }
              }
         }
 
         Value_P Z(shape_Z, LOC);
 
-        Z->set_default(*B.get(), LOC);
+        Z->set_default(B, LOC);
 
-        const Shape3 shape_A3(A->get_shape(), axis);
-        const ShapeItem slice_a = shape_A3.l() * A->get_shape_item(axis);
+        const Shape3 shape_A3(A.get_shape(), axis);
+        const ShapeItem slice_a = shape_A3.l() * A.get_shape_item(axis);
         const ShapeItem slice_b = shape_A3.l();
 
-        const Cell * cA = &A->get_cfirst();
-        const Cell * cB = &B->get_cfirst();
+        const Cell * cA = &A.get_cfirst();
+        const Cell * cB = &B.get_cfirst();
 
         loop (hz, shape_A3.h())
             {
@@ -251,40 +251,40 @@ Bif_COMMA::catenate(Value_P A, sAxis axis, Value_P B)
               Cell::copy(*Z.get(), cB, slice_b);
             }
 
-        Z->set_default(*B.get(), LOC);
+        Z->set_default(B, LOC);
 
         Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
+        return Z;
       }
-   if (A->get_rank() != B->get_rank())   RANK_ERROR;
+   if (A.get_rank() != B.get_rank())   RANK_ERROR;
 
    // A and B have the same rank. The shapes need to agree, except for the
    // dimension corresponding to the axis.
    //
 Shape shape_Z;
 
-   loop(r, A->get_rank())
+   loop(r, A.get_rank())
        {
          if (r != axis)
             {
-              if (A->get_shape_item(r) != B->get_shape_item(r))
+              if (A.get_shape_item(r) != B.get_shape_item(r))
                  LENGTH_ERROR;
 
-              shape_Z.add_shape_item(A->get_shape_item(r));
+              shape_Z.add_shape_item(A.get_shape_item(r));
             }
          else
             {
-              shape_Z.add_shape_item(A->get_shape_item(r) +
-                                   + B->get_shape_item(r));
+              shape_Z.add_shape_item(A.get_shape_item(r) +
+                                   + B.get_shape_item(r));
             }
        }
 
-const Shape3 shape_A3(A->get_shape(), axis);
+const Shape3 shape_A3(A.get_shape(), axis);
 
-const Cell * cA = &A->get_cfirst();
-const Cell * cB = &B->get_cfirst();
-const ShapeItem slice_a = shape_A3.l() * A->get_shape_item(axis);
-const ShapeItem slice_b = shape_A3.l() * B->get_shape_item(axis);
+const Cell * cA = &A.get_cfirst();
+const Cell * cB = &B.get_cfirst();
+const ShapeItem slice_a = shape_A3.l() * A.get_shape_item(axis);
+const ShapeItem slice_b = shape_A3.l() * B.get_shape_item(axis);
 
 Value_P Z(shape_Z, LOC);
    loop(hz, shape_A3.h())
@@ -293,33 +293,33 @@ Value_P Z(shape_Z, LOC);
          Cell::copy(*Z.get(), cB, slice_b);
        }
 
-   Z->set_default(*B.get(), LOC);
+   Z->set_default(B, LOC);
    Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
-Token
-Bif_COMMA::laminate(Value_P A, sAxis axis, Value_P B)
+Value_P
+Bif_COMMA::laminate(const Value & A, sAxis axis, const Value & B)
 {
    // shapes of A and B must be the same, unless one of them is a scalar.
    //
-   if (!A->is_scalar() && !B->is_scalar())
-      A->get_shape().check_same(B->get_shape(),
+   if (!A.is_scalar() && !B.is_scalar())
+      A.get_shape().check_same(B.get_shape(),
                                 E_INDEX_ERROR, E_LENGTH_ERROR, LOC);
 
-const Shape shape_Z = A->is_scalar() ? B->get_shape().insert_axis(axis, 2)
-                                    : A->get_shape().insert_axis(axis, 2);
+const Shape shape_Z = A.is_scalar() ? B.get_shape().insert_axis(axis, 2)
+                                    : A.get_shape().insert_axis(axis, 2);
 
 Value_P Z(shape_Z, LOC);
 
 const Shape3 shape_Z3(shape_Z, axis);
    if (shape_Z3.m() != 2)   AXIS_ERROR;
 
-const Cell * cA = &A->get_cfirst();
-const Cell * cB = &B->get_cfirst();
-   if (A->is_scalar())
+const Cell * cA = &A.get_cfirst();
+const Cell * cB = &B.get_cfirst();
+   if (A.is_scalar())
       {
-        if (B->is_scalar())
+        if (B.is_scalar())
            {
              Z->next_ravel_Cell(*cA);
              Z->next_ravel_Cell(*cB);
@@ -336,7 +336,7 @@ const Cell * cB = &B->get_cfirst();
       }
    else
       {
-        if (B->is_scalar())
+        if (B.is_scalar())
            {
              loop(h, shape_Z3.h())
                  {
@@ -354,10 +354,10 @@ const Cell * cB = &B->get_cfirst();
            }
       }
 
-   Z->set_default(*B.get(), LOC);
+   Z->set_default(B, LOC);
 
    Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   return Z;
 }
 //----------------------------------------------------------------------------
 Token
@@ -469,34 +469,35 @@ Bif_F12_COMMA::eval_AB(Value_P A, Value_P B) const
 
 uRank max_rank = A->get_rank();
    if (max_rank < B->get_rank())  max_rank = B->get_rank();
-   return catenate(A, max_rank - 1, B);
+   return Token(TOK_APL_VALUE1, catenate(A.getref(), max_rank-1, B.getref()));
 }
 //----------------------------------------------------------------------------
-Token
-Bif_F12_COMMA::eval_AXB(Value_P A, Value_P X, Value_P B) const
+Value_P
+Bif_COMMA::catenate_or_laminate(const Value & A, const Value & X,
+                                const Value & B)
 {
- if (A->is_scalar() && B->is_scalar())   RANK_ERROR;
+ if (A.is_scalar() && B.is_scalar())   RANK_ERROR;
 
    // catenate or laminate
    //
-   if (!X->is_scalar_or_len1_vector())   AXIS_ERROR;
+   if (!X.is_scalar_or_len1_vector())   AXIS_ERROR;
 
-const Cell & cX = X->get_cfirst();
+const Cell & cX = X.get_cfirst();
 const APL_Integer qio = Workspace::get_IO();
 
    if (cX.is_near_int())   // catenate along existing axis
       {
         const sAxis axis = cX.get_checked_near_int() - qio;
         if (axis < 0)                                         AXIS_ERROR;
-        if (uAxis(axis) >= A->get_rank() && uAxis(axis) >= B->get_rank())
+        if (uAxis(axis) >= A.get_rank() && uAxis(axis) >= B.get_rank())
            AXIS_ERROR;
         return catenate(A, axis, B);
       }
 
 const APL_Float axis = cX.get_real_value() - qio;
    if (axis <= -1.0)   AXIS_ERROR;
-   if (axis >= (A->get_rank() + 1.0) &&
-       axis >= (B->get_rank() + 1.0))   AXIS_ERROR;
+   if (axis >= (A.get_rank() + 1.0) &&
+       axis >= (B.get_rank() + 1.0))   AXIS_ERROR;
    return laminate(A, sAxis(axis + 1.0), B);
 }
 //============================================================================
@@ -519,7 +520,7 @@ Shape shape_Z(c1, c2);
        this == Workspace::SI_top()->get_prefix().get_monadic_fun())
       {
         Log(LOG_optimization) CERR << "optimizing ,B" << endl;
-        
+
         B->set_shape(shape_Z);
         return Token(TOK_APL_VALUE1, B);
       }
@@ -538,13 +539,7 @@ Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B) const
        return Token(TOK_APL_VALUE1, Z);
      }
 
-   return catenate(A, 0, B);
-}
-//----------------------------------------------------------------------------
-Token
-Bif_F12_COMMA1::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-   return Bif_F12_COMMA::fun->eval_AXB(A, X, B);
+   return Token(TOK_APL_VALUE1, catenate(A.getref(), 0, B.getref()));
 }
 //============================================================================
 

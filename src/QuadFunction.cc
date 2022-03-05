@@ -583,7 +583,7 @@ const ErrorCode ec = get_error_code(B);
    Assert(Workspace::SI_top());
    if (StateIndicator * si = Workspace::SI_top()->get_parent())
       {
-        const UserFunction * ufun = si->get_executable()->get_ufun();
+        const UserFunction * ufun = si->get_executable()->get_exec_ufun();
         if (ufun)
            {
              // lrm p 282: When ⎕ES is executed from within a defined function
@@ -1139,7 +1139,7 @@ Token
 Quad_NL::do_quad_NL(Value_P A, Value_P B)
 {
    if (+A && !A->is_char_string())   DOMAIN_ERROR;
-   if (B->get_rank() > 1)             RANK_ERROR;
+   if (B->get_rank() > 1)            RANK_ERROR;
    if (B->element_count() == 0)   // nothing requested
       {
         return Token(TOK_APL_VALUE1, Str0_0(LOC));
@@ -1189,20 +1189,24 @@ UCS_string_vector names;
 
    // 3, append ⎕-vars and ⎕-functions to name table (unless prevented by A)
    //
-   if (first_chars.size() == 0 || first_chars.contains(UNI_Quad_Quad))
+const bool vars = requested_NCs & 1 << 5;
+const bool funs = requested_NCs & 1 << 6;
+
+   if (first_chars.size() == 0 ||                  // all
+       first_chars.contains(UNI_Quad_Quad))   // ⎕-variables and -functions
       {
-#define ro_sv_def(x, _str, _txt)                                   \
-   { Symbol * symbol = &Workspace::get_v_ ## x();           \
-     if ((requested_NCs & 1 << 5) && symbol->get_NC() != 0) \
+#define ro_sv_def(x, _str, _txt)                            \
+   { const Symbol * symbol = &Workspace::get_v_ ## x();     \
+     if (vars && symbol->get_NC() != 0)                     \
         names.push_back(symbol->get_name()); }
 
-#define rw_sv_def(x, _str, _txt)                                   \
-   { Symbol * symbol = &Workspace::get_v_ ## x();           \
-     if ((requested_NCs & 1 << 5) && symbol->get_NC() != 0) \
+#define rw_sv_def(x, _str, _txt)                            \
+   { const Symbol * symbol = &Workspace::get_v_ ## x();     \
+     if (vars && symbol->get_NC() != 0)                     \
         names.push_back(symbol->get_name()); }
 
-#define sf_def(x, _str, _txt)                                      \
-   { if (requested_NCs & 1 << 6)   names.push_back((x::fun->get_name())); }
+#define sf_def(_x, str, _txt)                               \
+   { if (funs)   names.push_back(UCS_string(UTF8_string("⎕" str))); }
 #include "SystemVariable.def"
       }
 
@@ -1500,7 +1504,7 @@ Function_P fun = fun_symbol->get_function();
         return 0;
       }
 
-const UserFunction * ufun = fun->get_ufun1();
+const UserFunction * ufun = fun->get_func_ufun();
    if (ufun == 0)
       {
         CERR << "symbol " << fun_name_ucs

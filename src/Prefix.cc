@@ -786,7 +786,7 @@ Prefix::replace_AB(Value_P old_value, Value_P new_value)
      {
        Token & tok = at(s).tok;
        if (tok.get_Class() != TC_VALUE)   continue;
-       if (tok.get_apl_val() == old_value)   // found
+       if (tok.get_apl_val().get() == old_value.get())   // found
           {
             new (&tok) Token(tok.get_tag(), new_value);
             return true;
@@ -1367,18 +1367,19 @@ Token result = Token(TOK_FUN2, derived);
 void
 Prefix::reduce_D_V__()
 {
-   /* end of an A.B.C...Z chain. at0() is the final member Z and at1() is
-      the '.' before Z. Collect members until no more '.' token are found.
+   /* end of an A.B.C...V chain. at0() is the final member V and at1() is
+      the '.' (aka. D) before V. Collect the members (and discard the '.'
+      preceeding them) until no more '.' token are found.
 
       Prefix::reduce_D_V__() is called from two places:
 
-      1. from reduce_statements() with prefix_len == 2, or
-      2. from reduce_D_V_ASS_B() with prefix_len == 4.
+      1. from reduce_statements() with prefix_len == 2, or else
+      2. from reduce_D_V_ASS_B()  with prefix_len == 4.
 
       The processing of member variables is somewhat lengthy and almost the
-      same for member reference and for member assignment. We therefore do
-      both here instead of duplicating the work in reduce_D_V__() (i.e. here)
-      and in reduce_D_V_ASS_B().
+      same for member reference and for member assignment. We therefore
+      handle both cases here (i.e. in reduce_D_V__()) instead of replicating
+      almost the same code in in reduce_D_V_ASS_B().
     */
 
 const bool member_assign = prefix_len == 4;   // assume member reference
@@ -1469,29 +1470,38 @@ Symbol * top_sym = 0;
               }
          }
 
-Value_P toplevel_val = top_sym->get_value();
-   if (!toplevel_val)   // top_sym is not a variable (-name). Maybe create one.
+Value_P top_val = top_sym->get_value();
+   if (!top_val)   // top_sym is not a variable (-name). Maybe create one.
       {
         if (member_assign)
            {
-             toplevel_val = EmptyStruct(LOC);
-             top_sym->assign(toplevel_val, false, LOC);
+             // VAR.member ← value. The user assigns a value to the member of
+             // a structured variable that does not yet exist. We do the same
+             // as for VAR←value for not existing APL variables, i.e. we
+             // create it automatically.
+             //
+             top_val = EmptyStruct(LOC);
+             top_sym->assign(top_val, false, LOC);
              set_assign_state(ASS_none);
            }
-        else
+        else   // member reference
            {
-            UCS_string & more = MORE_ERROR()
+             // reference of the member a not existing variable. Like
+             // referencing a normal variable we raise a VALUE ERROR but
+             // give the user some more info.
+             //
+             UCS_string & more = MORE_ERROR()
                     << "member access: missing top-level variable "
                     << top_sym->get_name() << " for member ";
-            more.append_members(members, 0);
-            more << " not found";
-            VALUE_ERROR;
+             more.append_members(members, 0);
+             more << " not found";
+             VALUE_ERROR;
            }
       }
 
 Value * member_owner = 0;
-Cell * member_cell = toplevel_val->get_member(members, member_owner,
-                                              member_assign, true);
+Cell * member_cell = top_val->get_member(members, member_owner,
+                                         member_assign, true);
    Assert(member_owner);
 
    if (member_assign)   // (direct) member assignment
@@ -2100,7 +2110,7 @@ const Value * A = at1().get_apl_val().get();   // the condition
 const APL_Integer line_no = A->get_cfirst().get_near_int();
 APL_Integer real_line_no = line_no;
 
-   if (const UserFunction * ufun = si.get_executable()->get_ufun())
+   if (const UserFunction * ufun = si.get_executable()->get_exec_ufun())
       {
         if (line_no >= ufun->get_text_size())
            {
@@ -2280,7 +2290,7 @@ const bool trace = at0().get_Class() == TC_END &&
    //
    if (at1().get_tag() == TOK_STOP_LINE)   // S∆ line
       {
-        const UserFunction * ufun = si.get_executable()->get_ufun();
+        const UserFunction * ufun = si.get_executable()->get_exec_ufun();
         if (ufun && ufun->get_exec_properties()[2])
            {
               // the function ignores attention (aka. weak interrupt)
@@ -2351,7 +2361,7 @@ Prefix::reduce_RETC___()
                 CERR << "- end of ∇ context (function has no result)" << endl;
 
              {
-               const UserFunction * ufun = si.get_executable()->get_ufun();
+               const UserFunction * ufun = si.get_executable()->get_exec_ufun();
                if (ufun)   { /* do nothing, needed for -Wall */ }
                Assert1(ufun);
                at0().clear(LOC);
@@ -2361,7 +2371,7 @@ Prefix::reduce_RETC___()
 
         case TOK_RETURN_SYMBOL:   // user-defined function returning a value
              {
-               const UserFunction * ufun = si.get_executable()->get_ufun();
+               const UserFunction * ufun = si.get_executable()->get_exec_ufun();
                Assert1(ufun);
                Symbol * ufun_Z = ufun->get_sym_Z();
                Value_P Z;

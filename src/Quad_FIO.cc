@@ -1361,7 +1361,7 @@ const ShapeItem function_number = X->get_cfirst().get_int_value();
         case 49:
            {
              Token lines_B = eval_XB(X, B);
-             return Bif_OPER1_EACH::fun->eval_LB(LO, lines_B.get_apl_val());
+             return Bif_OPER1_EACH::do_eval_LB(LO, lines_B.get_apl_val());
            }
       }
 

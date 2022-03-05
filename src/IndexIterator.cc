@@ -50,7 +50,7 @@ IndexIterator::print(ostream & out) const
 {
    out << "Iterator "     << voidP(this) << ":"  << endl
        << "   upper:       " << voidP(upper)     << endl
-       << "   value:       " << get_value()      << endl
+       << "   value:       " << get_ivalue()     << endl
        << "   indices[" << get_index_count()     << "] :";
 
    loop(i, get_index_count())   out << " " << get_pos(i);
@@ -158,7 +158,7 @@ MultiIndexIterator::operator ++(int)
 
 ShapeItem ret = 0;
    for (IndexIterator * it = lowest_it; it; it = it->get_upper())
-            ret += it->get_value();
+            ret += it->get_ivalue();
 
    if (lowest_it)   ++*lowest_it;
    return ret;

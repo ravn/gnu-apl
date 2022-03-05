@@ -75,7 +75,7 @@ Symbol::print_verbose(ostream & out) const
        {
          out << "[" << v << "] ";
          const ValueStackItem & item = value_stack[v];
-         switch(item.name_class)
+         switch(item.get_NC())
             {
               case NC_INVALID:
                    out << "---INVALID---" << endl;
@@ -86,13 +86,13 @@ Symbol::print_verbose(ostream & out) const
                    break;
 
               case NC_LABEL:
-                   out << "Label line " << item.sym_val.label << endl;
+                   out << "Label line " << item.get_label() << endl;
                    break;
 
               case NC_VARIABLE:
                    {
-                      Value_P val = item.apl_val;
-                      out << "Variable at " << voidP(val.get()) << endl;
+                      const Value * val = item.get_val_cptr();
+                      out << "Variable at " << voidP(val) << endl;
                       val->print_properties(out, 8, false);
                       out << endl;
                    }
@@ -101,12 +101,12 @@ Symbol::print_verbose(ostream & out) const
               case NC_FUNCTION:
               case NC_OPERATOR:
                    {
-                     Function_P fun = item.sym_val.function;
+                     Function_P fun = item.get_function();
                      Assert(fun);
 
                      fun->print_properties(out, 4);
-                     out << "    ⎕NC:            " << item.name_class << endl
-                         << "    addr:           " << voidP(fun) << endl;
+                     out << "    ⎕NC:            " << item.get_NC() << endl
+                         << "    addr:           " << voidP(fun)    << endl;
 
                      out << endl;
                    }
@@ -135,25 +135,25 @@ Symbol::assign(Value_P new_value, bool clone, const char * loc)
 
 ValueStackItem & vs = value_stack.back();
 
-   switch(vs.name_class)
+   switch(vs.get_NC())
       {
         case NC_UNUSED_USER_NAME:
              if (clone)  new_value = new_value->clone(loc);
 
-             vs.name_class = NC_VARIABLE;
-             vs.apl_val = new_value;
+             vs.set_apl_value(new_value);
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
              return;
 
         case NC_LABEL:
              MORE_ERROR() << "attempt to assign a value to label "
-                          << get_name();
+                          << get_name() << " (line " << vs.get_label() << ")";
+
         case NC_VARIABLE:
-             if (vs.apl_val == new_value)   return;   // X←X
+             if (vs.get_val_cptr() == new_value.get())   return;   // X←X
 
              if (clone)  new_value = new_value->clone(loc);
 
-             vs.apl_val = new_value;
+             vs.set_apl_value(new_value);
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
              return;
 
@@ -346,25 +346,24 @@ bool
 Symbol::assign_named_lambda(Function_P lambda, const char * loc)
 {
 ValueStackItem & vs = value_stack.back();
-const UserFunction * ufun = lambda->get_ufun1();
+const UserFunction * ufun = lambda->get_func_ufun();
    Assert(ufun);
 const Executable * uexec = ufun;
    Assert(uexec);
 
-   switch(vs.name_class)
+   switch(vs.get_NC())
       {
         case NC_FUNCTION:
         case NC_OPERATOR:
              {
-               Function_P old_fun = vs.sym_val.function;
+               Function_P old_fun = vs.get_function();
                Assert(old_fun);
                if (!old_fun->is_lambda())   SYNTAX_ERROR;
-               const UserFunction * old_ufun = old_fun->get_ufun1();
+               const UserFunction * old_ufun = old_fun->get_func_ufun();
                Assert(old_ufun);
                for (StateIndicator * si = Workspace::SI_top();
                     si; si = si->get_parent())
                    {
-//                   if (uexec == si->get_executable())
                      if (si->uses_function(old_ufun))
                         {
                           MORE_ERROR() << "function " << get_name()
@@ -373,17 +372,14 @@ const Executable * uexec = ufun;
                         }
                    }
 
-               const_cast<UserFunction *>(vs.sym_val.function->get_ufun1())
+               const_cast<UserFunction *>(vs.get_function()->get_func_ufun())
                          ->decrement_refcount(LOC);
              }
 
              /* fall through */
 
         case NC_UNUSED_USER_NAME:
-             if (lambda->is_operator())   vs.name_class = NC_OPERATOR;
-             else                         vs.name_class = NC_FUNCTION;
-
-             vs.sym_val.function = ufun;
+             vs.set_function(lambda);
              const_cast<UserFunction *>(ufun)->increment_refcount(LOC);
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
              return false;
@@ -405,15 +401,15 @@ Symbol::pop()
 
 const ValueStackItem & vs = value_stack.back();
 
-   if (vs.name_class == NC_VARIABLE)
+   if (get_NC() == NC_VARIABLE)
       {
         Log(LOG_SYMBOL_push_pop)
            {
-             Value_P ret = vs.apl_val;
+             const Value * ret = get_val_cptr();
              CERR << "-pop-value " << name
                   << " flags " << ret->get_flags() << " ";
              if (value_stack.size() == 0)   CERR << " (last)";
-             CERR << " addr " << voidP(ret.get()) << endl;
+             CERR << " addr " << voidP(ret) << endl;
            }
 
         value_stack.pop_back();
@@ -424,7 +420,7 @@ const ValueStackItem & vs = value_stack.back();
         Log(LOG_SYMBOL_push_pop)
            {
              CERR << "-pop " << name
-                  << " name_class " << vs.name_class << " ";
+                  << " name_class " << vs.get_NC() << " ";
              if (value_stack.size() == 0)   CERR << " (last)";
              CERR << endl;
            }
@@ -472,9 +468,7 @@ Symbol::push_function(Function_P function)
       }
 
 ValueStackItem vs;
-   if (function->is_operator())   vs.name_class = NC_OPERATOR;
-   else                           vs.name_class = NC_FUNCTION;
-   vs.sym_val.function = function;
+   vs.set_function(function);
    value_stack.push_back(vs);
    if (monitor_callback)   monitor_callback(*this, SEV_PUSHED);
 }
@@ -497,7 +491,7 @@ ValueStackItem vs;
 }
 //----------------------------------------------------------------------------
 int
-Symbol::get_ufun_depth(const UserFunction * ufun)
+Symbol::get_exec_ufun_depth(const UserFunction * ufun)
 {
 const Function * fun = ufun;
 const int sym_stack_size = value_stack_size();
@@ -505,9 +499,9 @@ const int sym_stack_size = value_stack_size();
    loop(s, sym_stack_size)
       {
         const ValueStackItem & vsi = value_stack[s];
-        if (vsi.name_class != NC_FUNCTION &&
-            vsi.name_class != NC_OPERATOR)   continue;
-        if (fun != vsi.sym_val.function)     continue;
+        if (vsi.get_NC() != NC_FUNCTION &&
+            vsi.get_NC() != NC_OPERATOR)   continue;
+        if (fun != vsi.get_function())       continue;
 
        // found at level s
        //
@@ -521,10 +515,9 @@ const int sym_stack_size = value_stack_size();
 Value_P
 Symbol::get_value()
 {
-   if (value_stack.size())
+   if (value_stack.size() && get_NC() == NC_VARIABLE)
       {
-        const ValueStackItem & vs = value_stack.back();
-        if (vs.name_class == NC_VARIABLE)   return vs.apl_val;
+        return Value_P(value_stack.back().get_val_wptr(), LOC);
       }
 
    return Value_P();
@@ -537,9 +530,9 @@ Symbol::cant_be_defined() const
    if (Workspace::is_called(name))
       return "function is called (used on the )SI stack). Try )SIC first.";
 
-   if (value_stack.back().name_class == NC_UNUSED_USER_NAME)   return 0;   // OK
-   if (value_stack.back().name_class == NC_FUNCTION)           return 0;   // OK
-   if (value_stack.back().name_class == NC_OPERATOR)           return 0;   // OK
+   if (value_stack.back().get_NC() &
+        (NC_UNUSED_USER_NAME | NC_FUNCTION | NC_OPERATOR))   return 0;   // OK
+
    return "bad name class";
 }
 //----------------------------------------------------------------------------
@@ -547,30 +540,24 @@ Value_P
 Symbol::get_apl_value() const
 {
    Assert(value_stack.size() > 0);
-   if (value_stack.back().name_class != NC_VARIABLE)
+   if (value_stack.back().get_NC() != NC_VARIABLE)
       Error::throw_symbol_error(get_name(), LOC);
 
-   return value_stack.back().apl_val;
+   return Value_P(const_cast<Value *>(value_stack.back().get_val_cptr()), LOC);
 }
 //----------------------------------------------------------------------------
 const Cell *
 Symbol::get_first_cell() const
 {
    Assert(value_stack.size() > 0);
-   if (value_stack.back().name_class != NC_VARIABLE)   return 0;
-   return &value_stack.back().apl_val->get_cfirst();
+   if (value_stack.back().get_NC() != NC_VARIABLE)   return 0;
+   return &value_stack.back().get_val_cptr()->get_cfirst();
 }
 //----------------------------------------------------------------------------
 bool
 Symbol::can_be_assigned() const
 {
-   switch (value_stack.back().name_class)
-      {
-        case NC_UNUSED_USER_NAME:
-        case NC_VARIABLE:
-        case NC_SYSTEM_VAR: return true;
-        default:            return false;
-      }
+   return value_stack.back().get_NC() & NC_left;
 }
 //----------------------------------------------------------------------------
 SV_key
@@ -578,28 +565,33 @@ Symbol::get_SV_key() const
 {
    Assert(value_stack.size() > 0);
 
-   if (value_stack.back().name_class != NC_SYSTEM_VAR)   return SV_key(0);
+   if (value_stack.back().get_NC() != NC_SYSTEM_VAR)   return SV_key(0);
 
-   return value_stack.back().sym_val.sv_key;
+   return value_stack.back().get_key();
 }
 //----------------------------------------------------------------------------
 void
 Symbol::set_SV_key(SV_key key)
 {
-   value_stack.back().name_class = NC_SYSTEM_VAR;
-   value_stack.back().sym_val.sv_key = key;
+   value_stack.back().set_key(key);
 }
 //----------------------------------------------------------------------------
-const Function *
+Function_P
 Symbol::get_function() const
 {
    Assert(value_stack.size() > 0);
-   switch(value_stack.back().name_class)
-      {
-        case NC_FUNCTION:
-        case NC_OPERATOR: return value_stack.back().sym_val.function;
-        default:          return 0;
-      }
+   if (value_stack.back().get_NC() & NC_FUN_OPER)
+      return value_stack.back().get_function();
+   return 0;
+}
+//----------------------------------------------------------------------------
+Function_P
+Symbol::get_function(unsigned int si) const
+{
+   Assert(value_stack.size() > 0);
+   if (value_stack[si].get_NC() & NC_FUN_OPER)
+      return value_stack[si].get_function();
+   return 0;
 }
 //----------------------------------------------------------------------------
 Function_P
@@ -607,8 +599,7 @@ Symbol::get_function()
 {
 const ValueStackItem & vs = value_stack.back();
 
-   if (vs.name_class == NC_FUNCTION)   return vs.sym_val.function;
-   if (vs.name_class == NC_OPERATOR)   return vs.sym_val.function;
+   if (vs.get_NC() & NC_FUN_OPER)   return vs.get_function();
 
    return 0;
 }
@@ -619,7 +610,7 @@ Symbol::get_attributes(int mode, Value & Z) const
 const ValueStackItem & vs = value_stack.back();
 int has_result = 0;   // no result
 
-   switch(vs.name_class)
+   switch(vs.get_NC())
       {
         case NC_LABEL:
         case NC_VARIABLE:
@@ -628,7 +619,7 @@ int has_result = 0;   // no result
 
         case NC_FUNCTION:
         case NC_OPERATOR:
-             vs.sym_val.function->get_attributes(mode, Z);
+             vs.get_function()->get_attributes(mode, Z);
              return;
 
         default: break;
@@ -648,7 +639,7 @@ int has_result = 0;   // no result
                 break;
 
         case 4: {
-                  Value_P val = get_apl_value();
+                  const Value * val = get_val_cptr();
                   const CDR_type cdr_type = val->get_CDR_type();
                   const int brutto = val->total_size_brutto(cdr_type);
                   const int data = val->data_size(cdr_type);
@@ -671,7 +662,7 @@ Symbol::resolve(Token & tok, bool left_sym)
    Assert1(value_stack.size());
 
 const ValueStackItem & vs = value_stack.back();
-   switch(vs.name_class)
+   switch(vs.get_NC())
       {
         case NC_UNUSED_USER_NAME:
              if (!left_sym)   Error::throw_symbol_error(get_name(), LOC);
@@ -681,8 +672,7 @@ const ValueStackItem & vs = value_stack.back();
              if (left_sym)   SYNTAX_ERROR;   // assignment to (read-only) label
 
              {
-               IntCell lab(vs.sym_val.label);
-               Value_P value(lab, LOC);
+               Value_P value = IntScalar(vs.get_label(), LOC);
                Token t(TOK_APL_VALUE1, value);
                tok.move_1(t, LOC);
              }
@@ -700,13 +690,13 @@ const ValueStackItem & vs = value_stack.back();
 
         case NC_FUNCTION:
         case NC_OPERATOR:
-             if (left_sym && vs.sym_val.function->is_lambda())
+             if (left_sym && vs.get_function()->is_lambda())
                 {
                   // lambda re-assign, e.g. SYM←{ ... }
                   //
                   return;
                 }
-             tok.move_2(vs.sym_val.function->get_token(), LOC);
+             tok.move_2(vs.get_function()->get_token(), LOC);
              return;
 
         case NC_SYSTEM_VAR:
@@ -728,15 +718,15 @@ Symbol::resolve_lv(const char * loc)
 
    Assert(value_stack.size());
 
-   if (value_stack.back().name_class == NC_VARIABLE)
+   if (value_stack.back().get_NC() == NC_VARIABLE)
       {
-        Value_P val = value_stack.back().apl_val;
+        Value_P val = get_value();
         return Token(TOK_APL_VALUE1, val->get_cellrefs(loc));
       }
 
    MORE_ERROR() << "Symbol '" << get_name()
                 << "' has changed type from variable to name class "
-                << value_stack.back().name_class
+                << value_stack.back().get_NC()
                 << "\nwhile executing an assignment\n";
    throw_apl_error(E_LEFT_SYNTAX_ERROR, loc);
 }
@@ -746,17 +736,17 @@ Symbol::resolve_class(bool left)
 {
    Assert1(value_stack.size());
 
-   switch(value_stack.back().name_class)
+   switch(value_stack.back().get_NC())
       {
         case NC_LABEL:
         case NC_VARIABLE:
         case NC_SYSTEM_VAR:
-             return (left) ? TC_SYMBOL : TC_VALUE;
+             return left ? TC_SYMBOL : TC_VALUE;
 
         case NC_FUNCTION:
              {
-               const int valence = value_stack.back().sym_val.function
-                                 ->get_fun_valence();
+               const int valence = value_stack.back().get_function()
+                                                    ->get_fun_valence();
                if (valence == 2)   return TC_FUN2;
                if (valence == 1)   return TC_FUN1;
                return TC_FUN0;
@@ -764,7 +754,7 @@ Symbol::resolve_class(bool left)
 
         case NC_OPERATOR:
              {
-               const int valence = value_stack.back().sym_val.function
+               const int valence = value_stack.back().get_function()
                                  ->get_oper_valence();
                return (valence == 2) ? TC_OPER2 : TC_OPER1;
              }
@@ -780,26 +770,26 @@ Symbol::expunge()
 
 ValueStackItem & vs = value_stack.back();
 
-   if (vs.name_class == NC_VARIABLE)
+   if (vs.get_NC() == NC_VARIABLE)
       {
-        vs.apl_val.reset();   // delete the value owned by this var
+        vs.reset_apl_value();   // delete the value owned by this var
       }
-   else if (vs.name_class == NC_FUNCTION || vs.name_class == NC_OPERATOR)
+   else if (vs.get_NC() &  NC_FUN_OPER)
       {
-        if (vs.sym_val.function->is_native())
+        if (vs.get_function()->is_native())
            {
              // do not delete native functions
            }
-        else if (vs.sym_val.function->is_lambda())
+        else if (vs.get_function()->is_lambda())
            {
-             const UserFunction * ufun = vs.sym_val.function->get_ufun1();
+             const UserFunction * ufun = vs.get_function()->get_func_ufun();
              Assert(ufun);
-               const_cast<UserFunction *>(vs.sym_val.function->get_ufun1())
+               const_cast<UserFunction *>(vs.get_function()->get_func_ufun())
                           ->decrement_refcount(LOC);
            }
         else
            {
-             const UserFunction * ufun = vs.sym_val.function->get_ufun1();
+             const UserFunction * ufun = vs.get_function()->get_func_ufun();
              const Executable * exec = ufun;
              StateIndicator * oexec = Workspace::oldest_exec(exec);
              if (oexec)
@@ -816,7 +806,7 @@ ValueStackItem & vs = value_stack.back();
                   delete ufun;
                 }
            }
-        vs.name_class = NC_UNUSED_USER_NAME;
+        vs.set_NC(NC_UNUSED_USER_NAME);
       }
 
    vs.clear();
@@ -829,9 +819,11 @@ Symbol::set_NC(NameClass nc)
 {
 ValueStackItem & vs = value_stack.back();
 
-   if (vs.name_class == NC_UNUSED_USER_NAME)
+   // the name class can only be set for unused names.
+   //
+   if (vs.get_NC() == NC_UNUSED_USER_NAME)
       {
-        vs.name_class = nc;
+        vs.set_NC(nc);
         return;
       }
 
@@ -843,14 +835,13 @@ Symbol::share_var(SV_key key)
 {
 ValueStackItem & vs = value_stack.back();
 
-   if (vs.name_class == NC_UNUSED_USER_NAME)   // new shared variable
+   if (vs.get_NC() == NC_UNUSED_USER_NAME)   // new shared variable
       {
-        vs.name_class = NC_SYSTEM_VAR;
         set_SV_key(key);
         return;
       }
 
-   if (vs.name_class == NC_VARIABLE)           // existing variable
+   if (vs.get_NC() == NC_VARIABLE)           // existing variable
       {
         // remember old value
         //
@@ -858,7 +849,6 @@ ValueStackItem & vs = value_stack.back();
 
         // change name class and store AP number
         //
-        vs.name_class = NC_SYSTEM_VAR;
         set_SV_key(key);
 
         // assign old value to shared variable
@@ -876,7 +866,7 @@ Symbol::unshare_var()
    if (value_stack.size() == 0)   return NO_COUPLING;
 
 ValueStackItem & vs = value_stack.back();
-   if (vs.name_class != NC_SYSTEM_VAR)   return NO_COUPLING;
+   if (vs.get_NC() != NC_SYSTEM_VAR)   return NO_COUPLING;
 
 const SV_key key = get_SV_key();
 const SV_Coupling old_coupling = Svar_DB::get_coupling(key);
@@ -884,7 +874,7 @@ const SV_Coupling old_coupling = Svar_DB::get_coupling(key);
    Svar_DB::retract_var(key);
 
    set_SV_key(0);
-   vs.name_class = NC_UNUSED_USER_NAME;
+   vs.set_NC(NC_UNUSED_USER_NAME);
 
    return old_coupling;
 }
@@ -894,20 +884,20 @@ Symbol::set_NC(NameClass nc, Function_P fun)
 {
 ValueStackItem & vs = value_stack.back();
 
-const bool can_set = (vs.name_class == NC_FUNCTION) ||
-                     (vs.name_class == NC_OPERATOR) ||
-                     (vs.name_class == NC_UNUSED_USER_NAME);
+const bool can_set = (vs.get_NC() == NC_FUNCTION) ||
+                     (vs.get_NC() == NC_OPERATOR) ||
+                     (vs.get_NC() == NC_UNUSED_USER_NAME);
 
    Assert(nc == NC_FUNCTION || nc == NC_OPERATOR || nc == NC_UNUSED_USER_NAME);
 
    if (!can_set)   DEFN_ERROR;
-   vs.sym_val.function = fun;
-   if (fun)   vs.name_class = nc;
-   else       vs.name_class = NC_UNUSED_USER_NAME;
+
+   if (fun)   vs.set_function(fun);
+   else       vs.clear_function();
 }
 //----------------------------------------------------------------------------
 ostream &
-Symbol::list(ostream & out)
+Symbol::list(ostream & out) const
 {
    out << "   ";
    loop(s, name.size())   out << name[s];
@@ -916,14 +906,16 @@ Symbol::list(ostream & out)
 
    if (is_erased())   out << "   ERASED";
    Assert(value_stack.size());
-const NameClass nc = value_stack.back().name_class;
-   if      (nc == NC_INVALID)            out << "   INVALID NC";
-   else if (nc == NC_UNUSED_USER_NAME)   out << "   Unused";
-   else if (nc == NC_LABEL)              out << "   Label";
-   else if (nc == NC_VARIABLE)           out << "   Variable";
-   else if (nc == NC_FUNCTION)           out << "   Function";
-   else if (nc == NC_OPERATOR)           out << "   Operator";
-   else                                  out << "   !!! Error !!!";
+   switch(value_stack.back().get_NC())
+      {
+        case NC_INVALID:          out << "   INVALID NC";   break;
+        case NC_UNUSED_USER_NAME: out << "   Unused";       break;
+        case NC_LABEL:            out << "   Label";        break;
+        case NC_VARIABLE:         out << "   Variable";     break;
+        case NC_FUNCTION:         out << "   Function";     break;
+        case NC_OPERATOR:         out << "   Operator";     break;
+        default:                  out << "   !!! Error !!!";
+      }
 
    return out << endl;
 }
@@ -934,13 +926,13 @@ Symbol::write_OUT(FILE * out, uint64_t & seq) const
 char buffer[128];   // a little bigger than needed - don't use sizeof(buffer)
 UCS_string data;
 
-const NameClass nc = value_stack[0].name_class;
-   switch(nc)
+   switch(value_stack[0].get_NC())
       {
         case NC_VARIABLE:
              {
                data.append(UNI_A);
-               Token tok = Quad_TF::tf2_var(get_name(), value_stack[0].apl_val);
+               Token tok = Quad_TF::tf2_var(get_name(),
+                                            *value_stack[0].get_val_cptr());
                const UCS_string ucs(*tok.get_apl_val());
                data.append(ucs);
              }
@@ -951,8 +943,8 @@ const NameClass nc = value_stack[0].name_class;
              {
                // write a timestamp record
                //
-               const Function & fun = *value_stack[0].sym_val.function;
-               const YMDhmsu ymdhmsu(fun.get_creation_time());
+               Function_P fun = value_stack[0].get_function();
+               const YMDhmsu ymdhmsu(fun->get_creation_time());
                sprintf(buffer, "*(%d %d %d %d %d %d %d)",
                        ymdhmsu.year, ymdhmsu.month, ymdhmsu.day,
                        ymdhmsu.hour, ymdhmsu.minute, ymdhmsu.second,
@@ -968,7 +960,7 @@ const NameClass nc = value_stack[0].name_class;
                data.append(UNI_F);
                data.append(get_name());
                data.append(UNI_SPACE);
-               Quad_TF::tf2_fun_ucs(data, get_name(), fun);
+               Quad_TF::tf2_fun_ucs(data, get_name(), *fun);
              }
              break;
 
@@ -998,23 +990,24 @@ Symbol::unmark_all_values() const
    loop(v, value_stack.size())
        {
          const ValueStackItem & item = value_stack[v];
-         switch(item.name_class)
+         switch(item.get_NC())
             {
               case NC_VARIABLE:
-                   item.apl_val->unmark();
+                   item.get_val_cptr()->unmark();
                    break;
 
               case NC_FUNCTION:
               case NC_OPERATOR:
-                   if (item.sym_val.function->is_native())   break;
+                   if (item.get_function()->is_native())   break;
                    {
-                     const UserFunction * ufun =
-                                          item.sym_val.function->get_ufun1();
-
                      // ufun can be 0 for example if F is a function argument
                      // of a defined operator and F is a primitive function
                      //
-                     if (ufun)   ufun->unmark_all_values();
+                     if (const UserFunction * ufun =
+                               item.get_function()->get_func_ufun())
+                        {
+                          ufun->unmark_all_values();
+                        }
                    }
                    break;
 
@@ -1031,13 +1024,13 @@ int count = 0;
    loop(v, value_stack.size())
        {
          const ValueStackItem & item = value_stack[v];
-         switch(item.name_class)
+         switch(item.get_NC())
             {
               case NC_VARIABLE:
-                   if (Value::is_or_contains(item.apl_val.get(), &value))
+                   if (Value::is_or_contains(item.get_val_cptr(), &value))
                       {
                          out << "    Variable[vs=" << v << "] "
-                            << get_name() << endl;
+                             << get_name() << endl;
                          ++count;
                       }
                    break;
@@ -1045,8 +1038,8 @@ int count = 0;
               case NC_FUNCTION:
               case NC_OPERATOR:
                    {
-                     const Function * fun = item.sym_val.function;
-                     const Executable * ufun = fun->get_ufun1();
+                     Function_P fun = item.get_function();
+                     const Executable * ufun = fun->get_func_ufun();
                      Assert(ufun || fun->is_native());
                      if (ufun)
                         {
@@ -1097,10 +1090,10 @@ void
 Symbol::dump(ostream & out) const
 {
 const ValueStackItem & vs = value_stack[0];
-   if (vs.name_class == NC_VARIABLE)
+   if (vs.get_NC() == NC_VARIABLE)
       {
         UCS_string_vector CR10;
-        const Value & value = vs.apl_val.getref();
+        const Value & value = *vs.get_val_cptr();
         Quad_CR::do_CR10_variable(CR10, get_name(), value);
 
         if (value.is_member())
@@ -1117,10 +1110,9 @@ const ValueStackItem & vs = value_stack[0];
 
         out << endl;
       }
-   else if (vs.name_class == NC_FUNCTION ||
-            vs.name_class == NC_OPERATOR)
+   else if (vs.get_NC() & NC_FUN_OPER)
       {
-        const Function * fun = vs.sym_val.function;
+        Function_P fun = vs.get_function();
         if (fun == 0)
            {
              out << "⍝ function " << get_name() << " has function pointer 0!"
@@ -1128,7 +1120,7 @@ const ValueStackItem & vs = value_stack[0];
              return;
            }
 
-        const UserFunction * ufun = fun->get_ufun1();
+        const UserFunction * ufun = fun->get_func_ufun();
         if (ufun == 0)
            {
              out << "⍝ function " << get_name() << " has ufun1 pointer 0!"
@@ -1193,13 +1185,13 @@ const ValueStackItem & vs = value_stack[0];
 }
 //----------------------------------------------------------------------------
 int
-Symbol::get_SI_level(const Function * fun) const
+Symbol::get_SI_level(Function_P fun) const
 {
    loop(v, value_stack.size())
        {
          const ShapeItem from_tos = value_stack.size() - v - 1;
          const ValueStackItem & item = value_stack[from_tos];
-         if (item.sym_val.function == fun)
+         if (item.get_function() == fun)
             return Workspace::SI_top()->nth_push(this, from_tos);
        }
 
@@ -1212,8 +1204,8 @@ Symbol::get_SI_level(const Value & val) const
    loop(v, value_stack.size())
        {
          const ShapeItem from_tos = value_stack.size() - v - 1;
-         const ValueStackItem & item = value_stack[from_tos];
-         if (item.apl_val.get() == &val)
+         const ValueStackItem & vs = value_stack[from_tos];
+         if (vs.get_val_cptr() == &val)
             return Workspace::SI_top()->nth_push(this, from_tos);
        }
 
@@ -1230,7 +1222,7 @@ Symbol::clear_vs()
 
 ValueStackItem & tos = value_stack[0];
 
-   switch(tos.name_class)
+   switch(tos.get_NC())
       {
         case NC_LABEL:
              // should not happen since stack height == 1"
@@ -1238,8 +1230,8 @@ ValueStackItem & tos = value_stack[0];
              break;
 
         case NC_VARIABLE:
-             tos.apl_val.reset();   // delete the value owned by this var
-             tos.name_class = NC_UNUSED_USER_NAME;
+             tos.reset_apl_value();   // delete the value owned by this var
+             tos.set_NC(NC_UNUSED_USER_NAME);
              break;
 
         case NC_UNUSED_USER_NAME:
@@ -1247,8 +1239,8 @@ ValueStackItem & tos = value_stack[0];
 
         case NC_FUNCTION:
         case NC_OPERATOR:
-             const_cast<Function *>(tos.sym_val.function)->destroy();
-             tos.name_class = NC_UNUSED_USER_NAME;
+             const_cast<Function *>(tos.get_function())->destroy();
+             tos.set_NC(NC_UNUSED_USER_NAME);
              break;
 
         default: break;
@@ -1270,7 +1262,7 @@ CDR_string cdr;
    CDR::to_CDR(cdr, *new_value);
    if (cdr.size() > MAX_SVAR_SIZE)   LIMIT_ERROR_SVAR;
 
-string data(charP(cdr.get_items()), cdr.size());
+std::string data(charP(cdr.get_items()), cdr.size());
 
    // wait for shared variable to be ready
    //

@@ -202,7 +202,7 @@ StateIndicator * si = Workspace::SI_top();
    //
    if (si)
       {
-        const UserFunction * ufun = si->get_executable()->get_ufun();
+        const UserFunction * ufun = si->get_executable()->get_exec_ufun();
         if (ufun && ufun->get_exec_properties()[3])   code = E_DOMAIN_ERROR;
       }
 
@@ -286,7 +286,7 @@ void
 Error::update_error_info(StateIndicator * si)
 {
 bool locked = false;
-const UserFunction * ufun = si->get_executable()->get_ufun();
+const UserFunction * ufun = si->get_executable()->get_exec_ufun();
 
    // prepare second error line (failed statement)
    //
@@ -320,7 +320,7 @@ const UserFunction * ufun = si->get_executable()->get_ufun();
 
    if (locked)
       {
-        si->get_executable()->get_ufun()->set_locked_error_info(*this);
+        si->get_executable()->get_exec_ufun()->set_locked_error_info(*this);
       }
    else
       {

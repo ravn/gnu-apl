@@ -67,7 +67,7 @@ DynamicObject::print(ostream & out) const
 }
 //----------------------------------------------------------------------------
 /// cast DynamicObject to derived class Value.
-/// This only works properly after #include Value.hh !
+/// This only works properly after including Value.hh !
 Value &
 DynamicObject::rValue()
 {
@@ -79,7 +79,7 @@ DynamicObject::rValue()
 }
 //----------------------------------------------------------------------------
 /// cast DynamicObject to derived class Value.
-/// This only works properly after #include Value.hh !
+/// This only works properly after including Value.hh !
 const Value &
 DynamicObject::rValue() const
 {

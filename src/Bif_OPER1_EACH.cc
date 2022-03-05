@@ -61,8 +61,8 @@ Function_P LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P First_A = Bif_F12_TAKE::first(A);
-        Value_P First_B = Bif_F12_TAKE::first(B);
+        Value_P First_A = Bif_F12_TAKE::first(A.getref());
+        Value_P First_B = Bif_F12_TAKE::first(B.getref());
         Shape shape_Z;   // will be ⍴A or ⍴B and therefore empty
 
         if (A->is_empty())          shape_Z = A->get_shape();
@@ -232,12 +232,13 @@ Value_P Z;
 }
 //----------------------------------------------------------------------------
 Token
-Bif_OPER1_EACH::eval_LB(Token & _LO, Value_P B) const
+Bif_OPER1_EACH::do_eval_LB(Token & _LO, Value_P B)
 {
    // monadic EACH: call _LO for every item of B
 
 Function_P LO = _LO.get_function();
    Assert1(LO);
+
    if (LO->is_operator())                SYNTAX_ERROR;
    if (!(LO->get_signature() & SIG_B))   VALENCE_ERROR;
 
@@ -245,7 +246,7 @@ Function_P LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P First_B = Bif_F12_TAKE::first(B);
+        Value_P First_B = Bif_F12_TAKE::first(B.getref());
         Token tZ = LO->eval_fill_B(First_B);
         Value_P Z1 = tZ.get_apl_val();
 

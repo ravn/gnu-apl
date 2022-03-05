@@ -60,7 +60,7 @@ Unicode Quad_AV::qav[Avec::MAX_AV];
 
 //============================================================================
 void
-SystemVariable::assign(Value_P value, bool clone, const char * loc)
+SystemVariable::assign(Value_P B, bool clone, const char * loc)
 {
    CERR << "SystemVariable::assign() not (yet) implemented for "
         << get_Id() << endl;
@@ -68,7 +68,7 @@ SystemVariable::assign(Value_P value, bool clone, const char * loc)
 }
 //----------------------------------------------------------------------------
 void
-SystemVariable::assign_indexed(const Value * X, Value_P value)
+SystemVariable::assign_indexed(const Value * X, Value_P B)
 {
    CERR << "SystemVariable::assign_indexed() not (yet) implemented for "
         << get_Id() << endl;
@@ -214,15 +214,15 @@ Quad_CT::Quad_CT()
 }
 //----------------------------------------------------------------------------
 void
-Quad_CT::assign(Value_P value, bool clone, const char * loc)
+Quad_CT::assign(Value_P B, bool clone, const char * loc)
 {
-   if (!value->is_scalar_or_len1_vector())
+   if (!B->is_scalar_or_len1_vector())
       {
-        if (value->get_rank() > 1)   RANK_ERROR;
+        if (B->get_rank() > 1)   RANK_ERROR;
         else                         LENGTH_ERROR;
       }
 
-const Cell & cell = value->get_cfirst();
+const Cell & cell = B->get_cfirst();
    if (!cell.is_numeric())             DOMAIN_ERROR;
    if (cell.get_imag_value() != 0.0)   DOMAIN_ERROR;
 
@@ -238,7 +238,7 @@ APL_Float val = cell.get_real_value();
       }
    else
       {
-        Symbol::assign(value, clone, LOC);
+        Symbol::assign(B, clone, LOC);
       }
 }
 //============================================================================
@@ -337,15 +337,15 @@ Value_P QFC(6, LOC);
 }
 //----------------------------------------------------------------------------
 void
-Quad_FC::assign(Value_P value, bool clone, const char * loc)
+Quad_FC::assign(Value_P B, bool clone, const char * loc)
 {
-   if (!value->is_scalar_or_vector())   RANK_ERROR;
+   if (!B->is_scalar_or_vector())   RANK_ERROR;
 
-ShapeItem value_len = value->element_count();
+ShapeItem value_len = B->element_count();
    if (value_len > 6)   value_len = 6;
 
    loop(c, value_len)
-       if (!value->get_cravel(c).is_character_cell())   DOMAIN_ERROR;
+       if (!B->get_cravel(c).is_character_cell())   DOMAIN_ERROR;
 
    // new value is correct. 
    //
@@ -353,7 +353,7 @@ Unicode fc[6] = { UNI_FULLSTOP, UNI_COMMA,      UNI_STAR_OPERATOR,
                   UNI_0,        UNI_UNDERSCORE, UNI_OVERBAR };
 
    loop(c, 6)   if (c < value_len)
-         fc[c] = value->get_cravel(c).get_char_value();
+         fc[c] = B->get_cravel(c).get_char_value();
 
    // 0123456789,. are forbidden for ⎕FC[4 + ⎕IO]
    //
@@ -366,25 +366,25 @@ Value_P new_val(ucs, LOC);
 }
 //----------------------------------------------------------------------------
 void
-Quad_FC::assign_indexed(const IndexExpr & IX, Value_P value)
+Quad_FC::assign_indexed(const IndexExpr & IX, Value_P B)
 {
    if (!IX.is_axis())   INDEX_ERROR;
 
    // at this point we have a one dimensional index. It it were non-empty,
    // then assign_indexed(Value) would have been called instead. Therefore
-   // IX must be an elided index (like in ⎕FC[] ← value)
+   // IX must be an elided index (like in ⎕FC[] ← B)
    //
    Assert1(!IX.values[0]);
-   assign(value, true, LOC);   // ⎕FC[]←value
+   assign(B, true, LOC);   // ⎕FC[]←value
 }
 //----------------------------------------------------------------------------
 void
-Quad_FC::assign_indexed(const Value * X, Value_P value)
+Quad_FC::assign_indexed(const Value * X, Value_P B)
 {
    // we don't do scalar extension but require indices to match the value.
    //
 ShapeItem ec = X->element_count();
-   if (ec != value->element_count())   INDEX_ERROR;
+   if (ec != B->element_count())   INDEX_ERROR;
 
    // ignore extra values.
    //
@@ -403,7 +403,7 @@ Unicode fc[6];
         if (idx < 0)   continue;
         if (idx > 5)   continue;
 
-        fc[idx] = value->get_cravel(e).get_char_value();
+        fc[idx] = B->get_cravel(e).get_char_value();
       }
 
    // 0123456789,. are forbidden for ⎕FC[4 + ⎕IO]
@@ -423,15 +423,15 @@ Quad_IO::Quad_IO()
 }
 //----------------------------------------------------------------------------
 void
-Quad_IO::assign(Value_P value, bool clone, const char * loc)
+Quad_IO::assign(Value_P B, bool clone, const char * loc)
 {
-   if (!value->is_scalar_or_len1_vector())
+   if (!B->is_scalar_or_len1_vector())
       {
-        if (value->get_rank() > 1)   RANK_ERROR;
+        if (B->get_rank() > 1)   RANK_ERROR;
         else                         LENGTH_ERROR;
       }
 
-   if (value->get_cfirst().get_near_bool())
+   if (B->get_cfirst().get_near_bool())
       Symbol::assign(IntScalar(1, LOC), false, LOC);
    else
       Symbol::assign(IntScalar(0, LOC), false, LOC);
@@ -444,7 +444,7 @@ Quad_L::Quad_L()
 }
 //----------------------------------------------------------------------------
 void
-Quad_L::assign(Value_P value, bool clone, const char * loc)
+Quad_L::assign(Value_P B, bool clone, const char * loc)
 {
 StateIndicator * si = Workspace::SI_top_fun();
    if (si == 0)   return;
@@ -453,7 +453,7 @@ StateIndicator * si = Workspace::SI_top_fun();
    //
    if (StateIndicator::get_error(si).is_syntax_or_value_error())   return;
 
-   si->set_L(value);
+   si->set_L(B);
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -508,12 +508,12 @@ Quad_LX::Quad_LX()
 }
 //----------------------------------------------------------------------------
 void
-Quad_LX::assign(Value_P value, bool clone, const char * loc)
+Quad_LX::assign(Value_P B, bool clone, const char * loc)
 {
-   if (value->get_rank() > 1)      RANK_ERROR;
-   if (!value->is_char_string())   DOMAIN_ERROR;
+   if (B->get_rank() > 1)      RANK_ERROR;
+   if (!B->is_char_string())   DOMAIN_ERROR;
 
-   Symbol::assign(value, clone, LOC);
+   Symbol::assign(B, clone, LOC);
 }
 //============================================================================
 Quad_PP::Quad_PP()
@@ -524,9 +524,9 @@ Value_P Qpp = IntScalar(DEFAULT_Quad_PP, LOC);
 }
 //----------------------------------------------------------------------------
 void
-Quad_PP::assign(Value_P value, bool clone, const char * loc)
+Quad_PP::assign(Value_P B, bool clone, const char * loc)
 {
-APL_Integer pp = value->get_sole_integer();
+APL_Integer pp = B->get_sole_integer();
    if (pp < MIN_Quad_PP)   DOMAIN_ERROR;
    if (pp > MAX_Quad_PP)   pp = MAX_Quad_PP;
 
@@ -540,13 +540,13 @@ Quad_PR::Quad_PR()
 }
 //----------------------------------------------------------------------------
 void
-Quad_PR::assign(Value_P value, bool clone, const char * loc)
+Quad_PR::assign(Value_P B, bool clone, const char * loc)
 {
-UCS_string ucs = value->get_UCS_ravel();
+UCS_string ucs = B->get_UCS_ravel();
 
    if (ucs.size() > 1)   LENGTH_ERROR;
 
-   Symbol::assign(value, clone, LOC);
+   Symbol::assign(B, clone, LOC);
 }
 //============================================================================
 Quad_PS::Quad_PS()
@@ -689,9 +689,9 @@ Quad_PW::Quad_PW()
 }
 //----------------------------------------------------------------------------
 void
-Quad_PW::assign(Value_P value, bool clone, const char * loc)
+Quad_PW::assign(Value_P B, bool clone, const char * loc)
 {
-const APL_Integer pw = value->get_sole_integer();
+const APL_Integer pw = B->get_sole_integer();
 
    // min. ⎕PW is 30. Ignore smaller values.
    if (pw < MIN_Quad_PW)   return;
@@ -708,12 +708,12 @@ Quad_Quad::Quad_Quad()
 }
 //----------------------------------------------------------------------------
 void
-Quad_Quad::assign(Value_P value, bool clone, const char * loc)
+Quad_Quad::assign(Value_P B, bool clone, const char * loc)
 {
    // write pending LF from  ⍞ (if any)
    Quad_QUOTE::done(true, LOC);
 
-   value->print(COUT);
+   B->print(COUT);
 }
 //----------------------------------------------------------------------------
 void
@@ -761,14 +761,14 @@ Quad_QUOTE::done(bool with_LF, const char * loc)
 }
 //----------------------------------------------------------------------------
 void
-Quad_QUOTE::assign(Value_P value, bool clone, const char * loc)
+Quad_QUOTE::assign(Value_P B, bool clone, const char * loc)
 {
    Log(LOG_cork)
       CERR << "Quad_QUOTE::assign() called, buffer = ["
            << prompt << "]" << endl;
 
 PrintContext pctx(PR_QUOTE_Quad);
-PrintBuffer pb(*value, pctx, 0);
+PrintBuffer pb(*B, pctx, 0);
    if (pb.get_row_count() > 1)  // multi line output: flush and restart corking
       {
         loop(y, pb.get_row_count())
@@ -838,7 +838,7 @@ Quad_R::Quad_R()
 }
 //----------------------------------------------------------------------------
 void
-Quad_R::assign(Value_P value, bool clone, const char * loc)
+Quad_R::assign(Value_P B, bool clone, const char * loc)
 {
 StateIndicator * si = Workspace::SI_top_fun();
    if (si == 0)   return;
@@ -847,7 +847,7 @@ StateIndicator * si = Workspace::SI_top_fun();
    //
    if (StateIndicator::get_error(si).is_syntax_or_value_error())   return;
 
-   si->set_R(value);
+   si->set_R(B);
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -864,12 +864,12 @@ StateIndicator * si = Workspace::SI_top_error();
 }
 //============================================================================
 void
-Quad_SYL::assign(Value_P value, bool clone, const char * loc)
+Quad_SYL::assign(Value_P B, bool clone, const char * loc)
 {
    // Quad_SYL is mostly read-only, so we only allow assign_indexed() with
    // certain values.
    //
-   if (+value)   SYNTAX_ERROR;
+   if (+B)   SYNTAX_ERROR;
 
    // this assign is called from the constructor in order to trigger the
    // creation of a symbol for Quad_SYL.
@@ -878,7 +878,7 @@ Quad_SYL::assign(Value_P value, bool clone, const char * loc)
 }
 //----------------------------------------------------------------------------
 void
-Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P value)
+Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P B)
 {
    //  must be an array index of the form [something; 2]
    //
@@ -898,7 +898,7 @@ const APL_Integer qio = Workspace::get_IO();
 
 const Value * X1 = IDX.get_axis_value(0);
 
-   assign_indexed(X1, value);
+   assign_indexed(X1, B);
 }
 //----------------------------------------------------------------------------
 void
@@ -1095,20 +1095,20 @@ ostringstream os;
 }
 //----------------------------------------------------------------------------
 void
-Quad_TZ::assign(Value_P value, bool clone, const char * loc)
+Quad_TZ::assign(Value_P B, bool clone, const char * loc)
 {
-   if (!value->is_scalar())   RANK_ERROR;
+   if (!B->is_scalar())   RANK_ERROR;
 
    // ignore values outside [-12 ... 14], DOMAIN ERROR for bad types.
 
-const Cell & cell = value->get_cfirst();
+const Cell & cell = B->get_cfirst();
    if (cell.is_integer_cell())
       {
         const APL_Integer ival = cell.get_near_int();
         if (ival < -12)   return;
         if (ival > 14)    return;
         offset_seconds = ival*3600;
-        Symbol::assign(value, clone, LOC);
+        Symbol::assign(B, clone, LOC);
         return;
       }
 
@@ -1118,7 +1118,7 @@ const Cell & cell = value->get_cfirst();
         if (hours < -12.1)   return;
         if (hours > 14.1)    return;
         offset_seconds = int(0.5 + hours*3600);
-        Symbol::assign(value, clone, LOC);
+        Symbol::assign(B, clone, LOC);
         return;
       }
 
@@ -1165,7 +1165,7 @@ Quad_X::Quad_X()
 }
 //----------------------------------------------------------------------------
 void
-Quad_X::assign(Value_P value, bool clone, const char * loc)
+Quad_X::assign(Value_P B, bool clone, const char * loc)
 {
 StateIndicator * si = Workspace::SI_top_fun();
    if (si == 0)   return;
@@ -1174,7 +1174,7 @@ StateIndicator * si = Workspace::SI_top_fun();
    //
    if (StateIndicator::get_error(si).is_syntax_or_value_error())   return;
 
-   si->set_X(value);
+   si->set_X(B);
 }
 //----------------------------------------------------------------------------
 Value_P

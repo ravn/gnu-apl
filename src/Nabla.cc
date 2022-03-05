@@ -634,7 +634,7 @@ Function_P function = fun_symbol->get_function();
    if (Workspace::is_called(fun_symbol->get_name()))
       return "function is used, pendent or suspended";
 
-const UserFunction * ufun = function->get_ufun1();
+const UserFunction * ufun = function->get_func_ufun();
    if (ufun == 0)
       return "function is not editable at " LOC;
 
@@ -917,7 +917,7 @@ const Function * fun = fun_symbol ? fun_symbol->get_function() : 0;
 
    if (fun)   // existing function
       {
-        const UserFunction * ufun = fun->get_ufun1();
+        const UserFunction * ufun = fun->get_func_ufun();
         Assert(ufun);
         loop(l, ufun->get_text_size())
             {

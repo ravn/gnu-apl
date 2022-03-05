@@ -41,7 +41,7 @@ public:
    static Quad_GTK  _fun;          ///< Built-in function.
 
    /// close all open windows
-   void clear();
+   static void clear();
 
 protected:
    /// the type of a function parameter or return value

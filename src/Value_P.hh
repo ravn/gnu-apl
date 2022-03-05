@@ -54,14 +54,6 @@ public:
    bool operator!() const
       { return value_p == 0; }
 
-   /// return true if this Value_P points to the same Value as \b other
-   bool operator ==(const Value_P_Base & other) const
-      { return value_p == other.value_p; }
-
-   /// return true if this Value_P points to a different Value than \b other
-   bool operator !=(const Value_P_Base & other) const
-      { return value_p != other.value_p; }
-
    /// return a const pointer to the Value (overloaded ->)
    const Value * operator->()  const
       { return value_p; }
@@ -159,6 +151,9 @@ public:
    /// Destructor
    inline ~Value_P();
 };
+
+typedef Value_P FunArg;
+
 //----------------------------------------------------------------------------
 
 #endif // __SHARED_VALUE_POINTER_HH_DEFINED__

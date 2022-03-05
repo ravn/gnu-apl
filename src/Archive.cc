@@ -358,7 +358,7 @@ XML_Saving_Archive::save_Function(const Function & fun)
       }
    else if (fun.is_macro())
       {
-        const UserFunction * ufun = fun.get_ufun1();
+        const UserFunction * ufun = fun.get_func_ufun();
         Assert(ufun);
 
         out << " macro=\"" << ufun->get_macnum() << "\"/>" << endl;
@@ -446,13 +446,13 @@ XML_Saving_Archive::save_Function_name(const Function & fun)
              << endl;
       }
 
-const UserFunction * ufun = fun.get_ufun1();
+const UserFunction * ufun = fun.get_func_ufun();
    if (ufun)   // user defined function
       {
         const UCS_string & fname = ufun->get_name();
         Symbol * sym = Workspace::lookup_symbol(fname);
         Assert(sym);
-        const int sym_depth = sym->get_ufun_depth(ufun);
+        const int sym_depth = sym->get_exec_ufun_depth(ufun);
         out << " ufun-name=\""  << fname     << "\""
             << " symbol-level=\"" << sym_depth << "\"";
         return 2;   // two attributes
@@ -585,9 +585,9 @@ const Executable & exec = *si.get_executable();
              {
                Symbol * sym = Workspace::lookup_symbol(exec.get_name());
                Assert(sym);
-               const UserFunction * ufun = exec.get_ufun();
+               const UserFunction * ufun = exec.get_exec_ufun();
                Assert(ufun);
-               const int sym_depth = sym->get_ufun_depth(ufun);
+               const int sym_depth = sym->get_exec_ufun_depth(ufun);
 
                if (ufun->is_macro())
                   out << "<UserFunction macro-num=\"" << ufun->get_macnum()
@@ -785,23 +785,23 @@ XML_Saving_Archive::save_vstack_item(const ValueStackItem & vsi)
 
         case NC_LABEL:
              do_indent();
-             out << "<Label value=\"" << vsi.sym_val.label << "\"/>" << endl;
+             out << "<Label value=\"" << vsi.get_label() << "\"/>" << endl;
              break;
 
         case NC_VARIABLE:
              do_indent();
-             out << "<Variable vid=\"" << find_vid(vsi.apl_val.get())
+             out << "<Variable vid=\"" << find_vid(vsi.get_val_cptr())
                  << "\"/>" << endl;
              break;
 
         case NC_FUNCTION:
         case NC_OPERATOR:
-             save_Function(*vsi.sym_val.function);
+             save_Function(*vsi.get_function());
              break;
 
         case NC_SYSTEM_VAR:
              do_indent();
-             out << "<Shared-Variable key=\"" << vsi.sym_val.sv_key
+             out << "<Shared-Variable key=\"" << vsi.get_key()
                  << "\"/>" << endl;
              break;
 
@@ -2144,7 +2144,7 @@ const Fid LO_fid = find_Fid_attr("LO-fid", true, 16);
         symbol.push();   // placeholder (for now)
         add_fid_function(fid, 0, LOC);
 
-        _derived_todo td = { 0, &symbol.top_of_stack()->sym_val.function,
+        _derived_todo td = { 0, symbol.top_of_stack()->get_function_P(),
                              fid, LO_fid, OPER_fid, RO_fid, AXIS_vid, LOC };
         derived_todos.push_back(td);
         return;
@@ -2631,9 +2631,9 @@ Symbol * symbol = Workspace::lookup_symbol(name_UCS);
    Assert(level < symbol->value_stack_size());
 ValueStackItem & vsi = (*symbol)[level];
    Assert(vsi.get_NC() == NC_FUNCTION || vsi.get_NC() == NC_OPERATOR);
-Function_P fun = vsi.sym_val.function;
+Function_P fun = vsi.get_function();
    Assert(fun);
-const UserFunction * ufun = fun->get_ufun1();
+const UserFunction * ufun = fun->get_func_ufun();
    Assert(fun == ufun);
 
    return ufun;
@@ -2860,7 +2860,7 @@ const UTF8 * fun_name = find_optional_attr("ufun-name");
         Assert(level < symbol.value_stack_size());
         const ValueStackItem & vsi = symbol[level];
         Assert(vsi.get_NC() == NC_FUNCTION);
-        Function_P fun = vsi.sym_val.function;
+        Function_P fun = vsi.get_function();
         Assert(fun);
         return fun;
       }
@@ -3012,12 +3012,11 @@ const Token_string & body = exec.get_body();
              loop(v, sym->value_stack_size())
                 {
                   const ValueStackItem & vs = (*sym)[v];
-                  if (vs.get_NC() == NC_FUNCTION ||
-                      vs.get_NC() == NC_OPERATOR)
+                  if (vs.get_NC() & NC_FUN_OPER)
                      {
-                       if (vs.sym_val.function->get_name() == lambda)
+                       if (vs.get_function()->get_name() == lambda)
                           {
-                            return vs.sym_val.function;
+                            return vs.get_function();
                           }
                      }
                 }
@@ -3027,7 +3026,7 @@ const Token_string & body = exec.get_body();
 
         Function_P fun = tok.get_function();
         Assert1(fun);
-        const UserFunction * ufun = fun->get_ufun1();
+        const UserFunction * ufun = fun->get_func_ufun();
         if (!ufun)   continue;   // not a user defined function
 
         const UCS_string & fname = ufun->get_name();

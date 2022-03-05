@@ -65,7 +65,7 @@ Quad_RL::get_random()
    state *= Knuth_a;
    state += Knuth_c;
 
-   value_stack.back().apl_val->set_ravel_Int(0, state);
+   value_stack.back().get_val_wptr()->set_ravel_Int(0, state);
    return state;
 }
 //----------------------------------------------------------------------------
@@ -81,6 +81,6 @@ void
 Quad_RL::pop()
 {
    Symbol::pop();
-   state = value_stack.back().apl_val->get_cfirst().get_near_int();
+   state = value_stack.back().get_val_cptr()->get_cfirst().get_near_int();
 }
 //============================================================================

@@ -92,7 +92,7 @@ SymbolTable::find_lambda_name(const UserFunction * lambda)
          for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
              {
                if (sym->is_erased())   continue;
-               if (sym->get_ufun_depth(lambda) != -1)   return sym->get_name();
+               if (sym->get_exec_ufun_depth(lambda) != -1)   return sym->get_name();
              }
        }
 
@@ -385,7 +385,7 @@ Symbol * symbol = lookup_existing_symbol(sym);
         return true;
       }
 
-ValueStackItem & tos = symbol->value_stack[0];
+ValueStackItem & tos = symbol->value_stack[0];   // APL top-level
 
    switch(tos.get_NC())
       {
@@ -402,21 +402,21 @@ ValueStackItem & tos = symbol->value_stack[0];
 
         case NC_FUNCTION:
         case NC_OPERATOR:
-             Assert(tos.sym_val.function);
-             if (tos.sym_val.function->is_native())
+             Assert(tos.get_function());
+             if (tos.get_function()->is_native())
                 {
                   symbol->expunge();
                   return false;
                 }
 
-             if (tos.sym_val.function->is_lambda())
+             if (tos.get_function()->is_lambda())
                 {
                   symbol->expunge();
                   return false;
                 }
 
              {
-               const UserFunction * ufun = tos.sym_val.function->get_ufun1();
+               const UserFunction * ufun = tos.get_function()->get_func_ufun();
                Assert(ufun);
                if (Workspace::oldest_exec(ufun))
                   {
@@ -426,9 +426,8 @@ ValueStackItem & tos = symbol->value_stack[0];
                   }
              }
 
-             delete tos.sym_val.function;
-             tos.sym_val.function = 0;
-             tos.name_class = NC_UNUSED_USER_NAME;
+             delete tos.get_function();
+             tos.clear_function();
              return false;
 
         default: break;

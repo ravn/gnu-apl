@@ -354,7 +354,7 @@ const int data_chars = len - idx;
         loop(d, data_chars)   new_val->next_ravel_Char(ravel[idx + d]);
         new_val->check_value(LOC);
 
-         Token t = Quad_FX::fun->eval_B(new_val);
+         Token t = Quad_FX::do_eval_B(new_val.getref());
       }
    else if (mode == UNI_C)   // char array
       {
@@ -471,7 +471,7 @@ const Symbol * symbol = obj->get_symbol();
    if (symbol)
       {
         Value_P value = symbol->get_apl_value();
-        if (+value)   return tf2_var(name, value);
+        if (+value)   return tf2_var(name, value.getref());
 
         /* not a variable: fall through */
       }
@@ -481,20 +481,20 @@ const Symbol * symbol = obj->get_symbol();
 }
 //----------------------------------------------------------------------------
 Token
-Quad_TF::tf2_var(const UCS_string & var_name, Value_P value)
+Quad_TF::tf2_var(const UCS_string & var_name, const Value & B)
 {
    Log(LOG_Quad_TF)   CERR << "tf2_var(" << var_name << ")" << endl;
 
 UCS_string ucs_value; /// the right hand side of VAR←VALUE
-   if (value->is_scalar() && !value->is_simple_scalar())
+   if (B.is_scalar() && !B.is_simple_scalar())
       {
-        const Cell & cell = value->get_cfirst();
+        const Cell & cell = B.get_cfirst();
         Assert(cell.is_pointer_cell());
         tf2_value(0, ucs_value, cell.get_pointer_value().getref(), 1);
       }
    else
       {
-        tf2_value(0, ucs_value, value.getref(), 0);
+        tf2_value(0, ucs_value, B, 0);
       }
 
    Assert(ucs_value[0] == UNI_L_PARENT);
@@ -604,10 +604,10 @@ Token_string tos;
        tos[2].get_tag()   == TOK_Quad_FX &&
        tos[3].get_Class() == TC_VALUE)
       {
-        Value_P fname   =  tos[1].get_apl_val();
-        Value_P so_path =  tos[3].get_apl_val();
+        const Value & fname   =  tos[1].get_apl_val().getref();
+        const Value & so_path =  tos[3].get_apl_val().getref();
 
-        const Token tok = Quad_FX::fun->eval_AB(so_path, fname);
+        const Token tok = Quad_FX::do_eval_AB(so_path, fname);
         if (tok.get_Class() == TC_VALUE)   // ⎕FX successful
            {
              Value_P val = tok.get_apl_val();
@@ -633,7 +633,7 @@ Token_string tos;
    if (tos[2].get_Class() != TC_VALUE)    return UCS_string();
 
 static const int eprops[] = { 0, 0, 0, 0 };
-const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val(),
+const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().getref(),
                                       UTF8_string("2 ⎕TF"), true);
 
    if (tok.get_Class() != TC_VALUE)

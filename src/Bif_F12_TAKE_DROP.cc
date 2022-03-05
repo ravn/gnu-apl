@@ -35,10 +35,10 @@ Bif_F12_DROP      * Bif_F12_DROP     ::fun = &Bif_F12_DROP     ::_fun;
 
 //============================================================================
 Value_P
-Bif_F12_TAKE::first(Value_P B)
+Bif_F12_TAKE::first(const Value & B)
 {
-const Cell & first_B = B->get_cfirst();
-   if (B->element_count() == 0)   // empty value: return prototype
+const Cell & first_B = B.get_cfirst();
+   if (B.element_count() == 0)   // empty value: return prototype
       {
         if (first_B.is_lval_cell())   // (↑...)←V
             {
@@ -49,7 +49,7 @@ const Cell & first_B = B->get_cfirst();
 
         // normal (right-) value
         //
-        Value_P Z = B->prototype(LOC);
+        Value_P Z = B.prototype(LOC);
         Z->check_value(LOC);
         return Z;
       }

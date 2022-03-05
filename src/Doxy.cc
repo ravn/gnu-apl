@@ -251,12 +251,10 @@ int total_lines = 0;
         const Symbol * fun_sym = functions[f];
         loop(si, fun_sym->value_stack_size())
             {
-              if ((*fun_sym)[si].name_class != NC_FUNCTION &&
-                  (*fun_sym)[si].name_class != NC_OPERATOR)   continue;
+              Function_P fp = fun_sym->get_function(si);
+              if (fp == 0)   continue;
 
-              const Function * fp = (*fun_sym)[si].sym_val.function;
-              Assert(fp);
-              const UserFunction * ufun = fp->get_ufun1();
+              const UserFunction * ufun = fp->get_func_ufun();
               const int si_level = fun_sym->get_SI_level(fp);
 
               // colunm 1: function name/link
@@ -379,13 +377,12 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
         const Symbol & var_sym = *variables[v];
         loop(si, var_sym.value_stack_size())
             {
-              if (var_sym[si].name_class != NC_VARIABLE)   continue;
+              if (var_sym[si].get_NC() != NC_VARIABLE)   continue;
 
-              Assert(+var_sym[si].apl_val);
-              Value_P value = var_sym[si].apl_val;
-              const int si_level = var_sym.get_SI_level(value.getref());
-              const Token elem = Bif_F12_ELEMENT::fun->eval_B(value);
-              Value_P first = Bif_F12_TAKE::first(elem.get_apl_val());
+              const Value * value = var_sym[si].get_val_cptr();
+              const int si_level  = var_sym.get_SI_level(*value);
+              const Value * elem = Bif_F12_ELEMENT::do_eval_B(*value).get();
+              Value_P first = Bif_F12_TAKE::first(*elem);
               page <<
 "     <TR>"                                                                CRLF
 "      <TD class=code>" << var_sym.get_name() <<                           CRLF
@@ -458,7 +455,7 @@ std::vector<const StateIndicator *> stack;
          const StateIndicator * si = stack[stack.size() - d - 1];
          const Executable * exec = si->get_executable();
          Assert(exec);
-         const UserFunction * ufun = exec->get_ufun();   // possibly 0!
+         const UserFunction * ufun = exec->get_exec_ufun();   // possibly 0!
 
          page <<
 "     <TR>"                                                                CRLF
@@ -678,12 +675,9 @@ Doxy::make_call_graph(const std::vector<const Symbol *> & all_fns)
         const Symbol & fun_sym = *(all_fns[f]);
         loop(si, fun_sym.value_stack_size())
             {
-              if (fun_sym[si].name_class == NC_FUNCTION ||
-                  fun_sym[si].name_class == NC_OPERATOR)
+              if (Function_P fp = fun_sym.get_function(si))
                  {
-                   const Function * fp = fun_sym[si].sym_val.function;
-                   Assert(fp);
-                   const UserFunction * ufun = fp->get_ufun1();
+                   const UserFunction * ufun = fp->get_func_ufun();
                    if (ufun)   add_fun_to_call_graph(&fun_sym, ufun);
                  }
             }
@@ -719,12 +713,10 @@ const Token_string & body = ufun->get_body();
         const Symbol & callee_sym = *callee_ptr;
         loop(si, callee_sym.value_stack_size())
             {
-              if (callee_sym[si].name_class == NC_FUNCTION ||
-                  callee_sym[si].name_class == NC_OPERATOR)
+              if (const Function * fp = callee_sym.get_function(si))
                  {
-                   const Function * fp = callee_sym[si].sym_val.function;
                    Assert(fp);
-                   const UserFunction * callee = fp->get_ufun1();
+                   const UserFunction * callee = fp->get_func_ufun();
                    if (!callee)   continue;
 
                     // ignore multiple calls of the same callee from the
@@ -777,7 +769,7 @@ UCS_string root_name("all");
                  {
                    const Symbol * sym = all_functions[f];
                    const Function * fun = sym->get_function();
-                   const UserFunction * ufun = fun->get_ufun1();
+                   const UserFunction * ufun = fun->get_func_ufun();
                    nodes.push_back(ufun);
                    aliases.push_back(ufun->get_name());
                  }

@@ -197,7 +197,7 @@ Value_P Z(shape_Z, LOC);
 Token
 Bif_F12_DOMINO::eval_fill_B(Value_P B) const
 {
-   return Bif_F12_TRANSPOSE::fun->eval_B(B);
+   return Bif_F12_TRANSPOSE::do_eval_B(B.getref());
 }
 //----------------------------------------------------------------------------
 Token
@@ -236,7 +236,7 @@ Value_P A(2, LOC);   // A←0 4
    A->next_ravel_Int(4);   // number of fractional digits
    A->check_value(LOC);
 
-Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
+Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
    CERR << name;
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
@@ -259,7 +259,7 @@ Value_P A(2, LOC);
    A->next_ravel_Int(4);   // number of fractional digits
    A->check_value(LOC);
 
-Value_P Z = Bif_F12_FORMAT::fun->format_by_specification(A, B);
+Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
    CERR << name;
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG

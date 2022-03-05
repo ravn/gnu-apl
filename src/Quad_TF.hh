@@ -70,7 +70,7 @@ public:
    static UCS_string tf2_inverse(const UCS_string & ravel);
 
    /// return B in transfer format 2 (new APL format) for a variable
-   static Token tf2_var(const UCS_string & var_name, Value_P val);
+   static Token tf2_var(const UCS_string & var_name, const Value & val);
 
 protected:
    /// append \b shape in tf2_format to \b ucs.

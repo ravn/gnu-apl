@@ -158,9 +158,10 @@ const bool B_enclosed = B->get_rank() > 1;
            }
         else
            {
-             // A RO B has returned a vector, so compute LO/A_RO_B
+             // A RO B has returned vector A_RO_B, compute LO/A_RO_B
              //
-             const Token T2 = Bif_OPER1_REDUCE::fun->eval_LB(_LO, A_RO_B);
+             const Token T2 = Bif_OPER1_REDUCE::reduce(_LO, A_RO_B,
+                                                       A_RO_B->get_rank() - 1);
              if (T2.get_tag() == TOK_ERROR)   return T2;
 
              Value_P V2 = T2.get_apl_val();

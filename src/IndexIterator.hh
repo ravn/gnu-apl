@@ -49,7 +49,7 @@ public:
    bool more() const   { return count && pos < count; }
 
    /// return the current index
-   virtual ShapeItem get_value() const = 0;
+   virtual ShapeItem get_ivalue() const = 0;
 
    /// return the current index
    virtual ShapeItem get_pos(ShapeItem p) const = 0;
@@ -90,7 +90,7 @@ public:
    {}
 
    /// get the current index.
-   virtual ShapeItem get_value() const { return pos * weight; }
+   virtual ShapeItem get_ivalue() const { return pos * weight; }
 
    /// get the index i.
    virtual ShapeItem get_pos(ShapeItem i) const
@@ -110,7 +110,7 @@ public:
       { delete [] indices; }
 
    /// return the current index
-   virtual ShapeItem get_value() const
+   virtual ShapeItem get_ivalue() const
       { Assert(pos < count);   return indices[pos]; }
 
    /// return the i'th index

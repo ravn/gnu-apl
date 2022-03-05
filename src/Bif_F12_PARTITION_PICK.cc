@@ -88,7 +88,7 @@ AxesBitmap axes_X = 0;   // axes in axes_X with ⎕IO←0
       {
         //  ⊂[⍳0]B   ←→   ⊂¨B
         Token part(TOK_FUN1, Bif_F12_PARTITION::fun);
-        return Bif_OPER1_EACH::fun->eval_LB(part, B).get_apl_val();
+        return Bif_OPER1_EACH::do_eval_LB(part, B).get_apl_val();
       }
 
 Value_P Z(shape_Z, LOC);
@@ -309,7 +309,7 @@ const Shape shape_Z = B->get_shape() + item_shape;
 const ShapeItem len_B = B->element_count();
    if (len_B == 0)
       {
-         Value_P first = Bif_F12_TAKE::first(B);
+         Value_P first = Bif_F12_TAKE::first(B.getref());
          Value_P result = disclose(first, rank_tolerant);
          result->set_shape(shape_Z);
          return result;
@@ -467,7 +467,7 @@ Shape perm_cB;   // perm_cB is the permutation of cB, constructed from X
 
    Assert(perm_cB.get_rank() == cB->get_rank());
 
-   return Bif_F12_TRANSPOSE::transpose(perm_cB, cB);
+   return Bif_F12_TRANSPOSE::transpose(perm_cB, cB.getref());
 }
 //----------------------------------------------------------------------------
 Shape

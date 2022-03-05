@@ -55,7 +55,7 @@ StateIndicator::~StateIndicator()
    //
    if (get_parse_mode() == PM_FUNCTION)
       {
-        const UserFunction * ufun = get_executable()->get_ufun();
+        const UserFunction * ufun = get_executable()->get_exec_ufun();
         if (ufun)   ufun->pop_local_vars();
       }
    else
@@ -69,7 +69,7 @@ StateIndicator::~StateIndicator()
 void
 StateIndicator::goon(Function_Line new_line, const char * loc)
 {
-const Function_PC pc = get_executable()->get_ufun()->pc_for_line(new_line);
+const Function_PC pc = get_executable()->get_exec_ufun()->pc_for_line(new_line);
 
    Log(LOG_StateIndicator__push_pop)
       CERR << "Continue SI[" << level << "] at line " << new_line
@@ -175,7 +175,7 @@ StateIndicator::print(ostream & out) const
       {
         case PM_FUNCTION:
              out << "Pmode:      ∇ "
-                 << executable->get_ufun()->get_name_and_line(get_PC());
+                 << executable->get_exec_ufun()->get_name_and_line(get_PC());
              break;
 
         case PM_STATEMENT_LIST:
@@ -224,7 +224,7 @@ StateIndicator::list(ostream & out, SI_mode mode) const
              Assert(executable);
              if (mode == SIM_SI)   // )SI
                 {
-                  out << executable->get_ufun()->get_name_and_line(get_PC());
+                  out << executable->get_exec_ufun()->get_name_and_line(get_PC());
                   break;
                 }
 
@@ -238,7 +238,7 @@ StateIndicator::list(ostream & out, SI_mode mode) const
                   else
                      {
                        const UCS_string name_and_line =
-                            executable->get_ufun()->get_name_and_line(get_PC());
+                            executable->get_exec_ufun()->get_name_and_line(get_PC());
                        out << name_and_line
                            << "  " << executable->statement_text(get_PC())
                            << endl
@@ -250,9 +250,9 @@ StateIndicator::list(ostream & out, SI_mode mode) const
              if (mode & SIM_name_list)   // )SINL
                 {
                   const UCS_string name_and_line =
-                        executable->get_ufun()->get_name_and_line(get_PC());
+                        executable->get_exec_ufun()->get_name_and_line(get_PC());
                        out << name_and_line << " ";
-                       executable->get_ufun()->print_local_vars(out);
+                       executable->get_exec_ufun()->print_local_vars(out);
                 }
              break;
 
@@ -333,7 +333,7 @@ StateIndicator::jump(Value_P value)
 
 const Function_Line line = value->get_line_number();
 
-const UserFunction * ufun = get_executable()->get_ufun();
+const UserFunction * ufun = get_executable()->get_exec_ufun();
 
    if (ufun)   // →N in user defined function
       {
@@ -514,7 +514,7 @@ StateIndicator::statement_result(Token & result, bool trace)
 
    if (trace)
       {
-        const UserFunction * ufun = executable->get_ufun();
+        const UserFunction * ufun = executable->get_exec_ufun();
         if (ufun && (ufun->get_exec_properties()[0] == 0))
            {
              const Function_Line line =

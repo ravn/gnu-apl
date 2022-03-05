@@ -533,7 +533,7 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
         message_2.append(header.A()->get_name());
         message_2.append(UNI_SPACE);
 #else
-        Value_P val_A = header.A()->get_value();
+        Value_P val_A = header.A()->get_apl_value();
         if (+val_A)
            {
              PrintContext pctx(PR_BOXED_GRAPHIC);
@@ -552,7 +552,7 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
         message_2.append(UNI_SPACE);
         message_2.append(header.B()->get_name());
 #else
-        Value_P val_B = header.B()->get_value();
+        Value_P val_B = header.B()->get_apl_value();
         if (+val_B)
            {
              message_2.append(UNI_SPACE);
@@ -1109,7 +1109,7 @@ Function_P old_function = symbol->get_function();
              DEFN_ERROR;
            }
 
-        const UserFunction * old_ufun = old_function->get_ufun1();
+        const UserFunction * old_ufun = old_function->get_func_ufun();
         Assert(old_ufun);
         delete old_ufun;
       }

@@ -71,7 +71,7 @@ void TraceData::display_value_for_trace( ostream &out, const Value_P &value, int
 
 void TraceData::send_update( Symbol_Event ev )
 {
-    const Value_P v = symbol->get_value();
+    const Value_P v = symbol->get_apl_value();
 
     for( map<NetworkConnection *, TraceDataEntry>::iterator it = active_listeners.begin()
              ; it != active_listeners.end()

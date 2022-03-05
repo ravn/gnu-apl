@@ -71,7 +71,7 @@ public:
       { return 0; }
 
    /// return a UserFunction * (if \b this is one) or else 0.
-   virtual const UserFunction * get_ufun() const
+   virtual const UserFunction * get_exec_ufun() const
       { return 0; }
 
    /// return true if this Executable localizes Symbol \b sym
@@ -79,7 +79,7 @@ public:
       { return false; }
 
    /// return a UserFunction * (if \b this is one) or else 0.
-   virtual UserFunction * get_ufun()
+   virtual UserFunction * get_exec_ufun()
    { return 0; }
 
    /// get the line number for pc

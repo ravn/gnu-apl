@@ -158,7 +158,7 @@ const Executable * exec = SI_top()->get_executable();
              << "pmode=" << exec->get_parse_mode()
              << " exec=" << exec << " ";
 
-        if (exec->get_ufun())   CERR << exec->get_ufun()->get_name();
+        if (exec->get_exec_ufun())   CERR << exec->get_exec_ufun()->get_name();
         else                    CERR << SI_top()->get_parse_mode_name();
         CERR << " " << voidP(SI_top())
              << " at " << loc << endl;
@@ -388,7 +388,7 @@ const NameClass nc = current_referent->get_NC();
 const Function * fun = current_referent->get_function();
    Assert(fun);
 
-const UserFunction * ufun = fun->get_ufun1();
+const UserFunction * ufun = fun->get_func_ufun();
    if (!ufun)   return false;         // not a defined function
 
    for (const StateIndicator * si = SI_top(); si; si = si->get_parent())
@@ -560,8 +560,8 @@ Workspace::clear_WS(ostream & out, bool silent)
 
    // ⎕PW and ⎕TZ shall survive )CLEAR (lrm p. 260);
    //
-const int pw = the_workspace.v_Quad_PW[0].apl_val->get_sole_integer();
-const int tz = the_workspace.v_Quad_TZ.get_offset();
+const APL_Integer pw = the_workspace.v_Quad_PW.current();
+const APL_Integer tz = the_workspace.v_Quad_TZ.get_offset();
 
    // clear the value stacks of read/write system variables...
    //
@@ -584,10 +584,10 @@ const int tz = the_workspace.v_Quad_TZ.get_offset();
    the_workspace.v_Quad_TZ.set_offset(tz);
 
    // close open windows in ⎕GTK
-   Quad_GTK::fun->clear();
+   Quad_GTK::clear();
 
    // close open files in ⎕FIO
-   Quad_FIO::fun->clear();
+   Quad_FIO::clear();
 
    set_WS_name(UCS_string("CLEAR WS"));
    if (!silent)   out << "CLEAR WS" << endl;

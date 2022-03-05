@@ -37,7 +37,7 @@ public:
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE1, first(B));}
+      { return Token(TOK_APL_VALUE1, first(B.getref()));}
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
@@ -60,7 +60,7 @@ public:
    static Bif_F12_TAKE  _fun;   ///< Built-in function
 
    /// ↑B
-   static Value_P first(Value_P B);
+   static Value_P first(const Value & B);
 
 protected:
    /// Take A from B

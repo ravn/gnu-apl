@@ -122,7 +122,7 @@ Executable::clear_body()
         if (body[b].is_function())
            {
              Function_P fun = body[b].get_function();
-             const UserFunction * ufun = fun->get_ufun1();
+             const UserFunction * ufun = fun->get_func_ufun();
              if (ufun && ufun->is_lambda())
                 const_cast<UserFunction *>(ufun)->decrement_refcount(LOC);
              new (&body[b]) Token();
@@ -176,7 +176,7 @@ const ShapeItem end = input.size();
         Token tok_sym = input[0];   // get the label symbol
         idx = 2;                   // skip the :
 
-        UserFunction * ufun = get_ufun();
+        UserFunction * ufun = get_exec_ufun();
         Assert(ufun);
         ufun->add_label(tok_sym.get_sym_ptr(), line);
       }
@@ -479,7 +479,7 @@ Executable::unmark_all_values() const
         if (tok.get_ValueType() == TV_FUN)
            {
              Function_P fun = tok.get_function();
-             const UserFunction * ufun = fun->get_ufun1();
+             const UserFunction * ufun = fun->get_func_ufun();
              if (ufun && ufun->is_lambda())
                 {
                   ufun->unmark_all_values();
@@ -828,8 +828,8 @@ Executable::reverse_all_token(Token_string & tos)
 void
 Executable::increment_refcount(const char * loc)
 {
-   Assert1(get_ufun());
-   Assert(get_ufun()->is_lambda());
+   Assert1(get_exec_ufun());
+   Assert(get_exec_ufun()->is_lambda());
 
    ++refcount;
 
@@ -840,7 +840,7 @@ Executable::increment_refcount(const char * loc)
 void
 Executable::decrement_refcount(const char * loc)
 {
-UserFunction * ufun = get_ufun();
+UserFunction * ufun = get_exec_ufun();
    Assert1(ufun);
    Assert(ufun->is_lambda());
 

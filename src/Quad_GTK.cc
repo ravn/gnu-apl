@@ -556,7 +556,7 @@ Quad_GTK::close_window(int fd)
                 {
                   CERR << "write(close Tag) failed in ⎕GTK::close_window()";
                 }
-             const int err = Quad_FIO::fun->close_handle(fd);
+             const int err = Quad_FIO::close_handle(fd);
              return IntScalar(err, LOC);
            }
       }
@@ -655,7 +655,7 @@ int envp_idx = 0;
               envp[envp_idx] = 0;
             }
        }
-const int fd = Quad_FIO::fun->do_FIO_57(path, envp);
+const int fd = Quad_FIO::do_FIO_57(path, envp);
 
    // write TLVs 1 and 3 or 1, 2, and 3 to Gtk_server...
    //
@@ -669,7 +669,7 @@ UTF8_string gui_utf8(gui_filename);
    slen = write(fd, path1, 8 + gui_utf8.size());
    if (slen == -1)
       {
-         Quad_FIO::fun->close_handle(fd);
+         Quad_FIO::close_handle(fd);
          MORE_ERROR() << "write(Tag 1) failed in ⎕GTK";
          DOMAIN_ERROR;
       }
@@ -685,7 +685,7 @@ UTF8_string gui_utf8(gui_filename);
         slen = write(fd, path2, 8 + css_utf8.size());
         if (slen == -1)
            {
-              Quad_FIO::fun->close_handle(fd);
+              Quad_FIO::close_handle(fd);
               MORE_ERROR() << "write(Tag 2) failed in ⎕GTK";
               DOMAIN_ERROR;
            }
@@ -693,7 +693,7 @@ UTF8_string gui_utf8(gui_filename);
 
    if (write_TL0(fd, 3))
       {
-         Quad_FIO::fun->close_handle(fd);
+         Quad_FIO::close_handle(fd);
          MORE_ERROR() << "write(Tag 3) failed in ⎕GTK";
          DOMAIN_ERROR;
       }

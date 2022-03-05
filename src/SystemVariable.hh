@@ -49,10 +49,10 @@ public:
    virtual ostream & print(ostream & out) const;
 
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed().
-   virtual void assign_indexed(const Value * X, Value_P value);
+   virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::get_attributes().
    virtual void get_attributes(int mode, Value & Z) const;
@@ -88,7 +88,7 @@ protected:
    virtual void push_function(Function_P function) {}
 
    /// overloaded Symbol::push_value()
-   virtual void push_value(Value_P value) {}
+   virtual void push_value(Value_P B) {}
 
    /// overloaded Symbol::pop()
    virtual void pop() { }
@@ -108,10 +108,10 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc) {}
+   virtual void assign(Value_P B, bool clone, const char * loc) {}
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(const Value * X, Value_P value) {}
+   virtual void assign_indexed(const Value * X, Value_P B) {}
 
    /// overloaded Symbol::is_readonly()
    virtual bool is_readonly() const   { return true; }
@@ -196,7 +196,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -255,13 +255,13 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed().
-   virtual void assign_indexed(const Value * X, Value_P value);
+   virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::assign_indexed().
-   virtual void assign_indexed(const IndexExpr & IX, Value_P value);
+   virtual void assign_indexed(const IndexExpr & IX, Value_P B);
 
    // overloaded Symbol::push()
    virtual void push();
@@ -284,7 +284,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -309,7 +309,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
@@ -342,10 +342,10 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(const Value * X, Value_P value) {}
+   virtual void assign_indexed(const Value * X, Value_P B) {}
 };
 //----------------------------------------------------------------------------
 /**
@@ -365,7 +365,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -391,7 +391,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -431,10 +431,10 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(const Value * X, Value_P value);
+   virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::push()
    virtual void push()
@@ -466,7 +466,7 @@ public:
       { return get_first_cell()->get_int_value(); }
 
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
 protected:
    // overloaded Symbol::push()
@@ -491,7 +491,7 @@ public:
    virtual void resolve(Token & token, bool left);
 
 protected:
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // should never be called due to overloaded resolve()
    virtual Value_P get_apl_value() const
@@ -513,7 +513,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
@@ -537,7 +537,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
@@ -555,13 +555,13 @@ public:
       { assign(Value_P(), false, LOC); }
 
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(const Value * X, Value_P value);
+   virtual void assign_indexed(const Value * X, Value_P B);
 
    /// overloaded Symbol::assign_indexed()
-   virtual void assign_indexed(const IndexExpr & IDX, Value_P value);
+   virtual void assign_indexed(const IndexExpr & IDX, Value_P B);
 
    virtual Value_P get_apl_value() const;
 
@@ -643,7 +643,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign().
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    // overloaded Symbol::push()
    virtual void push()
@@ -696,7 +696,7 @@ public:
 
 protected:
    /// overloaded Symbol::assign()
-   virtual void assign(Value_P value, bool clone, const char * loc);
+   virtual void assign(Value_P B, bool clone, const char * loc);
 
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;
