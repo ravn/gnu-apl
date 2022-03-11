@@ -34,6 +34,8 @@
 /// A defined function written in C++.
 class NativeFunction : public Function
 {
+   friend class Doxy;
+
 public:
    /// return the name of the .so library that implements this function
    const UCS_string & get_so_path() const

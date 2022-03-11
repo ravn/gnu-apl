@@ -151,6 +151,7 @@ public:
    /// Destructor
    inline ~Value_P();
 };
+
 //----------------------------------------------------------------------------
 
 #endif // __SHARED_VALUE_POINTER_HH_DEFINED__

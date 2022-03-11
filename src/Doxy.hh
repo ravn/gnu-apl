@@ -45,8 +45,8 @@ struct fcall_edge
    {}
 
    /// constructor
-   fcall_edge(const UserFunction * cer, const UCS_string & cer_name,
-              const UserFunction * cee, const UCS_string & cee_name )
+   fcall_edge(Function_P cer, const UCS_string & cer_name,
+              Function_P cee, const UCS_string & cee_name )
    : caller(cer),
      caller_name(cer_name),
      callee(cee),
@@ -55,13 +55,13 @@ struct fcall_edge
    {}
 
    /// the calling function
-   const UserFunction * caller;
+   Function_P caller;
 
    /// the (Symbol-) name of the calling function
    UCS_string caller_name;
 
    /// the called function
-   const UserFunction * callee;
+   Function_P callee;
 
    /// the (Symbol-) name of called function
    UCS_string callee_name;
@@ -114,26 +114,28 @@ protected:
    /// assigned.
    void function_page(const UserFunction * ufun, const UCS_string & alias);
 
+   /// write the page for one native function.
+   void native_page(const Function * fun, const UCS_string & alias);
+
    /// create the call graph
    void make_call_graph(const std::vector<const Symbol *> & all_funs);
 
-   /// add one symbol to the call graph. Note that one symbol can have different
-   /// UserFunctions at different SI levels.
+   /// add one symbol to the call graph. Note that one symbol can have
+   /// different UserFunctions (at different SI levels).
    void add_fun_to_call_graph(const Symbol * sym, const UserFunction * ufun);
 
    /// make the call graph start from function \b ufun and set \b nodes to
    /// those nodes that are reachable from ufun
-   void set_call_graph_root(const UserFunction * ufun);
+   void set_call_graph_root(Function_P fun);
 
    /// write the call graph (if caller == false), or else the caller graph
-   int write_call_graph(const UserFunction * ufun, const UCS_string & alias,
-                        bool caller);
+   int write_call_graph(Function_P fun, const UCS_string & alias, bool caller);
 
    /// swap callers and callees (reverse the direction of an edge)
    void swap_caller_calee();
 
    /// return the index of \b ufun in \b nodes[] or -1 if not found
-   int node_ID(const UserFunction * ufun);
+   int node_ID(Function_P fun);
 
    /// return an HTML-anchor for function \b name (in the output files)
    static UCS_string fun_anchor(const UCS_string & name);
@@ -152,7 +154,7 @@ protected:
    UTF8_string root_dir;
 
    /// the nodes for the current root.
-   std::vector<const UserFunction *> nodes;
+   std::vector<const Function *> nodes;
 
    /// the nodes for all function symbols (independent of the current root).
    std::vector<const Symbol *> all_functions;
