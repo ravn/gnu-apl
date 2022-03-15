@@ -49,7 +49,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-UCS_string Quad_QUOTE::prompt;
+UCS_string Quad_QUOTE::buffer;
 
 ShapeItem Quad_SYL::si_depth_limit = 0;
 ShapeItem Quad_SYL::value_count_limit = 0;
@@ -751,39 +751,46 @@ Quad_QUOTE::done(bool with_LF, const char * loc)
 {
    Log(LOG_cork)
       CERR << "Quad_QUOTE::done(" << with_LF << ") called from " << loc
-           << " , buffer = [" << prompt << "]" << endl;
+           << " , buffer = [" << buffer << "]" << endl;
 
-   if (prompt.size())
+   if (buffer.size())
       {
         if (with_LF)   COUT << endl;
-        prompt.clear();
+        buffer.clear();
       }
 }
 //----------------------------------------------------------------------------
 void
 Quad_QUOTE::assign(Value_P B, bool clone, const char * loc)
 {
+   // ⍞ ← B. At this point we cannot know whether a another ⍞ ← B will
+   // follow and we therefore we don't emit a trailing \n. The trailing \n
+   // may be emitted later when Quad_QUOTE::done() above is called.
+   //
    Log(LOG_cork)
       CERR << "Quad_QUOTE::assign() called, buffer = ["
-           << prompt << "]" << endl;
+           << buffer << "]" << endl;
 
-PrintContext pctx(PR_QUOTE_Quad);
-PrintBuffer pb(*B, pctx, 0);
+PrintContext pctx(PR_QUOTE_Quad,         // ⍞ style
+                  Workspace::get_PP(),   // user's choice
+                  0);                    // no APL line folding
+
+PrintBuffer pb(*B, pctx, /* print directly to COUT*/ 0);
    if (pb.get_row_count() > 1)  // multi line output: flush and restart corking
       {
         loop(y, pb.get_row_count())
            {
              done(true, LOC);
-             prompt = pb.get_line(y).no_pad();
-             COUT << prompt;
+             buffer = pb.get_line(y).no_pad();
+             COUT << buffer;
            }
       }
-   else if (pb.get_row_count() > 0)
+   else if (pb.get_row_count() > 0)   // one line output
       {
         COUT << pb.l1().no_pad() << flush;
-        prompt.append(pb.l1());
+        buffer.append(pb.l1());
       }
-   else   // empty output
+   else                               // empty output
       {
         // nothing to do
       }
@@ -792,37 +799,41 @@ PrintBuffer pb(*B, pctx, 0);
 
    Log(LOG_cork)
       CERR << "Quad_QUOTE::assign() done, buffer = ["
-           << prompt << "]" << endl;
+           << buffer << "]" << endl;
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_QUOTE::get_apl_value() const
 {
+   // Z ← ⍞.
+
    Log(LOG_cork)
       CERR << "Quad_QUOTE::get_apl_value() called, buffer = ["
-           << prompt << "]" << endl;
+           << buffer << "]" << endl;
 
-   // get_quad_cr_line() may call done(), so we save the current prompt.
+   // InputMux::get_line() may call done() which calls buffer.clear().
+   // We therefore save the prompt before calling InputMux::get_line().
    //
-const UCS_string old_prompt = prompt.no_pad();
+const UCS_string old_buffer = buffer.no_pad();
 
 bool eof = false;
 UCS_string line;
-   InputMux::get_line(LIM_Quote_Quad, old_prompt, line, eof,
+   InputMux::get_line(LIM_Quote_Quad, old_buffer, line, eof,
                       LineHistory::quote_quad_history);
-   done(false, LOC);   // if get_quad_cr_line() has not called it
+   done(false, LOC);   // in case InputMux::get_line() has not called it
 
    if (interrupt_is_raised())   INTERRUPT
 
-const UCS_string qpr = Workspace::get_PR();
-
-   if (qpr.size() > 0)   // valid prompt replacement char
+   if (Workspace::get_PR().size() > 0)   // valid prompt replacement char
       {
+        const Unicode qpr = Workspace::get_PR()[0];
+        // replace the characters in line that were not changed with ⎕PR and
+        // leave the characters after the first changed one unchanged.
         loop(i, line.size())
            {
-             if (i >= old_prompt.size())   break;
-             if (old_prompt[i] != line[i])   break;
-             line[i] = qpr[0];
+             if (i >= old_buffer.size())     break;   // end of prompt
+             if (old_buffer[i] != line[i])   break;   // changed prompt[i]
+             line[i] = qpr;          // unchanged prompt[i]: replace with qpr
            }
       }
 

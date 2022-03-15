@@ -449,21 +449,29 @@ PrintBuffer::print_interruptible(ostream & out, sRank rank, int quad_PW)
    // indented by 6 blanks.
    //
 const int total_width = get_column_count();
-const int max_breaks = 2 + total_width/quad_PW;   // an upper limit
 
 vector<ShapeItem> chunk_lengths;
-   chunk_lengths.reserve(max_breaks + 1);
+   if (quad_PW)   // APL folding of lines near ⎕PW
+      {
+        const int max_breaks = 2 + total_width/quad_PW;   // a first guess
 
-   // initialize chunk_lengths, based on the first row of the PrintBuffer.
-   // All subsequent rows are aligned to the first row, therefore the first
-   // row can be taken as a prototype for all rows.
-   //
-   for (int col = 0; col < total_width;)
-       {
-         const size_t chunk_len =
+        chunk_lengths.reserve(max_breaks + 1);
+
+        // initialize chunk_lengths based on the first row of the PrintBuffer.
+        // All subsequent rows are aligned to the first row, therefore the
+        // first row can be taken as a prototype for all rows.
+        //
+        for (int col = 0; col < total_width;)
+            {
+              const ShapeItem chunk_len =
                       get_line(0).compute_chunk_length(quad_PW, col);
-         chunk_lengths.push_back(chunk_len);
-         col += chunk_len;
+              chunk_lengths.push_back(chunk_len);
+              col += chunk_len;
+            }
+       }
+    else          // no APL wrap around
+       {
+         chunk_lengths.push_back(total_width);
        }
 
    // print rows, breaking each row at chunk_lengths

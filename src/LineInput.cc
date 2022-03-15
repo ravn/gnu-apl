@@ -830,7 +830,7 @@ bool interactive = (mode == LIM_Quote_Quad) || (mode == LIM_Quad_Quad);
         const APL_time_us from = now();
          const char * s = fgets(buffer, sizeof(buffer) - 1, stdin);
         Workspace::add_wait(now() - from);
- 
+
         if (s == 0)
            {
              eof = true;

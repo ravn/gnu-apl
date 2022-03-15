@@ -385,7 +385,7 @@ public:
    /// Constructor.
    Quad_PR();
 
-   /// Return the current prompt replacement.
+   /// Return the current prompt replacement, aka. ⎕PR.
    const UCS_string current() const
       { return  UCS_string(*get_apl_value()); }
 
@@ -478,7 +478,7 @@ protected:
 };
 //----------------------------------------------------------------------------
 /**
-   System variable Quad-Quad (Evaluated Input/Output).
+   System variable Quad-Quad (Evaluated Input/Output aka. ⎕).
  */
 /// The class implementing ⎕
 class Quad_Quad : public SystemVariable
@@ -499,9 +499,9 @@ protected:
 };
 //----------------------------------------------------------------------------
 /**
-   System variable Quote-Quad (Evaluated Input/Output).
+   System variable Quote-Quad (Character Input/Output aka. ⍞).
  */
-/// The class implementing ⍞
+/// The class that implements ⍞
 class Quad_QUOTE : public SystemVariable
 {
 public:
@@ -519,7 +519,7 @@ protected:
    virtual Value_P get_apl_value() const;
 
    /// last line of output
-   static UCS_string prompt;
+   static UCS_string buffer;
 };
 //----------------------------------------------------------------------------
 /**
