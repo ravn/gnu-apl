@@ -117,7 +117,7 @@ Token
 ScalarFunction::eval_scalar_B(const Value & B, prim_f1 fun) const
 {
 const ShapeItem len_Z = B.element_count();
-   if (len_Z == 0)   return eval_fill_B(B);
+   if (len_Z == 0)   return do_eval_fill_B(B);
 
 PERFORMANCE_START(start)
 
@@ -362,7 +362,7 @@ const Shape * shape_Z = 0;
       }
 
 const ShapeItem len_Z = shape_Z->get_volume();
-   if (len_Z == 0)   return eval_fill_AB(A, B).get_apl_val();
+   if (len_Z == 0)   return do_eval_fill_AB(A, B).get_apl_val();
 
 Value_P Z(*shape_Z, LOC);
 
@@ -442,7 +442,8 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const ShapeItem len_Z1 = sh_Z1->get_volume();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1 = eval_fill_AB(A1, B1).get_apl_val();
+                                Value_P Z1 =
+                                        do_eval_fill_AB(A1, B1).get_apl_val();
                                 job_AB->value_Z->next_ravel_Pointer(Z1.get());
                                 continue;
                               }
@@ -467,7 +468,8 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const ShapeItem len_Z1 = A1.element_count();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1 = eval_fill_AB(A1, B).get_apl_val();
+                                Value_P Z1 =
+                                        do_eval_fill_AB(A1, B).get_apl_val();
                                 new (&cell_Z) PointerCell(Z1.get(),
                                                           *job_AB->value_Z);
                               }
@@ -497,7 +499,8 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const ShapeItem len_Z1 = B1.element_count();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1 = eval_fill_AB(A, B1).get_apl_val();
+                                Value_P Z1 =
+                                        do_eval_fill_AB(A, B1).get_apl_val();
                                 new (&cell_Z) PointerCell(Z1.get(),
                                                           *job_AB->value_Z);
                               }
@@ -668,7 +671,7 @@ CELL_PERFORMANCE_END(job_AB->fun->get_statistics_AB(), start_2, z)
 }
 //----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_fill_AB(const Value & A, const Value & B) const
+ScalarFunction::do_eval_fill_AB(const Value & A, const Value & B) const
 {
    // eval_fill_AB() is called when A or B (or both) are empty.
    //
@@ -719,7 +722,7 @@ Value_P Z = B.clone(LOC);
 }
 //----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_fill_B(const Value & B) const
+ScalarFunction::do_eval_fill_B(const Value & B) const
 {
    // eval_fill_B() is called when a scalar function with empty B is called
    //

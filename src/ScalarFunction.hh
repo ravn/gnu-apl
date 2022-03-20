@@ -65,10 +65,12 @@ protected:
                          prim_f2 fun) const;
 
    /// overloaded Function::eval_fill_AB()
-   virtual Token eval_fill_AB(const Value & A, const Value & B) const;
+   virtual Token eval_fill_AB(Value_P A, Value_P B) const
+      { return do_eval_fill_AB(A.getref(), B.getref()); }
 
    /// overloaded Function::eval_fill_B()
-   virtual Token eval_fill_B(const Value & B) const;
+   virtual Token eval_fill_B(Value_P B) const
+      { return do_eval_fill_B(B.getref()); }
 
    /// overloaded Function::has_result()
    virtual bool has_result() const   { return true; }
@@ -87,6 +89,12 @@ protected:
    /// A helper function for eval_scalar_AXB().
    Value_P eval_scalar_AXB(const Value & A, AxesBitmap axes_in_X,
                            const Value & B, prim_f2 fun, bool reversed) const;
+
+   /// A helper function for eval_fill_AB().
+   Token do_eval_fill_AB(const Value & A, const Value & B) const;
+
+   /// A helper function for eval_fill_B().
+   Token do_eval_fill_B(const Value & B) const;
 
    /// Evaluate \b the identity function.
    static Token eval_scalar_identity_fun(Value_P B, sAxis axis, Value_P FI0);
