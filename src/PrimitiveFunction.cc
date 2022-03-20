@@ -1075,6 +1075,13 @@ Bif_F12_ELEMENT::eval_AB(Value_P A, Value_P B) const
 const double qct = Workspace::get_CT();
 Value_P Z(A->get_shape(), LOC);
 
+   if (A->element_count() == 0)
+      {
+        Z->set_default(*B, LOC);
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
    for (ConstRavel_P a(A, true); +a; ++a)
        {
          APL_Integer found_a_in_B = 0;
