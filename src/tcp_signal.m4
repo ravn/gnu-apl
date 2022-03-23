@@ -2,7 +2,7 @@
    This file is part of GNU APL, a free implementation of the
    ISO/IEC Standard 13751, "Programming Language APL, Extended"
  
-   Copyright (C) 2008-2021  Dr. Jürgen Sauermann
+   Copyright (C) 2008-2014  Dr. Jürgen Sauermann
  
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ public:
       }
 
    /// return the value of the item
-   T get_svalue() const   { return value; }
+   T get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a string
    void store(string & buffer) const
@@ -183,12 +183,12 @@ public:
    Sig_item_string(const uint8_t * & buffer)
       {
         Sig_item_u16 len (buffer);
-        value.reserve(len.get_svalue() + 2);
-        for (int b = 0; b < len.get_svalue(); ++b)   value += *buffer++;
+        value.reserve(len.get_value() + 2);
+        for (int b = 0; b < len.get_value(); ++b)   value += *buffer++;
       }
 
    /// return the value of the item
-   const string get_svalue() const   { return value; }
+   const string get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a buffer
    void store(string & buffer) const
@@ -256,7 +256,7 @@ define(`sig_args', `,
                 Sig_item_`'$2 _`'$3')
 define(`sig_init', `$3(`_'$3)')
 define(`sig_get', `   /// get $3
-   const typtrans($2) get_$3() const { return $3.get_svalue(); }
+   const typtrans($2) get_$3() const { return $3.get_value(); }
 
 ')
 define(`sig_memb', `   `Sig_item_'$2 $3;   ///< $3
@@ -266,7 +266,7 @@ define(`sig_bad', `   virtual typtrans($2) get__$1__$3() const   ///< dito
       { bad_get("$1", "$3"); return 0; }
 ')
 define(`sig_good', `  /// return item $3 of this signal 
-   virtual typtrans($2) get__$1__$3() const { return $3.get_svalue(); }
+   virtual typtrans($2) get__$1__$3() const { return $3.get_value(); }
 
 ')
 define(`sig_store', `        $3.store(buffer);
@@ -321,24 +321,15 @@ include(protocol.def)dnl
 protected:
 
    /// send this signal on TCP (or AF_UNIX) socket tcp_sock
-   ssize_t send_TCP(int tcp_sock) const
+   int send_TCP(int tcp_sock) const
        {
          string buffer;
          store(buffer);
 
-         const uint32_t ll = htonl(buffer.size());
-         const char * ccp_ll = reinterpret_cast<const char *>(&ll);
-
-// MAC OS has no MSG_MORE
-#ifndef MSG_MORE
-# define MSG_MORE 0
-#endif
-         if (sizeof(ll) == send(tcp_sock, ccp_ll, sizeof(ll), MSG_MORE))
-            {
-              return send(tcp_sock, buffer.data(), buffer.size(), 0);
-            }
-         cerr << "*** send_TCP() : " << errno << strerror(errno) << endl;
-         return -errno;
+         uint32_t ll = htonl(buffer.size());
+         send(tcp_sock, reinterpret_cast<const char *>(&ll), 4, 0);
+         ssize_t sent = send(tcp_sock, buffer.data(), buffer.size(), 0);
+         return sent;
        }
 };
 define(`m4_signal',
@@ -512,13 +503,13 @@ const uint8_t * b = reinterpret_cast<const uint8_t *>(rx_buf);
 Sig_item_u16 signal_id(b);
 
 Signal_base * ret = 0;
-   switch(signal_id.get_svalue())
+   switch(signal_id.get_value())
       {
 define(`m4_signal',
        `        case sid_`'$1: ret = new $1`'_c(b);   break;')
 include(protocol.def)dnl
         default: cerr << "Signal_base::recv_TCP() failed: unknown signal id "
-                      << signal_id.get_svalue() << endl;
+                      << signal_id.get_value() << endl;
                  errno = EINVAL;
                  *loc = LOC;
                  return 0;

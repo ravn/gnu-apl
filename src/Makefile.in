@@ -100,7 +100,7 @@ host_triplet = @host@
 # but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
 #
 @HAVE_GTK3_TRUE@am__append_2 = Gtk
-@HAVE_LIBPCRE2_32_TRUE@am__append_3 = Regexp.cc                                Regexp.hh
+@HAVE_LIBPCRE2_32_TRUE@am__append_3 = Regexp.cc					Regexp.hh
 @SQLITE3_TRUE@am__append_4 = $(SQLITE3_CFLAGS)
 @SQLITE3_TRUE@am__append_5 = $(SQLITE3_LDFLAGS)
 @SQLITE3_TRUE@am__append_6 = sql/SqliteArgListBuilder.cc \
@@ -118,14 +118,11 @@ host_triplet = @host@
 @POSTGRES_TRUE@	sql/PostgresConnection.hh \
 @POSTGRES_TRUE@	sql/PostgresProvider.cc sql/PostgresProvider.hh
 @WANT_LIBAPL_TRUE@am__append_11 = libapl.la
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
@@ -184,9 +181,9 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc \
 	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
 	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh ConstCell_P.hh Doxy.cc Doxy.hh \
-	CharCell.cc CharCell.hh Command.cc Command.def Command.hh \
-	Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
+	CharCell.hh Command.cc Command.def Command.hh Common.cc \
+	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
@@ -326,8 +323,9 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-ValueHistory.lo lib_gnu_apl_la-Workspace.lo \
 	lib_gnu_apl_la-static_Objects.lo $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5)
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS = $(am__objects_6) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(am__objects_6) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
 lib_gnu_apl_la_OBJECTS = $(am_lib_gnu_apl_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -337,8 +335,8 @@ lib_gnu_apl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) \
 	$(lib_gnu_apl_la_LDFLAGS) $(LDFLAGS) -o $@
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_rpath = -rpath \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(pkglibdir)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_rpath = -rpath \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(pkglibdir)
 libapl_la_LIBADD =
 am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	../config.h APL_Float_as_class.hh APL_types.hh Archive.cc \
@@ -355,9 +353,9 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
 	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh ConstCell_P.hh Doxy.cc Doxy.hh \
-	CharCell.cc CharCell.hh Command.cc Command.def Command.hh \
-	Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
+	CharCell.hh Command.cc Command.def Command.hh Common.cc \
+	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
@@ -506,9 +504,9 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
 	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
 	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh ConstCell_P.hh Doxy.cc Doxy.hh \
-	CharCell.cc CharCell.hh Command.cc Command.def Command.hh \
-	Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
+	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
+	CharCell.hh Command.cc Command.def Command.hh Common.cc \
+	Common.hh ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
@@ -636,8 +634,9 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
 	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
 	$(am__objects_17)
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@am_apl_OBJECTS = apl-main.$(OBJEXT) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(am__objects_18)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@am_apl_OBJECTS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	apl-main.$(OBJEXT) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(am__objects_18)
 am__EXTRA_apl_SOURCES_DIST = Plot_gtk.cc Plot_xcb.cc
 apl_OBJECTS = $(am_apl_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -745,7 +744,7 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp TODO
+am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -956,40 +955,41 @@ common_SOURCES = $(plot_SOURCES) ../buildtag.hh ../config.h \
 	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
 	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
 	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
-	Cell.icc Cell.hh ConstCell_P.hh Doxy.cc Doxy.hh CharCell.cc \
-	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh DerivedFunction.cc \
-	DerivedFunction.hh DiffOut.cc DiffOut.hh DynamicObject.cc \
-	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
-	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
-	FloatCell.hh Function.cc Function.hh Help.def Heapsort.hh \
-	Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc IndexExpr.hh \
-	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
-	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
-	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
-	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
-	Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc Macro.def Macro.hh \
-	Missing_Libraries.cc NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.icc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parallel.cc Parallel.hh Parser.cc Parser.hh \
-	Performance.cc Performance.def Performance.hh PointerCell.cc \
-	PointerCell.hh Prefix.cc Prefix.def Prefix.hh \
-	Plot_line_properties.cc Plot_line_properties.hh Plot_data.cc \
-	Plot_data.hh Plot_window_properties.cc \
-	Plot_window_properties.hh PrimitiveFunction.cc \
-	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
-	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
-	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
-	Quad_CR.cc Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh \
-	Quad_FFT.cc Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh \
-	Quad_FX.cc Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc \
-	Quad_JSON.hh Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc \
-	Quad_PLOT.def Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh \
-	Quad_SVx.cc Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc \
-	Quad_WA.hh Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh \
-	sbrk.cc Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
+	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
+	Command.cc Command.def Command.hh Common.cc Common.hh \
+	ComplexCell.cc ComplexCell.hh ConstCell_P.hh \
+	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
+	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
+	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
+	FloatCell.cc FloatCell.hh Function.cc Function.hh Help.def \
+	Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc \
+	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
+	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
+	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
+	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
+	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.icc \
+	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
+	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
+	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
+	Prefix.def Prefix.hh Plot_line_properties.cc \
+	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
+	Plot_window_properties.cc Plot_window_properties.hh \
+	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.cc \
+	PrimitiveOperator.hh PrintBuffer.cc PrintBuffer.hh \
+	PrintContext.hh PrintOperator.hh QuadFunction.cc \
+	QuadFunction.hh ProcessorID.cc ProcessorID.hh Quad_CR.cc \
+	Quad_CR.def Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.def Quad_FIO.hh Quad_FX.cc \
+	Quad_FX.hh Quad_GTK.cc Quad_GTK.hh Quad_JSON.cc Quad_JSON.hh \
+	Quad_MAP.cc Quad_MAP.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_RVAL.cc Quad_RVAL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc \
+	Quad_SVx.hh Quad_TF.cc Quad_TF.hh Quad_WA.cc Quad_WA.hh \
+	Quad_XML.cc Quad_XML.hh RealCell.cc RealCell.hh sbrk.cc \
+	Shape.cc Shape.hh ScalarFunction.cc ScalarFunction.hh \
 	Security.cc Security.def Security.hh StateIndicator.cc \
 	StateIndicator.hh Svar_DB.cc Svar_DB.hh Svar_record.cc \
 	Svar_record.hh tcp_signal.m4 Svar_signals.def Svar_signals.hh \
@@ -1008,7 +1008,6 @@ common_SOURCES = $(plot_SOURCES) ../buildtag.hh ../config.h \
 	$(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
-@WANT_ERLANG_TRUE@@WANT_LIBAPL_FALSE@pkginclude_HEADERS = libapl.h Error.def
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 @WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version
@@ -1018,30 +1017,29 @@ pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
 @WANT_LIBAPL_TRUE@libapl_la_CXXFLAGS = $(common_CXXFLAGS) \
 @WANT_LIBAPL_TRUE@	$(GCOV_WANTED) $(GPROF_WANTED) \
 @WANT_LIBAPL_TRUE@	$(CXX_RDYNAMIC)
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_SOURCES = $(common_SOURCES) python_apl.cc
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_LDFLAGS = $(common_LDFLAGS) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-avoid-version
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_CXXFLAGS = $(common_CXXFLAGS) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GCOV_WANTED) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GPROF_WANTED) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(CXX_RDYNAMIC) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-DNDEBUG \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-D_FORTIFY_SOURCE=2 \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fwrapv \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fPIC \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fstack-protector \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	--param=ssp-buffer-size=4 \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.5m \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.6m \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.8 \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	# \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	server58
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_SOURCES = main.cc $(common_SOURCES)
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_CXXFLAGS = $(common_CXXFLAGS) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GCOV_WANTED) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GPROF_WANTED) \
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(CXX_RDYNAMIC)
-@WANT_ERLANG_FALSE@@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_SOURCES = $(common_SOURCES) python_apl.cc
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_LDFLAGS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(common_LDFLAGS) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-avoid-version
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_CXXFLAGS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(common_CXXFLAGS) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GCOV_WANTED) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GPROF_WANTED) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(CXX_RDYNAMIC) -DNDEBUG \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-D_FORTIFY_SOURCE=2 \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fwrapv -fPIC \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fstack-protector \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	--param=ssp-buffer-size=4 \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.5m \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.6m \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	# server68
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_SOURCES = main.cc $(common_SOURCES)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_CXXFLAGS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(common_CXXFLAGS) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GCOV_WANTED) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GPROF_WANTED) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(CXX_RDYNAMIC)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
 apl_LDADD = $(LIBS)
 all: all-recursive
 
@@ -5303,7 +5301,7 @@ all: ../makefile.h
 # but what if m4 is missing? So we explicitly 'make update-svar_signals'
 # when Svar_signals.def or tcp_signal.m4 have changed (which rarely happens)
 #
-.PHONY: update-svar_signals
+.PHONY:	update-svar_signals
 update-svar_signals:
 	m4 -D protocol=Svar_signals tcp_signal.m4 > Svar_signals.hh
 
@@ -5326,17 +5324,17 @@ testAP: all
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt
 
-.PHONY: patch
+.PHONY:	patch
 patch:
 	mkdir -p patches
 	svn diff > patches/`date +patch_%F-%R.diff`
 
-.PHONY: git-pull
+.PHONY:	git-pull
 git-pull:
 	make -C emacs_mode $@
 	make -C sql $@
 
-.PHONY: help
+.PHONY:	help
 help:
 	@echo ""
 	@echo ""

@@ -91,24 +91,20 @@ build_triplet = @build@
 host_triplet = @host@
 @SQLITE3_TRUE@am__append_1 = $(SQLITE3_CFLAGS)
 @SQLITE3_TRUE@am__append_2 = $(SQLITE3_LDFLAGS)
-@SQLITE3_TRUE@am__append_3 = apl-sqlite.cc             apl-sqlite.hh           \
-@SQLITE3_TRUE@                      SqliteArgListBuilder.cc   SqliteArgListBuilder.hh \
-@SQLITE3_TRUE@                      SqliteConnection.cc       SqliteConnection.hh     \
-@SQLITE3_TRUE@                      SqliteResultValue.cc      SqliteResultValue.hh    \
-@SQLITE3_TRUE@                      SqliteProvider.cc         SqliteProvider.hh
+@SQLITE3_TRUE@am__append_3 = SqliteArgListBuilder.cc	SqliteArgListBuilder.hh	\
+@SQLITE3_TRUE@			SqliteConnection.cc	SqliteConnection.hh	\
+@SQLITE3_TRUE@			SqliteResultValue.cc	SqliteResultValue.hh	\
+@SQLITE3_TRUE@			SqliteProvider.cc	SqliteProvider.hh
 
 @POSTGRES_TRUE@am__append_4 = $(POSTGRESQL_CFLAGS)
 @POSTGRES_TRUE@am__append_5 = $(POSTGRESQL_LDFLAGS)
 @POSTGRES_TRUE@am__append_6 = PostgresArgListBuilder.cc PostgresArgListBuilder.hh \
-@POSTGRES_TRUE@                      PostgresConnection.cc     PostgresConnection.hh     \
-@POSTGRES_TRUE@                      PostgresProvider.cc       PostgresProvider.hh
+@POSTGRES_TRUE@			PostgresConnection.cc     PostgresConnection.hh	\
+@POSTGRES_TRUE@			PostgresProvider.cc       PostgresProvider.hh
 
 subdir = src/sql
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
@@ -151,20 +147,20 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(docdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 lib_sql_la_LIBADD =
-am__lib_sql_la_SOURCES_DIST = Connection.cc Connection.hh \
-	ArgListBuilder.hh Provider.hh apl-sqlite.cc apl-sqlite.hh \
+am__lib_sql_la_SOURCES_DIST = apl-sqlite.cc apl-sqlite.hh \
+	Connection.cc Connection.hh ArgListBuilder.hh Provider.hh \
 	SqliteArgListBuilder.cc SqliteArgListBuilder.hh \
 	SqliteConnection.cc SqliteConnection.hh SqliteResultValue.cc \
 	SqliteResultValue.hh SqliteProvider.cc SqliteProvider.hh \
 	PostgresArgListBuilder.cc PostgresArgListBuilder.hh \
 	PostgresConnection.cc PostgresConnection.hh \
 	PostgresProvider.cc PostgresProvider.hh
-@SQLITE3_TRUE@am__objects_1 = apl-sqlite.lo SqliteArgListBuilder.lo \
+@SQLITE3_TRUE@am__objects_1 = SqliteArgListBuilder.lo \
 @SQLITE3_TRUE@	SqliteConnection.lo SqliteResultValue.lo \
 @SQLITE3_TRUE@	SqliteProvider.lo
 @POSTGRES_TRUE@am__objects_2 = PostgresArgListBuilder.lo \
 @POSTGRES_TRUE@	PostgresConnection.lo PostgresProvider.lo
-am_lib_sql_la_OBJECTS = Connection.lo $(am__objects_1) \
+am_lib_sql_la_OBJECTS = apl-sqlite.lo Connection.lo $(am__objects_1) \
 	$(am__objects_2)
 lib_sql_la_OBJECTS = $(am_lib_sql_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -405,16 +401,17 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-dist_noinst_DATA = AUTHORS              \
-                   LAST_GIT_PULL
+dist_noinst_DATA = AUTHORS		\
+			LAST_GIT_PULL
 
 dist_doc_DATA = SQL.apl
 pkglib_LTLIBRARIES = lib_sql.la
 AM_CXXFLAGS = -I $(srcdir)/.. -I $(srcdir)/../.. \
 	-Wno-deprecated-declarations $(am__append_1) $(am__append_4)
 AM_LDFLAGS = $(am__append_2) $(am__append_5)
-lib_sql_la_SOURCES = Connection.cc Connection.hh ArgListBuilder.hh \
-	Provider.hh $(am__append_3) $(am__append_6)
+lib_sql_la_SOURCES = apl-sqlite.cc apl-sqlite.hh Connection.cc \
+	Connection.hh ArgListBuilder.hh Provider.hh $(am__append_3) \
+	$(am__append_6)
 all: all-am
 
 .SUFFIXES:
@@ -765,7 +762,7 @@ uninstall-am: uninstall-dist_docDATA uninstall-pkglibLTLIBRARIES
 .PRECIOUS: Makefile
 
 
-.PHONY:	git-pull
+.PHONY: git-pull
 git-pull:
 	rm -Rf tmp
 	svn export https://github.com/lokedhs/apl-sqlite/trunk tmp

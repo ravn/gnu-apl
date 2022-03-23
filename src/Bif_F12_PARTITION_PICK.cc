@@ -180,16 +180,7 @@ const ShapeItem len_A = A->get_shape_item(0);
    // construct a vector of (non-0) partitions from A...
 
    /// one partition along the B-axis
-struct partition
-   {
-     ShapeItem start;   ///< start position on the B-axis (oncluding)
-     ShapeItem end;     ///< end position on the B-axis (excluding)
-
-     /// the number of items in \b this partition
-     ShapeItem length() const    { return end - start; }
-   };
-
-vector<partition> partitions;   // all partions on the B-axis
+vector<Partition> partitions;   // all partions on the B-axis
 
 ShapeItem zm = 0;   // number of non-0 partitions
 
@@ -199,12 +190,12 @@ ShapeItem zm = 0;   // number of non-0 partitions
         loop(apos, len_A)
             {
               const APL_Integer aval = A->get_cravel(apos).get_near_int();
-              if (aval < 0)             DOMAIN_ERROR;
+              if (aval < 0)            DOMAIN_ERROR;
 
               if (aval > prev_A)   // new partition starting at apos
                  {
                    if (in_partition)   partitions.back().end = apos;
-                   const partition part = { apos, -1 };
+                   const Partition part = { apos, -1 };
                    partitions.push_back(part);
                    in_partition = true;
                    ++zm;

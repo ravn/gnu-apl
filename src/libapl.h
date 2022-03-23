@@ -70,10 +70,9 @@ extern "C" {
 
 struct Value;
 typedef struct Value * APL_value;
-typedef enum LIBAPL_error LIBAPL_error;
 
 struct Function;
-typedef const struct Function * APL_function;
+typedef struct const Function * APL_function;
 
 #endif
 

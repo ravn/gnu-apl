@@ -67,6 +67,16 @@ public:
    static Value_P enclose_with_axes(const Shape & shape_X, Value_P B);
 
 protected:
+   /// one partition (along an axis of B)
+   struct Partition
+      {
+        ShapeItem start;   ///< the start position on the B-axis (including)
+        ShapeItem end;     ///< the end position on the B-axis (excluding)
+
+        /// the number of items in \b this partition
+        ShapeItem length() const    { return end - start; }
+      };
+
    /// enclose B with axis
    static Token enclose_with_axis(Value_P B, Value_P X);
 
