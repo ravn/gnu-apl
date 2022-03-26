@@ -105,6 +105,11 @@ Bif_F2_UNEQU    * Bif_F2_UNEQU   ::fun         = &Bif_F2_UNEQU   ::_fun;
 Bif_F2_UNEQ_B   * Bif_F2_UNEQ_B  ::fun         = &Bif_F2_UNEQ_B  ::_fun;
 Bif_F12_WITHOUT * Bif_F12_WITHOUT::fun         = &Bif_F12_WITHOUT::_fun;
 
+const IntCell ScalarFunction::integer_0(0);
+const IntCell ScalarFunction::integer_1(1);
+const FloatCell ScalarFunction::float_min(-BIG_FLOAT);
+const FloatCell ScalarFunction::float_max(BIG_FLOAT);
+
 #ifdef PARALLEL_ENABLED
 static volatile _Atomic_word parallel_jobs_lock = 0;
 #endif
@@ -746,28 +751,24 @@ Value_P Z = B.clone(LOC);
 }
 //----------------------------------------------------------------------------
 Token
-ScalarFunction::eval_scalar_identity_fun(Value_P B, sAxis axis, Value_P FI0)
+ScalarFunction::eval_scalar_identity_fun(Value_P B, sAxis axis,
+                                         const Cell & FI0)
 {
    // for scalar functions the result of the identity function for scalar
    // function F is defined as follows (lrm p. 210)
    //
-   // Z←SRρB+F/ι0    with SR ↔ ⍴Z
+   // Z←SRρB+F/ι0    with SR ←→ ⍴Z
    //
    // The term F/ι0 is passed as argument FI0, so that the above becomes
    //
    // Z←SRρB+FI0
    //
-   // Since F is scalar, the ravel elements of B (if any) are 0 and
-   // therefore B+FI0 becomes (⍴B)⍴FI0.
-   //
-   if (!FI0->is_scalar())   Q1(FI0->get_shape())
 
 const Shape shape_Z = B->get_shape().without_axis(axis);
 
 Value_P Z(shape_Z, LOC);
 
 const Cell & proto_B = B->get_cfirst();
-const Cell & cell_FI0 = FI0->get_cfirst();
 
    if (proto_B.is_pointer_cell())
       {
@@ -776,15 +777,15 @@ const Cell & cell_FI0 = FI0->get_cfirst();
         POOL_LOCK(parallel_jobs_lock,
            Value_P sub(proto_B.get_pointer_value()->get_shape(),LOC))
         const ShapeItem len_sub = sub->nz_element_count();
-        loop(s, len_sub)   sub->next_ravel_Cell(cell_FI0);
+        loop(s, len_sub)   sub->next_ravel_Cell(FI0);
         sub->check_value(LOC);
 
         while (Z->more())   Z->next_ravel_Pointer(sub->clone(LOC).get());
       }
    else
       {
-        while (Z->more())   Z->next_ravel_Cell(cell_FI0);
-        if (Z->is_empty())  Z->next_ravel_Cell(cell_FI0);
+        if (Z->is_empty())  Z->get_wproto().init(FI0, Z.getref(), LOC);
+        while (Z->more())   Z->next_ravel_Cell(FI0);
       }
 
    Z->check_value(LOC);

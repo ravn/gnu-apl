@@ -185,10 +185,10 @@ public:
    /// overloaded Cell::get_byte_value()
    virtual int get_byte_value() const;
 
-   /// \b false returned for packed Cells
+   /// \b false (for packed Cells)
    static const IntCell boolean_FALSE;
 
-   /// \b true returned for packed Cells
+   /// \b true (for packed Cells)
    static const IntCell boolean_TRUE;
 
 #ifndef __LIBAPL__

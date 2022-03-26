@@ -97,13 +97,27 @@ protected:
    Token do_eval_fill_B(const Value & B) const;
 
    /// Evaluate \b the identity function.
-   static Token eval_scalar_identity_fun(Value_P B, sAxis axis, Value_P FI0);
+   static Token eval_scalar_identity_fun(Value_P B, sAxis axis,
+                                         const Cell & FI0);
 
    /// parallel eval_scalar_AB
    static Thread_context::PoolFunction PF_scalar_AB;
 
    /// parallel eval_scalar_B
    static Thread_context::PoolFunction PF_scalar_B;
+
+   /// 0 (for eval_scalar_identity_fun)
+   static const IntCell integer_0;
+
+   /// 1 (for eval_scalar_identity_fun)
+   static const IntCell integer_1;
+
+   /// -BIG_FLOAT (for eval_scalar_identity_fun)
+   static const FloatCell float_min;
+
+   /// BIG_FLOAT (for eval_scalar_identity_fun)
+   static const FloatCell float_max;
+
 };
 
 #define PERF_A(x)   TOK_F2_ ## x,                           \
@@ -150,7 +164,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -183,7 +197,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(0, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -216,7 +230,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -250,7 +264,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -284,7 +298,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -318,7 +332,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(0, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -354,7 +368,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -395,7 +409,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -431,7 +445,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(0, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -471,7 +485,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(0, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -504,7 +518,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -537,7 +551,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -570,7 +584,7 @@ public:
 protected:
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(0, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -755,7 +769,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -805,7 +819,7 @@ public:
 protected:
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(0, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -850,7 +864,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(0, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -962,7 +976,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -1007,7 +1021,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, integer_1); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -1099,7 +1113,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, FloatScalar(-BIG_FLOAT, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, float_min); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -1139,7 +1153,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, FloatScalar(BIG_FLOAT, LOC)); }
+      { return eval_scalar_identity_fun(B, axis, float_max); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -1176,7 +1190,7 @@ protected:
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-   { return eval_scalar_identity_fun(B, axis, IntScalar(0, LOC)); }
+   { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
