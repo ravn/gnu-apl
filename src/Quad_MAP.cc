@@ -126,7 +126,7 @@ const ShapeItem len_B = B->element_count();
                  {
                    Cell & cell_Z0 = Z->get_wproto();
                    cell_Z0.init(cell_A, Z.getref(), LOC);
-                   cell_Z0.get_pointer_value()->to_proto();
+                   cell_Z0.get_pointer_value()->to_type();
                  }
               else if (cell_A.is_character_cell())
                  Z->set_proto_Spc();

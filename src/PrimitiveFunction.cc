@@ -151,11 +151,11 @@ const Shape shape_Z(A.getref(), 0);
 
 const ShapeItem len_Z = shape_Z.get_volume();
 
-   if (len_Z <= B->element_count() &&   // Z is not longer than B
-       B->get_owner_count() == 2   &&   // B is a temporary value
-       this == Workspace::SI_top()->get_prefix().get_dyadic_fun())
+   if (len_Z <= B->element_count() &&   // 1.   Z is not longer than B
+       B->get_owner_count() == 2   &&   // 2.   B is a temporary value
+       this == Workspace::SI_top()->get_prefix().get_dyadic_fun())   // 3. below
       {
-        /* Optimization of Z←B. At this point:
+        /* Optimization of Z←A⍴B. At this point:
 
           1. Z is not longer than B, and
           2. B has only 2 owners:
@@ -178,14 +178,14 @@ const ShapeItem len_Z = shape_Z.get_volume();
 
         // release the no longer used cells of B after shape_Z.
         //
-        const ShapeItem len_B = B->element_count();
-        ShapeItem rest = len_Z;
+        const ShapeItem len_B = B->element_count();   // all Cells
+        ShapeItem rest = len_Z;                       // Cells remaining
         if (rest == 0)   // Z is empty
            {
              rest = 1;
              if (B->get_cproto().is_pointer_cell())
                 {
-                  B->get_cproto().get_pointer_value()->to_proto();
+                  B->get_cproto().get_pointer_value()->to_type();
                 }
              else
                 {
@@ -193,6 +193,7 @@ const ShapeItem len_Z = shape_Z.get_volume();
                 }
            }
 
+        // release the Cells after Z
         while (rest < len_B)   B->release(rest++, LOC);
 
         B->set_shape(shape_Z);
@@ -205,7 +206,6 @@ const uint64_t end_1 = cycle_counter();
 
         return Token(TOK_APL_VALUE1, B);
       }
-
 
 #ifdef PERFORMANCE_COUNTERS_WANTED
 Token ret = do_reshape(shape_Z, *B);
@@ -222,9 +222,9 @@ Token
 Bif_F12_RHO::do_reshape(const Shape & shape_Z, const Value & B)
 {
 const ShapeItem len_B = B.element_count();
-const ShapeItem len_Z = shape_Z.get_volume();
 
 Value_P Z(shape_Z, LOC);
+const ShapeItem len_Z = Z->element_count();
 
    if (len_B == 0)   // empty B: use prototype of B for all cells of Z
       {
@@ -233,9 +233,9 @@ Value_P Z(shape_Z, LOC);
    else
       {
         loop(z, len_Z)
-             {
-             Z->next_ravel_Cell(B.get_cravel(z % len_B));
-             }
+          {
+            Z->next_ravel_Cell(B.get_cravel(z % len_B));
+          }
       }
 
    Z->set_default(B, LOC);
@@ -248,7 +248,7 @@ Bif_ROTATE::reverse(Value_P B, sAxis axis)
 {
    if (B->is_scalar())
       {
-        Token result(TOK_APL_VALUE1, B->clone(LOC));
+        Token result(TOK_APL_VALUE1, CLONE_P(B, LOC));
         return result;
       }
 
@@ -291,7 +291,7 @@ const Shape shape_A2(shape_B3.h(), shape_B3.l());
         gsh = A->get_cfirst().get_near_int();
         if (gsh == 0)   // nothing to do.
            {
-             Token result(TOK_APL_VALUE1, B->clone(LOC));
+             Token result(TOK_APL_VALUE1, CLONE_P(B, LOC));
              return result;
            }
       }
@@ -375,7 +375,7 @@ Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B) const
    if (B->is_scalar())   // B is a scalar (so A should be empty)
       {
         if (A->element_count() != 0)   LENGTH_ERROR;
-        Value_P Z = B->clone(LOC);
+        Value_P Z = CLONE_P(B, LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -1116,7 +1116,7 @@ IndexExpr index_expr(ASS_none, LOC);
          const Cell & cell = A->get_cravel(ec_A - a - 1);
          if (cell.is_pointer_cell())
             {
-              Value_P val = cell.get_pointer_value()->clone(LOC);
+              Value_P val = CLONE_P(cell.get_pointer_value(), LOC);
               if (val->compute_depth() > 1)   DOMAIN_ERROR;
               index_expr.add_index(val);
             }
@@ -1176,7 +1176,7 @@ ShapeItem a = ec_A;   // index_expr[0] ←→  B[;;;b]
          const Cell & cell_A = A->get_cravel(--a);
           if (cell_A.is_pointer_cell())
              {
-               Value_P val = cell_A.get_pointer_value()->clone(LOC);
+               Value_P val = CLONE_P(cell_A.get_pointer_value(), LOC);
                if (val->compute_depth() > 1)   DOMAIN_ERROR;
               index_expr.add_index(val);
              }
@@ -1497,7 +1497,7 @@ Bif_F12_UNION::eval_B(Value_P B) const
    if (B->get_rank() > 1)   RANK_ERROR;
 
 const ShapeItem len_B = B->element_count();
-   if (len_B <= 1)   return Token(TOK_APL_VALUE1, B->clone(LOC));
+   if (len_B <= 1)   return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
 const double qct = Workspace::get_CT();
 
@@ -1683,8 +1683,8 @@ const int inc_X = X->is_scalar_extensible() ? 0 : 1;
    if (inc_X == 0)   // single item X: pick entire A or B according to X
       {
         const APL_Integer x0 = X->get_cfirst().get_int_value();
-        if (x0 == 0)   return Token(TOK_APL_VALUE1, A->clone(LOC));
-        if (x0 == 1)   return Token(TOK_APL_VALUE1, B->clone(LOC));
+        if (x0 == 0)   return Token(TOK_APL_VALUE1, CLONE_P(A, LOC));
+        if (x0 == 1)   return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
         DOMAIN_ERROR;
       }
 

@@ -71,6 +71,10 @@ INTERRUPT+
 FOO[1]  'A FOO B with B:' B
         ^
 
+      )MORE
+the system limit on SI depth (as set in ⎕SYL[1;2]) was reached
+(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).
+
       ⍝ when ⎕SYL[1] triggers then it shall clear itself.
       ⎕SYL[1;2]
 0
@@ -117,9 +121,9 @@ OK      - no duplicate parents
       ⎕SYL[2;2]
 300
 
-      ⎕SYL[2]←400
+      ⎕SYL[2]←200
       ⎕SYL[2;2]
-400
+200
 
       0 FOO 0
  A FOO B with B: 0 
@@ -137,15 +141,13 @@ OK      - no duplicate parents
  A FOO B with B: 12 
  A FOO B with B: 13 
  A FOO B with B: 14 
- A FOO B with B: 15 
- A FOO B with B: 16 
 INTERRUPT+
-FOO[1]  'A FOO B with B:' B
+FOO[2]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
         ^
 
       )MORE
-the system limit on the APL value count (as set in ⎕SYL) was reached
-(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).
+the system limit on the APL value count (as set in ⎕SYL[2;2]) was reached
+(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).
 
       ⎕SYL[2;2]
 0
@@ -164,9 +166,9 @@ the system limit on the APL value count (as set in ⎕SYL) was reached
       ⎕SYL[3;2]
 3000000
 
-      ⎕SYL[3]←3600000
+      ⎕SYL[3]←349992
       ⎕SYL[3;2]
-3600000
+349992
 
       100 FOO 0
  A FOO B with B: 0 

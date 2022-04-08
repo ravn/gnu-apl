@@ -44,7 +44,8 @@ Bif_F12_PARTITION::do_eval_B(Value_P B)
    if (B->is_simple_scalar())   return B;
 
 Value_P Z(LOC);
-   Z->next_ravel_Pointer(B->clone(LOC).get());
+Value_P B0 = CLONE_P(B, LOC);
+   Z->next_ravel_Pointer(B0.get());
    Z->check_value(LOC);
    return Z;
 }
@@ -216,7 +217,7 @@ ShapeItem zm = 0;   // number of non-0 partitions
         if (partitions[0].start == 0)   // non-zero ↑A: Z ← ⊂ B
            {
              Value_P Z(LOC);
-             Z->next_ravel_Pointer(B->clone(LOC).get());
+             Z->next_ravel_Pointer(CLONE_P(B, LOC).get());
              Z->check_value(LOC);
              return Z;
            }
@@ -382,9 +383,9 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
            }
         else if (target->is_pointer_cell())        // case 2.
            {
-             Value_P vB = target->get_pointer_value();
-             const Value & cellref_B = vB->get_cellrefs(LOC).getref();
-             Bif_F12_TAKE::fill(item_shape, Z, cellref_B, false);
+             Value_P subval = target->get_pointer_value();
+             const Value & subrefs = subval->get_cellrefs(LOC).getref();
+             Bif_F12_TAKE::fill(item_shape, Z, subrefs, false);
            }
         else                                       // case 3.
            {
@@ -652,8 +653,8 @@ const Cell * cB = &B->get_cravel(offset);
            {
              // Note: this is a little tricky...
 
-             // first of all, we need a pointer cell. Therefore the target of cB
-             // should be a PointerCell.
+             // first of all, we need a pointer cell. Therefore the target
+             // of cB should be a PointerCell.
              //
              Cell & target = *cB->get_lval_value();
              if (!target.is_pointer_cell())   DOMAIN_ERROR;
@@ -678,7 +679,7 @@ const Cell * cB = &B->get_cravel(offset);
    //
    if (cB->is_pointer_cell())
       {
-        Value_P Z = cB->get_pointer_value()->clone(LOC);
+        Value_P Z = CLONE_P(cB->get_pointer_value(), LOC);
         return Z;
       }
 
@@ -694,9 +695,9 @@ const Cell * cB = &B->get_cravel(offset);
              // PointerCell (which does not exist) was deferred until this
              // point in time and needs to be done now.
              //
-             Value_P sub = target->get_pointer_value();
-             Value_P Z = sub->get_cellrefs(LOC);
-             return Z;
+             Value_P subval = target->get_pointer_value();
+             Value_P subrefs = subval->get_cellrefs(LOC);
+             return subrefs;
            }
 
         Value_P Z(LOC);

@@ -255,4 +255,18 @@ inline Value_P::Value_P(Value * val, const char * loc)
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
 //----------------------------------------------------------------------------
+inline void
+Value_P_Base::isolate(const char * loc)
+{
+#ifdef NEW_CLONE
+   if (value_p && value_p->get_owner_count() > 1)
+      {
+        Value_P Z = value_p->clone(loc);
+        value_p->decrement_owner_count(LOC);
+        value_p = Z.value_p;
+        Z.value_p = 0;
+      }
+#endif
+}
+//----------------------------------------------------------------------------
 

@@ -72,6 +72,10 @@ public:
    Value * get_cell_owner() const
       { return value.pval.owner; }
 
+   /// isolate value.pval.valp (make \b value.pval the sole owner)
+   void isolate(const char * loc)
+      { if (+value.pval.valp)   value.pval.valp.isolate(LOC); }
+
 protected:
    ///  overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const

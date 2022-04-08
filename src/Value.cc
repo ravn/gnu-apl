@@ -80,8 +80,10 @@ Value::init_ravel()
        Quad_SYL::value_count_limit < APL_Integer(value_count))
       {
         MORE_ERROR() <<
-"the system limit on the APL value count (as set in ⎕SYL) was reached\n"
-"(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).";
+"the system limit on the APL value count (as set in ⎕SYL["
+<< (Quad_SYL::SYL_VALUE_COUNT_LIMIT + Workspace::get_IO())
+<< ";2]) was reached\n"
+"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
 
         // reset the limit so that we don't get stuck here.
         //
@@ -112,6 +114,7 @@ const ShapeItem length = shape.get_volume();
    if (Quad_SYL::ravel_count_limit &&
        Quad_SYL::ravel_count_limit < APL_Integer(total_ravel_count + length))
       {
+CERR << "*** Quad_SYL::ravel_count_limit hit ***" << endl;
         // make sure that the value is properly initialized
         //
         new (&shape) Shape();
@@ -119,9 +122,10 @@ const ShapeItem length = shape.get_volume();
         IntCell::zI(ravel, 42);
 
         MORE_ERROR() <<
-"the system limit on the total ravel size (as set in ⎕SYL) was reached\n"
-"(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).";
-
+"the system limit on the total ravel size (as set in ⎕SYL["
+<< (Quad_SYL::SYL_RAVEL_BYTES_LIMIT + Workspace::get_IO())
+<< ";2]) was reached\n"
+"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
         // reset the limit so that we don't get stuck here.
         //
         Quad_SYL::ravel_count_limit = 0;
@@ -1042,21 +1046,28 @@ Cell * doubled = new Cell[new_cells];
 Value *
 Value::get_lval_cellowner() const
 {
-const ShapeItem ec = nz_element_count();
+   /* this Value may or may not be a left value. If it is, then its
+      top-level (!) ravel is a mix of:
 
-   // find the first lval cell with a non-0 owner.
-   //
-   loop(e, ec)
+      1.  PointerCells pointing to (not yet get_cellrefs()ed) right Values,
+      2a. valid LvalCells (from get_cellrefs()), or
+      2b. invalid LvalCells(0, 0) (e.g. from ↑ overtake).
+
+      The first case 1. or 2a. (if any) determines the cellowner
+    */
+   loop(e, nz_element_count())
       {
-        const Cell & cell = get_cravel(e);
-        if (cell.is_lval_cell())
+        const Cell * cell = &get_cravel(e);
+        if (cell->is_pointer_cell())   // case 1.
            {
-             const LvalCell & lval = reinterpret_cast<const LvalCell &>(cell);
-             return lval.get_cell_owner();
+             return  cell->get_pointer_value()->get_lval_cellowner();
            }
 
-        if (cell.is_pointer_cell())
-           return  cell.get_pointer_value()->get_lval_cellowner();
+        if (cell->is_lval_cell())      // case 2a. or 2b.
+           {
+             const LvalCell * lval = reinterpret_cast<const LvalCell *>(cell);
+             if (lval->get_cell_owner())   return lval->get_cell_owner();
+           }
       }
 
    return 0;   // not found (this is most likely not a left value)
@@ -1362,13 +1373,14 @@ Value::enlist_left(Value & Z) const
             }
          else if (cell.is_lval_cell())
             {
-              const Cell * target = cell.get_lval_value();
+              Cell * target = cell.get_lval_value();
               if (target == 0)
                  {
                    CERR << "0-pointer at " LOC << endl;
                  }
               else if (target->is_pointer_cell())
                  {
+                   reinterpret_cast<PointerCell *>(target)->isolate(LOC);
                    target->get_pointer_value()->enlist_left(Z);
                  }
               else 
@@ -1435,9 +1447,10 @@ Value::NOTCHAR() const
    if (!get_cfirst().is_character_cell())   return true;
 
 const ShapeItem ec = element_count();
-   loop(c, ec)   if (!get_cravel(c).is_character_cell())   return true;
+   for (ShapeItem e = 1; e < ec; ++e)
+       if (!get_cravel(e).is_character_cell())   return true;
 
-   // all items are single chars.
+   // all ravel items are (single) characters.
    return false;
 }
 //----------------------------------------------------------------------------
@@ -1763,7 +1776,10 @@ const ShapeItem ec_z = Z->element_count();
 Value_P
 Value::index(const Value * X) const
 {
-   if (!X)   return clone(LOC);   // [ ] (1-item elided index)
+   if (!X)   // A[] (1-item elided index)
+      {
+        return clone(LOC);
+      }
 
    if (is_member())
       {
@@ -1774,7 +1790,7 @@ Value::index(const Value * X) const
            {
              if (data->is_pointer_cell())
                 {
-                  return data->get_pointer_value()->clone(LOC);
+                  return CLONE_P(data->get_pointer_value(), LOC);
                 }
              Value_P Z(LOC);
              Z->next_ravel_Cell(*data);
@@ -1782,8 +1798,11 @@ Value::index(const Value * X) const
              return Z;
            }
 
-        UCS_string & more = MORE_ERROR() << "member access: member " << name
-                                << " was not found. The valid members are:";
+        // construct a )MORE error...
+        //
+        UCS_string & more = MORE_ERROR();
+        more << "member access: member " << name
+             << " not found. The valid members are:";
         const ShapeItem rows = get_rows();
         loop(r, rows)
             {
@@ -1800,41 +1819,44 @@ Value::index(const Value * X) const
 const ShapeItem max_idx = element_count();
 const APL_Integer qio = Workspace::get_IO();
 
-   // important special case: scalar X
+   // important (since frequent) special case: A[X] with scalar X and vector A
    //
-   if (get_rank() == 1 && +X && X->is_scalar())
+   if (get_rank() == 1 && X->is_scalar())
       {
-        const APL_Integer idx = X->get_cfirst().get_near_int() - qio;
-        if (idx >= 0 && idx < max_idx)
+        const APL_Integer idx0 = X->get_cscalar().get_near_int() - qio;
+        if (idx0 >= 0 && idx0 < max_idx)
            {
              Value_P Z(LOC);
-             Z->next_ravel_Cell(get_cravel(idx));
+             Z->next_ravel_Cell(get_cravel(idx0));
              Z->check_value(LOC);
              return Z;
            }
+
+        // fall through re-using the verbose INDEX_ERROR below
       }
 
    if (get_rank() != 1)   RANK_ERROR;
 
-   // the shape of the result is the shape of the index
+   // ⍴A[X] = ⍴X
+   //
 Value_P Z(X->get_shape(), LOC);
 
 const Cell * cI = &X->get_cfirst();
 
    while (Z->more())
       {
-         const ShapeItem idx = cI++->get_near_int() - qio;
-         if (idx < 0 || idx >= max_idx)
+         const ShapeItem idx0 = cI++->get_near_int() - qio;
+         if (idx0 < 0 || idx0 >= max_idx)
             {
               MORE_ERROR() << "min index=⎕IO (=" << qio
-                           <<  "), offending index=" << (idx + qio)
+                           <<  "), offending index=" << (idx0 + qio)
                            << ", max index=⎕IO+" << (max_idx - 1)
                            << " (=" << (max_idx + qio - 1) << ")";
               Z->rollback(Z->valid_ravel_items, LOC);
               INDEX_ERROR;
             }
 
-         Z->next_ravel_Cell(get_cravel(idx));
+         Z->next_ravel_Cell(get_cravel(idx0));
       }
 
    Z->set_default(*this, LOC);
@@ -2116,10 +2138,10 @@ const ShapeItem ec = nz_element_count();
 }
 //----------------------------------------------------------------------------
 int
-Value::total_size_netto(CDR_type cdr_type) const
+Value::total_CDR_size_netto(CDR_type cdr_type) const
 {
    if (cdr_type != 7)   // not nested
-      return 16 + 4*get_rank() + data_size(cdr_type);
+      return 16 + 4*get_rank() + CDR_data_size(cdr_type);
 
    // nested: header + offset-array + sub-values.
    //
@@ -2141,7 +2163,7 @@ int size = 16 + 4*get_rank() + 4*ec;   // top_level size
            {
              Value_P sub_val = cell.get_pointer_value();
              const CDR_type sub_type = sub_val->get_CDR_type();
-             size += sub_val->total_size_brutto(sub_type);
+             size += sub_val->total_CDR_size_brutto(sub_type);
            }
          else
            DOMAIN_ERROR;
@@ -2151,7 +2173,7 @@ int size = 16 + 4*get_rank() + 4*ec;   // top_level size
 }
 //----------------------------------------------------------------------------
 int
-Value::data_size(CDR_type cdr_type) const
+Value::CDR_data_size(CDR_type cdr_type) const
 {
 const ShapeItem ec = nz_element_count();
    
@@ -2184,7 +2206,7 @@ int size = 0;
            {
              Value_P sub_val = cell.get_pointer_value();
              const CDR_type sub_type = sub_val->get_CDR_type();
-             size += sub_val->data_size(sub_type);
+             size += sub_val->CDR_data_size(sub_type);
            }
          else
            DOMAIN_ERROR;
@@ -2470,12 +2492,16 @@ const ShapeItem ec = element_count();
 }
 //----------------------------------------------------------------------------
 void
-Value::to_proto()
+Value::to_type()
 {
    loop(e, nz_element_count())
       {
         Cell & cell = get_wravel(e);
-        if (cell.is_pointer_cell())       cell.get_pointer_value()->to_proto();
+        if (cell.is_pointer_cell())
+           {
+             reinterpret_cast<PointerCell &>(cell).isolate(LOC);
+             cell.get_pointer_value()->to_type();
+           }
         else if (cell.is_character_cell())   set_ravel_Char(e, UNI_SPACE);
         else                                 set_ravel_Int(e, 0);
       }
@@ -2541,10 +2567,18 @@ const uint64_t count1 = nz_element_count();
 Value_P
 Value::prototype(const char * loc) const
 {
-   // the type of an array is an array with the same structure, but all numbers
-   // replaced with 0 and all chars replaced with ' '.
-   //
-   // the prototype of an array is the type of the first element of the array.
+   /** lrm p.46:
+
+       The type of an array is an array with the same structure, but with
+      all numbers replaced with 0 and all characters replaced with ' '.
+
+      The prototype of an array is the type of the first element of the array.
+
+      type B        ←→   ↑0⍴⊂B
+      prototype B   ←→   ↑0⍴⊂↑B
+
+      Since ↑B is a scalar the prototype of B is also a scalar.
+    **/
 
 const Cell & first = get_cfirst();
    if (first.is_integer_cell())     return IntScalar(0, LOC);
@@ -2553,9 +2587,8 @@ const Cell & first = get_cfirst();
       {
         Value_P B0 = first.get_pointer_value();
         Value_P Z(B0->get_shape(), loc);
-        const ShapeItem ec_Z =  Z->element_count();
 
-        loop(z, ec_Z)   Z->next_ravel_Proto(B0->get_cravel(z));
+        loop(z, Z->element_count())   Z->next_ravel_Proto(B0->get_cravel(z));
         Z->check_value(LOC);
         return Z;
       }

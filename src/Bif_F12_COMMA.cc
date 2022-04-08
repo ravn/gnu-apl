@@ -461,8 +461,8 @@ Bif_F12_COMMA::eval_AB(Value_P A, Value_P B) const
   if (A->is_scalar() && B->is_scalar())
      {
        Value_P Z(2, LOC);
-       Z->next_ravel_Cell(A->get_cfirst());
-       Z->next_ravel_Cell(B->get_cfirst());
+       Z->next_ravel_Cell(A->get_cscalar());
+       Z->next_ravel_Cell(B->get_cscalar());
        Z->check_value(LOC);
        return Token(TOK_APL_VALUE1, Z);
      }

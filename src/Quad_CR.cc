@@ -1301,7 +1301,7 @@ const ShapeItem len = B.element_count();
       {
         return B.clone(LOC);
         if (!B.get_cfirst().is_pointer_cell())   return B.clone(LOC);
-        return B.get_cfirst().get_pointer_value()->clone(LOC);
+        return CLONE(B.get_cfirst().get_pointer_value(), LOC);
       }
 */
 
@@ -1337,7 +1337,7 @@ Value_P Z(shape_Z, LOC);
         const Cell & cB = B.get_cravel(b);
         if (cB.is_pointer_cell())
            {
-             Value_P B_sub = cB.get_pointer_value()->clone(LOC);
+             Value_P B_sub = CLONE_P(cB.get_pointer_value(), LOC);
              Shape sh_sub = B_sub->get_shape();
              sh_sub.expand_rank(conformed.get_rank());
              B_sub->set_shape(sh_sub);
@@ -1374,7 +1374,7 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
 
         if (row->element_count() == 1)   // single item
            {
-             Value_P Zrow = row->get_cfirst().get_pointer_value()->clone(LOC);
+             Value_P Zrow = CLONE_P(row->get_cfirst().get_pointer_value(), LOC);
              Z->next_ravel_Pointer(Zrow.get());
              continue;
            }

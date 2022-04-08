@@ -75,8 +75,7 @@ Nabla::throw_edit_error(const char * why)
 void
 Nabla::edit()
 {
-const char * error = start();
-   if (error)
+   if (const char * error = start())
       {
         Log(LOG_verbose_error)   if (Workspace::more_error().size() == 0)
            {
@@ -190,22 +189,23 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
 
    if (ufun == 0)   // UserFunction::fix() failed
       {
+        const UCS_string & MORE = Workspace::more_error();
         if (InputFile::running_script())
            {
              // the ∇-editor runs from a script, therefore warning the user
-             // interactively and asking to fix the fault makles no sense. We
+             // interactively and asking to fix the fault makes no sense. We
              // therefore exit with DEFN_ERROR, so that the scrip does not hang
              // in a endless try again loop.
              //
-             UTF8_string more_utf8(MORE_ERROR());
+             UTF8_string more_utf8(MORE);
              throw_edit_error(more_utf8.c_str());
            }
 
-        COUT << "Fatal error in defined function. Please correct "
-                "(or else delete with [∆" << error_line <<"])\n"
-                " the offending line indicated above.\n";
+        COUT << MORE << 
+"Fatal error in defined function line [" << error_line << "].\n"
+"Proceed with [" << error_line << "] ..., [∆" << error_line <<
+"], or [→] before ∇.\n";
         do_close = false;
-        COUT << MORE_ERROR();
         goto try_again;
 
       }

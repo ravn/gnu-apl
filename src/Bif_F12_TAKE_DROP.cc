@@ -101,7 +101,7 @@ const ShapeItem len_X = X->element_count();
 
    if (len_X == 0)   // no axes
       {
-        Token result(TOK_APL_VALUE1, B->clone(LOC));
+        Token result(TOK_APL_VALUE1, CLONE_P(B, LOC));
         return result;
       }
 
@@ -150,7 +150,7 @@ Shape ravel_A1(A.getref(), /* ⎕IO */ 0);   // checks 1 ≤ ⍴⍴A and ⍴A �
       {
         Shape shape_B1;
         loop(a, ravel_A1.get_rank())   shape_B1.add_shape_item(1);
-        Value_P B1 = B->clone(LOC);   // so that we can set_shape()
+        Value_P B1 = CLONE_P(B, LOC);   // so that we can set_shape()
         B1->set_shape(shape_B1);
         return Token(TOK_APL_VALUE1, do_take(ravel_A1, B1.getref(), false));
       }
@@ -162,7 +162,7 @@ Shape ravel_A1(A.getref(), /* ⎕IO */ 0);   // checks 1 ≤ ⍴⍴A and ⍴A �
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_TAKE::do_take(const Shape & ravel_A1, const Value &  B,
+Bif_F12_TAKE::do_take(const Shape & ravel_A1, const Value & B,
                       AxesBitmap axes)
 {
    // ravel_A1 can have negative items (for take from the end).
@@ -201,21 +201,30 @@ Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z,
 Token
 Bif_F12_DROP::eval_AB(Value_P A, Value_P B) const
 {
-const Shape ravel_A(A.getref(), /* ⎕IO */ 0);
    if (A->get_rank() > 1)   RANK_ERROR;
+
+const Shape ravel_A(A.getref(), /* ⎕IO */ 0);
 
    if (B->is_scalar())
       {
-        /* Z←A↓B with scalar B has an element count() of 1 (if all items of A
-           are are 0 thus nothing is dropped) or else 1.
+        /*
+           A scalar B is taken as ((⍴⍴B)⍴1)⍴B.
 
-           ⍴⍴Z is ⍴⍴A and ⍴Z[j] ←→  A[j] = 0
+           Z←A↓B with scalar B has an element count() of either 0 or 1:
+
+           If all items of A are are 0 then nothing is dropped) and therefore
+           the result is the scalar B.
+
+            Otherwise at least one axis A[j] is ≠ 0 dropped and the result
+            is empty.
+
+           ⍴⍴Z is ⍴,A and ⍴Z[j] ←→  0 ⌈ (⍴B)[j] - ∣ A[j]
          */
         Shape shape_Z;
         loop(r, ravel_A.get_rank())
             {
-               // the r'th shape item is either 0 (if anything is dropped)
-               // or 1 if not.
+               // (⍴Zi)[r] r'th either 1 (if nothing is dropped)
+               // or else 1 (possibly overdrop).
                if (ravel_A.get_shape_item(r))   shape_Z.add_shape_item(0);
                else                             shape_Z.add_shape_item(1);
             }
@@ -223,27 +232,27 @@ const Shape ravel_A(A.getref(), /* ⎕IO */ 0);
         Value_P Z(shape_Z, LOC);
 
         Z->set_ravel_Cell(0, B->get_cfirst());
-        if (shape_Z.get_volume() == 0)   Z->to_proto();
+        if (shape_Z.get_volume() == 0)   Z->to_type();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
    if (ravel_A.get_rank() != B->get_rank())   LENGTH_ERROR;
 
-Shape sh_Z;
+Shape shape_Z;
    loop(r, ravel_A.get_rank())
        {
-         const ShapeItem sA = ravel_A.get_shape_item(r);
-         const ShapeItem sB = B->get_shape_item(r);
-         const ShapeItem pA = sA < 0 ? -sA : sA;
-         if (pA >= sB)   sh_Z.add_shape_item(0);   // over-drop
-         else            sh_Z.add_shape_item(sB - pA); 
+         const ShapeItem sA = ravel_A.get_shape_item(r);    // A[r]
+         const ShapeItem sB = B->get_shape_item(r);         // (⍴B[r]
+         const ShapeItem pA = sA < 0 ? -sA : sA;            // ∣ A[r]
+         if (pA >= sB)   shape_Z.add_shape_item(0);         // over-drop
+         else            shape_Z.add_shape_item(sB - pA);   // normal drop
        }
 
-Value_P Z(sh_Z, LOC);
-   if (sh_Z.is_empty())   // empty Z, e.g. from overdrop
+Value_P Z(shape_Z, LOC);
+   if (shape_Z.is_empty())   // empty Z, e.g. from overdrop
       {
-        Value_P Z(sh_Z, LOC);
+        Value_P Z(shape_Z, LOC);
         Z->set_default(*B.get(), LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -264,7 +273,8 @@ Bif_F12_DROP::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    if (X->element_count() == 0)   // no axes
       {
-        Token result(TOK_APL_VALUE1, B->clone(LOC));
+        Value_P Z = CLONE_P(B, LOC);
+        Token result(TOK_APL_VALUE1, Z);
         return result;
       }
 

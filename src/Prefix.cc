@@ -1550,8 +1550,7 @@ Cell * member_cell = top_val->get_member(members, member_owner,
                  }
               else
                  {
-                   Value_P Z(member_cell->get_pointer_value()
-                                        ->clone(LOC), LOC);
+                   Value_P Z(CLONE_P(member_cell->get_pointer_value(),LOC), LOC);
                    pop_args_push_result(Token(TOK_APL_VALUE1, Z));
                  }
             }
@@ -2095,7 +2094,14 @@ const Value * B = at3().get_apl_val().get();   // the condition
         else                     LENGTH_ERROR;
       }
 
-const APL_Integer condition = B->get_cfirst().get_near_bool();
+const Cell & B0 =  B->get_cfirst();
+   if (!B0.is_near_bool())
+      {
+        MORE_ERROR() << "Non-boolean ↑B in A → B";
+        DOMAIN_ERROR;
+      }
+
+const APL_Integer condition = B0.get_near_bool();
    if (!condition)
       {
         pop_and_discard();   // B

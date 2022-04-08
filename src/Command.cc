@@ -659,48 +659,55 @@ Command::cmd_CHECK(ostream & out)
    //
    {
      bool erased = false;
-     int stale = Workspace::cleanup_expunged(CERR, erased);
-     if (stale)
+     if (const int stale = Workspace::cleanup_expunged(CERR, erased))
         {
           out << "WARNING - " << stale << " stale functions ("
                << (erased ? "" : "not ") << "erased)" << endl;
         }
-     else out << "OK      - no stale functions" << endl;
+     else
+        {
+          out << "OK      - no stale functions" << endl;
+        }
    }
 
    // 2. print stale values (if any)
    //
    {
-     const int stale = Value::print_stale(CERR);
-     if (stale)
+     if (const int stale = Value::print_stale(CERR))
         {
           out << "ERROR   - " << stale << " stale values" << endl;
           IO_Files::apl_error(LOC);
         }
-     else out << "OK      - no stale values" << endl;
+     else
+        {
+          out << "OK      - no stale values" << endl;
+        }
    }
 
    // 3. print stale index expressions (if any)
    {
-     const int stale = IndexExpr::print_stale(CERR);
-     if (stale)
+     if (const int stale = IndexExpr::print_stale(CERR))
         {
           out << "ERROR   - " << stale << " stale indices" << endl;
           IO_Files::apl_error(LOC);
         }
-     else out << "OK      - no stale indices" << endl;
+     else
+        {
+          out << "OK      - no stale indices" << endl;
+        }
    }
 
-   // 3. discover duplicate parents
+   // 4. discover duplicate parents
    //
    {
-     // 3a. create a { parent = 0, value } vector<val_val> of all values
+#ifndef NEW_CLONE   // old clone
+     // 4a. create a { parent = 0, value } vector<val_val> of all values
      //
      std::vector<val_val> values;
      ShapeItem duplicate_parents = 0;
      for (const DynamicObject * obj =
                 DynamicObject::get_all_values()->get_next();
-        obj != DynamicObject::get_all_values(); obj = obj->get_next())
+          obj != DynamicObject::get_all_values(); obj = obj->get_next())
          {
            const Value * val = static_cast<const Value *>(obj);
 
@@ -708,14 +715,14 @@ Command::cmd_CHECK(ostream & out)
            values.push_back(vv);
          }
 
-     // 3b. sort vector<val_val> values by address so we can bsearch it.
+     // 4b. sort vector<val_val> values by address so we can bsearch it.
      //
      Heapsort<val_val>::sort(&values[0], values.size(), 0,
                              &val_val::compare_val_val);
      loop(v, (values.size() - 1))
          Assert(&values[v].child < &values[v + 1].child);
 
-      // 3c. set parents of pointer cells
+      // 4c. set parents of pointer cells
       //
       loop(v, values.size())   // for every .child (acting as parent here)
           {
@@ -764,6 +771,7 @@ Command::cmd_CHECK(ostream & out)
             IO_Files::apl_error(LOC);
           }
      else
+#endif
           {
             out << "OK      - no duplicate parents" << endl;
           }

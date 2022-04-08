@@ -77,7 +77,7 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
       {
         Value_P sub = other.get_pointer_value()->clone(loc);
         Assert(!sub->is_simple_scalar());
-        sub->to_proto();
+        sub->to_type();
         new (this) PointerCell(sub.get(), cell_owner);
       }
    else if (other.is_lval_cell())      new (this) LvalCell(0, 0);

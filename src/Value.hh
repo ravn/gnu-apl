@@ -62,8 +62,8 @@ class Value : public DynamicObject
    friend class PointerCell;   // needs & for &cell_owner
 
 protected:
-   // constructors. Values should not be constructed directly but via their
-   // counterparts in class Value_P.
+   // constructors. Values shall not be constructed directly but only via
+   // their counterparts in class Value_P
    //
    /// constructor: scalar value (i.e. a value with rank 0).
    Value(const char * loc);
@@ -198,16 +198,16 @@ public:
    ShapeItem get_last_shape_item() const
       { return shape.get_last_shape_item(); }
 
-   /// return the length of the last dimension, or 1 for scalars
+   /// return the length of the last axis, or 1 for scalars
    ShapeItem get_cols() const
       { return shape.get_cols(); }
 
-   /// return the product of all but the the last dimension, or 1 for scalars
+   /// return the product of all but the the last axis, or 1 for scalars
    ShapeItem get_rows() const
       { return shape.get_rows(); }
 
-   /// set the length of dimension \b r to \b sh.
-   void set_shape_item(sRank r, ShapeItem sh)
+   /// set the length of axis \b r to \b sh.
+   void set_shape_item(sAxis r, ShapeItem sh)
       { shape.set_shape_item(r, sh); }
 
    /** reshape this value in place. This is generally dangerous and only
@@ -218,6 +218,9 @@ public:
 
        If this value is empty, then (due to its prototype) reshaping
        it to volume 1 is permitted.
+
+       The caller is responsible for ensuring that this value does not have
+       multiple owners.
    **/
    void set_shape(const Shape & new_shape)
       { Assert(new_shape.get_volume() <= nz_element_count() && is_complete());
@@ -704,8 +707,31 @@ public:
    /// the prototype of this value
    Value_P prototype(const char * loc) const;
 
-   /// return a deep copy of \b this value
-   Value_P clone(const char * loc) const;
+/** macro NEW_CLONE selects one of two clone() schemes:
+
+   1. the old scheme ( #undef NEW_CLONE ) clones values early, so that:
+   1a. Different PointerCells always point to different Sub-Values, and
+   1b. Arguments of defined functions are different in the caller and in
+       the callee, and
+   1c. Values may be cloned without need.
+
+   2. the new scheme ( #define NEW_CLONE ) clones Values late, so that
+   2a. Different PointerCells (of the same or even of different
+       Values) may point to the same Sub-Value, and
+   2b. Arguments of defined functions are different in the caller and in
+       the callee are the same as long as they are not modified, and
+   2c. A Value is only cloned before it is being modified and only if it
+       has more than one owner.
+ **/
+#define NEW_CLONE
+
+#ifdef NEW_CLONE
+# define CLONE_P(B_P, L)   (B_P)
+# define CLONE(pB, L)      Value_P(*(pB), LOC)
+#else
+# define CLONE_P(B_P, L)   (B_P).get()->clone(L)
+# define CLONE(pB, L)      (pB)->clone(L)
+#endif
 
    /// get the min spacing for this column and set/clear if there
    /// is/isn't a numeric item in the column.
@@ -720,16 +746,16 @@ public:
    void check_value(const char * loc);
 
    /// return the total CDR size (header + data + padding) for \b this value.
-   int total_size_brutto(CDR_type cdr_type) const
-      { return (total_size_netto(cdr_type) + 15) & ~15; }
+   int total_CDR_size_brutto(CDR_type cdr_type) const
+      { return (total_CDR_size_netto(cdr_type) + 15) & ~15; }
 
    /// return the total CDR size in bytes (header + data),
-   ///  not including any except padding for \b this value.
-   int total_size_netto(CDR_type cdr_type) const;
+   /// not including any padding for \b this value.
+   int total_CDR_size_netto(CDR_type cdr_type) const;
 
    /// return the CDR size in bytes for the data of \b value,
    /// not including the CDR header and padding
-   int data_size(CDR_type cdr_type) const;
+   int CDR_data_size(CDR_type cdr_type) const;
 
    /// return the CDR type for \b this value
    CDR_type get_CDR_type() const;
@@ -747,8 +773,9 @@ public:
    /// if the ravel contains non-char or nested cells.
    UCS_string get_UCS_ravel() const;
 
-   /// recursively replace all ravel elements with 0
-   void to_proto();
+   /// recursively replace all numeric ravel elements with 0 and all
+   /// characters with blank. See lrm p. 46.
+   void to_type();
 
    /// print address, shape, and flags of this value
    void print_structure(ostream & out, int indent, ShapeItem idx) const;
@@ -842,6 +869,9 @@ public:
 
    /// the number of slow (malloc() based) new() calls
    static uint64_t slow_new_count;
+
+   /// return a deep copy of \b this value
+   Value_P clone(const char * loc) const;
 
 protected:
    /// return the next ravel cell to be initialized (excluding prototype)

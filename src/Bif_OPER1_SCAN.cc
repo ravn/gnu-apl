@@ -128,7 +128,7 @@ Bif_SCAN::scan(Token & tok_LO, Value_P B, uAxis axis) const
 {
    // if B is a scalar, then Z is B.
    //
-   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
+   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
    if (!tok_LO.is_function())
       {
@@ -157,7 +157,7 @@ Function_P LO = tok_LO.get_function();
 
 const ShapeItem m_len = B->get_shape_item(axis);
 
-   if (m_len == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
+   if (m_len == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
    if (m_len == 1)
       {

@@ -85,8 +85,11 @@ Workspace::push_SI(const Executable * fun, const char * loc)
        Quad_SYL::si_depth_limit <= SI_top()->get_level())
       {
         MORE_ERROR() <<
-        "the system limit on SI depth (as set in ⎕SYL) was reached\n"
-        "(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).";
+"the system limit on SI depth (as set in ⎕SYL["
+<< (Quad_SYL::SYL_SI_DEPTH_LIMIT + Workspace::get_IO())
+<< ";2]) was reached\n"
+"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
+
 
         Quad_SYL::si_depth_limit = 0;
         set_attention_raised(LOC);

@@ -340,12 +340,12 @@ Cell * cell = &val->get_wravel(idx);
       {
         const Cell & src = new_value->get_cfirst();
         if (!src.is_pointer_cell())   DOMAIN_ERROR;
-        Value_P sub = src.get_pointer_value()->clone(LOC);
+        Value_P sub = CLONE(src.get_pointer_value(), LOC);
         new (cell)   PointerCell(sub.get(), *val);
       }
    else
       {
-        Value_P sub = new_value->clone(LOC);
+        Value_P sub = CLONE(new_value, LOC);
         new (cell)   PointerCell(sub.get(), *val);
       }
 }

@@ -891,7 +891,7 @@ ShapeItem error_count = 0;
            }
       }
 
-   if (val.is_empty())   val.to_proto();   // unlikely
+   if (val.is_empty())   val.to_type();   // unlikely
 
    return error_count;
 }
@@ -1478,8 +1478,7 @@ const NamedObject * obj = Workspace::lookup_existing_name(name);
 const Symbol * symbol = obj->get_symbol();
    if (symbol)
       {
-        const Value * value = &*symbol->get_apl_value();
-        if (value)
+        if (const Value * value = symbol->get_apl_value().get())
            {
              CDR_string cdr;
              CDR::to_CDR(cdr, *value);

@@ -54,7 +54,7 @@ public:
    bool operator!() const
       { return value_p == 0; }
 
-   /// return a const pointer to the Value (overloaded ->)
+   /// return a const pointer to the Value (overloaded *)
    const Value * operator->()  const
       { return value_p; }
 
@@ -64,6 +64,10 @@ public:
 
    /// return a const reference to the Value
    const Value & operator*() const
+      { return *value_p; }
+
+   /// return a reference to the Value
+   Value & operator*()
       { return *value_p; }
 
    /// return a const pointer to the Value
@@ -92,6 +96,9 @@ public:
    /// increment the owner count of \b val. The function body of this function
    /// requires Value.hh and is therefore implemented in Value.icc.
    static inline void increment_owner_count(Value * val, const char * loc);
+
+   /// clone value if more than one Value_P points to it
+   inline void isolate(const char * loc);
 
 protected:
    /// pointer to the value

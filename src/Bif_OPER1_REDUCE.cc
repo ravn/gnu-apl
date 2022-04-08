@@ -123,7 +123,7 @@ Bif_REDUCE::reduce(Token & tok_LO, Value_P B, uAxis axis)
 {
    // if B is a scalar, then Z is B.
    //
-   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
+   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
    if (!tok_LO.is_function())
       {
@@ -236,7 +236,7 @@ const int n_wise = A0 < 0 ? -A0 : A0;   // the number of items (= M1 in iso)
 
    Assert1(LO);
 
-   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
+   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
    if (axis >= B->get_rank())   AXIS_ERROR;
 

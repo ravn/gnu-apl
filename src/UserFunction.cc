@@ -510,14 +510,14 @@ UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B
 Token
 UserFunction::eval_fill_B(Value_P B) const
 {
-Value_P Z = B->clone(LOC);
+Value_P Z = CLONE_P(B, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
 Token
 UserFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
-Value_P Z = B->clone(LOC);
+Value_P Z = CLONE_P(B, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------

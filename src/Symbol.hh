@@ -124,6 +124,10 @@ public:
    void set_vs_flags(VS_flags flg)
       { flags = flg; }
 
+   /// make \b apl_val the sole owner of apl_val.value
+   void isolate(const char * loc)
+      { if (+apl_val)   apl_val.isolate(loc); }
+
 protected:
    /// constructor: ValueStackItem for an unused symbol
    ValueStackItem()

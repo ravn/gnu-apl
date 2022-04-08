@@ -23,6 +23,7 @@ dist_noinst_DATA =                              \
         Catenate_with_Axis.tc                   \
         Ceiling.tc                              \
         Circle_Functions.tc                     \
+        Clone.tc                                \
         Cloning.tc                              \
         Commute.tc                              \
         Compress.tc                             \

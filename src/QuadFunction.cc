@@ -531,10 +531,10 @@ Quad_ES::event_simulate(const UCS_string * A, Value_P B, Error & error)
    if (B->element_count() == 0)   return Token();
 
 const ErrorCode ec = get_error_code(B);
-   if (ec == E_QUAD_ES_BRA)   return Token(TOK_QUAD_ES_BRA, B->clone(LOC));
-   if (ec == E_QUAD_ES_COM)   return Token(TOK_QUAD_ES_COM, B->clone(LOC));
-   if (ec == E_QUAD_ES_ERR)   return Token(TOK_QUAD_ES_ERR, B->clone(LOC));
-   if (ec == E_QUAD_ES_ESC)   return Token(TOK_QUAD_ES_ESC, B->clone(LOC));
+   if (ec == E_QUAD_ES_BRA)   return Token(TOK_QUAD_ES_BRA, CLONE_P(B, LOC));
+   if (ec == E_QUAD_ES_COM)   return Token(TOK_QUAD_ES_COM, CLONE_P(B, LOC));
+   if (ec == E_QUAD_ES_ERR)   return Token(TOK_QUAD_ES_ERR, CLONE_P(B, LOC));
+   if (ec == E_QUAD_ES_ESC)   return Token(TOK_QUAD_ES_ESC, CLONE_P(B, LOC));
 
    new (&error)   Error(ec, error.get_throw_loc());
 

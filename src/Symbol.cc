@@ -138,7 +138,7 @@ ValueStackItem & vs = value_stack.back();
    switch(vs.get_NC())
       {
         case NC_UNUSED_USER_NAME:
-             if (clone)  new_value = new_value->clone(loc);
+             if (clone)  new_value = CLONE_P(new_value, loc);
 
              vs.set_apl_value(new_value);
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
@@ -151,7 +151,7 @@ ValueStackItem & vs = value_stack.back();
         case NC_VARIABLE:
              if (vs.get_val_cptr() == new_value.get())   return;   // X←X
 
-             if (clone)  new_value = new_value->clone(loc);
+             if (clone)  new_value = CLONE_P(new_value, loc);
 
              vs.set_apl_value(new_value);
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
@@ -175,6 +175,7 @@ Symbol::assign_indexed(const Value * X, Value_P B)   // A[X] ← B
    // 
 const APL_Integer qio = Workspace::get_IO();
 
+   value_stack.back().isolate(LOC);
 Value_P Z = get_apl_value();  // the current APL value of this Symbol
 
    if (Z->is_member())
@@ -267,11 +268,12 @@ Symbol::assign_indexed(const IndexExpr & IX, Value_P B)   // A[IX;...] ← B
         return;
       }
 
-   // see Value::index() for comments.
+   // see comments in Value::index() above.
 
-Value_P A = get_apl_value();
+   value_stack.back().isolate(LOC);
+Value_P Z = get_apl_value();
 
-   if (A->get_rank() != IX.get_rank())   RANK_ERROR;   // ISO p. 159
+   if (Z->get_rank() != IX.get_rank())   RANK_ERROR;   // ISO p. 159
 
    // B must either be a scalar (and is then scalar extended to the size
    // of the updated area, or else have the shape of the concatenated index
@@ -307,9 +309,9 @@ Value_P A = get_apl_value();
                  }
                else         // elided index: add corresponding B dimenssion
                  {
-                   if (ix >= A->get_rank())   RANK_ERROR;
+                   if (ix >= Z->get_rank())   RANK_ERROR;
                    const ShapeItem sbx =
-                         A->get_shape_item(A->get_rank() - ix - 1);
+                         Z->get_shape_item(Z->get_rank() - ix - 1);
                    if (sbx == 0)   return;   // empty index
                    if (sbx != 1)   IX1.add_shape_item(sbx);
                  }
@@ -322,7 +324,7 @@ Value_P A = get_apl_value();
            }
       }
 
-MultiIndexIterator mult(A->get_shape(), IX);
+MultiIndexIterator mult(Z->get_shape(), IX);
 
 const ShapeItem ec_B = B->element_count();
 const Cell * cB = &B->get_cfirst();
@@ -330,12 +332,12 @@ const int incr_B = (ec_B == 1) ? 0 : 1;
 
    while (mult.more())
       {
-        const ShapeItem offset_A = mult++;
-        if (offset_A < 0)                     INDEX_ERROR;
-        if (offset_A >= A->element_count())   INDEX_ERROR;
-        Cell & dest = A->get_wravel(offset_A);
+        const ShapeItem offset_Z = mult++;
+        if (offset_Z < 0)                     INDEX_ERROR;
+        if (offset_Z >= Z->element_count())   INDEX_ERROR;
+        Cell & dest = Z->get_wravel(offset_Z);
         dest.release(LOC);   // free sub-values etc (if any)
-        dest.init(*cB, A.getref(), LOC);
+        dest.init(*cB, Z.getref(), LOC);
         cB += incr_B;
      }
 
@@ -641,8 +643,8 @@ int has_result = 0;   // no result
         case 4: {
                   const Value * val = get_val_cptr();
                   const CDR_type cdr_type = val->get_CDR_type();
-                  const int brutto = val->total_size_brutto(cdr_type);
-                  const int data = val->data_size(cdr_type);
+                  const int brutto = val->total_CDR_size_brutto(cdr_type);
+                  const int data = val->CDR_data_size(cdr_type);
 
                   Z.next_ravel_Int(brutto);
                   Z.next_ravel_Int(data);
@@ -683,7 +685,7 @@ const ValueStackItem & vs = value_stack.back();
 
              // if we resolve a variable. the value is considered grouped.
              {
-               Token t(TOK_APL_VALUE1, get_apl_value()->clone(LOC));
+               Token t(TOK_APL_VALUE1, CLONE_P(get_apl_value(), LOC));
                tok.move_1(t, LOC);
              }
              return;
@@ -720,8 +722,9 @@ Symbol::resolve_lv(const char * loc)
 
    if (value_stack.back().get_NC() == NC_VARIABLE)
       {
-        Value_P val = get_value();
-        return Token(TOK_APL_VALUE1, val->get_cellrefs(loc));
+        value_stack.back().isolate(loc);
+        Value_P Z = get_value();
+        return Token(TOK_APL_VALUE1, Z->get_cellrefs(loc));
       }
 
    MORE_ERROR() << "Symbol '" << get_name()

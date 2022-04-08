@@ -252,8 +252,8 @@ ShapeItem end_z = z + slice_len;
               if (len_Z1 == 0)
                  {
                    POOL_LOCK(parallel_jobs_lock,
-                             Value_P Z1 = B1->clone(LOC))
-                    Z1->to_proto();
+                             Value_P Z1 = CLONE_P(B1, LOC));
+                    Z1->to_type();
                     new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
                  }
               else
@@ -691,7 +691,7 @@ ScalarFunction::do_eval_fill_AB(const Value & A, const Value & B) const
            }
 
         Value_P Z = B.clone(LOC);
-        Z->to_proto();
+        Z->to_type();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -706,7 +706,7 @@ ScalarFunction::do_eval_fill_AB(const Value & A, const Value & B) const
              return Token(TOK_APL_VALUE1, Z);
            }
         Value_P Z = A.clone(LOC);
-        Z->to_proto();
+        Z->to_type();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -716,10 +716,11 @@ ScalarFunction::do_eval_fill_AB(const Value & A, const Value & B) const
    if (A.get_rank() != B.get_rank())   RANK_ERROR;
    if (!A.same_shape(B))               LENGTH_ERROR;
 
-   // Value::prototype() does not work here, so we clone() and to_proto()
+   // B.prototype() cannot be used since it would return the type of ↑B
+   // while we need the type of B here. We therefore clone() and to_type()
    //
 Value_P Z = B.clone(LOC);
-   Z->to_proto();
+   Z->to_type();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 
@@ -741,10 +742,10 @@ ScalarFunction::do_eval_fill_B(const Value & B) const
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   // Value::prototype() does not work here, so we clone() and to_proto()
+   // Value::prototype() does not work here, so we clone() and to_type()
    //
 Value_P Z = B.clone(LOC);
-   Z->to_proto();
+   Z->to_type();
    Z->check_value(LOC);
 
    return Token(TOK_APL_VALUE1, Z);
@@ -780,7 +781,7 @@ const Cell & proto_B = B->get_cfirst();
         loop(s, len_sub)   sub->next_ravel_Cell(FI0);
         sub->check_value(LOC);
 
-        while (Z->more())   Z->next_ravel_Pointer(sub->clone(LOC).get());
+        while (Z->more())   Z->next_ravel_Pointer(CLONE_P(sub, LOC).get());
       }
    else
       {

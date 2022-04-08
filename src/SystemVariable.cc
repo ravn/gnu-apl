@@ -112,8 +112,8 @@ SystemVariable::get_attributes(int mode, Value & Z) const
         case 4: {
                   Value_P val = get_apl_value();
                   const CDR_type cdr_type = val->get_CDR_type();
-                  const int brutto = val->total_size_brutto(cdr_type);
-                  const int data = val->data_size(cdr_type);
+                  const int brutto = val->total_CDR_size_brutto(cdr_type);
+                  const int data = val->CDR_data_size(cdr_type);
 
                   Z.next_ravel_Int(brutto);
                   Z.next_ravel_Int(data);
