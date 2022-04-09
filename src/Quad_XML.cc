@@ -1730,8 +1730,8 @@ const Value & A1 = *A.get_cravel(1).get_pointer_value();
         B.sorted_members(member_indices, /* filters */ 0);
 
         const Cell & cell = B.get_cravel(2*member_indices[0]);
-        const Value & name =  cell.get_pointer_value().getref();
-        return Token(TOK_APL_VALUE1, name.clone(LOC));
+        Value * name =  cell.get_pointer_value().get();
+        return Token(TOK_APL_VALUE1, CLONE(name, LOC));
       }
 
 Value_P path = path_split(A1);
@@ -1786,14 +1786,14 @@ std::vector<ShapeItem> member_indices;
         const Cell & cell = container->get_cravel(2*member_indices[m]);
         Assert(cell.is_pointer_cell());
 
-        const Value & name_m =  cell.get_pointer_value().getref();
+        Value * name_m =  cell.get_pointer_value().get();
         ShapeItem position_m;
-        const int weight = split_name(0, &position_m, 0, name_m);
+        const int weight = split_name(0, &position_m, 0, *name_m);
         position_m += weight*B_total;
 
         if (position_m > leaf_position)   // next item after leaf
            {
-             return Token(TOK_APL_VALUE1, name_m.clone(LOC));
+             return Token(TOK_APL_VALUE1, CLONE(name_m, LOC));
            }
       }
 

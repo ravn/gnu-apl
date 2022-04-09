@@ -1778,7 +1778,7 @@ Value::index(const Value * X) const
 {
    if (!X)   // A[] (1-item elided index)
       {
-        return clone(LOC);
+        return CLONE(const_cast<Value *>(this), LOC);
       }
 
    if (is_member())
@@ -2361,7 +2361,7 @@ const size_t indent = member_prefix.size() + longest_name + 3;
                  }
               else if (sub->is_char_vector())   // maybe multi-line with \n
                  {
-                   Value_P sub1 = Quad_CR::do_CR35(sub.getref());
+                   Value_P sub1 = Quad_CR::do_CR35(sub.get());
                    Value_P sub2 = Bif_F12_PICK::disclose(sub1, false);
                    if (sub2->get_rows() > 1)
                       {
@@ -2466,7 +2466,7 @@ Value::print_boxed(ostream & out, int indent) const
 {
 const PrintContext pctx(PST_NONE);
 
-Value_P Z = Quad_CR::do_CR(8, *this, pctx);
+Value_P Z = Quad_CR::do_CR(8, this, pctx);
    Assert(Z->get_rank() == 2);
 const ShapeItem rows = Z->get_rows();
 const ShapeItem cols = Z->get_cols();
@@ -2782,7 +2782,7 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob) const
       {
         print_structure(out, 0, 0);
         const PrintContext pctx(PST_NONE);
-        Value_P Z = Quad_CR::do_CR(7, *this, pctx);
+        Value_P Z = Quad_CR::do_CR(7, this, pctx);
         Z->print(out);
         out << endl;
       }

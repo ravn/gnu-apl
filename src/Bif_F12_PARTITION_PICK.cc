@@ -459,7 +459,7 @@ Shape perm_cB;   // perm_cB is the permutation of cB, constructed from X
 
    Assert(perm_cB.get_rank() == cB->get_rank());
 
-   return Bif_F12_TRANSPOSE::transpose(perm_cB, cB.getref());
+   return Bif_F12_TRANSPOSE::transpose(perm_cB, cB.get());
 }
 //----------------------------------------------------------------------------
 Shape

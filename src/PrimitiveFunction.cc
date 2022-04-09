@@ -351,16 +351,16 @@ const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
 }
 //----------------------------------------------------------------------------
 Token
-Bif_F12_TRANSPOSE::do_eval_B(const Value & B)
+Bif_F12_TRANSPOSE::do_eval_B(const Value * B)
 {
 Shape shape_A;
 
    // monadic transpose is A⍉B with A = ... 4 3 2 1 0
    //
-   loop(r, B.get_rank())   shape_A.add_shape_item(B.get_rank() - r - 1);
+   loop(r, B->get_rank())   shape_A.add_shape_item(B->get_rank() - r - 1);
 
 Value_P Z = transpose(shape_A, B);
-   Z->set_default(B, LOC);
+   Z->set_default(*B, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -391,8 +391,8 @@ const Shape shape_A(A.getref(), Workspace::get_IO());
       }
 
 Value_P Z = (shape_A.get_rank() == B->get_rank() && shape_A.is_permutation())
-          ? transpose(shape_A, B.getref())
-          : transpose_diag(shape_A, B);
+          ? transpose(shape_A, B.get())
+          : transpose_diag(shape_A, B.get());
 
    Z->set_default(*B.get(), LOC);
 
@@ -401,7 +401,7 @@ Value_P Z = (shape_A.get_rank() == B->get_rank() && shape_A.is_permutation())
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_TRANSPOSE::transpose(const Shape & A, const Value & B)
+Bif_F12_TRANSPOSE::transpose(const Shape & A, const Value * B)
 {
    // some simple to optimize cases beforehand...
    //
@@ -409,21 +409,21 @@ Bif_F12_TRANSPOSE::transpose(const Shape & A, const Value & B)
       {
         if (A.get_rank() <= 1)   // scalar or vector B:
            {
-              return B.clone(LOC);
+              return CLONE(B, LOC);
            }
 
         // 2-dimensional matrix
         //
         if (A.get_shape_item(0) == 0 &&
-            A.get_shape_item(1) == 1)   return B.clone(LOC);   // identity
+            A.get_shape_item(1) == 1)   return CLONE(B, LOC);   // identity
 
-        const ShapeItem rows_B = B.get_shape_item(0);
-        const ShapeItem cols_B = B.get_shape_item(1);
+        const ShapeItem rows_B = B->get_shape_item(0);
+        const ShapeItem cols_B = B->get_shape_item(1);
         const Shape shape_Z(cols_B, rows_B);
         Value_P Z(shape_Z, LOC);
         loop(rZ, cols_B)   // the rows of B are columns of Z
         loop(cZ, rows_B)   // the columns of B are rows of Z
-            Z->next_ravel_Cell(B.get_cravel(rZ + cZ*cols_B));
+            Z->next_ravel_Cell(B->get_cravel(rZ + cZ*cols_B));
         Z->check_value(LOC);
         return Z;
       }
@@ -444,20 +444,20 @@ Bif_F12_TRANSPOSE::transpose(const Shape & A, const Value & B)
     */
 
 const Shape   shape_inv_A = inverse_permutation(A);
-const Shape & shape_B     = B.get_shape();
+const Shape & shape_B     = B->get_shape();
 const Shape   shape_Z     = permute(shape_B, shape_inv_A);
 
 Value_P Z(shape_Z, LOC);
 
    if (shape_Z.is_empty())
       {
-         Z->set_default(B, LOC);
+         Z->set_default(*B, LOC);
          return Z;
       }
 
    for (ArrayIterator b(shape_Z, A); b.more(); ++b)
        {
-         Z->next_ravel_Cell(B.get_cravel(b.get_ravel_offset()));
+         Z->next_ravel_Cell(B->get_cravel(b.get_ravel_offset()));
        }
 
    Z->check_value(LOC);
@@ -465,7 +465,7 @@ Value_P Z(shape_Z, LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_TRANSPOSE::transpose_diag(const Shape & A, Value_P B)
+Bif_F12_TRANSPOSE::transpose_diag(const Shape & A, const Value * B)
 {
    // check that: ∧/(⍳⌈/0,A)ϵA
    //
@@ -508,7 +508,7 @@ Shape shape_Z;
 Value_P Z(shape_Z, LOC);
    if (Z->is_empty())
       {
-         Z->set_default(*B.get(), LOC);
+         Z->set_default(*B, LOC);
         return Z;
       }
 
@@ -987,14 +987,14 @@ APL_Complex bc = iB->get_complex_value();   // the value being decoded
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_ELEMENT::do_eval_B(const Value & B)
+Bif_F12_ELEMENT::do_eval_B(const Value * B)
 {
    // enlist
    //
-   if (B.element_count() == 0)   // empty argument
+   if (B->element_count() == 0)   // empty argument
       {
         Value_P Z(ShapeItem(0), LOC);   // empty vector with proto ' ' or '0'
-        const Cell * C = &B.get_cfirst();
+        const Cell * C = &B->get_cfirst();
         bool left = false;
         for (;;)
             {
@@ -1056,13 +1056,13 @@ Bif_F12_ELEMENT::do_eval_B(const Value & B)
         return  Z;
       }
 
-const ShapeItem len_Z = B.get_enlist_count();
+const ShapeItem len_Z = B->get_enlist_count();
 Value_P Z(len_Z, LOC);
 
-   if (B.get_lval_cellowner())   B.enlist_left(Z.getref());
-   else                          B.enlist_right(Z.getref());
+   if (B->get_lval_cellowner())   B->enlist_left(Z.getref());
+   else                           B->enlist_right(Z.getref());
 
-   Z->set_default(B, LOC);
+   Z->set_default(*B, LOC);
    Z->check_value(LOC);
    return Z;
 }

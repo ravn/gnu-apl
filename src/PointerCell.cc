@@ -61,7 +61,7 @@ PointerCell::init_other(void * other, Value & other_owner,
 
 Value_P sub;   // instantiate beforehand so that sub is 0 if clone() fails
 
-   sub = get_pointer_value()->clone(loc);
+   sub = CLONE_P(get_pointer_value(), loc);
    Assert(+sub);
    new (other) PointerCell(sub.get(), other_owner);
 }

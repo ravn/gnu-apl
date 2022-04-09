@@ -197,7 +197,7 @@ Value_P Z(shape_Z, LOC);
 Token
 Bif_F12_DOMINO::eval_fill_B(Value_P B) const
 {
-   return Bif_F12_TRANSPOSE::do_eval_B(B.getref());
+   return Bif_F12_TRANSPOSE::do_eval_B(B.get());
 }
 //----------------------------------------------------------------------------
 Token

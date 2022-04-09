@@ -1096,19 +1096,19 @@ const ValueStackItem & vs = value_stack[0];
    if (vs.get_NC() == NC_VARIABLE)
       {
         UCS_string_vector CR10;
-        const Value & value = *vs.get_val_cptr();
+        const Value * value = vs.get_val_cptr();
         Quad_CR::do_CR10_variable(CR10, get_name(), value);
 
-        if (value.is_member())
+        if (value->is_member())
            out << "⍝ structured variable " << get_name() << endl;
 
         loop(l, CR10.size())
            {
-             if (l || value.is_member())   out << "  ";
+             if (l || value->is_member())   out << "  ";
              out << CR10[l] << endl;
            }
 
-        if (value.is_member())
+        if (value->is_member())
            out << "⍝ end of structured variable " << get_name() << endl;
 
         out << endl;
@@ -1262,7 +1262,7 @@ Symbol::assign_shared_variable(Value_P new_value, const char * loc)
    // put new_value into a CDR string
    //
 CDR_string cdr;
-   CDR::to_CDR(cdr, *new_value);
+   CDR::to_CDR(cdr, new_value.get());
    if (cdr.size() > MAX_SVAR_SIZE)   LIMIT_ERROR_SVAR;
 
 std::string data(charP(cdr.get_items()), cdr.size());

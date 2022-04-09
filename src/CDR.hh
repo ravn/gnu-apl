@@ -35,7 +35,7 @@ class CDR
 {
 public:
    /// convert \b value into a CDR_string
-   static void to_CDR(CDR_string & result, const Value & value);
+   static void to_CDR(CDR_string & result, const Value * value);
 
    /// create a value from a CDR_string, throwing
    /// DOMAIN ERROR if cdr is ill-formed

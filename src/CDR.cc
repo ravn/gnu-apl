@@ -29,14 +29,14 @@
 
 //----------------------------------------------------------------------------
 void
-CDR::to_CDR(CDR_string & result, const Value & value)
+CDR::to_CDR(CDR_string & result, const Value * value)
 {
-const CDR_type type = value.get_CDR_type();
-const int len = value.total_CDR_size_brutto(type);
+const CDR_type type = value->get_CDR_type();
+const int len = value->total_CDR_size_brutto(type);
    result.reserve(len + 1);
    result.clear();
 
-   fill(result, type, len, value);
+   fill(result, type, len, *value);
 }
 //----------------------------------------------------------------------------
 void

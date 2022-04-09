@@ -403,7 +403,7 @@ const APL_Integer qio = Workspace::get_IO();
    //
    if (X->is_scalar_or_len1_vector())   // single int: return B->
       {
-        Token result(TOK_APL_VALUE1, B->clone(LOC));
+        Token result(TOK_APL_VALUE1, CLONE_P(B, LOC));
         return result;
       }
 

@@ -354,7 +354,7 @@ const int data_chars = len - idx;
         loop(d, data_chars)   new_val->next_ravel_Char(ravel[idx + d]);
         new_val->check_value(LOC);
 
-         Token t = Quad_FX::do_eval_B(new_val.getref());
+         Token t = Quad_FX::do_eval_B(new_val.get());
       }
    else if (mode == UNI_C)   // char array
       {
@@ -604,8 +604,8 @@ Token_string tos;
        tos[2].get_tag()   == TOK_Quad_FX &&
        tos[3].get_Class() == TC_VALUE)
       {
-        const Value & fname   =  tos[1].get_apl_val().getref();
-        const Value & so_path =  tos[3].get_apl_val().getref();
+        const Value * fname   =  tos[1].get_apl_val().get();
+        const Value * so_path =  tos[3].get_apl_val().get();
 
         const Token tok = Quad_FX::do_eval_AB(so_path, fname);
         if (tok.get_Class() == TC_VALUE)   // ⎕FX successful
@@ -633,7 +633,7 @@ Token_string tos;
    if (tos[2].get_Class() != TC_VALUE)    return UCS_string();
 
 static const int eprops[] = { 0, 0, 0, 0 };
-const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().getref(),
+const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().get(),
                                       UTF8_string("2 ⎕TF"), true);
 
    if (tok.get_Class() != TC_VALUE)
@@ -1481,7 +1481,7 @@ const Symbol * symbol = obj->get_symbol();
         if (const Value * value = symbol->get_apl_value().get())
            {
              CDR_string cdr;
-             CDR::to_CDR(cdr, *value);
+             CDR::to_CDR(cdr, value);
 
              return Value_P(cdr, LOC);
            }

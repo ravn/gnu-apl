@@ -58,15 +58,15 @@ Cell::to_value(const char * loc) const
 {
    if (is_pointer_cell())
       {
-        Value_P ret = get_pointer_value();   //->clone(LOC);
-        return ret;
+        Value_P Z = get_pointer_value();   //->clone(LOC);
+        return Z;
       }
    else
       {
-        Value_P ret(loc);
-        ret->set_ravel_Cell(0, *this);
-        ret->check_value(LOC);
-        return ret;
+        Value_P Z(loc);
+        Z->set_ravel_Cell(0, *this);
+        Z->check_value(LOC);
+        return Z;
       }
 }
 //----------------------------------------------------------------------------
@@ -75,6 +75,9 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
 {
    if (other.is_pointer_cell())
       {
+        // Somewhat tricky! We must 'Value_P sub' so that sub owns the cloned
+        // value until PointerCell() owns it.
+        //
         Value_P sub = other.get_pointer_value()->clone(loc);
         Assert(!sub->is_simple_scalar());
         sub->to_type();

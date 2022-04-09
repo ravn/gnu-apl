@@ -726,11 +726,21 @@ public:
 #define NEW_CLONE
 
 #ifdef NEW_CLONE
+
+/// clone, given a Value_P
 # define CLONE_P(B_P, L)   (B_P)
-# define CLONE(pB, L)      Value_P(*(pB), LOC)
-#else
+
+/// clone, given a const Value *
+# define CLONE(pB, L)      Value_P(const_cast<Value *>(pB), L)
+
+#else   /* old clone */
+
+/// clone, given a Value_P
 # define CLONE_P(B_P, L)   (B_P).get()->clone(L)
+
+/// clone, given a Value *
 # define CLONE(pB, L)      (pB)->clone(L)
+
 #endif
 
    /// get the min spacing for this column and set/clear if there

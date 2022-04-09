@@ -82,11 +82,20 @@ Value_P Z;
         // temporarily reduce the N > 2 dimensions of B
         // to N = 2 dimensions of B1 (with the same ravel).
         //
+        const Shape shape_B = B->get_shape();
         const Shape shape_B1(B->get_rows(), B->get_cols());
-        Value_P B1 = B->clone(LOC);
-        B1->set_shape(shape_B1);
 
-        Z = monadic_format(B1);
+        try
+           {
+             B->set_shape(shape_B1);
+             Z = monadic_format(B);
+             B->set_shape(shape_B);
+           }
+        catch (...)
+           {
+             B->set_shape(shape_B);
+             throw;   // rethrow error
+           }
 
         // ¯1↓⍴B ←→ ¯1↓⍴Z i.e. the leading axes of B have the same lengths as
         // the leading axes of Z. monadic ⍕ changes (increases) only the length

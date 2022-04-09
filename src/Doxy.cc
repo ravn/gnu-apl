@@ -385,7 +385,7 @@ Doxy::variables_table(const std::vector<const Symbol *> & variables,
 
               const Value * value = var_sym[si].get_val_cptr();
               const int si_level  = var_sym.get_SI_level(*value);
-              const Value * elem = Bif_F12_ELEMENT::do_eval_B(*value).get();
+              const Value * elem = Bif_F12_ELEMENT::do_eval_B(value).get();
               Value_P first = Bif_F12_TAKE::first(*elem);
               page <<
 "     <TR>"                                                               CRLF

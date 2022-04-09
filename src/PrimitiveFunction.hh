@@ -180,7 +180,7 @@ public:
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE1, do_eval_B(B.getref())); }
+      { return Token(TOK_APL_VALUE1, do_eval_B(B.get())); }
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
@@ -188,8 +188,9 @@ public:
    static Bif_F12_ELEMENT * fun;   ///< Built-in function
    static Bif_F12_ELEMENT  _fun;   ///< Built-in function
 
-   /// impleementation of eval_B()
-   static Value_P do_eval_B(const Value & B);
+   /// implementation of eval_B()
+   static Value_P do_eval_B(const Value * B);
+
 protected:
 };
 //----------------------------------------------------------------------------
@@ -387,7 +388,7 @@ public:
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const
-      { return do_eval_B(B.getref()); }
+      { return do_eval_B(B.get()); }
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
@@ -396,14 +397,14 @@ public:
    static Bif_F12_TRANSPOSE  _fun;   ///< Built-in function
 
    /// Transpose B according to axes A (without diagonals)
-   static Value_P transpose(const Shape & A, const Value & B);
+   static Value_P transpose(const Shape & A, const Value * B);
 
    /// implementation of eval_B()
-   static Token do_eval_B(const Value & B);
+   static Token do_eval_B(const Value * B);
 
 protected:
    /// Transpose B according to axes A (with diagonals)
-   static Value_P transpose_diag(const Shape & A, Value_P B);
+   static Value_P transpose_diag(const Shape & A, const Value * B);
 
    /// for \b sh being a permutation of 0, 1, ... rank - 1,
    /// return the inverse permutation sh⁻¹
