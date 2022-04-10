@@ -185,7 +185,7 @@ ShapeItem cols_B = 1;
 
 const bool need_complex = A->is_complex(true) || B->is_complex(true);
 Value_P Z(shape_Z, LOC);
-   divide_matrix(Z.getref(), need_complex, rows_A, cols_A, &A->get_cfirst(),
+   divide_matrix(*Z, need_complex, rows_A, cols_A, &A->get_cfirst(),
                                                    cols_B, &B->get_cfirst());
 
    Z->set_default(*B.get(), LOC);

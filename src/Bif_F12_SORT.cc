@@ -200,7 +200,7 @@ const ShapeItem comp_len = ec_B/len_BZ;
    //
 Value_P B1(B->get_shape(), LOC);
 const Cell * base_B1 = &B1->get_cfirst() - qio*comp_len;
-CollatingCache cache(A.getref(), base_B1, comp_len);
+CollatingCache cache(*A, base_B1, comp_len);
    loop(b, ec_B)
       {
         const Unicode uni = B->get_cravel(b).get_char_value();

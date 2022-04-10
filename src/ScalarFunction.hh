@@ -66,11 +66,11 @@ protected:
 
    /// overloaded Function::eval_fill_AB()
    virtual Token eval_fill_AB(Value_P A, Value_P B) const
-      { return do_eval_fill_AB(A.getref(), B.getref()); }
+      { return do_eval_fill_AB(*A, *B); }
 
    /// overloaded Function::eval_fill_B()
    virtual Token eval_fill_B(Value_P B) const
-      { return do_eval_fill_B(B.getref()); }
+      { return do_eval_fill_B(*B); }
 
    /// overloaded Function::has_result()
    virtual bool has_result() const   { return true; }
@@ -152,11 +152,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_factorial); }
+      { return eval_scalar_B(*B, &Cell::bif_factorial); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_binomial); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_binomial); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -168,7 +168,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_binomial); }
 };
 //----------------------------------------------------------------------------
@@ -189,7 +189,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_less_than); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_less_than); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -201,7 +201,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_less_than); }
 };
 //----------------------------------------------------------------------------
@@ -222,7 +222,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_equal); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_equal); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -234,7 +234,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_equal); }
 };
 //----------------------------------------------------------------------------
@@ -255,7 +255,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(),
+      { return eval_scalar_AB(*A, *B,
                               &Cell::bif_equal_bitwise); }
 
    /// overloaded Function::get_scalar_f2
@@ -268,7 +268,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_equal_bitwise); }
 };
 //----------------------------------------------------------------------------
@@ -289,7 +289,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(),
+      { return eval_scalar_AB(*A, *B,
                               &Cell::bif_not_equal_bitwise); }
 
    /// overloaded Function::get_scalar_f2
@@ -302,7 +302,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_not_equal_bitwise); }
 };
 //----------------------------------------------------------------------------
@@ -323,8 +323,8 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(),
-                              B.getref(), &Cell::bif_greater_than); }
+      { return eval_scalar_AB(*A,
+                              *B, &Cell::bif_greater_than); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -336,7 +336,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_greater_than); }
 };
 //----------------------------------------------------------------------------
@@ -357,7 +357,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_and); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_and); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -372,7 +372,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_and); }
 };
 //----------------------------------------------------------------------------
@@ -393,11 +393,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_within_quad_CT); }
+      { return eval_scalar_B(*B, &Cell::bif_within_quad_CT); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(),
+      { return eval_scalar_AB(*A, *B,
                               &Cell::bif_and_bitwise); }
 
    /// overloaded Function::get_scalar_f2
@@ -413,7 +413,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_and_bitwise); }
 };
 //----------------------------------------------------------------------------
@@ -434,7 +434,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_or); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_or); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -449,7 +449,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_or); }
 };
 //----------------------------------------------------------------------------
@@ -470,11 +470,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_near_int64_t); }
+      { return eval_scalar_B(*B, &Cell::bif_near_int64_t); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_or_bitwise); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_or_bitwise); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -489,7 +489,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_or_bitwise); }
 };
 //----------------------------------------------------------------------------
@@ -510,7 +510,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_less_eq); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_less_eq); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -522,7 +522,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_less_eq); }
 };
 //----------------------------------------------------------------------------
@@ -543,7 +543,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_greater_eq); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_greater_eq); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -555,7 +555,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_greater_eq); }
 };
 //----------------------------------------------------------------------------
@@ -575,7 +575,7 @@ public:
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_not_equal); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_not_equal); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -588,7 +588,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_not_equal); }
 };
 //----------------------------------------------------------------------------
@@ -636,7 +636,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_nor); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_nor); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -644,7 +644,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_nor); }
 };
 //----------------------------------------------------------------------------
@@ -665,11 +665,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_not_bitwise); }
+      { return eval_scalar_B(*B, &Cell::bif_not_bitwise); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(),
+      { return eval_scalar_AB(*A, *B,
                               &Cell::bif_nor_bitwise); }
 
    /// overloaded Function::get_scalar_f2()
@@ -678,7 +678,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_nor_bitwise); }
 };
 //----------------------------------------------------------------------------
@@ -699,7 +699,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_nand); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_nand); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -707,7 +707,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_nand); }
 };
 //----------------------------------------------------------------------------
@@ -728,7 +728,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_nand_bitwise); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_nand_bitwise); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -736,7 +736,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_nand_bitwise); }
 };
 //----------------------------------------------------------------------------
@@ -757,11 +757,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_exponential); }
+      { return eval_scalar_B(*B, &Cell::bif_exponential); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_power); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_power); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -773,7 +773,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_power); }
 
    /// overloaded Function::get_monadic_inverse()
@@ -797,11 +797,11 @@ public:
 
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_conjugate); }
+      { return eval_scalar_B(*B, &Cell::bif_conjugate); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(),
+      { return eval_scalar_AB(*A, *B,
                inverse ? &Cell::bif_add_inverse : &Cell::bif_add); }
 
    /// overloaded Function::get_scalar_f2()
@@ -823,7 +823,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_add); }
 
    /// overloaded Function::get_dyadic_inverse()
@@ -852,11 +852,11 @@ public:
 protected:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_subtract); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_subtract); }
 
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_negative); }
+      { return eval_scalar_B(*B, &Cell::bif_negative); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -868,7 +868,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_subtract); }
 
    /// overloaded Function::get_monadic_inverse()
@@ -930,7 +930,7 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_not); }
+      { return eval_scalar_B(*B, &Cell::bif_not); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -960,11 +960,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_direction); }
+      { return eval_scalar_B(*B, &Cell::bif_direction); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(),
+      { return eval_scalar_AB(*A, *B,
                inverse ? &Cell::bif_multiply_inverse : &Cell::bif_multiply); }
 
    /// overloaded Function::get_scalar_f2()
@@ -980,7 +980,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_multiply); }
 
    /// overloaded Function::get_dyadic_inverse()
@@ -1009,11 +1009,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_reciprocal); }
+      { return eval_scalar_B(*B, &Cell::bif_reciprocal); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_divide); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_divide); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -1025,7 +1025,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_divide); }
 
    /// overloaded Function::get_monadic_inverse()
@@ -1055,12 +1055,12 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(),
+      { return eval_scalar_B(*B,
                inverse ? &Cell::bif_pi_times_inverse : &Cell::bif_pi_times); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(),
+      { return eval_scalar_AB(*A, *B,
                               inverse ? &Cell::bif_circle_fun_inverse
                                       : &Cell::bif_circle_fun); }
 
@@ -1098,11 +1098,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_ceiling); }
+      { return eval_scalar_B(*B, &Cell::bif_ceiling); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_maximum); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_maximum); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -1117,7 +1117,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_maximum); }
 };
 //----------------------------------------------------------------------------
@@ -1138,11 +1138,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_floor); }
+      { return eval_scalar_B(*B, &Cell::bif_floor); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_minimum); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_minimum); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -1157,7 +1157,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_minimum); }
 };
 //----------------------------------------------------------------------------
@@ -1177,7 +1177,7 @@ public:
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_residue); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_residue); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -1186,7 +1186,7 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_magnitude); }
+      { return eval_scalar_B(*B, &Cell::bif_magnitude); }
 
    /// overloaded Function::eval_identity_fun();
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const
@@ -1194,7 +1194,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_residue); }
 };
 //----------------------------------------------------------------------------
@@ -1215,11 +1215,11 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B.getref(), &Cell::bif_nat_log); }
+      { return eval_scalar_B(*B, &Cell::bif_nat_log); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A.getref(), B.getref(), &Cell::bif_logarithm); }
+      { return eval_scalar_AB(*A, *B, &Cell::bif_logarithm); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
@@ -1227,7 +1227,7 @@ protected:
 
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return eval_scalar_AXB(A.getref(), X.getref(), B.getref(),
+      { return eval_scalar_AXB(*A, *X, *B,
                                &Cell::bif_logarithm); }
 
    /// overloaded Function::get_monadic_inverse()

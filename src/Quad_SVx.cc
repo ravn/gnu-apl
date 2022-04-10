@@ -161,7 +161,7 @@ Quad_SVC::eval_AB(Value_P A, Value_P B) const
 const ShapeItem var_count = B->get_rows();
    if (A->get_rows() != var_count)               LENGTH_ERROR;
    if (A->get_rank() > 0 && A->get_cols() != 4)   LENGTH_ERROR;
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 const Cell * cA = &A->get_cfirst();
 
@@ -220,7 +220,7 @@ Quad_SVC::eval_B(Value_P B) const
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -320,8 +320,8 @@ Quad_SVO::eval_AB(Value_P A, Value_P B) const
 const ShapeItem var_count = B->get_rows();
    if (A->get_rank() == 1 && A->element_count() != var_count)   LENGTH_ERROR;
 
-const UCS_string_vector apl_vars(B.getref(), false);
-const UCS_string_vector surrogates(B.getref(), true);
+const UCS_string_vector apl_vars(*B, false);
+const UCS_string_vector surrogates(*B, true);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -455,7 +455,7 @@ Quad_SVO::eval_B(Value_P B) const
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -675,7 +675,7 @@ Quad_SVR::eval_B(Value_P B) const
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -705,7 +705,7 @@ Quad_SVS::eval_B(Value_P B) const
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);

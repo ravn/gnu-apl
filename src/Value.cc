@@ -731,8 +731,7 @@ const ShapeItem rows = get_rows();
               const Cell & member_data_cell = get_cravel(2*r + 1);
               if (member_data_cell.is_pointer_cell())   // nested value
                  {
-                   const Value & subval = member_data_cell.get_pointer_value()
-                                                          .getref();
+                   const Value & subval = *member_data_cell.get_pointer_value();
                    if (!subval.is_structured())   continue;
                    count += subval.get_all_members_count();
                  }
@@ -815,7 +814,7 @@ ShapeItem * sorted_nodes = sorted + max_member_count;   // ∆ and _
          const Cell & member_name_cell = get_cravel(2*r);
          if (!member_name_cell.is_pointer_cell())   continue;   // unused
 
-         const Value & val = member_name_cell.get_pointer_value().getref();
+         const Value & val = *member_name_cell.get_pointer_value();
          ShapeItem member_pos;     // the position in the XML file
          Unicode category;
          UCS_string name;
@@ -1029,7 +1028,7 @@ Cell * doubled = new Cell[new_cells];
          Cell & member_name_cell = old_ravel[2*r];
          if (!member_name_cell.is_pointer_cell())   continue;   // unused
          Assert(member_name_cell.is_pointer_cell());
-         UCS_string member_name(member_name_cell.get_pointer_value().getref());
+         UCS_string member_name(*member_name_cell.get_pointer_value());
          member_name_cell.release(LOC);
 
          // transfer the member value. memcpy() should work because ownership
@@ -1698,7 +1697,7 @@ Value::index(const IndexExpr & IX) const
              }
 
          if (member_count == 0)   // no valid members (last member )ERASEd)
-            new (&Z->get_wfirst()) PointerCell(Idx0(LOC).get(), Z.getref());
+            new (&Z->get_wfirst()) PointerCell(Idx0(LOC).get(), *Z);
 
          Z->check_value(LOC);
          return Z;
@@ -1810,7 +1809,7 @@ Value::index(const Value * X) const
               if (cell_r.is_pointer_cell())
                  {
                    more << "\n      "
-                        << UCS_string(cell_r.get_pointer_value().getref());
+                        << UCS_string(*cell_r.get_pointer_value());
                  }
             }
         INDEX_ERROR;
@@ -2492,7 +2491,7 @@ const ShapeItem ec = element_count();
 }
 //----------------------------------------------------------------------------
 void
-Value::to_type()
+Value::to_type(bool force_numeric)
 {
    loop(e, nz_element_count())
       {
@@ -2500,10 +2499,14 @@ Value::to_type()
         if (cell.is_pointer_cell())
            {
              reinterpret_cast<PointerCell &>(cell).isolate(LOC);
-             cell.get_pointer_value()->to_type();
+             cell.get_pointer_value()->to_type(false);
            }
-        else if (cell.is_character_cell())   set_ravel_Char(e, UNI_SPACE);
-        else                                 set_ravel_Int(e, 0);
+        else if (cell.is_character_cell())
+           {
+             if (force_numeric)   set_ravel_Int(e, 0);
+             else                 set_ravel_Char(e, UNI_SPACE);
+           }
+        else                      set_ravel_Int(e, 0);
       }
 }
 //----------------------------------------------------------------------------
@@ -2550,7 +2553,7 @@ Value_P Z(get_shape(), loc);
       }
    else                                              // empty
       {
-        get_cproto().init_other(&Z->get_wproto(), Z.getref(), LOC);
+        get_cproto().init_other(&Z->get_wproto(), *Z, LOC);
       }
 
    Z->check_value(LOC);

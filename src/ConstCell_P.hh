@@ -130,7 +130,7 @@ public:
 
    /// constructor from pointer to the owner of the Cell
    ConstRavel_P(Value_P _owner, bool _inc)
-   : owner(_owner.getref()),
+   : owner(*_owner),
      end(_owner->element_count()),
      offset(0),
      increment(_inc)

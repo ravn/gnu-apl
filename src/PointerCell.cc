@@ -188,7 +188,7 @@ Value_P val = get_pointer_value();
 
    if (pctx.get_style() & PST_QUOTE_CHARS)
       {
-        if (val->is_char_vector())   return PrintBuffer(val.getref(), pctx, 0);
+        if (val->is_char_vector())   return PrintBuffer(*val, pctx, 0);
       }
 
    if (pctx.get_style() == PR_APL_FUN)   // APL function display

@@ -37,7 +37,7 @@ public:
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE1, first(B.getref()));}
+      { return Token(TOK_APL_VALUE1, first(*B));}
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;

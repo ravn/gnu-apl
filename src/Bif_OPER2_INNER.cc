@@ -19,6 +19,7 @@
 */
 
 #include "Bif_F12_PARTITION_PICK.hh"
+#include "Bif_F12_TAKE_DROP.hh"
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER1_REDUCE.hh"
 #include "Macro.hh"
@@ -30,6 +31,36 @@ Bif_OPER2_INNER * Bif_OPER2_INNER::fun = &Bif_OPER2_INNER::_fun;
 
 Bif_OPER2_INNER::PJob_product Bif_OPER2_INNER::job;
 
+//----------------------------------------------------------------------------
+Token
+Bif_OPER2_INNER::fill(const Shape shape_Z, Value_P A, Function_P fun,
+                      Value_P B, const char * loc)
+{
+   // this function is called from A f.g B when A fun B is called with an
+   // empty A or B. In this case shape_Z is empty since A->get_shape() or
+   // B->get_shape() (or both) contain axes of length 0.
+
+Value_P Fill_A;   // argument A of the fill function
+Value_P Fill_B;   // argument B of the fill function
+
+   if (A->is_empty())   Fill_A = A->prototype(LOC);
+   else                 Fill_A = Bif_F12_TAKE::first(*A);
+
+   if (B->is_empty())   Fill_B = B->prototype(LOC);
+   else                 Fill_B = Bif_F12_TAKE::first(*B);
+
+Token tok = fun->eval_fill_AB(Fill_A, Fill_B);
+
+   if (tok.get_Class() != TC_VALUE)   return tok;
+
+Value * Z = tok.get_apl_val().get();
+
+Value_P Z1(shape_Z, LOC);   // shape_Z is empty
+   Z1->get_wproto().init_from_value(Z, *Z1, loc);
+
+   Z1->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z1);
+}
 //----------------------------------------------------------------------------
 Token
 Bif_OPER2_INNER::eval_ALRB(Value_P A, Token & _LO, Token & _RO, Value_P B) const

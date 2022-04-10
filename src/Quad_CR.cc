@@ -241,7 +241,7 @@ int function_number = -1;
    if (A->get_rank() > 1)                    RANK_ERROR;
    if (A->is_char_array())   // function name, e.g. "APL_expression"
       {
-        UCS_string ucs_A(A.getref());
+        UCS_string ucs_A(*A);
         UTF8_string utf_A(ucs_A);
         function_number = subfun_to_axis(utf_A.c_str());
         if (function_number == -1)
@@ -362,7 +362,7 @@ bool extra_frame = false;
       {
         Value_P Z(LOC);
         Value * BB = const_cast<Value *>(B);
-        new (&Z->get_wscalar()) PointerCell(BB, Z.getref());
+        new (&Z->get_wscalar()) PointerCell(BB, *Z);
         Z->check_value(LOC);
         PrintBuffer pb(*Z, pctx, 0);
         return Value_P(pb, LOC);
@@ -1346,8 +1346,7 @@ Value_P Z(shape_Z, LOC);
              sh_sub.expand_rank(conformed.get_rank());
              B_sub->set_shape(sh_sub);
 
-             Value_P ZZ = Bif_F12_TAKE::do_take(conformed,
-                                                B_sub.getref(), false);
+             Value_P ZZ = Bif_F12_TAKE::do_take(conformed, *B_sub, false);
              loop(zz, conformed_len)   Z->next_ravel_Cell(ZZ->get_cravel(zz));
            }
         else   // simple scalar
@@ -1677,13 +1676,13 @@ Value_P Z(shape_Z, LOC);
            {
              UCS_string name(member_name.get_char_value());
              Cell * data = Z->get_new_member(name);
-             data->init(B->get_cravel(2*r + 1), Z.getref(), LOC);
+             data->init(B->get_cravel(2*r + 1), *Z, LOC);
            }
         else if (member_name.is_pointer_cell())               // valid row
            {
-             UCS_string name(member_name.get_pointer_value().getref());
+             UCS_string name(*member_name.get_pointer_value());
              Cell * data = Z->get_new_member(name);
-             data->init(B->get_cravel(2*r + 1), Z.getref(), LOC);
+             data->init(B->get_cravel(2*r + 1), *Z, LOC);
            }
       }
 

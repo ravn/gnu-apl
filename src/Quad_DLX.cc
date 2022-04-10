@@ -735,7 +735,7 @@ DLX_Node * h = right;
                Assert(!v->is_header);
                Assert(h->col == v->col);
                const Cell & src = cB[h->col + cols*v->row];
-               Z->get_wravel(col + cols_Z*v->row).init(src, Z.getref(), LOC);
+               Z->get_wravel(col + cols_Z*v->row).init(src, *Z, LOC);
              }
          h = h->right;
        }
@@ -758,20 +758,20 @@ const APL_Integer a0 = A->get_cfirst().get_int_value();
       {
         const ShapeItem rows = B->get_rows();
         const ShapeItem cols = B->get_cols();
-        DLX_Root_Node root(rows, cols, 0, B.getref());
+        DLX_Root_Node root(rows, cols, 0, *B);
         return root.preset(&A->get_cravel(1), A->element_count() - 1,
                            &B->get_cfirst());
       }
 
    if (A->element_count() != 1)   LENGTH_ERROR;
-   return do_DLX(a0, B.getref());
+   return do_DLX(a0, *B);
 }
 //----------------------------------------------------------------------------
 Token
 Quad_DLX::eval_B(Value_P B) const
 {
    if (B->get_rank() != 2)   RANK_ERROR;
-   return do_DLX(0, B.getref());
+   return do_DLX(0, *B);
 };
 //----------------------------------------------------------------------------
 Token
@@ -824,7 +824,7 @@ Value_P Z(root.get_solution_count(), LOC);
    if (root.get_solution_count() == 0)   // empty result
       {
         Value_P Z1 = Idx0(LOC);   // Z1 ← ⍬
-        new (&Z->get_wproto())   PointerCell(Z1.get(), Z.getref());
+        new (&Z->get_wproto())   PointerCell(Z1.get(), *Z);
       }
    else
       {

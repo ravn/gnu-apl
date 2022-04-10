@@ -1049,10 +1049,10 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
              Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
 
              const Cell * QES_arg = &result.get_apl_val()->get_cfirst();
-             UCS_string statement_A(   QES_arg[2].get_pointer_value().getref());
+             UCS_string statement_A(  *QES_arg[2].get_pointer_value());
              const APL_Integer major = QES_arg[3].get_int_value();
              const APL_Integer minor = QES_arg[4].get_int_value();
-             const ErrorCode ec = ErrorCode(major << 16 | minor);
+             const ErrorCode ec      = ErrorCode(major << 16 | minor);
 
              Token result_A = Bif_F1_EXECUTE::execute_statement(statement_A);
              if (result_A.get_Class() == TC_VALUE)   // ⍎ literal

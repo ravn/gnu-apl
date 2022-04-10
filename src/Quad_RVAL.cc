@@ -98,12 +98,12 @@ bool need_restore = false;
               const Cell & cell = B.get_cfirst();
               if (cell.is_pointer_cell())
                  {
-                   do_eval_AB(1, cell.get_pointer_value().getref());
+                   do_eval_AB(1, *cell.get_pointer_value());
                  }
               else   // rank as scalar
                  {
                    Value_P rank = IntScalar(cell.get_int_value(), LOC);
-                   do_eval_AB(1, rank.getref());
+                   do_eval_AB(1, *rank);
                  }
             }
 
@@ -112,29 +112,29 @@ bool need_restore = false;
               const Cell & cell = B.get_cravel(1);
               if (cell.is_pointer_cell())
                  {
-                   do_eval_AB(2, cell.get_pointer_value().getref());
+                   do_eval_AB(2, *cell.get_pointer_value());
                  }
               else   // shape as scalar: Z← (rank⍴ec_B)⍴random_data
                  {
                    Value_P rank = IntScalar(cell.get_int_value(), LOC);
-                   do_eval_AB(2, rank.getref());
+                   do_eval_AB(2, *rank);
                  }
             }
 
          if (ec_B >= 3)   // type: always enclosed vector (distribution)
-            do_eval_AB(3, B.get_cravel(2).get_pointer_value().getref());
+            do_eval_AB(3, *B.get_cravel(2).get_pointer_value());
 
          if (ec_B >= 4)   // maxdepth: scalar or 1-element vector
             {
               const Cell & cell = B.get_cravel(3);
               if (cell.is_pointer_cell())   // maxdepth as 1-element vector
                  {
-                   do_eval_AB(4, cell.get_pointer_value().getref());
+                   do_eval_AB(4, *cell.get_pointer_value());
                  }
               else   // maxdepth as scalar
                  {
                    Value_P rank = IntScalar(cell.get_int_value(), LOC);
-                   do_eval_AB(4, rank.getref());
+                   do_eval_AB(4, *rank);
                  }
             }
        }
@@ -168,11 +168,11 @@ const ShapeItem ec = Z->element_count();
                       while (depth == desired_maxdepth && type_z == 4);
          switch(type_z)
             {
-               case 0:   random_character(Z.getref());          continue;
-               case 1:   random_integer(Z.getref());            continue;
-               case 2:   random_float(Z.getref());              continue;
-               case 3:   random_complex(Z.getref());            continue;
-               case 4:   random_nested(Z.getref(), B, depth);   continue;
+               case 0:   random_character(*Z);          continue;
+               case 1:   random_integer(*Z);            continue;
+               case 2:   random_float(*Z);              continue;
+               case 3:   random_complex(*Z);            continue;
+               case 4:   random_nested(*Z, B, depth);   continue;
                default:  FIXME;
             }
       }
@@ -207,7 +207,7 @@ Quad_RVAL::eval_AB(Value_P A, Value_P B) const
         DOMAIN_ERROR;
       }
 
-Value_P Z = do_eval_AB(A->get_cfirst().get_int_value(), B.getref());
+Value_P Z = do_eval_AB(A->get_cfirst().get_int_value(), *B);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------

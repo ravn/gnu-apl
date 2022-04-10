@@ -2018,21 +2018,21 @@ Value_P Z = values[vid];
 
    if (Z->is_packed())   // so it can't be short and ravel is a utf8_t *
       {
-        read_Cells(Z.getref(), cells_utf);
+        read_Cells(*Z, cells_utf);
         return;
       }
 
    if (Z->element_count() == 0)   // then Z->more() is 0 and can't be used
       {
         Value_P Z0(LOC);   // a scalar to read the prototype
-        read_Cells(Z0.getref(), cells_utf);   // prototype
-        Z->set_default(Z0.getref(), LOC);
+        read_Cells(*Z0, cells_utf);   // prototype
+        Z->set_default(*Z0, LOC);
       }
    else
       {
         while (Z->more())
             {
-              cells_utf = read_Cells(Z.getref(), cells_utf);
+              cells_utf = read_Cells(*Z, cells_utf);
            // while (*cells_utf <= ' ')   ++cells_utf;   // trailing whitespace
             }
          }

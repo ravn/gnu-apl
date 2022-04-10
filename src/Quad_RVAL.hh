@@ -43,7 +43,7 @@ protected:
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE1, do_eval_B(B.getref(), 0)); }
+      { return Token(TOK_APL_VALUE1, do_eval_B(*B, 0)); }
 
    /// do eval_AB(A, B);
    static Value_P do_eval_AB(int A, const Value & B);

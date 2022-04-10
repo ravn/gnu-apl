@@ -60,7 +60,7 @@ const ShapeItem ec = B->element_count();
         return Token(TOK_APL_VALUE1, Z);
       }
 
-Shape sh_Z(B.getref(), 0);
+Shape sh_Z(*B, 0);
    loop(b, ec)   if (sh_Z.get_shape_item(b) < 0)   DOMAIN_ERROR;
 
    // at this point sh is correct and ⍳ cannot fail.
@@ -91,7 +91,7 @@ const sRank rk_Z = Z->get_rank();
         while (ZZ->more())   ZZ->next_ravel_0();
         ZZ->check_value(LOC);
 
-        new (&Z->get_wproto())   PointerCell(ZZ.get(), Z.getref()); // ⊂(⍴⍴Z)⍴0
+        new (&Z->get_wproto())   PointerCell(ZZ.get(), *Z); // ⊂(⍴⍴Z)⍴0
       }
 
    Z->check_value(LOC);

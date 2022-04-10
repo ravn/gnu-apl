@@ -165,14 +165,14 @@ Value_P Z(shape_Z, LOC);
         if (const Function * function = obj->get_function())
            {
              // defined or system function.
-             function->get_attributes(mode, Z.getref());
+             function->get_attributes(mode, *Z);
              continue;
            }
 
         if (const Symbol * symbol = obj->get_symbol())
            {
              // defined or sys var
-             symbol->get_attributes(mode, Z.getref());
+             symbol->get_attributes(mode, *Z);
              continue;
            }
 
@@ -334,7 +334,7 @@ Value_P Zsub(3, LOC);                           // Zsub ← 3 (⊂Z2) (⊂⍬)..
    Zsub->check_value(LOC);
 
 Value_P Z(ShapeItem(0), LOC);                   // Z ← 0 ⍴ ⊂Zsub
-  new (&Z->get_wproto())   PointerCell(Zsub.get(), Z.getref());
+  new (&Z->get_wproto())   PointerCell(Zsub.get(), *Z);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -648,7 +648,7 @@ Quad_EX::eval_B(Value_P B) const
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -1050,7 +1050,7 @@ Quad_NC::eval_B(Value_P B) const
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);

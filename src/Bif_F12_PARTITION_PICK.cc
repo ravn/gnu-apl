@@ -113,7 +113,7 @@ Value_P Z(shape_Z, LOC);
 
         if (item_shape.is_empty())
            {
-             vZ->set_default(B.getref(), LOC);
+             vZ->set_default(*B, LOC);
            }
         else
            {
@@ -301,7 +301,7 @@ const Shape shape_Z = B->get_shape() + item_shape;
 const ShapeItem len_B = B->element_count();
    if (len_B == 0)
       {
-         Value_P first = Bif_F12_TAKE::first(B.getref());
+         Value_P first = Bif_F12_TAKE::first(*B);
          Value_P result = disclose(first, rank_tolerant);
          result->set_shape(shape_Z);
          return result;
@@ -318,7 +318,7 @@ const ShapeItem item_len = item_shape.get_volume();
            {
              Value_P vB = B0.get_pointer_value();    // some nested value
              Value_P B_proto = vB->prototype(LOC);   // its prototype
-             Z->get_wproto().init(B_proto->get_cproto(), Z.getref(), LOC);
+             Z->get_wproto().init(B_proto->get_cproto(), *Z, LOC);
            }
         else
            {
@@ -332,7 +332,7 @@ const ShapeItem item_len = item_shape.get_volume();
    loop(b, len_B)   // for all items in B...
        {
          const Cell & B_item = B->get_cravel(b);
-         disclose_item(Z.getref(), b, item_shape, item_len, B_item);
+         disclose_item(*Z, b, item_shape, item_len, B_item);
        }
 
    Z->set_default(*B.get(), LOC);
@@ -350,7 +350,7 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
          // B_item points to a nested APL value. Take that value, expand
          // it to item_shape, and store it in Z.
          //
-        const Value & vB = B_item.get_pointer_value().getref();
+        const Value & vB = *B_item.get_pointer_value();
         Bif_F12_TAKE::fill(item_shape, Z, vB, false);
       }
    else if (B_item.is_lval_cell())
@@ -384,7 +384,7 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
         else if (target->is_pointer_cell())        // case 2.
            {
              Value_P subval = target->get_pointer_value();
-             const Value & subrefs = subval->get_cellrefs(LOC).getref();
+             const Value & subrefs = *subval->get_cellrefs(LOC);
              Bif_F12_TAKE::fill(item_shape, Z, subrefs, false);
            }
         else                                       // case 3.
@@ -564,7 +564,7 @@ const Cell & cA = A0[idx_A];
            case ii.   (⊂1 1) ⊃ A←3 3⍴⍳9               (normal A)
          */
 
-        const Value & A = cA.get_pointer_value().getref();
+        const Value & A = *cA.get_pointer_value();
 
         if (B->is_member())   // case i. (structured B)
            {

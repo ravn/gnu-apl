@@ -471,7 +471,7 @@ const Symbol * symbol = obj->get_symbol();
    if (symbol)
       {
         Value_P value = symbol->get_apl_value();
-        if (+value)   return tf2_var(name, value.getref());
+        if (+value)   return tf2_var(name, *value);
 
         /* not a variable: fall through */
       }
@@ -490,7 +490,7 @@ UCS_string ucs_value; /// the right hand side of VAR←VALUE
       {
         const Cell & cell = B.get_cfirst();
         Assert(cell.is_pointer_cell());
-        tf2_value(0, ucs_value, cell.get_pointer_value().getref(), 1);
+        tf2_value(0, ucs_value, *cell.get_pointer_value(), 1);
       }
    else
       {
@@ -735,7 +735,7 @@ Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
                       sub_val = sub_val->get_cfirst().get_pointer_value();
                     }
 
-              tf2_value(level + 1, ucs, sub_val.getref(), nesting);
+              tf2_value(level + 1, ucs, *sub_val, nesting);
            }
         else if (cell.is_lval_cell())
            {
@@ -883,7 +883,7 @@ ShapeItem error_count = 0;
            }
         else if (cell.is_pointer_cell())   // nested
            {
-             error_count += tf2_toggle_UCS(cell.get_pointer_value().getref());
+             error_count += tf2_toggle_UCS(*cell.get_pointer_value());
            }
         else
            {
@@ -891,7 +891,7 @@ ShapeItem error_count = 0;
            }
       }
 
-   if (val.is_empty())   val.to_type();   // unlikely
+   if (val.is_empty())   val.to_type(false);   // unlikely
 
    return error_count;
 }
@@ -919,7 +919,7 @@ ShapeItem skipped = 0;
 
         Shape sh;
         {
-          const Value & aval = tos[s].get_apl_val().getref();
+          const Value & aval = *tos[s].get_apl_val();
           sh = Shape(aval, /* ⎕IO */ 0);
           tos[s].extract_apl_val(LOC);
         }

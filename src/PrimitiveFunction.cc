@@ -140,7 +140,7 @@ Bif_F12_RHO::eval_AB(Value_P A, Value_P B) const
 const uint64_t start_1 = cycle_counter();
 #endif
 
-const Shape shape_Z(A.getref(), 0);
+const Shape shape_Z(*A, 0);
 
    // check that shape_Z is positive
    //
@@ -185,11 +185,11 @@ const ShapeItem len_Z = shape_Z.get_volume();
              rest = 1;
              if (B->get_cproto().is_pointer_cell())
                 {
-                  B->get_cproto().get_pointer_value()->to_type();
+                  B->get_cproto().get_pointer_value()->to_type(false);
                 }
              else
                 {
-                   B->get_wproto().init_type(B->get_cproto(), B.getref(), LOC);
+                   B->get_wproto().init_type(B->get_cproto(), *B, LOC);
                 }
            }
 
@@ -380,7 +380,7 @@ Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B) const
         return Token(TOK_APL_VALUE1, Z);
       }
 
-const Shape shape_A(A.getref(), Workspace::get_IO());
+const Shape shape_A(*A, Workspace::get_IO());
    if (shape_A.get_rank() != B->get_rank())   LENGTH_ERROR;
 
    // the elements in A shall be valid axes of B->
@@ -683,7 +683,7 @@ const Cell * cA = &A->get_cfirst();
                const Cell * cB = &B->get_cravel(l);
                if (integer_A && integer_B)
                   {
-                    const bool overflow = decode_int(Z.getref(), l_len_A, cA,
+                    const bool overflow = decode_int(*Z, l_len_A, cA,
                                                      h_len_B, cB, l_len_B);
                      if (!overflow)   continue;
 
@@ -691,10 +691,10 @@ const Cell * cA = &A->get_cfirst();
                   }
 
                if (complex_A || complex_B)
-                  decode_complex(Z.getref(), l_len_A, cA,
+                  decode_complex(*Z, l_len_A, cA,
                                              h_len_B, cB, l_len_B);
                else
-                  decode_real(Z.getref(), l_len_A, cA,
+                  decode_real(*Z, l_len_A, cA,
                                           h_len_B, cB, l_len_B);
              }
          cA += l_len_A;
@@ -850,11 +850,11 @@ ConstRavel_P iA(A, true);
               else                           DOMAIN_ERROR;
 
               if (ct == CT_INT)          // A and B are both integer
-                 encode_Int(Z.getref(), aL, aH, iA, iB);
+                 encode_Int(*Z, aL, aH, iA, iB);
               else if (ct == CT_FLOAT)   // A and B are not APL_Complex
-                 encode_Flt(Z.getref(), aL, aH, iA, iB, qct);
+                 encode_Flt(*Z, aL, aH, iA, iB, qct);
               else                       // A or B contain APL_Complex
-                 encode_Cpx(Z.getref(), aL, aH, iA, iB, qct);
+                 encode_Cpx(*Z, aL, aH, iA, iB, qct);
             }
          ++iA;
        }
@@ -1059,8 +1059,8 @@ Bif_F12_ELEMENT::do_eval_B(const Value * B)
 const ShapeItem len_Z = B->get_enlist_count();
 Value_P Z(len_Z, LOC);
 
-   if (B->get_lval_cellowner())   B->enlist_left(Z.getref());
-   else                           B->enlist_right(Z.getref());
+   if (B->get_lval_cellowner())   B->enlist_left(*Z);
+   else                           B->enlist_right(*Z);
 
    Z->set_default(*B, LOC);
    Z->check_value(LOC);

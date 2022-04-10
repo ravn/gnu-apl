@@ -220,20 +220,17 @@ vector<int>          formats(array_len, 0);
                            //  INT4OID        or INT8OID
                            if (col_type == 23 || col_type == 20)
                               {
-                                update_int_cell(db_result_value.getref(),
-                                                value);
+                                update_int_cell(*db_result_value, value);
                               }
                         else if (col_type == 1700)   // NUMERICOID
                               {
                                 if (strchr(value, '.' ) == NULL)
                                    {
-                                     update_int_cell(
-                                            db_result_value.getref(), value);
+                                     update_int_cell(*db_result_value, value);
                                    }
                                 else
                                    {
-                                     update_double_cell(
-                                            db_result_value.getref(), value);
+                                     update_double_cell(*db_result_value, value);
                                    }
                               }
                            else

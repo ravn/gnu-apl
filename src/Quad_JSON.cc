@@ -51,17 +51,17 @@ const int function_number = A->get_cfirst().get_int_value();
 
          case 1:   // read and convert a JSOM file
               {
-                return convert_file(B.getref());
+                return convert_file(*B);
               }
 
          case 2:   // read and convert a JSOM file (unsorted)
               {
-                return Token(TOK_APL_VALUE1, APL_to_JSON(B.getref(), false));
+                return Token(TOK_APL_VALUE1, APL_to_JSON(*B, false));
               }
 
          case 3:   // read and convert a JSOM file (sorted)
               {
-                return Token(TOK_APL_VALUE1, APL_to_JSON(B.getref(), true));
+                return Token(TOK_APL_VALUE1, APL_to_JSON(*B, true));
               }
 
       }
@@ -127,7 +127,7 @@ Quad_JSON::eval_B(Value_P B) const
 {
    if (B->get_rank() != 1)   RANK_ERROR;
 
-Value_P Z = JSON_to_APL(B.getref());
+Value_P Z = JSON_to_APL(*B);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -290,7 +290,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
              result.append(UCS_string(2*level, UNI_SPACE));   // level indent
              if (m)   result.append_UTF8("  \"");
              else     result.append_UTF8("{ \"");
-             UCS_string member(member_name.get_pointer_value().getref());
+             UCS_string member(*member_name.get_pointer_value());
              result.append(member_name);
              result.append_UTF8("\": ");
              APL_to_JSON_string(result, member_data, level + 1, sorted);
@@ -463,7 +463,7 @@ std::vector<ShapeItem> tokens_B;
 
 Value_P Z(LOC);
 size_t token0 = 0;
-   parse_value(Z.getref(), ucs_B, tokens_B, token0);
+   parse_value(*Z, ucs_B, tokens_B, token0);
    Z->check_value(LOC);
 
    if (token0 != tokens_B.size())
@@ -555,7 +555,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
            {
              // CERR << "One element ARRAY" << std::endl;
              Value_P Zsub(1, LOC);
-             parse_value(Zsub.getref(), ucs_B, tokens_B, token_from);
+             parse_value(*Zsub, ucs_B, tokens_B, token_from);
              Zsub->check_value(LOC);
              Z.next_ravel_Value(Zsub.get());
            }
@@ -569,7 +569,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
         Value_P Zsub(len, LOC);
         loop(l, len)
             {
-              parse_value(Zsub.getref(), ucs_B, tokens_B, token_from);
+              parse_value(*Zsub, ucs_B, tokens_B, token_from);
               const Unicode uni = ucs_B[tokens_B[token_from]];
               if (uni == UNI_COMMA)           ++token_from;
               else if (uni == UNI_R_BRACK)    ++token_from;
@@ -614,8 +614,7 @@ Value_P assoc_array = EmptyStruct(LOC);
         else
            {
              // CERR << "One element OBJECT" << std::endl;
-             parse_object_member(assoc_array.getref(), ucs_B, tokens_B,
-                                 token_from);
+             parse_object_member(*assoc_array, ucs_B, tokens_B, token_from);
            }
       }
    else               // { 'name' : value , 'name' : value... }
@@ -625,8 +624,7 @@ Value_P assoc_array = EmptyStruct(LOC);
 
         loop(it, items)
             {
-              parse_object_member(assoc_array.getref(), ucs_B, tokens_B,
-                                  token_from);
+              parse_object_member(*assoc_array, ucs_B, tokens_B, token_from);
             }
       }
 
@@ -694,7 +692,7 @@ UCS_string member_name;
    // parse the member value
    {
      Value_P Zsub(LOC);
-     parse_value(Zsub.getref(), ucs_B, tokens_B, token_from);
+     parse_value(*Zsub, ucs_B, tokens_B, token_from);
      Zsub->check_value(LOC);
 
      Cell * member_data = Z.get_new_member(member_name);

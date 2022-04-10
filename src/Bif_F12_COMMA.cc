@@ -409,7 +409,7 @@ const APL_Integer qio = Workspace::get_IO();
 
    // case 3b: ,[n1 ... nk]B : combine axes.
    //
-const Shape axes(X.getref(), qio);
+const Shape axes(*X, qio);
 
 const ShapeItem from = axes.get_first_shape_item();
    if (from < 0)   AXIS_ERROR;
@@ -469,7 +469,7 @@ Bif_F12_COMMA::eval_AB(Value_P A, Value_P B) const
 
 uRank max_rank = A->get_rank();
    if (max_rank < B->get_rank())  max_rank = B->get_rank();
-   return Token(TOK_APL_VALUE1, catenate(A.getref(), max_rank-1, B.getref()));
+   return Token(TOK_APL_VALUE1, catenate(*A, max_rank-1, *B));
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -539,7 +539,7 @@ Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B) const
        return Token(TOK_APL_VALUE1, Z);
      }
 
-   return Token(TOK_APL_VALUE1, catenate(A.getref(), 0, B.getref()));
+   return Token(TOK_APL_VALUE1, catenate(*A, 0, *B));
 }
 //============================================================================
 

@@ -57,7 +57,7 @@ const Cell & first_B = B.get_cfirst();
    if (!first_B.is_pointer_cell())   // simple cell
       {
         Value_P Z(LOC);
-        Z->get_wscalar().init(first_B, Z.getref(), LOC);
+        Z->get_wscalar().init(first_B, *Z, LOC);
         Z->check_value(LOC);
         return Z;
       }
@@ -80,7 +80,7 @@ Value * v1_owner = v1->get_lval_cellowner();
       {
         const ShapeItem ec = v1->element_count();
         Value_P Z(v1->get_shape(), LOC);
-        if (ec == 0)   Z->set_default(v1.getref(), LOC);
+        if (ec == 0)   Z->set_default(*v1, LOC);
 
         loop(e, ec)   Z->next_ravel_Cell(v1->get_cravel(e));
 
@@ -118,7 +118,7 @@ Shape sh_take = B->get_shape();   // start with ⍴B
         sh_take.set_shape_item(axis, alen);
       }
 
-   return Token(TOK_APL_VALUE1, do_take(sh_take, B.getref(), axes_X));
+   return Token(TOK_APL_VALUE1, do_take(sh_take, *B, axes_X));
 }
 //----------------------------------------------------------------------------
 Token
@@ -138,13 +138,13 @@ Shape sh_take = B->get_shape();   // start with ⍴B
          if (axes_X & 1 << b) sh_take.set_shape_item(b, 1);
        }
 
-   return Token(TOK_APL_VALUE1, do_take(sh_take, B.getref(), axes_X));
+   return Token(TOK_APL_VALUE1, do_take(sh_take, *B, axes_X));
 }
 //----------------------------------------------------------------------------
 Token
 Bif_F12_TAKE::eval_AB(Value_P A, Value_P B) const
 {
-Shape ravel_A1(A.getref(), /* ⎕IO */ 0);   // checks 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RANK
+Shape ravel_A1(*A, /* ⎕IO */ 0);   // checks 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RANK
 
    if (B->is_scalar())
       {
@@ -152,12 +152,12 @@ Shape ravel_A1(A.getref(), /* ⎕IO */ 0);   // checks 1 ≤ ⍴⍴A and ⍴A �
         loop(a, ravel_A1.get_rank())   shape_B1.add_shape_item(1);
         Value_P B1 = CLONE_P(B, LOC);   // so that we can set_shape()
         B1->set_shape(shape_B1);
-        return Token(TOK_APL_VALUE1, do_take(ravel_A1, B1.getref(), false));
+        return Token(TOK_APL_VALUE1, do_take(ravel_A1, *B1, false));
       }
    else
       {
         if (ravel_A1.get_rank() != B->get_rank())   LENGTH_ERROR;
-        return Token(TOK_APL_VALUE1, do_take(ravel_A1, B.getref(), false));
+        return Token(TOK_APL_VALUE1, do_take(ravel_A1, *B, false));
       }
 }
 //----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ Bif_F12_TAKE::do_take(const Shape & ravel_A1, const Value & B,
 Value_P Z(ravel_A1.abs(), LOC);
 
    if (ravel_A1.is_empty())   Z->set_default(B, LOC);
-   else                       fill(ravel_A1, Z.getref(), B, axes);
+   else                       fill(ravel_A1, *Z, B, axes);
    Z->check_value(LOC);
    return Z;
 }
@@ -203,7 +203,7 @@ Bif_F12_DROP::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
 
-const Shape ravel_A(A.getref(), /* ⎕IO */ 0);
+const Shape ravel_A(*A, /* ⎕IO */ 0);
 
    if (B->is_scalar())
       {
@@ -232,7 +232,7 @@ const Shape ravel_A(A.getref(), /* ⎕IO */ 0);
         Value_P Z(shape_Z, LOC);
 
         Z->set_ravel_Cell(0, B->get_cfirst());
-        if (shape_Z.get_volume() == 0)   Z->to_type();
+        if (shape_Z.get_volume() == 0)   Z->to_type(false);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -314,7 +314,7 @@ bool seen[MAX_RANK];
        }
 
    return Token(TOK_APL_VALUE1,
-                Bif_F12_TAKE::do_take(ravel_A, B.getref(), 0));
+                Bif_F12_TAKE::do_take(ravel_A, *B, 0));
 }
 //============================================================================
 ShapeItem

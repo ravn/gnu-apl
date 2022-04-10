@@ -1383,7 +1383,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
 int function_number = -1;
    if (X->is_char_array())   // function name, e.g. "open"
       {
-        UCS_string ucs_X(X.getref());
+        UCS_string ucs_X(*X);
         UTF8_string utf_X(ucs_X);
         function_number = function_name_to_int(utf_X.c_str());
         if (function_number == -1)
@@ -2289,7 +2289,7 @@ Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 int function_number = -1;
    if (X->is_char_array())   // function name, e.g. "open"
       {
-        UCS_string ucs_X(X.getref());
+        UCS_string ucs_X(*X);
         UTF8_string utf_X(ucs_X);
         function_number = function_name_to_int(utf_X.c_str());
         if (function_number == -1)
@@ -2750,7 +2750,7 @@ int function_number = -1;
                 loop(a, line_count)
                     {
                       const Cell & cA = A->get_cravel(a);
-                      const Value & Ai = cA.get_pointer_value().getref();
+                      const Value & Ai = *cA.get_pointer_value();
                       UCS_string line_ucs(Ai);
                       UTF8_string line_utf(line_ucs);
                       line_utf += '\n';
@@ -2765,7 +2765,7 @@ int function_number = -1;
 
          case 58:   // sprintf(Af, B...)
               {
-                const UCS_string A_format(A.getref());
+                const UCS_string A_format(*A);
                 UCS_string UZ;
                 do_sprintf(UZ, A_format, B.get(), 0);
                 Value_P Z(UZ, LOC);

@@ -218,7 +218,7 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 
    // plot window with default attributes
    //
-Plot_data * data = setup_data(B.getref());
+Plot_data * data = setup_data(*B);
    if (data == 0)   DOMAIN_ERROR;
 
 Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
@@ -234,7 +234,7 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
    // from here on 'data' is owned by 'w_props' (whose destructor
    // will delete it).
    //
-   if (const ErrorCode ec = parse_attributes(A.getref(), w_props))
+   if (const ErrorCode ec = parse_attributes(*A, w_props))
       {
         delete w_props;
         throw_apl_error(ec, LOC);
@@ -399,7 +399,7 @@ Quad_PLOT::eval_B(Value_P B) const
 
    // plot window with default attributes
    //
-Plot_data * data = setup_data(B.getref());
+Plot_data * data = setup_data(*B);
    if (data == 0)   DOMAIN_ERROR;
 
 Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);

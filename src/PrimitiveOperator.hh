@@ -44,10 +44,6 @@ public:
    /// monadic, so we return 1 and overload dyadic operators (i.e. inner/outer
    /// product) to return 2
    virtual int get_oper_valence() const   { return 1; }
-
-   /// evaluate the fill function with arguments A and B
-   static Token fill(const Shape shape_Z, Value_P A, Function_P fun,
-                     Value_P B, const char * loc);
 };
 //----------------------------------------------------------------------------
 

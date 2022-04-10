@@ -207,7 +207,7 @@ PERFORMANCE_END(fs_M_join_B, start_M_join, 1);
                         Value_P Z1(B1->get_shape(), LOC);
                         new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
 
-                        PJob_scalar_B j1(Z1.get(), B1.getref());
+                        PJob_scalar_B j1(Z1.get(), *B1);
                         Thread_context::get_master().joblist_B.add_job(j1);
                       }
                    else                            // simple B-item
@@ -253,7 +253,7 @@ ShapeItem end_z = z + slice_len;
                  {
                    POOL_LOCK(parallel_jobs_lock,
                              Value_P Z1 = CLONE_P(B1, LOC));
-                    Z1->to_type();
+                    Z1->to_type(/* numeric */ true);
                     new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
                  }
               else
@@ -262,7 +262,7 @@ ShapeItem end_z = z + slice_len;
                              Value_P Z1(B1->get_shape(), LOC))
                    new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
 
-                   PJob_scalar_B j1(Z1.get(), B1.getref());
+                   PJob_scalar_B j1(Z1.get(), *B1);
                    tctx.joblist_B.add_job(j1);
                  }
             }
@@ -287,19 +287,18 @@ ScalarFunction::expand_nested(Value * Z, const Cell * cell_A,
       {
         if (cell_B->is_pointer_cell())   // nested A and nested B
            {
-             const Value & value_A = cell_A->get_pointer_value().getref();
-             const Value & value_B = cell_B->get_pointer_value().getref();
+             const Value & value_A = *cell_A->get_pointer_value();
+             const Value & value_B = *cell_B->get_pointer_value();
              POOL_LOCK(parallel_jobs_lock,
                        Token token = eval_scalar_AB(value_A, value_B, fun))
              Z->next_ravel_Pointer(token.get_apl_val().get());
            }
         else                             // nested A and simple B
            {
-             const Value & value_A = cell_A->get_pointer_value().getref();
+             const Value & value_A = *cell_A->get_pointer_value();
              Value_P scalar_B(*cell_B, LOC);
              POOL_LOCK(parallel_jobs_lock,
-                       Token token = eval_scalar_AB(value_A,
-                                                    scalar_B.getref(), fun))
+                       Token token = eval_scalar_AB(value_A, *scalar_B, fun))
              Z->next_ravel_Pointer(token.get_apl_val().get());
            }
       }
@@ -308,10 +307,9 @@ ScalarFunction::expand_nested(Value * Z, const Cell * cell_A,
         if (cell_B->is_pointer_cell())   // simple A and nested B
            {
              Value_P scalar_A(*cell_A, LOC);
-             const Value & value_B = cell_B->get_pointer_value().getref();
+             const Value & value_B = *cell_B->get_pointer_value();
              POOL_LOCK(parallel_jobs_lock,
-                       Token token = eval_scalar_AB(scalar_A.getref(),
-                                                    value_B, fun))
+                       Token token = eval_scalar_AB(*scalar_A, value_B, fun))
              Z->next_ravel_Pointer(token.get_apl_val().get());
            }
         else                             // simple A and simple B
@@ -421,117 +419,118 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                    const Cell & cell_B = job_AB->B_at(z);
                    Cell & cell_Z       = job_AB->Z_at(z);
 
-                   if (cell_A.is_pointer_cell())
-                      if (cell_B.is_pointer_cell())
-                         {
-                           // both A and B are nested
-                           //
-                           const Value & A1 =
-                                    cell_A.get_pointer_value().getref();
-                           const Value & B1 =
-                                    cell_B.get_pointer_value().getref();
-                           const int inc_A1 = A1.get_increment();
-                           const int inc_B1 = B1.get_increment();
-                           const Shape * sh_Z1 = &B1.get_shape();
-                           if      (A1.is_scalar())  sh_Z1 = &B1.get_shape();
-                           else if (B1.is_scalar())  sh_Z1 = &A1.get_shape();
-                           else if (inc_B1 == 0)      sh_Z1 = &A1.get_shape();
+                   if (cell_A.is_pointer_cell() && cell_B.is_pointer_cell())
+                      {
+                        /* both cell_A and cell_B are nested, pointing to
+                           Values A1 and B1 respectively.
+                           cell_Z is nested, pointing to Z1←A1 fun B1.
+                         */
+                        const Value & A1 = *cell_A.get_pointer_value();
+                        const Value & B1 = *cell_B.get_pointer_value();
+                        const int inc_A1 = A1.get_increment();
+                        const int inc_B1 = B1.get_increment();
+                        const Shape * sh_Z1 = &B1.get_shape();
+                        if      (A1.is_scalar())  sh_Z1 = &B1.get_shape();
+                        else if (B1.is_scalar())  sh_Z1 = &A1.get_shape();
+                        else if (inc_B1 == 0)     sh_Z1 = &A1.get_shape();
 
-                           if (inc_A1 && inc_B1 && !A1.same_shape(B1))
-                              {
-                                if (A1.same_rank(B1))   ec = E_LENGTH_ERROR;
-                                else                     ec = E_RANK_ERROR;
-                                return Value_P();
-                              }
+                        if (inc_A1 && inc_B1 && !A1.same_shape(B1))
+                           {
+                             if (A1.same_rank(B1))   ec = E_LENGTH_ERROR;
+                             else                     ec = E_RANK_ERROR;
+                             return Value_P();
+                           }
 
-                           const ShapeItem len_Z1 = sh_Z1->get_volume();
-                           if (len_Z1 == 0)
-                              {
-                                Value_P Z1 =
-                                        do_eval_fill_AB(A1, B1).get_apl_val();
-                                job_AB->value_Z->next_ravel_Pointer(Z1.get());
-                                continue;
-                              }
+                        const ShapeItem len_Z1 = sh_Z1->get_volume();
+                        if (len_Z1 == 0)
+                           {
+                             Value_P Z1 = do_eval_fill_AB(A1, B1).get_apl_val();
+                             job_AB->value_Z->next_ravel_Pointer(Z1.get());
+                             continue;
+                           }
 
-                           Value_P Z1(*sh_Z1, LOC);
-                           new (&cell_Z)
-                               PointerCell(Z1.get(), *job_AB->value_Z,
-                                           0x6B616769);
+                        Value_P Z1(*sh_Z1, LOC);
+                        new (&cell_Z)
+                            PointerCell(Z1.get(), *job_AB->value_Z,
+                                        0x6B616769);
 
-                           PJob_scalar_AB j1(Z1.get(), A1, inc_A1, B1, inc_B1);
-                           Thread_context::get_master()
-                                          .joblist_AB.add_job(j1);
-                         }
-                      else
-                         {
-                           // A is nested, B is simple
-                           //
-                           const Value & A1 =
-                                    cell_A.get_pointer_value().getref();
-                           const int inc_A1 = A1.get_increment();
+                        PJob_scalar_AB j1(Z1.get(), A1, inc_A1, B1, inc_B1);
+                        Thread_context::get_master()
+                                       .joblist_AB.add_job(j1);
+                      }
+                   else if (cell_A.is_pointer_cell())
+                      {
+                        /* cell_A is nested, pointing to Values A1.
+                           cell_Z is nested, pointing to Z1←A1 fun B where B
+                           is a scalar according to cell_B.
+                         */
+                        const Value & A1 = *cell_A.get_pointer_value();
+                        const int inc_A1 = A1.get_increment();
 
-                           const ShapeItem len_Z1 = A1.element_count();
-                           if (len_Z1 == 0)
-                              {
-                                Value_P Z1 =
-                                        do_eval_fill_AB(A1, B).get_apl_val();
-                                new (&cell_Z) PointerCell(Z1.get(),
-                                                          *job_AB->value_Z);
-                              }
-                           else
-                              {
-                                 Value_P Z1(A1.get_shape(), LOC);
-                                 if (!Z1)   WS_FULL;
-                                 new (&cell_Z)
-                                     PointerCell(Z1.get(),*job_AB->value_Z,
-                                                 0x6B616769);
+                        const ShapeItem len_Z1 = A1.element_count();
+                        if (len_Z1 == 0)
+                           {
+                             Value_P Z1 = do_eval_fill_B(A1).get_apl_val();
+                             new (&cell_Z) PointerCell(Z1.get(),
+                                                       *job_AB->value_Z);
+                           }
+                        else
+                           {
+                              Value_P Z1(A1.get_shape(), LOC);
+                              if (!Z1)   WS_FULL;
+                              new (&cell_Z)
+                                  PointerCell(Z1.get(),*job_AB->value_Z,
+                                              0x6B616769);
 
-                                 PJob_scalar_AB j1(Z1.get(), A1, inc_A1,
-                                                   cell_B);
-                                 Thread_context::get_master().joblist_AB
-                                                             .add_job(j1);
-                              }
-                         }
+                              PJob_scalar_AB j1(Z1.get(), A1, inc_A1,
+                                                cell_B);
+                              Thread_context::get_master().joblist_AB
+                                                          .add_job(j1);
+                           }
+                      }
+                   else if (cell_B.is_pointer_cell())
+                      {
+                        /* cell_B is nested, pointing to Values B1.
+                           cell_Z is nested, pointing to Z1←A fun B1 where A
+                           is a scalar according to cell_A.
+                         */
+                        // B is nested, A is simple
+                        //
+                        const Value & B1 = *cell_B.get_pointer_value();
+                        const int inc_B1 = B1.get_increment();
+
+                        const ShapeItem len_Z1 = B1.element_count();
+                        if (len_Z1 == 0)
+                           {
+                             Value_P Z1 =
+                                     do_eval_fill_B(B1).get_apl_val();
+                             new (&cell_Z) PointerCell(Z1.get(),
+                                                       *job_AB->value_Z);
+                           }
+                        else
+                           {
+                             Value_P Z1(B1.get_shape(), LOC);
+
+                             new (&cell_Z)
+                                 PointerCell(Z1.get(), *job_AB->value_Z,
+                                             0x6B616769);
+
+                             PJob_scalar_AB j1(Z1.get(), cell_A, B1, inc_B1);
+                             Thread_context::get_master()
+                                            .joblist_AB.add_job(j1);
+                          }
+                      }
                    else
-                      if (cell_B.is_pointer_cell())
-                         {
-                           // B is nested, A is not
-                           //
-                           const Value & B1 =
-                                    cell_B.get_pointer_value().getref();
-                           const int inc_B1 = B1.get_increment();
-
-                           const ShapeItem len_Z1 = B1.element_count();
-                           if (len_Z1 == 0)
-                              {
-                                Value_P Z1 =
-                                        do_eval_fill_AB(A, B1).get_apl_val();
-                                new (&cell_Z) PointerCell(Z1.get(),
-                                                          *job_AB->value_Z);
-                              }
-                           else
-                              {
-                                Value_P Z1(B1.get_shape(), LOC);
-
-                                new (&cell_Z)
-                                    PointerCell(Z1.get(), *job_AB->value_Z,
-                                                0x6B616769);
-
-                                PJob_scalar_AB j1(Z1.get(), cell_A, B1, inc_B1);
-                                Thread_context::get_master()
-                                               .joblist_AB.add_job(j1);
-                             }
-                         }
-                      else
-                         {
-                           // neither A nor B are nested: execute fun
-                           //
+                      {
+                        /* cell_A and cell_B are both simple.
+                           Compute cell_Z = cell_A fun cell_B
+                         */
 PERFORMANCE_START(start_2)
 
-                           ec = (cell_B.*fun)(&cell_Z, &cell_A);
-                           if (ec != E_NO_ERROR)   return Value_P();
+                        ec = (cell_B.*fun)(&cell_Z, &cell_A);
+                        if (ec != E_NO_ERROR)   return Value_P();
 CELL_PERFORMANCE_END(get_statistics_AB(), start_2, z)
-                         }
+                      }
                  }
            }
         job_AB->value_Z->check_value(LOC);
@@ -556,182 +555,182 @@ ShapeItem end_z = z + slice_len;
 
    for (; z < end_z; ++z)
        {
-             const Cell & cell_A = job_AB->A_at(z);
-             const Cell & cell_B = job_AB->B_at(z);
-             Cell & cell_Z       = job_AB->Z_at(z);
+         const Cell & cell_A = job_AB->A_at(z);
+         const Cell & cell_B = job_AB->B_at(z);
+         Cell & cell_Z       = job_AB->Z_at(z);
 
-             if (cell_A.is_pointer_cell())
-                if (cell_B.is_pointer_cell())
-                   {
-                     // both A and B are nested
-                     //
-                     Value_P A1 = cell_A.get_pointer_value();
-                     Value_P B1 = cell_B.get_pointer_value();
-                     const int inc_A1 = A1->get_increment();
-                     const int inc_B1 = B1->get_increment();
-                     const Shape * sh_Z1 = &B1->get_shape();
-                     if      (A1->is_scalar())   sh_Z1 = &B1->get_shape();
-                     else if (B1->is_scalar())   sh_Z1 = &A1->get_shape();
-                     else if (inc_B1 == 0)       sh_Z1 = &A1->get_shape();
+         if (cell_A.is_pointer_cell() && cell_B.is_pointer_cell())
+            {
+              // both A and B are nested
+              //
+              Value_P A1 = cell_A.get_pointer_value();
+              Value_P B1 = cell_B.get_pointer_value();
+              const int inc_A1 = A1->get_increment();
+              const int inc_B1 = B1->get_increment();
+              const Shape * sh_Z1 = &B1->get_shape();
+              if      (A1->is_scalar())   sh_Z1 = &B1->get_shape();
+              else if (B1->is_scalar())   sh_Z1 = &A1->get_shape();
+              else if (inc_B1 == 0)       sh_Z1 = &A1->get_shape();
 
-                     if (inc_A1 && inc_B1 && !A1->same_shape(*B1))
-                        {
-                          job_AB->error = A1->same_rank(*B1) ? E_LENGTH_ERROR
-                                                         : E_RANK_ERROR;
-                          return;
-                        }
+              if (inc_A1 && inc_B1 && !A1->same_shape(*B1))
+                 {
+                   job_AB->error = A1->same_rank(*B1) ? E_LENGTH_ERROR
+                                                  : E_RANK_ERROR;
+                   return;
+                 }
 
-                     const ShapeItem len_Z1 = sh_Z1->get_volume();
-                     if (len_Z1 == 0)
-                        {
-                          Token result =job_AB->fun->eval_fill_AB(A1, B1);
-                          if (result.get_tag() == TOK_ERROR)
-                             {
-                               job_AB->error = ErrorCode(result.get_int_val());
-                               return;
-                             }
-                        }
+              const ShapeItem len_Z1 = sh_Z1->get_volume();
+              if (len_Z1 == 0)
+                 {
+                   Token result =job_AB->fun->eval_fill_AB(A1, B1);
+                   if (result.get_tag() == TOK_ERROR)
+                      {
+                        job_AB->error = ErrorCode(result.get_int_val());
+                        return;
+                      }
+                 }
 
-                     POOL_LOCK(parallel_jobs_lock,
-                               Value_P Z1(*sh_Z1, LOC))
-                        new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+              POOL_LOCK(parallel_jobs_lock,
+                        Value_P Z1(*sh_Z1, LOC))
+                 new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
 
-                        PJob_scalar_AB j1(Z1.get(),
-                                          A1.getref(), inc_A1,
-                                          B1.getref(), inc_B1);
-                        tctx.joblist_AB.add_job(j1);
-                   }
-                else
-                   {
-                     // A is nested, B is simple
-                     //
-                     Value_P A1 = cell_A.get_pointer_value();
-                     const int inc_A1 = A1->get_increment();
+                 PJob_scalar_AB j1(Z1.get(),
+                                   *A1, inc_A1,
+                                   *B1, inc_B1);
+                 tctx.joblist_AB.add_job(j1);
+            }
+         else if (cell_A.is_pointer_cell())
+            {
+              // A is nested, B is simple
+              //
+              Value_P A1 = cell_A.get_pointer_value();
+              const int inc_A1 = A1->get_increment();
 
-                     const ShapeItem len_Z1 = A1->element_count();
-                     if (len_Z1 == 0)
-                        {
-                          Value_P B(LOC);   // a scalar
-                          B->set_ravel_Cell(0, cell_B);
-                          Value_P Z1 = job_AB->fun->eval_fill_AB(A1, B)
-                                                   .get_apl_val();
-                          new (&cell_Z) PointerCell(Z1.get(),
-                                                    *job_AB->value_Z);
-                        }
-                     else
-                        {
-                          Value_P Z1(A1->get_shape(), LOC);
-                          new (&cell_Z) PointerCell(Z1.get(),
-                                                    *job_AB->value_Z);
+              const ShapeItem len_Z1 = A1->element_count();
+              if (len_Z1 == 0)
+                 {
+                   Value_P B(LOC);   // a scalar
+                   B->set_ravel_Cell(0, cell_B);
+                   Value_P Z1 = job_AB->fun->eval_fill_AB(A1, B)
+                                            .get_apl_val();
+                   new (&cell_Z) PointerCell(Z1.get(),
+                                             *job_AB->value_Z);
+                 }
+              else
+                 {
+                   Value_P Z1(A1->get_shape(), LOC);
+                   new (&cell_Z) PointerCell(Z1.get(),
+                                             *job_AB->value_Z);
 
-                          PJob_scalar_AB j1(Z1.get(),
-                                            A1.getref(), inc_A1, cell_B);
-                          tctx.joblist_AB.add_job(j1);
-                        }
-                   }
-             else
-                if (cell_B.is_pointer_cell())
-                   {
-                     // A is simple, B is nested
-                     //
-                     Value_P B1 = cell_B.get_pointer_value();
-                     const int inc_B1 = B1->get_increment();
+                   PJob_scalar_AB j1(Z1.get(),
+                                     *A1, inc_A1, cell_B);
+                   tctx.joblist_AB.add_job(j1);
+                 }
+            }
+         else if (cell_B.is_pointer_cell())
+            {
+              // A is simple, B is nested
+              //
+              Value_P B1 = cell_B.get_pointer_value();
+              const int inc_B1 = B1->get_increment();
 
-                     const ShapeItem len_Z1 = B1->element_count();
-                     if (len_Z1 == 0)
-                        {
-                          Value_P A(LOC);   // a scalar
-                          A->set_ravel_Cell(0, cell_A);
-                          Value_P Z1 = job_AB->fun->eval_fill_AB(A, B1)
-                                                   .get_apl_val();
-                          new (&cell_Z) PointerCell(Z1.get(),
-                                                    *job_AB->value_Z);
-                        }
-                     else
-                        {
-                          POOL_LOCK(parallel_jobs_lock,
-                                    Value_P Z1(B1->get_shape(), LOC))
-                          new (&cell_Z) PointerCell(Z1.get(),
-                                                    *job_AB->value_Z);
+              const ShapeItem len_Z1 = B1->element_count();
+              if (len_Z1 == 0)
+                 {
+                   Value_P A(LOC);   // a scalar
+                   A->set_ravel_Cell(0, cell_A);
+                   Value_P Z1 = job_AB->fun->eval_fill_AB(A, B1)
+                                            .get_apl_val();
+                   new (&cell_Z) PointerCell(Z1.get(),
+                                             *job_AB->value_Z);
+                 }
+              else
+                 {
+                   POOL_LOCK(parallel_jobs_lock,
+                             Value_P Z1(B1->get_shape(), LOC))
+                   new (&cell_Z) PointerCell(Z1.get(),
+                                             *job_AB->value_Z);
 
-                          Value_P A1 = cell_A.get_pointer_value();
-                          PJob_scalar_AB j1(Z1.get(),
-                                            A1.getref(), 0,
-                                            B1.getref(), inc_B1);
-                          tctx.joblist_AB.add_job(j1);
-                       }
-                   }
-                else
-                   {
-                     // neither A nor B are nested: execute fun
-                     //
+                   Value_P A1 = cell_A.get_pointer_value();
+                   PJob_scalar_AB j1(Z1.get(),
+                                     *A1, 0,
+                                     *B1, inc_B1);
+                   tctx.joblist_AB.add_job(j1);
+                }
+            }
+         else
+            {
 PERFORMANCE_START(start_2)
+              // neither A nor B are nested: execute fun
+              //
 
-                     job_AB->error = (cell_B.*job_AB->fun2)(&cell_Z, &cell_A);
-                     if (job_AB->error != E_NO_ERROR)   return;
+              job_AB->error = (cell_B.*job_AB->fun2)(&cell_Z, &cell_A);
+              if (job_AB->error != E_NO_ERROR)   return;
 
 CELL_PERFORMANCE_END(job_AB->fun->get_statistics_AB(), start_2, z)
-                   }
+            }
        }
 }
 //----------------------------------------------------------------------------
 Token
 ScalarFunction::do_eval_fill_AB(const Value & A, const Value & B) const
 {
-   // eval_fill_AB() is called when A or B (or both) are empty.
-   //
-   if (B.element_count() == 0)   // B is empty
-      {
-        if (B.get_cfirst().is_numeric() ||
-            B.get_cfirst().is_character_cell())
-           {
-             Value_P Z(B.get_shape(), LOC);
-             Z->check_value(LOC);
-             return Token(TOK_APL_VALUE1, Z);
-           }
+   /* eval_fill_AB() is called when A and/or B is empty and the non-empty
+      argument (if any) is non-scalar. The scalar case for the non-empty
+      argument of a dyadic scalar function is handled by do_eval_fill_B().
 
-        Value_P Z = B.clone(LOC);
-        Z->to_type();
-        Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
-      }
+       NOTE however, that even though non-empty arguments of scalar functions
+       must be scalars (and are therefore are not handled here but instead in
+       do_eval_fill_B() below) A or B may still be non-scalar and non-empty
+       when called from other places (such as  Bif_OPER2_INNER::fill()).
 
-   if (A.element_count() == 0)   // A is empty
-      {
-        if (A.get_cfirst().is_numeric() ||
-            A.get_cfirst().is_character_cell())
-           {
-             Value_P Z(A.get_shape(), LOC);
-             Z->check_value(LOC);
-             return Token(TOK_APL_VALUE1, Z);
-           }
-        Value_P Z = A.clone(LOC);
-        Z->to_type();
-        Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
-      }
+       NOTE also that there seems to be some confusion in lrm regarding
+       fill functions. On p. 56 a description and examples for the fill
+       function is given and IBM APL2 seem to follow that description.
 
-   // both A and B are empty
-   //
-   if (A.get_rank() != B.get_rank())   RANK_ERROR;
-   if (!A.same_shape(B))               LENGTH_ERROR;
+       On p. 110/Figure 20 of lrm a different definition for the fill
+       function for scalar functions is given, i.e.:
 
-   // B.prototype() cannot be used since it would return the type of ↑B
-   // while we need the type of B here. We therefore clone() and to_type()
-   //
-Value_P Z = B.clone(LOC);
-   Z->to_type();
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
+       Z←(R) ≠ (L)   with R←↑A and L←↑B   (*)
 
-//   return Bif_F2_UNEQU::fun.eval_AB(A, B);
+       The example on page 56 of lrm, i.e.:
+
+       W←(ι0) ⌈ ι0
+       DISPALY W
+
+       gives:
+
+       ┌⊖┐
+       │0│
+       └─┘
+
+       in both APL2 (PC version) and in GNU APL while
+
+      (↑⍳0) ≠ (↑⍳0)   (according to the definition on lrm p. 110/Figure 20)
+
+      gives the simple numeric scalar
+
+      0
+
+      in both APL2 (PC version) and in GNU APL. Therefore the definition
+      given on p. 110/Figure 20 looks wrong.
+    */
+
+   if (B.element_count() == 0)   return do_eval_fill_B(B);
+   if (A.element_count() == 0)   return do_eval_fill_B(A);
+   return do_eval_fill_B(A);
 }
 //----------------------------------------------------------------------------
 Token
 ScalarFunction::do_eval_fill_B(const Value & B) const
 {
-   // eval_fill_B() is called when a scalar function with empty B is called
-   //
+   /* eval_fill_B() is called for:
+
+      1.  a monadic scalar function with empty B, or
+      2a. a dyadic (!) scalar function with empty A and scalar B, or
+      2b. a dyadic (!) scalar function with scalar A and empty B.
+    */
+
    // lrm p. 56: When the prototypes of the empty arguments are simple
    //            scalars, return a zero prototype
    //
@@ -742,10 +741,12 @@ ScalarFunction::do_eval_fill_B(const Value & B) const
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   // Value::prototype() does not work here, so we clone() and to_type()
-   //
+   /* Apply do_eval_fill_B() recursively. Value::prototype() does not work
+      here, so we clone() and to_type(true) where true forces numeric 0
+      for character Cells.
+    */
 Value_P Z = B.clone(LOC);
-   Z->to_type();
+   Z->to_type(/* numeric */ true);
    Z->check_value(LOC);
 
    return Token(TOK_APL_VALUE1, Z);
@@ -785,7 +786,7 @@ const Cell & proto_B = B->get_cfirst();
       }
    else
       {
-        if (Z->is_empty())  Z->get_wproto().init(FI0, Z.getref(), LOC);
+        if (Z->is_empty())  Z->get_wproto().init(FI0, *Z, LOC);
         while (Z->more())   Z->next_ravel_Cell(FI0);
       }
 
@@ -1059,9 +1060,9 @@ Bif_F12_ROLL::eval_B(Value_P B) const
    // the standard wants ? to be atomic. We therefore check beforehand
    // that all elements of B are proper, and throw an error if not
    //
-   if (check_B(B.getref(), Workspace::get_CT()))   DOMAIN_ERROR;
+   if (check_B(*B, Workspace::get_CT()))   DOMAIN_ERROR;
 
-   return eval_scalar_B(B.getref(), &Cell::bif_roll);
+   return eval_scalar_B(*B, &Cell::bif_roll);
 }
 //----------------------------------------------------------------------------
 bool
@@ -1101,7 +1102,7 @@ const ShapeItem len_B = B->element_count();
    // large_eval_AB() becomes faster than plain eval_AB() is N=61.
    //
    if (len_A*len_B > 60*60)
-      return Token(TOK_APL_VALUE1, large_eval_AB(A.getref(), B.getref()));
+      return Token(TOK_APL_VALUE1, large_eval_AB(*A, *B));
 
 const double qct = Workspace::get_CT();
 Value_P Z(len_A, LOC);

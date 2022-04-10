@@ -69,6 +69,10 @@ protected:
 
    /// the main loop for an inner product with scalar functions
    static void PF_scalar_inner_product(Thread_context & tctx);
+
+   /// evaluate the fill function with arguments A and B
+   static Token fill(const Shape shape_Z, Value_P A, Function_P fun,
+                     Value_P B, const char * loc);
 };
 //----------------------------------------------------------------------------
 

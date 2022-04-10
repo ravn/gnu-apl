@@ -78,14 +78,6 @@ public:
    Value * get()
       { return value_p; }
 
-   /// return a const reference of the Value
-   const Value & getref() const
-      { return *value_p; }
-
-   /// return a reference of the Value
-   Value & getref()
-      { return *value_p; }
-
    /// clear the pointer (and possibly add an event)
    inline void clear_pointer(const char * loc);
 

@@ -237,14 +237,14 @@ Quad_XML::eval_B(Value_P B) const
 {
    if (B->is_structured())   // associative B array to XML string
       {
-        Value_P Z = APL_to_XML(B.getref());
+        Value_P Z = APL_to_XML(*B);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
    if (B->get_rank() != 1)   RANK_ERROR;
 
-Value_P Z = XML_to_APL(B.getref());
+Value_P Z = XML_to_APL(*B);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -290,13 +290,13 @@ bool tag_open = false;
          ShapeItem member_pos;     // the position in the XML file
          Unicode category;
          UCS_string name;
-         const Value & member_name = B.get_cravel(2*member_indices[m])
-                                      .get_pointer_value().getref();
+         const Value & member_name = *B.get_cravel(2*member_indices[m])
+                                       .get_pointer_value();
 
          split_name(&category, &member_pos, &name, member_name);
 
-         const Value & member_data = B.get_cravel(2*member_indices[m] + 1)
-                                      .get_pointer_value().getref();
+         const Value & member_data = *B.get_cravel(2*member_indices[m] + 1)
+                                      .get_pointer_value();
 
          // one tag; the member_indices items occur in the following
          // order (also below):
@@ -1175,83 +1175,83 @@ const int function_number = A->get_cfirst().get_int_value();
 
          case 1:   // read and convert an XML file
               {
-                return convert_file(B.getref());
+                return convert_file(*B);
               }
 
          case 2:
               {
-                Value_P Z = path_split(B.getref());
+                Value_P Z = path_split(*B);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 3:
               {
-                Value_P Z = name_split(B.getref());
+                Value_P Z = name_split(*B);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case -3:
               {
-                Value_P Z = name_unsplit(B.getref());
+                Value_P Z = name_unsplit(*B);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 4:
               {
-                Value_P Z = tree(B.getref(), tf_none);
+                Value_P Z = tree(*B, tf_none);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 5:
               {
-                Value_P Z = tree(B.getref(), tf_with_pos | tf_with_decl);
+                Value_P Z = tree(*B, tf_with_pos | tf_with_decl);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 6:
               {
-                Value_P Z = tree(B.getref(), tf_with_pos | tf_fullpath);
+                Value_P Z = tree(*B, tf_with_pos | tf_fullpath);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 7:
               {
-                return all_members(B.getref(), tf_all);
+                return all_members(*B, tf_all);
               }
 
          case 8:
               {
-                return all_members(B.getref(), tf_tagname);
+                return all_members(*B, tf_tagname);
               }
 
          case 9:
               {
-                return all_members(B.getref(), tf_decl);
+                return all_members(*B, tf_decl);
               }
 
          case 10:
               {
-                return all_members(B.getref(), tf_text);
+                return all_members(*B, tf_text);
               }
 
          case 11:
               {
-                return all_members(B.getref(), tf_sub);
+                return all_members(*B, tf_sub);
               }
 
          case 12:
               {
-                return all_members(B.getref(), tf_all | tf_flat);
+                return all_members(*B, tf_all | tf_flat);
               }
 
          case 13:
               {
-                return all_members(B.getref(), tf_sub | tf_flat);
+                return all_members(*B, tf_sub | tf_flat);
               }
 
          case 14:
               {
-                return next_member(A.getref(), B.getref());
+                return next_member(*A, *B);
               }
 
       }
@@ -1593,7 +1593,7 @@ std::vector<const Cell *>member_values;
         UCS_string subname(name_prefix);
         subname += UNI_FULLSTOP;
         subname += member_names[m];
-        tree(sub.getref(), z, prefix, subname, flags);
+        tree(*sub, z, prefix, subname, flags);
         if (last_member && prefix.size() > 1)
            {
              // the char was │ initially, has now become └, and should be
@@ -1691,7 +1691,7 @@ std::vector<const Cell *>member_values;
         const Cell & member_data = *member_values[m];
         if (!member_data.is_pointer_cell())   continue;  // can't recurse
 
-        const Value & sub = member_data.get_pointer_value().getref();
+        const Value & sub = *member_data.get_pointer_value();
         if (sub.is_structured())   all_members(result, sub, path, flags);
       }
 }
@@ -1770,8 +1770,8 @@ const Value * container = &B;
        }
 const Value & last_path_item = path_length == 1
                              ? A1
-                             : path->get_cravel(path_length - 1)
-                                    .get_pointer_value().getref();
+                             : *path->get_cravel(path_length - 1)
+                                    .get_pointer_value();
 ShapeItem leaf_position;
    {
      const int weight = split_name(0, &leaf_position, 0, last_path_item);

@@ -70,7 +70,7 @@ Function_P LO = _LO.get_function();
 const Shape shape_Z = B->get_shape().high_shape(B->get_rank() - rank_chunk_B);
    if (shape_Z.is_empty())
       {
-        Value_P Fill_B = Bif_F12_TAKE::first(B.getref());
+        Value_P Fill_B = Bif_F12_TAKE::first(*B);
         Token tZ = LO->eval_fill_B(Fill_B);
         Value_P Z = tZ.get_apl_val();
         Z->set_shape(B->get_shape());
@@ -162,8 +162,8 @@ const Shape shape_Z = rk_B_frame ? B->get_shape().high_shape(rk_B_frame)
 
    if (shape_Z.is_empty())
       {
-        Value_P Fill_A = Bif_F12_TAKE::first(A.getref());
-        Value_P Fill_B = Bif_F12_TAKE::first(B.getref());
+        Value_P Fill_A = Bif_F12_TAKE::first(*A);
+        Value_P Fill_B = Bif_F12_TAKE::first(*B);
         Shape shape_Z;
 
         if (A->is_empty())          shape_Z = A->get_shape();

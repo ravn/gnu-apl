@@ -129,7 +129,7 @@ Symbol::assign(Value_P new_value, bool clone, const char * loc)
       {
         CERR << "Incomplete value at " LOC << endl;
         new_value->print_properties(CERR, 0, false);
-        VH_entry::print_history(CERR, new_value.getref(), LOC);
+        VH_entry::print_history(CERR, *new_value, LOC);
         Assert(0);
       }
 
@@ -200,7 +200,7 @@ Value_P Z = get_apl_value();  // the current APL value of this Symbol
            {
              data = Z->get_new_member(name);
            }
-        data->init_from_value(B.get(), Z.getref(), LOC);
+        data->init_from_value(B.get(), *Z, LOC);
         return;
       }
 
@@ -215,7 +215,7 @@ const ShapeItem max_idx = Z->element_count();
            {
              Cell & cell = Z->get_wravel(idx);
              cell.release(LOC);   // release the old value if Z[X]
-             cell.init(B->get_cfirst(), Z.getref(), LOC);   // Z[X] ← ↑B
+             cell.init(B->get_cfirst(), *Z, LOC);   // Z[X] ← ↑B
              return;
            }
       }
@@ -230,7 +230,7 @@ const ShapeItem max_idx = Z->element_count();
             {
               Cell & dest = Z->get_wravel(a);
               dest.release(LOC);   // free sub-values etc (if any)
-              dest.init(src, Z.getref(), LOC);
+              dest.init(src, *Z, LOC);
             }
         if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
         return;
@@ -251,7 +251,7 @@ const Cell * cB = &B->get_cfirst();
         if (idx >= max_idx)   INDEX_ERROR;
         Cell & dest = Z->get_wravel(idx);
         dest.release(LOC);   // free sub-values etc (if any)
-        dest.init(*cB, Z.getref(), LOC);
+        dest.init(*cB, *Z, LOC);
 
          cB += incr_B;
       }
@@ -337,7 +337,7 @@ const int incr_B = (ec_B == 1) ? 0 : 1;
         if (offset_Z >= Z->element_count())   INDEX_ERROR;
         Cell & dest = Z->get_wravel(offset_Z);
         dest.release(LOC);   // free sub-values etc (if any)
-        dest.init(*cB, Z.getref(), LOC);
+        dest.init(*cB, *Z, LOC);
         cB += incr_B;
      }
 

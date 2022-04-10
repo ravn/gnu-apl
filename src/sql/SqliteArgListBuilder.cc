@@ -110,7 +110,7 @@ int row_count = results.size();
                                                                 = row.begin();
                     col_iterator != row.end() ; col_iterator++)
                    {
-                     (*col_iterator)->update(db_result_value.getref());
+                     (*col_iterator)->update(*db_result_value);
                    }
              }
        }

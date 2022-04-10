@@ -227,7 +227,7 @@ const int n_wise = A0 < 0 ? -A0 : A0;   // the number of items (= M1 in iso)
         //
         Shape sh;
         if (n_wise == 2)   sh.add_shape_item(0);
-        return Bif_F12_RHO::do_reshape(sh, B.getref());
+        return Bif_F12_RHO::do_reshape(sh, *B);
       }
    else
       {
@@ -337,7 +337,7 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
         // Z[z] = B[b]. We use Z[z] as accumulator for the reduction
         //
         Cell & accu = Z->get_wravel(z);
-        accu.init(B->get_cravel(b), Z.getref(), LOC);
+        accu.init(B->get_cravel(b), *Z, LOC);
 
         loop(lo, LO_count)
            {
@@ -364,7 +364,7 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
 
                   Assert(result.get_Class() == TC_VALUE);
                   Value_P ZZ = result.get_apl_val();
-                  accu.init_from_value(ZZ.get(), Z.getref(), LOC);
+                  accu.init_from_value(ZZ.get(), *Z, LOC);
                 }
            }
       }

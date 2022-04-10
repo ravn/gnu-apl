@@ -61,8 +61,8 @@ Function_P LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P First_A = Bif_F12_TAKE::first(A.getref());
-        Value_P First_B = Bif_F12_TAKE::first(B.getref());
+        Value_P First_A = Bif_F12_TAKE::first(*A);
+        Value_P First_B = Bif_F12_TAKE::first(*B);
         Shape shape_Z;   // will be ⍴A or ⍴B and therefore empty
 
         if (A->is_empty())          shape_Z = A->get_shape();
@@ -128,11 +128,11 @@ Function_P LO = _LO.get_function();
              if (extend_B && !B->is_scalar())   // 1-element non-scalar B
                 {
                   Value_P A1(LOC);   // A1 ← , A
-                  A1->get_wscalar().init(A->get_cscalar(), A1.getref(), LOC);
+                  A1->get_wscalar().init(A->get_cscalar(), *A1, LOC);
                   A1->check_value(LOC);
 
                   Value_P B1(LOC);   // B1 ← , B
-                  B1->get_wscalar().init(B->get_cscalar(), B1.getref(), LOC);
+                  B1->get_wscalar().init(B->get_cscalar(), *B1, LOC);
                   B1->check_value(LOC);
 
                   return macro->eval_ALB(A1, _LO, B1);
@@ -140,7 +140,7 @@ Function_P LO = _LO.get_function();
              else
                 {
                   Value_P A1(LOC);
-                  A1->get_wscalar().init(A->get_cfirst(), A1.getref(), LOC);
+                  A1->get_wscalar().init(A->get_cfirst(), *A1, LOC);
                   A1->check_value(LOC);
 
                   return macro->eval_ALB(A1, _LO, B);
@@ -149,7 +149,7 @@ Function_P LO = _LO.get_function();
         else if (extend_B && !B->is_scalar())   // 1-element non-scalar B
            {
              Value_P B1(LOC);
-             B1->get_wscalar().init(B->get_cfirst(), B1.getref(), LOC);
+             B1->get_wscalar().init(B->get_cfirst(), *B1, LOC);
              B1->check_value(LOC);
 
              return macro->eval_ALB(A, _LO, B1);
@@ -246,7 +246,7 @@ Function_P LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P First_B = Bif_F12_TAKE::first(B.getref());
+        Value_P First_B = Bif_F12_TAKE::first(*B);
         Token tZ = LO->eval_fill_B(First_B);
         Value_P Z1 = tZ.get_apl_val();
 

@@ -71,7 +71,7 @@ const double qct = Workspace::get_CT();
              }
        }
 
-Value_P Z = do_map(A.getref(), indices, B.get(), recursive);
+Value_P Z = do_map(*A, indices, B.get(), recursive);
    delete[] indices;
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -125,8 +125,8 @@ const ShapeItem len_B = B->element_count();
               if (cell_A.is_pointer_cell())
                  {
                    Cell & cell_Z0 = Z->get_wproto();
-                   cell_Z0.init(cell_A, Z.getref(), LOC);
-                   cell_Z0.get_pointer_value()->to_type();
+                   cell_Z0.init(cell_A, *Z, LOC);
+                   cell_Z0.get_pointer_value()->to_type(false);
                  }
               else if (cell_A.is_character_cell())
                  Z->set_proto_Spc();

@@ -75,13 +75,13 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
 {
    if (other.is_pointer_cell())
       {
-        // Somewhat tricky! We must 'Value_P sub' so that sub owns the cloned
-        // value until PointerCell() owns it.
+        // Somewhat tricky! We must 'Value_P proto' so that proto owns
+        // the cloned value until PointerCell() takes over ownership of it.
         //
-        Value_P sub = other.get_pointer_value()->clone(loc);
-        Assert(!sub->is_simple_scalar());
-        sub->to_type();
-        new (this) PointerCell(sub.get(), cell_owner);
+        Value_P proto = other.get_pointer_value()->clone(loc);
+        Assert(!proto->is_simple_scalar());
+        proto->to_type(false);
+        new (this) PointerCell(proto.get(), cell_owner);
       }
    else if (other.is_lval_cell())      new (this) LvalCell(0, 0);
    else if (other.is_character_cell()) new (this) CharCell(UNI_SPACE);

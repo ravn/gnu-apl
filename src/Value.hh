@@ -785,7 +785,7 @@ public:
 
    /// recursively replace all numeric ravel elements with 0 and all
    /// characters with blank. See lrm p. 46.
-   void to_type();
+   void to_type(bool force_numeric);
 
    /// print address, shape, and flags of this value
    void print_structure(ostream & out, int indent, ShapeItem idx) const;
