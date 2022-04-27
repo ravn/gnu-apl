@@ -248,7 +248,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>March 23, 2022
+<p>April 27, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -3497,12 +3497,29 @@ Next: <a href="#Section-2_002e31" accesskey="n" rel="next">Section 2.31</a>, Pre
 <p>⎕MAP changes the ravel items of its right argument according to a mapping
 table provided as its left argument. Let Z←A ⎕MAP B.
 </p>
-<p>The left argument A of ⎕MAP must be a N×2 matrix. Each 2-element row of
-A specifies a separate mapping. That is, the elements of B which are found
-in A[;1] are replaced by the corresponding element in A[;2]. The shape of
-the result Z is the shape of the right argument B.
+<p>The left argument A of Z←A ⎕MAP B shall be a N×2 matrix. Each 2-element row of
+A, say A[J;], specifies a separate mapping A[J;1] → A[J;2]. The result Z has
+the same shape as the right argument B. The items Z[...] iof ther result are
+constructed from their corresponding items B[...] in B as follows:
 </p>
-<p>Example:
+<ul>
+<li> if B[...] ≡ A[J;1] for some J then Z[...] is A[J;2].
+
+</li><li> otherwise B[...] is different from all A[1;J] and then Z[...] is B[...]
+
+</li></ul>
+
+<p>In other words, Z is B, but with items of B found in A[;1] replaced by their
+mapped item A[;2].
+</p>
+<p>In practice th left argument A is frequently created from a literal APL value
+such as 5 2⍴&rsquo;eEwWaAzZ92&rsquo; in the example below. To simplify these cases, A ⎕MAP B
+also accepts a vector instead of a N×2 matrix:
+</p>
+<p>A ⎕MAP B   ←→   ((N 2)⍴A) ⎕MAP B   if (2×N)   ←→    ⍴A
+</p>
+
+<p>Examples:
 </p>
 <pre class="verbatim">      ⍝ the map A
       ⊢A←5 2⍴'eEwWaAzZ92'
@@ -3517,6 +3534,10 @@ zZ    ⍝ map 'z' → 'Z'
 Halloween
 
       ⍝ the result of A ⎕MAP B
+      A ⎕MAP B
+HAlloWEEn
+
+      A←'eEwWaAzZ92'   ⍝ vector A instead of N×2 matrix
       A ⎕MAP B
 HAlloWEEn
 
@@ -3540,7 +3561,8 @@ nested iff A[N;2] is nested. If, for some N, the depths of A[N;1] and A[N;2]
 differ, then then depths of B and A ⎕MAP B may differ as well. That is, ⎕MAP
 conserves the shape of B, but not necessarily the depth of B.
 
-</li><li> By default the mapping of B is non-recursive, i.e. the top-level items of
+</li><li> 
+By default the mapping of B is non-recursive, i.e. the top-level items of
 B are compared with the top-level keys A[;1], and nested keys and items of B
 are handled as described above.
 

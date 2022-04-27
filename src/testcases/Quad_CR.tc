@@ -404,7 +404,7 @@ DOMAIN ERROR+
       ^      ^
 
       )MORE
-A ⎕CR B with invalid A
+A ⎕CR B with invalid A (=42)
       →
 
       ⍝ control characters
@@ -416,6 +416,8 @@ A ⎕CR B with invalid A
       ⍝ regression
       5 ⎕CR '1'
 31
+
+      )SIC
 
       )CHECK
 OK      - no stale functions

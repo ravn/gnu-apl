@@ -96,7 +96,7 @@ protected:
    static Token do_eval_B(const Value * B, bool remove_extra_spaces);
 
    /// compute \b 5 ⎕CR \b B or \b 6 ⎕CR \b B
-   static Value_P do_CR5_6(const char * alpha, const Value * B);
+   static Value_P do_CR5_6(int A56, const Value * B);
 
    /// compute \b 10 ⎕CR \b B
    static Value_P do_CR10(const Value * B);
@@ -132,13 +132,13 @@ protected:
    static Value_P do_CR26(const Value * B);
 
    /// compute \b 27 ⎕CR \b B or \b 28 ⎕CR \b B
-   static Value_P do_CR27_28(bool primary, const Value * B);
+   static Value_P do_CR27_28(int A_27_28, const Value * B);
 
    /// compute \b 30 ⎕CR \b B
    static Value_P do_CR30(const Value * B);
 
    /// compute \b 31 ⎕CR \b B or \b 32 ⎕CR \b B
-   static Value_P do_CR31_32(bool primary, const Value * B);
+   static Value_P do_CR31_32(int A_31_32, const Value * B);
 
    /// compute \b 33 ⎕CR \b B
    static Value_P do_CR33(const Value * B);

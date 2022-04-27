@@ -3246,12 +3246,30 @@ is large.
 ⎕MAP changes the ravel items of its right argument according to a mapping
 table provided as its left argument. Let Z←A ⎕MAP B.
 
-The left argument A of ⎕MAP must be a N×2 matrix. Each 2-element row of
-A specifies a separate mapping. That is, the elements of B which are found
-in A[;1] are replaced by the corresponding element in A[;2]. The shape of
-the result Z is the shape of the right argument B.
+The left argument A of Z←A ⎕MAP B shall be a N×2 matrix. Each 2-element row of
+A, say A[J;], specifies a separate mapping A[J;1] → A[J;2]. The result Z has
+the same shape as the right argument B. The items Z[...] iof ther result are
+constructed from their corresponding items B[...] in B as follows:
 
-Example:
+@itemize
+
+@item if B[...] ≡ A[J;1] for some J then Z[...] is A[J;2].
+
+@item otherwise B[...] is different from all A[1;J] and then Z[...] is B[...]
+
+@end itemize
+
+In other words, Z is B, but with items of B found in A[;1] replaced by their
+mapped item A[;2].
+
+In practice th left argument A is frequently created from a literal APL value
+such as 5 2⍴'eEwWaAzZ92' in the example below. To simplify these cases, A ⎕MAP B
+also accepts a vector instead of a N×2 matrix:
+
+      A ⎕MAP B   ←→   ((N 2)⍴A) ⎕MAP B   if (2×N)   ←→    ⍴A
+
+
+Examples:
 
 @verbatim
       ⍝ the map A
@@ -3267,6 +3285,10 @@ zZ    ⍝ map 'z' → 'Z'
 Halloween
 
       ⍝ the result of A ⎕MAP B
+      A ⎕MAP B
+HAlloWEEn
+
+      A←'eEwWaAzZ92'   ⍝ vector A instead of N×2 matrix
       A ⎕MAP B
 HAlloWEEn
 
@@ -3295,6 +3317,7 @@ differ, then then depths of B and A ⎕MAP B may differ as well. That is, ⎕MAP
 conserves the shape of B, but not necessarily the depth of B.
 
 @item
+
 By default the mapping of B is non-recursive, i.e. the top-level items of
 B are compared with the top-level keys A[;1], and nested keys and items of B
 are handled as described above.

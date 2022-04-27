@@ -479,7 +479,7 @@ grow:
              }
           else
              {
-               const NameClass  nc = sym->get_NC();
+               const NameClass nc = sym->get_NC();
                if (size_t(PC) < body.size() &&
                    body[PC + 1].get_tag() == TOK_OPER2_INNER)
                   {
@@ -499,9 +499,30 @@ grow:
                const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
                if (is_left_sym)
                  {
-                   // allow assignment only to variables or undefined names
+                   // allow assignment only to variables or undefined names.
+                   // This is a pitfal;; if a label with the same name exists,
+                   // so we should to provide some more info.
                    //
-                   if (!(nc & NC_left))   syntax_error(LOC);
+                   if (!(nc & NC_left))
+                      {
+                        UCS_string & more = MORE_ERROR();
+                        more << "Assignment to symbol " << sym->get_name()
+                             << " which (currently) is ";
+                        switch(nc)
+                           {
+                              case NC_LABEL:
+                                   more << "a label";              break;
+                              case NC_OPERATOR:
+                                   more << "a defined operator";   break;
+                              case NC_FUNCTION:
+                                   more << "a defined function";   break;
+                              case NC_SYSTEM_FUN:
+                                   more << "a system function";   break;
+
+                              default: FIXME;
+                           }
+                        syntax_error(LOC);
+                      }
                  }
 
                bool resolved = false;

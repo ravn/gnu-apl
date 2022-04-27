@@ -309,60 +309,65 @@ bool extra_frame = false;
 
    switch(a)
       {
-        case  0: pctx.set_style(PR_APL);               break;
-        case  1: pctx.set_style(PR_APL_FUN);           break;
-        case  2: pctx.set_style(PR_BOXED_CHAR);        break;
-        case  3: pctx.set_style(PR_BOXED_GRAPHIC);     break;
-        case  4: pctx.set_style(PR_BOXED_GRAPHIC);     break;
-        case  5: return do_CR5_6("0123456789ABCDEF", B);   // byte-vector → HEX
-        case  6: return do_CR5_6("0123456789abcdef", B);   // byte-vector → hex
-        case  7: pctx.set_style(PR_BOXED_GRAPHIC1);    break;
-        case  8: pctx.set_style(PR_BOXED_GRAPHIC1);    break;
-        case  9: pctx.set_style(PR_BOXED_GRAPHIC2);    break;
-        case 10: return do_CR10(B);
-        case 11: return do_CR11(B);    // Value → CDR conversion
-        case 12: return do_CR12(B);    // CDR → Value conversion
-        case 13: return do_CR13(B);    // hex → byte-vector
-        case 14: return do_CR14(B);    // Value → CDR → hex conversion
-        case 15: return do_CR15(B);    // hex → CDR → Value conversion
-        case 16: return do_CR16(B);    // byte vector → base64 (RFC 4648)
-        case 17: return do_CR17(B);    // base64 → byte vector (RFC 4648)
-        case 18: return do_CR18(B);    // UCS → UTF8 byte vector
-        case 19: return do_CR19(B);    // UTF8 byte vector → UCS string
-        case 20: pctx.set_style(PR_NARS);              break;
-        case 21: pctx.set_style(PR_NARS1);             break;
-        case 22: pctx.set_style(PR_NARS2);             break;
-        case 23: pctx.set_style(PR_NARS);              break;
-        case 24: pctx.set_style(PR_NARS1);             break;
-        case 25: pctx.set_style(PR_NARS2);             break;
-        case 26: return do_CR26(B);             // Cell types
-        case 27: return do_CR27_28(true,  B);   // value as int
-        case 28: return do_CR27_28(false, B);   // value2 as int
-        case 29: pctx.set_style(PR_BOXED_GRAPHIC3);    break;
-        case 30: return do_CR30(B);             // conform B (for ⍤ macro)
-        case 31: return do_CR31_32(true, B);    // ⎕INP helper
-        case 32: return do_CR31_32(false, B);   // ⎕INP helper
-        case 33: return do_CR33(B);             // TV to TLV byte vector
-        case 34: return do_CR34(B);             // TLV byte vector to TV
-        case 35: return do_CR35(B);             // lines to nested strings
-        case 36: return do_CR36(B);             // nested strings to lines
-        case 37: return do_CR37(B);             // ⎕CR B but extra spaces kept
-        case 38: return do_CR38(B);             // plain →  structure
-        case 39: return do_CR39(B);             // structure → plain
-        case 40: return do_CR40(B);             // boolean → packed
-        case 41: return do_CR41(B);             // packed → boolean
 
-        default: MORE_ERROR() << "A ⎕CR B with invalid A";
+/// a local shortcut for the various frame variants of ⎕CR
+#define FRAME(x)   pctx.set_style(x);   break;
+
+        case  0: FRAME(PR_APL)
+        case  1: FRAME(PR_APL_FUN)
+        case  2: FRAME(PR_BOXED_CHAR)
+        case  3: FRAME(PR_BOXED_GRAPHIC)
+        case  4: FRAME(PR_BOXED_GRAPHIC)
+        case  5:                               // byte-vector → HEX
+        case  6: return do_CR5_6(a, B);        // byte-vector → hex
+        case  7: FRAME(PR_BOXED_GRAPHIC1)
+        case  8: FRAME(PR_BOXED_GRAPHIC1)
+        case  9: FRAME(PR_BOXED_GRAPHIC2)
+        case 10: return do_CR10(B);
+        case 11: return do_CR11(B);            // Value → CDR conversion
+        case 12: return do_CR12(B);            // CDR → Value conversion
+        case 13: return do_CR13(B);            // hex → byte-vector
+        case 14: return do_CR14(B);            // Value → CDR → hex conversion
+        case 15: return do_CR15(B);            // hex → CDR → Value conversion
+        case 16: return do_CR16(B);            // byte vector → base64, RFC 4648
+        case 17: return do_CR17(B);            // base64 → byte vector, RFC 4648
+        case 18: return do_CR18(B);            // UCS → UTF8 byte vector
+        case 19: return do_CR19(B);            // UTF8 byte vector → UCS string
+        case 20: FRAME(PR_NARS)
+        case 21: FRAME(PR_NARS1)
+        case 22: FRAME(PR_NARS2)
+        case 23: FRAME(PR_NARS)
+        case 24: FRAME(PR_NARS1)
+        case 25: FRAME(PR_NARS2)
+        case 26: return do_CR26(B);            // Cell types
+        case 27:                               // value as int
+        case 28: return do_CR27_28(a, B);      // value2 as int
+        case 29: FRAME(PR_BOXED_GRAPHIC3)
+        case 30: return do_CR30(B);            // conform B (for ⍤ macro)
+        case 31:                               // ⎕INP helper
+        case 32: return do_CR31_32(a, B);      // ⎕INP helper
+        case 33: return do_CR33(B);            // TV to TLV byte vector
+        case 34: return do_CR34(B);            // TLV byte vector to TV
+        case 35: return do_CR35(B);            // lines to nested strings
+        case 36: return do_CR36(B);            // nested strings to lines
+        case 37: return do_CR37(B);            // ⎕CR B but extra spaces kept
+        case 38: return do_CR38(B);            // plain →  structure
+        case 39: return do_CR39(B);            // structure → plain
+        case 40: return do_CR40(B);            // boolean → packed
+        case 41: return do_CR41(B);            // packed → boolean
+
+        default: MORE_ERROR() << "A ⎕CR B with invalid A (=" << a << ")";
                  DOMAIN_ERROR;
+#undef FRAME
       }
 
    // common code for ⎕CR variants that only differ by print style...
    //
    if (extra_frame && !B->is_simple_scalar())
       {
-        Value_P Z(LOC);
-        Value * BB = const_cast<Value *>(B);
-        new (&Z->get_wscalar()) PointerCell(BB, *Z);
+        Value_P Z(LOC);                          // a nested scalar
+        Value * Zsub = const_cast<Value *>(B);   // will die at } below
+        Z->next_ravel_Pointer(Zsub);             // Z ← ⊂ B
         Z->check_value(LOC);
         PrintBuffer pb(*Z, pctx, 0);
         return Value_P(pb, LOC);
@@ -375,8 +380,9 @@ bool extra_frame = false;
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR5_6(const char * alpha, const Value * B)
+Quad_CR::do_CR5_6(int A_5_6, const Value * B)
 {
+const char * alpha = (A_5_6 == 5) ? "0123456789ABCDEF" : "0123456789abcdef";
 Shape shape_Z(B->get_shape());
    if (shape_Z.get_rank() == 0)   // scalar B
       {
@@ -1238,7 +1244,7 @@ Value_P Z(len, LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR27_28(bool primary, const Value * B)
+Quad_CR::do_CR27_28(int A_27_28, const Value * B)
 {
 const ShapeItem len = B->element_count();
 Value_P Z(len, LOC);
@@ -1248,13 +1254,13 @@ Value_P Z(len, LOC);
          if (cB.is_pointer_cell())
             {
               Value_P B_sub = cB.get_pointer_value();
-              Value_P Z_sub = do_CR27_28(primary, B_sub.get());
+              Value_P Z_sub = do_CR27_28(A_27_28, B_sub.get());
               Z->next_ravel_Pointer(Z_sub.get());
             }
          else
             {
               APL_Integer data = 0;
-              if (primary)   // primary value
+              if (A_27_28 == 27)   // 27 ⎕CR B: primary value
                  {
                    if (cB.get_cell_type() == CT_CHAR)
                       data = cB.get_char_value();
@@ -1263,7 +1269,7 @@ Value_P Z(len, LOC);
                    else
                       memcpy(&data, cB.get_u0(), sizeof(data));
                  }
-              else   // additional value
+              else               // 28 ⎕CR B: additional value
                  {
                    if (cB.get_cell_type() == CT_COMPLEX)
                       {
@@ -1361,7 +1367,7 @@ Value_P Z(shape_Z, LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR31_32(bool align_bottom, const Value * B)
+Quad_CR::do_CR31_32(int A_31_32, const Value * B)
 {
 const ShapeItem len = B->element_count();
    if (len == 0)   LENGTH_ERROR;
@@ -1388,7 +1394,7 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
               Value_P item = row->get_cravel(col).get_pointer_value();
               PrintBuffer pb_item(*item, pctx, 0);
               pb.pad_height(UNI_SPACE, pb_item.get_row_count());
-              if (align_bottom)
+              if (A_31_32 == 31)   // align bottoms
                  pb_item.pad_height_above(UNI_SPACE, pb.get_row_count());
               else
                  pb_item.pad_height(UNI_SPACE, pb.get_row_count());

@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-February 20, 2022
+April 27, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3142,12 +3142,27 @@ File: apl.info,  Node: Section 2.30,  Next: Section 2.31,  Prev: Section 2.29,  
 ⎕MAP changes the ravel items of its right argument according to a
 mapping table provided as its left argument.  Let Z←A ⎕MAP B.
 
-   The left argument A of ⎕MAP must be a N×2 matrix.  Each 2-element row
-of A specifies a separate mapping.  That is, the elements of B which are
-found in A[;1] are replaced by the corresponding element in A[;2].  The
-shape of the result Z is the shape of the right argument B.
+   The left argument A of Z←A ⎕MAP B shall be a N×2 matrix.  Each
+2-element row of A, say A[J;], specifies a separate mapping A[J;1] →
+A[J;2].  The result Z has the same shape as the right argument B. The
+items Z[...]  iof ther result are constructed from their corresponding
+items B[...]  in B as follows:
 
-   Example:
+   • if B[...]  ≡ A[J;1] for some J then Z[...]  is A[J;2].
+
+   • otherwise B[...]  is different from all A[1;J] and then Z[...]  is
+     B[...]
+
+   In other words, Z is B, but with items of B found in A[;1] replaced
+by their mapped item A[;2].
+
+   In practice th left argument A is frequently created from a literal
+APL value such as 5 2⍴’eEwWaAzZ92’ in the example below.  To simplify
+these cases, A ⎕MAP B also accepts a vector instead of a N×2 matrix:
+
+   A ⎕MAP B ←→ ((N 2)⍴A) ⎕MAP B if (2×N) ←→ ⍴A
+
+   Examples:
 
       ⍝ the map A
       ⊢A←5 2⍴'eEwWaAzZ92'
@@ -3162,6 +3177,10 @@ zZ    ⍝ map 'z' → 'Z'
 Halloween
 
       ⍝ the result of A ⎕MAP B
+      A ⎕MAP B
+HAlloWEEn
+
+      A←'eEwWaAzZ92'   ⍝ vector A instead of N×2 matrix
       A ⎕MAP B
 HAlloWEEn
 
@@ -3186,7 +3205,8 @@ HAlloWEEn
      then then depths of B and A ⎕MAP B may differ as well.  That is,
      ⎕MAP conserves the shape of B, but not necessarily the depth of B.
 
-   • By default the mapping of B is non-recursive, i.e.  the top-level
+   • 
+     By default the mapping of B is non-recursive, i.e.  the top-level
      items of B are compared with the top-level keys A[;1], and nested
      keys and items of B are handled as described above.
 
@@ -6304,63 +6324,63 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11439
-Node: Chapter 222735
-Node: Section 2.124630
-Node: Section 2.240790
-Node: Section 2.341549
-Node: Section 2.442836
-Node: Section 2.547201
-Node: Section 2.647374
-Node: Section 2.748004
-Node: Section 2.851957
-Node: Section 2.953492
-Node: Section 2.1055585
-Node: Section 2.1157138
-Node: Section 2.1258923
-Node: Section 2.1360863
-Node: Section 2.1461804
-Node: Section 2.1562056
-Node: Section 2.1663452
-Node: Section 2.1773597
-Node: Section 2.1876115
-Node: Section 2.1982822
-Node: Section 2.2084267
-Node: Section 2.2189928
-Node: Section 2.2294962
-Node: Section 2.2398243
-Node: Section 2.2498534
-Node: Section 2.25109359
-Node: Section 2.26109631
-Node: Section 2.27116209
-Node: Section 2.28118669
-Node: Section 2.29119338
-Node: Section 2.30120997
-Node: Section 2.31124120
-Node: Section 2.32132872
-Node: Section 2.33133822
-Node: Section 2.34148546
-Node: Section 2.35158543
-Node: Section 2.36161647
-Node: Section 2.37163636
-Node: Section 2.38168061
-Node: Chapter 3189479
-Node: Chapter 4191982
-Node: Chapter 5193108
-Node: Section 5.1194645
-Node: Section 5.2195925
-Node: Section 5.3196285
-Node: Section 5.4196527
-Node: Section 5.5197189
-Node: Section 5.6197667
-Node: Section 5.7198439
-Node: Section 5.8198896
-Node: Chapter 6199298
-Node: Section 6.1199717
-Node: Section 6.2200404
-Node: Chapter 7201235
-Node: Section 7.1201738
-Node: Section 7.2227052
+Node: Chapter 11436
+Node: Chapter 222732
+Node: Section 2.124627
+Node: Section 2.240787
+Node: Section 2.341546
+Node: Section 2.442833
+Node: Section 2.547198
+Node: Section 2.647371
+Node: Section 2.748001
+Node: Section 2.851954
+Node: Section 2.953489
+Node: Section 2.1055582
+Node: Section 2.1157135
+Node: Section 2.1258920
+Node: Section 2.1360860
+Node: Section 2.1461801
+Node: Section 2.1562053
+Node: Section 2.1663449
+Node: Section 2.1773594
+Node: Section 2.1876112
+Node: Section 2.1982819
+Node: Section 2.2084264
+Node: Section 2.2189925
+Node: Section 2.2294959
+Node: Section 2.2398240
+Node: Section 2.2498531
+Node: Section 2.25109356
+Node: Section 2.26109628
+Node: Section 2.27116206
+Node: Section 2.28118666
+Node: Section 2.29119335
+Node: Section 2.30120994
+Node: Section 2.31124783
+Node: Section 2.32133535
+Node: Section 2.33134485
+Node: Section 2.34149209
+Node: Section 2.35159206
+Node: Section 2.36162310
+Node: Section 2.37164299
+Node: Section 2.38168724
+Node: Chapter 3190142
+Node: Chapter 4192645
+Node: Chapter 5193771
+Node: Section 5.1195308
+Node: Section 5.2196588
+Node: Section 5.3196948
+Node: Section 5.4197190
+Node: Section 5.5197852
+Node: Section 5.6198330
+Node: Section 5.7199102
+Node: Section 5.8199559
+Node: Chapter 6199961
+Node: Section 6.1200380
+Node: Section 6.2201067
+Node: Chapter 7201898
+Node: Section 7.1202401
+Node: Section 7.2227715
 
 End Tag Table
 

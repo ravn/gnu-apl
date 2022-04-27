@@ -33,17 +33,42 @@ Quad_MAP::eval_AB(Value_P A, Value_P B) const
 {
 bool recursive = false;
 
-   // a nested scalar A indicates recursive ⎕MAP
-   //
+   /* a nested scalar A indicates recursive ⎕MAP. For example
+
+      Map←6 2⍴'aAbBcCdDeEfF'   ⍝ lowercase to uppercase for a-f
+      Map ⎕MAP B      ⍝ flat (top-level only) mapping of B
+      (⊂Map) ⎕Map B   ⍝ recursive mapping of B
+
+      if A is a nested  scalar, then setrecursive and proceed with ⊃A.
+    */
    if (A->get_rank() == 0 && A->get_cfirst().is_pointer_cell())
       {
          recursive = true;
          A = A->get_cfirst().get_pointer_value();
       }
 
-const ShapeItem map_len = A->get_rows();
-   if (A->get_rank() != 2)   RANK_ERROR;
-   if (map_len == 0)   LENGTH_ERROR;
+ShapeItem map_len = A->get_rows();               // the number of mappings
+   if      (A->get_rank() == 0)   RANK_ERROR;
+   else if (A->get_rank() == 1)
+      {
+        // A is a vector, accepted to avoid the need for (N 2⍴A)
+        // A[1 3 5...] are the keys while A[2 4 6...] are the mapped values
+        //
+        map_len = A->element_count();
+        if (map_len & 1)
+           {
+             MORE_ERROR() << "Odd length of A in A ⎕MAP B";
+             LENGTH_ERROR;
+           }
+        map_len = map_len >> 1;
+      }
+   else if (A->get_rank() > 2)   RANK_ERROR;
+
+   if (map_len == 0)
+           {
+             MORE_ERROR() << "A with length 0 in A ⎕MAP B";
+             LENGTH_ERROR;
+           }
 
 ShapeItem * indices = new ShapeItem[map_len];
    if (indices == 0)   WS_FULL;
@@ -110,6 +135,8 @@ const ravel_comp_len ctx = { &A.get_cfirst(),   // start of the ravel
                            };
 
 const ShapeItem len_B = B->element_count();
+const ShapeItem map_len = (A.get_rank() == 1) ? A.element_count() >> 1
+                                              : A.get_rows();
    if (len_B == 0)   // empty value
       {
          const Cell & cell_B = B->get_cfirst();
@@ -117,7 +144,7 @@ const ShapeItem len_B = B->element_count();
                    Heapsort<ShapeItem>::search<const Cell &>
                                               (cell_B,
                                                sorted_indices_A,
-                                               A.get_rows(),
+                                               map_len,
                                                compare_MAP,
                                                &ctx))
             {
@@ -145,7 +172,7 @@ const ShapeItem len_B = B->element_count();
        {
          const Cell & cell_B = B->get_cravel(b);
          if (const ShapeItem * map = Heapsort<ShapeItem>::search<const Cell &>
-                   (cell_B, sorted_indices_A, A.get_rows(), compare_MAP, &ctx))
+                   (cell_B, sorted_indices_A, map_len, compare_MAP, &ctx))
             {
              Z->next_ravel_Cell(A.get_cravel(*map*2 + 1));
             }

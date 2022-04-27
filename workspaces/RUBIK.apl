@@ -1,13 +1,17 @@
 #!apl --script
 
+⍝ See DESCRIPTION and/or PROGRAMMER's REFERENCE at the end of this file.
+
 ⎕PW←10000 ⍝ don't wrap APL output
 
+⍝------------------------------------------------------------------------
 ∇Z←Xterm_Color B
  ⍝
- ⍝⍝ B is an internal color name like 'W', 'Y', 'O', 'R', 'B', 'G', 'b', or 'w'.
+ ⍝⍝ B is a single character that designates a color, i.e. Bϵ'WYORBGbw' which
+ ⍝⍝ stands for White/Yellow/Orange/Red/Blue/green/black/white respectively.
  ⍝⍝ return the XTerm ESC sequence for it.
  ⍝
- →(B='WYORBGbw')/cW cY cO cR cB cG cb cw ◊ 4 ⎕CR B ◊ +++
+ →((↑B,'-')='WYORBGbw-')/cW cY cO cR cB cG cb cw cw ◊ 4 ⎕CR B ◊ +++
 cW: Z←'8;2;255;255;255' ◊ →0 ◊ white  cube face
 cY: Z←'8;2;255;213;85'  ◊ →0 ◊ yellow cube face
 cO: Z←'8;2;255;88;0'    ◊ →0 ◊ orange cube face 
@@ -17,35 +21,45 @@ cG: Z←'8;2;0;158;96'    ◊ →0 ◊ green  cube face
 cb: Z←'8;2;0;0;0'       ◊ →0 ◊ black  foreground (text color)
 cw: Z←'8;2;176;176;176' ◊ →0 ◊ grey   cube background
 ∇
-
+⍝------------------------------------------------------------------------
+∇Z←foreground Bg_Fg
+ ⍝
+ ⍝⍝ Return the foreground for Bg_Fg. For (Bg Fg) the foreground is Fg,
+ ⍝⍝ while for a single color Bg it is a color with good contrast
+ ⍝
+ Z←⍬⍴¯1↑Bg_Fg←,Bg_Fg ◊ →(2=⍴Bg_Fg)/0
+ Z←(8 2⍴ 'WbYbObRwBwGwwb-w') ⎕MAP ⍬⍴Z
+∇
+⍝------------------------------------------------------------------------
 ∇Z←A print_field Bg_Fg;Bg;Fg
  ⍝
- ⍝⍝ string A with given background/foreground colors Bg_Fg. If no foreground
- ⍝⍝ color is given then compute it from the background color.
+ ⍝⍝ Z is string A prefixed with the Xterm color string for the given
+ ⍝⍝ background/foreground colors Bg_Fg. The foreground in Bg_Fg is optional
+ ⍝⍝ and will be computed from the background color if ommitted.
  ⍝
- Bg←1↑Bg_Fg ◊ Fg←¯1↑Bg_Fg ◊ →(1≠⍴,Bg_Fg)/1+↑⎕LC ◊ Fg←(Bg='WYORBGbw')/'bbbWWWwb'
+ Bg←1↑Bg_Fg ◊ Fg←foreground Bg_Fg
  Z←(⎕UCS 27),'[0'                      ⍝ normal mode
  Z←Z,';3', Xterm_Color Fg    ⍝ foreground color
  Z←Z,';4', Xterm_Color Bg    ⍝ background color
  Z←Z,'m', A
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←find_initial_pos Color_XYZ;CX;CY;CZ
  ⍝
  ⍝⍝ find the initial position of the cube with colors Color_XYZ
  ⍝
- CX←¯1↑'-',(Color_XYZ∈"RO")/Color_XYZ
- CY←¯1↑'-',(Color_XYZ∈"BG")/Color_XYZ
- CZ←¯1↑'-',(Color_XYZ∈"WY")/Color_XYZ
- Z←''⍴(∧/∆Initial_State=[2]CX,CY,CZ)/⍳27
- →(Z∈⍳27)/0 ◊ 4 ⎕CR RGB ◊ +++
+ CX←¯1↑'-',(Color_XYZϵ"RO")/Color_XYZ
+ CY←¯1↑'-',(Color_XYZϵ"BG")/Color_XYZ
+ CZ←¯1↑'-',(Color_XYZϵ"WY")/Color_XYZ
+ Z←''⍴(∧/∆Solved_State=[2]CX,CY,CZ)/⍳27
+ →(Zϵ⍳27)/0 ◊ 4 ⎕CR RGB ◊ +++
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←pattern B;DX;DY;DZ;W;S1;Sz;Lx;Ly;Lz;RH;RH1;Rx;Ry;Diag;DPx;DP
  ⍝
- ⍝⍝ Z is a 3D layout (a View) that can be combind with a State
+ ⍝⍝ Z is a 3D layout (aka. a View) that can be combined with a State
  ⍝⍝ (in function 'interpret_all' in order to display the State in a colored
- ⍝⍝ 3D fashion in an Xterm.
+ ⍝⍝ 3D fashion in an Xterm (-window).
  ⍝⍝
  ⍝⍝ The argument B specifies the lengths (in characters) of the sub-cubes
  ⍝⍝ in the X, Y, and Z dimensions
@@ -97,7 +111,7 @@ cw: Z←'8;2;176;176;176' ◊ →0 ◊ grey   cube background
  Z[(DZ-Lz) + ⍳DY;1+DX+Lz]←Z[(DZ-Lz) + ⍳DY;1+DX+Lz] + 4000
  Z[(DZ-2×Lz) + ⍳DY;1+DX+2×Lz]←Z[(DZ-2×Lz) + ⍳DY;1+DX+2×Lz] + 4000
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←State interpret_char B;M1;Mode;Type;Pos
  →(B≠0)/1+⎕LC ◊ Z←' ' print_field 'wB' ◊ →0   ⍝ Background
 
@@ -113,14 +127,14 @@ D8: Z←'◢' print_field State[Pos    ;1  ],'w' ◊ →0
 
 F:  →M1↓0 ◊ Z←Z print_field State[Pos; Type]
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←State interpret_all View;L;Max_L;C;Max_C;ZC;Row
  Z←'' ◊ L←1 ◊ Max_L←↑⍴View
 LOOP_L: ZC←'' ◊ C←1 ◊ Max_C←⍴Row←View[L;]
 LOOP_C: ZC←ZC,State interpret_char Row[C] ◊ →(Max_C≥C←C+1)/LOOP_C
  Z←Z,⊂ZC ◊ →(Max_L≥L←L+1)/LOOP_L
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←Face mirror Z
  ⍝
  ⍝⍝ mirror Z horizontally (Face=2 or 5), vertically (Face=1) or not at all.
@@ -128,17 +142,24 @@ LOOP_C: ZC←ZC,State interpret_char Row[C] ◊ →(Max_C≥C←C+1)/LOOP_C
  →(Face=3 4 6 1)/0 0 0,1+↑⎕LC ◊ Z←⌽Z ◊ →0
  Z←⊖Z
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←State face_text B;VPos;VAxis;Color_XYZ;Face;Pos
  ⍝
  ⍝⍝ Z is the 2D text (= the facet number) given the 3D position and view axis
  ⍝
  (VPos VAxis)←B ◊ Face←'YOBRGW'⍳(Color_XYZ←State[VPos;])[VAxis]
+⍝ → Face_position   ⍝ comment this line tu show cubicle position
+
+Face_number:   ⍝ number faces from 1..48 (6 faces with 8 numbers)
  Pos←1+(⌽3 3 3⊤¯1+find_initial_pos Color_XYZ)[⌽1 2 3∼(3 1 2 1 2 3)[Face]]
  Z←¯2↑'ULFRBD'[Face] ◊ →(Pos≡2 2)/0   ⍝ Pos≡2 2 is center cube
  Z←¯2↑⍕(8×Face-1)+Z-5<Z←Pos ⌷ Face mirror 3 3⍴⍳9
-∇
+ → 0
 
+Face_position: ⍝ number the faces with their cubicle index
+ Z←2 0 ⍕ VPos
+∇
+⍝------------------------------------------------------------------------
 ∇Z←State row_2D B;Axis;Pos;Face;Row
  ⍝
  ⍝⍝ Z is one row (3 cubes) of a 2D face
@@ -151,7 +172,7 @@ LOOP_C: ZC←ZC,State interpret_char Row[C] ◊ →(Max_C≥C←C+1)/LOOP_C
  Z[2; 6  7]←State face_text Pos[Row;2] Axis
  Z[2;10 11]←State face_text Pos[Row;3] Axis
 ∇
-
+⍝------------------------------------------------------------------------
 ∇A show_cube State;View1;View2;Z1;Z2;F
  ⍝
  ⍝⍝ display the entire view, either in 2D or in 3D
@@ -161,26 +182,26 @@ LOOP_C: ZC←ZC,State interpret_char Row[C] ◊ →(Max_C≥C←C+1)/LOOP_C
  ⍝
  '' print_field 'w'
  Z1←2 12⍴⊂' ' print_field 'w' ◊ F←'' print_field 'w'
- Z2←Z1, State row_2D (face 1) 1 ◊ ∈Z2[1;],F ◊ ∈Z2[2;],F
- Z2←Z1, State row_2D (face 1) 2 ◊ ∈Z2[1;],F ◊ ∈Z2[2;],F
- Z2←Z1, State row_2D (face 1) 3 ◊ ∈Z2[1;],F ◊ ∈Z2[2;],F
+ Z2←Z1, State row_2D (face 1) 1 ◊ ϵZ2[1;],F ◊ ϵZ2[2;],F
+ Z2←Z1, State row_2D (face 1) 2 ◊ ϵZ2[1;],F ◊ ϵZ2[2;],F
+ Z2←Z1, State row_2D (face 1) 3 ◊ ϵZ2[1;],F ◊ ϵZ2[2;],F
 
  Z2←    State row_2D (face 2) 1
  Z2←Z2, State row_2D (face 3) 1
  Z2←Z2, State row_2D (face 4) 1
- Z2←Z2, State row_2D (face 5) 1 ◊ ∈Z2[1;],F ◊ ∈Z2[2;],F
+ Z2←Z2, State row_2D (face 5) 1 ◊ ϵZ2[1;],F ◊ ϵZ2[2;],F
  Z2←    State row_2D (face 2) 2
  Z2←Z2, State row_2D (face 3) 2
  Z2←Z2, State row_2D (face 4) 2
- Z2←Z2, State row_2D (face 5) 2 ◊ ∈Z2[1;],F ◊ ∈Z2[2;],F
+ Z2←Z2, State row_2D (face 5) 2 ◊ ϵZ2[1;],F ◊ ϵZ2[2;],F
  Z2←    State row_2D (face 2) 3
  Z2←Z2, State row_2D (face 3) 3
  Z2←Z2, State row_2D (face 4) 3
- Z2←Z2, State row_2D (face 5) 3 ◊ ∈Z2[1;],F ◊ ∈Z2[2;],F
+ Z2←Z2, State row_2D (face 5) 3 ◊ ϵZ2[1;],F ◊ ϵZ2[2;],F
 
- Z2←Z1, State row_2D (face 6) 1 ◊ ∈Z2[1;],F ◊ ∈Z2[2;],F
- Z2←Z1, State row_2D (face 6) 2 ◊ ∈Z2[1;],F ◊ ∈Z2[2;],F
- Z2←Z1, State row_2D (face 6) 3 ◊ ∈Z2[1;],F ◊ ∈Z2[2;],F
+ Z2←Z1, State row_2D (face 6) 1 ◊ ϵZ2[1;],F ◊ ϵZ2[2;],F
+ Z2←Z1, State row_2D (face 6) 2 ◊ ϵZ2[1;],F ◊ ϵZ2[2;],F
+ Z2←Z1, State row_2D (face 6) 3 ◊ ϵZ2[1;],F ◊ ϵZ2[2;],F
  →0
 
 V3D: ⍝ 3-dimensional cube view
@@ -190,13 +211,21 @@ V3D: ⍝ 3-dimensional cube view
  Z2←(⊖State) interpret_all View
  ⊣{ ⎕←'  ',(⊃Z1[⍵]),(interpret_char 0),'    ',(⊃Z2[⍵]), interpret_char 0 }¨⍳⍴Z2
 ∇
-
+⍝------------------------------------------------------------------------
 ∇State←State do_moves M
- ⊣{State←State turn ⍵}¨∈M
+ ⍝
+ ⍝⍝ perform move M in cube state State; return the resulting state.
+ ⍝⍝ Each move M may consist of several twists, we therefore iterate over ϵ M.
+ ⍝
+ ⊣ {State←State twist ⍵} ¨ ϵ M
 ∇
-
-∇State←State turn M;N;PE;PV;RR
- N←1 + 2×M∈'udlrfb' ◊ →(M='UuDdLlRrFfBb  ')/2/MU MD ML MR MF MB 0 ◊ +++
+⍝------------------------------------------------------------------------
+∇State←State twist M;N;PE;PV;RR
+ ⍝
+ ⍝⍝ perform one twist U, L, F, R, B, D, u, l, f, r, b, or d
+ ⍝⍝ N is 1 for UDLRFB and 3 for udlrfb (since e.g. u is UUU).
+ ⍝
+ N←1 + 2×Mϵ'udlrfb' ◊ →(M='UuDdLlRrFfBb  ')/2/MU MD ML MR MF MB 0 ◊ +++
 MU: PV← 1  7  9  3 ◊ PE← 2  4  8  6 ◊ RR←2 1 3 ◊ →COMMON
 ML: PV←19 25  7  1 ◊ PE←10 22 16  4 ◊ RR←1 3 2 ◊ →COMMON
 MF: PV← 1  3 21 19 ◊ PE← 2 12 20 10 ◊ RR←3 2 1 ◊ →COMMON
@@ -205,7 +234,7 @@ MB: PV←25 27  9  7 ◊ PE←16 26 18  8 ◊ RR←3 2 1 ◊ →COMMON
 MD: PV←21 27 25 19 ◊ PE←24 26 22 20 ◊ RR←2 1 3 ◊ →COMMON
 COMMON: State[(N⌽PV),N⌽PE;RR]←State[PV,PE;] ◊ ∆TCNT←∆TCNT+1
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←State get_moves B;Level;Pivot
  ⍝
  ⍝ return moves that are useful at Level. The levels are:
@@ -221,7 +250,7 @@ COMMON: State[(N⌽PV),N⌽PE;RR]←State[PV,PE;] ◊ ∆TCNT←∆TCNT+1
  ⍝
  (Level Pivot)←B ◊ Z←0,'' ◊ →(L1,L2,L3,L4,L5,L6,0)[Level] ◊ +++
 
-L1: ⍝ all turns
+L1: ⍝ all twists
     Z←,¨'LRFBUDlrfbud'
     Z←10,Z ◊ →0
 
@@ -272,9 +301,9 @@ L6: ⍝ Apply (3.3) lDZdXDzd. It leaves the bottom cross and one bottom corner
     Z←(,¨'Bb'),Z
     Z←10,Z
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←get_level State;S;N;I;Eq;Eq1
- Eq←State = ∆Initial_State
+ Eq←State = ∆Solved_State
  Z←1 'U+'  (Eq1⍳0) S←  N←+/Eq1←∧/Eq[I← 2  4  6  8;  ] ◊ →(N<⍴I)/0
  Z←2 'U'   (Eq1⍳0) S←S+N←+/Eq1←∧/Eq[I← 1  3  7  9;  ] ◊ →(N<⍴I)/0
  Z←3 'M'   (Eq1⍳0) S←S+N←+/Eq1←∧/Eq[I←16 10 12 18;  ] ◊ →(N<⍴I)/0
@@ -283,7 +312,7 @@ L6: ⍝ Apply (3.3) lDZdXDzd. It leaves the bottom cross and one bottom corner
  Z←6 'B'   (Eq1⍳0) S←S+N←+/Eq1←∧/Eq[I←19 21 25 27;  ] ◊ →(N<⍴I)/0
  Z←7 'Done'     0  S
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Progress←State try_moves Moves;S0;SM
  ⍝
  ⍝⍝ perform Moves and see if they place more sub-cubes
@@ -291,7 +320,7 @@ L6: ⍝ Apply (3.3) lDZdXDzd. It leaves the bottom cross and one bottom corner
  S0←(get_level State)[4] ◊ State←State do_moves Moves
  SM←(get_level State)[4] ◊ Progress←S0<SM   ⍝ 1 = progress, 0 = no progress
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←State propose_len_moves A;Len;Moves;Rad;Progress;N;Max_N
  ⍝
  ⍝⍝ perform all combinations of Len moves from repertoire A.
@@ -299,97 +328,108 @@ L6: ⍝ Apply (3.3) lDZdXDzd. It leaves the bottom cross and one bottom corner
  ⍝
  (Moves Len)←A ◊ Rad←Len⍴⍴Moves
  N←0 ◊ Max_N←(⍴Moves)⋆Len
-⍝'Length: ' Len 'Count:' Max_N
-LOOP: Z←Moves[1+Rad⊤N] ◊ →(State try_moves ∈Z)/0
+'Moves' Moves 'Length: ' Len 'Max_N:' Max_N
+LOOP: Z←Moves[1+Rad⊤N] ◊ →(State try_moves ϵZ)/0
  →(Max_N>N←N+1)/LOOP
  Z←''
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←print_level State;Level;LN;Pivot;Score;Moves
  (Level LN Pivot Score)←get_level State
  Moves←1↓Z←State get_moves Level Pivot
  'Level:' Level (⊃LN) 'Pivot:' Pivot 'Score:' Score 'Tcount:' ∆TCNT
  'Repertoire:', Moves
 ∇
-
+⍝------------------------------------------------------------------------
 ∇Z←propose_moves State;Len;Max_Len;Moves;∆TCNT
  ⍝
  ⍝⍝ propose a move that makes progress (= placse more sub-cubes)
  ⍝
- →(State≡∆Initial_State)↓1+↑⎕LC ◊ ' No proposal (cube solved)' ◊ Z←'' ◊ →0
+ →(State≡∆Solved_State)↓1+↑⎕LC ◊ ' No proposal (cube solved)' ◊ Z←'' ◊ →0
  ∆TCNT←0 ◊ Len←1 ◊ Max_Len←↑Moves←print_level State ◊ Moves←1↓Moves
 LOOP: Z←State propose_len_moves Moves Len
- →(↑⍴∈Z)/0             ⍝ success
+ →(↑⍴ϵZ)/0             ⍝ success
  →(Max_Len > Len←Len+1)/LOOP
  'No moves found' ◊ Z←0 3⍴0
 ∇
-
-∇Z←edge_parity State;Edges;S0;S1;E
+⍝------------------------------------------------------------------------
+∇Z←cube_p2 B;C0;C1
  ⍝
- ⍝⍝ compute edge parity (to detect illegal cube states)
+ ⍝⍝ return parity of edge cubicle B (e.g. 'UF', 'UR', ...)
  ⍝
- Edges←2 4 6 8 10 12 16 18 20 22 24 26
- Z←0 ◊ E←0
-LOOP: →(12<E←E+1)/GOON ◊ S1←State[Edges[E];]
- S0←∆Initial_State[find_initial_pos S1;]
- →(S0≡S1)/LOOP ◊ →(S0≡S1[2 3 1])/LOOP ◊ →(S0≡S1[3 1 2])/LOOP 
- Z←∼Z ◊ →LOOP
-
-GOON: →Z/0   ⍝ bad orientation
- IP←find_initial_pos¨⊂[2]State[Edges;]
-IPLP: →(0=⍴IP)/0
- →(1≠SMA←IP⍳⌊/IP)/1+↑⎕LC ◊ IP←1↓IP ◊ →IPLP  ⍝ smallest is (already) first in IP
- Z←∼Z ◊ IP[SMA]←IP[1] ◊ IP←1↓IP ◊ →IPLP
+ B←⊂B
+ ⍝     2    4    8    6   20   22   26   24   12   10   18   16
+ C1←{⌽⍵}¨C0← 'UF' 'RU' 'UB' 'LU' 'DF' 'RD' 'DB' 'LD' 'FR' 'FL' 'BR' 'BL'
+ Z←0 ◊ → (BϵC0)⍴0
+ Z←1 ◊ → (BϵC1)⍴0
+ '*** edge cubicle' B 'is not in ' C0 'or' C1 ◊ +++
 ∇
-
-∇Z←parity3 State;Corners;IP;M;∆TCNT
+⍝------------------------------------------------------------------------
+∇Z←cube_p3 B;C0;C1;C2
  ⍝
- ⍝⍝ compute cube parity (to detect illegal cube states)
+ ⍝⍝ return parity of corner cubicle B (e.g. 'UFR', 'URB', ...)
  ⍝
- ∆TCNT←0 ◊ Corners←1 3 7 9 19 21 25 27
-
- ⍝ Corner positions...
- ⍝
- IP←find_initial_pos¨⊂[2]State[Corners;]
- State←State do_moves ('' 'f' 'L' 'UU' 'l' 'FF' 'LL' 'RRf')[   IP⍳1]
- IP←find_initial_pos¨⊂[2]State[Corners;]
- State←State do_moves ('' 'br' 'r' 'DR' 'R' 'DDR' 'RR'    )[¯1+IP⍳3]
- IP←find_initial_pos¨⊂[2]State[Corners;]
- State←State do_moves ('' 'B'  'db' 'DDb' 'b' 'Db'        )[¯2+IP⍳7]
- IP←find_initial_pos¨⊂[2]State[Corners;]
- State←State do_moves ('' 'RDDr' 'bDB' 'Rdr' 'RDr'        )[¯3+IP⍳ 9]
- IP←find_initial_pos¨⊂[2]State[Corners;]
- State←State do_moves ('' 'd' 'D' 'DD'                    )[¯4+IP⍳19]
- IP←find_initial_pos¨⊂[2]State[Corners;]
- State←State do_moves ('' 'rDLdRDld' 'DLdrDldR'           )[¯5+IP⍳21]
- IP←find_initial_pos¨⊂[2]State[Corners;]
- State←State do_moves ('' 'lflLuufrbRDDrdLdrDldR'         )[¯6+IP⍳25]
-
- ⍝ Corner orientations...
- ⍝
- State←State do_moves M,M←⊃(State[ 1;]∈'OR')/'' 'fRDDrFUU' 'uufRddrF'
- State←State do_moves M,M←⊃(State[ 3;]∈'OR')/'' 'uuBrddRb' 'BrDDRbUU'
- State←State do_moves M,M←⊃(State[ 7;]∈'OR')/'' 'bbuRffrU' 'uRFFrUBB'
- State←State do_moves M,M←⊃(State[ 9;]∈'OR')/'' 'rrBdllDb' 'BdLLDbRR'
- State←State do_moves M,M←⊃(State[19;]∈'OR')/'' 'FrUURfDD' 'ddFruuRf'
- State←State do_moves M,M←⊃(State[21;]∈'OR')/'' 'ddbRuurB' 'bRUUrBDD'
- M←'' 'fDBdFDbRdlDrdLDLdrDldR' 'rDLdRDldlDRdLDrBdfDbdF'
- State←State do_moves M,M←⊃(State[25;]∈'OR')/M
- Z←∼State[Corners;]≡∆Initial_State[Corners;]
+ B←⊂B
+ C0← 'UFR' 'URB' 'UBL' 'ULF' 'DRF' 'DFL' 'DLB' 'DBR'
+               Z←0 ◊ → (BϵC0)⍴0
+ C1←{1⌽⍵}¨C0 ◊ Z←1 ◊ → (BϵC1)⍴0
+ C2←{1⌽⍵}¨C1 ◊ Z←2 ◊ → (BϵC2)⍴0
+ '*** corner cubicle' B 'is not in ' C0 'or' C1 'or' C2 ◊ +++
 ∇
+⍝------------------------------------------------------------------------
+∇Edges←edge_positions State;Map
+⍝
+⍝⍝ return the edge cubicles of State in Up/Down/Left/Right/Front/Back format
+⍝
+ Map←6 2⍴'OLRRBFGBWDYU'
+ State←State[∆Edges;]              ⍝ pick edges from State
+ State←Map ⎕Map State              ⍝ map our colors to positions
+ State←0 ¯1↓1 2 1 2 1 2 1 2 0 0 0 0⌽State
+ Edges←⊂[2] ⌽State
+∇
+⍝------------------------------------------------------------------------
+∇Corners←corner_positions State;Map
+⍝
+⍝⍝ return the corner cubicles of State in Up/Down/Left/Right/Front/Back format
+⍝
+⍝ depending on j, Corners[j] is either State[j;3 2 1] or State[j;3 1 2]
+⍝
+ Map←6 2⍴'OLRRBFGBWDYU'
+ State←State[∆Corners;]              ⍝ pick corners from State
+ State←Map ⎕Map State                ⍝ map our colors to positions
+ State←⌽State
+ State[2 4 5 7;2 3]←⌽State[2 4 5 7;2 3]
+ Corners←⊂[2] State
+∇
+⍝------------------------------------------------------------------------
+∇Z←parities State;S;I;Map;Edges;Corners;CP;EP
+ ⍝
+ ⍝⍝ Z←(CP EP), where CP is the parities of the  8 corners, and
+ ⍝⍝                  EP is the parities of the 12 edges
+ ⍝
 
+ ⍝ read State in the input order of optimal.c...
+ ⍝
+ Edges←edge_positions State
+ Corners←corner_positions State
+
+ CP←cube_p3 ¨ Corners   ⍝ cube parity
+ EP←cube_p2 ¨ Edges     ⍝ edge parity
+ Z←CP EP
+∇
+⍝------------------------------------------------------------------------
 ∇State←State setup_cube Clear;C;E;Old;New;Spaces;N;S1;N1;NewState
  ⍝
- ⍝⍝ set up a cube by entering the colors of its facets (in 2D view)
+ ⍝⍝ set up a cube by entering the colors of its facets (in a 2D view)
  ⍝
  →∆3D↓1+↑⎕LC ◊ 0 show_cube State
  C←1 1 1 1 0 1 1 1 1 ◊ E←0 1 1 1 0 1 1 0 1 1 1 0 0
  '' ◊ 'Please enter the colors for faces U, L, F, R, B, and D below.' ◊ ''
  ' --Face U--   --Face L--   --Face F--   --Face R--   --Face B--   --Face D-'
  Old←'' ◊ ⊣{ Old←Old, E\C/,(face ⍵) ⌷ State } ¨ ⍳6 ◊ Old←¯2↓Old
-LOOP: →Clear/1+↑⎕LC ◊ ⍞←Old
+LOOP: →Clear/1+↑⎕LC ◊ (6 2⍴'YUOLBFRRGBWD') ⎕MAP Old ◊ ⍞←Old
  New←⍞ ◊ Spaces←+/∧\New=' ' ◊ Clear←0
- New←(New∈'YOBRGW')/New←(Spaces↑Old),Spaces↓New
+ New←(Newϵ'YOBRGW')/New←(Spaces↑Old),Spaces↓New
  →(8=N←+/New='B')/1+↑⎕LC ◊ 'Error: need 8 blue (B) but got'   N ◊ →LOOP
  →(8=N←+/New='O')/1+↑⎕LC ◊ 'Error: need 8 orange (O) but got' N ◊ →LOOP
  →(8=N←+/New='Y')/1+↑⎕LC ◊ 'Error: need 8 yellow (Y) but got' N ◊ →LOOP
@@ -400,44 +440,50 @@ LOOP: →Clear/1+↑⎕LC ◊ ⍞←Old
  NewState←State ◊ ⊣{ (C/,(face ⍵) ⌷ NewState)←New[(⍳8)+8×⍵-1] } ¨ ⍳6
  S1←S1[⍋S1←{ ⍵[⍋⍵] }¨⊂[2]State] ◊ N1←N1[⍋N1←{ ⍵[⍋⍵] }¨⊂[2]NewState]
  →(S1≡¨N1)/CE   ⍝ OK: same cubes as before
- 'Error: cube(s)' ,(⍕(∼S1∈N1)/S1), 'missing. Please try again.' ◊ →LOOP
+ 'Error: cube(s)' ,(⍕(∼S1ϵN1)/S1), 'missing. Please try again.' ◊ →LOOP
 
-CE: →(edge_parity NewState)↓C3
+CE: →(parities NewState)↓C3
  'Error: bad edge parity (cube cannot be solved). Please try again.' ◊ →LOOP
 
-C3: →(parity3 NewState)↓OK
+C3: →(↑parities NewState)↓OK
  'Error: bad corner 3-parity (cube cannot be solved). Please try again.' ◊ →LOOP
 
 OK: State←NewState
 ∇
+⍝========================================================================
 
-∆HELP←⎕INP 'END-OF-HELP'
+∆HELP←"""
 Valid commands are:
 H h ?   Help
 Q q     Quit
 0       reset cube to unscrambled state
-3       toggle between 2D and 3D views
+2       change to 2D view
+3       change to 3D view
 
-U       turn Upper face (clockwise in 2D view)
-D       turn Down  face (clockwise in 2D view)
-L       turn Left  face (clockwise in 2D view)
-R       turn Right face (clockwise in 2D view)
-F       turn Front face (clockwise in 2D view)
-B       turn Back  face (clockwise in 2D view)
+Twists (single 90° turns):
+U       twist Upper face (clockwise in 2D view)
+D       twist Down  face (clockwise in 2D view)
+L       twist Left  face (clockwise in 2D view)
+R       twist Right face (clockwise in 2D view)
+F       twist Front face (clockwise in 2D view)
+B       twist Back  face (clockwise in 2D view)
 
-u       turn upper face (counter-clockwise in 2D view)
-d       turn down  face (counter-clockwise in 2D view)
-l       turn left  face (counter-clockwise in 2D view)
-f       turn front face (counter-clockwise in 2D view)
-b       turn back  face (counter-clockwise in 2D view)
+u       twist upper face (counter-clockwise in 2D view)
+d       twist down  face (counter-clockwise in 2D view)
+l       twist left  face (counter-clockwise in 2D view)
+f       twist front face (counter-clockwise in 2D view)
+b       twist back  face (counter-clockwise in 2D view)
 
-m       1 random turn
-M       6 random turns
-P       propose one move (= a few turns)
+T       rotate cubicle 3 clockwise in place
+t       flip cubicle 2 in place
+
+m       do 1 random twist
+M       do 6 random twists
+P       propose one move (= a few twists)
 p       propose and execute one move
 
 S s     setup cube (enter colors)
-END-OF-HELP
+"""
 
 ∇Z←face N;Pos;Axis;HL;IDX
  ⍝
@@ -448,40 +494,88 @@ END-OF-HELP
  Z←(N mirror ((⌽IDX)⌷3 3 3⍴⍳27)) Axis
 ∇
 
-∇go;State;View;Cmd;P
+∇Z←paint Colors
  ⍝
- ⍝⍝ the main program
+ ⍝⍝ Colors is a color string like 'OBY' or 'OB-'. Paint every colore with its
+ ⍝⍝ own color
+ ⍝
+ Xt←Colors ◊ (('-' = Xt)/Xt)←'w'
+ Z←   Colors[1] print_field Xt[1]
+ Z←Z, Colors[2] print_field Xt[2]
+ Z←Z, Colors[3] print_field Xt[3]
+ Z←Z, '' print_field 'w'
+∇
+
+∇Z←Pos cubicle_info State; Color_XYZ;Type;Ini_Pos;Ini_XYZ;Moved;EP;CP;P
+ ⍝
+ ⍝⍝ return the current and the initial cubicle positions and colors of the
+ ⍝⍝ cubicle at (current) position Pos (with colors Color_XYZ)
+ ⍝
+ Z←' ' ◊ →(Pos = 0)⍴0
+ (CP EP)←parities State
+ P←(↑⍴State)⍴⍬ ◊ P[∆Corners]←CP ◊ P[∆Edges]←EP ◊ P←P[Pos]
+ P←((⍴,P)⍴⊂'Parity:'),2 0⍕P-3×P=2
+ Color_XYZ←State[Pos;]
+ Type←("Corner" "Edge  " "Middle" "Center")[⎕IO + +/Color_XYZ = '-']
+ Ini_XYZ←∆Solved_State[Ini_Pos←find_initial_pos Color_XYZ;]
+ Moved←(Pos≢Ini_Pos) ∨ Color_XYZ ≢ Ini_XYZ
+ Moved←Moved/'(from initial position ', (2 0⍕Ini_Pos), ' ', (paint Ini_XYZ), ')'
+ Z←Type (2 0⍕Pos) P (paint Color_XYZ) Moved
+∇
+
+∇info State;C;E
+ ⍝
+ ⍝⍝ display some information for corner and edge cubicles
+ ⍝
+ C←∆Corners[⍋∆Corners] ◊ E←∆Edges[⍋∆Edges]
+ ⊣ { ⎕←⍵ cubicle_info State } ¨ C, 0, E
+∇
+
+∇go;State;View;Cmd;EP;CP
+ ⍝
+ ⍝⍝ the main program. An (almost) endless loop that gets one character 'Cmd'
+ ⍝⍝ from the user and executes a command for that character
  ⍝
 
  State←27 3⍴'-' ◊ ⊣{ ((face ⍵) ⌷ State) ←'YOBRGW'[⍵] } ¨⍳6
- ∆Initial_State←State  ⍝ the unscrambled state
+ ∆Solved_State←State  ⍝ the unscrambled state
  ∆3D←1                 ⍝ initial view: 3D
- ∆TCNT←0               ⍝ turn counter
+ ∆TCNT←0               ⍝ twist counter
+ ∆Corners←3 9 7 1 21 19 25 27
+ ∆Edges←2 6 8 4 20 24 26 22 12 10 18 16
+
 
 LOOP: ∆3D show_cube State
+      (CP EP)←parities State ◊ 'Parity:' (3∣+/CP) (2∣+/EP)
 LP1:  Cmd←⎕UCS (⎕FIO.fgetc 0)
-      →(Cmd∈'UuDdLlRrFfBb')/MOVE
-      →(Cmd='Hh?Qq P',⎕UCS 10)/HELP HELP HELP 0 0 LP1 PRO STAT
-      →(Cmd='03MmpSs')/CLR V3D Q1 Q6 PROE SETUP SETUP
+      →(Cmdϵ'UuDdLlRrFfBb')/MOVE
+      →(Cmd='Hh?Qq P',⎕UCS 10)/HELP HELP INFO 0 0 LP1 PRO STAT
+      →(Cmd='023mMpSsTt')/CLR V2D V3D RAN1 RAN6 PROE SETUP SETUP TW TE
       'Invalid command:' Cmd,'. Type h for help.'                       ◊ →LP1
-HELP: ⊣{⎕←⍵}¨∆HELP                                                      ◊ →LP1
-STAT: print_level State                                                 ◊ →LP1
+HELP: ⊣ {⎕←⍵}¨∆HELP                                                     ◊ →LP1
+INFO: info State                                                        ◊ →LP1
+STAT: ⊣print_level State                                                ◊ →LP1
 PRO:  'Proposal:',P←propose_moves State                                 ◊ →LP1
-MOVE: 'Turn: ', Cmd ◊ State←State turn Cmd                              ◊ →LOOP
-CLR:  'Clear' ◊ State←∆Initial_State ◊ ∆TCNT←0                          ◊ →LOOP
-V3D:  ∆3D←∼∆3D                                                          ◊ →LOOP
-Q6:   '6 random turns' P←'UuDdLlRrFfBb'[?6⍴12]
+MOVE: 'Turn: ', Cmd ◊ State←State twist Cmd                             ◊ →LOOP
+CLR:  'Clear' ◊ State←∆Solved_State ◊ ∆TCNT←0                           ◊ →LOOP
+V2D:  ∆3D←0                                                             ◊ →LOOP
+V3D:  ∆3D←1                                                             ◊ →LOOP
+RAN6:   '6 random twists' P←'UuDdLlRrFfBb'[?6⍴12]
       State←State do_moves P ◊ ∆TCNT←0                                  ◊ →LOOP
-Q1:   '1 random turn'  P←'UuDdLlRrFfBb'[?,12]
+RAN1:   '1 random twist'  P←'UuDdLlRrFfBb'[?,12]
       State←State do_moves P ◊ ∆TCNT←0                                  ◊ →LOOP
-PROE: 'Proposal:', P←propose_moves State ◊ State←State do_moves ∈P      ◊ →LOOP
+TW:   'turn corner 3 clockwise in place (possibly making cube insolvable)'
+      State[3;]←State[3;3 1 2]                                          ◊ →LOOP
+TE:   'flip edge 2 in place (possibly making cube insolvable)' 
+      State[2;2 3]←State[2;3 2]                                         ◊ →LOOP
+PROE: 'Proposal:', P←propose_moves State ◊ State←State do_moves ϵP      ◊ →LOOP
 SETUP: State←State setup_cube Cmd='S'                                   ◊ →LOOP
 ∇
 
 
 go
 
-)Vars
+)VARS
 ⍎(1=⍴⎕SI 2)/')OFF'
 ]NEXTFILE
 
@@ -494,7 +588,7 @@ Purpose
 With this GNU APL program you can do the following:
 
 1. show a Rubik's Cube in an (Color-) XTerm and change its state by
-   performing moves (turning the faces of the cube), or
+   performing twists (turning the faces of the cube), or
 
 2. enter the colors of a scrambled cube and display proposals for
    bringing it back to its un-scrambled state.
@@ -510,15 +604,17 @@ Views
 -----
 This program provides a 3D view (useful to compare with a physical Rubik's
 cube) and a 2D view (useful for understanding individual moves). Both the
-2D and the 3D view use numbers to identify sub-bubes, but the numbers are
-different in the 2D view and in the 3D view.
+2D and the 3D view use numbers to identify cubicles, but the numbers may
+be different in the 2D view and in the 3D view.
 
-The 2D view numbers are those found in the literature; they number the
-facets of the cube from 1 to 48 with no number for the center facet.
-The center facet is labeled U (for Up), L (for Left), F (for Front), R (for
-Right), B (for Back), and D (for Down). In the 2D view the sub-cubes
-have 3 numbers (corners), 2 numbers (edges), one of U, L, F, R, B, or D
-(centers)
+The 2D view numbers are either the same as in the 3D view or those found
+in the literature; they number the facets of the cube from 1 to 48 with
+no number for the center facet.
+The center facet of each cube face has no number in the 2D view but
+is labeled with U (for Up), L (for Left), F (for Front), R (for
+Right), B (for Back), or D (for Down). In the 2D view a cubicle
+has 3 numbers (corners), 2 numbers (edges), or one of U, L, F, R, B, or D
+(middles)
 
 The 3D view is more APL-like in that the cubes are numbered 3 3 3⍴⍳27;
 every sub-cube has one number and the 0, 1, 2, or 3 different facets of
@@ -560,31 +656,35 @@ The program is interactive and understands the following 1-key commands:
 H h ?   Help
 Q q     Quit
 0       reset cube to unscrambled state
-3       toggle between 2D and 3D views
+2       change to 2D view
+3       change to 3D view
 
-U       turn Upper face (clockwise in 2D view)
-D       turn Down  face (clockwise in 2D view)
-L       turn Left  face (clockwise in 2D view)
-R       turn Right face (clockwise in 2D view)
-F       turn Front face (clockwise in 2D view)
-B       turn Back  face (clockwise in 2D view)
+U       twist Upper face (clockwise in 2D view)
+D       twist Down  face (clockwise in 2D view)
+L       twist Left  face (clockwise in 2D view)
+R       twist Right face (clockwise in 2D view)
+F       twist Front face (clockwise in 2D view)
+B       twist Back  face (clockwise in 2D view)
 
-u       turn upper face (counter-clockwise in 2D view)
-d       turn down  face (counter-clockwise in 2D view)
-l       turn left  face (counter-clockwise in 2D view)
-f       turn front face (counter-clockwise in 2D view)
-b       turn back  face (counter-clockwise in 2D view)
+u       twist upper face (counter-clockwise in 2D view)
+d       twist down  face (counter-clockwise in 2D view)
+l       twist left  face (counter-clockwise in 2D view)
+f       twist front face (counter-clockwise in 2D view)
+b       twist back  face (counter-clockwise in 2D view)
 
-m       1 random turn
-M       6 random turns
-P       propose one move (= a few turns)
+T       rotate cubicle 3 clockwise in place
+t       flip cubicle 2 in place
+
+m       do 1 random twist
+M       do 6 random twists
+P       propose one move (= a few twists)
 p       propose and execute one move
 
 S s     setup cube (enter colors)
 
 
-The turn commands (U, D, L, R, F, B, u, d, l, r, f, and b) perform one
-quarter-turn of the respective face of the cube.
+The twist commands (U, D, L, R, F, B, u, d, l, r, f, and b) perform one
+twist (quarter-turn) of the respective face of the cube.
 
 The m and M commands perform random moves that bring the cube into a random
 state (for training your capabilities).
@@ -653,3 +753,130 @@ Notes
            |46  47  48|
            +----------+
 
+
+
+                     PROGRAMMER's REFERENCE
+                     ======================
+⍝
+⍝ A RUBIK's cube consist of 27 smaller called cubicles. The cubicles are
+⍝  numbered from 1...27 and are either:
+⍝
+⍝ * one of  8 corner cubicles:  1, 3, 7, 9, 19, 21, 25, 27, or
+⍝ * one of 12 edge cubicles:    2, 4, 6, 8, 10, 12, 16, 18, 20, 22, 24, 26, or
+⍝ * one of  6 middle cubicles:  5, 11, 15, 13, 17, 23, or
+⍝ * the     1 center cubicle:   14 (invisible)
+⍝
+⍝ The state of a cube can be visualized in 2 ways:
+⍝
+⍝ 3-dimensional (3D) view (see below).
+⍝ The numbers in this view are cubicle numbers (1-27) as above.
+⍝
+⍝                 Corners                       Edges
+⍝            7---------------9            +-------8-------+
+⍝           /|              /|           /|              /|
+⍝          / |             / |          4 |             6 |
+⍝         /  |            /  |         / 16            /  18
+⍝        1---|-----------3   |        +---|---2-------+   |
+⍝        |   |           |   |        |   |           |   |
+⍝        |  25-----------|---27       |   +------26---|---+
+⍝        |  /            |  /        10  /           12  /
+⍝        | /             | /          | 22            | 24
+⍝        |/              |/           |/              |/
+⍝       19---------------21           +------20-------+
+⍝
+⍝
+⍝ 2-dimensional (2D) view (see below).
+⍝ The numbers in this view are cubicle numbers (1-27) as above.
+⍝
+⍝
+⍝                    ╔════╤════╤════╗
+⍝                    ║  7 │  8 │  9 ║
+⍝                    ╟────┼────┼────╢
+⍝                    ║  4 │  U │  6 ║
+⍝                    ╟────│────┼────╢
+⍝                    ║  1 │  2 │  3 ║
+⍝     ╔════╤════╤════╬════╪════╪════╬════╤════╤════╦════╤════╤════╗
+⍝     ║  7 │  4 │  1 ║  1 │  2 │  3 ║  3 │  6 │  9 ║  9 │  8 │  7 ║
+⍝     ╟────┼────┼────╫────┼────┼────╫────┼────┼────╫────┼────┼────║
+⍝     ║ 16 │  L │ 10 ║ 10 │  F │ 12 ║ 12 │  R │ 18 ║ 18 │  B │ 16 ║
+⍝     ╟────┼────┼────╫────┼────┼────╫────┼────┼────╫────┼────┼────║
+⍝     ║ 25 │ 22 │ 19 ║ 19 │ 20 │ 21 ║ 21 │ 24 │ 27 ║ 27 │ 26 │ 25 ║
+⍝     ╚════╧════╧════╬════╪════╪════╬════╧════╧════╩════╧════╧════╝
+⍝                    ║ 19 │ 20 │ 21 ║
+⍝                    ╟────┼────┼────╢
+⍝                    ║ 22 │  D │ 24 ║
+⍝                    ╟────┼────┼────╢
+⍝                    ║ 25 │ 26 │ 27 ║
+⍝                    ╚════╧════╧════╝
+⍝
+⍝ For debugging purposes, one can replace "→ Face_position" with "→ Face_number"
+⍝ in function face_text to have the (faces of) the cubicles numbered like this:
+⍝
+⍝                    ╔════╤════╤════╗
+⍝                    ║  1 │  2 │  3 ║
+⍝                    ╟────┼────┼────╢
+⍝                    ║  4 │  U │  5 ║
+⍝                    ╟────│────┼────╢
+⍝                    ║  6 │  7 │  8 ║
+⍝     ╔════╤════╤════╬════╪════╪════╬════╤════╤════╦════╤════╤════╗
+⍝     ║  9 │ 10 │ 11 ║ 17 │ 18 │ 19 ║ 25 │ 26 │ 27 ║ 33 │ 34 │ 35 ║
+⍝     ╟────┼────┼────╫────┼────┼────╫────┼────┼────╫────┼────┼────║
+⍝     ║ 12 │  L │ 13 ║ 20 │  F │ 21 ║ 28 │  R │ 29 ║ 36 │  B │ 37 ║
+⍝     ╟────┼────┼────╫────┼────┼────╫────┼────┼────╫────┼────┼────║
+⍝     ║ 14 │ 15 │ 16 ║ 22 │ 23 │ 24 ║ 30 │ 31 │ 32 ║ 38 │ 39 │ 40 ║
+⍝     ╚════╧════╧════╬════╪════╪════╬════╧════╧════╩════╧════╧════╝
+⍝                    ║ 41 │ 42 │ 43 ║
+⍝                    ╟────┼────┼────╢
+⍝                    ║ 44 │  D │ 45 ║
+⍝                    ╟────┼────┼────╢
+⍝                    ║ 46 │ 47 │ 48 ║
+⍝                    ╚════╧════╧════╝
+⍝
+⍝ The state of a cube is represented by a 27×3 matrix State where:
+⍝
+⍝ State[N;] is a 3-character string indicating the colors of the cubicle
+⍝ at position N (1 ≤ N ≤ 27) and (in the sense of the 3D view):
+⍝
+⍝ For a corner cubicle N:
+⍝
+⍝ State[N; 1] is the current color in the X (i.e. left-right) direction,
+⍝ State[N; 2] is the current color in the Y (i.e. front-bach) direction, and
+⍝ State[N; 3] is the current color in the Z (i.e. up-down) direction.
+⍝
+⍝ For an edge cubicle N: Like corner cubicle N, but with character '-' for
+⍝ direction of the missing face.
+
+⍝ For a middle cubicle N: Like corner cubicle N, but with character '-' for
+⍝ the two directions of the missing faces.
+⍝
+⍝ For the center cubicle 14: "---" since all 3 directions are missing.
+⍝
+⍝ The algorithm implemented by this workspace always leaves the 6 middle
+⍝ cubicle and the center cubicle in place.
+⍝
+⍝ A garbled cubic is solved by performing a sequence of elementary operation
+⍝ called twists. A twist is a 90 degree clockwise turn of on of the 6 faces
+⍝ of the cube where s face is one of U (for Up), D (for Down), L (for Left)m
+⍝ R (for Right), F (for Front) or B (for Back),
+⍝
+⍝ The cube is solved by performing a sequence of moves where:
+⍝
+⍝ * A move consists of several twists, and
+⍝ * Every move brings (at least) one more cubicle into its place, or into its position,
+⍀   or both.
+⍝
+⍝ The algorithm is not optimal (nor is the method of placing or orienting one cube after
+⍝ the other) but easier to understand for humans than optimal algorithms.
+⍝
+⍝                           Global variables
+⍝                           ----------------
+⍝
+⍝ The program uses a handful of global variables:
+⍝
+⍝ ∆3D           : the currently selected view, 1 for the 3D view or 0 for the 2D view.
+⍝ ∆Corners      : the (numbers of the) 8 corner cubicles.
+⍝ ∆Edges        : the (numbers of the) 12 edge cubicles.
+⍝ ∆HELP         : the text displayed by the help command.
+⍝ ∆Solved_State : The state of a solved cube
+⍝ ∆TCNT         : a twist counter used when proposing moves.
+⍝
