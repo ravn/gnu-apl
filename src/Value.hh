@@ -727,18 +727,18 @@ public:
 
 #ifdef NEW_CLONE
 
-/// clone, given a Value_P
+/// clone, given a Value_P. Result is a Value_P.
 # define CLONE_P(B_P, L)   (B_P)
 
-/// clone, given a const Value *
+/// clone, given a const Value *. Result is a Value_P.
 # define CLONE(pB, L)      Value_P(const_cast<Value *>(pB), L)
 
-#else   /* old clone */
+#else   /* old clone() scheme */
 
-/// clone, given a Value_P
+/// clone, given a Value_P. Result is a Value_P.
 # define CLONE_P(B_P, L)   (B_P).get()->clone(L)
 
-/// clone, given a Value *
+/// clone, given a Value *. Result is a Value_P.
 # define CLONE(pB, L)      (pB)->clone(L)
 
 #endif
