@@ -517,13 +517,13 @@ std::vector<const StateIndicator *> stack;
           else if (si->get_parse_mode() == PM_STATEMENT_LIST)
              {
                page <<
-"      <TD 'code center'>-"                                               CRLF
+"      <TD class='code center'>-"                                         CRLF
 "      <TD class=code>" << exec->get_text(0) <<                           CRLF;
              }
           else                          // PM_EXECUTE
              {
                page <<
-"      <TD'code center'>-"                                                CRLF
+"      <TD class='code center'>-"                                         CRLF
 "      <TD class=code>" << exec->get_text(0) <<                           CRLF;
              }
        }
