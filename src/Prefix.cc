@@ -2108,6 +2108,12 @@ Prefix::reduce_END_A_GOTO_B()
 {
    Assert1(prefix_len == 4);
 
+   if (si.get_executable()->get_parse_mode() != PM_FUNCTION)
+      {
+        MORE_ERROR() << "Invalid use of A → B outside defined function";
+        SYNTAX_ERROR;
+      }
+
 const Value * B = at3().get_apl_val().get();   // the condition
    if (B->element_count() != 1)
       {

@@ -78,12 +78,13 @@ ul.no-bullet {list-style: none}
       <li><a name="toc-Make-the-script-file-executable" href="#Make-the-script-file-executable">2.1.2 Make the script file executable</a></li>
       <li><a name="toc-How-command-line-arguments-are-handled" href="#How-command-line-arguments-are-handled">2.1.3 How command line arguments are handled</a></li>
       <li><a name="toc-Helpful-Features-for-Scripting" href="#Helpful-Features-for-Scripting">2.1.4 Helpful Features for Scripting</a></li>
-      <li><a name="toc-Multi_002dLine-Strings" href="#Multi_002dLine-Strings">2.1.5 Multi-Line Strings</a>
+      <li><a name="toc-Double_002dquoted-Strings" href="#Double_002dquoted-Strings">2.1.5 Double-quoted Strings</a></li>
+      <li><a name="toc-Multi_002dLine-Strings" href="#Multi_002dLine-Strings">2.1.6 Multi-Line Strings</a>
       <ul class="no-bullet">
-        <li><a name="toc-Old_002dstyle-Multi_002dLine-Strings" href="#Old_002dstyle-Multi_002dLine-Strings">2.1.5.1 Old-style Multi-Line Strings</a></li>
-        <li><a name="toc-New_002dstyle-Multi_002dLine-Strings" href="#New_002dstyle-Multi_002dLine-Strings">2.1.5.2 New-style Multi-Line Strings</a></li>
+        <li><a name="toc-Old_002dstyle-Multi_002dLine-Strings" href="#Old_002dstyle-Multi_002dLine-Strings">2.1.6.1 Old-style Multi-Line Strings</a></li>
+        <li><a name="toc-New_002dstyle-Multi_002dLine-Strings" href="#New_002dstyle-Multi_002dLine-Strings">2.1.6.2 New-style Multi-Line Strings</a></li>
       </ul></li>
-      <li><a name="toc-Script-Example" href="#Script-Example">2.1.6 Script Example</a></li>
+      <li><a name="toc-Script-Example" href="#Script-Example">2.1.7 Script Example</a></li>
     </ul></li>
     <li><a name="toc-Axis-argument-in-defined-functions" href="#Section-2_002e2">2.2 Axis argument in defined functions</a></li>
     <li><a name="toc-Colored-Output" href="#Section-2_002e3">2.3 Colored Output</a></li>
@@ -248,7 +249,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>April 27, 2022
+<p>May 9, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -622,7 +623,7 @@ library files and the workspaces shipped with GNU APL are installed. Then exit.
 </li><li> <samp>--show_src_dir</samp>
 
 <p>display the source directory where, according to ./configure, GNU APL
-was compiled. Then exit. This can be used, for example, by native functions\
+was compiled. Then exit. This can be used, for example, by native functions
 that are built outside the GNU APL source tree to find GNU APL header files
 that are needed to compile the native function.
 </p>
@@ -1188,8 +1189,27 @@ Third line
 ...
 END-OF-⎕INP
 </p>
+<a name="Double_002dquoted-Strings"></a>
+<h4 class="subsection">2.1.5 Double-quoted Strings</h4>
+
+<p>Standard APL literals (aka. strings) such as &rsquo;Hello&rsquo; are single quoted. As a
+matter of convenience, GNU APL also provides double-quoted strings which
+differ from single quoted strings in two ways:
+</p>
+<ul>
+<li> A standard single quoted APL is a vector if its length is ≠ 1 but a
+scalar if its length is = 1. This is sometimes inconvenient and therefore
+double-quoted strings are more consistent in always being vectors regardless
+of their length. In other words, &rsquo;A&rsquo; is a scalar while &quot;A&quot; is a vector.
+
+</li><li> doubly quoted strings understand the standard C escape sequences such
+for control character, such as \n for ASCII line feed, \t for ASCII TAB etc.
+
+</li></ul>
+
+
 <a name="Multi_002dLine-Strings"></a>
-<h4 class="subsection">2.1.5 Multi-Line Strings</h4>
+<h4 class="subsection">2.1.6 Multi-Line Strings</h4>
 
 <p>Another feature of GNU APL to simplify the creation of values that contain
 longer texts are strings that span several lines. One consequence of how ⎕INP
@@ -1206,7 +1226,7 @@ multi-line strings were introduced. They come in two flavors: old-style
 and new-style.
 </p>
 <a name="Old_002dstyle-Multi_002dLine-Strings"></a>
-<h4 class="subsubsection">2.1.5.1 Old-style Multi-Line Strings</h4>
+<h4 class="subsubsection">2.1.6.1 Old-style Multi-Line Strings</h4>
 
 <p>Old-style multi-line strings were the first attempt to provide long strings for
 defined functions. These strings are not allowed in immediate execution mode
@@ -1253,7 +1273,7 @@ ABC
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
 </pre>
 <a name="New_002dstyle-Multi_002dLine-Strings"></a>
-<h4 class="subsubsection">2.1.5.2 New-style Multi-Line Strings</h4>
+<h4 class="subsubsection">2.1.6.2 New-style Multi-Line Strings</h4>
 
 <p>Even though the combination of ⎕INP for immediate execution and multi-line
 strings for defined functions achieved the goal of specifying large amounts
@@ -1304,7 +1324,7 @@ ABC
 point in time.
 </p>
 <a name="Script-Example"></a>
-<h4 class="subsection">2.1.6 Script Example</h4>
+<h4 class="subsection">2.1.7 Script Example</h4>
 
 <p>Note that the two different ways of running an APL script have an impact on
 how ⎕ARG looks like. If stdin is redirected then there is only one (possibly
@@ -1809,7 +1829,7 @@ scripting).
 <h4 class="subsection">2.9.2 )DUMP-HTML Command</h4>
 
 <p>The )DUMP-HTML command is similar to the )DUMP command. The output format
-is similar to the )DUMP command, the difference is that those characters\
+is similar to the )DUMP command, the difference is that those characters
 that need HTML-escaping (e.g. &rsquo;&lt;&rsquo; becomes &amp;lt;, &rsquo;&gt;&rsquo; becomes &rsquo;&amp;gt;) are being
 HTML-escaped. The output of the )DUMP-HTML command can therefore be directly
 used by a web server to display workspace listings (in order to share the
@@ -2125,7 +2145,7 @@ copied into a new, larger structure. The overhead caused by this reorganization
 can be avoided by specifying a sufficiently large capacity when the structure is
 created (with <strong>38 ⎕CR</strong>).
 </p>
-<p>An entire structured variable can be erased with <strong>⎕EX</strong> or with\
+<p>An entire structured variable can be erased with <strong>⎕EX</strong> or with
 <strong>)ERASE</strong> just like other variables. That erases the variable along
 with all its members. In addition to erasing an entire structured variable,
 individual members at any depth can also be erased with <strong>⎕EX</strong> or

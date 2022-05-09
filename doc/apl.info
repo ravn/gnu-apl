@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-April 27, 2022
+May 9, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -390,7 +390,7 @@ GNU APL understands the following command line options:
 
      display the source directory where, according to ./configure, GNU
      APL was compiled.  Then exit.  This can be used, for example, by
-     native functions\ that are built outside the GNU APL source tree to
+     native functions that are built outside the GNU APL source tree to
      find GNU APL header files that are needed to compile the native
      function.
 
@@ -912,7 +912,24 @@ text, similar to PHP scripts:
    ’<?apl’ ’?>’ ⎕INP ’END-OF-⎕INP’ First line Time is now: <?apl ⍕⎕TS ?>
 Third line ...  END-OF-⎕INP
 
-2.1.5 Multi-Line Strings
+2.1.5 Double-quoted Strings
+---------------------------
+
+Standard APL literals (aka.  strings) such as ’Hello’ are single quoted.
+As a matter of convenience, GNU APL also provides double-quoted strings
+which differ from single quoted strings in two ways:
+
+   • A standard single quoted APL is a vector if its length is ≠ 1 but a
+     scalar if its length is = 1.  This is sometimes inconvenient and
+     therefore double-quoted strings are more consistent in always being
+     vectors regardless of their length.  In other words, ’A’ is a
+     scalar while "A" is a vector.
+
+   • doubly quoted strings understand the standard C escape sequences
+     such for control character, such as \n for ASCII line feed, \t for
+     ASCII TAB etc.
+
+2.1.6 Multi-Line Strings
 ------------------------
 
 Another feature of GNU APL to simplify the creation of values that
@@ -929,7 +946,7 @@ script.  That renders ⎕SI almost useless for defined functions.
 functions, multi-line strings were introduced.  They come in two
 flavors: old-style and new-style.
 
-2.1.5.1 Old-style Multi-Line Strings
+2.1.6.1 Old-style Multi-Line Strings
 ....................................
 
 Old-style multi-line strings were the first attempt to provide long
@@ -978,7 +995,7 @@ ABC
 ┃┗━┛ ┗━━━┛ ┗━━━━┛ ┗━━━━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-2.1.5.2 New-style Multi-Line Strings
+2.1.6.2 New-style Multi-Line Strings
 ....................................
 
 Even though the combination of ⎕INP for immediate execution and
@@ -1031,7 +1048,7 @@ prefixed by → to indicate that a Multi-Line String is being entered.
    ⎕INP and old-style strings will coexist for a while, but may
 disappear at some point in time.
 
-2.1.6 Script Example
+2.1.7 Script Example
 --------------------
 
 Note that the two different ways of running an APL script have an impact
@@ -1509,7 +1526,7 @@ made executable (see scripting).
 
 The )DUMP-HTML command is similar to the )DUMP command.  The output
 format is similar to the )DUMP command, the difference is that those
-characters\ that need HTML-escaping (e.g.  ’<’ becomes &lt;, ’>’ becomes
+characters that need HTML-escaping (e.g.  ’<’ becomes &lt;, ’>’ becomes
 ’&gt;) are being HTML-escaped.  The output of the )DUMP-HTML command can
 therefore be directly used by a web server to display workspace listings
 (in order to share the code).
@@ -1809,7 +1826,7 @@ caused by this reorganization can be avoided by specifying a
 sufficiently large capacity when the structure is created (with *38
 ⎕CR*).
 
-   An entire structured variable can be erased with *⎕EX* or with\
+   An entire structured variable can be erased with *⎕EX* or with
 *)ERASE* just like other variables.  That erases the variable along with
 all its members.  In addition to erasing an entire structured variable,
 individual members at any depth can also be erased with *⎕EX* or
@@ -6324,63 +6341,63 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11436
-Node: Chapter 222732
-Node: Section 2.124627
-Node: Section 2.240787
-Node: Section 2.341546
-Node: Section 2.442833
-Node: Section 2.547198
-Node: Section 2.647371
-Node: Section 2.748001
-Node: Section 2.851954
-Node: Section 2.953489
-Node: Section 2.1055582
-Node: Section 2.1157135
-Node: Section 2.1258920
-Node: Section 2.1360860
-Node: Section 2.1461801
-Node: Section 2.1562053
-Node: Section 2.1663449
-Node: Section 2.1773594
-Node: Section 2.1876112
-Node: Section 2.1982819
-Node: Section 2.2084264
-Node: Section 2.2189925
-Node: Section 2.2294959
-Node: Section 2.2398240
-Node: Section 2.2498531
-Node: Section 2.25109356
-Node: Section 2.26109628
-Node: Section 2.27116206
-Node: Section 2.28118666
-Node: Section 2.29119335
-Node: Section 2.30120994
-Node: Section 2.31124783
-Node: Section 2.32133535
-Node: Section 2.33134485
-Node: Section 2.34149209
-Node: Section 2.35159206
-Node: Section 2.36162310
-Node: Section 2.37164299
-Node: Section 2.38168724
-Node: Chapter 3190142
-Node: Chapter 4192645
-Node: Chapter 5193771
-Node: Section 5.1195308
-Node: Section 5.2196588
-Node: Section 5.3196948
-Node: Section 5.4197190
-Node: Section 5.5197852
-Node: Section 5.6198330
-Node: Section 5.7199102
-Node: Section 5.8199559
-Node: Chapter 6199961
-Node: Section 6.1200380
-Node: Section 6.2201067
-Node: Chapter 7201898
-Node: Section 7.1202401
-Node: Section 7.2227715
+Node: Chapter 11433
+Node: Chapter 222728
+Node: Section 2.124623
+Node: Section 2.241535
+Node: Section 2.342294
+Node: Section 2.443581
+Node: Section 2.547946
+Node: Section 2.648119
+Node: Section 2.748749
+Node: Section 2.852702
+Node: Section 2.954237
+Node: Section 2.1056329
+Node: Section 2.1157882
+Node: Section 2.1259667
+Node: Section 2.1361607
+Node: Section 2.1462548
+Node: Section 2.1562800
+Node: Section 2.1664196
+Node: Section 2.1774340
+Node: Section 2.1876858
+Node: Section 2.1983565
+Node: Section 2.2085010
+Node: Section 2.2190671
+Node: Section 2.2295705
+Node: Section 2.2398986
+Node: Section 2.2499277
+Node: Section 2.25110102
+Node: Section 2.26110374
+Node: Section 2.27116952
+Node: Section 2.28119412
+Node: Section 2.29120081
+Node: Section 2.30121740
+Node: Section 2.31125529
+Node: Section 2.32134281
+Node: Section 2.33135231
+Node: Section 2.34149955
+Node: Section 2.35159952
+Node: Section 2.36163056
+Node: Section 2.37165045
+Node: Section 2.38169470
+Node: Chapter 3190888
+Node: Chapter 4193391
+Node: Chapter 5194517
+Node: Section 5.1196054
+Node: Section 5.2197334
+Node: Section 5.3197694
+Node: Section 5.4197936
+Node: Section 5.5198598
+Node: Section 5.6199076
+Node: Section 5.7199848
+Node: Section 5.8200305
+Node: Chapter 6200707
+Node: Section 6.1201126
+Node: Section 6.2201813
+Node: Chapter 7202644
+Node: Section 7.1203147
+Node: Section 7.2228461
 
 End Tag Table
 

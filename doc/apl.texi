@@ -447,7 +447,7 @@ library files and the workspaces shipped with GNU APL are installed. Then exit.
 @option{--show_src_dir}
 
 display the source directory where, according to ./configure, GNU APL
-was compiled. Then exit. This can be used, for example, by native functions\
+was compiled. Then exit. This can be used, for example, by native functions
 that are built outside the GNU APL source tree to find GNU APL header files
 that are needed to compile the native function.
 
@@ -995,6 +995,25 @@ Time is now: <?apl ⍕⎕TS ?>
 Third line
 ...
 END-OF-⎕INP
+
+@subsection Double-quoted Strings
+
+Standard APL literals (aka. strings) such as 'Hello' are single quoted. As a
+matter of convenience, GNU APL also provides double-quoted strings which
+differ from single quoted strings in two ways:
+
+@itemize
+
+@item A standard single quoted APL is a vector if its length is ≠ 1 but a
+scalar if its length is = 1. This is sometimes inconvenient and therefore
+double-quoted strings are more consistent in always being vectors regardless
+of their length. In other words, 'A' is a scalar while "A" is a vector.
+
+@item doubly quoted strings understand the standard C escape sequences such
+for control character, such as \n for ASCII line feed, \t for ASCII TAB etc.
+
+@end itemize
+
 
 @subsection Multi-Line Strings
 
@@ -1615,7 +1634,7 @@ scripting).
 @subsection )DUMP-HTML Command
 
 The )DUMP-HTML command is similar to the )DUMP command. The output format
-is similar to the )DUMP command, the difference is that those characters\
+is similar to the )DUMP command, the difference is that those characters
 that need HTML-escaping (e.g. '<' becomes &lt;, '>' becomes '&gt;) are being
 HTML-escaped. The output of the )DUMP-HTML command can therefore be directly
 used by a web server to display workspace listings (in order to share the
@@ -1901,7 +1920,7 @@ copied into a new, larger structure. The overhead caused by this reorganization
 can be avoided by specifying a sufficiently large capacity when the structure is
 created (with @strong{38 ⎕CR}).
 
-An entire structured variable can be erased with @strong{⎕EX} or with\
+An entire structured variable can be erased with @strong{⎕EX} or with
 @strong{)ERASE} just like other variables. That erases the variable along
 with all its members. In addition to erasing an entire structured variable,
 individual members at any depth can also be erased with @strong{⎕EX} or
