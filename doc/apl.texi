@@ -1090,7 +1090,7 @@ to have different approaches for different APL modes.
 
 This was leading to the new-style multi-line strings. They adopted the triple
 quote (""") syntax know from e.g. the Python language. The syntax of new-style
-multi-line strings cleaner: empty lines are handled more consistently and the
+multi-line strings is cleaner: empty lines are handled more consistently and the
 string lines are completely separated from the APL code lines.
 More importantly, new-style multi-line strings work alike in immediate
 execution mode, in scripts, and in defined functions. New-style strings are a

@@ -1006,12 +1006,12 @@ modes.
 
    This was leading to the new-style multi-line strings.  They adopted
 the triple quote (""") syntax know from e.g.  the Python language.  The
-syntax of new-style multi-line strings cleaner: empty lines are handled
-more consistently and the string lines are completely separated from the
-APL code lines.  More importantly, new-style multi-line strings work
-alike in immediate execution mode, in scripts, and in defined functions.
-New-style strings are a little different and more restrictive than their
-old-style companions:
+syntax of new-style multi-line strings is cleaner: empty lines are
+handled more consistently and the string lines are completely separated
+from the APL code lines.  More importantly, new-style multi-line strings
+work alike in immediate execution mode, in scripts, and in defined
+functions.  New-style strings are a little different and more
+restrictive than their old-style companions:
 
    • the starting """ must be placed at the end of an APL code line,
      i.e.  no mixing of APL code and string content on the same line.
@@ -6344,60 +6344,60 @@ Node: Top383
 Node: Chapter 11433
 Node: Chapter 222728
 Node: Section 2.124623
-Node: Section 2.241535
-Node: Section 2.342294
-Node: Section 2.443581
-Node: Section 2.547946
-Node: Section 2.648119
-Node: Section 2.748749
-Node: Section 2.852702
-Node: Section 2.954237
-Node: Section 2.1056329
-Node: Section 2.1157882
-Node: Section 2.1259667
-Node: Section 2.1361607
-Node: Section 2.1462548
-Node: Section 2.1562800
-Node: Section 2.1664196
-Node: Section 2.1774340
-Node: Section 2.1876858
-Node: Section 2.1983565
-Node: Section 2.2085010
-Node: Section 2.2190671
-Node: Section 2.2295705
-Node: Section 2.2398986
-Node: Section 2.2499277
-Node: Section 2.25110102
-Node: Section 2.26110374
-Node: Section 2.27116952
-Node: Section 2.28119412
-Node: Section 2.29120081
-Node: Section 2.30121740
-Node: Section 2.31125529
-Node: Section 2.32134281
-Node: Section 2.33135231
-Node: Section 2.34149955
-Node: Section 2.35159952
-Node: Section 2.36163056
-Node: Section 2.37165045
-Node: Section 2.38169470
-Node: Chapter 3190888
-Node: Chapter 4193391
-Node: Chapter 5194517
-Node: Section 5.1196054
-Node: Section 5.2197334
-Node: Section 5.3197694
-Node: Section 5.4197936
-Node: Section 5.5198598
-Node: Section 5.6199076
-Node: Section 5.7199848
-Node: Section 5.8200305
-Node: Chapter 6200707
-Node: Section 6.1201126
-Node: Section 6.2201813
-Node: Chapter 7202644
-Node: Section 7.1203147
-Node: Section 7.2228461
+Node: Section 2.241539
+Node: Section 2.342298
+Node: Section 2.443585
+Node: Section 2.547950
+Node: Section 2.648123
+Node: Section 2.748753
+Node: Section 2.852706
+Node: Section 2.954241
+Node: Section 2.1056333
+Node: Section 2.1157886
+Node: Section 2.1259671
+Node: Section 2.1361611
+Node: Section 2.1462552
+Node: Section 2.1562804
+Node: Section 2.1664200
+Node: Section 2.1774344
+Node: Section 2.1876862
+Node: Section 2.1983569
+Node: Section 2.2085014
+Node: Section 2.2190675
+Node: Section 2.2295709
+Node: Section 2.2398990
+Node: Section 2.2499281
+Node: Section 2.25110106
+Node: Section 2.26110378
+Node: Section 2.27116956
+Node: Section 2.28119416
+Node: Section 2.29120085
+Node: Section 2.30121744
+Node: Section 2.31125533
+Node: Section 2.32134285
+Node: Section 2.33135235
+Node: Section 2.34149959
+Node: Section 2.35159956
+Node: Section 2.36163060
+Node: Section 2.37165049
+Node: Section 2.38169474
+Node: Chapter 3190892
+Node: Chapter 4193395
+Node: Chapter 5194521
+Node: Section 5.1196058
+Node: Section 5.2197338
+Node: Section 5.3197698
+Node: Section 5.4197940
+Node: Section 5.5198602
+Node: Section 5.6199080
+Node: Section 5.7199852
+Node: Section 5.8200309
+Node: Chapter 6200711
+Node: Section 6.1201130
+Node: Section 6.2201817
+Node: Chapter 7202648
+Node: Section 7.1203151
+Node: Section 7.2228465
 
 End Tag Table
 

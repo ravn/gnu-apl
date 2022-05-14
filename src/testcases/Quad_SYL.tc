@@ -141,8 +141,10 @@ OK      - no duplicate parents
  A FOO B with B: 12 
  A FOO B with B: 13 
  A FOO B with B: 14 
+ A FOO B with B: 15 
+ A FOO B with B: 16 
 INTERRUPT+
-FOO[2]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
+FOO[1]  'A FOO B with B:' B
         ^
 
       )MORE
