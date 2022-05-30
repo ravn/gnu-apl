@@ -372,7 +372,8 @@ top_srcdir = @top_srcdir@
 @WANT_ERLANG_TRUE@EXTRA_liberlang_APL_nif_la_SOURCES = apl.erl apl_example.erl
 @WANT_ERLANG_TRUE@liberlang_APL_nif_la_CFLAGS = $(AM_CFLAGS) -I \
 @WANT_ERLANG_TRUE@	$(abs_top_srcdir) -fpic -shared -I \
-@WANT_ERLANG_TRUE@	$(pkgincludedir)
+@WANT_ERLANG_TRUE@	$(pkgincludedir) -I $(pkgincludedir)/.. # \
+@WANT_ERLANG_TRUE@	e.g. /usr/local/include
 @WANT_ERLANG_TRUE@liberlang_APL_nif_la_LDFLAGS = -avoid-version -export-dynamic -E
 
 # for some reason, using libtool causes Erlang to try to load the file
@@ -718,7 +719,7 @@ uninstall-am: uninstall-pkglibLTLIBRARIES
 
 @WANT_ERLANG_FALSE@.PHONY:	all
 @WANT_ERLANG_FALSE@all:
-@WANT_ERLANG_FALSE@	echo "nothing to be done because GNU APL was NOT configured --with-erlang"
+@WANT_ERLANG_FALSE@	@echo "nothing to be done because GNU APL was NOT configured --with-erlang"
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
