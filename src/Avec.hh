@@ -103,6 +103,9 @@ public:
    static bool is_number(Unicode uni)
       { return is_digit(uni) || (uni == UNI_OVERBAR); }
 
+   /// map possibly non-standard APL character to its standard character
+   static Unicode make_standard(Unicode uni);
+
    /// return true if unicode \b is defined by a char_def() or char_uni() macro
    static bool is_known_char(Unicode uni);
 

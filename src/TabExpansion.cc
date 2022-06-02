@@ -245,24 +245,46 @@ UCS_string_vector matches;
    return ER_REPLACE;
 }
 //----------------------------------------------------------------------------
+const struct _help
+{
+  int valence;           ///< -5..2, see explanation in file Help.def
+  const char * prim;     ///< primitive, e.g. "⍬",     "+", ...
+  const char * name;     ///< name,      e.g. "Zilde", "Plus", ...
+  const char * title;    ///< brief description
+  const char * descr;    ///< long description
+} help_texts[] = {
+#define help_def(ar, pr, na, ti, descr) { ar, pr, na, ti, descr },
+#include "Help.def"
+};
+
+enum { HELP_count = sizeof(help_texts) / sizeof(_help) };
+
 ExpandResult
 TabExpansion::expand_help_topics()
 {
    CIN << "\n";
    CERR << "Help topics (APL primitives and user-defined names) are:" << endl;
 
-   // show APL primotives (but only once). For that Help.def must be sorted.
+   // show APL primitives (but only once). For that Help.def must be sorted.
+   // Many primitives occur twice (once for their monadic and once for their
+   // dyadic form. We filter those duplicates out with strcmp(prim, last)
+   //
+   // We also remove some duplicates caused by different Unicodes (like ∣ and |)
    //
 const char * last = "";
 int col = 0;
 const int max_col = Workspace::get_PW() - 4;
 
-#define help_def(_ar, prim, _name, _title, _descr)                          \
-   if (strcmp(prim, last))                                                  \
-      { CERR << " " << (last = prim);   col += 2;                           \
-        if (col > max_col)   { CERR << endl;   col = 0; } \
-      }
-#include "Help.def"
+   loop(h, HELP_count)
+       {
+         const char * prim = help_texts[h].prim;
+         if (!strcmp(prim, last))    continue;
+         last = prim;   // remember it.
+         if (strchr("|~", *prim))    continue;
+         CERR << " " << prim;
+         col += 2;
+         if (col > max_col)   { CERR << endl;   col = 0; } \
+       }
 
 std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
 

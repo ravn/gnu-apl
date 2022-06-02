@@ -76,7 +76,7 @@ SQUARE[1]  Z←R⋆2
       SQUARE 5
 VALUE ERROR
       SQUARE 5
-      ^
+             ^
 
       R←5
       →⎕LC
@@ -85,7 +85,7 @@ VALUE ERROR
       SQUARE 5
 VALUE ERROR
       SQUARE 5
-      ^
+             ^
 
       →
 

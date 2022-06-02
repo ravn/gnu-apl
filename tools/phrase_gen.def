@@ -52,6 +52,7 @@ phrase(BS_ANY+ 1,      N    ,      ,      ,      , DITO )
 //
 phrase_MISC (BS_F_B+2,        F    , B    ,      , DITO )
 phrase_MISC (BS_F_B+3,        F    , C    , B    , DITO )
+phrase_MISC (BS_LO_OP+2,      M    , M    ,      , DITO )
 
 // function called dyadically
 //

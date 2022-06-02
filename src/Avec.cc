@@ -150,7 +150,7 @@ int errors = 0;
 #define char_uni(_name, _uni, _tag, _flags)
 #include "Avec.def"
 
-     CERR << "checking ⎕AV" << endl;
+//   CERR << "checking ⎕AV..." << endl;
      loop(p, MAX_AV)
          {
            if (positions[p] > 1)   // duplicate
@@ -221,7 +221,6 @@ Avec::uni_to_token(Unicode & uni, const char * loc)
    }
 
    // not found: try alternative characters.
-   //
 const CHT_Index idx = map_alternative_char(uni);
    if (idx != Invalid_CHT)
       {
@@ -308,6 +307,13 @@ Avec::map_alternative_char(Unicode alt_av)
 
         default:     return Invalid_CHT;         // unknown alt_av
       }
+}
+//----------------------------------------------------------------------------
+Unicode
+Avec::make_standard(Unicode uni)
+{
+const CHT_Index idx = map_alternative_char(uni);
+   return idx == Invalid_CHT ? uni : character_table[idx].unicode;
 }
 //----------------------------------------------------------------------------
 bool

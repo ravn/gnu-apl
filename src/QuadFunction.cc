@@ -220,23 +220,28 @@ const APL_time_us start = now();
    if (!B->get_cfirst().is_real_cell())   DOMAIN_ERROR;
 
 const APL_time_us end = start + 1000000 * B->get_cfirst().get_real_value();
-   if (end < start)                            DOMAIN_ERROR;
+   if (end < start)                           DOMAIN_ERROR;
    if (end > start + 31*24*60*60*1000000LL)   DOMAIN_ERROR;   // > 1 month
 
-   for (;;)
+bool need_CR = false;
+   while (now() < end)
        {
-         // compute time remaining.
-         //
-         const APL_time_us remaining_us =  end - now();
-         if (remaining_us <= 0)   break;
-
-         const int wait_sec  = remaining_us/1000000;
-         const int wait_usec = remaining_us%1000000;
-         timeval tv = { wait_sec, wait_usec };
-         if (select(0, 0, 0, 0, &tv) == 0)   break;
+         usleep(20000);
+         if (attention_is_raised())   need_CR = true;
+         if (interrupt_is_raised())
+            {
+              need_CR = true;
+              break;
+            }
        }
 
-   // return time elapsed.
+   // interrupt or attention may have displayed ^C, start a new line if so.
+   if (need_CR)   CERR << endl;
+
+   // we do not clear_attention_raised(LOC) or clear_interrupt_raised(LOC);
+   // so that the user can continue with →''
+
+   // return the time elapsed.
    //
    return Token(TOK_APL_VALUE1, FloatScalar(0.000001*(now() - start), LOC));
 }

@@ -47,7 +47,7 @@ Shape.hh:133:18: error: ‘shape_Z.Shape::rho[<unknown>]’ may be used uninitia
   133 |         if (rho[r])   { volume /= rho[r];  rho[r] = sh;  volume *= rho[r]; }
       |             ~~~~~^
 
-Suppress this (and other warnings) with:
+Suppress this (and likewise other warnings) with:
 
 CXXFLAGS="-Wno-maybe-uninitialized -Wno-class-memaccess" ./configure
 -----------------------------------------------------------------------------

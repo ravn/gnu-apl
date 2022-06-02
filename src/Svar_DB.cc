@@ -138,9 +138,9 @@ const int APserver_result = pclose(fp);
 
    logit && get_CERR() << endl;
 
-   if (APserver_result)
+   if (APserver_result && (errno != ECHILD))
       {
-         get_CERR() << "pclose(APserver) returned error: "
+         get_CERR() << "pclose(APserver) returned error " << errno << ": "
                     << strerror(errno) << endl;
       }
 

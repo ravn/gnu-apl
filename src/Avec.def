@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -197,6 +197,8 @@ char_uni(PAD_L6            , 0x2086 , END          , NO_SPACE      ) /* ₆ */
 char_uni(PAD_L7            , 0x2087 , END          , NO_SPACE      ) /* ₇ */
 char_uni(PAD_L8            , 0x2088 , END          , NO_SPACE      ) /* ₈ */
 char_uni(PAD_L9            , 0x2089 , END          , NO_SPACE      ) /* ₉ */
+char_uni(PAD_Lk            , 0x2096 , END          , NO_SPACE      ) /* ₖ */
+char_uni(PAD_Ln            , 0x2099 , END          , NO_SPACE      ) /* ₙ */
 char_def(EURO              , 0x20AC , END          , NO_SPACE , 081) /* € */
 char_def(LEFT_ARROW        , 0x2190 , ASSIGN       , NO_SPACE ,  BD) /* ← */
 char_def(UP_ARROW          , 0x2191 , F12_TAKE     , NO_SPACE ,  C6) /* ↑ */

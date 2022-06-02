@@ -603,16 +603,20 @@ const ShapeItem ec = nz_element_count();
    //
    loop(e, ec)
        {
-         const Cell * cell = &get_cravel(e);
+         const Cell * cell = &get_cravel(e);   // rarely
          if (cell->is_pointer_cell())
             {
               cell->get_pointer_value()->check_lval_consistency();
             }
-         else
+         else if (cell->is_lval_cell())
             {
-              Assert(cell->is_lval_cell());
               const LvalCell * LVC = reinterpret_cast<const LvalCell *>(cell);
               LVC->check_consistency();
+            }
+         else       // error, e.g. 3{⍺+2←⍵}4
+            {
+              MORE_ERROR() << "mal-formed selective specification";
+              SYNTAX_ERROR;
             }
        }
 }

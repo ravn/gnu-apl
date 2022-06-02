@@ -1190,11 +1190,7 @@ Token result = at1().get_function()->eval_AB(at0().get_apl_val(),
 void
 Prefix::reduce_A_M_B_()
 {
-const TokenTag tag = at1().get_tag();
-   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
-      return reduce_A_F_B_();
-
+   if (is_SLASH_or_BACKSLASH(at1().get_tag()))   return reduce_A_F_B_();
    syntax_error(LOC);
 }
 //----------------------------------------------------------------------------
@@ -1224,11 +1220,7 @@ Token result = at1().get_function()->eval_AXB(at0().get_apl_val(),
 void
 Prefix::reduce_A_M_C_B()
 {
-const TokenTag tag = at1().get_tag();
-   if (tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
-       tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1)
-      return reduce_A_F_C_B();
-
+   if (is_SLASH_or_BACKSLASH(at1().get_tag()))   return reduce_A_F_C_B();
    syntax_error(LOC);
 }
 //----------------------------------------------------------------------------
@@ -1243,6 +1235,39 @@ DerivedFunction * derived =
 
    pop_args_push_result(Token(TOK_FUN2, derived));
    action = RA_CONTINUE;
+}
+//----------------------------------------------------------------------------
+void
+Prefix::reduce_MISC_M_M_()
+{
+   Assert1(prefix_len == 2);
+
+   if (saved_lookahead.tok.get_Class() == TC_FUN12)
+      {
+        /* E.g. LA  M  M  B
+                +   /  /  1 2 3    (saved_lookahead is +)
+                ≡   ¨  ¨  1 2      (saved_lookahead is ≡)
+         */
+        DerivedFunction * derived_1 =
+           Workspace::SI_top()->fun_oper_cache.get(LOC);
+        new (derived_1) DerivedFunction(saved_lookahead.tok,
+                                        at0().get_function(), LOC);
+        Token TF1(TOK_FUN2, derived_1);
+        DerivedFunction * derived_2 =
+           Workspace::SI_top()->fun_oper_cache.get(LOC);
+        new (derived_2) DerivedFunction(TF1, at1().get_function(), LOC);
+        pop_args_push_result(Token(TOK_FUN2, derived_2));
+        saved_lookahead.tok.clear(LOC);
+        action = RA_CONTINUE;
+      }
+   else if (saved_lookahead.tok.get_Class() == TC_OPER1)
+      {
+        action = RA_PUSH_NEXT;
+      }
+   else
+      {
+        return reduce_F_M__();
+      }
 }
 //----------------------------------------------------------------------------
 void

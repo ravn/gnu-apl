@@ -1098,31 +1098,39 @@ Pfstat_ID iarg = PFS_ALL;
 //----------------------------------------------------------------------------
 void
 Command::primitive_help(ostream & out, const char * arg, int arity,
-                        const char * prim, const char * name,
+                        const char * prim,  const char * name,
                         const char * brief, const char * descr)
 {
    if (strcmp(arg, prim))   return;
 
    switch(arity)
       {
-        case -5: out << "   quasi-dyadic operator:   Z ← A (∘ "
-                     << prim << " G) B";                                  break;
-        case -4: out << "   dyadic operator:   Z ← A (F "
-                     << prim << " G) B";                                  break;
-        case -3: out << "   dyadic operator:   Z ← (F "
-                     << prim << " G) B";                                  break;
-        case -2: out << "   monadic operator:  Z ← A (F "
-                     << prim << ") B";                                    break;
-        case -1: out << "   monadic operator:  Z ← (F "
-                     << prim << ") B";                                    break;
-        case 0:  out << "    niladic function: Z ← " << prim;             break;
-        case 1:  out << "    monadic function: Z ← " << prim << " B";     break;
-        case 2:  out << "    dyadic function:  Z ← A " << prim << " B";   break;
+        case -6: out << "   " << name << ":   " << brief << endl
+                     << "    " << descr;                     return;
+
+        case -5: out << "   quasi-dyadic operator:"
+                        "   Z ← A (∘ . G) B";               break;
+        case -4: out << "   dyadic primitive operator:"
+                        "   Z ← A (F . G) B";               break;
+        case -3: out << "   dyadic primitive operator:"
+                        "   Z ← (F " << prim << " G) B";    break;
+        case -2: out << "   monadic primitive operator:"
+                        "  Z ← A (F " << prim << ") B";     break;
+        case -1: out << "   monadic primitive operator:"
+                        "  Z ← (F " << prim << ") B";       break;
+        case  0: out << "   niladic primitive function:"
+                        " Z ← " << prim;                    break;
+        case  1: out << "   monadic primitive function:"
+                        " Z ← " << prim << " B";            break;
+        case  2: out << "   dyadic primitive function:"
+                        "  Z ← A " << prim << " B";         break;
+
         default: FIXME;
       }
 
-   out << "  (" << name  <<  ")" << endl
-       << "    " << brief << endl;
+   if (*name)   out << "  ("  << name  <<  ")";
+   out << endl;
+   if (*brief)  out << "    " << brief << endl;
 
    if (descr)   out << descr << endl;
 }
@@ -1138,8 +1146,13 @@ int ret = 0;
 }
 
 void
-Command::cmd_HELP(ostream & out, const UCS_string & arg)
+Command::cmd_HELP(ostream & out, const UCS_string & _arg)
 {
+   // map alternate APL characters to standard ones
+   //
+UCS_string arg;
+   loop(a, _arg.size())   arg += Avec::make_standard(_arg[a]);
+
    if (arg.size() > 0 && Avec::is_first_symbol_char(arg[0]))
       {
         // help for a user defined name
@@ -1242,18 +1255,24 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
         return;
       }
 
-   if (arg.size() == 1 ||               // standard (1-character) APL primitive
-       (arg.size() == 2 && arg[0] == UNI_DOWN_TACK))  // ⊤∧ and friends
-      {
-        UTF8_string arg_utf(arg);
-        const char * arg_cp = arg_utf.c_str();
+   {
+     bool prim = arg.size() == 1;   // standard (1-character) APL primitive
+     if (arg.size() == 2)
+        prim = arg[0] == UNI_DOWN_TACK ||
+              (arg[0] == UNI_COMMENT && arg[1] == UNI_COMMENT);
+
+     if (prim)
+        {
+          UTF8_string arg_utf(arg);
+          const char * arg_cp = arg_utf.c_str();
 
 #define help_def(ar, prim, name, title, descr)              \
    primitive_help(out, arg_cp, ar, prim, name, title, descr);
 #include "Help.def"
 
          return;
-      }
+        }
+   }
 
    enum { COL2 = 40 };   ///< where the second column starts
 

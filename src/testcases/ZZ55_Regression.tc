@@ -1,0 +1,17 @@
+⍝ ZZ55_Regression.tc
+⍝ ------------------
+
+      ⍝ hudson@hudsonlacerda.com, June 1, 2022
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      3{⍺+2←⍵}4
+SYNTAX ERROR+
+λ1[1]  λ←⍺+2←⍵
+           ^ ^
+      )MORE
+mal-formed selective specification
+
+      )SIC
+
