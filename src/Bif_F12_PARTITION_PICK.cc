@@ -138,128 +138,101 @@ Value_P
 Bif_F12_PARTITION::partition(Value_P A, Value_P B, sAxis axis)
 {
    // A must be a scalar or vector (of non-negative integers)
+   // B must be non-scalar
    //
    if (A->get_rank() > 1)    RANK_ERROR;
    if (B->get_rank() == 0)   RANK_ERROR;
 
-   if (A->element_count() == 1)
-      {
-        /* lrm p. 188:
+const ShapeItem len_A = A->element_count();
 
-           The length of the left argument and the size of the last axis of
-           the right argument must match, unless the left argument is a
-           scalar or one-item vector, in which case it is extended.
-
-           We generalize "one-item vector" to mean "one-item array".
-         */
-
-         // a non-zero scalar A extends to A A A ... A, i.e. Z ← ⊂ B
-         //
-         if (const APL_Integer a = A->get_cscalar().get_near_int())
-            {
-              return do_eval_B(B);
-            }
-
-         // a zero scalar A extends to 0 0 0 ... 0, i.e. Z ← '' or Z ← ⍬
-         //
-         if (B->get_cfirst().is_numeric())          return Idx0(LOC);
-         if (B->get_cfirst().is_character_cell())   return Str0(LOC);
-         DOMAIN_ERROR;
-      }
-
-   // the length of A shall be then length of the B-axis along which the
-   // partitioning is performed.
+   // the length of A shall be 1 (which is then extended to the length of the
+   // B axis) or else the length of the B-axis along which the partitioning
+   //  is performed.
    //
-const ShapeItem len_A = A->get_shape_item(0);
-   if (len_A != B->get_shape_item(axis))
+   // Unlike IBM APL2 we not only extend scalars and one-item vectors but
+   // also one-element arrays of rank ≥ 2.
+   //
+   if (len_A != 1 && len_A != B->get_shape_item(axis))
       {
         MORE_ERROR() << "In A ⊂ B: partition length ⍴A is " << len_A
-                     << ", B axis length is " << B->get_shape_item(axis);
+                     << ", which does not match the B axis length "
+                     << B->get_shape_item(axis);
         LENGTH_ERROR;
       }
 
-   // construct a vector of (non-0) partitions from A...
+   // construct a vector of partitions from A...
+vector<Partition> partitions;   // all partitions on the B-axis
+   {
+     ShapeItem prev_A = 0;
+     bool in_partition = false;
+     loop(apos, len_A)
+         {
+           const APL_Integer aval = A->get_cravel(apos).get_near_int();
+           if (aval < 0)            DOMAIN_ERROR;
 
-   /// one partition along the B-axis
-vector<Partition> partitions;   // all partions on the B-axis
+           if (aval > prev_A)   // new partition starting at apos
+              {
+                if (in_partition)   partitions.back().end = apos;
+                const Partition part = { apos, -1 };
+                partitions.push_back(part);
+                in_partition = true;
+              }
+           else if (in_partition && aval == 0)
+              {
+                partitions.back().end = apos;
+                in_partition = false;
+              }
+           prev_A = aval;
+         }
 
-ShapeItem zm = 0;   // number of non-0 partitions
+     if (in_partition)   partitions.back().end = len_A;
+   }
 
-      {
-        ShapeItem prev_A = 0;
-        bool in_partition = false;
-        loop(apos, len_A)
-            {
-              const APL_Integer aval = A->get_cravel(apos).get_near_int();
-              if (aval < 0)            DOMAIN_ERROR;
-
-              if (aval > prev_A)   // new partition starting at apos
-                 {
-                   if (in_partition)   partitions.back().end = apos;
-                   const Partition part = { apos, -1 };
-                   partitions.push_back(part);
-                   in_partition = true;
-                   ++zm;
-                 }
-              else if (in_partition && aval == 0)
-                 {
-                   partitions.back().end = apos;
-                   in_partition = false;
-                 }
-              prev_A = aval;
-            }
-
-        if (in_partition)   partitions.back().end = len_A;
-      }
-
-   if (zm == 1)   // single partition
-      {
-        if (partitions[0].start == 0)   // non-zero ↑A: Z ← ⊂ B
-           {
-             Value_P Z(LOC);
-             Z->next_ravel_Pointer(CLONE_P(B, LOC).get());
-             Z->check_value(LOC);
-             return Z;
-           }
-
-        // 0 ⊂ B is empty
-        return Idx0(LOC);
-      }
-
+   // ⍴⍴Z ←→ ⍴⍴B
+   // ⍴Z  ←→ (¯1↓⍴B), bm            ( for A ⊂ B )
+   // ⍴Z  ←→ (⍴B) ⊢[axis=⍳⍴⍴B] bm   ( for A ⊂[axis] B )
+   //
+const ShapeItem Zm = partitions.size();   // number of non-0 partitions
 Shape shape_Z(B->get_shape());
-   shape_Z.set_shape_item(axis, zm);
+   shape_Z.set_shape_item(axis, Zm);
 
 Value_P Z(shape_Z, LOC);
 
    if (Z->is_empty())
       {
-        Z->set_default(*B.get(), LOC);
+        const ShapeItem len = 0;
+        Value_P ZZ(len, LOC);
+        ZZ->set_default(*B.get(), LOC);
+        ZZ->check_value(LOC);
+        new (&Z->get_wproto()) PointerCell(ZZ.get(), *Z);
         Z->check_value(LOC);
         return Z;
       }
 
-const Shape3 shape_B3(B->get_shape(), axis);
+const Shape & shape_B = B->get_shape();
+const Shape3 shape_B3(shape_B, axis);
+const ShapeItem B3_lm = shape_B3.l() * shape_B3.m();
+
+   // Extend scalars and one-item arrays A to the length of the B-axis
+   if (len_A == 1)   partitions[0].end *= shape_B3.m();
 
    loop(h, shape_B3.h())
-   loop(m, zm)
+   loop(m, Zm)
+   loop(l, shape_B3.l())
        {
-         const ShapeItem start_B = shape_B3.l() *
-                              (partitions[m].start + h * shape_B3.m());
-         loop(l, shape_B3.l())
+         const ShapeItem partition_start = partitions[m].start;
+         const ShapeItem partition_len   = partitions[m].length();
+         const ShapeItem start_B = l + partition_start * shape_B3.l() + h * B3_lm;
+         const Cell * src_B = &B->get_cravel(start_B);
+
+         Value_P ZZ(partition_len, LOC);   // the m'th partition
+         loop(p, partition_len)
              {
-               const Cell * src_B = &B->get_cravel(l + start_B);
-
-               const ShapeItem partition_len = partitions[m].length();
-
-               Value_P ZZ(partition_len, LOC);
-               loop(p, partition_len)
-                   {
-                     ZZ->next_ravel_Cell(*src_B);
-                     src_B += shape_B3.l();
-                   }
-               ZZ->check_value(LOC);
-               Z->next_ravel_Pointer(ZZ.get());
+               ZZ->next_ravel_Cell(*src_B);
+               src_B += shape_B3.l();
              }
+         ZZ->check_value(LOC);
+         Z->next_ravel_Pointer(ZZ.get());
        }
 
    Z->check_value(LOC);

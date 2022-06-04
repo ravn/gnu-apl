@@ -1106,7 +1106,7 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
    switch(arity)
       {
         case -6: out << "   " << name << ":   " << brief << endl
-                     << "    " << descr;                     return;
+                     << "    " << descr << endl;            return;
 
         case -5: out << "   quasi-dyadic operator:"
                         "   Z ← A (∘ . G) B";               break;
@@ -1888,7 +1888,6 @@ Command::cmd_OFF(int exit_val)
         COUT << "Goodbye." << endl
              << "Session duration: " << (end.tv_sec + 0.000001*end.tv_usec)
              << " seconds " << endl;
-
       }
 
    cleanup(true);

@@ -156,6 +156,14 @@ const Shape shape_Z = B->get_shape().without_axis(axis);
 
    if (m_len == 0)   // apply the identity function
       {
+        /*
+           Theory:   A)   f/B₁ B₂ ... Bₙ   ←→    (f/B₁, B₂, ... Bₙ₋₁) f Bₙ
+           -------   B)   f/B₁   ←→    B₁
+
+                             A)          B)
+            therefore:  B₁   ←→   f/B₁   ←→   B₀ f B₁
+                        if there is such a B₀ (i.e. with B₀ f B₁   ←→    B₁).
+         */
         return LO->eval_identity_fun(B, axis);
       }
 

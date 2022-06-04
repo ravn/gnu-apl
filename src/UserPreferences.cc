@@ -114,7 +114,7 @@ UserPreferences::usage(const char * prog)
 "    --[no]SV             [do not] start APnnn (a shared variable server)\n"
 "    -T testcases ...     run testcases\n"
 "    --TM mode            test mode (for -T files):\n"
-"                         0:   (default) exit after last testcase\n"
+"                         0:   exit after last testcase (default)\n"
 "                         1:   exit after last testcase if no error\n"
 "                         2:   continue (don't exit) after last testcase\n"
 "                         3:   stop testcases after first error (don't exit)\n"
@@ -694,7 +694,7 @@ UserPreferences::parse_argv_2(bool logit)
                    CERR << "--TM without test mode" << endl;
                    exit(a);
                  }
-              const int mode = atoi(val);
+              const int mode = 1 << atoi(val);
               IO_Files::test_mode = IO_Files::TestMode(mode);
               continue;
             }

@@ -39,7 +39,7 @@ int IO_Files::last_apl_error_line = -1;
 int IO_Files::assert_errors = 0;
 int IO_Files::diff_errors = 0;
 int IO_Files::parse_errors = 0;
-IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST;
+IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST_FILE;
 bool IO_Files::need_total = false;
 ofstream IO_Files::current_testreport;
 
@@ -91,8 +91,8 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
         print_summary();
         need_total = false;   // forget the -T option
 
-        if ((test_mode == TM_EXIT_AFTER_LAST) ||
-            (test_mode == TM_EXIT_AFTER_LAST_IF_OK && !error_count()))
+        if ((test_mode == TM_EXIT_AFTER_LAST_FILE) ||
+            (test_mode == TM_EXIT_AFTER_LAST_FILE_IF_OK && !error_count()))
           {
             CERR << "Exiting (test_mode " << test_mode << ")" << endl;
             cleanup(true);
@@ -260,8 +260,8 @@ IO_Files::end_of_current_file()
 
         summary << InputFile::current_filename() << endl;
 
-        if ((test_mode == TM_STOP_AFTER_ERROR ||
-             test_mode == TM_EXIT_AFTER_ERROR) && error_count())
+        if ((test_mode == TM_STOP_AFTER_FILE_ERROR ||
+             test_mode == TM_EXIT_AFTER_FILE_ERROR) && error_count())
            {
              CERR << endl
                   << "Stopping test execution since an error has occurred"
@@ -335,7 +335,7 @@ IO_Files::open_next_file()
            if (!InputFile::current_file())   break;   // no more files
 
            char log_name[FILENAME_MAX];
-           snprintf(log_name, sizeof(log_name) - 1,  "%s.log",
+           snprintf(log_name, FILENAME_MAX - 1,  "%s.log",
                     InputFile::current_filename());
 
            if (InputFile::current_file()->test)
@@ -456,5 +456,14 @@ IO_Files::diff_error()
    ++diff_errors;
    Log(LOG_test_execution)
       CERR << "Diff errors incremented to " << diff_errors << endl;
+
+   if (test_mode & TM_DONE_AFTER_LINE_ERROR)
+      {
+        ++total_errors;
+        ++testcases_done;
+        InputFile::close_current_file();
+        InputFile::files_todo.clear();
+        if (test_mode == TM_EXIT_AFTER_LINE_ERROR)   Command::cmd_OFF(1);
+      }
 }
 //----------------------------------------------------------------------------

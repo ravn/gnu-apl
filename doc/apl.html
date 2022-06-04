@@ -249,7 +249,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>May 9, 2022
+<p>June 3, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -262,6 +262,9 @@ and texts about APL. We would like to refer the reader to the following:
 </p>
 <p>ISO Standard for APL: <br>
     www.math.uwaterloo.ca/~ljdickey/apl-rep/docs/is13751.pdf
+</p>
+<p>Note that the file <strong>is13751.pdf</strong> above is compressed with gzip,
+therefore it must be expanded with e.g.  <strong>gunzip</strong> before it can be read.
 </p>
 <p>More pointers to APL resources on the Web: <br>
     ftp://rtfm.mit.edu/pub/usenet-by-group/comp.lang.apl/APL_language_FAQ
@@ -2393,7 +2396,7 @@ the run-time of ⊣B from O(,B) to O(1). Also, ⊢B is marginally faster than �
 </p>
 <p>Dyadic ⊢ with axis is a selection function that generalizes ⊣ and ⊢.
 </p>
-<p>Let <b>Z←A[X] B</b>. Then:
+<p>Let <b>Z←A ⊣[X] B</b>. Then:
 </p>
 <ul>
 <li> if X is a one-element vector and ↑X is 0 then Z ≡ A,

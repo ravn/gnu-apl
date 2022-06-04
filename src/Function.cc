@@ -145,6 +145,18 @@ int sig = SIG_FUN;
    return Fun_signature(sig);
 }
 //----------------------------------------------------------------------------
+Token Function::eval_fill_AB(Value_P A, Value_P B) const
+{
+  MORE_ERROR() << " function " << get_name() << " has no fill function";
+  DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Token Function::eval_identity_fun(Value_P B, sAxis axis) const
+{
+  MORE_ERROR() << " function " << get_name() << " has no identity function";
+  DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, const Function & fun)
 {

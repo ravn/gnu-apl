@@ -251,12 +251,15 @@ public:
       { DOMAIN_ERROR; }
 
    /// Evaluate \b the fill function.
-   virtual Token eval_fill_AB(Value_P A, Value_P B) const
-      { DOMAIN_ERROR; }
+   virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
-   /// Evaluate \b the identity function.
-   virtual Token eval_identity_fun(Value_P B, sAxis axis) const
-      {  DOMAIN_ERROR; }
+   /** Evaluate \b the identity function. B is empty and the result is a
+   /// value f/B0 with (B0 f ↑B) ≡ B for all B (and f is \b this function).
+   /// If such a B0 does not exist then raise a DOMAIN ERROR.
+
+       NOTE that eval_identity_fun() returns f/B0 and not B0 !!!
+    **/
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
 
    /// Delete this function (do nothing, overloaded by UserFunction).
    virtual void destroy() {}

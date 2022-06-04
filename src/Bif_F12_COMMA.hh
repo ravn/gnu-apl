@@ -57,6 +57,9 @@ public:
    /// Prepend scalar cell_B to A along axis
    static Value_P append_scalar(const Value & A, uAxis axis,
                                 const Cell & cell_B);
+
+   /// Evaluate \b the identity function.
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
 };
 //----------------------------------------------------------------------------
 /** primitive functions catenate, laminate, and ravel along last axis */

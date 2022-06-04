@@ -58,6 +58,9 @@ and texts about APL. We would like to refer the reader to the following:
     ISO Standard for APL: @*
     www.math.uwaterloo.ca/~ljdickey/apl-rep/docs/is13751.pdf
 
+Note that the file @strong{is13751.pdf} above is compressed with gzip,
+therefore it must be expanded with e.g.  @strong{gunzip} before it can be read.
+
     More pointers to APL resources on the Web: @*
     ftp://rtfm.mit.edu/pub/usenet-by-group/comp.lang.apl/APL_language_FAQ
 
@@ -2180,7 +2183,7 @@ the run-time of ⊣B from O(,B) to O(1). Also, ⊢B is marginally faster than �
 
 Dyadic ⊢ with axis is a selection function that generalizes ⊣ and ⊢.
 
-Let @b{Z←A[X] B}. Then:
+Let @b{Z←A ⊣[X] B}. Then:
 
 @itemize
 @item if X is a one-element vector and ↑X is 0 then Z ≡ A,

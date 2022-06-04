@@ -1238,36 +1238,26 @@ DerivedFunction * derived =
 }
 //----------------------------------------------------------------------------
 void
-Prefix::reduce_MISC_M_M_()
+Prefix::reduce_M_M__()
 {
-   Assert1(prefix_len == 2);
+   if (is_SLASH_or_BACKSLASH(at0().get_tag()))
+      {
+        // the left M aka. at0() could be e.g. replicate instead of reduce.
+        // if so, degrade it from OPER1 to FUN2.
+        //
+        const TokenClass next = body[PC].get_Class();
+        if (next == TC_VALUE ||       // e.g. (1 0 1)(0 1 1) /¨ ⊂'abc
+            next == TC_END)           // e.g. ⍨ 1 2 3
+           {
+             enum { OPER1_TO_FUN2 = TC_OPER1 - TC_FUN2 };
+              const TokenTag tfun = TokenTag(at0().get_tag() - OPER1_TO_FUN2);
+              at0().ChangeTag(tfun);
+              action = RA_CONTINUE;
+              return;
+           }
+      }
 
-   if (saved_lookahead.tok.get_Class() == TC_FUN12)
-      {
-        /* E.g. LA  M  M  B
-                +   /  /  1 2 3    (saved_lookahead is +)
-                ≡   ¨  ¨  1 2      (saved_lookahead is ≡)
-         */
-        DerivedFunction * derived_1 =
-           Workspace::SI_top()->fun_oper_cache.get(LOC);
-        new (derived_1) DerivedFunction(saved_lookahead.tok,
-                                        at0().get_function(), LOC);
-        Token TF1(TOK_FUN2, derived_1);
-        DerivedFunction * derived_2 =
-           Workspace::SI_top()->fun_oper_cache.get(LOC);
-        new (derived_2) DerivedFunction(TF1, at1().get_function(), LOC);
-        pop_args_push_result(Token(TOK_FUN2, derived_2));
-        saved_lookahead.tok.clear(LOC);
-        action = RA_CONTINUE;
-      }
-   else if (saved_lookahead.tok.get_Class() == TC_OPER1)
-      {
-        action = RA_PUSH_NEXT;
-      }
-   else
-      {
-        return reduce_F_M__();
-      }
+   action = RA_PUSH_NEXT;
 }
 //----------------------------------------------------------------------------
 void

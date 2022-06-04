@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-May 9, 2022
+June 3, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -31,6 +31,9 @@ following:
 
    ISO Standard for APL:
 www.math.uwaterloo.ca/~ljdickey/apl-rep/docs/is13751.pdf
+
+   Note that the file *is13751.pdf* above is compressed with gzip,
+therefore it must be expanded with e.g.  *gunzip* before it can be read.
 
    More pointers to APL resources on the Web:
 ftp://rtfm.mit.edu/pub/usenet-by-group/comp.lang.apl/APL_language_FAQ
@@ -2076,7 +2079,7 @@ O(1).  Also, ⊢B is marginally faster than ⎕←B.
 
    Dyadic ⊢ with axis is a selection function that generalizes ⊣ and ⊢.
 
-   Let Z←A[X] B. Then:
+   Let Z←A ⊣[X] B. Then:
 
    • if X is a one-element vector and ↑X is 0 then Z ≡ A,
    • if X is a one-element vector and ↑X is 1 then Z ≡ B,
@@ -6341,63 +6344,63 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11433
-Node: Chapter 222728
-Node: Section 2.124623
-Node: Section 2.241539
-Node: Section 2.342298
-Node: Section 2.443585
-Node: Section 2.547950
-Node: Section 2.648123
-Node: Section 2.748753
-Node: Section 2.852706
-Node: Section 2.954241
-Node: Section 2.1056333
-Node: Section 2.1157886
-Node: Section 2.1259671
-Node: Section 2.1361611
-Node: Section 2.1462552
-Node: Section 2.1562804
-Node: Section 2.1664200
-Node: Section 2.1774344
-Node: Section 2.1876862
-Node: Section 2.1983569
-Node: Section 2.2085014
-Node: Section 2.2190675
-Node: Section 2.2295709
-Node: Section 2.2398990
-Node: Section 2.2499281
-Node: Section 2.25110106
-Node: Section 2.26110378
-Node: Section 2.27116956
-Node: Section 2.28119416
-Node: Section 2.29120085
-Node: Section 2.30121744
-Node: Section 2.31125533
-Node: Section 2.32134285
-Node: Section 2.33135235
-Node: Section 2.34149959
-Node: Section 2.35159956
-Node: Section 2.36163060
-Node: Section 2.37165049
-Node: Section 2.38169474
-Node: Chapter 3190892
-Node: Chapter 4193395
-Node: Chapter 5194521
-Node: Section 5.1196058
-Node: Section 5.2197338
-Node: Section 5.3197698
-Node: Section 5.4197940
-Node: Section 5.5198602
-Node: Section 5.6199080
-Node: Section 5.7199852
-Node: Section 5.8200309
-Node: Chapter 6200711
-Node: Section 6.1201130
-Node: Section 6.2201817
-Node: Chapter 7202648
-Node: Section 7.1203151
-Node: Section 7.2228465
+Node: Chapter 11575
+Node: Chapter 222870
+Node: Section 2.124765
+Node: Section 2.241681
+Node: Section 2.342440
+Node: Section 2.443727
+Node: Section 2.548092
+Node: Section 2.648265
+Node: Section 2.748895
+Node: Section 2.852848
+Node: Section 2.954383
+Node: Section 2.1056475
+Node: Section 2.1158028
+Node: Section 2.1259813
+Node: Section 2.1361753
+Node: Section 2.1462694
+Node: Section 2.1562946
+Node: Section 2.1664342
+Node: Section 2.1774486
+Node: Section 2.1877008
+Node: Section 2.1983715
+Node: Section 2.2085160
+Node: Section 2.2190821
+Node: Section 2.2295855
+Node: Section 2.2399136
+Node: Section 2.2499427
+Node: Section 2.25110252
+Node: Section 2.26110524
+Node: Section 2.27117102
+Node: Section 2.28119562
+Node: Section 2.29120231
+Node: Section 2.30121890
+Node: Section 2.31125679
+Node: Section 2.32134431
+Node: Section 2.33135381
+Node: Section 2.34150105
+Node: Section 2.35160102
+Node: Section 2.36163206
+Node: Section 2.37165195
+Node: Section 2.38169620
+Node: Chapter 3191038
+Node: Chapter 4193541
+Node: Chapter 5194667
+Node: Section 5.1196204
+Node: Section 5.2197484
+Node: Section 5.3197844
+Node: Section 5.4198086
+Node: Section 5.5198748
+Node: Section 5.6199226
+Node: Section 5.7199998
+Node: Section 5.8200455
+Node: Chapter 6200857
+Node: Section 6.1201276
+Node: Section 6.2201963
+Node: Chapter 7202794
+Node: Section 7.1203297
+Node: Section 7.2228611
 
 End Tag Table
 

@@ -48,7 +48,7 @@ Bif_F12_DOMINO::eval_B(Value_P B) const
         Value_P Z(LOC);
 
         Cell cZ;
-        B->get_cfirst().bif_reciprocal(&cZ);
+        B->get_cscalar().bif_reciprocal(&cZ);
         Z->next_ravel_Cell(cZ);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);

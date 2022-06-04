@@ -72,8 +72,8 @@ help_def(1, "+", "Conjugate",
          "1J¯2 2J3 ¯3J¯4")
 
 help_def(2, "+", "Addition",
-         "Returns the sum of A and B",
-         "A and B must be numeric values or arrays:\n"
+         "Add A and B",
+         "A and B must be numeric. Example:\n"
          "      1+1\n"
          "2\n"
          "      1 2 3 + ¯1 ¯2 ¯3\n"
@@ -624,6 +624,32 @@ help_def(-6, "◊", "statement separator",
 help_def(-6, ";", "index separator (in bracket index A[...])",
          "A[I₁; I₂; ... ; Iₙ]",
          "Iₖ is the index along axis k of A (with n = ⍴⍴A, uses ⎕IO)\n")
+
+help_def(-6, "⍞", "character input",
+         "Z←⍞",
+         "Z is the next line entered by the user\n")
+
+help_def(-6, "⍞", "character output",
+         "⍞←B",
+         "B is printed\n")
+
+help_def(-6, "⎕", "evaluated input",
+         "Z←⎕",
+         "print a prompt ⎕: and read the next line entered by the user.\n"
+         "Z is the line evaluated as an APL expression. Example:\n"
+         "      Z←⌷   ⍝ read next line\n"
+         "⎕:\n"
+         "      2 + 5   ⍝ line entered by the user\n"
+         "      Z       ⍝ show the result of Z←⌷\n"
+         "7\n")
+
+help_def(-6, "⎕", "evaluated output",
+         "⎕←B",
+         "B is printed\n")
+
+help_def(-6, "⍞", "character input",
+         "Z←⍞",
+         "Z is the next line entered by the user\n")
 
 help_def(-6, "⍝", "(start of) comment",
          "⍝ ... (end-of-line)",

@@ -617,7 +617,7 @@ main(int argc, const char *argv[])
    for (;;)
        {
          Token t = Workspace::immediate_execution(
-                       IO_Files::test_mode == IO_Files::TM_EXIT_AFTER_ERROR);
+                   IO_Files::test_mode == IO_Files::TM_EXIT_AFTER_FILE_ERROR);
          if (t.get_tag() == TOK_OFF)   Command::cmd_OFF(0);
        }
 

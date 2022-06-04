@@ -120,21 +120,53 @@ LENGTH ERROR+
 
       ⍝ Regression
 
-      8 ⎕CR 1 ⊂ 'abc'   ⍝ Scalar A
-┌─────┐
+      ⍝ Scalar L
+      ⍝ +/ 2</ 0, Lext is the number of partitions
+      ⍝
+      L←42 ◊ R←'abc'
+      Lext←(¯1↑⍴R)⍴L   ⍝ 42 42 42
+      PCnt← +/ 2 </ 0,Lext   ⍝ partition count = number of L↑
+      Z←L⊂R
+      (⍴⍴Z) ≡ (⍴⍴R)
+1
+      (⍴Z) ≡ ((¯1↓⍴R), PCnt)
+1
+      (≡Z) ≡ (1+≡R)
+1
+      ((0 ≠ L)/R) ≡ (⊃,/L⊂R)
+1
+      8 ⎕CR Z
+┌→────┐
 │┌→──┐│
 ││abc││
 │└───┘│
 └ϵ────┘
 
-      8 ⎕CR 1 1 1 ⊂ 'abc'   ⍝ Scalar A extended
-┌─────┐
+      ⍝ same as above, but with Scalar L extended to (⍴R)⍴L
+      ⍝ result shall be the same.
+      ⍝
+      ⊢L←Lext
+42 42 42
+      PCnt← +/ 2 </ 0,L   ⍝ partition count = number of L↑
+      Z←L⊂R
+      (⍴⍴Z) ≡ (⍴⍴R)
+1
+      (⍴Z) ≡ ((¯1↓⍴R), PCnt)
+1
+      (≡Z) ≡ (1+≡R)
+1
+      8 ⎕CR Z
+┌→────┐
 │┌→──┐│
 ││abc││
 │└───┘│
 └ϵ────┘
 
-      8 ⎕CR 1 0 1 0 ⊂[1] 4 4⍴⍳16   ⍝ ↑A ≠ 0
+      ⍝ partition with axis
+      ⍝
+      L←1 0 1 0  ◊ R←4 4⍴⍳16   ⍝ ↑L ≠ 0
+      Z←L ⊂[1] R
+      8 ⎕CR Z
 ┌→─────────────────┐
 ↓┌→┐ ┌→┐  ┌→┐  ┌→┐ │
 ││1│ │2│  │3│  │4│ │
@@ -144,7 +176,9 @@ LENGTH ERROR+
 │└─┘ └──┘ └──┘ └──┘│
 └ϵ─────────────────┘
 
-      8 ⎕CR 0 1 0 1 ⊂[1] 4 4⍴⍳16   ⍝ ↑A = 0
+      L←0 1 0 1  ◊ R←4 4⍴⍳16   ⍝ ↑L = 0
+      Z←L ⊂[1] R
+      8 ⎕CR Z
 ┌→──────────────────┐
 ↓┌→┐  ┌→┐  ┌→┐  ┌→┐ │
 ││5│  │6│  │7│  │8│ │
@@ -155,6 +189,46 @@ LENGTH ERROR+
 └ϵ──────────────────┘
 
 
+⍝ Regression. Hudson Lacerda June 2, 2022
+
+      L←1 0 1 0 ◊ R←'abcd'
+      ⊢PCnt← +/ 2 </ 0,L   ⍝ partition count = number of L↑
+2
+      Z←L⊂R
+      (⍴⍴Z) ≡ (⍴⍴R)
+1
+      (⍴Z) ≡ ((¯1↓⍴R), PCnt)
+1
+      (≡Z) ≡ (1+≡R)
+1
+      (⎕← (0≠L)/R )≡(⎕← ⊃,/Z )
+ac
+ac
+1
+
+      L←1 1 1 0 ◊ R←'abcd'
+      ⊢PCnt← +/ 2 </ 0,L   ⍝ partition count = number of L↑
+1
+      Z←L⊂R
+      (⍴⍴Z) ≡ (⍴⍴R)
+1
+      (⍴Z) ≡ ((¯1↓⍴R), PCnt)
+1
+      (≡Z) ≡ (1+≡R)
+1
+      (⎕← (0≠L)/R )≡(⎕← ⊃,/Z )
+abc
+abc
+1
+
+      L←0 0 1 0 ◊ R←'abcd'
+      ⊢PCnt← +/ 2 </ 0,L   ⍝ partition count = number of L↑
+1
+      Z←L⊂R
+      (⎕← (0≠L)/R )≡(⎕← ⊃,/Z )
+c
+c
+1
 
 ⍝ ==================================
 
