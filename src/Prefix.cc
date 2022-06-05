@@ -1237,24 +1237,129 @@ DerivedFunction * derived =
    action = RA_CONTINUE;
 }
 //----------------------------------------------------------------------------
+bool
+Prefix::MM_is_FM(Function_PC pc)
+{
+   /*
+      dis-ambiguate / ⌿ \ or ⍀.
+      return true if M M shall actually be F M in reduce_M_M__().
+
+       On entry;
+                             ┌─────────────────── PC
+                             │      ┌──────────── PC-1
+                             │      │        ┌─── PC-2
+       ┌────────┬───   ───┬──────┬──────┬──────────┬───
+       │ TC_END │   ...   │ NEXT │ /⌿\⍀ | TC_OPER1 │   ...
+       └────────┴───   ───┴──────┴──────┴──────────┴───
+
+       token in metaclass MISC, i.e. ← → ; [ END ( may not be left of M M.
+    */
+   for (;;)
+       {
+         const Token & next = body[pc];
+         switch(const TokenClass tc_next = next.get_Class())
+            {
+                   // Examples:                     ┌─────── next
+                   //                               │ ┌───── M1 is / ⌿ \ or ⍀
+                   //                               │ │ ┌─── M2 any operator
+                   //                               │ │ │
+              case TC_ASSIGN:       //            Q ← / ⍨ 1 2 3         (MISC)
+              case TC_R_ARROW:      //              → / ⍨ 1 2 3         (MISC)
+              case TC_L_BRACK:      //              [ / ⍨ 1 2 3         (MISC)
+                                    //              ; / ⍨ 1 2 3         (MISC)
+              case TC_L_PARENT:     //              ( / ⍨ 1 2 3         (MISC)
+              case TC_END:          //              ◊ / ⍨ 1 2 3         (MISC)
+              case TC_FUN0:         //            FOO / ¨ ⊂ 'abc
+              case TC_OPER2:        //            FOO / ¨ ⊂ 'abc
+              case TC_RETURN:       //                / ⍨ 1 2 3
+              case TC_VALUE:        // (1 0 1)(0 1 1) / ¨ ⊂ 'abc
+                   return true;     //               │ │ │
+                                    //               │ │ │
+              case TC_FUN12:        //               + / ¨ (1 2)(3 4)(5 6)
+              case TC_OPER1:        //               / / ¨ (1 2)(3 4)(5 6)
+                   return false;
+
+              case TC_SYMBOL:
+                   // resolve the symbol which will normally lead to one of the
+                   // one of the other cases.
+                   //
+                   switch(const NameClass nc = next.get_sym_ptr()->get_NC())
+                       {
+                         // A. unknown/unassigned symbols...
+                         //
+                         case NC_INVALID:
+                         case NC_UNUSED_USER_NAME:
+                              MORE_ERROR() << "unassigned symbol "
+                                           << body[pc].get_sym_ptr()->get_name()
+                                           << "when resolving "
+                                           << body[pc - 1]
+                                                 .get_function()->get_name();
+                              syntax_error(LOC);
+
+                         // B. functions (so M1 remains an operator).
+                         //
+                         case NC_FUNCTION:
+                         case NC_SYSTEM_FUN:
+                              return false;
+
+                         // C. values (so M1 is a function
+                         //
+                         case NC_LABEL:
+                         case NC_VARIABLE:
+                         case NC_SYSTEM_VAR:
+                              return true;
+
+                         // D. function or value
+                         //
+                         case NC_OPERATOR:
+                              Assert(next.get_function());
+                              return next.get_function()
+                                        ->get_oper_valence() == 2;
+
+                         // E. missed cases (internal error)
+                         //
+                         default:
+                              CERR << "TODO: Nameclass " << nc << endl;
+                              TODO;
+                              return false;
+                       }
+
+              // TC_INDEX should not happen here since body[PC]... have
+              // not yet been parsed
+              case TC_INDEX: FIXME
+
+              case TC_R_BRACK:   // skip over [ ... ]
+                    pc = Function_PC(int(pc) + body[pc].get_int_val2());
+                    continue;
+
+              case TC_R_PARENT:
+                   pc = Function_PC(int(pc) + 1);
+
+              default: CERR << "next: " << tc_next << endl;
+                       TODO;
+            }
+       }
+}
+//----------------------------------------------------------------------------
 void
 Prefix::reduce_M_M__()
 {
    if (is_SLASH_or_BACKSLASH(at0().get_tag()))
       {
-        // the left M aka. at0() could be e.g. replicate instead of reduce.
-        // if so, degrade it from OPER1 to FUN2.
-        //
-        const TokenClass next = body[PC].get_Class();
-        if (next == TC_VALUE ||       // e.g. (1 0 1)(0 1 1) /¨ ⊂'abc
-            next == TC_END)           // e.g. ⍨ 1 2 3
+        if (MM_is_FM(PC))
            {
+             CERR << "/ is function" << endl;
              enum { OPER1_TO_FUN2 = TC_OPER1 - TC_FUN2 };
-              const TokenTag tfun = TokenTag(at0().get_tag() - OPER1_TO_FUN2);
-              at0().ChangeTag(tfun);
-              action = RA_CONTINUE;
-              return;
+             const TokenTag tfun = TokenTag(at0().get_tag() - OPER1_TO_FUN2);
+             at0().ChangeTag(tfun);
+             action = RA_CONTINUE;
            }
+        else
+           {
+             CERR << "/ is operator" << endl;
+             action = RA_PUSH_NEXT;
+           }
+        return;
       }
 
    action = RA_PUSH_NEXT;

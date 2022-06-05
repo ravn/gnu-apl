@@ -290,6 +290,9 @@ public:
        { Assert1(idx < put);   return content[put - idx - 1]; }
 
 protected:
+   /// return true if the left (back-)slash in M M means F M.
+   bool MM_is_FM(Function_PC PC);
+
    /// a unique identifier
    const uint64_t instance;
 

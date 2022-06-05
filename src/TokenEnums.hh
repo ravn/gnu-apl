@@ -32,7 +32,7 @@ enum TokenClass
    // token classes.
    //
 
-   // permanent token classes. Token of these classes can appear in
+   // permanent token classes. Only Token of these classes can appear in
    // the body of a defined function.
    //
    TC_ASSIGN        = 0x01,   ///< ←
@@ -53,11 +53,12 @@ enum TokenClass
 
    TC_MAX_PERM,               ///< permanent token are < TC_MAX_PERM
 
+   // token class aliases
    TC_FUN1          = TC_FUN12,   ///< monadic function
    TC_FUN2          = TC_FUN12,   ///< dyadic function
 
-   // temporary token classes. Token of these classes can appear as
-   // intermediate results during tokenization and execution
+   // temporary Token classes. Token of these classes can appear as
+   // intermediate results during tokenization and prefix parsing
    //
    TC_PINDEX        = 0x10,   ///< partial index
    TC_VOID          = 0x11,
@@ -81,7 +82,7 @@ enum TokenClass
    TC_MASK          = 0xFF,
    TC_INVALID       = 0xFF,
 
-   // short token class names for phrase table
+   // shorter token class names for phrase table
    //
    SN_A             = TC_VALUE,
    SN_ASS           = TC_ASSIGN,

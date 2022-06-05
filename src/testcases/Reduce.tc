@@ -86,14 +86,10 @@
 
       S←(1 1) (1 0)
       S/¨'ab' 'cd'
-DOMAIN ERROR
-      S/¨'ab' 'cd'
-      ^ ^
+ ab c 
 
       (S)/¨'ab' 'cd'
-DOMAIN ERROR
-      S/¨'ab' 'cd'
-      ^ ^
+ ab c 
 
       )SIC
 
