@@ -198,7 +198,7 @@ TokenClass next = body[pc].get_Class();
         return true;
       }
 
-   // dyadic operator with numeric function argument, for example:  ⍤ 0 
+   // dyadic operator with numeric function argument, for example:  ⍤ 0
    //
    if (next == TC_VALUE                  &&
        pc < Function_PC(body.size() - 1) &&
@@ -321,15 +321,30 @@ Prefix::get_range_low() const
 bool
 Prefix::value_expected()
 {
-   // return true iff the current saved_lookahead token (which has been tested
-   // to be a TC_INDEX token) is the index of a value and false it it is
-   // a function axis
+   /* on entry: saved_lookahead.get_Class() == TC_INDEX token.
+                body[PC] is the token left of saved_lookahead.
 
-   // if it contains semicolons then get_ValueType() is TV_INDEX and
-   // it MUST be a value.
+      return true if the token left of saved_lookahead must be a value (so
+      that saved_lookahead is the index of a value) or false if the token
+      left of saved_lookahead must be a function or operator (so that
+      saved_lookahead is the axis of a  function or operator).
+
+       See also: "Additional Requirement" at the bottom of page 48 in the
+       ISO standard.
+    */
+   Assert1(saved_lookahead.tok.get_Class() == TC_INDEX);
+   Assert1(saved_lookahead.pc == (PC - 1));
+
+   // function axes cannot contain semicolons. Therefore, if saved_lookahead
+   // contains semicolons then its get_ValueType() is TV_INDEX and
+   // saved_lookahead  MUST be the index of a value. The converse is not
+   // true: a get_ValueType() of TC_VALUE only indicates the lack of semicolons,
+   // which is valid for both functions and values.
    //
-   if (saved_lookahead.tok.get_ValueType() == TV_INDEX)   return true;
+   if (saved_lookahead.tok.get_ValueType() == TV_INDEX)   return true;   // value
 
+   // look ahead further until value index vs. function axis can be decided.
+   //
    for (size_t pc = PC; pc < body.size();)
       {
         const Token & tok = body[pc++];
@@ -340,7 +355,7 @@ Prefix::value_expected()
                     pc += tok.get_int_val2();
                     continue;
 
-               case TC_END:     return false;   // syntax error
+               case TC_END:     return false;   // ◊ [] : syntax error
 
                case TC_FUN0:    return true;   // niladic function is a value
                case TC_FUN12:   return false;  // function
@@ -526,7 +541,7 @@ grow:
                  }
 
                bool resolved = false;
-               if (size() > 0 && at(0).tok.get_Class() == TC_INDEX && 
+               if (size() > 0 && at(0).tok.get_Class() == TC_INDEX &&
                    tl.tok.get_tag() == TOK_SYMBOL)   // user defined variable
                   {
                     // indexed reference, e.g. A[N]. Calling sym->resolve()
@@ -648,7 +663,7 @@ found_prefix:
           // The ] could belong to:
           //
           // 1. an indexed value,        e.g. A[X] or
-          // 2. a function with an axis, e.g. +[2] 
+          // 2. a function with an axis, e.g. +[2]
           //
           // These cases lead to different reductions:
           //
@@ -1781,8 +1796,8 @@ Token result = Token(TOK_FUN2, derived);
         Token new_B(TOK_APL_VALUE1, B);
         Token_loc tl_B(new_B, pc_B);
         Token_loc tl_derived(result, pc_D);
-        push(tl_B);   
-        push(tl_derived);   
+        push(tl_B);
+        push(tl_derived);
       }
 
    action = RA_CONTINUE;

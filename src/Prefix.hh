@@ -41,7 +41,7 @@ enum R_action
    RA_CONTINUE = 0,
 
    /// push next token and repeat phrase matching with current stack
-   RA_PUSH_NEXT = 1,
+   RA_PUSH_NEXT = 1,   // aka. SHIFT
 
    /// return from parser with result arg[0]
    RA_RETURN = 2,

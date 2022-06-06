@@ -26,12 +26,12 @@
 //----------------------------------------------------------------------------
 /** Comma related functions (catenate, laminate, and ravel.) */
 /// Base class for , and ⍪
-class Bif_COMMA : public NonscalarFunction
+class Bif_COMMA : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_COMMA(TokenTag tag)
-   : NonscalarFunction(tag)
+   : NonscalarFunction_default_identity(tag)
    {}
 
    /// ravel along axis, with axis being the first (⍪( or last (,) axis of B
@@ -55,11 +55,7 @@ public:
                                  const Value & B);
 
    /// Prepend scalar cell_B to A along axis
-   static Value_P append_scalar(const Value & A, uAxis axis,
-                                const Cell & cell_B);
-
-   /// Evaluate \b the identity function.
-   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
+   static Value_P append_scalar(const Value & A, uAxis axis, const Cell & cell_B);
 };
 //----------------------------------------------------------------------------
 /** primitive functions catenate, laminate, and ravel along last axis */
@@ -115,11 +111,11 @@ public:
 
   /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return Token(TOK_APL_VALUE1,
-               catenate_or_laminate(*A, *X, *B)); }
+      { return Token(TOK_APL_VALUE1, catenate_or_laminate(*A, *X, *B)); }
 
    static Bif_F12_COMMA1 * fun;   ///< Built-in function
    static Bif_F12_COMMA1  _fun;   ///< Built-in function
+
 protected:
 };
 //----------------------------------------------------------------------------

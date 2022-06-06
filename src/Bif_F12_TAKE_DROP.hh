@@ -27,12 +27,12 @@
 //============================================================================
 /** primitive functions Take and First */
 /// The class implementing ↑
-class Bif_F12_TAKE : public NonscalarFunction
+class Bif_F12_TAKE : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_F12_TAKE()
-   : NonscalarFunction(TOK_F12_TAKE)
+   : NonscalarFunction_default_identity(TOK_F12_TAKE)
    {}
 
    /// overloaded Function::eval_B()

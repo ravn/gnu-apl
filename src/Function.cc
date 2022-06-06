@@ -147,13 +147,15 @@ int sig = SIG_FUN;
 //----------------------------------------------------------------------------
 Token Function::eval_fill_AB(Value_P A, Value_P B) const
 {
-  MORE_ERROR() << " function " << get_name() << " has no fill function";
+  MORE_ERROR() << "The fill function of " << get_name()
+               << " is not defined (or not yet implemented)";
   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 Token Function::eval_identity_fun(Value_P B, sAxis axis) const
 {
-  MORE_ERROR() << " function " << get_name() << " has no identity function";
+  MORE_ERROR() << "The identity function of " << get_name()
+               << " is not defined (or not yet implemented)";
   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------

@@ -367,7 +367,7 @@ struct Token_loc
      pc(_pc)
    {}
 
-   /// copy this Token_loc to \b other
+   /// copy \b other to this Token_loc
    void copy(const Token_loc & other, const char * loc)
       {
         pc = other.pc;

@@ -115,6 +115,36 @@ UCS_string ind(indent, UNI_SPACE);
    print(out);
    out << endl;
 }
+//----------------------------------------------------------------------------
+Token
+NonscalarFunction_default_identity::eval_identity_fun(Value_P B,
+                                                      sAxis axis) const
+{
+   // axis is already normalized to IO←0
+   // return Z←,/B0 where (B0 , B) is B.
+
+const sRank rank_B = B->get_rank();
+   if (rank_B < 1)       RANK_ERROR;   // identity restriction, lrm p. 212
+   if (axis >= rank_B)   RANK_ERROR;
+
+const Shape shape_Z = B->get_shape().without_axis(axis);
+
+   /* the removal of the reduction axis must not create a non-empty result.
+
+      In IBM APL2:
+
+                 ┌───── reduction axis
+            ⍴ ,/ 0 0⍴42   → 0
+            ⍴ ,/ 0 3⍴42   → 0
+            ⍴ ,/ 3 0⍴42   → DOMAIN ERROR (shape would be 3)
+    */
+   if (shape_Z.get_volume() > 0)   DOMAIN_ERROR;
+
+Value_P Z(shape_Z, LOC);
+   Z->set_default(*B, LOC);
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
 //============================================================================
 Token
 Bif_F0_ZILDE::eval_() const

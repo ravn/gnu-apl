@@ -28,12 +28,12 @@
 //----------------------------------------------------------------------------
 /** primitive functions matrix divide and matrix invert */
 /// The class implementing ⌹
-class Bif_F12_DOMINO : public NonscalarFunction
+class Bif_F12_DOMINO : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_F12_DOMINO()
-   : NonscalarFunction(TOK_F12_DOMINO)
+   : NonscalarFunction_default_identity(TOK_F12_DOMINO)
    {}
 
    /// overloaded Function::eval_B()

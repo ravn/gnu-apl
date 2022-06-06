@@ -96,6 +96,20 @@ public:
    {}
 };
 //----------------------------------------------------------------------------
+/// Base class for all internal non-scalar functions of the interpreter
+// that have the default identity function
+class NonscalarFunction_default_identity : public NonscalarFunction
+{
+public:
+   /// Constructor
+   NonscalarFunction_default_identity(TokenTag tag)
+   : NonscalarFunction(tag)
+   {}
+
+   /// Overloaded Function::eval_identity_fun
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
+};
+//----------------------------------------------------------------------------
 /** System function zilde (⍬) */
 /// The class implementing ⍬ (the empty numeric vector)
 class Bif_F0_ZILDE : public NonscalarFunction
@@ -286,6 +300,7 @@ public:
 
    static Bif_F12_DECODE * fun;   ///< Built-in function
    static Bif_F12_DECODE  _fun;   ///< Built-in function
+
 protected:
    /// decode B according to len_A and cA (integer A, B and Z)
    static bool decode_int(Value & Z, ShapeItem len_A, const Cell * cA,
@@ -302,12 +317,12 @@ protected:
 //----------------------------------------------------------------------------
 /** primitive functions rotate and reverse */
 /// Base class for implementing ⌽ and ⊖
-class Bif_ROTATE : public NonscalarFunction
+class Bif_ROTATE : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor.
    Bif_ROTATE(TokenTag tag)
-   : NonscalarFunction(tag)
+   : NonscalarFunction_default_identity(tag)
    {}
 
 protected:
@@ -378,12 +393,12 @@ protected:
 //----------------------------------------------------------------------------
 /** System function transpose */
 /// The class implementing ⍉
-class Bif_F12_TRANSPOSE : public NonscalarFunction
+class Bif_F12_TRANSPOSE : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_F12_TRANSPOSE()
-   : NonscalarFunction(TOK_F12_TRANSPOSE)
+   : NonscalarFunction_default_identity(TOK_F12_TRANSPOSE)
    {}
 
    /// overloaded Function::eval_B()
@@ -416,12 +431,12 @@ protected:
 //----------------------------------------------------------------------------
 /** primitive functions reshape and shape */
 /// The class implementing ⍴
-class Bif_F12_RHO : public NonscalarFunction
+class Bif_F12_RHO : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_F12_RHO()
-   : NonscalarFunction(TOK_F12_RHO)
+   : NonscalarFunction_default_identity(TOK_F12_RHO)
    {}
 
    /// overloaded Function::eval_B()

@@ -27,12 +27,12 @@
 //============================================================================
 /** primitive functions partition and enclose */
 /// The class implementing ⊂
-class Bif_F12_PARTITION : public NonscalarFunction
+class Bif_F12_PARTITION : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_F12_PARTITION()
-   : NonscalarFunction(TOK_F12_PARTITION)
+   : NonscalarFunction_default_identity(TOK_F12_PARTITION)
    {}
 
    /// overloaded Function::eval_B()

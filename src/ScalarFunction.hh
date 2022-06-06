@@ -912,7 +912,7 @@ protected:
 /** Scalar function not and non-scalar function without.
  */
 /// The class implementing ∼
-class Bif_F12_WITHOUT : public ScalarFunction
+class Bif_F12_WITHOUT : public ScalarFunction // (almost)
 {
 public:
    /// Constructor.
@@ -926,6 +926,10 @@ public:
    /// Compute A without B.
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const;
+
+   /// Overloaded Function::eval_identity_fun. Dyadic ∼ is not scalar, therefore
+   /// its eval_identity_fun() differs from ScalarFunction::eval_identity_fun().
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
 
 protected:
    /// overloaded Function::eval_B().
