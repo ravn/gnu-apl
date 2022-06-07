@@ -187,6 +187,18 @@ const size_t len = read(fd, buf, sizeof(buf));
 }
 //----------------------------------------------------------------------------
 bool
+UserPreferences::parse_argv_0(int argc, const char * argv[])
+{
+   for (int a = 1; a < (argc - 1); ++a)
+       {
+         if (!strcmp(argv[a], "-l") && atoi(argv[a+1]) == LID_startup)
+            return true;
+       }
+
+   return false;
+}
+//----------------------------------------------------------------------------
+bool
 UserPreferences::parse_argv_1()
 {
 bool log_startup = false;
@@ -769,13 +781,39 @@ UserPreferences::parse_argv_2(bool logit)
 
    if (randomize_testfiles)   InputFile::randomize_files();
 
-   // if running from a script then make the script the first input file
+#if 0
+   // at some point in time this was needed but it seems no longer so. The details
+      as to were lost in the meantime. We keep it in case it pops up again...
+
+   /* Note. Let the first line of script.apl be:
+
+      #!/home/eedjsa/apl-1.8/src/apl -l 37 --script
+
+    Suppose apl is started like this:
+
+      A.  apl -f script.apl   # with script.apl executable. Then:
+              script_argc is:                  2
+              expanded_argv[script_argc] is:   script.apl
+              InputFile::files_todo.size():    1
+
+      B.  apl -f script.apl   # with script.apl NOT executable. Then:
+               script_argc is:                 0
+               expanded_argv[script_argc] is:  apl
+              InputFile::files_todo.size():    1
+
+      C.  script.apl   # with script.apl executable. Then:
+              script_argc is:                  4   (from #!/home...)
+              expanded_argv[script_argc] is:   script.apl
+              InputFile::files_todo.size():    0
+    */
+
    if (script_argc != 0)
       {
         const UTF8_string & filename = expanded_argv[script_argc];
         InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
         InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
       }
+#endif
 
    // count number of testfiles
    //
@@ -815,13 +853,15 @@ UserPreferences::parse_argv_2(bool logit)
 void
 UserPreferences::expand_argv(int argc, const char ** argv)
 {
+   // 1. copy the command line arguments into original_argv and expanded_argv.
+   //
    loop(a, argc)
        {
          original_argv.push_back(argv[a]);
          expanded_argv.push_back(argv[a]);
        }
 
-   if (argc <= 1)   // no args at all
+   if (argc <= 1)   // program name argv[0] only, hence no arguments to expand
       {
         return;
       }

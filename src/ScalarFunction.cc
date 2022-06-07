@@ -770,23 +770,12 @@ const Shape shape_Z = B->get_shape().without_axis(axis);
 
 Value_P Z(shape_Z, LOC);
 
-const Cell & proto_B = B->get_cfirst();
-
-   if (proto_B.is_pointer_cell())
+   if (Z->is_empty())
       {
-        // create a value like ↑B but with all ravel elements like FI0...
-        //
-        POOL_LOCK(parallel_jobs_lock,
-           Value_P sub(proto_B.get_pointer_value()->get_shape(),LOC))
-        const ShapeItem len_sub = sub->nz_element_count();
-        loop(s, len_sub)   sub->next_ravel_Cell(FI0);
-        sub->check_value(LOC);
-
-        while (Z->more())   Z->next_ravel_Pointer(CLONE_P(sub, LOC).get());
+        Z->get_wproto().init(FI0, *Z, LOC);
       }
    else
       {
-        if (Z->is_empty())  Z->get_wproto().init(FI0, *Z, LOC);
         while (Z->more())   Z->next_ravel_Cell(FI0);
       }
 

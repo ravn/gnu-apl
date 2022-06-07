@@ -29,9 +29,6 @@
 #include "Value.hh"
 
 //----------------------------------------------------------------------------
-/** Base class for scalar functions (functions whose monadic and/or dyadic
-    version are scalar.
- */
 /// Base class for all scalar functions
 class ScalarFunction : public PrimitiveFunction
 {
@@ -97,8 +94,7 @@ protected:
    Token do_eval_fill_B(const Value & B) const;
 
    /// Evaluate \b the identity function.
-   static Token eval_scalar_identity_fun(Value_P B, sAxis axis,
-                                         const Cell & FI0);
+   static Token eval_scalar_identity_fun(Value_P B, sAxis axis, const Cell & FI0);
 
    /// parallel eval_scalar_AB
    static Thread_context::PoolFunction PF_scalar_AB;

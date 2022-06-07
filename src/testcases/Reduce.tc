@@ -66,9 +66,15 @@
 0
 
 
-      ×/2 3 0ρ⊂0 0
- 1 1  1 1  1 1 
- 1 1  1 1  1 1 
+      ⊢Z← ×/ B←2 3 0ρ⊂0 0
+1 1 1
+1 1 1
+
+      ⍝ lrm p. 209/ says: "if R is nested then ≡Z is ≡B". However, IBM APL2
+      ⍝ gives 1 = ≡Z and 2 = ≡B in the example above. We follow APL2.
+      ⍝
+      (≡Z) ≡ (≡B)   ⍝ lrm → 1, APL2 → 0
+0
 
       ⍝ reduce with reduction ----------------------------------
 

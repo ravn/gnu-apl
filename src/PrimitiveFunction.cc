@@ -123,22 +123,31 @@ NonscalarFunction_default_identity::eval_identity_fun(Value_P B,
    // axis is already normalized to IO←0
    // return Z←,/B0 where (B0 , B) is B.
 
-const sRank rank_B = B->get_rank();
+const Shape & shape_B = B->get_shape();
+const sRank rank_B = shape_B.get_rank();
    if (rank_B < 1)       RANK_ERROR;   // identity restriction, lrm p. 212
    if (axis >= rank_B)   RANK_ERROR;
 
-const Shape shape_Z = B->get_shape().without_axis(axis);
+   // eval_identity_fun() is supposedly only called when the length of axis is 0
+const ShapeItem axis_len = shape_B.get_shape_item(axis);
+   Assert(axis_len == 0);
+
+const Shape shape_Z = shape_B.without_axis(axis);
 
    /* the removal of the reduction axis must not create a non-empty result.
 
       In IBM APL2:
 
-                 ┌───── reduction axis
+                   ┌───── reduction axis
+                   │
             ⍴ ,/ 0 0⍴42   → 0
-            ⍴ ,/ 0 3⍴42   → 0
-            ⍴ ,/ 3 0⍴42   → DOMAIN ERROR (shape would be 3)
+            ⍴ ,/ 0 3⍴42   → 0 (not happening here since axis_len == 0)
+            ⍴ ,/ 3 0⍴42   → DOMAIN ERROR (volume would be 3)
+            ⍴ ,/   0⍴42   → DOMAIN ERROR (volume would be 1)
+      but:  ⍴ +/   0⍴42   → ⍬   and +/   0⍴42   → 0 (integer scalar 0)
+            ⍴ ×/   0⍴42   → ⍬   and +/   0⍴42   → 1 (integer scalar 1)
     */
-   if (shape_Z.get_volume() > 0)   DOMAIN_ERROR;
+   if (shape_Z.get_rank() && shape_Z.get_volume() > 0)   DOMAIN_ERROR;
 
 Value_P Z(shape_Z, LOC);
    Z->set_default(*B, LOC);

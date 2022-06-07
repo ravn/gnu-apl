@@ -374,8 +374,22 @@ init_apl(int argc, const char * argv[])
      if (term == 0 || *term == 0)   setenv("TERM", "dumb", 1);
    }
 
+const bool log_startup0 = uprefs.parse_argv_0(argc, argv);
+   if (LOG_argc_argv || log_startup0)
+      {
+         CERR << "argc/argv before expansion:\n";
+         show_argv(argc, argv);
+      }
+
    uprefs.expand_argv(argc, argv);
-const bool log_startup = uprefs.parse_argv_1();
+
+const bool log_startup = uprefs.parse_argv_1() || log_startup0;
+   if (LOG_argc_argv || log_startup)
+      {
+         CERR << "argc/argv after expansion:\n";
+         show_argv(uprefs.expanded_argv.size(), &uprefs.expanded_argv[0]);
+      }
+
 
 #ifdef DYNAMIC_LOG_WANTED
    if (log_startup)   Log_control(LID_startup, true);

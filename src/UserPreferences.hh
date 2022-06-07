@@ -100,16 +100,20 @@ struct UserPreferences
    /// show version information
    static void show_version(ostream & out);
 
-   /// parse command line parameters (before reading preference files)
+   /// parse the original command line parameters to figure start-up Logging
+   /// (BEFORe any expansions)
+   bool parse_argv_0(int argc, const char * argv[]);
+
+   /// parse command line parameters (BEFORE reading preference files)
    bool parse_argv_1();
 
-   /// parse command line parameters (after reading preference files)
+   /// parse command line parameters (AFTER reading preference files)
    void parse_argv_2(bool logit);
 
-   /// argv/argc at startup
+   /// argv/argc at startup before expand_argv()
    std::vector<const char *> original_argv;
 
-   /// argv/argc after expand_argv
+   /// argv/argc after expand_argv()
    std::vector<const char *> expanded_argv;
 
    /// append test results to summary.log rather than overriding it

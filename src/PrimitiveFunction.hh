@@ -106,8 +106,12 @@ public:
    : NonscalarFunction(tag)
    {}
 
-   /// Overloaded Function::eval_identity_fun
+   /// Overloaded Function::eval_identity_fun()
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
+
+   /// implementation of eval_identity_fun(), so that non-derived functions
+   /// may use it as well.
+   static Token do_eval_identity_fun(Value_P B, sAxis axis);
 };
 //----------------------------------------------------------------------------
 /** System function zilde (⍬) */

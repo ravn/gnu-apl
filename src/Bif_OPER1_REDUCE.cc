@@ -151,9 +151,6 @@ Function_P LO = tok_LO.get_function();
    if (axis >= B->get_rank())   AXIS_ERROR;
 
 const ShapeItem m_len = B->get_shape_item(axis);
-
-const Shape shape_Z = B->get_shape().without_axis(axis);
-
    if (m_len == 0)   // apply the identity function
       {
         /*
@@ -167,6 +164,7 @@ const Shape shape_Z = B->get_shape().without_axis(axis);
         return LO->eval_identity_fun(B, axis);
       }
 
+const Shape shape_Z = B->get_shape().without_axis(axis);
    if (m_len == 1)   return Bif_F12_RHO::do_reshape(shape_Z, *B);
 
    // non-trivial reduce (len > 1)
@@ -184,40 +182,39 @@ const Shape3 B3(B->get_shape(), axis);
                                 ->eval_LXB(tok_LO, X4, B);
       }
 
-   if (shape_Z.is_empty())   return LO->eval_identity_fun(B, axis);
-
 const Shape3 Z3(B3.h(), 1, B3.l());
    return do_reduce(shape_Z, Z3, B3.m(), LO, B, B->get_shape_item(axis));
 }
 //----------------------------------------------------------------------------
 Token
-Bif_REDUCE::reduce_n_wise(Value_P A, Token & tok_LO, Value_P B, uAxis axis)
+Bif_REDUCE::reduce_n_wise(Value_P A, Token & tok_LO,
+                          Value_P B, uAxis axis) const
 {
    if (!tok_LO.is_function())
       {
-        MORE_ERROR() << "The left argument of operator A / res. A ⌿"
-                        " is not a function";
+        MORE_ERROR() << "Function argument f of monadic operator A f/ B"
+                        " resp. A f⌿ B is not a function";
         DOMAIN_ERROR;
       }
 
 Function_P LO = tok_LO.get_function();
    if (!LO->has_result())
       {
-        MORE_ERROR() << "The left argument of operator A ⌿ resp. A ⌿"
-                        " is a function that returns no result";
+        MORE_ERROR() << "In A " << LO->get_name() << get_name() << " B: "
+                     <<  LO->get_name() << " returns no result";
         DOMAIN_ERROR;
       }
 
    if (LO->get_fun_valence() != 2)
       {
-        MORE_ERROR() << "The left argument of operator A ⌿ resp. A ⌿"
-                        " is a function that is not dyadic";
-        SYNTAX_ERROR;
+        MORE_ERROR() << "In A " << LO->get_name() << get_name() << " B: "
+                     <<  LO->get_name() << " is not a dyadic function";
+        VALENCE_ERROR;
       }
 
    if (A->element_count() != 1)   LENGTH_ERROR;
 const APL_Integer A0 = A->get_cfirst().get_int_value();
-const int n_wise = A0 < 0 ? -A0 : A0;   // the number of items (= M1 in iso)
+const int n_wise = A0 < 0 ? -A0 : A0;   // the number of items (= M1 in ISO)
 
    if (B->is_scalar())
       {
