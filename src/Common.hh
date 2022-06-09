@@ -473,6 +473,10 @@ charP(const void * vp)
                            setw(2) << int(x) << std::left << nohex
 #define HEX4(x)    "0x" << uhex << std::right << \
                            setw(4) << int(x) << std::left << nohex
+#define HEX8(x)    "0x" << uhex << std::right << \
+                           setw(8) << int32_t(x) << std::left << nohex
+#define HEX16(x)   "0x" << uhex << std::right << \
+                           setw(16) << int64_t(x) << std::left << nohex
 #define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
 
 /// cast to a const void *

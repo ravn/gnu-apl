@@ -5,13 +5,15 @@ ASCIIDOC = \
     APL-Communication-Cookbook.asciidoc \
     Parallel-APL.asciidoc               \
     Quad-GTK.asciidoc                   \
-    GNU-APL-Memory-Management.asciidoc
+    GNU-APL-Memory-Management.asciidoc  \
+    GNU-APL-Troubleshooting.asciidoc
 
 HTML = \
     APL-Communication-Cookbook.html \
     Parallel-APL.html               \
     Quad-GTK.html                   \
-    GNU-APL-Memory-Management.html
+    GNU-APL-Memory-Management.html  \
+    GNU-APL-Troubleshooting.html
 
 dist_doc_DATA = \
     $(HTML)              \

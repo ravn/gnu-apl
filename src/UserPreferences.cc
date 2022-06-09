@@ -781,39 +781,45 @@ UserPreferences::parse_argv_2(bool logit)
 
    if (randomize_testfiles)   InputFile::randomize_files();
 
-#if 0
-   // at some point in time this was needed but it seems no longer so. The details
-      as to were lost in the meantime. We keep it in case it pops up again...
-
    /* Note. Let the first line of script.apl be:
 
       #!/home/eedjsa/apl-1.8/src/apl -l 37 --script
 
-    Suppose apl is started like this:
+     apl may have been started in one off these ways:
 
-      A.  apl -f script.apl   # with script.apl executable. Then:
-              script_argc is:                  2
-              expanded_argv[script_argc] is:   script.apl
-              InputFile::files_todo.size():    1
-
-      B.  apl -f script.apl   # with script.apl NOT executable. Then:
+      A.  ./apl -f script1.apl   # with script1.apl NOT executable. Then:
+               expanded_argv[script_argc] is:  ./apl
+              InputFile::files_todo.size():    1   (from -f)
                script_argc is:                 0
-               expanded_argv[script_argc] is:  apl
-              InputFile::files_todo.size():    1
 
-      C.  script.apl   # with script.apl executable. Then:
-              script_argc is:                  4   (from #!/home...)
-              expanded_argv[script_argc] is:   script.apl
-              InputFile::files_todo.size():    0
+      B.  ./apl -f script2.apl   # with script2.apl executable. Then:
+              expanded_argv[script_argc] is:   script2.apl
+              InputFile::files_todo.size():    1    (from -f)
+               script_argc is:                 2
+
+      C.   ./apl
+               expanded_argv[script_argc] is:  ./apl
+              InputFile::files_todo.size():    0    (since no -f)
+               script_argc is:                 0
+
+      D.  ./script.apl   # with script2.apl executable. Then:
+              expanded_argv[script_argc] is:   script2.apl
+              InputFile::files_todo.size():    0    (since no -f)
+              script_argc is:                  1    #!./apl
+              script_argc is:                  2    #!./apl --script
+              script_argc is:                  4    #!./apl -l 37 --script
+
+      In case D. the interpreter has lost script_argc and the script file
+      needs to be appended to files_todo.
     */
 
-   if (script_argc != 0)
+   if (InputFile::files_todo.size() == 0)   // no -f (cases C. and D.)
+   if (script_argc > 0)                     // (case D.)
       {
         const UTF8_string & filename = expanded_argv[script_argc];
         InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
         InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
       }
-#endif
 
    // count number of testfiles
    //

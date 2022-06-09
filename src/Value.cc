@@ -416,10 +416,14 @@ Value::~Value()
 const ShapeItem length = nz_element_count();
 
 #if APL_Float_is_class
+
    //  APL_Float is a class, therefore we need to release all Cells
+
 #else
+
    // APL_Float is NOT a class, Therefore release only PointerCells
    if (get_pointer_cell_count() > 0)
+
 #endif
       {
         Cell * cZ = &get_wfirst();
@@ -433,7 +437,7 @@ const ShapeItem length = nz_element_count();
                 completed, usually due to a DOMAIN ERROR somewhere.
 
                 A. the first ravel cells (up to (including) valid_ravel_items)
-                   were intialized normaly (and can be safely released.
+                   were intialized normally (and can be safely released.
 
                 B. the ravel cell at valid_ravel_items may or may not have
                    been released. We don't release it because loosing some
@@ -1109,9 +1113,7 @@ void
 Value::init()
 {
    Log(LOG_startup)
-      CERR << "Max. Rank            is " << MAX_RANK << endl
-           << "sizeof(Value header) is " << sizeof(Value)  << " bytes" << endl
-           << "Cell size            is " << sizeof(Cell)   << " bytes" << endl;
+      CERR << "Max. Rank            is " << MAX_RANK << endl;
 };
 //----------------------------------------------------------------------------
 bool

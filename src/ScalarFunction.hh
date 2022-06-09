@@ -57,10 +57,6 @@ protected:
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const = 0;
 
-   /// Evaluate a scalar function dyadically with axis.
-   Token eval_scalar_AXB(const Value & A, const Value & X, const Value & B,
-                         prim_f2 fun) const;
-
    /// overloaded Function::eval_fill_AB()
    virtual Token eval_fill_AB(Value_P A, Value_P B) const
       { return do_eval_fill_AB(*A, *B); }
@@ -72,6 +68,9 @@ protected:
    /// overloaded Function::has_result()
    virtual bool has_result() const   { return true; }
 
+   /// return true if this function can be parallelized
+   virtual bool may_parallel() const   { return true; }
+
    /// compute the monadic scalar function \b fun along one ravel
    Value_P do_scalar_B(ErrorCode & ec, const Value & B, prim_f1 fun) const;
 
@@ -82,6 +81,10 @@ protected:
    /// compute cell_A fun cell_B, scalar-extending PointerCells
    void expand_nested(Value * Z, const Cell * cell_A,
                       const Cell * cell_B, prim_f2 fun) const;
+
+   /// Evaluate a scalar function dyadically with axis.
+   Token eval_scalar_AXB(const Value & A, const Value & X, const Value & B,
+                         prim_f2 fun) const;
 
    /// A helper function for eval_scalar_AXB().
    Value_P eval_scalar_AXB(const Value & A, AxesBitmap axes_in_X,
@@ -602,6 +605,9 @@ public:
    static Bif_F2_FIND * fun;         ///< Built-in function.
    static Bif_F2_FIND  _fun;         ///< Built-in function.
 
+   /// overloaded ScalarFunction::may_parallel()
+   virtual bool may_parallel() const   { return false; }
+
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const;
@@ -900,6 +906,9 @@ protected:
    virtual prim_f2 get_scalar_f2() const
       { return 0; }
 
+   /// overloaded ScalarFunction::may_parallel()
+   virtual bool may_parallel() const   { return false; }
+
    /// recursively check that all ravel elements of B are integers ≥ 0 and
    /// return \b true iff not.
    static bool check_B(const Value & B, double qct);
@@ -926,6 +935,9 @@ public:
    /// Overloaded Function::eval_identity_fun. Dyadic ∼ is not scalar, therefore
    /// its eval_identity_fun() differs from ScalarFunction::eval_identity_fun().
    virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
+
+   /// overloaded ScalarFunction::may_parallel()
+   virtual bool may_parallel() const   { return false; }
 
 protected:
    /// overloaded Function::eval_B().

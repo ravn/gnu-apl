@@ -59,7 +59,7 @@ char * loc = new char[loc_len + 1];
         get_CERR() << "\n\n================ " << fun <<  " ================\n";
       }
 
-   get_CERR() << "Call stack:" << endl;
+   get_CERR() << "C/C++ call stack:" << endl;
 
    if (asserting)
       {

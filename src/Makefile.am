@@ -248,7 +248,7 @@ update-svar_signals:
 apl_LDADD = $(LIBS)
 
 apl.lines: apl
-	objdump -j .text -l -d $< > $@
+	objdump --section=.text --line-numbers --disassemble $< > $@
 
 test: all
 	./apl --id 1010 -T testcases/*tc

@@ -1,0 +1,228 @@
+= Trouble-Shooting GNU APL
+// vim: et:ts=4:sw=4
+
+:Author: Jürgen Sauermann, GNU APL
+
+:page-width: 120em
+:toc:
+:toclevels: 4
+:iconsdir: /usr/share/asciidoc/icons
+:icons:
+
+== Abstract
+
+This document contains hints for GNU APL users who would like to report
+GNU APL problems and who want to make the life of the GNU APL developer(s)
+a little easier.
+
+== Introduction
+
+GNU APL is, in terms of source code size, a fairly large program. As of
+this writing the source code for the interpreter, not counting code in
+sub-directories, has more than 110,000 lines of code. Finding faults in
+a code of that size is not as trivial as finding faults in a short program
+of only a few thousand lines. Past experience shows, that after a new fault was
+observed, the time for reproducing and localizing the fault typically takes
+more than 90 % of the total time to fix it.
+
+For this reason, GNU APL comes with a handful of built-in trouble-shooting
+capabilities that makes locating a fault easier. Some of these capabilities
+require that GNU APL is built and run in a specific way as described in
+this document.
+
+Almost every error that might occur in GNU APL falls into one of 4 categories
+of increasing severities:
+
+* Errors in User Programs (aka. APL errors),
+* Incorrect APL results,
+* Failed Assertions, and
+* Crashes of the GNU APL interpreter.
+
+Each category requires different means and preparations for locating the
+root cause of the error.
+
+== Errors in User Programs (aka. APL errors),
+
+Errors in user programs are reported by the APL intepreter when APL code
+is being executed. Before the interpreter starts it internal computation(s)
+it checks the arguments. These checks depend on the computation required
+and usually occur in the following order:
+
+. Syntax Check (may raise SYNTAX ERROR)
+. Valence Check (may raise VALENCE ERROR or AXIS ERROR)
+. Value Check (may raise VALUE ERROR)
+. Rank Check (may raise RANK ERROR)
+. Shape Check (may raise LENGTH ERROR)
+. Domain Checks (may raise SYNTAX ERROR)
+
+That is, a VALUE error can normally only occur in the absence of SYNTAX
+and VALENCE ERRORs, a LENGTH ERROR can only occur in the absence of SYNTAX,
+VALENCE, AXIS, VALUE, and RANK ERRORs, and so on.
+
+An APL error is displayed immediately and (provided that output colouring
+is enabled) in a different color than the APL output. The first line of the
+error display is the type of error, possibly followed by +. The +, if
+present, indicates that there is more information available about the error
+(and that the additional information can be obtained with command )MORE.
+Example:
+
+      +/[1;2] 3   ⍝ ; is not allowed in function axes.
+AXIS ERROR+
+      +/[1;2]3
+      ^     ^
+      )MORE
+illegal ; in axis
+
+APL errors shall, of course,  not be reported to the GNU APL maintainers,
+with the following exceptions:
+
+* An error was raised incorrectly, i.e. for a valid APL input, or
+* the display of )MORE is misleading or could be improved. Many errors
+  create no )MORE information and that is on purpose. If you believe, however,
+  that a particular error case is difficult to grasp and would benefit from
+  a )MORE information, then feel free to propose that in an email to
+  bug-apl@gnu.org
+
+== Incorrect APL results
+
+If GNU APL produces an incorrect result, then you should report in in an
+email to bug-apl@gnu.org. People on that mailing list are gentle and helpful,
+so don't be afraid to report an error.
+
+However, please note the following: Even though APL as a language is
+standardized, (ISO Standard 13751 "Programming Language APL, Extended")
+there exist considerable differences (and also errors) between:
+
+* the APL standard, and
+* the APL documentation of different vendors,
+* and the interpreter implementations of different vendors (including GNU APL).
+
+In the case of such differences, GNU APL usually resolves the issue in the
+following order:
+
+* IBM APL2 PC implementation (highest priority)
+* IBM APL2 language reference manual
+* ISO Standard 13751
+* Other vendors (lowest priority).
+
+Before sending an email to bug-apl@gnu.org it may make sense to check if the
+issue was reported already (and maybe caused by such differences).
+
+== Failed Assertions
+
+An assertion is an expression in the source code that the programmer assumes
+to be *true* (aka. ≠ 0 in C/C\+\+). It can be very hard to find the origin
+(root cause) of an error, in particular when many CPU instruction we performed
+between the root cause and error being detected.
+
+By making assertions all over place in the source code, the programmer
+introces checks along the execution path in order to reduce the number of
+CPU instructions between a root cause and the point in time where it is
+being detected. In the C/C\+\+ code, assertions are typically made in the
+following places:
+
+* near the beginning of a function (also known as pre-condition) to check
+   the arguments passed to the function,
+* after calling a reasonably complex sub-function, and
+* near the end of a function (post-condition) to check the result returned by
+  the function.
+
+Assertions are implemented as one of C/C\+\+ macros called Assert() and
+Assert1(). As of this writing there are more than 530 Assert() and more
+than 110 Assert1() macros spread across the GNU APL source code. The reason
+for having different Assert macros their impact on performance.
+
+Assert1() macros are intended to test more trivial conditions while Assert()
+macros test more complex conditions. Every test performed by a single Assert()
+or Assert1() macro has a (relatively mild) performance impact. However, the
+large number of Assert() macros cululates the total performance impact which
+may be undesirable. To deal with this, the user may ./configure one of 3
+different assertion levels as follows (see also README-2-configure):
+
+* ASSERT_LEVEL_WANTED = 0: this disables both the Assert1() and the Assert()
+  macro so that the interpreter will have the maximal performance.
+* ASSERT_LEVEL_WANTED = 1 (the default): this disables the Assert1() macro and
+  enables and the Assert() macro.
+* ASSERT_LEVEL_WANTED = 2: this enables both the Assert1() and the Assert()
+  macro.
+
+We kindly ask the user to:
+
+make develop
+
+which, beside other settings, does ./configure with ASSERT_LEVEL_WANTED=2,
+this enabling both Assert macros and possibly making it easier to find the
+root cause of a fault.
+
+As confidence woth the source code increases over time, Assert() macros will
+evenntually be converted to Assert1() macros while new code will initially
+be protected with Assert() macros.
+
+=== Emulating Failed Assertions
+
+The user may emulate a failed Assert() or Assert1() macro with ⎕FIO:
+
+----
+
+      ⎕FIO ¯16   ⍝ emulate Assert
+
+      ⎕FIO ¯17   ⍝ emulate Assert1
+----
+
+If the respective macro is enabled with ASSERT_LEVEL_WANTED then it
+produces a stack trace like this:
+
+----
+      ⎕FIO ¯16
+
+ ==============================================================================
+ Assertion failed: 0 && "Simulated Assert() (aka. ⎕FIO ¯16)"
+ in Function:      eval_B
+ in file:          Quad_FIO.cc:1085
+
+ C/C++ Call stack:
+
+ ----------------------------------------
+ -- Stack trace at Assert.cc:72
+ ----------------------------------------
+ 0x7F4F1AB0FBF7 __libc_start_main
+ 0x55782F04C8E2  main
+ 0x55782F2160C7   Workspace::immediate_execution(bool)
+ 0x55782F0B0C1A    Command::process_line()
+ 0x55782F0B0DDC     Command::process_line(UCS_string&)
+ 0x55782F0B33A2      Command::do_APL_expression(UCS_string&)
+ 0x55782F0B3773       Command::finish_context()
+ 0x55782F0D6386        Executable::execute_body() const
+ 0x55782F1B518F         StateIndicator::run()
+ 0x55782F111924          Prefix::reduce_statements()
+ 0x55782F1125F9           Prefix::reduce_MISC_F_B_()
+ 0x55782F1619FF            Quad_FIO::eval_B(Value_P) const
+ 0x55782F06C813             do_Assert(char const*, char const*, char const*, int)
+ ========================================
+
+ SI stack:
+
+ Depth:      0
+ Exec:       0x557830b93cf0
+ Safe exec:  0
+ Pmode:      ◊  ⎕FIO ¯16
+ PC:         3 (4) RETURN_STATS
+ Stat:       ⎕FIO ¯16
+ err_code:   0x0
+
+----
+
+The stack dumps above tell us exactly which assertion has failed, and that
+brings us closer to the root cause of a problem. The SI stack tells us the
+corresponding location in APL.
+
+=== Line numbers in Stack Traces
+
+
+== Crashes of the GNU APL interpreter
+
+== Non-reproducible Errors
+
+
+
+

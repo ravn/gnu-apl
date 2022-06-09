@@ -43,7 +43,7 @@ Bif_F12_CIRCLE  Bif_F12_CIRCLE ::_fun_inverse(true);  // A inverted
 Bif_F12_DIVIDE  Bif_F12_DIVIDE ::_fun;                // ÷
 Bif_F2_EQUAL    Bif_F2_EQUAL   ::_fun;                // =
 Bif_F2_EQUAL_B  Bif_F2_EQUAL_B ::_fun;                // ==
-Bif_F2_FIND     Bif_F2_FIND    ::_fun;                // ⋸ (almost scalar)
+Bif_F2_FIND     Bif_F2_FIND    ::_fun;                // ⍷ (almost scalar)
 Bif_F2_GREATER  Bif_F2_GREATER ::_fun;                // >
 Bif_F2_LEQU     Bif_F2_LEQU    ::_fun;                // ≤
 Bif_F2_LESS     Bif_F2_LESS    ::_fun;                // <
@@ -159,6 +159,7 @@ Value_P Z(B.get_shape(), LOC);
 
 #if PARALLEL_ENABLED
 const bool maybe_parallel = Parallel::run_parallel &&
+                            may_parallel()         &&
                             Thread_context::get_active_core_count() > 1;
 #endif
 
@@ -1004,7 +1005,7 @@ const Shape weights_B = B->get_shape().get_weights();
 Token
 Bif_F12_ROLL::eval_AB(Value_P A, Value_P B) const
 {
-   // draw A items  from the set [quad-IO ... B]
+   // draw A items  from the set { ⎕IO ... ⎕IO+ B } (i.e. without repetitions)
    //
    if (!A->is_scalar_extensible())   RANK_ERROR;
    if (!B->is_scalar_extensible())   RANK_ERROR;
@@ -1016,6 +1017,9 @@ APL_Integer set_size = B->get_cfirst().get_near_int();
    if (set_size <  0)           DOMAIN_ERROR;
    if (set_size > 0x7FFFFFFF)   DOMAIN_ERROR;
 
+   // at this point, A and B are OK. We use a bitmap 'used' to keep track
+   // of items alrady drawn.
+   //
 Value_P Z(zlen, LOC);
 
    // set_size can be rather big, so we new/delete it
@@ -1028,12 +1032,12 @@ uint8_t * used = new uint8_t[(set_size + 7)/8];
        {
          const uint64_t rnd = Workspace::get_RL(set_size);
 
-         if (used[rnd >> 3] & 1 << (rnd & 7))   // already drawn
+         if (used[rnd >> 3] & 1 << (rnd & 7))   // already drawn: try again
             {
               --z;
               continue;
             }
-         used[rnd >> 3] |= 1 << (rnd & 7);
+         used[rnd >> 3] |= 1 << (rnd & 7);   // remember rnd
          Z->next_ravel_Int(rnd + Workspace::get_IO());
        }
 

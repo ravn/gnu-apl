@@ -5268,7 +5268,7 @@ update-svar_signals:
 	m4 -D protocol=Svar_signals tcp_signal.m4 > Svar_signals.hh
 
 apl.lines: apl
-	objdump -j .text -l -d $< > $@
+	objdump --section=.text --line-numbers --disassemble $< > $@
 
 test: all
 	./apl --id 1010 -T testcases/*tc

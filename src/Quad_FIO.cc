@@ -1077,6 +1077,14 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
         // function_numbers < 0 refer to "hacker functions" that should not be
         // used by normal mortals.
         //
+        case -17: // emulate Assert1()
+                  Assert1(0 && "Simulated Assert1() (aka. ⎕FIO ¯17)");
+                  return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+
+        case -16: // emulate Assert()
+                  Assert(0 && "Simulated Assert() (aka. ⎕FIO ¯16)");
+                  return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+
         case -15: // print performance IDs and names...
              {
                const ShapeItem count = PFS_MAX3;
@@ -1109,7 +1117,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
                           IntScalar(UCS_string::get_total_count(), LOC));
         case -12: // sbrk()
              return Token(TOK_APL_VALUE1, IntScalar(top_of_memory(), LOC));
-        case -11: // fast new
+        case -11: // fnew
              return Token(TOK_APL_VALUE1, IntScalar(Value::fast_new_count, LOC));
         case -10: // slow new
              return Token(TOK_APL_VALUE1, IntScalar(Value::slow_new_count, LOC));
