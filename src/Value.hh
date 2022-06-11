@@ -60,6 +60,8 @@ class Value : public DynamicObject
    friend class Value_P;
    friend class Value_P_Base;
    friend class PointerCell;   // needs & for &cell_owner
+   friend class PJob_scalar_AB;
+   friend class PJob_scalar_B;
 
 protected:
    // constructors. Values shall not be constructed directly but only via
@@ -975,6 +977,9 @@ protected:
       }
 
 #endif
+
+   // explicit cast from Value & to Value *. Use with care
+   Value * get_pointer ()   { return this; }
 
 private:
    /// prevent new[] of Value

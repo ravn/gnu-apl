@@ -21,6 +21,7 @@
 #ifndef __PARALLEL_HH_DEFINED__
 #define __PARALLEL_HH_DEFINED__
 
+#include <pthread.h>
 #include "Common.hh"
 
 // set PARALLEL_ENABLED if wanted and its prerequisites are satisfied
@@ -256,6 +257,8 @@ protected:
 class Parallel
 {
 public:
+
+#if 0
    /// lock \b lock
    static void acquire_lock(volatile _Atomic_word & lock)
       {
@@ -287,6 +290,14 @@ public:
       {
         atomic_add(lock, -1);
       }
+#else
+   static inline void acquire_lock(pthread_rwlock_t & lock)
+     { pthread_rwlock_wrlock(&lock); }
+
+   static inline void release_lock(pthread_rwlock_t & lock)
+     { pthread_rwlock_unlock(&lock); }
+
+#endif
 
    /// true if parallel execution is enabled
    static bool run_parallel;

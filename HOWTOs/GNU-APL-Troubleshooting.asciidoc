@@ -12,7 +12,7 @@
 == Abstract
 
 This document contains hints for GNU APL users who would like to report
-GNU APL problems and who want to make the life of the GNU APL developer(s)
+GNU APL problems and who want to make the life of the GNU APL maintainer(s)
 a little easier.
 
 == Introduction
@@ -154,23 +154,111 @@ which, beside other settings, does ./configure with ASSERT_LEVEL_WANTED=2,
 this enabling both Assert macros and possibly making it easier to find the
 root cause of a fault.
 
-As confidence woth the source code increases over time, Assert() macros will
+As confidence with the source code increases over time, Assert() macros will
 evenntually be converted to Assert1() macros while new code will initially
 be protected with Assert() macros.
 
 === Emulating Failed Assertions
 
-The user may emulate a failed Assert() or Assert1() macro with ⎕FIO:
+Fortunately we can emulate a failed Assert() or Assert1() macro with ⎕FIO:
 
 ----
 
-      ⎕FIO ¯16   ⍝ emulate Assert
+      ⎕FIO ¯16   ⍝ emulate Assert()
 
-      ⎕FIO ¯17   ⍝ emulate Assert1
+      ⎕FIO ¯17   ⍝ emulate Assert1()
 ----
 
-If the respective macro is enabled with ASSERT_LEVEL_WANTED then it
-produces a stack trace like this:
+If the respective macro is enabled with ASSERT_LEVEL_WANTED as explained
+above, then it produces a stack trace like this:
+
+----
+       ⎕FIO ¯16
+
+
+ ==============================================================================
+ Assertion failed: 0 && "Simulated Assert() (aka. ⎕FIO ¯16)"
+ in Function:      eval_B
+ in file:          Quad_FIO.cc:1085
+
+ C/C++ call stack:
+
+ ----------------------------------------
+ -- Stack trace at Assert.cc:72
+ ----------------------------------------
+ 0x7FBFD71CBBF7 __libc_start_main
+ 0x563D2320B04A  main
+ 0x563D233E822F   Workspace::immediate_execution(bool)
+ 0x563D2327411A    Command::process_line()
+ 0x563D232742DC     Command::process_line(UCS_string&)
+ 0x563D232768A2      Command::do_APL_expression(UCS_string&)
+ 0x563D23276C73       Command::finish_context()
+ 0x563D2329B5D2        Executable::execute_body() const
+ 0x563D2338199C         StateIndicator::run()
+ 0x563D232DAF86          Prefix::reduce_statements()
+ 0x563D232DBE92           Prefix::reduce_MISC_F_B_()
+ 0x563D2332D0CF            Quad_FIO::eval_B(Value_P) const
+ 0x563D2322C2A0             do_Assert(char const*, char const*, char const*, int)
+ ========================================
+
+ SI stack:
+
+ Depth:      0
+ Exec:       0x563d23f9fde0
+ Safe exec:  0
+ Pmode:      ◊  ⎕FIO ¯16
+ PC:         3 (4) RETURN_STATS
+ Stat:       ⎕FIO ¯16
+ err_code:   0x0
+
+ ==============================================================================
+
+----
+
+The C/C++ stack above tell us which assertion has failed and where the
+assertion is located in the C/C++ source code (i.e. file Quad_FIO.cc line 1085),
+while the )SI stack tells us where that location is in the APL code.
+
+This brings us brings us closer to the root cause of a problem. Unfortunately
+the hex addresses numbers on the left side of the C/C++ stack dump are process
+specific, i.e. the same *⎕FIO ¯16* will produce different numbers in a
+different process of the operating system.
+
+=== Line numbers in Stack Traces
+
+If the functions on the right side of the C/C++ stack are relatively small (as
+most functions in the source code of GNU APL are) then we can usually find the
+exact source linei for each stack entry rather easilyi using the function name
+displayed. For larger functions, the same function may be called from different
+source code lines in the same function. This can be improved by converting the
+hex addresses on the left into source line numbers as exlained in the
+following.
+
+First of all the C++ compiler must be instructed to not discard line numbers.
+Older g++ versions would always keep line numbers in the object files, but
+newer versions do not. The trick is this:
+
+----
+CXXFLAGS="-rdynamic -gdwarf-2" ./configure ...
+----
+
+*make develop* also does that for you. The CXXFLAGS above tell the *g++*
+compiler to use an older object format in which line numbers are not discarded.
+If your compiler does not accept *-gdwarf-2* then it probably uses it anyway.
+
+The second step is to create a file named *apl.lines*. If GNU APL finds this
+file then it uses it to map hex addresses to line numbers. In the src
+directory, the make target *apl.lines* createst this file (which takes quite a
+while and is therefore not created in a standard build). *make apl.lines*
+essentially does:
+
+----
+objdump --section=.text --line-numbers --disassemble apl > apl.lines
+----
+
+which extracts the line numbers from the apl binary (provided that the
+compiler has inserted them - see above). If GNU APL finds apl.lines, then
+the stack dump looks a little different:
 
 ----
       ⎕FIO ¯16
@@ -180,49 +268,187 @@ produces a stack trace like this:
  in Function:      eval_B
  in file:          Quad_FIO.cc:1085
 
- C/C++ Call stack:
+ C/C++ call stack:
+ total_lines in apl.lines:     618610
+ assembler lines in apl.lines: 86495
+ source line numbers found:    86495
 
  ----------------------------------------
  -- Stack trace at Assert.cc:72
  ----------------------------------------
- 0x7F4F1AB0FBF7 __libc_start_main
- 0x55782F04C8E2  main
- 0x55782F2160C7   Workspace::immediate_execution(bool)
- 0x55782F0B0C1A    Command::process_line()
- 0x55782F0B0DDC     Command::process_line(UCS_string&)
- 0x55782F0B33A2      Command::do_APL_expression(UCS_string&)
- 0x55782F0B3773       Command::finish_context()
- 0x55782F0D6386        Executable::execute_body() const
- 0x55782F1B518F         StateIndicator::run()
- 0x55782F111924          Prefix::reduce_statements()
- 0x55782F1125F9           Prefix::reduce_MISC_F_B_()
- 0x55782F1619FF            Quad_FIO::eval_B(Value_P) const
- 0x55782F06C813             do_Assert(char const*, char const*, char const*, int)
+ 0x29465EE76BF7 __libc_start_main
+ 0x14CCD2  main at main.cc:635
+ 0x3166E1   Workspace::immediate_execution(bool) at Workspace.cc:273
+ 0x1B1004    Command::process_line() at Command.cc:103
+ 0x1B11C6     Command::process_line(UCS_string&) at Command.cc:139
+ 0x1B378C      Command::do_APL_expression(UCS_string&) at Command.cc:329
+ 0x1B3B5D       Command::finish_context() at Command.cc:347
+ 0x1D6806        Executable::execute_body() const at Executable.cc:261
+ 0x2B564F         StateIndicator::run() at StateIndicator.cc:362
+ 0x211DA4          Prefix::reduce_statements() at Prefix.cc:723 (discriminator 4)
+ 0x212A79           Prefix::reduce_MISC_F_B_() at Prefix.cc:990
+ 0x261E7F            Quad_FIO::eval_B(Value_P) const at Quad_FIO.cc:1090
+ 0x16CC03             do_Assert(char const*, char const*, char const*, int) at Assert.cc:74
  ========================================
 
  SI stack:
 
  Depth:      0
- Exec:       0x557830b93cf0
+ Exec:       0x561c865a4da0
  Safe exec:  0
  Pmode:      ◊  ⎕FIO ¯16
  PC:         3 (4) RETURN_STATS
  Stat:       ⎕FIO ¯16
  err_code:   0x0
 
+
+ ==============================================================================
 ----
 
-The stack dumps above tell us exactly which assertion has failed, and that
-brings us closer to the root cause of a problem. The SI stack tells us the
-corresponding location in APL.
+The difference is twofold:
 
-=== Line numbers in Stack Traces
+. the hex numbers are now relative to the location of the *main()* function of
+  GNU APL, which makes them not only smaller but also identical even in
+  different processes.
 
+. The source line numbers are now displayed for most hex numbers. Some
+  addresses can not be resolved, this could be caused by C/C++ function
+  inlining or calls through function pointers etc.
+
+Needless to say that GNU APL trouble-shooters prefer stack traces with hex
+numbers resolved to line numbers.
+
+Occasionally you may get this message:
+
+----
+...
+C/C++ call stack:
+
+Cannot show line numbers, since apl.lines is older than apl.
+Consider running 'make apl.lines' in directory
+/home/eedjsa/apl-1.8 to fix this
+...
+----
+
+This happens if you do *make apl* without a subsequent *make apl.lines*.
+
+=== Summary concerning Assertions
+
+The GNU APL configuration for troubleshooting purposes is obtained like this:
+
+----
+cd <top-level-directory>
+make develop
+cd src
+make clean
+make apl.lines
+----
+
+where *top-level-directory* is the directory that contains the *README* files.
+Additional troubleshooting options may be used as well. Consider the *make*
+target *develop:* in file Makefile.incl (around line 41) only as a template
+that can be augmented by other troubleshooting options (see also
+*README-2-configure*).
+
+== The )CHECK command
+
+GNU APL provides a command *)CHECK* which is somewhat similar to IBM APL2's
+command *)CHECK WS*. This command performs an internal check of the internal
+data structures of the interpreter.
+
+Under normal circumstances, the output of the )CHECK command should be:
+
+----
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+----
+
+If not, then there were inconsistencies (primarily memory leaks) the need to
+be fixed and should therefore be reported to bug-apl@gnu.org. For example,
+a *stale value* is an APL value that has memory allocated but is not reachable
+any longer via either the symbol table of the interpreter (like an APL
+variable) or the body as a defined function (like an APL literal).
+
+An assertion checks the immediate state of the interpreter and can therefore
+not check the entire lifetime of an APL value or function. For this purpose,
+GNU APL povides a different debugging tool called *Value history*.
+
+The Value history tracks the locations in the GNU APL source code that have
+manipulated a value from its creation (memory allocation) to its destruction
+(memory deallocation). This tracking, when enabled, has performance impacts
+and is therefore disabled by default.
+
+If the )CHECK command indicates stale values, but also under some other error
+conditions, the history of a value at fault is being displayed and helps the
+GNU APL maintainers to locate the problem. The value history is enabled in
+./configure:
+
+----
+    ./configure VALUE_CHECK_WANTED=yes ...
+----
+
+and therefore needs recompilation of the interpreter.
+
+
+== Logging facilities
 
 == Crashes of the GNU APL interpreter
 
+Some programming errors bypass all built-in debugging tools of GNU and
+crash the interpreter rather than returning to the interactive immediate
+execution mode of APL.
+
+The crash may be silent or accompanied by an error message and it may or may
+not create a core file. A core file is an important file if no other
+information is printed as to what kind of fault has occurred.
+
+In the good old times core files were always produced when a binary executable
+crashed. These days the creation of core files may need to be enabled before
+the crashing binary is started. In GNU/Linux resp. *bas* that means:
+
+----
+ulimit -c unlimited   # enable core files
+----
+
+Instead of *unlimited* you may also use a different file size limit.
+
+After a core file was produced (we always assume the interpreter was started
+in directory src below the top--level-directory) the you can start the
+debugger *gdb* in the src directory with the core file as second argument:
+
+----
+gdb ./apl core
+----
+
+After that, you can use the gdb command *bt* (for 'backtrace') to show a
+stack dump similar to the one discussed eralier. The GNU APL maintainer(s) will
+appreciate a copy of that stack dump for problems that are difficult to
+reproduce.
+
+Normally the file is named '*core*' and found in the same directory as the
+binary, but some GNU/Linux distributions use a different directory for storing
+core files. See also *man 5 core*.
+
 == Non-reproducible Errors
 
+=== Optimization
 
+As of recently we have seen faults that may have been caused by an overly
+agressive optimization of the C++ code of the interpreter. These faults
+were observed for the same source code but only when compiled with newer
+versions of the same g++ compiler.
 
+By default GNU APL compiles with optimization level -O2. If a fault is
+suspect to being caused by optimization, then it could make sense to also test
+the same source code of GNU APL without any optimization.
+
+To do that:
+
+----
+cd src
+find and the string -O2 in the relevant Makefile(s)
+make clean all
+----
 

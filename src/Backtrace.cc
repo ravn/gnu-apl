@@ -199,7 +199,8 @@ main():
                              << " aka. " << pcs.src_loc << endl;
                    pc_2_src.push_back(pcs);
                    prev_pc = pc;
-                   new_line = false;
+
+                   // new_line = false;   causes some lines to not be found
                  }
               continue;
             }

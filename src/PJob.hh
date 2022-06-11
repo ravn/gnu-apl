@@ -25,6 +25,7 @@ class PrimitiveFunction;
 
 #include <vector>
 
+#include "Assert.hh"
 #include "ConstCell_P.hh"
 #include "PrimitiveFunction.hh"
 
@@ -44,36 +45,34 @@ class PJob_scalar_B
 public:
    /// default constructor
    PJob_scalar_B()
-   : value_Z(0),
-     len_Z(0),
+   : len_Z(0),
      error(E_NO_ERROR),
      fun(0),
      fun1(0)
    {}
 
-   /// assign \b other to \b this
-   void operator =(const PJob_scalar_B & other)
-      {
-        value_Z = other.value_Z;
-        len_Z = other.len_Z;
-        error = other.error;
-        fun = other.fun;
-        fun1 = other.fun1;
-        new (&cB) ConstCell_P(other.cB);
-      }
-
    /// constructor
-   PJob_scalar_B(Value * Z, const Value & B)
-   : value_Z(Z),
+   PJob_scalar_B(Value_P Z, Value_P B)
+   : value_B(B, LOC),
+     value_Z(Z, LOC),
      len_Z(Z->nz_element_count()),
      error(E_NO_ERROR),
      fun(0),
-     fun1(0),
-     cB(B, 1)
+     fun1(0)
    {}
 
+   /// destructor
+   ~PJob_scalar_B()
+      {
+        value_Z.clear(LOC);
+        value_B.clear(LOC);
+      }
+
+   /// the left argument for the value being computed
+   Value_P value_B;
+
    /// the value being computed
-   Value * value_Z;
+   Value_P value_Z;
 
    /// the length of the result
    ShapeItem len_Z;
@@ -87,17 +86,13 @@ public:
    /// the monadic cell function to be computed
    prim_f1 fun1;   // not initialized by constructor!
 
-   /// return B[z]
-   const Cell & B_at(ShapeItem z) const
-      { return cB[z]; }
+   /// return Bbz]
+   const Cell & B_at(ShapeItem b) const
+      { return value_B->get_cravel(b); }
 
    /// return Z[z]
-   Cell & Z_at(ShapeItem z) const
+   Cell & Z_at(ShapeItem z)
       { return value_Z->get_wravel(z); }
-
-protected:
-   /// ravel of the right argument
-   ConstCell_P cB;
 };
 //----------------------------------------------------------------------------
 /// one dyadic scalar job
@@ -106,8 +101,7 @@ class PJob_scalar_AB
 public:
    /// default constructor
    PJob_scalar_AB()
-   : value_Z(0),
-     len_Z(0),
+   : len_Z(0),
      inc_A(0),
      inc_B(0),
      error(E_NO_ERROR),
@@ -115,62 +109,35 @@ public:
      fun2(0)
    {}
 
-   /// assign \b other to \b this
-   void operator =(const PJob_scalar_AB & other)
+   /// constructor
+   PJob_scalar_AB(Value_P Z, Value_P A, Value_P B)
+   : value_A(A, LOC),
+     value_B(B, LOC),
+     value_Z(Z, LOC),
+     len_Z(Z->nz_element_count()),
+     inc_A(A->get_increment()),
+     inc_B(B->get_increment()),
+     error(E_NO_ERROR),
+     fun(0),
+     fun2(0)
+   {}
+
+   /// destructor
+   ~PJob_scalar_AB()
       {
-        value_Z = other.value_Z;
-        len_Z   = other.len_Z;
-        inc_A   = other.inc_A;
-        inc_B   = other.inc_B;
-        error   = other.error;
-        fun     = other.fun;
-        fun2    = other.fun2;
-        new (&cA) ConstCell_P(other.cA);
-        new (&cB) ConstCell_P(other.cB);
+        value_Z.clear(LOC);
+        value_B.clear(LOC);
+        value_A.clear(LOC);
       }
 
-   /// constructor: A and B nested
-   PJob_scalar_AB(Value * Z, const Value & _A, int _inc_A,
-                             const Value & _B, int _inc_B)
-   : value_Z(Z),
-     len_Z(Z->nz_element_count()),
-     inc_A(_inc_A),
-     inc_B(_inc_B),
-     error(E_NO_ERROR),
-     fun(0),
-     fun2(0),
-     cA(_A, _inc_A),
-     cB(_B, _inc_B)
-   {}
+   /// the left argument for the value being computed
+   Value_P value_A;
 
-   /// constructor: A nested, B simple
-   PJob_scalar_AB(Value * Z, const Value & _A, int _inc_A, const Cell & cell_B)
-   : value_Z(Z),
-     len_Z(Z->nz_element_count()),
-     inc_A(_inc_A),
-     inc_B(0),
-     error(E_NO_ERROR),
-     fun(0),
-     fun2(0),
-     cA(_A, _inc_A),
-     cB(cell_B)
-   {}
+   /// the right argument for the value being computed
+   Value_P value_B;
 
-   /// constructor: A simple, B nested
-   PJob_scalar_AB(Value * Z, const Cell & cell_A, const Value & _B, int _inc_B)
-   : value_Z(Z),
-     len_Z(Z->nz_element_count()),
-     inc_A(0),
-     inc_B(_inc_B),
-     error(E_NO_ERROR),
-     fun(0),
-     fun2(0),
-     cA(cell_A),
-     cB(_B, _inc_B)
-   {}
-
-   /// A value (e.g parallel ~Value())
-   Value * value_Z;
+   /// the value being computed
+   Value_P value_Z;
 
    /// the length of the result
    ShapeItem len_Z;
@@ -191,23 +158,16 @@ public:
    prim_f2 fun2;   // not initialized by constructor!
 
    /// return A[z]
-   const Cell & A_at(ShapeItem z) const
-      { return cA[z * inc_A]; }
+   const Cell & A_at(ShapeItem a) const
+      { return value_A->get_cravel(a * inc_A); }
 
    /// return B[z]
-   const Cell & B_at(ShapeItem z) const
-      { return cB[z * inc_B]; }
+   const Cell & B_at(ShapeItem b) const
+      { return value_B->get_cravel(b * inc_B); }
 
    /// return Z[z]
-   Cell & Z_at(ShapeItem z) const
+   Cell & Z_at(ShapeItem z)
       { return value_Z->get_wravel(z); }
-
-protected:
-   /// ravel of the left argument
-   ConstCell_P cA;
-
-   /// ravel of the right argument
-   ConstCell_P cB;
 };
 // ============================================================================
 /// a number of jobs, where each job can be executed in parallel
@@ -262,7 +222,8 @@ public:
    /// execution of current_job. Therefore we copy current_job from
    /// jobs (and can then safely use current_job *).
    T * next_job()
-      { if (jobs.size() == 0)
+      {
+        if (jobs.size() == 0)   // joblist done
            {
              started_loc = 0;
              return 0;
@@ -282,7 +243,7 @@ public:
       { return jobs.size(); }
 
    /// add \b job to \b jobs
-   void add_job(T & job)
+   void add_job(const T & job)
       { jobs.push_back(job); }
 
    /// return true if not all jobs are done yet

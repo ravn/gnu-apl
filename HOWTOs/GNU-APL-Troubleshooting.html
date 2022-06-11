@@ -741,7 +741,7 @@ asciidoc.install();
 <h2 id="_abstract">Abstract</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>This document contains hints for GNU APL users who would like to report
-GNU APL problems and who want to make the life of the GNU APL developer(s)
+GNU APL problems and who want to make the life of the GNU APL maintainer(s)
 a little easier.</p></div>
 </div>
 </div>
@@ -988,24 +988,117 @@ ASSERT_LEVEL_WANTED = 2: this enables both the Assert1() and the Assert()
 <div class="paragraph"><p>which, beside other settings, does ./configure with ASSERT_LEVEL_WANTED=2,
 this enabling both Assert macros and possibly making it easier to find the
 root cause of a fault.</p></div>
-<div class="paragraph"><p>As confidence woth the source code increases over time, Assert() macros will
+<div class="paragraph"><p>As confidence with the source code increases over time, Assert() macros will
 evenntually be converted to Assert1() macros while new code will initially
 be protected with Assert() macros.</p></div>
 <div class="sect2">
 <h3 id="_emulating_failed_assertions">Emulating Failed Assertions</h3>
-<div class="paragraph"><p>The user may emulate a failed Assert() or Assert1() macro with ⎕FIO:</p></div>
+<div class="paragraph"><p>Fortunately we can emulate a failed Assert() or Assert1() macro with ⎕FIO:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
-<code>      ⎕FIO ¯16   ⍝ emulate Assert
+<code>      ⎕FIO ¯16   ⍝ emulate Assert()
 
-      ⎕FIO ¯17   ⍝ emulate Assert1</code>
+      ⎕FIO ¯17   ⍝ emulate Assert1()</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>If the respective macro is enabled with ASSERT_LEVEL_WANTED then it
-produces a stack trace like this:</p></div>
+<div class="paragraph"><p>If the respective macro is enabled with ASSERT_LEVEL_WANTED as explained
+above, then it produces a stack trace like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>       ⎕FIO ¯16
+
+
+ ==============================================================================
+ Assertion failed: 0 &amp;&amp; "Simulated Assert() (aka. ⎕FIO ¯16)"
+ in Function:      eval_B
+ in file:          Quad_FIO.cc:1085
+
+ C/C++ call stack:
+
+ ----------------------------------------
+ -- Stack trace at Assert.cc:72
+ ----------------------------------------
+ 0x7FBFD71CBBF7 __libc_start_main
+ 0x563D2320B04A  main
+ 0x563D233E822F   Workspace::immediate_execution(bool)
+ 0x563D2327411A    Command::process_line()
+ 0x563D232742DC     Command::process_line(UCS_string&amp;)
+ 0x563D232768A2      Command::do_APL_expression(UCS_string&amp;)
+ 0x563D23276C73       Command::finish_context()
+ 0x563D2329B5D2        Executable::execute_body() const
+ 0x563D2338199C         StateIndicator::run()
+ 0x563D232DAF86          Prefix::reduce_statements()
+ 0x563D232DBE92           Prefix::reduce_MISC_F_B_()
+ 0x563D2332D0CF            Quad_FIO::eval_B(Value_P) const
+ 0x563D2322C2A0             do_Assert(char const*, char const*, char const*, int)
+ ========================================
+
+ SI stack:
+
+ Depth:      0
+ Exec:       0x563d23f9fde0
+ Safe exec:  0
+ Pmode:      ◊  ⎕FIO ¯16
+ PC:         3 (4) RETURN_STATS
+ Stat:       ⎕FIO ¯16
+ err_code:   0x0
+
+ ==============================================================================</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The C/C<code> stack above tell us which assertion has failed and where the
+assertion is located in the C/C</code> source code (i.e. file Quad_FIO.cc line 1085),
+while the )SI stack tells us where that location is in the APL code.</p></div>
+<div class="paragraph"><p>This brings us brings us closer to the root cause of a problem. Unfortunately
+the hex addresses numbers on the left side of the C/C++ stack dump are process
+specific, i.e. the same <strong>⎕FIO ¯16</strong> will produce different numbers in a
+different process of the operating system.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_line_numbers_in_stack_traces">Line numbers in Stack Traces</h3>
+<div class="paragraph"><p>If the functions on the right side of the C/C++ stack are relatively small (as
+most functions in the source code of GNU APL are) then we can usually find the
+exact source linei for each stack entry rather easilyi using the function name
+displayed. For larger functions, the same function may be called from different
+source code lines in the same function. This can be improved by converting the
+hex addresses on the left into source line numbers as exlained in the
+following.</p></div>
+<div class="paragraph"><p>First of all the C<code> compiler must be instructed to not discard line numbers.
+Older g</code> versions would always keep line numbers in the object files, but
+newer versions do not. The trick is this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>CXXFLAGS="-rdynamic -gdwarf-2" ./configure ...</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p><strong>make develop</strong> also does that for you. The CXXFLAGS above tell the <strong>g++</strong>
+compiler to use an older object format in which line numbers are not discarded.
+If your compiler does not accept <strong>-gdwarf-2</strong> then it probably uses it anyway.</p></div>
+<div class="paragraph"><p>The second step is to create a file named <strong>apl.lines</strong>. If GNU APL finds this
+file then it uses it to map hex addresses to line numbers. In the src
+directory, the make target <strong>apl.lines</strong> createst this file (which takes quite a
+while and is therefore not created in a standard build). <strong>make apl.lines</strong>
+essentially does:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>objdump --section=.text --line-numbers --disassemble apl &gt; apl.lines</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>which extracts the line numbers from the apl binary (provided that the
+compiler has inserted them - see above). If GNU APL finds apl.lines, then
+the stack dump looks a little different:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -1017,55 +1110,218 @@ produces a stack trace like this:</p></div>
  in Function:      eval_B
  in file:          Quad_FIO.cc:1085
 
- C/C++ Call stack:
+ C/C++ call stack:
+ total_lines in apl.lines:     618610
+ assembler lines in apl.lines: 86495
+ source line numbers found:    86495
 
  ----------------------------------------
  -- Stack trace at Assert.cc:72
  ----------------------------------------
- 0x7F4F1AB0FBF7 __libc_start_main
- 0x55782F04C8E2  main
- 0x55782F2160C7   Workspace::immediate_execution(bool)
- 0x55782F0B0C1A    Command::process_line()
- 0x55782F0B0DDC     Command::process_line(UCS_string&amp;)
- 0x55782F0B33A2      Command::do_APL_expression(UCS_string&amp;)
- 0x55782F0B3773       Command::finish_context()
- 0x55782F0D6386        Executable::execute_body() const
- 0x55782F1B518F         StateIndicator::run()
- 0x55782F111924          Prefix::reduce_statements()
- 0x55782F1125F9           Prefix::reduce_MISC_F_B_()
- 0x55782F1619FF            Quad_FIO::eval_B(Value_P) const
- 0x55782F06C813             do_Assert(char const*, char const*, char const*, int)
+ 0x29465EE76BF7 __libc_start_main
+ 0x14CCD2  main at main.cc:635
+ 0x3166E1   Workspace::immediate_execution(bool) at Workspace.cc:273
+ 0x1B1004    Command::process_line() at Command.cc:103
+ 0x1B11C6     Command::process_line(UCS_string&amp;) at Command.cc:139
+ 0x1B378C      Command::do_APL_expression(UCS_string&amp;) at Command.cc:329
+ 0x1B3B5D       Command::finish_context() at Command.cc:347
+ 0x1D6806        Executable::execute_body() const at Executable.cc:261
+ 0x2B564F         StateIndicator::run() at StateIndicator.cc:362
+ 0x211DA4          Prefix::reduce_statements() at Prefix.cc:723 (discriminator 4)
+ 0x212A79           Prefix::reduce_MISC_F_B_() at Prefix.cc:990
+ 0x261E7F            Quad_FIO::eval_B(Value_P) const at Quad_FIO.cc:1090
+ 0x16CC03             do_Assert(char const*, char const*, char const*, int) at Assert.cc:74
  ========================================
 
  SI stack:
 
  Depth:      0
- Exec:       0x557830b93cf0
+ Exec:       0x561c865a4da0
  Safe exec:  0
  Pmode:      ◊  ⎕FIO ¯16
  PC:         3 (4) RETURN_STATS
  Stat:       ⎕FIO ¯16
- err_code:   0x0</code>
+ err_code:   0x0
+
+
+ ==============================================================================</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>The stack dumps above tell us exactly which assertion has failed, and that
-brings us closer to the root cause of a problem. The SI stack tells us the
-corresponding location in APL.</p></div>
+<div class="paragraph"><p>The difference is twofold:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+the hex numbers are now relative to the location of the <strong>main()</strong> function of
+  GNU APL, which makes them not only smaller but also identical even in
+  different processes.
+</p>
+</li>
+<li>
+<p>
+The source line numbers are now displayed for most hex numbers. Some
+  addresses can not be resolved, this could be caused by C/C++ function
+  inlining or calls through function pointers etc.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Needless to say that GNU APL trouble-shooters prefer stack traces with hex
+numbers resolved to line numbers.</p></div>
+<div class="paragraph"><p>Occasionally you may get this message:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>...
+C/C++ call stack:
+
+Cannot show line numbers, since apl.lines is older than apl.
+Consider running 'make apl.lines' in directory
+/home/eedjsa/apl-1.8 to fix this
+...</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>This happens if you do <strong>make apl</strong> without a subsequent <strong>make apl.lines</strong>.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_line_numbers_in_stack_traces">Line numbers in Stack Traces</h3>
+<h3 id="_summary_concerning_assertions">Summary concerning Assertions</h3>
+<div class="paragraph"><p>The GNU APL configuration for troubleshooting purposes is obtained like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>cd &lt;top-level-directory&gt;
+make develop
+cd src
+make clean
+make apl.lines</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>where <strong>top-level-directory</strong> is the directory that contains the <strong>README</strong> files.
+Additional troubleshooting options may be used as well. Consider the <strong>make</strong>
+target <strong>develop:</strong> in file Makefile.incl (around line 41) only as a template
+that can be augmented by other troubleshooting options (see also
+<strong>README-2-configure</strong>).</p></div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_check_command">The )CHECK command</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>GNU APL provides a command <strong>)CHECK</strong> which is somewhat similar to IBM APL2&#8217;s
+command <strong>)CHECK WS</strong>. This command performs an internal check of the internal
+data structures of the interpreter.</p></div>
+<div class="paragraph"><p>Under normal circumstances, the output of the )CHECK command should be:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>If not, then there were inconsistencies (primarily memory leaks) the need to
+be fixed and should therefore be reported to <a href="mailto:bug-apl@gnu.org">bug-apl@gnu.org</a>. For example,
+a <strong>stale value</strong> is an APL value that has memory allocated but is not reachable
+any longer via either the symbol table of the interpreter (like an APL
+variable) or the body as a defined function (like an APL literal).</p></div>
+<div class="paragraph"><p>An assertion checks the immediate state of the interpreter and can therefore
+not check the entire lifetime of an APL value or function. For this purpose,
+GNU APL povides a different debugging tool called <strong>Value history</strong>.</p></div>
+<div class="paragraph"><p>The Value history tracks the locations in the GNU APL source code that have
+manipulated a value from its creation (memory allocation) to its destruction
+(memory deallocation). This tracking, when enabled, has performance impacts
+and is therefore disabled by default.</p></div>
+<div class="paragraph"><p>If the )CHECK command indicates stale values, but also under some other error
+conditions, the history of a value at fault is being displayed and helps the
+GNU APL maintainers to locate the problem. The value history is enabled in
+./configure:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>    ./configure VALUE_CHECK_WANTED=yes ...</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>and therefore needs recompilation of the interpreter.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_logging_facilities">Logging facilities</h2>
+<div class="sectionbody">
 </div>
 </div>
 <div class="sect1">
 <h2 id="_crashes_of_the_gnu_apl_interpreter">Crashes of the GNU APL interpreter</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>Some programming errors bypass all built-in debugging tools of GNU and
+crash the interpreter rather than returning to the interactive immediate
+execution mode of APL.</p></div>
+<div class="paragraph"><p>The crash may be silent or accompanied by an error message and it may or may
+not create a core file. A core file is an important file if no other
+information is printed as to what kind of fault has occurred.</p></div>
+<div class="paragraph"><p>In the good old times core files were always produced when a binary executable
+crashed. These days the creation of core files may need to be enabled before
+the crashing binary is started. In GNU/Linux resp. <strong>bas</strong> that means:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>ulimit -c unlimited   # enable core files</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Instead of <strong>unlimited</strong> you may also use a different file size limit.</p></div>
+<div class="paragraph"><p>After a core file was produced (we always assume the interpreter was started
+in directory src below the top&#8212;level-directory) the you can start the
+debugger <strong>gdb</strong> in the src directory with the core file as second argument:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>gdb ./apl core</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>After that, you can use the gdb command <strong>bt</strong> (for <em>backtrace</em>) to show a
+stack dump similar to the one discussed eralier. The GNU APL maintainer(s) will
+appreciate a copy of that stack dump for problems that are difficult to
+reproduce.</p></div>
+<div class="paragraph"><p>Normally the file is named <em><strong>core</strong></em> and found in the same directory as the
+binary, but some GNU/Linux distributions use a different directory for storing
+core files. See also <strong>man 5 core</strong>.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_non_reproducible_errors">Non-reproducible Errors</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_optimization">Optimization</h3>
+<div class="paragraph"><p>As of recently we have seen faults that may have been caused by an overly
+agressive optimization of the C<code> code of the interpreter. These faults
+were observed for the same source code but only when compiled with newer
+versions of the same g</code> compiler.</p></div>
+<div class="paragraph"><p>By default GNU APL compiles with optimization level -O2. If a fault is
+suspect to being caused by optimization, then it could make sense to also test
+the same source code of GNU APL without any optimization.</p></div>
+<div class="paragraph"><p>To do that:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>cd src
+find and the string -O2 in the relevant Makefile(s)
+make clean all</code>
+
+</pre>
+</div></div>
+</div>
 </div>
 </div>
 </div>
@@ -1073,7 +1329,7 @@ corresponding location in APL.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-06-08 20:47:26 CEST
+ 2022-06-09 20:07:16 CEST
 </div>
 </div>
 </body>
