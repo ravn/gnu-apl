@@ -811,6 +811,12 @@ public:
    /// print stale Values, and return the number of stale Values.
    static int print_stale(ostream & out);
 
+   /// check the cells of all values, return the number of bad Values.
+   static int check_all_Cells(ostream & out);
+
+   /// check the cells of \b this value, return the number of errors.
+   int check_Cells(ostream & out) const;
+
    /// total nz_element_counts of all non-short values
    static uint64_t total_ravel_count;
 

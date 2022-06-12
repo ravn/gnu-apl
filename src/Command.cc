@@ -697,8 +697,8 @@ Command::cmd_CHECK(ostream & out)
         }
    }
 
-   // 4. discover duplicate parents
-   //
+   // 4. discover duplicate parents. In the old clone() scheme every nested value    //    has (at most) one parent. In the new clone() scheme, however, a nested
+   //    value can be reused and have multiple parents.
    {
 #ifndef NEW_CLONE   // old clone
      // 4a. create a { parent = 0, value } vector<val_val> of all values
@@ -776,6 +776,10 @@ Command::cmd_CHECK(ostream & out)
             out << "OK      - no duplicate parents" << endl;
           }
    }
+
+   // 5. discover strange Cells and counters.
+   //
+   Value::check_all_Cells(out);
 }
 //----------------------------------------------------------------------------
 void

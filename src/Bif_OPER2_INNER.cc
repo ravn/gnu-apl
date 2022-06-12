@@ -263,6 +263,8 @@ ShapeItem end_z = z + slice_len;
         //
         // we use Z[z] as accumulator for LO /
         //
+        // we use the terms sum and product as if Z←A LO.RO B were A +.* B
+        //
         Cell * sum = job.cZ + z;
         loop(l, job.LO_len)
            {

@@ -2800,6 +2800,53 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob) const
    out << endl;
 }
 //----------------------------------------------------------------------------
+int
+Value::check_all_Cells(ostream & out)
+{
+int errors = 0;
+
+   for (const DynamicObject * dob = all_values.get_prev();
+        dob != &all_values; dob = dob->get_prev())
+       {
+         const Value & value = dob->rValue();
+         if (value.check_Cells(out))   ++errors;
+       }
+
+   return errors;
+}
+//----------------------------------------------------------------------------
+int
+Value::check_Cells(ostream & out) const
+{
+size_t errors = 0;
+ShapeItem pointer_count = 0;
+ShapeItem lval_count = 0;
+
+   loop(c, nz_element_count())
+       {
+         const Cell & cell = get_cravel(c);
+         if (cell.is_pointer_cell())     ++pointer_count;
+         else if (cell.is_lval_cell())   ++lval_count;
+       }
+
+   if (lval_count)
+      {
+        out << "*** Warning: value " << voidP(this)
+            << " has " << lval_count << "Lval Cells" << endl;
+        ++errors;
+      }
+
+   if (pointer_count != get_pointer_cell_count())
+      {
+        out << "*** Error: value " << voidP(this)
+            << " has pointer_cell_count=" << pointer_cell_count
+            << " but " << pointer_count << " PointerCells" << endl;
+        ++errors;
+      }
+
+   return errors;
+}
+//----------------------------------------------------------------------------
 void
 Value::explode()
 {
