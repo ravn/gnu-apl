@@ -113,9 +113,11 @@ const FloatCell ScalarFunction::float_min(-BIG_FLOAT);
 const FloatCell ScalarFunction::float_max(BIG_FLOAT);
 
 #ifdef PARALLEL_ENABLED
-pthread_rwlock_t jobs_lock         = PTHREAD_RWLOCK_INITIALIZER;
-pthread_rwlock_t value_lock        = PTHREAD_RWLOCK_INITIALIZER;
-pthread_rwlock_t pointer_cell_lock = PTHREAD_RWLOCK_INITIALIZER;
+
+/// a lock that prevents different threads to access the same data structure
+/// at the same time
+Parallel::parallel_lock_t jobs_lock = LOCK_INITIALIZER;
+
 #endif   // PARALLEL_ENABLED
 
 PJob_scalar_AB * job_AB = 0;
@@ -265,44 +267,40 @@ ShapeItem end_z = z + slice_len;
          const Cell & cell_B = job_B->B_at(z);
          Cell & cell_Z       = job_B->Z_at(z);
 
-         if (cell_B.is_pointer_cell())
+         const bool scalar_B = ! cell_B.is_pointer_cell();
+
+         if (scalar_B)
             {
-              // B is nested
-              //
-              Value_P B1 = cell_B.get_pointer_value();
-
-              const ShapeItem len_Z1 = B1->element_count();
-              if (len_Z1 == 0)
-                 {
-                   POOL_LOCK(value_lock,
-                             Value_P Z1 = CLONE_P(B1, LOC))
-                   Z1->to_type(/* numeric */ true);
-
-                   POOL_LOCK(pointer_cell_lock,
-                             new (&cell_Z) PointerCell(Z1.get(),
-                                                       *job_B->value_Z))
-                 }
-              else
-                 {
-                   POOL_LOCK(value_lock,
-                             Value_P Z1(B1->get_shape(), LOC))
-                   POOL_LOCK(pointer_cell_lock,
-                             new (&cell_Z) PointerCell(Z1.get(),
-                                                       *job_B->value_Z))
-
-                   const PJob_scalar_B j1(Z1, B1);
-                   POOL_LOCK(jobs_lock, tctx.joblist_B.add_job(j1))
-                 }
-            }
-         else
-            {
-                  // B not nested: execute fun
-                  //
 PERFORMANCE_START(start_2)
+
                   job_B->error = (cell_B.*job_B->fun1)(&cell_Z);
                   if (job_B->error != E_NO_ERROR)   return;
 
 CELL_PERFORMANCE_END(job_B->fun->get_statistics_B(), start_2, z)
+            }
+         else                            // B is nested
+            {
+              Parallel::acquire_lock(jobs_lock);
+
+              // B is nested
+              //
+              Value_P B1 = cell_B.get_pointer_value();
+
+              if (const ShapeItem len_Z1 = B1->element_count())
+                 {
+                   Value_P Z1(B1->get_shape(), LOC);
+                   new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
+
+                   const PJob_scalar_B j1(Z1, B1);
+                   tctx.joblist_B.add_job(j1);
+                 }
+              else
+                 {
+                   Value_P Z1 = CLONE_P(B1, LOC);
+                   Z1->to_type(/* numeric */ true);
+                   new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
+                 }
+              Parallel::release_lock(jobs_lock);
             }
        }
 #endif   // PARALLEL_ENABLED
@@ -318,16 +316,14 @@ ScalarFunction::expand_nested(Value * Z, const Cell * cell_A,
            {
              Value_P value_A = cell_A->get_pointer_value();
              Value_P value_B = cell_B->get_pointer_value();
-             POOL_LOCK(jobs_lock,
-                       Token token = eval_scalar_AB(value_A, value_B, fun))
+             Token token = eval_scalar_AB(value_A, value_B, fun);
              Z->next_ravel_Pointer(token.get_apl_val().get());
            }
         else                             // nested A and simple B
            {
              Value_P value_A = cell_A->get_pointer_value();
              Value_P scalar_B(*cell_B, LOC);
-             POOL_LOCK(jobs_lock,
-                       Token token = eval_scalar_AB(value_A, scalar_B, fun))
+             Token token = eval_scalar_AB(value_A, scalar_B, fun);
              Z->next_ravel_Pointer(token.get_apl_val().get());
            }
       }
@@ -337,8 +333,7 @@ ScalarFunction::expand_nested(Value * Z, const Cell * cell_A,
            {
              Value_P scalar_A(*cell_A, LOC);
              Value_P value_B = cell_B->get_pointer_value();
-             POOL_LOCK(jobs_lock,
-                       Token token = eval_scalar_AB(scalar_A, value_B, fun))
+             Token token = eval_scalar_AB(scalar_A, value_B, fun);
              Z->next_ravel_Pointer(token.get_apl_val().get());
            }
         else                             // simple A and simple B
@@ -579,29 +574,79 @@ ShapeItem end_z = z + slice_len;
          const Cell & cell_B = job_AB->B_at(z);
          Cell & cell_Z       = job_AB->Z_at(z);
 
-         const bool nested_A = cell_A.is_pointer_cell();
-         const bool nested_B = cell_B.is_pointer_cell();
+         const bool scalar_A = ! cell_A.is_pointer_cell();
+         const bool scalar_B = ! cell_B.is_pointer_cell();
 
-         if (nested_A)
+         if (scalar_A && scalar_B)   // simple A and simple B
             {
-              POOL_LOCK(value_lock, Value_P A1 = cell_A.get_pointer_value())
-              if (nested_B)    // nested A and nested B
+PERFORMANCE_START(start_2)
+
+              job_AB->error = (cell_B.*job_AB->fun2)(&cell_Z, &cell_A);
+              if (job_AB->error != E_NO_ERROR)   return;
+
+CELL_PERFORMANCE_END(job_AB->fun->get_statistics_AB(), start_2, z)
+            }
+         else                        // nested A and/or nested B
+            {
+              Parallel::acquire_lock(jobs_lock);
+              if (scalar_B)   // nested A and simple B
                  {
-                   POOL_LOCK(value_lock, Value_P B1 = cell_B.get_pointer_value())
+                   Value_P A1 = cell_A.get_pointer_value();
+                   Value_P B1(cell_B, LOC);
+                   if (const ShapeItem len_Z1 = A1->element_count())
+                      {
+                        Value_P Z1(A1->get_shape(), LOC);
+                        new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+
+                        const PJob_scalar_AB j1(Z1, A1, B1);
+                        tctx.joblist_AB.add_job(j1);
+                      }
+                   else               // empty A1 and simple B
+                      {
+                        Value_P Z1 = job_AB->fun->eval_fill_AB(A1, B1)
+                                                 .get_apl_val();
+                        new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+                      }
+                 }
+              else if (scalar_A)   // simple A and nested B
+                 {
+                   Value_P A1(cell_A, LOC);
+                   Value_P B1 = cell_B.get_pointer_value();
+                   if (const ShapeItem len_Z1 = B1->element_count())
+                      {
+                        Value_P Z1(B1->get_shape(), LOC);
+                        new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+
+                        const PJob_scalar_AB j1(Z1, A1, B1);
+                        tctx.joblist_AB.add_job(j1);
+                     }
+                   else            // simple A and empty B1
+                      {
+                        Value_P Z1 = job_AB->fun->eval_fill_AB(A1, B1)
+                                                 .get_apl_val();
+                        new (&cell_Z)   PointerCell(Z1.get(), *job_AB->value_Z);
+                      }
+                 }
+              else                // nested A and nested B
+                 {
+                   Value_P A1(cell_A, LOC);
+                   Value_P B1 = cell_B.get_pointer_value();
                    const Shape * sh_Z1 = conforming_shape(job_AB->error,
                                                           B1->get_shape(),
                                                           A1->get_shape());
-                   if (job_AB->error)   return;
+                   if (job_AB->error)
+                      {
+                        Parallel::release_lock(jobs_lock);
+                        return;
+                      }
 
                    if (const ShapeItem len_Z1 = sh_Z1->get_volume())
                       {
-                        POOL_LOCK(value_lock, Value_P Z1(*sh_Z1, LOC))
-                        POOL_LOCK(pointer_cell_lock,
-                                  new (&cell_Z) PointerCell(Z1.get(),
-                                                            *job_AB->value_Z))
+                        Value_P Z1(*sh_Z1, LOC);
+                        new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
 
                         const PJob_scalar_AB j1(Z1, A1, B1);
-                        POOL_LOCK(jobs_lock, tctx.joblist_AB.add_job(j1))
+                        tctx.joblist_AB.add_job(j1);
                       }
                    else   // empty B1/Z1
                       {
@@ -609,75 +654,16 @@ ShapeItem end_z = z + slice_len;
                         if (result.get_tag() == TOK_ERROR)
                            {
                              job_AB->error = ErrorCode(result.get_int_val());
+                             Parallel::release_lock(jobs_lock);
                              return;
                            }
                       }
-
                  }
-              else   // nested A and simple B
-                 {
-                   POOL_LOCK(value_lock, Value_P B1(cell_B, LOC))
-                   if (const ShapeItem len_Z1 = A1->element_count())
-                      {
-                        POOL_LOCK(value_lock, Value_P Z1(A1->get_shape(), LOC))
 
-                        POOL_LOCK(pointer_cell_lock,
-                                  new (&cell_Z) PointerCell(Z1.get(),
-                                                            *job_AB->value_Z))
-
-                        const PJob_scalar_AB j1(Z1, A1, B1);
-                        POOL_LOCK(jobs_lock, tctx.joblist_AB.add_job(j1))
-                      }
-                   else               // empty A1 and simple B
-                      {
-                        Value_P Z1 = job_AB->fun->eval_fill_AB(A1, B1)
-                                                 .get_apl_val();
-                        POOL_LOCK(pointer_cell_lock,
-                                  new (&cell_Z) PointerCell(Z1.get(),
-                                                            *job_AB->value_Z))
-                      }
-                 }
-            }
-         else    // simple A
-            {
-              POOL_LOCK(value_lock, Value_P A1(cell_A, LOC))
-              if (nested_B)   // simple A and nested B
-                 {
-                   Value_P B1 = cell_B.get_pointer_value();
-
-                   if (const ShapeItem len_Z1 = B1->element_count())
-                      {
-                        POOL_LOCK(value_lock,
-                                  Value_P Z1(B1->get_shape(), LOC))
-
-                        POOL_LOCK(pointer_cell_lock,
-                                  new (&cell_Z) PointerCell(Z1.get(),
-                                                            *job_AB->value_Z))
-
-
-                        const PJob_scalar_AB j1(Z1, A1, B1);
-                        POOL_LOCK(jobs_lock, tctx.joblist_AB.add_job(j1))
-                     }
-                   else               // simple A and empty B1
-                      {
-                        Value_P Z1 = job_AB->fun->eval_fill_AB(A1, B1)
-                                                             .get_apl_val();
-                        POOL_LOCK(pointer_cell_lock,
-                                  new (&cell_Z)   PointerCell(Z1.get(),
-                                                              *job_AB->value_Z))
-                      }
-                 }
-              else   // simple A and simple B
-                 {
-PERFORMANCE_START(start_2)
-
-                   job_AB->error = (cell_B.*job_AB->fun2)(&cell_Z, &cell_A);
-                   if (job_AB->error != E_NO_ERROR)   return;
-
-CELL_PERFORMANCE_END(job_AB->fun->get_statistics_AB(), start_2, z)
-                 }
+              Parallel::release_lock(jobs_lock);
             }
        }
+
 #endif   // PARALLEL_ENABLED
 }
 //----------------------------------------------------------------------------

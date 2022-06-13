@@ -52,13 +52,9 @@
 # define PRINT_LOCKED(x) \
    { sem_wait(Parallel::print_sema); x; sem_post(Parallel::print_sema); }
 
-# define POOL_LOCK(l, x) \
-     Parallel::acquire_lock(l); x; Parallel::release_lock(l);
-
 #else
 
 # define PRINT_LOCKED(x) x;
-# define POOL_LOCK(l, x) x;
 
 #endif // PARALLEL_ENABLED
 
@@ -251,50 +247,47 @@ protected:
 };
 //============================================================================
 /**
-  a class coordinating the different cores working in parallel
+  _Atomic_word class coordinating the different cores working in parallel on the
+  same ravel(s)
 **/
 /// Parallel APL execution
 class Parallel
 {
 public:
 
-#if 0
-   /// lock \b lock
-   static void acquire_lock(volatile _Atomic_word & lock)
+   // we have two approaches to locking. One is based on atomic_fetch_add(),
+   // the other is based on pthread_rwlock_wrlock().
+   //
+#if 1   /* use atomic_fetch_add() */
+
+   typedef _Atomic_word parallel_lock_t;
+#define LOCK_INITIALIZER 0
+
+   /// acquire \b lock
+   static inline void acquire_lock(volatile parallel_lock_t & lock)
       {
-         // chances are low that the lock is held. Therefore we try a simple
-         // atomic_fetch_add() first and return on success.
-         // This should not harm the lock because we do this only once per
-         // thread and acquire_lock()
-         //
-         if (atomic_fetch_add(lock, 1) == 0)   return;
-         atomic_add(lock, -1);   // undo the atomic_fetch_add()
-
-         // the lock was busy
-         //
-         for (;;)
-             {
-               // Wait to see a 0 on the lock. This is to avoid that the
-               // atomic_fetch_add() lock attempts occupy the lock without
-               // actually obtaining the lock. Waiting for 0 guarantees that
-               // at least one thread succeeds below.
-               //
-               if (atomic_read(lock))   continue;   // not 0: try again
-
-               if (atomic_fetch_add(lock, 1) == 0)   return;
-             }
+        for (;;)
+            {
+              if (atomic_fetch_add(lock, 1) == 0)   return;   // got the lock
+              atomic_add(lock, -1);   // undo the atomic_fetch_add()
+            }
       }
 
-   /// unlock \b lock
-   static void release_lock(volatile _Atomic_word & lock)
+   /// release \b lock
+   static inline void release_lock(volatile parallel_lock_t & lock)
       {
         atomic_add(lock, -1);
       }
-#else
-   static inline void acquire_lock(pthread_rwlock_t & lock)
+
+#else   /* use pthread_rwlock_wrlock() */
+
+   typedef pthread_rwlock_t parallel_lock_t;
+#define LOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
+
+   static inline void acquire_lock(parallel_lock_t & lock)
      { pthread_rwlock_wrlock(&lock); }
 
-   static inline void release_lock(pthread_rwlock_t & lock)
+   static inline void release_lock(parallel_lock_t & lock)
      { pthread_rwlock_unlock(&lock); }
 
 #endif
