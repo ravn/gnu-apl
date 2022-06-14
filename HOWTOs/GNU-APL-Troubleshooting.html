@@ -822,7 +822,7 @@ Shape Check (may raise LENGTH ERROR)
 </li>
 <li>
 <p>
-Domain Checks (may raise SYNTAX ERROR)
+Domain Checks (may raise DOMAIN ERROR)
 </p>
 </li>
 </ol></div>
@@ -920,7 +920,8 @@ Other vendors (lowest priority).
 </li>
 </ul></div>
 <div class="paragraph"><p>Before sending an email to <a href="mailto:bug-apl@gnu.org">bug-apl@gnu.org</a> it may make sense to check if the
-issue was reported already (and maybe caused by such differences).</p></div>
+issue was reported already (and often caused by such differences). However,
+don&#8217;t be afraid to report the same error twice if you are not sure.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1249,7 +1250,7 @@ conditions, the history of a value at fault is being displayed and helps the
 <div class="content">
 <pre>
 
-<code>    ./configure VALUE_CHECK_WANTED=yes ...</code>
+<code>    ./configure VALUE_HISTORY_WANTED=yes ...</code>
 
 </pre>
 </div></div>
@@ -1329,7 +1330,7 @@ the same source code of <strong>GNU APL</strong> without any optimization.</p></
 <pre>
 
 <code>cd src
-find and remove ior replace the string -O2 in the relevant Makefile(s)
+find and remove or replace the string -O2 in the relevant Makefile(s)
 make clean all</code>
 
 </pre>
@@ -1404,7 +1405,7 @@ Disadvantage: changes of log_def() macros require re-compilation of GNU
 </div>
 <div class="sect2">
 <h3 id="_dynamic_logging">Dynamic Logging</h3>
-<div class="paragraph"><p>Static logging is used with:</p></div>
+<div class="paragraph"><p>Dynamic logging is used with:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -1431,6 +1432,102 @@ Advantage: no re-compilation of <strong>GNU APL</strong> is required.
 </p>
 </li>
 </ul></div>
+<div class="sect3">
+<h4 id="_the_log_command">The ]LOG command</h4>
+<div class="paragraph"><p>GNU APL has a few debug commands, which are like standard APL commands but
+start with ] instead of ). One of these debug commands is <strong>]LOG</strong> which
+controls the logging facilities.</p></div>
+<div class="paragraph"><p>If static logging was <strong>./configure</strong>'d then <strong>]LOG</strong> displays an error message
+because changing the logging facilities at runtime requires dynanic logging.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ]LOG
+
+Command ]LOG is not available, since dynamic logging was not
+configured for this APL interpreter. To enable dynamic logging (which
+will slightly decrease performance), recompile the interpreter as follows:
+
+   ./configure DYNAMIC_LOG_WANTED=yes (... other configure options)
+   make
+   make install (or try: src/apl)
+
+above the src directory.</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>If dynamic logging was ./configure&#8217;d then <strong>]LOG</strong> without an argument displays
+the current state (i.e. ON or OFF) of all logging facilities:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ]LOG
+     1: (OFF) AV details
+     2: (OFF) new and delete calls
+     3: (OFF) input from user or testcase file
+     4: (OFF) parser: parsing
+     5: (OFF)  ...    function find_closing()
+     6: (OFF)  ...    tokenization
+     7: (OFF)  ...    function collect_constants()
+     8: (OFF)  ...    create value()
+     9: (OFF) defined function: fix()
+    10: (OFF)  ...              set_line()
+    11: (OFF)  ...              load()
+    12: (OFF)  ...              execute()
+    13: (OFF)  ...              enter/leave
+    14: (OFF) State indicator: enter/leave
+    15: (OFF)   ...            push/pop
+    16: (OFF) Symbol: lookup
+    17: (OFF)   ...   push/pop and )ERASE
+    18: (OFF)   ...   resolve
+    19: (OFF) Value:  glue()
+    20: (OFF)   ...  erase_stale()
+    21: (OFF) APL primitive function format
+    22: (OFF) character conversions
+    23: (OFF) APL system function Quad-FX
+    24: (OFF) commands )LOAD, )SAVE, )IN, and )OUT
+    25: (OFF) more verbose errors
+    26: (OFF) details of error throwing
+    27: (OFF) nabla editor
+    28: (OFF) execute(): state changes
+    29: (OFF) PrintBuffer: align() function
+    30: (OFF) Output: cork() functions
+    31: (OFF) Details of test execution
+    32: (OFF) Prefix parser
+    33: (OFF)  ...   location information
+    34: (OFF) FunOper1 and FunOper2 functions
+    35: (OFF) Shared Variable operations
+    36: (OFF) command line arguments (argc/argv)
+    37: (OFF) interpreter start-up messages
+    38: (OFF) optimization messages
+    39: (OFF) )LOAD and )SAVE details
+    40: (OFF) Svar_DB signals
+    41: (OFF) Parallel (multi-core) execution
+    42: (OFF) EOC handler functionality
+    43: (OFF) ⎕DLX details
+    44: (OFF) command ]DOXY
+    45: (OFF) details of Value allocation
+    46: (OFF) ⎕TF details
+    47: (OFF) ⎕PLOT details</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Otherwise <strong>]LOG N</strong> toggles the state of logging facility N, e.g.:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ]log 25
+    Logging facility 'more verbose errors' is now ON
+
+      ]log 26
+    Logging facility 'details of error throwing' is now ON</code>
+
+</pre>
+</div></div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_logging_facilities_of_interest">Logging Facilities of Interest</h3>
@@ -1439,7 +1536,7 @@ maintainers or have become obsolete and are therefore not too useful for
 the trouble-shooting performed by the user. The others mentioned below.</p></div>
 <div class="sect3">
 <h4 id="_log_2_new_and_delete_calls">]Log 2 : new and delete calls</h4>
-<div class="paragraph"><p>For tracking the allocation and de-allication of memory.
+<div class="paragraph"><p>For tracking the allocation and de-allocation of memory.
 To find memo leaks.</p></div>
 </div>
 <div class="sect3">
@@ -1456,7 +1553,7 @@ code. These logging facilities add this information.</p></div>
 <h4 id="_log_37_interpreter_startup">]Log 37 : Interpreter Startup</h4>
 <div class="paragraph"><p>Information when the <strong>GNU APL</strong> interpreter starts. This facility can also be
 enabled from the command line because the output of interest occurs before
-the interpreter accepts commands.</p></div>
+the interpreter accepts commands like <strong>]LOG</strong>.</p></div>
 </div>
 </div>
 </div>
@@ -1675,6 +1772,9 @@ located the fault this way), simply do</p></div>
 <div class="sect1">
 <h2 id="_keep_it_short_and_simple">Keep It Short and Simple</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>The first thing to check before reporting an error is to make sure that you
+have compiled and installed the latest GNU APL version from subbversion (SVN)
+or git.</p></div>
 <div class="paragraph"><p>From a maintainer&#8217;s perspective, the trouble reports that are appreciated the
 most are the short ones. Locating a fault usually requires multiple
 repetitions of the sequence that causes the fault. Consider two extremes:</p></div>
@@ -1730,7 +1830,7 @@ reduced to a small number of APL lines.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-06-12 18:06:34 CEST
+ 2022-06-14 18:02:00 CEST
 </div>
 </div>
 </body>

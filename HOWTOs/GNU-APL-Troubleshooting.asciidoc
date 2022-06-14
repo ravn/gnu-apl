@@ -53,7 +53,7 @@ and usually occur in the following order:
 . Value Check (may raise VALUE ERROR)
 . Rank Check (may raise RANK ERROR)
 . Shape Check (may raise LENGTH ERROR)
-. Domain Checks (may raise SYNTAX ERROR)
+. Domain Checks (may raise DOMAIN ERROR)
 
 That is, a VALUE error can normally only occur in the absence of SYNTAX
 and VALENCE ERRORs, a LENGTH ERROR can only occur in the absence of SYNTAX,
@@ -107,7 +107,8 @@ following order:
 * Other vendors (lowest priority).
 
 Before sending an email to bug-apl@gnu.org it may make sense to check if the
-issue was reported already (and maybe caused by such differences).
+issue was reported already (and often caused by such differences). However,
+don't be afraid to report the same error twice if you are not sure.
 
 == Failed Assertions
 
@@ -391,7 +392,7 @@ conditions, the history of a value at fault is being displayed and helps the
 *./configure*:
 
 ----
-    ./configure VALUE_CHECK_WANTED=yes ...
+    ./configure VALUE_HISTORY_WANTED=yes ...
 ----
 
 and therefore needs recompilation of the interpreter.
@@ -466,7 +467,7 @@ To do that:
 
 ----
 cd src
-find and remove ior replace the string -O2 in the relevant Makefile(s)
+find and remove or replace the string -O2 in the relevant Makefile(s)
 make clean all
 ----
 
@@ -521,7 +522,7 @@ also all tests for log_def(1, ...) in all Log() macros. That is:
 
 === Dynamic Logging
 
-Static logging is used with:
+Dynamic logging is used with:
 
 ----
    ./configure DYNAMIC_LOG_WANTED=yes
@@ -537,6 +538,93 @@ toggles the state of the respective variable).
    if all variables are set to OFF) which will cumulate for all Log() macros,
 * Advantage: no re-compilation of *GNU APL* is required.
 
+==== The ]LOG command
+
+GNU APL has a few debug commands, which are like standard APL commands but
+start with ] instead of ). One of these debug commands is *]LOG* which
+controls the logging facilities.
+
+If static logging was *./configure*'d then *]LOG* displays an error message
+because changing the logging facilities at runtime requires dynanic logging.
+
+----
+      ]LOG
+
+Command ]LOG is not available, since dynamic logging was not
+configured for this APL interpreter. To enable dynamic logging (which
+will slightly decrease performance), recompile the interpreter as follows:
+
+   ./configure DYNAMIC_LOG_WANTED=yes (... other configure options)
+   make
+   make install (or try: src/apl)
+
+above the src directory.
+----
+
+If dynamic logging was ./configure'd then *]LOG* without an argument displays
+the current state (i.e. ON or OFF) of all logging facilities:
+
+----
+      ]LOG
+     1: (OFF) AV details
+     2: (OFF) new and delete calls
+     3: (OFF) input from user or testcase file
+     4: (OFF) parser: parsing
+     5: (OFF)  ...    function find_closing()
+     6: (OFF)  ...    tokenization
+     7: (OFF)  ...    function collect_constants()
+     8: (OFF)  ...    create value()
+     9: (OFF) defined function: fix()
+    10: (OFF)  ...              set_line()
+    11: (OFF)  ...              load()
+    12: (OFF)  ...              execute()
+    13: (OFF)  ...              enter/leave
+    14: (OFF) State indicator: enter/leave
+    15: (OFF)   ...            push/pop
+    16: (OFF) Symbol: lookup
+    17: (OFF)   ...   push/pop and )ERASE
+    18: (OFF)   ...   resolve
+    19: (OFF) Value:  glue()
+    20: (OFF)   ...  erase_stale()
+    21: (OFF) APL primitive function format
+    22: (OFF) character conversions
+    23: (OFF) APL system function Quad-FX
+    24: (OFF) commands )LOAD, )SAVE, )IN, and )OUT
+    25: (OFF) more verbose errors
+    26: (OFF) details of error throwing
+    27: (OFF) nabla editor
+    28: (OFF) execute(): state changes
+    29: (OFF) PrintBuffer: align() function
+    30: (OFF) Output: cork() functions
+    31: (OFF) Details of test execution
+    32: (OFF) Prefix parser
+    33: (OFF)  ...   location information
+    34: (OFF) FunOper1 and FunOper2 functions
+    35: (OFF) Shared Variable operations
+    36: (OFF) command line arguments (argc/argv)
+    37: (OFF) interpreter start-up messages
+    38: (OFF) optimization messages
+    39: (OFF) )LOAD and )SAVE details
+    40: (OFF) Svar_DB signals
+    41: (OFF) Parallel (multi-core) execution
+    42: (OFF) EOC handler functionality
+    43: (OFF) ⎕DLX details
+    44: (OFF) command ]DOXY
+    45: (OFF) details of Value allocation
+    46: (OFF) ⎕TF details
+    47: (OFF) ⎕PLOT details
+----
+
+Otherwise *]LOG N* toggles the state of logging facility N, e.g.:
+
+----
+      ]log 25
+    Logging facility 'more verbose errors' is now ON
+
+      ]log 26
+    Logging facility 'details of error throwing' is now ON
+----
+
 === Logging Facilities of Interest
 
 Many of the currently over 40 logging server a particular purpose for the
@@ -545,7 +633,7 @@ the trouble-shooting performed by the user. The others mentioned below.
 
 ==== ]Log 2 : new and delete calls
 
-For tracking the allocation and de-allication of memory.
+For tracking the allocation and de-allocation of memory.
 To find memo leaks.
 
 ==== ]Log 25 and 26 : APL Errors
@@ -562,7 +650,7 @@ Parsing of APL commands and Expressions. To analyse SYNTAX ERRORs.
 
 Information when the *GNU APL* interpreter starts. This facility can also be
 enabled from the command line because the output of interest occurs before
-the interpreter accepts commands.
+the interpreter accepts commands like *]LOG*.
 
 == Intrusive Troubleshooting
 
@@ -729,6 +817,10 @@ svn revert *
 in the *src* directory which undoes all changes you made.
 
 == Keep It Short and Simple
+
+The first thing to check before reporting an error is to make sure that you
+have compiled and installed the latest GNU APL version from subbversion (SVN)
+or git.
 
 From a maintainer's perspective, the trouble reports that are appreciated the
 most are the short ones. Locating a fault usually requires multiple

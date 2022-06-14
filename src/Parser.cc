@@ -696,7 +696,8 @@ Parser::create_scalar_value(Token & output)
 
         case TOK_REAL:
              {
-               Token tok(TOK_APL_VALUE3, FloatScalar(output.get_flt_val(), LOC));
+               Token tok(TOK_APL_VALUE3,
+                         FloatScalar(output.get_flt_val(), LOC));
                output.move_1(tok, LOC);
              }
              return;
@@ -759,7 +760,7 @@ Value_P Z(count, LOC);
                  tok.clear(LOC);   // invalidate token
                  break;
 
-              default: Assert(0);
+              default: FIXME;
             }
        }
 

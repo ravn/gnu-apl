@@ -2280,14 +2280,17 @@ int on_off = -1;
 
    if (val >= LID_MIN && val <= LID_MAX)
       {
-        const char * info = Log_info(val);
-        Assert(info);
         bool new_status = !Log_status(val);   // toggle
         if (on_off == 0)        new_status = false;
         else if (on_off == 1)   new_status = true;
-
         Log_control(val, new_status);
-        CERR << "    Log facility '" << info << "' is now "
+
+        const char * info = Log_info(val);
+        Assert(info);
+        char cc[100];
+        size_t cc_len = snprintf(cc, sizeof(cc), "%s", info);
+        while (cc_len && cc[cc_len - 1] <= ' ')   cc[--cc_len] = 0;
+        CERR << "    Logging facility '" << cc << "' is now "
              << (new_status ? "ON " : "OFF") << endl;
       }
 }

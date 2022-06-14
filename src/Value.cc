@@ -447,8 +447,13 @@ const ShapeItem length = nz_element_count();
                    initialized, therefore they should not be released.
               */
              loop(c, valid_ravel_items - 1)   cZ++->release(LOC);
-           }
 
+             // case B. An APL error while this value is being initialized.
+             if (get_pointer_cell_count() == 1 && cZ->is_pointer_cell())
+                {
+                  cZ->release(LOC);
+                }
+           }
       }
 
    Assert1(get_pointer_cell_count() == 0);
