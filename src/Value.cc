@@ -427,33 +427,11 @@ const ShapeItem length = nz_element_count();
 #endif
       {
         Cell * cZ = &get_wfirst();
-        if (is_complete())   // OK to release all cells
-           {
-             loop(c, length)   cZ++->release(LOC);
-           }
-        else                 // be careful with releasing cells
-           {
-             /* at this point, the initialization of the value was not
-                completed, usually due to a DOMAIN ERROR somewhere.
-
-                A. the first ravel cells (up to (including) valid_ravel_items)
-                   were intialized normally (and can be safely released.
-
-                B. the ravel cell at valid_ravel_items may or may not have
-                   been released. We don't release it because loosing some
-                   memory is more convenient for the user than crashing here.
-
-                C. the ravel cells after valid_ravel_items were not
-                   initialized, therefore they should not be released.
-              */
-             loop(c, valid_ravel_items - 1)   cZ++->release(LOC);
-
-             // case B. An APL error while this value is being initialized.
-             if (get_pointer_cell_count() == 1 && cZ->is_pointer_cell())
-                {
-                  cZ->release(LOC);
-                }
-           }
+        loop(c, length)
+            {
+              if (get_pointer_cell_count() == 0)   break;
+              cZ++->release(LOC);
+            }
       }
 
    Assert1(get_pointer_cell_count() == 0);

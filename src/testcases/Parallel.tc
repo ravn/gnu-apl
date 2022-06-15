@@ -11,7 +11,7 @@ CLEAR WS
       DOIT 'parallel tests ( since ⎕SYL[24; 2] is:' ⎕SYL[24; 2] ')'
 ³
 
-      ⍎ NEXT
+      ⊣ ⍎ NEXT
 
 
       )CLEAR
