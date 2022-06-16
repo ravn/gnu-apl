@@ -972,7 +972,7 @@ Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
         return;
       }
 
-   // )DUMP: use )WSID unless CLEAR WS
+   // )DUMP: use )WSID unless it is CLEAR WS
    //
 LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();

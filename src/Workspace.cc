@@ -617,28 +617,28 @@ Workspace::list_SI(ostream & out, SI_mode mode)
 }
 //----------------------------------------------------------------------------
 void
-Workspace::save_WS(ostream & out, LibRef libref, const UCS_string & wsname,
+Workspace::save_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
                    bool name_from_WSID)
 {
-UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, false,
+UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, false,
                                                   ".xml", 0);
 
-   // dont )SAVE if wsname differs from wsid and the file exists
+   // dont )SAVE if WS_name differs from wsid and the file exists
    //
 const bool file_exists = access(filename.c_str(), W_OK) == 0;
    if (file_exists)
       {
-        if (wsname.compare(the_workspace.WS_name) != 0)   // names differ
+        if (WS_name.compare(the_workspace.WS_name) != 0)   // names differ
            {
              out << "NOT SAVED: THIS WS IS "
                  << the_workspace.WS_name << endl;
 
              MORE_ERROR() << "the workspace was not saved because:\n"
                   << "   the workspace name '" << the_workspace.WS_name
-                  << "' of )WSID\n   does not match the name '" << wsname
+                  << "' of )WSID\n   does not match the name '" << WS_name
                   << "' used in the )SAVE command\n"
                   << "   and the workspace file\n   " << filename
-                  << "\n   already exists. Use )WSID " << wsname << " first."; 
+                  << "\n   already exists. Use )WSID " << WS_name << " first."; 
              return;
            }
       }
@@ -655,12 +655,12 @@ const bool file_exists = access(filename.c_str(), W_OK) == 0;
 ofstream outf(filename.c_str(), ofstream::out);
    if (!outf.is_open())   // open failed
       {
-        CERR << "Unable to )SAVE workspace '" << wsname
+        CERR << "Unable to )SAVE workspace '" << WS_name
              << "'. " << strerror(errno) << endl;
         return;
       }
 
-   the_workspace.WS_name = wsname;
+   the_workspace.WS_name = WS_name;
 
    Log(LOG_archive)   CERR << "constructing XML_Saving_Archive." << endl;
 XML_Saving_Archive ar(outf);
@@ -805,19 +805,19 @@ public:
 };
 //----------------------------------------------------------------------------
 void
-Workspace::dump_WS(ostream & out, LibRef libref, const UCS_string & wsname,
+Workspace::dump_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
                    bool html, bool silent)
 {
    // )DUMP
-   // )DUMP wsname
-   // )DUMP libnum wsname
+   // )DUMP WS_name
+   // )DUMP libnum WS_name
 
 const char * extension = html ? ".html" : ".apl";
-UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, false,
+UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, false,
                                                   extension, 0);
-   if (wsname.compare(UCS_string("CLEAR WS")) == 0)   // don't save CLEAR WS
+   if (WS_name.compare(UCS_string("CLEAR WS")) == 0)   // don't save CLEAR WS
       {
-        COUT << "NOT DUMPED: THIS WS IS " << wsname << endl;
+        COUT << "NOT DUMPED: THIS WS IS " << WS_name << endl;
         MORE_ERROR() <<
         "the workspace was not dumped because 'CLEAR WS' is a special\n"
         "workspace name that cannot be dumped. Use )WSID <name> first.";
@@ -835,7 +835,7 @@ ofstream outf(filename.c_str(), ofstream::out);
 
    if (!outf.is_open())   // open failed
       {
-        CERR << "Unable to )DUMP workspace '" << wsname
+        CERR << "Unable to )DUMP workspace '" << WS_name
              << "': " << strerror(errno) << "." << endl
              << "    NOTE: filename: " << filename << endl;
         return;
@@ -859,7 +859,7 @@ const YMDhmsu time(gmt + 1000000*offset);
 "                      \"http://www.w3.org/TR/html4/strict.dtd\">"  << endl <<
 "<html>"                                                            << endl <<
 "  <head>"                                                          << endl <<
-"    <title>" << wsname << ".apl</title> "                          << endl <<
+"    <title>" << WS_name << ".apl</title> "                         << endl <<
 "    <meta http-equiv=\"content-type\" "                            << endl <<
 "          content=\"text/html; charset=UTF-8\">"                   << endl <<
 "    <meta name=\"author\" content=\"??????\">"                     << endl <<
@@ -899,16 +899,13 @@ const YMDhmsu time(gmt + 1000000*offset);
                << " --script" << endl;
         }
 
-UCS_string wsname_apl = wsname;
-   wsname_apl.append_UTF8(".apl");
-
      *sout <<
-" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << endl <<
-"⍝                                                                    ⍝" << endl <<
-"⍝ " << setw(36) << wsname_apl << " ";
-     get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << " ⍝" << endl <<
-"⍝                                                                    ⍝" << endl <<
-" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝"  << endl
+" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n"
+"⍝                                                                    ⍝\n"
+"⍝ " << setw(36) << WS_name << " ";
+     get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << " ⍝\n"
+"⍝                                                                    ⍝\n"
+" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n"
            << endl;
    }
 
@@ -932,7 +929,7 @@ int variable_count = 0;
       }
    else
       {
-        out << "DUMPED WORKSPACE '" << wsname << "'" << endl
+        out << "DUMPED WORKSPACE '" << WS_name << "'" << endl
             << " TO FILE '" << filename << "'" << endl
             << " (" << function_count << " FUNCTIONS, " << variable_count
             << " VARIABLES)" << endl;
@@ -954,31 +951,31 @@ vector<Command::user_command> & cmds = get_user_commands();
 //----------------------------------------------------------------------------
 // )LOAD WS, set ⎕LX of loaded WS on success
 void
-Workspace::load_WS(ostream & out, LibRef libref, const UCS_string & wsname,
+Workspace::load_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
                    UCS_string & quad_lx, bool silent)
 {
-   // )LOAD wsname                              wsname /absolute or relative
-   // )LOAD libnum wsname                       wsname relative
+   // )LOAD WS_name                              WS_name /absolute or relative
+   // )LOAD libnum WS_name                       WS_name relative
    //
-   if (UTF8_string(wsname).ends_with(".bak"))
+   if (UTF8_string(WS_name).ends_with(".bak"))
       {
         out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << wsname <<
+        MORE_ERROR() << WS_name <<
         " is a backup file! You need to rename it before it can be )LOADed";
         return;
       }
 
-UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, true,
+UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
                                                   ".xml", ".apl");
 
 int dump_fd = -1;
 XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 
-   if (dump_fd != -1)   // wsname.apl
+   if (dump_fd != -1)   // WS_name.apl
       {
         the_workspace.clear_WS(out, true);
 
-        Log(LOG_command_IN)   out << "LOADING " << wsname << " from file '"
+        Log(LOG_command_IN)   out << "LOADING " << WS_name << " from file '"
                                   << filename << "' ..." << endl;
 
         load_DUMP(out, filename, dump_fd, do_LX, silent, 0);   // closes dump_fd
@@ -1001,16 +998,16 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
         // we cant set ⎕LX because it was not executed yet.
         return;
       }
-   else   // wsname.xml
+   else   // WS_name.xml
       {
         if (!in.is_open())   // open failed
            {
-             out << ")LOAD " << wsname << " (file " << filename
+             out << ")LOAD " << WS_name << " (file " << filename
                  << ") failed: " << strerror(errno) << endl;
              return;
            }
 
-        Log(LOG_command_IN)   out << "LOADING " << wsname << " from file '"
+        Log(LOG_command_IN)   out << "LOADING " << WS_name << " from file '"
                                   << filename << "' ..." << endl;
 
         // got open file. We assume that from here on everything will be fine.
@@ -1031,15 +1028,15 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 }
 //----------------------------------------------------------------------------
 void
-Workspace::copy_WS(ostream & out, LibRef libref, const UCS_string & wsname,
+Workspace::copy_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
                    UCS_string_vector & lib_ws_objects, bool protection)
 {
-   // )COPY wsname                              wsname /absolute or relative
-   // )COPY libnum wsname                       wsname relative
-   // )COPY wsname objects...                   wsname /absolute or relative
-   // )COPY libnum wsname objects...            wsname relative
+   // )COPY WS_name                              WS_name /absolute or relative
+   // )COPY libnum WS_name                       WS_name relative
+   // )COPY WS_name objects...                   WS_name /absolute or relative
+   // )COPY libnum WS_name objects...            WS_name relative
 
-UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, true,
+UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
                                                   ".xml", ".apl");
 
 int dump_fd = -1;
@@ -1053,12 +1050,12 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 
    if (!in.is_open())   // open failed: try filename.xml unless already .xml
       {
-        CERR << ")COPY " << wsname << " (file " << filename
+        CERR << ")COPY " << WS_name << " (file " << filename
              << ") failed: " << strerror(errno) << endl;
         return;
       }
 
-   Log(LOG_command_IN)   CERR << "LOADING " << wsname << " from file '"
+   Log(LOG_command_IN)   CERR << "LOADING " << WS_name << " from file '"
                               << filename << "' ..." << endl;
 
    in.set_protection(protection, lib_ws_objects);
