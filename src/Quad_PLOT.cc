@@ -261,8 +261,7 @@ Quad_PLOT::parse_attributes(const Value & A, Plot_window_properties * w_props)
                    if (const char * error = w_props->set_attribute(ucs,
                                                   A.get_cravel(2*row + 1)))
                       {
-                        MORE_ERROR() << error << " in ⎕PLOT attribute ."
-                                     << ucs;
+                        MORE_ERROR() << error << " in ⎕PLOT attribute ." << ucs;
                         return E_DOMAIN_ERROR;
                       }
                  }

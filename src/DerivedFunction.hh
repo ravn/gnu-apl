@@ -116,8 +116,8 @@ protected:
       }
 
    /// overloaded Function::locate_X()
-   virtual const Value_P * locate_X() const
-      { return (!axis) ? 0 : &axis; }
+   virtual Value_P * locate_X() const
+      { return !axis ? 0 : const_cast<Value_P *>(&axis); }
 
    /// the function (to the left of the operator)
    Token left_arg;

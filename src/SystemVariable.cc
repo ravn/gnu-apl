@@ -459,13 +459,25 @@ StateIndicator * si = Workspace::SI_top_fun();
 Value_P
 Quad_L::get_apl_value() const
 {
-StateIndicator * si = Workspace::SI_top_error();
-   if (si)
+
+   if (StateIndicator * si = Workspace::SI_top_error())
       {
-        Value_P ret = si->get_L();
-        if (+ret)   return  ret;
+        UCS_string function;
+        Value_P ret = si->get_L(function);
+        if (!ret)
+           {
+             if (function.size())
+                MORE_ERROR() << "⎕L: no left argument of function "
+                             << function;
+             else
+                MORE_ERROR() << "⎕L: no function";
+             VALUE_ERROR;
+           }
+
+        return  ret;
       }
 
+   MORE_ERROR() << "⎕L: no )SI line with an error";
    VALUE_ERROR;
 }
 //============================================================================
@@ -864,13 +876,25 @@ StateIndicator * si = Workspace::SI_top_fun();
 Value_P
 Quad_R::get_apl_value() const
 {
-StateIndicator * si = Workspace::SI_top_error();
-   if (si)
+
+   if (StateIndicator * si = Workspace::SI_top_error())
       {
-        Value_P ret = si->get_R();
-        if (+ret)   return  ret;
+        UCS_string function;
+        Value_P ret = si->get_R(function);
+        if (!ret)
+           {
+             if (function.size())
+                MORE_ERROR() <<"⎕R: no right argument of function "
+                             << function;
+             else
+                MORE_ERROR() << "⎕R: no function";
+             VALUE_ERROR;
+           }
+
+        return  ret;
       }
 
+   MORE_ERROR() << "⎕R: no )SI line with an error";
    VALUE_ERROR;
 }
 //============================================================================
@@ -1191,13 +1215,24 @@ StateIndicator * si = Workspace::SI_top_fun();
 Value_P
 Quad_X::get_apl_value() const
 {
-StateIndicator * si = Workspace::SI_top_error();
-   if (si)
+   if (StateIndicator * si = Workspace::SI_top_error())
       {
-        Value_P ret = si->get_X();
-        if (+ret)   return ret;
+        UCS_string function;
+        Value_P ret = si->get_X(function);
+        if (!ret)
+           {
+             if (function.size())
+                MORE_ERROR() << "⎕X: no axis argument of function "
+                             << function;
+             else
+                MORE_ERROR() << "⎕X: no function";
+             VALUE_ERROR;
+           }
+
+        return ret;
       }
 
+   MORE_ERROR() << "⎕X: no )SI line with an error";
    VALUE_ERROR;
 }
 //============================================================================

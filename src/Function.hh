@@ -269,7 +269,7 @@ public:
       { NeverReach("Function::canonical() called"); }
 
    /// return axis (non-0 only for derived functions)
-   virtual const Value_P * locate_X() const
+   virtual Value_P * locate_X() const
       { return 0; }
 
    /// return true if this function has (named) sub-functions, i.e.

@@ -34,11 +34,11 @@ class Nabla;
 /// kind of input
 enum LineInputMode
 {
-   LIM_ImmediateExecution,
-   LIM_Quote_Quad,
-   LIM_Quad_Quad,
-   LIM_Quad_INP,
-   LIM_Nabla,
+   LIM_ImmediateExecution = 0,
+   LIM_Quote_Quad         = 1,
+   LIM_Quad_Quad          = 2,
+   LIM_Quad_INP           = 3,
+   LIM_Nabla              = 4,
 };
 //----------------------------------------------------------------------------
 /// the lines that the user has previously entered

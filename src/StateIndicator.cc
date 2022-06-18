@@ -398,54 +398,45 @@ StateIndicator::info(ostream & out, const char * loc) const
 }
 //----------------------------------------------------------------------------
 Value_P
-StateIndicator::get_L()
+StateIndicator::get_L(UCS_string & function)
 {
-Token * tok_L = current_stack.locate_L();
-   if (tok_L)   return tok_L->get_apl_val();
+   if (Value_P * L = current_stack.locate_L(function))   return *L;
    return Value_P();
 }
 //----------------------------------------------------------------------------
 Value_P
-StateIndicator::get_R()
+StateIndicator::get_R(UCS_string & function)
 {
-Token * tok_R = current_stack.locate_R();
-   if (tok_R)   return tok_R->get_apl_val();
+   if (Value_P * R = current_stack.locate_R(function))   return *R;
    return Value_P();
 }
 //----------------------------------------------------------------------------
 Value_P
-StateIndicator::get_X()
+StateIndicator::get_X(UCS_string & function)
 {
-   if (const Value_P * X = current_stack.locate_X())
-      return *const_cast<Value_P *>(X);
+   if (Value_P * X = current_stack.locate_X(function))   return *X;
    return Value_P();
 }
 //----------------------------------------------------------------------------
 void
 StateIndicator::set_L(Value_P new_value)
 {
-Token * tok_L = current_stack.locate_L();
-   if (tok_L == 0)   return;
-
-Value_P old_value = tok_L->get_apl_val();   // so that 
-   tok_L->move_2(Token(tok_L->get_tag(), new_value), LOC);
+UCS_string function;
+   if (Value_P * L = current_stack.locate_L(function))   *L = new_value;
 }
 //----------------------------------------------------------------------------
 void
 StateIndicator::set_R(Value_P new_value)
 {
-Token * tok_R = current_stack.locate_R();
-   if (tok_R == 0)   return;
-
-Value_P old_value = tok_R->get_apl_val();   // so that 
-   tok_R->move_2(Token(tok_R->get_tag(), new_value), LOC);
+UCS_string function;
+   if (Value_P * R = current_stack.locate_R(function))   *R = new_value;
 }
 //----------------------------------------------------------------------------
 void
 StateIndicator::set_X(Value_P new_value)
 {
-const Value_P * X = current_stack.locate_X();
-   if (X)   *const_cast<Value_P *>(X) = new_value;
+UCS_string function;
+   if (Value_P * X = current_stack.locate_X(function))   *X = new_value;
 }
 //----------------------------------------------------------------------------
 const StateIndicator *

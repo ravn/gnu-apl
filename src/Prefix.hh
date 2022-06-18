@@ -106,13 +106,13 @@ public:
    bool replace_AB(Value_P old_value, Value_P new_value);
 
    /// return the left argument of a failed primitive function (if any)
-   Token * locate_L();
+   Value_P * locate_L(UCS_string & function);
 
    /// return the axis argument of a failed primitive function (if any)
-   const Value_P * locate_X();
+   Value_P * locate_X(UCS_string & function);
 
    /// return the right argument of a failed primitive function (if any)
-   Token * locate_R();
+   Value_P * locate_R(UCS_string & function);
 
    /// return the current monadic function (if any)
    const Function * get_dyadic_fun() const

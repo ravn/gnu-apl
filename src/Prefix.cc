@@ -831,24 +831,39 @@ Prefix::replace_AB(Value_P old_value, Value_P new_value)
    return false;
 }
 //----------------------------------------------------------------------------
-Token * Prefix::locate_L()
+Value_P *
+Prefix::locate_L(UCS_string & function)
 {
-   // expect at least A f B (so we have at0(), at1() and at2()
+   /*  ⎕L requires at least A f B (so we have at0(), at1() and at2(). However,
+       the user could fail on a monadic function (with prefix_len = 2) and then
+       query ⎕L. For example:
+
+       at0 at1 at2  prefix_len
+        ÷   0       2            in × ÷ 0   (hence no ⎕L)
+        2   ÷   0   3            in 2 ÷ 0   (⎕L is 2)
+    */
+
+   if (prefix_len > 0 && at0().get_ValueType() == TV_FUN)
+      {
+        // e.g. DOMAIN ERROR in × ÷ 0. prefix_len is 2 and at0() us ÷
+        function = at0().get_function()->get_name();
+        return 0;
+      }
+   if (prefix_len > 1 && at1().get_ValueType() == TV_FUN)
+      {
+        function = at1().get_function()->get_name();
+      }
 
    if (prefix_len < 3)   return 0;
 
-   if (at1().get_Class() != TC_FUN12 &&
-       at1().get_Class() != TC_OPER1 &&
-       at1().get_Class() != TC_OPER2)   return 0;
-
-   if (at0().get_Class() == TC_VALUE)   return &at0();
+   if (at0().get_Class() == TC_VALUE)   return at0().get_apl_valp();
    return 0;
 }
 //----------------------------------------------------------------------------
-const Value_P *
-Prefix::locate_X()
+Value_P *
+Prefix::locate_X(UCS_string & function)
 {
-   // expect at least B X (so we have at0() and at1() and at2()
+   // ⎕X requires at least X B (so we have at0() and at1()
 
    if (prefix_len < 2)   return 0;
 
@@ -859,11 +874,12 @@ Prefix::locate_X()
        {
          if (content[x].tok.get_ValueType() == TV_FUN)
             {
-              Function_P fun = content[x].tok.get_function();
-              if (fun)
+              if (Function_P fun = content[x].tok.get_function())
                  {
-                   const Value_P * X = fun->locate_X();
-                   if (X)   return  X;   // only for derived function
+                   function = fun->get_name();
+                   // locate_X() always returns 0 for non-derived functions
+                   // because we can't allow ⎕X to modify the function body.
+                   if (Value_P * X = fun->locate_X())   return  X;
                  }
             }
          else if (content[x].tok.get_Class() == TC_INDEX)   // maybe found X ?
@@ -875,24 +891,21 @@ Prefix::locate_X()
    return 0;
 }
 //----------------------------------------------------------------------------
-Token * Prefix::locate_R()
+Value_P *
+Prefix::locate_R(UCS_string & function)
 {
-   // expect at least f B (so we have at0(), at1() and at2()
+   // ⎕R requires at least f B (so we have at0() and at1()
 
    if (prefix_len < 2)   return 0;
 
    // either at0() (for monadic f B) or at1() (for dyadic A f B) must
    // be a function or operator
    //
-   if (at0().get_Class() != TC_FUN12 &&
-       at0().get_Class() != TC_OPER1 &&
-       at0().get_Class() != TC_OPER2 &&
-       at1().get_Class() != TC_FUN12 &&
-       at1().get_Class() != TC_OPER1 &&
-       at1().get_Class() != TC_OPER2)   return 0;
+   if (at0().get_ValueType() != TV_FUN &&
+       at1().get_ValueType() != TV_FUN)   return 0;
 
 Token * ret = &content[put - prefix_len].tok;
-   if (ret->get_Class() == TC_VALUE)   return ret;
+   if (ret->get_Class() == TC_VALUE)   return ret->get_apl_valp();
    return 0;
 }
 //----------------------------------------------------------------------------

@@ -652,6 +652,28 @@ Quad_EX::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
+   // we don't throw a DOMAIN ERROR if B is bad, but provide info for
+   // the user if she asks for it with )MORE.
+   loop(b, B->element_count())
+       {
+         const Cell & cell = B->get_cravel(b);
+         if (!cell.is_character_cell())
+            {
+              MORE_ERROR() << "⎕EX B: non-character in list B (of symbol names)";
+              break;
+            }
+
+        const Unicode uni = cell.get_char_value();
+        if (!( Avec::is_symbol_char(uni) ||
+               Avec::is_white(uni)       ||
+               (uni == UNI_FULLSTOP)))
+           {
+              MORE_ERROR() << "⎕EX B: invalid character "
+                           << uni << " in list B (of symbol names)";
+              break;
+           }
+       }
+
 const ShapeItem var_count = B->get_rows();
 const UCS_string_vector vars(*B, false);
 
@@ -659,7 +681,13 @@ Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
 Value_P Z(sh_Z, LOC);
 
-   loop(z, var_count)   Z->next_ravel_Int(expunge(vars[z]));
+   loop(z, var_count)
+      {
+        const UCS_string & var = vars[z];
+        const int erased = expunge(var);
+
+        Z->next_ravel_Int(erased);
+      }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);

@@ -53,6 +53,7 @@ const ShapeItem name_len = val.get_cols();
                   name.append(uni);
                   continue;
                 }
+
              // end of (first) name reached. At this point we expect either
              // spaces until 'end' or some spaces and another name.
              //

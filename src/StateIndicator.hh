@@ -128,20 +128,20 @@ public:
    static const Error & get_error(const StateIndicator * si)
        { return si ? si->error : top_level_error; }
 
-   /// return left arg
-   Value_P get_L();
+   /// return left arg (and set \b function)
+   Value_P get_L(UCS_string & function);
 
    /// change left arg
    void set_L(Value_P value);
 
-   /// return right arg
-   Value_P get_R();
+   /// return right arg (and set \b function)
+   Value_P get_R(UCS_string & function);
 
    /// change right arg
    void set_R(Value_P value);
 
-   /// return axis arg
-   Value_P get_X();
+   /// return axis arg (and set \b function)
+   Value_P get_X(UCS_string & function);
 
    /// change axis arg
    void set_X(Value_P value);
