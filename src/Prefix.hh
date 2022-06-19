@@ -73,6 +73,9 @@ public:
    /// return true if ufun is on the stack
    bool uses_function(const UserFunction * ufun) const;
 
+   /// return true if the state of \b this Prefix has ⎕R (and maybe ⎕L or ⎕X).
+   bool has_quad_LRX() const;
+
    /// print the state of this parser
    void print(ostream & out, int indent) const;
 

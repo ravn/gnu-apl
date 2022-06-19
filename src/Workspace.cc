@@ -215,12 +215,15 @@ Workspace::SI_top_fun()
 }
 //----------------------------------------------------------------------------
 StateIndicator *
-Workspace::SI_top_error()
+Workspace::SI_top_error(bool quad_LRX)
 {
    for (StateIndicator * si = SI_top(); si; si = si->get_parent())
        {
          if (StateIndicator::get_error(si).get_error_code() != E_NO_ERROR)
-            return si;
+            {
+              if (!quad_LRX ||   // ⎕L, ⎕R, or ⎕X not required
+                  si->get_prefix().has_quad_LRX())   return si;
+            }
        }
 
    return 0;   // no context with an error

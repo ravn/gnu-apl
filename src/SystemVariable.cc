@@ -460,7 +460,7 @@ Value_P
 Quad_L::get_apl_value() const
 {
 
-   if (StateIndicator * si = Workspace::SI_top_error())
+   if (StateIndicator * si = Workspace::SI_top_error(true))
       {
         UCS_string function;
         Value_P ret = si->get_L(function);
@@ -477,7 +477,7 @@ Quad_L::get_apl_value() const
         return  ret;
       }
 
-   MORE_ERROR() << "⎕L: no )SI line with an error";
+   MORE_ERROR() << "⎕L: no )SI line with a matching error";
    VALUE_ERROR;
 }
 //============================================================================
@@ -877,7 +877,7 @@ Value_P
 Quad_R::get_apl_value() const
 {
 
-   if (StateIndicator * si = Workspace::SI_top_error())
+   if (StateIndicator * si = Workspace::SI_top_error(true))
       {
         UCS_string function;
         Value_P ret = si->get_R(function);
@@ -894,7 +894,7 @@ Quad_R::get_apl_value() const
         return  ret;
       }
 
-   MORE_ERROR() << "⎕R: no )SI line with an error";
+   MORE_ERROR() << "⎕R: no )SI line with a matching error";
    VALUE_ERROR;
 }
 //============================================================================
@@ -1215,7 +1215,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 Value_P
 Quad_X::get_apl_value() const
 {
-   if (StateIndicator * si = Workspace::SI_top_error())
+   if (StateIndicator * si = Workspace::SI_top_error(true))
       {
         UCS_string function;
         Value_P ret = si->get_X(function);
@@ -1232,7 +1232,7 @@ Quad_X::get_apl_value() const
         return ret;
       }
 
-   MORE_ERROR() << "⎕X: no )SI line with an error";
+   MORE_ERROR() << "⎕X: no )SI line with a matching error";
    VALUE_ERROR;
 }
 //============================================================================

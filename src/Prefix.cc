@@ -132,6 +132,31 @@ Prefix::uses_function(const UserFunction * ufun) const
 }
 //----------------------------------------------------------------------------
 bool
+Prefix::has_quad_LRX() const
+{
+   /* examples:
+
+       at0 at1 at2 at3  prefix_len
+        ÷   R           2            in MISC  ÷ R      has ⎕R
+        L   ÷   R       3            in    L  ÷ R      has ⎕L and ⎕R
+        L   ÷  [X]  R   4            in    L  ÷ [X] R  has ⎕L and ⎕X and ⎕R
+        B  [X]                       in  5 6 [2]
+    */
+
+   switch(prefix_len)
+      {
+        case 0:  return false;
+        case 1:  return false;
+        case 2:  if (at1().get_Class() == TC_INDEX)   return true;   // B[X]
+                 // fall through
+        default: if (at(prefix_len - 1).tok.get_Class() == TC_VALUE)   /// ... ⎕R
+                    return true;
+      }
+
+   return false;
+}
+//----------------------------------------------------------------------------
+bool
 Prefix::is_value_parenthesis(int pc) const
 {
    // we have ) XXX with XXX on the stack and need to know if the evaluation
@@ -845,13 +870,19 @@ Prefix::locate_L(UCS_string & function)
 
    if (prefix_len > 0 && at0().get_ValueType() == TV_FUN)
       {
-        // e.g. DOMAIN ERROR in × ÷ 0. prefix_len is 2 and at0() us ÷
+        // e.g. DOMAIN ERROR in × ÷ 0. prefix_len is 2 and at0() is ÷
         function = at0().get_function()->get_name();
         return 0;
       }
+
    if (prefix_len > 1 && at1().get_ValueType() == TV_FUN)
       {
         function = at1().get_function()->get_name();
+      }
+   else if (prefix_len == 2 && at1().get_Class() == TC_INDEX)   // B[X]
+      {
+        function = UCS_string("[]");
+        return at0().get_apl_valp();
       }
 
    if (prefix_len < 3)   return 0;
@@ -897,6 +928,12 @@ Prefix::locate_R(UCS_string & function)
    // ⎕R requires at least f B (so we have at0() and at1()
 
    if (prefix_len < 2)   return 0;
+
+   if (prefix_len == 2 && at1().get_Class() == TC_INDEX)   // B[X]
+      {
+        function = UCS_string("[]");   // valid function
+        return 0;                      // but no ⎕R.
+      }
 
    // either at0() (for monadic f B) or at1() (for dyadic A f B) must
    // be a function or operator

@@ -205,8 +205,8 @@ public:
    /// the topmost SI with parse mode PM_FUNCTION
    static StateIndicator * SI_top_fun();
 
-   /// the topmost SI with an error
-   static StateIndicator * SI_top_error();
+   /// the topmost SI with an error, maybe require ⎕L, ⎕R, or ⎕X.
+   static StateIndicator * SI_top_error(bool quad_LRX);
 
    /// lookup an existing name (user defined or ⎕xx, var or function).
    /// return 0 if not found.
