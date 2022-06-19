@@ -143,13 +143,13 @@ Prefix::has_quad_LRX() const
         B  [X]                       in  5 6 [2]
     */
 
-   switch(prefix_len)
+   switch(size())
       {
         case 0:  return false;
         case 1:  return false;
         case 2:  if (at1().get_Class() == TC_INDEX)   return true;   // B[X]
                  // fall through
-        default: if (at(prefix_len - 1).tok.get_Class() == TC_VALUE)   /// ... ⎕R
+        default: if (at(size() - 1).tok.get_Class() == TC_VALUE)   /// ... ⎕R
                     return true;
       }
 
@@ -860,32 +860,32 @@ Value_P *
 Prefix::locate_L(UCS_string & function)
 {
    /*  ⎕L requires at least A f B (so we have at0(), at1() and at2(). However,
-       the user could fail on a monadic function (with prefix_len = 2) and then
+       the user could fail on a monadic function (with size() = 2) and then
        query ⎕L. For example:
 
-       at0 at1 at2  prefix_len
+       at0 at1 at2  size()
         ÷   0       2            in × ÷ 0   (hence no ⎕L)
         2   ÷   0   3            in 2 ÷ 0   (⎕L is 2)
     */
 
-   if (prefix_len > 0 && at0().get_ValueType() == TV_FUN)
+   if (size() > 0 && at0().get_ValueType() == TV_FUN)
       {
-        // e.g. DOMAIN ERROR in × ÷ 0. prefix_len is 2 and at0() is ÷
+        // e.g. DOMAIN ERROR in × ÷ 0. size() is 2 and at0() is ÷
         function = at0().get_function()->get_name();
         return 0;
       }
 
-   if (prefix_len > 1 && at1().get_ValueType() == TV_FUN)
+   if (size() > 1 && at1().get_ValueType() == TV_FUN)
       {
         function = at1().get_function()->get_name();
       }
-   else if (prefix_len == 2 && at1().get_Class() == TC_INDEX)   // B[X]
+   else if (size() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
       {
         function = UCS_string("[]");
         return at0().get_apl_valp();
       }
 
-   if (prefix_len < 3)   return 0;
+   if (size() < 3)   return 0;
 
    if (at0().get_Class() == TC_VALUE)   return at0().get_apl_valp();
    return 0;
@@ -896,12 +896,12 @@ Prefix::locate_X(UCS_string & function)
 {
    // ⎕X requires at least X B (so we have at0() and at1()
 
-   if (prefix_len < 2)   return 0;
+   if (size() < 2)   return 0;
 
    // either at0() (for monadic f X B) or at1() (for dyadic A f X B) must
    // be a function or operator
    //
-   for (int x = put - 1; x >= put - prefix_len; --x)
+   for (int x = size() - 1; x >= 0; --x)
        {
          if (content[x].tok.get_ValueType() == TV_FUN)
             {
@@ -927,9 +927,9 @@ Prefix::locate_R(UCS_string & function)
 {
    // ⎕R requires at least f B (so we have at0() and at1()
 
-   if (prefix_len < 2)   return 0;
+   if (size() < 2)   return 0;
 
-   if (prefix_len == 2 && at1().get_Class() == TC_INDEX)   // B[X]
+   if (size() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
       {
         function = UCS_string("[]");   // valid function
         return 0;                      // but no ⎕R.
@@ -941,7 +941,7 @@ Prefix::locate_R(UCS_string & function)
    if (at0().get_ValueType() != TV_FUN &&
        at1().get_ValueType() != TV_FUN)   return 0;
 
-Token * ret = &content[put - prefix_len].tok;
+Token * ret = &content[size() - prefix_len].tok;
    if (ret->get_Class() == TC_VALUE)   return ret->get_apl_valp();
    return 0;
 }
