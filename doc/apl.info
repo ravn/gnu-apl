@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-June 3, 2022
+June 19, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3457,7 +3457,12 @@ different ways:
      or
    • from APL by calling ⎕PLOT H (which closes a specific plot window),
      where H is the plot window handle returned by monadic ⎕PLOT B or by
-     dyadic A ⎕PLOT B with plot attributes A
+     dyadic A ⎕PLOT B with plot attributes A.
+
+   Note that the exact method for closing a plot window with the mouse
+(as opposed to calling ⎕PLOT with the window handle from APL) differs
+between different window managers.  The above simply means to use the
+standard method for closing windows on your system.
 
 
 File: apl.info,  Node: Section 2.32,  Next: Section 2.33,  Prev: Section 2.31,  Up: Chapter 2
@@ -6344,63 +6349,63 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11575
-Node: Chapter 222870
-Node: Section 2.124765
-Node: Section 2.241681
-Node: Section 2.342440
-Node: Section 2.443727
-Node: Section 2.548092
-Node: Section 2.648265
-Node: Section 2.748895
-Node: Section 2.852848
-Node: Section 2.954383
-Node: Section 2.1056475
-Node: Section 2.1158028
-Node: Section 2.1259813
-Node: Section 2.1361753
-Node: Section 2.1462694
-Node: Section 2.1562946
-Node: Section 2.1664342
-Node: Section 2.1774486
-Node: Section 2.1877008
-Node: Section 2.1983715
-Node: Section 2.2085160
-Node: Section 2.2190821
-Node: Section 2.2295855
-Node: Section 2.2399136
-Node: Section 2.2499427
-Node: Section 2.25110252
-Node: Section 2.26110524
-Node: Section 2.27117102
-Node: Section 2.28119562
-Node: Section 2.29120231
-Node: Section 2.30121890
-Node: Section 2.31125679
-Node: Section 2.32134431
-Node: Section 2.33135381
-Node: Section 2.34150105
-Node: Section 2.35160102
-Node: Section 2.36163206
-Node: Section 2.37165195
-Node: Section 2.38169620
-Node: Chapter 3191038
-Node: Chapter 4193541
-Node: Chapter 5194667
-Node: Section 5.1196204
-Node: Section 5.2197484
-Node: Section 5.3197844
-Node: Section 5.4198086
-Node: Section 5.5198748
-Node: Section 5.6199226
-Node: Section 5.7199998
-Node: Section 5.8200455
-Node: Chapter 6200857
-Node: Section 6.1201276
-Node: Section 6.2201963
-Node: Chapter 7202794
-Node: Section 7.1203297
-Node: Section 7.2228611
+Node: Chapter 11576
+Node: Chapter 222871
+Node: Section 2.124766
+Node: Section 2.241682
+Node: Section 2.342441
+Node: Section 2.443728
+Node: Section 2.548093
+Node: Section 2.648266
+Node: Section 2.748896
+Node: Section 2.852849
+Node: Section 2.954384
+Node: Section 2.1056476
+Node: Section 2.1158029
+Node: Section 2.1259814
+Node: Section 2.1361754
+Node: Section 2.1462695
+Node: Section 2.1562947
+Node: Section 2.1664343
+Node: Section 2.1774487
+Node: Section 2.1877009
+Node: Section 2.1983716
+Node: Section 2.2085161
+Node: Section 2.2190822
+Node: Section 2.2295856
+Node: Section 2.2399137
+Node: Section 2.2499428
+Node: Section 2.25110253
+Node: Section 2.26110525
+Node: Section 2.27117103
+Node: Section 2.28119563
+Node: Section 2.29120232
+Node: Section 2.30121891
+Node: Section 2.31125680
+Node: Section 2.32134699
+Node: Section 2.33135649
+Node: Section 2.34150373
+Node: Section 2.35160370
+Node: Section 2.36163474
+Node: Section 2.37165463
+Node: Section 2.38169888
+Node: Chapter 3191306
+Node: Chapter 4193809
+Node: Chapter 5194935
+Node: Section 5.1196472
+Node: Section 5.2197752
+Node: Section 5.3198112
+Node: Section 5.4198354
+Node: Section 5.5199016
+Node: Section 5.6199494
+Node: Section 5.7200266
+Node: Section 5.8200723
+Node: Chapter 6201125
+Node: Section 6.1201544
+Node: Section 6.2202231
+Node: Chapter 7203062
+Node: Section 7.1203565
+Node: Section 7.2228879
 
 End Tag Table
 

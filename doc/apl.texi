@@ -3580,8 +3580,13 @@ thread until it is being closed. A plot window can be closed in different ways:
 @item from APL by calling ⎕PLOT ¯3 (which closes all open plot windows), or
 @item from APL by calling ⎕PLOT H (which closes a specific plot window),
   where H is the plot window handle returned by monadic ⎕PLOT B or by dyadic
-  A ⎕PLOT B with plot attributes A
+  A ⎕PLOT B with plot attributes A.
 @end itemize
+
+Note that the exact method for closing a plot window with the mouse (as opposed
+to calling ⎕PLOT with the window handle from APL) differs between different
+window managers. The above simply means to use the standard method for closing
+windows on your system.
 
 @node    Section 2.32
 @section ⎕PS - Print Style

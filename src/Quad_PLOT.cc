@@ -351,10 +351,26 @@ Quad_PLOT::eval_B(Value_P B) const
 
         if (u.B0 == -3)   // close all windows
            {
+#if HAVE_GTK3
+             Value_P Z(plot_threads.size(), LOC);
+             loop(p, plot_threads.size())
+                {
+                  u.B0 = plot_threads[p];
+                  Z->next_ravel_Int(u.B0);
+
+                  plot_stop(u.w_props);
+                }
+             plot_threads.clear();
+             Z->check_value(LOC);
+             return Token(TOK_APL_VALUE1, Z);
+#else   // XCB
              while (plot_threads.size())
                 {
                   plot_threads.pop_back();
                 }
+
+              // continue below...
+#endif
            }
 
         if (u.B0 == -4)                // enable SHOW_DRAW

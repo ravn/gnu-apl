@@ -249,7 +249,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>June 3, 2022
+<p>June 19, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -3816,9 +3816,14 @@ thread until it is being closed. A plot window can be closed in different ways:
 </li><li> from APL by calling ⎕PLOT ¯3 (which closes all open plot windows), or
 </li><li> from APL by calling ⎕PLOT H (which closes a specific plot window),
   where H is the plot window handle returned by monadic ⎕PLOT B or by dyadic
-  A ⎕PLOT B with plot attributes A
+  A ⎕PLOT B with plot attributes A.
 </li></ul>
 
+<p>Note that the exact method for closing a plot window with the mouse (as opposed
+to calling ⎕PLOT with the window handle from APL) differs between different
+window managers. The above simply means to use the standard method for closing
+windows on your system.
+</p>
 <hr>
 <a name="Section-2_002e32"></a>
 <div class="header">
