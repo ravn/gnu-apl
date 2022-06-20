@@ -260,6 +260,7 @@ public:
    //
 #if 1   /* use atomic_fetch_add() */
 
+   /// a lock coordinating parallel access to shared objects
    typedef _Atomic_word parallel_lock_t;
 #define LOCK_INITIALIZER 0
 
@@ -281,6 +282,7 @@ public:
 
 #else   /* use pthread_rwlock_wrlock() */
 
+   /// a lock coordinating parallel access to shared objects
    typedef pthread_rwlock_t parallel_lock_t;
 #define LOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
 

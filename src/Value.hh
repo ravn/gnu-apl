@@ -711,13 +711,13 @@ public:
 
 /** macro NEW_CLONE selects one of two clone() schemes:
 
-   1. the old scheme ( #undef NEW_CLONE ) clones values early, so that:
+   1. the old scheme (with # undef NEW_CLONE) clones values early, so that:
    1a. Different PointerCells always point to different Sub-Values, and
    1b. Arguments of defined functions are different in the caller and in
        the callee, and
    1c. Values may be cloned without need.
 
-   2. the new scheme ( #define NEW_CLONE ) clones Values late, so that
+   2. the new scheme (with # define NEW_CLONE) clones Values late, so that
    2a. Different PointerCells (of the same or even of different
        Values) may point to the same Sub-Value, and
    2b. Arguments of defined functions are different in the caller and in
@@ -984,7 +984,7 @@ protected:
 
 #endif
 
-   // explicit cast from Value & to Value *. Use with care
+   /// explicit cast from Value & to Value *. Use with care
    Value * get_pointer ()   { return this; }
 
 private:

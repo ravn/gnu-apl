@@ -218,11 +218,12 @@ options:
  ATTS.caption       ← 'Parallel Speedup vs. Core Count'
  ATTS.pw_pos_X      ← 200
  ATTS.pw_pos_Y      ← 200
- ATTS.legend_name_1 ← "parallel speedup"
+ ATTS. format_X ← "%d\nCores"
  ATTS.legend_X      ← 50
  ATTS.legend_Y      ← 200
+ ATTS.legend_name_1 ← "parallel speedup"
  ATTS.point_color_1 ← "#0000FF"
- ATTS. line_color_1 ← "#FF00FF"
+ ATTS.pa_border_B   ← 50
 ∇
 ⍝ ====================================================================
 ∇ONE_CORE_COUNT CORES;EXPR;DLEN;DATA;P_pit;P_sup;S_pit;S_sup;I;LEN;SUM;SUM2;Q;PZ;SZ
@@ -300,6 +301,7 @@ L: ONE_CORE_COUNT ↑CORE_COUNTS
 decode_ARGS
 GO ∆CORES
 
+ 'Speedups: ' SPEEDUPS
  ⊣ SPEEDUP_ATTS ⎕PLOT SPEEDUPS[;1] + 0J1×SPEEDUPS[;2]
 
 )MORE

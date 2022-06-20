@@ -28,7 +28,8 @@ dist_doc_DATA = \
     APL1.png             \
     APL2.png             \
     APL3.png             \
-    APL4.png
+    APL4.png             \
+    APL5.png
 
 .asciidoc.html:
 	if [ -z `which asciidoc` ] ; then touch $@ ;       \

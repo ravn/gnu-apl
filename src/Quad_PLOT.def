@@ -48,6 +48,9 @@ gdef(double,   rangeZ_min,           0, "the start of the Z range to be plotted"
 gdef(double,   rangeZ_max,           0, "the end of the Z range to be plotted")
 gdef(Pixel_X,  origin_X,           100, "X position offset of the origin")
 gdef(Pixel_Y,  origin_Y,           100, "Y position offset of the origin")
+gdef(String,   format_X,            "", "number format for the X-axis")
+gdef(String,   format_Y,            "", "number format for the Y-axis")
+gdef(String,   format_Z,            "", "number format for the Z-axis")
 #endif
 
 #ifdef ldef

@@ -245,13 +245,14 @@ UCS_string_vector matches;
    return ER_REPLACE;
 }
 //----------------------------------------------------------------------------
+/// one help topic
 const struct _help
 {
-  int valence;           ///< -5..2, see explanation in file Help.def
-  const char * prim;     ///< primitive, e.g. "⍬",     "+", ...
-  const char * name;     ///< name,      e.g. "Zilde", "Plus", ...
-  const char * title;    ///< brief description
-  const char * descr;    ///< long description
+  int          valence;   ///< -5..2, see explanation in file Help.def
+  const char * prim;      ///< primitive, e.g. "⍬",     "+", ...
+  const char * name;      ///< name,      e.g. "Zilde", "Plus", ...
+  const char * title;     ///< brief description
+  const char * descr;     ///< long description
 } help_texts[] = {
 #define help_def(ar, pr, na, ti, descr) { ar, pr, na, ti, descr },
 #include "Help.def"

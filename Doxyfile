@@ -410,7 +410,7 @@ EXTRACT_PRIVATE        = YES
 # scope will be included in the documentation.
 # The default value is: NO.
 
-EXTRACT_PACKAGE        = NO
+EXTRACT_PACKAGE        = YES
 
 # If the EXTRACT_STATIC tag is set to YES all static members of a file will be
 # included in the documentation.
@@ -1923,7 +1923,9 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             =
+# need to #define some macros so that conditional sections (controlled by
+# ./configure) will be documented even if ./configure skipped them
+PREDEFINED             = HAVE_GTK3 HAVE_LIBFFTW3 HAVE_LIBPCRE2_32
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
