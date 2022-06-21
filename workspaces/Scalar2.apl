@@ -307,6 +307,7 @@ GO ∆CORES
 )MORE
 'Hit RETURN to close windows and exit'
 ⎕
+⎕PLOT ¯3   ⍝ close plot windows
 )FNS
 )VARS
 )OFF

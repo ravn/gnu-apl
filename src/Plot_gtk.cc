@@ -1215,7 +1215,32 @@ plot_destroyed(GtkWidget * top_level);
 gboolean
 plot_destroyed(GtkWidget * top_level)
 {
+   /* top_level is the window that was destroyed. Remove it from 
+      all_all_plot_contexts to avoid
+      'invalid unclassed pointer in cast to 'GtkWindow' assertions.
+
+      Case 1: the window was closed from APL. Then plot_stop() has already
+              removed the window from all_plot_contexts and we will not find it
+              below.
+
+      Case 2: the user has closed the window via the GUI. Then plot_stop() was
+              not yet called. We will then find top_level in all_plot_contexts
+              and remove it.
+    */
+
    if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
+
+   for (size_t th = 0; th < all_plot_contexts.size(); ++th)
+       {
+         const Plot_context * pctx = all_plot_contexts[th];
+         if (top_level == pctx->window)                       // mark it closed
+            {
+              all_plot_contexts[th] = all_plot_contexts.back();
+              all_plot_contexts.pop_back();
+              break;
+            }
+       }
+
   // gtk_main_quit();
   return TRUE;   // event handled by this handler
 }
@@ -1399,9 +1424,15 @@ plot_stop(const Plot_window_properties * props)
          const Plot_window_properties * w_props = &pctx->w_props;
          if (w_props == props)
             {
-              gtk_window_close(GTK_WINDOW(pctx->window));
+              const GtkWidget * top_level = pctx->window;
+
+               // gtk_window_close() calls plot_destroyed() so we should
+               // remove it from all_plot_contexts beforehand.
+               //
               all_plot_contexts[th] = all_plot_contexts.back();
               all_plot_contexts.pop_back();
+
+              gtk_window_close(GTK_WINDOW(top_level));
               return props;
             }
        }
