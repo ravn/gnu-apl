@@ -160,6 +160,7 @@ ul.no-bullet {list-style: none}
       </ul></li>
       <li><a name="toc-The-Plot-Attributes-A" href="#The-Plot-Attributes-A">2.31.2 The Plot Attributes A</a></li>
       <li><a name="toc-Plot-Window-Handling" href="#Plot-Window-Handling">2.31.3 Plot Window Handling</a></li>
+      <li><a name="toc-Output-File-Format-1" href="#Output-File-Format">2.31.4 Output File Format</a></li>
     </ul></li>
     <li><a name="toc-_005b_003f_005dPS-_002d-Print-Style" href="#Section-2_002e32">2.32 ⎕PS - Print Style</a></li>
     <li><a name="toc-_005b_003f_005dRE-_002d-Regular-Expressions" href="#Section-2_002e33">2.33 ⎕RE - Regular Expressions</a>
@@ -190,7 +191,19 @@ ul.no-bullet {list-style: none}
         <li><a name="toc-monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value" href="#monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value">2.34.2.6 monadic ⎕RVAL B: Return a new random value</a></li>
       </ul></li>
     </ul></li>
-    <li><a name="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-2_002e35">2.35 ⎕SQL - SQL Database Interface</a></li>
+    <li><a name="toc-_005b_003f_005dSQL-_002d-SQL-Database-Interface" href="#Section-2_002e35">2.35 ⎕SQL - SQL Database Interface</a>
+    <ul class="no-bullet">
+      <li><a name="toc-_005b_003f_005dSQL_005b0_005d-_003a-display-subfunctions" href="#g_t_005b_003f_005dSQL_005b0_005d-_003a-display-subfunctions">2.35.1 ⎕SQL[0] : display subfunctions</a></li>
+      <li><a name="toc-ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database" href="#ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database">2.35.2 ref ← A ⎕SQL[1] B : open database</a></li>
+      <li><a name="toc-_005b_003f_005dSQL_005b2_005d-B-_003a-close-database" href="#g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database">2.35.3 ⎕SQL[2] B : close database</a></li>
+      <li><a name="toc-Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029">2.35.4 Z ← A ⎕SQL[3, ref] B : database query (with result)</a></li>
+      <li><a name="toc-Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029" href="#Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029">2.35.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</a></li>
+      <li><a name="toc-_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction" href="#g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction">2.35.6 ⎕SQL[5] B : start transaction</a></li>
+      <li><a name="toc-_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction" href="#g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction">2.35.7 ⎕SQL[6] B : commit transaction</a></li>
+      <li><a name="toc-_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction" href="#g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction">2.35.8 ⎕SQL[7] B : rollback transaction</a></li>
+      <li><a name="toc-Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names" href="#Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">2.35.9 Z←⎕SQL[8] B : table names</a></li>
+      <li><a name="toc-Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names" href="#Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">2.35.10 Z←⎕SQL[9] B : column names</a></li>
+    </ul></li>
     <li><a name="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-2_002e36">2.36 ⎕SI - State Indicator</a></li>
     <li><a name="toc-_005b_003f_005dSYL-_002d-System-limits" href="#Section-2_002e37">2.37 ⎕SYL - System limits</a>
     <ul class="no-bullet">
@@ -249,7 +262,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>June 19, 2022
+<p>June 23, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -491,7 +504,7 @@ using this option, the user is fully responsible for ensuring that the
 specified amount of memory will always be available. The following rules
 should be observed.
 </p>
-<p>The intepreter will exit at start-up if <samp>--mem</samp> is used and:
+<p>The interpreter will exit at start-up if <samp>--mem</samp> is used and:
 </p>
 <ul>
 <li> the platform on which the interpreter runs has no /proc/meminfo, or
@@ -1900,7 +1913,7 @@ processing of the current script file. Unlike ]NEXTFILE, ]PUSHFILE does
 not proceed to the next script file but enters a new immediate execution
 context in which the user can interact with the interpreter. This context
 can be processes input until a ]NEXTFILE command is given. After the
-]NEXTFILE that leaves the immediat execution context processing proceeds
+]NEXTFILE that leaves the immediate execution context processing proceeds
 at the next line after the ]PUSHFILE command.
 </p>
 <hr>
@@ -2175,7 +2188,7 @@ to the file system on a computer. This tree has:
 <ul>
 <li> one root (which is the structured variable itself),
 
-</li><li> zero or more non-leafs (like subdirectories of the top-level root
+</li><li> zero or more non-leafs (like sub-directories of the top-level root
   directory), and
 
 </li><li> zero or more leafs. The case of zero non-leafs occurs, for example, directly
@@ -3637,6 +3650,11 @@ colors for lines and grids, etc.
    ⎕PLOT ¯2      ⍝ verbosity: DEBUG (also print debug information)
    ⎕PLOT ¯3      ⍝ close all plot windows
 </pre>
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Output-File-Format" accesskey="1">Output File Format</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+</table>
+
 <a name="The-Plot-Data-B"></a>
 <h4 class="subsection">2.31.1 The Plot Data B</h4>
 
@@ -3704,52 +3722,95 @@ all real items in B are taken as complex with imaginary part 0.
 <p>There are a number of attributes like colors, point sizes, line widths,
 etc. that control how the resulting plot will look like.
 </p>
-<p>A list of these attributes can be displayed with ⎕PLOT &rdquo;,
-for example:
+<p>Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a list of
+the arguments. The list of arguments grows over time and therefore the list
+displayed by ⎕PLOT &rdquo; may be more up-to-date than this description.
+For example:
 </p>
-<pre class="verbatim">      ⎕PLOT ''
-
+<pre class="verbatim">
    ⎕PLOT Usage:
 
    ⎕PLOT B     plot B with default attribute values
-   A ⎕PLOT B   plot B with attributes A
+   A ⎕PLOT B   plot B with attributes specified by A
 
    A is a nested vector of strings.
-   Each string has the form &quot;Attribute: Value&quot;
+   Each string A[i] has the form &quot;Attribute: Value&quot;
    Colors are specified either as #RGB or as #RRGGBB or as RR GG BB)
-   The attributes understood and their defaults are:
+
+   The attributes understood by ⎕PLOT and their default values are:
 
    1. Global (plot window) Attributes:
 
-caption:            GNU APL PLOT   (plot window caption)
-filename:                          (output file name)
+caption:            ⎕PLOT          (plot window caption)
+output_filename:                   (output file name)
+auto_close:         0              (= do not close X window automatically)
+                   (1)             (= close if file was written successfully)
+                   (2)             (= always close X window automatically)
+with_border:        1              (= write plot area and window borders)
+                   (0)             (= write only plot area to output file)
+pw_pos_X:           50 pixel       (plot window position X)
+pw_pos_Y:           50 pixel       (plot window position Y)
+border_width:       10 pixel       (width of the window border)
 pa_width:           600 pixel      (plotarea width)
 pa_height:          400 pixel      (plotarea height)
 pa_border_L:        30 pixel       (pixels left of the plotarea)
 pa_border_R:        20 pixel       (pixels right of the plotarea)
 pa_border_T:        25 pixel       (pixels above the plotarea)
 pa_border_B:        25 pixel       (pixels below the plotarea)
-gridx_style:        1              (X grid style (0-2))
-gridx_pixels:       44 pixel       (pixels between X grid lines)
-gridy_style:        1              (Y grid style (0-2))
-gridy_pixels:       33 pixel       (pixels between Y grid lines)
-border_width:       10 pixel       (width of the window border)
-canvas_color:       #FFFFFF        (background color of the plot window)
-gridX_color:        #000000        (color of the X-grid lines)
+gridX_style:        1              (X grid style = ──────── )
+                   (2)             (             = ╴╴╴╴╴╴╴╴ )
+                   (3)             (             = ─╴─╴─╴─╴ )
+axisX_arrow:        0              (X-axis arrow)
+axisX_label:        X              (X-axis label)
+axisY_arrow:        0              (Yaxis arrow)
+axisY_label:        Y              (Y-axislabel)
+axisZ_arrow:        0              (Z-axis arrow)
+axisZ_label:        Z              (Z-axis label)
+gridX_pixels:       44 pixel       (pixels between X grid lines)
 gridX_line_width:   1 pixel        (thickness of the X-grid lines)
-gridY_color:        #000000        (color of the Y-grid lines)
+gridX_color:        #000000        (color of the X-grid lines)
+gridY_style:        1              (Y grid style, see gridX_style above)
+gridY_pixels:       33 pixel       (pixels between Y grid lines)
 gridY_line_width:   1 pixel        (thickness of the Y-grid lines)
+gridY_color:        #000000        (color of the Y-grid lines)
+gridZ_style:        1              (Z grid style, see gridX_style above)
+gridZ_pixels:       33 pixel       (pixels between Z grid lines)
+gridZ_line_width:   1 pixel        (thickness of the Z-grid lines)
+gridZ_color:        #000000        (color of the Z-grid lines)
+canvas_color:       #FFFFFF        (background color of the plot window)
 legend_X:           50 pixel       (the X position of the legend)
 legend_Y:           50 pixel       (the Y position of the legend)
 legend_dY:          15 pixel       (the distance between legend lines)
 legend_lX:          50 pixel       (the length of the legend lines)
+rangeX_min:         0.0            (the start of the X range to be plotted)
+rangeX_max:         0.0            (the end of the X range to be plotted)
+rangeY_min:         0.0            (the start of the Y range to be plotted)
+rangeY_max:         0.0            (the end of the Y range to be plotted)
+rangeZ_min:         0.0            (the start of the Z range to be plotted)
+rangeZ_max:         0.0            (the end of the Z range to be plotted)
+origin_X:           100 pixel      (X position offset of the origin)
+origin_Y:           100 pixel      (Y position offset of the origin)
+format_X:                          (number format for the X-axis)
+format_Y:                          (number format for the Y-axis)
+format_Z:                          (number format for the Z-axis)
+
+color_level-P:      (none)         (color gradient at P% (surface plots only))
 
    2. Local (plot line N) Attributes:
 
 line_color-N:       #00FF00        (the color of plot line N)
+line_style-N:       1              (line style, see gridX_style above)
 line_width-N:       3 pixel        (the thickness of plot line N)
-point_color-N:      #00FF00        (the color of the plot points)
-point_size-N:       8 pixel        (the diameter of the plot points)
+point_color-N:      #000000        (the color of the plot points)
+point_style-N:      1              (= plot_points: ● )
+                   (2)             (= plot_points: ▲ )
+                   (3)             (= plot_points: ▼ )
+                   (4)             (= plot_points: ◆ )
+                   (5)             (= plot_points: ■ )
+                   (6)             (= plot_points: 🞤   (GTK only)
+                   (7)             (= plot_points: 🞫   (GTK only)
+point_size-N:       8 pixel        (the outer diameter of the plot points)
+point_size2-N:      0 pixel        (the inner diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
 
 </pre>
@@ -3779,27 +3840,28 @@ Attributes.legend_name_2 ← &quot;Random Row 2&quot;
       Attributes ⎕PLOT Data
 </pre>
 <p>Note that (for syntactical reasons) the separation between the line attribute
-and the line number is _ (underscore) if A is specified as a strutural
-variable and / (minus) if A is specified as a string of lines.
+and the line number is <strong>_</strong> (underscore) if <strong>A</strong> is specified as
+a structured APL value and <strong>-</strong> (minus) if A is specified as a string
+of lines.
 </p>
-<p>If the global attribute &quot;filename&quot; is given, then the plot is not only being
-displayed in an X window on the screen, but also written to a file with the
-name provided as attribute value. The file format is bitmap (typical file
-extension: .bmp) which can then eaily converted to other graphic formats
-such as .png or .jpg with tools like &rsquo;convert&rsquo; from package imagemagick.
+<p>If the global attribute <strong>output_filename</strong> is given, then the plot is
+not only being displayed in a window on the screen, but also written
+to a file with the name of the file provided as attribute value. 
+See <a href="#Output-File-Format">Output File Format</a>, below.
 </p>
 <p>For example:
 </p>
-<pre class="verbatim">      ⊣ ( ⊂ &quot;filename: /tmp/bitmap.bmp&quot; ) ⎕PLOT 1 3 1 4 2
+<pre class="verbatim">      ⊣ ( ⊂ &quot;output_filename: /tmp/bitmap.png&quot; ) ⎕PLOT 1 3 1 4 2
 </pre>
-<p>writes the plot of a a zigzag curve to file /tmp/bitmap.bmp (note: ⎕PLOT
-with attribute filename overrides existing files without a warning. Lack
-of permissions to write the file raises a DOMAIN ERROR with )MORE providing
-details.
+<p>writes the plot of a a zigzag curve to file <strong>/tmp/bitmap.png</strong>
+(<strong>Caution</strong>: ⎕PLOT with attribute output_filename overrides existing
+files without a warning). Lack of permissions to write the file raises
+a DOMAIN ERROR with )MORE possibly providing details.
 </p>
-<p>Some line attributes like line widths or point sizes are frequently the same
-for several or all plot lines. In that case one can use the line attribute
-without a -N or _N suffix.
+<p>Some line attributes such as <strong>line_width</strong> or <strong>point size</strong> are
+frequently the same for several or all plot lines. In that case one can use
+the line attribute without a -N resp. _N suffix which is then used for all lines
+(unless overridden by the same attribute with -N resp. _N suffix.
 </p>
 <a name="Plot-Window-Handling"></a>
 <h4 class="subsection">2.31.3 Plot Window Handling</h4>
@@ -3809,21 +3871,50 @@ server (which implies that ⎕PLOT requires X). That window runs in its own
 thread until it is being closed. A plot window can be closed in different ways:
 </p>
 <ul>
-<li> by clicking on the close button (at the top-right) of the
-  window, or
-</li><li> by opening the drop down menu of the window (at the top left of
-  the window) and selecting the option named &quot;Close&quot;, or
-</li><li> from APL by calling ⎕PLOT ¯3 (which closes all open plot windows), or
-</li><li> from APL by calling ⎕PLOT H (which closes a specific plot window),
+<li> by clicking on the close button (often located near the top-right corner)
+  of the window,
+</li><li> by opening the drop down menu of the window (near the top left-of
+  the window) and selecting the option named &quot;Close&quot;,
+</li><li> from APL by calling <strong>⎕PLOT ¯3</strong> (which closes <strong>all</strong> open
+  plot windows), or
+</li><li> from APL by calling <strong>⎕PLOT H</strong> (which closes a specific plot window),
   where H is the plot window handle returned by monadic ⎕PLOT B or by dyadic
   A ⎕PLOT B with plot attributes A.
 </li></ul>
 
 <p>Note that the exact method for closing a plot window with the mouse (as opposed
-to calling ⎕PLOT with the window handle from APL) differs between different
-window managers. The above simply means to use the standard method for closing
-windows on your system.
+to <strong>⎕PLOT ¯3</strong> or <strong>⎕PLOT H</strong> from APL) differs between different
+window managers. The above stands for the standard method(s) for closing windows
+on your system.
 </p>
+<hr>
+<a name="Output-File-Format"></a>
+<div class="header">
+<p>
+Up: <a href="#Section-2_002e31" accesskey="u" rel="up">Section 2.31</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<a name="Output-File-Format-1"></a>
+<h4 class="subsection">2.31.4 Output File Format</h4>
+
+<p>Early versions of ⎕PLOT were using <strong>libxcb</strong> to display the results of
+⎕PLOT while recent versions use <strong>libgtk-3</strong>. The primary driver for this
+change was the lack of full Unicode support in <strong>libxcb</strong> which made it,
+for example, difficult to properly display APL characters in window captions
+or in plot line legends.
+</p>
+<p>Writing the pixles of a plot to a file uses functions provided by either 
+<strong>libxcb</strong> or <strong>libgtk-3</strong>, and these functions generate different
+file formats.
+</p>
+<p><strong>libxcb</strong> is the older of the two libraries and it therefore produces the
+older file format <strong>.bmp</strong> (bitmaps). <strong>libgtk-3</strong> is the newer
+librariy and it procuces the somewhat newer file format <strong>.png</strong>
+(portable network graphics). There are tools like <strong>convert</strong> from package
+<strong>imagemagick</strong> that can be used to convert different image file formats
+into each other and therefore this incompatibility should not cause too much 
+trouble.
+</p>
+
 <hr>
 <a name="Section-2_002e32"></a>
 <div class="header">
@@ -4284,18 +4375,20 @@ change the state of the other.
 1 ⎕RVAL B as follows.
 </p>
 <ul>
-<li> If B is a scalar 0 ≤ B &lt; MAX_RANK (MAX_RANK is ./configurable with a
-default of 8) then subsequently generated random values will have
-the fixed rank B.
+<li> If B is a non-negative scalar B with 0 ≤ B &lt; MAX_RANK then the subsequently
+generated random values will have the fixed rank B. MAX_RANK is a 
+./configurable constant with a default of 8.
 
-</li><li> If B is a scalar 0 &gt; B &gt; -MAX_RANK then the ranks of subsequently generated
-random values will be chosen at random between 0 and -B (including). All
-possible ranks 0, ... MAX_RANK have the same probability P = 100÷1-B %.
+</li><li> If B is a negative scalar B with 0 &gt; B &gt; -MAX_RANK then the ranks of the
+subsequently generated random values will be chosen at random between
+0 and -B (including). All possible ranks 0 ... B will have the same
+probability P = 100÷1-B %.
 
 </li><li> Otherwise B must be a vector of positive integers. The integers are the
 relative frequencies of the ranks 0, 1, ... MAX_RANK respectively. Too many
-integers will give raise LENGTH ERROR while fewer (than MAX_RANK) are
-set to 0.
+integers (i.e. MAX_RANK &gt; ⍴B) will raise a LENGTH ERROR while fewer (than
+MAX_RANK) are set to 0.
+
 </li></ul>
 
 <p>1 ⎕RVAL always returns its previous setting (i.e. before applying B).
@@ -4463,8 +4556,12 @@ Next: <a href="#Section-2_002e36" accesskey="n" rel="next">Section 2.36</a>, Pre
 <h3 class="section">2.35 ⎕SQL - SQL Database Interface</h3>
 
 <p>As of GNU APL 1.6, the native function SQL has been replaced by the
-system function ⎕SQL, described below.
+system function ⎕SQL, described below. ⎕SQL has an axis argument that
+selects a sub-function of ⎕SQL.
 </p>
+<a name="g_t_005b_003f_005dSQL_005b0_005d-_003a-display-subfunctions"></a>
+<h4 class="subsection">2.35.1 ⎕SQL[0] : display subfunctions</h4>
+
 <pre class="verbatim">      ⎕SQL[0]''
 Available function numbers:
 type  ⎕SQL[1] file      - open a database file, return reference ID for it
@@ -4477,14 +4574,18 @@ query ⎕SQL[4,db] params - send SQL update
       ⎕SQL[8] ref       - list tables
 ref   ⎕SQL[9] table     - list columns for table
 </pre>
+<a name="ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database"></a>
+<h4 class="subsection">2.35.2 ref ← A ⎕SQL[1] B : open database</h4>
+
 <pre class="verbatim">      type  ⎕SQL[1] file
 </pre>
-<p>Connect to database of type L using connection arguments R.
+<p>Connect to database of type A using connection arguments B. The result is a
+database handle <strong>ref</strong> to be used in the other ⎕SQL functions.
 </p>
-<p>L must be a string indicating the database type. Currently supported
+<p><strong>A</strong> must be a string indicating the database type. Currently supported
 values are &rsquo;postgresql&rsquo; and &rsquo;sqlite&rsquo;.
 </p>
-<p>R is the connection parameters which depends on the type of
+<p><strong>B</strong> is the connection parameters which depends on the type of
 database:
 </p>
 <p>- For type≡&rsquo;sqlite&rsquo;: the argument is string pointing to the
@@ -4498,56 +4599,80 @@ using other SQL functions. This value should be seen as an opaque
 handle. It is, however, guaranteed that the handle is a scalar
 value.
 </p>
+<a name="g_t_005b_003f_005dSQL_005b2_005d-B-_003a-close-database"></a>
+<h4 class="subsection">2.35.3 ⎕SQL[2] B : close database</h4>
+
 <pre class="verbatim">      ⎕SQL[2] ref
 </pre>
-<p>Disconnect from database R.
+<p>Disconnect from database <strong>ref</strong>.
 </p>
-<p>R is the database handle that should be disconnected. After this
+<p>B is the database handle that should be disconnected. After this
 function has been called, no further operations are to be performed
-on this handle. Future calls to SQL∆Connect may reuse previously
+on this handle. Future calls to ⎕SQL[1]  may reuse previously
 disconnected handles.
 </p>
-<pre class="verbatim">      query ⎕SQL[3,db] params
+<a name="Z-_002d-A-_005b_003f_005dSQL_005b3_002c-ref_005d-B-_003a-database-query-_0028with-result_0029"></a>
+<h4 class="subsection">2.35.4 Z ← A ⎕SQL[3, ref] B : database query (with result)</h4>
+
+<pre class="verbatim">      query ⎕SQL[3, ref] params
 </pre>
 <p>Execute a select statement and return the result table.
 </p>
 <p>The axis parameter indicates the database handle.
 </p>
-<p>L is a select statement to be executed. Positional parameters can
+<p>A is a select statement to be executed. Positional parameters can
 be supplied by specifying a question mark &quot;?&quot; in the statement.
 </p>
-<p>R is an array containing the values for the positional parameters.
+<p>B is an array containing the values for the positional parameters.
 If the array is of rank 2, the statement will be executed multiple
 times with each row being the values for each call.
 </p>
-<p>The return value is a rank-2 array representing the result of the
+<p>The return value Z is a rank-2 array representing the result of the
 select statement. Null values are returned as ⍬ and empty strings
 are returned as &rdquo;.
 </p>
-<pre class="verbatim">      query ⎕SQL[4,db] params
+<a name="Z-_002d-A-_005b_003f_005dSQL_005b4_002c-ref_005d-B-_003a-database-query-_0028w_002fo-result_0029"></a>
+<h4 class="subsection">2.35.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)</h4>
+
+<pre class="verbatim">      query ⎕SQL[4, ref] params
 </pre>
 <p>Execute an SQL statement that does not return a result.
 </p>
 <p>This function is identical to SQL∆Select with the exception that it
 is used on statements which do not return a result table.
 </p>
+<a name="g_t_005b_003f_005dSQL_005b5_005d-B-_003a-start-transaction"></a>
+<h4 class="subsection">2.35.6 ⎕SQL[5] B : start transaction</h4>
+
 <pre class="verbatim">      ⎕SQL[5] ref
 </pre>
 <p>Begin a transaction.
 </p>
+<a name="g_t_005b_003f_005dSQL_005b6_005d-B-_003a-commit-transaction"></a>
+<h4 class="subsection">2.35.7 ⎕SQL[6] B : commit transaction</h4>
+
 <pre class="verbatim">      ⎕SQL[6] ref
 </pre>
 <p>Commit a transaction.
 </p>
+<a name="g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction"></a>
+<h4 class="subsection">2.35.8 ⎕SQL[7] B : rollback transaction</h4>
+
 <pre class="verbatim">      ⎕SQL[7] ref
 </pre>
 <p>Rolls back the current transaction.
 </p>
+<a name="Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names"></a>
+<h4 class="subsection">2.35.9 Z←⎕SQL[8] B : table names</h4>
+
 <pre class="verbatim">      ⎕SQL[8] ref
 </pre>
 <p>Return an array containing the name of all tables.
 </p>
-<pre class="verbatim">      ref   ⎕SQL[9] table
+<a name="Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names"></a>
+<h4 class="subsection">2.35.10 Z←⎕SQL[9] B : column names</h4>
+
+<pre class="verbatim">      ref  ⎕SQL[9] table
 </pre>
 <p>Return an array containing information about the columns in the
 given table. Currently, the column layout is as follows:
@@ -4594,34 +4719,42 @@ to the assert() macro in C/C++:
 ∇
 
 </pre>
-<p>⎕SI is a system function whose right argument specifies which aspect of
-the State indicator shall be returned:
+<p>The right argument of ⎕SI specifies which aspect of the State Indicator
+shall be returned:
 </p>
-<p>⎕SI 1: The name of the context. That is either the name of a user defined
-function, or ◊ for an immediate execution context, or ⍎ for an execute
-context.
-</p>
-<p>⎕SI 2: The line number (of a defined function) or 0 for immediate execution
-and execute.
-</p>
-<p>⎕SI 3: The function name and line number in square brackets, like foo[3]
-</p>
-<p>⎕SI 4: Either the statement text of the function line or the error text of
+<ul>
+<li> ⎕SI 1: The name of the context. That name is either:
+<ul>
+<li> the name of a defined function, or
+</li><li> ◊ for an immediate execution context, or
+</li><li> ⍎ for an execute context.
+</li></ul>
+
+</li><li> ⎕SI 2: The line number (of a defined function) or 0 for immediate execution
+and execute contexts.
+
+</li><li> ⎕SI 3: The function name and line number in square brackets, for example:
+<strong>&quot;FOO[3]&quot;</strong>
+
+</li><li> ⎕SI 4: Either the statement text of the function line or the error text of
  an error that has occurred on the line
-</p>
-<p>⎕SI 5: The program counter (= token number counted from the start of the
-function text
-</p>
-<p>⎕SI 6: the parse mode of the context (immediate execution, execute, or
+
+</li><li> ⎕SI 5: The program counter (= token number counted from the start of the
+function text)
+
+</li><li> ⎕SI 6: the parse mode of the context (immediate execution, execute, or
 defined function).
-</p>
+
+</li></ul>
+
 <p>If no left argument is provided then the result of ⎕SI is a vector with
-one entry per State Indicator level (and hence ⍴⎕SI B is the depth of the SI).
+one entry per State Indicator level (and hence ⍴⎕SI B is the depth of the SI
+stack).
 </p>
-<p>If a left argument A is provided then specifies a particular level of the SI
-instead of the entire SI. A should be an integer scalar. If A is positive
-then the level is counted from the oldest entry to the latest, while negative
-A count from the latest to the oldest level.
+<p>If the optional left argument A is provided then it specifies a particular
+level of the SI instead of the entire SI. A should be an integer scalar.
+If A is positive then the level is counted from the oldest entry to the latest,
+while negative A count from the latest to the oldest level.
 </p>
 <p>For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.

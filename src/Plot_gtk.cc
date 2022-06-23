@@ -97,7 +97,7 @@ struct Plot_context
 };
 
 /// all Plot_contexts (= all open windows)
-static vector<const Plot_context *> all_plot_contexts;
+static vector<Plot_context *> all_plot_contexts;
 
 /// the number of open plot windows (to see when the last one was closed).
 static int plot_window_count = 0;
@@ -359,13 +359,13 @@ char * cp = cc;
         val = -val;
       }
 
-   // at this point,. val > 0
+   // at this point, val > 0
    //
-   if (val < 1 && val >= 0.1)  // 100-999 milli
+   if (val < 1 && val >= 0.1)  // 100 milli - 999 milli
       {
-        snprintf(cc, sizeof(cc), "0.%03d", int(val*1000));
+        snprintf(cp, sizeof(cc) - 2, "0.%03d", int(val*1000 + 0.5));
         size_t cc_len = strlen(cc);
-        if (cc[--cc_len] == '0')   cc[cc_len] = 0;   // skip trailing 0
+        if (cc[--cc_len] == '0')   cc[cc_len] = 0;   // skip one trailing 0
         return cc;
       }
 
@@ -390,8 +390,8 @@ const char * unit = 0;
 
    if (unit == 0)   // very large or very small
       {
-        snprintf(cp, sizeof(cc) - 1, "%.2E", val);
-        return cc;
+        snprintf(cp, sizeof(cc) - 2, "%.2E", val);
+        goto done;
       }
 
    // at this point: 1 ≤ val < 1000
@@ -399,6 +399,11 @@ const char * unit = 0;
    if      (val < 10)    snprintf(cp, sizeof(cc) - 1, "%.2f%s", val, unit);
    else if (val < 100)   snprintf(cp, sizeof(cc) - 1, "%.1f%s", val, unit);
    else                  snprintf(cp, sizeof(cc) - 1, "%.0f%s", val, unit);
+
+done:
+   // some locales produce , instead of . in snprintf(). We fix that here...
+   //
+   for (cp = cc; *cp; ++cp)   if (*cp == ',')   *cp = '.';
    return cc;
 }
 //----------------------------------------------------------------------------
@@ -712,7 +717,7 @@ const vector<level_color> & color_steps = w_props.get_gradient();
       }
 }
 //----------------------------------------------------------------------------
-/// draw the (vertical) X grid-lines of the plot
+/// draw the (vertical) X grid-lines of the plot (starting from the X axis)
 void
 draw_X_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
@@ -740,7 +745,7 @@ const int grid_style = w_props.get_gridX_style();
          else
             {
               draw_line(cr, grid_color, grid_style, line_width,
-                        Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1 - 5));
+                        Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
             }
 
          const char * format = w_props.get_format_X().c_str();
@@ -748,7 +753,7 @@ const int grid_style = w_props.get_gridX_style();
          double cc_width, cc_height;
          cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
 
-         Pixel_XY cc_pos(px0 - 0.5*cc_width, py0 + cc_height + 3);
+         Pixel_XY cc_pos(px0 - 0.5*cc_width, py0 + cc_height + 8);
          if (surface_plot)
             {
               cc_pos.x -= w_props.get_origin_X();
@@ -773,7 +778,7 @@ const int grid_style = w_props.get_gridX_style();
       }
 }
 //----------------------------------------------------------------------------
-/// draw the (horizontal) Y grid-lines of the plot
+/// draw the (horizontal) Y grid-lines of the plot (starting at the Y axis)
 void
 draw_Y_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
@@ -793,7 +798,7 @@ const int grid_style = w_props.get_gridY_style();
          if (iy == 0 || iy == w_props.get_gridY_last())
             {
               draw_line(cr, grid_color, 1, line_width,
-                        Pixel_XY(px0, py0), Pixel_XY(px1, py0));
+                        Pixel_XY(px0 - 1, py0), Pixel_XY(px1 + 1, py0));
             }
          else
             {
@@ -806,7 +811,7 @@ const int grid_style = w_props.get_gridY_style();
          double cc_width, cc_height;
          cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
 
-         Pixel_XY cc_pos(px0 - cc_width - 4, py0 + 0.5 * cc_height - 1);
+         Pixel_XY cc_pos(px0 - cc_width - 8, py0 + 0.5 * cc_height - 1);
          if (surface_plot)
             {
               cc_pos.x -= w_props.get_origin_X();
@@ -1249,67 +1254,119 @@ plot_destroyed(GtkWidget * top_level)
 cairo_surface_t *
 add_border(const Plot_context & pctx, cairo_surface_t * old_surface)
 {
-   // gtk_win is the window including borders
+   // gtk_win is the smaller window (excluding the borders created by the
+   // window manager).
    //
 GtkWindow * gtk_win = GTK_WINDOW(pctx.window);   // the plot window (GTK)
    Assert(gtk_win);
-int gtk_x, gtk_y, gtk_w, gtk_h;
-   gtk_window_get_position(gtk_win, &gtk_x, &gtk_y);
-   gtk_window_get_size(gtk_win, &gtk_w, &gtk_h);
 
-   // gtd is the window excluding borders (with slightly larger x, y and the
-   // same size
+int gtk_x, gtk_y;   gtk_window_get_position(gtk_win, &gtk_x, &gtk_y);
+int gtk_w, gtk_h;   gtk_window_get_size(gtk_win, &gtk_w, &gtk_h);
+
+   // gdk_win is the larger window (i.e. including borders created by the window
+   //  manager.
    //
 GdkWindow * gdk_win = gtk_widget_get_window(GTK_WIDGET(gtk_win));   // dito (GDK)
    Assert(gdk_win);
+int gdk_x, gdk_y;   gdk_window_get_position(gdk_win, &gdk_x, &gdk_y);
 
-int gdk_x, gdk_y;
-   gdk_window_get_position(gdk_win, &gdk_x, &gdk_y);
+   /* compute the border widths. We can assume that the thin east, south, and
+   // west borders are the same while the north boarder is thicker due to the
+   // window caption. We subtract the N/W corner of the (smaller) gtk_win from
+   // the N/W corner of the gdk_win. The x-difference is then the thinkness
+   // of the East- (and hence South and West-) border while the x-difference
+   // is the thinkness of the North- border.
+
+          ╔═════════════ Gdk window ═══ ...
+          ║    dy
+          ║    ┌──────── Gtk window ─── ...
+          ║ dx │
+          ║    │
+           ...
+    */
 
 const int N_border   = gdk_y - gtk_y;   // north border (window caption)
-const int ESW_border = gdk_x - gtk_x;   // east, south, or west border
+const int ESW_border = gdk_x - gtk_x;   // east, south, or west borders
 
-GdkWindow * root = gdk_get_default_root_window();
-GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(root, gtk_x, gtk_y,
-                                                gtk_w + 2*ESW_border,
-                                                gtk_h + N_border + ESW_border);
-
-cairo_surface_t * ret = gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
-
-   // at this point the window manager has already displayed the window borders,
-   // but not yet the content (since we haven't returned yet). We fix that by
-   // copyingg the new content (which is contained in old_surface) into ret.
+   // create a GdkPixbuf. The gdk_get_default_root_window() contains the
+   // (north) window caption and east, south, aand weset borders, so they
+   // need to be added to that the GdkPixbuf does not get truncated.
    //
-cairo_t * cr2 = cairo_create(ret);
-   cairo_new_path(cr2);
-   cairo_set_source_surface(cr2, old_surface, ESW_border, N_border);
-   cairo_rectangle(cr2, ESW_border, N_border, gtk_w, gtk_h);
-   cairo_fill(cr2);
-   cairo_destroy(cr2);
+GdkWindow * root = gdk_get_default_root_window();
+   if (pctx.w_props.get_with_border())   // with window borders
+      {
+        GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(root, gtk_x, gtk_y,
+                                                        gtk_w + 2*ESW_border,
+                                                        gtk_h + N_border
+                                                              + ESW_border);
 
-   return ret;
+        cairo_surface_t * ret = gdk_cairo_surface_create_from_pixbuf(pixbuf,
+                                                                     1, gdk_win);
+
+        // at this point the window manager has already displayed the window
+        // borders, but not the window content (since we have not yet returned
+        // from draw_callback()).  We fix that by copying the new content
+        //  (which is contained in old_surface) into ret.
+        //
+        cairo_t * cr2 = cairo_create(ret);
+        cairo_new_path(cr2);
+        cairo_set_source_surface(cr2, old_surface, ESW_border, N_border);
+        cairo_rectangle(cr2, ESW_border, N_border, gtk_w, gtk_h);
+        cairo_fill(cr2);
+        cairo_destroy(cr2);
+
+        return ret;
+      }
+   else                                     // without window borders
+      {
+        // the pix buf starts a little later and is a little smaller
+        //
+        GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(root,
+                                                        gtk_x + ESW_border,
+                                                        gtk_y + N_border,
+                                                        gtk_w, gtk_h);
+
+        cairo_surface_t * ret = gdk_cairo_surface_create_from_pixbuf(pixbuf,
+                                                                     1, gdk_win);
+
+        // at this point the window manager has already displayed the window
+        // borders, but not the window content (since we have not yet returned
+        // from draw_callback()).  We fix that by copying the new content
+        //  (which is contained in old_surface) into ret.
+        //
+        cairo_t * cr2 = cairo_create(ret);
+        cairo_new_path(cr2);
+        cairo_set_source_surface(cr2, old_surface, 0, 0);
+        cairo_rectangle(cr2, 0, 0, gtk_w, gtk_h);
+        cairo_fill(cr2);
+        cairo_destroy(cr2);
+
+        return ret;
+      }
 }
 //----------------------------------------------------------------------------
 /// save the pixels of the plot to a file
 static void
-save_file(const Plot_context & pctx, cairo_surface_t * surface)
+save_file(Plot_context & pctx, cairo_surface_t * surface)
 {
-const Plot_window_properties & w_props = pctx.w_props;
+Plot_window_properties & w_props = pctx.w_props;
 
 string fname = w_props.get_output_filename();
-   if (fname.size() == 0)   return;
+   if (fname.size() == 0)   return;   // no output_filename or already written
 
+   // append .png unless already there
    if (fname.size() < 4 || strcmp(".png", fname.c_str() + fname.size() - 4))
       fname += ".png";
 
-cairo_status_t stat;
+cairo_status_t stat = CAIRO_STATUS_SUCCESS;
 
+   errno = 0;
    if (cairo_surface_t * file_surface = add_border(pctx, surface))
       {
         stat = cairo_surface_write_to_png(file_surface, fname.c_str());
         cairo_surface_destroy(file_surface);
       }
-   else   // adding window boarder failed (or not desired)
+   else   // adding window border failed (or not desired)
       {
         stat = cairo_surface_write_to_png(surface, fname.c_str());
       }
@@ -1317,12 +1374,18 @@ cairo_status_t stat;
    if (stat == CAIRO_STATUS_SUCCESS)
       {
         CERR << "wrote output file: " << fname << endl;
+
+        // clear filename so it won;t be written again.
+        //
+        string empty;
+        w_props.set_output_filename(empty);
   //    if (w_props.get_auto_close() == 1)   gtk_main_quit();
       }
 
    else
       {
-        CERR << "*** writing output fil: " << fname << " failed." << endl;
+        CERR << "*** writing output file: '" << fname << "' failed: "
+             << strerror(errno) << endl;
   //    if (w_props.get_auto_close() == 2)   gtk_main_quit();
       }
 }
@@ -1345,7 +1408,7 @@ const int new_height = gtk_widget_get_allocated_height(drawing_area);
 
    // find the Plot_context for this event...
    //
-const Plot_context * pctx = 0;
+Plot_context * pctx = 0;
    for (size_t th = 0; th < all_plot_contexts.size(); ++th)
        {
            if (all_plot_contexts[th]->drawing_area == drawing_area)

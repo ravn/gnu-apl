@@ -666,7 +666,7 @@ const int dy = w_props.get_legend_dY();
      xcb_flush(pctx.conn);
 }
 //----------------------------------------------------------------------------
-/// draw the grid lines that start at the X axis
+/// draw the (vertical) grid lines that start at the X axis
 void
 draw_X_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
             bool surface)
@@ -714,7 +714,7 @@ const Pixel_Y py1 = w_props.valY2pixel(dy);
        }
 }
 //----------------------------------------------------------------------------
-/// draw the grid lines that start at the Y axis
+/// draw the (horizontal) grid lines that start at the Y axis
 void
 draw_Y_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
             bool surface)
