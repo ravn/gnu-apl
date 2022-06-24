@@ -337,12 +337,33 @@ static char cc[40];   // should suffice
    return cc;
 }
 //----------------------------------------------------------------------------
-/// format the text of a tick (with value val) according to format
+char *
+remove_trailing_0s(char * number, const char * unit)
+{
+   if (strchr(number, '.'))   // X.xxx
+      {
+        size_t len = strlen(number);
+        while (len && number[len-1] == '0')   number[--len] = 0;
+        if    (len && number[len-1] == '.')   number[--len] = 0;
+      }
+
+   if (unit)   strcat(number, unit);
+   return number;
+}
+//----------------------------------------------------------------------------
+/// format the text of a tick (with value val) according to format.
+/// val is rounded to the nearest 1En, 2En, or 5En.
 const char *
 format_tick(double val, const char * format)
 {
-   if (const char * percent = strchr(format, '%'))
-      return format_user_tick(val, format, percent);
+   if (*format)   // user-defined format string
+      {
+        if (const char * percent = strchr(format, '%'))
+           return format_user_tick(val, format, percent);
+
+        MORE_ERROR() << "⎕PLOT: no % in user-defined format string";
+        DOMAIN_ERROR;
+      }
 
 static char cc[40];   // should suffice
 char * cp = cc;
@@ -359,17 +380,19 @@ char * cp = cc;
         val = -val;
       }
 
-   // at this point, val > 0
+const char * unit = 0;
+
+   // at this point, val > 0. We treat values 0.1..1.0 differently because
+   // e.g. 0.1 looks somewhat betterr than 100m. Values close to 0.1 are
+   // subject to rounding errors here, so we compare wwith a slightly smaller
+   // value that will be 0.1 after rounding.
    //
-   if (val < 1 && val >= 0.1)  // 100 milli - 999 milli
+   if (val < 1 && val > 0.09999)  // 100 milli - 999 milli
       {
         snprintf(cp, sizeof(cc) - 2, "0.%03d", int(val*1000 + 0.5));
-        size_t cc_len = strlen(cc);
-        if (cc[--cc_len] == '0')   cc[cc_len] = 0;   // skip one trailing 0
-        return cc;
+        goto done;
       }
 
-const char * unit = 0;
    if (val >= 1e3)
       {
         if      (val >= 1e15)   ;
@@ -381,7 +404,7 @@ const char * unit = 0;
    else
       {
 
-        if (val >= 1e0)    { unit = "";                  }
+        if (val >= 1.0)         { unit = "";                  }
         else if (val >= 1e-3)   { unit = "m";   val *= 1e3;   }
         else if (val >= 1e-6)   { unit = "μ";   val *= 1e6;   }
         else if (val >= 1e-9)   { unit = "n";   val *= 1e9;   }
@@ -396,15 +419,24 @@ const char * unit = 0;
 
    // at this point: 1 ≤ val < 1000
    //
-   if      (val < 10)    snprintf(cp, sizeof(cc) - 1, "%.2f%s", val, unit);
-   else if (val < 100)   snprintf(cp, sizeof(cc) - 1, "%.1f%s", val, unit);
-   else                  snprintf(cp, sizeof(cc) - 1, "%.0f%s", val, unit);
+   if (val < 10)
+      {
+        snprintf(cp, sizeof(cc) - 1, "%.2f", val);   // 2.00 3.40 5.67
+      }
+   else if (val < 100)
+      {
+        snprintf(cp, sizeof(cc) - 1, "%.1f", val);   // 20.0 34.0 56.7
+      }
+   else
+      {
+        snprintf(cp, sizeof(cc) - 1, "%.0f", val);   // 200 340 567
+      }
 
 done:
    // some locales produce , instead of . in snprintf(). We fix that here...
    //
    for (cp = cc; *cp; ++cp)   if (*cp == ',')   *cp = '.';
-   return cc;
+   return remove_trailing_0s(cc, unit);
 }
 //----------------------------------------------------------------------------
 /// return the size of single_line string \b text when printed with font \b
@@ -737,9 +769,12 @@ const int grid_style = w_props.get_gridX_style();
          const int px0 = w_props.valX2pixel(v - w_props.get_min_X())
                        + w_props.get_origin_X();
 
+         // draw the first and last grid line solid, the others with
+         // the desired line style.
+         //
          if (ix == 0 || ix == w_props.get_gridX_last())
             {
-              draw_line(cr, grid_color, 1, line_width,
+              draw_line(cr, grid_color, /* solid */ 1, line_width,
                         Pixel_XY(px0, py0), Pixel_XY(px0, py1));
             }
          else
@@ -790,21 +825,26 @@ const Pixel_X px0 = w_props.valX2pixel(0) + w_props.get_origin_X();
 const double dv = w_props.get_max_X() - w_props.get_min_X();
 const Pixel_X px1 = w_props.valX2pixel(dv) + w_props.get_origin_X();
 const int grid_style = w_props.get_gridY_style();
+
    for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
        {
          const double v = w_props.get_min_Y()
                         + iy*w_props.get_value_per_tile_Y();
          const Pixel_Y py0 = w_props.valY2pixel(v - w_props.get_min_Y());
-         if (iy == 0 || iy == w_props.get_gridY_last())
+
+         // draw the first and last grid line solid, the others with
+         // the desired line style.
+         //
+         if (iy == 0 || iy == w_props.get_gridY_last())   // first or last line
             {
-              draw_line(cr, grid_color, 1, line_width,
+              draw_line(cr, grid_color, /* solid */ 1, line_width,
                         Pixel_XY(px0 - 1, py0), Pixel_XY(px1 + 1, py0));
             }
          else
             {
 
               draw_line(cr, grid_color, grid_style, line_width,
-                        Pixel_XY(px0 - 5, py0), Pixel_XY(px1 + 5, py0));
+                        Pixel_XY(px0 - 5, py0), Pixel_XY(px1 + 1, py0));
             }
          const char * format = w_props.get_format_Y().c_str();
          const char * cc = format_tick(v, format);
@@ -817,6 +857,15 @@ const int grid_style = w_props.get_gridY_style();
               cc_pos.x -= w_props.get_origin_X();
               cc_pos.y += w_props.get_origin_Y();
             }
+
+           if (int16_t(cc_pos.x) < 0)
+              {
+                CERR << "⎕PLOT warning: pa_border_L="
+                     << int(w_props.get_pa_border_L())
+                     << " is too small to print all Y-axis ticks";
+                COUT << endl;
+              }
+
            draw_multiline(cr, cc, cc_pos, cc_width);
        }
 
@@ -891,10 +940,13 @@ int grid_style = w_props.get_gridZ_style();
          const  Pixel_XY PX(px1, py0);   // along the X axis
          const  Pixel_XY PY(px0, py1);   // along the Y axis
 
+         // draw the first and last grid line solid, the others with
+         // the desired line style.
+         //
          if (iz == iz_max)   // full line
             {
-              draw_line(cr, grid_color, 1, line_width, PZ, PX);
-              draw_line(cr, grid_color, 1, line_width, PZ, PY);
+              draw_line(cr, grid_color, /* solid */ 1, line_width, PZ, PX);
+              draw_line(cr, grid_color, /* solid */ 1, line_width, PZ, PY);
             }
          else
             {
