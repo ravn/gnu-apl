@@ -262,7 +262,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>June 24, 2022
+<p>June 25, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -3778,6 +3778,7 @@ gridZ_pixels:       33 pixel       (pixels between Z grid lines)
 gridZ_line_width:   1 pixel        (thickness of the Z-grid lines)
 gridZ_color:        #000000        (color of the Z-grid lines)
 canvas_color:       #FFFFFF        (background color of the plot window)
+legend_color:       #F0F0F0        (background color of the legend)
 legend_X:           50 pixel       (the X position of the legend)
 legend_Y:           50 pixel       (the Y position of the legend)
 legend_dY:          15 pixel       (the distance between legend lines)
@@ -3902,7 +3903,7 @@ change was the lack of full Unicode support in <strong>libxcb</strong> which mad
 for example, difficult to properly display APL characters in window captions
 or in plot line legends.
 </p>
-<p>Writing the pixles of a plot to a file uses functions provided by either 
+<p>Writing the pixels of a plot to a file uses functions provided by either 
 <strong>libxcb</strong> or <strong>libgtk-3</strong>, and these functions generate different
 file formats.
 </p>
@@ -3913,6 +3914,10 @@ librariy and it procuces the somewhat newer file format <strong>.png</strong>
 <strong>imagemagick</strong> that can be used to convert different image file formats
 into each other and therefore this incompatibility should not cause too much 
 trouble.
+</p>
+<p>For backward compatibility, the <strong>libxcb</strong> option for ⎕PLOT will continue
+to exist for some time, but bug fixes and new features will only be made for the
+<strong>libgtk-3</strong> option.
 </p>
 
 <hr>

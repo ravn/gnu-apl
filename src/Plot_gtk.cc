@@ -318,8 +318,44 @@ const Pixel_XY T(S.x + TIP*Ux, S.y + TIP*Uy);
 /// format \b val according to \b format (with \b percent pointing to % in
 /// format, e.g. %d or %f like in printf()).
 const char *
-format_user_tick(double val, const char * format, const char * percent)
+format_user_tick(double val, int tidx, const char * format, const char * percent)
 {
+static char cc[60] = "";   // should suffice
+
+   if (percent[1] == 's')   // %s: inline tick texts separated by %
+      {
+        // e.g. '%sTick0%Tick1%...TickN"
+        const char * tick_text = percent + 2;   // e.g. Tick0
+        for (int idx = tidx; idx > 0; --idx)   // skip texts < idx
+            {
+              const char * tick_end = strchr(tick_text + 1, '%');
+              if (tick_end == 0)   // no more '%'
+                 {
+                   CERR << "⎕PLOT: too few tick texts in " << percent
+                                << " (at tick " << tidx << ")";
+                   sprintf(cc, "Tick-%d", tidx);
+                   return cc;
+                 }
+              tick_text = tick_end + 1;
+            }
+
+        size_t tick_len = 0;
+        if (const char * tick_end = strchr(tick_text, '%'))
+           tick_len = tick_end - tick_text;
+        else
+           tick_len = strlen(tick_text);
+
+        if (tick_len >= (sizeof(cc) - 1))
+           {
+             CERR << "⎕PLOT: tick text too long";
+             sprintf(cc, "Tick-%d", tidx);
+             return cc;
+           }
+
+        strncpy(cc, tick_text, tick_len);
+        return cc;
+      }
+
 bool round = false;
    while (*percent)
       {
@@ -329,7 +365,6 @@ bool round = false;
         if (cc == 'u')  { round = true;   break; }   // %u
       }
 
-static char cc[40];   // should suffice
    if (!round)         snprintf(cc, sizeof(cc), format, val);
    else if (val > 0)   snprintf(cc, sizeof(cc), format, int(rint(val) + 0.5));
    else                snprintf(cc, sizeof(cc), format, int(rint(val) - 0.5));
@@ -338,7 +373,7 @@ static char cc[40];   // should suffice
 }
 //----------------------------------------------------------------------------
 char *
-remove_trailing_0s(char * number, const char * unit)
+remove_trailing_0s(char * number)
 {
    if (strchr(number, '.'))   // X.xxx
       {
@@ -347,96 +382,51 @@ remove_trailing_0s(char * number, const char * unit)
         if    (len && number[len-1] == '.')   number[--len] = 0;
       }
 
-   if (unit)   strcat(number, unit);
    return number;
 }
 //----------------------------------------------------------------------------
 /// format the text of a tick (with value val) according to format.
-/// val is rounded to the nearest 1En, 2En, or 5En.
 const char *
-format_tick(double val, const char * format)
+format_tick(double val, double dV, int idx, const char * format)
 {
    if (*format)   // user-defined format string
       {
         if (const char * percent = strchr(format, '%'))
-           return format_user_tick(val, format, percent);
+           return format_user_tick(val, idx, format, percent);
 
         MORE_ERROR() << "⎕PLOT: no % in user-defined format string";
         DOMAIN_ERROR;
       }
 
+   if (val == 0)   return "0";
+
 static char cc[40];   // should suffice
-char * cp = cc;
-   if (val == 0)
-      {
-        *cp++ = '0';
-        *cp++ = 0;
-        return cc;
-      }
 
-   if (val < 0)
-      {
-        *cp++ = '-';
-        val = -val;
-      }
-
-const char * unit = 0;
-
-   // at this point, val > 0. We treat values 0.1..1.0 differently because
-   // e.g. 0.1 looks somewhat betterr than 100m. Values close to 0.1 are
-   // subject to rounding errors here, so we compare wwith a slightly smaller
-   // value that will be 0.1 after rounding.
+   // Avoid duplicate axis strings when dV is small. For that we need so many
+   // fractional digits that dV makes a difference.
    //
-   if (val < 1 && val > 0.09999)  // 100 milli - 999 milli
-      {
-        snprintf(cp, sizeof(cc) - 2, "0.%03d", int(val*1000 + 0.5));
-        goto done;
-      }
+char fmt[10];
+short digits = 0;
+   while (dV < 1.0)   { ++digits;   dV *= 10.0; }
+   snprintf(fmt, sizeof(fmt), "%%.%uf", digits);
+   snprintf(cc,  sizeof(cc) - 1, fmt, val);   // 2.00 3.40 5.67
 
-   if (val >= 1e3)
-      {
-        if      (val >= 1e15)   ;
-        else if (val >= 1e12)   { unit = "T";   val *= 1e-12; }
-        else if (val >= 1e9)    { unit = "G";   val *= 1e-9;  }
-        else if (val >= 1e6)    { unit = "M";   val *= 1e-6;  }
-        else                    { unit = "k";   val *= 1e-3;  }
-      }
-   else
-      {
-
-        if (val >= 1.0)         { unit = "";                  }
-        else if (val >= 1e-3)   { unit = "m";   val *= 1e3;   }
-        else if (val >= 1e-6)   { unit = "μ";   val *= 1e6;   }
-        else if (val >= 1e-9)   { unit = "n";   val *= 1e9;   }
-        else if (val >= 1e-12)  { unit = "p";   val *= 1e12;  }
-      }
-
-   if (unit == 0)   // very large or very small
-      {
-        snprintf(cp, sizeof(cc) - 2, "%.2E", val);
-        goto done;
-      }
-
-   // at this point: 1 ≤ val < 1000
-   //
-   if (val < 10)
-      {
-        snprintf(cp, sizeof(cc) - 1, "%.2f", val);   // 2.00 3.40 5.67
-      }
-   else if (val < 100)
-      {
-        snprintf(cp, sizeof(cc) - 1, "%.1f", val);   // 20.0 34.0 56.7
-      }
-   else
-      {
-        snprintf(cp, sizeof(cc) - 1, "%.0f", val);   // 200 340 567
-      }
-
-done:
    // some locales produce , instead of . in snprintf(). We fix that here...
    //
-   for (cp = cc; *cp; ++cp)   if (*cp == ',')   *cp = '.';
-   return remove_trailing_0s(cc, unit);
+   for (char * cp = cc; *cp; ++cp)   if (*cp == ',')   *cp = '.';
+
+   // skip leading 0 in 0.xxx
+   if (cc[1] == '.' && cc[0] == '0')   return cc + 1;
+
+   // skip leading 0 in -0.xxx
+   if (cc[2] == '.' && cc[1] == '0' && cc[0] == '-')
+      {
+      cc[1] = '-';
+       return cc + 1;
+      }
+
+   // skip leading 0 in -0.xxx
+   return cc;
 }
 //----------------------------------------------------------------------------
 /// return the size of single_line string \b text when printed with font \b
@@ -582,6 +572,7 @@ double longest_len = 0.0;
        }
 
 const Color canvas_color = w_props.get_canvas_color();
+const Color legend_color = w_props.get_legend_color();
 
   /*
                              ┌────────────────────────┐
@@ -619,7 +610,7 @@ const int dy = w_props.get_legend_dY();
      const double Y0 = y0 - ly2                       - BORDER;
      const double Y1 = y0 + ly2 + dy*(line_count - 1) + BORDER;
 
-     cairo_set_RGB_source(cr, canvas_color);
+     cairo_set_RGB_source(cr, legend_color);
      cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
      cairo_fill_preserve(cr);
      cairo_set_RGB_source(cr, 0x000000);
@@ -764,8 +755,8 @@ const int grid_style = w_props.get_gridX_style();
 
    for (int ix = 0; ix <= w_props.get_gridX_last(); ++ix)
        {
-         const double v = w_props.get_min_X()
-                        + ix*w_props.get_value_per_tile_X();
+         const double dV = w_props.get_value_per_tile_X();
+         const double v = w_props.get_min_X() + ix*dV;
          const int px0 = w_props.valX2pixel(v - w_props.get_min_X())
                        + w_props.get_origin_X();
 
@@ -775,7 +766,7 @@ const int grid_style = w_props.get_gridX_style();
          if (ix == 0 || ix == w_props.get_gridX_last())
             {
               draw_line(cr, grid_color, /* solid */ 1, line_width,
-                        Pixel_XY(px0, py0), Pixel_XY(px0, py1));
+                        Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
             }
          else
             {
@@ -783,8 +774,8 @@ const int grid_style = w_props.get_gridX_style();
                         Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
             }
 
-         const char * format = w_props.get_format_X().c_str();
-         const char * cc = format_tick(v, format);
+         string format = w_props.get_format_X();
+         const char * cc = format_tick(v, dV, ix, format.c_str());
          double cc_width, cc_height;
          cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
 
@@ -828,8 +819,8 @@ const int grid_style = w_props.get_gridY_style();
 
    for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
        {
-         const double v = w_props.get_min_Y()
-                        + iy*w_props.get_value_per_tile_Y();
+         const double dV = w_props.get_value_per_tile_Y();
+         const double v = w_props.get_min_Y() + iy*dV;
          const Pixel_Y py0 = w_props.valY2pixel(v - w_props.get_min_Y());
 
          // draw the first and last grid line solid, the others with
@@ -838,7 +829,7 @@ const int grid_style = w_props.get_gridY_style();
          if (iy == 0 || iy == w_props.get_gridY_last())   // first or last line
             {
               draw_line(cr, grid_color, /* solid */ 1, line_width,
-                        Pixel_XY(px0 - 1, py0), Pixel_XY(px1 + 1, py0));
+                        Pixel_XY(px0 - 5, py0), Pixel_XY(px1 + 1, py0));
             }
          else
             {
@@ -846,8 +837,8 @@ const int grid_style = w_props.get_gridY_style();
               draw_line(cr, grid_color, grid_style, line_width,
                         Pixel_XY(px0 - 5, py0), Pixel_XY(px1 + 1, py0));
             }
-         const char * format = w_props.get_format_Y().c_str();
-         const char * cc = format_tick(v, format);
+         string format = w_props.get_format_Y();
+         const char * cc = format_tick(v, dV, iy, format.c_str());
          double cc_width, cc_height;
          cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
 
@@ -862,7 +853,8 @@ const int grid_style = w_props.get_gridY_style();
               {
                 CERR << "⎕PLOT warning: pa_border_L="
                      << int(w_props.get_pa_border_L())
-                     << " is too small to print all Y-axis ticks";
+                     << " is too small to print all Y-axis ticks (add "
+                     << -int16_t(cc_pos.x) << ").";
                 COUT << endl;
               }
 
@@ -954,10 +946,10 @@ int grid_style = w_props.get_gridZ_style();
               draw_line(cr, grid_color, grid_style, line_width, PZ, PY);
             }
 
-         const double v = w_props.get_min_Z()
-                        + iz*w_props.get_value_per_tile_Z();
-         const char * format = w_props.get_format_Z().c_str();
-         const char * cc = format_tick(v, format);
+         const double dV = w_props.get_value_per_tile_Z();
+         const double v = w_props.get_min_Z() + iz*dV;
+         string format = w_props.get_format_Z();
+         const char * cc = format_tick(v, dV, iz, format.c_str());
          double cc_width, cc_height;
          cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
          const Pixel_XY cc_pos(px1 + 10, py0 + 0.5*cc_height - 1);

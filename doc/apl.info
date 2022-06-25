@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-June 24, 2022
+June 25, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3403,6 +3403,7 @@ gridZ_pixels:       33 pixel       (pixels between Z grid lines)
 gridZ_line_width:   1 pixel        (thickness of the Z-grid lines)
 gridZ_color:        #000000        (color of the Z-grid lines)
 canvas_color:       #FFFFFF        (background color of the plot window)
+legend_color:       #F0F0F0        (background color of the legend)
 legend_X:           50 pixel       (the X position of the legend)
 legend_Y:           50 pixel       (the Y position of the legend)
 legend_dY:          15 pixel       (the distance between legend lines)
@@ -3524,7 +3525,7 @@ change was the lack of full Unicode support in *libxcb* which made it,
 for example, difficult to properly display APL characters in window
 captions or in plot line legends.
 
-   Writing the pixles of a plot to a file uses functions provided by
+   Writing the pixels of a plot to a file uses functions provided by
 either *libxcb* or *libgtk-3*, and these functions generate different
 file formats.
 
@@ -3535,6 +3536,10 @@ network graphics).  There are tools like *convert* from package
 *imagemagick* that can be used to convert different image file formats
 into each other and therefore this incompatibility should not cause too
 much trouble.
+
+   For backward compatibility, the *libxcb* option for ⎕PLOT will
+continue to exist for some time, but bug fixes and new features will
+only be made for the *libgtk-3* option.
 
 
 File: apl.info,  Node: Section 2.32,  Next: Section 2.33,  Prev: Section 2.31,  Up: Chapter 2
@@ -6490,31 +6495,31 @@ Node: Section 2.28119566
 Node: Section 2.29120235
 Node: Section 2.30121894
 Node: Section 2.31125683
-Node: Output File Format137641
-Node: Section 2.32138665
-Node: Section 2.33139615
-Node: Section 2.34154339
-Node: Section 2.35164408
-Node: Section 2.36168535
-Node: Section 2.37170632
-Node: Section 2.38175057
-Node: Chapter 3196475
-Node: Chapter 4198978
-Node: Chapter 5200104
-Node: Section 5.1201641
-Node: Section 5.2202921
-Node: Section 5.3203281
-Node: Section 5.4203523
-Node: Section 5.5204185
-Node: Section 5.6204663
-Node: Section 5.7205435
-Node: Section 5.8205892
-Node: Chapter 6206294
-Node: Section 6.1206713
-Node: Section 6.2207400
-Node: Chapter 7208231
-Node: Section 7.1208734
-Node: Section 7.2234048
+Node: Output File Format137709
+Node: Section 2.32138911
+Node: Section 2.33139861
+Node: Section 2.34154585
+Node: Section 2.35164654
+Node: Section 2.36168781
+Node: Section 2.37170878
+Node: Section 2.38175303
+Node: Chapter 3196721
+Node: Chapter 4199224
+Node: Chapter 5200350
+Node: Section 5.1201887
+Node: Section 5.2203167
+Node: Section 5.3203527
+Node: Section 5.4203769
+Node: Section 5.5204431
+Node: Section 5.6204909
+Node: Section 5.7205681
+Node: Section 5.8206138
+Node: Chapter 6206540
+Node: Section 6.1206959
+Node: Section 6.2207646
+Node: Chapter 7208477
+Node: Section 7.1208980
+Node: Section 7.2234294
 
 End Tag Table
 

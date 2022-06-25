@@ -3518,6 +3518,7 @@ gridZ_pixels:       33 pixel       (pixels between Z grid lines)
 gridZ_line_width:   1 pixel        (thickness of the Z-grid lines)
 gridZ_color:        #000000        (color of the Z-grid lines)
 canvas_color:       #FFFFFF        (background color of the plot window)
+legend_color:       #F0F0F0        (background color of the legend)
 legend_X:           50 pixel       (the X position of the legend)
 legend_Y:           50 pixel       (the Y position of the legend)
 legend_dY:          15 pixel       (the distance between legend lines)
@@ -3642,7 +3643,7 @@ change was the lack of full Unicode support in @strong{libxcb} which made it,
 for example, difficult to properly display APL characters in window captions
 or in plot line legends.
 
-Writing the pixles of a plot to a file uses functions provided by either 
+Writing the pixels of a plot to a file uses functions provided by either 
 @strong{libxcb} or @strong{libgtk-3}, and these functions generate different
 file formats.
 
@@ -3653,6 +3654,10 @@ librariy and it procuces the somewhat newer file format @strong{.png}
 @strong{imagemagick} that can be used to convert different image file formats
 into each other and therefore this incompatibility should not cause too much 
 trouble.
+
+For backward compatibility, the @strong{libxcb} option for ⎕PLOT will continue
+to exist for some time, but bug fixes and new features will only be made for the
+@strong{libgtk-3} option.
 
 
 @node    Section 2.32

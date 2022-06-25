@@ -161,13 +161,13 @@ The APL interpreter is an (almost) complete implementation of
 The APL interpreter has implemented:
 <?apl ⊃ yFEATURES ?>
 
-In addition, <B>GNU APL</B> can be scripted. For example,
-<?apl HTML∆x2y 'APL_demo.html' HTML∆A "<B>this HTML page</B>" ?>
-is the output of a CGI script written in APL.
+In addition, <B>GNU APL</B> can be scripted. For example, this
+GNU APL home page was produced by a CGI script written in APL (see
+<?apl HTML∆x2y 'APL_demo.html' HTML∆A "<B>APL demo</B>" ?>).
 <BR>
 <BR>
 GNU APL was written and is being maintained by Jürgen Sauermann.
-</DIV>
+<A href="http://xn--jrgen-sauermann-zvb.de"></A></DIV>
 <DIV class="c3">
 
 <?apl HTML∆H2[''] 'Downloading and Installing GNU APL' ?>
