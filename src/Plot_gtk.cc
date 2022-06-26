@@ -28,6 +28,12 @@ static int verbosity;
 
 #if HAVE_GTK3
 
+// avoid some stupid warnings from gtk...
+#define __gtk_reserved1 dummy1)(
+#define __gtk_reserved2 dummy2)(
+#define __gtk_reserved3 dummy3)(
+#define __gtk_reserved4 dummy4)(
+
 #include <X11/Xlib.h>
 # include <gtk/gtk.h>
 
@@ -385,7 +391,7 @@ remove_trailing_0s(char * number)
    return number;
 }
 //----------------------------------------------------------------------------
-/// format the text of a tick (with value val) according to format.
+/// format the text of tick \b idx (with value \b val) according to \b format.
 const char *
 format_tick(double val, double dV, int idx, const char * format)
 {
@@ -402,14 +408,23 @@ format_tick(double val, double dV, int idx, const char * format)
 
 static char cc[40];   // should suffice
 
-   // Avoid duplicate axis strings when dV is small. For that we need so many
-   // fractional digits that dV makes a difference.
-   //
+   /* Avoid duplicate axis strings when dV is small. For that we need so many
+      fractional digits that dV makes a difference.
+
+      if dV ≥ 1    then adding dV will increment the integer part of val and
+                        no  fractional digits are needed.
+      if dV ≥ 0.1  then one fractional digit is needed to make a difference
+      if dV ≥ 0.01 then two fractional digit is needed
+      ...
+
+      dV is { 1, 2, 5 }×10ⁿ and threrfore it is better to compare with 0.9
+      instead of 1.0 as to avoid rounding problems with 1.0 < 1.0.
+    */
 char fmt[10];
 short digits = 0;
-   while (dV < 1.0)   { ++digits;   dV *= 10.0; }
-   snprintf(fmt, sizeof(fmt), "%%.%uf", digits);
-   snprintf(cc,  sizeof(cc) - 1, fmt, val);   // 2.00 3.40 5.67
+   while (dV < 0.9)   { ++digits;   dV *= 10.0; }
+   snprintf(fmt, sizeof(fmt), "%%.%uf", digits);   // e.g. %.2f
+   snprintf(cc,  sizeof(cc) - 1, fmt, val);
 
    // some locales produce , instead of . in snprintf(). We fix that here...
    //
