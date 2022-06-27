@@ -28,12 +28,6 @@ static int verbosity;
 
 #if HAVE_GTK3
 
-// avoid some stupid warnings from gtk...
-#define __gtk_reserved1 dummy1)(
-#define __gtk_reserved2 dummy2)(
-#define __gtk_reserved3 dummy3)(
-#define __gtk_reserved4 dummy4)(
-
 #include <X11/Xlib.h>
 # include <gtk/gtk.h>
 

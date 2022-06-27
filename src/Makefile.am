@@ -16,6 +16,7 @@ all: ../makefile.h
 if HAVE_GTK3
 SUBDIRS += Gtk
    plot_SOURCES      = Plot_gtk.cc
+   plot_CXXFLAGS     = -Wno-parentheses
    EXTRA_apl_SOURCES = Plot_xcb.cc
 else
    plot_SOURCES      = Plot_xcb.cc
@@ -31,7 +32,7 @@ host_os = @host_os@
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Wall -I sql -I $(abs_top_srcdir) $(CXX_WERROR)
+common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I sql -I $(abs_top_srcdir) $(CXX_WERROR)
 common_CXXFLAGS += $(GTK_CFLAGS) $(GTK_LIBS)
 common_CXXFLAGS += $(PYTHON_CFLAGS)
 common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS)
