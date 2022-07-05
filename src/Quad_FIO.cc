@@ -279,7 +279,8 @@ char numbuf[50];
          //
          char fmt[40];
          unsigned int fm = 0;        // an index into fmt;
-         fmt[fm++] = '%';   // copy the '%'
+         fmt[fm++] = '%';            // copy the % into fmt
+         bool thousands = false;     // print thousands separator (',')
          for (;;)
              {
                if (f >= A_format.size())
@@ -311,12 +312,14 @@ char numbuf[50];
                   {
                      // flag chars and field width/precision
                      //
+                     case '\'': thousands = true;
+                                continue;
+
                      case '#':
                      case '0' ... '9':
                      case '-':
                      case ' ':
                      case '+':
-                     case '\'':   // SUSE
                      case 'I':    // glibc
                      case '.':
 
@@ -350,6 +353,7 @@ char numbuf[50];
                                }
                             fmt[fm++] = un1;   fmt[fm] = 0;
                             sprintf(numbuf, fmt, iv);
+                            if (thousands)   group_thousands(numbuf, sizeof(numbuf), false);
                             UZ.append_UTF8(numbuf);
                           }
                           goto field_done;
@@ -358,25 +362,29 @@ char numbuf[50];
                      case 'g':   case 'G':   case 'a':   case 'A':
                           {
                             const APL_Float fv =
-                                            B->get_cravel(b++).get_real_value();
+                                  B->get_cravel(b++).get_real_value();
                             fmt[fm++] = un1;   fmt[fm] = 0;
                             sprintf(numbuf, fmt, fv);
+                            if (thousands)   group_thousands(numbuf, sizeof(numbuf), true);
                             UZ.append_UTF8(numbuf);
                           }
                           goto field_done;
 
                      case 's':   // string or char
-                          if (B->get_cravel(b).is_character_cell())   goto cval;
-                              {
-                                Value_P str =
+                          if (B->get_cravel(b).is_character_cell())
+                             {
+                               UZ.append(B->get_cravel(b++).get_char_value());
+                               goto field_done;
+                             }
+                          {
+                            Value_P str =
                                         B->get_cravel(b++).get_pointer_value();
-                                UCS_string ucs(*str.get());
-                                UZ.append(ucs);
-                              }
+                            UCS_string ucs(*str.get());
+                            UZ.append(ucs);
+                          }
                           goto field_done;
 
                      case 'c':   // single char
-                     cval:
                           UZ.append(B->get_cravel(b++).get_char_value());
                           goto field_done;
 
@@ -402,6 +410,58 @@ char numbuf[50];
              }
          field_done: ;
        }
+}
+//----------------------------------------------------------------------------
+void
+Quad_FIO::group_thousands(char * buffer, size_t bufsize, bool flt)
+{
+const UCS_string ts_uni(Workspace::get_FC(1));  // thousands separator in ⎕FC
+const UTF8_string ts_utf(ts_uni);
+
+   // save buffer to src so that we can override buffer.
+   //
+char src[bufsize];
+   memcpy(src, buffer, bufsize);
+
+   // make ilen the length of the integer part (which possibly includes
+   // padding or the - sign).
+int ilen;
+   if (!flt)                                       ilen = strlen(src);
+   else if (const char * dot = strchr(src, '.'))   ilen = dot - src;
+   else                                            ilen = strlen(src);
+
+   // count the digits in the integer part.
+   //
+int digits = 0;
+   loop(i, ilen)   if (src[i] >= '0' && src[i] <= '9')   ++digits;
+int sep_count = digits > 3 ? (digits - 1) / 3 : 0;
+int sep_mod       = digits % 3;
+   if (sep_mod == 0)   sep_mod = 3;
+
+char * b = buffer;
+   for (const char * s = src; *s; ++s)
+       {
+         const char cc = *s;
+         if (cc == '.')   // fractional part reached
+            {
+             while (*s)   *b++ = *s++;
+             break;   // for (...)
+            }
+
+         *b++ = cc;
+         if (cc >= '0' && cc <= '9')
+            {
+              --sep_mod;
+              if (sep_mod == 0 && sep_count)
+                 {
+                   loop(t, ts_utf.size())   *b++ = ts_utf[t];
+                   sep_mod = 3;
+                   --sep_count;
+                 }
+            }
+       }
+   *b = 0;   // final 0-terminator
+
 }
 //----------------------------------------------------------------------------
 Value_P

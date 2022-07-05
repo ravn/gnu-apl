@@ -71,7 +71,8 @@ public:
             else        break;
       }
 
-   /// constructor: copy of UCS string. The UCS characters will be UTF8-encoded
+   /// constructor: copy of UCS string. The UCS characters in ucs
+   /// will be UTF8-encoded
    UTF8_string(const UCS_string & ucs);
 
    /// constructor: UCS_string from (simple character vector) APL value.
