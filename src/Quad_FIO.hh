@@ -169,9 +169,9 @@ protected:
          return fe.fe_fd;
        }
 
-   /// insert thousands separator into buffer. The buffer contains a 0-terminated
-   /// integer (flt = false) or float (flt = true). string
-   static void group_thousands(char * buffer, size_t buflen, bool flt);
+   /// append ASCII-buffer \b buffer to dest, inserting thousands' separators.
+   /// Note: \b buffer may be modified.
+   static void group_thousands(UCS_string & dest, char * buffer, bool flt);
 
    /// throw a DOMAIN error if the interpreter runs in safe mode.
    static void UNSAFE(const char * funname, int funnum)

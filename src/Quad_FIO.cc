@@ -273,11 +273,12 @@ char numbuf[50];
               continue;
             }
 
-         // % seen. copy the field in format to fmt and fprintf it with
-         // the next argument. That is for format = eg. "...%42.42llf..."
-         // we want fmt to be "%42.42llf"
+         // uni is % which is the start of a format field. Copy the format field
+         // into to string fmt and printf() it with the next argument.
+         // That is, for e.g. format = "...%42.42llf..." we want fmt to be
+         // "%42.42llf"
          //
-         char fmt[40];
+         char fmt[40];               // the naked format for one printf() argument
          unsigned int fm = 0;        // an index into fmt;
          fmt[fm++] = '%';            // copy the % into fmt
          bool thousands = false;     // print thousands separator (',')
@@ -285,9 +286,9 @@ char numbuf[50];
              {
                if (f >= A_format.size())
                   {
-                    // end of format string reached without seeing the
-                    // format char. We print the string and are done.
-                    // (This was a mal-formed format string from the user)
+                    // end of format string reached without seeing the conversion
+                    // specifier. We print the string and are done. This happens
+                    // only if A_format was somewhat mal-formed.
                     //
                     UCS_string ufmt(fmt);
                     UZ.append(ufmt);
@@ -296,7 +297,7 @@ char numbuf[50];
 
                if (fm >= sizeof(fmt))
                   {
-                    // end of fmt reached without seeing the format char.
+                    // end of fmt reached without seeing the conversion specifier.
                     // We print the string and are done.
                     // (This may or may not be a mal-formed format string
                     // from the user; we assume it is)
@@ -307,8 +308,8 @@ char numbuf[50];
                     goto field_done;
                   }
 
-               const Unicode un1 = A_format[f++];
-               switch(un1)
+               const Unicode uni_1 = A_format[f++];
+               switch(uni_1)
                   {
                      // flag chars and field width/precision
                      //
@@ -331,7 +332,7 @@ char numbuf[50];
                      case 'q':
                      case 'j':
                      case 'z':
-                     case 't': fmt[fm++] = un1;   fmt[fm] = 0;
+                     case 't': fmt[fm++] = uni_1;   fmt[fm] = 0;
                                continue;
 
                          // conversion specifiers
@@ -340,33 +341,46 @@ char numbuf[50];
                      case 'u':   case 'x':   case 'X':   case 'p':
                           {
                             const Cell & cell = B->get_cravel(b++);
-                            APL_Integer iv;
+                            APL_Integer int_val;
                             if (cell.is_integer_cell())
                                {
-                                 iv = cell.get_int_value();
+                                 int_val = cell.get_int_value();
                                }
                             else
                                {
                                  const double fv = cell.get_real_value();
-                                 if (fv < 0.0)   iv = -int(-fv);
-                                 else            iv = int(fv);
+                                 if (fv < 0.0)   int_val = -int(-fv);
+                                 else            int_val = int(fv);
                                }
-                            fmt[fm++] = un1;   fmt[fm] = 0;
-                            sprintf(numbuf, fmt, iv);
-                            if (thousands)   group_thousands(numbuf, sizeof(numbuf), false);
-                            UZ.append_UTF8(numbuf);
+                            fmt[fm++] = uni_1;   fmt[fm] = 0;
+                            sprintf(numbuf, fmt, int_val);
+                            if (thousands)   group_thousands(UZ, numbuf, false);
+                            else             UZ.append_UTF8(numbuf);
                           }
                           goto field_done;
 
                      case 'e':   case 'E':   case 'f':   case 'F':
                      case 'g':   case 'G':   case 'a':   case 'A':
                           {
-                            const APL_Float fv =
+                            const APL_Float float_val =
                                   B->get_cravel(b++).get_real_value();
-                            fmt[fm++] = un1;   fmt[fm] = 0;
-                            sprintf(numbuf, fmt, fv);
-                            if (thousands)   group_thousands(numbuf, sizeof(numbuf), true);
-                            UZ.append_UTF8(numbuf);
+                            fmt[fm++] = uni_1;   fmt[fm] = 0;
+                            sprintf(numbuf, fmt, float_val);
+                            if (thousands)
+                               {
+                                 group_thousands(UZ, numbuf, true);
+                               }
+                            else if (char * const dot = strchr(numbuf, '.'))
+                               {
+                                 *dot = 0;
+                                 UZ.append_ASCII(numbuf);
+                                 UZ.append(Workspace::get_FC(0));
+                                 UZ.append_ASCII(dot + 1);
+                               }
+                            else
+                               {
+                                 UZ.append_UTF8(numbuf);
+                               }
                           }
                           goto field_done;
 
@@ -402,7 +416,7 @@ char numbuf[50];
                           /* no break */
 
                      default:
-                          MORE_ERROR() << "invalid format character " << un1
+                          MORE_ERROR() << "invalid format character " << uni_1
                                        << " in function 22 (aka. printf())"
                                          " in module file_io:: ";
                           DOMAIN_ERROR;   // bad format char
@@ -413,55 +427,40 @@ char numbuf[50];
 }
 //----------------------------------------------------------------------------
 void
-Quad_FIO::group_thousands(char * buffer, size_t bufsize, bool flt)
+Quad_FIO::group_thousands(UCS_string & dest, char * buffer, bool flt)
 {
-const UCS_string ts_uni(Workspace::get_FC(1));  // thousands separator in ⎕FC
-const UTF8_string ts_utf(ts_uni);
+   // buffer is the 0-terminated and ASCII-only output of some sprintf("%..."),
+   // and the user has requested thousands' separators in the integer part of
+   // buffer.
 
-   // save buffer to src so that we can override buffer.
+   if (flt)   // buffer may or may not have a fractional part
+      {
+        if (char * dot = strchr(buffer, '.'))   // buffer has a  fractional part
+           {
+             *dot = 0;
+             group_thousands(dest, buffer, false);
+             dest.append(Workspace::get_FC(0));
+             dest.append_ASCII(dot + 1);
+             return;
+           }
+      }
+
+   // at this point, buffer is integer only.
    //
-char src[bufsize];
-   memcpy(src, buffer, bufsize);
+int digit_count = 0;
+   for (const char * b = buffer; *b; ++b)
+       if (*b >= '0' && *b <= '9')   ++digit_count;
 
-   // make ilen the length of the integer part (which possibly includes
-   // padding or the - sign).
-int ilen;
-   if (!flt)                                       ilen = strlen(src);
-   else if (const char * dot = strchr(src, '.'))   ilen = dot - src;
-   else                                            ilen = strlen(src);
-
-   // count the digits in the integer part.
-   //
-int digits = 0;
-   loop(i, ilen)   if (src[i] >= '0' && src[i] <= '9')   ++digits;
-int sep_count = digits > 3 ? (digits - 1) / 3 : 0;
-int sep_mod       = digits % 3;
-   if (sep_mod == 0)   sep_mod = 3;
-
-char * b = buffer;
-   for (const char * s = src; *s; ++s)
+   for (const char * b = buffer; *b;)
        {
-         const char cc = *s;
-         if (cc == '.')   // fractional part reached
+         const char cc = *b++;
+         dest.append(Unicode(cc));
+         if (cc >= '0' && cc <= '9')   // digit
             {
-             while (*s)   *b++ = *s++;
-             break;   // for (...)
+              if (--digit_count && !(digit_count % 3))
+                 dest.append(Workspace::get_FC(1));
             }
-
-         *b++ = cc;
-         if (cc >= '0' && cc <= '9')
-            {
-              --sep_mod;
-              if (sep_mod == 0 && sep_count)
-                 {
-                   loop(t, ts_utf.size())   *b++ = ts_utf[t];
-                   sep_mod = 3;
-                   --sep_count;
-                 }
-            }
-       }
-   *b = 0;   // final 0-terminator
-
+         }
 }
 //----------------------------------------------------------------------------
 Value_P

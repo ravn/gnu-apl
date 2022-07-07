@@ -581,7 +581,7 @@ help_def(-2, "¨",  "Each",
          "Z[i] is A[i] F B[i] for all valid indices i (with scalar extended A or B)\n",
          "")
 
-help_def(-6, "∘",  "Outer Product",
+help_def(-5, "∘",  "Outer Product",
          "Z[i;j] is A[i] G B[j] for all valid indices i of A and j of B\n",
          "")
 

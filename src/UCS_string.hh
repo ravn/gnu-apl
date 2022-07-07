@@ -264,8 +264,7 @@ public:
    /// \b str is NOT interpreted as UTF8 string (use append_UTF8() instead of
    /// append_ASCII() if such interpretation is desired)
    void append_ASCII(const char * ascii)
-      { while (*ascii)   *this += Unicode(*ascii++); }
-
+      { while (const char cc = *ascii++)   *this += Unicode(cc); }
 
    /// append 0-terminated UTF8 string str to \b this UCS_string.
    // This is different from append_ASCII((const char * str):

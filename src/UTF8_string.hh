@@ -71,7 +71,7 @@ public:
             else        break;
       }
 
-   /// constructor: copy of UCS string. The UCS characters in ucs
+   /// constructor: copy of UCS string. The Unicodes in ucs
    /// will be UTF8-encoded
    UTF8_string(const UCS_string & ucs);
 
