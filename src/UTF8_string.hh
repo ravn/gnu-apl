@@ -75,10 +75,6 @@ public:
    /// will be UTF8-encoded
    UTF8_string(const UCS_string & ucs);
 
-   /// constructor: UCS_string from (simple character vector) APL value.
-   /// Non-ASCII characters will be UTF8 encoded.
-   UTF8_string(const Value & value);
-
    /// return true iff \b this is equal to \b other
    bool operator ==(const UTF8_string & other) const
       {

@@ -2388,9 +2388,10 @@ int function_number = -1;
 
          case 3:   // fopen(Bs, As) filename Bs mode As
               {
+                const UCS_string mode_ucs(*A.get());
                 const UCS_string path_ucs(*B.get());
+                UTF8_string mode(mode_ucs);
                 const UTF8_string path(path_ucs);
-                UTF8_string mode(*A.get());
 
                 const char * m = mode.c_str();
                 bool read = false;
@@ -2537,9 +2538,10 @@ int function_number = -1;
 
          case 24:   // popen(Bs, As) command Bs mode As
               {
+                const UCS_string mode_ucs(*A.get());
                 const UCS_string path_ucs(*B.get());
+                const UTF8_string mode(mode_ucs);
                 const UTF8_string path(path_ucs);
-                const UTF8_string mode(*A.get());
                 const char * m = mode.c_str();
                 bool read = false;
                 bool write = false;
@@ -2567,8 +2569,10 @@ int function_number = -1;
 
          case 27:   // rename(As, Bs)
               {
-                UTF8_string old_name(*A.get());
-                UTF8_string new_name(*B.get());
+                const UCS_string old_name_ucs(*A.get());
+                const UCS_string new_name_ucs(*B.get());
+                UTF8_string old_name(old_name_ucs);
+                UTF8_string new_name(new_name_ucs);
                 errno = 0;
                 const int result = rename(old_name.c_str(), new_name.c_str());
                 if (result && errno)   goto out_errno;   // errno should be set
@@ -2578,8 +2582,9 @@ int function_number = -1;
 
          case 31:   // access
               {
-                UTF8_string permissions(*A.get());
+                const UCS_string mode_ucs(*A.get());
                 const UCS_string path_ucs(*B.get());
+                UTF8_string permissions(mode_ucs);
                 const UTF8_string path(path_ucs);
                 int perms = 0;
                 loop(a, permissions.size())

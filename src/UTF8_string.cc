@@ -131,14 +131,6 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
       CERR << "UTF8_string::UTF8_string(): utf = " << *this << endl;
 }
 //----------------------------------------------------------------------------
-UTF8_string::UTF8_string(const Value & value)
-{
-   loop(v, value.element_count())
-       {
-         *this += value.get_cravel(v).get_char_value() & 0xFF;
-       }
-}
-//----------------------------------------------------------------------------
 ostream &
 UTF8_string::dump_hex(ostream & out, int max_bytes) const
 {
