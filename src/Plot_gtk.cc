@@ -372,19 +372,6 @@ bool round = false;
    return cc;
 }
 //----------------------------------------------------------------------------
-char *
-remove_trailing_0s(char * number)
-{
-   if (strchr(number, '.'))   // X.xxx
-      {
-        size_t len = strlen(number);
-        while (len && number[len-1] == '0')   number[--len] = 0;
-        if    (len && number[len-1] == '.')   number[--len] = 0;
-      }
-
-   return number;
-}
-//----------------------------------------------------------------------------
 /// format the text of tick \b idx (with value \b val) according to \b format.
 const char *
 format_tick(double val, double dV, int idx, const char * format)

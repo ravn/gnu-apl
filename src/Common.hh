@@ -373,13 +373,13 @@ inline bool is_iPAD_char(Unicode uni)
 }
 //----------------------------------------------------------------------------
 
+extern std::ostream & get_CERR();
+
 /// Stringify x.
 /// The current location in the source file.
 #define LOC Loc(__FILE__, __LINE__)
 /// The location line l in file f.
 #define Loc(f, l) f ":" STR(l)
-
-extern std::ostream & get_CERR();
 
 /// print x and its source code location
 #define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;

@@ -1488,7 +1488,8 @@ int function_number = -1;
 
          case 3:   // fopen(Bs, "r") filename Bs
               {
-                const UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 errno = 0;
                 FILE * f = fopen(path.c_str(), "r");
                 if (f == 0)   return Token(TOK_APL_VALUE1, IntScalar(-1, LOC));
@@ -1625,7 +1626,8 @@ int function_number = -1;
          case 19:   // unlink(Bc)
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 unlink(path.c_str());
               }
               goto out_errno;
@@ -1633,7 +1635,8 @@ int function_number = -1;
          case 20:   // mkdir(Bc)
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 mkdir(path.c_str(), 0777);
               }
               goto out_errno;
@@ -1641,14 +1644,16 @@ int function_number = -1;
          case 21:   // rmdir(Bc)
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 rmdir(path.c_str());
               }
               goto out_errno;
 
          case 24:   // popen(Bs, "r") command Bs
               {
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 errno = 0;
                 FILE * f = popen(path.c_str(), "r");
                 if (f == 0)
@@ -1685,7 +1690,8 @@ int function_number = -1;
          case 26:   // read entire file
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 int fd = open(path.c_str(), O_RDONLY);
                 if (fd == -1)   goto out_errno;
 
@@ -1723,7 +1729,8 @@ int function_number = -1;
          case 29:   // read file names in directory Bs
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 DIR * dir = opendir(path.c_str());
                 if (dir == 0)   goto out_errno;
 
@@ -2001,7 +2008,8 @@ int function_number = -1;
          case 49:   // read entire file as nested lines
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 const int fd = open(path.c_str(), O_RDONLY);
                 if (fd == -1)   goto out_errno;
 
@@ -2146,7 +2154,8 @@ int function_number = -1;
 
          case 54:    // chdir
               {
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 errno = chdir(path.c_str());
                 goto out_errno;
               }
@@ -2309,7 +2318,8 @@ const int sock = spair[1];
    //
    dup2(sock, 3);
 
-UTF8_string path(B);
+const UCS_string path_ucs(B);
+const UTF8_string path(path_ucs);
 char * filename = strdup(path.c_str());
 int argc = 1;
    for (const char * f = filename; *f; ++f)
@@ -2378,7 +2388,8 @@ int function_number = -1;
 
          case 3:   // fopen(Bs, As) filename Bs mode As
               {
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 UTF8_string mode(*A.get());
 
                 const char * m = mode.c_str();
@@ -2500,7 +2511,8 @@ int function_number = -1;
               {
                 errno = 0;
                 const int mask = A->get_cfirst().get_near_int();
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 mkdir(path.c_str(), mask);
               }
               goto out_errno;
@@ -2525,8 +2537,9 @@ int function_number = -1;
 
          case 24:   // popen(Bs, As) command Bs mode As
               {
-                UTF8_string path(*B.get());
-                UTF8_string mode(*A.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
+                const UTF8_string mode(*A.get());
                 const char * m = mode.c_str();
                 bool read = false;
                 bool write = false;
@@ -2566,7 +2579,8 @@ int function_number = -1;
          case 31:   // access
               {
                 UTF8_string permissions(*A.get());
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 int perms = 0;
                 loop(a, permissions.size())
                     {
@@ -2786,7 +2800,8 @@ int function_number = -1;
                 //
                 errno = 0;
                 size_t items_written = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 if (A->get_rank() > 1)   RANK_ERROR;
                 const ShapeItem line_count = A->element_count();
                 loop(a, line_count)

@@ -41,6 +41,7 @@
 // or maybe CXXFLAGS=-D XCB_WINDOWS_WITH_UTF8_CAPTIONS=0 ./configure...
 //
 # ifndef XCB_WINDOWS_WITH_UTF8_CAPTIONS
+   /// undefined → 0
 #  define XCB_WINDOWS_WITH_UTF8_CAPTIONS 0
 # endif
 
@@ -68,8 +69,16 @@ using namespace std;
 /// the pthread that handles one plot window.
 extern void * plot_main(void * vp_props);
 
+/// two int16_t
 #define I1616(x, y) int16_t(x), int16_t(y)
+/// the number of items in \b x
 #define ITEMS(x) sizeof(x)/sizeof(*x), x
+
+/// 2 byte little endian
+#define LE2(x) uint8_t((x)), uint8_t((x) >> 8)
+
+/// 4 byte little endian
+#define LE4(x) LE2((x)), LE2((x >> 16))
 
 // ===========================================================================
 /// Some xcb IDs (returned from the X server)
@@ -138,12 +147,12 @@ const xcb_query_text_extents_cookie_t cookie =
       }
 }
 //----------------------------------------------------------------------------
+/// test obtaining of a cookie
 void
 testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
            const char * errMessage)
 {
-xcb_generic_error_t * error = xcb_request_check(conn, cookie);
-   if (error)
+   if (xcb_generic_error_t * error = xcb_request_check(conn, cookie))
       {
         CERR <<"ERROR: " << errMessage << " : " << error->error_code << endl;
         xcb_disconnect(conn);
@@ -151,6 +160,7 @@ xcb_generic_error_t * error = xcb_request_check(conn, cookie);
       }
 }
 //----------------------------------------------------------------------------
+/// return a xcb_gcontext_t for font \b font_name
 xcb_gcontext_t
 setup_font_gc(Plot_context & pctx, const char * font_name, Color canvas_color)
 {
@@ -168,12 +178,13 @@ uint32_t values[3] = { 0x00FFFFFF & ~canvas_color, canvas_color, pctx.font };
    return gc;
 }
 //----------------------------------------------------------------------------
-# define XFT   0   /* draw text with Xdt */
-# define PANGO 0   /* draw text with pango */
+# define XFT   0   /**< draw text with Xdt */
+# define PANGO 0   /**< draw text with pango */
 # if XFT
 #  include <X11/Xft/Xft.h>
 # endif
 
+/// draw text \b label at position \b xy
 void
 draw_text(const Plot_context & pctx, const char * label, const Pixel_XY & xy)
 {
@@ -239,6 +250,7 @@ xcb_void_cookie_t textCookie = xcb_image_text_8_checked(pctx.conn,
 # endif
 }
 //----------------------------------------------------------------------------
+/// return the text of a grid tick with value \b val
 char *
 format_tick(double val)
 {
@@ -290,6 +302,7 @@ const char * unit = 0;
    return cc;
 }
 //----------------------------------------------------------------------------
+/// draw a line from P0 to P1
 void
 draw_line(const Plot_context & pctx, xcb_gcontext_t gc,
           const Pixel_XY & P0, const Pixel_XY & P1)
@@ -298,6 +311,7 @@ const xcb_segment_t segment = { I1616(P0.x, P0.y), I1616(P1.x, P1.y) };
    xcb_poly_segment(pctx.conn, pctx.window, gc, 1, &segment);
 }
 //----------------------------------------------------------------------------
+/// swap pixels at P0 (with value Y0) and P1 (with value Y1) and 
 inline void
 pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
 {
@@ -368,6 +382,7 @@ const double denom = ((-Bx)*(Dy-Ay) - (-By)*(Dx-Ax));     // right factor
    return /* beta == */ numer/denom;
 }
 //----------------------------------------------------------------------------
+/// set the an attribute of a xcb_gcontext_t
 inline void
 set_GC_attr(const Plot_context & pctx, xcb_gcontext_t gc,
             xcb_gc_t mask, uint32_t value)
@@ -375,18 +390,21 @@ set_GC_attr(const Plot_context & pctx, xcb_gcontext_t gc,
    xcb_change_gc(pctx.conn, gc, mask, &value);
 }
 //----------------------------------------------------------------------------
+/// set the foreground color of a xcb_gcontext_t
 inline void
 set_GC_foreground(const Plot_context & pctx, xcb_gcontext_t gc, Color color)
 {
    set_GC_attr(pctx, gc, XCB_GC_FOREGROUND, color);
 }
 //----------------------------------------------------------------------------
+/// set the line width of a xcb_gcontext_t
 inline void
 set_GC_line_width(const Plot_context & pctx, xcb_gcontext_t gc, int width)
 {
    set_GC_attr(pctx, gc, XCB_GC_LINE_WIDTH, width);
 }
 //----------------------------------------------------------------------------
+/// draw a triangular area of a 3D plot
 void
 draw_triangle(const Plot_context & pctx, int verbosity,
               Pixel_XY P0, double H0, Pixel_XY P1, Pixel_XY P2, double H12)
@@ -420,6 +438,7 @@ const double dH = (H12 - H0) / steps;
        }
 }
 //----------------------------------------------------------------------------
+/// draw a triangular plot point (∆ or ∇)
 void
 draw_triangle(const Plot_context & pctx, int verbosity, Pixel_XY P0, double H0,
               Pixel_XY P1, double H1, Pixel_XY P2, double H2)
@@ -466,6 +485,7 @@ draw_triangle(const Plot_context & pctx, int verbosity, Pixel_XY P0, double H0,
       }
 }
 //----------------------------------------------------------------------------
+/// draw a plot point (representing one data value) at position \b xy
 void
 draw_point(const Plot_context & pctx, const Pixel_XY & xy, Color canvas_color,
            const Plot_line_properties & l_props)
@@ -1015,6 +1035,7 @@ const int verbosity = w_props.get_verbosity();
        }
 }
 //----------------------------------------------------------------------------
+/// draw the content of a plot window
 void
 do_plot(const Plot_context & pctx,
         const Plot_window_properties & w_props, const Plot_data & data)
@@ -1047,6 +1068,7 @@ const bool surface = data.is_surface_plot();   // 2D or 3D plot ?
    draw_legend(pctx, w_props);
 }
 //----------------------------------------------------------------------------
+/// obtain an ID for \b name
 xcb_atom_t
 get_atom_ID(xcb_connection_t * conn, int only_existing, const char * name)
 {
@@ -1056,6 +1078,7 @@ xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
    return reply.atom;
 }
 //----------------------------------------------------------------------------
+/// save plot window to file named \b outfile
 void
 save_file(const char * outfile, Display * dpy, int window,
           const Plot_context & pctx)
@@ -1090,7 +1113,7 @@ unsigned int geo_border_w, geo_depth;
              << "  bits/pixel=" << geo_depth             << endl;
          */
       }
-   else   // error
+   else                                           // error
       {
         CERR << "  XGetGeometry() failed" << endl;
         MORE_ERROR() << "XGetGeometry() failed in save_file()";
@@ -1154,12 +1177,6 @@ const int file_size = file_header_size
                     + dib_header_size
                     + 3*pixel_count
                     + pad_bytes;
-
-/// 2 byte little endian
-#define LE2(x) uint8_t((x)), uint8_t((x) >> 8)
-
-/// 4 byte little endian
-#define LE4(x) LE2((x)), LE2((x >> 16))
 
 int file_bytes = 0;
    {

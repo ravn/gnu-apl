@@ -58,8 +58,9 @@
    GNU APL tries to be compatible with both the \b ISO \b standard \b 13751
    (aka. Programming Language APL, Extended) and to \b IBM \b APL2.
 
-   It is \b NOT meant to be a vehicle for implementing new features to the
-   APL language.
+   It is \b NOT meant to be a vehicle for adding new features to the
+   APL language. Its promary focus is on compatibility with APL2 and the
+   ISO standard and portability to different platforms.
  **/
 
 /// when this file  was built
