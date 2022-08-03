@@ -262,7 +262,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>June 25, 2022
+<p>August 3, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -1048,12 +1048,12 @@ passed on to APL. We briefly discuss both cases:
 </p>
 <p>0. General Remark
 </p>
-<p>There is a convention in GNU APL that command line options (and
-possibly option arguments) that occur left of &rsquo;&mdash;-&rsquo; are options directed
-to (and understood by) the APL interpreter while options right of &rsquo;&mdash;-&rsquo; are
-passed to the APL application (and their exact format is defined by the
-application). The command line options that were used to start APL can be
-retrieved with ⎕ARG.
+<p>There is a convention in (not only) GNU APL, that the command line options (and
+possibly an optional option argument) that occur left of &rsquo;&mdash;-&rsquo; are options
+directed to (and understood by) the APL interpreter while the options right
+of &rsquo;&mdash;-&rsquo; are passed to the APL application (and their exact format is then
+defined by the APL application). All command line options that were used to
+start APL can later be retrieved with the system variable ⎕ARG in APL.
 </p>
 <p>Example 1: APL started directly
 </p>
@@ -1074,12 +1074,14 @@ app2
 <p>Example 2: APL started indirectly
 </p>
 <p>Starting APL indirectly means that there is a script (a text file with execute
-permission) that contains APL code and has a special first line as described
-above. There are now two sets of command line options: those passed to the
-script and those on the first line of the scripts. When the script is started,
-possibly with command line arguments, then the command line arguments entered
-by the user are combined with the arguments on the first line of the script
-in a way that is described in &rsquo;man 2 execve&rsquo;.
+permission) that contains APL code and has a special first line (sometimes
+referred to as the <strong>shebang</strong> of the script) as shown above. In this case
+there are now two sets of command line options: those passed to the script
+as command line arguments and those on the shebang line of the scripts.
+</p>
+<p>When the script is started, possibly with command line arguments, then the
+command line arguments entered by the user are combined with the arguments
+on the shebang line of the script in a way that is described in &rsquo;man 2 execve&rsquo;.
 </p>
 <p>Assume the script file SCRIPT.apl contains this (the file is shipped
 with GNU APL):
@@ -1104,10 +1106,11 @@ as seen by ⎕ARG, is produced:
 sarg1             
 sarg2 
 </pre>
-<p>This tells us that the different names are constructed by execve() in the
-following order:
+<p>This suggests that the options and option argments are constructed by execve()
+(the function that is eventually responsible for processing scripts in shells
+and other executables) in the following order:
 </p>
-<p>1. Interpreter name (the first name in the script file, here: /usr/local/bin/apl)
+<p>1. Interpreter name (the first name in the shebang, here: /usr/local/bin/apl)
 </p>
 <p>2. Optional Interpreter arguments (here: &mdash;-script)
 </p>
@@ -1119,7 +1122,7 @@ following order:
 interpreter arguments (2. above) is system specific and possibly not portable.
 For that reason the optional interpreter argument should not be missing (you
 can use &mdash;- to provide at least one argument) and also not more than one
-argument. On GNU/Linux systems the following first lines of the script are
+argument. On GNU/Linux systems the following shebang lines of the script are
 understood:
 </p>
 <pre class="verbatim">/usr/local/bin/apl
@@ -1131,15 +1134,19 @@ understood:
 </pre>
 <p>The recommended form is: /usr/local/bin/apl &mdash;-script
 </p>
-<p>Note that &rsquo;&mdash;-&rsquo; and options that follow it ARE NOT shown in ⎕ARG if they
-are given on the first line of the script, while &rsquo;&mdash;-&rsquo; and options that follow
-on the script command line ARE shown. There is no point in passing application
-options in the script file via the command line to apl; instead you can use
-them directly in the script.
+<p>Note that &rsquo;&mdash;-&rsquo; and options that follow it on the shebang line MAY OR MAY
+NOT be occur in ⎕ARG (this depends on the platform used), while options that
+follow &rsquo;&mdash;-&rsquo; on the script command line WILL BE shown. There is no point
+in passing any application options on the shebang line to APL; instead
+you can provide them directly further down in the script.
 </p>
-<p>Using &rsquo;&mdash;-&rsquo; as last argument on the first line of the script file prevents any
-of the options given to the script to be interpreted as APL options; all
-such options are passed to the application via ⎕ARG.
+<p>Using &rsquo;&mdash;-&rsquo; on the shebang line of the script file usually prevents subsequent
+options on the shebang line from being interpreted as APL options (and, more
+importantly, from causing <strong>unknown option</strong> errors when GNU APL starts).
+At least under GNU/Linux with <strong>bash</strong> the subsequent options passed to
+the APL application via ⎕ARG.
+</p>
+<p>Depending on this exact behaviour cannot be recommended.
 </p>
 <a name="Helpful-Features-for-Scripting"></a>
 <h4 class="subsection">2.1.4 Helpful Features for Scripting</h4>
