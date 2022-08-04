@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-August 3, 2022
+August 4, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -32,8 +32,8 @@ following:
    ISO Standard for APL:
 www.math.uwaterloo.ca/~ljdickey/apl-rep/docs/is13751.pdf
 
-   Note that the file *is13751.pdf* above is compressed with gzip,
-therefore it must be expanded with e.g.  *gunzip* before it can be read.
+   Note that the file is13751.pdf above is compressed with gzip,
+therefore it must be expanded with e.g.  gunzip before it can be read.
 
    More pointers to APL resources on the Web:
 ftp://rtfm.mit.edu/pub/usenet-by-group/comp.lang.apl/APL_language_FAQ
@@ -156,7 +156,7 @@ GNU APL understands the following command line options:
           a consequence, file names in other command line options of GNU
           APL are also affected by -C. That means that the file names in
           command line options arr being interpreted relative to
-          new_root and *not* relative to the current directory of the
+          new_root and not relative to the current directory of the
           process that had started GNU APL.
 
         • GNU APL may automatically start other processes such as
@@ -221,8 +221,8 @@ GNU APL understands the following command line options:
 
    • ‘--LX expr’
 
-     execute *expr* first.  The workspaces behaves as if ⎕LX (latent
-     expression) were set to *expr* in the workspace.  This can be used,
+     execute expr first.  The workspaces behaves as if ⎕LX (latent
+     expression) were set to expr in the workspace.  This can be used,
      for example, to start the same workspace with different start-up
      values.
 
@@ -239,7 +239,7 @@ GNU APL understands the following command line options:
 
    • ‘-l num’
 
-     turn logging facility *num* ON (provided that dynamic logging was
+     turn logging facility num ON (provided that dynamic logging was
      ./configure’d).  The logging facility 37 (start-up messages) is of
      particular importance for troubleshooting and it works even if
      dynamic logging was not ./configure’d.
@@ -762,11 +762,11 @@ arguments that are passed on to APL. We briefly discuss both cases:
    0.  General Remark
 
    There is a convention in (not only) GNU APL, that the command line
-options (and possibly an optional option argument) that occur left of
-’—-’ are options directed to (and understood by) the APL interpreter
-while the options right of ’—-’ are passed to the APL application (and
-their exact format is then defined by the APL application).  All command
-line options that were used to start APL can later be retrieved with the
+options (and possibly an optional option argument) that occur left of --
+are options directed to (and understood by) the APL interpreter while
+the options right of -- are passed to the APL application (and their
+exact format is then defined by the APL application).  All command line
+options that were used to start APL can later be retrieved with the
 system variable ⎕ARG in APL.
 
    Example 1: APL started directly
@@ -787,14 +787,28 @@ app2
 
    Example 2: APL started indirectly
 
-   Starting APL indirectly means that there is a script (a text file
-with execute permission) that contains APL code and has a special first
-line (sometimes referred to as the *shebang* of the script) as shown
-above.  In this case there are now two sets of command line options:
-those passed to the script as command line arguments and those on the
-shebang line of the scripts.
+   A script is is a text file file which as execute permissions.  The
+first line of a script, commonly known as the shebang of the script, has
+a special format which specifies how the subsequent lines of the script
+file shall be processed, see man execve for details.
 
-   When the script is started, possibly with command line arguments,
+   A GNU APL script is then a script whose shebang indicates the apl
+binary as the intepreter for the subsequent lines where those subsequent
+lines are either APL commands or APL statements.  With some limitations,
+executing such an APL script yields the same result as entering the
+subsequent lines in immediate execution mode.
+
+   When APL is started directly, then there is only one (possibly empty)
+set of command lines options, which are processed by the shell and then
+passed to the apl binary.
+
+   Starting APL indirectly refers to executing an APL script.  In this
+case there are two sets of command line options:
+
+   • those passed to the script as command line arguments, and
+   • those on the shebang line of the scripts
+
+   When the APL script is started, possibly with command line arguments,
 then the command line arguments entered by the user are combined with
 the arguments on the shebang line of the script in a way that is
 described in ’man 2 execve’.
@@ -849,66 +863,110 @@ following shebang lines of the script are understood:
 /usr/local/bin/apl -s --
 /usr/local/bin/apl --script --
 
-   The recommended form is: /usr/local/bin/apl —-script
+   The recommended form is: /usr/local/bin/apl --script.
 
-   Note that ’—-’ and options that follow it on the shebang line MAY OR
-MAY NOT be occur in ⎕ARG (this depends on the platform used), while
-options that follow ’—-’ on the script command line WILL BE shown.
-There is no point in passing any application options on the shebang line
-to APL; instead you can provide them directly further down in the
-script.
+   Note that -- and any options that follow it on the shebang line MAY
+OR MAY NOT be occur in ⎕ARG (this depends on the platform used).  In
+contrast, options that follow -- on the script command line WILL BE
+shown since this is controlled by GNU APL and not by the platform.
+There is normally no point in passing any application options on the
+shebang line to APL because such parameters can more easily be provided
+directly further down in the script.  However in cases where the script
+has only application options it may be convenient to make -- the last
+option of the shebang so that the user of the script need not specify it
+manually.
 
-   Using ’—-’ on the shebang line of the script file usually prevents
+   Using -- on the shebang line of the script file usually prevents
 subsequent options on the shebang line from being interpreted as APL
-options (and, more importantly, from causing *unknown option* errors
-when GNU APL starts).  At least under GNU/Linux with *bash* the
-subsequent options passed to the APL application via ⎕ARG.
+options (and, more importantly, from causing unknown option errors when
+GNU APL starts).  At least under GNU/Linux with bash the subsequent
+options will be passed to the APL application via ⎕ARG.
 
-   Depending on this exact behaviour cannot be recommended.
+   Depending on this exact behaviour cannot be recommended.  A cleaner
+approach is to use options starting with - or -- only for the
+interpreter options, and options starting with + for application
+options.  This should work on all platforms because for strings, say,
+APLOPT, ARG1, ARG2, ..., which contain no whitespace:
+
+   • +APLOPT is ignored, although shown in ⎕ARG,
+   • ++APLOPT ARG1 is ignored, although shown in ⎕ARG,
+   • +++APLOPT ARG1 ARG2 is ignored, although shown in ⎕ARG,
+   • ...
 
 2.1.4 Helpful Features for Scripting
 ------------------------------------
 
-In order to be really useful for scripting, three more features have
-been added:
+GNU APL provides three system variables and functions that are
+particularly useful for scripting:
 
-   • ⎕ARG: access to the command line arguments given to the interpreter
+   • ⎕ARG: access to the command line arguments given to the
+     interpreter,
    • ⎕ENV: access to the environment variables of the process running
      the interpreter, and
    • ⎕INP: Here-Document-alike function for creating large text
      variables
 
-   The system variable ⎕ARG contains all command line arguments passed
-to the interpreter.  In the initial example above this would be a nested
+2.1.4.1 ⎕ARG
+............
+
+The system variable ⎕ARG contains all command line arguments passed to
+the interpreter.  In the initial example above this would be a nested
 3-element vector:
 
     /usr/local/bin/apl --id 1010
 
-   A feature particularly useful for CGI scripting (where some
-information is passed to the APL script via environment variables) is
-the monadic system function ⎕ENV B. ⎕ENV B returns all environment
-variables whose name starts with B. If ⍴B is 0, like:
+2.1.4.2 ⎕ENV
+............
+
+There are usually at least two ways of passing parameters to a script:
+
+   • as command line options, and/or
+   • by means of environment variables
+
+   Just like the system variable ⎕ARG makes the command line optios used
+available to APL, does the system function ⎕ENV make the environment
+variables available to APL. Since there normally exist far more
+environment variables than command line options, ⎕ENV is a monadic
+function whose argument is a filter for the name(s) of the variable(s)
+to be retrieved.
+
+   ⎕ENV B returns all environment variables whose name starts with B. If
+⍴B is 0, like:
 
     ⎕ENV ''
 
-   then all environment variables are returned.  The result of ⎕ENV is a
-N-by-2 matrix.  The first column is the name of the environment
-variable.  The second column is the value of the variable.  The number N
-of environment variables returned obviously depends on the number of
-environment variables whose name begins with the prefix given in B. B is
-case sensitive; by convention the names of environment are all
-uppercase.
+   then all environment variables of the process running GNU APL are
+returned.
 
-   If you need to create a longer text, like the body of a web page,
-then you would normally construct it like this:
+   The result of ⎕ENV is a (possibly empty) N×2 matrix.  The first
+column contains the the name(s) of the environment variable(s), while
+the second column contains their value(s).  The name and the value are
+both strings.
+
+   The number N of environment variables returned by ⎕ENV obviously
+depends on the number of environment variables whose name begins with
+the prefix given in B; shorter prefixes B therefore result in higher
+counts N. B is case sensitive; by convention the names of environment
+variables are all uppercase.  Note the subtle difference between shell
+variables and environment variables in shells like bash: ⎕ENV returns
+only environment variables (which are set with command setenv in bash),
+but not shell variables (which are set with command set in bash).  For a
+shell variable to occur in ⎕ENV it must be exported into the environment
+of the process before the GNU APL interpreter is started.
+
+2.1.4.3 ⎕INP
+............
+
+If you need to create a longer static text, like the body of a web page,
+then you would normally construct it in APL like this:
 
 BODY ← ⊂ 'First line'
 BODY ← BODY , ⊂ 'Second line'
 BODY ← BODY , ⊂ 'Third line'
    ...
 
-   That is not very handy for longer texts.  Instead you can write the
-following in an APL script:
+   The above is obviously not very handy for longer texts.  Instead you
+may write the following in a GNU APL script:
 
 BODY←⎕INP 'END-OF-⎕INP'
 First line
@@ -918,12 +976,33 @@ Third line
 END-OF-⎕INP
 
    This works like "Here documents" in bash.  The right argument of ⎕INP
-is the end of text marker, ⎕INP also has a dyadic form where the left
-argument specifies an escape sequence from text to apl and back to the
-text, similar to PHP scripts:
+is the end of text marker.
 
-   ’<?apl’ ’?>’ ⎕INP ’END-OF-⎕INP’ First line Time is now: <?apl ⍕⎕TS ?>
-Third line ...  END-OF-⎕INP
+   ⎕INP also has a dyadic form where the left argument specifies an
+escape sequence from text to APL and back to the text, similar to PHP
+scripts.  For example:
+
+Z←'<?apl' '?>' ⎕INP 'END-OF-⎕INP'
+First line
+Time is now: <?apl ⍕⎕TS ?>
+Third line
+...
+END-OF-⎕INP
+
+   This creates a mainly static text with a small dynamic plug-in
+computed by APL:
+
+      ⊃Z
+First line                       
+Time is now: 2022 8 4 15 15 2 177
+Third line                       
+...         
+
+   It should be noted that, while ⎕INP simplifies the construction of
+multi-line strings compared to standard APL, it has come to age and
+these days an even simpler feature - Multi-line strings as described
+below - is provided for the same purpose.  The monadic ⎕INP has
+therefore become obsolete.
 
 2.1.5 Double-quoted Strings
 ---------------------------
@@ -939,8 +1018,8 @@ which differ from single quoted strings in two ways:
      scalar while "A" is a vector.
 
    • doubly quoted strings understand the standard C escape sequences
-     such for control character, such as \n for ASCII line feed, \t for
-     ASCII TAB etc.
+     for control character, such as \n for ASCII line feed, \t for ASCII
+     TAB etc.
 
 2.1.6 Multi-Line Strings
 ------------------------
@@ -949,14 +1028,15 @@ Another feature of GNU APL to simplify the creation of values that
 contain longer texts are strings that span several lines.  One
 consequence of how ⎕INP works is that the strings read by ⎕INP always
 originate in stdin of the interpreter.  In immediate execution mode (and
-therefore also in APL scripts) stdin is the next lines entered by the
-user (interactive APL sessions) or the next lines in the script file (in
-APL scripts).  Often, however, a programmer wants to specify long
-strings inside a defined function and not on the top-level of an APL
-script.  That renders ⎕SI almost useless for defined functions.
+therefore also in APL scripts) reading stdin returns either the next
+lines entered by the user (in interactive APL sessions) or else the next
+lines in the script file (in APL scripts).  Often, however, a programmer
+wants to specify long strings inside a defined function and not e.g.  on
+the top-level of an APL script.  That renders ⎕INP almost useless for
+defined functions.
 
-   In order to provide a way for defining long strings inside defined
-functions, multi-line strings were introduced.  They come in two
+   In order to provide a better way for defining long strings inside
+defined functions, multi-line strings were introduced.  They come in two
 flavors: old-style and new-style.
 
 2.1.6.1 Old-style Multi-Line Strings
@@ -972,7 +1052,9 @@ have obscured the traditional behavior of immediate execution mode.
 defined function that has line with an odd number of " characters.  It
 continues over the subsequent function lines until the next ".  The
 result is a nested APL value containing one nested string per line
-involved.
+involved.  This method of specifying a multi-line string was adopted
+from the bash shell.  In immediate execution mode an old-style
+multi-line string yields No string end found.
 
    For example:
 
@@ -1013,8 +1095,8 @@ ABC
 
 Even though the combination of ⎕INP for immediate execution and
 multi-line strings for defined functions achieved the goal of specifying
-large amounts of text in a simple manner, its was certainly not very
-intuitive or elegant to have different approaches for different APL
+large amounts of text in a simple manner, it was certainly neither
+intuitive nor elegant to have different approaches for the different APL
 modes.
 
    This was leading to the new-style multi-line strings.  They adopted
@@ -1023,14 +1105,15 @@ syntax of new-style multi-line strings is cleaner: empty lines are
 handled more consistently and the string lines are completely separated
 from the APL code lines.  More importantly, new-style multi-line strings
 work alike in immediate execution mode, in scripts, and in defined
-functions.  New-style strings are a little different and more
-restrictive than their old-style companions:
+functions.  New-style strings are a little different and syntactically
+stricter than their old-style companions:
 
    • the starting """ must be placed at the end of an APL code line,
-     i.e.  no mixing of APL code and string content on the same line.
-     In old-style strings the APL line on which the string started
-     became part of the string while in new-style strings the strings
-     begins at the following line.
+     i.e.  there is no more mixing of APL code and string content on the
+     same line.  An old-style string starts with APL code and ends with
+     the first line of the string, while a new-style string starts with
+     an APL code line and the string itself begins at the following
+     line.
 
    • the ending """ must be placed at the end of a separate lines with
      only spaces allowed before the """ (to vertically align it with the
@@ -1225,41 +1308,42 @@ File: apl.info,  Node: Section 2.4,  Next: Section 2.5,  Prev: Section 2.3,  Up:
 ====================
 
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤,
-≥, and > (but not of = or ≠) are integer or real numbers, and, as a
-consequence, that the argument of ⍋ or ⍒ is a vector of integer or real
-numbers.  In contrast GNU APL also allows the comparison of characters
-and numbers or the comparison of complex numbers according to the
-following, more general, rules.
+≥, and > (but not of = or ≠) are integer or real numbers.  As a
+consequence, the argument(s) of ⍋ or ⍒ (which require comparison) must
+also a vector of integer or real numbers.
+
+   In contrast, GNU APL also allows the comparison of characters and
+numbers or the comparison of complex numbers according to the following,
+more general, rules.
 
    Let A and B two APL values to be compared.  Then the final result of
-comparing A and B is the first decision (i.e.  A < B, A > B, or A = B)
-made when following the rules below:
+comparing A and B is the first verdict (i.e.  either A < B, or A > B, or
+A = B) obtained when following the rules below (and in that order):
 
   1. Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
 
   2. Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa.
-     The first different shape item decides.
+     The first differing shape item (from the left) decides.
 
-  3. Comparison of ravel elements: at this point ⍴A ≡ ⍴B. If all
+  3. Comparison of ravel elements: at this point (⍴A) ≡ (⍴B). If all
      corresponding ravel elements of A and B are equal (i.e.  tolerantly
      equal within ⎕CT as defined in the ISO standard) then A = B.
 
      Otherwise let A1 and B1 the first corresponding ravel elements of A
-     and B with A1≠B1.  If A1 < B1 then A < B and vice versa.  The
+     and B with A1 ≠ B1.  If A1 < B1 then A < B and vice versa.  The
      comparison A1 < B1 is made according to the following rules 4.  -
      7.  below.
 
   4. Comparison by depth:
 
-        • if A1 is simple (i.e.  A1 is a single character or number) and
-          B1 is nested then A1 < B1.  And vice versa.
+        • If A1 and B1 are both nested: the rules 1.  - 4.  above are
+          (recursively) applied to corresponding ravel elements of ⊃A1
+          and ⊃B1 until a verdict is obtained.
 
-        • otherwise, If A1 and B1 are both nested, then the rules 1.  -
-          4.  are (recursively) applied to the corresponding ravel
-          elements of A and B.
+        • if A1 is simple and B1 is nested then A < B. And vice versa.
 
-        • otherwise both A1 and B1 are simple and they are compared
-          according to the rules 5.  - 8.  below.
+        • otherwise (i.e.  A1 and B1 are both simple): A < B if A1 < B1
+          according to rules 5.  - 8.  below.  And vice versa.
 
   5. Comparison by Unicode: if A1 and B1 are both character values and
      (⎕UCS A1) < (⎕UCS B1) then A < B. And vice versa.
@@ -1288,7 +1372,7 @@ values in the following order:
      values,
    • the depths of the differing ravel elements,
    • the types (character vs.  numeric) of the differing ravel elements,
-   • the Unicodes of the differing ravel elements
+   • the Unicodes of the differing ravel elements (if applicable)
    • the real parts of numeric values,
    • the imaginary parts of numeric values,
 
@@ -1313,10 +1397,10 @@ real companions.  For example, a magnitude first comparison of complex
 numbers would make ¯2 < ¯1 < ¯2J0E¯20 for the near-complex number
 ¯2J0E¯20.
 
-   *CAUTION*: The comparison of two strings (i.e.  nested character
+   CAUTION: The comparison of two strings (i.e.  nested character
 vectors) may give unexpected results because shorter strings come before
-longer strings.  For example, ’Zoo’ comes *before* ’Adam’ even though
-one might expect the opposite.
+longer strings.  For example, ’Zoo’ comes before ’Adam’ even though one
+might expect the opposite.
 
       Z[⍋Z ← 'Adam' 'Zoo']
  Zoo Adam 
@@ -1326,7 +1410,7 @@ one might expect the opposite.
 
    This pitfall can be avoided by enforcing the same length for all
 strings being compared or sorted.  A simple way to achieve that is the
-use of *⊂[2]⊃* like this (assuming IO←1):
+use of ⊂[2]⊃ like this (assuming IO←1):
 
       Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zoo']
  Adam Zoo  
@@ -1789,8 +1873,8 @@ File: apl.info,  Node: Section 2.16,  Next: Section 2.17,  Prev: Section 2.15,  
 ================================================
 
 GNU APL has implemented two features that are closely related because,
-under the hood, they share the same implementation: *structured
-variables* and *associative arrays*.
+under the hood, they share the same implementation: structured variables
+and associative arrays.
 
 2.16.1 Structured Variables
 ---------------------------
@@ -1808,9 +1892,9 @@ For example:
 
       PERSON.address.street
 
-   is a structured variable *PERSON*, which has a member *address*, and
-*PERSON.address* is a structured (sub-)variable of PERSON which has a
-member *street*.
+   is a structured variable PERSON, which has a member address, and
+PERSON.address is a structured (sub-)variable of PERSON which has a
+member street.
 
    For a structured variable and all its sub-variables, the usual rules
 for normal variables apply.  They can be created, erased, and even
@@ -1827,7 +1911,7 @@ case the intermediate members are created automatically.  For example:
 
       PERSON.address.street ←  '42 Main Street'   ⍝ implicitly creates PERSON.address
 
-   Empty structured variables can be created with *38 ⎕CR*:
+   Empty structured variables can be created with 38 ⎕CR:
 
       EMPTY ← 38 ⎕CR CAPACITY ← 32
 
@@ -1836,14 +1920,12 @@ members are added to it.  From time to time this expansion exceeds the
 space allocated for the members of the variable and then the existing
 members need to be copied into a new, larger structure.  The overhead
 caused by this reorganization can be avoided by specifying a
-sufficiently large capacity when the structure is created (with *38
-⎕CR*).
+sufficiently large capacity when the structure is created (with 38 ⎕CR).
 
-   An entire structured variable can be erased with *⎕EX* or with
-*)ERASE* just like other variables.  That erases the variable along with
-all its members.  In addition to erasing an entire structured variable,
-individual members at any depth can also be erased with *⎕EX* or
-*)ERASE*:
+   An entire structured variable can be erased with ⎕EX or with )ERASE
+just like other variables.  That erases the variable along with all its
+members.  In addition to erasing an entire structured variable,
+individual members at any depth can also be erased with ⎕EX or )ERASE:
 
       )ERASE PERSON.address      ⍝ OK, PERSON.address exists
       )ERASE PERSON.address      ⍝ error: PERSON.address does not exist anymore
@@ -1869,8 +1951,8 @@ similar to the file system on a computer.  This tree has:
      directory), and
 
    • zero or more leafs.  The case of zero non-leafs occurs, for
-     example, directly after a new empty variable was created with *38
-     ⎕CR*.
+     example, directly after a new empty variable was created with 38
+     ⎕CR.
 
    Due to their tree-like structure, structured variables need to be
 printed somewhat different than normal APL variables.  For example:
@@ -1917,7 +1999,7 @@ another structured variable is valid and concatenates the members:
       A.b.c.d.e
 leaf-cde
 
-   The file *src/testcases/Structured_variable.tc* contains the examples
+   The file src/testcases/Structured_variable.tc contains the examples
 above (and more)
 
 2.16.2 Associative Arrays
@@ -1926,8 +2008,8 @@ above (and more)
 APL arrays are primarily indexed with numbers (or arrays of numbers),
 which is also the most efficient method.  Many other languages provide,
 in either addition or else alternatively, a method to index arrays by
-*keys*, where the keys are frequently characters strings.  Such arrays
-are commonly referred to as *associative arrays*.
+keys, where the keys are frequently characters strings.  Such arrays are
+commonly referred to as associative arrays.
 
    APL has no associative array per se, but the structured variables in
 GNU APL can be used for the same purpose.  The only limitation is
@@ -3148,20 +3230,20 @@ about the error and where in B the error was detected.
 
 Z←A ⎕JSON B performs one of the following conversions:
 
-   • *Z←0 ⎕JSON B* is the same as monadic Z←⎕JSON B.
+   • Z←0 ⎕JSON B is the same as monadic Z←⎕JSON B.
 
-   • *Z←1 ⎕JSON B* is like Z←0 ⎕XML B, except that B is not the JSON
+   • Z←1 ⎕JSON B is like Z←0 ⎕XML B, except that B is not the JSON
      string itself but the name of a file from which an JSON string is
      read.
 
-   • *Z←2 ⎕JSON B* is the inverse of Z←0 ⎕XML B. It converts an APL
-     value to a JSON string.
+   • Z←2 ⎕JSON B is the inverse of Z←0 ⎕XML B. It converts an APL value
+     to a JSON string.
 
-   • *Z←3 ⎕JSON B* is like 2 ⎕JSON B, except that the member names
-     (keys) of all JSON objects are sorted alphabetically.  That is of
-     little use (but costs perfomance) if Z is not displayed but
-     processed further, but it could help troubleshooting when Z is
-     displayed and the number of keys in Z is large.
+   • Z←3 ⎕JSON B is like 2 ⎕JSON B, except that the member names (keys)
+     of all JSON objects are sorted alphabetically.  That is of little
+     use (but costs perfomance) if Z is not displayed but processed
+     further, but it could help troubleshooting when Z is displayed and
+     the number of keys in Z is large.
 
 
 File: apl.info,  Node: Section 2.30,  Next: Section 2.31,  Prev: Section 2.29,  Up: Chapter 2
@@ -3476,11 +3558,11 @@ Attributes.legend_name_2 ← "Random Row 2"
       Attributes ⎕PLOT Data
 
    Note that (for syntactical reasons) the separation between the line
-attribute and the line number is *_* (underscore) if *A* is specified as
-a structured APL value and *-* (minus) if A is specified as a string of
+attribute and the line number is _ (underscore) if A is specified as a
+structured APL value and - (minus) if A is specified as a string of
 lines.
 
-   If the global attribute *output_filename* is given, then the plot is
+   If the global attribute output_filename is given, then the plot is
 not only being displayed in a window on the screen, but also written to
 a file with the name of the file provided as attribute value.  *Note
 Output File Format::, below.
@@ -3489,16 +3571,15 @@ Output File Format::, below.
 
       ⊣ ( ⊂ "output_filename: /tmp/bitmap.png" ) ⎕PLOT 1 3 1 4 2
 
-   writes the plot of a a zigzag curve to file */tmp/bitmap.png*
-(*Caution*: ⎕PLOT with attribute output_filename overrides existing
-files without a warning).  Lack of permissions to write the file raises
-a DOMAIN ERROR with )MORE possibly providing details.
+   writes the plot of a a zigzag curve to file /tmp/bitmap.png (Caution:
+⎕PLOT with attribute output_filename overrides existing files without a
+warning).  Lack of permissions to write the file raises a DOMAIN ERROR
+with )MORE possibly providing details.
 
-   Some line attributes such as *line_width* or *point size* are
-frequently the same for several or all plot lines.  In that case one can
-use the line attribute without a -N resp.  _N suffix which is then used
-for all lines (unless overridden by the same attribute with -N resp.  _N
-suffix.
+   Some line attributes such as line_width or point size are frequently
+the same for several or all plot lines.  In that case one can use the
+line attribute without a -N resp.  _N suffix which is then used for all
+lines (unless overridden by the same attribute with -N resp.  _N suffix.
 
 2.31.3 Plot Window Handling
 ---------------------------
@@ -3512,16 +3593,16 @@ different ways:
      corner) of the window,
    • by opening the drop down menu of the window (near the top left-of
      the window) and selecting the option named "Close",
-   • from APL by calling *⎕PLOT ¯3* (which closes *all* open plot
-     windows), or
-   • from APL by calling *⎕PLOT H* (which closes a specific plot
-     window), where H is the plot window handle returned by monadic
-     ⎕PLOT B or by dyadic A ⎕PLOT B with plot attributes A.
+   • from APL by calling ⎕PLOT ¯3 (which closes all open plot windows),
+     or
+   • from APL by calling ⎕PLOT H (which closes a specific plot window),
+     where H is the plot window handle returned by monadic ⎕PLOT B or by
+     dyadic A ⎕PLOT B with plot attributes A.
 
    Note that the exact method for closing a plot window with the mouse
-(as opposed to *⎕PLOT ¯3* or *⎕PLOT H* from APL) differs between
-different window managers.  The above stands for the standard method(s)
-for closing windows on your system.
+(as opposed to ⎕PLOT ¯3 or ⎕PLOT H from APL) differs between different
+window managers.  The above stands for the standard method(s) for
+closing windows on your system.
 
 
 File: apl.info,  Node: Output File Format,  Up: Section 2.31
@@ -3529,27 +3610,26 @@ File: apl.info,  Node: Output File Format,  Up: Section 2.31
 2.31.4 Output File Format
 -------------------------
 
-Early versions of ⎕PLOT were using *libxcb* to display the results of
-⎕PLOT while recent versions use *libgtk-3*.  The primary driver for this
-change was the lack of full Unicode support in *libxcb* which made it,
-for example, difficult to properly display APL characters in window
-captions or in plot line legends.
+Early versions of ⎕PLOT were using libxcb to display the results of
+⎕PLOT while recent versions use libgtk-3.  The primary driver for this
+change was the lack of full Unicode support in libxcb which made it, for
+example, difficult to properly display APL characters in window captions
+or in plot line legends.
 
    Writing the pixels of a plot to a file uses functions provided by
-either *libxcb* or *libgtk-3*, and these functions generate different
-file formats.
+either libxcb or libgtk-3, and these functions generate different file
+formats.
 
-   *libxcb* is the older of the two libraries and it therefore produces
-the older file format *.bmp* (bitmaps).  *libgtk-3* is the newer
-librariy and it procuces the somewhat newer file format *.png* (portable
-network graphics).  There are tools like *convert* from package
-*imagemagick* that can be used to convert different image file formats
-into each other and therefore this incompatibility should not cause too
-much trouble.
+   libxcb is the older of the two libraries and it therefore produces
+the older file format .bmp (bitmaps).  libgtk-3 is the newer library and
+it procuces the somewhat newer file format .png (portable network
+graphics).  There are tools like convert from package imagemagick that
+can be used to convert different image file formats into each other and
+therefore this incompatibility should not cause too much trouble.
 
-   For backward compatibility, the *libxcb* option for ⎕PLOT will
-continue to exist for some time, but bug fixes and new features will
-only be made for the *libgtk-3* option.
+   For backward compatibility, the libxcb option for ⎕PLOT will continue
+to exist for some time, but bug fixes and new features will only be made
+for the libgtk-3 option.
 
 
 File: apl.info,  Node: Section 2.32,  Next: Section 2.33,  Prev: Section 2.31,  Up: Chapter 2
@@ -3628,7 +3708,7 @@ simple REs to very complex REs.  In fact, regular expressions are a
 language of their own, and it is impossible to describe them here.  The
 user of ⎕RE is referred to the description that comes with libpcre2.
 
-   See in particular: *man pcre2pattern*
+   See in particular: man pcre2pattern
 
 2.33.4 The String(s) B Being Matched
 ------------------------------------
@@ -3666,15 +3746,15 @@ libpcre2 documentation.
 ------------------
 
 By default, i.e.  without an axis argument X or - equivalently - with an
-empty string X←*""* as axis argument, ⎕RE returns the first match of the
+empty string X←"" as axis argument, ⎕RE returns the first match of the
 regular expression A in the string B as an APL string.
 
-   By means of the optional axis argument *X ≢ ""* (in the following
+   By means of the optional axis argument X ≢ "" (in the following
 called flags) one can change the default behavior in order to adapt
 various aspects of the matching to satisfy the requirements that the
 user of ⎕RE may have.
 
-   The X argument of *A⎕RE[X] B* is a character vector where each
+   The X argument of A⎕RE[X] B is a character vector where each
 character is a flag.  Each flag is either understood by (and then passed
 unmodified to) libpcre2 or else understood by ⎕RE itself (and then not
 passed to libpcre2).
@@ -3914,11 +3994,11 @@ File: apl.info,  Node: Section 2.34,  Next: Section 2.35,  Prev: Section 2.33,  
 =============================
 
 The standard way to produce random numbers is the primitive function ?
-aka.  *Roll*.  Roll returns a simple random array whose ravel elements
-are positive integers chosen in a (pseudo-) random fashion.  While this
-is sufficient for many applications, one sometimes needs APL values
-whose randomness not only affects the ravel elements themselves, but
-also other aspects like:
+aka.  Roll.  Roll returns a simple random array whose ravel elements are
+positive integers chosen in a (pseudo-) random fashion.  While this is
+sufficient for many applications, one sometimes needs APL values whose
+randomness not only affects the ravel elements themselves, but also
+other aspects like:
 
    • the rank of the value,
    • the shape of the value,
@@ -4207,14 +4287,12 @@ ref   ⎕SQL[9] table     - list columns for table
       type  ⎕SQL[1] file
 
    Connect to database of type A using connection arguments B. The
-result is a database handle *ref* to be used in the other ⎕SQL
-functions.
+result is a database handle ref to be used in the other ⎕SQL functions.
 
-   *A* must be a string indicating the database type.  Currently
-supported values are ’postgresql’ and ’sqlite’.
+   A must be a string indicating the database type.  Currently supported
+values are ’postgresql’ and ’sqlite’.
 
-   *B* is the connection parameters which depends on the type of
-database:
+   B is the connection parameters which depends on the type of database:
 
    - For type≡’sqlite’: the argument is string pointing to the database
 file.
@@ -4231,7 +4309,7 @@ handle.  It is, however, guaranteed that the handle is a scalar value.
 
       ⎕SQL[2] ref
 
-   Disconnect from database *ref*.
+   Disconnect from database ref.
 
    B is the database handle that should be disconnected.  After this
 function has been called, no further operations are to be performed on
@@ -4353,7 +4431,7 @@ Indicator shall be returned:
      execution and execute contexts.
 
    • ⎕SI 3: The function name and line number in square brackets, for
-     example: *"FOO[3]"*
+     example: "FOO[3]"
 
    • ⎕SI 4: Either the statement text of the function line or the error
      text of an error that has occurred on the line
@@ -4488,10 +4566,10 @@ File: apl.info,  Node: Section 2.38,  Prev: Section 2.37,  Up: Chapter 2
 2.38.1 Purpose
 --------------
 
-GNU APL provides ⎕XML as a means of performing *elementary*
-manipulations of APL character strings that are formatted according to
-the XML standard.  The anticipated procedure for such modifications is
-something like:
+GNU APL provides ⎕XML as a means of performing elementary manipulations
+of APL character strings that are formatted according to the XML
+standard.  The anticipated procedure for such modifications is something
+like:
 
       XML_string ← "<A><B><C>Hello</C></B></A>"   ⍝ input data (usually from an .xml file)
       APL ← ⎕XML XML_string       ⍝ convert XML_string to associative array APL
@@ -4597,12 +4675,12 @@ recognized (and translated) by ⎕XML.
 
 The principal mapping between XML strings and APL values is:
 
-   • *XML document* ←→ structured (top-level) APL value or variable (=
-     an associative array)
-   • *XML node* ←→ structured APL (sub-) value (= an associative (sub-)
+   • XML document ←→ structured (top-level) APL value or variable (= an
+     associative array)
+   • XML node ←→ structured APL (sub-) value (= an associative (sub-)
      array of either the top-level value or of another XML node)
-   • *XML name* ←→ name of a member in a structured APL value
-   • *Other* ←→ member value
+   • XML name ←→ name of a member in a structured APL value
+   • Other ←→ member value
 
    Every valid name in XML is also a valid name for an APL variable or
 structure member.  Unfortunately, mapping XML names directly to APL
@@ -4628,7 +4706,7 @@ member names cannot work because:
 
    • Likewise, at least for readability reasons, the order if XML the
      order of nodes attributes, should not be changed.  XML documents
-     are frequently processed with text tools like *diff* which would
+     are frequently processed with text tools like diff which would
      incorrectly show differences between XML documents that are
      equivalent from an XML perspective.
 
@@ -4655,7 +4733,7 @@ is understood by the APL parser):
    • A single character ⍙, ∆, or _, that indicates the role of the name
      in the XML document as follows:
         • the character ⍙ characterizes an attribute name, i.e.  a names
-          that was used *inside* (i.e.  between < and >) of an XML start
+          that was used inside (i.e.  between < and >) of an XML start
           or leaf tag.  The character ⍙ alone is the name of a special
           member which is present in every associative array below the
           top-level and whose value is the original XML tag name of a
@@ -4667,10 +4745,10 @@ is understood by the APL parser):
           therefore had no tag name), or
 
         • the character _ characterizes the name of an XML entity, i.e.
-          an CML name that occur *between* the start tag and the
+          an CML name that occur between the start tag and the
           corresponding end tag (if any: leaf tags have no such entities
 
-   • a position prefix of the form *NN*, where NN is the position of the
+   • a position prefix of the form NN, where NN is the position of the
      member in relation to the tag to which it belongs.  The numbering
      starts at ⎕IO and restarts at every XML start or leaf tag.
 
@@ -4690,12 +4768,11 @@ is understood by the APL parser):
    Let NN be a sequence of decimal digits.  Then only the following 4
 synthesized names are produced by ⎕XML:
 
-   • *∆NNcomment* for XML comments, i.e.  <!— ...  —> in XML,
-   • *∆NNdeclaration* for XML declarations, i.e.  <?  ...  ?> in XML,
-   • *∆NNdoctype* for document type declarations, i.e.i <!DOCTYPE ...  >
+   • ∆NNcomment for XML comments, i.e.  <!— ...  —> in XML,
+   • ∆NNdeclaration for XML declarations, i.e.  <?  ...  ?> in XML,
+   • ∆NNdoctype for document type declarations, i.e.i <!DOCTYPE ...  >
      in XML
-   • *∆NNtext* for unstructured (and hence untagged) text segemnts in
-     XML.
+   • ∆NNtext for unstructured (and hence untagged) text segemnts in XML.
 
    Every XML name (of a tag or attribute) is also a valid APL name, but
 valid APL names may also contain the characters ¯, ∆, and ⍙ which are
@@ -4703,7 +4780,7 @@ not valid in XML and used in the naming convention above to clearly
 separate the member names used in APL from the names used in the XML
 document.
 
-   The essence of all this is that *everything* that belongs to an XML
+   The essence of all this is that everything that belongs to an XML
 node or document, i.e.  the attributes inside a tag, the sub-nodes
 between a start tag and its corresponding end tag (if any),
 declarations, etc.  will be contained in a single associative array.
@@ -4721,10 +4798,10 @@ declarations, etc.  will be contained in a single associative array.
 2.38.4 Monadic ⎕XML
 -------------------
 
-*Z ← ⎕XML B* converts APL string B that contains a valid XML document to
+Z ← ⎕XML B converts APL string B that contains a valid XML document to
 an associative APL array Z and vice versa.
 
-   *Note*: If you convert an associative APL array back to a an XML
+   Note: If you convert an associative APL array back to a an XML
 document, then the result is a possibly very long strings with
 containing several linefeed characters.  That is OK if the string is
 written to a file, but causes problems when the string is being
@@ -4738,7 +4815,7 @@ suppressed in 2 ways:
 2.38.5 Dyadic ⎕XML
 ------------------
 
-*Z ← A ⎕XML B* provides a number of convenience functions.  Its left
+Z ← A ⎕XML B provides a number of convenience functions.  Its left
 argument A is an interger function number, possibly followed by
 arguments of the function number ↑A.
 
@@ -4760,23 +4837,23 @@ APL←⎕XML XML
 
    Then
 
-   • *Z←0 ⎕XML B* is the same as monadic Z←⎕XML B.
+   • Z←0 ⎕XML B is the same as monadic Z←⎕XML B.
 
-   • *Z←1 ⎕XML B* is like 0 ⎕XML B, except that B is not the XML
-     document (string) itself but the name of a file from which an XML
-     document is read.
+   • Z←1 ⎕XML B is like 0 ⎕XML B, except that B is not the XML document
+     (string) itself but the name of a file from which an XML document
+     is read.
 
-   • *Z←2 ⎕XML B* splits an APL member path (a sequence of member names)
+   • Z←2 ⎕XML B splits an APL member path (a sequence of member names)
      into a vector P of (nested) member names.  This vector P is
      understood by the ASPL primitive PICK (i.e.  Z←P⊃APL or
      (P⊃APL←value) and can be used to address the data in an XML node.
 
-   • *Z←3 ⎕XML B* splits an APL member name (as produced by e.g.
-     monadic ⎕XML into a 3-item vector Z. Z[1] is a single character
-     indicating the category (i.e.  a character scalar ∆, ⍙, or _).
-     Z[2] is the position (an integer scalar ≥ ⎕IO). Z[3] is a (nested)
-     APL string.  3 ⎕XML has an inverse function ¯3 ⎕XML which converts
-     a 3-item vector as produced by 3 ⎕XML back into an APL member name.
+   • Z←3 ⎕XML B splits an APL member name (as produced by e.g.  monadic
+     ⎕XML into a 3-item vector Z. Z[1] is a single character indicating
+     the category (i.e.  a character scalar ∆, ⍙, or _).  Z[2] is the
+     position (an integer scalar ≥ ⎕IO). Z[3] is a (nested) APL string.
+     3 ⎕XML has an inverse function ¯3 ⎕XML which converts a 3-item
+     vector as produced by 3 ⎕XML back into an APL member name.
 
      indicating the category (i.e.  _, ∆, or ⍙) and the name from the
      XML tag:
@@ -4799,7 +4876,7 @@ APL←⎕XML XML
      ∆2comment
      
 
-   • *Z←4 ⎕XML B* is a string that shows the member names of the
+   • Z←4 ⎕XML B is a string that shows the member names of the
      associative array B in a tree-like fashion.  For example:
 
            ⊃35⎕CR 4 ⎕XML APL
@@ -4811,7 +4888,7 @@ APL←⎕XML XML
                   │          
                   └─── Subtag
 
-   • *Z←5 ⎕XML B* is like 4 ⎕XML but displays not only the XML tags but
+   • Z←5 ⎕XML B is like 4 ⎕XML but displays not only the XML tags but
      also other XML nodes (declarations, attributes, etc.):
 
            ⊃35⎕CR 5 ⎕XML APL
@@ -4835,8 +4912,8 @@ APL←⎕XML XML
             │     └─── _5∆text         
             └─── _3∆text               
 
-   • *Z←6 ⎕XML B* is like 4 ⎕XML but displays not only the member name
-     but the entire path to the member:
+   • Z←6 ⎕XML B is like 4 ⎕XML but displays not only the member name but
+     the entire path to the member:
 
            ⊃35⎕CR 6 ⎕XML APL
      XML                                             
@@ -4847,7 +4924,7 @@ APL←⎕XML XML
                   │                                  
                   └─── ._3_Document._2_Tag1._4_Subtag
 
-   • *Z←7 ⎕XML B* returns a list of all members in a depth-first order.
+   • Z←7 ⎕XML B returns a list of all members in a depth-first order.
      This list can be used as an iterator to traverse the entire tree
      (and possibly filter out items along the way).
 
@@ -4873,8 +4950,8 @@ APL←⎕XML XML
      ._3_Document._2_Tag1._4_Subtag._2∆comment
      ._3_Document._2_Tag1._4_Subtag._3∆text   
 
-   • *Z←8 ⎕XML B* is like Z←7 ⎕XML B, except that only the aubset of
-     those members that are related to tags (the tag name ⍙ and tag
+   • Z←8 ⎕XML B is like Z←7 ⎕XML B, except that only the aubset of those
+     members that are related to tags (the tag name ⍙ and tag
      attributes) are returned:
 
            ⊃8 ⎕XML APL   ⍝ all tag related member names (tag names and attributes)
@@ -4884,7 +4961,7 @@ APL←⎕XML XML
      ._3Document._2Tag1._4Subtag.⍙1····
      ._3Document._2Tag1._4Subtag.⍙2name
 
-   • *Z←9 ⎕XML B* is like Z←7 ⎕XML B, except that only the aubset of
+   • Z←9 ⎕XML B is like Z←7 ⎕XML B, except that only the aubset of
      synthesized members other than ∆text are returned:
 
            ⊃9 ⎕XML APL   ⍝ all synthetic member names (except unstructured text)
@@ -4892,7 +4969,7 @@ APL←⎕XML XML
      ._3Document._2Tag1.∆2comment·········
      ._3Document._2Tag1._4Subtag.∆2comment
 
-   • *Z←10 ⎕XML B* is like Z←7 ⎕XML B, except that only the aubset of
+   • Z←10 ⎕XML B is like Z←7 ⎕XML B, except that only the aubset of
      synthesized ∆text members are returned:
 
      .∆2text···························
@@ -4905,15 +4982,15 @@ APL←⎕XML XML
      ._3Document.∆3text················
      .∆18text··························
 
-   • *Z←11 ⎕XML B* is like Z←7 ⎕XML B, except that only the tag names
-     are returned:
+   • Z←11 ⎕XML B is like Z←7 ⎕XML B, except that only the tag names are
+     returned:
 
            ⊃11 ⎕XML APL   ⍝ all tag member names
      ._3Document················
      ._3Document._2Tag1·········
      ._3Document._2Tag1._4Subtag
 
-   • *Z←12 ⎕XML B* is like Z←7 ⎕XML B, except that all member names of B
+   • Z←12 ⎕XML B is like Z←7 ⎕XML B, except that all member names of B
      are returned without descending into sub-tree:
 
            ⊃12 ⎕XML APL   ⍝ all member names (7 ⎕XML, but non-recursive)
@@ -4925,13 +5002,13 @@ APL←⎕XML XML
      This variant may also be useful for structured variables that were
      not created by ⎕XML.
 
-   • *Z←13 ⎕XML B* shows the (flat) tag names in B, but but does not
+   • Z←13 ⎕XML B shows the (flat) tag names in B, but but does not
      descend into any sub-tree if B.
 
           ⊃13 ⎕XML APL   ⍝ all tag members (8 ⎕XML, but non-recursive)
       ._3Document 
 
-   • *Z←(14 "member-name") ⎕XML B* shows the next member in B after
+   • Z←(14 "member-name") ⎕XML B shows the next member in B after
      "member-name".  It can be used as an iterator that walks through
      the tags.  an empty member name returns the first member:
 
@@ -4989,7 +5066,7 @@ to 8.98E307.
 9223372036854775807.
 
    If the result of a computation is integer by nature, for example +,
--, or × with integer arguments, *and* falls into the guaranteed range,
+-, or × with integer arguments, and falls into the guaranteed range,
 then the result will be an APL integer.  If the result is to large for a
 64-bit signed integer then the result will be automatically converted to
 an APL floating point value.  However, if the result is outside the
@@ -6472,64 +6549,64 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11577
-Node: Chapter 222873
-Node: Section 2.124768
-Node: Section 2.242166
-Node: Section 2.342925
-Node: Section 2.444212
-Node: Section 2.548577
-Node: Section 2.648750
-Node: Section 2.749380
-Node: Section 2.853333
-Node: Section 2.954868
-Node: Section 2.1056960
-Node: Section 2.1158514
-Node: Section 2.1260299
-Node: Section 2.1362239
-Node: Section 2.1463180
-Node: Section 2.1563432
-Node: Section 2.1664828
-Node: Section 2.1774973
-Node: Section 2.1877495
-Node: Section 2.1984202
-Node: Section 2.2085647
-Node: Section 2.2191308
-Node: Section 2.2296342
-Node: Section 2.2399623
-Node: Section 2.2499914
-Node: Section 2.25110739
-Node: Section 2.26111011
-Node: Section 2.27117589
-Node: Section 2.28120049
-Node: Section 2.29120718
-Node: Section 2.30122377
-Node: Section 2.31126166
-Node: Output File Format138192
-Node: Section 2.32139394
-Node: Section 2.33140344
-Node: Section 2.34155068
-Node: Section 2.35165137
-Node: Section 2.36169264
-Node: Section 2.37171361
-Node: Section 2.38175786
-Node: Chapter 3197204
-Node: Chapter 4199707
-Node: Chapter 5200833
-Node: Section 5.1202370
-Node: Section 5.2203650
-Node: Section 5.3204010
-Node: Section 5.4204252
-Node: Section 5.5204914
-Node: Section 5.6205392
-Node: Section 5.7206164
-Node: Section 5.8206621
-Node: Chapter 6207023
-Node: Section 6.1207442
-Node: Section 6.2208129
-Node: Chapter 7208960
-Node: Section 7.1209463
-Node: Section 7.2234777
+Node: Chapter 11573
+Node: Chapter 222861
+Node: Section 2.124756
+Node: Section 2.245345
+Node: Section 2.346104
+Node: Section 2.447391
+Node: Section 2.551836
+Node: Section 2.652009
+Node: Section 2.752639
+Node: Section 2.856592
+Node: Section 2.958127
+Node: Section 2.1060219
+Node: Section 2.1161773
+Node: Section 2.1263558
+Node: Section 2.1365498
+Node: Section 2.1466439
+Node: Section 2.1566691
+Node: Section 2.1668087
+Node: Section 2.1778200
+Node: Section 2.1880722
+Node: Section 2.1987429
+Node: Section 2.2088874
+Node: Section 2.2194535
+Node: Section 2.2299569
+Node: Section 2.23102850
+Node: Section 2.24103141
+Node: Section 2.25113966
+Node: Section 2.26114238
+Node: Section 2.27120816
+Node: Section 2.28123276
+Node: Section 2.29123945
+Node: Section 2.30125596
+Node: Section 2.31129385
+Node: Output File Format141385
+Node: Section 2.32142560
+Node: Section 2.33143510
+Node: Section 2.34158226
+Node: Section 2.35168293
+Node: Section 2.36172412
+Node: Section 2.37174507
+Node: Section 2.38178932
+Node: Chapter 3200282
+Node: Chapter 4202783
+Node: Chapter 5203909
+Node: Section 5.1205446
+Node: Section 5.2206726
+Node: Section 5.3207086
+Node: Section 5.4207328
+Node: Section 5.5207990
+Node: Section 5.6208468
+Node: Section 5.7209240
+Node: Section 5.8209697
+Node: Chapter 6210099
+Node: Section 6.1210518
+Node: Section 6.2211205
+Node: Chapter 7212036
+Node: Section 7.1212539
+Node: Section 7.2237853
 
 End Tag Table
 

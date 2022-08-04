@@ -101,13 +101,17 @@ struct UserPreferences
    static void show_version(ostream & out);
 
    /// parse the original command line parameters to figure start-up Logging
-   /// (BEFORe any expansions)
+   /// (BEFORe any expansions). Parses (only) the -l option. Return true
+   /// iff startup-logging is requested.
    bool parse_argv_0(int argc, const char * argv[]);
 
-   /// parse command line parameters (BEFORE reading preference files)
+   /// parse command line parameters (BEFORE reading preference files).
+   /// Parses the -l, -p, -C, and -u options. Return true iff startup-logging
+   /// is requested.
    bool parse_argv_1();
 
    /// parse command line parameters (AFTER reading preference files)
+   /// Parses all valid options.
    void parse_argv_2(bool logit);
 
    /// argv/argc at startup before expand_argv()

@@ -66,8 +66,8 @@ UserPreferences::usage(const char * prog)
 
 #ifdef DYNAMIC_LOG_WANTED
    CERR <<
-"    -l num               turn logging facility num ON;\n"
-"                         num is 1-" << (LID_MAX - 1) << "\n";
+"    -l num               turn logging facility num ON (1 ≤ num ≤ "
+                             << (LID_MAX - 1) << ")\n";
 #else
    CERR <<
 "    -l 37                turn logging facility 37 (startup) ON\n";
@@ -126,7 +126,11 @@ UserPreferences::usage(const char * prog)
 #endif // WINDOWS
 "    -v, --version        show version information and exit\n"
 "    -w milli             wait milli milliseconds at startup\n"
-"    --                   end of options for " << prog << "\n"
+"    --                   end of options for the " << prog << " binary\n"
+"    +APPOPT              ignored (APL application option)\n"
+"    ++APPOPT ARG1        ignored (APL application option with 1 argument)\n"
+"    +++APPOPT ARG1 ARG2  ignored (APL application option with 2 arguments)\n"
+"       ...\n"
 "\n"
 "Please report problems to: bug-apl@gnu.org\n" << endl;
 }
@@ -287,11 +291,15 @@ bool log_startup = false;
 void
 UserPreferences::parse_argv_2(bool logit)
 {
-   // execve() puts the script name (and optional args at the end of argv.
+   // execve() puts the script name (and optional script arguments at the
+   // end of argv.
    // For example, argv might look like this:
    //
-   // /usr/bin/apl -apl-options... -- -script-options ./scriptname
+   // /usr/bin/apl -apl-options... -- -application-options
    //
+   // In general the options are the shebang of the script followed by the
+   // command line options (each starting with the interpreter or script name,
+   // followed by their optional arguments).
 
    // if GNU APL is started as aplscript, then --script is implied
    //
@@ -316,9 +324,20 @@ UserPreferences::parse_argv_2(bool logit)
          // at this point, argv[a] is the string after opt, i.e. either the
          // next option or an argument of the current option
          //
-         if (!strcmp(opt, "--"))
+         if (!strcmp(opt, "--"))   // end of options marker
             {
-              break;
+              break;   // for (size_t a = 1; ...
+            }
+
+         if (*opt == '+')   // APL application option
+            {
+              ++opt;   // skip first +
+              while (*opt == '+')
+                    {
+                      ++opt;   // skip +
+                      ++a;     // skip arg
+                    }
+              continue;
             }
 
          if (!strcmp(opt, "-C"))
@@ -880,13 +899,14 @@ UserPreferences::expand_argv(int argc, const char ** argv)
 
    if (!is_APL_script(argv[2]))   return;   // not run from a script
 
-   // at this point, argv[1] is the optional argument of the interpreter
-   // from the first line of the script, argv[2] is the name of the script,
-   // and argv[3] ... are the arguments given by the user when starting the
-   // script.
-   //
-   // expand argv[1], stopping at --
-   //
+   /* at this point:
+
+      argv[1] is the optional argument of the interpreter on the shebang line,
+      argv[2] is the name of the script, and
+      argv[3] ... are the command line arguments given by the user
+                  when starting the script.
+      expand argv[1], stopping at --
+    */
 const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
    script_argc = 2;
    if (!strchr(apl_args, ' '))   // single option
@@ -894,6 +914,7 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
         return;
       }
 
+   // remove expanded_argv[1] and insert the expanded expanded_argv[1] instead
    expanded_argv.erase(expanded_argv.begin() + 1);
    --script_argc;
    for (int index = 1;;)
