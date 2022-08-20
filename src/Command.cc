@@ -2186,7 +2186,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
    loop(c, command_name.size())
       {
         bool error = false;
-        if (c == 0)   error = error || command_name[c] != ']';
+        if (c == 0)   command_name[c] != ']' && command_name[c] != ')';
         else          error = error || !Avec::is_symbol_char(command_name[c]);
         if (error)
            {

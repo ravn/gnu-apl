@@ -56,6 +56,7 @@ ul.no-bullet {list-style: none}
 
 
 
+
 <a name="SEC_Contents"></a>
 <h2 class="contents-heading">Table of Contents</h2>
 
@@ -366,7 +367,7 @@ name and optional command line parameters, for example:
 </p>
 <p>or:
 </p>
-<p>$ apl &mdash;id 1001
+<p>$ apl <b><tt>-id</tt></b> 1001
 </p>
 <p>GNU APL is script-able; a text file whose first line looks like this (assuming
 the APL interpreter binary is called &rsquo;apl&rsquo; and is located in the current
@@ -397,7 +398,7 @@ U+2200 - U+23FF range).
 <p>GNU APL understands the following command line options:
 </p>
 <ul>
-<li> <samp>-C new_root</samp>
+<li> <b><tt>-C new_root</tt></b>
 
 <p>perform chroot(&quot;new_root&quot;) followed by chdir(&quot;/&quot;). This restricts the access
 of the the process running GNU APL to files in or below directory new_root, and
@@ -432,30 +433,30 @@ new_root. however, /usr/local/bin is no longer accessible and one would need to 
 
 </li></ul>
 
-</li><li> <samp>--cfg</samp>
+</li><li> <b><tt>--cfg</tt></b>
 
 <p>show ./configure options that were used to configure GNU APL, and exit.
 </p>
-</li><li> <samp>--[no]Color</samp>
+</li><li> <b><tt>--[no]Color</tt></b>
 
 <p>start with ]COLOR ON [OFF].
 </p>
-</li><li> <samp>-d</samp>
+</li><li> <b><tt>-d</tt></b>
 
 <p>run the APL interpreter (or APL script) in the background (i.e. as a daemon).
 For this to work you need to provide some input to the background process, e.g.
 via the -f option.
 </p>
-</li><li> <samp>--emacs</samp>
+</li><li> <b><tt>--emacs</tt></b>
 
 <p>run in (old) Emacs mode.
 </p>
-</li><li> <samp>--emacs_arg arg</samp>
+</li><li> <b><tt>--emacs_arg arg</tt></b>
 
 <p>run in (new) Emacs mode with argument arg.
 </p>
 
-</li><li> <samp>--eval line</samp>
+</li><li> <b><tt>--eval line</tt></b>
 
 <p>evaluate one APL line and exit. This option can be given several times; in
 that case several lines are being executed before GNU apl exits. Keep in
@@ -463,53 +464,53 @@ mind that command line options are normally processed by your shell before
 being passed to apl. Therefore sometimes quoting the argument of &ndash;eval may
 be needed and common wisdom has it to always quote the argument of &ndash;eval.
 </p>
-</li><li> <samp>-f file</samp>
+</li><li> <b><tt>-f file</tt></b>
 
 <p>read input from <i>file</i> rather than from the keyboard. When the end of
 the file is reached, input is switched back to the keyboard. 
 If you want to terminate the APL interpreter after executing the file,
 then use )OFF as last line in the file.
 </p>
-</li><li> <samp>--gpl</samp>
+</li><li> <b><tt>--gpl</tt></b>
 
 <p>show GNU APL license (GPL) and exit.
 </p>
-</li><li> <samp>-L wsname</samp>
+</li><li> <b><tt>-L wsname</tt></b>
 
 <p>)LOAD wsname on start-up.
 </p>
-</li><li> <samp>--LX expr</samp>
+</li><li> <b><tt>--LX expr</tt></b>
 
 <p>execute <b>expr</b> first. The workspaces behaves as if ⎕LX (latent
 expression) were set to <b>expr</b> in the workspace.  This can be used,
 for example, to start the same workspace with different start-up values.
 </p>
-</li><li> <samp>-h</samp>, <samp>--help</samp>
+</li><li> <b><tt>-h</tt></b>, <b><tt>--help</tt></b>
 
 <p>print all command line options with a brief hint what they do.
 </p>
-</li><li> <samp>--id proc</samp>
+</li><li> <b><tt>--id proc</tt></b>
 
 <p>use processor ID proc for this interpreter. If no ID is provided, then the
 first unused ID &gt; 1000 is taken by this interpreter and the ID becomes used
 as long as the interpreter runs. Processor IDs are used by shared variables
 to identify share partners.
 </p>
-</li><li> <samp>-l num</samp>
+</li><li> <b><tt>-l num</tt></b>
 
 <p>turn logging facility <b>num</b> ON (provided that dynamic logging was
 ./configure&rsquo;d). The logging facility 37 (start-up messages) is of particular
 importance for troubleshooting and it works even if dynamic logging
 was not ./configure&rsquo;d.
 </p>
-</li><li> <samp>--mem [memory-limit]</samp>
+</li><li> <b><tt>--mem [memory-limit]</tt></b>
 
 <p>tell the interpreter to not use more than memory-limit bytes of RAM. By
 using this option, the user is fully responsible for ensuring that the
 specified amount of memory will always be available. The following rules
 should be observed.
 </p>
-<p>The interpreter will exit at start-up if <samp>--mem</samp> is used and:
+<p>The interpreter will exit at start-up if <b><tt>--mem</tt></b> is used and:
 </p>
 <ul>
 <li> the platform on which the interpreter runs has no /proc/meminfo, or
@@ -531,9 +532,9 @@ is the given amount in kB, MB, or GB.
 <p>For example:
 </p>
 <ul>
-<li> <samp>--mem</samp>      (50% of MemFree: in /proc/meminfo are guaranteed)
-</li><li> <samp>--mem 80%</samp>  (80% of MemFree: in /proc/meminfo are guaranteed)
-</li><li> <samp>--mem 5G</samp>   (5 GB are guaranteed)
+<li> <b><tt>--mem</tt></b>      (50% of MemFree: in /proc/meminfo are guaranteed)
+</li><li> <b><tt>--mem 80%</tt></b>  (80% of MemFree: in /proc/meminfo are guaranteed)
+</li><li> <b><tt>--mem 5G</tt></b>   (5 GB are guaranteed)
 </li></ul>
 
 <p>WARNING: The memory-limit is checked against parameter &rsquo;MemFree&rsquo; in
@@ -545,15 +546,15 @@ responsibility to prevent it), then ⎕WA becomes unreliable and the
 interpreter may crash badly (i.e. without a WS FULL error, and without
 any chance to )SAVE the workspace) when the available memory is exhausted.
 </p>
-</li><li> <samp>--echoCIN</samp>
+</li><li> <b><tt>--echoCIN</tt></b>
 copy the input line (after editing) to stdout. For creating session logs.
 
-</li><li> <samp>--noCIN</samp>
+</li><li> <b><tt>--noCIN</tt></b>
 
 <p>do not echo stdin to stdout. Almost a must for scripting (unless you
 troubleshoot a script).
 </p>
-</li><li> <samp>--to_COUT</samp>
+</li><li> <b><tt>--to_COUT</tt></b>
 
 <p>normally GNU APL writes its output to stderr (i.e. file descriptor 2) so that,
 when GNU APL is started in a script, the output of the script appears on stdout
@@ -562,7 +563,7 @@ when GNU APL is started in a script, the output of the script appears on stdout
 <p>This option redirects the stderr output of GNU APL to stdout. The same effect
 can be achieved with the option &quot;OUTPUT-TO-COUT   Yes&quot; in a preferences file.
 </p>
-</li><li> <samp>--tcp_port PORT</samp>
+</li><li> <b><tt>--tcp_port PORT</tt></b>
 
 <p>this option starts GNU APL as server that listens on TCP port PORT.
 Every TCP connection accepted by the server forks a new GNU APL instance
@@ -570,78 +571,80 @@ which has its stdin, stdout, and stderr redirected to the TCP connection.
 </p>
 <p>WARNING: This option is dangerous if PORT is directly exposed to the internet!
 </p>
-</li><li> <samp>--noCONT</samp>
+</li><li> <b><tt>--noCONT</tt></b>
 
 <p>do not load a SETUP or CONTINUE workspace on start-up.
 </p>
-</li><li> <samp>--OFF</samp>
+</li><li> <b><tt>--OFF</tt></b>
 
 <p>This option causes GNU APL to perform an automatic )OFF command after the
 last line of the last input file (as per -f option) was executed.
 </p>
-</li><li> <samp>--PW COLS</samp>
+</li><li> <b><tt>--PW COLS</tt></b>
 
 <p>set the initial value of ⎕PW to COLS (min. 30, max. 10000)
 </p>
-</li><li> <samp>--[no]SV</samp>
+</li><li> <b><tt>--[no]SV</tt></b>
 
 <p>do [not] start APserver (a shared variable server) on start-up. This disables
 communication with other workspaces or auxiliary processors through
 shared variables.
 </p>
-</li><li> <samp>-p N</samp>
+</li><li> <b><tt>-p N</tt></b>
 
-<p>use profile number N in preferences files.
+<p>use profile number N in preferences files. A preference file may contain
+several sets of settings for different purposes; the profile number selectes
+one of these sets.
 </p>
-</li><li> <samp>--par pproc</samp>
+</li><li> <b><tt>--par pproc</tt></b>
 
 <p>use processor parent ID pproc (default: no parent ID).
 </p>
-</li><li> <samp>--rawCIN</samp>
+</li><li> <b><tt>--rawCIN</tt></b>
 
 <p>do not emit ESC sequences. Normally ESC sequences are emitted for colored
 output and during line editing. In scripts, however, ESC sequences usually
 not wanted and can be turned off with this option.
 </p>
-</li><li> <samp>-s</samp>, <samp>--script</samp>
+</li><li> <b><tt>-s</tt></b>, <b><tt>--script</tt></b>
 
 <p>this option is an abbreviation for:
- <samp>--silent</samp> <samp>--noCIN</samp> <samp>--noCONT</samp> <samp>-f -</samp>
+ <b><tt>--silent</tt></b> <b><tt>--noCIN</tt></b> <b><tt>--noCONT</tt></b> <b><tt>-f -</tt></b>
 which is a typical combination of options for APL scripts.
 </p>
-</li><li> <samp>-q</samp>, <samp>--silent</samp>
+</li><li> <b><tt>-q</tt></b>, <b><tt>--silent</tt></b>
 
 <p>suppress printing of the GNU APL welcome message. Useful for scripts.
 </p>
-</li><li> <samp>--safe</samp>
+</li><li> <b><tt>--safe</tt></b>
 
 <p>disable shared variables and native functions
 </p>
 
-</li><li> <samp>--show_bin_dir</samp>
+</li><li> <b><tt>--show_bin_dir</tt></b>
 
 <p>display the binary directory (where, according to ./configure,  the programs
 apl, APserver, AP100, and AP210 are supposed to be installed. Then exit.
 </p>
-</li><li> <samp>--show_doc_dir</samp>
+</li><li> <b><tt>--show_doc_dir</tt></b>
 
 <p>display the directory where, according to ./configure,  documentation files
 for GNU APL are installed. Then exit.
 </p>
 
-</li><li> <samp>--show_etc_dir</samp>
+</li><li> <b><tt>--show_etc_dir</tt></b>
 
 <p>display the system configuration directory where, according to ./configure,
 the preferences file for GNU APL is installed. Then exit.
 </p>
 
-</li><li> <samp>--show_lib_dir</samp>
+</li><li> <b><tt>--show_lib_dir</tt></b>
 
 <p>display the library directory where, according to ./configure, shared
 library files and the workspaces shipped with GNU APL are installed. Then exit.
 </p>
 
-</li><li> <samp>--show_src_dir</samp>
+</li><li> <b><tt>--show_src_dir</tt></b>
 
 <p>display the source directory where, according to ./configure, GNU APL
 was compiled. Then exit. This can be used, for example, by native functions
@@ -649,12 +652,12 @@ that are built outside the GNU APL source tree to find GNU APL header files
 that are needed to compile the native function.
 </p>
 
-</li><li> <samp>--show_all_dirs</samp>
+</li><li> <b><tt>--show_all_dirs</tt></b>
 
 <p>display all the directories above. Then exit.
 </p>
 
-</li><li> <samp>-T testcases ...</samp>
+</li><li> <b><tt>-T testcases ...</tt></b>
 run testcases. Testcases are text files that contain both input to the APL
 interpreter and the expected response from the interpreter. The output from
 the interpreter is compared with the expected output in the testcase file(s)
@@ -662,61 +665,75 @@ and differences are marked. In addition a summary file is created that tells
 whether or not each of the testcases was successful.
 
 </li><li> 
-<samp>--TM mode</samp>
+<b><tt>--TM mode</tt></b>
 
 <p>test mode. This option how the interpreter shall behave
-when running a number of testcases (as specified with the <samp>-T</samp> option)
+when running a number of testcases (as specified with the <b><tt>-T</tt></b> option)
 </p>
-<p><samp>--TM 0</samp> (default) run all testcases and exit after the last testcase.
+<p><b><tt>--TM 0</tt></b> (default) run all testcases and exit after the last testcase.
 </p>
-<p><samp>--TM 1</samp> like <samp>--TM 0</samp> if no error was detected.
+<p><b><tt>--TM 1</tt></b> like <b><tt>--TM 0</tt></b> if no error was detected.
 However, if one of the testcases has failed, then the interpreter
 does not exit so that the user can investigate the state of APL
 (SI, variable values, etc.).
 </p>
-<p><samp>--TM 2</samp> like <samp>--TM 1</samp>, but stay in the interpreter even if
+<p><b><tt>--TM 2</tt></b> like <b><tt>--TM 1</tt></b>, but stay in the interpreter even if
 all testcases have passed. This can be useful in order to quickly bring
 the interpreter into a specific state and continue manual troubleshooting
 from that state.
 </p>
-<p><samp>--TM 3</samp> like <samp>--TM 1</samp>, but stop testcase execution after the
+<p><b><tt>--TM 3</tt></b> like <b><tt>--TM 1</tt></b>, but stop testcase execution after the
 first failed testcase (i.e. do not exit).
 </p>
-<p><samp>--TM 4</samp> like <samp>--TM 3</samp>, but exit after the first failed
+<p><b><tt>--TM 4</tt></b> like <b><tt>--TM 3</tt></b>, but exit after the first failed
 testcase. The is useful for automatic regression tests, where no errors
 are expected.
 </p>
-</li><li> <samp>--TR</samp>
+</li><li> <b><tt>--TR</tt></b>
 
 <p>executes test case files in random order.
 </p>
-</li><li> <samp>--TS</samp>
+</li><li> <b><tt>--TS</tt></b>
 
-<p>Normally, when the interpreter is run with the <samp>-T</samp> option,
+<p>Normally, when the interpreter is run with the <b><tt>-T</tt></b> option,
 then an existing summary.log file is overridden without notice.
 This option causes new test results to be appended to a possibly
 existing summary.log instead of overriding it.
 </p>
-</li><li> <samp>-v</samp>, <samp>--version</samp>,
+</li><li> <b><tt>-v</tt></b>, <b><tt>--version</tt></b>,
 
 <p>show version information and exit.
 </p>
-</li><li> <samp>-u UID</samp>
+</li><li> <b><tt>-u UID</tt></b>
 
 <p>run as user with UID 0. This option can only be used by the root user (who
 then wants to run as a different user).
 </p>
-</li><li> <samp>-w milli</samp>
+</li><li> <b><tt>-w milli</tt></b>
 
 <p>wait milli milliseconds at start-up. Useful to give other programs that are
 started together with this interpreter time to initialize themselves.
 </p>
-</li><li> <samp>--</samp>
+</li><li> <b><tt>  +APPOPT</tt></b>
+</li><li> <b><tt> ++APPOPT ARG1</tt></b>
+</li><li> <b><tt>+++APPOPT ARG1 ARG2</tt></b>
+</li><li> ...
+
+<p>Those command line options above that start with - are understood by the
+   GNU APL binary and their arguments must follow the description given for
+   them. In addition the interpreter also accepts command line options that
+   start with +. However, these options are not checked by the interpreter
+   in any way, but are but merely copied to ⎕ARG (see below). In these options,
+   APPOPT, ARG1, ARG2, ... are arbitrary strings that should not contain any
+   whitespace characters. The purpose of these options is to control aspects
+   of the APL application from the command line.
+</p>
+</li><li> <b><tt>--</tt></b>
 
 <p>end of command line options for the interpreter. GNU APL provides the system
 variable ⎕ARG that returns all command line options with which the GNU APL
 interpreter was invoked (similar to variable argv in main(int argv,
-char * argv[]) in C/C++). Option &mdash;- can be used to separate command line
+char * argv[]) in C/C++). Option <b><tt>--</tt></b> can be used to separate command line
 options for the APL interpreter from command line options understood by APL
 applications.
 </p>
@@ -726,8 +743,8 @@ applications.
 </p>
 <p><code>(⎕ARG ⍳ ⊂'--') ↓ ⎕ARG</code> returns the options for the APL application.
 </p>
-<p>All command line options after <code>--</code> are ignored by the interpreter
-(except making them available in ⎕ARG).
+<p>All command line options after <b><tt>--</tt></b> are ignored by the interpreter
+(except for including them in ⎕ARG).
 </p>
 </li></ul>
 
@@ -1033,7 +1050,7 @@ work, the first line of the script must have a special format
 </p>
 <pre class="verbatim">    #! /usr/local/bin/apl --script
 </pre>
-<p><samp>--script</samp> prevents: printing of a welcome banner, 
+<p><b><tt>--script</tt></b> prevents: printing of a welcome banner, 
 echoing of stdin to stdout, automatic loading of a )CONTINUE workspaces,
  and prevents starting of a thread for shared variable communication.
 </p>
@@ -1174,7 +1191,7 @@ starts). At least under GNU/Linux with <b>bash</b> the subsequent options will
 be passed to the APL application via ⎕ARG.
 </p>
 <p>Depending on this exact behaviour cannot be recommended. A cleaner approach is
-to use options starting with - or <b><tt>--</tt></b>  only for the interpreter
+to use options starting with - or <b><tt>--</tt></b> only for the interpreter
 options, and options starting with + for application options. This should
 work on all platforms because for strings, say, APLOPT, ARG1, ARG2, ...,
 which contain no whitespace:
@@ -1461,7 +1478,7 @@ for the script.
 </pre>
 <p>then the first line <samp>#! /usr/local/bin/apl --script</samp> of file SCRIPT.apl 
 is merely a comment (GNU APL accepts both the traditional APL character
-⍝ and the character # as start of a comment). The <samp>--script</samp> option
+⍝ and the character # as start of a comment). The <b><tt>--script</tt></b> option
 is therefore ignored and the following mix of input and output is
 shown on the screen. The input from the script is indented by the
 usual APL prompt of 6 blanks, while the output of the APL interpreter
@@ -1484,7 +1501,7 @@ is not indented.
  /usr/local/bin/apl --script ../workspaces/SCRIPT.apl 
 
 </pre>
-<p>The <samp>--script</samp> implies <samp>--noCIN</samp> so that the
+<p>The <b><tt>--script</tt></b> implies <b><tt>--noCIN</tt></b> so that the
 input lines for the interpreter are no longer echoed to the output.
 That is most likely what you want when writing a script.
 </p>
@@ -1576,8 +1593,8 @@ Next: <a href="#Section-2_002e4" accesskey="n" rel="next">Section 2.4</a>, Previ
 
 <p>The APL interpreter gets its input from the standard input (stdin),
 which is normally connected to the user&rsquo;s keyboard,
-but can also be a file if APL scripting, the <samp>-f</samp> option,
- or the <samp>-T</samp> option is used.
+but can also be a file if APL scripting, the <b><tt>-f</tt></b> option,
+ or the <b><tt>-T</tt></b> option is used.
 </p>
 <p>The APL interpreter prints its results on either the standard output (stdout)
 for normal APL output, or to the error output (stderr) for additional

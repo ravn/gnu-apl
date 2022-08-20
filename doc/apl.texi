@@ -3,6 +3,11 @@
 @documentencoding UTF-8
 @settitle GNU APL
 
+@c BOP: Bold OPtion
+@macro BOP{opt}
+@b{@verb{|-\opt\|}}
+@end macro
+
 @c ============================================================================
 @c ====== Part 2: Summary Description and Copyright ===========================
 @c ============================================================================
@@ -133,7 +138,7 @@ $ apl
 
 or:
 
-$ apl ---id 1001
+$ apl @BOP{id} 1001
 
 GNU APL is script-able; a text file whose first line looks like this (assuming
 the APL interpreter binary is called 'apl' and is located in the current
@@ -165,7 +170,7 @@ GNU APL understands the following command line options:
 @itemize @bullet
 
 @item
-@option{-C new_root}
+@BOP{C new_root}
 
 perform chroot("new_root") followed by chdir("/"). This restricts the access
 of the the process running GNU APL to files in or below directory new_root, and
@@ -206,35 +211,35 @@ Depending on your platform, the process using -C may need root privileges.
 @end itemize
 
 @item
-@option{--cfg}
+@BOP{-cfg}
 
 show ./configure options that were used to configure GNU APL, and exit.
 
 @item
-@option{--[no]Color}
+@BOP{-[no]Color}
 
 start with ]COLOR ON [OFF].
 
 @item
-@option{-d}
+@BOP{d}
 
 run the APL interpreter (or APL script) in the background (i.e. as a daemon).
 For this to work you need to provide some input to the background process, e.g.
 via the -f option.
 
 @item
-@option{--emacs}
+@BOP{-emacs}
 
 run in (old) Emacs mode.
 
 @item
-@option{--emacs_arg arg}
+@BOP{-emacs_arg arg}
 
 run in (new) Emacs mode with argument arg.
 
 
 @item
-@option{--eval line}
+@BOP{-eval line}
 
 evaluate one APL line and exit. This option can be given several times; in
 that case several lines are being executed before GNU apl exits. Keep in
@@ -243,7 +248,7 @@ being passed to apl. Therefore sometimes quoting the argument of --eval may
 be needed and common wisdom has it to always quote the argument of --eval.
 
 @item
-@option{-f file}
+@BOP{f file}
 
 read input from @i{file} rather than from the keyboard. When the end of
 the file is reached, input is switched back to the keyboard. 
@@ -251,29 +256,29 @@ If you want to terminate the APL interpreter after executing the file,
 then use )OFF as last line in the file.
 
 @item
-@option{--gpl}
+@BOP{-gpl}
 
 show GNU APL license (GPL) and exit.
 
 @item
-@option{-L wsname}
+@BOP{L wsname}
 
 )LOAD wsname on start-up.
 
 @item
-@option{--LX expr}
+@BOP{-LX expr}
 
 execute @b{expr} first. The workspaces behaves as if ⎕LX (latent
 expression) were set to @b{expr} in the workspace.  This can be used,
 for example, to start the same workspace with different start-up values.
 
 @item
-@option{-h}, @option{--help}
+@BOP{h}, @BOP{-help}
 
 print all command line options with a brief hint what they do.
 
 @item
-@option{--id proc}
+@BOP{-id proc}
 
 use processor ID proc for this interpreter. If no ID is provided, then the
 first unused ID > 1000 is taken by this interpreter and the ID becomes used
@@ -281,7 +286,7 @@ as long as the interpreter runs. Processor IDs are used by shared variables
 to identify share partners.
 
 @item
-@option{-l num}
+@BOP{l num}
 
 turn logging facility @b{num} ON (provided that dynamic logging was
 ./configure'd). The logging facility 37 (start-up messages) is of particular
@@ -289,14 +294,14 @@ importance for troubleshooting and it works even if dynamic logging
 was not ./configure'd.
 
 @item
-@option{--mem [memory-limit]}
+@BOP{-mem [memory-limit]}
 
 tell the interpreter to not use more than memory-limit bytes of RAM. By
 using this option, the user is fully responsible for ensuring that the
 specified amount of memory will always be available. The following rules
 should be observed.
 
-The interpreter will exit at start-up if @option{--mem} is used and:
+The interpreter will exit at start-up if @BOP{-mem} is used and:
 
 @itemize
 @item the platform on which the interpreter runs has no /proc/meminfo, or
@@ -318,9 +323,9 @@ is the given amount in kB, MB, or GB.
 For example:
 
 @itemize
-@item @option{--mem}      (50% of MemFree: in /proc/meminfo are guaranteed)
-@item @option{--mem 80%}  (80% of MemFree: in /proc/meminfo are guaranteed)
-@item @option{--mem 5G}   (5 GB are guaranteed)
+@item @BOP{-mem}      (50% of MemFree: in /proc/meminfo are guaranteed)
+@item @BOP{-mem 80%}  (80% of MemFree: in /proc/meminfo are guaranteed)
+@item @BOP{-mem 5G}   (5 GB are guaranteed)
 @end itemize
 
 WARNING: The memory-limit is checked against parameter 'MemFree' in
@@ -333,17 +338,17 @@ interpreter may crash badly (i.e. without a WS FULL error, and without
 any chance to )SAVE the workspace) when the available memory is exhausted.
 
 @item
-@option{--echoCIN}
+@BOP{-echoCIN}
 copy the input line (after editing) to stdout. For creating session logs.
 
 @item
-@option{--noCIN}
+@BOP{-noCIN}
 
 do not echo stdin to stdout. Almost a must for scripting (unless you
 troubleshoot a script).
 
 @item
-@option{--to_COUT}
+@BOP{-to_COUT}
 
 normally GNU APL writes its output to stderr (i.e. file descriptor 2) so that,
 when GNU APL is started in a script, the output of the script appears on stdout
@@ -353,7 +358,7 @@ This option redirects the stderr output of GNU APL to stdout. The same effect
 can be achieved with the option "OUTPUT-TO-COUT   Yes" in a preferences file.
 
 @item
-@option{--tcp_port PORT}
+@BOP{-tcp_port PORT}
 
 this option starts GNU APL as server that listens on TCP port PORT.
 Every TCP connection accepted by the server forks a new GNU APL instance
@@ -362,92 +367,94 @@ which has its stdin, stdout, and stderr redirected to the TCP connection.
 WARNING: This option is dangerous if PORT is directly exposed to the internet!
 
 @item
-@option{--noCONT}
+@BOP{-noCONT}
 
 do not load a SETUP or CONTINUE workspace on start-up.
 
 @item
-@option{--OFF}
+@BOP{-OFF}
 
 This option causes GNU APL to perform an automatic )OFF command after the
 last line of the last input file (as per -f option) was executed.
 
 @item
-@option{--PW COLS}
+@BOP{-PW COLS}
 
 set the initial value of ⎕PW to COLS (min. 30, max. 10000)
 
 @item
-@option{--[no]SV}
+@BOP{-[no]SV}
 
 do [not] start APserver (a shared variable server) on start-up. This disables
 communication with other workspaces or auxiliary processors through
 shared variables.
 
 @item
-@option{-p N}
+@BOP{p N}
 
-use profile number N in preferences files.
+use profile number N in preferences files. A preference file may contain
+several sets of settings for different purposes; the profile number selectes
+one of these sets.
 
 @item
-@option{--par pproc}
+@BOP{-par pproc}
 
 use processor parent ID pproc (default: no parent ID).
 
 @item
-@option{--rawCIN}
+@BOP{-rawCIN}
 
 do not emit ESC sequences. Normally ESC sequences are emitted for colored
 output and during line editing. In scripts, however, ESC sequences usually
 not wanted and can be turned off with this option.
 
 @item
-@option{-s}, @option{--script}
+@BOP{s}, @BOP{-script}
 
 this option is an abbreviation for:
- @option{--silent} @option{--noCIN} @option{--noCONT} @option{-f -}
+ @BOP{-silent} @BOP{-noCIN} @BOP{-noCONT} @BOP{f -}
 which is a typical combination of options for APL scripts.
 
 @item
-@option{-q}, @option{--silent}
+@BOP{q}, @BOP{-silent}
 
 suppress printing of the GNU APL welcome message. Useful for scripts.
 
 @item
-@option{--safe}
+@BOP{-safe}
 
 disable shared variables and native functions
 
 
 @item
-@option{--show_bin_dir}
+@BOP{-show_bin_dir}
 
 display the binary directory (where, according to ./configure,  the programs
 apl, APserver, AP100, and AP210 are supposed to be installed. Then exit.
 
 @item
-@option{--show_doc_dir}
+@BOP{-show_doc_dir}
 
 display the directory where, according to ./configure,  documentation files
 for GNU APL are installed. Then exit.
 
 
 @item
-@option{--show_etc_dir}
+@BOP{-show_etc_dir}
 
 display the system configuration directory where, according to ./configure,
 the preferences file for GNU APL is installed. Then exit.
 
 
 @item
-@option{--show_lib_dir}
+@BOP{-show_lib_dir}
 
 display the library directory where, according to ./configure, shared
 library files and the workspaces shipped with GNU APL are installed. Then exit.
 
 
 @item
-@option{--show_src_dir}
+@BOP{-show_src_dir}
 
 display the source directory where, according to ./configure, GNU APL
 was compiled. Then exit. This can be used, for example, by native functions
@@ -456,13 +463,13 @@ that are needed to compile the native function.
 
 
 @item
-@option{--show_all_dirs}
+@BOP{-show_all_dirs}
 
 display all the directories above. Then exit.
 
 
 @item
-@option{-T testcases ...}
+@BOP{T testcases ...}
 run testcases. Testcases are text files that contain both input to the APL
 interpreter and the expected response from the interpreter. The output from
 the interpreter is compared with the expected output in the testcase file(s)
@@ -471,67 +478,81 @@ whether or not each of the testcases was successful.
 
 @item
 
-@option{--TM mode}
+@BOP{-TM mode}
 
 test mode. This option how the interpreter shall behave
-when running a number of testcases (as specified with the @option{-T} option)
+when running a number of testcases (as specified with the @BOP{T} option)
 
-@option{--TM 0} (default) run all testcases and exit after the last testcase.
+@BOP{-TM 0} (default) run all testcases and exit after the last testcase.
 
-@option{--TM 1} like @option{--TM 0} if no error was detected.
+@BOP{-TM 1} like @BOP{-TM 0} if no error was detected.
 However, if one of the testcases has failed, then the interpreter
 does not exit so that the user can investigate the state of APL
 (SI, variable values, etc.).
 
-@option{--TM 2} like @option{--TM 1}, but stay in the interpreter even if
+@BOP{-TM 2} like @BOP{-TM 1}, but stay in the interpreter even if
 all testcases have passed. This can be useful in order to quickly bring
 the interpreter into a specific state and continue manual troubleshooting
 from that state.
 
-@option{--TM 3} like @option{--TM 1}, but stop testcase execution after the
+@BOP{-TM 3} like @BOP{-TM 1}, but stop testcase execution after the
 first failed testcase (i.e. do not exit).
 
-@option{--TM 4} like @option{--TM 3}, but exit after the first failed
+@BOP{-TM 4} like @BOP{-TM 3}, but exit after the first failed
 testcase. The is useful for automatic regression tests, where no errors
 are expected.
 
 @item
-@option{--TR}
+@BOP{-TR}
 
 executes test case files in random order.
 
 @item
-@option{--TS}
+@BOP{-TS}
 
-Normally, when the interpreter is run with the @option{-T} option,
+Normally, when the interpreter is run with the @BOP{T} option,
 then an existing summary.log file is overridden without notice.
 This option causes new test results to be appended to a possibly
 existing summary.log instead of overriding it.
 
 @item
-@option{-v}, @option{--version},
+@BOP{v}, @BOP{-version},
 
 show version information and exit.
 
 @item
-@option{-u UID}
+@BOP{u UID}
 
 run as user with UID 0. This option can only be used by the root user (who
 then wants to run as a different user).
 
 @item
-@option{-w milli}
+@BOP{w milli}
 
 wait milli milliseconds at start-up. Useful to give other programs that are
 started together with this interpreter time to initialize themselves.
 
+@item @b{@verb{|  +APPOPT|}}
+@item @b{@verb{| ++APPOPT ARG1|}}
+@item @b{@verb{|+++APPOPT ARG1 ARG2|}}
+@item ...
+
+   Those command line options above that start with - are understood by the
+   GNU APL binary and their arguments must follow the description given for
+   them. In addition the interpreter also accepts command line options that
+   start with +. However, these options are not checked by the interpreter
+   in any way, but are but merely copied to ⎕ARG (see below). In these options,
+   APPOPT, ARG1, ARG2, ... are arbitrary strings that should not contain any
+   whitespace characters. The purpose of these options is to control aspects
+   of the APL application from the command line.
+
 @item
-@option{--}
+@BOP{-}
 
 end of command line options for the interpreter. GNU APL provides the system
 variable ⎕ARG that returns all command line options with which the GNU APL
 interpreter was invoked (similar to variable argv in main(int argv,
-char * argv[]) in C/C++). Option ---- can be used to separate command line
+char * argv[]) in C/C++). Option @BOP{-} can be used to separate command line
 options for the APL interpreter from command line options understood by APL
 applications.
 
@@ -541,8 +562,8 @@ Thus,
 
 @code{(⎕ARG ⍳ ⊂'--') ↓ ⎕ARG} returns the options for the APL application.
 
-All command line options after @code{--} are ignored by the interpreter
-(except making them available in ⎕ARG).
+All command line options after @BOP{-} are ignored by the interpreter
+(except for including them in ⎕ARG).
 
 @end itemize
 
@@ -806,7 +827,7 @@ work, the first line of the script must have a special format
     #! /usr/local/bin/apl --script
 @end verbatim
 
-@option{--script} prevents: printing of a welcome banner, 
+@BOP{-script} prevents: printing of a welcome banner, 
 echoing of stdin to stdout, automatic loading of a )CONTINUE workspaces,
  and prevents starting of a thread for shared variable communication.
 
@@ -826,9 +847,9 @@ passed on to APL. We briefly discuss both cases:
 0. General Remark
 
 There is a convention in (not only) GNU APL, that the command line options (and
-possibly an optional option argument) that occur left of @b{@verb{|--|}} are options
+possibly an optional option argument) that occur left of @BOP{-} are options
 directed to (and understood by) the APL interpreter while the options right
-of @b{@verb{|--|}} are passed to the APL application (and their exact format is then
+of @BOP{-} are passed to the APL application (and their exact format is then
 defined by the APL application). All command line options that were used to
 start APL can later be retrieved with the system variable ⎕ARG in APL.
 
@@ -938,9 +959,9 @@ understood:
 
 The recommended form is: @verb{|/usr/local/bin/apl --script|}.
 
-Note that @b{@verb{|--|}} and any options that follow it on the shebang line
+Note that @BOP{-} and any options that follow it on the shebang line
 MAY OR MAY NOT be occur in ⎕ARG (this depends on the platform used). In
-contrast,  options that follow @b{@verb{|--|}} on the script command line
+contrast,  options that follow @BOP{-} on the script command line
 WILL BE shown since this is controlled by GNU APL and not by the platform.
 There is normally no point in passing any application options on the shebang
 line to APL because such parameters can more easily be provided directly
@@ -949,14 +970,14 @@ application options it may be convenient to make @b{@verb{|--|}} the last
 option of the shebang so that the user of the script need not specify it
 manually.
 
-Using @b{@verb{|--|}} on the shebang line of the script file usually prevents
+Using @BOP{-} on the shebang line of the script file usually prevents
 subsequent options on the shebang line from being interpreted as APL options
 (and, more importantly, from causing @b{unknown option} errors when GNU APL
 starts). At least under GNU/Linux with @b{bash} the subsequent options will
 be passed to the APL application via ⎕ARG.
 
 Depending on this exact behaviour cannot be recommended. A cleaner approach is
-to use options starting with - or @b{@verb{|--|}}  only for the interpreter
+to use options starting with - or @BOP{-} only for the interpreter
 options, and options starting with + for application options. This should
 work on all platforms because for strings, say, APLOPT, ARG1, ARG2, ...,
 which contain no whitespace:
@@ -1257,7 +1278,7 @@ If SCRIPT.apl is redirected to stdin of the APL interpreter:
 
 then the first line @option{#! /usr/local/bin/apl --script} of file SCRIPT.apl 
 is merely a comment (GNU APL accepts both the traditional APL character
-⍝ and the character # as start of a comment). The @option{--script} option
+⍝ and the character # as start of a comment). The @BOP{-script} option
 is therefore ignored and the following mix of input and output is
 shown on the screen. The input from the script is indented by the
 usual APL prompt of 6 blanks, while the output of the APL interpreter
@@ -1286,7 +1307,7 @@ Then we get:
 
 @end verbatim
 
-The @option{--script} implies @option{--noCIN} so that the
+The @BOP{-script} implies @BOP{-noCIN} so that the
 input lines for the interpreter are no longer echoed to the output.
 That is most likely what you want when writing a script.
 
@@ -1374,8 +1395,8 @@ Use this feature carefully!
 
 The APL interpreter gets its input from the standard input (stdin),
 which is normally connected to the user's keyboard,
-but can also be a file if APL scripting, the @option{-f} option,
- or the @option{-T} option is used.
+but can also be a file if APL scripting, the @BOP{f} option,
+ or the @BOP{T} option is used.
 
 The APL interpreter prints its results on either the standard output (stdout)
 for normal APL output, or to the error output (stderr) for additional

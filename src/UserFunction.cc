@@ -1052,7 +1052,7 @@ const bool bad_function = info || err_line != -1;
 
          if (err_line == 0)
            {
-             MORE_ERROR() << info << "in function header";
+             MORE_ERROR() << info << " in function header";
              Log(LOG_UserFunction__fix) CERR << "Bad header line" <<  endl;
            }
          else if (err_line > 0)

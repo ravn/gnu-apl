@@ -101,7 +101,7 @@ its name and optional command line parameters, for example:
 
    or:
 
-   $ apl —id 1001
+   $ apl -id 1001
 
    GNU APL is script-able; a text file whose first line looks like this
 (assuming the APL interpreter binary is called ’apl’ and is located in
@@ -132,7 +132,7 @@ U+2200 - U+23FF range).
 
 GNU APL understands the following command line options:
 
-   • ‘-C new_root’
+   • -C new_root
 
      perform chroot("new_root") followed by chdir("/").  This restricts
      the access of the the process running GNU APL to files in or below
@@ -172,30 +172,30 @@ GNU APL understands the following command line options:
         • Depending on your platform, the process using -C may need root
           privileges.
 
-   • ‘--cfg’
+   • --cfg
 
      show ./configure options that were used to configure GNU APL, and
      exit.
 
-   • ‘--[no]Color’
+   • --[no]Color
 
      start with ]COLOR ON [OFF].
 
-   • ‘-d’
+   • -d
 
      run the APL interpreter (or APL script) in the background (i.e.  as
      a daemon).  For this to work you need to provide some input to the
      background process, e.g.  via the -f option.
 
-   • ‘--emacs’
+   • --emacs
 
      run in (old) Emacs mode.
 
-   • ‘--emacs_arg arg’
+   • --emacs_arg arg
 
      run in (new) Emacs mode with argument arg.
 
-   • ‘--eval line’
+   • --eval line
 
      evaluate one APL line and exit.  This option can be given several
      times; in that case several lines are being executed before GNU apl
@@ -204,54 +204,54 @@ GNU APL understands the following command line options:
      sometimes quoting the argument of –eval may be needed and common
      wisdom has it to always quote the argument of –eval.
 
-   • ‘-f file’
+   • -f file
 
      read input from file rather than from the keyboard.  When the end
      of the file is reached, input is switched back to the keyboard.  If
      you want to terminate the APL interpreter after executing the file,
      then use )OFF as last line in the file.
 
-   • ‘--gpl’
+   • --gpl
 
      show GNU APL license (GPL) and exit.
 
-   • ‘-L wsname’
+   • -L wsname
 
      )LOAD wsname on start-up.
 
-   • ‘--LX expr’
+   • --LX expr
 
      execute expr first.  The workspaces behaves as if ⎕LX (latent
      expression) were set to expr in the workspace.  This can be used,
      for example, to start the same workspace with different start-up
      values.
 
-   • ‘-h’, ‘--help’
+   • -h, --help
 
      print all command line options with a brief hint what they do.
 
-   • ‘--id proc’
+   • --id proc
 
      use processor ID proc for this interpreter.  If no ID is provided,
      then the first unused ID > 1000 is taken by this interpreter and
      the ID becomes used as long as the interpreter runs.  Processor IDs
      are used by shared variables to identify share partners.
 
-   • ‘-l num’
+   • -l num
 
      turn logging facility num ON (provided that dynamic logging was
      ./configure’d).  The logging facility 37 (start-up messages) is of
      particular importance for troubleshooting and it works even if
      dynamic logging was not ./configure’d.
 
-   • ‘--mem [memory-limit]’
+   • --mem [memory-limit]
 
      tell the interpreter to not use more than memory-limit bytes of
      RAM. By using this option, the user is fully responsible for
      ensuring that the specified amount of memory will always be
      available.  The following rules should be observed.
 
-     The interpreter will exit at start-up if ‘--mem’ is used and:
+     The interpreter will exit at start-up if --mem is used and:
 
         • the platform on which the interpreter runs has no
           /proc/meminfo, or
@@ -273,9 +273,9 @@ GNU APL understands the following command line options:
 
      For example:
 
-        • ‘--mem’ (50% of MemFree: in /proc/meminfo are guaranteed)
-        • ‘--mem 80%’ (80% of MemFree: in /proc/meminfo are guaranteed)
-        • ‘--mem 5G’ (5 GB are guaranteed)
+        • --mem (50% of MemFree: in /proc/meminfo are guaranteed)
+        • --mem 80% (80% of MemFree: in /proc/meminfo are guaranteed)
+        • --mem 5G (5 GB are guaranteed)
 
      WARNING: The memory-limit is checked against parameter ’MemFree’ in
      /proc/meminfo when GNU APL starts, but this does not protect
@@ -288,15 +288,15 @@ GNU APL understands the following command line options:
      without any chance to )SAVE the workspace) when the available
      memory is exhausted.
 
-   • ‘--echoCIN’ copy the input line (after editing) to stdout.  For
+   • --echoCIN copy the input line (after editing) to stdout.  For
      creating session logs.
 
-   • ‘--noCIN’
+   • --noCIN
 
      do not echo stdin to stdout.  Almost a must for scripting (unless
      you troubleshoot a script).
 
-   • ‘--to_COUT’
+   • --to_COUT
 
      normally GNU APL writes its output to stderr (i.e.  file descriptor
      2) so that, when GNU APL is started in a script, the output of the
@@ -307,7 +307,7 @@ GNU APL understands the following command line options:
      same effect can be achieved with the option "OUTPUT-TO-COUT Yes" in
      a preferences file.
 
-   • ‘--tcp_port PORT’
+   • --tcp_port PORT
 
      this option starts GNU APL as server that listens on TCP port PORT.
      Every TCP connection accepted by the server forks a new GNU APL
@@ -317,79 +317,81 @@ GNU APL understands the following command line options:
      WARNING: This option is dangerous if PORT is directly exposed to
      the internet!
 
-   • ‘--noCONT’
+   • --noCONT
 
      do not load a SETUP or CONTINUE workspace on start-up.
 
-   • ‘--OFF’
+   • --OFF
 
      This option causes GNU APL to perform an automatic )OFF command
      after the last line of the last input file (as per -f option) was
      executed.
 
-   • ‘--PW COLS’
+   • --PW COLS
 
      set the initial value of ⎕PW to COLS (min.  30, max.  10000)
 
-   • ‘--[no]SV’
+   • --[no]SV
 
      do [not] start APserver (a shared variable server) on start-up.
      This disables communication with other workspaces or auxiliary
      processors through shared variables.
 
-   • ‘-p N’
+   • -p N
 
-     use profile number N in preferences files.
+     use profile number N in preferences files.  A preference file may
+     contain several sets of settings for different purposes; the
+     profile number selectes one of these sets.
 
-   • ‘--par pproc’
+   • --par pproc
 
      use processor parent ID pproc (default: no parent ID).
 
-   • ‘--rawCIN’
+   • --rawCIN
 
      do not emit ESC sequences.  Normally ESC sequences are emitted for
      colored output and during line editing.  In scripts, however, ESC
      sequences usually not wanted and can be turned off with this
      option.
 
-   • ‘-s’, ‘--script’
+   • -s, --script
 
-     this option is an abbreviation for: ‘--silent’ ‘--noCIN’ ‘--noCONT’
-     ‘-f -’ which is a typical combination of options for APL scripts.
+     this option is an abbreviation for: --silent --noCIN --noCONT -f -
+     which is a typical combination of options for APL scripts.
 
-   • ‘-q’, ‘--silent’
+   • -q, --silent
 
      suppress printing of the GNU APL welcome message.  Useful for
      scripts.
 
-   • ‘--safe’
+   • --safe
 
      disable shared variables and native functions
 
-   • ‘--show_bin_dir’
+   • --show_bin_dir
 
      display the binary directory (where, according to ./configure, the
      programs apl, APserver, AP100, and AP210 are supposed to be
      installed.  Then exit.
 
-   • ‘--show_doc_dir’
+   • --show_doc_dir
 
      display the directory where, according to ./configure,
      documentation files for GNU APL are installed.  Then exit.
 
-   • ‘--show_etc_dir’
+   • --show_etc_dir
 
      display the system configuration directory where, according to
      ./configure, the preferences file for GNU APL is installed.  Then
      exit.
 
-   • ‘--show_lib_dir’
+   • --show_lib_dir
 
      display the library directory where, according to ./configure,
      shared library files and the workspaces shipped with GNU APL are
      installed.  Then exit.
 
-   • ‘--show_src_dir’
+   • --show_src_dir
 
      display the source directory where, according to ./configure, GNU
      APL was compiled.  Then exit.  This can be used, for example, by
@@ -397,11 +399,11 @@ GNU APL understands the following command line options:
      find GNU APL header files that are needed to compile the native
      function.
 
-   • ‘--show_all_dirs’
+   • --show_all_dirs
 
      display all the directories above.  Then exit.
 
-   • ‘-T testcases ...’ run testcases.  Testcases are text files that
+   • -T testcases ... run testcases.  Testcases are text files that
      contain both input to the APL interpreter and the expected response
      from the interpreter.  The output from the interpreter is compared
      with the expected output in the testcase file(s) and differences
@@ -409,63 +411,78 @@ GNU APL understands the following command line options:
      whether or not each of the testcases was successful.
 
    • 
-     ‘--TM mode’
+     --TM mode
 
      test mode.  This option how the interpreter shall behave when
-     running a number of testcases (as specified with the ‘-T’ option)
+     running a number of testcases (as specified with the -T option)
 
-     ‘--TM 0’ (default) run all testcases and exit after the last
+     --TM 0 (default) run all testcases and exit after the last
      testcase.
 
-     ‘--TM 1’ like ‘--TM 0’ if no error was detected.  However, if one
-     of the testcases has failed, then the interpreter does not exit so
+     --TM 1 like --TM 0 if no error was detected.  However, if one of
+     the testcases has failed, then the interpreter does not exit so
      that the user can investigate the state of APL (SI, variable
      values, etc.).
 
-     ‘--TM 2’ like ‘--TM 1’, but stay in the interpreter even if all
+     --TM 2 like --TM 1, but stay in the interpreter even if all
      testcases have passed.  This can be useful in order to quickly
      bring the interpreter into a specific state and continue manual
      troubleshooting from that state.
 
-     ‘--TM 3’ like ‘--TM 1’, but stop testcase execution after the first
+     --TM 3 like --TM 1, but stop testcase execution after the first
      failed testcase (i.e.  do not exit).
 
-     ‘--TM 4’ like ‘--TM 3’, but exit after the first failed testcase.
-     The is useful for automatic regression tests, where no errors are
+     --TM 4 like --TM 3, but exit after the first failed testcase.  The
+     is useful for automatic regression tests, where no errors are
      expected.
 
-   • ‘--TR’
+   • --TR
 
      executes test case files in random order.
 
-   • ‘--TS’
+   • --TS
 
-     Normally, when the interpreter is run with the ‘-T’ option, then an
+     Normally, when the interpreter is run with the -T option, then an
      existing summary.log file is overridden without notice.  This
      option causes new test results to be appended to a possibly
      existing summary.log instead of overriding it.
 
-   • ‘-v’, ‘--version’,
+   • -v, --version,
 
      show version information and exit.
 
-   • ‘-u UID’
+   • -u UID
 
      run as user with UID 0.  This option can only be used by the root
      user (who then wants to run as a different user).
 
-   • ‘-w milli’
+   • -w milli
 
      wait milli milliseconds at start-up.  Useful to give other programs
      that are started together with this interpreter time to initialize
      themselves.
 
-   • ‘--’
+   •   +APPOPT
+   •  ++APPOPT ARG1
+   • +++APPOPT ARG1 ARG2
+   • ...
+
+     Those command line options above that start with - are understood
+     by the GNU APL binary and their arguments must follow the
+     description given for them.  In addition the interpreter also
+     accepts command line options that start with +.  However, these
+     options are not checked by the interpreter in any way, but are but
+     merely copied to ⎕ARG (see below).  In these options, APPOPT, ARG1,
+     ARG2, ...  are arbitrary strings that should not contain any
+     whitespace characters.  The purpose of these options is to control
+     aspects of the APL application from the command line.
+
+   • --
 
      end of command line options for the interpreter.  GNU APL provides
      the system variable ⎕ARG that returns all command line options with
      which the GNU APL interpreter was invoked (similar to variable argv
-     in main(int argv, char * argv[]) in C/C++).  Option —- can be used
+     in main(int argv, char * argv[]) in C/C++).  Option -- can be used
      to separate command line options for the APL interpreter from
      command line options understood by APL applications.
 
@@ -477,8 +494,8 @@ GNU APL understands the following command line options:
      ‘(⎕ARG ⍳ ⊂'--') ↓ ⎕ARG’ returns the options for the APL
      application.
 
-     All command line options after ‘--’ are ignored by the interpreter
-     (except making them available in ⎕ARG).
+     All command line options after -- are ignored by the interpreter
+     (except for including them in ⎕ARG).
 
 1.4 Configuration File for GNU APL
 ==================================
@@ -741,8 +758,8 @@ work, the first line of the script must have a special format
 
     #! /usr/local/bin/apl --script
 
-   ‘--script’ prevents: printing of a welcome banner, echoing of stdin
-to stdout, automatic loading of a )CONTINUE workspaces, and prevents
+   --script prevents: printing of a welcome banner, echoing of stdin to
+stdout, automatic loading of a )CONTINUE workspaces, and prevents
 starting of a thread for shared variable communication.
 
    If the path to the interpreter is relative (which might be useful if
@@ -1171,7 +1188,7 @@ workspaces:
 
    then the first line ‘#! /usr/local/bin/apl --script’ of file
 SCRIPT.apl is merely a comment (GNU APL accepts both the traditional APL
-character ⍝ and the character # as start of a comment).  The ‘--script’
+character ⍝ and the character # as start of a comment).  The --script
 option is therefore ignored and the following mix of input and output is
 shown on the screen.  The input from the script is indented by the usual
 APL prompt of 6 blanks, while the output of the APL interpreter is not
@@ -1194,7 +1211,7 @@ indented.
  /usr/local/bin/apl --script ../workspaces/SCRIPT.apl 
 
 
-   The ‘--script’ implies ‘--noCIN’ so that the input lines for the
+   The --script implies --noCIN so that the input lines for the
 interpreter are no longer echoed to the output.  That is most likely
 what you want when writing a script.
 
@@ -1280,7 +1297,7 @@ File: apl.info,  Node: Section 2.3,  Next: Section 2.4,  Prev: Section 2.2,  Up:
 
 The APL interpreter gets its input from the standard input (stdin),
 which is normally connected to the user’s keyboard, but can also be a
-file if APL scripting, the ‘-f’ option, or the ‘-T’ option is used.
+file if APL scripting, the -f option, or the -T option is used.
 
    The APL interpreter prints its results on either the standard output
 (stdout) for normal APL output, or to the error output (stderr) for
@@ -6550,63 +6567,63 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 Tag Table:
 Node: Top383
 Node: Chapter 11573
-Node: Chapter 222861
-Node: Section 2.124756
-Node: Section 2.245345
-Node: Section 2.346104
-Node: Section 2.447391
-Node: Section 2.551836
-Node: Section 2.652009
-Node: Section 2.752639
-Node: Section 2.856592
-Node: Section 2.958127
-Node: Section 2.1060219
-Node: Section 2.1161773
-Node: Section 2.1263558
-Node: Section 2.1365498
-Node: Section 2.1466439
-Node: Section 2.1566691
-Node: Section 2.1668087
-Node: Section 2.1778200
-Node: Section 2.1880722
-Node: Section 2.1987429
-Node: Section 2.2088874
-Node: Section 2.2194535
-Node: Section 2.2299569
-Node: Section 2.23102850
-Node: Section 2.24103141
-Node: Section 2.25113966
-Node: Section 2.26114238
-Node: Section 2.27120816
-Node: Section 2.28123276
-Node: Section 2.29123945
-Node: Section 2.30125596
-Node: Section 2.31129385
-Node: Output File Format141385
-Node: Section 2.32142560
-Node: Section 2.33143510
-Node: Section 2.34158226
-Node: Section 2.35168293
-Node: Section 2.36172412
-Node: Section 2.37174507
-Node: Section 2.38178932
-Node: Chapter 3200282
-Node: Chapter 4202783
-Node: Chapter 5203909
-Node: Section 5.1205446
-Node: Section 5.2206726
-Node: Section 5.3207086
-Node: Section 5.4207328
-Node: Section 5.5207990
-Node: Section 5.6208468
-Node: Section 5.7209240
-Node: Section 5.8209697
-Node: Chapter 6210099
-Node: Section 6.1210518
-Node: Section 6.2211205
-Node: Chapter 7212036
-Node: Section 7.1212539
-Node: Section 7.2237853
+Node: Chapter 223283
+Node: Section 2.125178
+Node: Section 2.245743
+Node: Section 2.346502
+Node: Section 2.447777
+Node: Section 2.552222
+Node: Section 2.652395
+Node: Section 2.753025
+Node: Section 2.856978
+Node: Section 2.958513
+Node: Section 2.1060605
+Node: Section 2.1162159
+Node: Section 2.1263944
+Node: Section 2.1365884
+Node: Section 2.1466825
+Node: Section 2.1567077
+Node: Section 2.1668473
+Node: Section 2.1778586
+Node: Section 2.1881108
+Node: Section 2.1987815
+Node: Section 2.2089260
+Node: Section 2.2194921
+Node: Section 2.2299955
+Node: Section 2.23103236
+Node: Section 2.24103527
+Node: Section 2.25114352
+Node: Section 2.26114624
+Node: Section 2.27121202
+Node: Section 2.28123662
+Node: Section 2.29124331
+Node: Section 2.30125982
+Node: Section 2.31129771
+Node: Output File Format141771
+Node: Section 2.32142946
+Node: Section 2.33143896
+Node: Section 2.34158612
+Node: Section 2.35168679
+Node: Section 2.36172798
+Node: Section 2.37174893
+Node: Section 2.38179318
+Node: Chapter 3200668
+Node: Chapter 4203169
+Node: Chapter 5204295
+Node: Section 5.1205832
+Node: Section 5.2207112
+Node: Section 5.3207472
+Node: Section 5.4207714
+Node: Section 5.5208376
+Node: Section 5.6208854
+Node: Section 5.7209626
+Node: Section 5.8210083
+Node: Chapter 6210485
+Node: Section 6.1210904
+Node: Section 6.2211591
+Node: Chapter 7212422
+Node: Section 7.1212925
+Node: Section 7.2238239
 
 End Tag Table
 

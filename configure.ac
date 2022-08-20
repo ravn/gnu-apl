@@ -458,6 +458,7 @@ AC_CONFIG_FILES([Makefile
                  debian/Makefile
                  debian/source/Makefile
                  doc/Makefile
+                 doc/DALY/Makefile
                  erlang/Makefile
                  erlang/apl.erl
                  gnu-apl.d/Makefile
@@ -489,9 +490,11 @@ AC_CONFIG_FILES([Makefile
                  websock/server/Makefile
                  workspaces/Makefile
                  wslib3/Makefile
+                 wslib3/DALY/Makefile
                  wslib4/Makefile
                  wslib5/Makefile
                  wslib5/APLComponentFiles/Makefile
+                 wslib5/DALY/Makefile
                  wslib5/iso-apl-cf/Makefile
                 ])
 

@@ -363,7 +363,7 @@ const StateIndicator * si = Workspace::SI_top();
   Command::process_line(line_ucs);
    if (si == Workspace::SI_top())   return LAE_NO_ERROR;
 
-   si = Workspace::SI_top_error();
+   si = Workspace::SI_top_error(false);
    if (si == 0)   return LAE_UNKNOWN_ERROR;
    return LIBAPL_error(StateIndicator::get_error(si).get_error_code());
 } 
@@ -379,7 +379,7 @@ const StateIndicator * si = Workspace::SI_top();
   Command::process_line(line);
    if (si == Workspace::SI_top())   return LAE_NO_ERROR;
 
-   si = Workspace::SI_top_error();
+   si = Workspace::SI_top_error(false);
    if (si == 0)   return LAE_UNKNOWN_ERROR;
    return LIBAPL_error(StateIndicator::get_error(si).get_error_code());
 }
@@ -856,6 +856,11 @@ eval__L_oper_R_X_B(APL_function fL, APL_function fun, APL_function fR,
          Token result = Workspace::SI_top()->run();
          return result.extract_and_keep(LOC);
        } catch (...)   { return 0; }
+}
+//----------------------------------------------------------------------------
+void disable_safe_mode()
+{
+   uprefs.safe_mode = false;
 }
 //----------------------------------------------------------------------------
 

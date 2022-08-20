@@ -79,8 +79,7 @@ size_t rest_2 = 0;
     is detected.
 */
 void
-Tokenizer::do_tokenize(const UCS_string & input,
-                       Token_string & tos,
+Tokenizer::do_tokenize(const UCS_string & input, Token_string & tos,
                        size_t & rest_2) const
 {
    Log(LOG_tokenize)
@@ -156,25 +155,25 @@ Unicode_source src(input);
                         tos.push_back(Token(TOK_Quad_QUOTE,
                                          &Workspace::get_v_Quad_QUOTE()));
                       }
-                   else if (uni == UNI_ALPHA)
+                   else if (uni == UNI_ALPHA)   // ⍺
                       {
                         ++src;
                         tos.push_back(Token(TOK_ALPHA,
                                          &Workspace::get_v_ALPHA()));
                       }
-                   else if (uni == UNI_ALPHA_UNDERBAR)
+                   else if (uni == UNI_ALPHA_UNDERBAR)   // ⍶
                       {
                         ++src;
                         tos.push_back(Token(TOK_ALPHA_U,
                                             &Workspace::get_v_ALPHA_U()));
                       }
-                   else if (uni == UNI_CHI)
+                   else if (uni == UNI_CHI)   // χ
                       {
                         ++src;
                         tos.push_back(Token(TOK_CHI,
                                             &Workspace::get_v_CHI()));
                       }
-                   else if (uni == UNI_LAMBDA)
+                   else if (uni == UNI_LAMBDA)   // λ
                       {
                         // this could be λ like in λ← ...
                         // or λ1 or λ2 or ... as in ... ⍺ λ1 ⍵
@@ -190,19 +189,19 @@ Unicode_source src(input);
                                            &Workspace::get_v_LAMBDA()));
                            }
                       }
-                   else if (uni == UNI_OMEGA)
+                   else if (uni == UNI_OMEGA)   // ⍵
                       {
                         ++src;
                         tos.push_back(Token(TOK_OMEGA,
                                             &Workspace::get_v_OMEGA()));
                       }
-                   else if (uni == UNI_OMEGA_UNDERBAR)
+                   else if (uni == UNI_OMEGA_UNDERBAR)   // ⍹
                       {
                         ++src;
                         tos.push_back(Token(TOK_OMEGA_U,
                                             &Workspace::get_v_OMEGA_U()));
                       }
-                   else
+                   else   // A-Z, a-z
                       {
                         tokenize_symbol(src, tos);
                       }
@@ -620,7 +619,7 @@ Tokenizer::tokenize_number(Unicode_source & src, Token_string & tos,
 
 APL_Float   real_flt = 0.0;   // always valid
 APL_Integer real_int = 0;     // valid if need_float is false
-bool        real_need_float = false;
+bool real_need_float = false;
 const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
    if (!real_need_float)   real_flt = real_int;
    if (!real_valid)

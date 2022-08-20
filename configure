@@ -20003,7 +20003,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_python" >&5
 $as_echo "$user_wants_python" >&6; }
 
-ac_config_files="$ac_config_files Makefile build/Makefile debian/Makefile debian/source/Makefile doc/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences HOWTOs/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/Gtk/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Bill_Daly_Ubuntu/Makefile support-files/Dirk/Makefile support-files/Dyalog-Keyboard/Makefile support-files/Juergen-Mint-19/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile tools/Makefile websock/Makefile websock/client/Makefile websock/server/Makefile workspaces/Makefile wslib3/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/iso-apl-cf/Makefile"
+ac_config_files="$ac_config_files Makefile build/Makefile debian/Makefile debian/source/Makefile doc/Makefile doc/DALY/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences HOWTOs/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/Gtk/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Bill_Daly_Ubuntu/Makefile support-files/Dirk/Makefile support-files/Dyalog-Keyboard/Makefile support-files/Juergen-Mint-19/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile tools/Makefile websock/Makefile websock/client/Makefile websock/server/Makefile workspaces/Makefile wslib3/Makefile wslib3/DALY/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/DALY/Makefile wslib5/iso-apl-cf/Makefile"
 
 
 # AM_CXXFLAGS: do/dont -Werror ?
@@ -21514,6 +21514,7 @@ do
     "debian/Makefile") CONFIG_FILES="$CONFIG_FILES debian/Makefile" ;;
     "debian/source/Makefile") CONFIG_FILES="$CONFIG_FILES debian/source/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
+    "doc/DALY/Makefile") CONFIG_FILES="$CONFIG_FILES doc/DALY/Makefile" ;;
     "erlang/Makefile") CONFIG_FILES="$CONFIG_FILES erlang/Makefile" ;;
     "erlang/apl.erl") CONFIG_FILES="$CONFIG_FILES erlang/apl.erl" ;;
     "gnu-apl.d/Makefile") CONFIG_FILES="$CONFIG_FILES gnu-apl.d/Makefile" ;;
@@ -21545,9 +21546,11 @@ do
     "websock/server/Makefile") CONFIG_FILES="$CONFIG_FILES websock/server/Makefile" ;;
     "workspaces/Makefile") CONFIG_FILES="$CONFIG_FILES workspaces/Makefile" ;;
     "wslib3/Makefile") CONFIG_FILES="$CONFIG_FILES wslib3/Makefile" ;;
+    "wslib3/DALY/Makefile") CONFIG_FILES="$CONFIG_FILES wslib3/DALY/Makefile" ;;
     "wslib4/Makefile") CONFIG_FILES="$CONFIG_FILES wslib4/Makefile" ;;
     "wslib5/Makefile") CONFIG_FILES="$CONFIG_FILES wslib5/Makefile" ;;
     "wslib5/APLComponentFiles/Makefile") CONFIG_FILES="$CONFIG_FILES wslib5/APLComponentFiles/Makefile" ;;
+    "wslib5/DALY/Makefile") CONFIG_FILES="$CONFIG_FILES wslib5/DALY/Makefile" ;;
     "wslib5/iso-apl-cf/Makefile") CONFIG_FILES="$CONFIG_FILES wslib5/iso-apl-cf/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

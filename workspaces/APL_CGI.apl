@@ -265,27 +265,33 @@ The emails that we like the most are those that include a small example of
 list at 
 <?apl HTML∆x2y xMAIL_APL_ARCHIVE HTML∆A "<B>", xMAIL_APL_ARCHIVE,"</B>" ?>
 or subscribe to it at 
-<?apl HTML∆x2y xMAIL_APL_SUBSCRIBE HTML∆A "<B>", xMAIL_APL_SUBSCRIBE,"</B>" ?>
+<?apl HTML∆x2y xMAIL_APL_SUBSCRIBE HTML∆A "<B>", xMAIL_APL_SUBSCRIBE,"</B>" ?>.
 </DIV>
 <DIV class="c5">
 <?apl HTML∆H2[''] 'Documentation' ?>
-We have an <?apl HTML∆x2y 'apl.html' HTML∆A "<B>info manual</B>" ?> for GNU APL.
-
-We are also looking for <B>free</B> documentation on APL in general
-(volunteers welcome) that can be published here. A "Quick start" document
-for APL is planned but the work has not started yet.
+GNU APL comes with two documents:
+<?apl HTML∆x2y 'apl-intro.html' HTML∆A "<B>A Quick Tour of GNU APL</B>"?>,
+which was primarily written for newcomers to APL in general or to GNU APL in
+particular. It contains a brief introduction by examples into the APL
+language, followed by s short description of almost all GNU APL features.
 <BR><BR>
-The C++ source files for GNU APL are Doxygen documented. You can generate
-this documentation by running <B>make DOXY</B> in the top level directory
-of the GNU APL package.
+And, for those already familiar with APL, there is a slightly more detailed
+<?apl HTML∆x2y 'apl.html' HTML∆A "<B>info manual</B>" ?> for GNU APL whose
+focus on more the non-standard GNU APL features rather than on the APL
+language itself.
+<BR><BR>
+Finally, all C++ source code files for GNU APL are Doxygen documented.
+You can generate this documentation by running <B>make DOXY</B> in the
+top level directory of the GNU APL package.
 </DIV>
 <DIV class="c6">
 <?apl HTML∆H2[''] 'GNU APL Community' ?>
-There is a growing group of people that are using GNU APL and that have made
-their own developments related to APL available to the public.
+There is a growing group of people that are using GNU APL and that would like
+to share their APL code with other APL programmers.
 We have created a
 <?apl  'Community.html' HTML∆A '<b>GNU APL Community Web page</b>' ?>
-that collects <B>links</B> to those developments to avoid that they get lost.
+that aims at collectinf and preserving <B>links</B> this code to avoid that
+it get lost.
 <BR><BR>
 In addition, we maintain a 
 <?apl  'Bits_and_Pieces/' HTML∆A '<b>Bits-and-Pieces</b>' ?> directory
