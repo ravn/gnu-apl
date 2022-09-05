@@ -9,10 +9,10 @@
 #
 # In both cases the file name must be 'preferences'.
 #
-# The system configuration directory is usually /etc or /etc/local
+# The system configuration directory is usually /etc or /usr/local/etc
 # It can be overridden by  ./configure --sysconfdir=something-else
 #
-# If both files are present then (1) is read before (2) so that for
+# If both files are present then (1) is read before (2) so that in case of
 # contradicting settings in both files (2) prevails.
 #
 # Many settings can also be changed by command line options; the command line
@@ -23,7 +23,7 @@
 # uncomment them.
 #
 # The meaning of most settings should be obvious; if not, then please refer to
-# the more detailed desctption in the file README-9-Post-Installation, located
+# the more detailed description in the file README-9-Post-Installation, located
 # in the top-level directory of the GNU APL package.
 
 ###############################################################################

@@ -200,16 +200,16 @@ then
 else
     # user wants ⎕GTK)
     AC_MSG_RESULT([yes])
-    AC_MSG_CHECKING([if pkg-config is executable])
-    if test -x /usr/bin/pkg-config
+
+    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
+    if test x$PKG_CONFIG != xno
     then
-        AC_MSG_RESULT([yes])
         AC_MSG_CHECKING([if package gtk+-3.0 is installed])
-        if pkg-config --exists gtk+-3.0
+        if $PKG_CONFIG --exists gtk+-3.0
         then
             AC_MSG_RESULT([yes])
-            GTK_CFLAGS=`pkg-config --cflags gtk+-3.0`
-            GTK_LDFLAGS=`pkg-config --libs gtk+-3.0`
+            GTK_CFLAGS=`$PKG_CONFIG --cflags gtk+-3.0`
+            GTK_LDFLAGS=`$PKG_CONFIG --libs gtk+-3.0`
             HAVE_gtk3=yes
         else
             AC_MSG_RESULT([no])
@@ -378,11 +378,6 @@ fi
 AM_CONDITIONAL(WANT_CTRLD_DEL, test "x$user_wants_ctrld_del" = xyes)
 AC_MSG_RESULT([$user_wants_ctrld_del])
 
- # check if the user wants to build the python extension gnu_apl.so
- #
- AC_MSG_CHECKING([if we want to build libpython_apl.so])
-
-
 # check if the user compiles for ANDROID
 #
 AC_MSG_CHECKING([if we are compiling for Android])
@@ -444,10 +439,11 @@ AC_ARG_WITH( [python],
 
 if test "$user_wants_python" = yes ; then
    AC_DEFINE([WANT_PYTHON], [1], [Define if building lib_gnu_apl.so])
-   if test -x /usr/bin/pkg-config ; then        # we have pkg-config 
-        if pkg-config --exists python ; then    # and pkg-config knows python
-            PYTHON_CFLAGS=$( pkg-config --cflags python3 )
-        fi
+    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
+    if test x$PKG_CONFIG != xno ; then        # we have pkg-config
+       if $PKG_CONFIG --exists python ; then  # and pkg-config knows python
+            PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
+       fi
    fi
 fi
 AM_CONDITIONAL(WANT_PYTHON, test "x$user_wants_python" = xyes)

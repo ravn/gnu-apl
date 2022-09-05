@@ -338,6 +338,7 @@ PCRE_CFLAGS = @PCRE_CFLAGS@
 PCRE_LIBS = @PCRE_LIBS@
 PERFORMANCE_COUNTERS_WANTED = @PERFORMANCE_COUNTERS_WANTED@
 PG_CONFIG = @PG_CONFIG@
+PKG_CONFIG = @PKG_CONFIG@
 POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
@@ -953,7 +954,7 @@ uninstall-man: uninstall-man1
 .PRECIOUS: Makefile
 
 
-# info_TEXINFOS = fails for more than one .texi file. We therefore install
+# info_TEXINFOS = fails for more than one .info file. We therefore install
 # libapl.info explicitly
 #
 install-info-am:
