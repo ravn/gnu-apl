@@ -3,31 +3,15 @@
 # this script writes a build tag into file buildtag.hh
 # it is being source'd by ./configure
 #
+# Instead of using svn revision number, use datestamp + git commit hash.
 
-if [ -z `which svnversion` ]
-then
-   echo "*** svnversion not installed: keeping old buildtag"
-   return 0
-fi
-
-SVNINFO=$(svnversion)
-if [ "$SVNINFO" = "Unversioned directory" ]
-then
-   echo "*** current directory is not an SVN checkout: keeping old buildtag"
-   return 0
-fi
-
-if [ -z $(which svn) ]
-then
-   echo "*** subversion not installed: keeping old buildtag"
-   return 0
-fi
 
 PACKAGE_NAME=$1
 PACKAGE_VERSION=$2
 
-ARCHIVE_SVNINFO=`svn info "$apl_top"/src/Archive.cc | grep "Last Changed Rev" \
-                                                    | awk -F : '{print $2;}'`
+#ARCHIVE_SVNINFO=`svn info "$apl_top"/src/Archive.cc | grep "Last Changed Rev" \
+#                                                    | awk -F : '{print $2;}'`
+ARCHIVE_SVNINFO=`date +%F-%H%M`-`git rev-parse --short HEAD`
 
 CONFIGURE_OPTS="unknown ./configure options (no config.status file)"
 if [ -x ./config.status ]
