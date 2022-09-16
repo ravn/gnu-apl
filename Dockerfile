@@ -1,4 +1,8 @@
-FROM dqneo/ubuntu-build-essential as configured
+FROM ubuntu:latest as ubuntu-build-essential
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends apt-utils build-essential sudo git psmisc
+
+FROM ubuntu-build-essential as configured
 COPY . .
 RUN ./configure
 
